@@ -1,0 +1,38 @@
+{
+  "name": "react-query-builder",
+  "version": "0.0.0",
+  "main": "modules",
+  "scripts": {
+    "build-global": "rm -rf build/global && NODE_ENV=production webpack modules/index.js build/global/ReactQueryBuilder.js && NODE_ENV=production COMPRESS=1 webpack modules/index.js build/global/ReactQueryBuilder.min.js && echo \"gzipped, the global build is `gzip -c build/global/ReactQueryBuilder.min.js | wc -c` bytes\"",
+    "build-npm": "rm -rf build/npm && babel -d build/npm/lib ./modules && cp README.md build/npm && find -X build/npm/lib -type d -name __tests__ | xargs rm -rf && node -p 'p=require(\"./package\");p.main=\"lib\";p.scripts=p.devDependencies=undefined;JSON.stringify(p,null,2)' > build/npm/package.json",
+    "build-examples": "cd examples && webpack --config webpack.config.production.js",
+    "examples": "cd examples && webpack-dev-server --config webpack.config.js -d --hot --inline --display-error-details --colors --history-api-fallback --no-info --port 3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fubhy/react-query-builder.git"
+  },
+  "author": "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fubhy/react-query-builder/issues"
+  },
+  "homepage": "https://github.com/fubhy/react-query-builder",
+  "dependencies": {
+    "flux": "^2.0.1",
+    "lodash": "^3.5.0"
+  },
+  "peerDependencies": {
+    "react": "0.13.x",
+    "immutable": "^3.6.4"
+  },
+  "devDependencies": {
+    "babel": "^4.7.16",
+    "babel-core": "^4.6.6",
+    "babel-loader": "^4.0.0",
+    "react-hot-loader": "^1.1.4",
+    "rf-changelog": "^0.4.0",
+    "webpack": "^1.5.3",
+    "webpack-dev-server": "1.7.0"
+  }
+}
