@@ -30,11 +30,7 @@ var Text = (function (_React$Component) {
     },
     render: {
       value: function render() {
-        return React.createElement(
-          "div",
-          { className: "widget--TEXT" },
-          React.createElement("input", { type: "textfield", ref: "text", value: this.props.value, onChange: this.handleChange.bind(this) })
-        );
+        return React.createElement("input", { type: "textfield", ref: "text", value: this.props.value, onChange: this.handleChange.bind(this) });
       }
     }
   });

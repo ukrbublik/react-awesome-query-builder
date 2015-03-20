@@ -14,10 +14,6 @@ var GroupConstants = _interopRequire(require("../constants/Group"));
 
 var RuleConstants = _interopRequire(require("../constants/Rule"));
 
-var FilterConstants = _interopRequire(require("../constants/Filter"));
-
-var OperatorConstants = _interopRequire(require("../constants/Operator"));
-
 var assign = _interopRequire(require("react/lib/Object.assign"));
 
 var uuid = function uuid() {
@@ -126,10 +122,7 @@ var removeItem = function removeItem(path) {
  * @param {string} field
  */
 var setField = function setField(path, field) {
-  rules = rules.setIn(expandTreePath(path, "properties", "field"), field);
-  rules = rules.setIn(expandTreePath(path, "properties", "operator"), undefined);
-  rules = rules.setIn(expandTreePath(path, "properties", "options"), new Immutable.Map());
-  rules = rules.setIn(expandTreePath(path, "properties", "value"), new Immutable.List());
+  rules = rules.deleteIn(expandTreePath(path, "properties", "operator")).setIn(expandTreePath(path, "properties", "field"), field).setIn(expandTreePath(path, "properties", "options"), new Immutable.Map()).setIn(expandTreePath(path, "properties", "value"), new Immutable.List());
 };
 
 /**
@@ -137,9 +130,7 @@ var setField = function setField(path, field) {
  * @param {string} operator
  */
 var setOperator = function setOperator(path, operator) {
-  rules = rules.setIn(expandTreePath(path, "properties", "operator"), operator);
-  rules = rules.setIn(expandTreePath(path, "properties", "options"), new Immutable.Map());
-  rules = rules.setIn(expandTreePath(path, "properties", "value"), new Immutable.List());
+  rules = rules.setIn(expandTreePath(path, "properties", "operator"), operator).setIn(expandTreePath(path, "properties", "options"), new Immutable.Map()).setIn(expandTreePath(path, "properties", "value"), new Immutable.List());
 };
 
 /**
@@ -227,12 +218,12 @@ Dispatcher.register(function (action) {
       TreeStore.emit("change");
       break;
 
-    case FilterConstants.SET_DELTA_VALUE:
+    case RuleConstants.SET_DELTA_VALUE:
       setFilterDeltaValue(action.path, action.delta, action.value);
       TreeStore.emit("change");
       break;
 
-    case OperatorConstants.SET_OPTION:
+    case RuleConstants.SET_OPTION:
       setOperatorOption(action.path, action.name, action.value);
       TreeStore.emit("change");
       break;

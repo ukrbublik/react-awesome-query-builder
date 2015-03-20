@@ -15,8 +15,9 @@ module.exports = {
   /**
    * @param {Immutable.List} path
    * @param {object} properties
+   * @param {object} config
    */
-  addGroup: function addGroup(path, properties) {
+  addGroup: function addGroup(path, properties, config) {
     Dispatcher.dispatch({
       actionType: GroupConstants.ADD_GROUP,
       path: path,

@@ -8,13 +8,17 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== "fun
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React = _interopRequire(require("react"));
 
 var Immutable = _interopRequire(require("immutable"));
 
 var RuleActions = _interopRequire(require("../actions/Rule"));
 
-var Filter = _interopRequire(require("./Filter"));
+var Values = _interopRequire(require("./Values"));
+
+var Options = _interopRequire(require("./Options"));
 
 var assign = _interopRequire(require("react/lib/Object.assign"));
 
@@ -53,29 +57,94 @@ var Rule = (function (_React$Component) {
     },
     render: {
       value: function render() {
-        var config = this.props.config;
-        var field = this.props.field && config.fields[this.props.field] || config.fields[Object.keys(config.fields)[0]];
-        var widget = config.widgets[field.widget];
-        var operator = config.operators[this.props.operator || field.operators[0]];
-        var operators = filter(config.operators, function (value, key) {
-          return field.operators.indexOf(key) >= 0;
-        });
+        var body = [];
 
-        var fieldOptions = map(this.props.config.fields, function (item, index) {
-          return React.createElement(
-            "option",
-            { key: index, value: index },
-            item.label
-          );
-        });
+        var fields = this.props.config.fields;
+        var field = this.props.field && fields[this.props.field] || undefined;
 
-        var operatorOptions = map(operators, function (item, index) {
-          return React.createElement(
-            "option",
-            { key: index, value: index },
-            item.label
-          );
-        });
+        var operators = {};
+        for (var id in this.props.config.operators) {
+          if (this.props.config.operators.hasOwnProperty(id)) {
+            if (field && field.operators.indexOf(id) !== -1) {
+              operators[id] = this.props.config.operators[id];
+            }
+          }
+        }
+
+        var operator = field && this.props.operator && operators[this.props.operator] || undefined;
+
+        if (Object.keys(fields).length) {
+          var options = map(fields, function (item, index) {
+            return React.createElement(
+              "option",
+              { key: index, value: index },
+              item.label
+            );
+          });
+
+          if (typeof field === "undefined") {
+            options.unshift(React.createElement("option", { key: ":empty:", value: ":empty:" }));
+          }
+
+          body.push(React.createElement(
+            "div",
+            { key: "field", className: "rule--field" },
+            React.createElement(
+              "label",
+              null,
+              "Field"
+            ),
+            React.createElement(
+              "select",
+              { ref: "field", value: this.props.field || ":empty:", onChange: this.handleFieldSelect.bind(this) },
+              options
+            )
+          ));
+        }
+
+        if (Object.keys(operators).length) {
+          var options = map(operators, function (item, index) {
+            return React.createElement(
+              "option",
+              { key: index, value: index },
+              item.label
+            );
+          });
+
+          if (typeof operator === "undefined") {
+            options.unshift(React.createElement("option", { key: ":empty:", value: ":empty:" }));
+          }
+
+          body.push(React.createElement(
+            "div",
+            { key: "operator", className: "rule--operator" },
+            React.createElement(
+              "label",
+              null,
+              "Operator"
+            ),
+            React.createElement(
+              "select",
+              { ref: "operator", value: this.props.operator || ":empty:", onChange: this.handleOperatorSelect.bind(this) },
+              options
+            )
+          ));
+        }
+
+        if (field && operator) {
+          var widget = typeof field.widget === "string" ? this.props.config.widgets[field.widget] : field.widget;
+          var cardinality = operator.cardinality || 1;
+
+          var props = {
+            config: this.props.config,
+            path: this.props.path,
+            id: this.props.id,
+            field: field
+          };
+
+          body.push(React.createElement(Options, _extends({ key: "options" }, props, { options: this.props.options, operator: operator })));
+          body.push(React.createElement(Values, _extends({ key: "values" }, props, { value: this.props.value, cardinality: cardinality, widget: widget })));
+        }
 
         return React.createElement(
           "div",
@@ -88,37 +157,15 @@ var Rule = (function (_React$Component) {
               { className: "rule--actions" },
               React.createElement(
                 "a",
-                { href: "#", onClick: this.removeRule.bind(this) },
-                "Remove rule"
+                { href: "#", className: "action action--DELETE", onClick: this.removeRule.bind(this) },
+                "Delete"
               )
             )
           ),
           React.createElement(
             "div",
             { className: "rule--body" },
-            React.createElement(
-              "div",
-              { className: "rule--fields" },
-              React.createElement(
-                "select",
-                { ref: "field", value: this.props.field, onChange: this.handleFieldSelect.bind(this) },
-                fieldOptions
-              )
-            ),
-            React.createElement(
-              "div",
-              { className: "rule--operator" },
-              React.createElement(
-                "select",
-                { ref: "operator", value: this.props.operator, onChange: this.handleOperatorSelect.bind(this) },
-                operatorOptions
-              )
-            ),
-            React.createElement(
-              "div",
-              { className: "rule--filter" },
-              React.createElement(Filter, { path: this.props.path, value: this.props.value, options: this.props.options, field: field, operator: operator, widget: widget })
-            )
+            body
           )
         );
       }

@@ -16,17 +16,11 @@ var GroupConstants = _interopRequire(require("./constants/Group"));
 
 var RuleConstants = _interopRequire(require("./constants/Rule"));
 
-var FilterConstants = _interopRequire(require("./constants/Filter"));
-
-var OperatorConstants = _interopRequire(require("./constants/Operator"));
-
 var GroupActions = _interopRequire(require("./actions/Group"));
 
 var RuleActions = _interopRequire(require("./actions/Rule"));
 
-var FilterActions = _interopRequire(require("./actions/Filter"));
-
-var OperatorActions = _interopRequire(require("./actions/Operator"));
+var getQueryString = _interopRequire(require("./utils/QueryString"));
 
 module.exports = {
   Builder: Builder,
@@ -34,12 +28,9 @@ module.exports = {
   Dispatcher: Dispatcher,
   GroupConstants: GroupConstants,
   RuleConstants: RuleConstants,
-  FilterConstants: FilterConstants,
-  OperatorConstants: OperatorConstants,
   GroupActions: GroupActions,
   RuleActions: RuleActions,
-  FilterActions: FilterActions,
-  OperatorActions: OperatorActions,
   TextWidget: TextWidget,
-  SelectWidget: SelectWidget
+  SelectWidget: SelectWidget,
+  getQueryString: getQueryString
 };

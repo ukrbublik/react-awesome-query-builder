@@ -32,31 +32,27 @@ var Group = (function (_React$Component) {
   _createClass(Group, {
     setConjunction: {
       value: function setConjunction(event) {
-        GroupActions.setConjunction(this.props.path, event.target.value);
+        GroupActions.setConjunction(this.props.path, event.target.value, this.props.config);
       }
     },
     addGroup: {
       value: function addGroup() {
         GroupActions.addGroup(this.props.path, {
           conjunction: this.props.config.defaults.conjunction
-        });
+        }, this.props.config);
       }
     },
     removeGroup: {
       value: function removeGroup() {
-        GroupActions.removeGroup(this.props.path);
+        GroupActions.removeGroup(this.props.path, this.props.config);
       }
     },
     addRule: {
       value: function addRule() {
-        var field = this.props.config.defaults.field;
-
         RuleActions.addRule(this.props.path, {
-          field: field,
-          operator: this.props.config.fields[field].operators[0],
           value: new Immutable.List(),
           options: new Immutable.Map()
-        });
+        }, this.props.config);
       }
     },
     render: {
@@ -64,16 +60,18 @@ var Group = (function (_React$Component) {
         var name = "conjunction[" + this.props.id + "]";
         var conjunctions = map(this.props.config.conjunctions, function (item, index) {
           var checked = index == this.props.conjunction;
+          var state = checked ? "active" : "inactive";
+          var id = "conjunction-" + this.props.id + "-" + index;
 
           return React.createElement(
             "div",
-            { key: index, className: "conjunction--" + index },
+            { key: index, className: "conjunction conjunction--" + index.toUpperCase(), "data-state": state },
             React.createElement(
               "label",
-              null,
+              { htmlFor: id },
               item.label
             ),
-            React.createElement("input", { type: "radio", name: name, value: index, checked: checked, onChange: this.setConjunction.bind(this) })
+            React.createElement("input", { id: id, type: "radio", name: name, value: index, checked: checked, onChange: this.setConjunction.bind(this) })
           );
         }, this);
 
@@ -85,7 +83,7 @@ var Group = (function (_React$Component) {
             { className: "group--header" },
             React.createElement(
               "div",
-              { className: "group--conjunction" },
+              { className: "group--conjunctions" },
               conjunctions
             ),
             React.createElement(
@@ -93,18 +91,18 @@ var Group = (function (_React$Component) {
               { className: "group--actions" },
               React.createElement(
                 "a",
-                { href: "#", onClick: this.addGroup.bind(this) },
+                { href: "#", className: "action action--ADD-GROUP", onClick: this.addGroup.bind(this) },
                 "Add group"
               ),
               React.createElement(
                 "a",
-                { href: "#", onClick: this.removeGroup.bind(this) },
-                "Remove group"
+                { href: "#", className: "action action--ADD-RULE", onClick: this.addRule.bind(this) },
+                "Add rule"
               ),
               React.createElement(
                 "a",
-                { href: "#", onClick: this.addRule.bind(this) },
-                "Add rule"
+                { href: "#", className: "action action--DELETE", onClick: this.removeGroup.bind(this) },
+                "Delete"
               )
             )
           ),

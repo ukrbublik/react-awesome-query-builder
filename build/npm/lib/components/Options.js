@@ -12,70 +12,55 @@ var React = _interopRequire(require("react"));
 
 var Immutable = _interopRequire(require("immutable"));
 
-var assign = _interopRequire(require("react/lib/Object.assign"));
+var RuleActions = _interopRequire(require("../actions/Rule"));
 
-var FilterActions = _interopRequire(require("../actions/Filter"));
-
-var OperatorActions = _interopRequire(require("../actions/Operator"));
-
-var Filter = (function (_React$Component) {
-  function Filter() {
-    _classCallCheck(this, Filter);
+var Options = (function (_React$Component) {
+  function Options() {
+    _classCallCheck(this, Options);
 
     if (_React$Component != null) {
       _React$Component.apply(this, arguments);
     }
   }
 
-  _inherits(Filter, _React$Component);
+  _inherits(Options, _React$Component);
 
-  _createClass(Filter, {
+  _createClass(Options, {
     render: {
       value: function render() {
         var _this = this;
 
-        var widgets = [];
-        var path = this.props.path;
-        var cardinality = this.props.operator.cardinality || 1;
-
-        for (var delta = 0; delta < cardinality; delta++) {
-          (function (delta) {
-            widgets.push(React.createElement(_this.props.widget.component, {
-              key: delta,
-              definition: _this.props.widget,
-              field: _this.props.field,
-              delta: delta,
-              value: _this.props.value[delta],
-              setValue: function (value) {
-                return FilterActions.setDeltaValue(path, delta, value);
-              }
-            }));
-          })(delta);
+        if (!this.props.operator.options || !this.props.operator.options.component) {
+          return null;
         }
 
-        return React.createElement(this.props.operator.component, {
-          children: widgets,
+        var options = React.createElement(this.props.operator.options.component, {
           definition: this.props.operator,
           field: this.props.field,
-          value: this.props.value,
           options: this.props.options,
           setOption: function (name, value) {
-            return OperatorActions.setOption(path, name, value);
+            return RuleActions.setOption(_this.props.path, name, value, _this.props.config);
           }
         });
+
+        return React.createElement(
+          "div",
+          { className: "filter--options" },
+          options
+        );
       }
     }
   });
 
-  return Filter;
+  return Options;
 })(React.Component);
 
-Filter.propTypes = {
+Options.propTypes = {
   path: React.PropTypes.instanceOf(Immutable.List).isRequired,
+  options: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+  config: React.PropTypes.object.isRequired,
   field: React.PropTypes.object.isRequired,
-  operator: React.PropTypes.object.isRequired,
-  widget: React.PropTypes.object.isRequired,
-  value: React.PropTypes.any
+  operator: React.PropTypes.object.isRequired
 };
 
-module.exports = Filter;
+module.exports = Options;

@@ -10,6 +10,8 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var React = _interopRequire(require("react"));
 
+var map = _interopRequire(require("lodash/collection/map"));
+
 var Text = (function (_React$Component) {
   function Text() {
     _classCallCheck(this, Text);
@@ -30,7 +32,7 @@ var Text = (function (_React$Component) {
     },
     render: {
       value: function render() {
-        var options = this.props.field.options.map(function (label, value) {
+        var options = map(this.props.field.options, function (label, value) {
           return React.createElement(
             "option",
             { key: value, value: value },
@@ -39,13 +41,9 @@ var Text = (function (_React$Component) {
         });
 
         return React.createElement(
-          "div",
-          { className: "widget--SELECT" },
-          React.createElement(
-            "select",
-            { ref: "select", value: this.props.value, onChange: this.handleChange.bind(this) },
-            options
-          )
+          "select",
+          { ref: "select", value: this.props.value, onChange: this.handleChange.bind(this) },
+          options
         );
       }
     }

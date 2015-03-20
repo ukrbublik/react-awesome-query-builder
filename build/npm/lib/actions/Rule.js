@@ -15,8 +15,9 @@ module.exports = {
   /**
    * @param {Immutable.List} path
    * @param {object} properties
+   * @param {object} config
    */
-  addRule: function addRule(path, properties) {
+  addRule: function addRule(path, properties, config) {
     Dispatcher.dispatch({
       actionType: RuleConstants.ADD_RULE,
       path: path,
@@ -55,6 +56,34 @@ module.exports = {
       actionType: RuleConstants.SET_OPERATOR,
       path: path,
       operator: operator
+    });
+  },
+
+  /**
+   * @param {Immutable.List} path
+   * @param {integer} delta
+   * @param {*} value
+   */
+  setDeltaValue: function setDeltaValue(path, delta, value) {
+    Dispatcher.dispatch({
+      actionType: RuleConstants.SET_DELTA_VALUE,
+      path: path,
+      delta: delta,
+      value: value
+    });
+  },
+
+  /**
+   * @param {Immutable.List} path
+   * @param {string} name
+   * @param {*} value
+   */
+  setOption: function setOption(path, name, value) {
+    Dispatcher.dispatch({
+      actionType: RuleConstants.SET_OPTION,
+      path: path,
+      name: name,
+      value: value
     });
   }
 

@@ -66,7 +66,11 @@ var Builder = (function (_React$Component) {
           config: this.props.config
         };
 
-        return React.createElement(Item, _extends({ key: props.id }, props));
+        return React.createElement(
+          "div",
+          { className: "query-builder" },
+          React.createElement(Item, _extends({ key: props.id }, props))
+        );
       }
     }
   });
