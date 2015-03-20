@@ -8,8 +8,9 @@ export default {
   /**
    * @param {Immutable.List} path
    * @param {object} properties
+   * @param {object} config
    */
-  addGroup: function (path, properties) {
+  addGroup: function (path, properties, config) {
     Dispatcher.dispatch({
       actionType: GroupConstants.ADD_GROUP,
       path: path,

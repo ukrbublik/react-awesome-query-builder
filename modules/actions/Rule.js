@@ -8,8 +8,9 @@ export default {
   /**
    * @param {Immutable.List} path
    * @param {object} properties
+   * @param {object} config
    */
-  addRule: function (path, properties) {
+  addRule: function (path, properties, config) {
     Dispatcher.dispatch({
       actionType: RuleConstants.ADD_RULE,
       path: path,
@@ -48,6 +49,34 @@ export default {
       actionType: RuleConstants.SET_OPERATOR,
       path: path,
       operator: operator
+    });
+  },
+
+  /**
+   * @param {Immutable.List} path
+   * @param {integer} delta
+   * @param {*} value
+   */
+  setDeltaValue: function (path, delta, value) {
+    Dispatcher.dispatch({
+      actionType: RuleConstants.SET_DELTA_VALUE,
+      path: path,
+      delta: delta,
+      value: value
+    });
+  },
+
+  /**
+   * @param {Immutable.List} path
+   * @param {string} name
+   * @param {*} value
+   */
+  setOption: function (path, name, value) {
+    Dispatcher.dispatch({
+      actionType: RuleConstants.SET_OPTION,
+      path: path,
+      name: name,
+      value: value
     });
   }
 

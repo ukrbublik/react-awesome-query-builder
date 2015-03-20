@@ -1,7 +1,8 @@
 import React from 'react';
 import Immutable from 'immutable';
 import RuleActions from '../actions/Rule';
-import Filter from './Filter';
+import Values from './Values';
+import Options from './Options';
 import assign from 'react/lib/Object.assign';
 import map from 'lodash/collection/map';
 import filter from 'lodash/collection/filter';
@@ -22,38 +23,79 @@ class Rule extends React.Component {
   }
 
   render () {
-    let config = this.props.config;
-    let field = (this.props.field && config.fields[this.props.field]) || config.fields[Object.keys(config.fields)[0]];
-    let widget = config.widgets[field.widget];
-    let operator = config.operators[this.props.operator || field.operators[0]];
-    let operators = filter(config.operators,
-      (value, key) => field.operators.indexOf(key) >= 0
-    );
+    let body = [];
 
-    let fieldOptions = map(this.props.config.fields, (item, index) =>
-      <option key={index} value={index}>{item.label}</option>
-    );
+    let fields = this.props.config.fields;
+    let field = this.props.field && fields[this.props.field] || undefined;
 
-    let operatorOptions = map(operators, (item, index) =>
-      <option key={index} value={index}>{item.label}</option>
-    );
+    let operators = {};
+    for (var id in this.props.config.operators) {
+      if (this.props.config.operators.hasOwnProperty(id)) {
+        if (field && field.operators.indexOf(id) !== -1) {
+          operators[id] = this.props.config.operators[id];
+        }
+      }
+    }
+
+    let operator = field && this.props.operator && operators[this.props.operator] || undefined;
+
+    if (Object.keys(fields).length) {
+      let options = map(fields, (item, index) =>
+        <option key={index} value={index}>{item.label}</option>
+      );
+
+      if (typeof field === 'undefined') {
+        options.unshift(<option key=":empty:" value=":empty:"></option>);
+      }
+
+      body.push(
+        <div key="field" className="rule--field">
+          <label>Field</label>
+          <select ref="field" value={this.props.field || ':empty:'} onChange={this.handleFieldSelect.bind(this)}>{options}</select>
+        </div>
+      );
+    }
+
+    if (Object.keys(operators).length) {
+      let options = map(operators, (item, index) =>
+        <option key={index} value={index}>{item.label}</option>
+      );
+
+      if (typeof operator === 'undefined') {
+        options.unshift(<option key=":empty:" value=":empty:"></option>);
+      }
+
+      body.push(
+        <div key="operator" className="rule--operator">
+          <label>Operator</label>
+          <select ref="operator" value={this.props.operator || ':empty:'} onChange={this.handleOperatorSelect.bind(this)}>{options}</select>
+        </div>
+      );
+    }
+
+    if (field && operator) {
+      let widget = typeof field.widget === 'string' ? this.props.config.widgets[field.widget] : field.widget;
+      let cardinality = operator.cardinality || 1;
+
+      let props = {
+        config: this.props.config,
+        path: this.props.path,
+        id: this.props.id,
+        field: field
+      };
+
+      body.push(<Options key="options" {...props} options={this.props.options} operator={operator} />);
+      body.push(<Values key="values" {...props} value={this.props.value} cardinality={cardinality} widget={widget} />);
+    }
 
     return (
       <div className="rule">
         <div className="rule--header">
-          <div className="rule--actions"><a href="#" onClick={this.removeRule.bind(this)}>Remove rule</a></div>
-        </div>
-        <div className="rule--body">
-          <div className="rule--fields">
-            <select ref="field" value={this.props.field} onChange={this.handleFieldSelect.bind(this)}>{fieldOptions}</select>
-          </div>
-          <div className="rule--operator">
-            <select ref="operator" value={this.props.operator} onChange={this.handleOperatorSelect.bind(this)}>{operatorOptions}</select>
-          </div>
-          <div className="rule--filter">
-            <Filter path={this.props.path} value={this.props.value} options={this.props.options} field={field} operator={operator} widget={widget} />
+          <div className="rule--actions">
+            <a href="#" className="action action--DELETE" onClick={this.removeRule.bind(this)}>Delete</a>
           </div>
         </div>
+        <div className="rule--body">{body}</div>
       </div>
     );
   }

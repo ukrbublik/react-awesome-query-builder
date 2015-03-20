@@ -1,4 +1,5 @@
 import React from 'react';
+import map from 'lodash/collection/map';
 
 class Text extends React.Component {
   handleChange () {
@@ -7,14 +8,12 @@ class Text extends React.Component {
   }
 
   render () {
-    let options = this.props.field.options.map((label, value) =>
+    let options = map(this.props.field.options, (label, value) =>
       <option key={value} value={value}>{label}</option>
     );
 
     return (
-      <div className="widget--SELECT">
-        <select ref="select" value={this.props.value} onChange={this.handleChange.bind(this)}>{options}</select>
-      </div>
+      <select ref="select" value={this.props.value} onChange={this.handleChange.bind(this)}>{options}</select>
     );
   }
 }

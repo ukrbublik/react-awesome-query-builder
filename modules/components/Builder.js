@@ -40,7 +40,11 @@ class Builder extends React.Component {
       config: this.props.config
     };
 
-    return <Item key={props.id} {...props} />;
+    return (
+      <div className="query-builder">
+        <Item key={props.id} {...props} />
+      </div>
+    );
   }
 }
 
