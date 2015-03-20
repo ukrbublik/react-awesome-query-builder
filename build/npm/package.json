@@ -1,0 +1,23 @@
+{
+  "name": "react-query-builder",
+  "version": "0.0.1",
+  "main": "lib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fubhy/react-query-builder.git"
+  },
+  "author": "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fubhy/react-query-builder/issues"
+  },
+  "homepage": "https://github.com/fubhy/react-query-builder",
+  "dependencies": {
+    "flux": "^2.0.1",
+    "lodash": "^3.5.0"
+  },
+  "peerDependencies": {
+    "react": "0.13.x",
+    "immutable": "^3.6.4"
+  }
+}
