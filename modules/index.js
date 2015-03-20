@@ -7,6 +7,7 @@ import GroupConstants from './constants/Group';
 import RuleConstants from './constants/Rule';
 import GroupActions from './actions/Group';
 import RuleActions from './actions/Rule';
+import getQueryString from './utils/QueryString';
 
 export default {
   Builder: Builder,
@@ -17,5 +18,6 @@ export default {
   GroupActions: GroupActions,
   RuleActions: RuleActions,
   TextWidget: TextWidget,
-  SelectWidget: SelectWidget
+  SelectWidget: SelectWidget,
+  getQueryString: getQueryString
 }
