@@ -3,36 +3,35 @@ import Immutable from 'immutable';
 import RuleActions from '../actions/Rule';
 import Values from './Values';
 import Options from './Options';
-import assign from 'react/lib/Object.assign';
 import map from 'lodash/collection/map';
 import filter from 'lodash/collection/filter';
 
 class Rule extends React.Component {
   removeRule () {
-    RuleActions.removeRule(this.props.path);
+    RuleActions.removeRule(this.context.path);
   }
 
   handleFieldSelect () {
     let node = React.findDOMNode(this.refs.field);
-    RuleActions.setField(this.props.path, node.value);
+    RuleActions.setField(this.context.path, node.value);
   }
 
   handleOperatorSelect () {
     let node = React.findDOMNode(this.refs.operator);
-    RuleActions.setOperator(this.props.path, node.value);
+    RuleActions.setOperator(this.context.path, node.value);
   }
 
   render () {
     let body = [];
 
-    let fields = this.props.config.fields;
+    let fields = this.context.config.fields;
     let field = this.props.field && fields[this.props.field] || undefined;
 
     let operators = {};
-    for (var id in this.props.config.operators) {
-      if (this.props.config.operators.hasOwnProperty(id)) {
+    for (var id in this.context.config.operators) {
+      if (this.context.config.operators.hasOwnProperty(id)) {
         if (field && field.operators.indexOf(id) !== -1) {
-          operators[id] = this.props.config.operators[id];
+          operators[id] = this.context.config.operators[id];
         }
       }
     }
@@ -45,7 +44,7 @@ class Rule extends React.Component {
       );
 
       if (typeof field === 'undefined') {
-        options.unshift(<option key=":empty:" value=":empty:"></option>);
+        options.unshift(<option key=":empty:" value=":empty:">Select a field</option>);
       }
 
       body.push(
@@ -62,7 +61,7 @@ class Rule extends React.Component {
       );
 
       if (typeof operator === 'undefined') {
-        options.unshift(<option key=":empty:" value=":empty:"></option>);
+        options.unshift(<option key=":empty:" value=":empty:">Select an operator</option>);
       }
 
       body.push(
@@ -74,25 +73,18 @@ class Rule extends React.Component {
     }
 
     if (field && operator) {
-      let widget = typeof field.widget === 'string' ? this.props.config.widgets[field.widget] : field.widget;
+      let widget = typeof field.widget === 'string' ? this.context.config.widgets[field.widget] : field.widget;
       let cardinality = operator.cardinality || 1;
 
-      let props = {
-        config: this.props.config,
-        path: this.props.path,
-        id: this.props.id,
-        field: field
-      };
-
-      body.push(<Options key="options" {...props} options={this.props.options} operator={operator} />);
-      body.push(<Values key="values" {...props} value={this.props.value} cardinality={cardinality} widget={widget} />);
+      body.push(<Options key="options" field={field} options={this.props.options} operator={operator} />);
+      body.push(<Values key="values" field={field} value={this.props.value} cardinality={cardinality} widget={widget} />);
     }
 
     return (
       <div className="rule">
         <div className="rule--header">
           <div className="rule--actions">
-            <a href="#" className="action action--DELETE" onClick={this.removeRule.bind(this)}>Delete</a>
+            <button className="action action--DELETE" onClick={this.removeRule.bind(this)}>Delete</button>
           </div>
         </div>
         <div className="rule--body">{body}</div>
@@ -101,7 +93,7 @@ class Rule extends React.Component {
   }
 }
 
-Rule.propTypes = {
+Rule.contextTypes = {
   config: React.PropTypes.object.isRequired,
   id: React.PropTypes.string.isRequired,
   path: React.PropTypes.instanceOf(Immutable.List).isRequired

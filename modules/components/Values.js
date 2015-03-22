@@ -19,7 +19,7 @@ class Values extends React.Component {
           field: this.props.field,
           delta: delta,
           value: this.props.value[delta],
-          setValue: value => RuleActions.setDeltaValue(this.props.path, delta, value, this.props.config)
+          setValue: value => RuleActions.setDeltaValue(this.context.path, delta, value, this.context.config)
         });
 
         widgets.push(
@@ -28,7 +28,7 @@ class Values extends React.Component {
       }
 
       return (
-        <div className="filter--values">{widgets}</div>
+        <div className="rule--widgets">{widgets}</div>
       );
     }
 
@@ -37,21 +37,24 @@ class Values extends React.Component {
       field: this.props.field,
       cardinality: this.props.cardinality,
       value: this.props.value,
-      setDeltaValue: (delta, value) => RuleActions.setDeltaValue(this.props.path, delta, value, this.props.config)
+      setDeltaValue: (delta, value) => RuleActions.setDeltaValue(this.context.path, delta, value, this.context.config)
     });
 
     return (
-      <div className="filter--values">
+      <div className="rule--widgets">
         <div className={'widget widget--' + name}>{widget}</div>
       </div>
     );
   }
 }
 
-Values.propTypes = {
-  path: React.PropTypes.instanceOf(Immutable.List).isRequired,
-  value: React.PropTypes.instanceOf(Immutable.List).isRequired,
+Values.contextTypes = {
   config: React.PropTypes.object.isRequired,
+  path: React.PropTypes.instanceOf(Immutable.List).isRequired
+};
+
+Values.propTypes = {
+  value: React.PropTypes.instanceOf(Immutable.List).isRequired,
   field: React.PropTypes.object.isRequired,
   cardinality: React.PropTypes.number.isRequired,
   widget: React.PropTypes.object.isRequired

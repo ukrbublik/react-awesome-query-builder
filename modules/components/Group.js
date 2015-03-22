@@ -6,32 +6,32 @@ import map from 'lodash/collection/map';
 
 class Group extends React.Component {
   setConjunction (event) {
-    GroupActions.setConjunction(this.props.path, event.target.value, this.props.config);
+    GroupActions.setConjunction(this.context.path, event.target.value);
   }
 
   addGroup () {
-    GroupActions.addGroup(this.props.path, {
-      conjunction: this.props.config.defaults.conjunction
-    }, this.props.config);
+    GroupActions.addGroup(this.context.path, {
+      conjunction: this.context.config.settings.defaultConjunction
+    }, this.context.config);
   }
 
   removeGroup () {
-    GroupActions.removeGroup(this.props.path, this.props.config);
+    GroupActions.removeGroup(this.context.path);
   }
 
   addRule () {
-    RuleActions.addRule(this.props.path, {
+    RuleActions.addRule(this.context.path, {
       value: new Immutable.List,
       options: new Immutable.Map
-    }, this.props.config);
+    }, this.context.config);
   }
 
   render () {
-    let name = 'conjunction[' + this.props.id + ']';
-    let conjunctions = map(this.props.config.conjunctions, function (item, index) {
+    let name = 'conjunction[' + this.context.id + ']';
+    let conjunctions = map(this.context.config.conjunctions, function (item, index) {
       let checked = index == this.props.conjunction;
       let state = checked ? 'active' : 'inactive';
-      let id = 'conjunction-' + this.props.id + '-' + index;
+      let id = 'conjunction-' + this.context.id + '-' + index;
 
       return (
         <div key={index} className={'conjunction conjunction--' + index.toUpperCase()} data-state={state}>
@@ -41,14 +41,24 @@ class Group extends React.Component {
       );
     }, this);
 
+    let depth = this.context.path.size;
+    let max = this.context.config.settings.maxNesting;
+    let add = typeof max === 'undefined' || depth < max ? (
+      <button className="action action--ADD-GROUP" onClick={this.addGroup.bind(this)}>Add group</button>
+    ) : null;
+
+    let remove = depth > 1 ? (
+      <button className="action action--DELETE" onClick={this.removeGroup.bind(this)}>Delete</button>
+    ) : null;
+
     return (
       <div className="group">
         <div className="group--header">
           <div className="group--conjunctions">{conjunctions}</div>
           <div className="group--actions">
-            <a href="#" className="action action--ADD-GROUP" onClick={this.addGroup.bind(this)}>Add group</a>
-            <a href="#" className="action action--ADD-RULE" onClick={this.addRule.bind(this)}>Add rule</a>
-            <a href="#" className="action action--DELETE" onClick={this.removeGroup.bind(this)}>Delete</a>
+            {add}
+            <button className="action action--ADD-RULE" onClick={this.addRule.bind(this)}>Add rule</button>
+            {remove}
           </div>
         </div>
         <div className="group--children">{this.props.children}</div>
@@ -57,7 +67,7 @@ class Group extends React.Component {
   }
 }
 
-Group.propTypes = {
+Group.contextTypes = {
   config: React.PropTypes.object.isRequired,
   id: React.PropTypes.string.isRequired,
   path: React.PropTypes.instanceOf(Immutable.List).isRequired

@@ -1,7 +1,5 @@
-import React from 'react';
 import Dispatcher from '../dispatcher/Dispatcher';
 import RuleConstants from '../constants/Rule';
-import Immutable from 'immutable';
 
 export default {
 

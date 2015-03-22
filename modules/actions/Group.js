@@ -1,7 +1,5 @@
-import React from 'react';
 import Dispatcher from '../dispatcher/Dispatcher';
 import GroupConstants from '../constants/Group';
-import Immutable from 'immutable';
 
 export default {
 

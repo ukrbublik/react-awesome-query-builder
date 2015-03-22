@@ -1,4 +1,4 @@
-const getQueryStringRecursive = function (item, config) {
+const queryStringRecursive = function (item, config) {
   let type = item.get('type');
   let properties = item.get('properties');
   let children = item.get('children');
@@ -8,34 +8,44 @@ const getQueryStringRecursive = function (item, config) {
       return undefined;
     }
 
-    let value = properties.get('value');
+    let value = [];
     let field = config.fields[properties.get('field')];
     let operator = config.operators[properties.get('operator')];
     let options = properties.get('options');
+    let cardinality = operator.cardinality || 1;
 
-    if ((operator.cardinality || 1) !== 0) {
+    if (cardinality !== 0) {
       let widget = config.widgets[field.widget];
+      value = properties.get('value').filter(value => typeof value !== 'undefined');
 
-      value = value.map(function (value, key) {
+      if (value.size < cardinality) {
+        return undefined;
+      }
+
+      value = value.map(function (value) {
         return widget.value(value, config);
-      });
+      }).toArray();
     }
 
     return operator.value(value, field, options, operator, config);
   }
 
   if (type == 'group' && children && children.size) {
-    let values = children.map((item, key) => getQueryStringRecursive(item, config));
-    values = values.filter(value => typeof value !== 'undefined');
+    let value = children.map(item => queryStringRecursive(item, config));
+    value = value.filter(value => typeof value !== 'undefined');
+
+    if (!value.size) {
+      return undefined;
+    }
 
     let conjunction = properties.get('conjunction');
     conjunction = config.conjunctions[conjunction];
-    return conjunction.value(values, conjunction);
+    return conjunction.value(value.toArray(), conjunction);
   }
 
   return undefined;
 };
 
 export default function (item, config) {
-  return getQueryStringRecursive(item, config);
+  return queryStringRecursive(item, config);
 };

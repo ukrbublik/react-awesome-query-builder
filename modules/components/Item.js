@@ -10,41 +10,29 @@ const types = {
 };
 
 class Item extends React.Component {
-  constructor (props) {
-    super(props);
-
-    this.state = {
-      path: props.ancestors.push(props.id)
-    }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (!Immutable.is(this.props.ancestors, nextProps.ancestors)) {
-      this.setState({
-        path: this.props.ancestors.push(this.props.id)
-      });
+  getChildContext () {
+    return {
+      id: this.props.id,
+      path: this.props.path
     }
   }
 
   render () {
     let children = this.props.children ? this.props.children.map(function (item) {
+      let id = item.get('id');
       let props = {
-        config: this.props.config,
-        ancestors: this.state.path,
-        id: item.get('id'),
+        id: id,
+        path: this.props.path.push(id),
         children: item.get('children'),
         type: item.get('type'),
         properties: item.get('properties')
       };
 
-      return <Item key={props.id} {...props} />;
+      return <Item key={id} {...props} />;
     }, this).toList() : null;
 
     let component = types[this.props.type];
     let props = assign({}, this.props.properties.toObject(), {
-      config: this.props.config,
-      id: this.props.id,
-      path: this.state.path,
       children: children
     });
 
@@ -52,11 +40,19 @@ class Item extends React.Component {
   }
 }
 
+Item.contextTypes = {
+  config: React.PropTypes.object.isRequired
+};
+
+Item.childContextTypes = {
+  path: React.PropTypes.instanceOf(Immutable.List),
+  id: React.PropTypes.string
+};
+
 Item.propTypes = {
-  config: React.PropTypes.object.isRequired,
   id: React.PropTypes.string.isRequired,
   type: React.PropTypes.string.isRequired,
-  ancestors: React.PropTypes.instanceOf(Immutable.List).isRequired,
+  path: React.PropTypes.instanceOf(Immutable.List).isRequired,
   properties: React.PropTypes.instanceOf(Immutable.Map).isRequired,
   children: React.PropTypes.instanceOf(Immutable.OrderedMap)
 };

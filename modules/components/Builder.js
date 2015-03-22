@@ -8,7 +8,20 @@ class Builder extends React.Component {
     super(props);
 
     this.state = {
-      tree: TreeStore.getTree()
+      tree: TreeStore.getTree(),
+      config: {
+        conjunctions: props.conjunctions,
+        fields: props.fields,
+        operators: props.operators,
+        widgets: props.widgets,
+        settings: props.settings
+      }
+    }
+  }
+
+  getChildContext () {
+    return {
+      config: this.state.config
     }
   }
 
@@ -27,17 +40,13 @@ class Builder extends React.Component {
   }
 
   render () {
-    if (!this.state.tree) {
-      return null;
-    }
-
+    let id = this.state.tree.get('id');
     let props = {
-      id: this.state.tree.get('id'),
+      id: id,
+      path: Immutable.List.of(id),
       children: this.state.tree.get('children'),
-      ancestors: new Immutable.List,
       type: this.state.tree.get('type'),
-      properties: this.state.tree.get('properties'),
-      config: this.props.config
+      properties: this.state.tree.get('properties')
     };
 
     return (
@@ -48,8 +57,16 @@ class Builder extends React.Component {
   }
 }
 
+Builder.childContextTypes = {
+  config: React.PropTypes.object
+};
+
 Builder.propTypes = {
-  config: React.PropTypes.object.isRequired
+  conjunctions: React.PropTypes.object.isRequired,
+  fields: React.PropTypes.object.isRequired,
+  operators: React.PropTypes.object.isRequired,
+  widgets: React.PropTypes.object.isRequired,
+  settings: React.PropTypes.object.isRequired
 };
 
 export default Builder;

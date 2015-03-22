@@ -12,19 +12,22 @@ class Options extends React.Component {
       definition: this.props.operator,
       field: this.props.field,
       options: this.props.options,
-      setOption: (name, value) => RuleActions.setOption(this.props.path, name, value, this.props.config)
+      setOption: (name, value) => RuleActions.setOption(this.context.path, name, value, this.context.config)
     });
 
     return (
-      <div className="filter--options">{options}</div>
+      <div className="rule--options">{options}</div>
     );
   }
 }
 
-Options.propTypes = {
-  path: React.PropTypes.instanceOf(Immutable.List).isRequired,
-  options: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+Options.contextTypes = {
   config: React.PropTypes.object.isRequired,
+  path: React.PropTypes.instanceOf(Immutable.List).isRequired
+};
+
+Options.propTypes = {
+  options: React.PropTypes.instanceOf(Immutable.Map).isRequired,
   field: React.PropTypes.object.isRequired,
   operator: React.PropTypes.object.isRequired
 };
