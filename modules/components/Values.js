@@ -18,7 +18,7 @@ class Values extends React.Component {
           definition: this.props.widget,
           field: this.props.field,
           delta: delta,
-          value: this.props.value[delta],
+          value: this.props.value.get(delta),
           setValue: value => RuleActions.setDeltaValue(this.context.path, delta, value, this.context.config)
         });
 
