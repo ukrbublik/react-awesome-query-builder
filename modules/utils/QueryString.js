@@ -16,15 +16,16 @@ const queryStringRecursive = function (item, config) {
 
     if (cardinality !== 0) {
       let widget = config.widgets[field.widget];
-      value = properties.get('value').filter(value => typeof value !== 'undefined');
 
-      if (value.size < cardinality) {
+      value = properties.get('value').map(function (value) {
+        return widget.value(value, config);
+      }).filter(
+        value => typeof value !== 'undefined' && value !== ''
+      ).toArray();
+
+      if (value.length < cardinality) {
         return undefined;
       }
-
-      value = value.map(function (value) {
-        return widget.value(value, config);
-      }).toArray();
     }
 
     return operator.value(value, field, options, operator, config);
