@@ -1,7 +1,7 @@
 import React from 'react';
 import map from 'lodash/collection/map';
 
-class Text extends React.Component {
+class Select extends React.Component {
   handleChange () {
     let node = React.findDOMNode(this.refs.select);
     this.props.setValue(node.value);
@@ -18,4 +18,4 @@ class Text extends React.Component {
   }
 }
 
-export default Text;
+export default Select;
