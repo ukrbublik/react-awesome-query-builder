@@ -1,8 +1,9 @@
-import React from 'react';
+import { default as React, PropTypes } from 'react';
+import PureComponent from 'react-pure-render/component';
 import TreeStore from '../stores/Tree';
-import queryString from '../utils/QueryString';
+import queryString from '../utils/queryString';
 
-class Preview extends React.Component {
+class Preview extends PureComponent {
   constructor (props) {
     super(props);
 
@@ -33,16 +34,17 @@ class Preview extends React.Component {
   }
 
   render () {
-    return <div>{queryString(this.state.tree, this.state.config)}</div>;
+    return this.props.children(queryString(this.state.tree, this.state.config));
   }
 }
 
 Preview.propTypes = {
-  conjunctions: React.PropTypes.object.isRequired,
-  fields: React.PropTypes.object.isRequired,
-  operators: React.PropTypes.object.isRequired,
-  widgets: React.PropTypes.object.isRequired,
-  settings: React.PropTypes.object.isRequired
+  children: PropTypes.func.isRequired,
+  conjunctions: PropTypes.object.isRequired,
+  fields: PropTypes.object.isRequired,
+  operators: PropTypes.object.isRequired,
+  widgets: PropTypes.object.isRequired,
+  settings: PropTypes.object.isRequired
 };
 
 export default Preview;

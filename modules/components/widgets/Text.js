@@ -8,7 +8,7 @@ class Text extends React.Component {
 
   render () {
     return (
-      <input type="textfield" ref="text" value={this.props.value || ''} onChange={this.handleChange.bind(this)} />
+      <input type="text" ref="text" value={this.props.value} onChange={this.handleChange.bind(this)} />
     );
   }
 }

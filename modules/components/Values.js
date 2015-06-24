@@ -1,8 +1,9 @@
-import React from 'react';
+import { default as React, PropTypes } from 'react';
+import PureComponent from 'react-pure-render/component';
 import Immutable from 'immutable';
 import RuleActions from '../actions/Rule';
 
-class Values extends React.Component {
+class Values extends PureComponent {
   render () {
     if (this.props.cardinality === 0) {
       return null;
@@ -13,13 +14,12 @@ class Values extends React.Component {
       let widgets = [];
 
       for (let delta = 0; delta < this.props.cardinality; delta++) {
-        let widget = React.createElement(this.props.widget.component, {
-          key: delta,
+        let widget = this.props.widget.factory({
           definition: this.props.widget,
           field: this.props.field,
           delta: delta,
           value: this.props.value.get(delta),
-          setValue: value => RuleActions.setDeltaValue(this.context.path, delta, value, this.context.config)
+          setValue: value => RuleActions.setDeltaValue(this.props.path, delta, value, this.context.config)
         });
 
         widgets.push(
@@ -32,12 +32,12 @@ class Values extends React.Component {
       );
     }
 
-    let widget = React.createElement(this.props.widget.component, {
+    let widget = this.props.widget.factory({
       definition: this.props.widget,
       field: this.props.field,
       cardinality: this.props.cardinality,
       value: this.props.value,
-      setDeltaValue: (delta, value) => RuleActions.setDeltaValue(this.context.path, delta, value, this.context.config)
+      setDeltaValue: (delta, value) => RuleActions.setDeltaValue(this.props.path, delta, value, this.context.config)
     });
 
     return (
@@ -49,15 +49,15 @@ class Values extends React.Component {
 }
 
 Values.contextTypes = {
-  config: React.PropTypes.object.isRequired,
-  path: React.PropTypes.instanceOf(Immutable.List).isRequired
+  config: PropTypes.object.isRequired
 };
 
 Values.propTypes = {
-  value: React.PropTypes.instanceOf(Immutable.List).isRequired,
-  field: React.PropTypes.object.isRequired,
-  cardinality: React.PropTypes.number.isRequired,
-  widget: React.PropTypes.object.isRequired
+  path: PropTypes.instanceOf(Immutable.List).isRequired,
+  value: PropTypes.instanceOf(Immutable.List).isRequired,
+  field: PropTypes.object.isRequired,
+  cardinality: PropTypes.number.isRequired,
+  widget: PropTypes.object.isRequired
 };
 
 export default Values;

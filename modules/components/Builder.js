@@ -4,54 +4,53 @@ import Item from '../components/Item';
 import TreeStore from '../stores/Tree';
 
 class Builder extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     this.state = {
-      tree: TreeStore.getTree(),
+      tree: TreeStore.getTree()
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  getChildContext() {
+    return {
       config: {
-        conjunctions: props.conjunctions,
-        fields: props.fields,
-        operators: props.operators,
-        widgets: props.widgets,
-        settings: props.settings
+        conjunctions: this.props.conjunctions,
+        fields: this.props.fields,
+        operators: this.props.operators,
+        widgets: this.props.widgets,
+        settings: this.props.settings
       }
     }
   }
 
-  getChildContext () {
-    return {
-      config: this.state.config
-    }
+  componentDidMount() {
+    TreeStore.addChangeListener(this.handleChange);
   }
 
-  componentDidMount () {
-    TreeStore.addChangeListener(this.handleChange.bind(this));
+  componentWillUnmount() {
+    TreeStore.removeChangeListener(this.handleChange);
   }
 
-  componentWillUnmount () {
-    TreeStore.removeChangeListener(this.handleChange.bind(this));
-  }
-
-  handleChange () {
+  handleChange() {
     this.setState({
       tree: TreeStore.getTree()
     });
   }
 
-  render () {
-    let id = this.state.tree.get('id');
-    let props = {
-      id: id,
-      path: Immutable.List.of(id),
-      children: this.state.tree.get('children'),
-      type: this.state.tree.get('type'),
-      properties: this.state.tree.get('properties')
-    };
+  render() {
+    const tree = this.state.tree;
+    const id = tree.get('id');
 
     return (
       <div className="query-builder">
-        <Item key={props.id} {...props} />
+        <Item key={id}
+              id={id}
+              path={Immutable.List.of(id)}
+              type={tree.get('type')}
+              properties={tree.get('properties')}>{tree.get('children')}</Item>
       </div>
     );
   }

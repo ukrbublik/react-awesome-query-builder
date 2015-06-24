@@ -3,24 +3,11 @@ import Immutable from 'immutable';
 import Dispatcher from '../dispatcher/Dispatcher';
 import GroupConstants from '../constants/Group';
 import RuleConstants from '../constants/Rule';
-import assign from 'react/lib/Object.assign';
+import TreeConstants from '../constants/Tree';
+import defaultRoot from '../utils/defaultRoot';
+import uuid from '../utils/uuid';
 
-const uuid = function () {
-  // Generate a random GUID http://stackoverflow.com/a/2117523.
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-
-let rules = Immutable.Map({
-  type: 'group',
-  id: uuid(),
-  children: new Immutable.OrderedMap,
-  properties: Immutable.Map({
-    conjunction: 'and'
-  })
-});
+let rules = defaultRoot();
 
 /**
  * @param {string} id
@@ -63,11 +50,19 @@ const expandTreePath = function (path, suffix) {
 };
 
 /**
+ * @param {Immutable.Map} tree
+ */
+const setTree = function (tree) {
+  rules = tree;
+};
+
+/**
  * @param {Immutable.List} path
  * @param {string} conjunction
  */
 const setConjunction = function (path, conjunction) {
-  rules = rules.setIn(expandTreePath(path, 'properties', 'conjunction'), conjunction);
+  const expandedPath = expandTreePath(path, 'properties', 'conjunction');
+  rules = rules.setIn(expandedPath, conjunction);
 };
 
 /**
@@ -75,7 +70,8 @@ const setConjunction = function (path, conjunction) {
  * @param {Immutable.Map} item
  */
 const addItem = function (path, item) {
-  rules = rules.mergeIn(expandTreePath(path, 'children'), new Immutable.OrderedMap({
+  const expandedPath = expandTreePath(path, 'children');
+  rules = rules.mergeIn(expandedPath, new Immutable.OrderedMap({
     [item.get('id')]: item
   }));
 };
@@ -92,10 +88,13 @@ const removeItem = function (path) {
  * @param {string} field
  */
 const setField = function (path, field) {
-  rules = rules.deleteIn(expandTreePath(path, 'properties', 'operator'))
-    .setIn(expandTreePath(path, 'properties', 'field'), field)
-    .setIn(expandTreePath(path, 'properties', 'options'), new Immutable.Map)
-    .setIn(expandTreePath(path, 'properties', 'value'), new Immutable.List);
+  rules = rules.withMutations(map => {
+    const expandedPath = expandTreePath(path, 'properties');
+    return map.deleteIn(expandedPath.push('operator'))
+      .setIn(expandedPath.push('field'), field)
+      .setIn(expandedPath.push('options'), Immutable.Map())
+      .setIn(expandedPath.push('value'), Immutable.List());
+  });
 };
 
 /**
@@ -103,9 +102,10 @@ const setField = function (path, field) {
  * @param {string} operator
  */
 const setOperator = function (path, operator) {
-  rules = rules.setIn(expandTreePath(path, 'properties', 'operator'), operator)
-    .setIn(expandTreePath(path, 'properties', 'options'), new Immutable.Map)
-    .setIn(expandTreePath(path, 'properties', 'value'), new Immutable.List);
+  rules = rules.withMutations(map => {
+    const expandedPath = expandTreePath(path, 'properties');
+    return map.setIn(expandedPath.push('operator'), operator);
+  });
 };
 
 /**
@@ -114,7 +114,8 @@ const setOperator = function (path, operator) {
  * @param {*} value
  */
 const setFilterDeltaValue = function (path, delta, value) {
-  rules = rules.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+  const expandedPath = expandTreePath(path, 'properties', 'value', delta + '');
+  rules = rules.setIn(expandedPath, value);
 };
 
 /**
@@ -123,10 +124,11 @@ const setFilterDeltaValue = function (path, delta, value) {
  * @param {*} value
  */
 const setOperatorOption = function (path, name, value) {
-  rules = rules.setIn(expandTreePath(path, 'properties', 'options', name), value);
+  const expandedPath = expandTreePath(path, 'properties', 'options', name);
+  rules = rules.setIn(expandedPath, value);
 };
 
-const TreeStore = assign({}, EventEmitter.prototype, {
+const TreeStore = Object.assign({}, EventEmitter.prototype, {
   getTree: function () {
     return rules;
   },
@@ -148,6 +150,11 @@ const TreeStore = assign({}, EventEmitter.prototype, {
 
 Dispatcher.register(function(action) {
   switch(action.actionType) {
+    case TreeConstants.SET_TREE:
+      setTree(action.tree);
+      TreeStore.emit('change');
+      break;
+
     case GroupConstants.SET_CONJUNCTION:
       setConjunction(action.path, action.conjunction);
       TreeStore.emit('change');

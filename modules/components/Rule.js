@@ -1,102 +1,71 @@
-import React from 'react';
-import Immutable from 'immutable';
-import RuleActions from '../actions/Rule';
-import Values from './Values';
-import Options from './Options';
-import map from 'lodash/collection/map';
-import filter from 'lodash/collection/filter';
+import { default as React, PropTypes } from 'react';
+import PureComponent from 'react-pure-render/component';
+import RuleContainer from './containers/RuleContainer';
+import collectionMap from 'lodash/collection/map';
 
-class Rule extends React.Component {
-  removeRule () {
-    RuleActions.removeRule(this.context.path);
+class Rule extends PureComponent {
+  handleFieldSelect() {
+    const node = React.findDOMNode(this.refs.field);
+    this.props.setField(node.value);
   }
 
-  handleFieldSelect () {
-    let node = React.findDOMNode(this.refs.field);
-    RuleActions.setField(this.context.path, node.value);
+  handleOperatorSelect() {
+    const node = React.findDOMNode(this.refs.operator);
+    this.props.setOperator(node.value);
   }
 
-  handleOperatorSelect () {
-    let node = React.findDOMNode(this.refs.operator);
-    RuleActions.setOperator(this.context.path, node.value);
-  }
+  render() {
+    const fieldOptions = collectionMap(this.props.fieldOptions, (label, value) => (
+      <option key={value} value={value}>{label}</option>
+    ));
 
-  render () {
-    let body = [];
-
-    let fields = this.context.config.fields;
-    let field = this.props.field && fields[this.props.field] || undefined;
-
-    let operators = {};
-    for (var id in this.context.config.operators) {
-      if (this.context.config.operators.hasOwnProperty(id)) {
-        if (field && field.operators.indexOf(id) !== -1) {
-          operators[id] = this.context.config.operators[id];
-        }
-      }
+    if (fieldOptions.length && typeof this.props.selectedField === 'undefined') {
+      fieldOptions.unshift(<option key=":empty:" value=":empty:">Select a field</option>);
     }
 
-    let operator = field && this.props.operator && operators[this.props.operator] || undefined;
+    const operatorOptions = collectionMap(this.props.operatorOptions, (label, value) => (
+      <option key={value} value={value}>{label}</option>
+    ));
 
-    if (Object.keys(fields).length) {
-      let options = map(fields, (item, index) =>
-        <option key={index} value={index}>{item.label}</option>
-      );
-
-      if (typeof field === 'undefined') {
-        options.unshift(<option key=":empty:" value=":empty:">Select a field</option>);
-      }
-
-      body.push(
-        <div key="field" className="rule--field">
-          <label>Field</label>
-          <select ref="field" value={this.props.field || ':empty:'} onChange={this.handleFieldSelect.bind(this)}>{options}</select>
-        </div>
-      );
-    }
-
-    if (Object.keys(operators).length) {
-      let options = map(operators, (item, index) =>
-        <option key={index} value={index}>{item.label}</option>
-      );
-
-      if (typeof operator === 'undefined') {
-        options.unshift(<option key=":empty:" value=":empty:">Select an operator</option>);
-      }
-
-      body.push(
-        <div key="operator" className="rule--operator">
-          <label>Operator</label>
-          <select ref="operator" value={this.props.operator || ':empty:'} onChange={this.handleOperatorSelect.bind(this)}>{options}</select>
-        </div>
-      );
-    }
-
-    if (field && operator) {
-      let widget = typeof field.widget === 'string' ? this.context.config.widgets[field.widget] : field.widget;
-      let cardinality = operator.cardinality || 1;
-
-      body.push(<Options key="options" field={field} options={this.props.options} operator={operator} />);
-      body.push(<Values key="values" field={field} value={this.props.value} cardinality={cardinality} widget={widget} />);
+    if (operatorOptions.length && typeof this.props.selectedOperator === 'undefined') {
+      operatorOptions.unshift(<option key=":empty:" value=":empty:">Select an operator</option>);
     }
 
     return (
       <div className="rule">
         <div className="rule--header">
           <div className="rule--actions">
-            <button className="action action--DELETE" onClick={this.removeRule.bind(this)}>Delete</button>
+            <button className="action action--DELETE" onClick={this.props.removeSelf}>Delete</button>
           </div>
         </div>
-        <div className="rule--body">{body}</div>
+        <div className="rule--body">
+          {fieldOptions.length ? (
+            <div key="field" className="rule--field">
+              <label>Field</label>
+              <select ref="field" value={this.props.selectedField || ':empty:'} onChange={this.handleFieldSelect.bind(this)}>{fieldOptions}</select>
+            </div>
+          ) : null}
+          {operatorOptions.length ? (
+            <div key="operator" className="rule--operator">
+              <label>Operator</label>
+              <select ref="operator" value={this.props.selectedOperator || ':empty:'} onChange={this.handleOperatorSelect.bind(this)}>{operatorOptions}</select>
+            </div>
+          ) : null}
+          {this.props.children}
+        </div>
       </div>
     );
   }
 }
 
-Rule.contextTypes = {
-  config: React.PropTypes.object.isRequired,
-  id: React.PropTypes.string.isRequired,
-  path: React.PropTypes.instanceOf(Immutable.List).isRequired
+Rule.propTypes = {
+  fieldOptions: PropTypes.object.isRequired,
+  operatorOptions: PropTypes.object.isRequired,
+  setField: PropTypes.func.isRequired,
+  setOperator: PropTypes.func.isRequired,
+  removeSelf: PropTypes.func.isRequired,
+  selectedField: PropTypes.string,
+  selectedOperator: PropTypes.string
 };
 
-export default Rule;
+export default RuleContainer(Rule);

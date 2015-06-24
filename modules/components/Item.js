@@ -1,60 +1,58 @@
-import React from 'react';
+import { default as React, PropTypes } from 'react';
+import PureComponent from 'react-pure-render/component';
 import Immutable from 'immutable';
 import Rule from './Rule';
 import Group from './Group';
-import assign from 'react/lib/Object.assign';
 
-const types = {
-  group: Group,
-  rule: Rule
-};
+export default class Item extends PureComponent {
+  render() {
+    const { type, ...props } = this.props;
 
-class Item extends React.Component {
-  getChildContext () {
-    return {
-      id: this.props.id,
-      path: this.props.path
+    switch (type) {
+      case 'rule':
+        return renderRule(props);
+
+      case 'group':
+        return renderGroup(props);
     }
-  }
 
-  render () {
-    let children = this.props.children ? this.props.children.map(function (item) {
-      let id = item.get('id');
-      let props = {
-        id: id,
-        path: this.props.path.push(id),
-        children: item.get('children'),
-        type: item.get('type'),
-        properties: item.get('properties')
-      };
-
-      return <Item key={id} {...props} />;
-    }, this).toList() : null;
-
-    let component = types[this.props.type];
-    let props = assign({}, this.props.properties.toObject(), {
-      children: children
-    });
-
-    return React.createElement(component, props);
+    return null;
   }
 }
 
 Item.contextTypes = {
-  config: React.PropTypes.object.isRequired
+  config: PropTypes.object.isRequired
 };
 
 Item.childContextTypes = {
-  path: React.PropTypes.instanceOf(Immutable.List),
-  id: React.PropTypes.string
+  path: PropTypes.instanceOf(Immutable.List),
+  id: PropTypes.string
 };
 
 Item.propTypes = {
-  id: React.PropTypes.string.isRequired,
-  type: React.PropTypes.string.isRequired,
-  path: React.PropTypes.instanceOf(Immutable.List).isRequired,
-  properties: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-  children: React.PropTypes.instanceOf(Immutable.OrderedMap)
+  id: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  path: PropTypes.instanceOf(Immutable.List).isRequired,
+  properties: PropTypes.instanceOf(Immutable.Map).isRequired,
+  children: PropTypes.instanceOf(Immutable.OrderedMap)
 };
 
-export default Item;
+const renderGroup = props => {
+  const children = props.children ? props.children.map(item => {
+    const id = item.get('id');
+
+    return (
+      <Item key={id}
+            id={id}
+            path={props.path.push(id)}
+            type={item.get('type')}
+            properties={item.get('properties')}>{item.get('children')}</Item>
+    );
+  }).toList() : null;
+
+  return (
+    <Group id={props.id} path={props.path} {...props.properties.toObject()}>{children}</Group>
+  );
+};
+
+const renderRule = props => <Rule id={props.id} path={props.path} {...props.properties.toObject()} />;

@@ -1,4 +1,4 @@
-const queryStringRecursive = function (item, config) {
+const queryStringRecursive = (item, config) => {
   let type = item.get('type');
   let properties = item.get('properties');
   let children = item.get('children');
@@ -26,6 +26,10 @@ const queryStringRecursive = function (item, config) {
       if (value.length < cardinality) {
         return undefined;
       }
+
+      value = value.map(function (value) {
+        return widget.value(value, config);
+      });
     }
 
     return operator.value(value, field, options, operator, config);
@@ -41,12 +45,12 @@ const queryStringRecursive = function (item, config) {
 
     let conjunction = properties.get('conjunction');
     conjunction = config.conjunctions[conjunction];
-    return conjunction.value(value.toArray(), conjunction);
+    return conjunction.value(value, conjunction);
   }
 
   return undefined;
 };
 
-export default function (item, config) {
+export default (item, config) => {
   return queryStringRecursive(item, config);
 };

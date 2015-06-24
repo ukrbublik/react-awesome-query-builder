@@ -3,12 +3,12 @@ import map from 'lodash/collection/map';
 
 class Select extends React.Component {
   handleChange () {
-    let node = React.findDOMNode(this.refs.select);
+    const node = React.findDOMNode(this.refs.select);
     this.props.setValue(node.value);
   }
 
   render () {
-    let options = map(this.props.field.options, (label, value) =>
+    const options = map(this.props.field.options, (label, value) =>
       <option key={value} value={value}>{label}</option>
     );
 
