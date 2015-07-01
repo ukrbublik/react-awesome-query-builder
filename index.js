@@ -1,28 +1,25 @@
+import './reset.scss';
 import './styles.scss';
-import React from 'react';
-import { default as Router, Route, Redirect, Link, RouteHandler } from 'react-router';
-import Simple from './simple';
+import React, { Component } from 'react';
+import HashHistory from 'react-router/lib/HashHistory';
+import { Router, Route, Redirect } from 'react-router';
+import Demo from './demo';
 
 window.React = React;
 
-class App extends React.Component {
-  render () {
+class App extends Component {
+  render() {
     return (
-      <div>
-        <RouteHandler />
-      </div>
-    )
+      <div>{this.props.children}</div>
+    );
   }
 }
 
-var routes = (
-  <Route handler={App} path="/">
-    <Route name="simple" handler={Simple} />
-    <Redirect from="/" to="simple" />
-  </Route>
-);
-
-Router.run(routes, Router.HashLocation, function (Handler) {
-  React.render(<Handler/>, document.body);
-});
-
+React.render((
+  <Router history={new HashHistory()}>
+    <Redirect from="/" to="demo" />
+    <Route name="root" path="/" component={App}>
+      <Route name="demo" path="/demo" component={Demo} />
+    </Route>
+  </Router>
+), document.body);
