@@ -31,8 +31,10 @@ module.exports = {
   },
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
-      /^react-query-builder/,
-      path.resolve(__dirname, '../modules')
+      /^react-query-builder/, function (data) {
+        const suffix = data.request.substring('react-query-builder'.length);
+        data.request =  path.resolve(__dirname, '../modules/' + suffix);
+      }
     ),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.DefinePlugin({
