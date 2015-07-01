@@ -14,25 +14,25 @@ var _react = require("react");
 
 var _react2 = _interopRequireDefault(_react);
 
-var Text = (function (_Component) {
-  function Text() {
-    _classCallCheck(this, Text);
+var Date = (function (_Component) {
+  function Date() {
+    _classCallCheck(this, Date);
 
     _Component.apply(this, arguments);
   }
 
-  _inherits(Text, _Component);
+  _inherits(Date, _Component);
 
-  Text.prototype.handleChange = function handleChange() {
-    var node = _react2["default"].findDOMNode(this.refs.text);
+  Date.prototype.handleChange = function handleChange() {
+    var node = _react2["default"].findDOMNode(this.refs.date);
     this.props.setValue(node.value);
   };
 
-  Text.prototype.render = function render() {
-    return _react2["default"].createElement("input", { type: "text", ref: "text", value: this.props.value, onChange: this.handleChange.bind(this) });
+  Date.prototype.render = function render() {
+    return _react2["default"].createElement("input", { type: "month", ref: "date", value: this.props.value, onChange: this.handleChange.bind(this) });
   };
 
-  _createClass(Text, null, [{
+  _createClass(Date, null, [{
     key: "propTypes",
     value: {
       setValue: _react.PropTypes.func.isRequired
@@ -40,8 +40,8 @@ var Text = (function (_Component) {
     enumerable: true
   }]);
 
-  return Text;
+  return Date;
 })(_react.Component);
 
-exports["default"] = Text;
+exports["default"] = Date;
 module.exports = exports["default"];

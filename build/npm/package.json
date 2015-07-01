@@ -1,6 +1,6 @@
 {
   "name": "react-query-builder",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "lib",
   "repository": {
     "type": "git",
@@ -11,13 +11,5 @@
   "bugs": {
     "url": "https://github.com/fubhy/react-query-builder/issues"
   },
-  "homepage": "https://github.com/fubhy/react-query-builder",
-  "dependencies": {
-    "flux": "^2.0.1",
-    "lodash": "^3.5.0"
-  },
-  "peerDependencies": {
-    "react": "0.13.x",
-    "immutable": "^3.6.4"
-  }
+  "homepage": "https://github.com/fubhy/react-query-builder"
 }

@@ -1,184 +1,140 @@
-"use strict";
+'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+exports.__esModule = true;
 
-var React = _interopRequire(require("react"));
+var _react = require('react');
 
-var Immutable = _interopRequire(require("immutable"));
+var _react2 = _interopRequireDefault(_react);
 
-var RuleActions = _interopRequire(require("../actions/Rule"));
+var _reactPureRenderFunction = require('react-pure-render/function');
 
-var Values = _interopRequire(require("./Values"));
+var _reactPureRenderFunction2 = _interopRequireDefault(_reactPureRenderFunction);
 
-var Options = _interopRequire(require("./Options"));
+var _lodashCollectionMap = require('lodash/collection/map');
 
-var assign = _interopRequire(require("react/lib/Object.assign"));
+var _lodashCollectionMap2 = _interopRequireDefault(_lodashCollectionMap);
 
-var map = _interopRequire(require("lodash/collection/map"));
+var _lodashCollectionSize = require('lodash/collection/size');
 
-var filter = _interopRequire(require("lodash/collection/filter"));
+var _lodashCollectionSize2 = _interopRequireDefault(_lodashCollectionSize);
 
-var Rule = (function (_React$Component) {
+var _containersRuleContainer = require('./containers/RuleContainer');
+
+var _containersRuleContainer2 = _interopRequireDefault(_containersRuleContainer);
+
+var Rule = (function (_Component) {
   function Rule() {
-    _classCallCheck(this, Rule);
+    _classCallCheck(this, _Rule);
 
-    if (_React$Component != null) {
-      _React$Component.apply(this, arguments);
-    }
+    _Component.apply(this, arguments);
+
+    this.shouldComponentUpdate = _reactPureRenderFunction2['default'];
   }
 
-  _inherits(Rule, _React$Component);
+  _inherits(Rule, _Component);
 
-  _createClass(Rule, {
-    removeRule: {
-      value: function removeRule() {
-        RuleActions.removeRule(this.props.path);
-      }
-    },
-    handleFieldSelect: {
-      value: function handleFieldSelect() {
-        var node = React.findDOMNode(this.refs.field);
-        RuleActions.setField(this.props.path, node.value);
-      }
-    },
-    handleOperatorSelect: {
-      value: function handleOperatorSelect() {
-        var node = React.findDOMNode(this.refs.operator);
-        RuleActions.setOperator(this.props.path, node.value);
-      }
-    },
-    render: {
-      value: function render() {
-        var body = [];
+  var _Rule = Rule;
 
-        var fields = this.props.config.fields;
-        var field = this.props.field && fields[this.props.field] || undefined;
+  _Rule.prototype.handleFieldSelect = function handleFieldSelect() {
+    var node = _react2['default'].findDOMNode(this.refs.field);
+    this.props.setField(node.value);
+  };
 
-        var operators = {};
-        for (var id in this.props.config.operators) {
-          if (this.props.config.operators.hasOwnProperty(id)) {
-            if (field && field.operators.indexOf(id) !== -1) {
-              operators[id] = this.props.config.operators[id];
-            }
-          }
-        }
+  _Rule.prototype.handleOperatorSelect = function handleOperatorSelect() {
+    var node = _react2['default'].findDOMNode(this.refs.operator);
+    this.props.setOperator(node.value);
+  };
 
-        var operator = field && this.props.operator && operators[this.props.operator] || undefined;
-
-        if (Object.keys(fields).length) {
-          var options = map(fields, function (item, index) {
-            return React.createElement(
-              "option",
-              { key: index, value: index },
-              item.label
-            );
-          });
-
-          if (typeof field === "undefined") {
-            options.unshift(React.createElement("option", { key: ":empty:", value: ":empty:" }));
-          }
-
-          body.push(React.createElement(
-            "div",
-            { key: "field", className: "rule--field" },
-            React.createElement(
-              "label",
-              null,
-              "Field"
-            ),
-            React.createElement(
-              "select",
-              { ref: "field", value: this.props.field || ":empty:", onChange: this.handleFieldSelect.bind(this) },
-              options
-            )
-          ));
-        }
-
-        if (Object.keys(operators).length) {
-          var options = map(operators, function (item, index) {
-            return React.createElement(
-              "option",
-              { key: index, value: index },
-              item.label
-            );
-          });
-
-          if (typeof operator === "undefined") {
-            options.unshift(React.createElement("option", { key: ":empty:", value: ":empty:" }));
-          }
-
-          body.push(React.createElement(
-            "div",
-            { key: "operator", className: "rule--operator" },
-            React.createElement(
-              "label",
-              null,
-              "Operator"
-            ),
-            React.createElement(
-              "select",
-              { ref: "operator", value: this.props.operator || ":empty:", onChange: this.handleOperatorSelect.bind(this) },
-              options
-            )
-          ));
-        }
-
-        if (field && operator) {
-          var widget = typeof field.widget === "string" ? this.props.config.widgets[field.widget] : field.widget;
-          var cardinality = operator.cardinality || 1;
-
-          var props = {
-            config: this.props.config,
-            path: this.props.path,
-            id: this.props.id,
-            field: field
-          };
-
-          body.push(React.createElement(Options, _extends({ key: "options" }, props, { options: this.props.options, operator: operator })));
-          body.push(React.createElement(Values, _extends({ key: "values" }, props, { value: this.props.value, cardinality: cardinality, widget: widget })));
-        }
-
-        return React.createElement(
-          "div",
-          { className: "rule" },
-          React.createElement(
-            "div",
-            { className: "rule--header" },
-            React.createElement(
-              "div",
-              { className: "rule--actions" },
-              React.createElement(
-                "a",
-                { href: "#", className: "action action--DELETE", onClick: this.removeRule.bind(this) },
-                "Delete"
-              )
-            )
-          ),
-          React.createElement(
-            "div",
-            { className: "rule--body" },
-            body
+  _Rule.prototype.render = function render() {
+    return _react2['default'].createElement(
+      'div',
+      { className: 'rule' },
+      _react2['default'].createElement(
+        'div',
+        { className: 'rule--header' },
+        _react2['default'].createElement(
+          'div',
+          { className: 'rule--actions' },
+          _react2['default'].createElement(
+            'button',
+            { className: 'action action--DELETE', onClick: this.props.removeSelf },
+            'Delete'
           )
-        );
-      }
-    }
-  });
+        )
+      ),
+      _react2['default'].createElement(
+        'div',
+        { className: 'rule--body' },
+        _lodashCollectionSize2['default'](this.props.fieldOptions) ? _react2['default'].createElement(
+          'div',
+          { key: 'field', className: 'rule--field' },
+          _react2['default'].createElement(
+            'label',
+            null,
+            'Field'
+          ),
+          _react2['default'].createElement(
+            'select',
+            { ref: 'field', value: this.props.selectedField, onChange: this.handleFieldSelect.bind(this) },
+            _lodashCollectionMap2['default'](this.props.fieldOptions, function (label, value) {
+              return _react2['default'].createElement(
+                'option',
+                { key: value, value: value },
+                label
+              );
+            })
+          )
+        ) : null,
+        _lodashCollectionSize2['default'](this.props.operatorOptions) ? _react2['default'].createElement(
+          'div',
+          { key: 'operator', className: 'rule--operator' },
+          _react2['default'].createElement(
+            'label',
+            null,
+            'Operator'
+          ),
+          _react2['default'].createElement(
+            'select',
+            { ref: 'operator', value: this.props.selectedOperator, onChange: this.handleOperatorSelect.bind(this) },
+            _lodashCollectionMap2['default'](this.props.operatorOptions, function (label, value) {
+              return _react2['default'].createElement(
+                'option',
+                { key: value, value: value },
+                label
+              );
+            })
+          )
+        ) : null,
+        this.props.children
+      )
+    );
+  };
 
+  _createClass(_Rule, null, [{
+    key: 'propTypes',
+    value: {
+      fieldOptions: _react.PropTypes.object.isRequired,
+      operatorOptions: _react.PropTypes.object.isRequired,
+      setField: _react.PropTypes.func.isRequired,
+      setOperator: _react.PropTypes.func.isRequired,
+      removeSelf: _react.PropTypes.func.isRequired,
+      selectedField: _react.PropTypes.string,
+      selectedOperator: _react.PropTypes.string
+    },
+    enumerable: true
+  }]);
+
+  Rule = _containersRuleContainer2['default'](Rule) || Rule;
   return Rule;
-})(React.Component);
+})(_react.Component);
 
-Rule.propTypes = {
-  config: React.PropTypes.object.isRequired,
-  id: React.PropTypes.string.isRequired,
-  path: React.PropTypes.instanceOf(Immutable.List).isRequired
-};
-
-module.exports = Rule;
+exports['default'] = Rule;
+module.exports = exports['default'];

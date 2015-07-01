@@ -1,36 +1,17 @@
-"use strict";
+'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var _interopRequire = require('babel-runtime/helpers/interop-require')['default'];
 
-var Builder = _interopRequire(require("./components/Builder"));
+exports.__esModule = true;
 
-var TextWidget = _interopRequire(require("./components/widgets/Text"));
+var _componentsQuery = require('./components/Query');
 
-var SelectWidget = _interopRequire(require("./components/widgets/Select"));
+exports.Query = _interopRequire(_componentsQuery);
 
-var TreeStore = _interopRequire(require("./stores/Tree"));
+var _componentsBuilder = require('./components/Builder');
 
-var Dispatcher = _interopRequire(require("./dispatcher/Dispatcher"));
+exports.Builder = _interopRequire(_componentsBuilder);
 
-var GroupConstants = _interopRequire(require("./constants/Group"));
+var _componentsPreview = require('./components/Preview');
 
-var RuleConstants = _interopRequire(require("./constants/Rule"));
-
-var GroupActions = _interopRequire(require("./actions/Group"));
-
-var RuleActions = _interopRequire(require("./actions/Rule"));
-
-var getQueryString = _interopRequire(require("./utils/QueryString"));
-
-module.exports = {
-  Builder: Builder,
-  TreeStore: TreeStore,
-  Dispatcher: Dispatcher,
-  GroupConstants: GroupConstants,
-  RuleConstants: RuleConstants,
-  GroupActions: GroupActions,
-  RuleActions: RuleActions,
-  TextWidget: TextWidget,
-  SelectWidget: SelectWidget,
-  getQueryString: getQueryString
-};
+exports.Preview = _interopRequire(_componentsPreview);

@@ -1,6 +1,6 @@
 {
   "name": "react-query-builder",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "modules",
   "scripts": {
     "build-global": "rm -rf build/global && NODE_ENV=production webpack modules/index.js build/global/ReactQueryBuilder.js && NODE_ENV=production COMPRESS=1 webpack modules/index.js build/global/ReactQueryBuilder.min.js && echo \"gzipped, the global build is `gzip -c build/global/ReactQueryBuilder.min.js | wc -c` bytes\"",

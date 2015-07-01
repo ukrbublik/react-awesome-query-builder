@@ -1,93 +1,110 @@
-"use strict";
+'use strict';
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+var _extends = require('babel-runtime/helpers/extends')['default'];
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _objectWithoutProperties = require('babel-runtime/helpers/object-without-properties')['default'];
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
 
-var React = _interopRequire(require("react"));
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
-var Immutable = _interopRequire(require("immutable"));
+exports.__esModule = true;
 
-var Rule = _interopRequire(require("./Rule"));
+var _react = require('react');
 
-var Group = _interopRequire(require("./Group"));
+var _react2 = _interopRequireDefault(_react);
 
-var assign = _interopRequire(require("react/lib/Object.assign"));
+var _immutable = require('immutable');
 
-var types = {
-  group: Group,
-  rule: Rule
+var _immutable2 = _interopRequireDefault(_immutable);
+
+var _reactPureRenderFunction = require('react-pure-render/function');
+
+var _reactPureRenderFunction2 = _interopRequireDefault(_reactPureRenderFunction);
+
+var _Rule = require('./Rule');
+
+var _Rule2 = _interopRequireDefault(_Rule);
+
+var _Group = require('./Group');
+
+var _Group2 = _interopRequireDefault(_Group);
+
+var typeMap = {
+  rule: function rule(props) {
+    return _react2['default'].createElement(_Rule2['default'], _extends({}, props.properties.toObject(), {
+      id: props.id,
+      path: props.path,
+      actions: props.actions,
+      config: props.config }));
+  },
+  group: function group(props) {
+    return _react2['default'].createElement(
+      _Group2['default'],
+      _extends({}, props.properties.toObject(), {
+        id: props.id,
+        path: props.path,
+        actions: props.actions,
+        config: props.config }),
+      props.children ? props.children.map(function (item) {
+        return _react2['default'].createElement(
+          Item,
+          {
+            key: item.get('id'),
+            id: item.get('id'),
+            path: props.path.push(item.get('id')),
+            type: item.get('type'),
+            properties: item.get('properties'),
+            config: props.config,
+            actions: props.actions },
+          item.get('children')
+        );
+      }).toList() : null
+    );
+  }
 };
 
-var Item = (function (_React$Component) {
-  function Item(props) {
+var Item = (function (_Component) {
+  function Item() {
     _classCallCheck(this, Item);
 
-    _get(Object.getPrototypeOf(Item.prototype), "constructor", this).call(this, props);
+    _Component.apply(this, arguments);
 
-    this.state = {
-      path: props.ancestors.push(props.id)
-    };
+    this.shouldComponentUpdate = _reactPureRenderFunction2['default'];
   }
 
-  _inherits(Item, _React$Component);
+  _inherits(Item, _Component);
 
-  _createClass(Item, {
-    componentWillReceiveProps: {
-      value: function componentWillReceiveProps(nextProps) {
-        if (!Immutable.is(this.props.ancestors, nextProps.ancestors)) {
-          this.setState({
-            path: this.props.ancestors.push(this.props.id)
-          });
-        }
-      }
+  Item.prototype.render = function render() {
+    var _props = this.props;
+    var type = _props.type;
+
+    var props = _objectWithoutProperties(_props, ['type']);
+
+    return typeMap[type](props);
+  };
+
+  _createClass(Item, null, [{
+    key: 'propTypes',
+    value: {
+      config: _react.PropTypes.object.isRequired,
+      id: _react.PropTypes.string.isRequired,
+      type: _react.PropTypes.oneOf(_Object$keys(typeMap)).isRequired,
+      path: _react.PropTypes.instanceOf(_immutable2['default'].List).isRequired,
+      properties: _react.PropTypes.instanceOf(_immutable2['default'].Map).isRequired,
+      children: _react.PropTypes.instanceOf(_immutable2['default'].OrderedMap)
     },
-    render: {
-      value: function render() {
-        var children = this.props.children ? this.props.children.map(function (item) {
-          var props = {
-            config: this.props.config,
-            ancestors: this.state.path,
-            id: item.get("id"),
-            children: item.get("children"),
-            type: item.get("type"),
-            properties: item.get("properties")
-          };
-
-          return React.createElement(Item, _extends({ key: props.id }, props));
-        }, this).toList() : null;
-
-        var component = types[this.props.type];
-        var props = assign({}, this.props.properties.toObject(), {
-          config: this.props.config,
-          id: this.props.id,
-          path: this.state.path,
-          children: children
-        });
-
-        return React.createElement(component, props);
-      }
-    }
-  });
+    enumerable: true
+  }]);
 
   return Item;
-})(React.Component);
+})(_react.Component);
 
-Item.propTypes = {
-  config: React.PropTypes.object.isRequired,
-  id: React.PropTypes.string.isRequired,
-  type: React.PropTypes.string.isRequired,
-  ancestors: React.PropTypes.instanceOf(Immutable.List).isRequired,
-  properties: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-  children: React.PropTypes.instanceOf(Immutable.OrderedMap)
-};
-
-module.exports = Item;
+exports['default'] = Item;
+module.exports = exports['default'];
