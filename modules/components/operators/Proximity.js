@@ -1,15 +1,21 @@
-import { PropTypes } from 'react';
-import PureComponent from 'react-pure-render/component';
+import React, { Component, PropTypes } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
 import range from 'lodash/utility/range';
 
-class Proximity extends PureComponent {
+export default class Proximity extends Component {
+  static propTypes = {
+    setOption: PropTypes.func.isRequired
+  }
+
+  shouldComponentUpdate = shouldPureComponentUpdate;
+
   handleChange() {
     const node = React.findDOMNode(this.refs.proximity);
     this.props.setOption('proximity', node.value);
   }
 
   render() {
-    const options = range(2, 10).map(item => <option key={item} value={item}>{item}</option>);
+    const options = range(2, 10).map((item) => <option key={item} value={item}>{item}</option>);
     const handler = this.handleChange.bind(this);
     const proximity = this.props.options.get('proximity') || this.props.defaults.proximity;
 
@@ -23,5 +29,3 @@ class Proximity extends PureComponent {
     );
   }
 }
-
-export default Proximity;

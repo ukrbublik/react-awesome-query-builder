@@ -18,20 +18,22 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
-        loaders: ['react-hot-loader', 'babel-loader?stage=0&optional=runtime'],
+        loaders: ['react-hot-loader', 'babel-loader'],
         exclude: /node_modules/
       },
       {
         test: /\.scss$/,
-        loaders: ['style-loader', 'css-loader', 'sass-loader'],
+        loaders: ['style-loader', 'css-loader', 'sass-loader?sourceMap'],
         exclude: /node_modules/
       }
     ]
   },
   plugins: [
     new webpack.NormalModuleReplacementPlugin(
-      /^react-query-builder/,
-      path.resolve(__dirname, '../modules')
+      /^react-query-builder/, function (data) {
+        const suffix = data.request.substring('react-query-builder'.length);
+        data.request =  path.resolve(__dirname, '../modules/' + suffix);
+      }
     )
   ]
 };

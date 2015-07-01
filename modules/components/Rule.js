@@ -1,9 +1,23 @@
-import { default as React, PropTypes } from 'react';
-import PureComponent from 'react-pure-render/component';
+import React, { Component, PropTypes } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+import map from 'lodash/collection/map';
+import size from 'lodash/collection/size';
 import RuleContainer from './containers/RuleContainer';
-import collectionMap from 'lodash/collection/map';
 
-class Rule extends PureComponent {
+@RuleContainer
+export default class Rule extends Component {
+  static propTypes = {
+    fieldOptions: PropTypes.object.isRequired,
+    operatorOptions: PropTypes.object.isRequired,
+    setField: PropTypes.func.isRequired,
+    setOperator: PropTypes.func.isRequired,
+    removeSelf: PropTypes.func.isRequired,
+    selectedField: PropTypes.string,
+    selectedOperator: PropTypes.string
+  }
+
+  shouldComponentUpdate = shouldPureComponentUpdate;
+
   handleFieldSelect() {
     const node = React.findDOMNode(this.refs.field);
     this.props.setField(node.value);
@@ -15,22 +29,6 @@ class Rule extends PureComponent {
   }
 
   render() {
-    const fieldOptions = collectionMap(this.props.fieldOptions, (label, value) => (
-      <option key={value} value={value}>{label}</option>
-    ));
-
-    if (fieldOptions.length && typeof this.props.selectedField === 'undefined') {
-      fieldOptions.unshift(<option key=":empty:" value=":empty:">Select a field</option>);
-    }
-
-    const operatorOptions = collectionMap(this.props.operatorOptions, (label, value) => (
-      <option key={value} value={value}>{label}</option>
-    ));
-
-    if (operatorOptions.length && typeof this.props.selectedOperator === 'undefined') {
-      operatorOptions.unshift(<option key=":empty:" value=":empty:">Select an operator</option>);
-    }
-
     return (
       <div className="rule">
         <div className="rule--header">
@@ -39,16 +37,24 @@ class Rule extends PureComponent {
           </div>
         </div>
         <div className="rule--body">
-          {fieldOptions.length ? (
+          {size(this.props.fieldOptions) ? (
             <div key="field" className="rule--field">
               <label>Field</label>
-              <select ref="field" value={this.props.selectedField || ':empty:'} onChange={this.handleFieldSelect.bind(this)}>{fieldOptions}</select>
+              <select ref="field" value={this.props.selectedField} onChange={this.handleFieldSelect.bind(this)}>
+                {map(this.props.fieldOptions, (label, value) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
             </div>
           ) : null}
-          {operatorOptions.length ? (
+          {size(this.props.operatorOptions) ? (
             <div key="operator" className="rule--operator">
               <label>Operator</label>
-              <select ref="operator" value={this.props.selectedOperator || ':empty:'} onChange={this.handleOperatorSelect.bind(this)}>{operatorOptions}</select>
+              <select ref="operator" value={this.props.selectedOperator} onChange={this.handleOperatorSelect.bind(this)}>
+                {map(this.props.operatorOptions, (label, value) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
             </div>
           ) : null}
           {this.props.children}
@@ -57,15 +63,3 @@ class Rule extends PureComponent {
     );
   }
 }
-
-Rule.propTypes = {
-  fieldOptions: PropTypes.object.isRequired,
-  operatorOptions: PropTypes.object.isRequired,
-  setField: PropTypes.func.isRequired,
-  setOperator: PropTypes.func.isRequired,
-  removeSelf: PropTypes.func.isRequired,
-  selectedField: PropTypes.string,
-  selectedOperator: PropTypes.string
-};
-
-export default RuleContainer(Rule);

@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import map from 'lodash/collection/map';
 
-class Select extends React.Component {
-  handleChange () {
+export default class Select extends Component {
+  static propTypes = {
+    setValue: PropTypes.func.isRequired
+  }
+
+  handleChange() {
     const node = React.findDOMNode(this.refs.select);
     this.props.setValue(node.value);
   }
 
-  render () {
+  render() {
     const options = map(this.props.field.options, (label, value) =>
       <option key={value} value={value}>{label}</option>
     );
@@ -17,5 +21,3 @@ class Select extends React.Component {
     );
   }
 }
-
-export default Select;

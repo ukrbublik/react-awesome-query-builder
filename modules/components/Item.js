@@ -1,58 +1,53 @@
-import { default as React, PropTypes } from 'react';
-import PureComponent from 'react-pure-render/component';
+import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
+import shouldPureComponentUpdate from 'react-pure-render/function';
 import Rule from './Rule';
 import Group from './Group';
 
-export default class Item extends PureComponent {
+const typeMap = {
+  rule: (props) => (
+    <Rule {...props.properties.toObject()}
+      id={props.id}
+      path={props.path}
+      actions={props.actions}
+      config={props.config} />
+  ),
+  group: (props) => (
+    <Group {...props.properties.toObject()}
+      id={props.id}
+      path={props.path}
+      actions={props.actions}
+      config={props.config}>
+      {props.children ? props.children.map((item) => (
+        <Item
+          key={item.get('id')}
+          id={item.get('id')}
+          path={props.path.push(item.get('id'))}
+          type={item.get('type')}
+          properties={item.get('properties')}
+          config={props.config}
+          actions={props.actions}>
+          {item.get('children')}
+        </Item>
+      )).toList() : null}
+    </Group>
+  )
+};
+
+export default class Item extends Component {
+  static propTypes = {
+    config: PropTypes.object.isRequired,
+    id: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
+    path: PropTypes.instanceOf(Immutable.List).isRequired,
+    properties: PropTypes.instanceOf(Immutable.Map).isRequired,
+    children: PropTypes.instanceOf(Immutable.OrderedMap)
+  }
+
+  shouldComponentUpdate = shouldPureComponentUpdate;
+
   render() {
     const { type, ...props } = this.props;
-
-    switch (type) {
-      case 'rule':
-        return renderRule(props);
-
-      case 'group':
-        return renderGroup(props);
-    }
-
-    return null;
+    return typeMap[type](props);
   }
 }
-
-Item.contextTypes = {
-  config: PropTypes.object.isRequired
-};
-
-Item.childContextTypes = {
-  path: PropTypes.instanceOf(Immutable.List),
-  id: PropTypes.string
-};
-
-Item.propTypes = {
-  id: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  path: PropTypes.instanceOf(Immutable.List).isRequired,
-  properties: PropTypes.instanceOf(Immutable.Map).isRequired,
-  children: PropTypes.instanceOf(Immutable.OrderedMap)
-};
-
-const renderGroup = props => {
-  const children = props.children ? props.children.map(item => {
-    const id = item.get('id');
-
-    return (
-      <Item key={id}
-            id={id}
-            path={props.path.push(id)}
-            type={item.get('type')}
-            properties={item.get('properties')}>{item.get('children')}</Item>
-    );
-  }).toList() : null;
-
-  return (
-    <Group id={props.id} path={props.path} {...props.properties.toObject()}>{children}</Group>
-  );
-};
-
-const renderRule = props => <Rule id={props.id} path={props.path} {...props.properties.toObject()} />;

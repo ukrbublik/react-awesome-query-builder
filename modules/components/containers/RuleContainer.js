@@ -1,71 +1,84 @@
-import { default as React, PropTypes } from 'react';
-import PureComponent from 'react-pure-render/component';
-import Immutable from 'immutable';
-import RuleActions from '../../actions/Rule';
-import Values from '../Values';
-import Options from '../Options';
-import objectMapValues from 'lodash/object/mapValues';
-import objectPick from 'lodash/object/pick';
+import React, { Component, PropTypes } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+import size from 'lodash/collection/size';
+import mapValues from 'lodash/object/mapValues';
+import pick from 'lodash/object/pick';
+import Widget from '../Widget';
+import Operator from '../Operator';
 
-export default Rule => {
-  class RuleContainer extends PureComponent {
+export default (Rule) => {
+  return class RuleContainer extends Component {
+    static propTypes = {
+      config: PropTypes.object.isRequired,
+      operator: PropTypes.string,
+      field: PropTypes.string
+    }
+
+    shouldComponentUpdate = shouldPureComponentUpdate;
+
     removeSelf() {
-      RuleActions.removeRule(this.props.path);
+      this.props.actions.removeRule(this.props.path);
     }
 
     setField(field) {
-      RuleActions.setField(this.props.path, field);
+      this.props.actions.setField(this.props.path, field);
     }
 
     setOperator(operator) {
-      RuleActions.setOperator(this.props.path, operator);
+      this.props.actions.setOperator(this.props.path, operator);
     }
 
     render() {
-      const configuredOperators = this.context.config.operators;
-      const configuredFields = this.context.config.fields;
-      const selectedField = this.props.field && configuredFields[this.props.field] || undefined;
+      const { fields, operators } = this.props.config;
 
-      const applicableOperators = selectedField ? objectPick(configuredOperators, (item, index) => {
-        return selectedField.operators.indexOf(index) !== -1;
-      }) : {};
+      let fieldOptions = mapValues(fields, (item) => item.label);
 
-      const selectedOperator = selectedField && this.props.operator && applicableOperators[this.props.operator] || undefined;
+      // Add a special 'empty' option if no field has been selected yet.
+      if (size(fieldOptions) && typeof this.props.field === 'undefined') {
+        fieldOptions = Object.assign({}, { ':empty:': 'Select a field' }, fieldOptions);
+      }
 
-      const fieldOptions = objectMapValues(configuredFields, (item, index) => item.label);
-      const operatorOptions = objectMapValues(applicableOperators, (item, index) => item.label);
+      let operatorOptions = mapValues(pick(operators, (item, index) =>
+        this.props.field && fields[this.props.field] && fields[this.props.field].operators.indexOf(index) !== -1
+      ), (item) => item.label);
+
+      // Add a special 'empty' option if no operator has been selected yet.
+      if (size(operatorOptions) && typeof this.props.operator === 'undefined') {
+        operatorOptions = Object.assign({}, { ':empty:': 'Select an operator' }, operatorOptions);
+      }
 
       return (
-        <Rule id={this.props.id}
-              setField={this.setField.bind(this)}
-              setOperator={this.setOperator.bind(this)}
-              selectedField={selectedField ? this.props.field : undefined}
-              selectedOperator={selectedOperator ? this.props.operator : undefined}
-              fieldOptions={fieldOptions}
-              operatorOptions={operatorOptions}
-              removeSelf={this.removeSelf.bind(this)}>
-          {typeof selectedField !== 'undefined' && typeof selectedOperator !== 'undefined' ? ([(
-            <Options key="options"
-                     path={this.props.path}
-                     field={selectedField}
-                     options={this.props.options}
-                     operator={selectedOperator} />
+        <Rule
+          id={this.props.id}
+          removeSelf={this.removeSelf.bind(this)}
+          setField={this.setField.bind(this)}
+          setOperator={this.setOperator.bind(this)}
+          selectedField={this.props.field || ':empty:'}
+          selectedOperator={this.props.operator || ':empty:'}
+          fieldOptions={fieldOptions}
+          operatorOptions={operatorOptions}>
+          {typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(
+            <Operator
+              key="options"
+              path={this.props.path}
+              field={this.props.field}
+              options={this.props.operatorOptions}
+              operator={this.props.operator}
+              actions={this.props.actions}
+              config={this.props.config} />
           ), (
-            <Values key="values"
-                    path={this.props.path}
-                    field={selectedField}
-                    value={this.props.value}
-                    cardinality={selectedOperator.cardinality || 1}
-                    widget={typeof selectedField.widget === 'string' ? this.context.config.widgets[selectedField.widget] : selectedField.widget} />
+            <Widget
+              key="values"
+              path={this.props.path}
+              field={this.props.field}
+              value={this.props.value}
+              options={this.props.valueOptions}
+              operator={this.props.operator}
+              actions={this.props.actions}
+              config={this.props.config} />
           )]) : null}
         </Rule>
       );
     }
-  }
-
-  RuleContainer.contextTypes = {
-    config: PropTypes.object.isRequired
   };
-
-  return RuleContainer;
-}
+};

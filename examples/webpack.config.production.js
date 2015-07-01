@@ -17,14 +17,14 @@ module.exports = {
   },
   module: {
     loaders: [
-      { 
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/
       },
       {
         test: /\.scss$/,
-        loaders: ['style-loader', 'css-loader', 'sass-loader'],
+        loaders: ['style-loader', 'css-loader', 'sass-loader?sourceMap'],
         exclude: /node_modules/
       }
     ]
@@ -45,6 +45,7 @@ module.exports = {
         comments: false
       },
       compressor: {
+        screw_ie8: true,
         warnings: false
       }
     })

@@ -10,12 +10,27 @@
   @include clearfix;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /******************************************************************************/
 /** COMMON ********************************************************************/
 /******************************************************************************/
-.query-builder {
+.query-builder, .query-preview {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
+  line-height: 1.25;
+  margin: 1rem;
+}
+
+.query-preview {
+  font-size: 14px;
+  background: rgba(250, 240, 210, 0.5);
+  border: 1px solid #DCC896;
+  min-height: 1rem;
+  display: block;
+  padding: 1rem;
 }
 
 .group {
@@ -31,7 +46,6 @@
 .group, .rule {
   margin-top: 10px;
   padding: 10px;
-  border-radius: 5px;
   position: relative;
 }
 
@@ -94,7 +108,7 @@
   @extend %clearfix;
 }
 
-.rule--field, .rule--operator, .rule--options, .rule--widgets {
+.rule--field, .rule--operator, .rule--options, .rule--widget {
   display: inline-block;
   margin-right: 10px;
 }

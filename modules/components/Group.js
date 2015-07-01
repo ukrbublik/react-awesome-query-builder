@@ -1,15 +1,27 @@
-import { default as React, PropTypes } from 'react';
-import PureComponent from 'react-pure-render/component';
-import collectionMap from 'lodash/collection/map';
+import React, { Component, PropTypes } from 'react';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+import map from 'lodash/collection/map';
 import GroupContainer from './containers/GroupContainer';
 
-class Group extends PureComponent {
-  render () {
+@GroupContainer
+export default class Group extends Component {
+  static propTypes = {
+    conjunctionOptions: PropTypes.object.isRequired,
+    addRule: PropTypes.func.isRequired,
+    addGroup: PropTypes.func.isRequired,
+    removeSelf: PropTypes.func.isRequired,
+    allowFurtherNesting: PropTypes.bool.isRequired,
+    allowRemoval: PropTypes.bool.isRequired
+  }
+
+  shouldComponentUpdate = shouldPureComponentUpdate;
+
+  render() {
     return (
       <div className="group">
         <div className="group--header">
           <div className="group--conjunctions">
-            {collectionMap(this.props.conjunctionOptions, (item, index) => (
+            {map(this.props.conjunctionOptions, (item, index) => (
               <div key={index} className={`conjunction conjunction--${index.toUpperCase()}`} data-state={item.checked ? 'active' : 'inactive'}>
                 <label htmlFor={item.id}>{item.label}</label>
                 <input id={item.id} type="radio"name={item.name} value={index} checked={item.checked} onChange={item.setConjunction} />
@@ -33,14 +45,3 @@ class Group extends PureComponent {
     );
   }
 }
-
-Group.propTypes = {
-  conjunctionOptions: PropTypes.object.isRequired,
-  addRule: PropTypes.func.isRequired,
-  addGroup: PropTypes.func.isRequired,
-  removeSelf: PropTypes.func.isRequired,
-  allowFurtherNesting: PropTypes.bool.isRequired,
-  allowRemoval: PropTypes.bool.isRequired
-};
-
-export default GroupContainer(Group);

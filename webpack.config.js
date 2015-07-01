@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 
 var plugins = [
+  new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   })
@@ -13,6 +14,7 @@ if (process.env.COMPRESS) {
         comments: false
       },
       compressor: {
+        screw_ie8: true,
         warnings: false
       }
     })
@@ -42,7 +44,8 @@ module.exports = {
     loaders: [
       {
         test: /\.js$/,
-        loaders: ['babel-loader?stage=0&optional=runtime']
+        loaders: ['babel-loader'],
+        exclude: /node_modules/
       }
     ]
   },
