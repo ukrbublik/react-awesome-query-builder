@@ -15,14 +15,16 @@ export default class Proximity extends Component {
   }
 
   render() {
-    const options = range(2, 10).map((item) => <option key={item} value={item}>{item}</option>);
-    const handler = this.handleChange.bind(this);
-    const proximity = this.props.options.get('proximity') || this.props.defaults.proximity;
+    const selectedProximity = this.props.options.get('proximity', this.props.defaults.proximity);
 
     return (
       <div className="operator--PROXIMITY">
         <div className="operator--proximity">
-          <select ref="proximity" value={proximity} onChange={handler}>{options}</select>
+          <select ref="proximity" value={selectedProximity} onChange={this.handleChange.bind(this)}>
+            {range(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
         </div>
         <div className="operator--widgets">{this.props.children}</div>
       </div>

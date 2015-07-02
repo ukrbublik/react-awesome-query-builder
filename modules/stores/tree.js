@@ -1,6 +1,7 @@
 import Immutable from 'immutable';
 import defaultRoot from '../utils/defaultRoot';
-import uuid from '../utils/uuid';
+import defaultGroupProperties from '../utils/defaultGroupProperties';
+import defaultRuleProperties, { defaultOperator, defaultOperatorOptions, defaultValueOptions } from '../utils/defaultRuleProperties';
 import * as constants from '../constants';
 
 /**
@@ -44,22 +45,46 @@ const removeItem = (state, path) =>
  * @param {Immutable.List} path
  * @param {string} field
  */
-const setField = (state, path, field) =>
-  state.withMutations(map => {
-    const expandedPath = expandTreePath(path, 'properties');
-    return map.deleteIn(expandedPath.push('operator'))
-      .setIn(expandedPath.push('field'), field)
-      .setIn(expandedPath.push('options'), new Immutable.Map())
-      .setIn(expandedPath.push('value'), new Immutable.List());
-  });
+const setField = (state, path, field, config) =>
+  state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
+    const currentField = current.get('field');
+    const currentOperator = current.get('operator');
+    const currentValue = current.get('value');
+
+    // If the newly selected field supports the same operator the rule currently
+    // uses, keep it selected.
+    const operator = config.fields[field].operators.indexOf(currentOperator) !== -1 ?
+      currentOperator : defaultOperator(config, field);
+
+    const operatorCardinality = config.operators[operator].cardinality || 1;
+
+    return current.set('field', field)
+      .set('operator', operator)
+      .set('operatorOptions', defaultOperatorOptions(config, operator))
+      .set('valueOptions', defaultValueOptions(config, operator))
+      .set('value', (currentWidget, nextWidget) => {
+        return (currentWidget !== nextWidget) ?
+          new Immutable.List() :
+          new Immutable.List(currentValue.first(operatorCardinality));
+      }(config.fields[currentField].widget, config.fields[field]));
+  }));
 
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
  * @param {string} operator
  */
-const setOperator = (state, path, operator) =>
-  state.withMutations(map => map.setIn(expandTreePath(path, 'properties').push('operator'), operator));
+const setOperator = (state, path, operator, config) =>
+  state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
+    const operatorCardinality = config.operators[operator].cardinality || 1;
+    const currentValue = current.get('value', new Immutable.List());
+    const nextValue = new Immutable.List(currentValue.take(operatorCardinality));
+
+    return current.set('operator', operator)
+      .set('operatorOptions', defaultOperatorOptions(config, operator))
+      .set('valueOptions', defaultValueOptions(config, operator))
+      .set('value', nextValue);
+  }));
 
 /**
  * @param {Immutable.Map} state
@@ -101,8 +126,8 @@ export default (config) => {
       case constants.ADD_GROUP:
         return addItem(state, action.path, new Immutable.Map({
           type: 'group',
-          id: uuid(),
-          properties: new Immutable.Map(action.group)
+          id: action.id,
+          properties: defaultGroupProperties(action.config).merge(action.properties || {})
         }));
 
       case constants.REMOVE_GROUP:
@@ -111,8 +136,8 @@ export default (config) => {
       case constants.ADD_RULE:
         return addItem(state, action.path, new Immutable.Map({
           type: 'rule',
-          id: uuid(),
-          properties: new Immutable.Map(action.rule)
+          id: action.id,
+          properties: defaultRuleProperties(action.config).merge(action.properties || {})
         }));
 
       case constants.REMOVE_RULE:
@@ -122,10 +147,10 @@ export default (config) => {
         return setConjunction(state, action.path, action.conjunction);
 
       case constants.SET_FIELD:
-        return setField(state, action.path, action.field);
+        return setField(state, action.path, action.field, action.config);
 
       case constants.SET_OPERATOR:
-        return setOperator(state, action.path, action.operator);
+        return setOperator(state, action.path, action.operator, action.config);
 
       case constants.SET_VALUE:
         return setValue(state, action.path, action.delta, action.value);

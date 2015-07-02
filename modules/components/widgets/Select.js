@@ -12,7 +12,8 @@ export default class Select extends Component {
   }
 
   render() {
-    const options = map(this.props.field.options, (label, value) =>
+    const fieldDefinition = this.props.config.fields[this.props.field];
+    const options = map(fieldDefinition.options, (label, value) =>
       <option key={value} value={value}>{label}</option>
     );
 

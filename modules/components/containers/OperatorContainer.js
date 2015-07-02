@@ -15,7 +15,7 @@ export default (Operator) => {
     shouldComponentUpdate = shouldPureComponentUpdate;
 
     setOperatorOption(name, value) {
-      this.props.actions.setOperatorOption(this.props.path, name, value);
+      this.props.actions.setOperatorOption(this.props.path, name, value, this.props.config);
     }
 
     render() {

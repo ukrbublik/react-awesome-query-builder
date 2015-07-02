@@ -57,14 +57,21 @@ export default (Widget) => {
     }
 
     render() {
-      const cardinality = this.props.config.operators[this.props.operator].cardinality || 1;
-      if (cardinality === 0) {
+      const fieldDefinition = this.props.config.fields[this.props.field];
+      const operatorDefinition = this.props.config.operators[this.props.operator];
+      if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
         return null;
       }
 
-      const fieldDefinition = this.props.config.fields[this.props.field];
-      const widgetBehavior = this.props.config.widgets[fieldDefinition.widget].behavior;
-      const { factory: optionsFactory, ...operatorDefinition } = this.props.config.operators[this.props.operator];
+      const widgetDefinition = this.props.config.widgets[fieldDefinition.widget];
+      if (typeof widgetDefinition === 'undefined') {
+        return null;
+      }
+
+      const cardinality = operatorDefinition.cardinality || 1;
+      if (cardinality === 0) {
+        return null;
+      }
 
       if (typeof widgetBehavior === 'undefined') {
         return (

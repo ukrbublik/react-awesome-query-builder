@@ -4,20 +4,22 @@ import * as constants from '../constants';
  * @param {Immutable.List} path
  * @param {string} field
  */
-export const setField = (path, field) => ({
+export const setField = (path, field, config) => ({
   type: constants.SET_FIELD,
   path: path,
-  field: field
+  field: field,
+  config: config
 });
 
 /**
  * @param {Immutable.List} path
  * @param {string} operator
  */
-export const setOperator = (path, operator) => ({
+export const setOperator = (path, operator, config) => ({
   type: constants.SET_OPERATOR,
   path: path,
-  operator: operator
+  operator: operator,
+  config: config
 });
 
 /**
@@ -25,11 +27,12 @@ export const setOperator = (path, operator) => ({
  * @param {integer} delta
  * @param {*} value
  */
-export const setValue = (path, delta, value) => ({
+export const setValue = (path, delta, value, config) => ({
   type: constants.SET_VALUE,
   path: path,
   delta: delta,
-  value: value
+  value: value,
+  config: config
 });
 
 /**
@@ -37,11 +40,12 @@ export const setValue = (path, delta, value) => ({
  * @param {string} name
  * @param {*} value
  */
-export const setOperatorOption = (path, name, value) => ({
+export const setOperatorOption = (path, name, value, config) => ({
   type: constants.SET_OPERATOR_OPTION,
   path: path,
   name: name,
-  value: value
+  value: value,
+  config: config
 });
 
 /**
@@ -50,10 +54,11 @@ export const setOperatorOption = (path, name, value) => ({
  * @param {string} name
  * @param {*} value
  */
-export const setValueOption = (path, delta, name, value) => ({
+export const setValueOption = (path, delta, name, value, config) => ({
   type: constants.SET_VALUE_OPTION,
   path: path,
   delta: delta,
   name: name,
-  value: value
+  value: value,
+  config: config
 });

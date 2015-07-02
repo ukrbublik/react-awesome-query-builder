@@ -4,7 +4,7 @@ const queryStringRecursive = (item, config) => {
   const children = item.get('children');
 
   if (type === 'rule') {
-    if (!properties.has('field') || !properties.has('operator')) {
+    if (typeof properties.get('field') === 'undefined' || typeof properties.get('operator') === 'undefined') {
       return undefined;
     }
 
@@ -18,7 +18,12 @@ const queryStringRecursive = (item, config) => {
     const valueOptions = properties.get('valueOptions');
     const cardinality = operatorDefinition.cardinality || 1;
     const widget = config.widgets[fieldDefinition.widget];
-    const value = properties.get('value').map((currentValue) => widget.value(currentValue, config));
+    const value = properties.get('value').map((currentValue) =>
+      // Widgets can optionally define a value extraction function. This is useful in cases
+      // where an advanced widget is made up of multiple input fields that need to be composed
+      // when building the query string.
+      typeof widget.value === 'function' ? widget.value(currentValue, config) : currentValue
+    );
 
     if (value.size < cardinality) {
       return undefined;

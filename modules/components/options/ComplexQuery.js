@@ -16,9 +16,8 @@ export default class ComplexQuery extends Component {
   }
 
   render() {
-    const valueOptionDefinitions = this.props.config.operators[this.props.operator];
     const selectedOperator = this.props.options.get('operator');
-    const operatorOptions = map(mapValues(valueOptionDefinitions.valueOptions.operators, (item) => item.label), (label, value) => (
+    const operatorOptions = map(mapValues(this.props.operators, (item) => item.label), (label, value) => (
       <option key={value} value={value}>{label}</option>
     ));
 

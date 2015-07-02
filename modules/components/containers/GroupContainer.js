@@ -13,19 +13,19 @@ export default (Group) => {
     shouldComponentUpdate = shouldPureComponentUpdate;
 
     setConjunction(conjunction) {
-      this.props.actions.setConjunction(this.props.path, conjunction);
+      this.props.actions.setConjunction(this.props.path, conjunction, this.props.config);
     }
 
     removeSelf() {
-      this.props.actions.removeGroup(this.props.path);
+      this.props.actions.removeGroup(this.props.path, this.props.config);
     }
 
     addGroup() {
-      this.props.actions.addGroup(this.props.path, defaultGroupProperties(this.props.config));
+      this.props.actions.addGroup(this.props.path, this.props.config);
     }
 
     addRule() {
-      this.props.actions.addRule(this.props.path, defaultRuleProperties(this.props.config));
+      this.props.actions.addRule(this.props.path, this.props.config);
     }
 
     render() {
@@ -43,7 +43,7 @@ export default (Group) => {
         label: item.label,
         checked: index === this.props.conjunction,
         setConjunction: () => this.setConjunction.call(this, index)
-      }), this);
+      }));
 
       return (
         <Group
