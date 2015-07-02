@@ -8,7 +8,7 @@ export const defaultField = (config) =>
 
 export const defaultOperator = (config, field) =>
   typeof config.settings.defaultOperator === 'function' ?
-    config.settings.defaultOperator(field, config) : (config.settings.defaultOperator || Object.keys(config.fields[field].operators)[0]);
+    config.settings.defaultOperator(field, config) : (config.settings.defaultOperator || config.fields[field].operators[0]);
 
 export const defaultOperatorOptions = (config, operator) => new Immutable.Map(
   config.operators[operator].options &&

@@ -135,9 +135,6 @@ export default {
     }
   },
   settings: {
-    defaultConjunction: 'and',
-    defaultField: (config) => Object.keys(config.fields)[0],
-    defaultOperator: (field, config) => config.fields[field].operators[0],
     maxNesting: 10
   }
 };
