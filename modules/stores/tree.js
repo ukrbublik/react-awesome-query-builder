@@ -65,8 +65,8 @@ const setField = (state, path, field, config) =>
       .set('value', (currentWidget, nextWidget) => {
         return (currentWidget !== nextWidget) ?
           new Immutable.List() :
-          new Immutable.List(currentValue.first(operatorCardinality));
-      }(config.fields[currentField].widget, config.fields[field]));
+          new Immutable.List(currentValue.take(operatorCardinality));
+      }(config.fields[currentField].widget, config.fields[field].widget));
   }));
 
 /**
