@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import mapValues from 'lodash/object/mapValues';
-import defaultRuleProperties from '../../utils/defaultRuleProperties';
-import defaultGroupProperties from '../../utils/defaultGroupProperties';
 
 export default (Group) => {
   return class GroupContainer extends Component {
