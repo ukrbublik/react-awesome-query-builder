@@ -7,7 +7,7 @@ export default (Operator) => {
     static propTypes = {
       config: PropTypes.object.isRequired,
       path: PropTypes.instanceOf(Immutable.List).isRequired,
-      value: PropTypes.instanceOf(Immutable.List).isRequired,
+      options: PropTypes.instanceOf(Immutable.Map).isRequired,
       field: PropTypes.string.isRequired,
       operator: PropTypes.string.isRequired
     }
