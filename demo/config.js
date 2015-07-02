@@ -18,7 +18,7 @@ export default {
     name: {
       label: 'Name',
       widget: 'text',
-      operators: ['contains', 'startsWith', 'endsWith', 'proximity', 'complexQuery']
+      operators: ['contains', 'startsWith', 'endsWith', 'wordsOne', 'termsAll', 'exactPhrase', 'termsNone', 'proximity', 'complexQuery']
     },
     date: {
       label: 'Date',
@@ -53,8 +53,24 @@ export default {
       label: 'Ends with',
       value: (value, field) => `${field}:*${value.first()}`
     },
+    exactPhrase: {
+      label: 'Exact phrase',
+      value: (value, field) => `${field}:"${value.first()}"`
+    },
+    termsOne: {
+      label: 'At least one of the words',
+      value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' OR ')})`
+    },
+    termsAll: {
+      label: 'All of the words',
+      value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' AND ')})`
+    },
+    termsNone: {
+      label: 'Without the words',
+      value: (value, field) => `-${field}:(${value.first().trim().split(' ').join(' OR ')})`
+    },
     proximity: {
-      label: 'Proximity',
+      label: 'Proximity search',
       cardinality: 2,
       value: (value, field, options) => {
         const output = value.map(currentValue => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
