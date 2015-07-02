@@ -125,21 +125,19 @@ export default {
   },
   widgets: {
     text: {
-      factory: (props) => <TextWidget {...props} />,
-      value: (value) => value
+      factory: (props) => <TextWidget {...props} />
     },
     select: {
-      factory: (props) => <SelectWidget {...props} />,
-      value: (value) => value
+      factory: (props) => <SelectWidget {...props} />
     },
     date: {
-      factory: (props) => <DateWidget {...props} />,
-      value: (value) => value
+      factory: (props) => <DateWidget {...props} />
     }
   },
   settings: {
     defaultConjunction: 'and',
-    defaultField: 'name',
+    defaultField: (config) => Object.keys(config.fields)[0],
+    defaultOperator: (field, config) => config.fields[field].operators[0],
     maxNesting: 10
   }
 };
