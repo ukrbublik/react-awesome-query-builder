@@ -9,7 +9,7 @@ import * as constants from '../constants';
  * @param {...string} suffix
  */
 const expandTreePath = (path, ...suffix) =>
-  path.interpose('children').withMutations(list => {
+  path.interpose('children').withMutations((list) => {
     list.skip(1);
     list.push.apply(list, suffix);
     return list;
