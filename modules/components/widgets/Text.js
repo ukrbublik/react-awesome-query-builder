@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 
 export default class Text extends Component {
   static propTypes = {
-    setValue: PropTypes.func.isRequired
+    setValue: PropTypes.func.isRequired,
+    delta: PropTypes.number.isRequired
   }
 
   handleChange() {
@@ -12,7 +13,7 @@ export default class Text extends Component {
 
   render() {
     return (
-      <input type="text" ref="text" value={this.props.value} onChange={this.handleChange.bind(this)} />
+      <input autoFocus={this.props.delta === 0} type="text" ref="text" value={this.props.value} onChange={this.handleChange.bind(this)} />
     );
   }
 }

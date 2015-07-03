@@ -3,7 +3,8 @@ import map from 'lodash/collection/map';
 
 export default class Select extends Component {
   static propTypes = {
-    setValue: PropTypes.func.isRequired
+    setValue: PropTypes.func.isRequired,
+    delta: PropTypes.number.isRequired
   }
 
   handleChange() {
@@ -18,7 +19,7 @@ export default class Select extends Component {
     );
 
     return (
-      <select ref="select" value={this.props.value} onChange={this.handleChange.bind(this)}>{options}</select>
+      <select autoFocus={this.props.delta === 0} ref="select" value={this.props.value} onChange={this.handleChange.bind(this)}>{options}</select>
     );
   }
 }

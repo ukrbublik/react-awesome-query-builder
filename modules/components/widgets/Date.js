@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 
 export default class Date extends Component {
   static propTypes = {
-    setValue: PropTypes.func.isRequired
+    setValue: PropTypes.func.isRequired,
+    delta: PropTypes.number.isRequired
   }
 
   handleChange() {
@@ -12,7 +13,7 @@ export default class Date extends Component {
 
   render() {
     return (
-      <input type="month" ref="date" value={this.props.value} onChange={this.handleChange.bind(this)} />
+      <input autoFocus={this.props.delta === 0} type="month" ref="date" value={this.props.value} onChange={this.handleChange.bind(this)} />
     );
   }
 }
