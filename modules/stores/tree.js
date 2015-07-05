@@ -1,19 +1,9 @@
 import Immutable from 'immutable';
+import expandTreePath from '../utils/expandTreePath';
 import defaultRoot from '../utils/defaultRoot';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
-import defaultRuleProperties, { defaultOperator, defaultOperatorOptions, defaultValueOptions } from '../utils/defaultRuleProperties';
+import { defaultOperator, defaultOperatorOptions, defaultValueOptions } from '../utils/defaultRuleProperties';
 import * as constants from '../constants';
-
-/**
- * @param {Immutable.List} path
- * @param {...string} suffix
- */
-const expandTreePath = (path, ...suffix) =>
-  path.interpose('children').withMutations((list) => {
-    list.skip(1);
-    list.push.apply(list, suffix);
-    return list;
-  });
 
 /**
  * @param {Immutable.Map} state
@@ -137,7 +127,7 @@ export default (config) => {
         return addItem(state, action.path, new Immutable.Map({
           type: 'rule',
           id: action.id,
-          properties: defaultRuleProperties(action.config).merge(action.properties || {})
+          properties: action.properties
         }));
 
       case constants.REMOVE_RULE:

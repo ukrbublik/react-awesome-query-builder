@@ -11,19 +11,19 @@ export default (Group) => {
     shouldComponentUpdate = shouldPureComponentUpdate;
 
     setConjunction(conjunction) {
-      this.props.actions.setConjunction(this.props.path, conjunction, this.props.config);
+      this.props.actions.setConjunction(this.props.path, conjunction);
     }
 
     removeSelf() {
-      this.props.actions.removeGroup(this.props.path, this.props.config);
+      this.props.actions.removeGroup(this.props.path);
     }
 
     addGroup() {
-      this.props.actions.addGroup(this.props.path, this.props.config);
+      this.props.actions.addGroup(this.props.path);
     }
 
     addRule() {
-      this.props.actions.addRule(this.props.path, this.props.config);
+      this.props.actions.addRule(this.props.path);
     }
 
     render() {

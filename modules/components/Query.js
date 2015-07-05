@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import createTreeStore from '../stores/tree';
-import { createStore, bindActionCreators } from 'redux';
+import { createStore } from 'redux';
 import { Provider, Connector } from 'redux/react';
+import bindActionCreators from '../utils/bindActionCreators';
 import * as actions from '../actions';
 
 export default class Query extends Component {
@@ -33,6 +34,7 @@ export default class Query extends Component {
 
   render() {
     const { conjunctions, fields, operators, widgets, settings, children, ...props } = this.props;
+    const config = { conjunctions, fields, operators, widgets, settings };
 
     return (
       <Provider store={this.state.store}>{() => (
@@ -40,8 +42,8 @@ export default class Query extends Component {
           {({ tree, dispatch }) => {
             return children({
               tree: tree,
-              actions: bindActionCreators(Object.assign({}, actions.tree, actions.group, actions.rule), dispatch),
-              config: { conjunctions, fields, operators, widgets, settings }
+              actions: bindActionCreators({ ...actions.tree, ...actions.group, ...actions.rule }, config, dispatch),
+              config: config
             });
           }}
         </Connector>

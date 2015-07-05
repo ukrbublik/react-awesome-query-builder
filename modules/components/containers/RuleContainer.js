@@ -17,15 +17,15 @@ export default (Rule) => {
     shouldComponentUpdate = shouldPureComponentUpdate;
 
     removeSelf() {
-      this.props.actions.removeRule(this.props.path, this.props.config);
+      this.props.actions.removeRule(this.props.path);
     }
 
     setField(field) {
-      this.props.actions.setField(this.props.path, field, this.props.config);
+      this.props.actions.setField(this.props.path, field);
     }
 
     setOperator(operator) {
-      this.props.actions.setOperator(this.props.path, operator, this.props.config);
+      this.props.actions.setOperator(this.props.path, operator);
     }
 
     render() {

@@ -17,11 +17,11 @@ export default (Widget) => {
     shouldComponentUpdate = shouldPureComponentUpdate;
 
     setValue(delta, value) {
-      this.props.actions.setValue(this.props.path, delta, value, this.props.config);
+      this.props.actions.setValue(this.props.path, delta, value);
     }
 
     setValueOption(delta, name, value) {
-      this.props.actions.setValueOption(this.props.path, delta, name, value, this.props.config);
+      this.props.actions.setValueOption(this.props.path, delta, name, value);
     }
 
     renderOptions(delta) {
