@@ -1,7 +1,6 @@
 import Immutable from 'immutable';
 import expandTreePath from '../utils/expandTreePath';
 import defaultRoot from '../utils/defaultRoot';
-import defaultGroupProperties from '../utils/defaultGroupProperties';
 import { defaultOperator, defaultOperatorOptions, defaultValueOptions } from '../utils/defaultRuleProperties';
 import * as constants from '../constants';
 
@@ -117,7 +116,7 @@ export default (config) => {
         return addItem(state, action.path, new Immutable.Map({
           type: 'group',
           id: action.id,
-          properties: defaultGroupProperties(action.config).merge(action.properties || {})
+          properties: action.properties
         }));
 
       case constants.REMOVE_GROUP:

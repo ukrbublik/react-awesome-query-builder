@@ -1,6 +1,7 @@
 import uuid from '../utils/uuid';
 import expandTreePath from '../utils/expandTreePath';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
+import defaultGroupProperties from '../utils/defaultGroupProperties';
 import * as constants from '../constants';
 
 const hasChildren = (tree, path) =>
@@ -11,7 +12,7 @@ const hasChildren = (tree, path) =>
  * @param {Immutable.Map} tree
  */
 export const setTree = (config, tree) => ({
-	type: constants.SET_TREE,
+  type: constants.SET_TREE,
   tree: tree
 });
 
@@ -60,7 +61,7 @@ export const addGroup = (config, path, properties) => {
       type: constants.ADD_GROUP,
       path: path,
       id: groupUuid,
-      properties: properties,
+      properties: defaultGroupProperties(config).merge(properties || {}),
       config: config
     });
 
