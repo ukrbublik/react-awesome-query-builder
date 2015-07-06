@@ -3,17 +3,17 @@ import uuid from './uuid';
 import defaultRuleProperties from './defaultRuleProperties';
 import defaultGroupProperties from './defaultGroupProperties';
 
-const getChild = (id, config) => ({
+export const getChild = (id, config) => ({
   [id]: new Immutable.Map({
     type: 'rule',
     id: id,
-    properties: new Immutable.Map(defaultRuleProperties(config))
+    properties: defaultRuleProperties(config)
   })
 });
 
 export default (config) => new Immutable.Map({
   type: 'group',
   id: uuid(),
-  children: new Immutable.OrderedMap(getChild(uuid(), config)),
-  properties: new Immutable.Map(defaultGroupProperties(config))
+  children: new Immutable.OrderedMap({ ...getChild(uuid(), config), ...getChild(uuid(), config) }),
+  properties: defaultGroupProperties(config)
 });

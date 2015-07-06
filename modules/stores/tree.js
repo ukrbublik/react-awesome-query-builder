@@ -15,11 +15,13 @@ const setConjunction = (state, path, conjunction) =>
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
- * @param {Immutable.Map} item
+ * @param {string} type
+ * @param {string} id
+ * @param {Immutable.OrderedMap} properties
  */
-const addItem = (state, path, item) =>
+const addItem = (state, path, type, id, properties) =>
   state.mergeIn(expandTreePath(path, 'children'), new Immutable.OrderedMap({
-    [item.get('id')]: item
+    [id]: new Immutable.Map({ type, id, properties })
   }));
 
 /**
@@ -113,21 +115,13 @@ export default (config) => {
         return action.tree;
 
       case constants.ADD_GROUP:
-        return addItem(state, action.path, new Immutable.Map({
-          type: 'group',
-          id: action.id,
-          properties: action.properties
-        }));
+        return addItem(state, action.path, 'group', action.id, action.properties);
 
       case constants.REMOVE_GROUP:
         return removeItem(state, action.path);
 
       case constants.ADD_RULE:
-        return addItem(state, action.path, new Immutable.Map({
-          type: 'rule',
-          id: action.id,
-          properties: action.properties
-        }));
+        return addItem(state, action.path, 'rule', action.id, action.properties);
 
       case constants.REMOVE_RULE:
         return removeItem(state, action.path);
