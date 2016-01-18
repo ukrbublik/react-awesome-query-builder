@@ -1,7 +1,7 @@
 const queryStringRecursive = (item, config) => {
   const type = item.get('type');
   const properties = item.get('properties');
-  const children = item.get('children');
+  const children = item.get('children1');
 
   if (type === 'rule') {
     if (typeof properties.get('field') === 'undefined' || typeof properties.get('operator') === 'undefined') {

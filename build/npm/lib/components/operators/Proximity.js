@@ -1,84 +1,91 @@
 'use strict';
 
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
+var _class, _temp2;
 
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = undefined;
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactPureRenderFunction = require('react-pure-render/function');
+var _function = require('react-pure-render/function');
 
-var _reactPureRenderFunction2 = _interopRequireDefault(_reactPureRenderFunction);
+var _function2 = _interopRequireDefault(_function);
 
-var _lodashUtilityRange = require('lodash/utility/range');
+var _range = require('lodash/utility/range');
 
-var _lodashUtilityRange2 = _interopRequireDefault(_lodashUtilityRange);
+var _range2 = _interopRequireDefault(_range);
 
-var Proximity = (function (_Component) {
-  function Proximity() {
-    _classCallCheck(this, Proximity);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-    _Component.apply(this, arguments);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-    this.shouldComponentUpdate = _reactPureRenderFunction2['default'];
-  }
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Proximity = (_temp2 = _class = function (_Component) {
   _inherits(Proximity, _Component);
 
-  Proximity.prototype.handleChange = function handleChange() {
-    var node = _react2['default'].findDOMNode(this.refs.proximity);
-    this.props.setOption('proximity', node.value);
-  };
+  function Proximity() {
+    var _Object$getPrototypeO;
 
-  Proximity.prototype.render = function render() {
-    var options = _lodashUtilityRange2['default'](2, 10).map(function (item) {
-      return _react2['default'].createElement(
-        'option',
-        { key: item, value: item },
-        item
-      );
-    });
-    var handler = this.handleChange.bind(this);
-    var proximity = this.props.options.get('proximity') || this.props.defaults.proximity;
+    var _temp, _this, _ret;
 
-    return _react2['default'].createElement(
-      'div',
-      { className: 'operator--PROXIMITY' },
-      _react2['default'].createElement(
+    _classCallCheck(this, Proximity);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Proximity)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.shouldComponentUpdate = _function2.default, _temp), _possibleConstructorReturn(_this, _ret);
+  }
+
+  _createClass(Proximity, [{
+    key: 'handleChange',
+    value: function handleChange() {
+      var node = _react2.default.findDOMNode(this.refs.proximity);
+      this.props.setOption('proximity', node.value);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var selectedProximity = this.props.options.get('proximity', this.props.defaults.proximity);
+
+      return _react2.default.createElement(
         'div',
-        { className: 'operator--proximity' },
-        _react2['default'].createElement(
-          'select',
-          { ref: 'proximity', value: proximity, onChange: handler },
-          options
+        { className: 'operator--PROXIMITY' },
+        _react2.default.createElement(
+          'div',
+          { className: 'operator--proximity' },
+          _react2.default.createElement(
+            'select',
+            { ref: 'proximity', value: selectedProximity, onChange: this.handleChange.bind(this) },
+            (0, _range2.default)(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map(function (item) {
+              return _react2.default.createElement(
+                'option',
+                { key: item, value: item },
+                item
+              );
+            })
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'operator--widgets' },
+          this.props.children
         )
-      ),
-      _react2['default'].createElement(
-        'div',
-        { className: 'operator--widgets' },
-        this.props.children
-      )
-    );
-  };
-
-  _createClass(Proximity, null, [{
-    key: 'propTypes',
-    value: {
-      setOption: _react.PropTypes.func.isRequired
-    },
-    enumerable: true
+      );
+    }
   }]);
 
   return Proximity;
-})(_react.Component);
-
-exports['default'] = Proximity;
-module.exports = exports['default'];
+}(_react.Component), _class.propTypes = {
+  setOption: _react.PropTypes.func.isRequired
+}, _temp2);
+exports.default = Proximity;

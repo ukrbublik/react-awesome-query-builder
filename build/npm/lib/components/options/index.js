@@ -1,9 +1,14 @@
 'use strict';
 
-var _interopRequire = require('babel-runtime/helpers/interop-require')['default'];
-
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _ComplexQuery = require('./ComplexQuery');
 
-exports.ComplexQueryOptions = _interopRequire(_ComplexQuery);
+Object.defineProperty(exports, 'ComplexQueryOptions', {
+  enumerable: true,
+  get: function get() {
+    return _ComplexQuery.default;
+  }
+});

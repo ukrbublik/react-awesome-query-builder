@@ -14,22 +14,22 @@ export default class Rule extends Component {
     removeSelf: PropTypes.func.isRequired,
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   handleFieldSelect() {
-    const node = React.findDOMNode(this.refs.field);
-    this.props.setField(node.value);
+/*    const node = React.findDOMNode(this.refs.field);
+    this.props.setField(node.value);*/
   }
 
   handleOperatorSelect() {
-    const node = React.findDOMNode(this.refs.operator);
-    this.props.setOperator(node.value);
+/*    const node = React.findDOMNode(this.refs.operator);
+    this.props.setOperator(node.value);*/
   }
 
   render() {
-    return (
+   return (
       <div className="rule">
         <div className="rule--header">
           <div className="rule--actions">
@@ -40,7 +40,7 @@ export default class Rule extends Component {
           {size(this.props.fieldOptions) ? (
             <div key="field" className="rule--field">
               <label>Field</label>
-              <select ref="field" value={this.props.selectedField} onChange={this.handleFieldSelect.bind(this)}>
+              <select value={this.props.selectedField} onChange={this.handleFieldSelect.bind(this)}>
                 {map(this.props.fieldOptions, (label, value) => (
                   <option key={value} value={value}>{label}</option>
                 ))}

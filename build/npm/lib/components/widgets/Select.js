@@ -1,63 +1,68 @@
 'use strict';
 
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
+var _class, _temp;
 
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = undefined;
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _lodashCollectionMap = require('lodash/collection/map');
+var _map = require('lodash/collection/map');
 
-var _lodashCollectionMap2 = _interopRequireDefault(_lodashCollectionMap);
+var _map2 = _interopRequireDefault(_map);
 
-var Select = (function (_Component) {
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Select = (_temp = _class = function (_Component) {
+  _inherits(Select, _Component);
+
   function Select() {
     _classCallCheck(this, Select);
 
-    _Component.apply(this, arguments);
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(Select).apply(this, arguments));
   }
 
-  _inherits(Select, _Component);
+  _createClass(Select, [{
+    key: 'handleChange',
+    value: function handleChange() {
+      var node = _react2.default.findDOMNode(this.refs.select);
+      this.props.setValue(node.value);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var fieldDefinition = this.props.config.fields[this.props.field];
+      var options = (0, _map2.default)(fieldDefinition.options, function (label, value) {
+        return _react2.default.createElement(
+          'option',
+          { key: value, value: value },
+          label
+        );
+      });
 
-  Select.prototype.handleChange = function handleChange() {
-    var node = _react2['default'].findDOMNode(this.refs.select);
-    this.props.setValue(node.value);
-  };
-
-  Select.prototype.render = function render() {
-    var options = _lodashCollectionMap2['default'](this.props.field.options, function (label, value) {
-      return _react2['default'].createElement(
-        'option',
-        { key: value, value: value },
-        label
+      return _react2.default.createElement(
+        'select',
+        { autoFocus: this.props.delta === 0, ref: 'select', value: this.props.value, onChange: this.handleChange.bind(this) },
+        options
       );
-    });
-
-    return _react2['default'].createElement(
-      'select',
-      { ref: 'select', value: this.props.value, onChange: this.handleChange.bind(this) },
-      options
-    );
-  };
-
-  _createClass(Select, null, [{
-    key: 'propTypes',
-    value: {
-      setValue: _react.PropTypes.func.isRequired
-    },
-    enumerable: true
+    }
   }]);
 
   return Select;
-})(_react.Component);
-
-exports['default'] = Select;
-module.exports = exports['default'];
+}(_react.Component), _class.propTypes = {
+  setValue: _react.PropTypes.func.isRequired,
+  delta: _react.PropTypes.number.isRequired
+}, _temp);
+exports.default = Select;

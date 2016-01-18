@@ -4,7 +4,7 @@ export default class Date extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     delta: PropTypes.number.isRequired
-  }
+  };
 
   handleChange() {
     const node = React.findDOMNode(this.refs.date);

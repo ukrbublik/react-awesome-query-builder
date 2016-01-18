@@ -5,7 +5,7 @@ import range from 'lodash/utility/range';
 export default class Proximity extends Component {
   static propTypes = {
     setOption: PropTypes.func.isRequired
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 

@@ -4,7 +4,7 @@ export default class Text extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     delta: PropTypes.number.isRequired
-  }
+  };
 
   handleChange() {
     let node = React.findDOMNode(this.refs.text);

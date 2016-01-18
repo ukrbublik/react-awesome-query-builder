@@ -1,17 +1,32 @@
 'use strict';
 
-var _interopRequire = require('babel-runtime/helpers/interop-require')['default'];
-
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _Date = require('./Date');
 
-exports.DateWidget = _interopRequire(_Date);
+Object.defineProperty(exports, 'DateWidget', {
+  enumerable: true,
+  get: function get() {
+    return _Date.default;
+  }
+});
 
 var _Select = require('./Select');
 
-exports.SelectWidget = _interopRequire(_Select);
+Object.defineProperty(exports, 'SelectWidget', {
+  enumerable: true,
+  get: function get() {
+    return _Select.default;
+  }
+});
 
 var _Text = require('./Text');
 
-exports.TextWidget = _interopRequire(_Text);
+Object.defineProperty(exports, 'TextWidget', {
+  enumerable: true,
+  get: function get() {
+    return _Text.default;
+  }
+});

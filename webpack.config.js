@@ -33,6 +33,18 @@ module.exports = {
       commonjs: 'react',
       amd: 'react'
     },
+/*    "react-pure-render/function": {
+      root: 'ReactPureRender',
+      commonjs2: 'react-pure-render',
+      commonjs: 'react-pure-render',
+      amd: 'react-pure-render'
+    },
+    "react-redux": {
+      root: 'ReactRedux',
+      commonjs2: 'react-redux',
+      commonjs: 'react-redux',
+      amd: 'react-redux'
+    },*/
     immutable: {
       root: 'Immutable',
       commonjs2: 'immutable',

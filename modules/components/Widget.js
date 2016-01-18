@@ -7,11 +7,12 @@ export default class Widget extends Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   render() {
+    console.log("In Widget:render");
     return (
       <div className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}>{this.props.children}</div>
     );

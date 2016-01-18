@@ -12,7 +12,7 @@ export default (Rule) => {
       config: PropTypes.object.isRequired,
       operator: PropTypes.string,
       field: PropTypes.string
-    }
+    };
 
     shouldComponentUpdate = shouldPureComponentUpdate;
 
@@ -29,6 +29,7 @@ export default (Rule) => {
     }
 
     render() {
+      console.log("In Rule:render");
       const { fields, operators } = this.props.config;
 
       let fieldOptions = mapValues(fields, (item) => item.label);

@@ -2,11 +2,13 @@ import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import mapValues from 'lodash/object/mapValues';
 
+var stringify = require('json-stringify-safe');
+
 export default (Group) => {
   return class GroupContainer extends Component {
     static propTypes = {
       config: PropTypes.object.isRequired
-    }
+    };
 
     shouldComponentUpdate = shouldPureComponentUpdate;
 
@@ -19,10 +21,12 @@ export default (Group) => {
     }
 
     addGroup() {
+      console.log("In GroupContainer:addGroup. path="+stringify(this.props.path)+" actions="+stringify(this.props.actions));
       this.props.actions.addGroup(this.props.path);
     }
 
     addRule() {
+      console.log("In GroupContainer:addRule. path="+stringify(this.props.path)+" config="+stringify(this.props.config));
       this.props.actions.addRule(this.props.path);
     }
 

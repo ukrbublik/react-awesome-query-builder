@@ -1,9 +1,14 @@
 'use strict';
 
-var _interopRequire = require('babel-runtime/helpers/interop-require')['default'];
-
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _Proximity = require('./Proximity');
 
-exports.ProximityOperator = _interopRequire(_Proximity);
+Object.defineProperty(exports, 'ProximityOperator', {
+  enumerable: true,
+  get: function get() {
+    return _Proximity.default;
+  }
+});

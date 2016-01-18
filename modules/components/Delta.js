@@ -5,7 +5,7 @@ export default class Delta extends Component {
   static propTypes = {
     children: PropTypes.arrayOf(PropTypes.element).isRequired,
     delta: PropTypes.number.isRequired
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 

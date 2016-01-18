@@ -1,7 +1,14 @@
 {
   "name": "react-query-builder",
   "version": "0.0.4",
+  "main1": "modules",
+  "main2": "build/npm/lib",
   "main": "lib",
+  "browserify1": {
+    "transform": [
+      "babelify"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/fubhy/react-query-builder.git"
@@ -11,5 +18,16 @@
   "bugs": {
     "url": "https://github.com/fubhy/react-query-builder/issues"
   },
-  "homepage": "https://github.com/fubhy/react-query-builder"
+  "homepage": "https://github.com/fubhy/react-query-builder",
+  "comments": {
+    "redux": "^1.0.0-alpha",
+    "react": "^0.13.3",
+    "react-hot-loader": "^1.2.7",
+    "react-router": "^1.0.0-beta2"
+  },
+  "dependencies": {
+    "react": "^0.14.6",
+    "react-pure-render": "^1.0.2",
+    "react-redux": "^4.0.6"
+  }
 }

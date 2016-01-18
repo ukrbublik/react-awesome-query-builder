@@ -7,7 +7,7 @@ export default class Operator extends Component {
   static propTypes = {
     name: PropTypes.string.isRequired,
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 

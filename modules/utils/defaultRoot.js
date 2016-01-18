@@ -14,6 +14,6 @@ export const getChild = (id, config) => ({
 export default (config) => new Immutable.Map({
   type: 'group',
   id: uuid(),
-  children: new Immutable.OrderedMap({ ...getChild(uuid(), config), ...getChild(uuid(), config) }),
+  children1: new Immutable.OrderedMap({ ...getChild(uuid(), config), ...getChild(uuid(), config) }),
   properties: defaultGroupProperties(config)
 });

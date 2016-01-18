@@ -5,7 +5,7 @@ import defaultGroupProperties from '../utils/defaultGroupProperties';
 import * as constants from '../constants';
 
 const hasChildren = (tree, path) =>
-  tree.getIn(expandTreePath(path, 'children')).size > 0;
+  tree.getIn(expandTreePath(path, 'children1')).size > 0;
 
 /**
  * @param {object} config
@@ -32,7 +32,7 @@ export const addRule = (config, path, properties) => ({
  * @param {object} config
  * @param {Immutable.List} path
  */
-export const removeRule = (config, path) => {
+export const removeRuleOld = (config, path) => {
   return (dispatch, getState) => {
     dispatch({
       type: constants.REMOVE_RULE,
@@ -51,9 +51,20 @@ export const removeRule = (config, path) => {
 /**
  * @param {object} config
  * @param {Immutable.List} path
+ */
+export const removeRule = (config, path) => ({
+  type: constants.REMOVE_RULE,
+  path: path,
+  config: config
+});
+
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
  * @param {object} properties
  */
-export const addGroup = (config, path, properties) => {
+export const addGroupOld = (config, path, properties) => {
   return (dispatch) => {
     const groupUuid = uuid();
 
@@ -74,8 +85,22 @@ export const addGroup = (config, path, properties) => {
 /**
  * @param {object} config
  * @param {Immutable.List} path
+ * @param {object} properties
  */
-export const removeGroup = (config, path) => {
+export const addGroup = (config, path, properties) => ({
+    type: constants.ADD_NEW_GROUP,
+    path: path,
+    properties: defaultGroupProperties(config).merge(properties || {}),
+    config: config
+});
+
+
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ */
+export const removeGroupOld = (config, path) => {
   return (dispatch, getState) => {
     dispatch({
       type: constants.REMOVE_GROUP,
@@ -90,3 +115,13 @@ export const removeGroup = (config, path) => {
     }
   };
 };
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ */
+export const removeGroup = (config, path) => ({
+    type: constants.REMOVE_GROUP,
+    path: path,
+    config: config
+});

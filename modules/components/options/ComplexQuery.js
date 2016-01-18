@@ -6,7 +6,7 @@ import mapValues from 'lodash/object/mapValues';
 export default class ComplexQuery extends Component {
   static propTypes = {
     setOption: PropTypes.func.isRequired
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 

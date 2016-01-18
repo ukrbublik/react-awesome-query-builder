@@ -10,7 +10,7 @@ export default (Operator) => {
       options: PropTypes.instanceOf(Immutable.Map).isRequired,
       field: PropTypes.string.isRequired,
       operator: PropTypes.string.isRequired
-    }
+    };
 
     shouldComponentUpdate = shouldPureComponentUpdate;
 

@@ -12,7 +12,7 @@ export default class Group extends Component {
     removeSelf: PropTypes.func.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
     allowRemoval: PropTypes.bool.isRequired
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 

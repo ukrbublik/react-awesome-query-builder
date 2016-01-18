@@ -1,17 +1,53 @@
 'use strict';
 
-var _interopRequire = require('babel-runtime/helpers/interop-require')['default'];
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-exports.__esModule = true;
+var _Query = require('./components/Query');
 
-var _componentsQuery = require('./components/Query');
+Object.defineProperty(exports, 'Query', {
+  enumerable: true,
+  get: function get() {
+    return _Query.default;
+  }
+});
 
-exports.Query = _interopRequire(_componentsQuery);
+var _Builder = require('./components/Builder');
 
-var _componentsBuilder = require('./components/Builder');
+Object.defineProperty(exports, 'Builder', {
+  enumerable: true,
+  get: function get() {
+    return _Builder.default;
+  }
+});
 
-exports.Builder = _interopRequire(_componentsBuilder);
+var _Preview = require('./components/Preview');
 
-var _componentsPreview = require('./components/Preview');
+Object.defineProperty(exports, 'Preview', {
+  enumerable: true,
+  get: function get() {
+    return _Preview.default;
+  }
+});
 
-exports.Preview = _interopRequire(_componentsPreview);
+var _widgets = require('./components/widgets');
+
+Object.defineProperty(exports, 'TextWidget', {
+  enumerable: true,
+  get: function get() {
+    return _widgets.TextWidget;
+  }
+});
+Object.defineProperty(exports, 'SelectWidget', {
+  enumerable: true,
+  get: function get() {
+    return _widgets.SelectWidget;
+  }
+});
+Object.defineProperty(exports, 'DateWidget', {
+  enumerable: true,
+  get: function get() {
+    return _widgets.DateWidget;
+  }
+});

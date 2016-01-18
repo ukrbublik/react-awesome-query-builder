@@ -18,7 +18,7 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}>
-      {props.children ? props.children.map((item) => (
+      {props.children1 ? props.children1.map((item) => (
         <Item
           key={item.get('id')}
           id={item.get('id')}
@@ -26,8 +26,8 @@ const typeMap = {
           type={item.get('type')}
           properties={item.get('properties')}
           config={props.config}
-          actions={props.actions}>
-          {item.get('children')}
+          actions={props.actions}
+          children1={item.get('children1')}>
         </Item>
       )).toList() : null}
     </Group>
@@ -41,8 +41,8 @@ export default class Item extends Component {
     type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
     path: PropTypes.instanceOf(Immutable.List).isRequired,
     properties: PropTypes.instanceOf(Immutable.Map).isRequired,
-    children: PropTypes.instanceOf(Immutable.OrderedMap)
-  }
+    children1: PropTypes.instanceOf(Immutable.OrderedMap)
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
 

@@ -1,9 +1,11 @@
 'use strict';
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-exports['default'] = function () {
-  return (
+exports.default = function () {
+  return(
     // Generate a random GUID http://stackoverflow.com/a/2117523.
     'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       var r = Math.random() * 16 | 0;
@@ -12,5 +14,3 @@ exports['default'] = function () {
     })
   );
 };
-
-module.exports = exports['default'];
