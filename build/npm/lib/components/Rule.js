@@ -13,6 +13,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _function = require('react-pure-render/function');
 
 var _function2 = _interopRequireDefault(_function);
@@ -57,14 +61,14 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp2 = _class2 = function (_
   _createClass(Rule, [{
     key: 'handleFieldSelect',
     value: function handleFieldSelect() {
-      /*    const node = React.findDOMNode(this.refs.field);
-          this.props.setField(node.value);*/
+      var node = _reactDom2.default.findDOMNode(this.refs.field);
+      this.props.setField(node.value);
     }
   }, {
     key: 'handleOperatorSelect',
     value: function handleOperatorSelect() {
-      /*    const node = React.findDOMNode(this.refs.operator);
-          this.props.setOperator(node.value);*/
+      var node = _reactDom2.default.findDOMNode(this.refs.operator);
+      this.props.setOperator(node.value);
     }
   }, {
     key: 'render',
@@ -98,7 +102,7 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp2 = _class2 = function (_
             ),
             _react2.default.createElement(
               'select',
-              { value: this.props.selectedField, onChange: this.handleFieldSelect.bind(this) },
+              { ref: 'field', value: this.props.selectedField, onChange: this.handleFieldSelect.bind(this) },
               (0, _map2.default)(this.props.fieldOptions, function (label, value) {
                 return _react2.default.createElement(
                   'option',

@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 
 export default class Date extends Component {
   static propTypes = {
@@ -7,7 +8,7 @@ export default class Date extends Component {
   };
 
   handleChange() {
-    const node = React.findDOMNode(this.refs.date);
+    const node = ReactDOM.findDOMNode(this.refs.date);
     this.props.setValue(node.value);
   }
 

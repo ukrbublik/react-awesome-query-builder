@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import map from 'lodash/collection/map';
 import size from 'lodash/collection/size';
@@ -19,13 +20,13 @@ export default class Rule extends Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   handleFieldSelect() {
-/*    const node = React.findDOMNode(this.refs.field);
-    this.props.setField(node.value);*/
+    const node = ReactDOM.findDOMNode(this.refs.field);
+    this.props.setField(node.value);
   }
 
   handleOperatorSelect() {
-/*    const node = React.findDOMNode(this.refs.operator);
-    this.props.setOperator(node.value);*/
+    const node = ReactDOM.findDOMNode(this.refs.operator);
+    this.props.setOperator(node.value);
   }
 
   render() {
@@ -40,7 +41,7 @@ export default class Rule extends Component {
           {size(this.props.fieldOptions) ? (
             <div key="field" className="rule--field">
               <label>Field</label>
-              <select value={this.props.selectedField} onChange={this.handleFieldSelect.bind(this)}>
+              <select ref="field" value={this.props.selectedField} onChange={this.handleFieldSelect.bind(this)}>
                 {map(this.props.fieldOptions, (label, value) => (
                   <option key={value} value={value}>{label}</option>
                 ))}
