@@ -29,7 +29,7 @@ const queryStringRecursive = (item, config) => {
       return undefined;
     }
 
-    return operatorDefinition.value(value, field, options, valueOptions, operator, config);
+    return operatorDefinition.value(value, fieldDefinition.label, options, valueOptions, operator, config);
   }
 
   if (type === 'group' && children && children.size) {

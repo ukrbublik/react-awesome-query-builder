@@ -14,7 +14,7 @@ export default class Date extends Component {
 
   render() {
     return (
-      <input autoFocus={this.props.delta === 0} type="month" ref="date" value={this.props.value} onChange={this.handleChange.bind(this)} />
+      <input autoFocus={this.props.delta === 0} type="date" ref="date" value={this.props.value} onChange={this.handleChange.bind(this)} />
     );
   }
 }

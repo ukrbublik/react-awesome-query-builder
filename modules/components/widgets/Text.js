@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 
 export default class Text extends Component {
   static propTypes = {
@@ -7,7 +8,7 @@ export default class Text extends Component {
   };
 
   handleChange() {
-    let node = React.findDOMNode(this.refs.text);
+    let node = ReactDOM.findDOMNode(this.refs.text);
     this.props.setValue(node.value);
   }
 

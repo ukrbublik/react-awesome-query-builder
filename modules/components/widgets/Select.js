@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import map from 'lodash/collection/map';
 
 export default class Select extends Component {
@@ -8,7 +9,7 @@ export default class Select extends Component {
   };
 
   handleChange() {
-    const node = React.findDOMNode(this.refs.select);
+    const node = ReactDOM.findDOMNode(this.refs.select);
     this.props.setValue(node.value);
   }
 
