@@ -57,7 +57,6 @@ export default (Widget) => {
     }
 
     render() {
-      console.log("In Widget:render");
       const fieldDefinition = this.props.config.fields[this.props.field];
       const operatorDefinition = this.props.config.operators[this.props.operator];
       if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
@@ -75,7 +74,6 @@ export default (Widget) => {
       }
 
       if (typeof widgetBehavior === 'undefined') {
-          console.log("Going to render Widget");
         return (
           <Widget name={fieldDefinition.widget}>
             {range(0, cardinality).map(delta => (

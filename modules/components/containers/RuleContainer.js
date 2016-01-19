@@ -29,7 +29,6 @@ export default (Rule) => {
     }
 
     render() {
-      console.log("In Rule:render");
       const { fields, operators } = this.props.config;
 
       let fieldOptions = mapValues(fields, (item) => item.label);
