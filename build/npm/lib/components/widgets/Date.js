@@ -43,7 +43,7 @@ var Date = (_temp = _class = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement('input', { autoFocus: this.props.delta === 0, type: 'month', ref: 'date', value: this.props.value, onChange: this.handleChange.bind(this) });
+      return _react2.default.createElement('input', { autoFocus: this.props.delta === 0, type: 'date', ref: 'date', value: this.props.value, onChange: this.handleChange.bind(this) });
     }
   }]);
 

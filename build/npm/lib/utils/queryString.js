@@ -44,7 +44,7 @@ var queryStringRecursive = function queryStringRecursive(item, config) {
       }
 
       return {
-        v: operatorDefinition.value(value, field, options, valueOptions, operator, config)
+        v: operatorDefinition.value(value, fieldDefinition.label, options, valueOptions, operator, config)
       };
     }();
 

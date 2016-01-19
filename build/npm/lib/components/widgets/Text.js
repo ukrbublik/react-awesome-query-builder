@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -9,9 +9,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -31,15 +35,15 @@ var Text = (_temp = _class = function (_Component) {
   }
 
   _createClass(Text, [{
-    key: "handleChange",
+    key: 'handleChange',
     value: function handleChange() {
-      var node = _react2.default.findDOMNode(this.refs.text);
+      var node = _reactDom2.default.findDOMNode(this.refs.text);
       this.props.setValue(node.value);
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
-      return _react2.default.createElement("input", { autoFocus: this.props.delta === 0, type: "text", ref: "text", value: this.props.value, onChange: this.handleChange.bind(this) });
+      return _react2.default.createElement('input', { autoFocus: this.props.delta === 0, type: 'text', ref: 'text', value: this.props.value, onChange: this.handleChange.bind(this) });
     }
   }]);
 

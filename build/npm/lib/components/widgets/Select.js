@@ -13,6 +13,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _map = require('lodash/collection/map');
 
 var _map2 = _interopRequireDefault(_map);
@@ -37,7 +41,7 @@ var Select = (_temp = _class = function (_Component) {
   _createClass(Select, [{
     key: 'handleChange',
     value: function handleChange() {
-      var node = _react2.default.findDOMNode(this.refs.select);
+      var node = _reactDom2.default.findDOMNode(this.refs.select);
       this.props.setValue(node.value);
     }
   }, {
