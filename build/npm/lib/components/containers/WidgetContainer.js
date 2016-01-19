@@ -119,7 +119,6 @@ exports.default = function (Widget) {
       value: function render() {
         var _this4 = this;
 
-        console.log("In Widget:render");
         var fieldDefinition = this.props.config.fields[this.props.field];
         var operatorDefinition = this.props.config.operators[this.props.operator];
         if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
@@ -137,7 +136,6 @@ exports.default = function (Widget) {
         }
 
         if (typeof widgetBehavior === 'undefined') {
-          console.log("Going to render Widget");
           return _react2.default.createElement(
             Widget,
             { name: fieldDefinition.widget },

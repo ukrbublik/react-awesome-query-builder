@@ -49,7 +49,6 @@ var Widget = (0, _WidgetContainer2.default)(_class = (_temp2 = _class2 = functio
   _createClass(Widget, [{
     key: 'render',
     value: function render() {
-      console.log("In Widget:render");
       return _react2.default.createElement(
         'div',
         { className: 'rule--widget rule--widget--' + this.props.name.toUpperCase() },

@@ -61,13 +61,11 @@ exports.default = function (Group) {
     }, {
       key: 'addGroup',
       value: function addGroup() {
-        console.log("In GroupContainer:addGroup. path=" + stringify(this.props.path) + " actions=" + stringify(this.props.actions));
         this.props.actions.addGroup(this.props.path);
       }
     }, {
       key: 'addRule',
       value: function addRule() {
-        console.log("In GroupContainer:addRule. path=" + stringify(this.props.path) + " config=" + stringify(this.props.config));
         this.props.actions.addRule(this.props.path);
       }
     }, {

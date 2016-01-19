@@ -82,7 +82,6 @@ exports.default = function (Rule) {
       value: function render() {
         var _this2 = this;
 
-        console.log("In Rule:render");
         var _props$config = this.props.config;
         var fields = _props$config.fields;
         var operators = _props$config.operators;

@@ -206,11 +206,11 @@ exports.default = function (config) {
         return action.tree;
 
       case constants.ADD_NEW_GROUP:
-        console.log("Adding New group");
+        //        console.log("Adding New group");
         return addNewGroup(state, action.path, action.properties, action.config);
 
       case constants.ADD_GROUP:
-        console.log("Adding group");
+        //        console.log("Adding group");
         return addItem(state, action.path, 'group', action.id, action.properties);
 
       case constants.REMOVE_GROUP:
@@ -218,7 +218,7 @@ exports.default = function (config) {
       //      return removeItem(state, action.path);
 
       case constants.ADD_RULE:
-        console.log("Adding rule");
+        //        console.log("Adding rule");
         return addItem(state, action.path, 'rule', action.id, action.properties);
 
       case constants.REMOVE_RULE:
@@ -244,7 +244,7 @@ exports.default = function (config) {
         return setValueOption(state, action.path, action.delta, action.name, action.value);
 
       default:
-        console.log("Returning defaultRoot=" + state);
+        //        console.log("Returning defaultRoot="+state);
         return state;
     }
   };

@@ -2514,9 +2514,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(ConnectedQuery, [{
 	    key: 'render',
 	    value: function render() {
-	      console.log("In ConnectedQuery:render. state=" + this.props.store.getState().toString() + " props=" + stringify(this.props));
-	      console.log("get_children=" + stringify(this.props.get_children));
-	      console.log("dispatch=" + stringify(this.props.dispatch));
+	      //        console.log("In ConnectedQuery:render. state="+this.props.store.getState().toString()+" props="+stringify(this.props));
+	      //        console.log("get_children="+stringify(this.props.get_children));
+	      //        console.log("dispatch="+stringify(this.props.dispatch));
 	      var _props = this.props;
 	      var config = _props.config;
 	      var tree = _props.tree;
@@ -2572,7 +2572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _this2.state = {
 	      store: (0, _redux.createStore)(tree)
 	    };
-	    console.log("Query:constructor. state=" + stringify(_this2.state.store.getState()));
+	    //    console.log("Query:constructor. state="+stringify(this.state.store.getState()));
 	    return _this2;
 	  }
 
@@ -2592,8 +2592,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var config = { conjunctions: conjunctions, fields: fields, operators: operators, widgets: widgets, settings: settings };
 
-	      console.log("In Query:render. state=" + stringify(this.state.store.getState()) + " props=" + stringify(this.props));
-	      console.log("children=" + stringify(this.props.children));
+	      //    console.log("In Query:render. state="+stringify(this.state.store.getState())+" props="+stringify(this.props));
+	      //    console.log("children="+stringify(this.props.children));
 	      return _react2.default.createElement(
 	        _reactRedux.Provider,
 	        { store: this.state.store },
@@ -2838,7 +2838,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Widget, [{
 	    key: 'render',
 	    value: function render() {
-	      console.log("In Widget:render");
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'rule--widget rule--widget--' + this.props.name.toUpperCase() },
@@ -2922,13 +2921,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	      key: 'addGroup',
 	      value: function addGroup() {
-	        console.log("In GroupContainer:addGroup. path=" + stringify(this.props.path) + " actions=" + stringify(this.props.actions));
 	        this.props.actions.addGroup(this.props.path);
 	      }
 	    }, {
 	      key: 'addRule',
 	      value: function addRule() {
-	        console.log("In GroupContainer:addRule. path=" + stringify(this.props.path) + " config=" + stringify(this.props.config));
 	        this.props.actions.addRule(this.props.path);
 	      }
 	    }, {
@@ -3165,7 +3162,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value: function render() {
 	        var _this2 = this;
 
-	        console.log("In Rule:render");
 	        var _props$config = this.props.config;
 	        var fields = _props$config.fields;
 	        var operators = _props$config.operators;
@@ -3354,7 +3350,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value: function render() {
 	        var _this4 = this;
 
-	        console.log("In Widget:render");
 	        var fieldDefinition = this.props.config.fields[this.props.field];
 	        var operatorDefinition = this.props.config.operators[this.props.operator];
 	        if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
@@ -3372,7 +3367,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        if (typeof widgetBehavior === 'undefined') {
-	          console.log("Going to render Widget");
 	          return _react2.default.createElement(
 	            Widget,
 	            { name: fieldDefinition.widget },
@@ -3852,11 +3846,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return action.tree;
 
 	      case constants.ADD_NEW_GROUP:
-	        console.log("Adding New group");
+	        //        console.log("Adding New group");
 	        return addNewGroup(state, action.path, action.properties, action.config);
 
 	      case constants.ADD_GROUP:
-	        console.log("Adding group");
+	        //        console.log("Adding group");
 	        return addItem(state, action.path, 'group', action.id, action.properties);
 
 	      case constants.REMOVE_GROUP:
@@ -3864,7 +3858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //      return removeItem(state, action.path);
 
 	      case constants.ADD_RULE:
-	        console.log("Adding rule");
+	        //        console.log("Adding rule");
 	        return addItem(state, action.path, 'rule', action.id, action.properties);
 
 	      case constants.REMOVE_RULE:
@@ -3890,7 +3884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return setValueOption(state, action.path, action.delta, action.name, action.value);
 
 	      default:
-	        console.log("Returning defaultRoot=" + state);
+	        //        console.log("Returning defaultRoot="+state);
 	        return state;
 	    }
 	  };

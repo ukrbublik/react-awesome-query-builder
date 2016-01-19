@@ -55,9 +55,9 @@ var ConnectedQuery = function (_Component) {
   _createClass(ConnectedQuery, [{
     key: 'render',
     value: function render() {
-      console.log("In ConnectedQuery:render. state=" + this.props.store.getState().toString() + " props=" + stringify(this.props));
-      console.log("get_children=" + stringify(this.props.get_children));
-      console.log("dispatch=" + stringify(this.props.dispatch));
+      //        console.log("In ConnectedQuery:render. state="+this.props.store.getState().toString()+" props="+stringify(this.props));
+      //        console.log("get_children="+stringify(this.props.get_children));
+      //        console.log("dispatch="+stringify(this.props.dispatch));
       var _props = this.props;
       var config = _props.config;
       var tree = _props.tree;
@@ -113,7 +113,7 @@ var Query = function (_Component2) {
     _this2.state = {
       store: (0, _redux.createStore)(tree)
     };
-    console.log("Query:constructor. state=" + stringify(_this2.state.store.getState()));
+    //    console.log("Query:constructor. state="+stringify(this.state.store.getState()));
     return _this2;
   }
 
@@ -133,8 +133,8 @@ var Query = function (_Component2) {
 
       var config = { conjunctions: conjunctions, fields: fields, operators: operators, widgets: widgets, settings: settings };
 
-      console.log("In Query:render. state=" + stringify(this.state.store.getState()) + " props=" + stringify(this.props));
-      console.log("children=" + stringify(this.props.children));
+      //    console.log("In Query:render. state="+stringify(this.state.store.getState())+" props="+stringify(this.props));
+      //    console.log("children="+stringify(this.props.children));
       return _react2.default.createElement(
         _reactRedux.Provider,
         { store: this.state.store },
