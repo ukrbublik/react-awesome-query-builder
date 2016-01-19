@@ -12,7 +12,6 @@ export default class Widget extends Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   render() {
-    console.log("In Widget:render");
     return (
       <div className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}>{this.props.children}</div>
     );

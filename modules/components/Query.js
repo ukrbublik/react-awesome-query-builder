@@ -9,9 +9,9 @@ var stringify = require('json-stringify-safe');
 
 class ConnectedQuery extends Component {
     render() {
-        console.log("In ConnectedQuery:render. state="+this.props.store.getState().toString()+" props="+stringify(this.props));
-        console.log("get_children="+stringify(this.props.get_children));
-        console.log("dispatch="+stringify(this.props.dispatch));
+//        console.log("In ConnectedQuery:render. state="+this.props.store.getState().toString()+" props="+stringify(this.props));
+//        console.log("get_children="+stringify(this.props.get_children));
+//        console.log("dispatch="+stringify(this.props.dispatch));
         const { config, tree, get_children, dispatch, ...props } = this.props;
         return <div>
             {get_children({
@@ -57,15 +57,15 @@ export default class Query extends Component {
     this.state = {
       store: createStore(tree)
     };
-    console.log("Query:constructor. state="+stringify(this.state.store.getState()));
+//    console.log("Query:constructor. state="+stringify(this.state.store.getState()));
   }
 
   render() {
     const { conjunctions, fields, operators, widgets, settings, children, get_children, ...props } = this.props;
     const config = { conjunctions, fields, operators, widgets, settings };
 
-    console.log("In Query:render. state="+stringify(this.state.store.getState())+" props="+stringify(this.props));
-    console.log("children="+stringify(this.props.children));
+//    console.log("In Query:render. state="+stringify(this.state.store.getState())+" props="+stringify(this.props));
+//    console.log("children="+stringify(this.props.children));
     return <Provider store={this.state.store}><QueryContainer store={this.state.store} get_children={get_children} config={config}/></Provider>
     return (
       <Provider store={this.state.store}>{() => (
