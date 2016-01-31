@@ -17,6 +17,8 @@ var _reactDom = require('react-dom');
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
+var _reactBootstrap = require('react-bootstrap');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -37,13 +39,27 @@ var Date = (_temp = _class = function (_Component) {
   _createClass(Date, [{
     key: 'handleChange',
     value: function handleChange() {
-      var node = _reactDom2.default.findDOMNode(this.refs.date);
-      this.props.setValue(node.value);
+      //    const node = ReactDOM.findDOMNode(this.refs.date);
+      this.props.setValue(this.refs.date.getValue());
+    }
+  }, {
+    key: 'handleClick',
+    value: function handleClick() {
+      console.log("In Date:handleClick");
     }
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement('input', { autoFocus: this.props.delta === 0, type: 'date', ref: 'date', value: this.props.value, onChange: this.handleChange.bind(this) });
+      return _react2.default.createElement(
+        _reactBootstrap.Col,
+        { xs: 3 },
+        _react2.default.createElement(
+          'label',
+          null,
+          'Value'
+        ),
+        _react2.default.createElement(_reactBootstrap.Input, { autoFocus: this.props.delta === 0, type: 'date', ref: 'date', value: this.props.value, onInput: this.handleClick(this), onChange: this.handleChange.bind(this) })
+      );
     }
   }]);
 

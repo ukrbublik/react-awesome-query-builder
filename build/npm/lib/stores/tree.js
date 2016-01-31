@@ -244,7 +244,7 @@ exports.default = function (config) {
         return setValueOption(state, action.path, action.delta, action.name, action.value);
 
       default:
-        //        console.log("Returning defaultRoot="+state);
+        console.log("Returning defaultRoot=" + state);
         return state;
     }
   };

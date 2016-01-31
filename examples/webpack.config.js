@@ -22,10 +22,17 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.scss$/,
+        test: /(\.css|\.scss)$/,
         loaders: ['style-loader', 'css-loader', 'sass-loader?sourceMap'],
-        exclude: /node_modules/
-      }
+//        exclude: /node_modules/
+      },
+        {
+            test: /\.less$/,
+            loader: "style!css!less"
+        },
+    { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
+    { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
+
     ]
   },
   plugins: [
@@ -34,6 +41,11 @@ module.exports = {
         const suffix = data.request.substring('react-query-builder'.length);
         data.request =  path.resolve(__dirname, '../modules/' + suffix);
       }
-    )
+    ),
+      new webpack.ProvidePlugin({
+          $: "jquery",
+          jQuery: "jquery",
+          "window.jQuery": "jquery"
+      })
   ]
 };

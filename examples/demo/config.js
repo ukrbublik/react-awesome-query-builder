@@ -34,7 +34,21 @@ export default {
         orange: 'Orange'
       },
       operators: ['equals']
-    }
+    },
+    members: {
+        label: 'Members',
+        widget: 'submenu'
+    },
+    "members.name": {
+        label: 'Name',
+        widget: 'text',
+        operators: ['contains', 'startsWith', 'endsWith', 'wordsOne', 'termsAll', 'exactPhrase', 'termsNone', 'proximity', 'complexQuery']
+    },
+    "members.date": {
+        label: 'Date',
+        widget: 'date',
+        operators: ['equals', 'range', 'minimum', 'maximum']
+    },
   },
   operators: {
     equals: {

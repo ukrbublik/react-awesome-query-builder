@@ -58,7 +58,16 @@ module.exports = {
         test: /\.js$/,
         loaders: ['babel-loader'],
         exclude: /node_modules/
-      }
+      },
+        {
+            test: /(\.css|\.scss)$/,
+            loaders: ['style-loader', 'css-loader', 'sass-loader?sourceMap'],
+//        exclude: /node_modules/
+        },
+        {
+            test: /\.less$/,
+            loader: "style!css!less"
+        }
     ]
   },
   node: {

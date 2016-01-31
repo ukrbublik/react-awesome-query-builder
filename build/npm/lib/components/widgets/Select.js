@@ -21,6 +21,8 @@ var _map = require('lodash/collection/map');
 
 var _map2 = _interopRequireDefault(_map);
 
+var _reactBootstrap = require('react-bootstrap');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -41,8 +43,8 @@ var Select = (_temp = _class = function (_Component) {
   _createClass(Select, [{
     key: 'handleChange',
     value: function handleChange() {
-      var node = _reactDom2.default.findDOMNode(this.refs.select);
-      this.props.setValue(node.value);
+      //    const node = ReactDOM.findDOMNode(this.refs.select);
+      this.props.setValue(this.refs.select.getValue());
     }
   }, {
     key: 'render',
@@ -57,9 +59,18 @@ var Select = (_temp = _class = function (_Component) {
       });
 
       return _react2.default.createElement(
-        'select',
-        { autoFocus: this.props.delta === 0, ref: 'select', value: this.props.value, onChange: this.handleChange.bind(this) },
-        options
+        _reactBootstrap.Col,
+        { xs: 3 },
+        _react2.default.createElement(
+          'label',
+          null,
+          'Value'
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Input,
+          { autoFocus: this.props.delta === 0, type: 'select', ref: 'select', value: this.props.value, onChange: this.handleChange.bind(this) },
+          options
+        )
       );
     }
   }]);

@@ -31,7 +31,8 @@ export default (Rule) => {
     render() {
       const { fields, operators } = this.props.config;
 
-      let fieldOptions = mapValues(fields, (item) => item.label);
+//      let fieldOptions = mapValues(fields, (item) => item.label);
+      let fieldOptions = fields;
 
       // Add a special 'empty' option if no field has been selected yet.
       if (size(fieldOptions) && typeof this.props.field === 'undefined') {

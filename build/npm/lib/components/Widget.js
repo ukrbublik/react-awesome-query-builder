@@ -21,6 +21,8 @@ var _WidgetContainer = require('./containers/WidgetContainer');
 
 var _WidgetContainer2 = _interopRequireDefault(_WidgetContainer);
 
+var _reactBootstrap = require('react-bootstrap');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -50,8 +52,8 @@ var Widget = (0, _WidgetContainer2.default)(_class = (_temp2 = _class2 = functio
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
-        'div',
-        { className: 'rule--widget rule--widget--' + this.props.name.toUpperCase() },
+        _reactBootstrap.Col,
+        { xs: 8, className: 'rule--widget rule--widget--' + this.props.name.toUpperCase() },
         this.props.children
       );
     }

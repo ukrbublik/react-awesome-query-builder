@@ -86,9 +86,9 @@ exports.default = function (Rule) {
         var fields = _props$config.fields;
         var operators = _props$config.operators;
 
-        var fieldOptions = (0, _mapValues2.default)(fields, function (item) {
-          return item.label;
-        });
+        //      let fieldOptions = mapValues(fields, (item) => item.label);
+
+        var fieldOptions = fields;
 
         // Add a special 'empty' option if no field has been selected yet.
         if ((0, _size2.default)(fieldOptions) && typeof this.props.field === 'undefined') {
