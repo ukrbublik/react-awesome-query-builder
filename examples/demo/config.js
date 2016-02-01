@@ -49,6 +49,15 @@ export default {
         widget: 'date',
         operators: ['equals', 'range', 'minimum', 'maximum']
     },
+      "members.test": {
+          label: 'Test',
+          widget: 'submenu'
+      },
+      "members.test.date": {
+          label: 'Date',
+          widget: 'date',
+          operators: ['equals', 'range', 'minimum', 'maximum']
+      }
   },
   operators: {
     equals: {

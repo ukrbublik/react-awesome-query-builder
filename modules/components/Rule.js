@@ -77,8 +77,8 @@ export default class Rule extends Component {
     return keys(direct_fields).map(field => {
         if (fields[field].widget == "submenu") {
 //            console.log("Got submenu for field "+field);
-            var child_fields = pick(fields, (value, key)=> key.startsWith(prefix+field+"."));
-            child_fields = mapKeys(child_fields, (value, key) => key.substring((prefix+field).length+1));
+            var child_fields = pick(fields, (value, key)=> key.startsWith(field+"."));
+            child_fields = mapKeys(child_fields, (value, key) => key.substring(field.length+1));
 //            console.log("child_fields="+stringify(child_fields));
             return <NestedDropdownMenu key={prefix+field} toggle={<a href="#">{fields[field].label}</a>} direction="right">
                         {this.getFieldMenu(child_fields, prefix+field)}

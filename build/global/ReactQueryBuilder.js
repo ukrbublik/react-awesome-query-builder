@@ -21292,7 +21292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'handleFieldSelect',
 	    value: function handleFieldSelect(label, value) {
-	      console.log("Field clicked. Label=" + label + " value=" + value);
+	      //    console.log("Field clicked. Label="+label+" value="+value);
 	      this.props.setField(value);
 	      this.setState({ curField: label });
 	    }
@@ -21300,7 +21300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'handleOperatorSelect',
 	    value: function handleOperatorSelect() {
 	      var node = _reactDom2.default.findDOMNode(this.refs.operator);
-	      console.log("In handleOperatorSelect. value=" + this.refs.operator.getValue());
+	      //    console.log("In handleOperatorSelect. value="+this.refs.operator.getValue());
 	      this.props.setOperator(this.refs.operator.getValue());
 	    }
 	  }, {
@@ -21319,14 +21319,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	      return (0, _keys2.default)(direct_fields).map(function (field) {
 	        if (fields[field].widget == "submenu") {
-	          console.log("Got submenu for field " + field);
+	          //            console.log("Got submenu for field "+field);
 	          var child_fields = (0, _pick2.default)(fields, function (value, key) {
-	            return key.startsWith(prefix + field + ".");
+	            return key.startsWith(field + ".");
 	          });
 	          child_fields = (0, _mapkeys2.default)(child_fields, function (value, key) {
-	            return key.substring((prefix + field).length + 1);
+	            return key.substring(field.length + 1);
 	          });
-	          console.log("child_fields=" + stringify(child_fields));
+	          //            console.log("child_fields="+stringify(child_fields));
 	          return _react2.default.createElement(
 	            _reactDdMenu.NestedDropdownMenu,
 	            { key: prefix + field, toggle: _react2.default.createElement(
@@ -21337,7 +21337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this2.getFieldMenu(child_fields, prefix + field)
 	          );
 	        } else {
-	          console.log("Got single field. prefix=" + prefix + " field=" + field + " entire field=" + stringify(fields[field]));
+	          //            console.log("Got single field. prefix="+prefix+" field="+field+" entire field="+stringify(fields[field]));
 	          return _react2.default.createElement(
 	            'li',
 	            { key: prefix + field },
@@ -21353,7 +21353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      console.log("Rendering rule. fieldOptions=" + stringify(this.props.fieldOptions));
+	      //    console.log("Rendering rule. fieldOptions="+stringify(this.props.fieldOptions));
 	      /*    var field_items = [];
 	          map(this.props.fieldOptions, (label, value)=>
 	              field_items.push({label: label, value: value})
@@ -22668,7 +22668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return setValueOption(state, action.path, action.delta, action.name, action.value);
 
 	      default:
-	        console.log("Returning defaultRoot=" + state);
+	        //        console.log("Returning defaultRoot="+state);
 	        return state;
 	    }
 	  };
