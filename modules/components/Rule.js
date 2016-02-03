@@ -28,7 +28,9 @@ export default class Rule extends Component {
     setOperator: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
     selectedField: PropTypes.string,
-    selectedOperator: PropTypes.string
+    selectedOperator: PropTypes.string,
+    fieldSeparator: PropTypes.string,
+    fieldSeparatorDisplay: PropTypes.string
   };
 
   shouldComponentUpdate = shouldPureComponentUpdate;
@@ -70,16 +72,16 @@ export default class Rule extends Component {
     if (prefix === undefined) {
         prefix = '';
     } else {
-        prefix = prefix + '.';
+        prefix = prefix + this.props.fieldSeparator;
     }
 
-    const direct_fields = omitBy(fields, (value, key)=> key.indexOf('.') > -1);
+    const direct_fields = omitBy(fields, (value, key)=> key.indexOf(this.props.fieldSeparator) > -1);
     return keys(direct_fields).map(field => {
         if (fields[field].widget == "submenu") {
 //            console.log("Got submenu for field "+field);
-            var child_fields = pickBy(fields, (value, key)=> key.startsWith(field+"."));
+            var child_fields = pickBy(fields, (value, key)=> key.startsWith(field+this.props.fieldSeparator));
 //            console.log("child_fields before mapKeys="+stringify(child_fields));
-            child_fields = mapKeys(child_fields, (value, key) => key.substring(field.length+1));
+            child_fields = mapKeys(child_fields, (value, key) => key.substring(field.length+this.props.fieldSeparator.length));
 //            console.log("child_fields="+stringify(child_fields));
             return <NestedDropdownMenu key={prefix+field} toggle={<a href="#">{fields[field].label}</a>} direction="right" animate={false} delay={0}>
                         {this.getFieldMenu(child_fields, prefix+field)}
@@ -87,11 +89,12 @@ export default class Rule extends Component {
         } else {
 //            console.log("Got single field. prefix="+prefix+" field="+field+" entire field="+stringify(fields[field]));
             var short_label;
-            try{
-                short_label = fields[field].label.substring(fields[field].label.lastIndexOf(".")+1);
-            } catch(e){
+            if (fields[field].label.lastIndexOf(this.props.fieldSeparator) >= 0) {
+                short_label = fields[field].label.substring(fields[field].label.lastIndexOf(this.props.fieldSeparator)+this.props.fieldSeparator.length);
+            } else {
                 short_label = fields[field].label;
             }
+//            console.log("label="+fields[field].label+", short="+short_label+", last index="+fields[field].label.lastIndexOf(this.props.fieldSeparator)+", length="+this.props.fieldSeparator.length);
             return <li key={prefix+field}><button type="button" onClick={this.handleFieldSelect.bind(this, fields[field].label, prefix+field)}>{short_label}</button></li>
         }
     })
@@ -108,14 +111,17 @@ export default class Rule extends Component {
     )}
 //    console.log("fields="+stringify(field_items));*/
     var short_field;
-    try{
-        short_field = this.state.curField.substring(this.state.curField.lastIndexOf(".")+1);
-    } catch(e){
+    if (this.state.curField.lastIndexOf(this.props.fieldSeparator) >= 0) {
+        short_field = this.state.curField.substring(this.state.curField.lastIndexOf(this.props.fieldSeparator)+this.props.fieldSeparator.length);
+    } else {
         short_field = this.state.curField;
     }
     var toggle = <Button bsStyle="primary" onClick={this.toggle.bind(this)}>{short_field} <span className="caret"/></Button>;
     if (this.state.curField!=short_field) {
-        toggle = <OverlayTrigger placement="top" overlay={<Tooltip id="Field"><strong>{this.state.curField}</strong></Tooltip>}>{toggle}</OverlayTrigger>
+        RegExp.quote = function(str) {
+            return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+        };
+        toggle = <OverlayTrigger placement="top" overlay={<Tooltip id="Field"><strong>{this.state.curField.replace(new RegExp(RegExp.quote(this.props.fieldSeparator), 'g'), this.props.fieldSeparatorDisplay)}</strong></Tooltip>}>{toggle}</OverlayTrigger>
     }
     let fieldMenuOptions = {
         isOpen: this.state.isFieldOpen,

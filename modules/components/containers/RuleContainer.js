@@ -56,6 +56,8 @@ export default (Rule) => {
           setOperator={this.setOperator.bind(this)}
           selectedField={this.props.field || ':empty:'}
           selectedOperator={this.props.operator || ':empty:'}
+          fieldSeparator={this.props.config.settings.fieldSeparator || '*$.'}
+          fieldSeparatorDisplay={this.props.config.settings.fieldSeparatorDisplay || '=>'}
           fieldOptions={fieldOptions}
           operatorOptions={operatorOptions}>
           {typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(

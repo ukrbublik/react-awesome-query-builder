@@ -39,41 +39,41 @@ export default {
         label: 'Members',
         widget: 'submenu'
     },
-    "members.name": {
+    "members$$name": {
         label: 'Name',
         widget: 'text',
         operators: ['contains', 'startsWith', 'endsWith', 'wordsOne', 'termsAll', 'exactPhrase', 'termsNone', 'proximity', 'complexQuery']
     },
-    "members.date": {
+    "members$$date": {
         label: 'Date',
         widget: 'date',
         operators: ['equals', 'range', 'minimum', 'maximum']
     },
-      "members.test": {
+      "members$$test": {
           label: 'Test',
           widget: 'submenu'
       },
-      "members.test.date": {
-          label: 'Members.Test.Date.just.a.long.name',
+      "members$$test$$date": {
+          label: 'Members$$Test$$Date$$just$$a$$long$$name',
           widget: 'date',
           operators: ['equals', 'range', 'minimum', 'maximum']
       },
-      "members.test.hello": {
-          label: 'Members.Test.Date.just.a.long.hello.to.world',
+      "members$$test$$hello": {
+          label: 'Members$$Test$$Date$$just$$a$$long$$hello$$to$$world',
           widget: 'date',
           operators: ['equals', 'range', 'minimum', 'maximum']
       },
-      "members.test2": {
+      "members$$test2": {
           label: 'Test',
               widget: 'submenu'
       },
-      "members.test2.date": {
-          label: 'Members.Test.Date.just.a.long.name',
+      "members$$test2$$date": {
+          label: 'Members$$Test$$Date$$just$$a$$long$$name',
               widget: 'date',
               operators: ['equals', 'range', 'minimum', 'maximum']
       },
-      "members.test2.hello": {
-          label: 'Members.Test.Date.just.a.long.hello.to.world',
+      "members$$test2$$hello": {
+          label: 'Members$$Test$$Date$$just$$a$$long$$hello$$to$$world',
               widget: 'date',
               operators: ['equals', 'range', 'minimum', 'maximum']
       }
@@ -193,6 +193,8 @@ export default {
     }
   },
   settings: {
-    maxNesting: 10
+    maxNesting: 10,
+    fieldSeparator: '$$',
+    fieldSeparatorDisplay: '==>'
   }
 };
