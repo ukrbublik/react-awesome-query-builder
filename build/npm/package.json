@@ -1,0 +1,44 @@
+{
+  "name": "react-query-builder",
+  "version": "0.0.4",
+  "main1": "modules",
+  "main": "lib",
+  "main2": "build/global/ReactQueryBuilder.js",
+  "browserify1": {
+    "transform": [
+      "babelify"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fubhy/react-query-builder.git"
+  },
+  "author": "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fubhy/react-query-builder/issues"
+  },
+  "homepage": "https://github.com/fubhy/react-query-builder",
+  "comments": {
+    "redux": "^1.0.0-alpha",
+    "react": "^0.13.3",
+    "react-hot-loader": "^1.2.7",
+    "react-router": "^1.0.0-beta2",
+    "react-dropdown-button": "^1.0"
+  },
+  "dependencies": {
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6",
+    "react-pure-render": "^1.0.2",
+    "react-redux": "^4.0.6",
+    "redux": "^3.0.5",
+    "immutable": "^3.7.6",
+    "react-dd-menu": "^1.0",
+    "react-addons-css-transition-group": "^0.14.6",
+    "react-addons-pure-render-mixin": "^0.14.6",
+    "react-bootstrap": "^0.28.1",
+    "react-bootstrap-select": "^0.14",
+    "less-loader": "^2.2",
+    "less": "^2.6"
+  }
+}
