@@ -149,18 +149,24 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
                 'a',
                 { href: '#' },
                 fields[field].label
-              ), direction: 'right' },
+              ), direction: 'right', animate: false, delay: 0 },
             _this2.getFieldMenu(child_fields, prefix + field)
           );
         } else {
           //            console.log("Got single field. prefix="+prefix+" field="+field+" entire field="+stringify(fields[field]));
+          var short_label;
+          try {
+            short_label = fields[field].label.substring(fields[field].label.lastIndexOf(".") + 1);
+          } catch (e) {
+            short_label = fields[field].label;
+          }
           return _react2.default.createElement(
             'li',
             { key: prefix + field },
             _react2.default.createElement(
               'button',
               { type: 'button', onClick: _this2.handleFieldSelect.bind(_this2, fields[field].label, prefix + field) },
-              fields[field].label
+              short_label
             )
           );
         }
@@ -177,7 +183,7 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
           {map(this.props.fieldOptions, (label, item)=>
               <li key={value}><button type="button" onClick={this.handleFieldSelect.bind(this, label, item.value)}>{label}</button></li>
           )}
-          console.log("fields="+stringify(field_items));*/
+      //    console.log("fields="+stringify(field_items));*/
       var short_field;
       try {
         short_field = this.state.curField.substring(this.state.curField.lastIndexOf(".") + 1);
@@ -215,7 +221,6 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
         align: 'left',
         animate: true
       };
-      console.log("Rule:render. operatorOptions=" + stringify(this.props.operatorOptions));
       return _react2.default.createElement(
         'div',
         { className: 'rule' },

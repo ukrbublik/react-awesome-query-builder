@@ -81,12 +81,18 @@ export default class Rule extends Component {
 //            console.log("child_fields before mapKeys="+stringify(child_fields));
             child_fields = mapKeys(child_fields, (value, key) => key.substring(field.length+1));
 //            console.log("child_fields="+stringify(child_fields));
-            return <NestedDropdownMenu key={prefix+field} toggle={<a href="#">{fields[field].label}</a>} direction="right">
+            return <NestedDropdownMenu key={prefix+field} toggle={<a href="#">{fields[field].label}</a>} direction="right" animate={false} delay={0}>
                         {this.getFieldMenu(child_fields, prefix+field)}
                    </NestedDropdownMenu>
         } else {
 //            console.log("Got single field. prefix="+prefix+" field="+field+" entire field="+stringify(fields[field]));
-            return <li key={prefix+field}><button type="button" onClick={this.handleFieldSelect.bind(this, fields[field].label, prefix+field)}>{fields[field].label}</button></li>
+            var short_label;
+            try{
+                short_label = fields[field].label.substring(fields[field].label.lastIndexOf(".")+1);
+            } catch(e){
+                short_label = fields[field].label;
+            }
+            return <li key={prefix+field}><button type="button" onClick={this.handleFieldSelect.bind(this, fields[field].label, prefix+field)}>{short_label}</button></li>
         }
     })
   }
@@ -100,7 +106,7 @@ export default class Rule extends Component {
     {map(this.props.fieldOptions, (label, item)=>
         <li key={value}><button type="button" onClick={this.handleFieldSelect.bind(this, label, item.value)}>{label}</button></li>
     )}
-    console.log("fields="+stringify(field_items));*/
+//    console.log("fields="+stringify(field_items));*/
     var short_field;
     try{
         short_field = this.state.curField.substring(this.state.curField.lastIndexOf(".")+1);
@@ -119,8 +125,7 @@ export default class Rule extends Component {
         direction: 'right',
         align: 'left',
         animate: true
-        };
-    console.log("Rule:render. operatorOptions="+stringify(this.props.operatorOptions));
+    };
     return (
       <div className="rule">
         <div className="rule--header">

@@ -57,6 +57,25 @@ export default {
           label: 'Members.Test.Date.just.a.long.name',
           widget: 'date',
           operators: ['equals', 'range', 'minimum', 'maximum']
+      },
+      "members.test.hello": {
+          label: 'Members.Test.Date.just.a.long.hello.to.world',
+          widget: 'date',
+          operators: ['equals', 'range', 'minimum', 'maximum']
+      },
+      "members.test2": {
+          label: 'Test',
+              widget: 'submenu'
+      },
+      "members.test2.date": {
+          label: 'Members.Test.Date.just.a.long.name',
+              widget: 'date',
+              operators: ['equals', 'range', 'minimum', 'maximum']
+      },
+      "members.test2.hello": {
+          label: 'Members.Test.Date.just.a.long.hello.to.world',
+              widget: 'date',
+              operators: ['equals', 'range', 'minimum', 'maximum']
       }
   },
   operators: {
