@@ -18,7 +18,7 @@ var _function = require('react-pure-render/function');
 
 var _function2 = _interopRequireDefault(_function);
 
-var _range = require('lodash/utility/range');
+var _range = require('lodash/range');
 
 var _range2 = _interopRequireDefault(_range);
 

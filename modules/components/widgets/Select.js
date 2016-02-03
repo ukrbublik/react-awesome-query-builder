@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import map from 'lodash/collection/map';
+import map from 'lodash/map';
 import {Col, Input} from "react-bootstrap";
 
 export default class Select extends Component {

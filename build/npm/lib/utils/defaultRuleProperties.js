@@ -9,11 +9,11 @@ var _immutable = require('immutable');
 
 var _immutable2 = _interopRequireDefault(_immutable);
 
-var _map = require('lodash/collection/map');
+var _map = require('lodash/map');
 
 var _map2 = _interopRequireDefault(_map);
 
-var _range = require('lodash/utility/range');
+var _range = require('lodash/range');
 
 var _range2 = _interopRequireDefault(_range);
 

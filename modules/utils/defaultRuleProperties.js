@@ -1,6 +1,6 @@
 import Immutable from 'immutable';
-import map from 'lodash/collection/map';
-import range from 'lodash/utility/range';
+import map from 'lodash/map';
+import range from 'lodash/range';
 
 export const defaultField = (config) =>
   typeof config.settings.defaultField === 'function' ?

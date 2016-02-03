@@ -14,17 +14,17 @@ var _function = require('react-pure-render/function');
 
 var _function2 = _interopRequireDefault(_function);
 
-var _size = require('lodash/collection/size');
+var _size = require('lodash/size');
 
 var _size2 = _interopRequireDefault(_size);
 
-var _mapValues = require('lodash/object/mapValues');
+var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
 
-var _pick = require('lodash/object/pick');
+var _pickBy = require('lodash/pickBy');
 
-var _pick2 = _interopRequireDefault(_pick);
+var _pickBy2 = _interopRequireDefault(_pickBy);
 
 var _Widget = require('../Widget');
 
@@ -95,7 +95,7 @@ exports.default = function (Rule) {
           fieldOptions = Object.assign({}, { ':empty:': 'Select a field' }, fieldOptions);
         }
 
-        var operatorOptions = (0, _mapValues2.default)((0, _pick2.default)(operators, function (item, index) {
+        var operatorOptions = (0, _mapValues2.default)((0, _pickBy2.default)(operators, function (item, index) {
           return _this2.props.field && fields[_this2.props.field] && fields[_this2.props.field].operators.indexOf(index) !== -1;
         }), function (item) {
           return item.label;

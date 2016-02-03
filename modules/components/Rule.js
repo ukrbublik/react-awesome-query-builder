@@ -1,21 +1,21 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import map from 'lodash/collection/map';
-import size from 'lodash/collection/size';
+import map from 'lodash/map';
+import size from 'lodash/size';
 import RuleContainer from './containers/RuleContainer';
 import DropdownMenu, { NestedDropdownMenu } from 'react-dd-menu';
 require('react-dd-menu/dist/react-dd-menu.css');
 
-import {Row, Col, Button, Input} from "react-bootstrap";
+import {Row, Col, Button, Input, OverlayTrigger, Tooltip} from "react-bootstrap";
 React.Bootstrap = require('react-bootstrap');
 React.Bootstrap.Select = require('react-bootstrap-select');
 require('react-bootstrap-select/less/bootstrap-select.less');
 
-import keys from 'lodash/object/keys';
-import pick from 'lodash/object/pick';
-import omit from 'lodash/object/omit';
-import mapKeys from 'lodash/object/mapkeys';
+import keys from 'lodash/keys';
+import pickBy from 'lodash/pickBy';
+import omitBy from 'lodash/omitBy';
+import mapKeys from 'lodash/mapKeys';
 
 var stringify = require('json-stringify-safe');
 
@@ -73,11 +73,12 @@ export default class Rule extends Component {
         prefix = prefix + '.';
     }
 
-    const direct_fields = omit(fields, (value, key)=> key.indexOf('.') > -1);
+    const direct_fields = omitBy(fields, (value, key)=> key.indexOf('.') > -1);
     return keys(direct_fields).map(field => {
         if (fields[field].widget == "submenu") {
 //            console.log("Got submenu for field "+field);
-            var child_fields = pick(fields, (value, key)=> key.startsWith(field+"."));
+            var child_fields = pickBy(fields, (value, key)=> key.startsWith(field+"."));
+//            console.log("child_fields before mapKeys="+stringify(child_fields));
             child_fields = mapKeys(child_fields, (value, key) => key.substring(field.length+1));
 //            console.log("child_fields="+stringify(child_fields));
             return <NestedDropdownMenu key={prefix+field} toggle={<a href="#">{fields[field].label}</a>} direction="right">
@@ -100,15 +101,26 @@ export default class Rule extends Component {
         <li key={value}><button type="button" onClick={this.handleFieldSelect.bind(this, label, item.value)}>{label}</button></li>
     )}
     console.log("fields="+stringify(field_items));*/
+    var short_field;
+    try{
+        short_field = this.state.curField.substring(this.state.curField.lastIndexOf(".")+1);
+    } catch(e){
+        short_field = this.state.curField;
+    }
+    var toggle = <Button bsStyle="primary" onClick={this.toggle.bind(this)}>{short_field} <span className="caret"/></Button>;
+    if (this.state.curField!=short_field) {
+        toggle = <OverlayTrigger placement="top" overlay={<Tooltip id="Field"><strong>{this.state.curField}</strong></Tooltip>}>{toggle}</OverlayTrigger>
+    }
     let fieldMenuOptions = {
         isOpen: this.state.isFieldOpen,
         close: this.close.bind(this),
-        toggle: <Button bsStyle="primary" onClick={this.toggle.bind(this)}>{this.state.curField} <span className="caret"/></Button>,
+        toggle: toggle,
         nested: 'right',
         direction: 'right',
         align: 'left',
         animate: true
         };
+    console.log("Rule:render. operatorOptions="+stringify(this.props.operatorOptions));
     return (
       <div className="rule">
         <div className="rule--header">
@@ -118,7 +130,7 @@ export default class Rule extends Component {
         </div>
         <Row className="rule--body">
           {size(this.props.fieldOptions) ? (
-            <Col key="field" className="rule--field" xs={1}>
+            <Col key="field" className="rule--field">
                 <label>Field</label>
                 <DropdownMenu {...fieldMenuOptions}>
                     { this.getFieldMenu(this.props.fieldOptions)}
@@ -126,7 +138,7 @@ export default class Rule extends Component {
             </Col>
           ) : null}
           {size(this.props.operatorOptions) ? (
-            <Col key="operator" className="rule--operator" xs={2}>
+            <Col key="operator" className="rule--operator">
               <label>Operator</label>
               <Input className="btn-success" type="select" ref="operator" value={this.props.selectedOperator} onChange={this.handleOperatorSelect.bind(this)}>
                 {map(this.props.operatorOptions, (label, value) => (

@@ -17,7 +17,7 @@ var _reactDom = require('react-dom');
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _map = require('lodash/collection/map');
+var _map = require('lodash/map');
 
 var _map2 = _interopRequireDefault(_map);
 

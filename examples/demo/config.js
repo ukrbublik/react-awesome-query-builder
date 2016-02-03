@@ -54,7 +54,7 @@ export default {
           widget: 'submenu'
       },
       "members.test.date": {
-          label: 'Date',
+          label: 'Members.Test.Date.just.a.long.name',
           widget: 'date',
           operators: ['equals', 'range', 'minimum', 'maximum']
       }

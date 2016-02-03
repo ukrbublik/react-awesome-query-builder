@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import size from 'lodash/collection/size';
-import mapValues from 'lodash/object/mapValues';
-import pick from 'lodash/object/pick';
+import size from 'lodash/size';
+import mapValues from 'lodash/mapValues';
+import pickBy from 'lodash/pickBy';
 import Widget from '../Widget';
 import Operator from '../Operator';
 
@@ -39,7 +39,7 @@ export default (Rule) => {
         fieldOptions = Object.assign({}, { ':empty:': 'Select a field' }, fieldOptions);
       }
 
-      let operatorOptions = mapValues(pick(operators, (item, index) =>
+      let operatorOptions = mapValues(pickBy(operators, (item, index) =>
         this.props.field && fields[this.props.field] && fields[this.props.field].operators.indexOf(index) !== -1
       ), (item) => item.label);
 

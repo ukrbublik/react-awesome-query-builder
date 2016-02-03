@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import mapValues from 'lodash/object/mapValues';
+import mapValues from 'lodash/mapValues';
 
 var stringify = require('json-stringify-safe');
 

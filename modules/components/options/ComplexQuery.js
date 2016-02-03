@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import map from 'lodash/collection/map';
-import mapValues from 'lodash/object/mapValues';
+import map from 'lodash/map';
+import mapValues from 'lodash/mapValues';
 
 export default class ComplexQuery extends Component {
   static propTypes = {

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import range from 'lodash/utility/range';
+import range from 'lodash/range';
 import Delta from '../Delta';
 
 export default (Widget) => {

@@ -14,7 +14,7 @@ var _function = require('react-pure-render/function');
 
 var _function2 = _interopRequireDefault(_function);
 
-var _mapValues = require('lodash/object/mapValues');
+var _mapValues = require('lodash/mapValues');
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
 

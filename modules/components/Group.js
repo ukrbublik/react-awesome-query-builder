@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import map from 'lodash/collection/map';
+import map from 'lodash/map';
 import GroupContainer from './containers/GroupContainer';
 
 @GroupContainer

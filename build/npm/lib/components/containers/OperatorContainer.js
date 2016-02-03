@@ -28,6 +28,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var stringify = require('json-stringify-safe');
+
 exports.default = function (Operator) {
   var _class, _temp2;
 
@@ -59,6 +61,7 @@ exports.default = function (Operator) {
         var _this2 = this;
 
         var operatorDefinitions = this.props.config.operators[this.props.operator];
+        console.log("OperatorContainer:render. operator=" + this.props.operator + " operatorDefinitions=" + stringify(operatorDefinitions));
         if (typeof operatorDefinitions.options === 'undefined') {
           return null;
         }

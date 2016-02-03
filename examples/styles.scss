@@ -108,6 +108,22 @@
   @extend %clearfix;
 }
 
+.rule--field, .rule--operator {
+  float: left;
+  margin-left: 15px;
+}
+
+.rule--field .dd-menu button {
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+div.tooltip-inner {
+  max-width: 500px;
+}
+
 .rule--field, .rule--operator, .rule--options, .rule--widget {
   display: inline-block;
   margin-right: 10px;
