@@ -29,11 +29,11 @@ export default {
       label: 'Color',
       widget: 'select',
       options: {
-        yellow: 'Yellow',
+        yellow1: 'Yellow',
         green: 'Green',
         orange: 'Orange'
       },
-      operators: ['equals']
+      operators: ['selectEquals']
     },
     members: {
         label: 'Members',
@@ -52,6 +52,16 @@ export default {
       "members$$test": {
           label: 'Test',
           widget: 'submenu'
+      },
+      "members$$color": {
+          label: 'Members$$Color',
+          widget: 'select',
+          options: {
+              yellow1: 'Yellow',
+              green: 'Green',
+              orange: 'Orange'
+          },
+          operators: ['selectEquals']
       },
       "members$$test$$date": {
           label: 'Members$$Test$$Date$$just$$a$$long$$name',
@@ -79,6 +89,10 @@ export default {
       }
   },
   operators: {
+    selectEquals: {
+      label: 'Equals',
+      value: (value, field, operatorOptions, valueOptions, operator, config, fieldDefinition) => `${field}:${fieldDefinition.options[value.first()]}`
+    },
     equals: {
       label: 'Equals',
       value: (value, field) => `${field}:${value.first()}`
@@ -195,6 +209,6 @@ export default {
   settings: {
     maxNesting: 10,
     fieldSeparator: '$$',
-    fieldSeparatorDisplay: '==>'
+    fieldSeparatorDisplay: '->'
   }
 };

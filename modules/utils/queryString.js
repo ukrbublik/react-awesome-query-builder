@@ -29,7 +29,11 @@ const queryStringRecursive = (item, config) => {
       return undefined;
     }
 
-    return operatorDefinition.value(value, fieldDefinition.label, options, valueOptions, operator, config);
+      RegExp.quote = function(str) {
+          return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+      };
+
+    return operatorDefinition.value(value, fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), options, valueOptions, operator, config, fieldDefinition);
   }
 
   if (type === 'group' && children && children.size) {

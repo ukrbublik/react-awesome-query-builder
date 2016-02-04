@@ -43,8 +43,12 @@ var queryStringRecursive = function queryStringRecursive(item, config) {
         };
       }
 
+      RegExp.quote = function (str) {
+        return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+      };
+
       return {
-        v: operatorDefinition.value(value, fieldDefinition.label, options, valueOptions, operator, config)
+        v: operatorDefinition.value(value, fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), options, valueOptions, operator, config, fieldDefinition)
       };
     }();
 
