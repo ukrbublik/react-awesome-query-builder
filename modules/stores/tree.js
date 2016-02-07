@@ -138,8 +138,13 @@ const setOperator = (state, path, operator, config) =>
  * @param {integer} delta
  * @param {*} value
  */
-const setValue = (state, path, delta, value) =>
-  state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+const setValue = (state, path, delta, value) => {
+    if (typeof value === "undefined") {
+        return state.deleteIn(expandTreePath(path, 'properties', 'value', delta + ''));
+    } else {
+        return state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+    }
+};
 
 /**
  * @param {Immutable.Map} state

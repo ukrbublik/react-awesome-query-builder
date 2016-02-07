@@ -168,7 +168,11 @@ var setOperator = function setOperator(state, path, operator, config) {
  * @param {*} value
  */
 var setValue = function setValue(state, path, delta, value) {
-  return state.setIn((0, _expandTreePath2.default)(path, 'properties', 'value', delta + ''), value);
+  if (typeof value === "undefined") {
+    return state.deleteIn((0, _expandTreePath2.default)(path, 'properties', 'value', delta + ''));
+  } else {
+    return state.setIn((0, _expandTreePath2.default)(path, 'properties', 'value', delta + ''), value);
+  }
 };
 
 /**
