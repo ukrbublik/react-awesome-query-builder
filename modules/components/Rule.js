@@ -8,9 +8,9 @@ import DropdownMenu, { NestedDropdownMenu } from 'react-dd-menu';
 require('react-dd-menu/dist/react-dd-menu.css');
 
 import {Row, Col, Button, Input, OverlayTrigger, Tooltip} from "react-bootstrap";
-React.Bootstrap = require('react-bootstrap');
+/*React.Bootstrap = require('react-bootstrap');
 React.Bootstrap.Select = require('react-bootstrap-select');
-require('react-bootstrap-select/less/bootstrap-select.less');
+require('react-bootstrap-select/less/bootstrap-select.less');*/
 
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
