@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextWidget, SelectWidget, DateWidget } from 'react-query-builder/components/widgets';
+import { TextWidget, SelectWidget, DateWidget, BooleanWidget } from 'react-query-builder/components/widgets';
 import { ProximityOperator } from 'react-query-builder/components/operators';
 import { ComplexQueryOptions } from 'react-query-builder/components/options';
 
@@ -12,7 +12,7 @@ export default {
     or: {
       label: 'Or',
       value: (value) => value.size > 1 ? `(${value.join(' OR ')})` : value.first()
-    }
+    },
   },
   fields: {
     name: {
