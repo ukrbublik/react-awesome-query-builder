@@ -10,7 +10,6 @@ export default class Builder extends Component {
 
   render() {
     const id = this.props.tree.get('id');
-
     return (
       <Item key={id}
         id={id}

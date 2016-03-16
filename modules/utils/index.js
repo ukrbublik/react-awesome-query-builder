@@ -1,2 +1,2 @@
 'use strict';
-export queryBuilderFormat from './queryBuilderFormat'
+export {queryBuilderFormat, queryBuilderToTree} from './queryBuilderFormat'
