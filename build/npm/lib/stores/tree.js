@@ -32,6 +32,8 @@ var _defaultGroupProperties = require('../utils/defaultGroupProperties');
 
 var _defaultGroupProperties2 = _interopRequireDefault(_defaultGroupProperties);
 
+var _index = require('../utils/index');
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -57,7 +59,6 @@ var addNewGroup = function addNewGroup(state, path, properties, config) {
     var groupPath = path.push(groupUuid);
     // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn((0, _expandTreePath2.default)(groupPath, 'children1'), new _immutable2.default.OrderedMap());
-    state = addItem(state, groupPath, 'rule', (0, _uuid2.default)(), (0, _defaultRuleProperties2.default)(config).merge(properties || {}));
     state = addItem(state, groupPath, 'rule', (0, _uuid2.default)(), (0, _defaultRuleProperties2.default)(config).merge(properties || {}));
     return state;
 };
@@ -135,7 +136,7 @@ var setField = function setField(state, path, field, config) {
             // uses, keep it selected.
             var operator = config.fields[field].operators.indexOf(currentOperator) !== -1 ? currentOperator : (0, _defaultRuleProperties.defaultOperator)(config, field);
 
-            var operatorCardinality = config.operators[operator].cardinality || 1;
+            var operatorCardinality = (0, _index.defaultValue)(config.operators[operator].cardinality, 1);
 
             return current.set('field', field).set('operator', operator).set('operatorOptions', (0, _defaultRuleProperties.defaultOperatorOptions)(config, operator)).set('valueOptions', (0, _defaultRuleProperties.defaultValueOptions)(config, operator)).set('value', function (currentWidget, nextWidget) {
                 return currentWidget !== nextWidget ? new _immutable2.default.List() : new _immutable2.default.List(currentValue.take(operatorCardinality));
@@ -152,7 +153,7 @@ var setField = function setField(state, path, field, config) {
 var setOperator = function setOperator(state, path, operator, config) {
     return state.updateIn((0, _expandTreePath2.default)(path, 'properties'), function (map) {
         return map.withMutations(function (current) {
-            var operatorCardinality = config.operators[operator].cardinality || 1;
+            var operatorCardinality = (0, _index.defaultValue)(config.operators[operator].cardinality, 1);
             var currentValue = current.get('value', new _immutable2.default.List());
             var nextValue = new _immutable2.default.List(currentValue.take(operatorCardinality));
 

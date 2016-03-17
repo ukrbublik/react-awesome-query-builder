@@ -14,9 +14,9 @@ var _immutable = require('immutable');
 
 var _immutable2 = _interopRequireDefault(_immutable);
 
-var _function = require('react-pure-render/function');
+var _reactAddonsShallowCompare = require('react-addons-shallow-compare');
 
-var _function2 = _interopRequireDefault(_function);
+var _reactAddonsShallowCompare2 = _interopRequireDefault(_reactAddonsShallowCompare);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45,7 +45,7 @@ exports.default = function (Operator) {
         args[_key] = arguments[_key];
       }
 
-      return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(OperatorContainer)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.shouldComponentUpdate = _function2.default, _temp), _possibleConstructorReturn(_this, _ret);
+      return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(OperatorContainer)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.shouldComponentUpdate = _reactAddonsShallowCompare2.default, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
     _createClass(OperatorContainer, [{

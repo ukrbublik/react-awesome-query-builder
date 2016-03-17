@@ -6,6 +6,7 @@ import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
+import {defaultValue} from "../utils/index";
 
 var stringify = require('json-stringify-safe');
 
@@ -25,7 +26,6 @@ const addNewGroup = (state, path, properties, config) => {
     const groupPath = path.push(groupUuid);
     // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
-    state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config).merge(properties || {}));
     state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config).merge(properties || {}));
     return state;
 };
@@ -102,7 +102,7 @@ const setField = (state, path, field, config) => {
         const operator = config.fields[field].operators.indexOf(currentOperator) !== -1 ?
             currentOperator : defaultOperator(config, field);
 
-        const operatorCardinality = config.operators[operator].cardinality || 1;
+        const operatorCardinality = defaultValue(config.operators[operator].cardinality, 1);
 
         return current.set('field', field)
             .set('operator', operator)
@@ -123,7 +123,7 @@ const setField = (state, path, field, config) => {
  */
 const setOperator = (state, path, operator, config) =>
     state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
-        const operatorCardinality = config.operators[operator].cardinality || 1;
+        const operatorCardinality = defaultValue(config.operators[operator].cardinality, 1);
         const currentValue = current.get('value', new Immutable.List());
         const nextValue = new Immutable.List(currentValue.take(operatorCardinality));
 

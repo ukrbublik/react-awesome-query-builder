@@ -1,5 +1,12 @@
 import React from 'react';
-import {TextWidget, SelectWidget, DateWidget, BooleanWidget, TimeWidget, DateTimeWidget} from 'react-query-builder/components/widgets';
+import {
+    TextWidget,
+    SelectWidget,
+    DateWidget,
+    BooleanWidget,
+    TimeWidget,
+    DateTimeWidget
+} from 'react-query-builder/components/widgets';
 import {ProximityOperator} from 'react-query-builder/components/operators';
 import {ComplexQueryOptions} from 'react-query-builder/components/options';
 
@@ -79,12 +86,24 @@ export default {
         less_or_equal: {label: 'Less or equal'},
         greater: {label: 'Greater'},
         greater_or_equal: {label: 'Greater or equal'},
-        
-        between: {label: 'Between'},
-        not_between: {label: 'Not between'},
-        
-        is_empty: {label: 'Is Empty'},
-        is_not_empty: {label: 'Is not empty'},
+
+        between: {
+            label: 'Between',
+            cardinality: 2,
+        },
+        not_between: {
+            label: 'Not between',
+            cardinality: 2,
+        },
+
+        is_empty: {
+            label: 'Is Empty',
+            cardinality: 0,
+        },
+        is_not_empty: {
+            label: 'Is not empty',
+            cardinality: 0,
+        },
     },
     widgets: {
         text: {

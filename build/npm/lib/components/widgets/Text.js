@@ -39,7 +39,6 @@ var Text = (_temp = _class = function (_Component) {
   _createClass(Text, [{
     key: 'handleChange',
     value: function handleChange() {
-      //    let node = ReactDOM.findDOMNode(this.refs.text);
       this.props.setValue(this.refs.text.getValue());
     }
   }, {

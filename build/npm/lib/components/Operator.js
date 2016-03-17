@@ -13,9 +13,9 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _function = require('react-pure-render/function');
+var _reactAddonsShallowCompare = require('react-addons-shallow-compare');
 
-var _function2 = _interopRequireDefault(_function);
+var _reactAddonsShallowCompare2 = _interopRequireDefault(_reactAddonsShallowCompare);
 
 var _OperatorContainer = require('./containers/OperatorContainer');
 
@@ -43,7 +43,7 @@ var Operator = (0, _OperatorContainer2.default)(_class = (_temp2 = _class2 = fun
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Operator)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.shouldComponentUpdate = _function2.default, _temp), _possibleConstructorReturn(_this, _ret);
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Operator)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.shouldComponentUpdate = _reactAddonsShallowCompare2.default, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(Operator, [{

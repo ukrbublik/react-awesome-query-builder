@@ -43,7 +43,6 @@ var Select = (_temp = _class = function (_Component) {
   _createClass(Select, [{
     key: 'handleChange',
     value: function handleChange() {
-      //    const node = ReactDOM.findDOMNode(this.refs.select);
       this.props.setValue(this.refs.select.getValue());
     }
   }, {

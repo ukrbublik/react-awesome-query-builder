@@ -19,6 +19,8 @@ var _isArray = require('lodash/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
 
+var _index = require('./index');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
@@ -105,7 +107,7 @@ var queryBuilderFormat = exports.queryBuilderFormat = function queryBuilderForma
 
             var fieldType = fieldDefinition.type || "string";
 
-            var cardinality = operatorDefinition.cardinality || 1;
+            var cardinality = (0, _index.defaultValue)(operatorDefinition.cardinality, 1);
             var widget = config.widgets[fieldDefinition.widget];
 
             value = properties.get('value').map(function (currentValue) {

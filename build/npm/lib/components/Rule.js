@@ -17,9 +17,9 @@ var _reactDom = require('react-dom');
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _function = require('react-pure-render/function');
+var _reactAddonsShallowCompare = require('react-addons-shallow-compare');
 
-var _function2 = _interopRequireDefault(_function);
+var _reactAddonsShallowCompare2 = _interopRequireDefault(_reactAddonsShallowCompare);
 
 var _map = require('lodash/map');
 
@@ -75,7 +75,7 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
 
         var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Rule).call(this, props));
 
-        _this.shouldComponentUpdate = _function2.default;
+        _this.shouldComponentUpdate = _reactAddonsShallowCompare2.default;
 
         var curFieldOpts = props.fieldOptions[props.selectedField] || {};
         _this.state = {
@@ -96,12 +96,6 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
             this.setState({ isFieldOpen: false });
         }
     }, {
-        key: 'handleFieldSelect1',
-        value: function handleFieldSelect1() {
-            var node = _reactDom2.default.findDOMNode(this.refs.field);
-            this.props.setField(node.value);
-        }
-    }, {
         key: 'handleFieldSelect',
         value: function handleFieldSelect(label, value) {
             this.props.setField(value);
@@ -110,7 +104,6 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
     }, {
         key: 'handleOperatorSelect',
         value: function handleOperatorSelect() {
-            // const node = ReactDOM.findDOMNode(this.refs.operator);
             this.props.setOperator(this.refs.operator.getValue());
         }
     }, {

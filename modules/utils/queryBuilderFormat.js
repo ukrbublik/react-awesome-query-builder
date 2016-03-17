@@ -2,6 +2,7 @@
 import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
+import {defaultValue} from "./index";
 /*
  Build tree to http://querybuilder.js.org/ like format
 
@@ -80,7 +81,7 @@ export const queryBuilderFormat = (item, config) => {
 
         const fieldType = fieldDefinition.type || "string";
 
-        const cardinality = operatorDefinition.cardinality || 1;
+        const cardinality = defaultValue(operatorDefinition.cardinality, 1);
         const widget = config.widgets[fieldDefinition.widget];
 
         var value = properties.get('value').map((currentValue) =>
