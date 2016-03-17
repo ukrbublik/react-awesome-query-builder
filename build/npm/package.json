@@ -28,17 +28,21 @@
     "react-dropdown-button": "^1.0"
   },
   "dependencies": {
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6",
-    "react-pure-render": "^1.0.2",
-    "react-redux": "^4.0.6",
-    "redux": "^3.0.5",
     "immutable": "^3.7.6",
-    "react-dd-menu": "^1.0",
+    "less": "^2.6",
+    "less-loader": "^2.2",
+    "lodash": "^4.6.1",
+    "moment": "^2.12.0",
+    "react": "^0.14.6",
     "react-addons-css-transition-group": "^0.14.6",
     "react-addons-pure-render-mixin": "^0.14.6",
     "react-bootstrap": "^0.28.1",
-    "less-loader": "^2.2",
-    "less": "^2.6"
+    "react-datetime": "^2.1.0",
+    "react-dd-menu": "^1.0",
+    "react-dom": "^0.14.6",
+    "react-pure-render": "^1.0.2",
+    "react-radio-group": "^2.2.0",
+    "react-redux": "^4.0.6",
+    "redux": "^3.0.5"
   }
 }

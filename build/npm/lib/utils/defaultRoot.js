@@ -1,11 +1,11 @@
 'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getChild = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _immutable = require('immutable');
 
@@ -36,6 +36,10 @@ var getChild = exports.getChild = function getChild(id, config) {
 };
 
 exports.default = function (config) {
+  if (config.tree) {
+    return new _immutable2.default.Map(config.tree);
+  }
+
   return new _immutable2.default.Map({
     type: 'group',
     id: (0, _uuid2.default)(),
