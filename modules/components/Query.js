@@ -70,7 +70,7 @@ export default class Query extends Component {
 
         return (
             <Provider store={this.state.store}>
-                <QueryContainer store={this.state.store} get_children={get_children} config={config}/>
+                <QueryContainer store={this.state.store} get_children={get_children} config={config} onChange={onChange}/>
             </Provider>
         )
     }
