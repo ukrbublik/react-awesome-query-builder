@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import Rule from './Rule';
 import Group from './Group';
 
@@ -44,7 +44,7 @@ export default class Item extends Component {
     children1: PropTypes.instanceOf(Immutable.OrderedMap)
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   render() {
     const { type, ...props } = this.props;

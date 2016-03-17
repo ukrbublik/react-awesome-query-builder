@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import map from 'lodash/map';
 import GroupContainer from './containers/GroupContainer';
 
@@ -14,7 +14,7 @@ export default class Group extends Component {
     allowRemoval: PropTypes.bool.isRequired
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   render() {
     return (

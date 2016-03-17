@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
 
 var stringify = require('json-stringify-safe');
@@ -10,7 +10,7 @@ export default (Group) => {
       config: PropTypes.object.isRequired
     };
 
-    shouldComponentUpdate = shouldPureComponentUpdate;
+    shouldComponentUpdate = shallowCompare;
 
     setConjunction(conjunction) {
       this.props.actions.setConjunction(this.props.path, conjunction);

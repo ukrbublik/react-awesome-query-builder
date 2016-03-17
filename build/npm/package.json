@@ -19,14 +19,6 @@
     "url": "https://github.com/fubhy/react-query-builder/issues"
   },
   "homepage": "https://github.com/fubhy/react-query-builder",
-  "comments": {
-    "redux": "^1.0.0-alpha",
-    "react": "^0.13.3",
-    "react-hot-loader": "^1.2.7",
-    "react-router": "^1.0.0-beta2",
-    "react-bootstrap-select": "^0.14",
-    "react-dropdown-button": "^1.0"
-  },
   "dependencies": {
     "immutable": "^3.7.6",
     "less": "^2.6",

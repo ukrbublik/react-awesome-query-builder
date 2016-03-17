@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class Delta extends Component {
   static propTypes = {
@@ -7,7 +7,7 @@ export default class Delta extends Component {
     delta: PropTypes.number.isRequired
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   render() {
     return (

@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
 import mapValues from 'lodash/mapValues';
 import pickBy from 'lodash/pickBy';
@@ -14,7 +14,7 @@ export default (Rule) => {
       field: PropTypes.string
     };
 
-    shouldComponentUpdate = shouldPureComponentUpdate;
+    shouldComponentUpdate = shallowCompare;
 
     removeSelf() {
       this.props.actions.removeRule(this.props.path);

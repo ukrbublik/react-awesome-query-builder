@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 
 export default class Proximity extends Component {
@@ -7,7 +7,7 @@ export default class Proximity extends Component {
     setOption: PropTypes.func.isRequired
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   handleChange() {
     const node = React.findDOMNode(this.refs.proximity);

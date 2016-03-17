@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import Delta from '../Delta';
 
@@ -14,7 +14,7 @@ export default (Widget) => {
       operator: PropTypes.string.isRequired
     };
 
-    shouldComponentUpdate = shouldPureComponentUpdate;
+    shouldComponentUpdate = shallowCompare;
 
     setValue(delta, value) {
       this.props.actions.setValue(this.props.path, delta, value);

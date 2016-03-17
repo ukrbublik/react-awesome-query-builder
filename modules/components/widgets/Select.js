@@ -10,7 +10,6 @@ export default class Select extends Component {
   };
 
   handleChange() {
-//    const node = ReactDOM.findDOMNode(this.refs.select);
     this.props.setValue(this.refs.select.getValue());
   }
 

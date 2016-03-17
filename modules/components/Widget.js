@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import WidgetContainer from './containers/WidgetContainer';
 import {Col} from "react-bootstrap";
 
@@ -10,7 +10,7 @@ export default class Widget extends Component {
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   render() {
     return (

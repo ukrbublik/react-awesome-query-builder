@@ -9,7 +9,6 @@ export default class Text extends Component {
   };
 
   handleChange() {
-//    let node = ReactDOM.findDOMNode(this.refs.text);
     this.props.setValue(this.refs.text.getValue());
   }
 

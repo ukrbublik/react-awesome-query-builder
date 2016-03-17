@@ -113,6 +113,7 @@ export const queryBuilderFormat = (item, config) => {
 export const queryBuilderToTree = (ruleset) => {
     const condition = ruleset.condition;
     var tree = {}
+    tree.id = uuid()
     if (condition) {
         tree.type = 'group';
         var childrens = new Immutable.List(ruleset.rules)
@@ -130,9 +131,14 @@ export const queryBuilderToTree = (ruleset) => {
         } else {
             list_value = new Immutable.List([value])
         }
-        var properties = new Immutable.Map({field, input, type, value: list_value, operator})
-        tree.id = uuid()
-        tree.properties = properties
+        var properties = new Immutable.Map({
+            type,
+            operator,
+            field: field || id,
+            widget: input || type,
+            value: list_value,
+        })
+        tree.properties = properties;
         tree.type = 'rule'
     }
     return new Immutable.Map(tree)

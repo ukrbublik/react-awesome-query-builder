@@ -147,6 +147,7 @@ var queryBuilderFormat = exports.queryBuilderFormat = function queryBuilderForma
 var queryBuilderToTree = exports.queryBuilderToTree = function queryBuilderToTree(ruleset) {
     var condition = ruleset.condition;
     var tree = {};
+    tree.id = (0, _uuid2.default)();
     if (condition) {
         tree.type = 'group';
         var childrens = new _immutable2.default.List(ruleset.rules).map(queryBuilderToTree);
@@ -169,8 +170,13 @@ var queryBuilderToTree = exports.queryBuilderToTree = function queryBuilderToTre
         } else {
             list_value = new _immutable2.default.List([value]);
         }
-        var properties = new _immutable2.default.Map({ field: field, input: input, type: type, value: list_value, operator: operator });
-        tree.id = (0, _uuid2.default)();
+        var properties = new _immutable2.default.Map({
+            type: type,
+            operator: operator,
+            field: field || id,
+            widget: input || type,
+            value: list_value
+        });
         tree.properties = properties;
         tree.type = 'rule';
     }

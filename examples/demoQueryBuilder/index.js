@@ -45,6 +45,7 @@ export default class DemoQueryBuilder extends Component {
         return (
             <div>
                 <div>{stringify(queryBuilderFormat(props.tree, props.config))}</div>
+                <div>{stringify(props.tree)}</div>
                 <div className="query-builder">
                     <Builder {...props} />
                 </div>

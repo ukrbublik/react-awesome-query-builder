@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 
@@ -8,7 +8,7 @@ export default class ComplexQuery extends Component {
     setOption: PropTypes.func.isRequired
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   handleOperatorSelect() {
     const node = React.findDOMNode(this.refs.operator);

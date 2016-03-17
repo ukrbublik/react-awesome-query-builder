@@ -148,10 +148,11 @@ var Rule = (0, _RuleContainer2.default)(_class = (_temp = _class2 = function (_C
                     );
                 } else {
                     var short_label;
-                    if (fields[field].label.lastIndexOf(_this2.props.fieldSeparator) >= 0) {
-                        short_label = fields[field].label.substring(fields[field].label.lastIndexOf(_this2.props.fieldSeparator) + _this2.props.fieldSeparator.length);
+                    var label = fields[field].label || fields[field];
+                    if (label.lastIndexOf(_this2.props.fieldSeparator) >= 0) {
+                        short_label = label.substring(label.lastIndexOf(_this2.props.fieldSeparator) + _this2.props.fieldSeparator.length);
                     } else {
-                        short_label = fields[field].label;
+                        short_label = label;
                     }
                     return _react2.default.createElement(
                         'li',

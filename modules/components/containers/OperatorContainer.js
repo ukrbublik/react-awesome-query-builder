@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default (Operator) => {
   return class OperatorContainer extends Component {
@@ -12,7 +12,7 @@ export default (Operator) => {
       operator: PropTypes.string.isRequired
     };
 
-    shouldComponentUpdate = shouldPureComponentUpdate;
+    shouldComponentUpdate = shallowCompare;
 
     setOperatorOption(name, value) {
       this.props.actions.setOperatorOption(this.props.path, name, value);

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import map from 'lodash/map';
 import size from 'lodash/size';
 import RuleContainer from './containers/RuleContainer';
@@ -30,7 +30,7 @@ export default class Rule extends Component {
         fieldSeparatorDisplay: PropTypes.string
     };
 
-    shouldComponentUpdate = shouldPureComponentUpdate;
+    shouldComponentUpdate = shallowCompare;
 
     constructor(props) {
         super(props);
@@ -49,10 +49,6 @@ export default class Rule extends Component {
         this.setState({isFieldOpen: false});
     }
 
-    handleFieldSelect1() {
-        const node = ReactDOM.findDOMNode(this.refs.field);
-        this.props.setField(node.value);
-    }
 
     handleFieldSelect(label, value) {
         this.props.setField(value);
@@ -60,7 +56,6 @@ export default class Rule extends Component {
     }
 
     handleOperatorSelect() {
-        // const node = ReactDOM.findDOMNode(this.refs.operator);
         this.props.setOperator(this.refs.operator.getValue());
     }
 
@@ -83,10 +78,11 @@ export default class Rule extends Component {
                 </NestedDropdownMenu>
             } else {
                 var short_label;
-                if (fields[field].label.lastIndexOf(this.props.fieldSeparator) >= 0) {
-                    short_label = fields[field].label.substring(fields[field].label.lastIndexOf(this.props.fieldSeparator) + this.props.fieldSeparator.length);
+                const label = fields[field].label || fields[field];
+                if (label.lastIndexOf(this.props.fieldSeparator) >= 0) {
+                    short_label = label.substring(label.lastIndexOf(this.props.fieldSeparator) + this.props.fieldSeparator.length);
                 } else {
-                    short_label = fields[field].label;
+                    short_label = label;
                 }
                 return <li key={prefix+field}>
                     <button type="button"

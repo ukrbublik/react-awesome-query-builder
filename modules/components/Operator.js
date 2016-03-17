@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import shallowCompare from 'react-addons-shallow-compare';
 import OperatorContainer from './containers/OperatorContainer';
 
 @OperatorContainer
@@ -9,7 +9,7 @@ export default class Operator extends Component {
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = shallowCompare;
 
   render() {
     return (
