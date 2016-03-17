@@ -4,20 +4,21 @@ import Datetime from 'react-datetime';
 import moment from 'moment';
 import 'react-datetime/css/react-datetime.css'
 
-export default class Date extends Component {
+export default class Time extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
         delta: PropTypes.number.isRequired,
-        dateFormat: PropTypes.string,
+        timeFormat: PropTypes.string,
         valueFormat: PropTypes.string,
         locale: PropTypes.string,
     };
 
     static defaultProps = {
-        dateFormat: 'DD.MM.YYYY',
-        valueFormat: 'YYYY-MM-DD',
+        timeFormat: 'HH:mm',
+        valueFormat: 'HH:mm:ss',
         locale: 'ru',
     };
+    
 
     handleChange(value) {
         const {setValue, valueFormat} = this.props;
@@ -30,13 +31,13 @@ export default class Date extends Component {
     }
 
     render() {
-        const {dateFormat, value, locale} = this.props;
+        const {timeFormat, value, locale} = this.props;
         return (
             <Col xs={3}>
                 <label>Value</label>
                 <Datetime
-                    timeFormat={false}
-                    dateFormat={dateFormat}
+                    timeFormat={timeFormat}
+                    dateFormat={false}
                     locale={locale}
                     value={value}
                     onChange={this.handleChange.bind(this)}

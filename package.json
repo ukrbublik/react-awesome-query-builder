@@ -12,7 +12,7 @@
   "scripts": {
     "build-global": "rm -rf build/global && NODE_ENV=production webpack modules/index.js build/global/ReactQueryBuilder.js && NODE_ENV=production COMPRESS=1 webpack modules/index.js build/global/ReactQueryBuilder.min.js && echo \"gzipped, the global build is `gzip -c build/global/ReactQueryBuilder.min.js | wc -c` bytes\"",
     "build-npm": "rm -rf build/npm && babel -d build/npm/lib ./modules && cp README.md build/npm && find build/npm/lib -type d -name __tests__ | xargs rm -rf && node -p 'p=require(\"./package\");p.main=\"lib\";p.scripts=p.devDependencies=undefined;JSON.stringify(p,null,2)' > build/npm/package.json",
-    "build-examples": "cd examples && webpack --config webpack.config.production.js",
+    "build-examples": "cd examples && webpack --config webpack.config.js",
     "examples": "cd examples && webpack-dev-server --config webpack.config.js -d --hot --inline --display-error-details --colors --history-api-fallback --no-info --port 3001"
   },
   "repository": {
@@ -78,10 +78,12 @@
     "less": "^2.6",
     "less-loader": "^2.2",
     "lodash": "^4.6.1",
+    "moment": "^2.12.0",
     "react": "^0.14.6",
     "react-addons-css-transition-group": "^0.14.6",
     "react-addons-pure-render-mixin": "^0.14.6",
     "react-bootstrap": "^0.28.1",
+    "react-datetime": "^2.1.0",
     "react-dd-menu": "^1.0",
     "react-dom": "^0.14.6",
     "react-pure-render": "^1.0.2",
