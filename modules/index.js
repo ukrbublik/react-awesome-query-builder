@@ -7,4 +7,4 @@ export { default as Query } from './components/Query';
 export { default as Builder } from './components/Builder';
 export { default as Preview } from './components/Preview';
 
-export { TextWidget, SelectWidget, DateWidget } from './components/widgets';
+export {queryBuilderFormat, queryBuilderToTree} from './utils/queryBuilderFormat';
