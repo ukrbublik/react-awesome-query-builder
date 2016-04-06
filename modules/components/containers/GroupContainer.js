@@ -14,18 +14,22 @@ export default (Group) => {
 
     setConjunction(conjunction) {
       this.props.actions.setConjunction(this.props.path, conjunction);
+      return false;
     }
 
     removeSelf() {
       this.props.actions.removeGroup(this.props.path);
+      return false;
     }
 
     addGroup() {
       this.props.actions.addGroup(this.props.path);
+      return false;
     }
 
     addRule() {
       this.props.actions.addRule(this.props.path);
+      return false;
     }
 
     render() {
