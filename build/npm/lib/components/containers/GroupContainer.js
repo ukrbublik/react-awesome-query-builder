@@ -55,18 +55,24 @@ exports.default = function (Group) {
       }
     }, {
       key: 'removeSelf',
-      value: function removeSelf() {
+      value: function removeSelf(event) {
         this.props.actions.removeGroup(this.props.path);
+        event.preventDefault();
+        return false;
       }
     }, {
       key: 'addGroup',
-      value: function addGroup() {
+      value: function addGroup(event) {
         this.props.actions.addGroup(this.props.path);
+        event.preventDefault();
+        return false;
       }
     }, {
       key: 'addRule',
-      value: function addRule() {
+      value: function addRule(event) {
         this.props.actions.addRule(this.props.path);
+        event.preventDefault();
+        return false;
       }
     }, {
       key: 'render',

@@ -52,4 +52,19 @@ Object.defineProperty(exports, 'DateWidget', {
   }
 });
 
+var _queryBuilderFormat = require('./utils/queryBuilderFormat');
+
+Object.defineProperty(exports, 'queryBuilderFormat', {
+  enumerable: true,
+  get: function get() {
+    return _queryBuilderFormat.queryBuilderFormat;
+  }
+});
+Object.defineProperty(exports, 'queryBuilderToTree', {
+  enumerable: true,
+  get: function get() {
+    return _queryBuilderFormat.queryBuilderToTree;
+  }
+});
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
