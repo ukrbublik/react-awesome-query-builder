@@ -53,7 +53,7 @@ var Widget = (0, _WidgetContainer2.default)(_class = (_temp2 = _class2 = functio
     value: function render() {
       return _react2.default.createElement(
         _reactBootstrap.Col,
-        { xs: 8, className: 'rule--widget rule--widget--' + this.props.name.toUpperCase() },
+        { className: 'rule--widget rule--widget--' + this.props.name.toUpperCase() },
         this.props.children
       );
     }

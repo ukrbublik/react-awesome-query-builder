@@ -46,7 +46,7 @@ var Text = (_temp = _class = function (_Component) {
     value: function render() {
       return _react2.default.createElement(
         _reactBootstrap.Col,
-        { xs: 4 },
+        null,
         _react2.default.createElement(
           'label',
           null,

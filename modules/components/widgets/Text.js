@@ -14,7 +14,7 @@ export default class Text extends Component {
 
   render() {
     return (
-      <Col xs={4}>
+      <Col>
           <label>Value</label>
           <Input autoFocus={this.props.delta === 0} type="text" ref="text" value={this.props.value} onChange={this.handleChange.bind(this)} />
       </Col>

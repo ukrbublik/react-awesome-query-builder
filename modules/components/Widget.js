@@ -14,7 +14,7 @@ export default class Widget extends Component {
 
   render() {
     return (
-      <Col xs={8} className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}>{this.props.children}</Col>
+      <Col className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}>{this.props.children}</Col>
     );
   }
 }
