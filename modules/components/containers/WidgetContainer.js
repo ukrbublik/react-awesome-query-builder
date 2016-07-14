@@ -43,9 +43,8 @@ export default (Widget) => {
             }));
         }
 
-        renderWidget(delta) {
-            const fieldDefinition = this.props.config.fields[this.props.field];
-            const {factory: widgetFactory, ...widgetProps} = this.props.config.widgets[fieldDefinition.widget];
+        renderWidget(delta, widget) {
+            const {factory: widgetFactory, ...widgetProps} = this.props.config.widgets[widget];
 
             return widgetFactory(Object.assign({}, widgetProps, {
                 config: this.props.config,
@@ -63,8 +62,8 @@ export default (Widget) => {
             if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
                 return null;
             }
-
-            const widgetDefinition = this.props.config.widgets[fieldDefinition.widget];
+            const widget = defaultValue(operatorDefinition.widget, fieldDefinition.widget);
+            const widgetDefinition = this.props.config.widgets[widget];
             if (typeof widgetDefinition === 'undefined') {
                 return null;
             }
@@ -76,11 +75,11 @@ export default (Widget) => {
 
             if (typeof widgetBehavior === 'undefined') {
                 return (
-                    <Widget name={fieldDefinition.widget}>
+                    <Widget name={widget}>
                         {range(0, cardinality).map(delta => (
                             <Delta key={delta} delta={delta}>
-                                {this.renderWidget.call(this, delta)}
-                                {this.renderOptions.call(this, delta)}
+                                {this.renderWidget.call(this, delta, widget)}
+                                {this.renderOptions.call(this, delta, widget)}
                             </Delta>
                         ))}
                     </Widget>

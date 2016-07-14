@@ -41696,8 +41696,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
 	                    return null;
 	                }
-
-	                var widgetDefinition = this.props.config.widgets[fieldDefinition.widget];
+	                var widget = (0, _index.defaultValue)(operatorDefinition.widget, fieldDefinition.widget);
+	                var widgetDefinition = this.props.config.widgets[widget];
 	                if (typeof widgetDefinition === 'undefined') {
 	                    return null;
 	                }

@@ -96,11 +96,10 @@ exports.default = function (Widget) {
             }
         }, {
             key: 'renderWidget',
-            value: function renderWidget(delta) {
+            value: function renderWidget(delta, widget) {
                 var _this3 = this;
 
-                var fieldDefinition = this.props.config.fields[this.props.field];
-                var _props$config$widgets = this.props.config.widgets[fieldDefinition.widget];
+                var _props$config$widgets = this.props.config.widgets[widget];
                 var widgetFactory = _props$config$widgets.factory;
 
                 var widgetProps = _objectWithoutProperties(_props$config$widgets, ['factory']);
@@ -126,8 +125,8 @@ exports.default = function (Widget) {
                 if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
                     return null;
                 }
-
-                var widgetDefinition = this.props.config.widgets[fieldDefinition.widget];
+                var widget = (0, _index.defaultValue)(operatorDefinition.widget, fieldDefinition.widget);
+                var widgetDefinition = this.props.config.widgets[widget];
                 if (typeof widgetDefinition === 'undefined') {
                     return null;
                 }
@@ -140,13 +139,13 @@ exports.default = function (Widget) {
                 if (typeof widgetBehavior === 'undefined') {
                     return _react2.default.createElement(
                         Widget,
-                        { name: fieldDefinition.widget },
+                        { name: widget },
                         (0, _range2.default)(0, cardinality).map(function (delta) {
                             return _react2.default.createElement(
                                 _Delta2.default,
                                 { key: delta, delta: delta },
-                                _this4.renderWidget.call(_this4, delta),
-                                _this4.renderOptions.call(_this4, delta)
+                                _this4.renderWidget.call(_this4, delta, widget),
+                                _this4.renderOptions.call(_this4, delta, widget)
                             );
                         })
                     );
