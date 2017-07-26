@@ -31,7 +31,6 @@ export default (Rule) => {
     render() {
       const { fields, operators } = this.props.config;
 
-//      let fieldOptions = mapValues(fields, (item) => item.label);
       let fieldOptions = fields;
 
       // Add a special 'empty' option if no field has been selected yet.
@@ -41,13 +40,13 @@ export default (Rule) => {
 
       let operatorOptions = mapValues(pickBy(operators, (item, index) =>
         this.props.field && fields[this.props.field] && fields[this.props.field].operators.indexOf(index) !== -1
-      ), (item) => item.label);
+      ));
 
       // Add a special 'empty' option if no operator has been selected yet.
       if (size(operatorOptions) && typeof this.props.operator === 'undefined') {
         operatorOptions = Object.assign({}, { ':empty:': 'Select an operator' }, operatorOptions);
       }
-
+      
       return (
         <Rule
           id={this.props.id}

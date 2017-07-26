@@ -32,7 +32,7 @@ export default class Date extends Component {
     render() {
         const {dateFormat, value, locale} = this.props;
         return (
-            <Col xs={3}>
+            <Col>
                 <label>Value</label>
                 <Datetime
                     timeFormat={false}

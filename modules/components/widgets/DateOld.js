@@ -17,7 +17,7 @@ export default class Date extends Component {
 
   render() {
     return (
-      <Col xs={3}>
+      <Col>
           <label>Value</label>
           <Input autoFocus={this.props.delta === 0} 
                  type="date" ref="date" 

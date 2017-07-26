@@ -31,15 +31,17 @@ export default class Time extends Component {
     }
 
     render() {
+        const {valueFormat} = this.props;
         const {timeFormat, value, locale} = this.props;
+        const inputValue = value ? moment(value, valueFormat).format(timeFormat) : null;
         return (
-            <Col xs={3}>
+            <Col>
                 <label>Value</label>
                 <Datetime
                     timeFormat={timeFormat}
                     dateFormat={false}
                     locale={locale}
-                    value={value}
+                    value={inputValue}
                     onChange={this.handleChange.bind(this)}
                     ref="datetime"
                 />

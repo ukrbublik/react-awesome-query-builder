@@ -2,6 +2,7 @@ import React from 'react';
 import {
     TextWidget,
     SelectWidget,
+    MultiSelectWidget,
     DateWidget,
     BooleanWidget,
     TimeWidget,
@@ -78,6 +79,26 @@ export default {
                 "is_not_empty",
             ]
         },
+        color: {
+            label: 'Color',
+            widget: 'select',
+            options: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+            operators: ['selectEquals']
+        },
+        multicolor: {
+            label: 'Multicolor',
+            widget: 'multiselect',
+            options: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+            operators: ['in']
+        },
     },
     operators: {
         equal: {label: 'Equal'},
@@ -104,6 +125,17 @@ export default {
             label: 'Is not empty',
             cardinality: 0,
         },
+        selectEquals: {
+            label: 'Equals',
+            value: (value, field, operatorOptions, valueOptions, operator, config, fieldDefinition) => `${field}:${fieldDefinition.options[value.first()]}`
+        },
+        in: {
+            label: 'In',
+            value: (value, field, operatorOptions, valueOptions, operator, config, fieldDefinition) => {
+                console.log(2, value);
+                return '';
+            }
+        },
     },
     widgets: {
         text: {
@@ -111,6 +143,9 @@ export default {
         },
         select: {
             factory: (props) => <SelectWidget {...props} />
+        },
+        multiselect: {
+            factory: (props) => <MultiSelectWidget {...props} />
         },
         date: {
             factory: (props) => <DateWidget {...props} />
@@ -122,7 +157,7 @@ export default {
             factory: (props) => <DateTimeWidget {...props} />
         },
         boolean: {
-            factory: (props) => <SelectWidget {...props} />
+            factory: (props) => <BooleanWidget {...props} />
         }
     },
     settings: {

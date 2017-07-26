@@ -1,6 +1,6 @@
 {
-  "name": "react-query-builder",
-  "version": "0.0.4",
+  "name": "react-awesome-query-builder",
+  "version": "0.0.5",
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactQueryBuilder.js",
@@ -17,14 +17,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fubhy/react-query-builder.git"
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
   },
   "author": "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)",
+  "contributors": [
+    "ukrbubik"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fubhy/react-query-builder/issues"
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder/issues"
   },
-  "homepage": "https://github.com/fubhy/react-query-builder",
+  "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "devDependencies": {
     "babel": "^6.3.26",
     "babel-cli": "^6.4.0",
@@ -71,17 +74,18 @@
     "less-loader": "^2.2",
     "lodash": "^4.6.1",
     "moment": "^2.12.0",
-    "react": "^0.14.6",
+    "react": "^0.14.8",
     "react-addons-css-transition-group": "^0.14.6",
     "react-addons-pure-render-mixin": "^0.14.6",
     "react-addons-shallow-compare": "^0.14.7",
-    "react-bootstrap": "^0.28.1",
+    "react-bootstrap": "^0.30.10",
     "react-datetime": "^2.1.0",
     "react-dd-menu": "^1.0",
     "react-dom": "^0.14.6",
     "react-pure-render": "^1.0.2",
     "react-radio-group": "^2.2.0",
     "react-redux": "^4.0.6",
+    "react-select-picker": "0.0.7",
     "redux": "^3.0.5"
   }
 }

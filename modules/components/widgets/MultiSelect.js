@@ -11,6 +11,7 @@ export default class Select extends Component {
   };
 
   handleChange(val) {
+    console.log(1, val, this.refs.val);
     this.props.setValue(val);
   }
 
@@ -24,6 +25,7 @@ export default class Select extends Component {
         <Col>
             <label>Value</label>
             <SelectPicker 
+              multiple
               ref="val" 
               className="form-control"
               title="Value"

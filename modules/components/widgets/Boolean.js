@@ -16,7 +16,7 @@ export default class Boolean extends Component {
     render() {
         const {value, delta, id} = this.props;
         return (
-            <Col xs={4}>
+            <Col>
                 <label>Value</label>
                 <RadioGroup name={id} selectedValue={value}  ref="widget" onChange={this.handleChange.bind(this)}>
                     {Radio => (
@@ -24,7 +24,6 @@ export default class Boolean extends Component {
                             <Input autoFocus={delta === 0} type="radio"/> Yes
                             <Input autoFocus={delta === 0} type="radio"/> No
                         </div>
-
                     )}
                 </RadioGroup>
             </Col>

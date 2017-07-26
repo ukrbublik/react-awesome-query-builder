@@ -121,8 +121,8 @@ const setField = (state, path, field, config) => {
  * @param {Immutable.List} path
  * @param {string} operator
  */
-const setOperator = (state, path, operator, config) =>
-    state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
+const setOperator = (state, path, operator, config) => {
+    return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const operatorCardinality = defaultValue(config.operators[operator].cardinality, 1);
         const currentValue = current.get('value', new Immutable.List());
         const nextValue = new Immutable.List(currentValue.take(operatorCardinality));
@@ -132,6 +132,7 @@ const setOperator = (state, path, operator, config) =>
             .set('valueOptions', defaultValueOptions(config, operator))
             .set('value', nextValue);
     }));
+};
 
 /**
  * @param {Immutable.Map} state
