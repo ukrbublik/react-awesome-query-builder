@@ -22,27 +22,34 @@ export default class Rule extends Component {
     static propTypes = {
         fieldOptions: PropTypes.object.isRequired,
         operatorOptions: PropTypes.object.isRequired,
+        defaultFieldOptions: PropTypes.object.isRequired,
+        defaultOperatorOptions: PropTypes.object.isRequired,
         setField: PropTypes.func.isRequired,
         setOperator: PropTypes.func.isRequired,
         removeSelf: PropTypes.func.isRequired,
         selectedField: PropTypes.string,
         selectedOperator: PropTypes.string,
         fieldSeparator: PropTypes.string,
-        fieldSeparatorDisplay: PropTypes.string
+        fieldSeparatorDisplay: PropTypes.string,
+        config: PropTypes.object.isRequired,
     };
 
     shouldComponentUpdate = shallowCompare;
 
     constructor(props) {
         super(props);
-        const curFieldOpts = props.fieldOptions[props.selectedField] || {};
-        const curOpOpts = props.operatorOptions[props.selectedOperator] || {};
         this.state = {
             isFieldOpen: false,
-            curField: curFieldOpts.label || "Field",
             isOpOpen: false,
-            curOp: curOpOpts.label || "Operator",
         };
+    }
+
+    curFieldOpts() {
+        return Object.assign({label: "Field"}, this.props.defaultFieldOptions, this.props.fieldOptions[this.props.selectedField] || {});
+    }
+
+    curOpOpts() {
+        return Object.assign({label: "Operator"}, this.props.defaultOperatorOptions, this.props.operatorOptions[this.props.selectedOperator] || {});
     }
 
     toggleFieldMenu() {
@@ -69,7 +76,6 @@ export default class Rule extends Component {
         }
 
         this.props.setField(value);
-        this.setState({curField: label});
     }
 
     handleOperatorSelect(e, label, value) {
@@ -80,7 +86,6 @@ export default class Rule extends Component {
         }
 
         this.props.setOperator(value);
-        this.setState({curOp: label});
     }
 
     buildMenu(fields, handleSelect, prefix) {
@@ -146,7 +151,7 @@ export default class Rule extends Component {
         let fieldMenuOptions = {
             isOpen: this.state.isFieldOpen,
             close: this.closeFieldMenu.bind(this),
-            toggle: this.buildMenuToggler(this.state.curField, this.toggleFieldMenu),
+            toggle: this.buildMenuToggler(this.curFieldOpts().label, this.toggleFieldMenu),
             nested: 'right',
             direction: 'right',
             align: 'left',
@@ -156,7 +161,7 @@ export default class Rule extends Component {
         let operatorMenuOptions = {
             isOpen: this.state.isOpOpen,
             close: this.closeOpMenu.bind(this),
-            toggle: this.buildMenuToggler(this.state.curOp, this.toggleOpMenu),
+            toggle: this.buildMenuToggler(this.curOpOpts().label, this.toggleOpMenu),
             nested: 'right',
             direction: 'right',
             align: 'left',
@@ -167,13 +172,20 @@ export default class Rule extends Component {
             <div className="rule">
                 <div className="rule--header">
                     <div className="rule--actions">
-                        <button className="action action--DELETE" onClick={this.props.removeSelf}>Delete</button>
+                        <button 
+                            className="action action--DELETE" 
+                            onClick={this.props.removeSelf}
+                        >
+                            {this.props.config.settings.deleteLabel || "Delete"}
+                        </button>
                     </div>
                 </div>
                 <Row className="rule--body">
                     {size(this.props.fieldOptions) ? (
                         <Col key="field" className="rule--field">
-                            <label>Field</label>
+                            { this.props.config.settings.showLabels &&
+                                <label>{this.curFieldOpts().label || "Field"}</label>
+                            }
                             <DropdownMenu {...fieldMenuOptions}>
                                 { this.buildMenu(this.props.fieldOptions, this.handleFieldSelect)}
                             </DropdownMenu>
@@ -181,7 +193,9 @@ export default class Rule extends Component {
                     ) : null}
                     {size(this.props.operatorOptions) ? (
                         <Col key="operator" className="rule--operator">
-                            <label>Operator</label>
+                            { this.props.config.settings.showLabels &&
+                                <label>{this.curOpOpts().label || "Operator"}</label>
+                            }
                             <DropdownMenu {...operatorMenuOptions}>
                                 { this.buildMenu(this.props.operatorOptions, this.handleOperatorSelect)}
                             </DropdownMenu>
@@ -193,6 +207,7 @@ export default class Rule extends Component {
         );
     }
 
+    /*
     renderOld() {
         return (
             <div className="rule">
@@ -229,4 +244,5 @@ export default class Rule extends Component {
             </div>
         );
     }
+    */
 }

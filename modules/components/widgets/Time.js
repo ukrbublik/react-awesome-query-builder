@@ -4,7 +4,7 @@ import Datetime from 'react-datetime';
 import moment from 'moment';
 import 'react-datetime/css/react-datetime.css'
 
-export default class Time extends Component {
+export default class TimeWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
         delta: PropTypes.number.isRequired,
@@ -13,6 +13,16 @@ export default class Time extends Component {
         locale: PropTypes.string,
     };
 
+    constructor(props) {
+        super(props);
+
+        const {valueFormat, value, setValue} = props;
+        let mValue = value ? moment(value, valueFormat) : null;
+        if (mValue && !mValue.isValid()) {
+            setValue(null);
+        }
+    }
+
     static defaultProps = {
         timeFormat: 'HH:mm',
         valueFormat: 'HH:mm:ss',
@@ -20,28 +30,26 @@ export default class Time extends Component {
     };
     
 
-    handleChange(value) {
+    handleChange(_value) {
         const {setValue, valueFormat} = this.props;
-        value = moment(value).format(valueFormat);
-        setValue(value);
-    }
-
-    handleClick() {
-        console.log("In Date:handleClick");
+        const value = _value instanceof moment && _value.isValid() ? _value.format(valueFormat) : null;
+        if (value)
+            setValue(value);
     }
 
     render() {
-        const {valueFormat} = this.props;
-        const {timeFormat, value, locale} = this.props;
-        const inputValue = value ? moment(value, valueFormat).format(timeFormat) : null;
+        const {timeFormat, valueFormat, value, locale} = this.props;
+        let dateValue = value ? moment(value, valueFormat) : null;
         return (
-            <Col>
-                <label>Value</label>
+            <Col xs={5}>
+                { this.props.config.settings.showLabels &&
+                    <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
+                }
                 <Datetime
                     timeFormat={timeFormat}
                     dateFormat={false}
                     locale={locale}
-                    value={inputValue}
+                    value={dateValue}
                     onChange={this.handleChange.bind(this)}
                     ref="datetime"
                 />

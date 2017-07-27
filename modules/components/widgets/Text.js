@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import {Col, FormControl} from "react-bootstrap";
 
-export default class Text extends Component {
+export default class TextWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     delta: PropTypes.number.isRequired
@@ -15,7 +15,9 @@ export default class Text extends Component {
   render() {
     return (
       <Col>
-          <label>Value</label>
+            { this.props.config.settings.showLabels &&
+                <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
+            }
           <FormControl 
             autoFocus={this.props.delta === 0} 
             type={"text"} 

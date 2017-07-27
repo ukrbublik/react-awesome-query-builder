@@ -30,11 +30,11 @@ export default class Group extends Component {
           </div>
           <div className="group--actions">
             {this.props.allowFurtherNesting ? (
-              <button className="action action--ADD-GROUP" onClick={this.props.addGroup}>Add group</button>
+              <button className="action action--ADD-GROUP" onClick={this.props.addGroup}>{this.props.config.settings.addGroupLabel || "Add group"}</button>
             ) : null}
-            <button className="action action--ADD-RULE" onClick={this.props.addRule}>Add rule</button>
+            <button className="action action--ADD-RULE" onClick={this.props.addRule}>{this.props.config.settings.addRuleLabel || "Add rule"}</button>
             {this.props.allowRemoval ? (
-              <button className="action action--DELETE" onClick={this.props.removeSelf}>Delete</button>
+              <button className="action action--DELETE" onClick={this.props.removeSelf}>{this.props.config.settings.delGroupLabel || "Delete"}</button>
             ) : null}
           </div>
         </div>

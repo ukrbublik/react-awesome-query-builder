@@ -59,7 +59,9 @@ export default (Group) => {
           conjunctionOptions={conjunctionOptions}
           removeSelf={this.removeSelf.bind(this)}
           addGroup={this.addGroup.bind(this)}
-          addRule={this.addRule.bind(this)}>{this.props.children}</Group>
+          addRule={this.addRule.bind(this)}
+          config={this.props.config}
+        >{this.props.children}</Group>
       );
     }
   };

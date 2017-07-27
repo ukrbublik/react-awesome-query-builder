@@ -4,14 +4,13 @@ import map from 'lodash/map';
 import {Col} from "react-bootstrap";
 import SelectPicker from "react-select-picker";
 
-export default class Select extends Component {
+export default class MultiSelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     delta: PropTypes.number.isRequired
   };
 
   handleChange(val) {
-    console.log(1, val, this.refs.val);
     this.props.setValue(val);
   }
 
@@ -23,12 +22,14 @@ export default class Select extends Component {
 
     return (
         <Col>
-            <label>Value</label>
+            { this.props.config.settings.showLabels &&
+                <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
+            }
             <SelectPicker 
               multiple
               ref="val" 
               className="form-control"
-              title="Value"
+              title=""
               defaultValue={this.props.value}
               onChange={this.handleChange.bind(this)}
             >{options}</SelectPicker>

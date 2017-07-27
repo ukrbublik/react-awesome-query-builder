@@ -87,26 +87,26 @@ export default {
                 green: 'Green',
                 orange: 'Orange'
             },
-            operators: ['selectEquals']
+            operators: ['select_equals']
         },
         multicolor: {
-            label: 'Multicolor',
+            label: 'Colors',
             widget: 'multiselect',
             options: {
                 yellow: 'Yellow',
                 green: 'Green',
                 orange: 'Orange'
             },
-            operators: ['in']
+            operators: ['select_in']
         },
     },
     operators: {
-        equal: {label: 'Equal'},
-        not_equal: {label: 'Not equal'},
-        less: {label: 'Less'},
-        less_or_equal: {label: 'Less or equal'},
-        greater: {label: 'Greater'},
-        greater_or_equal: {label: 'Greater or equal'},
+        equal: {label: '=='},
+        not_equal: {label: '!='},
+        less: {label: '<'},
+        less_or_equal: {label: '<='},
+        greater: {label: '>'},
+        greater_or_equal: {label: '>='},
 
         between: {
             label: 'Between',
@@ -125,11 +125,11 @@ export default {
             label: 'Is not empty',
             cardinality: 0,
         },
-        selectEquals: {
-            label: 'Equals',
+        select_equals: {
+            label: '==',
             value: (value, field, operatorOptions, valueOptions, operator, config, fieldDefinition) => `${field}:${fieldDefinition.options[value.first()]}`
         },
-        in: {
+        select_in: {
             label: 'In',
             value: (value, field, operatorOptions, valueOptions, operator, config, fieldDefinition) => {
                 console.log(2, value);
@@ -148,13 +148,23 @@ export default {
             factory: (props) => <MultiSelectWidget {...props} />
         },
         date: {
-            factory: (props) => <DateWidget {...props} />
+            factory: (props) => <DateWidget {...props} />,
+            dateFormat: 'DD.MM.YYYY',
+            valueFormat: 'YYYY-MM-DD',
+            locale: 'ru',
         },
         time: {
-            factory: (props) => <TimeWidget {...props} />
+            factory: (props) => <TimeWidget {...props} />,
+            timeFormat: 'HH:mm',
+            valueFormat: 'HH:mm:ss',
+            locale: 'ru',
         },
         datetime: {
-            factory: (props) => <DateTimeWidget {...props} />
+            factory: (props) => <DateTimeWidget {...props} />,
+            timeFormat: 'HH:mm',
+            dateFormat: 'DD.MM.YYYY',
+            valueFormat: 'YYYY-MM-DD HH:mm:ss',
+            locale: 'ru',
         },
         boolean: {
             factory: (props) => <BooleanWidget {...props} />
@@ -163,6 +173,14 @@ export default {
     settings: {
         maxNesting: 10,
         fieldSeparator: '.',
-        fieldSeparatorDisplay: '->'
+        fieldSeparatorDisplay: '->',
+        showLabels: false,
+        valueLabel: "Value",
+        fieldLabel: "Field",
+        operatorLabel: "Operator",
+        deleteLabel: "x",
+        addGroupLabel: "Add group",
+        addRuleLabel: "Add rule",
+        delGroupLabel: "x",
     }
 };

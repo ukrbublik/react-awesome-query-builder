@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {Col, Input} from "react-bootstrap";
 import RadioGroup from "react-radio-group";
 
-export default class Boolean extends Component {
+export default class BooleanWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
         delta: PropTypes.number.isRequired
@@ -17,7 +17,9 @@ export default class Boolean extends Component {
         const {value, delta, id} = this.props;
         return (
             <Col>
-                <label>Value</label>
+                { this.props.config.settings.showLabels &&
+                    <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
+                }
                 <RadioGroup name={id} selectedValue={value}  ref="widget" onChange={this.handleChange.bind(this)}>
                     {Radio => (
                         <div>

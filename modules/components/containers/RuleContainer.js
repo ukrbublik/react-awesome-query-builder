@@ -29,7 +29,15 @@ export default (Rule) => {
     }
 
     render() {
-      const { fields, operators } = this.props.config;
+      const { fields, operators, settings } = this.props.config;
+
+      let defaultFieldOptions = {
+        label: settings.fieldLabel,
+      };
+
+      let defaultOperatorOptions = {
+        label: settings.operatorLabel,
+      };
 
       let fieldOptions = fields;
 
@@ -55,10 +63,14 @@ export default (Rule) => {
           setOperator={this.setOperator.bind(this)}
           selectedField={this.props.field || ':empty:'}
           selectedOperator={this.props.operator || ':empty:'}
-          fieldSeparator={this.props.config.settings.fieldSeparator || '*$.'}
-          fieldSeparatorDisplay={this.props.config.settings.fieldSeparatorDisplay || '=>'}
+          fieldSeparator={settings.fieldSeparator || '*$.'}
+          fieldSeparatorDisplay={settings.fieldSeparatorDisplay || '=>'}
           fieldOptions={fieldOptions}
-          operatorOptions={operatorOptions}>
+          operatorOptions={operatorOptions}
+          defaultFieldOptions={defaultFieldOptions}
+          defaultOperatorOptions={defaultOperatorOptions}
+          config={this.props.config}
+        >
           {typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(
             <Operator
               key="options"
@@ -67,7 +79,8 @@ export default (Rule) => {
               options={this.props.operatorOptions}
               operator={this.props.operator}
               actions={this.props.actions}
-              config={this.props.config} />
+              config={this.props.config} 
+            />
           ), (
             <Widget
               key="values"
@@ -77,7 +90,8 @@ export default (Rule) => {
               options={this.props.valueOptions}
               operator={this.props.operator}
               actions={this.props.actions}
-              config={this.props.config} />
+              config={this.props.config} 
+            />
           )]) : null}
         </Rule>
       );
