@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextWidget, SelectWidget, DateWidget, BooleanWidget } from 'react-query-builder/components/widgets';
+import { TextWidget, NumberWidget, SelectWidget, DateWidget, BooleanWidget } from 'react-query-builder/components/widgets';
 import { ProximityOperator } from 'react-query-builder/components/operators';
 import { ComplexQueryOptions } from 'react-query-builder/components/options';
 

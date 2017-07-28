@@ -40,10 +40,11 @@
 
 .rule {
   background-color: white;
-  border: 1px solid gray;
+  border: 1px solid transparent;
 }
 
 .group, .rule {
+  border-radius: 5px;
   margin-top: 10px;
   padding: 10px;
   position: relative;

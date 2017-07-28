@@ -47,7 +47,7 @@ export default (Rule) => {
       }
 
       let operatorOptions = mapValues(pickBy(operators, (item, index) =>
-        this.props.field && fields[this.props.field] && fields[this.props.field].operators.indexOf(index) !== -1
+        this.props.field && fields[this.props.field] && fields[this.props.field].operators && fields[this.props.field].operators.indexOf(index) !== -1
       ));
 
       // Add a special 'empty' option if no operator has been selected yet.
@@ -55,6 +55,8 @@ export default (Rule) => {
         operatorOptions = Object.assign({}, { ':empty:': 'Select an operator' }, operatorOptions);
       }
       
+      let isGroup = fields[this.props.field].widget == 'submenu';
+
       return (
         <Rule
           id={this.props.id}
@@ -71,7 +73,7 @@ export default (Rule) => {
           defaultOperatorOptions={defaultOperatorOptions}
           config={this.props.config}
         >
-          {typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(
+          {!isGroup && typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(
             <Operator
               key="options"
               path={this.props.path}

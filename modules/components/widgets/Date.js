@@ -45,6 +45,7 @@ export default class DateWidget extends Component {
                     <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
                 }
                 <Datetime
+                    inputProps={{bsSize: "xsmall"}}
                     timeFormat={false}
                     dateFormat={dateFormat}
                     locale={locale}

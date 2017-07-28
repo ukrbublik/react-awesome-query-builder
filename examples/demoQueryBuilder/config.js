@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     TextWidget,
+    NumberWidget,
     SelectWidget,
     MultiSelectWidget,
     DateWidget,
@@ -21,6 +22,16 @@ export default {
         },
     },
     fields: {
+        members: {
+            label: 'Members',
+            widget: 'submenu'
+        },
+        "members.name1": {
+            label: 'Members.Name1',
+            label2: 'MemberName1',
+            widget: 'text',
+            operators: ['equal']
+        },
         name: {
             label: 'Name',
             widget: 'text',
@@ -30,6 +41,24 @@ export default {
                 "is_empty",
                 "is_not_empty",
             ]
+        },
+        num: {
+            label: 'Number',
+            widget: 'number',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+            ],
+            widgetProps: {
+                min: 2,
+                max: 5
+            }
         },
         date: {
             label: 'Date',
@@ -140,6 +169,9 @@ export default {
     widgets: {
         text: {
             factory: (props) => <TextWidget {...props} />
+        },
+        number: {
+            factory: (props) => <NumberWidget {...props} />
         },
         select: {
             factory: (props) => <SelectWidget {...props} />

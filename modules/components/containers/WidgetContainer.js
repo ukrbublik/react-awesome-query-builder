@@ -44,16 +44,18 @@ export default (Widget) => {
         }
 
         renderWidget(delta, widget) {
-            const {factory: widgetFactory, ...widgetProps} = this.props.config.widgets[widget];
-
-            return widgetFactory(Object.assign({}, widgetProps, {
+            const {factory: widgetFactory, ...basicWidgetProps} = this.props.config.widgets[widget];
+            const {widgetProps: fieldWidgetProps} = this.props.config.fields[this.props.field];
+            let widgetProps = Object.assign({}, basicWidgetProps, (fieldWidgetProps || {}), {
                 config: this.props.config,
                 field: this.props.field,
                 operator: this.props.operator,
                 delta: delta,
                 value: this.props.value.get(delta),
                 setValue: value => this.setValue.call(this, delta, value)
-            }));
+            });
+            
+            return widgetFactory(widgetProps);
         }
 
         render() {

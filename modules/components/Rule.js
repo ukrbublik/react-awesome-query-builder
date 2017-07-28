@@ -1,15 +1,15 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import shallowCompare from 'react-addons-shallow-compare';
+import RuleContainer from './containers/RuleContainer';
+import { Row, Col, Layout, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
+const { Header, Footer, Sider, Content } = Layout;
+const SubMenu = Menu.SubMenu;
+const MenuItem = Menu.Item;
+const DropdownButton = Dropdown.Button;
+import {} from "../utils/index";
 import map from 'lodash/map';
 import size from 'lodash/size';
-import RuleContainer from './containers/RuleContainer';
-import DropdownMenu, {NestedDropdownMenu} from 'react-dd-menu';
-require('react-dd-menu/dist/react-dd-menu.css');
-import {} from "../utils/index";
-
-import {Row, Col, Button, Input, OverlayTrigger, Tooltip} from "react-bootstrap";
-
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import omitBy from 'lodash/omitBy';
@@ -39,8 +39,6 @@ export default class Rule extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isFieldOpen: false,
-            isOpOpen: false,
         };
     }
 
@@ -52,59 +50,32 @@ export default class Rule extends Component {
         return Object.assign({label: "Operator"}, this.props.defaultOperatorOptions, this.props.operatorOptions[this.props.selectedOperator] || {});
     }
 
-    toggleFieldMenu() {
-        this.setState({isFieldOpen: !this.state.isFieldOpen});
+    handleFieldSelect({key, keyPath}) {
+        this.props.setField(key);
     }
 
-    closeFieldMenu() {
-        this.setState({isFieldOpen: false});
+    handleOperatorSelect({key, keyPath}) {
+        this.props.setOperator(key);
     }
 
-    toggleOpMenu() {
-        this.setState({isOpOpen: !this.state.isOpOpen});
-    }
-
-    closeOpMenu() {
-        this.setState({isOpOpen: false});
-    }
-
-    handleFieldSelect(e, label, value) {
-        if (e) {
-            value = this.refs.field.value;
-            let fieldOpts = this.props.fieldOptions[value];
-            label = fieldOpts.label;
-        }
-
-        this.props.setField(value);
-    }
-
-    handleOperatorSelect(e, label, value) {
-        if (e) {
-            value = this.refs.operator.value;
-            let opOpts = this.props.operatorOptions[value];
-            label = opOpts.label;
-        }
-
-        this.props.setOperator(value);
-    }
-
-    buildMenu(fields, handleSelect, prefix) {
+    buildMenuItems(fields, prefix) {
         if (prefix === undefined) {
             prefix = '';
         } else {
             prefix = prefix + this.props.fieldSeparator;
         }
-
         const direct_fields = omitBy(fields, (value, key)=> key.indexOf(this.props.fieldSeparator) > -1);
 
         return keys(direct_fields).map(field => {
             if (fields[field].widget == "submenu") {
                 var child_fields = pickBy(fields, (value, key)=> key.startsWith(field + this.props.fieldSeparator));
                 child_fields = mapKeys(child_fields, (value, key) => key.substring(field.length + this.props.fieldSeparator.length));
-                return <NestedDropdownMenu key={prefix+field} toggle={<a href="#">{fields[field].label}</a>}
-                                           direction="right" animate={false} delay={0}>
-                    {this.buildMenu(child_fields, handleSelect, prefix + field)}
-                </NestedDropdownMenu>
+                return <SubMenu 
+                    key={prefix+field} 
+                    title={fields[field].label+'   -'}
+                >
+                    {this.buildMenuItems(child_fields, prefix + field)}
+                </SubMenu>
             } else {
                 var short_label;
                 const label = fields[field].label || fields[field];
@@ -113,32 +84,35 @@ export default class Rule extends Component {
                 } else {
                     short_label = label;
                 }
-                return <li key={prefix+field}>
-                    <button type="button"
-                            onClick={handleSelect.bind(this, null, fields[field].label, prefix+field)}>{short_label}</button>
-                </li>
+                return <MenuItem key={prefix+field}>{short_label}</MenuItem>
             }
         })
     }
 
-    buildMenuToggler(curField, toggleFn) {
+    buildMenuToggler(label, label2) {
         var short_field;
-        if (curField.lastIndexOf(this.props.fieldSeparator) >= 0) {
-            short_field = curField.substring(curField.lastIndexOf(this.props.fieldSeparator) 
+        if (label2) {
+            short_field = label2;
+        } else if (label.lastIndexOf(this.props.fieldSeparator) >= 0) {
+            short_field = label.substring(label.lastIndexOf(this.props.fieldSeparator) 
                 + this.props.fieldSeparator.length);
         } else {
-            short_field = curField;
+            short_field = label;
         }
         var toggler = 
-            <Button bsStyle="primary" onClick={toggleFn.bind(this)}>{short_field} <span className="caret"/></Button>;
-        if (curField != short_field) {
-            toggler = 
-                <OverlayTrigger placement="top"
-                    overlay={<Tooltip id="Field"><strong>{
-                        curField.replace(new RegExp(RegExp.quote(this.props.fieldSeparator), 'g'), 
-                            this.props.fieldSeparatorDisplay)
-                    }</strong></Tooltip>}
-                >{toggler}</OverlayTrigger>
+            <Button 
+                size="small" 
+            >
+                {short_field} <span className="caret"/>
+            </Button>;
+        let curFieldTooltip = label.replace(new RegExp(RegExp.quote(this.props.fieldSeparator), 'g'), this.props.fieldSeparatorDisplay);
+        if (label != short_field) {
+            toggler = <Tooltip
+                    placement="top"
+                    title={curFieldTooltip}
+                >
+                {toggler}
+                </Tooltip>;
         }
         return toggler;
     }
@@ -148,101 +122,70 @@ export default class Rule extends Component {
     }
 
     renderNew() {
-        let fieldMenuOptions = {
-            isOpen: this.state.isFieldOpen,
-            close: this.closeFieldMenu.bind(this),
-            toggle: this.buildMenuToggler(this.curFieldOpts().label, this.toggleFieldMenu),
-            nested: 'right',
-            direction: 'right',
-            align: 'left',
-            animate: true
-        };
+        let selectedFields = this.props.selectedField
+            .split(this.props.fieldSeparator)
+            .map((curr, ind, arr) => arr.slice(0, ind+1))
+            .map((parts) => parts.join(this.props.fieldSeparator));
 
-        let operatorMenuOptions = {
-            isOpen: this.state.isOpOpen,
-            close: this.closeOpMenu.bind(this),
-            toggle: this.buildMenuToggler(this.curOpOpts().label, this.toggleOpMenu),
-            nested: 'right',
-            direction: 'right',
-            align: 'left',
-            animate: true
-        };
+        let fieldMenuItems = this.buildMenuItems(this.props.fieldOptions);
+        let fieldMenu = (
+            <Menu 
+                selectedKeys={selectedFields}
+                onClick={this.handleFieldSelect.bind(this)}
+            >{fieldMenuItems}</Menu>
+        );
+        let fieldToggler = this.buildMenuToggler(this.curFieldOpts().label, this.curFieldOpts().label2);
+        let opMenuItems = this.buildMenuItems(this.props.operatorOptions);
+        let opMenu = (
+            <Menu 
+                onClick={this.handleOperatorSelect.bind(this)}
+            >{opMenuItems}</Menu>
+        );
+        let opToggler = this.buildMenuToggler(this.curOpOpts().label, null);
 
         return (
-            <div className="rule">
-                <div className="rule--header">
-                    <div className="rule--actions">
-                        <button 
-                            className="action action--DELETE" 
-                            onClick={this.props.removeSelf}
-                        >
-                            {this.props.config.settings.deleteLabel || "Delete"}
-                        </button>
-                    </div>
-                </div>
-                <Row className="rule--body">
-                    {size(this.props.fieldOptions) ? (
-                        <Col key="field" className="rule--field">
-                            { this.props.config.settings.showLabels &&
-                                <label>{this.curFieldOpts().label || "Field"}</label>
-                            }
-                            <DropdownMenu {...fieldMenuOptions}>
-                                { this.buildMenu(this.props.fieldOptions, this.handleFieldSelect)}
-                            </DropdownMenu>
-                        </Col>
-                    ) : null}
-                    {size(this.props.operatorOptions) ? (
-                        <Col key="operator" className="rule--operator">
-                            { this.props.config.settings.showLabels &&
-                                <label>{this.curOpOpts().label || "Operator"}</label>
-                            }
-                            <DropdownMenu {...operatorMenuOptions}>
-                                { this.buildMenu(this.props.operatorOptions, this.handleOperatorSelect)}
-                            </DropdownMenu>
-                        </Col>
-                    ) : null}
-                    {this.props.children}
-                </Row>
-            </div>
+            <Layout className="rule">
+                <Content className="rule--body">
+                    <Row>
+                        {size(this.props.fieldOptions) ? (
+                            <Col key="field" className="rule--field">
+                                { this.props.config.settings.showLabels &&
+                                    <label>{this.curFieldOpts().label || "Field"}</label>
+                                }
+                                <Dropdown 
+                                    overlay={fieldMenu} 
+                                    trigger={['click']}
+                                >
+                                    {fieldToggler}
+                                </Dropdown>
+                            </Col>
+                        ) : null}
+                        {size(this.props.operatorOptions) ? (
+                            <Col key="operator" className="rule--operator">
+                                { this.props.config.settings.showLabels &&
+                                    <label>{this.curOpOpts().label || "Operator"}</label>
+                                }
+                                <Dropdown 
+                                    overlay={opMenu} 
+                                    trigger={['click']}
+                                >
+                                    {opToggler}
+                                </Dropdown>
+                            </Col>
+                        ) : null}
+                        {this.props.children}
+                    </Row>
+                </Content>
+                <Sider className="rule--header">
+                    <Button 
+                        type={"danger"}
+                        onClick={this.props.removeSelf}
+                    >
+                        {this.props.config.settings.deleteLabel || "Delete"}
+                    </Button>
+                </Sider>
+            </Layout>
         );
     }
 
-    /*
-    renderOld() {
-        return (
-            <div className="rule">
-                <div className="rule--header">
-                    <div className="rule--actions">
-                        <button className="action action--DELETE" onClick={this.props.removeSelf}>Delete</button>
-                    </div>
-                </div>
-                <div className="rule--body">
-                    {size(this.props.fieldOptions) ? (
-                        <div key="field" className="rule--field">
-                            <label>Field</label>
-                            <select ref="field" value={this.props.selectedField}
-                                    onChange={this.handleFieldSelect.bind(this)}>
-                                {map(this.props.fieldOptions, (label, value) => (
-                                    <option key={value} value={value}>{label.label}</option>
-                                ))}
-                            </select>
-                        </div>
-                    ) : null}
-                    {size(this.props.operatorOptions) ? (
-                        <div key="operator" className="rule--operator">
-                            <label>Operator</label>
-                            <select ref="operator" value={this.props.selectedOperator}
-                                    onChange={this.handleOperatorSelect.bind(this)}>
-                                {map(this.props.operatorOptions, (label, value) => (
-                                    <option key={value} value={value}>{label.label}</option>
-                                ))}
-                            </select>
-                        </div>
-                    ) : null}
-                    {this.props.children}
-                </div>
-            </div>
-        );
-    }
-    */
 }

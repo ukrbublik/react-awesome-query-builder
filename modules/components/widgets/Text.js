@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import {Col, FormControl} from "react-bootstrap";
+import { Input, Col } from 'antd';
 
 export default class TextWidget extends Component {
   static propTypes = {
@@ -15,16 +15,13 @@ export default class TextWidget extends Component {
   render() {
     return (
       <Col>
-            { this.props.config.settings.showLabels &&
-                <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
-            }
-          <FormControl 
-            autoFocus={this.props.delta === 0} 
-            type={"text"} 
-            ref="text" 
-            value={this.props.value} 
-            onChange={this.handleChange.bind(this)} 
-          />
+        <Input 
+          size={"small"}
+          ref="text" 
+          type={"text"}
+          value={this.props.value} 
+          onChange={this.handleChange.bind(this)} 
+        />
       </Col>
     );
   }
