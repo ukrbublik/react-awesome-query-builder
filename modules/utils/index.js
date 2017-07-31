@@ -1,5 +1,6 @@
 'use strict';
 export {queryBuilderFormat, queryBuilderToTree} from './queryBuilderFormat'
+export {getFieldConfig, getFieldPath, getFieldPathLabels} from './configUtils';
 
 RegExp.quote = function (str) {
     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
@@ -8,4 +9,3 @@ RegExp.quote = function (str) {
 export const defaultValue = (value, _default) => {
     return (typeof value === "undefined") ? _default || undefined : value
 }
-

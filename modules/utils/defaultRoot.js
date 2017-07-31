@@ -19,7 +19,7 @@ export default (config) => {
   return new Immutable.Map({
     type: 'group',
     id: uuid(),
-    children1: new Immutable.OrderedMap({ ...getChild(uuid(), config), ...getChild(uuid(), config) }),
+    children1: new Immutable.OrderedMap({ ...getChild(uuid(), config) }),
     properties: defaultGroupProperties(config)
   });
 }

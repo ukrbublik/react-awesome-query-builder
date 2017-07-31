@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import Delta from '../Delta';
-import {defaultValue} from "../../utils/index";
+import {defaultValue, getFieldConfig} from "../../utils/index";
 
 export default (Widget) => {
     return class WidgetContainer extends Component {
@@ -45,7 +45,7 @@ export default (Widget) => {
 
         renderWidget(delta, widget) {
             const {factory: widgetFactory, ...basicWidgetProps} = this.props.config.widgets[widget];
-            const {widgetProps: fieldWidgetProps} = this.props.config.fields[this.props.field];
+            const {widgetProps: fieldWidgetProps} = getFieldConfig(this.props.field, this.props.config);
             let widgetProps = Object.assign({}, basicWidgetProps, (fieldWidgetProps || {}), {
                 config: this.props.config,
                 field: this.props.field,
@@ -59,7 +59,7 @@ export default (Widget) => {
         }
 
         render() {
-            const fieldDefinition = this.props.config.fields[this.props.field];
+            const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
             const operatorDefinition = this.props.config.operators[this.props.operator];
             if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
                 return null;

@@ -3,6 +3,8 @@ import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
 import {defaultValue} from "./index";
+import {getFieldConfig} from './configUtils';
+
 /*
  Build tree to http://querybuilder.js.org/ like format
 
@@ -76,7 +78,7 @@ export const queryBuilderFormat = (item, config) => {
         const options = properties.get('operatorOptions');
         const valueOptions = properties.get('valueOptions');
 
-        const fieldDefinition = config.fields[field] || {};
+        const fieldDefinition = getFieldConfig(field, config) || {};
         const operatorDefinition = config.operators[operator] || {};
 
         const fieldType = fieldDefinition.type || "string";

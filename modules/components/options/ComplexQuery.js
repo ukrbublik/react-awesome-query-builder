@@ -21,10 +21,6 @@ export default class ComplexQuery extends Component {
       <option key={value} value={value}>{label}</option>
     ));
 
-    if (operatorOptions.length && typeof selectedOperator === 'undefined') {
-      operatorOptions.unshift(<option key=":empty:" value=":empty:">Select an operator</option>);
-    }
-
     return (
       <div className="value-options--COMPLEX-QUERY">
         {operatorOptions.length ? (

@@ -2,6 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import map from 'lodash/map';
 import GroupContainer from './containers/GroupContainer';
+import { Row, Col, Icon, Button, Radio } from 'antd';
+const ButtonGroup = Button.Group;
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 
 @GroupContainer
 export default class Group extends Component {
@@ -11,7 +15,9 @@ export default class Group extends Component {
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
-    allowRemoval: PropTypes.bool.isRequired
+    allowRemoval: PropTypes.bool.isRequired,
+    selectedConjunction: PropTypes.string,
+    setConjunction: PropTypes.func.isRequired,
   };
 
   shouldComponentUpdate = shallowCompare;
@@ -21,21 +27,44 @@ export default class Group extends Component {
       <div className="group">
         <div className="group--header">
           <div className="group--conjunctions">
+            <RadioGroup 
+               disabled={this.props.children.size < 2}
+               value={this.props.selectedConjunction} 
+               size="small" 
+               onChange={this.props.setConjunction}
+            >
             {map(this.props.conjunctionOptions, (item, index) => (
-              <div key={index} className={`conjunction conjunction--${index.toUpperCase()}`} data-state={item.checked ? 'active' : 'inactive'}>
-                <label htmlFor={item.id}>{item.label}</label>
-                <input id={item.id} type="radio"name={item.name} value={index} checked={item.checked} onChange={item.setConjunction} />
-              </div>
+              <RadioButton 
+                value={item.key}
+                //checked={item.checked}
+              >{item.label}</RadioButton>
             ))}
+            </RadioGroup>
           </div>
           <div className="group--actions">
-            {this.props.allowFurtherNesting ? (
-              <button className="action action--ADD-GROUP" onClick={this.props.addGroup}>{this.props.config.settings.addGroupLabel || "Add group"}</button>
-            ) : null}
-            <button className="action action--ADD-RULE" onClick={this.props.addRule}>{this.props.config.settings.addRuleLabel || "Add rule"}</button>
-            {this.props.allowRemoval ? (
-              <button className="action action--DELETE" onClick={this.props.removeSelf}>{this.props.config.settings.delGroupLabel || "Delete"}</button>
-            ) : null}
+            <ButtonGroup size="small">
+                <Button 
+                  type="primary"
+                  icon="plus"
+                  className="action action--ADD-RULE" 
+                  onClick={this.props.addRule}
+                >{this.props.config.settings.addRuleLabel || "Add rule"}</Button>
+                {this.props.allowFurtherNesting ? (
+                  <Button 
+                    className="action action--ADD-GROUP" 
+                    icon="plus-circle-o"
+                    onClick={this.props.addGroup}
+                  >{this.props.config.settings.addGroupLabel || "Add group"}</Button>
+                ) : null}
+                {this.props.allowRemoval ? (
+                  <Button 
+                    type="danger"
+                    icon="delete"
+                    className="action action--ADD-DELETE" 
+                    onClick={this.props.removeSelf}
+                  >{this.props.config.settings.delGroupLabel !== undefined ? this.props.config.settings.delGroupLabel : "Delete"}</Button>
+                ) : null}
+            </ButtonGroup>
           </div>
         </div>
         {this.props.children ? (

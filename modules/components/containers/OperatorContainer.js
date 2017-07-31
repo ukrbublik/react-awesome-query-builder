@@ -19,6 +19,8 @@ export default (Operator) => {
     }
 
     render() {
+      if (!this.props.operator)
+        return null;
       const operatorDefinitions = this.props.config.operators[this.props.operator];
       if (typeof operatorDefinitions.options === 'undefined') {
         return null;

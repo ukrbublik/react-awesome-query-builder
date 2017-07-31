@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import map from 'lodash/map';
 import {Col} from "react-bootstrap";
 import SelectPicker from "react-select-picker";
+import {getFieldConfig} from "../../utils/index";
 
 export default class MultiSelectWidget extends Component {
   static propTypes = {
@@ -15,7 +16,7 @@ export default class MultiSelectWidget extends Component {
   }
 
   render() {
-    const fieldDefinition = this.props.config.fields[this.props.field];
+    const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
     const options = map(fieldDefinition.options, (label, value) =>
       <option key={value} value={value}>{label}</option>
     );

@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
-import mapValues from 'lodash/mapValues';
-import pickBy from 'lodash/pickBy';
 import Widget from '../Widget';
 import Operator from '../Operator';
+import {getFieldConfig} from "../../utils/index";
 
 export default (Rule) => {
   return class RuleContainer extends Component {
@@ -29,33 +28,8 @@ export default (Rule) => {
     }
 
     render() {
-      const { fields, operators, settings } = this.props.config;
-
-      let defaultFieldOptions = {
-        label: settings.fieldLabel,
-      };
-
-      let defaultOperatorOptions = {
-        label: settings.operatorLabel,
-      };
-
-      let fieldOptions = fields;
-
-      // Add a special 'empty' option if no field has been selected yet.
-      if (size(fieldOptions) && typeof this.props.field === 'undefined') {
-        fieldOptions = Object.assign({}, { ':empty:': 'Select a field' }, fieldOptions);
-      }
-
-      let operatorOptions = mapValues(pickBy(operators, (item, index) =>
-        this.props.field && fields[this.props.field] && fields[this.props.field].operators && fields[this.props.field].operators.indexOf(index) !== -1
-      ));
-
-      // Add a special 'empty' option if no operator has been selected yet.
-      if (size(operatorOptions) && typeof this.props.operator === 'undefined') {
-        operatorOptions = Object.assign({}, { ':empty:': 'Select an operator' }, operatorOptions);
-      }
-      
-      let isGroup = fields[this.props.field].widget == 'submenu';
+      const fieldConfig = getFieldConfig(this.props.field, this.props.config);
+      let isGroup = fieldConfig && fieldConfig.widget == '!struct';
 
       return (
         <Rule
@@ -63,14 +37,8 @@ export default (Rule) => {
           removeSelf={this.removeSelf.bind(this)}
           setField={this.setField.bind(this)}
           setOperator={this.setOperator.bind(this)}
-          selectedField={this.props.field || ':empty:'}
-          selectedOperator={this.props.operator || ':empty:'}
-          fieldSeparator={settings.fieldSeparator || '*$.'}
-          fieldSeparatorDisplay={settings.fieldSeparatorDisplay || '=>'}
-          fieldOptions={fieldOptions}
-          operatorOptions={operatorOptions}
-          defaultFieldOptions={defaultFieldOptions}
-          defaultOperatorOptions={defaultOperatorOptions}
+          selectedField={this.props.field || null}
+          selectedOperator={this.props.operator || null}
           config={this.props.config}
         >
           {!isGroup && typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(

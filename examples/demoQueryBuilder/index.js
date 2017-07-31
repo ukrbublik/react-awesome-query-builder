@@ -5,7 +5,7 @@ import config from './config';
 
 var stringify = require('json-stringify-safe');
 
-const ruleset = {
+let ruleset = {
     "condition": "AND",
     "rules": [
         {
@@ -55,11 +55,10 @@ export default class DemoQueryBuilder extends Component {
 
     render() {
         const {tree, ...config_props} = config;
-        
+        //<Query {...config_props} value={queryBuilderToTree(ruleset)} get_children={this.getChildren}> </Query>
+                
         return (
             <div>
-                <Query {...config_props} value={queryBuilderToTree(ruleset)} get_children={this.getChildren}> </Query>
-                <Query {...config_props} value={queryBuilderToTree(ruleset)} get_children={this.getChildren}> </Query>
                 <Query {...config_props} get_children={this.getChildren}> </Query>
             </div>
         );

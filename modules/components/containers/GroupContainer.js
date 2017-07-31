@@ -12,7 +12,8 @@ export default (Group) => {
 
     shouldComponentUpdate = shallowCompare;
 
-    setConjunction(conjunction) {
+    setConjunction(e) {
+      let conjunction = e.target.value;
       this.props.actions.setConjunction(this.props.path, conjunction);
     }
 
@@ -44,11 +45,11 @@ export default (Group) => {
       const allowRemoval = currentNesting > 1;
 
       const conjunctionOptions = mapValues(this.props.config.conjunctions, (item, index) => ({
-        id: `conjunction-${this.props.id}-${index}`,
-        name: `conjunction[${this.props.id}]`,
+        //id: `conjunction-${this.props.id}-${index}`,
+        //name: `conjunction[${this.props.id}]`,
+        key: index,
         label: item.label,
         checked: index === this.props.conjunction,
-        setConjunction: () => this.setConjunction.call(this, index)
       }));
 
       return (
@@ -57,6 +58,8 @@ export default (Group) => {
           allowRemoval={allowRemoval}
           allowFurtherNesting={allowFurtherNesting}
           conjunctionOptions={conjunctionOptions}
+          selectedConjunction={this.props.conjunction}
+          setConjunction={this.setConjunction.bind(this)}
           removeSelf={this.removeSelf.bind(this)}
           addGroup={this.addGroup.bind(this)}
           addRule={this.addRule.bind(this)}

@@ -1,12 +1,12 @@
 import Immutable from 'immutable';
 import expandTreePath from '../utils/expandTreePath';
 import defaultRoot from '../utils/defaultRoot';
-import {defaultOperator, defaultOperatorOptions, defaultValueOptions} from '../utils/defaultRuleProperties';
+import {defaultOperator, defaultOperatorOptions, defaultValueOptions, getFirstOperator} from '../utils/defaultRuleProperties';
 import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
-import {defaultValue} from "../utils/index";
+import {defaultValue, getFieldConfig} from "../utils/index";
 
 var stringify = require('json-stringify-safe');
 
@@ -97,22 +97,32 @@ const setField = (state, path, field, config) => {
         const currentOperator = current.get('operator');
         const currentValue = current.get('value');
 
+        const currentFieldConfig = getFieldConfig(currentField, config);
+        const fieldConfig = getFieldConfig(field, config);
+
         // If the newly selected field supports the same operator the rule currently
         // uses, keep it selected.
-        const operator = config.fields[field].operators.indexOf(currentOperator) !== -1 ?
-            currentOperator : defaultOperator(config, field);
-
-        const operatorCardinality = defaultValue(config.operators[operator].cardinality, 1);
+        const lastOp = fieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
+        let operator = null;
+        for (let strategy of config.settings.setOpOnChangeField || []) {
+            if (strategy == 'keep')
+                operator = lastOp;
+            else if (strategy == 'default')
+                operator = defaultOperator(config, field, false);
+            else if (strategy == 'first')
+                operator = getFirstOperator(config, field);
+        }
+        const operatorCardinality = operator ? defaultValue(config.operators[operator].cardinality, 1) : null;
 
         return current.set('field', field)
             .set('operator', operator)
-            .set('operatorOptions', defaultOperatorOptions(config, operator))
-            .set('valueOptions', defaultValueOptions(config, operator))
+            .set('operatorOptions', defaultOperatorOptions(config, operator, field))
+            .set('valueOptions', defaultValueOptions(config, operator, field))
             .set('value', ((currentWidget, nextWidget) => {
                 return (currentWidget !== nextWidget) ?
                     new Immutable.List() :
                     new Immutable.List(currentValue.take(operatorCardinality));
-            })(config.fields[currentField].widget, config.fields[field].widget));
+            })(currentFieldConfig ? currentFieldConfig.widget : null, fieldConfig ? fieldConfig.widget : null));
     }))
 };
 
@@ -125,11 +135,12 @@ const setOperator = (state, path, operator, config) => {
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const operatorCardinality = defaultValue(config.operators[operator].cardinality, 1);
         const currentValue = current.get('value', new Immutable.List());
+        const currentField = current.get('field');
         const nextValue = new Immutable.List(currentValue.take(operatorCardinality));
 
         return current.set('operator', operator)
-            .set('operatorOptions', defaultOperatorOptions(config, operator))
-            .set('valueOptions', defaultValueOptions(config, operator))
+            .set('operatorOptions', defaultOperatorOptions(config, operator, currentField))
+            .set('valueOptions', defaultValueOptions(config, operator, currentField))
             .set('value', nextValue);
     }));
 };

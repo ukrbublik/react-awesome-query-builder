@@ -37,7 +37,7 @@ export default {
     },
     members: {
         label: 'Members',
-        widget: 'submenu'
+        widget: '!struct'
     },
     "members$$name": {
         label: 'Name',
@@ -51,7 +51,7 @@ export default {
     },
       "members$$test": {
           label: 'Test',
-          widget: 'submenu'
+          widget: '!struct'
       },
       "members$$color": {
           label: 'Members$$Color',
@@ -75,7 +75,7 @@ export default {
       },
       "members$$test2": {
           label: 'Test',
-              widget: 'submenu'
+              widget: '!struct'
       },
       "members$$test2$$date": {
           label: 'Members$$Test$$Date$$just$$a$$long$$name',

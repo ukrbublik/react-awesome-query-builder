@@ -24,37 +24,24 @@ export default {
     fields: {
         members: {
             label: 'Members',
-            widget: 'submenu'
-        },
-        "members.name1": {
-            label: 'Members.Name1',
-            label2: 'MemberName1',
-            widget: 'text',
-            operators: ['equal']
+            widget: '!struct',
+            subfields: {
+                subname: {
+                    //label: 'Subname', //'subname' should be used instead
+                    label2: 'MemberName',
+                    widget: 'text',
+                    operators: ['equal', 'not_equal'], //todo test
+                    defaultOperator: 'not_equal', //todo test
+                },
+            }
         },
         name: {
             label: 'Name',
             widget: 'text',
-            operators: [
-                'equal',
-                'not_equal',
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         num: {
             label: 'Number',
             widget: 'number',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-            ],
             widgetProps: {
                 min: 2,
                 max: 5
@@ -63,50 +50,14 @@ export default {
         date: {
             label: 'Date',
             widget: 'date',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         time: {
             label: 'Time',
             widget: 'time',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         datetime: {
             label: 'DateTime',
             widget: 'datetime',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         color: {
             label: 'Color',
@@ -116,7 +67,6 @@ export default {
                 green: 'Green',
                 orange: 'Orange'
             },
-            operators: ['select_equals']
         },
         multicolor: {
             label: 'Colors',
@@ -126,7 +76,6 @@ export default {
                 green: 'Green',
                 orange: 'Orange'
             },
-            operators: ['select_in']
         },
     },
     operators: {
@@ -168,28 +117,71 @@ export default {
     },
     widgets: {
         text: {
-            factory: (props) => <TextWidget {...props} />
+            factory: (props) => <TextWidget {...props} />,
+            operators: [
+                'equal',
+                'not_equal',
+                "is_empty",
+                "is_not_empty",
+            ]
         },
         number: {
-            factory: (props) => <NumberWidget {...props} />
+            factory: (props) => <NumberWidget {...props} />,
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+            ],
+            defaultOperator: 'less' //todo test
         },
         select: {
-            factory: (props) => <SelectWidget {...props} />
+            factory: (props) => <SelectWidget {...props} />,
+            operators: ['select_equals']
         },
         multiselect: {
-            factory: (props) => <MultiSelectWidget {...props} />
+            factory: (props) => <MultiSelectWidget {...props} />,
+            operators: ['select_in']
         },
         date: {
             factory: (props) => <DateWidget {...props} />,
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD',
             locale: 'ru',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+                "is_empty",
+                "is_not_empty",
+            ]
         },
         time: {
             factory: (props) => <TimeWidget {...props} />,
             timeFormat: 'HH:mm',
             valueFormat: 'HH:mm:ss',
             locale: 'ru',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+                "is_empty",
+                "is_not_empty",
+            ]
         },
         datetime: {
             factory: (props) => <DateTimeWidget {...props} />,
@@ -197,22 +189,38 @@ export default {
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD HH:mm:ss',
             locale: 'ru',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+                "is_empty",
+                "is_not_empty",
+            ]
         },
         boolean: {
             factory: (props) => <BooleanWidget {...props} />
         }
     },
     settings: {
+        setOpOnChangeField: ['default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
+        setDefaultFieldAndOp: false,
         maxNesting: 10,
         fieldSeparator: '.',
         fieldSeparatorDisplay: '->',
-        showLabels: false,
+        showLabels: true,
         valueLabel: "Value",
         fieldLabel: "Field",
         operatorLabel: "Operator",
-        deleteLabel: "x",
+        selectFieldLabel: "Select field",
+        selectOperatorLabel: "Select operator",
+        deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",
-        delGroupLabel: "x",
+        delGroupLabel: null,
     }
 };

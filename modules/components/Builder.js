@@ -7,7 +7,7 @@ export default class Builder extends Component {
     tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired
   };
-
+  
   render() {
     const id = this.props.tree.get('id');
     return (

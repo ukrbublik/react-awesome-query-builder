@@ -1,20 +1,22 @@
 import Immutable from 'immutable';
 import map from 'lodash/map';
 import range from 'lodash/range';
+import {getFieldConfig, getFirstField} from './configUtils';
 
-export const defaultField = (config) =>
-  typeof config.settings.defaultField === 'function' ?
-    config.settings.defaultField(config) : (config.settings.defaultField || Object.keys(config.fields)[0]);
+export const defaultField = (config, canGetFirst = true) => {
+  return typeof config.settings.defaultField === 'function' ?
+    config.settings.defaultField() : (config.settings.defaultField || (canGetFirst ? getFirstField(config) : null));
+};
 
-export const defaultOperator = (config, field) => {
-  let fieldConfig = config.fields[field];
-  let fieldOps = fieldConfig.operators;
+export const defaultOperator = (config, field, canGetFirst = true) => {
+  let fieldConfig = getFieldConfig(field, config);
+  let fieldDefaultOperator = fieldConfig.defaultOperator || (canGetFirst ? getFirstOperator(config, field) : null);
   let op = typeof config.settings.defaultOperator === 'function' ?
-    config.settings.defaultOperator(field, config) : (config.settings.defaultOperator || (fieldOps ? fieldOps[0] : null));
+    config.settings.defaultOperator(field, fieldConfig) : fieldDefaultOperator;
   return op;
 };
 
-export const defaultOperatorOptions = (config, operator) => {
+export const defaultOperatorOptions = (config, operator, field) => {
   if (!operator)
     return new Immutable.Map();
   return new Immutable.Map(
@@ -23,7 +25,7 @@ export const defaultOperatorOptions = (config, operator) => {
   );
 };
 
-export const defaultValueOptions = (config, operator) => {
+export const defaultValueOptions = (config, operator, field) => {
   if (!operator)
     return new Immutable.List();
   return new Immutable.List(
@@ -35,14 +37,17 @@ export const defaultValueOptions = (config, operator) => {
 }
 
 export default (config) => {
-  const field = defaultField(config, field);
-  const operator = defaultOperator(config, field);
+  let field = null, operator = null;
+  if (config.settings.setDefaultFieldAndOp) {
+    field = defaultField(config);
+    operator = defaultOperator(config, field);
+  }
 
   return new Immutable.Map({
     field: field,
     operator: operator,
     value: new Immutable.List(),
-    operatorOptions: defaultOperatorOptions(config, operator),
+    operatorOptions: defaultOperatorOptions(config, operator, field),
     valueOptions: defaultValueOptions(config, operator)
   });
 };

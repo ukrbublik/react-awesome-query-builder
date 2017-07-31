@@ -6,13 +6,18 @@
   }
 }
 
+@mixin force_nomargin {
+  margin: 0px !important;
+}
+
 %clearfix {
   @include clearfix;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+%force_nomargin {
+  @include force_nomargin;
 }
+
 
 /******************************************************************************/
 /** COMMON ********************************************************************/
@@ -40,21 +45,25 @@
 
 .rule {
   background-color: white;
-  border: 1px solid transparent;
+  border: 1px solid gray;
 }
 
 .group, .rule {
-  border-radius: 5px;
-  margin-top: 10px;
-  padding: 10px;
+  padding: 5px;
   position: relative;
+}
+
+.group {
+  margin-top: 10px !important;
+  padding-left: 0px;
 }
 
 /******************************************************************************/
 /** GROUP *********************************************************************/
 /******************************************************************************/
 .group--children {
-  margin-left: 20px;
+  @extend %force_nomargin;
+  margin-left: 10px !important;
 
   & > .rule, & > .group {
     &:last-child {
@@ -67,7 +76,7 @@
       content: '';
       display: block;
       position: absolute;
-      left: -13px;
+      left: -7px;
       background-color: gray;
     }
 
@@ -80,7 +89,7 @@
     &::after {
       top: 50%;
       height: 2px;
-      width: 13px;
+      width: 7px;
     }
   }
 }
@@ -91,6 +100,8 @@
 
 .group--conjunctions {
   float: left;
+  @extend %force_nomargin;
+  margin-left: 4px !important;
 }
 
 .group--actions {
@@ -100,7 +111,6 @@
 /******************************************************************************/
 /** RULE **********************************************************************/
 /******************************************************************************/
-
 .rule--header {
   @extend %clearfix;
   float: right;
@@ -108,12 +118,18 @@
 
 .rule--body {
   @extend %clearfix;
-  display: inline-block;
 }
 
 .rule--field, .rule--operator {
   float: left;
   margin-left: 15px;
+}
+
+.rule--field .dd-menu button {
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 div.tooltip-inner {

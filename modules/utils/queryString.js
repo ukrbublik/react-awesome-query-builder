@@ -1,3 +1,5 @@
+import {getFieldConfig} from './configUtils';
+
 const queryStringRecursive = (item, config) => {
     const type = item.get('type');
     const properties = item.get('properties');
@@ -11,7 +13,7 @@ const queryStringRecursive = (item, config) => {
         const field = properties.get('field');
         const operator = properties.get('operator');
 
-        const fieldDefinition = config.fields[field];
+        const fieldDefinition = getFieldConfig(field, config);
         const operatorDefinition = config.operators[operator];
 
         const options = properties.get('operatorOptions');
@@ -33,7 +35,9 @@ const queryStringRecursive = (item, config) => {
             return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
         };
 
-        return operatorDefinition.value(value, fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), options, valueOptions, operator, config, fieldDefinition);
+        return operatorDefinition.value(value, 
+            fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), 
+            options, valueOptions, operator, config, fieldDefinition);
     }
 
     if (type === 'group' && children && children.size) {
