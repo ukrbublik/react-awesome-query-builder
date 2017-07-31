@@ -7,6 +7,7 @@ import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
 import {defaultValue, getFieldConfig} from "../utils/index";
+import {getOperatorsForField} from "../utils/configUtils";
 
 var stringify = require('json-stringify-safe');
 
@@ -104,13 +105,18 @@ const setField = (state, path, field, config) => {
         // uses, keep it selected.
         const lastOp = fieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
         let operator = null;
-        for (let strategy of config.settings.setOpOnChangeField || []) {
-            if (strategy == 'keep')
-                operator = lastOp;
-            else if (strategy == 'default')
-                operator = defaultOperator(config, field, false);
-            else if (strategy == 'first')
-                operator = getFirstOperator(config, field);
+        const availOps = getOperatorsForField(config, field);
+        if (availOps.length == 1)
+            operator = availOps[0];
+        else if (availOps.length > 1) {
+            for (let strategy of config.settings.setOpOnChangeField || []) {
+                if (strategy == 'keep')
+                    operator = lastOp;
+                else if (strategy == 'default')
+                    operator = defaultOperator(config, field, false);
+                else if (strategy == 'first')
+                    operator = getFirstOperator(config, field);
+            }
         }
         const operatorCardinality = operator ? defaultValue(config.operators[operator].cardinality, 1) : null;
 

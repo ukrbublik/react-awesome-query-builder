@@ -51,9 +51,14 @@ export const getFirstField = (config) => {
   return keysPath.join(fieldSeparator);
 };
 
-export const getFirstOperator = (config, field) => {
+export const getOperatorsForField = (config, field) => {
   let fieldConfig = getFieldConfig(field, config);
   let fieldOps = fieldConfig.operators;
+  return fieldOps;
+};
+
+export const getFirstOperator = (config, field) => {
+  let fieldOps = getOperatorsForField(config, field);
   return fieldOps ? fieldOps[0] : null;
 };
 
@@ -79,4 +84,21 @@ export const getFieldPathLabels = (field, config) => {
             let cnf = getFieldConfig(part, config);
             return cnf && cnf.label || last(part.split(fieldSeparator))
         });
+};
+
+export const getValueLabel = (config, field, operator, delta, cardinality) => {
+    let fieldConfig = getFieldConfig(field, config);
+    //let widgetConfig = config.widgets[fieldConfig.widget] || {};
+    let opConfig = config.operators[operator];
+    let ret = null;
+    if (cardinality > 1) {
+        const valueLabels = opConfig.valueLabels;
+        if (valueLabels)
+            ret = valueLabels[delta];
+        if (!ret)
+            ret = (config.settings.valueLabel || "Value") + " " + (delta+1);
+    } else {
+        ret = config.settings.valueLabel || "Value";
+    }
+    return ret;
 };

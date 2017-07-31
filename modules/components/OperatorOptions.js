@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
-import WidgetContainer from './containers/WidgetContainer';
-import {Col} from "react-bootstrap";
+import OperatorOptionsContainer from './containers/OperatorOptionsContainer';
 
-@WidgetContainer
-export default class Widget extends Component {
+@OperatorOptionsContainer
+export default class OperatorOptions extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     name: PropTypes.string.isRequired,
@@ -15,9 +14,9 @@ export default class Widget extends Component {
 
   render() {
     return (
-      <Col className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}>
+      <div className={`rule--operator rule--operator--${this.props.name.toUpperCase()}`}>
         {this.props.children}
-      </Col>
+      </div>
     );
   }
 }

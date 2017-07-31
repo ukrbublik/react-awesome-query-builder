@@ -12,9 +12,13 @@ export default (Group) => {
 
     shouldComponentUpdate = shallowCompare;
 
-    setConjunction(e) {
-      let conjunction = e.target.value;
-      this.props.actions.setConjunction(this.props.path, conjunction);
+    setConjunction(e = null, conj = null) {
+      if (!conj && e) {
+        //for RadioGroup
+        conj = e.target.value;
+      }
+
+      this.props.actions.setConjunction(this.props.path, conj);
     }
 
     removeSelf(event) {
@@ -45,8 +49,8 @@ export default (Group) => {
       const allowRemoval = currentNesting > 1;
 
       const conjunctionOptions = mapValues(this.props.config.conjunctions, (item, index) => ({
-        //id: `conjunction-${this.props.id}-${index}`,
-        //name: `conjunction[${this.props.id}]`,
+        id: `conjunction-${this.props.id}-${index}`,
+        name: `conjunction[${this.props.id}]`,
         key: index,
         label: item.label,
         checked: index === this.props.conjunction,

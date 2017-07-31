@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
-import Widget from '../Widget';
-import Operator from '../Operator';
 import {getFieldConfig} from "../../utils/index";
 
 export default (Rule) => {
@@ -27,6 +25,18 @@ export default (Rule) => {
       this.props.actions.setOperator(this.props.path, operator);
     }
 
+    setOperatorOption(name, value) {
+      this.props.actions.setOperatorOption(this.props.path, name, value);
+    }
+
+    setValue(delta, value) {
+        this.props.actions.setValue(this.props.path, delta, value);
+    }
+
+    setValueOption(delta, name, value) {
+        this.props.actions.setValueOption(this.props.path, delta, name, value);
+    }
+
     render() {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
       let isGroup = fieldConfig && fieldConfig.widget == '!struct';
@@ -37,33 +47,16 @@ export default (Rule) => {
           removeSelf={this.removeSelf.bind(this)}
           setField={this.setField.bind(this)}
           setOperator={this.setOperator.bind(this)}
+          setOperatorOption={this.setOperator.bind(this)}
+          setValue={this.setValue.bind(this)}
+          setValueOption={this.setValueOption.bind(this)}
           selectedField={this.props.field || null}
           selectedOperator={this.props.operator || null}
+          value={this.props.value || null}
+          valueOptions={this.props.valueOptions}
+          operatorOptions={this.props.operatorOptions}
           config={this.props.config}
-        >
-          {!isGroup && typeof this.props.field !== 'undefined' && typeof this.props.operator !== 'undefined' ? ([(
-            <Operator
-              key="options"
-              path={this.props.path}
-              field={this.props.field}
-              options={this.props.operatorOptions}
-              operator={this.props.operator}
-              actions={this.props.actions}
-              config={this.props.config} 
-            />
-          ), (
-            <Widget
-              key="values"
-              path={this.props.path}
-              field={this.props.field}
-              value={this.props.value}
-              options={this.props.valueOptions}
-              operator={this.props.operator}
-              actions={this.props.actions}
-              config={this.props.config} 
-            />
-          )]) : null}
-        </Rule>
+        />
       );
     }
   };

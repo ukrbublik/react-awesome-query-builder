@@ -17,15 +17,12 @@ export default class MultiSelectWidget extends Component {
 
   render() {
     const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
-    const options = map(fieldDefinition.options, (label, value) =>
+    const options = map(fieldDefinition.listValues, (label, value) =>
       <option key={value} value={value}>{label}</option>
     );
 
     return (
         <Col>
-            { this.props.config.settings.showLabels &&
-                <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
-            }
             <SelectPicker 
               multiple
               ref="val" 

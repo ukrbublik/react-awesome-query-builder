@@ -26,7 +26,7 @@ export default class NumberWidget extends Component {
     return (
       <Col>
         <InputNumber 
-          size={"small"}
+          size={this.props.config.settings.renderSize || "small"}
           ref="num" 
           value={this.props.value} 
           min={this.props.min} 

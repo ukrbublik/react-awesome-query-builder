@@ -111,18 +111,15 @@
   display: inline-block;
 }
 
-.rule--field, .rule--operator {
-  float: left;
-  margin-left: 15px;
+.rule--field, .rule--operator, .rule--value, .rule--operator-options, .widget--delta, .rule--widget {
+  display: inline-block;
+}
+.rule--field, .rule--operator, .rule--operator-options, .widget--delta {
+  margin-left: 10px;
 }
 
 div.tooltip-inner {
   max-width: 500px;
-}
-
-.rule--field, .rule--operator, .rule--options, .rule--widget {
-  display: inline-block;
-  margin-right: 10px;
 }
 
 .rule--field, .rule--operator {

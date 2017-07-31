@@ -1,56 +1,13 @@
-@mixin clearfix {
-  &:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
-}
-
 @mixin force_nomargin {
   margin: 0px !important;
-}
-
-%clearfix {
-  @include clearfix;
 }
 
 %force_nomargin {
   @include force_nomargin;
 }
 
-
-/******************************************************************************/
-/** COMMON ********************************************************************/
-/******************************************************************************/
-.query-builder, .query-preview {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  line-height: 1.25;
-  margin: 1rem;
-}
-
-.query-preview {
-  font-size: 14px;
-  background: rgba(250, 240, 210, 0.5);
-  border: 1px solid #DCC896;
-  min-height: 1rem;
-  display: block;
-  padding: 1rem;
-}
-
-.group {
-  background: rgba(250, 240, 210, 0.5);
-  border: 1px solid #DCC896;
-}
-
-.rule {
-  background-color: white;
-  border: 1px solid gray;
-}
-
 .group, .rule {
   padding: 5px;
-  position: relative;
 }
 
 .group {
@@ -58,178 +15,27 @@
   padding-left: 0px;
 }
 
-/******************************************************************************/
-/** GROUP *********************************************************************/
-/******************************************************************************/
 .group--children {
   @extend %force_nomargin;
   margin-left: 10px !important;
 
   & > .rule, & > .group {
-    &:last-child {
-      &::before {
-        bottom: 50%;
-      }
-    }
-
     &::before, &::after {
-      content: '';
-      display: block;
-      position: absolute;
       left: -7px;
-      background-color: gray;
     }
-
-    &::before {
-      width: 2px;
-      top: -11px;
-      bottom: -1px;
-    }
-
     &::after {
-      top: 50%;
-      height: 2px;
       width: 7px;
     }
   }
 }
 
-.group--header {
-  @extend %clearfix;
-}
-
 .group--conjunctions {
-  float: left;
   @extend %force_nomargin;
   margin-left: 4px !important;
 }
 
-.group--actions {
-  float: right;
-}
 
-/******************************************************************************/
-/** RULE **********************************************************************/
-/******************************************************************************/
-.rule--header {
-  @extend %clearfix;
-  float: right;
-}
-
-.rule--body {
-  @extend %clearfix;
-}
-
-.rule--field, .rule--operator {
-  float: left;
-  margin-left: 15px;
-}
-
-.rule--field .dd-menu button {
-  max-width: 200px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-div.tooltip-inner {
-  max-width: 500px;
-}
-
-.rule--field, .rule--operator, .rule--options, .rule--widget {
+.rule--field, .rule--operator, .rule--operator-options, .widget--delta {
   display: inline-block;
-  margin-right: 10px;
-}
-
-.rule--field, .rule--operator {
-  label {
-    display: block;
-    font-weight: bold;
-  }
-}
-
-/******************************************************************************/
-/** CONJUNCTION ***************************************************************/
-/******************************************************************************/
-.conjunction {
-  display: inline-block;
-
-  label {
-    display: inline-block;
-    border: 1px solid;
-    cursor: pointer;
-    color: white;
-    text-transform: uppercase;
-    padding: 0.2rem 0.4rem;
-  }
-
-  input {
-    display: none;
-  }
-
-  &[data-state="active"] {
-    label {
-      background-color: #3276b1;
-      border-color: #285e8e;
-    }
-  }
-
-  &[data-state="inactive"] {
-    label {
-      background-color: #428bca;
-      border-color: #357ebd;
-
-      &:hover {
-        background-color: #3276b1;
-        border-color: #285e8e;
-      }
-    }
-  }
-
-  &:first-child {
-    label {
-      border-radius: 3px 0 0 3px;
-    }
-  }
-
-  &:last-child {
-    label {
-      border-radius: 0 3px 3px 0;
-    }
-  }
-
-  &:first-child:last-child {
-    border-radius: 3px;
-  }
-}
-
-/******************************************************************************/
-/** ACTION ********************************************************************/
-/******************************************************************************/
-.action {
-  display: inline-block;
-  background-color: #5cb85c;
-  border: 1px solid #4cae4c;
-  cursor: pointer;
-  color: white;
-  padding: 0.2rem 0.4rem;
-  text-decoration: none;
-
-  &:first-child {
-    border-radius: 3px 0 0 3px;
-    border-left-width: 1px;
-  }
-
-  &:last-child {
-    border-radius: 0 3px 3px 0;
-  }
-
-  &:first-child:last-child {
-    border-radius: 3px;
-  }
-}
-
-.action--DELETE {
-  background-color: #d9534f;
-  border-color: #d43f3a;
+  margin-left: 5px;
 }

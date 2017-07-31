@@ -43,9 +43,6 @@ export default class DateTimeWidget extends Component {
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
             <Col xs={9}>
-                { this.props.config.settings.showLabels &&
-                    <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
-                }
                 <Datetime
                     timeFormat={timeFormat}
                     dateFormat={dateFormat}

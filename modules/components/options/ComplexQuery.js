@@ -26,7 +26,11 @@ export default class ComplexQuery extends Component {
         {operatorOptions.length ? (
           <div key="operator" className="rule--operator">
             <label>Operator</label>
-            <select ref="operator" value={selectedOperator || ':empty:'} onChange={this.handleOperatorSelect.bind(this)}>{operatorOptions}</select>
+            <select 
+              ref="operator" 
+              value={selectedOperator || ':empty:'} 
+              onChange={this.handleOperatorSelect.bind(this)}
+            >{operatorOptions}</select>
           </div>
         ) : null}
       </div>

@@ -4,6 +4,7 @@ import range from 'lodash/range';
 
 export default class Proximity extends Component {
   static propTypes = {
+    config: PropTypes.object.isRequired,
     setOption: PropTypes.func.isRequired
   };
 
@@ -19,6 +20,9 @@ export default class Proximity extends Component {
 
     return (
       <div className="operator--PROXIMITY">
+        { this.props.config.settings.showLabels &&
+          <label>{this.props.optionLabel || "Words between1"}</label>
+        }
         <div className="operator--proximity">
           <select ref="proximity" value={selectedProximity} onChange={this.handleChange.bind(this)}>
             {range(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map((item) => (

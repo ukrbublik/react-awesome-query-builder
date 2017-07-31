@@ -17,9 +17,6 @@ export default class BooleanWidget extends Component {
         const {value, delta, id} = this.props;
         return (
             <Col>
-                { this.props.config.settings.showLabels &&
-                    <label>{this.props.label || this.props.config.settings.valueLabel || "Value"}</label>
-                }
                 <RadioGroup name={id} selectedValue={value}  ref="widget" onChange={this.handleChange.bind(this)}>
                     {Radio => (
                         <div>

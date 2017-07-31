@@ -18,33 +18,52 @@ export default class Group extends Component {
     allowRemoval: PropTypes.bool.isRequired,
     selectedConjunction: PropTypes.string,
     setConjunction: PropTypes.func.isRequired,
+    config: PropTypes.object.isRequired,
   };
 
   shouldComponentUpdate = shallowCompare;
 
   render() {
+    let renderConjsAsRadios = false;
     return (
       <div className="group">
         <div className="group--header">
           <div className="group--conjunctions">
-            <RadioGroup 
-               disabled={this.props.children.size < 2}
-               value={this.props.selectedConjunction} 
-               size="small" 
-               onChange={this.props.setConjunction}
-            >
-            {map(this.props.conjunctionOptions, (item, index) => (
-              <RadioButton 
-                value={item.key}
-                //checked={item.checked}
-              >{item.label}</RadioButton>
-            ))}
-            </RadioGroup>
+            { this.props.config.settings.renderConjsAsRadios ?
+              <RadioGroup 
+                 disabled={this.props.children.size < 2}
+                 value={this.props.selectedConjunction} 
+                 size={this.props.config.settings.renderSize || "small"}
+                 onChange={this.props.setConjunction}
+              >
+              {map(this.props.conjunctionOptions, (item, index) => (
+                <RadioButton 
+                  value={item.key}
+                  //checked={item.checked}
+                >{item.label}</RadioButton>
+              ))}
+              </RadioGroup>
+            :
+              <ButtonGroup 
+                size={this.props.config.settings.renderSize || "small"}
+                disabled={this.props.children.size < 2}
+              >
+              {map(this.props.conjunctionOptions, (item, index) => (
+                <Button 
+                  disabled={this.props.children.size < 2}
+                  key={item.id}
+                  type={item.checked ? "primary" : null}
+                  onClick={(ev) => this.props.setConjunction(ev, item.key)}
+                >{item.label}</Button>
+              ))}
+              </ButtonGroup>
+            }
           </div>
           <div className="group--actions">
-            <ButtonGroup size="small">
+            <ButtonGroup 
+              size={this.props.config.settings.renderSize || "small"}
+            >
                 <Button 
-                  type="primary"
                   icon="plus"
                   className="action action--ADD-RULE" 
                   onClick={this.props.addRule}

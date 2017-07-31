@@ -30,14 +30,15 @@ export default {
                     //label: 'Subname', //'subname' should be used instead
                     label2: 'MemberName',
                     widget: 'text',
-                    operators: ['equal', 'not_equal'], //todo test
-                    defaultOperator: 'not_equal', //todo test
+                    operators: ['proximity', 'complexQuery'],
                 },
             }
         },
         name: {
             label: 'Name',
             widget: 'text',
+            operators: ['equal', 'not_equal'],
+            defaultOperator: 'not_equal',
         },
         num: {
             label: 'Number',
@@ -62,7 +63,7 @@ export default {
         color: {
             label: 'Color',
             widget: 'select',
-            options: {
+            listValues: {
                 yellow: 'Yellow',
                 green: 'Green',
                 orange: 'Orange'
@@ -71,7 +72,7 @@ export default {
         multicolor: {
             label: 'Colors',
             widget: 'multiselect',
-            options: {
+            listValues: {
                 yellow: 'Yellow',
                 green: 'Green',
                 orange: 'Orange'
@@ -89,10 +90,18 @@ export default {
         between: {
             label: 'Between',
             cardinality: 2,
+            valueLabels: [
+                'Value from', 
+                'Value to'
+            ],
         },
         not_between: {
             label: 'Not between',
             cardinality: 2,
+            valueLabels: [
+                'Value from', 
+                'Value to'
+            ],
         },
 
         is_empty: {
@@ -113,6 +122,68 @@ export default {
                 console.log(2, value);
                 return '';
             }
+        },
+        proximity: {
+          label: 'Proximity search',
+          cardinality: 2,
+          valueLabels: [
+            'Word 1', 
+            'Word 2'
+          ],
+          value: (value, field, options) => {
+            const output = value.map(currentValue => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
+            return `${field}:"(${output.join(') (')})"~${options.get('proximity')}`;
+          },
+          options: {
+            optionLabel: "Words between",
+            factory: (props) => <ProximityOperator {...props} />,
+            defaults: {
+              proximity: 2
+            }
+          }
+        },
+        complexQuery: {
+          label: 'Complex query',
+          cardinality: 2,
+          value: (value, field, operatorOptions, valueOptions, operator, config) => {
+            const output = value
+              .map((currentValue, delta) => {
+                const operatorDefinition = config.operators[operator];
+                const selectedOperator = valueOptions.getIn([delta + '', 'operator'], 'contains');
+                const valueFn = operatorDefinition.valueOptions.operators[selectedOperator].value;
+                return valueFn(currentValue);
+              }).map((currentValue) => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
+
+            return `{!complexphrase}${field}:"(${output.join(') (')})"~${operatorOptions.get('proximity')}`;
+          },
+          options: {
+            optionLabel: "Words between",
+            factory: (props) => <ProximityOperator {...props} />,
+            defaults: {
+              proximity: 2
+            }
+          },
+          valueOptions: {
+            factory: (props) => <ComplexQueryOptions {...props} />,
+            operators: {
+              contains: {
+                label: 'Contains',
+                value: (value) => `*${value}*`
+              },
+              startsWith: {
+                label: 'Starts with',
+                value: (value) => `${value}*`
+              },
+              endsWith: {
+                label: 'Ends with',
+                value: (value) => `*${value}`
+              }
+            },
+            defaults: {
+              operator: 'contains',
+              proximity: 2
+            }
+          }
         },
     },
     widgets: {
@@ -137,7 +208,7 @@ export default {
                 "between",
                 "not_between",
             ],
-            defaultOperator: 'less' //todo test
+            defaultOperator: 'less', //todo test
         },
         select: {
             factory: (props) => <SelectWidget {...props} />,
@@ -207,6 +278,9 @@ export default {
         }
     },
     settings: {
+        renderSize: 'small',
+        renderConjsAsRadios: false,
+        renderFieldAndOpAsDropdown: true,
         setOpOnChangeField: ['default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
         setDefaultFieldAndOp: false,
         maxNesting: 10,

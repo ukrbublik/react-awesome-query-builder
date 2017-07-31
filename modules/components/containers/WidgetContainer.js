@@ -3,27 +3,19 @@ import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import Delta from '../Delta';
-import {defaultValue, getFieldConfig} from "../../utils/index";
+import {defaultValue, getFieldConfig, getValueLabel} from "../../utils/index";
+
 
 export default (Widget) => {
     return class WidgetContainer extends Component {
         static propTypes = {
             config: PropTypes.object.isRequired,
-            path: PropTypes.instanceOf(Immutable.List).isRequired,
             value: PropTypes.instanceOf(Immutable.List).isRequired,
             field: PropTypes.string.isRequired,
             operator: PropTypes.string.isRequired
         };
 
         shouldComponentUpdate = shallowCompare;
-
-        setValue(delta, value) {
-            this.props.actions.setValue(this.props.path, delta, value);
-        }
-
-        setValueOption(delta, name, value) {
-            this.props.actions.setValueOption(this.props.path, delta, name, value);
-        }
 
         renderOptions(delta) {
             const operatorDefinitions = this.props.config.operators[this.props.operator];
@@ -39,7 +31,7 @@ export default (Widget) => {
                 operator: this.props.operator,
                 delta: delta,
                 options: this.props.options.get(delta + '', new Immutable.Map()),
-                setOption: (name, value) => this.setValueOption.call(this, delta, name, value)
+                setOption: (name, value) => this.props.setValueOption(delta, name, value)
             }));
         }
 
@@ -52,7 +44,7 @@ export default (Widget) => {
                 operator: this.props.operator,
                 delta: delta,
                 value: this.props.value.get(delta),
-                setValue: value => this.setValue.call(this, delta, value)
+                setValue: value => this.props.setValue(delta, value)
             });
             
             return widgetFactory(widgetProps);
@@ -75,11 +67,16 @@ export default (Widget) => {
                 return null;
             }
 
+            const settings = this.props.config.settings;
+
             if (typeof widgetBehavior === 'undefined') {
                 return (
                     <Widget name={widget}>
                         {range(0, cardinality).map(delta => (
                             <Delta key={delta} delta={delta}>
+                                {settings.showLabels ?
+                                    <label>{getValueLabel(this.props.config, this.props.field, this.props.operator, delta, cardinality)}</label>
+                                : null}
                                 {this.renderWidget.call(this, delta, widget)}
                                 {this.renderOptions.call(this, delta, widget)}
                             </Delta>
