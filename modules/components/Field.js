@@ -83,7 +83,7 @@ export default class Field extends Component {
             onClick={this.handleFieldSelect.bind(this)}
         >{fieldMenuItems}</Menu>
     );
-    let fieldToggler = this.buildMenuToggler(this.curFieldOpts().label || this.props.config.settings.selectFieldLabel, 
+    let fieldToggler = this.buildMenuToggler(this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder, 
         selectedFieldFullLabel, this.curFieldOpts().label2);
 
     return (

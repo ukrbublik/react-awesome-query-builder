@@ -18,6 +18,7 @@ export default (Widget) => {
         shouldComponentUpdate = shallowCompare;
 
         renderWidget(delta, widget) {
+            const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
             const {factory: widgetFactory, ...basicWidgetProps} = this.props.config.widgets[widget];
             const {widgetProps: fieldWidgetProps} = getFieldConfig(this.props.field, this.props.config);
             let widgetProps = Object.assign({}, basicWidgetProps, (fieldWidgetProps || {}), {
@@ -26,6 +27,8 @@ export default (Widget) => {
                 operator: this.props.operator,
                 delta: delta,
                 value: this.props.value.get(delta),
+                label: valueLabel.label,
+                placeholder: valueLabel.placeholder,
                 setValue: value => this.props.setValue(delta, value)
             });
             
@@ -54,14 +57,17 @@ export default (Widget) => {
             if (typeof widgetBehavior === 'undefined') {
                 return (
                     <Widget name={widget}>
-                        {range(0, cardinality).map(delta => (
-                            <Delta key={delta} delta={delta}>
-                                {settings.showLabels ?
-                                    <label>{getValueLabel(this.props.config, this.props.field, this.props.operator, delta, cardinality)}</label>
-                                : null}
-                                {this.renderWidget.call(this, delta, widget)}
-                            </Delta>
-                        ))}
+                        {range(0, cardinality).map(delta => {
+                            const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
+                            return (
+                                <Delta key={delta} delta={delta}>
+                                    {settings.showLabels ?
+                                        <label>{valueLabel.label}</label>
+                                    : null}
+                                    {this.renderWidget.call(this, delta, widget)}
+                                </Delta>
+                            );
+                        })}
                     </Widget>
                 );
             }

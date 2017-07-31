@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
+import { Select } from 'antd';
+const Option = Select.Option;
 
 export default class Proximity extends Component {
   static propTypes = {
@@ -10,9 +12,8 @@ export default class Proximity extends Component {
 
   shouldComponentUpdate = shallowCompare;
 
-  handleChange() {
-    const node = React.findDOMNode(this.refs.proximity);
-    this.props.setOption('proximity', node.value);
+  handleChange(value) {
+    this.props.setOption('proximity', value);
   }
 
   render() {
@@ -21,14 +22,20 @@ export default class Proximity extends Component {
     return (
       <div className="operator--PROXIMITY">
         { this.props.config.settings.showLabels &&
-          <label>{this.props.optionLabel || "Words between1"}</label>
+          <label>{this.props.optionLabel || "Words between"}</label>
         }
         <div className="operator--proximity">
-          <select ref="proximity" value={selectedProximity} onChange={this.handleChange.bind(this)}>
+          <Select 
+            size={this.props.config.settings.renderSize || "small"}
+            ref="proximity" 
+            placeholder={this.props.optionPlaceholder || "Select words between"}
+            value={selectedProximity} 
+            onChange={this.handleChange.bind(this)}
+          >
             {range(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map((item) => (
-              <option key={item} value={item}>{item}</option>
+              <Option key={item} value={item}>{item}</Option>
             ))}
-          </select>
+          </Select>
         </div>
         <div className="operator--widgets">{this.props.children}</div>
       </div>

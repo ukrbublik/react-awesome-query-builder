@@ -76,7 +76,7 @@ export default class Operator extends Component {
             onClick={this.handleOperatorSelect.bind(this)}
         >{opMenuItems}</Menu>
     );
-    let opToggler = this.buildMenuToggler(this.curOpOpts().label || this.props.config.settings.selectOperatorLabel);
+    let opToggler = this.buildMenuToggler(this.curOpOpts().label || this.props.config.settings.operatorPlaceholder);
 
 
     return (

@@ -23,7 +23,7 @@ export const getFieldConfig = (field, config) => {
         }
     }
 
-    let widgetConfig = config.widgets[fieldConfig.widget] || {};
+    const widgetConfig = config.widgets[fieldConfig.widget] || {};
     return Object.assign({}, 
         pick(widgetConfig, ['operators', 'defaultOperator']),
         fieldConfig || {}
@@ -38,7 +38,7 @@ export const getFirstField = (config) => {
     firstField = config.fields[key];
     keysPath.push(key);
     while (firstField.widget == '!struct') {
-        let subfields = firstField.subfields;
+        const subfields = firstField.subfields;
         if (!subfields || !Object.keys(subfields).length) {
             firstField = key = null;
             break;
@@ -52,13 +52,13 @@ export const getFirstField = (config) => {
 };
 
 export const getOperatorsForField = (config, field) => {
-  let fieldConfig = getFieldConfig(field, config);
-  let fieldOps = fieldConfig.operators;
+  const fieldConfig = getFieldConfig(field, config);
+  const fieldOps = fieldConfig.operators;
   return fieldOps;
 };
 
 export const getFirstOperator = (config, field) => {
-  let fieldOps = getOperatorsForField(config, field);
+  const fieldOps = getOperatorsForField(config, field);
   return fieldOps ? fieldOps[0] : null;
 };
 
@@ -81,24 +81,36 @@ export const getFieldPathLabels = (field, config) => {
         .map((curr, ind, arr) => arr.slice(0, ind+1))
         .map((parts) => parts.join(fieldSeparator))
         .map(part => {
-            let cnf = getFieldConfig(part, config);
+            const cnf = getFieldConfig(part, config);
             return cnf && cnf.label || last(part.split(fieldSeparator))
         });
 };
 
-export const getValueLabel = (config, field, operator, delta, cardinality) => {
-    let fieldConfig = getFieldConfig(field, config);
-    //let widgetConfig = config.widgets[fieldConfig.widget] || {};
-    let opConfig = config.operators[operator];
+export const getValueLabel = (config, field, operator, delta) => {
+    const fieldConfig = getFieldConfig(field, config);
+    const widgetConfig = config.widgets[fieldConfig.widget] || {};
+    const opConfig = config.operators[operator];
+    const cardinality = opConfig.cardinality;
     let ret = null;
     if (cardinality > 1) {
         const valueLabels = opConfig.valueLabels;
         if (valueLabels)
             ret = valueLabels[delta];
-        if (!ret)
-            ret = (config.settings.valueLabel || "Value") + " " + (delta+1);
+        if (ret && typeof ret != 'object') {
+            ret = {label: ret, palceholder: ret};
+        }
+        if (!ret) {
+            ret = {
+                label: (config.settings.valueLabel || "Value") + " " + (delta+1),
+                palceholder: (config.settings.valuePlaceholder || "Value") + " " + (delta+1),
+            }
+        }
     } else {
-        ret = config.settings.valueLabel || "Value";
+        ret = {
+            label: fieldConfig.valueLabel || widgetConfig.valueLabel || config.settings.valueLabel || "Value",
+            placeholder: fieldConfig.valuePlaceholder || widgetConfig.valuePlaceholder || config.settings.valuePlaceholder || "Value",
+        };
     }
+    
     return ret;
 };

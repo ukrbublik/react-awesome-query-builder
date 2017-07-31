@@ -124,7 +124,7 @@ const setField = (state, path, field, config) => {
             .set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, field))
             .set('value', ((currentWidget, nextWidget) => {
-                return (currentWidget !== nextWidget) ?
+                return (currentWidget !== nextWidget || config.settings.clearValueOnChangeField) ?
                     new Immutable.List() :
                     new Immutable.List(currentValue.take(operatorCardinality));
             })(currentFieldConfig ? currentFieldConfig.widget : null, fieldConfig ? fieldConfig.widget : null));
@@ -169,8 +169,9 @@ const setValue = (state, path, delta, value) => {
  * @param {string} name
  * @param {*} value
  */
-const setOperatorOption = (state, path, name, value) =>
-    state.setIn(expandTreePath(path, 'properties', 'operatorOptions', name), value);
+const setOperatorOption = (state, path, name, value) => {
+    return state.setIn(expandTreePath(path, 'properties', 'operatorOptions', name), value);
+};
 
 /**
  * @param {Immutable.Map} state

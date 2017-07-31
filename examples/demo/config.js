@@ -40,6 +40,8 @@ export default {
             widget: 'text',
             operators: ['equal', 'not_equal'],
             defaultOperator: 'not_equal',
+            valueLabel: "Name",
+            valuePlaceholder: "Enter name",
         },
         num: {
             label: 'Number',
@@ -47,7 +49,7 @@ export default {
             widgetProps: {
                 min: 2,
                 max: 5
-            }
+            },
         },
         date: {
             label: 'Date',
@@ -172,7 +174,7 @@ export default {
           label: 'Proximity search',
           cardinality: 2,
           valueLabels: [
-            'Word 1', 
+            {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
           value: (value, field, options) => {
@@ -181,6 +183,7 @@ export default {
           },
           options: {
             optionLabel: "Words between",
+            optionPlaceholder: "Select words between",
             factory: (props) => <ProximityOperator {...props} />,
             defaults: {
               proximity: 2
@@ -210,7 +213,8 @@ export default {
                 "between",
                 "not_between",
             ],
-            defaultOperator: 'less', //todo test
+            defaultOperator: 'less',
+            valueLabel: "Enter number",
         },
         select: {
             factory: (props) => <SelectWidget {...props} />,
@@ -285,16 +289,19 @@ export default {
         renderConjsAsRadios: false,
         renderFieldAndOpAsDropdown: true,
         setOpOnChangeField: ['default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
+        clearValueOnChangeField: true, //false - if prev & next fields have same type (widget), keep
         setDefaultFieldAndOp: false,
         maxNesting: 10,
         fieldSeparator: '.',
         fieldSeparatorDisplay: '->',
         showLabels: true,
         valueLabel: "Value",
+        valuePlaceholder: "Value",
         fieldLabel: "Field",
         operatorLabel: "Operator",
-        selectFieldLabel: "Select field",
-        selectOperatorLabel: "Select operator",
+        fieldPlaceholder: "Select field",
+        operatorPlaceholder: "Select operator",
+        valuePlaceholer: "Value", //todo: override for widgets
         deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",

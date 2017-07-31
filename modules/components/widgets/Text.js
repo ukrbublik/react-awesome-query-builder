@@ -5,7 +5,9 @@ import { Input, Col } from 'antd';
 export default class TextWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired
+    delta: PropTypes.number.isRequired,
+    label: PropTypes.string,
+    placeholder: PropTypes.string,
   };
 
   handleChange() {
@@ -20,6 +22,7 @@ export default class TextWidget extends Component {
           ref="text" 
           type={"text"}
           value={this.props.value} 
+          placeholder={this.props.placeholder} 
           onChange={this.handleChange.bind(this)} 
         />
       </Col>
