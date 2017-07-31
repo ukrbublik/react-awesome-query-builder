@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
-import Delta from '../Delta';
 import {defaultValue, getFieldConfig, getValueLabel} from "../../utils/index";
 
 
@@ -59,14 +58,31 @@ export default (Widget) => {
                     <Widget name={widget}>
                         {range(0, cardinality).map(delta => {
                             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
-                            return (
-                                <Delta key={delta} delta={delta}>
+                            let parts = [];
+                            if (operatorDefinition.textSeparators) {
+                                let sep = operatorDefinition.textSeparators[delta];
+                                if (sep) {
+                                    parts.push((
+                                        <div className="widget--sep">
+                                            {settings.showLabels ?
+                                                <label>&nbsp;</label>
+                                            : null}
+                                            <span>{sep}</span>
+                                        </div>
+                                    ));
+                                }
+                            }
+
+                            parts.push((
+                                <div key={"widget-"+delta} className="widget--widget">
                                     {settings.showLabels ?
                                         <label>{valueLabel.label}</label>
                                     : null}
                                     {this.renderWidget.call(this, delta, widget)}
-                                </Delta>
-                            );
+                                </div>
+                            ));
+
+                            return parts;
                         })}
                     </Widget>
                 );

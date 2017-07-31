@@ -111,6 +111,10 @@ export default {
                 'Value from', 
                 'Value to'
             ],
+            textSeparators: [
+                null,
+                'to'
+            ]
         },
         not_between: {
             label: 'Not between',
@@ -119,6 +123,10 @@ export default {
                 'Value from', 
                 'Value to'
             ],
+            textSeparators: [
+                null,
+                'to'
+            ]
         },
 
         is_empty: {
@@ -294,7 +302,7 @@ export default {
         maxNesting: 10,
         fieldSeparator: '.',
         fieldSeparatorDisplay: '->',
-        showLabels: true,
+        showLabels: false,
         valueLabel: "Value",
         valuePlaceholder: "Value",
         fieldLabel: "Field",

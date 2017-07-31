@@ -122,10 +122,10 @@
   display: inline-block;
 }
 
-.rule--field, .rule--operator, .rule--value, .rule--operator-options, .widget--delta, .rule--widget {
+.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .widget--widget, .widget--sep {
   display: inline-block;
 }
-.rule--field, .rule--operator, .widget--delta {
+.rule--field, .rule--operator, .widget--widget, .widget--sep {
   margin-left: 10px;
 }
 
