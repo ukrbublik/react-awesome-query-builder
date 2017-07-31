@@ -85,12 +85,23 @@
   }
 }
 
+.group--children.hide--line {
+    & > .rule, & > .group {
+        &::before, &::after {
+            background-color: rgba(128, 128, 128, 0.1);
+        }
+    }
+}
+
 .group--header {
   @extend %clearfix;
 }
 
 .group--conjunctions {
   float: left;
+}
+.group--conjunctions.hide--conj {
+    opacity: 0.3;
 }
 
 .group--actions {

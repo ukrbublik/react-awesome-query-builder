@@ -6,6 +6,7 @@ import { Row, Col, Icon, Button, Radio } from 'antd';
 const ButtonGroup = Button.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
+const classNames = require('classnames');
 
 @GroupContainer
 export default class Group extends Component {
@@ -28,7 +29,10 @@ export default class Group extends Component {
     return (
       <div className="group">
         <div className="group--header">
-          <div className="group--conjunctions">
+          <div className={classNames(
+            "group--conjunctions", 
+            this.props.children.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--conj' : ''
+          )}>
             { this.props.config.settings.renderConjsAsRadios ?
               <RadioGroup 
                  disabled={this.props.children.size < 2}
@@ -87,7 +91,10 @@ export default class Group extends Component {
           </div>
         </div>
         {this.props.children ? (
-          <div className="group--children">{this.props.children}</div>
+          <div className={classNames(
+            "group--children", 
+            this.props.children.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : ''
+          )}>{this.props.children}</div>
         ) : null}
       </div>
     );

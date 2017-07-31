@@ -280,6 +280,7 @@ export default {
         }
     },
     settings: {
+        hideConjForOne: true,
         renderSize: 'small',
         renderConjsAsRadios: false,
         renderFieldAndOpAsDropdown: true,

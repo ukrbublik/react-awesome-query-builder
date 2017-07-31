@@ -72,6 +72,7 @@
   },
   "dependencies": {
     "antd": "^2.12.2",
+    "classnames": "^2.2.5",
     "immutable": "^3.7.6",
     "less": "^2.6",
     "less-loader": "^2.2",
