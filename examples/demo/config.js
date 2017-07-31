@@ -1,214 +1,302 @@
 import React from 'react';
-import { TextWidget, NumberWidget, SelectWidget, DateWidget, BooleanWidget } from 'react-query-builder/components/widgets';
-import { ProximityOperator } from 'react-query-builder/components/operators';
-import { ComplexQueryOptions } from 'react-query-builder/components/options';
+import {
+    TextWidget,
+    NumberWidget,
+    SelectWidget,
+    MultiSelectWidget,
+    DateWidget,
+    BooleanWidget,
+    TimeWidget,
+    DateTimeWidget
+} from 'react-query-builder/components/widgets';
+import {ProximityOperator} from 'react-query-builder/components/operators';
 
 export default {
-  conjunctions: {
-    and: {
-      label: 'And',
-      value: (value) => value.size > 1 ? `(${value.join(' AND ')})` : value.first()
+    conjunctions: {
+        AND: {
+            label: 'And',
+            value: (value) => value.size > 1 ? `(${value.join(' AND ')})` : value.first()
+        },
+        OR: {
+            label: 'Or',
+            value: (value) => value.size > 1 ? `(${value.join(' OR ')})` : value.first()
+        },
     },
-    or: {
-      label: 'Or',
-      value: (value) => value.size > 1 ? `(${value.join(' OR ')})` : value.first()
+    fields: {
+        members: {
+            label: 'Members',
+            widget: '!struct',
+            subfields: {
+                subname: {
+                    //label: 'Subname', //'subname' should be used instead
+                    label2: 'MemberName',
+                    widget: 'text',
+                    operators: ['proximity'],
+                },
+            }
+        },
+        name: {
+            label: 'Name',
+            widget: 'text',
+            operators: ['equal', 'not_equal'],
+            defaultOperator: 'not_equal',
+        },
+        num: {
+            label: 'Number',
+            widget: 'number',
+            widgetProps: {
+                min: 2,
+                max: 5
+            }
+        },
+        date: {
+            label: 'Date',
+            widget: 'date',
+        },
+        time: {
+            label: 'Time',
+            widget: 'time',
+        },
+        datetime: {
+            label: 'DateTime',
+            widget: 'datetime',
+        },
+        color: {
+            label: 'Color',
+            widget: 'select',
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+        },
+        multicolor: {
+            label: 'Colors',
+            widget: 'multiselect',
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+        },
     },
-  },
-  fields: {
-    name: {
-      label: 'Name',
-      widget: 'text',
-      operators: ['contains', 'startsWith', 'endsWith', 'wordsOne', 'termsAll', 'exactPhrase', 'termsNone', 'proximity', 'complexQuery']
-    },
-    date: {
-      label: 'Date',
-      widget: 'date',
-      operators: ['equals', 'range', 'minimum', 'maximum']
-    },
-    color: {
-      label: 'Color',
-      widget: 'select',
-      options: {
-        yellow1: 'Yellow',
-        green: 'Green',
-        orange: 'Orange'
-      },
-      operators: ['selectEquals']
-    },
-    members: {
-        label: 'Members',
-        widget: '!struct'
-    },
-    "members$$name": {
-        label: 'Name',
-        widget: 'text',
-        operators: ['contains', 'startsWith', 'endsWith', 'wordsOne', 'termsAll', 'exactPhrase', 'termsNone', 'proximity', 'complexQuery']
-    },
-    "members$$date": {
-        label: 'Date',
-        widget: 'date',
-        operators: ['equals', 'range', 'minimum', 'maximum']
-    },
-      "members$$test": {
-          label: 'Test',
-          widget: '!struct'
-      },
-      "members$$color": {
-          label: 'Members$$Color',
-          widget: 'select',
-          options: {
-              yellow1: 'Yellow',
-              green: 'Green',
-              orange: 'Orange'
-          },
-          operators: ['selectEquals']
-      },
-      "members$$test$$date": {
-          label: 'Members$$Test$$Date$$just$$a$$long$$name',
-          widget: 'date',
-          operators: ['equals', 'range', 'minimum', 'maximum']
-      },
-      "members$$test$$hello": {
-          label: 'Members$$Test$$Date$$just$$a$$long$$hello$$to$$world',
-          widget: 'date',
-          operators: ['equals', 'range', 'minimum', 'maximum']
-      },
-      "members$$test2": {
-          label: 'Test',
-              widget: '!struct'
-      },
-      "members$$test2$$date": {
-          label: 'Members$$Test$$Date$$just$$a$$long$$name',
-              widget: 'date',
-              operators: ['equals', 'range', 'minimum', 'maximum']
-      },
-      "members$$test2$$hello": {
-          label: 'Members$$Test$$Date$$just$$a$$long$$hello$$to$$world',
-              widget: 'date',
-              operators: ['equals', 'range', 'minimum', 'maximum']
-      }
-  },
-  operators: {
-    selectEquals: {
-      label: 'Equals',
-      value: (value, field, operatorOptions, valueOptions, operator, config, fieldDefinition) => `${field}:${fieldDefinition.options[value.first()]}`
-    },
-    equals: {
-      label: 'Equals',
-      value: (value, field) => `${field}:${value.first()}`
-    },
-    contains: {
-      label: 'Contains',
-      value: (value, field) => `${field}:*${value.first()}*`
-    },
-    startsWith: {
-      label: 'Starts with',
-      value: (value, field) => `${field}:${value.first()}*`
-    },
-    endsWith: {
-      label: 'Ends with',
-      value: (value, field) => `${field}:*${value.first()}`
-    },
-    exactPhrase: {
-      label: 'Exact phrase',
-      value: (value, field) => `${field}:"${value.first()}"`
-    },
-    termsOne: {
-      label: 'At least one of the words',
-      value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' OR ')})`
-    },
-    termsAll: {
-      label: 'All of the words',
-      value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' AND ')})`
-    },
-    termsNone: {
-      label: 'Without the words',
-      value: (value, field) => `-${field}:(${value.first().trim().split(' ').join(' OR ')})`
-    },
-    proximity: {
-      label: 'Proximity search',
-      cardinality: 2,
-      value: (value, field, options) => {
-        const output = value.map(currentValue => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
-        return `${field}:"(${output.join(') (')})"~${options.get('proximity')}`;
-      },
-      options: {
-        factory: (props) => <ProximityOperator {...props} />,
-        defaults: {
-          proximity: 2
-        }
-      }
-    },
-    complexQuery: {
-      label: 'Complex query',
-      cardinality: 2,
-      value: (value, field, operatorOptions, valueOptions, operator, config) => {
-        const output = value
-          .map((currentValue, delta) => {
-            const operatorDefinition = config.operators[operator];
-            const selectedOperator = valueOptions.getIn([delta + '', 'operator'], 'contains');
-            const valueFn = operatorDefinition.valueOptions.operators[selectedOperator].value;
-            return valueFn(currentValue);
-          }).map((currentValue) => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
+    operators: {
+        equal: {
+            label: '==',
+            value: (value, field) => `${field}:${value.first()}`
+        },
+        not_equal: {
+            label: '!='
+        },
+        less: {
+            label: '<'
+        },
+        less_or_equal: {
+            label: '<='
+        },
+        greater: {
+            label: '>'
+        },
+        greater_or_equal: {
+            label: '>='
+        },
 
-        return `{!complexphrase}${field}:"(${output.join(') (')})"~${operatorOptions.get('proximity')}`;
-      },
-      options: {
-        factory: (props) => <ProximityOperator {...props} />,
-        defaults: {
-          proximity: 2
-        }
-      },
-      valueOptions: {
-        factory: (props) => <ComplexQueryOptions {...props} />,
-        operators: {
-          contains: {
-            label: 'Contains',
-            value: (value) => `*${value}*`
+        between: {
+            label: 'Between',
+            cardinality: 2,
+            value: (value, field) => `[${field}:${value.first()} TO ${value.get(1)}]`,
+            valueLabels: [
+                'Value from', 
+                'Value to'
+            ],
+        },
+        not_between: {
+            label: 'Not between',
+            cardinality: 2,
+            valueLabels: [
+                'Value from', 
+                'Value to'
+            ],
+        },
+
+        is_empty: {
+            label: 'Is Empty',
+            cardinality: 0,
+        },
+        is_not_empty: {
+            label: 'Is not empty',
+            cardinality: 0,
+        },
+        select_equals: {
+            label: '==',
+            value: (value, field, operatorOptions, operator, config, fieldDefinition) => `${field}:${fieldDefinition.options[value.first()]}`
+        },
+        select_in: {
+            label: 'In',
+            value: (value, field, operatorOptions, operator, config, fieldDefinition) => {
+                console.log(2, value);
+                return '';
+            }
+        },
+
+        contains: {
+          label: 'Contains',
+          value: (value, field) => `${field}:*${value.first()}*`
+        },
+        starts_with: {
+          label: 'Starts with',
+          value: (value, field) => `${field}:${value.first()}*`
+        },
+        ends_with: {
+          label: 'Ends with',
+          value: (value, field) => `${field}:*${value.first()}`
+        },
+        exact_phrase: {
+          label: 'Exact phrase',
+          value: (value, field) => `${field}:"${value.first()}"`
+        },
+        terms_one: {
+          label: 'At least one of the words',
+          value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' OR ')})`
+        },
+        terms_all: {
+          label: 'All of the words',
+          value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' AND ')})`
+        },
+        terms_none: {
+          label: 'Without the words',
+          value: (value, field) => `-${field}:(${value.first().trim().split(' ').join(' OR ')})`
+        },
+
+        proximity: {
+          label: 'Proximity search',
+          cardinality: 2,
+          valueLabels: [
+            'Word 1', 
+            'Word 2'
+          ],
+          value: (value, field, options) => {
+            const output = value.map(currentValue => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
+            return `${field}:"(${output.join(') (')})"~${options.get('proximity')}`;
           },
-          startsWith: {
-            label: 'Starts with',
-            value: (value) => `${value}*`
-          },
-          endsWith: {
-            label: 'Ends with',
-            value: (value) => `*${value}`
+          options: {
+            optionLabel: "Words between",
+            factory: (props) => <ProximityOperator {...props} />,
+            defaults: {
+              proximity: 2
+            }
           }
         },
-        defaults: {
-          operator: 'contains',
-          proximity: 2
+    },
+    widgets: {
+        text: {
+            factory: (props) => <TextWidget {...props} />,
+            operators: [
+                'equal',
+                'not_equal',
+                "is_empty",
+                "is_not_empty",
+            ]
+        },
+        number: {
+            factory: (props) => <NumberWidget {...props} />,
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+            ],
+            defaultOperator: 'less', //todo test
+        },
+        select: {
+            factory: (props) => <SelectWidget {...props} />,
+            operators: ['select_equals']
+        },
+        multiselect: {
+            factory: (props) => <MultiSelectWidget {...props} />,
+            operators: ['select_in']
+        },
+        date: {
+            factory: (props) => <DateWidget {...props} />,
+            dateFormat: 'DD.MM.YYYY',
+            valueFormat: 'YYYY-MM-DD',
+            locale: 'ru',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+                "is_empty",
+                "is_not_empty",
+            ]
+        },
+        time: {
+            factory: (props) => <TimeWidget {...props} />,
+            timeFormat: 'HH:mm',
+            valueFormat: 'HH:mm:ss',
+            locale: 'ru',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+                "is_empty",
+                "is_not_empty",
+            ]
+        },
+        datetime: {
+            factory: (props) => <DateTimeWidget {...props} />,
+            timeFormat: 'HH:mm',
+            dateFormat: 'DD.MM.YYYY',
+            valueFormat: 'YYYY-MM-DD HH:mm:ss',
+            locale: 'ru',
+            operators: [
+                "equal",
+                "not_equal",
+                "less",
+                "less_or_equal",
+                "greater",
+                "greater_or_equal",
+                "between",
+                "not_between",
+                "is_empty",
+                "is_not_empty",
+            ]
+        },
+        boolean: {
+            factory: (props) => <BooleanWidget {...props} />
         }
-      }
     },
-    range: {
-      label: 'Range',
-      cardinality: 2,
-      value: (value, field) => `[${field}:${value.first()} TO ${value.get(1)}]`
-    },
-    minimum: {
-      label: 'Minimum',
-      value: (value, field) => `[${field}:${value.first()} TO *]`
-    },
-    maximum: {
-      label: 'Maximum',
-      value: (value, field) => `[${field}:* TO ${value.first()}]`
+    settings: {
+        renderSize: 'small',
+        renderConjsAsRadios: false,
+        renderFieldAndOpAsDropdown: true,
+        setOpOnChangeField: ['default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
+        setDefaultFieldAndOp: false,
+        maxNesting: 10,
+        fieldSeparator: '.',
+        fieldSeparatorDisplay: '->',
+        showLabels: true,
+        valueLabel: "Value",
+        fieldLabel: "Field",
+        operatorLabel: "Operator",
+        selectFieldLabel: "Select field",
+        selectOperatorLabel: "Select operator",
+        deleteLabel: null,
+        addGroupLabel: "Add group",
+        addRuleLabel: "Add rule",
+        delGroupLabel: null,
     }
-  },
-  widgets: {
-    text: {
-      factory: (props) => <TextWidget {...props} />
-    },
-    select: {
-      factory: (props) => <SelectWidget {...props} />
-    },
-    date: {
-      factory: (props) => <DateWidget {...props} />
-    }
-  },
-  settings: {
-    maxNesting: 10,
-    fieldSeparator: '$$',
-    fieldSeparatorDisplay: '->'
-  }
 };

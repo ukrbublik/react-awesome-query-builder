@@ -51,19 +51,3 @@ export const setOperatorOption = (config, path, name, value) => ({
   value: value,
   config: config
 });
-
-/**
- * @param {object} config
- * @param {Immutable.List} path
- * @param {integer} delta
- * @param {string} name
- * @param {*} value
- */
-export const setValueOption = (config, path, delta, name, value) => ({
-  type: constants.SET_VALUE_OPTION,
-  path: path,
-  delta: delta,
-  name: name,
-  value: value,
-  config: config
-});

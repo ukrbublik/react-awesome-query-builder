@@ -106,10 +106,8 @@ export default class Rule extends Component {
                                   field={this.props.selectedField}
                                   operator={this.props.selectedOperator}
                                   value={this.props.value}
-                                  options={this.props.valueOptions}
                                   config={this.props.config} 
                                   setValue={this.props.setValue}
-                                  setValueOption={this.props.setValueOption}
                                 />
                             </Col>
                         }

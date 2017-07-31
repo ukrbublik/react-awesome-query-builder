@@ -76,7 +76,6 @@ export const queryBuilderFormat = (item, config) => {
         const field = properties.get('field');
         const operator = properties.get('operator');
         const options = properties.get('operatorOptions');
-        const valueOptions = properties.get('valueOptions');
 
         const fieldDefinition = getFieldConfig(field, config) || {};
         const operatorDefinition = config.operators[operator] || {};

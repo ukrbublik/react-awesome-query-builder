@@ -10,7 +10,6 @@ import ReactDOM from 'react-dom';
 import {hashHistory} from 'react-router';
 import {Router, Route, Redirect} from 'react-router';
 import Demo from './demo';
-import DemoQueryBuilder from './demoQueryBuilder';
 
 window.React = React;
 
@@ -26,8 +25,7 @@ ReactDOM.render((
     <Router history={hashHistory}>
         <Redirect from="/" to="demo"/>
         <Route name="root" path="/" component={App}>
-            <Route name="demo" path="/demo" component={DemoQueryBuilder}/>
-            <Route name="demoQueryBuilder" path="/demoQueryBulder" component={DemoQueryBuilder}/>
+            <Route name="demo" path="/demo" component={Demo}/>
         </Route>
     </Router>
 ), document.body);

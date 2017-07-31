@@ -17,24 +17,6 @@ export default (Widget) => {
 
         shouldComponentUpdate = shallowCompare;
 
-        renderOptions(delta) {
-            const operatorDefinitions = this.props.config.operators[this.props.operator];
-            if (typeof operatorDefinitions.valueOptions === 'undefined') {
-                return null;
-            }
-
-            const {factory: optionsFactory, ...optionsProps} = operatorDefinitions.valueOptions;
-
-            return optionsFactory(Object.assign({}, optionsProps, {
-                config: this.props.config,
-                field: this.props.field,
-                operator: this.props.operator,
-                delta: delta,
-                options: this.props.options.get(delta + '', new Immutable.Map()),
-                setOption: (name, value) => this.props.setValueOption(delta, name, value)
-            }));
-        }
-
         renderWidget(delta, widget) {
             const {factory: widgetFactory, ...basicWidgetProps} = this.props.config.widgets[widget];
             const {widgetProps: fieldWidgetProps} = getFieldConfig(this.props.field, this.props.config);
@@ -78,29 +60,11 @@ export default (Widget) => {
                                     <label>{getValueLabel(this.props.config, this.props.field, this.props.operator, delta, cardinality)}</label>
                                 : null}
                                 {this.renderWidget.call(this, delta, widget)}
-                                {this.renderOptions.call(this, delta, widget)}
                             </Delta>
                         ))}
                     </Widget>
                 );
             }
-
-            // @todo Implement custom widget behavior rendering.
-            // const widget = widgetFactory({
-            //   definition: widgetDefinition,
-            //   config: this.props.config,
-            //   field: this.props.field,
-            //   cardinality: cardinality,
-            //   value: this.props.value,
-            //   setValue: this.setValue.bind(this)
-            // }, delta => this.props.operator.valueOptions ? this.props.operator.valueOptions.factory({
-            //   definition: this.props.operator,
-            //   config: this.props.config,
-            //   field: this.props.field,
-            //   delta: delta,
-            //   options: this.props.valueOptions.get(delta),
-            //   setOption: (name, value) => this.setValueOption.call(this, delta, name, value)
-            // }) : null);
 
             return null;
         }

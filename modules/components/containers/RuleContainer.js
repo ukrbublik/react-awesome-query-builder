@@ -33,10 +33,6 @@ export default (Rule) => {
         this.props.actions.setValue(this.props.path, delta, value);
     }
 
-    setValueOption(delta, name, value) {
-        this.props.actions.setValueOption(this.props.path, delta, name, value);
-    }
-
     render() {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
       let isGroup = fieldConfig && fieldConfig.widget == '!struct';
@@ -49,11 +45,9 @@ export default (Rule) => {
           setOperator={this.setOperator.bind(this)}
           setOperatorOption={this.setOperator.bind(this)}
           setValue={this.setValue.bind(this)}
-          setValueOption={this.setValueOption.bind(this)}
           selectedField={this.props.field || null}
           selectedOperator={this.props.operator || null}
           value={this.props.value || null}
-          valueOptions={this.props.valueOptions}
           operatorOptions={this.props.operatorOptions}
           config={this.props.config}
         />

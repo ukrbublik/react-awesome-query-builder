@@ -25,17 +25,20 @@ export default (OperatorOptions) => {
 
       const { factory: optionsFactory, ...optionsProps } = operatorDefinitions.options;
 
-      return 
-        <OperatorOptions name={this.props.selectedOperator}>
+      return (
+        <OperatorOptions 
+            name={this.props.selectedOperator}
+            config={this.props.config}
+        >
           {optionsFactory(Object.assign({}, optionsProps, {
             config: this.props.config,
             field: this.props.selectedField,
             operator: this.props.selectedOperator,
             options: this.props.operatorOptions,
-            setOption: (name, value) => this.setOperatorOption(name, value)
+            setOption: (name, value) => this.props.setOperatorOption(name, value)
           }))}
         </OperatorOptions>
-      ;
+      );
     }
   };
 };

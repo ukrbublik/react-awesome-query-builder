@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import expandTreePath from '../utils/expandTreePath';
 import defaultRoot from '../utils/defaultRoot';
-import {defaultOperator, defaultOperatorOptions, defaultValueOptions, getFirstOperator} from '../utils/defaultRuleProperties';
+import {defaultOperator, defaultOperatorOptions, getFirstOperator} from '../utils/defaultRuleProperties';
 import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
@@ -123,7 +123,6 @@ const setField = (state, path, field, config) => {
         return current.set('field', field)
             .set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, field))
-            .set('valueOptions', defaultValueOptions(config, operator, field))
             .set('value', ((currentWidget, nextWidget) => {
                 return (currentWidget !== nextWidget) ?
                     new Immutable.List() :
@@ -146,7 +145,6 @@ const setOperator = (state, path, operator, config) => {
 
         return current.set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, currentField))
-            .set('valueOptions', defaultValueOptions(config, operator, currentField))
             .set('value', nextValue);
     }));
 };
@@ -173,15 +171,6 @@ const setValue = (state, path, delta, value) => {
  */
 const setOperatorOption = (state, path, name, value) =>
     state.setIn(expandTreePath(path, 'properties', 'operatorOptions', name), value);
-
-/**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
- * @param {string} name
- * @param {*} value
- */
-const setValueOption = (state, path, delta, name, value) =>
-    state.setIn(expandTreePath(path, 'properties', 'valueOptions', delta + '', name), value);
 
 /**
  * @param {Immutable.Map} state
@@ -222,9 +211,6 @@ export default (config) => {
 
             case constants.SET_OPERATOR_OPTION:
                 return setOperatorOption(state, action.path, action.name, action.value);
-
-            case constants.SET_VALUE_OPTION:
-                return setValueOption(state, action.path, action.delta, action.name, action.value);
 
             default:
                 return state;

@@ -2,10 +2,14 @@
     "presets": [
         "react",
         "es2015",
-	    "stage-0"
+	"stage-0"
     ],
     "plugins": [
         ["transform-decorators-legacy"],
-        ["import", { libraryName: "antd", style: "css" }]
+        ["import", { libraryName: "antd", style: "css" }],
+        ["transform-es2015-modules-commonjs", {
+            "allowTopLevelThis": true,
+            "loose": true
+        }]
     ]
 }

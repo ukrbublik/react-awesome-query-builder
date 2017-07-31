@@ -26,17 +26,6 @@ export const defaultOperatorOptions = (config, operator, field) => {
   );
 };
 
-export const defaultValueOptions = (config, operator, field) => {
-  if (!operator)
-    return new Immutable.List();
-  return new Immutable.List(
-    map(range(0, config.operators[operator].cardinality), () => new Immutable.Map(
-      config.operators[operator].valueOptions &&
-      config.operators[operator].valueOptions.defaults || {}
-    ))
-  );
-}
-
 export default (config) => {
   let field = null, operator = null;
   if (config.settings.setDefaultFieldAndOp) {
@@ -50,6 +39,5 @@ export default (config) => {
     value: new Immutable.List(),
     //used for complex operators like proximity
     operatorOptions: defaultOperatorOptions(config, operator, field),
-    valueOptions: defaultValueOptions(config, operator)
   });
 };

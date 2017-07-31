@@ -17,7 +17,6 @@ const queryStringRecursive = (item, config) => {
         const operatorDefinition = config.operators[operator];
 
         const options = properties.get('operatorOptions');
-        const valueOptions = properties.get('valueOptions');
         const cardinality = operatorDefinition.cardinality || 1;
         const widget = config.widgets[fieldDefinition.widget];
         const value = properties.get('value').map((currentValue) =>
@@ -37,7 +36,7 @@ const queryStringRecursive = (item, config) => {
 
         return operatorDefinition.value(value, 
             fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), 
-            options, valueOptions, operator, config, fieldDefinition);
+            options, operator, config, fieldDefinition);
     }
 
     if (type === 'group' && children && children.size) {
