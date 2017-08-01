@@ -26,6 +26,7 @@ export default class Proximity extends Component {
         }
         <div className="operator--proximity">
           <Select 
+            dropdownMatchSelectWidth={false}
             size={this.props.config.settings.renderSize || "small"}
             ref="proximity" 
             placeholder={this.props.optionPlaceholder || "Select words between"}

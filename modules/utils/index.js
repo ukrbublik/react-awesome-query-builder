@@ -24,3 +24,15 @@ export const getAntLocales = () => {
 export const getAntLocale = (full2) => {
     return antLocales[full2];
 };
+
+export const calcTextWidth = function(str, font) {
+  var f = font || '12px arial',
+      o = $('<div>' + str + '</div>')
+            .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f})
+            .appendTo($('body')),
+      w = o.width();
+
+  o.remove();
+
+  return w;
+}

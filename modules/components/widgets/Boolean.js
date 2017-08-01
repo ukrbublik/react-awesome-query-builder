@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import {Col, Input} from "react-bootstrap";
-import RadioGroup from "react-radio-group";
+import { Switch, Icon } from 'antd';
 
 export default class BooleanWidget extends Component {
     static propTypes = {
@@ -13,19 +12,18 @@ export default class BooleanWidget extends Component {
         this.props.setValue(this.refs.widget.getValue());
     }
 
+    static defaultProps = {
+        labelYes: null, //(<Icon type="check" />),
+        labelNo: null, //(<Icon type="cross" />),
+    };
+
     render() {
         const {value, delta, id} = this.props;
         return (
-            <Col>
-                <RadioGroup name={id} selectedValue={value}  ref="widget" onChange={this.handleChange.bind(this)}>
-                    {Radio => (
-                        <div>
-                            <Input autoFocus={delta === 0} type="radio"/> Yes
-                            <Input autoFocus={delta === 0} type="radio"/> No
-                        </div>
-                    )}
-                </RadioGroup>
-            </Col>
+            <Switch 
+                checkedChildren={this.props.labelYes || null}
+                unCheckedChildren={this.props.labelNo || null}
+            />
         );
     }
 }

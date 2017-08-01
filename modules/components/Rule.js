@@ -40,6 +40,7 @@ export default class Rule extends Component {
         const selectedFieldConfig = getFieldConfig(this.props.selectedField, this.props.config);
         let isSelectedGroup = selectedFieldConfig && selectedFieldConfig.widget == '!struct';
         let isFieldAndOpSelected = this.props.selectedField && this.props.selectedOperator && !isSelectedGroup;
+        //const widgetConfig = config.widgets[selectedFieldConfig.widget] || {};
 
         const selectedOperatorConfig = this.props.config.operators[this.props.selectedOperator];
         let selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
@@ -72,7 +73,7 @@ export default class Rule extends Component {
                                 />
                             </Col>
                         ) : null}
-                        {this.props.selectedField ? (
+                        {this.props.selectedField && !selectedFieldConfig.hideOperator && (
                             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                                 { this.props.config.settings.showLabels &&
                                     <label>{this.props.config.settings.operatorLabel || "Operator"}</label>
@@ -86,7 +87,17 @@ export default class Rule extends Component {
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
                                 />
                             </Col>
-                        ) : null}
+                        )}
+                        {this.props.selectedField && selectedFieldConfig.hideOperator && selectedFieldConfig.operatorLabel && (
+                            <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+                                <div className="rule--operator">
+                                    {this.props.config.settings.showLabels ?
+                                        <label>&nbsp;</label>
+                                    : null}
+                                    <span>{selectedFieldConfig.operatorLabel}</span>
+                                </div>
+                            </Col>
+                        )}
                         {isFieldAndOpSelected && selectedOperatorHasOptions &&
                             <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
                                 <OperatorOptions

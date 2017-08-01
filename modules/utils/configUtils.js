@@ -25,7 +25,7 @@ export const getFieldConfig = (field, config) => {
 
     const widgetConfig = config.widgets[fieldConfig.widget] || {};
     return Object.assign({}, 
-        pick(widgetConfig, ['operators', 'defaultOperator']),
+        pick(widgetConfig, ['operators', 'defaultOperator', 'hideOperator', 'operatorLabel']),
         fieldConfig || {}
     );
 };

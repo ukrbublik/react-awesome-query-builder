@@ -54,7 +54,7 @@ export default class Field extends Component {
           <Button 
               size={this.props.config.settings.renderSize || "small"}
           >
-              {customLabel ? customLabel : label} <span className="caret"/>
+              {customLabel ? customLabel : label} <Icon type="down" />
           </Button>;
 
       if (fullLabel && fullLabel != label) {

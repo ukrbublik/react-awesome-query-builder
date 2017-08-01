@@ -1,8 +1,9 @@
 import React, {Component, PropTypes} from 'react';
-import {Col, Input} from "react-bootstrap";
-import Datetime from 'react-datetime';
+import { TimePicker } from 'antd';
 import moment from 'moment';
-import 'react-datetime/css/react-datetime.css'
+import { LocaleProvider } from 'antd';
+import {getAntLocale} from '../../utils';
+
 
 export default class TimeWidget extends Component {
     static propTypes = {
@@ -10,7 +11,6 @@ export default class TimeWidget extends Component {
         delta: PropTypes.number.isRequired,
         timeFormat: PropTypes.string,
         valueFormat: PropTypes.string,
-        locale: PropTypes.string,
     };
 
     constructor(props) {
@@ -26,31 +26,29 @@ export default class TimeWidget extends Component {
     static defaultProps = {
         timeFormat: 'HH:mm',
         valueFormat: 'HH:mm:ss',
-        locale: 'ru',
     };
     
 
     handleChange(_value) {
         const {setValue, valueFormat} = this.props;
         const value = _value instanceof moment && _value.isValid() ? _value.format(valueFormat) : null;
-        if (value)
+        if (value || _value === null)
             setValue(value);
     }
 
     render() {
-        const {timeFormat, valueFormat, value, locale} = this.props;
+        const {timeFormat, valueFormat, value} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
-            <Col xs={5}>
-                <Datetime
-                    timeFormat={timeFormat}
-                    dateFormat={false}
-                    locale={locale}
-                    value={dateValue}
-                    onChange={this.handleChange.bind(this)}
-                    ref="datetime"
-                />
-            </Col>
+            <TimePicker
+                key="widget-time"
+                size={this.props.config.settings.renderSize || "small"}
+                placeholder={this.props.placeholder} 
+                format={timeFormat}
+                value={dateValue}
+                onChange={this.handleChange.bind(this)}
+                ref="datetime"
+            />
         );
     }
 }

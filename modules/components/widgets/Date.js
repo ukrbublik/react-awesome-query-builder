@@ -27,14 +27,14 @@ export default class DateWidget extends Component {
     }
 
     static defaultProps = {
-        dateFormat: 'DD.MM.YYYY',
+        dateFormat: 'YYYY-MM-DD',
         valueFormat: 'YYYY-MM-DD',
     };
 
     handleChange(_value) {
         const {setValue, valueFormat} = this.props;
         const value = _value instanceof moment && _value.isValid() ? _value.format(valueFormat) : null;
-        if (value)
+        if (value || _value === null)
             setValue(value);
     }
 
@@ -44,6 +44,8 @@ export default class DateWidget extends Component {
         return (
             <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
                 <DatePicker
+                    key="widget-date"
+                    placeholder={this.props.placeholder} 
                     size={this.props.config.settings.renderSize || "small"}
                     format={dateFormat}
                     value={dateValue}

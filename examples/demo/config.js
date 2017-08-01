@@ -81,6 +81,10 @@ export default {
                 orange: 'Orange'
             },
         },
+        stock: {
+            label: 'In stock',
+            widget: 'boolean',
+        },
     },
     operators: {
         equal: {
@@ -113,7 +117,7 @@ export default {
             ],
             textSeparators: [
                 null,
-                'to'
+                'and'
             ]
         },
         not_between: {
@@ -125,7 +129,7 @@ export default {
             ],
             textSeparators: [
                 null,
-                'to'
+                'and'
             ]
         },
 
@@ -285,7 +289,14 @@ export default {
             ]
         },
         boolean: {
-            factory: (props) => <BooleanWidget {...props} />
+            factory: (props) => <BooleanWidget {...props} />,
+            operators: [
+              "equal",
+            ],
+            hideOperator: true,
+            operatorLabel: "is",
+            labelYes: "Yes",
+            labelNo: "No ",
         }
     },
     settings: {

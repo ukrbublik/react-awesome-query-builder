@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import WidgetContainer from './containers/WidgetContainer';
-import {Col} from "react-bootstrap";
+import { Row, Col } from 'antd';
 
 @WidgetContainer
 export default class Widget extends Component {
@@ -15,7 +15,10 @@ export default class Widget extends Component {
 
   render() {
     return (
-      <Col className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}>
+      <Col 
+        className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}
+        key={"widget-col-"+this.props.name}
+      >
         {this.props.children}
       </Col>
     );

@@ -74,7 +74,7 @@ export default (Widget) => {
                             }
 
                             parts.push((
-                                <div key={"widget-"+delta} className="widget--widget">
+                                <div key={"widget-"+this.props.field+"-"+delta} className="widget--widget">
                                     {settings.showLabels ?
                                         <label>{valueLabel.label}</label>
                                     : null}

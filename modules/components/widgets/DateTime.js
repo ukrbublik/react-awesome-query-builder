@@ -1,8 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {Col, Input} from "react-bootstrap";
-import Datetime from 'react-datetime';
+import { DatePicker } from 'antd';
+const { MonthPicker, RangePicker } = DatePicker;
 import moment from 'moment';
-import 'react-datetime/css/react-datetime.css'
+import { LocaleProvider } from 'antd';
+import {getAntLocale} from '../../utils';
+
 
 export default class DateTimeWidget extends Component {
     static propTypes = {
@@ -11,7 +13,6 @@ export default class DateTimeWidget extends Component {
         timeFormat: PropTypes.string,
         dateFormat: PropTypes.string,
         valueFormat: PropTypes.string,
-        locale: PropTypes.string,
     };
 
     constructor(props) {
@@ -22,19 +23,20 @@ export default class DateTimeWidget extends Component {
         if (mValue && !mValue.isValid()) {
             setValue(null);
         }
+
+        moment.locale(this.props.config.settings.locale.short);
     }
 
     static defaultProps = {
         timeFormat: 'HH:mm',
-        dateFormat: 'DD.MM.YYYY',
+        dateFormat: 'YYYY-MM-DD',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        locale: 'ru',
     };
 
     handleChange(_value) {
         const {setValue, valueFormat} = this.props;
         const value = _value instanceof moment && _value.isValid() ? _value.format(valueFormat) : null;
-        if (value)
+        if (value || _value === null)
             setValue(value);
     }
 
@@ -42,16 +44,18 @@ export default class DateTimeWidget extends Component {
         const {dateFormat, timeFormat, valueFormat, value, locale} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
-            <Col xs={9}>
-                <Datetime
-                    timeFormat={timeFormat}
-                    dateFormat={dateFormat}
-                    locale={locale}
+            <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
+                <DatePicker 
+                    key="widget-datetime"
+                    showTime={{ format: timeFormat }}
+                    placeholder={this.props.placeholder} 
+                    size={this.props.config.settings.renderSize || "small"}
+                    format={dateFormat + ' ' + timeFormat}
                     value={dateValue}
                     onChange={this.handleChange.bind(this)}
                     ref="datetime"
                 />
-            </Col>
+            </LocaleProvider>
         );
     }
 }

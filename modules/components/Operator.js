@@ -60,7 +60,7 @@ export default class Operator extends Component {
           <Button 
               size={this.props.config.settings.renderSize || "small"}
           >
-              {label} <span className="caret"/>
+              {label} <Icon type="down" />
           </Button>;
 
       return toggler;

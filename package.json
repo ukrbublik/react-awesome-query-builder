@@ -82,13 +82,9 @@
     "react-addons-css-transition-group": "^0.14.6",
     "react-addons-pure-render-mixin": "^0.14.6",
     "react-addons-shallow-compare": "^0.14.7",
-    "react-bootstrap": "^0.30.10",
-    "react-datetime": "^2.1.0",
     "react-dom": "^0.14.6",
     "react-pure-render": "^1.0.2",
-    "react-radio-group": "^2.2.0",
     "react-redux": "^4.0.6",
-    "react-select-picker": "0.0.7",
     "redux": "^3.0.5"
   }
 }

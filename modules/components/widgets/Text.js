@@ -18,10 +18,11 @@ export default class TextWidget extends Component {
     return (
       <Col>
         <Input 
+          key="widget-text"
           size={this.props.config.settings.renderSize || "small"}
           ref="text" 
           type={"text"}
-          value={this.props.value} 
+          value={this.props.value || null} 
           placeholder={this.props.placeholder} 
           onChange={this.handleChange.bind(this)} 
         />

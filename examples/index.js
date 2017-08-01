@@ -1,6 +1,4 @@
 window.jQuery = window.$ = require('jquery/dist/jquery.min');
-require('bootstrap/dist/css/bootstrap.css');
-require('bootstrap/dist/js/bootstrap.js');
 import './reset.scss';
 import './styles.scss';
 //import './compact_styles.scss';
