@@ -2,6 +2,13 @@
 export {queryBuilderFormat, queryBuilderToTree} from './queryBuilderFormat'
 export {getFieldConfig, getFieldPath, getFieldPathLabels, getValueLabel} from './configUtils';
 
+import en_US from 'antd/lib/locale-provider/en_US';
+import ru_RU from 'antd/lib/locale-provider/ru_RU';
+const antLocales = {
+    en_US: en_US,
+    ru_RU: ru_RU,
+};
+
 RegExp.quote = function (str) {
     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 };
@@ -9,3 +16,11 @@ RegExp.quote = function (str) {
 export const defaultValue = (value, _default) => {
     return (typeof value === "undefined") ? _default || undefined : value
 }
+
+export const getAntLocales = () => {
+    return antLocales;
+};
+
+export const getAntLocale = (full2) => {
+    return antLocales[full2];
+};

@@ -55,7 +55,7 @@ export default (Widget) => {
 
             if (typeof widgetBehavior === 'undefined') {
                 return (
-                    <Widget name={widget}>
+                    <Widget name={widget} config={this.props.config}>
                         {range(0, cardinality).map(delta => {
                             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
                             let parts = [];

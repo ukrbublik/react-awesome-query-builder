@@ -1,8 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {Col, Input} from "react-bootstrap";
-import Datetime from 'react-datetime';
+import { DatePicker } from 'antd';
+const { MonthPicker, RangePicker } = DatePicker;
 import moment from 'moment';
-import 'react-datetime/css/react-datetime.css'
+import { LocaleProvider } from 'antd';
+import {getAntLocale} from '../../utils';
+
 
 export default class DateWidget extends Component {
     static propTypes = {
@@ -10,7 +12,6 @@ export default class DateWidget extends Component {
         delta: PropTypes.number.isRequired,
         dateFormat: PropTypes.string,
         valueFormat: PropTypes.string,
-        locale: PropTypes.string,
     };
 
     constructor(props) {
@@ -21,12 +22,13 @@ export default class DateWidget extends Component {
         if (mValue && !mValue.isValid()) {
             setValue(null);
         }
+
+        moment.locale(this.props.config.settings.locale.short);
     }
 
     static defaultProps = {
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD',
-        locale: 'ru',
     };
 
     handleChange(_value) {
@@ -37,20 +39,18 @@ export default class DateWidget extends Component {
     }
 
     render() {
-        const {dateFormat, valueFormat, value, locale} = this.props;
+        const {dateFormat, valueFormat, value} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
-            <Col xs={7}>
-                <Datetime
-                    inputProps={{bsSize: "xsmall"}}
-                    timeFormat={false}
-                    dateFormat={dateFormat}
-                    locale={locale}
+            <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
+                <DatePicker
+                    size={this.props.config.settings.renderSize || "small"}
+                    format={dateFormat}
                     value={dateValue}
                     onChange={this.handleChange.bind(this)}
                     ref="datetime"
                 />
-            </Col>
+            </LocaleProvider>
         );
     }
 }

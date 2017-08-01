@@ -236,7 +236,6 @@ export default {
             factory: (props) => <DateWidget {...props} />,
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD',
-            locale: 'ru',
             operators: [
                 "equal",
                 "not_equal",
@@ -254,7 +253,6 @@ export default {
             factory: (props) => <TimeWidget {...props} />,
             timeFormat: 'HH:mm',
             valueFormat: 'HH:mm:ss',
-            locale: 'ru',
             operators: [
                 "equal",
                 "not_equal",
@@ -273,7 +271,6 @@ export default {
             timeFormat: 'HH:mm',
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD HH:mm:ss',
-            locale: 'ru',
             operators: [
                 "equal",
                 "not_equal",
@@ -292,6 +289,11 @@ export default {
         }
     },
     settings: {
+        locale: {
+            short: 'en',
+            full1: 'en-US',
+            full2: 'en_US',
+        },
         hideConjForOne: true,
         renderSize: 'small',
         renderConjsAsRadios: false,
