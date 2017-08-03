@@ -8,8 +8,8 @@ import {
     BooleanWidget,
     TimeWidget,
     DateTimeWidget
-} from 'react-query-builder/components/widgets';
-import {ProximityOperator} from 'react-query-builder/components/operators';
+} from 'react-awesome-query-builder/components/widgets';
+import {ProximityOperator} from 'react-awesome-query-builder/components/operators';
 
 export default {
     conjunctions: {
@@ -148,7 +148,7 @@ export default {
         select_in: {
             label: 'In',
             value: (value, field, operatorOptions, operator, config, fieldDefinition) => {
-                console.log(2, value);
+                //todo
                 return '';
             }
         },
@@ -322,7 +322,6 @@ export default {
         operatorLabel: "Operator",
         fieldPlaceholder: "Select field",
         operatorPlaceholder: "Select operator",
-        valuePlaceholer: "Value", //todo: override for widgets
         deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",

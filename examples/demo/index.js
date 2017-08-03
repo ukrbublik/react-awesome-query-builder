@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Query, Builder, Preview} from 'react-query-builder';
-import {queryBuilderFormat, queryBuilderToTree} from 'react-query-builder/utils';
+import {Query, Builder, Preview} from 'react-awesome-query-builder';
+import {queryBuilderFormat, queryBuilderToTree} from 'react-awesome-query-builder/utils';
 import config from './config';
 
 var stringify = require('json-stringify-safe');
@@ -44,8 +44,8 @@ export default class DemoQueryBuilder extends Component {
     getChildren(props) {
         return (
             <div>
-                <div>{stringify(queryBuilderFormat(props.tree, props.config))}</div>
-                <div>{stringify(props.tree)}</div>
+                <div>queryBuilderFormat: {stringify(queryBuilderFormat(props.tree, props.config))}</div>
+                <div>Tree: {stringify(props.tree)}</div>
                 <div className="query-builder">
                     <Builder {...props} />
                 </div>
