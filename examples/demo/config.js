@@ -1,5 +1,6 @@
 import React from 'react';
-import {
+import {Widgets, Operators} from 'react-awesome-query-builder';
+const {
     TextWidget,
     NumberWidget,
     SelectWidget,
@@ -8,8 +9,8 @@ import {
     BooleanWidget,
     TimeWidget,
     DateTimeWidget
-} from 'react-awesome-query-builder/components/widgets';
-import {ProximityOperator} from 'react-awesome-query-builder/components/operators';
+} = Widgets;
+const {ProximityOperator} = Operators;
 
 export default {
     conjunctions: {

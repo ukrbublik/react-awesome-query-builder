@@ -4,8 +4,10 @@ User-friendly React component to build queries.
 Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
 
 
-### Install
-`npm i react-awesome-query-builder`
+### Install & use
+Install: `npm i react-awesome-query-builder`
+
+See `examples/demo` as example of usage and configuration
 
 
 ### Demo
@@ -21,8 +23,8 @@ To build the component locally, clone this repo then run:
 Then open localhost:3001 in a browser.
 
 Scripts:
+- `prepare` - Builds a npm module. Output path: `build/npm`
 - `npm run build-global` - Builds with webpack the self contained pack of the component. Output path: `build/global`
-- `npm run build-npm` - Builds a npm module. Output path: `build/global`
 - `npm run build-examples` - Builds with webpack the examples. Output path: `examples`
 - `npm run examples` - Builds with webpack the examples and runs a dev-server on localhost:3001.
 
