@@ -5,8 +5,6 @@ import './styles.scss';
 
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {hashHistory} from 'react-router';
-import {Router, Route, Redirect} from 'react-router';
 import Demo from './demo';
 
 window.React = React;
@@ -20,10 +18,7 @@ class App extends Component {
 }
 
 ReactDOM.render((
-    <Router history={hashHistory}>
-        <Redirect from="/" to="demo"/>
-        <Route name="root" path="/" component={App}>
-            <Route name="demo" path="/demo" component={Demo}/>
-        </Route>
-    </Router>
+    <App>
+        <Demo />
+    </App>
 ), document.body);
