@@ -10,8 +10,10 @@
   @include clearfix;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
+.query-builder {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 }
 
 /******************************************************************************/
@@ -125,7 +127,7 @@
 .rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .widget--widget, .widget--sep {
   display: inline-block;
 }
-.rule--field, .rule--operator, .widget--widget, .widget--sep {
+.rule--operator, .widget--widget, .widget--sep {
   margin-left: 10px;
 }
 

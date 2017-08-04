@@ -1,7 +1,8 @@
 window.jQuery = window.$ = require('jquery/dist/jquery.min');
 import './reset.scss';
 import './styles.scss';
-//import './compact_styles.scss';
+import './compact_styles.scss';
+import './denormalize.scss';
 
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';

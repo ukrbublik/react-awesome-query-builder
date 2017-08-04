@@ -27,7 +27,7 @@ export const getAntLocale = (full2) => {
 
 //jQuery variant
 export const _calcTextWidth = function(str, font) {
-  var f = font || '12px arial',
+  var f = font || '12px',
       o = $('<div>' + str + '</div>')
             .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f})
             .appendTo($('body')),
@@ -40,7 +40,7 @@ export const _calcTextWidth = function(str, font) {
 
 //vanilla variant
 export const calcTextWidth = function(str, font) {
-  var f = font || '12px arial';
+  var f = font || '12px';
   var div = document.createElement("div");
   div.innerHTML = str;
   var css = {
