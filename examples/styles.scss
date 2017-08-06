@@ -52,45 +52,76 @@
   position: relative;
 }
 
+.qb-draggable {
+  position: absolute;
+  opacity: 0.8;
+  z-index: 1000;
+
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.qb-placeholder {
+    border: 1px dashed #ccc;
+}
+
 /******************************************************************************/
 /** GROUP *********************************************************************/
 /******************************************************************************/
 .group--children {
   margin-left: 20px;
 
-  & > .rule, & > .group {
-    &:last-child {
-      &::before {
-        bottom: 50%;
-      }
+  & > .group-or-rule-container > .group-or-rule {
+    &:before {
+        top: -4px;
+        border-width: 0 0 2px 2px;
+    }
+
+     &::after {
+        top: 50%;
+        border-width: 0 0 0 2px;    
     }
 
     &::before, &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      left: -13px;
-      background-color: gray;
-    }
-
-    &::before {
-      width: 2px;
-      top: -11px;
-      bottom: -1px;
-    }
-
-    &::after {
-      top: 50%;
-      height: 2px;
-      width: 13px;
+        content: '';
+        position: absolute;
+        left: -14px;
+        width: 14px;
+        height: calc(50% + 8px);
+        border-color: #CCC;
+        border-style: solid;    
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
     }
   }
+
+
+  & > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        top: -12px;
+        height: calc(50% + 14px);
+      }
+  }
+
+  & > .group-or-rule-container:last-child > .group-or-rule {
+      &::before {
+        border-radius: 0 0 0 4px;
+      }
+      &::after {
+        display: none;
+      }
+  }
+
 }
 
 .group--children.hide--line {
-    & > .rule, & > .group {
+    & > .group-or-rule-container > .group-or-rule {
         &::before, &::after {
-            background-color: rgba(128, 128, 128, 0.1);
+            border-color: rgba(128, 128, 128, 0.1);
         }
     }
 }

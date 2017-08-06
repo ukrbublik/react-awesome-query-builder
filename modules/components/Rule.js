@@ -13,6 +13,7 @@ const DropdownButton = Dropdown.Button;
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/index";
 import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
+const classNames = require('classnames');
 
 @RuleContainer
 export default class Rule extends Component {
@@ -22,10 +23,10 @@ export default class Rule extends Component {
         operatorOptions: PropTypes.object.isRequired,
         config: PropTypes.object.isRequired,
         //actions
-        setField: PropTypes.func.isRequired,
-        setOperator: PropTypes.func.isRequired,
-        setOperatorOption: PropTypes.func.isRequired,
-        removeSelf: PropTypes.func.isRequired,
+        setField: PropTypes.func,
+        setOperator: PropTypes.func,
+        setOperatorOption: PropTypes.func,
+        removeSelf: PropTypes.func,
     };
 
     shouldComponentUpdate = shallowCompare;
@@ -35,7 +36,16 @@ export default class Rule extends Component {
         this.state = {};
     }
 
-    render() {
+    handleDraggerMouseDown (e) {
+        var nodeId = this.props.id;
+        var dom = this.refs.rule;
+
+        if (this.props.onDragStart) {
+          this.props.onDragStart(nodeId, dom, e);
+        }
+    }
+
+    render () {
         let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
         const selectedFieldConfig = getFieldConfig(this.props.selectedField, this.props.config);
         let isSelectedGroup = selectedFieldConfig && selectedFieldConfig.widget == '!struct';
@@ -45,8 +55,25 @@ export default class Rule extends Component {
         const selectedOperatorConfig = this.props.config.operators[this.props.selectedOperator];
         let selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
 
+        let styles = {};
+        if (this.props.renderType == 'dragging') {
+            styles = {
+                top: this.props.dragging.y,
+                left: this.props.dragging.x,
+                width: this.props.dragging.w
+            };
+        }
+
         return (
-            <div className="rule">
+            <div 
+                className={classNames("rule", "group-or-rule", 
+                    this.props.renderType == 'placeholder' ? 'qb-placeholder' : null,
+                    this.props.renderType == 'dragging' ? 'qb-draggable' : null,
+                )} 
+                style={styles}
+                ref="rule" 
+                data-id={this.props.id}
+            >
                 <div className="rule--header">
                     <Button 
                         type="danger"
@@ -59,6 +86,9 @@ export default class Rule extends Component {
                 </div>
                 <div className="rule--body">
                     <Row>
+                        { this.props.canReorder &&
+                            <span onMouseDown={this.handleDraggerMouseDown.bind(this)} >###</span>
+                        }
                         {true ? (
                             <Col key={"fields"} className="rule--field">
                                 { this.props.config.settings.showLabels &&

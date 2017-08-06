@@ -10,6 +10,7 @@ const typeMap = {
       id={props.id}
       path={props.path}
       actions={props.actions}
+      tree={props.tree}
       config={props.config} />
   ),
   group: (props) => (
@@ -17,7 +18,9 @@ const typeMap = {
       id={props.id}
       path={props.path}
       actions={props.actions}
-      config={props.config}>
+      config={props.config}
+      tree={props.tree}
+    >
       {props.children1 ? props.children1.map((item) => (
         <Item
           key={item.get('id')}
@@ -27,7 +30,9 @@ const typeMap = {
           properties={item.get('properties')}
           config={props.config}
           actions={props.actions}
-          children1={item.get('children1')}>
+          children1={item.get('children1')}
+          tree={props.tree}
+        >
         </Item>
       )).toList() : null}
     </Group>

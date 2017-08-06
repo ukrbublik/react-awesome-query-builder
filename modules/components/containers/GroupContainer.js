@@ -57,18 +57,21 @@ export default (Group) => {
       }));
 
       return (
-        <Group
-          id={this.props.id}
-          allowRemoval={allowRemoval}
-          allowFurtherNesting={allowFurtherNesting}
-          conjunctionOptions={conjunctionOptions}
-          selectedConjunction={this.props.conjunction}
-          setConjunction={this.setConjunction.bind(this)}
-          removeSelf={this.removeSelf.bind(this)}
-          addGroup={this.addGroup.bind(this)}
-          addRule={this.addRule.bind(this)}
-          config={this.props.config}
-        >{this.props.children}</Group>
+        <div className={'group-or-rule-container'}>
+            <Group
+              id={this.props.id}
+              allowRemoval={allowRemoval}
+              allowFurtherNesting={allowFurtherNesting}
+              conjunctionOptions={conjunctionOptions}
+              selectedConjunction={this.props.conjunction}
+              setConjunction={this.setConjunction.bind(this)}
+              removeSelf={this.removeSelf.bind(this)}
+              addGroup={this.addGroup.bind(this)}
+              addRule={this.addRule.bind(this)}
+              config={this.props.config}
+              tree={this.props.tree}
+            >{this.props.children}</Group>
+        </div>
       );
     }
   };

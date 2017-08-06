@@ -19,7 +19,9 @@ export default class Builder extends Component {
         config={this.props.config}
         actions={this.props.actions}
         dispatch={this.props.dispatch}
-        children1={this.props.tree.get('children1')}>
+        children1={this.props.tree.get('children1')}
+        tree={this.props.tree}
+      >
       </Item>
     );
   }

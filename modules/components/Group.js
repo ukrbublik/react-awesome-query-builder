@@ -27,7 +27,7 @@ export default class Group extends Component {
   render() {
     let renderConjsAsRadios = false;
     return (
-      <div className="group">
+      <div className="group group-or-rule" data-id={this.props.id}>
         <div className="group--header">
           <div className={classNames(
             "group--conjunctions", 

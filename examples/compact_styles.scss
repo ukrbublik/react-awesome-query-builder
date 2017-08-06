@@ -19,12 +19,10 @@
   @extend %force_nomargin;
   margin-left: 10px !important;
 
-  & > .rule, & > .group {
+  & > .group-or-rule-container > .group-or-rule {
     &::before, &::after {
-      left: -7px;
-    }
-    &::after {
-      width: 7px;
+        left: -7px;
+        width: 7px;
     }
   }
 }
