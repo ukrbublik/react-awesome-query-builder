@@ -18,7 +18,6 @@ export default class Proximity extends Component {
 
   render() {
     const selectedProximity = this.props.options.get('proximity', this.props.defaults.proximity);
-
     return (
       <div className="operator--PROXIMITY">
         { this.props.config.settings.showLabels &&
@@ -30,11 +29,11 @@ export default class Proximity extends Component {
             size={this.props.config.settings.renderSize || "small"}
             ref="proximity" 
             placeholder={this.props.optionPlaceholder || "Select words between"}
-            value={selectedProximity} 
+            value={selectedProximity != null ? ""+selectedProximity : ""} 
             onChange={this.handleChange.bind(this)}
           >
             {range(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map((item) => (
-              <Option key={item} value={item}>{item}</Option>
+              <Option key={""+item} value={""+item}>{item}</Option>
             ))}
           </Select>
         </div>

@@ -81,7 +81,6 @@ export const queryBuilderFormat = (item, config) => {
         const operatorDefinition = getOperatorConfig(config, operator, field) || {};
 
         const fieldType = fieldDefinition.type || "undefined";
-
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
         const widget = getWidgetForFieldOp(config, field, operator);
         const widgetDefinition = getFieldWidgetConfig(config, field, operator, widget);
@@ -90,7 +89,7 @@ export const queryBuilderFormat = (item, config) => {
             // Widgets can optionally define a value extraction function. This is useful in cases
             // where an advanced widget is made up of multiple input fields that need to be composed
             // when building the query string.
-            typeof widget.formatValue === 'function' ? widget.formatValue(currentValue, config) : currentValue
+            typeof widgetDefinition.formatValue === 'function' ? widgetDefinition.formatValue(currentValue, config) : currentValue
         );
 
         if (value.size < cardinality) {

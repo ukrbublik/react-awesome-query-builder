@@ -19,9 +19,8 @@ export default (Widget) => {
         renderWidget(delta, widget) {
             const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget);
             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
-            const {factory: widgetFactory, ...basicWidgetProps} = widgetDefinition;
-            const {widgetProps: fieldWidgetProps} = getFieldConfig(this.props.field, this.props.config);
-            let widgetProps = Object.assign({}, basicWidgetProps, (fieldWidgetProps || {}), {
+            const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+            let widgetProps = Object.assign({}, fieldWidgetProps, {
                 config: this.props.config,
                 field: this.props.field,
                 operator: this.props.operator,

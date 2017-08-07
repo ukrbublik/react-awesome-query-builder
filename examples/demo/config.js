@@ -145,6 +145,7 @@ export default {
                         'not_equal',
                         "is_empty",
                         "is_not_empty",
+                        'proximity'
                     ]
                 }
             },
@@ -481,5 +482,6 @@ export default {
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",
         delGroupLabel: null,
+        canLeaveEmptyGroup: true, //after deletion
     }
 };

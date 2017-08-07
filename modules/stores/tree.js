@@ -7,7 +7,7 @@ import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
-import {defaultValue, getFieldConfig} from "../utils/index";
+import {defaultValue, getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../utils/index";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
 
 var stringify = require('json-stringify-safe');
@@ -41,7 +41,10 @@ const removeGroup = (state, path, config) => {
     state = removeItem(state, path);
 
     const parentPath = path.slice(0, -1);
-    if (!hasChildren(state, parentPath)) {
+    let isEmptyGroup = !hasChildren(state, parentPath);
+    let isEmptyRoot = isEmptyGroup && parentPath.size == 1;
+    let canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
+    if (isEmptyGroup && !canLeaveEmpty) {
         state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
     }
     return state;
@@ -55,7 +58,10 @@ const removeRule = (state, path, config) => {
     state = removeItem(state, path);
 
     const parentPath = path.slice(0, -1);
-    if (!hasChildren(state, parentPath)) {
+    let isEmptyGroup = !hasChildren(state, parentPath);
+    let isEmptyRoot = isEmptyGroup && parentPath.size == 1;
+    let canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
+    if (isEmptyGroup && !canLeaveEmpty) {
         state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
     }
     return state;
@@ -100,6 +106,8 @@ const setField = (state, path, field, config) => {
         const currentValue = current.get('value');
 
         const currentFieldConfig = getFieldConfig(currentField, config);
+        const currentWidgetConfig = getFieldWidgetConfig(config, currentField, currentOperator);
+        const currentOperatorConfig = getOperatorConfig(config, currentOperator, currentField);
         const fieldConfig = getFieldConfig(field, config);
 
         // If the newly selected field supports the same operator the rule currently
@@ -119,7 +127,9 @@ const setField = (state, path, field, config) => {
                     operator = getFirstOperator(config, field);
             }
         }
-        const operatorCardinality = operator ? defaultValue(config.operators[operator].cardinality, 1) : null;
+        const operatorConfig = getOperatorConfig(config, operator, field);
+        const widgetConfig = getFieldWidgetConfig(config, field, operator);
+        const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
         return current.set('field', field)
             .set('operator', operator)
@@ -128,7 +138,7 @@ const setField = (state, path, field, config) => {
                 return (currentWidget !== nextWidget || config.settings.clearValueOnChangeField) ?
                     new Immutable.List() :
                     new Immutable.List(currentValue.take(operatorCardinality));
-            })(currentFieldConfig ? currentFieldConfig.widget : null, fieldConfig ? fieldConfig.widget : null));
+            })(currentWidgetConfig, widgetConfig));
     }))
 };
 
@@ -139,9 +149,10 @@ const setField = (state, path, field, config) => {
  */
 const setOperator = (state, path, operator, config) => {
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
-        const operatorCardinality = defaultValue(config.operators[operator].cardinality, 1);
         const currentValue = current.get('value', new Immutable.List());
         const currentField = current.get('field');
+        const operatorConfig = getOperatorConfig(config, operator, currentField);
+        const operatorCardinality = defaultValue(operatorConfig.cardinality, 1);
         const nextValue = new Immutable.List(currentValue.take(operatorCardinality));
 
         return current.set('operator', operator)

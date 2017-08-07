@@ -1,4 +1,4 @@
-import {getFieldConfig} from './configUtils';
+import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig} from './configUtils';
 
 const queryStringRecursive = (item, config) => {
     const type = item.get('type');
@@ -12,18 +12,21 @@ const queryStringRecursive = (item, config) => {
 
         const field = properties.get('field');
         const operator = properties.get('operator');
+        const options = properties.get('operatorOptions');
 
         const fieldDefinition = getFieldConfig(field, config);
-        const operatorDefinition = config.operators[operator];
+        const operatorDefinition = getOperatorConfig(config, operator, field) || {};
 
-        const options = properties.get('operatorOptions');
+        const fieldType = fieldDefinition.type || "undefined";
         const cardinality = operatorDefinition.cardinality || 1;
-        const widget = config.widgets[fieldDefinition.widget];
+        const widget = getWidgetForFieldOp(config, field, operator);
+        const widgetDefinition = getFieldWidgetConfig(config, field, operator, widget);
+
         const value = properties.get('value').map((currentValue) =>
             // Widgets can optionally define a value extraction function. This is useful in cases
             // where an advanced widget is made up of multiple input fields that need to be composed
             // when building the query string.
-            typeof widget.formatValue === 'function' ? widget.formatValue(currentValue, config) : currentValue
+            typeof widgetDefinition.formatValue === 'function' ? widgetDefinition.formatValue(currentValue, config) : currentValue
         );
 
         if (value.size < cardinality) {

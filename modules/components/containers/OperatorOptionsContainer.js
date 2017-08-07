@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
+import {getOperatorConfig} from "../../utils/index";
 
 export default (OperatorOptions) => {
   return class OperatorOptionsContainer extends Component {
@@ -18,7 +19,7 @@ export default (OperatorOptions) => {
     render() {
       if (!this.props.selectedOperator)
         return null;
-      const operatorDefinitions = this.props.config.operators[this.props.selectedOperator];
+      const operatorDefinitions = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
       if (typeof operatorDefinitions.options === 'undefined') {
         return null;
       }

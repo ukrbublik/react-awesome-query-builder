@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import map from 'lodash/map';
 import range from 'lodash/range';
-import {getFieldConfig, getFirstField, getFirstOperator} from './configUtils';
+import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
 
 export const defaultField = (config, canGetFirst = true) => {
   return typeof config.settings.defaultField === 'function' ?
@@ -20,9 +20,10 @@ export const defaultOperator = (config, field, canGetFirst = true) => {
 export const defaultOperatorOptions = (config, operator, field) => {
   if (!operator)
     return new Immutable.Map();
+  let operatorConfig = getOperatorConfig(config, operator, field);
   return new Immutable.Map(
-    config.operators[operator].options &&
-    config.operators[operator].options.defaults || {}
+    operatorConfig.options &&
+    operatorConfig.options.defaults || {}
   );
 };
 

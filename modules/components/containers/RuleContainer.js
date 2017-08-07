@@ -234,7 +234,6 @@ moveItem (itemInfo, dragInfo, e, canMoveFn) {
     var hovMnodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y);
     hovMnodeEl = hovMnodeEl ? hovMnodeEl.closest('.group-or-rule') : null;
     if (!hovMnodeEl) {
-      //todo: Bug #1: handle "out of tree bounds" problem; scroll tree viewport
       console.log('out of tree bounds!');
     } else {
       var hovNodeId = hovMnodeEl.getAttribute('data-id');
@@ -277,10 +276,9 @@ moveItem (itemInfo, dragInfo, e, canMoveFn) {
         if (trgRect) {
           var dragLeftOffset = dragRect.left - treeRect.left;
           var trgLeftOffset = trgRect.left - treeRect.left;
-          if (isSamePos) {
-            //todo: Bug #2: fix 10px offset in css
-            dragLeftOffset += 10; //fix, see "padding-left: 10px" at css
-          }
+          //if (isSamePos) {
+          //  dragLeftOffset += 1; //?
+          //}
           var trgLev = trgLeftOffset / paddingLeft;
           var dragLev = Math.max(0, Math.round(dragLeftOffset / paddingLeft));
           var availMoves = [];
@@ -298,7 +296,7 @@ moveItem (itemInfo, dragInfo, e, canMoveFn) {
               while (!tmp.leaf) {
                 if (itemInfo.parent != tmp.id)
                   availMoves.push(['append', tmp, tmp.lev+1]);
-                if (!tmp.children || !tmp.children.length) {
+                if (!tmp.children || !tmp.children.length || tmp.collapsed) {
                   break;
                 } else {
                   var lastChildId = tmp.children[tmp.children.length - 1];
@@ -312,7 +310,7 @@ moveItem (itemInfo, dragInfo, e, canMoveFn) {
             if (dragDirs.vrt < 0) {
               availMoves.push(['before', trgII, trgII.lev]);
             }
-            if (dragDirs.vrt > 0) {
+            if (dragDirs.vrt > 0 && (trgII.leaf || trgII.collapsed)) {
               availMoves.push(['after', trgII, trgII.lev]);
             }
             if (!trgII.leaf && dragDirs.vrt > 0) {
@@ -332,7 +330,7 @@ moveItem (itemInfo, dragInfo, e, canMoveFn) {
                 while (!tmp.leaf) {
                   if (itemInfo.parent != tmp.id)
                     availMoves.push(['append', tmp, tmp.lev+1]);
-                  if (!tmp.children || !tmp.children.length) {
+                  if (!tmp.children || !tmp.children.length || tmp.collapsed) {
                     break;
                   } else {
                     var lastChildId = tmp.children[tmp.children.length - 1];
@@ -349,6 +347,8 @@ moveItem (itemInfo, dragInfo, e, canMoveFn) {
             var placement = am[0];
             var trg = am[1];
             if ((placement == 'before' || placement == 'after') && trg.id == 1)
+              return false;
+            if (trg.collapsed && (placement == 'append' || placement == 'prepend'))
               return false;
 
             var isInside = (trg.id == itemInfo.id);
