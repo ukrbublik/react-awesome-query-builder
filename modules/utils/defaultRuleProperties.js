@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import map from 'lodash/map';
 import range from 'lodash/range';
-import {getFieldConfig, getFirstField} from './configUtils';
+import {getFieldConfig, getFirstField, getFirstOperator} from './configUtils';
 
 export const defaultField = (config, canGetFirst = true) => {
   return typeof config.settings.defaultField === 'function' ?

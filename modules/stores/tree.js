@@ -1,7 +1,8 @@
 import Immutable from 'immutable';
 import expandTreePath from '../utils/expandTreePath';
 import defaultRoot from '../utils/defaultRoot';
-import {defaultOperator, defaultOperatorOptions, getFirstOperator} from '../utils/defaultRuleProperties';
+import {defaultOperator, defaultOperatorOptions} from '../utils/defaultRuleProperties';
+import {getFirstOperator} from '../utils/configUtils';
 import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
