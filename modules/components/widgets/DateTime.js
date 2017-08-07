@@ -31,6 +31,7 @@ export default class DateTimeWidget extends Component {
         timeFormat: 'HH:mm',
         dateFormat: 'YYYY-MM-DD',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        use12Hours: false,
     };
 
     handleChange(_value) {
@@ -41,12 +42,13 @@ export default class DateTimeWidget extends Component {
     }
 
     render() {
-        const {dateFormat, timeFormat, valueFormat, value, locale} = this.props;
+        const {dateFormat, timeFormat, valueFormat, value, locale, use12Hours} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
             <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
                 <DatePicker 
                     key="widget-datetime"
+                    use12Hours={use12Hours}
                     showTime={{ format: timeFormat }}
                     placeholder={this.props.placeholder} 
                     size={this.props.config.settings.renderSize || "small"}

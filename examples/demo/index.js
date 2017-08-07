@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
-const {queryBuilderFormat, queryBuilderToTree} = Utils;
+const {queryBuilderFormat, queryBuilderToTree, extendConfig} = Utils;
 import config from './config';
 
 var stringify = require('json-stringify-safe');

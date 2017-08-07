@@ -8,7 +8,7 @@ import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
 import {defaultValue, getFieldConfig} from "../utils/index";
-import {getOperatorsForField} from "../utils/configUtils";
+import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
 
 var stringify = require('json-stringify-safe');
 

@@ -10,7 +10,7 @@ import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/index";
+import {getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp, getOperatorConfig} from "../utils/index";
 import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
@@ -46,14 +46,14 @@ export default class Rule extends Component {
     }
 
     render () {
-        let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
+        const selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
         const selectedFieldConfig = getFieldConfig(this.props.selectedField, this.props.config);
-        let isSelectedGroup = selectedFieldConfig && selectedFieldConfig.widget == '!struct';
-        let isFieldAndOpSelected = this.props.selectedField && this.props.selectedOperator && !isSelectedGroup;
-        //const widgetConfig = config.widgets[selectedFieldConfig.widget] || {};
-
-        const selectedOperatorConfig = this.props.config.operators[this.props.selectedOperator];
-        let selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
+        const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == '!struct';
+        const isFieldAndOpSelected = this.props.selectedField && this.props.selectedOperator && !isSelectedGroup;
+        const selectedWidget = getWidgetForFieldOp(this.props.config, this.props.selectedField, this.props.selectedOperator);
+        const selectedOperatorConfig = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
+        const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
+        const selectedFieldWidgetConfig = (selectedFieldConfig && selectedFieldConfig.widgets ? selectedFieldConfig.widgets[selectedWidget] : {}) || {};
 
         let styles = {};
         if (this.props.renderType == 'dragging') {
@@ -103,7 +103,7 @@ export default class Rule extends Component {
                                 />
                             </Col>
                         ) : null}
-                        {this.props.selectedField && !selectedFieldConfig.hideOperator && (
+                        {this.props.selectedField && !selectedFieldWidgetConfig.hideOperator && (
                             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                                 { this.props.config.settings.showLabels &&
                                     <label>{this.props.config.settings.operatorLabel || "Operator"}</label>
@@ -118,13 +118,13 @@ export default class Rule extends Component {
                                 />
                             </Col>
                         )}
-                        {this.props.selectedField && selectedFieldConfig.hideOperator && selectedFieldConfig.operatorLabel && (
+                        {this.props.selectedField && selectedFieldWidgetConfig.hideOperator && selectedFieldWidgetConfig.operatorInlineLabel && (
                             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                                 <div className="rule--operator">
                                     {this.props.config.settings.showLabels ?
                                         <label>&nbsp;</label>
                                     : null}
-                                    <span>{selectedFieldConfig.operatorLabel}</span>
+                                    <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
                                 </div>
                             </Col>
                         )}

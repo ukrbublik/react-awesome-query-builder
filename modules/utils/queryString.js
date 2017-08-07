@@ -23,7 +23,7 @@ const queryStringRecursive = (item, config) => {
             // Widgets can optionally define a value extraction function. This is useful in cases
             // where an advanced widget is made up of multiple input fields that need to be composed
             // when building the query string.
-            typeof widget.value === 'function' ? widget.value(currentValue, config) : currentValue
+            typeof widget.formatValue === 'function' ? widget.formatValue(currentValue, config) : currentValue
         );
 
         if (value.size < cardinality) {
@@ -34,7 +34,7 @@ const queryStringRecursive = (item, config) => {
             return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
         };
 
-        return operatorDefinition.value(value, 
+        return operatorDefinition.formatValue(value, 
             fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), 
             options, operator, config, fieldDefinition);
     }
@@ -50,7 +50,7 @@ const queryStringRecursive = (item, config) => {
 
         const conjunction = properties.get('conjunction');
         const conjunctionDefinition = config.conjunctions[conjunction];
-        return conjunctionDefinition.value(value, conjunction);
+        return conjunctionDefinition.formatValue(value, conjunction);
     }
 
     return undefined;

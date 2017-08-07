@@ -438,7 +438,7 @@ move (fromId, toId, placement) {
 
     render() {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
-      let isGroup = fieldConfig && fieldConfig.widget == '!struct';
+      let isGroup = fieldConfig && fieldConfig.type == '!struct';
 
       return (<div className={'group-or-rule-container'}>{[this.state.dragging.id == this.props.id ? (
         <Rule

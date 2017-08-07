@@ -4,7 +4,7 @@ import {createStore} from 'redux';
 import {Provider, Connector, connect} from 'react-redux';
 import bindActionCreators from '../utils/bindActionCreators';
 import * as actions from '../actions';
-
+import {extendConfig} from "../utils/index";
 
 class ConnectedQuery extends Component {
     componentWillReceiveProps(nextProps) {
@@ -40,6 +40,7 @@ export default class Query extends Component {
     static propTypes:{
         conjunctions: PropTypes.object.isRequired,
         fields: PropTypes.object.isRequired,
+        types: PropTypes.object.isRequired,
         operators: PropTypes.object.isRequired,
         widgets: PropTypes.object.isRequired,
         settings: PropTypes.object.isRequired
@@ -50,6 +51,7 @@ export default class Query extends Component {
         const config = {
             conjunctions: props.conjunctions,
             fields: props.fields,
+            types: props.types,
             operators: props.operators,
             widgets: props.widgets,
             settings: props.settings,
@@ -65,8 +67,9 @@ export default class Query extends Component {
 
 
     render() {
-        const {conjunctions, fields, operators, widgets, settings, get_children, onChange, onBlur, value, tree, children, ...props} = this.props;
-        const config = {conjunctions, fields, operators, widgets, settings};
+        const {conjunctions, fields, types, operators, widgets, settings, get_children, onChange, onBlur, value, tree, children, ...props} = this.props;
+        let config = {conjunctions, fields, types, operators, widgets, settings};
+        config = extendConfig(config);
 
         return (
             <Provider store={this.state.store}>

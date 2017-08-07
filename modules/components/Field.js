@@ -35,7 +35,7 @@ export default class Field extends Component {
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
-          if (field.widget == "!struct") {
+          if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <SubMenu 
                   key={prefix+fieldKey} 

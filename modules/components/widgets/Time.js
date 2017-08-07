@@ -26,6 +26,7 @@ export default class TimeWidget extends Component {
     static defaultProps = {
         timeFormat: 'HH:mm',
         valueFormat: 'HH:mm:ss',
+        use12Hours: false,
     };
     
 
@@ -37,10 +38,11 @@ export default class TimeWidget extends Component {
     }
 
     render() {
-        const {timeFormat, valueFormat, value} = this.props;
+        const {timeFormat, valueFormat, value, use12Hours} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
             <TimePicker
+                use12Hours={use12Hours}
                 key="widget-time"
                 size={this.props.config.settings.renderSize || "small"}
                 placeholder={this.props.placeholder} 

@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
-import {defaultValue, getFieldConfig, getValueLabel} from "../../utils/index";
+import {defaultValue, getFieldConfig, getValueLabel, getOperatorConfig, getWidgetForFieldOp, getFieldWidgetConfig} from "../../utils/index";
 
 
 export default (Widget) => {
@@ -17,8 +17,9 @@ export default (Widget) => {
         shouldComponentUpdate = shallowCompare;
 
         renderWidget(delta, widget) {
+            const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget);
             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
-            const {factory: widgetFactory, ...basicWidgetProps} = this.props.config.widgets[widget];
+            const {factory: widgetFactory, ...basicWidgetProps} = widgetDefinition;
             const {widgetProps: fieldWidgetProps} = getFieldConfig(this.props.field, this.props.config);
             let widgetProps = Object.assign({}, basicWidgetProps, (fieldWidgetProps || {}), {
                 config: this.props.config,
@@ -35,13 +36,13 @@ export default (Widget) => {
         }
 
         render() {
+            const widget = getWidgetForFieldOp(this.props.config, this.props.field, this.props.operator);
             const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
-            const operatorDefinition = this.props.config.operators[this.props.operator];
+            const operatorDefinition = getOperatorConfig(this.props.config, this.props.operator, this.props.field);
             if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
                 return null;
             }
-            const widget = defaultValue(operatorDefinition.widget, fieldDefinition.widget);
-            const widgetDefinition = this.props.config.widgets[widget];
+            const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget);
             if (typeof widgetDefinition === 'undefined') {
                 return null;
             }

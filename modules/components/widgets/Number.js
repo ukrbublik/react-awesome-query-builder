@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { InputNumber, Col } from 'antd';
 import 'antd/lib/date-picker/style';
+import {getFieldConfig} from '../../utils';
 
 export default class NumberWidget extends Component {
   static propTypes = {
@@ -23,6 +24,12 @@ export default class NumberWidget extends Component {
   };
 
   render() {
+    const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
+    const fieldSettings = fieldDefinition.fieldSettings || {};
+    const min = this.props.min != null ? this.props.min : fieldSettings.min;
+    const max = this.props.max != null ? this.props.max : fieldSettings.max;
+    const step = this.props.step != null ? this.props.step : fieldSettings.step;
+
     return (
       <Col>
         <InputNumber 
@@ -30,9 +37,9 @@ export default class NumberWidget extends Component {
           size={this.props.config.settings.renderSize || "small"}
           ref="num" 
           value={this.props.value || null} 
-          min={this.props.min} 
-          max={this.props.max} 
-          step={this.props.step} 
+          min={min} 
+          max={max} 
+          step={step} 
           onChange={this.handleChange.bind(this)} 
         />
       </Col>

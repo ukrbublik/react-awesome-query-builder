@@ -33,8 +33,8 @@ export default class Operator extends Component {
   
   onPropsChanged (props) {
       let fieldConfig = getFieldConfig(props.selectedField, props.config);
-      this.operatorOptions = mapValues(pickBy(props.config.operators, (item, index) =>
-          fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(index) !== -1
+      this.operatorOptions = mapValues(pickBy(props.config.operators, (item, key) =>
+          fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
       ));
   }
 

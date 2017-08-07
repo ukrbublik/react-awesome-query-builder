@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
 import {defaultValue} from "./index";
-import {getFieldConfig} from './configUtils';
+import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig} from './configUtils';
 
 /*
  Build tree to http://querybuilder.js.org/ like format
@@ -78,18 +78,19 @@ export const queryBuilderFormat = (item, config) => {
         const options = properties.get('operatorOptions');
 
         const fieldDefinition = getFieldConfig(field, config) || {};
-        const operatorDefinition = config.operators[operator] || {};
+        const operatorDefinition = getOperatorConfig(config, operator, field) || {};
 
-        const fieldType = fieldDefinition.type || "string";
+        const fieldType = fieldDefinition.type || "undefined";
 
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-        const widget = config.widgets[fieldDefinition.widget];
+        const widget = getWidgetForFieldOp(config, field, operator);
+        const widgetDefinition = getFieldWidgetConfig(config, field, operator, widget);
 
         var value = properties.get('value').map((currentValue) =>
             // Widgets can optionally define a value extraction function. This is useful in cases
             // where an advanced widget is made up of multiple input fields that need to be composed
             // when building the query string.
-            typeof widget.value === 'function' ? widget.value(currentValue, config) : currentValue
+            typeof widget.formatValue === 'function' ? widget.formatValue(currentValue, config) : currentValue
         );
 
         if (value.size < cardinality) {

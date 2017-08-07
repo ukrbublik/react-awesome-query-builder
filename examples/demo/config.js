@@ -16,57 +16,105 @@ export default {
     conjunctions: {
         AND: {
             label: 'And',
-            value: (value) => value.size > 1 ? `(${value.join(' AND ')})` : value.first()
+            formatValue: (value) => value.size > 1 ? `(${value.join(' AND ')})` : value.first()
         },
         OR: {
             label: 'Or',
-            value: (value) => value.size > 1 ? `(${value.join(' OR ')})` : value.first()
+            formatValue: (value) => value.size > 1 ? `(${value.join(' OR ')})` : value.first()
         },
     },
     fields: {
         members: {
             label: 'Members',
-            widget: '!struct',
+            type: '!struct',
             subfields: {
                 subname: {
                     //label: 'Subname', //'subname' should be used instead
                     label2: 'MemberName',
-                    widget: 'text',
+                    type: 'text',
                     operators: ['proximity'],
                 },
             }
         },
         name: {
             label: 'Name',
-            widget: 'text',
-            operators: ['equal', 'not_equal'],
+            type: 'text',
+            operators: ['equal'],
             defaultOperator: 'not_equal',
             valueLabel: "Name",
             valuePlaceholder: "Enter name",
         },
+        name: {
+            label: 'Name 2',
+            type: 'text',
+            operators: ['equal', 'not_equal'],
+            defaultOperator: 'not_equal',
+            valueLabel: "Name2",
+            valuePlaceholder: "Enter name2",
+        },
         num: {
             label: 'Number',
-            widget: 'number',
-            widgetProps: {
+            type: 'number',
+            fieldSettings: {
                 min: 2,
                 max: 5
             },
         },
         date: {
             label: 'Date',
-            widget: 'date',
+            type: 'date',
+            operators: ['greater', 'less'],
+            defaultOperator: 'less',
         },
         time: {
             label: 'Time',
-            widget: 'time',
+            type: 'time',
+            operators: ['greater_or_equal', 'less_or_equal', 'between'],
+            defaultOperator: 'between',
+            widgets: {
+                time: {
+                    opProps: {
+                        between: {
+                            valueLabels: [
+                                'Time from', 
+                                'Time to'
+                            ],
+                        },
+                    },
+                    widgetProps: {
+                        timeFormat: 'h:mm:ss A',
+                        use12Hours: true,
+                    },
+                },
+            },
         },
         datetime: {
             label: 'DateTime',
-            widget: 'datetime',
+            type: 'datetime',
         },
         color: {
             label: 'Color',
-            widget: 'select',
+            type: 'select',
+            operators: [
+                'select_equals',
+                'select_not_equals',
+                'select_any_in',
+                'select_not_any_in'
+            ],
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+        },
+        color2: {
+            label: 'Color2',
+            type: 'select',
+            defaultOperator: 'select_not_any_in',
+            operators: [
+                'select_not_equals',
+                'select_not_any_in'
+            ],
             listValues: {
                 yellow: 'Yellow',
                 green: 'Green',
@@ -75,7 +123,7 @@ export default {
         },
         multicolor: {
             label: 'Colors',
-            widget: 'multiselect',
+            type: 'multiselect',
             listValues: {
                 yellow: 'Yellow',
                 green: 'Green',
@@ -84,13 +132,158 @@ export default {
         },
         stock: {
             label: 'In stock',
-            widget: 'boolean',
+            type: 'boolean',
+        },
+    },
+    types: {
+        text: {
+            widgets: {
+                text: {
+                    defaultOperator: 'is_empty',
+                    operators: [
+                        'equal',
+                        'not_equal',
+                        "is_empty",
+                        "is_not_empty",
+                    ]
+                }
+            },
+        },
+        number: {
+            valueLabel: "Number1",
+            valuePlaceholder: "Enter number1",
+            widgets: {
+                number: {
+                    valueLabel: "Number2",
+                    valuePlaceholder: "Enter number2",
+                    operators: [
+                        "equal",
+                        "not_equal",
+                        "less",
+                        "less_or_equal",
+                        "greater",
+                        "greater_or_equal",
+                        "between",
+                        "not_between",
+                    ],
+                    defaultOperator: 'less',
+                }
+            },
+        },
+        date: {
+            widgets: {
+                date: {
+                    operators: [
+                        "equal",
+                        "not_equal",
+                        "less",
+                        "less_or_equal",
+                        "greater",
+                        "greater_or_equal",
+                        "between",
+                        "not_between",
+                        "is_empty",
+                        "is_not_empty",
+                    ]
+                }
+            },
+        },
+        time: {
+            widgets: {
+                time: {
+                    operators: [
+                        "equal",
+                        "not_equal",
+                        "less",
+                        "less_or_equal",
+                        "greater",
+                        "greater_or_equal",
+                        "between",
+                        "not_between",
+                        "is_empty",
+                        "is_not_empty",
+                    ]
+                }
+            },
+        },
+        datetime: {
+            widgets: {
+                datetime: {
+                    operators: [
+                        "equal",
+                        "not_equal",
+                        "less",
+                        "less_or_equal",
+                        "greater",
+                        "greater_or_equal",
+                        "between",
+                        "not_between",
+                        "is_empty",
+                        "is_not_empty",
+                    ],
+                    opProps: {
+                        between: {
+                            valueLabels: [
+                                'Date from', 
+                                'Date to'
+                            ],
+                        },
+                    },
+                    widgetProps: {
+                        timeFormat: 'HH:mm',
+                        dateFormat: 'YYYY-MM-DD',
+                        valueFormat: 'YYYY-MM-DD HH:mm',
+                    }
+                }
+            },
+        },
+        select: {
+            widgets: {
+                select: {
+                    operators: [
+                        'select_equals',
+                        'select_not_equals'
+                    ],
+                    widgetProps: {
+                    },
+                },
+                multiselect: {
+                    operators: [
+                        'select_any_in',
+                        'select_not_any_in'
+                    ],
+                    widgetProps: {
+                    },
+                }
+            },
+        },
+        multiselect: {
+            widgets: {
+                multiselect: {
+                    operators: [
+                        'multiselect_full_match',
+                        'select_any_in',
+                        'select_not_any_in'
+                    ]
+                }
+            },
+        },
+        boolean: {
+            widgets: {
+                boolean: {
+                    operators: [
+                        "equal",
+                    ],
+                    hideOperator: true,
+                    operatorInlineLabel: "is",
+                }
+            },
         },
     },
     operators: {
         equal: {
             label: '==',
-            value: (value, field) => `${field}:${value.first()}`
+            formatValue: (value, field) => `${field}:${value.first()}`
         },
         not_equal: {
             label: '!='
@@ -111,7 +304,7 @@ export default {
         between: {
             label: 'Between',
             cardinality: 2,
-            value: (value, field) => `[${field}:${value.first()} TO ${value.get(1)}]`,
+            formatValue: (value, field) => `[${field}:${value.first()} TO ${value.get(1)}]`,
             valueLabels: [
                 'Value from', 
                 'Value to'
@@ -144,11 +337,31 @@ export default {
         },
         select_equals: {
             label: '==',
-            value: (value, field, operatorOptions, operator, config, fieldDefinition) => `${field}:${fieldDefinition.options[value.first()]}`
+            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => 
+                `${field}:${fieldDefinition.options[value.first()]}`
         },
-        select_in: {
-            label: 'In',
-            value: (value, field, operatorOptions, operator, config, fieldDefinition) => {
+        select_not_equals: {
+            label: '!=',
+            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => 
+                `${field}:${fieldDefinition.options[value.first()]}`
+        },
+        select_any_in: {
+            label: 'Any in',
+            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => {
+                //todo
+                return '';
+            }
+        },
+        select_not_any_in: {
+            label: 'Not in',
+            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => {
+                //todo
+                return '';
+            }
+        },
+        multiselect_full_match: {
+            label: 'Matches',
+            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => {
                 //todo
                 return '';
             }
@@ -156,31 +369,31 @@ export default {
 
         contains: {
           label: 'Contains',
-          value: (value, field) => `${field}:*${value.first()}*`
+          formatValue: (value, field) => `${field}:*${value.first()}*`
         },
         starts_with: {
           label: 'Starts with',
-          value: (value, field) => `${field}:${value.first()}*`
+          formatValue: (value, field) => `${field}:${value.first()}*`
         },
         ends_with: {
           label: 'Ends with',
-          value: (value, field) => `${field}:*${value.first()}`
+          formatValue: (value, field) => `${field}:*${value.first()}`
         },
         exact_phrase: {
           label: 'Exact phrase',
-          value: (value, field) => `${field}:"${value.first()}"`
+          formatValue: (value, field) => `${field}:"${value.first()}"`
         },
         terms_one: {
           label: 'At least one of the words',
-          value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' OR ')})`
+          formatValue: (value, field) => `${field}:(${value.first().trim().split(' ').join(' OR ')})`
         },
         terms_all: {
           label: 'All of the words',
-          value: (value, field) => `${field}:(${value.first().trim().split(' ').join(' AND ')})`
+          formatValue: (value, field) => `${field}:(${value.first().trim().split(' ').join(' AND ')})`
         },
         terms_none: {
           label: 'Without the words',
-          value: (value, field) => `-${field}:(${value.first().trim().split(' ').join(' OR ')})`
+          formatValue: (value, field) => `-${field}:(${value.first().trim().split(' ').join(' OR ')})`
         },
 
         proximity: {
@@ -190,7 +403,7 @@ export default {
             {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
-          value: (value, field, options) => {
+          formatValue: (value, field, options) => {
             const output = value.map(currentValue => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
             return `${field}:"(${output.join(') (')})"~${options.get('proximity')}`;
           },
@@ -207,95 +420,36 @@ export default {
     widgets: {
         text: {
             factory: (props) => <TextWidget {...props} />,
-            operators: [
-                'equal',
-                'not_equal',
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         number: {
             factory: (props) => <NumberWidget {...props} />,
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-            ],
-            defaultOperator: 'less',
-            valueLabel: "Enter number",
+            valueLabel: "Number",
+            valuePlaceholder: "Enter number",
         },
         select: {
             factory: (props) => <SelectWidget {...props} />,
-            operators: ['select_equals']
         },
         multiselect: {
             factory: (props) => <MultiSelectWidget {...props} />,
-            operators: ['select_in']
         },
         date: {
             factory: (props) => <DateWidget {...props} />,
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         time: {
             factory: (props) => <TimeWidget {...props} />,
             timeFormat: 'HH:mm',
             valueFormat: 'HH:mm:ss',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         datetime: {
             factory: (props) => <DateTimeWidget {...props} />,
             timeFormat: 'HH:mm',
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD HH:mm:ss',
-            operators: [
-                "equal",
-                "not_equal",
-                "less",
-                "less_or_equal",
-                "greater",
-                "greater_or_equal",
-                "between",
-                "not_between",
-                "is_empty",
-                "is_not_empty",
-            ]
         },
         boolean: {
             factory: (props) => <BooleanWidget {...props} />,
-            operators: [
-              "equal",
-            ],
-            hideOperator: true,
-            operatorLabel: "is",
             labelYes: "Yes",
             labelNo: "No ",
         }
