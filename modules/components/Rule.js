@@ -10,7 +10,7 @@ import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import {getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp, getOperatorConfig} from "../utils/index";
+import {getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig} from "../utils/index";
 import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
@@ -53,7 +53,7 @@ export default class Rule extends Component {
         const selectedWidget = getWidgetForFieldOp(this.props.config, this.props.selectedField, this.props.selectedOperator);
         const selectedOperatorConfig = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
         const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
-        const selectedFieldWidgetConfig = (selectedFieldConfig && selectedFieldConfig.widgets ? selectedFieldConfig.widgets[selectedWidget] : {}) || {};
+        const selectedFieldWidgetConfig = getFieldWidgetConfig(this.props.config, this.props.selectedField, this.props.selectedOperator) || {};
 
         let styles = {};
         if (this.props.renderType == 'dragging') {

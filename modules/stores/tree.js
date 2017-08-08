@@ -151,9 +151,15 @@ const setOperator = (state, path, operator, config) => {
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const currentValue = current.get('value', new Immutable.List());
         const currentField = current.get('field');
+        const currentOperator = current.get('operator');
+
         const operatorConfig = getOperatorConfig(config, operator, currentField);
         const operatorCardinality = defaultValue(operatorConfig.cardinality, 1);
-        const nextValue = new Immutable.List(currentValue.take(operatorCardinality));
+        const currentWidget = getWidgetForFieldOp(config, currentField, currentOperator);
+        const nextWidget = getWidgetForFieldOp(config, currentField, operator);
+
+        let canKeepValue = (currentWidget == nextWidget);
+        const nextValue = canKeepValue ? new Immutable.List(currentValue.take(operatorCardinality)) : new Immutable.List();
 
         return current.set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, currentField))

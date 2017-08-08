@@ -24,7 +24,7 @@ export const extendConfig = (config) => {
             if (typeWidgetConfig.defaultOperator)
                 defaultOperator = typeWidgetConfig.defaultOperator;
             typeWidgetConfig = merge({}, pickBy(typeConfig, (v, k) => 
-                (['valueLabel', 'valuePlaceholder', 'hideOperator', 'operatorInlineLabel'].indexOf(k) != -1)), typeWidgetConfig);
+                (['widgetProps'].indexOf(k) != -1)), typeWidgetConfig);
             typeConfig.widgets[widget] = typeWidgetConfig;
         }
         if (!typeConfig.operators && operators)
@@ -36,20 +36,23 @@ export const extendConfig = (config) => {
     //extend 'fields' path
     function _extendFieldConfig(fieldConfig) {
         let operators = null, defaultOperator = null;
-        for (let widget in fieldConfig.widgets) {
-            let fieldWidgetConfig = fieldConfig.widgets[widget];
-            if (!fieldConfig.widgets)
-                fieldConfig.widgets = {};
-            if (fieldWidgetConfig.operators) {
-                if (!operators)
-                    operators = [];
-                operators = operators.concat(fieldWidgetConfig.operators.slice());
+        let typeConfig = config.types[fieldConfig.type];
+        if (fieldConfig.type != '!struct') {
+            for (let widget in typeConfig.widgets) {
+                if (!fieldConfig.widgets)
+                    fieldConfig.widgets = {};
+                let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
+                if (fieldWidgetConfig.operators) {
+                    if (!operators)
+                        operators = [];
+                    operators = operators.concat(fieldWidgetConfig.operators.slice());
+                }
+                if (fieldWidgetConfig.defaultOperator)
+                    defaultOperator = fieldWidgetConfig.defaultOperator;
+                fieldWidgetConfig = merge({}, pickBy(fieldConfig, (v, k) => 
+                    (['widgetProps'].indexOf(k) != -1)), fieldWidgetConfig);
+                fieldConfig.widgets[widget] = fieldWidgetConfig;
             }
-            if (fieldWidgetConfig.defaultOperator)
-                defaultOperator = fieldWidgetConfig.defaultOperator;
-            fieldWidgetConfig = merge({}, pickBy(fieldConfig, (v, k) => 
-                (['valueLabel', 'valuePlaceholder', 'hideOperator', 'operatorInlineLabel'].indexOf(k) != -1)), fieldWidgetConfig);
-            fieldConfig.widgets[widget] = fieldWidgetConfig;
         }
         if (!fieldConfig.operators && operators)
             fieldConfig.operators = operators;
@@ -65,7 +68,7 @@ export const extendConfig = (config) => {
         }
     }
     _extendFieldsConfig(config.fields);
-    console.log(config); 
+    //console.log(config); 
     return config;
 };
 

@@ -11,6 +11,7 @@ export default class NumberWidget extends Component {
     min: PropTypes.number,
     max: PropTypes.number,
     step: PropTypes.number,
+    placeholder: PropTypes.string,
   };
 
   handleChange(val) {
@@ -40,6 +41,7 @@ export default class NumberWidget extends Component {
           min={min} 
           max={max} 
           step={step} 
+          placeholder={this.props.placeholder} 
           onChange={this.handleChange.bind(this)} 
         />
       </Col>

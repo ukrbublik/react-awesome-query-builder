@@ -41,16 +41,17 @@ export default {
             type: 'text',
             operators: ['equal'],
             defaultOperator: 'not_equal',
-            valueLabel: "Name",
-            valuePlaceholder: "Enter name",
         },
-        name: {
+        name2: {
             label: 'Name 2',
             type: 'text',
             operators: ['equal', 'not_equal'],
             defaultOperator: 'not_equal',
-            valueLabel: "Name2",
-            valuePlaceholder: "Enter name2",
+            // widgetProps: {..}  - same as widgets: { text: { widgetProps: {..} } }
+            widgetProps: {
+                valueLabel: "Name2",
+                valuePlaceholder: "Enter name2",
+            }
         },
         num: {
             label: 'Number',
@@ -146,17 +147,17 @@ export default {
                         "is_empty",
                         "is_not_empty",
                         'proximity'
-                    ]
+                    ],
+                    widgetProps: {
+                        valueLabel: "Text",
+                        valuePlaceholder: "Enter text",
+                    }
                 }
             },
         },
         number: {
-            valueLabel: "Number1",
-            valuePlaceholder: "Enter number1",
             widgets: {
                 number: {
-                    valueLabel: "Number2",
-                    valuePlaceholder: "Enter number2",
                     operators: [
                         "equal",
                         "not_equal",
@@ -168,6 +169,10 @@ export default {
                         "not_between",
                     ],
                     defaultOperator: 'less',
+                    widgetProps: {
+                        valueLabel: "Number2",
+                        valuePlaceholder: "Enter number2",
+                    }
                 }
             },
         },
@@ -275,8 +280,10 @@ export default {
                     operators: [
                         "equal",
                     ],
-                    hideOperator: true,
-                    operatorInlineLabel: "is",
+                    widgetProps: {
+                        hideOperator: true,
+                        operatorInlineLabel: "is",
+                    }
                 }
             },
         },
