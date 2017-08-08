@@ -45,14 +45,18 @@ import pick from 'lodash/pick';
  ]
  }
  */
-export const queryBuilderFormat = (item, config) => {
-
+export const queryBuilderFormat = (item, config, rootQuery = null) => {
     const type = item.get('type');
     const properties = item.get('properties');
     const children = item.get('children1');
     const id = item.get('id')
 
-    var resultQuery = {}
+    var resultQuery = {};
+    var isRoot = (rootQuery === null);
+    if (isRoot) {
+        rootQuery = resultQuery;
+        rootQuery.usedFields = [];
+    }
 
     if (type === 'group' && children && children.size) {
         const conjunction = properties.get('conjunction');
@@ -60,7 +64,7 @@ export const queryBuilderFormat = (item, config) => {
 
         const list = children
             .map((currentChild) => {
-                return queryBuilderFormat(currentChild, config)
+                return queryBuilderFormat(currentChild, config, rootQuery)
             })
             .filter((currentChild) => typeof currentChild !== 'undefined')
         if (!list.size)
@@ -89,6 +93,9 @@ export const queryBuilderFormat = (item, config) => {
 
         if (value.size < cardinality)
             return undefined;
+
+        if (rootQuery.usedFields.indexOf(field) == -1)
+            rootQuery.usedFields.push(field);
         value = cardinality == 1 ? value.first() : value.toArray();
         
         var ruleQuery = {
@@ -104,7 +111,7 @@ export const queryBuilderFormat = (item, config) => {
     return undefined;
 };
 
-//untested!
+//not tested!
 export const queryBuilderToTree = (ruleset) => {
     const condition = ruleset.condition;
     var tree = {}
