@@ -241,8 +241,8 @@ export default {
                     opProps: {
                         between: {
                             valueLabels: [
-                                'Date from', 
-                                'Date to'
+                                {label: 'Date from', placeholder: 'Enrer datetime from'},
+                                {label: 'Date to', placeholder: 'Enter datetime to'},
                             ],
                         },
                     },
@@ -279,8 +279,7 @@ export default {
                 multiselect: {
                     operators: [
                         'multiselect_equals',
-                        'select_any_in',
-                        'select_not_any_in'
+                        'multiselect_not_equals',
                     ]
                 }
             },
@@ -425,6 +424,15 @@ export default {
             formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == (${values.join(', ')})`;
             },
+            reversedOp: 'multiselect_not_equals',
+        },
+        multiselect_not_equals: {
+            label: 'Not equals',
+            labelForFormat: '!=',
+            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return `${field} != (${values.join(', ')})`;
+            },
+            reversedOp: 'multiselect_equals',
         },
 
         proximity: {
