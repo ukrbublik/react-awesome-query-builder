@@ -71,7 +71,7 @@ export default class Field extends Component {
 
   render() {
     let fieldOptions = this.props.config.fields;
-    let selectedFieldsKeys = getFieldPath(this.props.selectedField, this.props.config);
+    let selectedFieldKeys = getFieldPath(this.props.selectedField, this.props.config);
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
 
@@ -79,7 +79,7 @@ export default class Field extends Component {
     let fieldMenu = (
         <Menu 
             //size={this.props.config.settings.renderSize || "small"}
-            selectedKeys={selectedFieldsKeys}
+            selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldSelect.bind(this)}
         >{fieldMenuItems}</Menu>
     );

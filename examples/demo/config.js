@@ -11,16 +11,25 @@ const {
     DateTimeWidget
 } = Widgets;
 const {ProximityOperator} = Operators;
+import moment from 'moment';
 
 export default {
     conjunctions: {
         AND: {
             label: 'And',
-            formatValue: (value) => value.size > 1 ? `(${value.join(' AND ')})` : value.first()
+            formatConj: (children, conj, isForDisplay) => {
+                return children.size > 1 ? 
+                    '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
+                    : children.first();
+            },
         },
         OR: {
             label: 'Or',
-            formatValue: (value) => value.size > 1 ? `(${value.join(' OR ')})` : value.first()
+            formatConj: (children, conj, isForDisplay) => {
+                return children.size > 1 ? 
+                    '(' + children.join(' '+ (isForDisplay ? "OR" : "||") +' ') + ')' 
+                    : children.first();
+            },
         },
     },
     fields: {
@@ -49,6 +58,7 @@ export default {
             defaultOperator: 'not_equal',
             // widgetProps: {..}  - same as widgets: { text: { widgetProps: {..} } }
             widgetProps: {
+                formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("__"+JSON.stringify(val)),
                 valueLabel: "Name2",
                 valuePlaceholder: "Enter name2",
             }
@@ -149,6 +159,7 @@ export default {
                         'proximity'
                     ],
                     widgetProps: {
+                        formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("_"+JSON.stringify(val)),
                         valueLabel: "Text",
                         valuePlaceholder: "Enter text",
                     }
@@ -267,7 +278,7 @@ export default {
             widgets: {
                 multiselect: {
                     operators: [
-                        'multiselect_full_match',
+                        'multiselect_equals',
                         'select_any_in',
                         'select_not_any_in'
                     ]
@@ -291,28 +302,47 @@ export default {
     operators: {
         equal: {
             label: '==',
-            formatValue: (value, field) => `${field}:${value.first()}`
+            labelForFormat: '==',
+            reversedOp: 'not_equal',
         },
         not_equal: {
-            label: '!='
+            label: '!=',
+            labelForFormat: '!=',
+            reversedOp: 'equal',
         },
         less: {
-            label: '<'
+            label: '<',
+            labelForFormat: '<',
+            reversedOp: 'greater_or_equal',
         },
         less_or_equal: {
-            label: '<='
+            label: '<=',
+            labelForFormat: '<=',
+            reversedOp: 'greater',
         },
         greater: {
-            label: '>'
+            label: '>',
+            labelForFormat: '>',
+            reversedOp: 'less_or_equal',
         },
         greater_or_equal: {
-            label: '>='
+            label: '>=',
+            labelForFormat: '>=',
+            reversedOp: 'less',
         },
 
         between: {
             label: 'Between',
+            labelForFormat: 'BETWEEN',
             cardinality: 2,
-            formatValue: (value, field) => `[${field}:${value.first()} TO ${value.get(1)}]`,
+            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                let valFrom = values.first();
+                let valTo = values.get(1);
+                if (isForDisplay)
+                    return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+                else
+                    return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+            },
             valueLabels: [
                 'Value from', 
                 'Value to'
@@ -320,11 +350,14 @@ export default {
             textSeparators: [
                 null,
                 'and'
-            ]
+            ],
+            reversedOp: 'not_between',
         },
         not_between: {
             label: 'Not between',
+            labelForFormat: 'NOT BETWEEN',
             cardinality: 2,
+            reversedOp: 'between',
             valueLabels: [
                 'Value from', 
                 'Value to'
@@ -332,76 +365,66 @@ export default {
             textSeparators: [
                 null,
                 'and'
-            ]
+            ],
+            reversedOp: 'between',
         },
 
         is_empty: {
             label: 'Is Empty',
+            labelForFormat: 'IS EMPTY',
             cardinality: 0,
+            reversedOp: 'is_not_empty',
+            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
+            },
         },
         is_not_empty: {
             label: 'Is not empty',
+            labelForFormat: 'IS NOT EMPTY',
             cardinality: 0,
+            reversedOp: 'is_empty',
+            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
+            },
         },
         select_equals: {
             label: '==',
-            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => 
-                `${field}:${fieldDefinition.options[value.first()]}`
+            labelForFormat: '==',
+            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return `${field} == ${value}`;
+            },
+            reversedOp: 'select_not_equals',
         },
         select_not_equals: {
             label: '!=',
-            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => 
-                `${field}:${fieldDefinition.options[value.first()]}`
+            labelForFormat: '!=',
+            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return `${field} != ${value}`;
+            },
+            reversedOp: 'select_equals',
         },
         select_any_in: {
             label: 'Any in',
-            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => {
-                //todo
-                return '';
-            }
+            labelForFormat: 'IN',
+            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return `${field} IN (${values.join(', ')})`;
+            },
+            reversedOp: 'select_not_any_in',
         },
         select_not_any_in: {
             label: 'Not in',
-            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => {
-                //todo
-                return '';
-            }
+            labelForFormat: 'NOT IN',
+            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return `${field} NOT IN (${values.join(', ')})`;
+            },
+            reversedOp: 'select_any_in',
         },
-        multiselect_full_match: {
-            label: 'Matches',
-            formatValue: (value, field, operatorOptions, operator, config, fieldDefinition) => {
-                //todo
-                return '';
-            }
-        },
-
-        contains: {
-          label: 'Contains',
-          formatValue: (value, field) => `${field}:*${value.first()}*`
-        },
-        starts_with: {
-          label: 'Starts with',
-          formatValue: (value, field) => `${field}:${value.first()}*`
-        },
-        ends_with: {
-          label: 'Ends with',
-          formatValue: (value, field) => `${field}:*${value.first()}`
-        },
-        exact_phrase: {
-          label: 'Exact phrase',
-          formatValue: (value, field) => `${field}:"${value.first()}"`
-        },
-        terms_one: {
-          label: 'At least one of the words',
-          formatValue: (value, field) => `${field}:(${value.first().trim().split(' ').join(' OR ')})`
-        },
-        terms_all: {
-          label: 'All of the words',
-          formatValue: (value, field) => `${field}:(${value.first().trim().split(' ').join(' AND ')})`
-        },
-        terms_none: {
-          label: 'Without the words',
-          formatValue: (value, field) => `-${field}:(${value.first().trim().split(' ').join(' OR ')})`
+        multiselect_equals: {
+            label: 'Equals',
+            labelForFormat: '==',
+            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+                return `${field} == (${values.join(', ')})`;
+            },
         },
 
         proximity: {
@@ -411,9 +434,10 @@ export default {
             {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
-          formatValue: (value, field, options) => {
-            const output = value.map(currentValue => currentValue.indexOf(' ') !== -1 ? `\\"${currentValue}\\"` : currentValue);
-            return `${field}:"(${output.join(') (')})"~${options.get('proximity')}`;
+          formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            let val1 = values.first();
+            let val2 = values.get(1);
+            return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
           },
           options: {
             optionLabel: "Words between",
@@ -428,38 +452,68 @@ export default {
     widgets: {
         text: {
             factory: (props) => <TextWidget {...props} />,
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                return isForDisplay ? '"'+val+'"' : JSON.stringify(val);
+            },
         },
         number: {
             factory: (props) => <NumberWidget {...props} />,
             valueLabel: "Number",
             valuePlaceholder: "Enter number",
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                return isForDisplay ? val : JSON.stringify(val);
+            },
         },
         select: {
             factory: (props) => <SelectWidget {...props} />,
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                let valLabel = fieldDef.listValues[val];
+                return isForDisplay ? '"'+valLabel+'"' : JSON.stringify(val);
+            },
         },
         multiselect: {
             factory: (props) => <MultiSelectWidget {...props} />,
+            formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
+                let valsLabels = vals.map(v => fieldDef.listValues[v]);
+                return isForDisplay ? valsLabels.map(v => '"'+v+'"') : vals.map(v => JSON.stringify(v));
+            },
         },
         date: {
             factory: (props) => <DateWidget {...props} />,
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD',
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                let dateVal = moment(val, wgtDef.valueFormat);
+                return isForDisplay ? '"'+dateVal.format(wgtDef.dateFormat)+'"' : JSON.stringify(val);
+            },
         },
         time: {
             factory: (props) => <TimeWidget {...props} />,
             timeFormat: 'HH:mm',
             valueFormat: 'HH:mm:ss',
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                let dateVal = moment(val, wgtDef.valueFormat);
+                return isForDisplay ? '"'+dateVal.format(wgtDef.timeFormat)+'"' : JSON.stringify(val);
+            },
         },
         datetime: {
             factory: (props) => <DateTimeWidget {...props} />,
             timeFormat: 'HH:mm',
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD HH:mm:ss',
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                let dateVal = moment(val, wgtDef.valueFormat);
+                return isForDisplay ? '"'+dateVal.format(wgtDef.dateFormat + ' ' + wgtDef.timeFormat)+'"' : JSON.stringify(val);
+            },
         },
         boolean: {
             factory: (props) => <BooleanWidget {...props} />,
             labelYes: "Yes",
             labelNo: "No ",
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                return isForDisplay ? (val ? "Yes" : "No") : JSON.stringify(!!val);
+            },
+            defaultValue: false,
         }
     },
     settings: {
@@ -490,5 +544,17 @@ export default {
         addRuleLabel: "Add rule",
         delGroupLabel: null,
         canLeaveEmptyGroup: true, //after deletion
+        formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
+            if (isForDisplay)
+                return "NOT(" + q + ")";
+            else
+                return "!(" + q + ")";
+        },
+        formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
+            if (isForDisplay)
+                return label2;
+            else
+                return field;
+        },
     }
 };

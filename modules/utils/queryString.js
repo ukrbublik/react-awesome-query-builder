@@ -1,63 +1,104 @@
-import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig} from './configUtils';
+import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
+import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 
-const queryStringRecursive = (item, config) => {
+export const queryString = (item, config, isForDisplay = false) => {
     const type = item.get('type');
     const properties = item.get('properties');
     const children = item.get('children1');
+    const id = item.get('id');
 
-    if (type === 'rule') {
-        if (typeof properties.get('field') === 'undefined' || typeof properties.get('operator') === 'undefined') {
+    if (type === 'group' && children && children.size) {
+        const conjunction = properties.get('conjunction');
+        const conjunctionDefinition = config.conjunctions[conjunction];
+
+        const list = children
+            .map((currentChild) => queryString(currentChild, config, isForDisplay))
+            .filter((currentChild) => typeof currentChild !== 'undefined');
+        if (!list.size)
             return undefined;
-        }
 
+        return conjunctionDefinition.formatConj(list, conjunction, isForDisplay);
+    } else if (type === 'rule') {
         const field = properties.get('field');
         const operator = properties.get('operator');
-        const options = properties.get('operatorOptions');
+        const operatorOptions = properties.get('operatorOptions');
+        if (field == null || operator == null)
+            return undefined;
 
-        const fieldDefinition = getFieldConfig(field, config);
+        const fieldDefinition = getFieldConfig(field, config) || {};
         const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-
+        const reversedOp = operatorDefinition.reversedOp;
+        const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const fieldType = fieldDefinition.type || "undefined";
         const cardinality = operatorDefinition.cardinality || 1;
         const widget = getWidgetForFieldOp(config, field, operator);
-        const widgetDefinition = getFieldWidgetConfig(config, field, operator, widget);
+        const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget), ['factory']);
+        const typeConfig = config.types[fieldDefinition.type] || {};
 
-        const value = properties.get('value').map((currentValue) =>
-            // Widgets can optionally define a value extraction function. This is useful in cases
-            // where an advanced widget is made up of multiple input fields that need to be composed
-            // when building the query string.
-            typeof widgetDefinition.formatValue === 'function' ? widgetDefinition.formatValue(currentValue, config) : currentValue
-        );
-
-        if (value.size < cardinality) {
+        //format value
+        let value = properties.get('value').map((currentValue) => {
+            if (typeof fieldWidgetDefinition.formatValue === 'function') {
+                let fn = fieldWidgetDefinition.formatValue;
+                let args = [
+                    currentValue,
+                    pick(fieldDefinition, ['fieldSettings', 'listValues']),
+                    omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
+                    isForDisplay
+                ];
+                return fn(...args);
+            }
+            return currentValue;
+        });
+        if (value.size < cardinality)
             return undefined;
+        let formattedValue = (cardinality == 1 ? value.first() : value);
+
+        //find fn to format expr
+        let isRev = false;
+        let fn = operatorDefinition.formatOp;
+        if (!fn && reversedOp) {
+            fn = revOperatorDefinition.formatOp;
+            if (fn) {
+                isRev = true;
+            }
         }
-
-        RegExp.quote = function (str) {
-            return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
-        };
-
-        return operatorDefinition.formatValue(value, 
-            fieldDefinition.label.replace(new RegExp(RegExp.quote(config.settings.fieldSeparator), 'g'), config.settings.fieldSeparatorDisplay), 
-            options, operator, config, fieldDefinition);
-    }
-
-    if (type === 'group' && children && children.size) {
-        const value = children
-            .map((currentChild) => queryStringRecursive(currentChild, config))
-            .filter((currentChild) => typeof currentChild !== 'undefined');
-
-        if (!value.size) {
+        if (!fn && cardinality == 1) {
+            let _operator = operatorDefinition.labelForFormat || operator;
+            fn = (field, operator, value, fieldDef, isForDisplay) => {
+                return `${field} ${_operator} ${value}`;
+            };
+        }
+        if (!fn)
             return undefined;
+        
+        //format field
+        const fieldSeparator = config.settings.fieldSeparator;
+        const parts = field.split(fieldSeparator);
+        let fieldKeys = getFieldPath(field, config);
+        let fieldPartsLabels = getFieldPathLabels(field, config);
+        let fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
+        let fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
+        let formattedField = config.settings.formatField(field, parts, fieldLabel2, fieldDefinition, config, isForDisplay);
+        
+        //format expr
+        let args = [
+            formattedField,
+            operator,
+            formattedValue,
+            omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
+            omit(operatorDefinition, ['formatOp']),
+            operatorOptions,
+            isForDisplay
+        ];
+        let ret = fn(...args);
+        if (isRev) {
+            ret = config.settings.formatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay);
         }
-
-        const conjunction = properties.get('conjunction');
-        const conjunctionDefinition = config.conjunctions[conjunction];
-        return conjunctionDefinition.formatValue(value, conjunction);
+        return ret;
     }
 
     return undefined;
 };
 
-export default queryStringRecursive;
 

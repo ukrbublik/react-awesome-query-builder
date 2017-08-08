@@ -129,15 +129,18 @@ const setField = (state, path, field, config) => {
         }
         const operatorConfig = getOperatorConfig(config, operator, field);
         const widgetConfig = getFieldWidgetConfig(config, field, operator);
+        
         const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
         return current.set('field', field)
             .set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, field))
             .set('value', ((currentWidget, nextWidget) => {
-                return (currentWidget !== nextWidget || config.settings.clearValueOnChangeField) ?
-                    new Immutable.List() :
-                    new Immutable.List(currentValue.take(operatorCardinality));
+                if (currentWidget === nextWidget && !config.settings.clearValueOnChangeField)
+                    return new Immutable.List(currentValue.take(operatorCardinality));
+                if (widgetConfig && widgetConfig.defaultValue !== undefined)
+                    return new Immutable.List([widgetConfig.defaultValue]);
+                return new Immutable.List();
             })(currentWidgetConfig, widgetConfig));
     }))
 };

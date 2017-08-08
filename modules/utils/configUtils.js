@@ -190,17 +190,6 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null) => 
 };
 
 export const getValueLabel = (config, field, operator, delta) => {
-    /*
-    const fieldConfig = getFieldConfig(field, config);
-    //const typeConfig = config.types[field.type] || {};
-    const opConfig = config.operators[operator];
-    const widget = getWidgetForFieldOp(config, field, operator);
-    //const widgetConfig = config.widgets[widget] || {};
-    //const typeWidgetConfig = typeConfig.widgets[widget];
-    const fieldWidgetConfig = fieldConfig.widgets ? fieldConfig.widgets[widget] : {};
-    const fieldWidgetOpProps = (fieldWidgetConfig.opProps || {})[operator];
-    const mergedOpConfig = merge({}, opConfig, fieldWidgetOpProps);
-    */
     const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator) || {};
     const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
 

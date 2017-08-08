@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
-const {queryBuilderFormat, queryBuilderToTree, extendConfig} = Utils;
+const {queryBuilderFormat, queryBuilderToTree, queryString, extendConfig} = Utils;
 import config from './config';
 
 var stringify = require('json-stringify-safe');
@@ -40,11 +40,15 @@ let ruleset = {
     ]
 }
 
+
+
 export default class DemoQueryBuilder extends Component {
     getChildren(props) {
         return (
             <div>
                 <div>queryBuilderFormat: {stringify(queryBuilderFormat(props.tree, props.config))}</div>
+                <div>stringFormat: {queryString(props.tree, props.config)}</div>
+                <div>humanStringFormat: {queryString(props.tree, props.config, true)}</div>
                 <div>Tree: {stringify(props.tree)}</div>
                 <div className="query-builder">
                     <Builder {...props} />
@@ -55,7 +59,6 @@ export default class DemoQueryBuilder extends Component {
 
     render() {
         const {tree, ...config_props} = config;
-        //<Query {...config_props} value={queryBuilderToTree(ruleset)} get_children={this.getChildren}> </Query>
                 
         return (
             <div>

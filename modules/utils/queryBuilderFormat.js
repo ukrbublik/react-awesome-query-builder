@@ -3,7 +3,9 @@ import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
 import {defaultValue} from "./index";
-import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig} from './configUtils';
+import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
+import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 
 /*
  Build tree to http://querybuilder.js.org/ like format
@@ -54,64 +56,55 @@ export const queryBuilderFormat = (item, config) => {
 
     if (type === 'group' && children && children.size) {
         const conjunction = properties.get('conjunction');
-        // const conjunctionDefinition = config.conjunctions[conjunction];
-        resultQuery['condition'] = conjunction.toUpperCase();
+        const conjunctionDefinition = config.conjunctions[conjunction];
 
-        const value = children
+        const list = children
             .map((currentChild) => {
                 return queryBuilderFormat(currentChild, config)
             })
             .filter((currentChild) => typeof currentChild !== 'undefined')
+        if (!list.size)
+            return undefined;
+        resultQuery['rules'] = list.toList();
+        resultQuery['condition'] = conjunction.toUpperCase();
 
-        if (!value.size) {
-            return undefined;
-        }
-        resultQuery['rules'] = value.toList();
         return resultQuery;
-    }
-    if (type === 'rule') {
-        if (typeof properties.get('field') === 'undefined' || typeof properties.get('operator') === 'undefined') {
-            return undefined;
-        }
+    } else if (type === 'rule') {
         const field = properties.get('field');
         const operator = properties.get('operator');
         const options = properties.get('operatorOptions');
+        let value = properties.get('value');
+        if (field == null || operator == null)
+            return undefined;
 
         const fieldDefinition = getFieldConfig(field, config) || {};
         const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-
+        //const reversedOp = operatorDefinition.reversedOp;
+        //const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const fieldType = fieldDefinition.type || "undefined";
-        const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+        const cardinality = operatorDefinition.cardinality || 1;
         const widget = getWidgetForFieldOp(config, field, operator);
-        const widgetDefinition = getFieldWidgetConfig(config, field, operator, widget);
+        const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget), ['factory']);
+        const typeConfig = config.types[fieldDefinition.type] || {};
 
-        var value = properties.get('value').map((currentValue) =>
-            // Widgets can optionally define a value extraction function. This is useful in cases
-            // where an advanced widget is made up of multiple input fields that need to be composed
-            // when building the query string.
-            typeof widgetDefinition.formatValue === 'function' ? widgetDefinition.formatValue(currentValue, config) : currentValue
-        );
-
-        if (value.size < cardinality) {
+        if (value.size < cardinality)
             return undefined;
-        }
-        if (cardinality == 1) {
-
-        }
-
+        value = cardinality == 1 ? value.first() : value.toArray();
+        
         var ruleQuery = {
             id,
             field,
             operator,
             value,
             type: fieldType,
-            input: fieldDefinition.widget,
+            input: Object.keys(typeConfig.widgets)[0],
         };
         return ruleQuery
     }
     return undefined;
 };
 
+//untested!
 export const queryBuilderToTree = (ruleset) => {
     const condition = ruleset.condition;
     var tree = {}
