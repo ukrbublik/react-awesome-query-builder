@@ -564,5 +564,6 @@ export default {
             else
                 return field;
         },
+        canReorder: false,
     }
 };

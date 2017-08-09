@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import expandTreePath from '../utils/expandTreePath';
+import expandTreeSubpath from '../utils/expandTreeSubpath';
 import getItemByPath from '../utils/getItemByPath';
 import defaultRoot from '../utils/defaultRoot';
 import {defaultOperator, defaultOperatorOptions} from '../utils/defaultRuleProperties';
@@ -104,24 +105,42 @@ const removeItem = (state, path) =>
  */
 const moveItem = (state, fromPath, toPath, placement, config) => {
     let from = getItemByPath(state, fromPath);
-    let source = fromPath.size > 1 ? getItemByPath(state, fromPath.pop()) : null;
+    let sourcePath = fromPath.pop();
+    let source = fromPath.size > 1 ? getItemByPath(state, sourcePath) : null;
     let sourceChildren = source ? source.get('children1') : null;
+
     let to = getItemByPath(state, toPath);
     let targetPath = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? toPath : toPath.pop();
     let target = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? 
         to
-        : toPath.size > 1 ? getItemByPath(state, toPath.pop()) : null;
+        : toPath.size > 1 ? getItemByPath(state, targetPath) : null;
     let targetChildren = target ? target.get('children1') : null;
 
     if (!source || !target)
         return state;
 
     let isSameParent = (source.get('id') == target.get('id'));
+    let isSourceInsideTarget = targetPath.size < sourcePath.size 
+        && JSON.stringify(targetPath.toArray()) == JSON.stringify(sourcePath.toArray().slice(0, targetPath.size));
+    let isTargetInsideSource = targetPath.size > sourcePath.size 
+        && JSON.stringify(sourcePath.toArray()) == JSON.stringify(targetPath.toArray().slice(0, sourcePath.size));
+    let sourceSubpathFromTarget = null;
+    let targetSubpathFromSource = null;
+    if (isSourceInsideTarget) {
+        sourceSubpathFromTarget = Immutable.List(sourcePath.toArray().slice(targetPath.size));
+    } else if (isTargetInsideSource) {
+        targetSubpathFromSource = Immutable.List(targetPath.toArray().slice(sourcePath.size));
+    }
 
     let newTargetChildren = targetChildren, newSourceChildren = sourceChildren;
-    newSourceChildren = newSourceChildren.delete(from.get('id'));
-    if (isSameParent)
+    if (!isTargetInsideSource)
+        newSourceChildren = newSourceChildren.delete(from.get('id'));
+    if (isSameParent) {
         newTargetChildren = newSourceChildren;
+    } else if (isSourceInsideTarget) {
+        newTargetChildren = newTargetChildren.updateIn(expandTreeSubpath(sourceSubpathFromTarget, 'children1'), (oldChildren) => newSourceChildren);
+    }
+
     if (placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) {
         newTargetChildren = Immutable.OrderedMap().withMutations(r => {
             let itemId, item, i = 0, size = newTargetChildren.size;
@@ -142,9 +161,16 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
     } else if (placement == constants.PLACEMENT_PREPEND) {
         newTargetChildren = Immutable.OrderedMap({[from.get('id')]: from}).merge(newTargetChildren);
     }
-    if (!isSameParent)
-        state = state.updateIn(expandTreePath(fromPath.pop(), 'children1'), newSourceChildren);
-    state = state.updateIn(expandTreePath(targetPath, 'children1'), (oldChildren) => newTargetChildren);
+
+    if (isTargetInsideSource) {
+        newSourceChildren = newSourceChildren.updateIn(expandTreeSubpath(targetSubpathFromSource, 'children1'), (oldChildren) => newTargetChildren);
+        newSourceChildren = newSourceChildren.delete(from.get('id'));
+    }
+
+    if (!isSameParent && !isSourceInsideTarget)
+        state = state.updateIn(expandTreePath(sourcePath, 'children1'), (oldChildren) => newSourceChildren);
+    if (!isTargetInsideSource)
+        state = state.updateIn(expandTreePath(targetPath, 'children1'), (oldChildren) => newTargetChildren);
 
     return state;
 };

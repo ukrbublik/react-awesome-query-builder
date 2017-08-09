@@ -11,7 +11,10 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       tree={props.tree}
-      config={props.config} />
+      config={props.config}
+      onDragStart={props.onDragStart}
+      dragging={props.dragging}
+    />
   ),
   group: (props) => (
     <Group {...props.properties.toObject()}
@@ -20,6 +23,8 @@ const typeMap = {
       actions={props.actions}
       config={props.config}
       tree={props.tree}
+      onDragStart={props.onDragStart}
+      dragging={props.dragging}
     >
       {props.children1 ? props.children1.map((item) => (
         <Item
@@ -32,8 +37,9 @@ const typeMap = {
           actions={props.actions}
           children1={item.get('children1')}
           tree={props.tree}
-        >
-        </Item>
+          onDragStart={props.onDragStart}
+          dragging={props.dragging}
+        />
       )).toList() : null}
     </Group>
   )

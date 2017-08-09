@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import shallowCompare from 'react-addons-shallow-compare';
 import RuleContainer from './containers/RuleContainer';
-import SortableContainer from './containers/SortableContainer';
 import Field from './Field';
 import Operator from './Operator';
 import Widget from './Widget';
@@ -16,7 +15,6 @@ import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
 
-@SortableContainer
 @RuleContainer
 export default class Rule extends Component {
     static propTypes = {
@@ -88,7 +86,7 @@ export default class Rule extends Component {
                 </div>
                 <div className="rule--body">
                     <Row>
-                        { this.props.canReorder &&
+                        { this.props.config.settings.canReorder &&
                             <span onMouseDown={this.handleDraggerMouseDown.bind(this)} >###</span>
                         }
                         {true ? (

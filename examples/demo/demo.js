@@ -2,9 +2,14 @@ import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
 const {queryBuilderFormat, queryBuilderToTree, queryString, extendConfig} = Utils;
 import config from './config';
-
 var stringify = require('json-stringify-safe');
 
+import '../../css/reset.scss';
+import '../../css/styles.scss';
+import '../../css/compact_styles.scss';
+import '../../css/denormalize.scss';
+
+/*
 let ruleset = {
     "condition": "AND",
     "rules": [
@@ -39,7 +44,7 @@ let ruleset = {
         }
     ]
 }
-
+*/
 
 
 export default class DemoQueryBuilder extends Component {

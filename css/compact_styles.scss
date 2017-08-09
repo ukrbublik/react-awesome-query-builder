@@ -7,18 +7,19 @@
 }
 
 .group, .rule {
+}
+
+.rule {
   padding: 5px;
-  margin-top: 5px;
 }
 
 .group {
-  margin-top: 10px !important;
   padding-left: 0px;
 }
 
 .group--children {
   @extend %force_nomargin;
-  margin-left: 10px !important;
+  padding-left: 10px !important;
 
   & > .group-or-rule-container > .group-or-rule {
     &::before, &::after {
@@ -33,8 +34,24 @@
   margin-left: 4px !important;
 }
 
+.group-or-rule-container {
+    padding-bottom: 5px;
+    padding-right: 5px;
+}
 
 .rule--operator, .widget--widget {
   display: inline-block;
   margin-left: 5px;
 }
+
+.group--header {
+  padding: 5px;
+  padding-left: 0;
+}
+
+
+.group-or-rule-container {
+    padding-bottom: 5px;
+    padding-right: 5px;
+}
+

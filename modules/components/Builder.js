@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Item from '../components/Item';
+import SortableContainer from './containers/SortableContainer';
 
+@SortableContainer
 export default class Builder extends Component {
   static propTypes = {
     tree: PropTypes.instanceOf(Immutable.Map).isRequired,
@@ -21,6 +23,8 @@ export default class Builder extends Component {
         dispatch={this.props.dispatch}
         children1={this.props.tree.get('children1')}
         tree={this.props.tree}
+        onDragStart={this.props.onDragStart}
+        dragging={this.props.dragging}
       >
       </Item>
     );

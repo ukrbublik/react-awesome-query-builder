@@ -7,7 +7,7 @@ import * as constants from '../../constants';
 
 //todo: add to readme about .query-builder-container
 
-export default (RuleOrGroup, CanMoveFn = null) => {
+export default (Builder, CanMoveFn = null) => {
   return class SortableContainer extends Component {
 
     constructor(props) {
@@ -197,19 +197,19 @@ export default (RuleOrGroup, CanMoveFn = null) => {
           x: treeRect.left + (treeRect.right - treeRect.left) / 2, 
           y: dragDirs.vrt >= 0 ? dragRect.bottom : dragRect.top,
         };
-        var hovMnodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y);
-        hovMnodeEl = hovMnodeEl ? hovMnodeEl.closest('.group-or-rule-container') : null;
-        if (!hovMnodeEl) {
+        var hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
+        var hovCNodeEl = hovNodeEl ? hovNodeEl.closest('.group-or-rule-container') : null;
+        if (!hovCNodeEl) {
           console.log('out of tree bounds!');
         } else {
-          var isGroup = hovMnodeEl.classList.contains('group-container');
-          var hovNodeId = hovMnodeEl.getAttribute('data-id');
+          var isGroup = hovCNodeEl.classList.contains('group-container');
+          var hovNodeId = hovCNodeEl.getAttribute('data-id');
           var hovEl = null;
           if (isGroup) {
-            var hovInnerEls = hovMnodeEl.getElementsByClassName('group--header');
+            var hovInnerEls = hovCNodeEl.getElementsByClassName('group--header');
             var hovEl = hovInnerEls.length ? hovInnerEls[0] : null;
           } else {
-            hovEl = hovMnodeEl;
+            hovEl = hovCNodeEl;
           }
           if (hovEl) {
             var hovRect = hovEl.getBoundingClientRect();
@@ -350,7 +350,7 @@ export default (RuleOrGroup, CanMoveFn = null) => {
                 am[3] = toParentII;
                 return am;
               });
-console.log(availMoves.map(am => am[0]));
+
               var bestMode = null;
               availMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
               var levs = availMoves.map(am => am[2]);
@@ -380,7 +380,7 @@ console.log(availMoves.map(am => am[0]));
 
       return false;
     }
-
+    
     canMove (fromII, toII, placement, toParentII, canMoveFn) {
       if(!fromII || !toII)
         return false;
@@ -399,7 +399,7 @@ console.log(availMoves.map(am => am[0]));
     }
 
     render() {
-      return <RuleOrGroup
+      return <Builder
           {...this.props}
           dragging={this.state.dragging}
           onDragStart={this.onDragStart.bind(this)}

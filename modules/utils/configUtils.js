@@ -8,7 +8,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 export const extendConfig = (config) => {
     //operators, defaultOperator - merge
-    //valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel - concrete by widget
+    //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
     //extend 'types' path
     for (let type in config.types) {

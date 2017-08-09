@@ -6,11 +6,25 @@
   }
 }
 
+@mixin noselect {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+%noselect {
+  @include noselect;
+}
+
 %clearfix {
   @include clearfix;
 }
 
 .query-builder {
+  overflow: hidden;
   *, *::before, *::after {
     box-sizing: border-box;
   }
@@ -43,36 +57,36 @@
 .rule {
   background-color: white;
   border: 1px solid transparent;
+  padding: 10px;
 }
 
 .group, .rule {
   border-radius: 5px;
-  margin-top: 10px;
-  padding: 10px;
   position: relative;
 }
 
 .qb-draggable {
+  @extend %noselect;
   position: absolute;
   opacity: 0.8;
   z-index: 1000;
-
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
 .qb-placeholder {
     border: 1px dashed #ccc;
 }
 
+.group-or-rule-container {
+    padding-bottom: 10px;
+    padding-right: 10px;
+}
+
+
 /******************************************************************************/
 /** GROUP *********************************************************************/
 /******************************************************************************/
 .group--children {
-  margin-left: 20px;
+  padding-left: 20px;
 
   & > .group-or-rule-container > .group-or-rule {
     &:before {
@@ -128,7 +142,10 @@
 
 .group--header {
   @extend %clearfix;
+  padding: 10px;
+  padding-left: 5px;
 }
+
 
 .group--conjunctions {
   float: left;
