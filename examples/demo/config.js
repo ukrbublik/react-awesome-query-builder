@@ -533,7 +533,7 @@ export default {
         hideConjForOne: true,
         renderSize: 'small',
         renderConjsAsRadios: false,
-        renderFieldAndOpAsDropdown: true,
+        renderFieldAndOpAsDropdown: false,
         setOpOnChangeField: ['default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
         clearValueOnChangeField: true, //false - if prev & next fields have same type (widget), keep
         setDefaultFieldAndOp: false,

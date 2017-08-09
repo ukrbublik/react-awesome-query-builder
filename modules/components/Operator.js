@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
-import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/index";
-import { Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
+import {getFieldConfig, getFieldPath, getFieldPathLabels, calcTextWidth} from "../utils/index";
+import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
+const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
@@ -42,7 +43,11 @@ export default class Operator extends Component {
       return Object.assign({}, {label: this.props.selectedOperator}, this.operatorOptions[this.props.selectedOperator] || {});
   }
 
-  handleOperatorSelect({key, keyPath}) {
+  handleOperatorMenuSelect({key, keyPath}) {
+      this.props.setOperator(key);
+  }
+
+  handleOperatorSelect(key) {
       this.props.setOperator(key);
   }
 
@@ -66,17 +71,60 @@ export default class Operator extends Component {
       return toggler;
   }
 
+  buildSelectItems(fields) {
+      if (!fields)
+          return null;
+      return keys(fields).map(fieldKey => {
+          let field = fields[fieldKey];
+          return <Option 
+            key={fieldKey}
+            value={fieldKey}
+          >
+            {field.label}
+          </Option>;
+      });
+  }
+
   render() {
+    if (this.props.renderAsDropdown)
+        return this.renderAsDropdown();
+    else
+        return this.renderAsSelect();
+  }
+
+  renderAsSelect() {
     let selectedOpKey = this.props.selectedOperator;
+    let opMenuItems = this.buildMenuItems(this.operatorOptions);
+    let placeholder = this.curOpOpts().label || this.props.config.settings.operatorPlaceholder;
+    let placeholderWidth = calcTextWidth(placeholder, '12px');
+    let fieldSelectItems = this.buildSelectItems(this.operatorOptions);
+    let opSelect = (
+        <Select 
+            dropdownMatchSelectWidth={false}
+            style={{ width: this.props.selectedOperator ? null : placeholderWidth + 36 }}
+            ref="field" 
+            placeholder={placeholder}
+            size={this.props.config.settings.renderSize || "small"}
+            onChange={this.handleOperatorSelect.bind(this)}
+            value={this.props.selectedOperator || undefined}
+        >{fieldSelectItems}</Select>
+    );
+
+    return opSelect;
+  }
+
+  renderAsDropdown() {
+    let selectedOpKey = this.props.selectedOperator;
+    let placeholder = this.curOpOpts().label || this.props.config.settings.operatorPlaceholder;
     let opMenuItems = this.buildMenuItems(this.operatorOptions);
     let opMenu = (
         <Menu 
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={[selectedOpKey]}
-            onClick={this.handleOperatorSelect.bind(this)}
+            onClick={this.handleOperatorMenuSelect.bind(this)}
         >{opMenuItems}</Menu>
     );
-    let opToggler = this.buildMenuToggler(this.curOpOpts().label || this.props.config.settings.operatorPlaceholder);
+    let opToggler = this.buildMenuToggler(placeholder);
 
 
     return (
