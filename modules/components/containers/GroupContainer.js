@@ -57,7 +57,10 @@ export default (Group) => {
       }));
 
       return (
-        <div className={'group-or-rule-container'}>
+        <div 
+          className={'group-or-rule-container group-container'}
+          data-id={this.props.id}
+        >
             <Group
               id={this.props.id}
               allowRemoval={allowRemoval}

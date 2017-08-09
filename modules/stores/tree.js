@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import expandTreePath from '../utils/expandTreePath';
+import getItemByPath from '../utils/getItemByPath';
 import defaultRoot from '../utils/defaultRoot';
 import {defaultOperator, defaultOperatorOptions} from '../utils/defaultRuleProperties';
 import {getFirstOperator} from '../utils/configUtils';
@@ -82,10 +83,10 @@ const setConjunction = (state, path, conjunction) =>
  * @param {string} id
  * @param {Immutable.OrderedMap} properties
  */
-const addItem = (state, path, type, id, properties) =>
-    state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
+const addItem = (state, path, type, id, properties) => {
+    return state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
         [id]: new Immutable.Map({type, id, properties})
-    }));
+    }))};
 
 /**
  * @param {Immutable.Map} state
@@ -93,6 +94,60 @@ const addItem = (state, path, type, id, properties) =>
  */
 const removeItem = (state, path) =>
     state.deleteIn(expandTreePath(path));
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} fromPath
+ * @param {Immutable.List} toPath
+ * @param {string} placement, see constants PLACEMENT_*: PLACEMENT_AFTER, PLACEMENT_BEFORE, PLACEMENT_APPEND, PLACEMENT_PREPEND
+ * @param {object} config
+ */
+const moveItem = (state, fromPath, toPath, placement, config) => {
+    let from = getItemByPath(state, fromPath);
+    let source = fromPath.size > 1 ? getItemByPath(state, fromPath.pop()) : null;
+    let sourceChildren = source ? source.get('children1') : null;
+    let to = getItemByPath(state, toPath);
+    let targetPath = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? toPath : toPath.pop();
+    let target = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? 
+        to
+        : toPath.size > 1 ? getItemByPath(state, toPath.pop()) : null;
+    let targetChildren = target ? target.get('children1') : null;
+
+    if (!source || !target)
+        return state;
+
+    let isSameParent = (source.get('id') == target.get('id'));
+
+    let newTargetChildren = targetChildren, newSourceChildren = sourceChildren;
+    newSourceChildren = newSourceChildren.delete(from.get('id'));
+    if (isSameParent)
+        newTargetChildren = newSourceChildren;
+    if (placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) {
+        newTargetChildren = Immutable.OrderedMap().withMutations(r => {
+            let itemId, item, i = 0, size = newTargetChildren.size;
+            for ([itemId, item] of newTargetChildren.entries()) {
+                if (itemId == to.get('id') && placement == constants.PLACEMENT_BEFORE) {
+                    r.set(from.get('id'), from);
+                }
+                
+                r.set(itemId, item);
+
+                if (itemId == to.get('id') && placement == constants.PLACEMENT_AFTER) {
+                    r.set(from.get('id'), from);
+                }
+            }
+        });
+    } else if (placement == constants.PLACEMENT_APPEND) {
+        newTargetChildren = newTargetChildren.merge({[from.get('id')]: from});
+    } else if (placement == constants.PLACEMENT_PREPEND) {
+        newTargetChildren = Immutable.OrderedMap({[from.get('id')]: from}).merge(newTargetChildren);
+    }
+    if (!isSameParent)
+        state = state.updateIn(expandTreePath(fromPath.pop(), 'children1'), newSourceChildren);
+    state = state.updateIn(expandTreePath(targetPath, 'children1'), (oldChildren) => newTargetChildren);
+
+    return state;
+};
 
 /**
  * @param {Immutable.Map} state
@@ -233,6 +288,9 @@ export default (config) => {
 
             case constants.SET_OPERATOR_OPTION:
                 return setOperatorOption(state, action.path, action.name, action.value);
+
+            case constants.MOVE_ITEM:
+                return moveItem(state, action.fromPath, action.toPath, action.placement, action.config);
 
             default:
                 return state;

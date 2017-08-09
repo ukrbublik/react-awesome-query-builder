@@ -3,6 +3,7 @@ import expandTreePath from '../utils/expandTreePath';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
 import * as constants from '../constants';
+import Immutable from 'immutable';
 
 const hasChildren = (tree, path) =>
   tree.getIn(expandTreePath(path, 'children1')).size > 0;
@@ -124,4 +125,20 @@ export const removeGroup = (config, path) => ({
     type: constants.REMOVE_GROUP,
     path: path,
     config: config
+});
+
+
+
+/**
+ * @param {object} config
+ * @param {Array} fromPath
+ * @param {Array} toPath
+ * @param {String} placement, see constants PLACEMENT_*
+ */
+export const moveItem = (config, fromPath, toPath, placement) => ({
+  type: constants.MOVE_ITEM,
+  fromPath: new Immutable.List(fromPath),
+  toPath: new Immutable.List(toPath),
+  placement: placement,
+  config: config,
 });

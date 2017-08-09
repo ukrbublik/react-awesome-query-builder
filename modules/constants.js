@@ -11,3 +11,10 @@ export const SET_VALUE = 'SET_VALUE';
 export const SET_OPERATOR_OPTION = 'SET_OPERATOR_OPTION';
 
 export const SET_TREE = 'SET_TREE';
+
+export const MOVE_ITEM = 'MOVE_ITEM';
+
+export const PLACEMENT_AFTER = 'after';
+export const PLACEMENT_BEFORE = 'before';
+export const PLACEMENT_APPEND = 'append';
+export const PLACEMENT_PREPEND = 'prepend';
