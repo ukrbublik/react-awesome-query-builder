@@ -185,6 +185,7 @@ const setField = (state, path, field, config) => {
         const currentField = current.get('field');
         const currentOperator = current.get('operator');
         const currentValue = current.get('value');
+        const currentValueSrc = current.get('valueSrc');
 
         const currentFieldConfig = getFieldConfig(currentField, config);
         const currentWidgetConfig = getFieldWidgetConfig(config, currentField, currentOperator);
@@ -222,7 +223,14 @@ const setField = (state, path, field, config) => {
                 if (widgetConfig && widgetConfig.defaultValue !== undefined)
                     return new Immutable.List([widgetConfig.defaultValue]);
                 return new Immutable.List();
-            })(currentWidgetConfig, widgetConfig));
+            })(currentWidgetConfig, widgetConfig))
+            .set('valueSrc', ((currentWidget, nextWidget) => {
+                if (currentWidget === nextWidget && !config.settings.clearValueOnChangeField
+                        && !currentValueSrc.find(srcKey => !(srcKey == null || srcKey == 'value')))
+                    return new Immutable.List(currentValueSrc.take(operatorCardinality));
+                return new Immutable.List();
+            })(currentWidgetConfig, widgetConfig))
+            ;
     }))
 };
 
@@ -234,6 +242,7 @@ const setField = (state, path, field, config) => {
 const setOperator = (state, path, operator, config) => {
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const currentValue = current.get('value', new Immutable.List());
+        const currentValueSrc = current.get('valueSrc', new Immutable.List());
         const currentField = current.get('field');
         const currentOperator = current.get('operator');
 
@@ -244,10 +253,12 @@ const setOperator = (state, path, operator, config) => {
 
         let canKeepValue = (currentWidget == nextWidget);
         const nextValue = canKeepValue ? new Immutable.List(currentValue.take(operatorCardinality)) : new Immutable.List();
+        const nextValueSrc = canKeepValue ? new Immutable.List(currentValueSrc.take(operatorCardinality)) : new Immutable.List();
 
         return current.set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, currentField))
-            .set('value', nextValue);
+            .set('value', nextValue)
+            .set('valueSrc', nextValueSrc);
     }));
 };
 
@@ -263,6 +274,22 @@ const setValue = (state, path, delta, value) => {
     } else {
         return state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
     }
+};
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
+ * @param {integer} delta
+ * @param {*} srcKey
+ */
+const setValueSrc = (state, path, delta, srcKey) => {
+    state = state.deleteIn(expandTreePath(path, 'properties', 'value', delta + ''));
+    if (typeof srcKey === "undefined") {
+        state = state.deleteIn(expandTreePath(path, 'properties', 'valueSrc', delta + ''));
+    } else {
+        state = state.setIn(expandTreePath(path, 'properties', 'valueSrc', delta + ''), srcKey);
+    }
+    return state;
 };
 
 /**
@@ -311,6 +338,9 @@ export default (config) => {
 
             case constants.SET_VALUE:
                 return setValue(state, action.path, action.delta, action.value);
+
+            case constants.SET_VALUE_SRC:
+                return setValueSrc(state, action.path, action.delta, action.srcKey);
 
             case constants.SET_OPERATOR_OPTION:
                 return setOperatorOption(state, action.path, action.name, action.value);

@@ -43,6 +43,10 @@ export default (Rule) => {
         this.props.actions.setValue(this.props.path, delta, value);
     }
 
+    setValueSrc(delta, srcKey) {
+        this.props.actions.setValueSrc(this.props.path, delta, srcKey);
+    }
+
 
     render() {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
@@ -65,6 +69,7 @@ export default (Rule) => {
               selectedField={this.props.field || null}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
+              valueSrc={this.props.valueSrc || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               dragging={this.props.dragging}
@@ -79,9 +84,11 @@ export default (Rule) => {
               setOperator={this.setOperator.bind(this)}
               setOperatorOption={this.setOperatorOption.bind(this)}
               setValue={this.setValue.bind(this)}
+              setValueSrc={this.setValueSrc.bind(this)}
               selectedField={this.props.field || null}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
+              valueSrc={this.props.valueSrc || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               onDragStart={this.props.onDragStart}

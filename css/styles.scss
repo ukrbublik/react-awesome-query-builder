@@ -172,10 +172,10 @@
   display: inline-block;
 }
 
-.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .widget--widget, .widget--sep {
+.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .widget--widget, .widget--valuesrc, .widget--sep {
   display: inline-block;
 }
-.rule--operator, .widget--widget, .widget--sep {
+.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
 }
 

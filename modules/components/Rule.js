@@ -10,7 +10,7 @@ import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import {getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig} from "../utils/index";
+import {getFieldConfig, getFieldPath, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/index";
 import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
@@ -50,7 +50,6 @@ export default class Rule extends Component {
         const selectedFieldConfig = getFieldConfig(this.props.selectedField, this.props.config);
         const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == '!struct';
         const isFieldAndOpSelected = this.props.selectedField && this.props.selectedOperator && !isSelectedGroup;
-        const selectedWidget = getWidgetForFieldOp(this.props.config, this.props.selectedField, this.props.selectedOperator);
         const selectedOperatorConfig = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
         const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
         const selectedFieldWidgetConfig = getFieldWidgetConfig(this.props.config, this.props.selectedField, this.props.selectedOperator) || {};
@@ -147,8 +146,10 @@ export default class Rule extends Component {
                                   field={this.props.selectedField}
                                   operator={this.props.selectedOperator}
                                   value={this.props.value}
+                                  valueSrc={this.props.valueSrc}
                                   config={this.props.config} 
                                   setValue={this.props.setValue}
+                                  setValueSrc={this.props.setValueSrc}
                                 />
                             </Col>
                         }

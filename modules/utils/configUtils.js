@@ -218,19 +218,21 @@ export const getValueLabel = (config, field, operator, delta) => {
 };
 
 
-export const getWidgetForFieldOp = (config, field, operator) => {
+export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
     if (!field || !operator)
         return null;
     const fieldConfig = getFieldConfig(field, config);
-    const typeConfig = config.types[fieldConfig.type] || {};
+    //const typeConfig = config.types[fieldConfig.type] || {};
     //const opConfig = config.operators[operator];
     let wdgt = null;
-    if (typeConfig.widgets) {
-        for (let widget in typeConfig.widgets) {
-            let widgetConfig = typeConfig.widgets[widget];
+    if (fieldConfig.widgets) {
+        for (let widget in fieldConfig.widgets) {
+            let widgetConfig = fieldConfig.widgets[widget];
             if (widgetConfig.operators && widgetConfig.operators.indexOf(operator) != -1) {
-                wdgt = widget;
-                break;
+                if (!valueSrc || valueSrc == widgetConfig.valueSrc) {
+                    wdgt = widget;
+                    break;
+                }
             }
         }
     }

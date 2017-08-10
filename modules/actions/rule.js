@@ -41,6 +41,20 @@ export const setValue = (config, path, delta, value) => ({
 /**
  * @param {object} config
  * @param {Immutable.List} path
+ * @param {integer} delta
+ * @param {*} srcKey
+ */
+export const setValueSrc = (config, path, delta, srcKey) => ({
+  type: constants.SET_VALUE_SRC,
+  path: path,
+  delta: delta,
+  srcKey: srcKey,
+  config: config
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
  * @param {string} name
  * @param {*} value
  */

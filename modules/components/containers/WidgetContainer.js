@@ -2,14 +2,18 @@ import React, {Component, PropTypes} from 'react';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
+import map from 'lodash/map';
 import {defaultValue, getFieldConfig, getValueLabel, getOperatorConfig, getWidgetForFieldOp, getFieldWidgetConfig} from "../../utils/index";
-
+import { Icon, Popover, Button, Radio } from 'antd';
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 
 export default (Widget) => {
     return class WidgetContainer extends Component {
         static propTypes = {
             config: PropTypes.object.isRequired,
             value: PropTypes.instanceOf(Immutable.List).isRequired,
+            valueSrc: PropTypes.instanceOf(Immutable.List).isRequired,
             field: PropTypes.string.isRequired,
             operator: PropTypes.string.isRequired
         };
@@ -19,7 +23,15 @@ export default (Widget) => {
         renderWidget(delta, widget) {
             const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget);
             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
+            const valueSources = widgetDefinition.valueSources || this.props.config.settings.valueSources || {};
             const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+            const valueSrc = this.props.valueSrc.get(delta) || 'value';
+            const valueSrcInfo = valueSources[valueSrc] || {};
+            if (valueSrc != 'value') {
+                //todo....
+                //widget = valueSrcInfo.widget;
+            }
+
             let widgetProps = Object.assign({}, fieldWidgetProps, {
                 config: this.props.config,
                 field: this.props.field,
@@ -30,8 +42,48 @@ export default (Widget) => {
                 placeholder: valueLabel.placeholder,
                 setValue: value => this.props.setValue(delta, value)
             });
-            
+
             return widgetFactory(widgetProps);
+        }
+
+        hasMultiValueSorces(delta) {
+            const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator);
+            const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+            const valueSources = widgetDefinition.valueSources || this.props.config.settings.valueSources;
+            return (valueSources && Object.keys(valueSources).length > 1);
+        }
+
+        renderValueSorces(delta) {
+            const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator);
+            const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+            let valueSources = widgetDefinition.valueSources || this.props.config.settings.valueSources;
+            if (!valueSources || Object.keys(valueSources).length == 1)
+                return null;
+
+            let content = (
+              <RadioGroup 
+                 key={'valuesrc-'+delta}
+                 value={this.props.valueSrc.get(delta) || 'value'} 
+                 size={this.props.config.settings.renderSize || "small"}
+                 onChange={(e) => {let srcKey = e.target.value; return this.props.setValueSrc(delta, srcKey);}}
+              >
+              {map(valueSources, (srcInfo, srcKey) => (
+                <RadioButton 
+                  key={srcKey}
+                  value={srcKey}
+                  //checked={item.checked}
+                >{srcInfo.label}</RadioButton>
+              ))}
+              </RadioGroup>
+            );
+
+            return (
+                <span>
+                    <Popover content={content} title={this.props.config.settings.valueSourcesPopupTitle}>
+                        <Icon type="ellipsis" />
+                    </Popover>
+                </span>
+            );
         }
 
         render() {
@@ -72,6 +124,16 @@ export default (Widget) => {
                                     ));
                                 }
                             }
+
+                            if (this.hasMultiValueSorces(delta))
+                                parts.push((
+                                    <div key={"valuesrc-"+this.props.field+"-"+delta} className="widget--valuesrc">
+                                        {settings.showLabels ?
+                                            <label>&nbsp;</label>
+                                        : null}
+                                        {this.renderValueSorces.call(this, delta)}
+                                    </div>
+                                ));
 
                             parts.push((
                                 <div key={"widget-"+this.props.field+"-"+delta} className="widget--widget">

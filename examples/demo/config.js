@@ -8,7 +8,8 @@ const {
     DateWidget,
     BooleanWidget,
     TimeWidget,
-    DateTimeWidget
+    DateTimeWidget,
+    FieldWidget
 } = Widgets;
 const {ProximityOperator} = Operators;
 import moment from 'moment';
@@ -459,12 +460,14 @@ export default {
     },
     widgets: {
         text: {
+            valueSrc: 'value',
             factory: (props) => <TextWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 return isForDisplay ? '"'+val+'"' : JSON.stringify(val);
             },
         },
         number: {
+            valueSrc: 'value',
             factory: (props) => <NumberWidget {...props} />,
             valueLabel: "Number",
             valuePlaceholder: "Enter number",
@@ -473,6 +476,7 @@ export default {
             },
         },
         select: {
+            valueSrc: 'value',
             factory: (props) => <SelectWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 let valLabel = fieldDef.listValues[val];
@@ -480,6 +484,7 @@ export default {
             },
         },
         multiselect: {
+            valueSrc: 'value',
             factory: (props) => <MultiSelectWidget {...props} />,
             formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
                 let valsLabels = vals.map(v => fieldDef.listValues[v]);
@@ -487,6 +492,7 @@ export default {
             },
         },
         date: {
+            valueSrc: 'value',
             factory: (props) => <DateWidget {...props} />,
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD',
@@ -496,6 +502,7 @@ export default {
             },
         },
         time: {
+            valueSrc: 'value',
             factory: (props) => <TimeWidget {...props} />,
             timeFormat: 'HH:mm',
             valueFormat: 'HH:mm:ss',
@@ -505,6 +512,7 @@ export default {
             },
         },
         datetime: {
+            valueSrc: 'value',
             factory: (props) => <DateTimeWidget {...props} />,
             timeFormat: 'HH:mm',
             dateFormat: 'DD.MM.YYYY',
@@ -515,6 +523,7 @@ export default {
             },
         },
         boolean: {
+            valueSrc: 'value',
             factory: (props) => <BooleanWidget {...props} />,
             labelYes: "Yes",
             labelNo: "No ",
@@ -522,6 +531,10 @@ export default {
                 return isForDisplay ? (val ? "Yes" : "No") : JSON.stringify(!!val);
             },
             defaultValue: false,
+        },
+        field: {
+            valueSrc: 'field',
+            factory: (props) => <FieldWidget {...props} />,
         }
     },
     settings: {
@@ -565,5 +578,15 @@ export default {
                 return field;
         },
         canReorder: false,
+        valueSources: {
+            value: {
+                label: "Value"
+            },
+            field: {
+                label: "Field",
+                widget: "field",
+            }
+        },
+        valueSourcesPopupTitle: "Select value source"
     }
 };
