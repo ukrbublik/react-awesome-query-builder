@@ -32,7 +32,7 @@ export default class TimeWidget extends Component {
 
     handleChange(_value) {
         const {setValue, valueFormat} = this.props;
-        const value = _value instanceof moment && _value.isValid() ? _value.format(valueFormat) : null;
+        const value = _value && _value.isValid() ? _value.format(valueFormat) : null;
         if (value || _value === null)
             setValue(value);
     }
