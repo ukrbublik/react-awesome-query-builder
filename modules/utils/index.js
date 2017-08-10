@@ -1,7 +1,10 @@
 'use strict';
 export {queryBuilderFormat, queryBuilderToTree} from './queryBuilderFormat'
 export {queryString} from './queryString'
-export {getFieldConfig, getFieldPath, getFieldPathLabels, getValueLabel, extendConfig, getFieldWidgetConfig, getOperatorConfig, getWidgetForFieldOp} from './configUtils';
+export {
+  getFieldConfig, getFieldPath, getFieldPathLabels, getValueLabel, extendConfig, 
+  getFieldWidgetConfig, getOperatorConfig, getWidgetsForFieldOp, getWidgetForFieldOp
+} from './configUtils';
 
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';

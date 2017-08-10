@@ -37,7 +37,8 @@ export const queryString = (item, config, isForDisplay = false) => {
         const typeConfig = config.types[fieldDefinition.type] || {};
 
         //format value
-        let value = properties.get('value').map((currentValue) => {
+        let value = properties.get('value').map((currentValue, ind) => {
+            let valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
             if (typeof fieldWidgetDefinition.formatValue === 'function') {
                 let fn = fieldWidgetDefinition.formatValue;
                 let args = [
@@ -46,6 +47,10 @@ export const queryString = (item, config, isForDisplay = false) => {
                     omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
                     isForDisplay
                 ];
+                if (valueSrc == 'field') {
+                    let valFieldDefinition = getFieldConfig(currentValue, config) || {};
+                    args.push(valFieldDefinition);
+                }
                 return fn(...args);
             }
             return currentValue;

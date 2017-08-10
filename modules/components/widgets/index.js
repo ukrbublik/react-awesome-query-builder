@@ -6,3 +6,4 @@ export {default as TextWidget} from './Text';
 export {default as NumberWidget} from './Number';
 export {default as BooleanWidget} from './Boolean'
 export {default as MultiSelectWidget} from './MultiSelect';
+export {default as ValueFieldWidget} from './ValueField';

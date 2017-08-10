@@ -9,7 +9,7 @@ const {
     BooleanWidget,
     TimeWidget,
     DateTimeWidget,
-    FieldWidget
+    ValueFieldWidget
 } = Widgets;
 const {ProximityOperator} = Operators;
 import moment from 'moment';
@@ -103,6 +103,7 @@ export default {
         datetime: {
             label: 'DateTime',
             type: 'datetime',
+            valueSources: ['field']
         },
         color: {
             label: 'Color',
@@ -164,10 +165,21 @@ export default {
                         valueLabel: "Text",
                         valuePlaceholder: "Enter text",
                     }
+                },
+                field: {
+                    operators: [
+                        'equal',
+                        'not_equal',
+                        //note that unary ops will be excluded anyway, see getWidgetsForFieldOp()
+                        //"is_empty",
+                        //"is_not_empty",
+                        'proximity'
+                    ],
                 }
             },
         },
         number: {
+            valueSources: ['value'],
             widgets: {
                 number: {
                     operators: [
@@ -179,6 +191,8 @@ export default {
                         "greater_or_equal",
                         "between",
                         "not_between",
+                        "is_empty",
+                        "is_not_empty",
                     ],
                     defaultOperator: 'less',
                     widgetProps: {
@@ -370,6 +384,7 @@ export default {
         },
 
         is_empty: {
+            isUnary: true,
             label: 'Is Empty',
             labelForFormat: 'IS EMPTY',
             cardinality: 0,
@@ -379,6 +394,7 @@ export default {
             },
         },
         is_not_empty: {
+            isUnary: true,
             label: 'Is not empty',
             labelForFormat: 'IS NOT EMPTY',
             cardinality: 0,
@@ -534,7 +550,12 @@ export default {
         },
         field: {
             valueSrc: 'field',
-            factory: (props) => <FieldWidget {...props} />,
+            factory: (props) => <ValueFieldWidget {...props} />,
+            formatValue: (val, fieldDef, wgtDef, isForDisplay, valFieldDef) => {
+                return isForDisplay ? (valFieldDef.label || val) : val;
+            },
+            valueLabel: "Field to compare",
+            valuePlaceholder: "Select field to compare",
         }
     },
     settings: {
@@ -577,8 +598,7 @@ export default {
             else
                 return field;
         },
-        canReorder: false,
-        valueSources: {
+        valueSourcesInfo: {
             value: {
                 label: "Value"
             },
@@ -587,6 +607,7 @@ export default {
                 widget: "field",
             }
         },
-        valueSourcesPopupTitle: "Select value source"
+        valueSourcesPopupTitle: "Select value source",
+        canReorder: false,
     }
 };

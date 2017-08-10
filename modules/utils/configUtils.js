@@ -27,10 +27,19 @@ export const extendConfig = (config) => {
                 (['widgetProps'].indexOf(k) != -1)), typeWidgetConfig);
             typeConfig.widgets[widget] = typeWidgetConfig;
         }
+        if (!typeConfig.valueSources)
+            typeConfig.valueSources = Object.keys(config.settings.valueSourcesInfo);
+        for (let valueSrc of typeConfig.valueSources) {
+            if (valueSrc != 'value' && !typeConfig.widgets[valueSrc]) {
+                typeConfig.widgets[valueSrc] = {
+                };
+            }
+        }
         if (!typeConfig.operators && operators)
             typeConfig.operators = operators;
         if (!typeConfig.defaultOperator && defaultOperator)
             typeConfig.defaultOperator = defaultOperator;
+        config.types[type] = typeConfig;
     }
 
     //extend 'fields' path
@@ -53,6 +62,8 @@ export const extendConfig = (config) => {
                     (['widgetProps'].indexOf(k) != -1)), fieldWidgetConfig);
                 fieldConfig.widgets[widget] = fieldWidgetConfig;
             }
+            fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources || ['value'];
+            console.log(fieldConfig.valueSources, typeConfig.valueSources, fieldConfig.type, fieldConfig.valueSources);
         }
         if (!fieldConfig.operators && operators)
             fieldConfig.operators = operators;
@@ -68,7 +79,7 @@ export const extendConfig = (config) => {
         }
     }
     _extendFieldsConfig(config.fields);
-    //console.log(config); 
+    console.log(config); 
     return config;
 };
 
@@ -176,12 +187,12 @@ export const getOperatorConfig = (config, operator, field = null) => {
     }
 };
 
-export const getFieldWidgetConfig = (config, field, operator, widget = null) => {
+export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
     if (!field || !(operator || widget))
         return null;
     const fieldConfig = getFieldConfig(field, config);
     if (!widget)
-        widget = getWidgetForFieldOp(config, field, operator);
+        widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const widgetConfig = config.widgets[widget] || {};
     const fieldWidgetConfig = (fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
     const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});
@@ -189,8 +200,8 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null) => 
     return mergedConfig;
 };
 
-export const getValueLabel = (config, field, operator, delta) => {
-    const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator) || {};
+export const getValueLabel = (config, field, operator, delta, valueSrc = null) => {
+    const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
     const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
 
     const cardinality = mergedOpConfig.cardinality;
@@ -217,24 +228,31 @@ export const getValueLabel = (config, field, operator, delta) => {
     return ret;
 };
 
-
-export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
+export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {
+    let ret = [];
     if (!field || !operator)
-        return null;
+        return ret;
     const fieldConfig = getFieldConfig(field, config);
     //const typeConfig = config.types[fieldConfig.type] || {};
-    //const opConfig = config.operators[operator];
-    let wdgt = null;
+    const opConfig = config.operators[operator];
     if (fieldConfig.widgets) {
         for (let widget in fieldConfig.widgets) {
             let widgetConfig = fieldConfig.widgets[widget];
-            if (widgetConfig.operators && widgetConfig.operators.indexOf(operator) != -1) {
-                if (!valueSrc || valueSrc == widgetConfig.valueSrc) {
-                    wdgt = widget;
-                    break;
+            if (valueSrc != 'value' && !widgetConfig.operators 
+                || widgetConfig.operators && widgetConfig.operators.indexOf(operator) != -1) {
+                let canAdd = !valueSrc || valueSrc == config.widgets[widget].valueSrc;
+                if (opConfig.isUnary && (valueSrc && valueSrc != 'value'))
+                    canAdd = false;
+                if (canAdd) {
+                    ret.push(widget);
                 }
             }
         }
     }
-    return wdgt;
+    return ret;
+};
+
+export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
+    let widgets = getWidgetsForFieldOp(config, field, operator, valueSrc);
+    return widgets.length ? widgets[0] : null;
 };

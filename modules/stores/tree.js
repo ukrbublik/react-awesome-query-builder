@@ -185,10 +185,10 @@ const setField = (state, path, field, config) => {
         const currentField = current.get('field');
         const currentOperator = current.get('operator');
         const currentValue = current.get('value');
-        const currentValueSrc = current.get('valueSrc');
+        const currentValueSrc = current.get('valueSrc', new Immutable.List());
 
         const currentFieldConfig = getFieldConfig(currentField, config);
-        const currentWidgetConfig = getFieldWidgetConfig(config, currentField, currentOperator);
+        const currentWidgetConfig = getFieldWidgetConfig(config, currentField, currentOperator, null, currentValueSrc.first());
         const currentOperatorConfig = getOperatorConfig(config, currentOperator, currentField);
         const fieldConfig = getFieldConfig(field, config);
 
@@ -210,27 +210,30 @@ const setField = (state, path, field, config) => {
             }
         }
         const operatorConfig = getOperatorConfig(config, operator, field);
-        const widgetConfig = getFieldWidgetConfig(config, field, operator);
-        
+        const widgetConfig = getFieldWidgetConfig(config, field, operator, null, currentValueSrc.first());
         const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
-        return current.set('field', field)
+        let isCurrentValueCustomSrc = currentValueSrc.find(srcKey => !(srcKey == null || srcKey == 'value'));
+        let canReuseValue = (currentWidgetConfig === widgetConfig && !config.settings.clearValueOnChangeField
+            && !isCurrentValueCustomSrc);
+        let newValue = null, newValueSrc = null;
+        if (canReuseValue)
+            newValue = new Immutable.List(currentValue.take(operatorCardinality));
+        else if (widgetConfig && widgetConfig.defaultValue !== undefined)
+            newValue = new Immutable.List([widgetConfig.defaultValue]);
+        else
+            newValue = new Immutable.List();
+        if (canReuseValue)
+            newValueSrc = new Immutable.List(currentValueSrc.take(operatorCardinality));
+        else
+            newValueSrc = new Immutable.List();
+
+        return current
+            .set('field', field)
             .set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, field))
-            .set('value', ((currentWidget, nextWidget) => {
-                if (currentWidget === nextWidget && !config.settings.clearValueOnChangeField)
-                    return new Immutable.List(currentValue.take(operatorCardinality));
-                if (widgetConfig && widgetConfig.defaultValue !== undefined)
-                    return new Immutable.List([widgetConfig.defaultValue]);
-                return new Immutable.List();
-            })(currentWidgetConfig, widgetConfig))
-            .set('valueSrc', ((currentWidget, nextWidget) => {
-                if (currentWidget === nextWidget && !config.settings.clearValueOnChangeField
-                        && !currentValueSrc.find(srcKey => !(srcKey == null || srcKey == 'value')))
-                    return new Immutable.List(currentValueSrc.take(operatorCardinality));
-                return new Immutable.List();
-            })(currentWidgetConfig, widgetConfig))
-            ;
+            .set('value', newValue)
+            .set('valueSrc', newValueSrc);
     }))
 };
 
@@ -246,19 +249,33 @@ const setOperator = (state, path, operator, config) => {
         const currentField = current.get('field');
         const currentOperator = current.get('operator');
 
+        const currentWidgetConfig = getFieldWidgetConfig(config, currentField, currentOperator, null, currentValueSrc.first());
+        const widgetConfig = getFieldWidgetConfig(config, currentField, operator, null, currentValueSrc.first());
         const operatorConfig = getOperatorConfig(config, operator, currentField);
         const operatorCardinality = defaultValue(operatorConfig.cardinality, 1);
         const currentWidget = getWidgetForFieldOp(config, currentField, currentOperator);
         const nextWidget = getWidgetForFieldOp(config, currentField, operator);
 
-        let canKeepValue = (currentWidget == nextWidget);
-        const nextValue = canKeepValue ? new Immutable.List(currentValue.take(operatorCardinality)) : new Immutable.List();
-        const nextValueSrc = canKeepValue ? new Immutable.List(currentValueSrc.take(operatorCardinality)) : new Immutable.List();
+        let isCurrentValueCustomSrc = currentValueSrc.find(srcKey => !(srcKey == null || srcKey == 'value'));
+        let canReuseValue = (currentWidgetConfig === widgetConfig && !config.settings.clearValueOnChangeField
+            && !isCurrentValueCustomSrc);
+        let newValue = null, newValueSrc = null;
+        if (canReuseValue)
+            newValue = new Immutable.List(currentValue.take(operatorCardinality));
+        else if (widgetConfig && widgetConfig.defaultValue !== undefined)
+            newValue = new Immutable.List([widgetConfig.defaultValue]);
+        else
+            newValue = new Immutable.List();
+        if (canReuseValue)
+            newValueSrc = new Immutable.List(currentValueSrc.take(operatorCardinality));
+        else
+            newValueSrc = new Immutable.List();
 
-        return current.set('operator', operator)
+        return current
+            .set('operator', operator)
             .set('operatorOptions', defaultOperatorOptions(config, operator, currentField))
-            .set('value', nextValue)
-            .set('valueSrc', nextValueSrc);
+            .set('value', newValue)
+            .set('valueSrc', newValueSrc);
     }));
 };
 
