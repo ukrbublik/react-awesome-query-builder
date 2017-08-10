@@ -9,7 +9,7 @@ import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import defaultRuleProperties from '../utils/defaultRuleProperties';
 import defaultGroupProperties from '../utils/defaultGroupProperties';
-import {defaultValue, getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../utils/index";
+import {defaultValue, getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getValueSourcesForFieldOp} from "../utils/index";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
 
 var stringify = require('json-stringify-safe');
@@ -223,8 +223,12 @@ const setField = (state, path, field, config) => {
             newValue = new Immutable.List([widgetConfig.defaultValue]);
         else
             newValue = new Immutable.List();
+
+        const valueSources = getValueSourcesForFieldOp(config, field, operator);
         if (canReuseValue)
             newValueSrc = new Immutable.List(currentValueSrc.take(operatorCardinality));
+        else if (valueSources.length == 1)
+            newValueSrc = new Immutable.List([ valueSources[0] ]);
         else
             newValueSrc = new Immutable.List();
 
@@ -266,8 +270,12 @@ const setOperator = (state, path, operator, config) => {
             newValue = new Immutable.List([widgetConfig.defaultValue]);
         else
             newValue = new Immutable.List();
+
+        const valueSources = getValueSourcesForFieldOp(config, currentField, operator);
         if (canReuseValue)
             newValueSrc = new Immutable.List(currentValueSrc.take(operatorCardinality));
+        else if (valueSources.length == 1)
+            newValueSrc = new Immutable.List([ valueSources[0] ]);
         else
             newValueSrc = new Immutable.List();
 

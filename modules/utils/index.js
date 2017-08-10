@@ -3,7 +3,7 @@ export {queryBuilderFormat, queryBuilderToTree} from './queryBuilderFormat'
 export {queryString} from './queryString'
 export {
   getFieldConfig, getFieldPath, getFieldPathLabels, getValueLabel, extendConfig, 
-  getFieldWidgetConfig, getOperatorConfig, getWidgetsForFieldOp, getWidgetForFieldOp
+  getFieldWidgetConfig, getOperatorConfig, getWidgetsForFieldOp, getWidgetForFieldOp, getValueSourcesForFieldOp
 } from './configUtils';
 
 import en_US from 'antd/lib/locale-provider/en_US';

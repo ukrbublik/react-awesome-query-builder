@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
 import {defaultValue} from "./index";
-import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
+import {getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 

@@ -306,9 +306,15 @@ export default {
                         "equal",
                     ],
                     widgetProps: {
-                        hideOperator: true,
-                        operatorInlineLabel: "is",
+                        //hideOperator: true,
+                        //operatorInlineLabel: "is",
                     }
+                },
+                field: {
+                    operators: [
+                        "equal",
+                        "not_equal",
+                    ],
                 }
             },
         },

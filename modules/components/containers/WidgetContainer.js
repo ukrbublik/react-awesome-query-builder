@@ -3,7 +3,10 @@ import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import map from 'lodash/map';
-import {defaultValue, getFieldConfig, getValueLabel, getOperatorConfig, getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp} from "../../utils/index";
+import {
+    defaultValue, getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp, 
+    getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
+} from "../../utils/index";
 import { Icon, Popover, Button, Radio } from 'antd';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -24,8 +27,11 @@ export default (Widget) => {
             const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
             const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
-            const valueSources = fieldDefinition.valueSources || {};
             const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+
+console.log(widgetProps, widgetDefinition, widget, valueSrc);
+            if (!widgetFactory)
+                return '?';
 
             let widgetProps = Object.assign({}, fieldWidgetProps, {
                 config: this.props.config,
@@ -37,7 +43,7 @@ export default (Widget) => {
                 placeholder: valueLabel.placeholder,
                 setValue: value => this.props.setValue(delta, value)
             });
-console.log(widgetProps);
+
             if (valueSrc != 'value') {
                 //todo....
                 //widget = valueSrcInfo.widget;
@@ -46,11 +52,12 @@ console.log(widgetProps);
             return widgetFactory(widgetProps);
         }
 
-        renderValueSorces(delta, valueSrc) {
+        renderValueSorces(delta, valueSources, valueSrc) {
             const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
             const valueSourcesInfo = this.props.config.settings.valueSourcesInfo;
             const valueSourcesPopupTitle = this.props.config.settings.valueSourcesPopupTitle;
-            let valueSources = fieldDefinition.valueSources;
+            //let valueSources = fieldDefinition.valueSources;
+            //let valueSources = getValueSourcesForFieldOp(this.props.config, this.props.field, this.props.operator);
 
             if (!valueSources || Object.keys(valueSources).length == 1)
                 return null;
@@ -58,7 +65,7 @@ console.log(widgetProps);
             let content = (
               <RadioGroup 
                  key={'valuesrc-'+delta}
-                 value={valueSrc} 
+                 value={valueSrc || "value"} 
                  size={this.props.config.settings.renderSize || "small"}
                  onChange={(e) => {let srcKey = e.target.value; return this.props.setValueSrc(delta, srcKey);}}
               >
@@ -94,13 +101,16 @@ console.log(widgetProps);
             if (cardinality === 0) {
                 return null;
             }
-            
+
             return (
                 <Widget name={defaultWidget} config={this.props.config}>
                     {range(0, cardinality).map(delta => {
-                        const valueSrc = this.props.valueSrc.get(delta) || 'value';
                         //const valueSources = fieldDefinition.valueSources || {};
-                        //const valueSrcInfo = valueSources[valueSrc] || {};
+                        const valueSources = getValueSourcesForFieldOp(this.props.config, this.props.field, this.props.operator);
+                        let valueSrc = this.props.valueSrc.get(delta) || null;
+                        //if (!valueSrc && valueSources.length == 1) {
+                        //    this.props.setValueSrc(delta, valueSources[0]);
+                        //}
                         const widget = getWidgetForFieldOp(this.props.config, this.props.field, this.props.operator, valueSrc);
                         const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
                         const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta, valueSrc);
@@ -125,7 +135,7 @@ console.log(widgetProps);
                                     {settings.showLabels ?
                                         <label>&nbsp;</label>
                                     : null}
-                                    {this.renderValueSorces.call(this, delta, valueSrc)}
+                                    {this.renderValueSorces.call(this, delta, valueSources, valueSrc)}
                                 </div>
                             ));
 

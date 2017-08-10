@@ -47,6 +47,7 @@ export const queryString = (item, config, isForDisplay = false) => {
                     omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
                     isForDisplay
                 ];
+                console.log(3, valueSrc, properties.get('valueSrc'));
                 if (valueSrc == 'field') {
                     let valFieldDefinition = getFieldConfig(currentValue, config) || {};
                     args.push(valFieldDefinition);
