@@ -2,8 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import { DatePicker } from 'antd';
 const { MonthPicker, RangePicker } = DatePicker;
 import moment from 'moment';
-import { LocaleProvider } from 'antd';
-import {getAntLocale} from '../../utils';
 
 
 export default class DateTimeWidget extends Component {
@@ -45,19 +43,17 @@ export default class DateTimeWidget extends Component {
         const {dateFormat, timeFormat, valueFormat, value, locale, use12Hours} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
-            <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
-                <DatePicker 
-                    key="widget-datetime"
-                    use12Hours={use12Hours}
-                    showTime={{ format: timeFormat }}
-                    placeholder={this.props.placeholder} 
-                    size={this.props.config.settings.renderSize || "small"}
-                    format={dateFormat + ' ' + timeFormat}
-                    value={dateValue}
-                    onChange={this.handleChange.bind(this)}
-                    ref="datetime"
-                />
-            </LocaleProvider>
+            <DatePicker 
+                key="widget-datetime"
+                use12Hours={use12Hours}
+                showTime={{ format: timeFormat }}
+                placeholder={this.props.placeholder} 
+                size={this.props.config.settings.renderSize || "small"}
+                format={dateFormat + ' ' + timeFormat}
+                value={dateValue}
+                onChange={this.handleChange.bind(this)}
+                ref="datetime"
+            />
         );
     }
 }

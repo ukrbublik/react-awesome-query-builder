@@ -4,7 +4,9 @@ import {createStore} from 'redux';
 import {Provider, Connector, connect} from 'react-redux';
 import bindActionCreators from '../utils/bindActionCreators';
 import * as actions from '../actions';
-import {extendConfig} from "../utils/index";
+import {extendConfig, getAntLocale} from "../utils/index";
+import { LocaleProvider } from 'antd';
+
 
 class ConnectedQuery extends Component {
     componentWillReceiveProps(nextProps) {
@@ -72,9 +74,11 @@ export default class Query extends Component {
         config = extendConfig(config);
 
         return (
-            <Provider store={this.state.store}>
-                <QueryContainer store={this.state.store} get_children={get_children} config={config} onChange={onChange}/>
-            </Provider>
+            <LocaleProvider locale={getAntLocale(config.settings.locale.full2)}>
+                <Provider store={this.state.store}>
+                    <QueryContainer store={this.state.store} get_children={get_children} config={config} onChange={onChange}/>
+                </Provider>
+            </LocaleProvider>
         )
     }
 }

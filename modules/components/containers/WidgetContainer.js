@@ -29,7 +29,6 @@ export default (Widget) => {
             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
             const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
 
-console.log(widgetProps, widgetDefinition, widget, valueSrc);
             if (!widgetFactory)
                 return '?';
 
@@ -44,9 +43,8 @@ console.log(widgetProps, widgetDefinition, widget, valueSrc);
                 setValue: value => this.props.setValue(delta, value)
             });
 
-            if (valueSrc != 'value') {
-                //todo....
-                //widget = valueSrcInfo.widget;
+            if (widget == 'field') {
+                //
             }
 
             return widgetFactory(widgetProps);
@@ -105,7 +103,6 @@ console.log(widgetProps, widgetDefinition, widget, valueSrc);
             return (
                 <Widget name={defaultWidget} config={this.props.config}>
                     {range(0, cardinality).map(delta => {
-                        //const valueSources = fieldDefinition.valueSources || {};
                         const valueSources = getValueSourcesForFieldOp(this.props.config, this.props.field, this.props.operator);
                         let valueSrc = this.props.valueSrc.get(delta) || null;
                         //if (!valueSrc && valueSources.length == 1) {

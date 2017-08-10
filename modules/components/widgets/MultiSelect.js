@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 import map from 'lodash/map';
 import { Select } from 'antd';
 const Option = Select.Option;
-import { getFieldConfig, calcTextWidth, getAntLocale } from "../../utils/index";
-import { LocaleProvider } from 'antd';
 
 export default class MultiSelectWidget extends Component {
   static propTypes = {
@@ -48,7 +46,6 @@ export default class MultiSelectWidget extends Component {
     let value = this.props.value && this.props.value.length ? this.props.value : null;
 
     return (
-      <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
         <Select
             multiple
             style={{ 
@@ -67,7 +64,6 @@ export default class MultiSelectWidget extends Component {
             onChange={this.handleChange.bind(this)}
           >{options}
         </Select>
-      </LocaleProvider>
     );
   }
 }

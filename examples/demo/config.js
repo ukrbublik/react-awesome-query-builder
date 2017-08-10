@@ -41,15 +41,15 @@ export default {
                 subname: {
                     //label: 'Subname', //'subname' should be used instead
                     label2: 'MemberName',
-                    type: 'text',
-                    operators: ['proximity'],
+                    type: 'number',
+                    operators: ['equal'],
                 },
             }
         },
         name: {
             label: 'Name',
             type: 'text',
-            operators: ['equal'],
+            operators: ['proximity'],
             defaultOperator: 'not_equal',
         },
         name2: {

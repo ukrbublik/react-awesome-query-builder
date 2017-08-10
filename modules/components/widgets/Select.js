@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 import map from 'lodash/map';
 import { Select } from 'antd';
 const Option = Select.Option;
-import { getFieldConfig, calcTextWidth, getAntLocale } from "../../utils/index";
-import { LocaleProvider } from 'antd';
 
 export default class SelectWidget extends Component {
   static propTypes = {
@@ -26,7 +24,6 @@ export default class SelectWidget extends Component {
     let placeholderWidth = calcTextWidth(placeholder, '12px');
 
     return (
-      <LocaleProvider locale={getAntLocale(this.props.config.settings.locale.full2)}>
         <Select 
             style={{ width: this.props.value ? null : placeholderWidth + 36 }}
             key={"widget-select"}
@@ -38,7 +35,6 @@ export default class SelectWidget extends Component {
             onChange={this.handleChange.bind(this)}
           >{options}
         </Select>
-      </LocaleProvider>
     );
   }
 }
