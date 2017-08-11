@@ -14,6 +14,7 @@ export const extendConfig = (config) => {
     for (let type in config.types) {
         let typeConfig = config.types[type];
         let operators = null, defaultOperator = null;
+        typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != 'field')[0];
         for (let widget in typeConfig.widgets) {
             let typeWidgetConfig = typeConfig.widgets[widget];
             if (typeWidgetConfig.operators) {
@@ -23,8 +24,10 @@ export const extendConfig = (config) => {
             }
             if (typeWidgetConfig.defaultOperator)
                 defaultOperator = typeWidgetConfig.defaultOperator;
-            typeWidgetConfig = merge({}, pickBy(typeConfig, (v, k) => 
-                (['widgetProps'].indexOf(k) != -1)), typeWidgetConfig);
+            if (widget == typeConfig.mainWidget) {
+                typeWidgetConfig = merge({}, pickBy(typeConfig, (v, k) => 
+                    (['mainWidgetProps'].indexOf(k) != -1)), typeWidgetConfig);
+            }
             typeConfig.widgets[widget] = typeWidgetConfig;
         }
         if (!typeConfig.valueSources)
@@ -36,7 +39,7 @@ export const extendConfig = (config) => {
             }
         }
         if (!typeConfig.operators && operators)
-            typeConfig.operators = operators;
+            typeConfig.operators = Array.from(new Set(operators)); //unique
         if (!typeConfig.defaultOperator && defaultOperator)
             typeConfig.defaultOperator = defaultOperator;
         config.types[type] = typeConfig;
@@ -47,9 +50,10 @@ export const extendConfig = (config) => {
         let operators = null, defaultOperator = null;
         let typeConfig = config.types[fieldConfig.type];
         if (fieldConfig.type != '!struct') {
+            if (!fieldConfig.widgets)
+                fieldConfig.widgets = {};
+            fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
             for (let widget in typeConfig.widgets) {
-                if (!fieldConfig.widgets)
-                    fieldConfig.widgets = {};
                 let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
                 if (fieldWidgetConfig.operators) {
                     if (!operators)
@@ -58,16 +62,18 @@ export const extendConfig = (config) => {
                 }
                 if (fieldWidgetConfig.defaultOperator)
                     defaultOperator = fieldWidgetConfig.defaultOperator;
-                fieldWidgetConfig = merge({}, pickBy(fieldConfig, (v, k) => 
-                    (['widgetProps'].indexOf(k) != -1)), fieldWidgetConfig);
+                if (widget == fieldConfig.mainWidget) {
+                    fieldWidgetConfig = merge({}, pickBy(fieldConfig, (v, k) => 
+                        (['mainWidgetProps'].indexOf(k) != -1)), fieldWidgetConfig);
+                }
                 fieldConfig.widgets[widget] = fieldWidgetConfig;
             }
             fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources || ['value'];
+            if (!fieldConfig.operators && operators)
+                fieldConfig.operators = Array.from(new Set(operators));
+            if (!fieldConfig.defaultOperator && defaultOperator)
+                fieldConfig.defaultOperator = defaultOperator;
         }
-        if (!fieldConfig.operators && operators)
-            fieldConfig.operators = operators;
-        if (!fieldConfig.defaultOperator && defaultOperator)
-            fieldConfig.defaultOperator = defaultOperator;
     };
     function _extendFieldsConfig(subconfig) {
         for (let field in subconfig) {
@@ -78,7 +84,7 @@ export const extendConfig = (config) => {
         }
     }
     _extendFieldsConfig(config.fields);
-    console.log(config); 
+    //console.log(config); 
     return config;
 };
 

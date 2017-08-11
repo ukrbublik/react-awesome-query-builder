@@ -3,7 +3,10 @@ import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
 import {defaultValue} from "./index";
-import {getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
+import {
+    getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, 
+    getFieldPath, getFieldPathLabels, fieldWidgetDefinition
+} from './configUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 
@@ -78,6 +81,7 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         const operator = properties.get('operator');
         const options = properties.get('operatorOptions');
         let value = properties.get('value');
+        let valueSrc = properties.get('valueSrc');
         if (field == null || operator == null)
             return undefined;
 
@@ -96,54 +100,32 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
 
         if (rootQuery.usedFields.indexOf(field) == -1)
             rootQuery.usedFields.push(field);
-        value = cardinality == 1 ? value.first() : value.toArray();
+        value = value.toArray();
+        valueSrc = valueSrc.toArray();
+        let values = [];
+        for (let i = 0 ; i < value.length ; i++) {
+            let val = {
+                type: valueSrc[i],
+                value: value[i],
+            };
+            values.push(val);
+        }
+        let operatorOptions = options.toJS();
+        if (!Object.keys(operatorOptions).length)
+            operatorOptions = null;
         
         var ruleQuery = {
             id,
             field,
-            operator,
-            value,
             type: fieldType,
-            input: Object.keys(typeConfig.widgets)[0],
+            input: typeConfig.mainWidget,
+            operator,
         };
+        if (operatorOptions)
+            ruleQuery.operatorOptions = operatorOptions;
+        ruleQuery.values = values;
         return ruleQuery
     }
     return undefined;
 };
-
-//not tested!
-export const queryBuilderToTree = (ruleset) => {
-    const condition = ruleset.condition;
-    var tree = {}
-    tree.id = uuid()
-    if (condition) {
-        tree.type = 'group';
-        var childrens = new Immutable.List(ruleset.rules)
-            .map(queryBuilderToTree)
-        childrens = childrens.reduce((result, item) => {
-            return result.set(item.get('id'), item)
-        }, new Immutable.OrderedMap())
-        tree.children1 = childrens;
-        tree.properties = new Immutable.Map({conjunction: condition, id: uuid()})
-    } else {
-        const {id, field, input, type, value, operator} = ruleset;
-        var list_value = value;
-        if (isArray(value)) {
-            list_value = new Immutable.List(value)
-        } else {
-            list_value = new Immutable.List([value])
-        }
-        var properties = new Immutable.Map({
-            type,
-            operator,
-            field: field || id,
-            widget: input || type,
-            value: list_value,
-        })
-        tree.properties = properties;
-        tree.type = 'rule'
-    }
-    return new Immutable.Map(tree)
-
-}
 

@@ -32,28 +32,42 @@ export const queryString = (item, config, isForDisplay = false) => {
         const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const fieldType = fieldDefinition.type || "undefined";
         const cardinality = operatorDefinition.cardinality || 1;
-        const widget = getWidgetForFieldOp(config, field, operator);
-        const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget), ['factory']);
         const typeConfig = config.types[fieldDefinition.type] || {};
+        const fieldSeparator = config.settings.fieldSeparator;
 
         //format value
         let value = properties.get('value').map((currentValue, ind) => {
-            let valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
-            if (typeof fieldWidgetDefinition.formatValue === 'function') {
-                let fn = fieldWidgetDefinition.formatValue;
-                let args = [
-                    currentValue,
-                    pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                    omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
-                    isForDisplay
-                ];
-                if (valueSrc == 'field') {
-                    let valFieldDefinition = getFieldConfig(currentValue, config) || {};
-                    args.push(valFieldDefinition);
+            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
+            const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+            const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
+            if (valueSrc == 'field') {
+                //format field
+                const rightField = currentValue;
+                const rightFieldDefinition = getFieldConfig(rightField, config) || {};
+                const fieldParts = rightField.split(fieldSeparator);
+                //let fieldKeys = getFieldPath(rightField, config);
+                let fieldPartsLabels = getFieldPathLabels(rightField, config);
+                let fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
+                let fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
+                let formattedField = config.settings.formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
+                return formattedField;
+            } else {
+                if (typeof fieldWidgetDefinition.formatValue === 'function') {
+                    let fn = fieldWidgetDefinition.formatValue;
+                    let args = [
+                        currentValue,
+                        pick(fieldDefinition, ['fieldSettings', 'listValues']),
+                        omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
+                        isForDisplay
+                    ];
+                    if (valueSrc == 'field') {
+                        let valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
+                        args.push(valFieldDefinition);
+                    }
+                    return fn(...args);
                 }
-                return fn(...args);
+                return currentValue;
             }
-            return currentValue;
         });
         if (value.size < cardinality)
             return undefined;
@@ -78,20 +92,18 @@ export const queryString = (item, config, isForDisplay = false) => {
             return undefined;
         
         //format field
-        const fieldSeparator = config.settings.fieldSeparator;
-        const parts = field.split(fieldSeparator);
-        let fieldKeys = getFieldPath(field, config);
+        const fieldParts = field.split(fieldSeparator);
+        //let fieldKeys = getFieldPath(field, config);
         let fieldPartsLabels = getFieldPathLabels(field, config);
         let fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
         let fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
-        let formattedField = config.settings.formatField(field, parts, fieldLabel2, fieldDefinition, config, isForDisplay);
+        let formattedField = config.settings.formatField(field, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
         
         //format expr
         let args = [
             formattedField,
             operator,
             formattedValue,
-            omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
             omit(operatorDefinition, ['formatOp']),
             operatorOptions,
             isForDisplay

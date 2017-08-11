@@ -257,8 +257,6 @@ const setOperator = (state, path, operator, config) => {
         const widgetConfig = getFieldWidgetConfig(config, currentField, operator, null, currentValueSrc.first());
         const operatorConfig = getOperatorConfig(config, operator, currentField);
         const operatorCardinality = defaultValue(operatorConfig.cardinality, 1);
-        const currentWidget = getWidgetForFieldOp(config, currentField, currentOperator);
-        const nextWidget = getWidgetForFieldOp(config, currentField, operator);
 
         let isCurrentValueCustomSrc = currentValueSrc.find(srcKey => !(srcKey == null || srcKey == 'value'));
         let canReuseValue = (currentWidgetConfig === widgetConfig && !config.settings.clearValueOnChangeField

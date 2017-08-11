@@ -57,12 +57,11 @@ export default {
             type: 'text',
             operators: ['equal', 'not_equal'],
             defaultOperator: 'not_equal',
-            // widgetProps: {..}  - same as widgets: { text: { widgetProps: {..} } }
-            widgetProps: {
+            mainWidgetProps: {
                 formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("__"+JSON.stringify(val)),
                 valueLabel: "Name2",
                 valuePlaceholder: "Enter name2",
-            }
+            },
         },
         num: {
             label: 'Number',
@@ -270,6 +269,7 @@ export default {
             },
         },
         select: {
+            mainWidget: "select",
             widgets: {
                 select: {
                     operators: [
@@ -355,7 +355,7 @@ export default {
             label: 'Between',
             labelForFormat: 'BETWEEN',
             cardinality: 2,
-            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
                 let valFrom = values.first();
                 let valTo = values.get(1);
                 if (isForDisplay)
@@ -395,7 +395,7 @@ export default {
             labelForFormat: 'IS EMPTY',
             cardinality: 0,
             reversedOp: 'is_not_empty',
-            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
             },
         },
@@ -405,14 +405,14 @@ export default {
             labelForFormat: 'IS NOT EMPTY',
             cardinality: 0,
             reversedOp: 'is_empty',
-            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
             },
         },
         select_equals: {
             label: '==',
             labelForFormat: '==',
-            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == ${value}`;
             },
             reversedOp: 'select_not_equals',
@@ -420,7 +420,7 @@ export default {
         select_not_equals: {
             label: '!=',
             labelForFormat: '!=',
-            formatOp: (field, op, value, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
                 return `${field} != ${value}`;
             },
             reversedOp: 'select_equals',
@@ -428,7 +428,7 @@ export default {
         select_any_in: {
             label: 'Any in',
             labelForFormat: 'IN',
-            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
                 return `${field} IN (${values.join(', ')})`;
             },
             reversedOp: 'select_not_any_in',
@@ -436,7 +436,7 @@ export default {
         select_not_any_in: {
             label: 'Not in',
             labelForFormat: 'NOT IN',
-            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
                 return `${field} NOT IN (${values.join(', ')})`;
             },
             reversedOp: 'select_any_in',
@@ -444,7 +444,7 @@ export default {
         multiselect_equals: {
             label: 'Equals',
             labelForFormat: '==',
-            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == (${values.join(', ')})`;
             },
             reversedOp: 'multiselect_not_equals',
@@ -452,7 +452,7 @@ export default {
         multiselect_not_equals: {
             label: 'Not equals',
             labelForFormat: '!=',
-            formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
                 return `${field} != (${values.join(', ')})`;
             },
             reversedOp: 'multiselect_equals',
@@ -465,7 +465,7 @@ export default {
             {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
-          formatOp: (field, op, values, fieldDef, opDef, operatorOptions, isForDisplay) => {
+          formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
             let val1 = values.first();
             let val2 = values.get(1);
             return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
