@@ -83,8 +83,8 @@ export default class Rule extends Component {
                         {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}
                     </Button>
                 </div>
-                <div className="rule--body">
-                    <Row>
+                {/*<div className="rule--body">*/}
+                    {/*<Row>*/}
                         { this.props.config.settings.canReorder &&
                             <span onMouseDown={this.handleDraggerMouseDown.bind(this)} >###</span>
                         }
@@ -153,8 +153,8 @@ export default class Rule extends Component {
                                 />
                             </Col>
                         }
-                    </Row>
-                </div>
+                    {/*</Row>*/}
+                {/*</div>*/}
             </div>
         );
     }
