@@ -396,7 +396,7 @@ export default {
             labelForFormat: 'IS EMPTY',
             cardinality: 0,
             reversedOp: 'is_not_empty',
-            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay,) => {
+            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
             },
         },
