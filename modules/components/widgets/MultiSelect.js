@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import map from 'lodash/map';
 import { Select } from 'antd';
+import {getFieldConfig, calcTextWidth} from '../../utils';
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends Component {
