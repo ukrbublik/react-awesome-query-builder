@@ -84,7 +84,7 @@ export const extendConfig = (config) => {
         }
     }
     _extendFieldsConfig(config.fields);
-    //console.log(config); 
+    console.log(config); 
     return config;
 };
 
@@ -256,6 +256,14 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
             }
         }
     }
+    widgets.sort((w1, w2) => {
+        let w1Main = w1 == fieldConfig.mainWidget;
+        let w2Main = w2 == fieldConfig.mainWidget;
+        if (w1 != w2) {
+            return w1 ? -1 : +1;
+        }
+        return 0;
+    });
     return {widgets, valueSrcs};
 };
 

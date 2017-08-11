@@ -36,6 +36,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         const fieldSeparator = config.settings.fieldSeparator;
 
         //format value
+        let valueSrcs = [];
         let value = properties.get('value').map((currentValue, ind) => {
             const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -68,6 +69,7 @@ export const queryString = (item, config, isForDisplay = false) => {
                 }
                 return currentValue;
             }
+            valueSrcs.push(valueSrc);
         });
         if (value.size < cardinality)
             return undefined;
@@ -84,7 +86,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         }
         if (!fn && cardinality == 1) {
             let _operator = operatorDefinition.labelForFormat || operator;
-            fn = (field, operator, value, fieldDef, isForDisplay) => {
+            fn = (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
                 return `${field} ${_operator} ${value}`;
             };
         }
@@ -104,6 +106,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             formattedField,
             operator,
             formattedValue,
+            (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
             omit(operatorDefinition, ['formatOp']),
             operatorOptions,
             isForDisplay

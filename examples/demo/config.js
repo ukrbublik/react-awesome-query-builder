@@ -286,7 +286,7 @@ export default {
                     ],
                     widgetProps: {
                     },
-                }
+                },
             },
         },
         multiselect: {
@@ -306,6 +306,7 @@ export default {
                         "equal",
                     ],
                     widgetProps: {
+                        //you can enable this if you don't use fields as value sources
                         //hideOperator: true,
                         //operatorInlineLabel: "is",
                     }
@@ -355,7 +356,7 @@ export default {
             label: 'Between',
             labelForFormat: 'BETWEEN',
             cardinality: 2,
-            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, valueSrcs, opDef, operatorOptions, isForDisplay) => {
                 let valFrom = values.first();
                 let valTo = values.get(1);
                 if (isForDisplay)
@@ -395,7 +396,7 @@ export default {
             labelForFormat: 'IS EMPTY',
             cardinality: 0,
             reversedOp: 'is_not_empty',
-            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay,) => {
                 return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
             },
         },
@@ -405,14 +406,14 @@ export default {
             labelForFormat: 'IS NOT EMPTY',
             cardinality: 0,
             reversedOp: 'is_empty',
-            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
             },
         },
         select_equals: {
             label: '==',
             labelForFormat: '==',
-            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == ${value}`;
             },
             reversedOp: 'select_not_equals',
@@ -420,7 +421,7 @@ export default {
         select_not_equals: {
             label: '!=',
             labelForFormat: '!=',
-            formatOp: (field, op, value, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
                 return `${field} != ${value}`;
             },
             reversedOp: 'select_equals',
@@ -428,32 +429,44 @@ export default {
         select_any_in: {
             label: 'Any in',
             labelForFormat: 'IN',
-            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
-                return `${field} IN (${values.join(', ')})`;
+            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+                if (valueSrc == 'value')
+                    return `${field} IN (${values.join(', ')})`;
+                else
+                    return `${field} IN (${values})`;
             },
             reversedOp: 'select_not_any_in',
         },
         select_not_any_in: {
             label: 'Not in',
             labelForFormat: 'NOT IN',
-            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
-                return `${field} NOT IN (${values.join(', ')})`;
+            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+                if (valueSrc == 'value')
+                    return `${field} NOT IN (${values.join(', ')})`;
+                else
+                    return `${field} NOT IN (${values})`;
             },
             reversedOp: 'select_any_in',
         },
         multiselect_equals: {
             label: 'Equals',
             labelForFormat: '==',
-            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
-                return `${field} == (${values.join(', ')})`;
+            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+                if (valueSrc == 'value')
+                    return `${field} == [${values.join(', ')}]`;
+                else
+                    return `${field} == ${values}`;
             },
             reversedOp: 'multiselect_not_equals',
         },
         multiselect_not_equals: {
             label: 'Not equals',
             labelForFormat: '!=',
-            formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
-                return `${field} != (${values.join(', ')})`;
+            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+                if (valueSrc == 'value')
+                    return `${field} != [${values.join(', ')}]`;
+                else
+                    return `${field} != ${values}`;
             },
             reversedOp: 'multiselect_equals',
         },
@@ -465,7 +478,7 @@ export default {
             {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
-          formatOp: (field, op, values, opDef, operatorOptions, isForDisplay) => {
+          formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
             let val1 = values.first();
             let val2 = values.get(1);
             return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
@@ -482,6 +495,7 @@ export default {
     },
     widgets: {
         text: {
+            type: "text",
             valueSrc: 'value',
             factory: (props) => <TextWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -489,6 +503,7 @@ export default {
             },
         },
         number: {
+            type: "number",
             valueSrc: 'value',
             factory: (props) => <NumberWidget {...props} />,
             valueLabel: "Number",
@@ -498,6 +513,7 @@ export default {
             },
         },
         select: {
+            type: "select",
             valueSrc: 'value',
             factory: (props) => <SelectWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -506,6 +522,7 @@ export default {
             },
         },
         multiselect: {
+            type: "multiselect",
             valueSrc: 'value',
             factory: (props) => <MultiSelectWidget {...props} />,
             formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
@@ -514,6 +531,7 @@ export default {
             },
         },
         date: {
+            type: "date",
             valueSrc: 'value',
             factory: (props) => <DateWidget {...props} />,
             dateFormat: 'DD.MM.YYYY',
@@ -524,6 +542,7 @@ export default {
             },
         },
         time: {
+            type: "time",
             valueSrc: 'value',
             factory: (props) => <TimeWidget {...props} />,
             timeFormat: 'HH:mm',
@@ -534,6 +553,7 @@ export default {
             },
         },
         datetime: {
+            type: "datetime",
             valueSrc: 'value',
             factory: (props) => <DateTimeWidget {...props} />,
             timeFormat: 'HH:mm',
@@ -545,6 +565,7 @@ export default {
             },
         },
         boolean: {
+            type: "boolean",
             valueSrc: 'value',
             factory: (props) => <BooleanWidget {...props} />,
             labelYes: "Yes",
@@ -615,5 +636,9 @@ export default {
         },
         valueSourcesPopupTitle: "Select value source",
         canReorder: false,
+        canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
+            //for type == 'select'/'multiselect' you can check listValues
+            return true;
+        },
     }
 };

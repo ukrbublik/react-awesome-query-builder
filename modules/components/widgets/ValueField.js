@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
-import {getFieldConfig, getFieldPath, getFieldPathLabels, calcTextWidth} from "../../utils/index";
+import {
+  getFieldConfig, getFieldPath, getFieldPathLabels, calcTextWidth, getValueSourcesForFieldOp, getWidgetForFieldOp
+} from "../../utils/index";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -34,24 +36,40 @@ export default class ValueField extends Component {
     this.props.setValue(key);
   }
 
-  //tip: empty groups is ok for antd
-  filterFieldsByLeftField(fields, leftFieldKey) {
-    const leftFieldConfig = getFieldConfig(leftFieldKey, this.props.config);
+  //tip: empty groups are ok for antd
+  filterFields(config, fields, leftFieldFullkey, operator) {
+    fields = clone(fields);
+    const valueSources = getValueSourcesForFieldOp(config, leftFieldFullkey, operator);
+    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
+    let valueSrc = valueSources.find(vs => vs == 'value');
+    if (!valueSrc)
+      return [];
+    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, valueSrc);
+    let widgetConfig = config.widgets[widget];
+    let widgetType = widgetConfig.type;
+    //let expectedType = leftFieldConfig.type;
+    let expectedType = widgetType;
+    const fieldSeparator = config.settings.fieldSeparator;
+
     function _filter(list, path) {
-      for (let fieldKey in list) {
-        let field = list[fieldKey];
-        if (field.type == "!struct") {
-          let subpath = (path ? path : []).concat(fieldKey);
-          _filter(field.subfields, subpath);
+      for (let rightFieldKey in list) {
+        let subfields = list[rightFieldKey].subfields;
+        let subpath = (path ? path : []).concat(rightFieldKey);
+        let rightFieldFullkey = subpath.join(fieldSeparator);
+        let rightFieldConfig = getFieldConfig(rightFieldFullkey, config);
+        if (rightFieldConfig.type == "!struct") {
+          _filter(subfields, subpath);
         } else {
-          if (field.type != leftFieldConfig.type || fieldKey == leftFieldKey) {
-            delete list[fieldKey];
-          }
+          let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
+          let fn = config.settings.canCompareFieldWithField;
+          if (fn)
+            canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig);
+          if (!canUse)
+            delete list[rightFieldKey];
         }
       }
     }
 
-    fields = clone(fields);
     _filter(fields, []);
     
     return fields;
@@ -134,7 +152,7 @@ export default class ValueField extends Component {
   }
 
   renderAsSelect() {
-    let fieldOptions = this.filterFieldsByLeftField(this.props.config.fields, this.props.field);
+    let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
@@ -154,7 +172,7 @@ export default class ValueField extends Component {
   }
 
   renderAsDropdown() {
-    let fieldOptions = this.filterFieldsByLeftField(this.props.config.fields, this.props.field);
+    let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
     let selectedFieldKeys = getFieldPath(this.props.value, this.props.config);
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.value, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;

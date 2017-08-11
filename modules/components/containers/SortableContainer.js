@@ -5,7 +5,6 @@ import {getFieldConfig} from "../../utils/index";
 import getFlatTree from "../../utils/getFlatTree";
 import * as constants from '../../constants';
 
-//todo: add to readme about .query-builder-container
 
 export default (Builder, CanMoveFn = null) => {
   return class SortableContainer extends Component {
