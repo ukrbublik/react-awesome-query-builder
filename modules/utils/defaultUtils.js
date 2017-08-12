@@ -1,7 +1,9 @@
 import Immutable from 'immutable';
 import map from 'lodash/map';
 import range from 'lodash/range';
+import uuid from './uuid';
 import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
+
 
 export const defaultField = (config, canGetFirst = true) => {
   return typeof config.settings.defaultField === 'function' ?
@@ -27,7 +29,7 @@ export const defaultOperatorOptions = (config, operator, field) => {
   );
 };
 
-export default (config) => {
+export const defaultRuleProperties = (config) => {
   let field = null, operator = null;
   if (config.settings.setDefaultFieldAndOp) {
     field = defaultField(config);
@@ -42,3 +44,36 @@ export default (config) => {
     operatorOptions: defaultOperatorOptions(config, operator, field),
   });
 };
+
+//------------
+
+export const defaultConjunction = (config) =>
+  config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
+
+export const defaultGroupProperties = (config) => new Immutable.Map({
+  conjunction: defaultConjunction(config)
+});
+
+
+//------------
+
+export const getChild = (id, config) => ({
+  [id]: new Immutable.Map({
+    type: 'rule',
+    id: id,
+    properties: defaultRuleProperties(config)
+  })
+});
+
+export const defaultRoot = (config) => {
+  if (config.tree) {
+    return new Immutable.Map(config.tree);
+  }
+  
+  return new Immutable.Map({
+    type: 'group',
+    id: uuid(),
+    children1: new Immutable.OrderedMap({ ...getChild(uuid(), config) }),
+    properties: defaultGroupProperties(config)
+  });
+}

@@ -2,9 +2,9 @@ import React, {Component, PropTypes} from 'react';
 import createTreeStore from '../stores/tree';
 import {createStore} from 'redux';
 import {Provider, Connector, connect} from 'react-redux';
-import bindActionCreators from '../utils/bindActionCreators';
 import * as actions from '../actions';
-import {extendConfig, getAntLocale} from "../utils/index";
+import {extendConfig} from "../utils/configUtils";
+import {bindActionCreators} from "../utils/stuff";
 import { LocaleProvider } from 'antd';
 
 
@@ -74,7 +74,7 @@ export default class Query extends Component {
         config = extendConfig(config);
 
         return (
-            <LocaleProvider locale={getAntLocale(config.settings.locale.full2)}>
+            <LocaleProvider locale={config.settings.locale.antd}>
                 <Provider store={this.state.store}>
                     <QueryContainer store={this.state.store} get_children={get_children} config={config} onChange={onChange}/>
                 </Provider>

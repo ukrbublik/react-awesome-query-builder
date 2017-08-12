@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { InputNumber, Col } from 'antd';
 import 'antd/lib/date-picker/style';
-import {getFieldConfig} from '../../utils';
+import {getFieldConfig} from '../../utils/configUtils';
 
 export default class NumberWidget extends Component {
   static propTypes = {

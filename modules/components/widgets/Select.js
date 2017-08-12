@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import map from 'lodash/map';
-import {getFieldConfig, calcTextWidth} from '../../utils';
+import {getFieldConfig} from '../../utils/configUtils';
+import {calcTextWidth} from '../../utils/stuff';
 import { Select } from 'antd';
 const Option = Select.Option;
 

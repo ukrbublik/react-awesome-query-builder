@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
-import {getFieldConfig} from "../../utils/index";
-import getFlatTree from "../../utils/getFlatTree";
+import {getFieldConfig} from "../../utils/configUtils";
+import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from '../../constants';
 
 

@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
-import {getOperatorConfig} from "../../utils/index";
+import {getOperatorConfig} from "../../utils/configUtils";
 
 export default (OperatorOptions) => {
   return class OperatorOptionsContainer extends Component {

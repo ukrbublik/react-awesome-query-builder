@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
-const {queryBuilderFormat, queryString, extendConfig} = Utils;
+const {queryBuilderFormat, queryString} = Utils;
 import config from './config';
 var stringify = require('json-stringify-safe');
-
 import '../../css/reset.scss';
 import '../../css/styles.scss';
 import '../../css/compact_styles.scss';

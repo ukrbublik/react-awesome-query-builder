@@ -37,20 +37,28 @@ export const queryString = (item, config, isForDisplay = false) => {
 
         //format value
         let valueSrcs = [];
+        let hasUndefinedValues = false;
         let value = properties.get('value').map((currentValue, ind) => {
+            if (currentValue === undefined) {
+                hasUndefinedValues = true;
+                return undefined;
+            }
             const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
             if (valueSrc == 'field') {
                 //format field
                 const rightField = currentValue;
-                const rightFieldDefinition = getFieldConfig(rightField, config) || {};
-                const fieldParts = rightField.split(fieldSeparator);
-                //let fieldKeys = getFieldPath(rightField, config);
-                let fieldPartsLabels = getFieldPathLabels(rightField, config);
-                let fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
-                let fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
-                let formattedField = config.settings.formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
+                let formattedField = null;
+                if (rightField) {
+                    const rightFieldDefinition = getFieldConfig(rightField, config) || {};
+                    const fieldParts = rightField.split(fieldSeparator);
+                    //let fieldKeys = getFieldPath(rightField, config);
+                    let fieldPartsLabels = getFieldPathLabels(rightField, config);
+                    let fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
+                    let fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
+                    formattedField = config.settings.formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
+                }
                 return formattedField;
             } else {
                 if (typeof fieldWidgetDefinition.formatValue === 'function') {
@@ -71,7 +79,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             }
             valueSrcs.push(valueSrc);
         });
-        if (value.size < cardinality)
+        if (hasUndefinedValues || value.size < cardinality)
             return undefined;
         let formattedValue = (cardinality == 1 ? value.first() : value);
 

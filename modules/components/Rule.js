@@ -10,7 +10,7 @@ import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import {getFieldConfig, getFieldPath, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/index";
+import {getFieldConfig, getFieldPath, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');

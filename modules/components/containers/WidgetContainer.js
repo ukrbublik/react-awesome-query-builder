@@ -4,9 +4,10 @@ import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import map from 'lodash/map';
 import {
-    defaultValue, getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp, 
+    getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp, 
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
-} from "../../utils/index";
+} from "../../utils/configUtils";
+import {defaultValue} from "../../utils/stuff";
 import { Icon, Popover, Button, Radio } from 'antd';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;

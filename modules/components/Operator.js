@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
-import {getFieldConfig, getFieldPath, getFieldPathLabels, calcTextWidth} from "../utils/index";
+import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
+import {calcTextWidth} from "../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;

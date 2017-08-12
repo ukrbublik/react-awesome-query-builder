@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
-import {getFieldConfig} from "../../utils/index";
+import {getFieldConfig} from "../../utils/configUtils";
 
 export default (Rule) => {
   return class RuleContainer extends Component {

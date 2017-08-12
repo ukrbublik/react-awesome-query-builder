@@ -2,7 +2,7 @@
 import Immutable from 'immutable';
 import uuid from "./uuid";
 import isArray from 'lodash/isArray'
-import {defaultValue} from "./index";
+import {defaultValue} from "./stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, 
     getFieldPath, getFieldPathLabels, fieldWidgetDefinition
@@ -82,7 +82,16 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         const options = properties.get('operatorOptions');
         let value = properties.get('value');
         let valueSrc = properties.get('valueSrc');
-        if (field == null || operator == null)
+
+        let hasUndefinedValues = false;
+        value.map((currentValue, ind) => {
+            if (currentValue === undefined) {
+                hasUndefinedValues = true;
+                return undefined;
+            }
+        });
+
+        if (field == null || operator == null || hasUndefinedValues)
             return undefined;
 
         const fieldDefinition = getFieldConfig(field, config) || {};

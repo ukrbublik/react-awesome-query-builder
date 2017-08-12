@@ -1,5 +1,6 @@
+import Immutable from 'immutable';
 
-const getFlatTree = (tree) => {
+export const getFlatTree = (tree) => {
 
     let flat = [];
     let items = {};
@@ -62,5 +63,40 @@ const getFlatTree = (tree) => {
     return {flat, items};
 };
 
-export default getFlatTree;
 
+/**
+ * @param {Immutable.List} path
+ * @param {...string} suffix
+ */
+export const expandTreePath = (path, ...suffix) =>
+  path.interpose('children1').withMutations((list) => {
+    list.skip(1);
+    list.push.apply(list, suffix);
+    return list;
+  });
+
+
+/**
+ * @param {Immutable.List} path
+ * @param {...string} suffix
+ */
+export const expandTreeSubpath = (path, ...suffix) =>
+  path.interpose('children1').withMutations((list) => {
+    list.push.apply(list, suffix);
+    return list;
+  });
+
+
+/**
+ * @param {Immutable.Map} path
+ * @param {Immutable.List} path
+ */
+export const getItemByPath = (tree, path) => {
+    let children = new Immutable.OrderedMap({ [tree.get('id')] : tree });
+    let res = tree;
+    path.forEach((id) => {
+        res = children.get(id);
+        children = res.get('children1');
+    });
+    return res;
+};

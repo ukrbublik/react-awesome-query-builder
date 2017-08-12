@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import {
-  getFieldConfig, getFieldPath, getFieldPathLabels, calcTextWidth, getValueSourcesForFieldOp, getWidgetForFieldOp
-} from "../../utils/index";
+  getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
+} from "../../utils/configUtils";
+import {calcTextWidth} from "../../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;

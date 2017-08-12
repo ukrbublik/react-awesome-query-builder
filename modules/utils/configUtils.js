@@ -84,9 +84,10 @@ export const extendConfig = (config) => {
         }
     }
     _extendFieldsConfig(config.fields);
-    console.log(config); 
+    //console.log(config); 
     return config;
 };
+
 
 export const getFieldConfig = (field, config) => {
     if (!field || field == ':empty:')

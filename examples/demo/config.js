@@ -13,6 +13,8 @@ const {
 } = Widgets;
 const {ProximityOperator} = Operators;
 import moment from 'moment';
+import en_US from 'antd/lib/locale-provider/en_US';
+import ru_RU from 'antd/lib/locale-provider/ru_RU';
 
 export default {
     conjunctions: {
@@ -40,17 +42,22 @@ export default {
             subfields: {
                 subname: {
                     //label: 'Subname', //'subname' should be used instead
-                    label2: 'MemberName',
+                    label2: 'MemberName', //only for menu's toggler
                     type: 'number',
                     operators: ['equal'],
                 },
+                prox1: {
+                    label: 'prox1',
+                    type: 'text',
+                    operators: ['proximity'],
+                },
             }
         },
-        name: {
-            label: 'Name',
+        prox2: {
+            label: 'prox2',
             type: 'text',
             operators: ['proximity'],
-            defaultOperator: 'not_equal',
+            defaultOperator: 'not_equal', //will not be used
         },
         name2: {
             label: 'Name 2',
@@ -104,6 +111,11 @@ export default {
             type: 'datetime',
             valueSources: ['field']
         },
+        datetime2: {
+            label: 'DateTime2',
+            type: 'datetime',
+            valueSources: ['value']
+        },
         color: {
             label: 'Color',
             type: 'select',
@@ -130,7 +142,23 @@ export default {
             listValues: {
                 yellow: 'Yellow',
                 green: 'Green',
-                orange: 'Orange'
+                orange: 'Orange',
+                purple: 'Purple'
+            },
+        },
+        color3: {
+            label: 'Color3',
+            type: 'select',
+            defaultOperator: 'select_not_equals',
+            operators: [
+                'select_not_equals',
+                'select_not_any_in'
+            ],
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange',
+                purple: 'Purple'
             },
         },
         multicolor: {
@@ -144,6 +172,10 @@ export default {
         },
         stock: {
             label: 'In stock',
+            type: 'boolean',
+        },
+        expecting: {
+            label: 'Expecting',
             type: 'boolean',
         },
     },
@@ -588,15 +620,16 @@ export default {
     settings: {
         locale: {
             short: 'en',
-            full1: 'en-US',
-            full2: 'en_US',
+            full: 'en-US',
+            antd: en_US,
         },
         hideConjForOne: true,
         renderSize: 'small',
         renderConjsAsRadios: false,
         renderFieldAndOpAsDropdown: false,
-        setOpOnChangeField: ['default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
-        clearValueOnChangeField: true, //false - if prev & next fields have same type (widget), keep
+        setOpOnChangeField: ['keep', 'default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
+        clearValueOnChangeField: false, //false - if prev & next fields have same type (widget), keep
+        clearValueOnChangeOp: false,
         setDefaultFieldAndOp: false,
         maxNesting: 10,
         fieldSeparator: '.',

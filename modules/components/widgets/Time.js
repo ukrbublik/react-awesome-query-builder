@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { LocaleProvider } from 'antd';
-import {getAntLocale} from '../../utils';
 
 
 export default class TimeWidget extends Component {
