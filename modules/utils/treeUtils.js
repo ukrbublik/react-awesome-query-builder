@@ -34,7 +34,7 @@ export const getFlatTree = (tree) => {
 
         items[id] = {
             type: type,
-            parent: path.length ? path[0] : null,
+            parent: path.length ? path[path.length-1] : null,
             path: path.concat(id),
             lev: lev,
             leaf: !children,

@@ -668,7 +668,7 @@ export default {
             }
         },
         valueSourcesPopupTitle: "Select value source",
-        canReorder: false,
+        canReorder: true,
         canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
             //for type == 'select'/'multiselect' you can check listValues
             return true;

@@ -4,6 +4,7 @@ import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
 import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from '../../constants';
+import clone from 'clone';
 
 
 export default (Builder, CanMoveFn = null) => {
@@ -31,6 +32,30 @@ export default (Builder, CanMoveFn = null) => {
 
     componentWillReceiveProps(nextProps) {
         this.tree = getFlatTree(nextProps.tree);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        var dragging = this.draggingInfo;
+        var startDragging = this.dragStartInfo;
+        if (startDragging && startDragging.id) {
+            dragging.itemInfo = this.tree.items[dragging.id];
+
+            if (dragging.itemInfo.index != startDragging.itemInfo.index) {
+              var treeEl = startDragging.treeEl;
+              var plhEl = this._getPlaceholderNodeEl(treeEl, true);
+              if (plhEl) {
+                  var plX = plhEl.getBoundingClientRect().left + window.scrollX;
+                  var plY = plhEl.getBoundingClientRect().top + window.scrollY;
+                  var oldPlX = startDragging.plX;
+                  var oldPlY = startDragging.plY;
+                  startDragging.plX = plX;
+                  startDragging.plY = plY;
+                  startDragging.itemInfo = clone(dragging.itemInfo);
+                  startDragging.y = plhEl.offsetTop;
+                  startDragging.clientY += (plY - oldPlY);
+              }
+            }
+        }
     }
 
     _getNodeElById (treeEl, indexId, ignoreCache = false) {
@@ -72,26 +97,33 @@ export default (Builder, CanMoveFn = null) => {
 
     onDragStart (id, dom, e) {
       var treeEl = dom.closest('.query-builder');
+      treeEl.classList.add("qb-dragging");
       var treeElContainer = treeEl.closest('.query-builder-container');
       if (!treeElContainer)
           treeElContainer = dom.closest('body');
       var scrollTop = treeElContainer.scrollTop;
 
+      var dragEl = this._getDraggableNodeEl(treeEl);
+      var plhEl = this._getPlaceholderNodeEl(treeEl);
+
       this.draggingInfo = {
         id: id,
-        w: dom.offsetWidth,
-        h: dom.offsetHeight,
         x: dom.offsetLeft,
         y: dom.offsetTop,
-        treeEl: treeEl,
-        treeElContainer: treeElContainer,
+        w: dom.offsetWidth,
+        h: dom.offsetHeight,
+        itemInfo: this.tree.items[id],
       };
       this.dragStartInfo = {
+        id: id,
         x: dom.offsetLeft,
         y: dom.offsetTop,
         scrollTop: scrollTop,
-        offsetX: e.clientX,
-        offsetY: e.clientY,
+        clientX: e.clientX,
+        clientY: e.clientY,
+        itemInfo: clone(this.tree.items[id]),
+        treeEl: treeEl,
+        treeElContainer: treeElContainer,
       };
       this.didAnySortOnDrag = false;
 
@@ -106,29 +138,39 @@ export default (Builder, CanMoveFn = null) => {
 
     _onDrag (e) {
       var dragging = this.draggingInfo;
+      var startDragging = this.dragStartInfo;
       var paddingLeft = this.props.paddingLeft;
-      var treeElContainer = dragging.treeElContainer;
+      var treeElContainer = startDragging.treeElContainer;
       var scrollTop = treeElContainer.scrollTop;
-      var itemInfo = this.tree.items[dragging.id];
-      if (!itemInfo) {
+      dragging.itemInfo = this.tree.items[dragging.id];
+      if (!dragging.itemInfo) {
         return;
       }
 
-      var startX = this.dragStartInfo.x;
-      var startY = this.dragStartInfo.y;
-      var startOffsetX = this.dragStartInfo.offsetX;
-      var startOffsetY = this.dragStartInfo.offsetY;
-      var startScrollTop = this.dragStartInfo.scrollTop;
-      
+      //first init plX/plY
+      if (!startDragging.plX) {
+        var treeEl = startDragging.treeEl;
+        var plhEl = this._getPlaceholderNodeEl(treeEl);
+        if (plhEl) {
+            startDragging.plX = plhEl.getBoundingClientRect().left + window.scrollX;
+            startDragging.plY = plhEl.getBoundingClientRect().top + window.scrollY;
+        }
+      }
+
+      var startX = startDragging.x;
+      var startY = startDragging.y;
+      var startClientX = startDragging.clientX;
+      var startClientY = startDragging.clientY;
+      var startScrollTop = startDragging.scrollTop;
       var pos = {
-        x: startX + (e.clientX - startOffsetX),
-        y: startY + (e.clientY - startOffsetY) + (scrollTop - startScrollTop)
+        x: startX + (e.clientX - startClientX),
+        y: startY + (e.clientY - startClientY) + (scrollTop - startScrollTop)
       };
       dragging.x = pos.x;
       dragging.y = pos.y;
       dragging.paddingLeft = paddingLeft;
 
-      var moved = this.handleDrag(itemInfo, dragging, e, CanMoveFn);
+      var moved = this.handleDrag(dragging, e, CanMoveFn);
 
       if (moved) {
         this.didAnySortOnDrag = true;
@@ -142,17 +184,22 @@ export default (Builder, CanMoveFn = null) => {
     }
 
     _onDragEnd() {
+      var treeEl = this.dragStartInfo.treeEl;
       this.draggingInfo = {
         id: null,
         x: null,
         y: null,
         w: null,
-        h: null
+        h: null,
+      };
+      this.dragStartInfo = {
+        id: null,
       };
       this.setState({
         dragging: this.draggingInfo
       });
 
+      treeEl.classList.remove("qb-dragging");
       this._cacheEls = {};
 
       if (this.didAnySortOnDrag) {
@@ -164,13 +211,14 @@ export default (Builder, CanMoveFn = null) => {
     }
 
 
-    handleDrag (itemInfo, dragInfo, e, canMoveFn) {
+    handleDrag (dragInfo, e, canMoveFn) {
+      var itemInfo = dragInfo.itemInfo;
       var newItemInfo = null;
       var paddingLeft = dragInfo.paddingLeft;
 
       var moveInfo = null;
-      var treeEl = dragInfo.treeEl;
-      //var treeElContainer = dragInfo.treeElContainer;
+      var treeEl = this.dragStartInfo.treeEl;
+      //var treeElContainer = this.dragStartInfo.treeElContainer;
       //var scrollTop = treeElContainer.scrollTop;
       var dragId = dragInfo.id;
       var dragEl = this._getDraggableNodeEl(treeEl);

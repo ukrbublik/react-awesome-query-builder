@@ -40,6 +40,12 @@
   margin: 1rem;
 }
 
+.query-builder.qb-dragging {
+  button {
+    pointer-events: none;
+  }
+}
+
 .query-preview {
   font-size: 14px;
   background: rgba(250, 240, 210, 0.5);
@@ -60,7 +66,7 @@
   padding: 10px;
 }
 
-.group, .rule {
+.group-or-rule {
   border-radius: 5px;
   position: relative;
 }
