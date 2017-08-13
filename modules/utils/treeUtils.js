@@ -1,4 +1,5 @@
 import Immutable from 'immutable';
+import clone from 'clone';
 
 export const getFlatTree = (tree) => {
 
@@ -25,7 +26,7 @@ export const getFlatTree = (tree) => {
                 _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo);
             });
             if (!collapsed) {
-                info.height = (info.height || 0) + subinfo.height;
+                info.height = (info.height || 0) + (subinfo.height || 0);
             }
         }
         let itemsAfter = flat.length;
@@ -38,13 +39,14 @@ export const getFlatTree = (tree) => {
             path: path.concat(id),
             lev: lev,
             leaf: !children,
-            index: flat.length,
+            index: itemsBefore,
             id: id,
             children: childrenIds,
             _top: itemsBefore,
             _height: (itemsAfter - itemsBefore),
             top: (insideCollapsed ? null : top),
             height: height,
+            bottom: (insideCollapsed ? null : top) + height,
             collapsed: collapsed,
             node: item,
         };

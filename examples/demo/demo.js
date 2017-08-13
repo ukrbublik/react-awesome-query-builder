@@ -50,13 +50,14 @@ export default class DemoQueryBuilder extends Component {
     getChildren(props) {
         return (
             <div>
+                <div className="query-builder">
+                    <Builder {...props} />
+                </div>
+                <br />
                 <div>queryBuilderFormat: {stringify(queryBuilderFormat(props.tree, props.config))}</div>
                 <div>stringFormat: {queryString(props.tree, props.config)}</div>
                 <div>humanStringFormat: {queryString(props.tree, props.config, true)}</div>
                 <div>Tree: {stringify(props.tree)}</div>
-                <div className="query-builder">
-                    <Builder {...props} />
-                </div>
             </div>
         )
     }

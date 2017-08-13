@@ -39,8 +39,7 @@ export default (Builder, CanMoveFn = null) => {
         var startDragging = this.dragStartInfo;
         if (startDragging && startDragging.id) {
             dragging.itemInfo = this.tree.items[dragging.id];
-
-            if (dragging.itemInfo.index != startDragging.itemInfo.index) {
+            if (dragging.itemInfo.index != startDragging.itemInfo.index || dragging.itemInfo.parent != startDragging.itemInfo.parent) {
               var treeEl = startDragging.treeEl;
               var plhEl = this._getPlaceholderNodeEl(treeEl, true);
               if (plhEl) {
@@ -53,6 +52,8 @@ export default (Builder, CanMoveFn = null) => {
                   startDragging.itemInfo = clone(dragging.itemInfo);
                   startDragging.y = plhEl.offsetTop;
                   startDragging.clientY += (plY - oldPlY);
+
+                  this._onDrag(this.mousePos, false);
               }
             }
         }
@@ -126,6 +127,10 @@ export default (Builder, CanMoveFn = null) => {
         treeElContainer: treeElContainer,
       };
       this.didAnySortOnDrag = false;
+      this.mousePos = {
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
 
       window.addEventListener('mousemove', this.onDrag);
       window.addEventListener('mouseup', this.onDragEnd);
@@ -136,7 +141,7 @@ export default (Builder, CanMoveFn = null) => {
     }
 
 
-    _onDrag (e) {
+    _onDrag (e, doHandleDrag = true) {
       var dragging = this.draggingInfo;
       var startDragging = this.dragStartInfo;
       var paddingLeft = this.props.paddingLeft;
@@ -146,6 +151,11 @@ export default (Builder, CanMoveFn = null) => {
       if (!dragging.itemInfo) {
         return;
       }
+
+      this.mousePos = {
+        clientX: e.clientX,
+        clientY: e.clientY,
+      };
 
       //first init plX/plY
       if (!startDragging.plX) {
@@ -170,12 +180,13 @@ export default (Builder, CanMoveFn = null) => {
       dragging.y = pos.y;
       dragging.paddingLeft = paddingLeft;
 
-      var moved = this.handleDrag(dragging, e, CanMoveFn);
+      var moved = doHandleDrag ? this.handleDrag(dragging, e, CanMoveFn) : false;
 
       if (moved) {
         this.didAnySortOnDrag = true;
       } else {
-        e.preventDefault();
+        if (e.preventDefault)
+          e.preventDefault();
       }
 
       this.setState({
@@ -198,6 +209,7 @@ export default (Builder, CanMoveFn = null) => {
       this.setState({
         dragging: this.draggingInfo
       });
+      this.mousePos = {};
 
       treeEl.classList.remove("qb-dragging");
       this._cacheEls = {};
@@ -251,13 +263,9 @@ export default (Builder, CanMoveFn = null) => {
         } else {
           var isGroup = hovCNodeEl.classList.contains('group-container');
           var hovNodeId = hovCNodeEl.getAttribute('data-id');
-          var hovEl = null;
-          if (isGroup) {
-            var hovInnerEls = hovCNodeEl.getElementsByClassName('group--header');
-            var hovEl = hovInnerEls.length ? hovInnerEls[0] : null;
-          } else {
-            hovEl = hovCNodeEl;
-          }
+          var hovEl = hovCNodeEl;
+          var onlyAppend = false;
+          var onlyPrepend = false;
           if (hovEl) {
             var hovRect = hovEl.getBoundingClientRect();
             var hovHeight = hovRect.bottom - hovRect.top;
@@ -272,24 +280,53 @@ export default (Builder, CanMoveFn = null) => {
               if (trgEl)
                 trgRect = trgEl.getBoundingClientRect();
             } else {
-              var isOverHover = (dragDirs.vrt < 0 //up
-                ? ((hovRect.bottom - dragRect.top) > hovHeight/2)
-                : ((dragRect.bottom - hovRect.top) > hovHeight/2));
-              if (isOverHover) {
-                trgII = hovII;
-                trgRect = hovRect;
-                trgEl = hovEl;
-              } else {
-                var trgII = dragDirs.vrt <= 0 //up
-                  ? Object.values(this.tree.items).find(it => it.top == (hovII.top + 1)) //below
-                  : Object.values(this.tree.items).find(it => it.top == (hovII.top - 1)); //above
-                if (trgII) {
-                  if (trgII.id == dragId) {
-                    trgEl = plhEl;
-                  } else
-                    trgEl = this._getNodeElById(treeEl, trgII.id);
-                  trgRect = trgEl.getBoundingClientRect();
+              if (isGroup) {
+                if (dragDirs.vrt > 0) { //down
+                    //take group header (for prepend only)
+                    var hovInnerEl = hovCNodeEl.getElementsByClassName('group--header');
+                    var hovEl2 = hovInnerEl.length ? hovInnerEl[0] : null;
+                    var hovRect2 = hovEl2.getBoundingClientRect();
+                    var hovHeight2 = hovRect2.bottom - hovRect2.top;
+                    var isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
+                    if (isOverHover && hovII.top > dragInfo.itemInfo.top) {
+                      trgII = hovII;
+                      trgRect = hovRect2;
+                      trgEl = hovEl2;
+                      onlyPrepend = true;
+                    }
+                } else if (dragDirs.vrt < 0) { //up
+                  if (hovII.lev >= itemInfo.lev) {
+                    //take whole group
+                    var isClimbToHover = ((hovRect.bottom - dragRect.top) >= 5); //todo: 5 is magic for now, configure it!
+                    if (isClimbToHover && hovII.top < dragInfo.itemInfo.top) {
+                        trgII = hovII;
+                        trgRect = hovRect;
+                        trgEl = hovEl;
+                        onlyAppend = true;
+                    }
+                  }
                 }
+                if (!onlyPrepend && !onlyAppend) {
+                  //take whole group and check if we can move before/after group
+                  var isOverHover = (dragDirs.vrt < 0 //up
+                    ? ((hovRect.bottom - dragRect.top) > (hovHeight-2))
+                    : ((dragRect.bottom - hovRect.top) > (hovHeight-2)));
+                  if (isOverHover) {
+                    trgII = hovII;
+                    trgRect = hovRect;
+                    trgEl = hovEl;
+                  }
+                }
+              } else {
+                //check if we can move before/after group
+                  var isOverHover = (dragDirs.vrt < 0 //up
+                    ? ((hovRect.bottom - dragRect.top) > hovHeight/2)
+                    : ((dragRect.bottom - hovRect.top) > hovHeight/2));
+                  if (isOverHover) {
+                    trgII = hovII;
+                    trgRect = hovRect;
+                    trgEl = hovEl;
+                  }
               }
             }
 
@@ -297,69 +334,28 @@ export default (Builder, CanMoveFn = null) => {
             if (trgRect) {
               var dragLeftOffset = dragRect.left - treeRect.left;
               var trgLeftOffset = trgRect.left - treeRect.left;
-              //if (isSamePos) {
-              //  dragLeftOffset += 1; //?
-              //}
               var trgLev = trgLeftOffset / paddingLeft;
               var dragLev = Math.max(0, Math.round(dragLeftOffset / paddingLeft));
               var availMoves = [];
               if (isSamePos) {
-                //allow to move only left/right
-                var tmp = trgII;
-                while (tmp.parent && !tmp.next) {
-                  var parII = this.tree.items[tmp.parent];
-                  if (parII.id != 1)
-                    availMoves.push([constants.PLACEMENT_AFTER, parII, parII.lev]);
-                  tmp = parII;
-                }
-                if (trgII.prev) {
-                  var tmp = this.tree.items[trgII.prev];
-                  while (!tmp.leaf) {
-                    if (itemInfo.parent != tmp.id)
-                      availMoves.push([constants.PLACEMENT_APPEND, tmp, tmp.lev+1]);
-                    if (!tmp.children || !tmp.children.length || tmp.collapsed) {
-                      break;
-                    } else {
-                      var lastChildId = tmp.children[tmp.children.length - 1];
-                      var lastChildII = this.tree.items[lastChildId];
-                      tmp = lastChildII;
-                    }
-                  }
-                }
+                //do nothing
               } else {
                 //find out where we can move..
-                if (dragDirs.vrt < 0) {
-                  availMoves.push([constants.PLACEMENT_BEFORE, trgII, trgII.lev]);
-                }
-                if (dragDirs.vrt > 0 && (trgII.leaf || trgII.collapsed)) {
-                  availMoves.push([constants.PLACEMENT_AFTER, trgII, trgII.lev]);
-                }
-                if (!trgII.leaf && dragDirs.vrt > 0) {
-                  availMoves.push([constants.PLACEMENT_PREPEND, trgII, trgII.lev+1]);
-                }
-                if (dragDirs.vrt > 0) {
-                  var tmp = trgII;
-                  while (tmp.parent && !tmp.next) {
-                    var parII = this.tree.items[tmp.parent];
-                    availMoves.push([constants.PLACEMENT_APPEND, parII, parII.lev+1]);
-                    tmp = parII;
-                  }
-                }
-                if (dragDirs.vrt < 0) {
-                  if (trgII.prev) {
-                    var tmp = this.tree.items[trgII.prev];
-                    while (!tmp.leaf) {
-                      if (itemInfo.parent != tmp.id)
-                        availMoves.push([constants.PLACEMENT_APPEND, tmp, tmp.lev+1]);
-                      if (!tmp.children || !tmp.children.length || tmp.collapsed) {
-                        break;
-                      } else {
-                        var lastChildId = tmp.children[tmp.children.length - 1];
-                        var lastChildII = this.tree.items[lastChildId];
-                        tmp = lastChildII;
-                      }
+                if (isGroup) {
+                    if (onlyAppend) {
+                      availMoves.push([constants.PLACEMENT_APPEND, trgII, trgII.lev+1]);
                     }
-                  }
+                    if (onlyPrepend) {
+                      availMoves.push([constants.PLACEMENT_PREPEND, trgII, trgII.lev+1]);
+                    }
+                }
+                if (!onlyAppend && !onlyPrepend) {
+                    if (dragDirs.vrt < 0) {
+                      availMoves.push([constants.PLACEMENT_BEFORE, trgII, trgII.lev]);
+                    }
+                    if (dragDirs.vrt > 0 && (trgII.leaf || trgII.collapsed || !trgII.leaf && trgII.top < dragInfo.itemInfo.top)) {
+                      availMoves.push([constants.PLACEMENT_AFTER, trgII, trgII.lev]);
+                    }
                 }
               }
 
@@ -413,7 +409,6 @@ export default (Builder, CanMoveFn = null) => {
               bestMode = availMoves.find(am => am[2] == closestDragLev);
               if (!isSamePos && !bestMode && availMoves.length)
                 bestMode = availMoves[0];
-
               moveInfo = bestMode;
             }
           }
@@ -421,6 +416,7 @@ export default (Builder, CanMoveFn = null) => {
       }
 
       if (moveInfo) {
+        console.log('moveInfo', moveInfo);
         this.move(itemInfo, moveInfo[1], moveInfo[0], moveInfo[3]);
         return true;
       }
