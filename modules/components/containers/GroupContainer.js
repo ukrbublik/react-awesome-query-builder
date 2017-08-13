@@ -46,7 +46,7 @@ export default (Group) => {
       // Don't allow nesting further than the maximum configured depth and don't
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === 'undefined' || currentNesting < maxNesting;
-      const allowRemoval = currentNesting > 1;
+      const isRoot = currentNesting == 1;
 
       const conjunctionOptions = mapValues(this.props.config.conjunctions, (item, index) => ({
         id: `conjunction-${this.props.id}-${index}`,
@@ -61,9 +61,11 @@ export default (Group) => {
           className={'group-or-rule-container group-container'}
           data-id={this.props.id}
         >
+          {[this.props.dragging && this.props.dragging.id == this.props.id ? (
             <Group
+              key={"dragging"}
               id={this.props.id}
-              allowRemoval={allowRemoval}
+              isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={conjunctionOptions}
               selectedConjunction={this.props.conjunction}
@@ -73,7 +75,28 @@ export default (Group) => {
               addRule={this.addRule.bind(this)}
               config={this.props.config}
               tree={this.props.tree}
+              dragging={this.props.dragging}
+              renderType={'dragging'}
             >{this.props.children}</Group>
+          ) : null, (
+            <Group
+              key={this.props.id}
+              id={this.props.id}
+              isRoot={isRoot}
+              allowFurtherNesting={allowFurtherNesting}
+              conjunctionOptions={conjunctionOptions}
+              selectedConjunction={this.props.conjunction}
+              setConjunction={this.setConjunction.bind(this)}
+              removeSelf={this.removeSelf.bind(this)}
+              addGroup={this.addGroup.bind(this)}
+              addRule={this.addRule.bind(this)}
+              config={this.props.config}
+              tree={this.props.tree}
+              onDragStart={this.props.onDragStart}
+              dragging={this.props.dragging}
+              renderType={this.props.dragging && this.props.dragging.id == this.props.id ? 'placeholder' : null}
+            >{this.props.children}</Group>
+          )]}
         </div>
       );
     }

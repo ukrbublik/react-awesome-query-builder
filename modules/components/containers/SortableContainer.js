@@ -51,7 +51,9 @@ export default (Builder, CanMoveFn = null) => {
                   startDragging.plY = plY;
                   startDragging.itemInfo = clone(dragging.itemInfo);
                   startDragging.y = plhEl.offsetTop;
+                  startDragging.x = plhEl.offsetLeft;
                   startDragging.clientY += (plY - oldPlY);
+                  startDragging.clientX += (plX - oldPlX);
 
                   this._onDrag(this.mousePos, false);
               }
@@ -264,8 +266,8 @@ export default (Builder, CanMoveFn = null) => {
           var isGroup = hovCNodeEl.classList.contains('group-container');
           var hovNodeId = hovCNodeEl.getAttribute('data-id');
           var hovEl = hovCNodeEl;
-          var onlyAppend = false;
-          var onlyPrepend = false;
+          var doAppend = false;
+          var doPrepend = false;
           if (hovEl) {
             var hovRect = hovEl.getBoundingClientRect();
             var hovHeight = hovRect.bottom - hovRect.top;
@@ -292,25 +294,26 @@ export default (Builder, CanMoveFn = null) => {
                       trgII = hovII;
                       trgRect = hovRect2;
                       trgEl = hovEl2;
-                      onlyPrepend = true;
+                      doPrepend = true;
                     }
                 } else if (dragDirs.vrt < 0) { //up
                   if (hovII.lev >= itemInfo.lev) {
                     //take whole group
-                    var isClimbToHover = ((hovRect.bottom - dragRect.top) >= 5); //todo: 5 is magic for now, configure it!
+                    //todo: 5 is magic for now (bottom margin), configure it!
+                    var isClimbToHover = ((hovRect.bottom - dragRect.top) >= 2);
                     if (isClimbToHover && hovII.top < dragInfo.itemInfo.top) {
                         trgII = hovII;
                         trgRect = hovRect;
                         trgEl = hovEl;
-                        onlyAppend = true;
+                        doAppend = true;
                     }
                   }
                 }
-                if (!onlyPrepend && !onlyAppend) {
+                if (!doPrepend && !doAppend) {
                   //take whole group and check if we can move before/after group
                   var isOverHover = (dragDirs.vrt < 0 //up
-                    ? ((hovRect.bottom - dragRect.top) > (hovHeight-2))
-                    : ((dragRect.bottom - hovRect.top) > (hovHeight-2)));
+                    ? ((hovRect.bottom - dragRect.top) > (hovHeight-5))
+                    : ((dragRect.bottom - hovRect.top) > (hovHeight-5)));
                   if (isOverHover) {
                     trgII = hovII;
                     trgRect = hovRect;
@@ -340,20 +343,17 @@ export default (Builder, CanMoveFn = null) => {
               if (isSamePos) {
                 //do nothing
               } else {
-                //find out where we can move..
                 if (isGroup) {
-                    if (onlyAppend) {
+                    if (doAppend) {
                       availMoves.push([constants.PLACEMENT_APPEND, trgII, trgII.lev+1]);
-                    }
-                    if (onlyPrepend) {
+                    } else if (doPrepend) {
                       availMoves.push([constants.PLACEMENT_PREPEND, trgII, trgII.lev+1]);
                     }
                 }
-                if (!onlyAppend && !onlyPrepend) {
+                if (!doAppend && !doPrepend) {
                     if (dragDirs.vrt < 0) {
                       availMoves.push([constants.PLACEMENT_BEFORE, trgII, trgII.lev]);
-                    }
-                    if (dragDirs.vrt > 0 && (trgII.leaf || trgII.collapsed || !trgII.leaf && trgII.top < dragInfo.itemInfo.top)) {
+                    } else if (dragDirs.vrt > 0) {
                       availMoves.push([constants.PLACEMENT_AFTER, trgII, trgII.lev]);
                     }
                 }

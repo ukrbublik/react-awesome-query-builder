@@ -86,7 +86,7 @@ export default class Rule extends Component {
                 {/*<div className="rule--body">*/}
                     {/*<Row>*/}
                         { this.props.config.settings.canReorder &&
-                            <span onMouseDown={this.handleDraggerMouseDown.bind(this)} >###</span>
+                            <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown.bind(this)} ><Icon type="bars" /> </span>
                         }
                         {true ? (
                             <Col key={"fields"} className="rule--field">

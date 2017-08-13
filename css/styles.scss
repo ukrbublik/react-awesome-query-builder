@@ -12,7 +12,6 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  pointer-events: none;
 }
 
 %noselect {
@@ -41,6 +40,8 @@
 }
 
 .query-builder.qb-dragging {
+  cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
   button {
     pointer-events: none;
   }
@@ -73,6 +74,7 @@
 
 .qb-draggable {
   @extend %noselect;
+  pointer-events: none;
   position: absolute;
   opacity: 0.7;
   z-index: 1000;
@@ -150,6 +152,12 @@
     &::before, &::after {
         display: none;
     }
+}
+
+.qb-drag-handler {
+  @extend %noselect;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
 }
 
 .group--header {

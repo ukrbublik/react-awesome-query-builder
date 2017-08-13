@@ -16,7 +16,7 @@ export default class Group extends Component {
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
-    allowRemoval: PropTypes.bool.isRequired,
+    isRoot: PropTypes.bool.isRequired,
     selectedConjunction: PropTypes.string,
     setConjunction: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
@@ -24,10 +24,38 @@ export default class Group extends Component {
 
   shouldComponentUpdate = shallowCompare;
 
+
+    handleDraggerMouseDown (e) {
+        var nodeId = this.props.id;
+        var dom = this.refs.group;
+console.log(this.props.onDragStart);
+        if (this.props.onDragStart) {
+          this.props.onDragStart(nodeId, dom, e);
+        }
+    }
+
   render() {
     let renderConjsAsRadios = false;
+        
+    let styles = {};
+    if (this.props.renderType == 'dragging') {
+        styles = {
+            top: this.props.dragging.y,
+            left: this.props.dragging.x,
+            width: this.props.dragging.w
+        };
+    }
+console.log(this.props);
     return (
-      <div className="group group-or-rule" data-id={this.props.id}>
+      <div 
+        className={classNames("group", "group-or-rule", 
+            this.props.renderType == 'placeholder' ? 'qb-placeholder' : null,
+            this.props.renderType == 'dragging' ? 'qb-draggable' : null,
+        )} 
+        style={styles}
+        ref="group" 
+        data-id={this.props.id}
+      >
         <div className="group--header">
           <div className={classNames(
             "group--conjunctions", 
@@ -62,6 +90,9 @@ export default class Group extends Component {
               ))}
               </ButtonGroup>
             }
+            { this.props.config.settings.canReorder && !this.props.isRoot &&
+                <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown.bind(this)} > <Icon type="bars" /> </span>
+            }
           </div>
           <div className="group--actions">
             <ButtonGroup 
@@ -79,7 +110,7 @@ export default class Group extends Component {
                     onClick={this.props.addGroup}
                   >{this.props.config.settings.addGroupLabel || "Add group"}</Button>
                 ) : null}
-                {this.props.allowRemoval ? (
+                {!this.props.isRoot ? (
                   <Button 
                     type="danger"
                     icon="delete"
