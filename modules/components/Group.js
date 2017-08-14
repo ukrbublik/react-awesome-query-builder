@@ -28,7 +28,6 @@ export default class Group extends Component {
     handleDraggerMouseDown (e) {
         var nodeId = this.props.id;
         var dom = this.refs.group;
-console.log(this.props.onDragStart);
         if (this.props.onDragStart) {
           this.props.onDragStart(nodeId, dom, e);
         }
@@ -45,7 +44,7 @@ console.log(this.props.onDragStart);
             width: this.props.dragging.w
         };
     }
-console.log(this.props);
+
     return (
       <div 
         className={classNames("group", "group-or-rule", 
@@ -90,7 +89,7 @@ console.log(this.props);
               ))}
               </ButtonGroup>
             }
-            { this.props.config.settings.canReorder && !this.props.isRoot &&
+            { this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
                 <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown.bind(this)} > <Icon type="bars" /> </span>
             }
           </div>

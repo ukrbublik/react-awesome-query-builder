@@ -15,6 +15,7 @@ import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
 
+
 @RuleContainer
 export default class Rule extends Component {
     static propTypes = {
@@ -85,7 +86,7 @@ export default class Rule extends Component {
                 </div>
                 {/*<div className="rule--body">*/}
                     {/*<Row>*/}
-                        { this.props.config.settings.canReorder &&
+                        { this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 &&
                             <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown.bind(this)} ><Icon type="bars" /> </span>
                         }
                         {true ? (

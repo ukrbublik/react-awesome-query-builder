@@ -75,6 +75,7 @@ export default (Group) => {
               addRule={this.addRule.bind(this)}
               config={this.props.config}
               tree={this.props.tree}
+              treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
               renderType={'dragging'}
             >{this.props.children}</Group>
@@ -92,6 +93,7 @@ export default (Group) => {
               addRule={this.addRule.bind(this)}
               config={this.props.config}
               tree={this.props.tree}
+              treeNodesCnt={this.props.treeNodesCnt}
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}
               renderType={this.props.dragging && this.props.dragging.id == this.props.id ? 'placeholder' : null}

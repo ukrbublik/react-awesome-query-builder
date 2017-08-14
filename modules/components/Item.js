@@ -11,6 +11,7 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       tree={props.tree}
+      treeNodesCnt={props.treeNodesCnt}
       config={props.config}
       onDragStart={props.onDragStart}
       dragging={props.dragging}
@@ -23,6 +24,7 @@ const typeMap = {
       actions={props.actions}
       config={props.config}
       tree={props.tree}
+      treeNodesCnt={props.treeNodesCnt}
       onDragStart={props.onDragStart}
       dragging={props.dragging}
     >
@@ -37,6 +39,7 @@ const typeMap = {
           actions={props.actions}
           children1={item.get('children1')}
           tree={props.tree}
+          treeNodesCnt={props.treeNodesCnt}
           onDragStart={props.onDragStart}
           dragging={props.dragging}
         />

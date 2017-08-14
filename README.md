@@ -3,6 +3,10 @@ User-friendly React component to build queries.
 
 Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
 
+Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
+
+Using [Ant Design](https://ant.design/)
+
 
 ### Install & use
 Install: `npm i react-awesome-query-builder`

@@ -66,6 +66,28 @@ export const getFlatTree = (tree) => {
 };
 
 
+export const getTotalNodesCountInTree = (tree) => {
+    if (!tree)
+        return -1;
+    let cnt = 0;
+
+    function _processNode (item, path, lev) {
+        const id = item.get('id');
+        const children = item.get('children1');
+        cnt++;
+        if (children) {
+            children.map((child, childId) => {
+                _processNode(child, path.concat(id), lev + 1);
+            });
+        }
+    };
+
+    _processNode(tree, [], 0);
+
+    return cnt;
+};
+
+
 /**
  * @param {Immutable.List} path
  * @param {...string} suffix

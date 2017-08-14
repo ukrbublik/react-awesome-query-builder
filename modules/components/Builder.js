@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import Immutable from 'immutable';
 import Item from '../components/Item';
 import SortableContainer from './containers/SortableContainer';
+import {getTotalNodesCountInTree} from "../utils/treeUtils";
+
 
 @SortableContainer
 export default class Builder extends Component {
@@ -11,6 +13,7 @@ export default class Builder extends Component {
   };
   
   render() {
+    const treeNodesCnt = getTotalNodesCountInTree(this.props.tree);
     const id = this.props.tree.get('id');
     return (
       <Item key={id}
@@ -23,6 +26,7 @@ export default class Builder extends Component {
         dispatch={this.props.dispatch}
         children1={this.props.tree.get('children1')}
         tree={this.props.tree}
+        treeNodesCnt={treeNodesCnt}
         onDragStart={this.props.onDragStart}
         dragging={this.props.dragging}
       >
