@@ -5,7 +5,7 @@ Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fu
 
 Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
 
-Using [Ant Design](https://ant.design/)
+Using awesome [Ant Design](https://ant.design/) for widgets
 
 
 ### Install & use

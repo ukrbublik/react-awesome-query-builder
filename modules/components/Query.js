@@ -39,14 +39,14 @@ const QueryContainer = connect(
 )(ConnectedQuery);
 
 export default class Query extends Component {
-    static propTypes:{
+    static propTypes: {
         conjunctions: PropTypes.object.isRequired,
         fields: PropTypes.object.isRequired,
         types: PropTypes.object.isRequired,
         operators: PropTypes.object.isRequired,
         widgets: PropTypes.object.isRequired,
         settings: PropTypes.object.isRequired
-        };
+    };
 
     constructor(props, context) {
         super(props, context);
@@ -66,7 +66,6 @@ export default class Query extends Component {
             store: createStore(tree)
         };
     }
-
 
     render() {
         const {conjunctions, fields, types, operators, widgets, settings, get_children, onChange, onBlur, value, tree, children, ...props} = this.props;

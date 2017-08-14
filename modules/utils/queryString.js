@@ -95,7 +95,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         if (!fn && cardinality == 1) {
             let _operator = operatorDefinition.labelForFormat || operator;
             fn = (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
-                return `${field} ${_operator} ${value}`;
+                return `${field} ${_operator} ${values}`;
             };
         }
         if (!fn)
