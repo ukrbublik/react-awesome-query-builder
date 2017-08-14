@@ -30,7 +30,6 @@ export const queryString = (item, config, isForDisplay = false) => {
         const operatorDefinition = getOperatorConfig(config, operator, field) || {};
         const reversedOp = operatorDefinition.reversedOp;
         const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-        const fieldType = fieldDefinition.type || "undefined";
         const cardinality = operatorDefinition.cardinality || 1;
         const typeConfig = config.types[fieldDefinition.type] || {};
         const fieldSeparator = config.settings.fieldSeparator;

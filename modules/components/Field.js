@@ -19,10 +19,22 @@ export default class Field extends Component {
     renderAsDropdown: PropTypes.bool,
   };
 
+  constructor(props) {
+      super(props);
+  }
+
+  componentWillReceiveProps (nextProps) {
+    //let prevProps = this.props;
+  }
+
   shouldComponentUpdate = shallowCompare;
 
   curFieldOpts() {
-      return Object.assign({}, {label: this.props.selectedField}, getFieldConfig(this.props.selectedField, this.props.config) || {});
+      return Object.assign({}, {
+          label: this.props.selectedField
+        }, 
+        getFieldConfig(this.props.selectedField, this.props.config) || {}
+      );
   }
 
   handleFieldMenuSelect({key, keyPath}) {

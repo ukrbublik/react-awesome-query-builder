@@ -178,7 +178,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {string} newOperator
  * @return {object} - {canReuseValue, newValue, newValueSrc}
  */
-const _getNewValueForFieldOp = function (config, current, newField, newOperator) {
+export const _getNewValueForFieldOp = function (config, current, newField, newOperator) {
     const currentField = current.get('field');
     const currentOperator = current.get('operator');
     const currentValue = current.get('value');
@@ -216,8 +216,9 @@ const _getNewValueForFieldOp = function (config, current, newField, newOperator)
             let vs = currentValueSrc.get(i) || null;
             if (v != null) {
                 if (vs == 'field') {
-                    if (v == currentField) {
-                        //can't compare field with itself!
+                    const rightFieldDefinition = getFieldConfig(v, config);
+                    if (v == currentField || !rightFieldDefinition) {
+                        //can't compare field with itself or no such field
                         canReuseValue = false;
                         break;
                     }
@@ -262,7 +263,7 @@ const _getNewValueForFieldOp = function (config, current, newField, newOperator)
                 vs = currentValueSrc.get(i);
         } else if (valueSources.length == 1) {
             vs = valueSources[0];
-        } else {
+        } else if (valueSources.length > 1) {
             vs = valueSources[0];
         }
         return vs;
@@ -277,6 +278,9 @@ const _getNewValueForFieldOp = function (config, current, newField, newOperator)
  * @param {string} field
  */
 const setField = (state, path, newField, config) => {
+    if (!newField)
+        return removeItem(state, path);
+
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const currentField = current.get('field');
         const currentOperator = current.get('operator');

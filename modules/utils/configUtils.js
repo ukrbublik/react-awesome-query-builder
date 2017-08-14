@@ -88,8 +88,7 @@ export const extendConfig = (config) => {
     return config;
 };
 
-
-export const getFieldConfig = (field, config) => {
+export const getFieldRawConfig = (field, config) => {
     if (!field || field == ':empty:')
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
@@ -100,17 +99,26 @@ export const getFieldConfig = (field, config) => {
         const part = parts[i];
         const tmpFieldConfig = fields[part];
         if (!tmpFieldConfig)
-            throw new Error("Can't find field " + field + ", please check your config");
+            return null;
         if (i == parts.length-1) {
             fieldConfig = tmpFieldConfig;
         } else {
             fields = tmpFieldConfig.subfields;
             if (!fields)
-                throw new Error("Can't find field " + field + ", please check your config");
+                return null;
         }
     }
+    return fieldConfig;
+};
 
-    //merge, but don't merge operators (reqrite instead)
+export const getFieldConfig = (field, config) => {
+    if (!field || field == ':empty:')
+        return null;
+    const fieldConfig = getFieldRawConfig(field, config);
+    if (!fieldConfig)
+        throw new Error("Can't find field " + field + ", please check your config");
+
+    //merge, but don't merge operators (rewrite instead)
     const typeConfig = config.types[fieldConfig.type] || {};
     let ret = mergeWith({}, typeConfig, fieldConfig || {}, (objValue, srcValue, key, object, source, stack) => {
         if (Array.isArray(objValue)) {

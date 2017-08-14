@@ -12,7 +12,7 @@ export const defaultField = (config, canGetFirst = true) => {
 
 export const defaultOperator = (config, field, canGetFirst = true) => {
   let fieldConfig = getFieldConfig(field, config);
-  let fieldDefaultOperator = fieldConfig.defaultOperator || (canGetFirst ? getFirstOperator(config, field) : null);
+  let fieldDefaultOperator = fieldConfig && fieldConfig.defaultOperator || (canGetFirst ? getFirstOperator(config, field) : null);
   let op = typeof config.settings.defaultOperator === 'function' ?
     config.settings.defaultOperator(field, fieldConfig) : fieldDefaultOperator;
   return op;
@@ -20,9 +20,9 @@ export const defaultOperator = (config, field, canGetFirst = true) => {
 
 //used for complex operators like proximity
 export const defaultOperatorOptions = (config, operator, field) => {
-  if (!operator)
-    return new Immutable.Map();
-  let operatorConfig = getOperatorConfig(config, operator, field);
+  let operatorConfig = operator ? getOperatorConfig(config, operator, field) : null;
+  if (!operatorConfig)
+    return null; //new Immutable.Map();
   return new Immutable.Map(
     operatorConfig.options &&
     operatorConfig.options.defaults || {}
@@ -40,6 +40,7 @@ export const defaultRuleProperties = (config) => {
     field: field,
     operator: operator,
     value: new Immutable.List(),
+    valueSrc: new Immutable.List(),
     //used for complex operators like proximity
     operatorOptions: defaultOperatorOptions(config, operator, field),
   });

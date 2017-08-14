@@ -119,8 +119,8 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
             };
             values.push(val);
         }
-        let operatorOptions = options.toJS();
-        if (!Object.keys(operatorOptions).length)
+        let operatorOptions = options ? options.toJS() : null;
+        if (operatorOptions && !Object.keys(operatorOptions).length)
             operatorOptions = null;
         
         var ruleQuery = {

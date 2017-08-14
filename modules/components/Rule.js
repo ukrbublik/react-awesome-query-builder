@@ -21,7 +21,7 @@ export default class Rule extends Component {
     static propTypes = {
         selectedField: PropTypes.string,
         selectedOperator: PropTypes.string,
-        operatorOptions: PropTypes.object.isRequired,
+        operatorOptions: PropTypes.object,
         config: PropTypes.object.isRequired,
         //actions
         setField: PropTypes.func,

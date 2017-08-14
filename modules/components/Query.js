@@ -5,15 +5,29 @@ import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
 import {bindActionCreators} from "../utils/stuff";
+import {validateTree} from "../utils/validation";
 import { LocaleProvider } from 'antd';
 
 
 class ConnectedQuery extends Component {
+    constructor(props) {
+        super(props);
+
+        this.validatedTree = this.validateTree(props);
+        console.log(1, props.tree, this.validatedTree);
+    }
+
+    validateTree (props) {
+        return validateTree(props.tree, props.config, true, true);
+    }
+
     componentWillReceiveProps(nextProps) {
         const {tree, onChange} = nextProps;
         const oldTree = this.props.tree;
         if (oldTree !== tree) {
-            onChange && onChange(tree);
+            this.validatedTree = this.validateTree(nextProps);
+            console.log(1, tree, this.validatedTree);
+            onChange && onChange(this.validatedTree);
             this.setState({treeChanged: true})
         } else {
             this.setState({treeChanged: false})
@@ -22,9 +36,10 @@ class ConnectedQuery extends Component {
 
     render() {
         const {config, tree, get_children, dispatch, ...props} = this.props;
+        const validatedTree = this.validatedTree;
         return <div>
             {get_children({
-                tree: tree,
+                tree: this.validatedTree,
                 actions: bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch),
                 config: config,
                 dispatch: dispatch
