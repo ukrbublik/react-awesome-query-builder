@@ -13,20 +13,21 @@ class ConnectedQuery extends Component {
     constructor(props) {
         super(props);
 
-        this.validatedTree = this.validateTree(props);
-        console.log(1, props.tree, this.validatedTree);
+        this.validatedTree = this.validateTree(props, props.config, props.tree);
     }
 
-    validateTree (props) {
-        return validateTree(props.tree, props.config, true, true);
+    validateTree (props, oldConfig, oldTree) {
+        return validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
     }
 
     componentWillReceiveProps(nextProps) {
         const {tree, onChange} = nextProps;
         const oldTree = this.props.tree;
-        if (oldTree !== tree) {
-            this.validatedTree = this.validateTree(nextProps);
-            console.log(1, tree, this.validatedTree);
+        const oldConfig = this.props.config;
+        const newTree = nextProps.tree;
+        const oldValidatedTree = this.validatedTree;
+        this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
+        if (oldValidatedTree !== this.validatedTree) {
             onChange && onChange(this.validatedTree);
             this.setState({treeChanged: true})
         } else {

@@ -23,10 +23,10 @@ export const defaultOperatorOptions = (config, operator, field) => {
   let operatorConfig = operator ? getOperatorConfig(config, operator, field) : null;
   if (!operatorConfig)
     return null; //new Immutable.Map();
-  return new Immutable.Map(
+  return operatorConfig.options ? new Immutable.Map(
     operatorConfig.options &&
     operatorConfig.options.defaults || {}
-  );
+  ) : null;
 };
 
 export const defaultRuleProperties = (config) => {
