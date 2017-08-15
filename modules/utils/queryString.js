@@ -36,6 +36,7 @@ export const queryString = (item, config, isForDisplay = false) => {
 
         //format value
         let valueSrcs = [];
+        let valueTypes = [];
         let hasUndefinedValues = false;
         let value = properties.get('value').map((currentValue, ind) => {
             if (currentValue === undefined) {
@@ -43,6 +44,7 @@ export const queryString = (item, config, isForDisplay = false) => {
                 return undefined;
             }
             const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
+            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
             if (valueSrc == 'field') {
@@ -77,6 +79,7 @@ export const queryString = (item, config, isForDisplay = false) => {
                 return currentValue;
             }
             valueSrcs.push(valueSrc);
+            valueTypes.push(valueType);
         });
         if (hasUndefinedValues || value.size < cardinality)
             return undefined;
@@ -114,6 +117,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             operator,
             formattedValue,
             (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
+            (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
             omit(operatorDefinition, ['formatOp']),
             operatorOptions,
             isForDisplay

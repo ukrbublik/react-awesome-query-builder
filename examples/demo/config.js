@@ -68,6 +68,9 @@ export default {
                 formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("__"+JSON.stringify(val)),
                 valueLabel: "Name2",
                 valuePlaceholder: "Enter name2",
+                validateValue: (val, fieldDef) => {
+                    return (val != 'test2');
+                },
             },
         },
         num: {
@@ -388,7 +391,7 @@ export default {
             label: 'Between',
             labelForFormat: 'BETWEEN',
             cardinality: 2,
-            formatOp: (field, op, values, valueSrcs, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
                 let valFrom = values.first();
                 let valTo = values.get(1);
                 if (isForDisplay)
@@ -428,7 +431,7 @@ export default {
             labelForFormat: 'IS EMPTY',
             cardinality: 0,
             reversedOp: 'is_not_empty',
-            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
             },
         },
@@ -438,14 +441,14 @@ export default {
             labelForFormat: 'IS NOT EMPTY',
             cardinality: 0,
             reversedOp: 'is_empty',
-            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
             },
         },
         select_equals: {
             label: '==',
             labelForFormat: '==',
-            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == ${value}`;
             },
             reversedOp: 'select_not_equals',
@@ -453,7 +456,7 @@ export default {
         select_not_equals: {
             label: '!=',
             labelForFormat: '!=',
-            formatOp: (field, op, value, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return `${field} != ${value}`;
             },
             reversedOp: 'select_equals',
@@ -461,7 +464,7 @@ export default {
         select_any_in: {
             label: 'Any in',
             labelForFormat: 'IN',
-            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 if (valueSrc == 'value')
                     return `${field} IN (${values.join(', ')})`;
                 else
@@ -472,7 +475,7 @@ export default {
         select_not_any_in: {
             label: 'Not in',
             labelForFormat: 'NOT IN',
-            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 if (valueSrc == 'value')
                     return `${field} NOT IN (${values.join(', ')})`;
                 else
@@ -483,7 +486,7 @@ export default {
         multiselect_equals: {
             label: 'Equals',
             labelForFormat: '==',
-            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 if (valueSrc == 'value')
                     return `${field} == [${values.join(', ')}]`;
                 else
@@ -494,7 +497,7 @@ export default {
         multiselect_not_equals: {
             label: 'Not equals',
             labelForFormat: '!=',
-            formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+            formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 if (valueSrc == 'value')
                     return `${field} != [${values.join(', ')}]`;
                 else
@@ -510,7 +513,7 @@ export default {
             {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
-          formatOp: (field, op, values, valueSrc, opDef, operatorOptions, isForDisplay) => {
+          formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
             let val1 = values.first();
             let val2 = values.get(1);
             return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
@@ -532,6 +535,9 @@ export default {
             factory: (props) => <TextWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 return isForDisplay ? '"'+val+'"' : JSON.stringify(val);
+            },
+            validateValue: (val, fieldDef) => {
+                return (val != "test");
             },
         },
         number: {

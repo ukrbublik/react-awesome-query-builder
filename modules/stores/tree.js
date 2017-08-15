@@ -4,6 +4,7 @@ import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultO
 import {getFirstOperator} from '../utils/configUtils';
 import * as constants from '../constants';
 import uuid from '../utils/uuid';
+import omit from 'lodash/omit';
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getValueSourcesForFieldOp} from "../utils/configUtils";
 import {defaultValue, eqArrSet} from "../utils/stuff";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
@@ -177,13 +178,18 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {Immutable.Map} current
  * @param {string} newField
  * @param {string} newOperator
- * @return {object} - {canReuseValue, newValue, newValueSrc}
+ * @param {string} changedField
+ * @param {bool} removeInvalidValues
+ * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType}
  */
-export const _getNewValueForFieldOp = function (config, oldConfig, current, newField, newOperator, changedField = null) {
+export const _getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedField = null, removeInvalidValues = false) {
+    if (!oldConfig)
+        oldConfig = config;
     const currentField = current.get('field');
     const currentOperator = current.get('operator');
     const currentValue = current.get('value');
     const currentValueSrc = current.get('valueSrc', new Immutable.List());
+    const currentValueType = current.get('valueType', new Immutable.List());
 
     const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
     const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
@@ -215,17 +221,24 @@ export const _getNewValueForFieldOp = function (config, oldConfig, current, newF
     if (canReuseValue) {
         for (let i = 0 ; i < commonWidgetsCnt ; i++) {
             let v = currentValue.get(i);
-            //let w = newWidgets[i];
-            let vs = currentValueSrc.get(i) || null;
+            let vType = currentValueType.get(i) || null;
+            let vSrc = currentValueSrc.get(i) || null;
+            let w = newWidgets[i];
+            let wConfig = config.widgets[w];
+            let wType = wConfig.type;
+            let fieldWidgetDefinition = omit(getFieldWidgetConfig(config, newField, newOperator, w, vSrc), ['factory', 'formatValue']);
             if (v != null) {
-                if (vs == 'field') {
-                    const rightFieldDefinition = getFieldConfig(v, config);
+                let isValid = true;
+                const rightFieldDefinition = (vSrc == 'field' ? getFieldConfig(v, config) : null);
+                if (vSrc == 'field') {
                     if (v == currentField || !rightFieldDefinition) {
                         //can't compare field with itself or no such field
                         canReuseValue = false;
-                        break;
                     }
-                } else if (vs == 'value') {
+                } else if (vSrc == 'value') {
+                    if (vType != wType) {
+                        canReuseValue = false;
+                    }
                     if (newFieldConfig.listValues) {
                         if (v instanceof Array) {
                             for (let _v of v) {
@@ -243,12 +256,35 @@ export const _getNewValueForFieldOp = function (config, oldConfig, current, newF
                             }
                         }
                     }
+                    const fieldSettings = newFieldConfig.fieldSettings;
+                    if (fieldSettings) {
+                        if (fieldSettings.min != null) {
+                            isValid = isValid && (v >= fieldSettings.min);
+                        }
+                        if (fieldSettings.max != null) {
+                            isValid = isValid && (v <= fieldSettings.max);
+                        }
+                    }
+                }
+                let fn = fieldWidgetDefinition.validateValue;
+                if (typeof fn == 'function') {
+                    let args = [
+                        v, 
+                        //newField,
+                        newFieldConfig,
+                    ];
+                    if (vSrc == 'field')
+                        v.push(rightFieldDefinition);
+                    isValid = isValid && fn(...args);
+                }
+                if (!isValid && removeInvalidValues) {
+                    canReuseValue = false;
                 }
             }
         }
     }
 
-    let newValue = null, newValueSrc = null;
+    let newValue = null, newValueSrc = null, newValueType = null;
     newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
         let v = undefined;
         if (canReuseValue) {
@@ -271,8 +307,18 @@ export const _getNewValueForFieldOp = function (config, oldConfig, current, newF
         }
         return vs;
     }));
+    newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+        let v = null;
+        if (canReuseValue) {
+            if (i < currentValueType.size)
+                v = currentValueType.get(i);
+        } else if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.defaultValue !== undefined) {
+            v = firstWidgetConfig.type;
+        }
+        return v;
+    }));
 
-    return {canReuseValue, newValue, newValueSrc};
+    return {canReuseValue, newValue, newValueSrc, newValueType};
 };
 
 /**
@@ -288,8 +334,9 @@ const setField = (state, path, newField, config) => {
         const currentField = current.get('field');
         const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');
-        const currentValue = current.get('value');
-        const currentValueSrc = current.get('valueSrc', new Immutable.List());
+        //const currentValue = current.get('value');
+        //const currentValueSrc = current.get('valueSrc', new Immutable.List());
+        //const currentValueType = current.get('valueType', new Immutable.List());
 
         // If the newly selected field supports the same operator the rule currently
         // uses, keep it selected.
@@ -312,7 +359,7 @@ const setField = (state, path, newField, config) => {
             }
         }
 
-        let {canReuseValue, newValue, newValueSrc} = _getNewValueForFieldOp (config, config, current, newField, newOperator, 'field');
+        let {canReuseValue, newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, newField, newOperator, 'field');
         let newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
 
         return current
@@ -320,7 +367,8 @@ const setField = (state, path, newField, config) => {
             .set('operator', newOperator)
             .set('operatorOptions', newOperatorOptions)
             .set('value', newValue)
-            .set('valueSrc', newValueSrc);
+            .set('valueSrc', newValueSrc)
+            .set('valueType', newValueType);
     }))
 };
 
@@ -337,14 +385,15 @@ const setOperator = (state, path, newOperator, config) => {
         const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');
 
-        let {canReuseValue, newValue, newValueSrc} = _getNewValueForFieldOp (config, config, current, currentField, newOperator, 'operator');
+        let {canReuseValue, newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, currentField, newOperator, 'operator');
         let newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
 
         return current
             .set('operator', newOperator)
             .set('operatorOptions', newOperatorOptions)
             .set('value', newValue)
-            .set('valueSrc', newValueSrc);
+            .set('valueSrc', newValueSrc)
+            .set('valueType', newValueType);
     }));
 };
 
@@ -353,12 +402,15 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {Immutable.List} path
  * @param {integer} delta
  * @param {*} value
+ * @param {string} valueType
  */
-const setValue = (state, path, delta, value) => {
+const setValue = (state, path, delta, value, valueType) => {
     if (typeof value === "undefined") {
         state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
+        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
     } else {
         state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), valueType);
     }
     return state;
 };
@@ -371,6 +423,7 @@ const setValue = (state, path, delta, value) => {
  */
 const setValueSrc = (state, path, delta, srcKey) => {
     state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
+    state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
 
     if (typeof srcKey === "undefined") {
         state = state.setIn(expandTreePath(path, 'properties', 'valueSrc', delta + ''), null);
@@ -425,7 +478,7 @@ export default (config) => {
                 return setOperator(state, action.path, action.operator, action.config);
 
             case constants.SET_VALUE:
-                return setValue(state, action.path, action.delta, action.value);
+                return setValue(state, action.path, action.delta, action.value, action.valueType);
 
             case constants.SET_VALUE_SRC:
                 return setValueSrc(state, action.path, action.delta, action.srcKey);

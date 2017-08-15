@@ -25,8 +25,7 @@ export const extendConfig = (config) => {
             if (typeWidgetConfig.defaultOperator)
                 defaultOperator = typeWidgetConfig.defaultOperator;
             if (widget == typeConfig.mainWidget) {
-                typeWidgetConfig = merge({}, pickBy(typeConfig, (v, k) => 
-                    (['mainWidgetProps'].indexOf(k) != -1)), typeWidgetConfig);
+                typeWidgetConfig = merge({}, {widgetProps: typeConfig.mainWidgetProps || {}}, typeWidgetConfig);
             }
             typeConfig.widgets[widget] = typeWidgetConfig;
         }
@@ -63,8 +62,7 @@ export const extendConfig = (config) => {
                 if (fieldWidgetConfig.defaultOperator)
                     defaultOperator = fieldWidgetConfig.defaultOperator;
                 if (widget == fieldConfig.mainWidget) {
-                    fieldWidgetConfig = merge({}, pickBy(fieldConfig, (v, k) => 
-                        (['mainWidgetProps'].indexOf(k) != -1)), fieldWidgetConfig);
+                    fieldWidgetConfig = merge({}, {widgetProps: fieldConfig.mainWidgetProps || {}}, fieldWidgetConfig);
                 }
                 fieldConfig.widgets[widget] = fieldWidgetConfig;
             }
@@ -87,6 +85,7 @@ export const extendConfig = (config) => {
     //console.log(config); 
     return config;
 };
+
 
 export const getFieldRawConfig = (field, config) => {
     if (!field || field == ':empty:')

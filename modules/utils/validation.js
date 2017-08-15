@@ -12,7 +12,7 @@ import Immutable from 'immutable';
 import {_getNewValueForFieldOp} from "../stores/tree";
 
 
-export const validateTree = (tree, oldTree, config, oldConfig, removeEmptyGroups = false, removeInvalidRules = false) => {
+export const validateTree = (tree, oldTree, config, oldConfig, removeEmptyGroups = false, removeInvalidRules = false, removeInvalidValues = false) => {
     let treeSanitized = false;
 
 	let _validateItem = (item, path = []) => {
@@ -96,7 +96,8 @@ export const validateTree = (tree, oldTree, config, oldConfig, removeEmptyGroups
 	        //validate values
 	        valueSrc = properties.get('valueSrc');
 	        value = properties.get('value');
-	        let {canReuseValue, newValue, newValueSrc} = _getNewValueForFieldOp(config, oldConfig, properties, field, operator, null);
+	        let {canReuseValue, newValue, newValueSrc, newValueType} = 
+                _getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, removeInvalidValues);
 	        value = newValue;
 	        valueSrc = newValueSrc;
 	        properties = properties.set('value', value);

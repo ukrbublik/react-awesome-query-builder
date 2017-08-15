@@ -29,12 +29,14 @@ export const setOperator = (config, path, operator) => ({
  * @param {Immutable.List} path
  * @param {integer} delta
  * @param {*} value
+ * @param {string} valueType
  */
-export const setValue = (config, path, delta, value) => ({
+export const setValue = (config, path, delta, value, valueType) => ({
   type: constants.SET_VALUE,
   path: path,
   delta: delta,
   value: value,
+  valueType: valueType,
   config: config
 });
 

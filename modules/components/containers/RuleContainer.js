@@ -39,8 +39,8 @@ export default (Rule) => {
       this.props.actions.setOperatorOption(this.props.path, name, value);
     }
 
-    setValue(delta, value) {
-        this.props.actions.setValue(this.props.path, delta, value);
+    setValue(delta, value, type) {
+        this.props.actions.setValue(this.props.path, delta, value, type);
     }
 
     setValueSrc(delta, srcKey) {

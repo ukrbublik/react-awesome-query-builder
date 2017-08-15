@@ -82,6 +82,7 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         const options = properties.get('operatorOptions');
         let value = properties.get('value');
         let valueSrc = properties.get('valueSrc');
+        let valueType = properties.get('valueType');
 
         let hasUndefinedValues = false;
         value.map((currentValue, ind) => {
@@ -111,10 +112,11 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
             rootQuery.usedFields.push(field);
         value = value.toArray();
         valueSrc = valueSrc.toArray();
+        valueType = valueType.toArray();
         let values = [];
         for (let i = 0 ; i < value.length ; i++) {
             let val = {
-                type: valueSrc[i],
+                type: valueType[i],
                 value: value[i],
             };
             values.push(val);
