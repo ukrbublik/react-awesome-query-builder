@@ -115,7 +115,7 @@ export const getFieldConfig = (field, config) => {
         return null;
     const fieldConfig = getFieldRawConfig(field, config);
     if (!fieldConfig)
-        throw new Error("Can't find field " + field + ", please check your config");
+        return null; //throw new Error("Can't find field " + field + ", please check your config");
 
     //merge, but don't merge operators (rewrite instead)
     const typeConfig = config.types[fieldConfig.type] || {};
