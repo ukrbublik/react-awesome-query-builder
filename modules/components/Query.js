@@ -14,6 +14,9 @@ class ConnectedQuery extends Component {
         super(props);
 
         this.validatedTree = this.validateTree(props, props.config, props.tree);
+        if (props.tree !== this.validatedTree) {
+            props.onChange && props.onChange(this.validatedTree);
+        }
     }
 
     validateTree (props, oldConfig, oldTree) {
