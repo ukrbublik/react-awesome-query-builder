@@ -179,10 +179,9 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {string} newField
  * @param {string} newOperator
  * @param {string} changedField
- * @param {bool} removeInvalidValues
  * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType}
  */
-export const _getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedField = null, removeInvalidValues = false) {
+export const _getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedField = null) {
     if (!oldConfig)
         oldConfig = config;
     const currentField = current.get('field');
@@ -223,64 +222,9 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
             let v = currentValue.get(i);
             let vType = currentValueType.get(i) || null;
             let vSrc = currentValueSrc.get(i) || null;
-            let w = newWidgets[i];
-            let wConfig = config.widgets[w];
-            let wType = wConfig.type;
-            let fieldWidgetDefinition = omit(getFieldWidgetConfig(config, newField, newOperator, w, vSrc), ['factory', 'formatValue']);
-            if (v != null) {
-                let isValid = true;
-                const rightFieldDefinition = (vSrc == 'field' ? getFieldConfig(v, config) : null);
-                if (vSrc == 'field') {
-                    if (v == currentField || !rightFieldDefinition) {
-                        //can't compare field with itself or no such field
-                        canReuseValue = false;
-                    }
-                } else if (vSrc == 'value') {
-                    if (vType != wType) {
-                        canReuseValue = false;
-                    }
-                    if (newFieldConfig.listValues) {
-                        if (v instanceof Array) {
-                            for (let _v of v) {
-                                if (newFieldConfig.listValues[_v] == undefined) {
-                                    //prev value is not in new list of values!
-                                    canReuseValue = false;
-                                    break;
-                                }
-                            }
-                        } else {
-                            if (newFieldConfig.listValues[v] == undefined) {
-                                //prev value is not in new list of values!
-                                canReuseValue = false;
-                                break;
-                            }
-                        }
-                    }
-                    const fieldSettings = newFieldConfig.fieldSettings;
-                    if (fieldSettings) {
-                        if (fieldSettings.min != null) {
-                            isValid = isValid && (v >= fieldSettings.min);
-                        }
-                        if (fieldSettings.max != null) {
-                            isValid = isValid && (v <= fieldSettings.max);
-                        }
-                    }
-                }
-                let fn = fieldWidgetDefinition.validateValue;
-                if (typeof fn == 'function') {
-                    let args = [
-                        v, 
-                        //newField,
-                        newFieldConfig,
-                    ];
-                    if (vSrc == 'field')
-                        v.push(rightFieldDefinition);
-                    isValid = isValid && fn(...args);
-                }
-                if (!isValid && removeInvalidValues) {
-                    canReuseValue = false;
-                }
-            }
+            let isValid = _validateValue(config, newField, newOperator, v, vType, vSrc);
+            if (!isValid)
+                canReuseValue = false;
         }
     }
 
@@ -319,6 +263,68 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
     }));
 
     return {canReuseValue, newValue, newValueSrc, newValueType};
+};
+
+const _validateValue = (config, field, operator, value, valueType, valueSrc) => {
+    let v = value,
+        vType = valueType,
+        vSrc = valueSrc;
+    const fieldConfig = getFieldConfig(field, config);
+    let w = getWidgetForFieldOp(config, field, operator, vSrc);
+    let wConfig = config.widgets[w];
+    let wType = wConfig.type;
+    let fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, vSrc), ['factory', 'formatValue']);
+    let isValid = true;
+    if (v != null) {
+        const rightFieldDefinition = (vSrc == 'field' ? getFieldConfig(v, config) : null);
+        if (vSrc == 'field') {
+            if (v == currentField || !rightFieldDefinition) {
+                //can't compare field with itself or no such field
+                isValid = false;
+            }
+        } else if (vSrc == 'value') {
+            if (vType != wType) {
+                isValid = false;
+            }
+            if (fieldConfig.listValues) {
+                if (v instanceof Array) {
+                    for (let _v of v) {
+                        if (fieldConfig.listValues[_v] == undefined) {
+                            //prev value is not in new list of values!
+                            isValid = false;
+                            break;
+                        }
+                    }
+                } else {
+                    if (fieldConfig.listValues[v] == undefined) {
+                        //prev value is not in new list of values!
+                        isValid = false;
+                    }
+                }
+            }
+            const fieldSettings = fieldConfig.fieldSettings;
+            if (fieldSettings) {
+                if (fieldSettings.min != null) {
+                    isValid = isValid && (v >= fieldSettings.min);
+                }
+                if (fieldSettings.max != null) {
+                    isValid = isValid && (v <= fieldSettings.max);
+                }
+            }
+        }
+        let fn = fieldWidgetDefinition.validateValue;
+        if (typeof fn == 'function') {
+            let args = [
+                v, 
+                //field,
+                fieldConfig,
+            ];
+            if (vSrc == 'field')
+                v.push(rightFieldDefinition);
+            isValid = isValid && fn(...args);
+        }
+    }
+    return isValid;
 };
 
 /**
@@ -404,14 +410,22 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {*} value
  * @param {string} valueType
  */
-const setValue = (state, path, delta, value, valueType) => {
-    if (typeof value === "undefined") {
-        state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
-        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
-    } else {
-        state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), valueType);
+const setValue = (state, path, delta, value, valueType, config) => {
+    const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
+    const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
+    const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
+    let isValid = _validateValue(config, field, operator, value, valueType, valueSrc);
+
+    if (isValid) {
+        if (typeof value === "undefined") {
+            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
+            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+        } else {
+            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), valueType);
+        }
     }
+
     return state;
 };
 
@@ -478,7 +492,7 @@ export default (config) => {
                 return setOperator(state, action.path, action.operator, action.config);
 
             case constants.SET_VALUE:
-                return setValue(state, action.path, action.delta, action.value, action.valueType);
+                return setValue(state, action.path, action.delta, action.value, action.valueType, action.config);
 
             case constants.SET_VALUE_SRC:
                 return setValueSrc(state, action.path, action.delta, action.srcKey);
