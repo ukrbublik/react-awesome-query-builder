@@ -278,7 +278,7 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
     if (v != null) {
         const rightFieldDefinition = (vSrc == 'field' ? getFieldConfig(v, config) : null);
         if (vSrc == 'field') {
-            if (v == currentField || !rightFieldDefinition) {
+            if (v == field || !rightFieldDefinition) {
                 //can't compare field with itself or no such field
                 isValid = false;
             }
