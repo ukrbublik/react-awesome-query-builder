@@ -1,4 +1,5 @@
 node_modules/
 tests/
 scripts/
-build/npm
+build/npm/
+examples/
