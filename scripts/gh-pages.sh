@@ -1,7 +1,5 @@
 npm run build-global
 
-npm run build-npm
-
 npm run build-examples
 mkdir /tmp/react-awesome-query-builder -p
 rm -rf /tmp/react-awesome-query-builder/gh-pages
