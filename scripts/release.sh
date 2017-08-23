@@ -10,7 +10,7 @@ current_version=$(node -p "require('./package').version")
 printf "Next version (current is $current_version)? "
 read next_version
 
-if ! [[ $next_version =~ ^[0-9]\.[0-9]+\.[0-9]+(-.+)? ]]; then
+if ! [[ $next_version =~ ^[0-9]\.[0-9]+\.[0-9]+(-.+)?$ ]]; then
   echo "Version must be a valid semver string, e.g. 1.0.2 or 2.3.0-beta.1"
   exit 1
 fi
