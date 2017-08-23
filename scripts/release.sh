@@ -18,15 +18,6 @@ fi
 next_ref="v$next_version"
 
 update_version 'package.json' $next_version
-update_version 'bower.json' $next_version
-
-node_modules/.bin/changelog -t $next_ref
-
-npm run build-global
-git add -A build/global
-
-npm run build-npm
-git add -A build/npm
 
 git commit -am "Version $next_version"
 
@@ -37,4 +28,5 @@ git push origin master
 git push origin $next_ref
 git push origin latest -f
 
-npm publish build/npm
+npm publish
+
