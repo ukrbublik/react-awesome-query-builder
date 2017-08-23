@@ -3,14 +3,14 @@
   "version": "0.1.15",
   "main1": "modules",
   "main": "build/npm/lib",
-  "main2": "build/global/ReactQueryBuilder.js",
+  "main2": "build/global/ReactAwesomeQueryBuilder.js",
   "browserify1": {
     "transform": [
       "babelify"
     ]
   },
   "scripts": {
-    "build-global": "rm -rf build/global && NODE_ENV=production webpack modules/index.js build/global/ReactQueryBuilder.js && NODE_ENV=production COMPRESS=1 webpack modules/index.js build/global/ReactQueryBuilder.min.js && echo \"gzipped, the global build is `gzip -c build/global/ReactQueryBuilder.min.js | wc -c` bytes\"",
+    "build-global": "rm -rf build/global && NODE_ENV=production webpack modules/index.js build/global/ReactAwesomeQueryBuilder.js && NODE_ENV=production COMPRESS=1 webpack modules/index.js build/global/ReactAwesomeQueryBuilder.min.js && echo \"gzipped, the global build is `gzip -c build/global/ReactAwesomeQueryBuilder.min.js | wc -c` bytes\"",
     "build-npm": "rm -rf build/npm && babel -d build/npm/lib ./modules && cp README.md build/npm && find build/npm/lib -type d -name __tests__ | xargs rm -rf && node -p 'p=require(\"./package\");p.main=\"lib\";p.scripts=p.devDependencies=undefined;JSON.stringify(p,null,2)' > build/npm/package.json",
     "prepublish": "npm run build-npm",
     "build-examples": "cd examples && webpack --config webpack.config.js",
