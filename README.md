@@ -17,6 +17,8 @@ See `examples/demo` as example of usage and configuration
 ### Demo
 [Demo](https://ukrbublik.github.io/react-awesome-query-builder)
 
+![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)
+
 
 ### Development
 To build the component locally, clone this repo then run:
