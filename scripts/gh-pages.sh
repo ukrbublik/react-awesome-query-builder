@@ -1,5 +1,3 @@
-cd ..
-
 npm run build-global
 git add -A build/global
 
