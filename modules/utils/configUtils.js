@@ -52,6 +52,7 @@ export const extendConfig = (config) => {
             if (!fieldConfig.widgets)
                 fieldConfig.widgets = {};
             fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
+            fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
             for (let widget in typeConfig.widgets) {
                 let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
                 if (fieldWidgetConfig.operators) {
@@ -66,7 +67,6 @@ export const extendConfig = (config) => {
                 }
                 fieldConfig.widgets[widget] = fieldWidgetConfig;
             }
-            fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources || ['value'];
             if (!fieldConfig.operators && operators)
                 fieldConfig.operators = Array.from(new Set(operators));
             if (!fieldConfig.defaultOperator && defaultOperator)
@@ -259,7 +259,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
                 canAdd = false;
             if (canAdd) {
                 widgets.push(widget);
-                if (!valueSrcs.find(v => v == widgetValueSrc))
+                if (fieldConfig.valueSources.indexOf(widgetValueSrc) != -1 && !valueSrcs.find(v => v == widgetValueSrc))
                     valueSrcs.push(widgetValueSrc);
             }
         }

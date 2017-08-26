@@ -222,9 +222,12 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
             let v = currentValue.get(i);
             let vType = currentValueType.get(i) || null;
             let vSrc = currentValueSrc.get(i) || null;
+            let isValidSrc = (valueSources.find(v => v == vSrc) != null);
             let isValid = _validateValue(config, newField, newOperator, v, vType, vSrc);
-            if (!isValid)
+            if (!isValidSrc || !isValid) {
                 canReuseValue = false;
+                break;
+            }
         }
     }
 
