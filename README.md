@@ -33,8 +33,9 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 ### Install & use
 Install: `npm i react-awesome-query-builder`
 
-See `examples/demo` as example of usage and configuration
+See `examples/demo` as example of usage and configuration.
 
+For full reordering support you need to add class `query-builder-container` for dom-element which is holding your querybuilder component AND has scrolling. If there is no such dom-element (only body) you can do nothing.
 
 ## Use
 ```javascript
