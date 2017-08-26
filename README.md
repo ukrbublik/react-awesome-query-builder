@@ -36,17 +36,29 @@ Install: `npm i react-awesome-query-builder`
 See `examples/demo` as example of usage and configuration
 
 
-### Use
+## Use
 ```
 import React, {Component} from 'react';
 import {Query, Builder, Utils as QbUtils} from 'react-awesome-query-builder';
-import config from './config';
-import '../../css/reset.scss';
-import '../../css/styles.scss';
-import '../../css/compact_styles.scss';
-import '../../css/denormalize.scss';
+import config from './config'; //see below 'Config format'
+import 'react-awesome-query-builder/css/styles.scss';
+import 'react-awesome-query-builder/css/compact_styles.scss';
+import 'react-awesome-query-builder/css/denormalize.scss';
 
-export default class DemoQueryBuilder extends Component {
+class DemoQueryBuilder extends Component {
+    render() {                
+        return (
+            <div>
+                <Query 
+                  {...config} 
+                  //value={you can pass object here, see tree at onChange}
+                  get_children={this.getChildren}
+                  onChange={this.onChange}
+                ></Query>
+            </div>
+        );
+    }
+    
     getChildren(props) {
         return (
             <div>
@@ -61,25 +73,26 @@ export default class DemoQueryBuilder extends Component {
     onChange(tree) {
       //here you can save tree object
     }
-
-    render() {                
-        return (
-            <div>
-                <Query 
-                  {...config} 
-                  //value={...you can pass object here (see tree at onChange)...}
-                  get_children={this.getChildren}
-                  onChange={this.onChange}
-                ></Query>
-            </div>
-        );
-    }
 }
 ```
 
-### Config format
+## Config format
 ```
-{
+import {Widgets, Operators} from 'react-awesome-query-builder';
+const {
+    TextWidget,
+    NumberWidget,
+    SelectWidget,
+    MultiSelectWidget,
+    DateWidget,
+    BooleanWidget,
+    TimeWidget,
+    DateTimeWidget,
+    ValueFieldWidget
+} = Widgets;
+import en_US from 'antd/lib/locale-provider/en_US';
+
+export default {
   conjunctions: {
     'AND': {
       label: 'And', //label for conjunctions swicther
