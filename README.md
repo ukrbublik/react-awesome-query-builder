@@ -99,7 +99,8 @@ export default {
       //(for building query string) function to join rules into group
       // children - list of already formatted queries (strings) to be joined with conjuction
       // isForDisplay - false by default, for building query string for SQL/expression/etc., 
-      //  true can be used to format query string displayed on collapsed query group (noy used for now, see Issue #2)
+      //  true can be used to format query string displayed on collapsed query group 
+      //  (not used for now, see Issue #2)
       formatConj: (Immultable.List children, string conj, bool isForDisplay) => string,
     },
     'OR': ...same as for 'AND'
@@ -131,7 +132,8 @@ export default {
       subfields: { //only for type == '!struct'
         subname: { //key of subfield
           label: 'Subname', //label for list of fields
-          label2: 'MemberName', //label for field menu's toggler (for config.renderFieldAndOpAsDropdown == true)
+          //label for field menu's toggler (for config.renderFieldAndOpAsDropdown == true)
+          label2: 'MemberName',
           type: 'text', //one of types described below in section 'types'
         },
       },
@@ -141,8 +143,9 @@ export default {
   
   types: {
     number: { //type key
-      //(optional) Values of fields can be compared with values or another fields (see settings.valueSourcesInfo)
-      //If you want to compare values of this type only with values or other fields of this type, edit this:
+      //(optional) Values of fields can be compared with values or another fields
+      // (see settings.valueSourcesInfo)
+      //If you want to compare values of this type only with values or other fields of this type, edit:
       valueSources: ['value'],
       //Available widgets for type and its configs:
       widgets: {
@@ -163,10 +166,11 @@ export default {
             ...other ops
           },
         },
-        //Most of types can have only 1 widget, 
-        // but for list there can be 2: single-select widget (for op ==) and multi-select widget (for op 'in')
+        //Most of types can have only 1 widget, but for list there can be 2: 
+        // single-select widget (for op ==) and multi-select widget (for op 'in')
         ...other widgets if applicable
-        //'field' is special widget to compare values of field of this type with another fields (of this type)
+        //'field' is special widget to compare values of field of this type
+        // with another fields (of this type)
         field: {
           ...you can overwrire 'operators' for example
         }
@@ -183,8 +187,10 @@ export default {
       cardinality: 1, //number of right operands (1 for binary, 2 for 'between')
       isUnary: true,
       //(for building query string) function to format rule
-      // value - string (already formatted value) for cardinality==1 -or- Immutable.List of strings for cardinality!=1
-      formatOp: (string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, bool isForDisplay) => string,
+      // value - string (already formatted value) for cardinality==1 
+      // -or- Immutable.List of strings for cardinality!=1
+      formatOp: (string field, string op, mixed value, string valueSrc, string valueType, 
+        Object opDef, Object operatorOptions, bool isForDisplay) => string,
       //for cardinality==2 ('between')
       valueLabels: ['Value from', {label: 'Value to', placeholder: 'Enter value to'}],
       textSeparators: [null, 'and'],
@@ -260,15 +266,18 @@ export default {
     valueSourcesPopupTitle: "Select value source",
     //Leave empty group after deletion or add 1 clean rule immediately?
     canLeaveEmptyGroup: true, //after deletion
-    //(for building query string) function to format rule with reverse operator which haven't 'formatOp'
+    //(for building query string) function to format rule with reverse operator 
+    // which haven't 'formatOp'
     // q - already formatted rule for opposite operator (which have 'formatOp')
     // return smth like "NOT(" + q + ")"
-    formatReverse: (string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string,
+    formatReverse: (string q, string operator, string reversedOp, Object operatorDefinition, 
+      Object revOperatorDefinition, bool isForDisplay) => string,
     //(for building query string) function to format field
     // parts - for struct field
     // label2 - with using of 'fieldSeparatorDisplay'
     //just return field (or label2 for isForDisplay==true)
-    formatField: (string field, Array parts, string label2, Object fieldDefinition, Object config, bool isForDisplay) => string,
+    formatField: (string field, Array parts, string label2, Object fieldDefinition, Object config, 
+      bool isForDisplay) => string,
     //Values of fields can be compared with values or another fields
     //If you want to disable this feature and leave only comparing with values, remove 'field'
     valueSourcesInfo: {
@@ -283,7 +292,8 @@ export default {
     //Activate reordering support for rules and groups of rules?
     canReorder: true,
     //(For comparing field with field) Function for building right list of fields to compare
-    canCompareFieldWithField: (string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => {
+    canCompareFieldWithField: (string leftField, Object leftFieldConfig, string rightField, 
+      Object rightFieldConfig) => {
         //for type == 'select'/'multiselect' you can check listValues
         return true;
     },
