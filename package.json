@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactAwesomeQueryBuilder.js",
