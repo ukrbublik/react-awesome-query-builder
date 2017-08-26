@@ -37,7 +37,7 @@ See `examples/demo` as example of usage and configuration
 
 
 ## Use
-```
+```javascript
 import React, {Component} from 'react';
 import {Query, Builder, Utils as QbUtils} from 'react-awesome-query-builder';
 import config from './config'; //see below 'Config format'
@@ -77,7 +77,7 @@ class DemoQueryBuilder extends Component {
 ```
 
 ## Config format
-```
+```javascript
 import {Widgets, Operators} from 'react-awesome-query-builder';
 const {
     TextWidget,
@@ -144,8 +144,8 @@ export default {
   types: {
     number: { //type key
       //(optional) Values of fields can be compared with values or another fields
-      // (see settings.valueSourcesInfo)
-      //If you want to compare values of this type only with values or other fields of this type, edit:
+      // (see settings.valueSourcesInfo). If you want to compare values of this type 
+      // only with values or other fields of this type, edit:
       valueSources: ['value'],
       //Available widgets for type and its configs:
       widgets: {
