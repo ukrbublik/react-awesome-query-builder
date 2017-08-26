@@ -25,7 +25,7 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 
 
 ### Demo
-[Demo](https://ukrbublik.github.io/react-awesome-query-builder)
+[Live Demo](https://ukrbublik.github.io/react-awesome-query-builder)
 
 ![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)
 
