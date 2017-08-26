@@ -47,9 +47,11 @@
 }
 */
 
-.rule--operator, .widget--widget {
-  display: inline-block;
+.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 5px;
+}
+.operator--options--sep {
+  margin-right: 5px;
 }
 
 .group--header {

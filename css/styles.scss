@@ -194,18 +194,22 @@
 }
 */
 
-.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .widget--widget, .widget--valuesrc, .widget--sep {
+.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
+.widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep {
   display: inline-block;
 }
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
+}
+.operator--options--sep {
+  margin-right: 10px;
 }
 
 div.tooltip-inner {
   max-width: 500px;
 }
 
-.rule--field, .rule--operator {
+.rule--field, .rule--operator, .widget--widget {
   label {
     display: block;
     font-weight: bold;

@@ -513,13 +513,18 @@ export default {
             {label: 'Word 1', placeholder: 'Enter first word'},
             'Word 2'
           ],
+          textSeparators: [
+            //'Word 1',
+            //'Word 2'
+          ],
           formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
             let val1 = values.first();
             let val2 = values.get(1);
             return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
           },
           options: {
-            optionLabel: "Words between",
+            optionLabel: "Near",
+            optionTextBefore: "Near",
             optionPlaceholder: "Select words between",
             factory: (props) => <ProximityOperator {...props} />,
             defaults: {

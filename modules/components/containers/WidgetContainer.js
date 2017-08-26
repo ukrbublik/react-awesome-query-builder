@@ -127,8 +127,8 @@ export default (Widget) => {
                                 ));
                             }
                         }
-
-                        if (widgets.length > 1)
+                        
+                        if (valueSources.length > 1)
                             parts.push((
                                 <div key={"valuesrc-"+this.props.field+"-"+delta} className="widget--valuesrc">
                                     {settings.showLabels ?

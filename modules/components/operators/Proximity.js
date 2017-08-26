@@ -20,10 +20,15 @@ export default class Proximity extends Component {
     const selectedProximity = this.props.options.get('proximity', this.props.defaults.proximity);
     return (
       <div className="operator--PROXIMITY">
-        { this.props.config.settings.showLabels &&
-          <label>{this.props.optionLabel || "Words between"}</label>
-        }
-        <div className="operator--proximity">
+        <div className="operator--options">
+          { this.props.config.settings.showLabels &&
+            <label>{this.props.optionLabel || "Words between"}</label>
+          }
+          { !this.props.config.settings.showLabels && this.props.optionTextBefore &&
+            <div className="operator--options--sep">
+                <span>{this.props.optionTextBefore}</span>
+            </div>
+          }
           <Select 
             dropdownMatchSelectWidth={false}
             size={this.props.config.settings.renderSize || "small"}

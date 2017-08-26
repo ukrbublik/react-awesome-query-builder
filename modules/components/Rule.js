@@ -128,18 +128,6 @@ export default class Rule extends Component {
                                 </div>
                             </Col>
                         )}
-                        {isFieldAndOpSelected && selectedOperatorHasOptions &&
-                            <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
-                                <OperatorOptions
-                                  key="operatorOptions"
-                                  selectedField={this.props.selectedField}
-                                  selectedOperator={this.props.selectedOperator}
-                                  operatorOptions={this.props.operatorOptions}
-                                  setOperatorOption={this.props.setOperatorOption}
-                                  config={this.props.config} 
-                                />
-                            </Col>
-                        }
                         {isFieldAndOpSelected &&
                             <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
                                 <Widget
@@ -151,6 +139,18 @@ export default class Rule extends Component {
                                   config={this.props.config} 
                                   setValue={this.props.setValue}
                                   setValueSrc={this.props.setValueSrc}
+                                />
+                            </Col>
+                        }
+                        {isFieldAndOpSelected && selectedOperatorHasOptions &&
+                            <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
+                                <OperatorOptions
+                                  key="operatorOptions"
+                                  selectedField={this.props.selectedField}
+                                  selectedOperator={this.props.selectedOperator}
+                                  operatorOptions={this.props.operatorOptions}
+                                  setOperatorOption={this.props.setOperatorOption}
+                                  config={this.props.config} 
                                 />
                             </Col>
                         }
