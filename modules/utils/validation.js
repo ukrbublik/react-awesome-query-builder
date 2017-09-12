@@ -121,6 +121,8 @@ export const validateTree = (tree, oldTree, config, oldConfig, removeEmptyGroups
 	        if (sanitized)
 	        	item = item.set('properties', properties);
 	        return item;
+	    } else {
+	    	return item;
 	    }
 	};
 
