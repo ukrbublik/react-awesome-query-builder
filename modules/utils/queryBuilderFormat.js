@@ -100,7 +100,7 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         //const reversedOp = operatorDefinition.reversedOp;
         //const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const fieldType = fieldDefinition.type || "undefined";
-        const cardinality = operatorDefinition.cardinality || 1;
+        const cardinality = defaultValue(operatorDefinition.cardinality, 1);
         const widget = getWidgetForFieldOp(config, field, operator);
         const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget), ['factory']);
         const typeConfig = config.types[fieldDefinition.type] || {};

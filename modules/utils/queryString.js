@@ -1,6 +1,7 @@
 import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
+import {defaultValue} from "./stuff";
 
 export const queryString = (item, config, isForDisplay = false) => {
     const type = item.get('type');
@@ -30,7 +31,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         const operatorDefinition = getOperatorConfig(config, operator, field) || {};
         const reversedOp = operatorDefinition.reversedOp;
         const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-        const cardinality = operatorDefinition.cardinality || 1;
+        const cardinality = defaultValue(operatorDefinition.cardinality, 1);
         const typeConfig = config.types[fieldDefinition.type] || {};
         const fieldSeparator = config.settings.fieldSeparator;
 
