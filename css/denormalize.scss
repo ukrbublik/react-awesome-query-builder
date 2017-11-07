@@ -22,3 +22,21 @@ body {
 }
 
 
+select {
+  -webkit-appearance: menulist;
+}
+button, input[type="button"], input[type="reset"], input[type="submit"] {
+  -webkit-appearance: button;
+}
+input[type="text"] {
+  -webkit-appearance: textfield;
+}
+input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+}
+input[type="radio"] {
+  -webkit-appearance: radio;
+}
+textarea {
+  -webkit-appearance: textarea;
+}
