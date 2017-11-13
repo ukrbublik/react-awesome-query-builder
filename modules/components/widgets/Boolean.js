@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Switch, Icon } from 'antd';
 
@@ -24,12 +25,12 @@ export default class BooleanWidget extends Component {
     render() {
         const {value, delta, id} = this.props;
         return (
-            <Switch 
-                ref="switch" 
+            <Switch
+                ref="switch"
                 checkedChildren={this.props.labelYes || null}
                 unCheckedChildren={this.props.labelNo || null}
-                checked={this.props.value || null} 
-                onChange={this.handleChange.bind(this)} 
+                checked={this.props.value || null}
+                onChange={this.handleChange.bind(this)}
             />
         );
     }

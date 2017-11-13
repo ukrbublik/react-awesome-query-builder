@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { DatePicker } from 'antd';
 const { MonthPicker, RangePicker } = DatePicker;
 import moment from 'moment';
@@ -42,7 +43,7 @@ export default class DateWidget extends Component {
         return (
             <DatePicker
                 key="widget-date"
-                placeholder={this.props.placeholder} 
+                placeholder={this.props.placeholder}
                 size={this.props.config.settings.renderSize || "small"}
                 format={dateFormat}
                 value={dateValue}

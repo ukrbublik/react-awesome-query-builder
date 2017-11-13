@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
 
@@ -57,7 +58,7 @@ export default (Group) => {
       }));
 
       return (
-        <div 
+        <div
           className={'group-or-rule-container group-container'}
           data-id={this.props.id}
         >

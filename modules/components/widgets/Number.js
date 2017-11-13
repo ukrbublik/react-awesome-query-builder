@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { InputNumber, Col } from 'antd';
 import 'antd/lib/date-picker/style';
@@ -33,16 +34,16 @@ export default class NumberWidget extends Component {
 
     return (
       <Col>
-        <InputNumber 
+        <InputNumber
           key="widget-number"
           size={this.props.config.settings.renderSize || "small"}
-          ref="num" 
-          value={this.props.value || null} 
-          min={min} 
-          max={max} 
-          step={step} 
-          placeholder={this.props.placeholder} 
-          onChange={this.handleChange.bind(this)} 
+          ref="num"
+          value={this.props.value || null}
+          min={min}
+          max={max}
+          step={step}
+          placeholder={this.props.placeholder}
+          onChange={this.handleChange.bind(this)}
         />
       </Col>
     );

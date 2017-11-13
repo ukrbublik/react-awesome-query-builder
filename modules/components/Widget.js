@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import WidgetContainer from './containers/WidgetContainer';
 import { Row, Col } from 'antd';
@@ -15,7 +16,7 @@ export default class Widget extends Component {
 
   render() {
     return (
-      <Col 
+      <Col
         className={`rule--widget rule--widget--${this.props.name.toUpperCase()}`}
         key={"widget-col-"+this.props.name}
       >

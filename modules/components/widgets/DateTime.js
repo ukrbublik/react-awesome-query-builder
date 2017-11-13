@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { DatePicker } from 'antd';
 const { MonthPicker, RangePicker } = DatePicker;
 import moment from 'moment';
@@ -43,11 +44,11 @@ export default class DateTimeWidget extends Component {
         const {dateFormat, timeFormat, valueFormat, value, locale, use12Hours} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
         return (
-            <DatePicker 
+            <DatePicker
                 key="widget-datetime"
                 use12Hours={use12Hours}
                 showTime={{ format: timeFormat }}
-                placeholder={this.props.placeholder} 
+                placeholder={this.props.placeholder}
                 size={this.props.config.settings.renderSize || "small"}
                 format={dateFormat + ' ' + timeFormat}
                 value={dateValue}

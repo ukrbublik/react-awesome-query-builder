@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { LocaleProvider } from 'antd';
@@ -27,7 +28,7 @@ export default class TimeWidget extends Component {
         valueFormat: 'HH:mm:ss',
         use12Hours: false,
     };
-    
+
 
     handleChange(_value) {
         const {setValue, valueFormat} = this.props;
@@ -44,7 +45,7 @@ export default class TimeWidget extends Component {
                 use12Hours={use12Hours}
                 key="widget-time"
                 size={this.props.config.settings.renderSize || "small"}
-                placeholder={this.props.placeholder} 
+                placeholder={this.props.placeholder}
                 format={timeFormat}
                 value={dateValue}
                 onChange={this.handleChange.bind(this)}
