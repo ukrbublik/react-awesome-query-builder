@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
@@ -219,7 +219,7 @@ export default (Builder, CanMoveFn = null) => {
       if (this.didAnySortOnDrag) {
           //todo ?
       }
-      
+
       window.removeEventListener('mousemove', this.onDrag);
       window.removeEventListener('mouseup', this.onDragEnd);
     }
@@ -255,7 +255,7 @@ export default (Builder, CanMoveFn = null) => {
 
         var treeRect = treeEl.getBoundingClientRect();
         var trgCoord = {
-          x: treeRect.left + (treeRect.right - treeRect.left) / 2, 
+          x: treeRect.left + (treeRect.right - treeRect.left) / 2,
           y: dragDirs.vrt >= 0 ? dragRect.bottom : dragRect.top,
         };
         var hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
@@ -423,7 +423,7 @@ export default (Builder, CanMoveFn = null) => {
 
       return false;
     }
-    
+
     canMove (fromII, toII, placement, toParentII, canMoveFn) {
       if(!fromII || !toII)
         return false;

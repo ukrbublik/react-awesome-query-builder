@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
@@ -53,7 +54,7 @@ export default (Rule) => {
       let isGroup = fieldConfig && fieldConfig.type == '!struct';
 
       return (
-        <div 
+        <div
           className={'group-or-rule-container rule-container'}
           data-id={this.props.id}
         >

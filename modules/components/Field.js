@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
 import {calcTextWidth} from "../utils/stuff";
@@ -32,7 +33,7 @@ export default class Field extends Component {
   curFieldOpts() {
       return Object.assign({}, {
           label: this.props.selectedField
-        }, 
+        },
         getFieldConfig(this.props.selectedField, this.props.config) || {}
       );
   }
@@ -55,8 +56,8 @@ export default class Field extends Component {
           let field = fields[fieldKey];
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
-              return <SubMenu 
-                  key={prefix+fieldKey} 
+              return <SubMenu
+                  key={prefix+fieldKey}
                   title={<span>{field.label || last(fieldKey.split(fieldSeparator))} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
               >
                   {this.buildMenuItems(field.subfields, subpath)}
@@ -77,14 +78,14 @@ export default class Field extends Component {
           let field = fields[fieldKey];
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
-              return <OptGroup 
-                  key={prefix+fieldKey} 
+              return <OptGroup
+                  key={prefix+fieldKey}
                   label={field.label || last(fieldKey.split(fieldSeparator))}
               >
                   {this.buildSelectItems(field.subfields, subpath)}
               </OptGroup>
           } else {
-              return <Option 
+              return <Option
                 key={prefix+fieldKey}
                 value={prefix+fieldKey}
               >
@@ -95,8 +96,8 @@ export default class Field extends Component {
   }
 
   buildMenuToggler(label, fullLabel, customLabel) {
-      var toggler = 
-          <Button 
+      var toggler =
+          <Button
               size={this.props.config.settings.renderSize || "small"}
           >
               {customLabel ? customLabel : label} <Icon type="down" />
@@ -127,10 +128,10 @@ export default class Field extends Component {
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let fieldSelect = (
-        <Select 
+        <Select
             dropdownMatchSelectWidth={false}
             style={{ width: this.props.selectedField ? null : placeholderWidth + 36 }}
-            ref="field" 
+            ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleFieldSelect.bind(this)}
@@ -150,7 +151,7 @@ export default class Field extends Component {
 
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
     let fieldMenu = (
-        <Menu 
+        <Menu
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldMenuSelect.bind(this)}
@@ -159,8 +160,8 @@ export default class Field extends Component {
     let fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);
 
     return (
-      <Dropdown 
-          overlay={fieldMenu} 
+      <Dropdown
+          overlay={fieldMenu}
           trigger={['click']}
       >
           {fieldToggler}

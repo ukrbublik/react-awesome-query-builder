@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import shallowCompare from 'react-addons-shallow-compare';
 import RuleContainer from './containers/RuleContainer';
@@ -65,17 +66,17 @@ export default class Rule extends Component {
         }
 
         return (
-            <div 
-                className={classNames("rule", "group-or-rule", 
+            <div
+                className={classNames("rule", "group-or-rule",
                     this.props.renderType == 'placeholder' ? 'qb-placeholder' : null,
                     this.props.renderType == 'dragging' ? 'qb-draggable' : null,
-                )} 
+                )}
                 style={styles}
-                ref="rule" 
+                ref="rule"
                 data-id={this.props.id}
             >
                 <div className="rule--header">
-                    <Button 
+                    <Button
                         type="danger"
                         icon="delete"
                         onClick={this.props.removeSelf}
@@ -136,7 +137,7 @@ export default class Rule extends Component {
                                   operator={this.props.selectedOperator}
                                   value={this.props.value}
                                   valueSrc={this.props.valueSrc}
-                                  config={this.props.config} 
+                                  config={this.props.config}
                                   setValue={this.props.setValue}
                                   setValueSrc={this.props.setValueSrc}
                                 />
@@ -150,7 +151,7 @@ export default class Rule extends Component {
                                   selectedOperator={this.props.selectedOperator}
                                   operatorOptions={this.props.operatorOptions}
                                   setOperatorOption={this.props.setOperatorOption}
-                                  config={this.props.config} 
+                                  config={this.props.config}
                                 />
                             </Col>
                         }

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getOperatorConfig} from "../../utils/configUtils";
@@ -27,7 +28,7 @@ export default (OperatorOptions) => {
       const { factory: optionsFactory, ...optionsProps } = operatorDefinitions.options;
 
       return (
-        <OperatorOptions 
+        <OperatorOptions
             name={this.props.selectedOperator}
             config={this.props.config}
         >

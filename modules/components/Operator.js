@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
 import {calcTextWidth} from "../utils/stuff";
@@ -32,7 +33,7 @@ export default class Operator extends Component {
   componentWillReceiveProps (props) {
       this.onPropsChanged(props);
   }
-  
+
   onPropsChanged (props) {
       let fieldConfig = getFieldConfig(props.selectedField, props.config);
       this.operatorOptions = mapValues(pickBy(props.config.operators, (item, key) =>
@@ -62,8 +63,8 @@ export default class Operator extends Component {
   }
 
   buildMenuToggler(label) {
-      var toggler = 
-          <Button 
+      var toggler =
+          <Button
               size={this.props.config.settings.renderSize || "small"}
           >
               {label} <Icon type="down" />
@@ -77,7 +78,7 @@ export default class Operator extends Component {
           return null;
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
-          return <Option 
+          return <Option
             key={fieldKey}
             value={fieldKey}
           >
@@ -100,10 +101,10 @@ export default class Operator extends Component {
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(this.operatorOptions);
     let opSelect = (
-        <Select 
+        <Select
             dropdownMatchSelectWidth={false}
             style={{ width: this.props.selectedOperator ? null : placeholderWidth + 36 }}
-            ref="field" 
+            ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleOperatorSelect.bind(this)}
@@ -119,7 +120,7 @@ export default class Operator extends Component {
     let placeholder = this.curOpOpts().label || this.props.config.settings.operatorPlaceholder;
     let opMenuItems = this.buildMenuItems(this.operatorOptions);
     let opMenu = (
-        <Menu 
+        <Menu
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={[selectedOpKey]}
             onClick={this.handleOperatorMenuSelect.bind(this)}
@@ -129,8 +130,8 @@ export default class Operator extends Component {
 
 
     return (
-      <Dropdown 
-          overlay={opMenu} 
+      <Dropdown
+          overlay={opMenu}
           trigger={['click']}
       >
           {opToggler}

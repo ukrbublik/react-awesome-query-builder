@@ -1,10 +1,11 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import map from 'lodash/map';
 import {
-    getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp, 
+    getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
 import {defaultValue} from "../../utils/stuff";
@@ -63,14 +64,14 @@ export default (Widget) => {
                 return null;
 
             let content = (
-              <RadioGroup 
+              <RadioGroup
                  key={'valuesrc-'+delta}
-                 value={valueSrc || "value"} 
+                 value={valueSrc || "value"}
                  size={this.props.config.settings.renderSize || "small"}
                  onChange={(e) => {let srcKey = e.target.value; return this.props.setValueSrc(delta, srcKey);}}
               >
                   {valueSources.map(srcKey => (
-                        <RadioButton 
+                        <RadioButton
                           key={srcKey}
                           value={srcKey}
                           //checked={item.checked}
@@ -127,7 +128,7 @@ export default (Widget) => {
                                 ));
                             }
                         }
-                        
+
                         if (valueSources.length > 1)
                             parts.push((
                                 <div key={"valuesrc-"+this.props.field+"-"+delta} className="widget--valuesrc">

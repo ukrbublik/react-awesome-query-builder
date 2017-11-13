@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import map from 'lodash/map';
 import {getFieldConfig} from '../../utils/configUtils';
@@ -26,11 +27,11 @@ export default class SelectWidget extends Component {
     let placeholderWidth = calcTextWidth(placeholder, '12px');
 
     return (
-        <Select 
+        <Select
             style={{ width: this.props.value ? null : placeholderWidth + 36 }}
             key={"widget-select"}
             dropdownMatchSelectWidth={false}
-            ref="val" 
+            ref="val"
             placeholder={placeholder}
             size={size}
             value={this.props.value || undefined} //note: (bug?) null forces placeholder to hide

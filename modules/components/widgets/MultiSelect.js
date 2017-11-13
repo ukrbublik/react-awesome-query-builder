@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import map from 'lodash/map';
 import { Select } from 'antd';
@@ -24,7 +25,7 @@ export default class MultiSelectWidget extends Component {
   componentWillReceiveProps (props) {
       this.onPropsChanged(props);
   }
-  
+
   onPropsChanged (props) {
     let placeholder = this.props.placeholder || "Select option";
     let placeholderWidth = calcTextWidth(placeholder, '12px');
@@ -33,7 +34,7 @@ export default class MultiSelectWidget extends Component {
     map(fieldDefinition.listValues, (label, value) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(label, '12px'));
     });
-    
+
     this.placeholder = placeholder;
     this.placeholderWidth = placeholderWidth;
     this.optionsMaxWidth = optionsMaxWidth;
@@ -50,16 +51,16 @@ export default class MultiSelectWidget extends Component {
     return (
         <Select
             multiple
-            style={{ 
+            style={{
               minWidth: value ? null : this.placeholderWidth + 30,
               width: this.props.value ? null : this.placeholderWidth + 30,
-            }} 
+            }}
             dropdownStyle={{
               width: this.optionsMaxWidth + 40,
             }}
             key={"widget-multiselect"}
             dropdownMatchSelectWidth={false}
-            ref="val" 
+            ref="val"
             placeholder={this.placeholder}
             size={size}
             value={value || undefined}  //note: (bug?) null forces placeholder to hide

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import Item from '../components/Item';
 import SortableContainer from './containers/SortableContainer';
@@ -11,7 +12,7 @@ export default class Builder extends Component {
     tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired
   };
-  
+
   render() {
     const treeNodesCnt = getTotalNodesCountInTree(this.props.tree);
     const id = this.props.tree.get('id');

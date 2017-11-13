@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Input, Col } from 'antd';
 
@@ -17,14 +18,14 @@ export default class TextWidget extends Component {
   render() {
     return (
       <Col>
-        <Input 
+        <Input
           key="widget-text"
           size={this.props.config.settings.renderSize || "small"}
-          ref="text" 
+          ref="text"
           type={"text"}
-          value={this.props.value || null} 
-          placeholder={this.props.placeholder} 
-          onChange={this.handleChange.bind(this)} 
+          value={this.props.value || null}
+          placeholder={this.props.placeholder}
+          onChange={this.handleChange.bind(this)}
         />
       </Col>
     );
