@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {calcTextWidth, truncateString} from "../utils/stuff";
+import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS} from "../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -132,6 +132,7 @@ export default class Field extends Component {
   }
 
   renderAsSelect() {
+    let dropdownPlacement = this.props.config.settings.dropdownPlacement;
     let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
     let fieldOptions = this.props.config.fields;
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
@@ -140,6 +141,7 @@ export default class Field extends Component {
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let fieldSelect = (
         <Select
+            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
             style={{ width: this.props.selectedField ? null : placeholderWidth + 36 }}
             ref="field"
@@ -174,6 +176,7 @@ export default class Field extends Component {
       <Dropdown
           overlay={fieldMenu}
           trigger={['click']}
+          placement={this.props.config.settings.dropdownPlacement}
       >
           {fieldToggler}
       </Dropdown>

@@ -231,6 +231,8 @@ export default {
     },
     //To shorten long labels of fields/values (by length, i.e. number of chars)
     maxLabelsLength: 50,
+    //Placement of antdesign's dropdown pop-up menu (default: 'bottomLeft')
+    dropdownPlacement: 'bottomRight',
     //Don't show conjunctions switcher for only 1 rule?
     hideConjForOne: true,
     //Size of AntDesign components

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {calcTextWidth} from "../utils/stuff";
+import {calcTextWidth, BUILT_IN_PLACEMENTS} from "../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -95,6 +95,7 @@ export default class Operator extends Component {
   }
 
   renderAsSelect() {
+    let dropdownPlacement = this.props.config.settings.dropdownPlacement;
     let selectedOpKey = this.props.selectedOperator;
     let opMenuItems = this.buildMenuItems(this.operatorOptions);
     let placeholder = this.curOpOpts().label || this.props.config.settings.operatorPlaceholder;
@@ -102,6 +103,7 @@ export default class Operator extends Component {
     let fieldSelectItems = this.buildSelectItems(this.operatorOptions);
     let opSelect = (
         <Select
+            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
             style={{ width: this.props.selectedOperator ? null : placeholderWidth + 36 }}
             ref="field"
@@ -133,6 +135,7 @@ export default class Operator extends Component {
       <Dropdown
           overlay={opMenu}
           trigger={['click']}
+          placement={this.props.config.settings.dropdownPlacement}
       >
           {opToggler}
       </Dropdown>

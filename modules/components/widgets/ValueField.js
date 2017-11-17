@@ -4,7 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare';
 import {
   getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../../utils/configUtils";
-import {calcTextWidth, truncateString} from "../../utils/stuff";
+import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS} from "../../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -156,12 +156,14 @@ export default class ValueField extends Component {
   }
 
   renderAsSelect() {
+    let dropdownPlacement = this.props.config.settings.dropdownPlacement;
     let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let fieldSelect = (
           <Select
+              dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
               dropdownMatchSelectWidth={false}
               style={{ width: this.props.value ? null : placeholderWidth + 36 }}
               ref="field"
@@ -196,6 +198,7 @@ export default class ValueField extends Component {
         <Dropdown
             overlay={fieldMenu}
             trigger={['click']}
+            placement={this.props.config.settings.dropdownPlacement}
         >
             {fieldToggler}
         </Dropdown>
