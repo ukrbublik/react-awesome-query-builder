@@ -4,7 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare';
 import {
   getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../../utils/configUtils";
-import {calcTextWidth} from "../../utils/stuff";
+import {calcTextWidth, truncateString} from "../../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -75,39 +75,45 @@ export default class ValueField extends Component {
 
   buildMenuItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
+          let label = field.label || last(fieldKey.split(fieldSeparator));
+          label = truncateString(label, maxLabelsLength);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <SubMenu
                   key={prefix+fieldKey}
-                  title={<span>{field.label || last(fieldKey.split(fieldSeparator))} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
+                  title={<span>{label} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
               >
                   {this.buildMenuItems(field.subfields, subpath)}
               </SubMenu>
           } else {
-              return <MenuItem key={prefix+fieldKey}>{field.label || last(fieldKey.split(fieldSeparator))}</MenuItem>;
+              return <MenuItem key={prefix+fieldKey}>{label}</MenuItem>;
           }
       });
   }
 
   buildSelectItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
+          let label = field.label || last(fieldKey.split(fieldSeparator));
+          label = truncateString(label, maxLabelsLength);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <OptGroup
                   key={prefix+fieldKey}
-                  label={field.label || last(fieldKey.split(fieldSeparator))}
+                  label={label}
               >
                   {this.buildSelectItems(field.subfields, subpath)}
               </OptGroup>
@@ -116,7 +122,7 @@ export default class ValueField extends Component {
                 key={prefix+fieldKey}
                 value={prefix+fieldKey}
               >
-                {field.label || last(fieldKey.split(fieldSeparator))}
+                {label}
               </Option>;
           }
       });

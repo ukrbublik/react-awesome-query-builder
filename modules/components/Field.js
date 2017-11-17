@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {calcTextWidth} from "../utils/stuff";
+import {calcTextWidth, truncateString} from "../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -48,39 +48,45 @@ export default class Field extends Component {
 
   buildMenuItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
+          let label = field.label || last(fieldKey.split(fieldSeparator));
+          label = truncateString(label, maxLabelsLength);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <SubMenu
                   key={prefix+fieldKey}
-                  title={<span>{field.label || last(fieldKey.split(fieldSeparator))} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
+                  title={<span>{label} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
               >
                   {this.buildMenuItems(field.subfields, subpath)}
               </SubMenu>
           } else {
-              return <MenuItem key={prefix+fieldKey}>{field.label || last(fieldKey.split(fieldSeparator))}</MenuItem>;
+              return <MenuItem key={prefix+fieldKey}>{label}</MenuItem>;
           }
       });
   }
 
   buildSelectItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
+          let label = field.label || last(fieldKey.split(fieldSeparator));
+          label = truncateString(label, maxLabelsLength);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <OptGroup
                   key={prefix+fieldKey}
-                  label={field.label || last(fieldKey.split(fieldSeparator))}
+                  label={label}
               >
                   {this.buildSelectItems(field.subfields, subpath)}
               </OptGroup>
@@ -89,18 +95,21 @@ export default class Field extends Component {
                 key={prefix+fieldKey}
                 value={prefix+fieldKey}
               >
-                {field.label || last(fieldKey.split(fieldSeparator))}
+                {label}
               </Option>;
           }
       });
   }
 
   buildMenuToggler(label, fullLabel, customLabel) {
+      let btnLabel = customLabel ? customLabel : label;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+      btnLabel = truncateString(btnLabel, maxLabelsLength);
       var toggler =
           <Button
               size={this.props.config.settings.renderSize || "small"}
           >
-              {customLabel ? customLabel : label} <Icon type="down" />
+              {btnLabel} <Icon type="down" />
           </Button>;
 
       if (fullLabel && fullLabel != label) {
@@ -123,8 +132,10 @@ export default class Field extends Component {
   }
 
   renderAsSelect() {
+    let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
     let fieldOptions = this.props.config.fields;
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+    placeholder = truncateString(placeholder, maxLabelsLength);
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let fieldSelect = (

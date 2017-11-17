@@ -634,6 +634,7 @@ export default {
             full: 'en-US',
             antd: en_US,
         },
+        maxLabelsLength: 50,
         hideConjForOne: true,
         renderSize: 'small',
         renderConjsAsRadios: false,
