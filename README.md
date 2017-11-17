@@ -229,6 +229,8 @@ export default {
         full: 'en-US',
         antd: en_US,
     },
+    //To shorten long labels of fields/values (by length, i.e. number of chars)
+    maxLabelsLength: 50,
     //Don't show conjunctions switcher for only 1 rule?
     hideConjForOne: true,
     //Size of AntDesign components
