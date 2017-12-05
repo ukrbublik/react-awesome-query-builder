@@ -25,6 +25,9 @@ body {
 select {
   -webkit-appearance: menulist;
 }
+select[multiple] {
+  -webkit-appearance: listbox;
+}
 button, input[type="button"], input[type="reset"], input[type="submit"] {
   -webkit-appearance: button;
 }
