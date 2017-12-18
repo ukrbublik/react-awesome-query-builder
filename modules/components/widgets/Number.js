@@ -16,6 +16,8 @@ export default class NumberWidget extends Component {
   };
 
   handleChange(val) {
+    if (val === '')
+      val = undefined;
     this.props.setValue(val);
   }
 
@@ -38,7 +40,7 @@ export default class NumberWidget extends Component {
           key="widget-number"
           size={this.props.config.settings.renderSize || "small"}
           ref="num"
-          value={this.props.value || null}
+          value={this.props.value != undefined ? this.props.value : null}
           min={min}
           max={max}
           step={step}

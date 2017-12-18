@@ -120,6 +120,11 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
                 value: value[i],
             };
             values.push(val);
+            if (valueSrc[i] == 'field') {
+                let secondField = value[i];
+                if (rootQuery.usedFields.indexOf(secondField) == -1)
+                    rootQuery.usedFields.push(secondField);
+            }
         }
         let operatorOptions = options ? options.toJS() : null;
         if (operatorOptions && !Object.keys(operatorOptions).length)

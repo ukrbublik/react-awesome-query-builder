@@ -77,7 +77,7 @@ export default {
             label: 'Number',
             type: 'number',
             fieldSettings: {
-                min: 2,
+                min: -1,
                 max: 5
             },
         },
