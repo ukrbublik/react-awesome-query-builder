@@ -52,7 +52,8 @@ class DemoQueryBuilder extends Component {
             <div>
                 <Query 
                   {...config} 
-                  //value={you can pass object here, see tree at onChange}
+                  //you can pass object here, see treeJSON at onChange
+                  //value=transit.fromJSON(treeJSON)
                   get_children={this.getChildren}
                   onChange={this.onChange}
                 ></Query>
@@ -72,7 +73,8 @@ class DemoQueryBuilder extends Component {
     }
     
     onChange(tree) {
-      //here you can save tree object
+      //here you can save tree object: 
+      //var treeJSON = transit.toJSON(tree)
     }
 }
 ```
