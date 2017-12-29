@@ -89,6 +89,17 @@ export default class Query extends Component {
         };
     }
 
+    // handle case when value property changes
+    componentWillReceiveProps(nextProps) {
+      var tree = nextProps.value;
+      var oldTree = this.props.tree;
+      if (tree !== oldTree) {
+        this.state.store.dispatch(
+          actions.tree.setTree(this.props.config, tree)
+        )
+      }
+    }
+
     render() {
         const {conjunctions, fields, types, operators, widgets, settings, get_children, onChange, onBlur, value, tree, children, ...props} = this.props;
         let config = {conjunctions, fields, types, operators, widgets, settings};
