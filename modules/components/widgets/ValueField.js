@@ -44,13 +44,18 @@ export default class ValueField extends Component {
   //tip: empty groups are ok for antd
   filterFields(config, fields, leftFieldFullkey, operator) {
     fields = clone(fields);
-    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
-    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
-    let widgetConfig = config.widgets[widget];
-    let widgetType = widgetConfig.type;
-    //let expectedType = leftFieldConfig.type;
-    let expectedType = widgetType;
     const fieldSeparator = config.settings.fieldSeparator;
+    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
+    let expectedType;
+    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
+    if (widget) {
+      let widgetConfig = config.widgets[widget];
+      let widgetType = widgetConfig.type;
+      //expectedType = leftFieldConfig.type;
+      expectedType = widgetType;
+    } else {
+      expectedType = leftFieldConfig.type;
+    }
 
     function _filter(list, path) {
       for (let rightFieldKey in list) {
