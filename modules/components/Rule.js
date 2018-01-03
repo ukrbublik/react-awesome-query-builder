@@ -110,6 +110,7 @@ export default class Rule extends Component {
                                     selectedField={this.props.selectedField}
                                     setField={this.props.setField}
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
+                                    customProps={this.props.config.settings.customFieldSelectProps}
                                 />
                             </Col>
                         ) : null}

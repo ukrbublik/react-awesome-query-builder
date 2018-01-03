@@ -16,6 +16,7 @@ export default class DateTimeWidget extends Component {
         field: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         use12Hours: PropTypes.bool,
+        customProps: PropTypes.object,
     };
 
     constructor(props) {
@@ -45,8 +46,10 @@ export default class DateTimeWidget extends Component {
     }
 
     render() {
+        let customProps = this.props.customProps || {};
         const {dateFormat, timeFormat, valueFormat, value, use12Hours} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
+
         return (
             <DatePicker
                 key="widget-datetime"
@@ -58,6 +61,7 @@ export default class DateTimeWidget extends Component {
                 value={dateValue}
                 onChange={this.handleChange.bind(this)}
                 ref="datetime"
+                {...customProps}
             />
         );
     }

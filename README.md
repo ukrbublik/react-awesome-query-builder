@@ -160,6 +160,11 @@ export default {
           widgetProps: {
             //for example, here you can overwrire 'valueLabel', 'valuePlaceholder', 
             // for date/time: 'timeFormat', 'dateFormat', 'valueFormat'
+
+            //also you can pass props directly to widget, for example enable search for Select widget:
+            customProps: {
+                showSearch: true
+            }
           },
           //Config for operators for this widget (all optional):
           opProps: {
@@ -219,6 +224,8 @@ export default {
       dateFormat: 'YYYY-MM-DD',
       valueFormat: 'YYYY-MM-DD HH:mm',
       // ...for your custom widgets you can add here your options
+      // also you can pass customProps, for example to enable search for select widget:
+      customProps: { showSearch: true }
     },
     ...other widgets (you can add your custom ones here)
     ...also there should be special 'field' widget, see examples/demo
@@ -243,6 +250,10 @@ export default {
     renderConjsAsRadios: false,
     //How to render fields/ops list? true - use Dropdown/Menu, false - use Select
     renderFieldAndOpAsDropdown: false,
+    //You can pass props to Select field widget
+    customFieldSelectProps: {
+        showSearch: true
+    },
     //Strategies for selecting operator for new field (used by order until success)
     // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
     setOpOnChangeField: ['keep', 'default'],

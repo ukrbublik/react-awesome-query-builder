@@ -17,6 +17,7 @@ export default class Field extends Component {
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.string,
     renderAsDropdown: PropTypes.bool,
+    customProps: PropTypes.object,
     //actions
     setField: PropTypes.func.isRequired,
   };
@@ -140,16 +141,20 @@ export default class Field extends Component {
     placeholder = truncateString(placeholder, maxLabelsLength);
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
+    let customProps = this.props.customProps || {};
+
     let fieldSelect = (
         <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            style={{ width: this.props.selectedField ? null : placeholderWidth + 36 }}
+            style={{ width: this.props.selectedField && !customProps.showSearch ? null : placeholderWidth + 36 }}
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleFieldSelect.bind(this)}
             value={this.props.selectedField || undefined}
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            {...customProps}
         >{fieldSelectItems}</Select>
     );
 
@@ -162,6 +167,7 @@ export default class Field extends Component {
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+    let customProps = this.props.customProps || {};
 
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
     let fieldMenu = (
@@ -169,6 +175,7 @@ export default class Field extends Component {
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldMenuSelect.bind(this)}
+            {...customProps}
         >{fieldMenuItems}</Menu>
     );
     let fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);

@@ -15,6 +15,7 @@ export default class NumberWidget extends Component {
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
     value: PropTypes.number,
+    customProps: PropTypes.object,
   };
 
   handleChange(val) {
@@ -35,6 +36,7 @@ export default class NumberWidget extends Component {
     const min = this.props.min != null ? this.props.min : fieldSettings.min;
     const max = this.props.max != null ? this.props.max : fieldSettings.max;
     const step = this.props.step != null ? this.props.step : fieldSettings.step;
+    let customProps = this.props.customProps || {};
 
     return (
       <Col>
@@ -48,6 +50,7 @@ export default class NumberWidget extends Component {
           step={step}
           placeholder={this.props.placeholder}
           onChange={this.handleChange.bind(this)}
+          {...customProps}
         />
       </Col>
     );

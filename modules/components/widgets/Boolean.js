@@ -11,6 +11,7 @@ export default class BooleanWidget extends Component {
         value: PropTypes.bool,
         config: PropTypes.object.isRequired,
         field: PropTypes.string.isRequired,
+        customProps: PropTypes.object,
     }
 
     handleChange(val) {
@@ -27,6 +28,8 @@ export default class BooleanWidget extends Component {
     }
 
     render() {
+        let customProps = this.props.customProps || {};
+
         return (
             <Switch
                 ref="switch"
@@ -34,6 +37,7 @@ export default class BooleanWidget extends Component {
                 unCheckedChildren={this.props.labelNo || null}
                 checked={this.props.value || null}
                 onChange={this.handleChange.bind(this)}
+                {...customProps}
             />
         );
     }
