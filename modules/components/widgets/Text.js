@@ -6,9 +6,10 @@ import { Input, Col } from 'antd';
 export default class TextWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired,
-    label: PropTypes.string,
     placeholder: PropTypes.string,
+    config: PropTypes.object.isRequired,
+    value: PropTypes.string,
+    field: PropTypes.string.isRequired,
   };
 
   handleChange() {

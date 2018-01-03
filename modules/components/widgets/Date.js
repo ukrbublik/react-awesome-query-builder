@@ -8,9 +8,12 @@ import moment from 'moment';
 export default class DateWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        delta: PropTypes.number.isRequired,
         dateFormat: PropTypes.string,
         valueFormat: PropTypes.string,
+        value: PropTypes.string, //in valueFormat
+        field: PropTypes.string.isRequired,
+        config: PropTypes.object.isRequired,
+        placeholder: PropTypes.string,
     };
 
     constructor(props) {

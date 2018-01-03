@@ -3,14 +3,23 @@ import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
+import Immutable from 'immutable';
 
 export default (Rule) => {
   return class RuleContainer extends Component {
     static propTypes = {
+      id: PropTypes.string.isRequired,
       config: PropTypes.object.isRequired,
+      path: PropTypes.instanceOf(Immutable.List).isRequired,
       operator: PropTypes.string,
       field: PropTypes.string,
-      dragging: PropTypes.object,
+      actions: PropTypes.object.isRequired, //{removeRule: Funciton, setField, setOperator, setOperatorOption, setValue, setValueSrc, ...}
+      dragging: PropTypes.object, //{id, x, y, w, h}
+      onDragStart: PropTypes.func,
+      value: PropTypes.any, //depends on widget
+      valueSrc: PropTypes.any,
+      operatorOptions: PropTypes.object,
+      treeNodesCnt: PropTypes.number,
     };
 
     constructor(props) {

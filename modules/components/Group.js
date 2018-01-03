@@ -8,23 +8,32 @@ const ButtonGroup = Button.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const classNames = require('classnames');
+import Immutable from 'immutable';
 
 @GroupContainer
 export default class Group extends Component {
   static propTypes = {
+    tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+    treeNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
-    addRule: PropTypes.func.isRequired,
-    addGroup: PropTypes.func.isRequired,
-    removeSelf: PropTypes.func.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
     selectedConjunction: PropTypes.string,
-    setConjunction: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
+    renderType: PropTypes.string, //'dragging', 'placeholder', null
+    id: PropTypes.string.isRequired,
+    //path: PropTypes.instanceOf(Immutable.List),
+    dragging: PropTypes.object, //{id, x, y, w, h}
+    onDragStart: PropTypes.func,
+    children: PropTypes.instanceOf(Immutable.List),
+    //actions
+    addRule: PropTypes.func.isRequired,
+    addGroup: PropTypes.func.isRequired,
+    removeSelf: PropTypes.func.isRequired,
+    setConjunction: PropTypes.func.isRequired,
   };
 
   shouldComponentUpdate = shallowCompare;
-
 
     handleDraggerMouseDown (e) {
         var nodeId = this.props.id;

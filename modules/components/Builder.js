@@ -10,7 +10,11 @@ import {getTotalNodesCountInTree} from "../utils/treeUtils";
 export default class Builder extends Component {
   static propTypes = {
     tree: PropTypes.instanceOf(Immutable.Map).isRequired,
-    config: PropTypes.object.isRequired
+    config: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired,
+    //dispatch: PropTypes.func.isRequired,
+    onDragStart: PropTypes.func,
+    dragging: PropTypes.object, //{id, x, y, w, h}
   };
 
   render() {

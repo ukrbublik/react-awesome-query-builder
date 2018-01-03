@@ -8,9 +8,13 @@ import { LocaleProvider } from 'antd';
 export default class TimeWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        delta: PropTypes.number.isRequired,
         timeFormat: PropTypes.string,
         valueFormat: PropTypes.string,
+        use12Hours: PropTypes.bool,
+        value: PropTypes.string, //in valueFormat
+        config: PropTypes.object.isRequired,
+        field: PropTypes.string.isRequired,
+        placeholder: PropTypes.string,
     };
 
     constructor(props) {

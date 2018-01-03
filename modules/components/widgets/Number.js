@@ -8,11 +8,13 @@ import {getFieldConfig} from '../../utils/configUtils';
 export default class NumberWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired,
     min: PropTypes.number,
     max: PropTypes.number,
     step: PropTypes.number,
     placeholder: PropTypes.string,
+    config: PropTypes.object.isRequired,
+    field: PropTypes.string.isRequired,
+    value: PropTypes.number,
   };
 
   handleChange(val) {

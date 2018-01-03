@@ -5,10 +5,18 @@ import {getFieldConfig} from "../../utils/configUtils";
 import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from '../../constants';
 import clone from 'clone';
+import PropTypes from 'prop-types';
+import Immutable from 'immutable';
 
 
 export default (Builder, CanMoveFn = null) => {
   return class SortableContainer extends Component {
+
+    static propTypes = {
+      tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+      actions: PropTypes.object.isRequired, // {moveItem: Function, ..}
+      //... see Builder
+    };
 
     constructor(props) {
         super(props);

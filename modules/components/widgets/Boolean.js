@@ -6,7 +6,11 @@ import { Switch, Icon } from 'antd';
 export default class BooleanWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        delta: PropTypes.number.isRequired
+        labelYes: PropTypes.string,
+        labelNo: PropTypes.string,
+        value: PropTypes.bool,
+        config: PropTypes.object.isRequired,
+        field: PropTypes.string.isRequired,
     }
 
     handleChange(val) {
@@ -23,7 +27,6 @@ export default class BooleanWidget extends Component {
     }
 
     render() {
-        const {value, delta, id} = this.props;
         return (
             <Switch
                 ref="switch"

@@ -16,8 +16,9 @@ export default class Field extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.string,
-    setField: PropTypes.func.isRequired,
     renderAsDropdown: PropTypes.bool,
+    //actions
+    setField: PropTypes.func.isRequired,
   };
 
   constructor(props) {

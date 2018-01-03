@@ -10,7 +10,9 @@ const Option = Select.Option;
 export default class SelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired
+    config: PropTypes.object.isRequired,
+    field: PropTypes.string.isRequired,
+    value: PropTypes.string, //key in listValues
   };
 
   handleChange(val) {

@@ -10,7 +10,10 @@ const Option = Select.Option;
 export default class MultiSelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired
+    config: PropTypes.object.isRequired,
+    value: PropTypes.array,
+    field: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
   };
 
   handleChange(val) {

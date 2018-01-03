@@ -20,8 +20,11 @@ import clone from 'clone';
 export default class ValueField extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired,
     renderAsDropdown: PropTypes.bool,
+    config: PropTypes.object.isRequired,
+    field: PropTypes.string.isRequired,
+    value: PropTypes.string,
+    operator: PropTypes.string,
   };
 
   shouldComponentUpdate = shallowCompare;
