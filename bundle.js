@@ -32022,6 +32022,8 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _class, _temp, _class2, _temp2;
+	
 	__webpack_require__(312);
 	
 	var _react = __webpack_require__(36);
@@ -32050,6 +32052,10 @@
 	
 	var _validation = __webpack_require__(555);
 	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -32062,7 +32068,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var ConnectedQuery = function (_Component) {
+	var ConnectedQuery = (_temp = _class = function (_Component) {
 	    _inherits(ConnectedQuery, _Component);
 	
 	    function ConnectedQuery(props) {
@@ -32126,13 +32132,20 @@
 	    }]);
 	
 	    return ConnectedQuery;
-	}(_react.Component);
+	}(_react.Component), _class.propTypes = {
+	    config: _propTypes2.default.object.isRequired,
+	    onChange: _propTypes2.default.func,
+	    get_children: _propTypes2.default.func,
+	    tree: _propTypes2.default.instanceOf(_immutable2.default.Map)
+	    //dispatch: PropTypes.func.isRequired,
+	}, _temp);
+	
 	
 	var QueryContainer = (0, _reactRedux.connect)(function (tree) {
 	    return { tree: tree };
 	})(ConnectedQuery);
 	
-	var Query = function (_Component2) {
+	var Query = (_temp2 = _class2 = function (_Component2) {
 	    _inherits(Query, _Component2);
 	
 	    function Query(props, context) {
@@ -32182,11 +32195,10 @@
 	                settings = _props2.settings,
 	                get_children = _props2.get_children,
 	                onChange = _props2.onChange,
-	                onBlur = _props2.onBlur,
 	                value = _props2.value,
 	                tree = _props2.tree,
 	                children = _props2.children,
-	                props = _objectWithoutProperties(_props2, ['conjunctions', 'fields', 'types', 'operators', 'widgets', 'settings', 'get_children', 'onChange', 'onBlur', 'value', 'tree', 'children']);
+	                props = _objectWithoutProperties(_props2, ['conjunctions', 'fields', 'types', 'operators', 'widgets', 'settings', 'get_children', 'onChange', 'value', 'tree', 'children']);
 	
 	            var config = { conjunctions: conjunctions, fields: fields, types: types, operators: operators, widgets: widgets, settings: settings };
 	            config = (0, _configUtils.extendConfig)(config);
@@ -32197,15 +32209,31 @@
 	                _react2.default.createElement(
 	                    _reactRedux.Provider,
 	                    { store: this.state.store },
-	                    _react2.default.createElement(QueryContainer, { store: this.state.store, get_children: get_children, config: config, onChange: onChange })
+	                    _react2.default.createElement(QueryContainer, {
+	                        store: this.state.store,
+	                        get_children: get_children,
+	                        config: config,
+	                        onChange: onChange
+	                    })
 	                )
 	            );
 	        }
 	    }]);
 	
 	    return Query;
-	}(_react.Component);
+	}(_react.Component), _class2.propTypes = {
+	    //config
+	    conjunctions: _propTypes2.default.object.isRequired,
+	    fields: _propTypes2.default.object.isRequired,
+	    types: _propTypes2.default.object.isRequired,
+	    operators: _propTypes2.default.object.isRequired,
+	    widgets: _propTypes2.default.object.isRequired,
+	    settings: _propTypes2.default.object.isRequired,
 	
+	    onChange: _propTypes2.default.func,
+	    get_children: _propTypes2.default.func,
+	    value: _propTypes2.default.instanceOf(_immutable2.default.Map)
+	}, _temp2);
 	exports.default = Query;
 	
 	/* REACT HOT LOADER */ }).call(this); } finally { if (false) { (function () { var foundReactClasses = module.hot.data && module.hot.data.foundReactClasses || false; if (module.exports && module.makeHot) { var makeExportsHot = require("/home/ukrbublik/projs/react-awesome-query-builder/node_modules/react-hot-loader/makeExportsHot.js"); if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot apply hot update to " + "Query.js" + ": " + err.message); } }); } } module.hot.dispose(function (data) { data.makeHot = module.makeHot; data.foundReactClasses = foundReactClasses; }); })(); } }
@@ -52242,7 +52270,11 @@
 	  return Builder;
 	}(_react.Component), _class2.propTypes = {
 	  tree: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
-	  config: _propTypes2.default.object.isRequired
+	  config: _propTypes2.default.object.isRequired,
+	  actions: _propTypes2.default.object.isRequired,
+	  //dispatch: PropTypes.func.isRequired,
+	  onDragStart: _propTypes2.default.func,
+	  dragging: _propTypes2.default.object //{id, x, y, w, h}
 	}, _temp)) || _class;
 	
 	exports.default = Builder;
@@ -52376,12 +52408,17 @@
 	
 	  return Item;
 	}(_react.Component), _class.propTypes = {
+	  tree: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
 	  config: _propTypes2.default.object.isRequired,
 	  id: _propTypes2.default.string.isRequired,
 	  type: _propTypes2.default.oneOf(Object.keys(typeMap)).isRequired,
 	  path: _propTypes2.default.instanceOf(_immutable2.default.List).isRequired,
 	  properties: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
-	  children1: _propTypes2.default.instanceOf(_immutable2.default.OrderedMap)
+	  children1: _propTypes2.default.instanceOf(_immutable2.default.OrderedMap),
+	  actions: _propTypes2.default.object.isRequired,
+	  treeNodesCnt: _propTypes2.default.number,
+	  onDragStart: _propTypes2.default.func,
+	  dragging: _propTypes2.default.object //{id, x, y, w, h}
 	}, _temp2);
 	exports.default = Item;
 	
@@ -52606,7 +52643,8 @@
 	                        config: this.props.config,
 	                        selectedField: this.props.selectedField,
 	                        setField: this.props.setField,
-	                        renderAsDropdown: this.props.config.settings.renderFieldAndOpAsDropdown
+	                        renderAsDropdown: this.props.config.settings.renderFieldAndOpAsDropdown,
+	                        customProps: this.props.config.settings.customFieldSelectProps
 	                    })
 	                ) : null,
 	                this.props.selectedField && !selectedFieldWidgetConfig.hideOperator && _react2.default.createElement(
@@ -52680,11 +52718,20 @@
 	    selectedOperator: _propTypes2.default.string,
 	    operatorOptions: _propTypes2.default.object,
 	    config: _propTypes2.default.object.isRequired,
+	    dragging: _propTypes2.default.object, //{id, x, y, w, h}
+	    onDragStart: _propTypes2.default.func,
+	    renderType: _propTypes2.default.string, //'dragging', 'placeholder', null
+	    value: _propTypes2.default.any, //depends on widget
+	    valueSrc: _propTypes2.default.any,
+	    //path: PropTypes.instanceOf(Immutable.List),
 	    //actions
 	    setField: _propTypes2.default.func,
 	    setOperator: _propTypes2.default.func,
 	    setOperatorOption: _propTypes2.default.func,
-	    removeSelf: _propTypes2.default.func
+	    removeSelf: _propTypes2.default.func,
+	    setValue: _propTypes2.default.func,
+	    setValueSrc: _propTypes2.default.func,
+	    treeNodesCnt: _propTypes2.default.number
 	}, _temp)) || _class;
 	
 	exports.default = Rule;
@@ -62829,6 +62876,10 @@
 	
 	var _configUtils = __webpack_require__(455);
 	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -62938,10 +62989,18 @@
 	
 	    return RuleContainer;
 	  }(_react.Component), _class.propTypes = {
+	    id: _propTypes2.default.string.isRequired,
 	    config: _propTypes2.default.object.isRequired,
+	    path: _propTypes2.default.instanceOf(_immutable2.default.List).isRequired,
 	    operator: _propTypes2.default.string,
 	    field: _propTypes2.default.string,
-	    dragging: _propTypes2.default.object
+	    actions: _propTypes2.default.object.isRequired, //{removeRule: Funciton, setField, setOperator, setOperatorOption, setValue, setValueSrc, ...}
+	    dragging: _propTypes2.default.object, //{id, x, y, w, h}
+	    onDragStart: _propTypes2.default.func,
+	    value: _propTypes2.default.any, //depends on widget
+	    valueSrc: _propTypes2.default.any,
+	    operatorOptions: _propTypes2.default.object,
+	    treeNodesCnt: _propTypes2.default.number
 	  }, _temp;
 	};
 	
@@ -63194,6 +63253,8 @@
 	
 	var _select2 = _interopRequireDefault(_select);
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _class, _temp;
@@ -63411,18 +63472,23 @@
 	            placeholder = (0, _stuff.truncateString)(placeholder, maxLabelsLength);
 	            var placeholderWidth = (0, _stuff.calcTextWidth)(placeholder, '12px');
 	            var fieldSelectItems = this.buildSelectItems(fieldOptions);
+	            var customProps = this.props.customProps || {};
+	
 	            var fieldSelect = _react2.default.createElement(
 	                _select2.default,
-	                {
+	                _extends({
 	                    dropdownAlign: dropdownPlacement ? _stuff.BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined,
 	                    dropdownMatchSelectWidth: false,
-	                    style: { width: this.props.selectedField ? null : placeholderWidth + 36 },
+	                    style: { width: this.props.selectedField && !customProps.showSearch ? null : placeholderWidth + 36 },
 	                    ref: 'field',
 	                    placeholder: placeholder,
 	                    size: this.props.config.settings.renderSize || "small",
 	                    onChange: this.handleFieldSelect.bind(this),
-	                    value: this.props.selectedField || undefined
-	                },
+	                    value: this.props.selectedField || undefined,
+	                    filterOption: function filterOption(input, option) {
+	                        return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+	                    }
+	                }, customProps),
 	                fieldSelectItems
 	            );
 	
@@ -63436,15 +63502,16 @@
 	            var selectedFieldPartsLabels = (0, _configUtils.getFieldPathLabels)(this.props.selectedField, this.props.config);
 	            var selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
 	            var placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+	            var customProps = this.props.customProps || {};
 	
 	            var fieldMenuItems = this.buildMenuItems(fieldOptions);
 	            var fieldMenu = _react2.default.createElement(
 	                _menu2.default,
-	                {
+	                _extends({
 	                    //size={this.props.config.settings.renderSize || "small"}
 	                    selectedKeys: selectedFieldKeys,
 	                    onClick: this.handleFieldMenuSelect.bind(this)
-	                },
+	                }, customProps),
 	                fieldMenuItems
 	            );
 	            var fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);
@@ -63465,8 +63532,10 @@
 	}(_react.Component), _class.propTypes = {
 	    config: _propTypes2.default.object.isRequired,
 	    selectedField: _propTypes2.default.string,
-	    setField: _propTypes2.default.func.isRequired,
-	    renderAsDropdown: _propTypes2.default.bool
+	    renderAsDropdown: _propTypes2.default.bool,
+	    customProps: _propTypes2.default.object,
+	    //actions
+	    setField: _propTypes2.default.func.isRequired
 	}, _temp);
 	exports.default = Field;
 	
@@ -66112,8 +66181,9 @@
 	    config: _propTypes2.default.object.isRequired,
 	    selectedField: _propTypes2.default.string,
 	    selectedOperator: _propTypes2.default.string,
-	    setOperator: _propTypes2.default.func.isRequired,
-	    renderAsDropdown: _propTypes2.default.bool
+	    renderAsDropdown: _propTypes2.default.bool,
+	    //actions
+	    setOperator: _propTypes2.default.func.isRequired
 	}, _temp);
 	exports.default = Operator;
 	
@@ -66463,7 +66533,10 @@
 	        value: _propTypes2.default.instanceOf(_immutable2.default.List).isRequired,
 	        valueSrc: _propTypes2.default.instanceOf(_immutable2.default.List).isRequired,
 	        field: _propTypes2.default.string.isRequired,
-	        operator: _propTypes2.default.string.isRequired
+	        operator: _propTypes2.default.string.isRequired,
+	        //actions
+	        setValue: _propTypes2.default.func,
+	        setValueSrc: _propTypes2.default.func
 	    }, _temp2;
 	};
 	
@@ -68532,6 +68605,10 @@
 	
 	var _GroupContainer2 = _interopRequireDefault(_GroupContainer);
 	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -68698,15 +68775,24 @@
 	
 	  return Group;
 	}(_react.Component), _class2.propTypes = {
+	  tree: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
+	  treeNodesCnt: _propTypes2.default.number,
 	  conjunctionOptions: _propTypes2.default.object.isRequired,
-	  addRule: _propTypes2.default.func.isRequired,
-	  addGroup: _propTypes2.default.func.isRequired,
-	  removeSelf: _propTypes2.default.func.isRequired,
 	  allowFurtherNesting: _propTypes2.default.bool.isRequired,
 	  isRoot: _propTypes2.default.bool.isRequired,
 	  selectedConjunction: _propTypes2.default.string,
-	  setConjunction: _propTypes2.default.func.isRequired,
-	  config: _propTypes2.default.object.isRequired
+	  config: _propTypes2.default.object.isRequired,
+	  renderType: _propTypes2.default.string, //'dragging', 'placeholder', null
+	  id: _propTypes2.default.string.isRequired,
+	  //path: PropTypes.instanceOf(Immutable.List),
+	  dragging: _propTypes2.default.object, //{id, x, y, w, h}
+	  onDragStart: _propTypes2.default.func,
+	  children: _propTypes2.default.instanceOf(_immutable2.default.List),
+	  //actions
+	  addRule: _propTypes2.default.func.isRequired,
+	  addGroup: _propTypes2.default.func.isRequired,
+	  removeSelf: _propTypes2.default.func.isRequired,
+	  setConjunction: _propTypes2.default.func.isRequired
 	}, _temp2)) || _class;
 	
 	exports.default = Group;
@@ -68740,6 +68826,10 @@
 	var _mapValues = __webpack_require__(522);
 	
 	var _mapValues2 = _interopRequireDefault(_mapValues);
+	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -68882,7 +68972,16 @@
 	
 	    return GroupContainer;
 	  }(_react.Component), _class.propTypes = {
-	    config: _propTypes2.default.object.isRequired
+	    tree: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
+	    config: _propTypes2.default.object.isRequired,
+	    actions: _propTypes2.default.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
+	    path: _propTypes2.default.instanceOf(_immutable2.default.List).isRequired,
+	    id: _propTypes2.default.string.isRequired,
+	    conjunction: _propTypes2.default.string,
+	    children: _propTypes2.default.instanceOf(_immutable2.default.List),
+	    dragging: _propTypes2.default.object, //{id, x, y, w, h}
+	    onDragStart: _propTypes2.default.func,
+	    treeNodesCnt: _propTypes2.default.number
 	  }, _temp2;
 	};
 	
@@ -68926,6 +69025,14 @@
 	
 	var _clone2 = _interopRequireDefault(_clone);
 	
+	var _propTypes = __webpack_require__(309);
+	
+	var _propTypes2 = _interopRequireDefault(_propTypes);
+	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -68939,9 +69046,11 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	exports.default = function (Builder) {
+	  var _class, _temp;
+	
 	  var CanMoveFn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	
-	  return function (_Component) {
+	  return _temp = _class = function (_Component) {
 	    _inherits(SortableContainer, _Component);
 	
 	    function SortableContainer(props) {
@@ -69052,13 +69161,22 @@
 	        var dragEl = this._getDraggableNodeEl(treeEl);
 	        var plhEl = this._getPlaceholderNodeEl(treeEl);
 	
+	        var tmpAllGroups = treeEl.querySelectorAll('.group--children');
+	        var anyGroup = tmpAllGroups.length ? tmpAllGroups[0] : null;
+	        var groupPadding;
+	        if (anyGroup) {
+	          groupPadding = window.getComputedStyle(anyGroup, null).getPropertyValue('padding-left');
+	          groupPadding = parseInt(groupPadding);
+	        }
+	
 	        this.draggingInfo = {
 	          id: id,
 	          x: dom.offsetLeft,
 	          y: dom.offsetTop,
 	          w: dom.offsetWidth,
 	          h: dom.offsetHeight,
-	          itemInfo: this.tree.items[id]
+	          itemInfo: this.tree.items[id],
+	          paddingLeft: groupPadding
 	        };
 	        this.dragStartInfo = {
 	          id: id,
@@ -69091,7 +69209,7 @@
 	
 	        var dragging = this.draggingInfo;
 	        var startDragging = this.dragStartInfo;
-	        var paddingLeft = this.props.paddingLeft;
+	        var paddingLeft = dragging.paddingLeft; //this.props.paddingLeft;
 	        var treeElContainer = startDragging.treeElContainer;
 	        var scrollTop = treeElContainer.scrollTop;
 	        dragging.itemInfo = this.tree.items[dragging.id];
@@ -69386,7 +69504,11 @@
 	    }]);
 	
 	    return SortableContainer;
-	  }(_react.Component);
+	  }(_react.Component), _class.propTypes = {
+	    tree: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
+	    actions: _propTypes2.default.object.isRequired // {moveItem: Function, ..}
+	    //... see Builder
+	  }, _temp;
 	};
 	
 	/* REACT HOT LOADER */ }).call(this); } finally { if (false) { (function () { var foundReactClasses = module.hot.data && module.hot.data.foundReactClasses || false; if (module.exports && module.makeHot) { var makeExportsHot = require("/home/ukrbublik/projs/react-awesome-query-builder/node_modules/react-hot-loader/makeExportsHot.js"); if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot apply hot update to " + "SortableContainer.js" + ": " + err.message); } }); } } module.hot.dispose(function (data) { data.makeHot = module.makeHot; data.foundReactClasses = foundReactClasses; }); })(); } }
@@ -69421,6 +69543,10 @@
 	var _queryString = __webpack_require__(709);
 	
 	var _queryString2 = _interopRequireDefault(_queryString);
+	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -69458,7 +69584,8 @@
 	
 	  return Preview;
 	}(_react.Component), _class.propTypes = {
-	  config: _propTypes2.default.object.isRequired
+	  config: _propTypes2.default.object.isRequired,
+	  tree: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired
 	}, _temp2);
 	exports.default = Preview;
 	
@@ -69718,6 +69845,8 @@
 	
 	var _datePicker2 = _interopRequireDefault(_datePicker);
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _class, _temp;
@@ -69780,13 +69909,15 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var customProps = this.props.customProps || {};
 	            var _props2 = this.props,
 	                dateFormat = _props2.dateFormat,
 	                valueFormat = _props2.valueFormat,
 	                value = _props2.value;
 	
 	            var dateValue = value ? (0, _moment2.default)(value, valueFormat) : null;
-	            return _react2.default.createElement(_datePicker2.default, {
+	
+	            return _react2.default.createElement(_datePicker2.default, _extends({
 	                key: 'widget-date',
 	                placeholder: this.props.placeholder,
 	                size: this.props.config.settings.renderSize || "small",
@@ -69794,16 +69925,20 @@
 	                value: dateValue,
 	                onChange: this.handleChange.bind(this),
 	                ref: 'datetime'
-	            });
+	            }, customProps));
 	        }
 	    }]);
 	
 	    return DateWidget;
 	}(_react.Component), _class.propTypes = {
 	    setValue: _propTypes2.default.func.isRequired,
-	    delta: _propTypes2.default.number.isRequired,
 	    dateFormat: _propTypes2.default.string,
-	    valueFormat: _propTypes2.default.string
+	    valueFormat: _propTypes2.default.string,
+	    value: _propTypes2.default.string, //in valueFormat
+	    field: _propTypes2.default.string.isRequired,
+	    config: _propTypes2.default.object.isRequired,
+	    placeholder: _propTypes2.default.string,
+	    customProps: _propTypes2.default.object
 	}, _class.defaultProps = {
 	    dateFormat: 'YYYY-MM-DD',
 	    valueFormat: 'YYYY-MM-DD'
@@ -92988,6 +93123,8 @@
 	
 	var _datePicker2 = _interopRequireDefault(_datePicker);
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _class, _temp;
@@ -93050,16 +93187,17 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var customProps = this.props.customProps || {};
 	            var _props2 = this.props,
 	                dateFormat = _props2.dateFormat,
 	                timeFormat = _props2.timeFormat,
 	                valueFormat = _props2.valueFormat,
 	                value = _props2.value,
-	                locale = _props2.locale,
 	                use12Hours = _props2.use12Hours;
 	
 	            var dateValue = value ? (0, _moment2.default)(value, valueFormat) : null;
-	            return _react2.default.createElement(_datePicker2.default, {
+	
+	            return _react2.default.createElement(_datePicker2.default, _extends({
 	                key: 'widget-datetime',
 	                use12Hours: use12Hours,
 	                showTime: { format: timeFormat },
@@ -93069,17 +93207,22 @@
 	                value: dateValue,
 	                onChange: this.handleChange.bind(this),
 	                ref: 'datetime'
-	            });
+	            }, customProps));
 	        }
 	    }]);
 	
 	    return DateTimeWidget;
 	}(_react.Component), _class.propTypes = {
 	    setValue: _propTypes2.default.func.isRequired,
-	    delta: _propTypes2.default.number.isRequired,
 	    timeFormat: _propTypes2.default.string,
 	    dateFormat: _propTypes2.default.string,
-	    valueFormat: _propTypes2.default.string
+	    valueFormat: _propTypes2.default.string,
+	    value: _propTypes2.default.string, //in valueFormat
+	    config: _propTypes2.default.object.isRequired,
+	    field: _propTypes2.default.string.isRequired,
+	    placeholder: _propTypes2.default.string,
+	    use12Hours: _propTypes2.default.bool,
+	    customProps: _propTypes2.default.object
 	}, _class.defaultProps = {
 	    timeFormat: 'HH:mm',
 	    dateFormat: 'YYYY-MM-DD',
@@ -93104,6 +93247,8 @@
 	var _timePicker = __webpack_require__(864);
 	
 	var _timePicker2 = _interopRequireDefault(_timePicker);
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -93170,7 +93315,9 @@
 	                use12Hours = _props2.use12Hours;
 	
 	            var dateValue = value ? (0, _moment2.default)(value, valueFormat) : null;
-	            return _react2.default.createElement(_timePicker2.default, {
+	            var customProps = this.props.customProps || {};
+	
+	            return _react2.default.createElement(_timePicker2.default, _extends({
 	                use12Hours: use12Hours,
 	                key: 'widget-time',
 	                size: this.props.config.settings.renderSize || "small",
@@ -93179,16 +93326,21 @@
 	                value: dateValue,
 	                onChange: this.handleChange.bind(this),
 	                ref: 'datetime'
-	            });
+	            }, customProps));
 	        }
 	    }]);
 	
 	    return TimeWidget;
 	}(_react.Component), _class.propTypes = {
 	    setValue: _propTypes2.default.func.isRequired,
-	    delta: _propTypes2.default.number.isRequired,
 	    timeFormat: _propTypes2.default.string,
-	    valueFormat: _propTypes2.default.string
+	    valueFormat: _propTypes2.default.string,
+	    use12Hours: _propTypes2.default.bool,
+	    value: _propTypes2.default.string, //in valueFormat
+	    config: _propTypes2.default.object.isRequired,
+	    field: _propTypes2.default.string.isRequired,
+	    placeholder: _propTypes2.default.string,
+	    customProps: _propTypes2.default.object
 	}, _class.defaultProps = {
 	    timeFormat: 'HH:mm',
 	    valueFormat: 'HH:mm:ss',
@@ -93212,6 +93364,8 @@
 	var _select = __webpack_require__(664);
 	
 	var _select2 = _interopRequireDefault(_select);
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -93277,10 +93431,11 @@
 	        );
 	      });
 	      var placeholderWidth = (0, _stuff.calcTextWidth)(placeholder, '12px');
+	      var customProps = this.props.customProps || {};
 	
 	      return _react2.default.createElement(
 	        _select2.default,
-	        {
+	        _extends({
 	          style: { width: this.props.value ? null : placeholderWidth + 36 },
 	          key: "widget-select",
 	          dropdownMatchSelectWidth: false,
@@ -93288,8 +93443,11 @@
 	          placeholder: placeholder,
 	          size: size,
 	          value: this.props.value || undefined //note: (bug?) null forces placeholder to hide
-	          , onChange: this.handleChange.bind(this)
-	        },
+	          , onChange: this.handleChange.bind(this),
+	          filterOption: function filterOption(input, option) {
+	            return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+	          }
+	        }, customProps),
 	        options
 	      );
 	    }
@@ -93298,7 +93456,10 @@
 	  return SelectWidget;
 	}(_react.Component), _class.propTypes = {
 	  setValue: _propTypes2.default.func.isRequired,
-	  delta: _propTypes2.default.number.isRequired
+	  config: _propTypes2.default.object.isRequired,
+	  field: _propTypes2.default.string.isRequired,
+	  value: _propTypes2.default.string, //key in listValues
+	  customProps: _propTypes2.default.object
 	}, _temp);
 	exports.default = SelectWidget;
 	
@@ -93322,6 +93483,8 @@
 	var _input = __webpack_require__(902);
 	
 	var _input2 = _interopRequireDefault(_input);
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -93368,10 +93531,12 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var customProps = this.props.customProps || {};
+	
 	      return _react2.default.createElement(
 	        _col2.default,
 	        null,
-	        _react2.default.createElement(_input2.default, {
+	        _react2.default.createElement(_input2.default, _extends({
 	          key: 'widget-text',
 	          size: this.props.config.settings.renderSize || "small",
 	          ref: 'text',
@@ -93379,7 +93544,7 @@
 	          value: this.props.value || null,
 	          placeholder: this.props.placeholder,
 	          onChange: this.handleChange.bind(this)
-	        })
+	        }, customProps))
 	      );
 	    }
 	  }]);
@@ -93387,9 +93552,11 @@
 	  return TextWidget;
 	}(_react.Component), _class.propTypes = {
 	  setValue: _propTypes2.default.func.isRequired,
-	  delta: _propTypes2.default.number.isRequired,
-	  label: _propTypes2.default.string,
-	  placeholder: _propTypes2.default.string
+	  placeholder: _propTypes2.default.string,
+	  config: _propTypes2.default.object.isRequired,
+	  value: _propTypes2.default.string,
+	  field: _propTypes2.default.string.isRequired,
+	  customProps: _propTypes2.default.object
 	}, _temp);
 	exports.default = TextWidget;
 	
@@ -94121,6 +94288,8 @@
 	
 	var _inputNumber2 = _interopRequireDefault(_inputNumber);
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _class, _temp;
@@ -94176,11 +94345,12 @@
 	      var min = this.props.min != null ? this.props.min : fieldSettings.min;
 	      var max = this.props.max != null ? this.props.max : fieldSettings.max;
 	      var step = this.props.step != null ? this.props.step : fieldSettings.step;
+	      var customProps = this.props.customProps || {};
 	
 	      return _react2.default.createElement(
 	        _col2.default,
 	        null,
-	        _react2.default.createElement(_inputNumber2.default, {
+	        _react2.default.createElement(_inputNumber2.default, _extends({
 	          key: 'widget-number',
 	          size: this.props.config.settings.renderSize || "small",
 	          ref: 'num',
@@ -94190,7 +94360,7 @@
 	          step: step,
 	          placeholder: this.props.placeholder,
 	          onChange: this.handleChange.bind(this)
-	        })
+	        }, customProps))
 	      );
 	    }
 	  }]);
@@ -94198,11 +94368,14 @@
 	  return NumberWidget;
 	}(_react.Component), _class.propTypes = {
 	  setValue: _propTypes2.default.func.isRequired,
-	  delta: _propTypes2.default.number.isRequired,
 	  min: _propTypes2.default.number,
 	  max: _propTypes2.default.number,
 	  step: _propTypes2.default.number,
-	  placeholder: _propTypes2.default.string
+	  placeholder: _propTypes2.default.string,
+	  config: _propTypes2.default.object.isRequired,
+	  field: _propTypes2.default.string.isRequired,
+	  value: _propTypes2.default.number,
+	  customProps: _propTypes2.default.object
 	}, _class.defaultProps = {
 	  min: undefined,
 	  max: undefined,
@@ -96015,6 +96188,8 @@
 	
 	var _switch2 = _interopRequireDefault(_switch);
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _class, _temp;
@@ -96060,25 +96235,27 @@
 	    _createClass(BooleanWidget, [{
 	        key: 'render',
 	        value: function render() {
-	            var _props = this.props,
-	                value = _props.value,
-	                delta = _props.delta,
-	                id = _props.id;
+	            var customProps = this.props.customProps || {};
 	
-	            return _react2.default.createElement(_switch2.default, {
+	            return _react2.default.createElement(_switch2.default, _extends({
 	                ref: 'switch',
 	                checkedChildren: this.props.labelYes || null,
 	                unCheckedChildren: this.props.labelNo || null,
 	                checked: this.props.value || null,
 	                onChange: this.handleChange.bind(this)
-	            });
+	            }, customProps));
 	        }
 	    }]);
 	
 	    return BooleanWidget;
 	}(_react.Component), _class.propTypes = {
 	    setValue: _propTypes2.default.func.isRequired,
-	    delta: _propTypes2.default.number.isRequired
+	    labelYes: _propTypes2.default.string,
+	    labelNo: _propTypes2.default.string,
+	    value: _propTypes2.default.bool,
+	    config: _propTypes2.default.object.isRequired,
+	    field: _propTypes2.default.string.isRequired,
+	    customProps: _propTypes2.default.object
 	}, _class.defaultProps = {
 	    labelYes: null, //(<Icon type="check" />),
 	    labelNo: null //(<Icon type="cross" />),
@@ -96450,6 +96627,8 @@
 	
 	var _select2 = _interopRequireDefault(_select);
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _class, _temp;
@@ -96528,6 +96707,7 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var customProps = this.props.customProps || {};
 	      var size = this.props.config.settings.renderSize || "small";
 	      var fieldDefinition = (0, _configUtils.getFieldConfig)(this.props.field, this.props.config);
 	      var options = (0, _map2.default)(fieldDefinition.listValues, function (label, value) {
@@ -96541,7 +96721,7 @@
 	
 	      return _react2.default.createElement(
 	        _select2.default,
-	        {
+	        _extends({
 	          multiple: true,
 	          style: {
 	            minWidth: value ? null : this.placeholderWidth + 30,
@@ -96556,8 +96736,11 @@
 	          placeholder: this.placeholder,
 	          size: size,
 	          value: value || undefined //note: (bug?) null forces placeholder to hide
-	          , onChange: this.handleChange.bind(this)
-	        },
+	          , onChange: this.handleChange.bind(this),
+	          filterOption: function filterOption(input, option) {
+	            return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+	          }
+	        }, customProps),
 	        options
 	      );
 	    }
@@ -96566,7 +96749,11 @@
 	  return MultiSelectWidget;
 	}(_react.Component), _class.propTypes = {
 	  setValue: _propTypes2.default.func.isRequired,
-	  delta: _propTypes2.default.number.isRequired
+	  config: _propTypes2.default.object.isRequired,
+	  value: _propTypes2.default.array,
+	  field: _propTypes2.default.string.isRequired,
+	  placeholder: _propTypes2.default.string,
+	  customProps: _propTypes2.default.object
 	}, _temp);
 	exports.default = MultiSelectWidget;
 	
@@ -96606,6 +96793,8 @@
 	var _select = __webpack_require__(664);
 	
 	var _select2 = _interopRequireDefault(_select);
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -96715,13 +96904,18 @@
 	        key: 'filterFields',
 	        value: function filterFields(config, fields, leftFieldFullkey, operator) {
 	            fields = (0, _clone2.default)(fields);
-	            var leftFieldConfig = (0, _configUtils.getFieldConfig)(leftFieldFullkey, config);
-	            var widget = (0, _configUtils.getWidgetForFieldOp)(config, leftFieldFullkey, operator, 'value');
-	            var widgetConfig = config.widgets[widget];
-	            var widgetType = widgetConfig.type;
-	            //let expectedType = leftFieldConfig.type;
-	            var expectedType = widgetType;
 	            var fieldSeparator = config.settings.fieldSeparator;
+	            var leftFieldConfig = (0, _configUtils.getFieldConfig)(leftFieldFullkey, config);
+	            var expectedType = void 0;
+	            var widget = (0, _configUtils.getWidgetForFieldOp)(config, leftFieldFullkey, operator, 'value');
+	            if (widget) {
+	                var widgetConfig = config.widgets[widget];
+	                var widgetType = widgetConfig.type;
+	                //expectedType = leftFieldConfig.type;
+	                expectedType = widgetType;
+	            } else {
+	                expectedType = leftFieldConfig.type;
+	            }
 	
 	            function _filter(list, path) {
 	                for (var rightFieldKey in list) {
@@ -96861,9 +97055,11 @@
 	            var placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
 	            var placeholderWidth = (0, _stuff.calcTextWidth)(placeholder, '12px');
 	            var fieldSelectItems = this.buildSelectItems(fieldOptions);
+	            var customProps = this.props.customProps || {};
+	
 	            var fieldSelect = _react2.default.createElement(
 	                _select2.default,
-	                {
+	                _extends({
 	                    dropdownAlign: dropdownPlacement ? _stuff.BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined,
 	                    dropdownMatchSelectWidth: false,
 	                    style: { width: this.props.value ? null : placeholderWidth + 36 },
@@ -96871,8 +97067,11 @@
 	                    placeholder: placeholder,
 	                    size: this.props.config.settings.renderSize || "small",
 	                    onChange: this.handleFieldSelect.bind(this),
-	                    value: this.props.value || undefined
-	                },
+	                    value: this.props.value || undefined,
+	                    filterOption: function filterOption(input, option) {
+	                        return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+	                    }
+	                }, customProps),
 	                fieldSelectItems
 	            );
 	
@@ -96886,15 +97085,16 @@
 	            var selectedFieldPartsLabels = (0, _configUtils.getFieldPathLabels)(this.props.value, this.props.config);
 	            var selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
 	            var placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+	            var customProps = this.props.customProps || {};
 	
 	            var fieldMenuItems = this.buildMenuItems(fieldOptions);
 	            var fieldMenu = _react2.default.createElement(
 	                _menu2.default,
-	                {
+	                _extends({
 	                    //size={this.props.config.settings.renderSize || "small"}
 	                    selectedKeys: selectedFieldKeys,
 	                    onClick: this.handleFieldMenuSelect.bind(this)
-	                },
+	                }, customProps),
 	                fieldMenuItems
 	            );
 	            var fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);
@@ -96914,8 +97114,12 @@
 	    return ValueField;
 	}(_react.Component), _class.propTypes = {
 	    setValue: _propTypes2.default.func.isRequired,
-	    delta: _propTypes2.default.number.isRequired,
-	    renderAsDropdown: _propTypes2.default.bool
+	    renderAsDropdown: _propTypes2.default.bool,
+	    config: _propTypes2.default.object.isRequired,
+	    field: _propTypes2.default.string.isRequired,
+	    value: _propTypes2.default.string,
+	    operator: _propTypes2.default.string,
+	    customProps: _propTypes2.default.object
 	}, _temp2);
 	exports.default = ValueField;
 	
@@ -96981,6 +97185,10 @@
 	
 	var _range2 = _interopRequireDefault(_range);
 	
+	var _immutable = __webpack_require__(318);
+	
+	var _immutable2 = _interopRequireDefault(_immutable);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -96990,7 +97198,6 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var Option = _select2.default.Option;
-	
 	var Proximity = (_temp2 = _class = function (_Component) {
 	  _inherits(Proximity, _Component);
 	
@@ -97068,7 +97275,15 @@
 	  return Proximity;
 	}(_react.Component), _class.propTypes = {
 	  config: _propTypes2.default.object.isRequired,
-	  setOption: _propTypes2.default.func.isRequired
+	  setOption: _propTypes2.default.func.isRequired,
+	  defaults: _propTypes2.default.object.isRequired,
+	  options: _propTypes2.default.instanceOf(_immutable2.default.Map).isRequired,
+	  minProximity: _propTypes2.default.number,
+	  maxProximity: _propTypes2.default.number,
+	  optionPlaceholder: _propTypes2.default.string,
+	  optionTextBefore: _propTypes2.default.string,
+	  optionLabel: _propTypes2.default.string
+	  //children
 	}, _temp2);
 	exports.default = Proximity;
 	
@@ -97615,7 +97830,11 @@
 	            widgets: {
 	                select: {
 	                    operators: ['select_equals', 'select_not_equals'],
-	                    widgetProps: {}
+	                    widgetProps: {
+	                        customProps: {
+	                            showSearch: true
+	                        }
+	                    }
 	                },
 	                multiselect: {
 	                    operators: ['select_any_in', 'select_not_any_in'],
@@ -97911,7 +98130,10 @@
 	                return isForDisplay ? valFieldDef.label || val : val;
 	            },
 	            valueLabel: "Field to compare",
-	            valuePlaceholder: "Select field to compare"
+	            valuePlaceholder: "Select field to compare",
+	            customProps: {
+	                showSearch: true
+	            }
 	        }
 	    },
 	    settings: {
@@ -97925,6 +98147,9 @@
 	        renderSize: 'small',
 	        renderConjsAsRadios: false,
 	        renderFieldAndOpAsDropdown: false,
+	        customFieldSelectProps: {
+	            showSearch: true
+	        },
 	        setOpOnChangeField: ['keep', 'default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
 	        clearValueOnChangeField: false, //false - if prev & next fields have same type (widget), keep
 	        clearValueOnChangeOp: false,
