@@ -1,4 +1,6 @@
 # react-awesome-query-builder
+<a href='https://www.npmjs.com/package/react-awesome-query-builder'><img src='https://img.shields.io/npm/v/react-awesome-query-builder.svg' /> <img src='https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master' /></a>
+
 User-friendly React component to build queries.
 
 Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
