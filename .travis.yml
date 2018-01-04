@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+  - "6.10"
+before_install:
+install:
+  - npm install
+  - npm run build-examples
