@@ -44,6 +44,7 @@ export default {
                     //label: 'Subname', //'subname' should be used instead
                     label2: 'MemberName', //only for menu's toggler
                     type: 'number',
+                    tableName: 't1',
                     operators: ['equal'],
                 },
                 prox1: {
