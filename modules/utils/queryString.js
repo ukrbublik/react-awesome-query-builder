@@ -21,7 +21,7 @@ export const queryString = (item, config, isForDisplay = false) => {
 
         return conjunctionDefinition.formatConj(list, conjunction, isForDisplay);
     } else if (type === 'rule') {
-        const field = properties.get('field');
+        let field = properties.get('field');
         const operator = properties.get('operator');
         const operatorOptions = properties.get('operatorOptions');
         if (field == null || operator == null)
@@ -105,7 +105,11 @@ export const queryString = (item, config, isForDisplay = false) => {
             return undefined;
         
         //format field
-        const fieldParts = field.split(fieldSeparator);
+        if (fieldDefinition.tableName) {
+          const regex = new RegExp(field.split(fieldSeparator)[0])
+          field = field.replace(regex, fieldDefinition.tableName)
+        }
+        let fieldParts = field.split(fieldSeparator);
         //let fieldKeys = getFieldPath(field, config);
         let fieldPartsLabels = getFieldPathLabels(field, config);
         let fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
