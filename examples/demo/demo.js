@@ -50,17 +50,47 @@ let ruleset = {
 
 export default class DemoQueryBuilder extends Component {
     getChildren(props) {
+        const jsonStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' } 
         return (
-            <div>
+            <div style={{padding: '10px'}}>
                 <div className="query-builder">
                     <Builder {...props} />
                 </div>
                 <br />
-                <div>queryBuilderFormat: {stringify(queryBuilderFormat(props.tree, props.config))}</div>
-                <div>stringFormat: {queryString(props.tree, props.config)}</div>
-                <div>humanStringFormat: {queryString(props.tree, props.config, true)}</div>
-                <div>Tree: {stringify(props.tree)}</div>
-                <div>Immutable Tree: {transit.toJSON(props.tree)}</div>
+                <div>
+                  queryBuilderFormat: 
+                    <pre style={jsonStyle}>
+                      {stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)}
+                    </pre>
+                </div>
+                <hr/>
+                <div>
+                  stringFormat: 
+                  <pre style={jsonStyle}>
+                    {stringify(queryString(props.tree, props.config), undefined, 2)}
+                  </pre>
+                </div>
+                <hr/>
+                <div>
+                  humanStringFormat: 
+                  <pre style={jsonStyle}>
+                    {stringify(queryString(props.tree, props.config, true), undefined, 2)}
+                  </pre>
+                </div>
+                <hr/>
+                <div>
+                  Tree: 
+                  <pre style={jsonStyle}>
+                    {stringify(props.tree, undefined, 2)}
+                  </pre>
+                </div>
+                <hr/>
+                <div>
+                  Immutable Tree: 
+                  <div style={jsonStyle}>
+                    {transit.toJSON(props.tree)}
+                  </div>
+                </div>
             </div>
         )
     }
@@ -81,4 +111,3 @@ export default class DemoQueryBuilder extends Component {
         );
     }
 }
-
