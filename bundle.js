@@ -31871,9 +31871,10 @@
 	    _createClass(DemoQueryBuilder, [{
 	        key: 'getChildren',
 	        value: function getChildren(props) {
+	            var jsonStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 	            return _react2.default.createElement(
 	                'div',
-	                null,
+	                { style: { padding: '10px' } },
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'query-builder' },
@@ -31883,32 +31884,56 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    'queryBuilderFormat: ',
-	                    stringify(queryBuilderFormat(props.tree, props.config))
+	                    'queryBuilderFormat:',
+	                    _react2.default.createElement(
+	                        'pre',
+	                        { style: jsonStyle },
+	                        stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)
+	                    )
 	                ),
+	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    'stringFormat: ',
-	                    queryString(props.tree, props.config)
+	                    'stringFormat:',
+	                    _react2.default.createElement(
+	                        'pre',
+	                        { style: jsonStyle },
+	                        stringify(queryString(props.tree, props.config), undefined, 2)
+	                    )
 	                ),
+	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    'humanStringFormat: ',
-	                    queryString(props.tree, props.config, true)
+	                    'humanStringFormat:',
+	                    _react2.default.createElement(
+	                        'pre',
+	                        { style: jsonStyle },
+	                        stringify(queryString(props.tree, props.config, true), undefined, 2)
+	                    )
 	                ),
+	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    'Tree: ',
-	                    stringify(props.tree)
+	                    'Tree:',
+	                    _react2.default.createElement(
+	                        'pre',
+	                        { style: jsonStyle },
+	                        stringify(props.tree, undefined, 2)
+	                    )
 	                ),
+	                _react2.default.createElement('hr', null),
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    'Immutable Tree: ',
-	                    transit.toJSON(props.tree)
+	                    'Immutable Tree:',
+	                    _react2.default.createElement(
+	                        'div',
+	                        { style: jsonStyle },
+	                        transit.toJSON(props.tree)
+	                    )
 	                )
 	            );
 	        }
@@ -63331,11 +63356,16 @@
 	            //let prevProps = this.props;
 	        }
 	    }, {
+	        key: 'curField',
+	        value: function curField() {
+	            return this.props.selectedField ? (0, _configUtils.getFieldConfig)(this.props.selectedField, this.props.config) : null;
+	        }
+	    }, {
 	        key: 'curFieldOpts',
 	        value: function curFieldOpts() {
 	            return Object.assign({}, {
 	                label: this.props.selectedField
-	            }, (0, _configUtils.getFieldConfig)(this.props.selectedField, this.props.config) || {});
+	            }, this.curField() || {});
 	        }
 	    }, {
 	        key: 'handleFieldMenuSelect',
@@ -63351,6 +63381,15 @@
 	            this.props.setField(key);
 	        }
 	    }, {
+	        key: 'getFieldDisplayLabel',
+	        value: function getFieldDisplayLabel(field, fieldKey) {
+	            var fieldSeparator = this.props.config.settings.fieldSeparator;
+	            var maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+	            var label = field.label || (0, _last2.default)(fieldKey.split(fieldSeparator));
+	            label = (0, _stuff.truncateString)(label, maxLabelsLength);
+	            return label;
+	        }
+	    }, {
 	        key: 'buildMenuItems',
 	        value: function buildMenuItems(fields) {
 	            var _this2 = this;
@@ -63358,14 +63397,12 @@
 	            var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	
 	            var fieldSeparator = this.props.config.settings.fieldSeparator;
-	            var maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
 	            if (!fields) return null;
 	            var prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 	
 	            return (0, _keys2.default)(fields).map(function (fieldKey) {
 	                var field = fields[fieldKey];
-	                var label = field.label || (0, _last2.default)(fieldKey.split(fieldSeparator));
-	                label = (0, _stuff.truncateString)(label, maxLabelsLength);
+	                var label = _this2.getFieldDisplayLabel(field, fieldKey);
 	                if (field.type == "!struct") {
 	                    var subpath = (path ? path : []).concat(fieldKey);
 	                    return _react2.default.createElement(
@@ -63398,14 +63435,12 @@
 	            var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 	
 	            var fieldSeparator = this.props.config.settings.fieldSeparator;
-	            var maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
 	            if (!fields) return null;
 	            var prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 	
 	            return (0, _keys2.default)(fields).map(function (fieldKey) {
 	                var field = fields[fieldKey];
-	                var label = field.label || (0, _last2.default)(fieldKey.split(fieldSeparator));
-	                label = (0, _stuff.truncateString)(label, maxLabelsLength);
+	                var label = _this3.getFieldDisplayLabel(field, fieldKey);
 	                if (field.type == "!struct") {
 	                    var subpath = (path ? path : []).concat(fieldKey);
 	                    return _react2.default.createElement(
@@ -63465,12 +63500,18 @@
 	    }, {
 	        key: 'renderAsSelect',
 	        value: function renderAsSelect() {
+	            var isFieldSelected = !!this.props.selectedField;
 	            var dropdownPlacement = this.props.config.settings.dropdownPlacement;
 	            var maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
 	            var fieldOptions = this.props.config.fields;
-	            var placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
-	            placeholder = (0, _stuff.truncateString)(placeholder, maxLabelsLength);
-	            var placeholderWidth = (0, _stuff.calcTextWidth)(placeholder, '12px');
+	            var selectedFieldPartsLabels = (0, _configUtils.getFieldPathLabels)(this.props.selectedField, this.props.config);
+	            var selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
+	            var placeholder = isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
+	            var fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
+	            var selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
+	            selectText = (0, _stuff.truncateString)(selectText, maxLabelsLength);
+	            var selectWidth = (0, _stuff.calcTextWidth)(selectText, '12px');
+	            //let tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
 	            var fieldSelectItems = this.buildSelectItems(fieldOptions);
 	            var customProps = this.props.customProps || {};
 	
@@ -63479,7 +63520,7 @@
 	                _extends({
 	                    dropdownAlign: dropdownPlacement ? _stuff.BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined,
 	                    dropdownMatchSelectWidth: false,
-	                    style: { width: this.props.selectedField && !customProps.showSearch ? null : placeholderWidth + 36 },
+	                    style: { width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 36 },
 	                    ref: 'field',
 	                    placeholder: placeholder,
 	                    size: this.props.config.settings.renderSize || "small",
@@ -69714,6 +69755,10 @@
 	        if (!fn) return undefined;
 	
 	        //format field
+	        if (fieldDefinition.tableName) {
+	            var regex = new RegExp(field.split(fieldSeparator)[0]);
+	            field = field.replace(regex, fieldDefinition.tableName);
+	        }
 	        var fieldParts = field.split(fieldSeparator);
 	        //let fieldKeys = getFieldPath(field, config);
 	        var fieldPartsLabels = (0, _configUtils.getFieldPathLabels)(field, config);
@@ -97632,6 +97677,7 @@
 	                    //label: 'Subname', //'subname' should be used instead
 	                    label2: 'MemberName', //only for menu's toggler
 	                    type: 'number',
+	                    tableName: 't1',
 	                    operators: ['equal']
 	                },
 	                prox1: {
