@@ -63506,7 +63506,7 @@
 	            var fieldOptions = this.props.config.fields;
 	            var selectedFieldPartsLabels = (0, _configUtils.getFieldPathLabels)(this.props.selectedField, this.props.config);
 	            var selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
-	            var placeholder = isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
+	            var placeholder = !isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
 	            var fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
 	            var selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
 	            selectText = (0, _stuff.truncateString)(selectText, maxLabelsLength);
