@@ -148,7 +148,7 @@ export default class Field extends Component {
     let fieldOptions = this.props.config.fields;
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
-    let placeholder = isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
+    let placeholder = !isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
     let fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
     let selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
     selectText = truncateString(selectText, maxLabelsLength);
