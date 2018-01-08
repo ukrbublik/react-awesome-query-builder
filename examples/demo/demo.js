@@ -58,13 +58,6 @@ export default class DemoQueryBuilder extends Component {
                 </div>
                 <br />
                 <div>
-                  queryBuilderFormat: 
-                    <pre style={jsonStyle}>
-                      {stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)}
-                    </pre>
-                </div>
-                <hr/>
-                <div>
                   stringFormat: 
                   <pre style={jsonStyle}>
                     {stringify(queryString(props.tree, props.config), undefined, 2)}
@@ -76,6 +69,13 @@ export default class DemoQueryBuilder extends Component {
                   <pre style={jsonStyle}>
                     {stringify(queryString(props.tree, props.config, true), undefined, 2)}
                   </pre>
+                </div>
+                <hr/>
+                <div>
+                  queryBuilderFormat: 
+                    <pre style={jsonStyle}>
+                      {stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)}
+                    </pre>
                 </div>
                 <hr/>
                 <div>
