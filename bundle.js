@@ -31884,17 +31884,6 @@
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
-	                    'queryBuilderFormat:',
-	                    _react2.default.createElement(
-	                        'pre',
-	                        { style: jsonStyle },
-	                        stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)
-	                    )
-	                ),
-	                _react2.default.createElement('hr', null),
-	                _react2.default.createElement(
-	                    'div',
-	                    null,
 	                    'stringFormat:',
 	                    _react2.default.createElement(
 	                        'pre',
@@ -31911,6 +31900,17 @@
 	                        'pre',
 	                        { style: jsonStyle },
 	                        stringify(queryString(props.tree, props.config, true), undefined, 2)
+	                    )
+	                ),
+	                _react2.default.createElement('hr', null),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    'queryBuilderFormat:',
+	                    _react2.default.createElement(
+	                        'pre',
+	                        { style: jsonStyle },
+	                        stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)
 	                    )
 	                ),
 	                _react2.default.createElement('hr', null),
@@ -97547,9 +97547,9 @@
 	
 	        return resultQuery;
 	    } else if (type === 'rule') {
-	        var field = properties.get('field');
 	        var operator = properties.get('operator');
 	        var options = properties.get('operatorOptions');
+	        var field = properties.get('field');
 	        var value = properties.get('value');
 	        var valueSrc = properties.get('valueSrc');
 	        var valueType = properties.get('valueType');
@@ -97573,6 +97573,12 @@
 	        var widget = (0, _configUtils.getWidgetForFieldOp)(config, field, operator);
 	        var _fieldWidgetDefinition = (0, _omit2.default)((0, _configUtils.getFieldWidgetConfig)(config, field, operator, widget), ['factory']);
 	        var typeConfig = config.types[fieldDefinition.type] || {};
+	
+	        //format field
+	        if (fieldDefinition.tableName) {
+	            var regex = new RegExp(field.split(config.settings.fieldSeparator)[0]);
+	            field = field.replace(regex, fieldDefinition.tableName);
+	        }
 	
 	        if (value.size < cardinality) return undefined;
 	
