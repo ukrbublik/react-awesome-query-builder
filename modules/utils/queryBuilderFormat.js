@@ -77,9 +77,9 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
 
         return resultQuery;
     } else if (type === 'rule') {
-        const field = properties.get('field');
         const operator = properties.get('operator');
         const options = properties.get('operatorOptions');
+        let field = properties.get('field');
         let value = properties.get('value');
         let valueSrc = properties.get('valueSrc');
         let valueType = properties.get('valueType');
@@ -104,6 +104,12 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         const widget = getWidgetForFieldOp(config, field, operator);
         const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget), ['factory']);
         const typeConfig = config.types[fieldDefinition.type] || {};
+
+        //format field
+        if (fieldDefinition.tableName) {
+          const regex = new RegExp(field.split(config.settings.fieldSeparator)[0])
+          field = field.replace(regex, fieldDefinition.tableName)
+        }
 
         if (value.size < cardinality)
             return undefined;
