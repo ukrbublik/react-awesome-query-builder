@@ -110,9 +110,10 @@ export default class Query extends Component {
       var tree = nextProps.value;
       var oldTree = this.props.tree;
       if (tree !== oldTree) {
-        this.state.store.dispatch(
-          actions.tree.setTree(this.props.config, tree)
-        )
+        //TODO: This causes infinite loop! Dispatch in updating lifecycle methods is evil!
+        //this.state.store.dispatch(
+        //  actions.tree.setTree(this.props.config, tree)
+        //)
       }
     }
 
