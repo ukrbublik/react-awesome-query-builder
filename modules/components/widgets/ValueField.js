@@ -20,8 +20,12 @@ import clone from 'clone';
 export default class ValueField extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired,
     renderAsDropdown: PropTypes.bool,
+    config: PropTypes.object.isRequired,
+    field: PropTypes.string.isRequired,
+    value: PropTypes.string,
+    operator: PropTypes.string,
+    customProps: PropTypes.object,
   };
 
   shouldComponentUpdate = shallowCompare;
@@ -41,13 +45,18 @@ export default class ValueField extends Component {
   //tip: empty groups are ok for antd
   filterFields(config, fields, leftFieldFullkey, operator) {
     fields = clone(fields);
-    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
-    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
-    let widgetConfig = config.widgets[widget];
-    let widgetType = widgetConfig.type;
-    //let expectedType = leftFieldConfig.type;
-    let expectedType = widgetType;
     const fieldSeparator = config.settings.fieldSeparator;
+    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
+    let expectedType;
+    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
+    if (widget) {
+      let widgetConfig = config.widgets[widget];
+      let widgetType = widgetConfig.type;
+      //expectedType = leftFieldConfig.type;
+      expectedType = widgetType;
+    } else {
+      expectedType = leftFieldConfig.type;
+    }
 
     function _filter(list, path) {
       for (let rightFieldKey in list) {
@@ -161,6 +170,8 @@ export default class ValueField extends Component {
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
     let placeholderWidth = calcTextWidth(placeholder, '12px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
+    let customProps = this.props.customProps || {};
+
     let fieldSelect = (
           <Select
               dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
@@ -171,6 +182,8 @@ export default class ValueField extends Component {
               size={this.props.config.settings.renderSize || "small"}
               onChange={this.handleFieldSelect.bind(this)}
               value={this.props.value || undefined}
+              filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+              {...customProps}
           >{fieldSelectItems}</Select>
     );
 
@@ -183,6 +196,7 @@ export default class ValueField extends Component {
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.value, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+    let customProps = this.props.customProps || {};
 
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
     let fieldMenu = (
@@ -190,6 +204,7 @@ export default class ValueField extends Component {
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldMenuSelect.bind(this)}
+            {...customProps}
         >{fieldMenuItems}</Menu>
     );
     let fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);

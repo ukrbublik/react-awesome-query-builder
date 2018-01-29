@@ -4,11 +4,20 @@ import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import { Select } from 'antd';
 const Option = Select.Option;
+import Immutable from 'immutable';
 
 export default class Proximity extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    setOption: PropTypes.func.isRequired
+    setOption: PropTypes.func.isRequired,
+    defaults: PropTypes.object.isRequired,
+    options: PropTypes.instanceOf(Immutable.Map).isRequired,
+    minProximity: PropTypes.number,
+    maxProximity: PropTypes.number,
+    optionPlaceholder: PropTypes.string,
+    optionTextBefore: PropTypes.string,
+    optionLabel: PropTypes.string,
+    //children
   };
 
   shouldComponentUpdate = shallowCompare;

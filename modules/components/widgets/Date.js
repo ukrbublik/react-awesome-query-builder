@@ -8,9 +8,13 @@ import moment from 'moment';
 export default class DateWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        delta: PropTypes.number.isRequired,
         dateFormat: PropTypes.string,
         valueFormat: PropTypes.string,
+        value: PropTypes.string, //in valueFormat
+        field: PropTypes.string.isRequired,
+        config: PropTypes.object.isRequired,
+        placeholder: PropTypes.string,
+        customProps: PropTypes.object,
     };
 
     constructor(props) {
@@ -38,8 +42,10 @@ export default class DateWidget extends Component {
     }
 
     render() {
+        let customProps = this.props.customProps || {};
         const {dateFormat, valueFormat, value} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
+
         return (
             <DatePicker
                 key="widget-date"
@@ -49,6 +55,7 @@ export default class DateWidget extends Component {
                 value={dateValue}
                 onChange={this.handleChange.bind(this)}
                 ref="datetime"
+                {...customProps}
             />
         );
     }

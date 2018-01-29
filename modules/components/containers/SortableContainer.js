@@ -5,10 +5,18 @@ import {getFieldConfig} from "../../utils/configUtils";
 import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from '../../constants';
 import clone from 'clone';
+import PropTypes from 'prop-types';
+import Immutable from 'immutable';
 
 
 export default (Builder, CanMoveFn = null) => {
   return class SortableContainer extends Component {
+
+    static propTypes = {
+      tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+      actions: PropTypes.object.isRequired, // {moveItem: Function, ..}
+      //... see Builder
+    };
 
     constructor(props) {
         super(props);
@@ -109,6 +117,14 @@ export default (Builder, CanMoveFn = null) => {
       var dragEl = this._getDraggableNodeEl(treeEl);
       var plhEl = this._getPlaceholderNodeEl(treeEl);
 
+      var tmpAllGroups = treeEl.querySelectorAll('.group--children');
+      var anyGroup = tmpAllGroups.length ? tmpAllGroups[0] : null;
+      var groupPadding;
+      if (anyGroup) {
+        groupPadding = window.getComputedStyle(anyGroup, null).getPropertyValue('padding-left');
+        groupPadding = parseInt(groupPadding);
+      }
+
       this.draggingInfo = {
         id: id,
         x: dom.offsetLeft,
@@ -116,6 +132,7 @@ export default (Builder, CanMoveFn = null) => {
         w: dom.offsetWidth,
         h: dom.offsetHeight,
         itemInfo: this.tree.items[id],
+        paddingLeft: groupPadding,
       };
       this.dragStartInfo = {
         id: id,
@@ -146,7 +163,7 @@ export default (Builder, CanMoveFn = null) => {
     _onDrag (e, doHandleDrag = true) {
       var dragging = this.draggingInfo;
       var startDragging = this.dragStartInfo;
-      var paddingLeft = this.props.paddingLeft;
+      var paddingLeft = dragging.paddingLeft; //this.props.paddingLeft;
       var treeElContainer = startDragging.treeElContainer;
       var scrollTop = treeElContainer.scrollTop;
       dragging.itemInfo = this.tree.items[dragging.id];

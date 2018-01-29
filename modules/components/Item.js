@@ -51,12 +51,17 @@ const typeMap = {
 
 export default class Item extends Component {
   static propTypes = {
+    tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
     path: PropTypes.instanceOf(Immutable.List).isRequired,
     properties: PropTypes.instanceOf(Immutable.Map).isRequired,
-    children1: PropTypes.instanceOf(Immutable.OrderedMap)
+    children1: PropTypes.instanceOf(Immutable.OrderedMap),
+    actions: PropTypes.object.isRequired,
+    treeNodesCnt: PropTypes.number,
+    onDragStart: PropTypes.func,
+    dragging: PropTypes.object, //{id, x, y, w, h}
   };
 
   shouldComponentUpdate = shallowCompare;

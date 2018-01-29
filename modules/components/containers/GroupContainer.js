@@ -2,13 +2,22 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
-
+import Immutable from 'immutable';
 var stringify = require('json-stringify-safe');
 
 export default (Group) => {
   return class GroupContainer extends Component {
     static propTypes = {
-      config: PropTypes.object.isRequired
+      tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+      config: PropTypes.object.isRequired,
+      actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
+      path: PropTypes.instanceOf(Immutable.List).isRequired,
+      id: PropTypes.string.isRequired,
+      conjunction: PropTypes.string,
+      children: PropTypes.instanceOf(Immutable.List),
+      dragging: PropTypes.object, //{id, x, y, w, h}
+      onDragStart: PropTypes.func,
+      treeNodesCnt: PropTypes.number,
     };
 
     shouldComponentUpdate = shallowCompare;

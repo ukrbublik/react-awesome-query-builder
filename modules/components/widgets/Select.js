@@ -10,7 +10,10 @@ const Option = Select.Option;
 export default class SelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired
+    config: PropTypes.object.isRequired,
+    field: PropTypes.string.isRequired,
+    value: PropTypes.string, //key in listValues
+    customProps: PropTypes.object,
   };
 
   handleChange(val) {
@@ -25,6 +28,7 @@ export default class SelectWidget extends Component {
       return (<Option key={value} value={value}>{label}</Option>);
     });
     let placeholderWidth = calcTextWidth(placeholder, '12px');
+    let customProps = this.props.customProps || {};
 
     return (
         <Select
@@ -36,6 +40,8 @@ export default class SelectWidget extends Component {
             size={size}
             value={this.props.value || undefined} //note: (bug?) null forces placeholder to hide
             onChange={this.handleChange.bind(this)}
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            {...customProps}
           >{options}
         </Select>
     );

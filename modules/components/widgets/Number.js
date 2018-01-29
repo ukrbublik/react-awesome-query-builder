@@ -8,14 +8,19 @@ import {getFieldConfig} from '../../utils/configUtils';
 export default class NumberWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired,
     min: PropTypes.number,
     max: PropTypes.number,
     step: PropTypes.number,
     placeholder: PropTypes.string,
+    config: PropTypes.object.isRequired,
+    field: PropTypes.string.isRequired,
+    value: PropTypes.number,
+    customProps: PropTypes.object,
   };
 
   handleChange(val) {
+    if (val === '')
+      val = undefined;
     this.props.setValue(val);
   }
 
@@ -31,6 +36,7 @@ export default class NumberWidget extends Component {
     const min = this.props.min != null ? this.props.min : fieldSettings.min;
     const max = this.props.max != null ? this.props.max : fieldSettings.max;
     const step = this.props.step != null ? this.props.step : fieldSettings.step;
+    let customProps = this.props.customProps || {};
 
     return (
       <Col>
@@ -38,12 +44,13 @@ export default class NumberWidget extends Component {
           key="widget-number"
           size={this.props.config.settings.renderSize || "small"}
           ref="num"
-          value={this.props.value || null}
+          value={this.props.value != undefined ? this.props.value : null}
           min={min}
           max={max}
           step={step}
           placeholder={this.props.placeholder}
           onChange={this.handleChange.bind(this)}
+          {...customProps}
         />
       </Col>
     );

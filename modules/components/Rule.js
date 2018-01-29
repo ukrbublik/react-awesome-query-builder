@@ -24,11 +24,20 @@ export default class Rule extends Component {
         selectedOperator: PropTypes.string,
         operatorOptions: PropTypes.object,
         config: PropTypes.object.isRequired,
+        dragging: PropTypes.object, //{id, x, y, w, h}
+        onDragStart: PropTypes.func,
+        renderType: PropTypes.string, //'dragging', 'placeholder', null
+        value: PropTypes.any, //depends on widget
+        valueSrc: PropTypes.any,
+        //path: PropTypes.instanceOf(Immutable.List),
         //actions
         setField: PropTypes.func,
         setOperator: PropTypes.func,
         setOperatorOption: PropTypes.func,
         removeSelf: PropTypes.func,
+        setValue: PropTypes.func,
+        setValueSrc: PropTypes.func,
+        treeNodesCnt: PropTypes.number,
     };
 
     shouldComponentUpdate = shallowCompare;
@@ -101,6 +110,7 @@ export default class Rule extends Component {
                                     selectedField={this.props.selectedField}
                                     setField={this.props.setField}
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
+                                    customProps={this.props.config.settings.customFieldSelectProps}
                                 />
                             </Col>
                         ) : null}

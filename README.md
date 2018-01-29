@@ -1,4 +1,6 @@
 # react-awesome-query-builder
+<a href='https://www.npmjs.com/package/react-awesome-query-builder'><img src='https://img.shields.io/npm/v/react-awesome-query-builder.svg' /> <img src='https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master' /></a>
+
 User-friendly React component to build queries.
 
 Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
@@ -52,7 +54,8 @@ class DemoQueryBuilder extends Component {
             <div>
                 <Query 
                   {...config} 
-                  //value={you can pass object here, see tree at onChange}
+                  //you can pass object here, see treeJSON at onChange
+                  //value=transit.fromJSON(treeJSON)
                   get_children={this.getChildren}
                   onChange={this.onChange}
                 ></Query>
@@ -72,7 +75,8 @@ class DemoQueryBuilder extends Component {
     }
     
     onChange(tree) {
-      //here you can save tree object
+      //here you can save tree object: 
+      //var treeJSON = transit.toJSON(tree)
     }
 }
 ```
@@ -158,6 +162,11 @@ export default {
           widgetProps: {
             //for example, here you can overwrire 'valueLabel', 'valuePlaceholder', 
             // for date/time: 'timeFormat', 'dateFormat', 'valueFormat'
+
+            //also you can pass props directly to widget, for example enable search for Select widget:
+            customProps: {
+                showSearch: true
+            }
           },
           //Config for operators for this widget (all optional):
           opProps: {
@@ -217,6 +226,8 @@ export default {
       dateFormat: 'YYYY-MM-DD',
       valueFormat: 'YYYY-MM-DD HH:mm',
       // ...for your custom widgets you can add here your options
+      // also you can pass customProps, for example to enable search for select widget:
+      customProps: { showSearch: true }
     },
     ...other widgets (you can add your custom ones here)
     ...also there should be special 'field' widget, see examples/demo
@@ -241,6 +252,21 @@ export default {
     renderConjsAsRadios: false,
     //How to render fields/ops list? true - use Dropdown/Menu, false - use Select
     renderFieldAndOpAsDropdown: false,
+    //You can pass props to Select field widget
+    customFieldSelectProps: {
+        showSearch: true
+    },
+    // You can change the position of the group actions to the following:
+    // oneOf [topLeft, topCenter, topRight (default), bottomLeft, bottomCenter, bottomRight]
+    groupActionsPosition: 'topRight', 
+    groupActionsPositionList: {
+      topLeft: 'group--actions--tl',
+      topCenter: 'group--actions--tc',
+      topRight: 'group--actions--tr',
+      bottomLeft: 'group--actions--bl',
+      bottomCenter: 'group--actions--bc',
+      bottomRight: 'group--actions--br'
+    },
     //Strategies for selecting operator for new field (used by order until success)
     // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
     setOpOnChangeField: ['keep', 'default'],

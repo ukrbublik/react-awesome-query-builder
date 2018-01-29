@@ -10,7 +10,11 @@ const Option = Select.Option;
 export default class MultiSelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    delta: PropTypes.number.isRequired
+    config: PropTypes.object.isRequired,
+    value: PropTypes.array,
+    field: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
+    customProps: PropTypes.object,
   };
 
   handleChange(val) {
@@ -41,6 +45,7 @@ export default class MultiSelectWidget extends Component {
   }
 
   render() {
+    let customProps = this.props.customProps || {};
     let size = this.props.config.settings.renderSize || "small";
     const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
     const options = map(fieldDefinition.listValues, (label, value) => {
@@ -65,6 +70,8 @@ export default class MultiSelectWidget extends Component {
             size={size}
             value={value || undefined}  //note: (bug?) null forces placeholder to hide
             onChange={this.handleChange.bind(this)}
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            {...customProps}
           >{options}
         </Select>
     );

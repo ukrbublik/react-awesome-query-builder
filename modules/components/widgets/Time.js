@@ -8,9 +8,14 @@ import { LocaleProvider } from 'antd';
 export default class TimeWidget extends Component {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        delta: PropTypes.number.isRequired,
         timeFormat: PropTypes.string,
         valueFormat: PropTypes.string,
+        use12Hours: PropTypes.bool,
+        value: PropTypes.string, //in valueFormat
+        config: PropTypes.object.isRequired,
+        field: PropTypes.string.isRequired,
+        placeholder: PropTypes.string,
+        customProps: PropTypes.object,
     };
 
     constructor(props) {
@@ -40,6 +45,8 @@ export default class TimeWidget extends Component {
     render() {
         const {timeFormat, valueFormat, value, use12Hours} = this.props;
         let dateValue = value ? moment(value, valueFormat) : null;
+        let customProps = this.props.customProps || {};
+
         return (
             <TimePicker
                 use12Hours={use12Hours}
@@ -50,6 +57,7 @@ export default class TimeWidget extends Component {
                 value={dateValue}
                 onChange={this.handleChange.bind(this)}
                 ref="datetime"
+                {...customProps}
             />
         );
     }

@@ -44,6 +44,7 @@ export default {
                     //label: 'Subname', //'subname' should be used instead
                     label2: 'MemberName', //only for menu's toggler
                     type: 'number',
+                    tableName: 't1',
                     operators: ['equal'],
                 },
                 prox1: {
@@ -77,7 +78,7 @@ export default {
             label: 'Number',
             type: 'number',
             fieldSettings: {
-                min: 2,
+                min: -1,
                 max: 5
             },
         },
@@ -312,6 +313,9 @@ export default {
                         'select_not_equals'
                     ],
                     widgetProps: {
+                        customProps: {
+                            showSearch: true
+                        }
                     },
                 },
                 multiselect: {
@@ -626,6 +630,9 @@ export default {
             },
             valueLabel: "Field to compare",
             valuePlaceholder: "Select field to compare",
+            customProps: {
+                showSearch: true
+            }
         }
     },
     settings: {
@@ -639,6 +646,18 @@ export default {
         renderSize: 'small',
         renderConjsAsRadios: false,
         renderFieldAndOpAsDropdown: false,
+        customFieldSelectProps: {
+            showSearch: true
+        },
+        groupActionsPosition: 'topRight', // oneOf [topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight]
+        groupActionsPositionList: {
+          topLeft: 'group--actions--tl',
+          topCenter: 'group--actions--tc',
+          topRight: 'group--actions--tr',
+          bottomLeft: 'group--actions--bl',
+          bottomCenter: 'group--actions--bc',
+          bottomRight: 'group--actions--br'
+        },
         setOpOnChangeField: ['keep', 'default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
         clearValueOnChangeField: false, //false - if prev & next fields have same type (widget), keep
         clearValueOnChangeOp: false,

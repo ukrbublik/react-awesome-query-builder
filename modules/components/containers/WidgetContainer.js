@@ -20,7 +20,10 @@ export default (Widget) => {
             value: PropTypes.instanceOf(Immutable.List).isRequired,
             valueSrc: PropTypes.instanceOf(Immutable.List).isRequired,
             field: PropTypes.string.isRequired,
-            operator: PropTypes.string.isRequired
+            operator: PropTypes.string.isRequired,
+            //actions
+            setValue: PropTypes.func,
+            setValueSrc: PropTypes.func,
         };
 
         shouldComponentUpdate = shallowCompare;

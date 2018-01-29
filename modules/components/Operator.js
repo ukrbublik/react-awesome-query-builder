@@ -19,8 +19,9 @@ export default class Operator extends Component {
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string,
-    setOperator: PropTypes.func.isRequired,
     renderAsDropdown: PropTypes.bool,
+    //actions
+    setOperator: PropTypes.func.isRequired,
   };
 
   shouldComponentUpdate = shallowCompare;

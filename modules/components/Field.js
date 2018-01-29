@@ -16,8 +16,10 @@ export default class Field extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.string,
-    setField: PropTypes.func.isRequired,
     renderAsDropdown: PropTypes.bool,
+    customProps: PropTypes.object,
+    //actions
+    setField: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -30,11 +32,15 @@ export default class Field extends Component {
 
   shouldComponentUpdate = shallowCompare;
 
+  curField() {
+      return this.props.selectedField ? getFieldConfig(this.props.selectedField, this.props.config) : null;
+  }
+
   curFieldOpts() {
       return Object.assign({}, {
-          label: this.props.selectedField
+          label: this.props.selectedField,
         },
-        getFieldConfig(this.props.selectedField, this.props.config) || {}
+        this.curField() || {}
       );
   }
 
@@ -46,17 +52,23 @@ export default class Field extends Component {
     this.props.setField(key);
   }
 
-  buildMenuItems(fields, path = null) {
+  getFieldDisplayLabel(field, fieldKey) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
       let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+      let label = field.label || last(fieldKey.split(fieldSeparator));
+      label = truncateString(label, maxLabelsLength);
+      return label;
+  }
+
+  buildMenuItems(fields, path = null) {
+      let fieldSeparator = this.props.config.settings.fieldSeparator;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
-          let label = field.label || last(fieldKey.split(fieldSeparator));
-          label = truncateString(label, maxLabelsLength);
+          let label = this.getFieldDisplayLabel(field, fieldKey);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <SubMenu
@@ -73,15 +85,13 @@ export default class Field extends Component {
 
   buildSelectItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
-          let label = field.label || last(fieldKey.split(fieldSeparator));
-          label = truncateString(label, maxLabelsLength);
+          let label = this.getFieldDisplayLabel(field, fieldKey);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <OptGroup
@@ -132,23 +142,33 @@ export default class Field extends Component {
   }
 
   renderAsSelect() {
+    let isFieldSelected = !!this.props.selectedField;
     let dropdownPlacement = this.props.config.settings.dropdownPlacement;
     let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
     let fieldOptions = this.props.config.fields;
-    let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
-    placeholder = truncateString(placeholder, maxLabelsLength);
-    let placeholderWidth = calcTextWidth(placeholder, '12px');
+    let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
+    let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
+    let placeholder = !isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
+    let fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
+    let selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
+    selectText = truncateString(selectText, maxLabelsLength);
+    let selectWidth = calcTextWidth(selectText, '12px');
+    //let tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
+    let customProps = this.props.customProps || {};
+
     let fieldSelect = (
         <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            style={{ width: this.props.selectedField ? null : placeholderWidth + 36 }}
+            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 36 }}
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleFieldSelect.bind(this)}
             value={this.props.selectedField || undefined}
+            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            {...customProps}
         >{fieldSelectItems}</Select>
     );
 
@@ -161,6 +181,7 @@ export default class Field extends Component {
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+    let customProps = this.props.customProps || {};
 
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
     let fieldMenu = (
@@ -168,6 +189,7 @@ export default class Field extends Component {
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldMenuSelect.bind(this)}
+            {...customProps}
         >{fieldMenuItems}</Menu>
     );
     let fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);
