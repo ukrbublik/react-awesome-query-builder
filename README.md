@@ -256,6 +256,17 @@ export default {
     customFieldSelectProps: {
         showSearch: true
     },
+    // You can change the position of the group actions to the following:
+    // oneOf [topLeft, topCenter, topRight (default), bottomLeft, bottomCenter, bottomRight]
+    groupActionsPosition: 'topRight', 
+    groupActionsPositionList: {
+      topLeft: 'group--actions--tl',
+      topCenter: 'group--actions--tc',
+      topRight: 'group--actions--tr',
+      bottomLeft: 'group--actions--bl',
+      bottomCenter: 'group--actions--bc',
+      bottomRight: 'group--actions--br'
+    },
     //Strategies for selecting operator for new field (used by order until success)
     // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
     setOpOnChangeField: ['keep', 'default'],

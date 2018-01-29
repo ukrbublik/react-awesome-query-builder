@@ -1,3 +1,8 @@
+@mixin flex{
+  display: flex;
+  align-items: center;
+}
+
 @mixin clearfix {
   &:after {
     content: "";
@@ -20,6 +25,10 @@
 
 %clearfix {
   @include clearfix;
+}
+
+%flex{
+  @include flex;
 }
 
 .query-builder {
@@ -94,6 +103,10 @@
 /******************************************************************************/
 /** GROUP *********************************************************************/
 /******************************************************************************/
+.group--header,
+.group--footer{
+  @extend %flex;
+}
 
 .group--children {
   padding-left: 20px;
@@ -162,22 +175,41 @@
   cursor: grabbing;
 }
 
-.group--header {
-  @extend %clearfix;
-  padding: 10px;
-  padding-left: 5px;
+.group--header,
+.group--footer {
+  padding: {
+    top: 10px;
+    right: 5px;
+    bottom: 10px;
+    left: 10px;
+  }
 }
 
-
-.group--conjunctions {
-  float: left;
-}
 .group--conjunctions.hide--conj {
     opacity: 0.3;
 }
 
 .group--actions {
-  float: right;
+  flex: 1;
+  display: flex;
+  &--tl,
+  &--bl{
+    justify-content: flex-start;
+  }
+
+  &--tl{
+    margin-left: 20px;
+  }
+
+  &--tc,
+  &--bc {
+    justify-content: center;
+  }
+
+  &--tr,
+  &--br{
+    justify-content: flex-end;
+  }
 }
 
 /******************************************************************************/
