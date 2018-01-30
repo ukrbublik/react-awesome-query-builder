@@ -650,14 +650,6 @@ export default {
             showSearch: true
         },
         groupActionsPosition: 'topRight', // oneOf [topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight]
-        groupActionsPositionList: {
-          topLeft: 'group--actions--tl',
-          topCenter: 'group--actions--tc',
-          topRight: 'group--actions--tr',
-          bottomLeft: 'group--actions--bl',
-          bottomCenter: 'group--actions--bc',
-          bottomRight: 'group--actions--br'
-        },
         setOpOnChangeField: ['keep', 'default'], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
         clearValueOnChangeField: false, //false - if prev & next fields have same type (widget), keep
         clearValueOnChangeOp: false,

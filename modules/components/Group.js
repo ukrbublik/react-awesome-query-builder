@@ -11,6 +11,17 @@ const RadioGroup = Radio.Group;
 const classNames = require('classnames');
 import Immutable from 'immutable';
 
+export const groupActionsPositionList = {
+  topLeft: 'group--actions--tl',
+  topCenter: 'group--actions--tc',
+  topRight: 'group--actions--tr',
+  bottomLeft: 'group--actions--bl',
+  bottomCenter: 'group--actions--bc',
+  bottomRight: 'group--actions--br'
+}
+
+const defaultPosition = 'bottomRight'
+
 @GroupContainer
 export default class Group extends Component {
   static propTypes = {
@@ -45,12 +56,12 @@ export default class Group extends Component {
   }
 
   getGroupPositionClass = () => {
-    const { groupActionsPosition, groupActionsPositionList } = this.props.config.settings
-    return groupActionsPositionList[groupActionsPosition] || 'group--actions--tr'
+    const { groupActionsPosition } = this.props.config.settings
+    return groupActionsPositionList[groupActionsPosition] || groupActionsPositionList[defaultPosition]
   }
 
   isGroupTopPosition = () => {
-    return startsWith(this.props.config.settings.groupActionsPosition || 'topRight', 'top')
+    return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, 'top')
   }
 
   renderGroup = (position) => {
