@@ -52,6 +52,18 @@ export default class Field extends Component {
     this.props.setField(key);
   }
 
+  filterOption(input, option) {
+    const isInChildren = option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 
+    const isInValue    = option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0 
+    let isInGroupLabel = false 
+
+    if (option.props.groupLabel) {
+      isInGroupLabel = option.props.groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    }
+
+    return(isInChildren || isInValue || isInGroupLabel)
+  }
+
   getFieldDisplayLabel(field, fieldKey) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
       let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
@@ -83,7 +95,7 @@ export default class Field extends Component {
       });
   }
 
-  buildSelectItems(fields, path = null) {
+  buildSelectItems(fields, path = null, optGroupLabel = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
       if (!fields)
           return null;
@@ -98,12 +110,13 @@ export default class Field extends Component {
                   key={prefix+fieldKey}
                   label={label}
               >
-                  {this.buildSelectItems(field.subfields, subpath)}
+                  {this.buildSelectItems(field.subfields, subpath, label)}
               </OptGroup>
           } else {
               return <Option
                 key={prefix+fieldKey}
                 value={prefix+fieldKey}
+                groupLabel={optGroupLabel}
               >
                 {label}
               </Option>;
@@ -167,7 +180,7 @@ export default class Field extends Component {
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleFieldSelect.bind(this)}
             value={this.props.selectedField || undefined}
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) => this.filterOption(input, option)}
             {...customProps}
         >{fieldSelectItems}</Select>
     );
