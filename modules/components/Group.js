@@ -20,7 +20,7 @@ export const groupActionsPositionList = {
   bottomRight: 'group--actions--br'
 }
 
-const defaultPosition = 'bottomRight'
+const defaultPosition = 'topRight'
 
 @GroupContainer
 export default class Group extends Component {
