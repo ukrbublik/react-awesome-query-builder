@@ -213,7 +213,7 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
         && (!changedField 
             || changedField == 'field' && !config.settings.clearValueOnChangeField 
             || changedField == 'operator' && !config.settings.clearValueOnChangeOp)
-        && (currentFieldConfig.type == newFieldConfig.type) 
+        && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
         && JSON.stringify(currentWidgets.slice(0, commonWidgetsCnt)) == JSON.stringify(newWidgets.slice(0, commonWidgetsCnt))
     ;
 
@@ -289,7 +289,7 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
             if (vType != wType) {
                 isValid = false;
             }
-            if (fieldConfig.listValues) {
+            if (fieldConfig && fieldConfig.listValues) {
                 if (v instanceof Array) {
                     for (let _v of v) {
                         if (fieldConfig.listValues[_v] == undefined) {
@@ -350,7 +350,7 @@ const setField = (state, path, newField, config) => {
         // If the newly selected field supports the same operator the rule currently
         // uses, keep it selected.
         const newFieldConfig = getFieldConfig(newField, config);
-        const lastOp = newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
+        const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
         let newOperator = null;
         const availOps = getOperatorsForField(config, newField);
         if (availOps.length == 1)

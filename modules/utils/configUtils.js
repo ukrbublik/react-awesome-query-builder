@@ -151,7 +151,7 @@ export const getFirstField = (config) => {
 
 export const getOperatorsForField = (config, field) => {
   const fieldConfig = getFieldConfig(field, config);
-  const fieldOps = fieldConfig.operators;
+  const fieldOps = fieldConfig ? fieldConfig.operators : [];
   return fieldOps;
 };
 
@@ -191,7 +191,7 @@ export const getOperatorConfig = (config, operator, field = null) => {
     if (field) {
         const fieldConfig = getFieldConfig(field, config);
         const widget = getWidgetForFieldOp(config, field, operator);
-        const fieldWidgetConfig = (fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
+        const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
         const fieldWidgetOpProps = (fieldWidgetConfig.opProps || {})[operator];
         const mergedOpConfig = merge({}, opConfig, fieldWidgetOpProps);
         return mergedOpConfig;
@@ -207,7 +207,7 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
     if (!widget)
         widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const widgetConfig = config.widgets[widget] || {};
-    const fieldWidgetConfig = (fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
+    const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
     const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});
     const mergedConfig = merge({}, widgetConfig, fieldWidgetProps);
     return mergedConfig;
@@ -249,7 +249,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
     const fieldConfig = getFieldConfig(field, config);
     //const typeConfig = config.types[fieldConfig.type] || {};
     const opConfig = config.operators[operator];
-    if (fieldConfig.widgets) {
+    if (fieldConfig && fieldConfig.widgets) {
         for (let widget in fieldConfig.widgets) {
             let widgetConfig = fieldConfig.widgets[widget];
             let widgetValueSrc = config.widgets[widget].valueSrc;
