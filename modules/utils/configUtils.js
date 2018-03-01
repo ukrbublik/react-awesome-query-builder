@@ -259,7 +259,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
                 canAdd = false;
             if (canAdd) {
                 widgets.push(widget);
-                if (fieldConfig.valueSources.indexOf(widgetValueSrc) != -1 && !valueSrcs.find(v => v == widgetValueSrc))
+                if (fieldConfig.valueSources && fieldConfig.valueSources.indexOf(widgetValueSrc) != -1 && !valueSrcs.find(v => v == widgetValueSrc))
                     valueSrcs.push(widgetValueSrc);
             }
         }
