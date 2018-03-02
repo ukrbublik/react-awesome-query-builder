@@ -22,7 +22,7 @@ export default (Group) => {
 
     shouldComponentUpdate = shallowCompare;
 
-    setConjunction(e = null, conj = null) {
+    setConjunction = (e = null, conj = null) => {
       if (!conj && e) {
         //for RadioGroup
         conj = e.target.value;
@@ -31,19 +31,19 @@ export default (Group) => {
       this.props.actions.setConjunction(this.props.path, conj);
     }
 
-    removeSelf(event) {
+    removeSelf = (event) => {
       this.props.actions.removeGroup(this.props.path);
       event.preventDefault();
       return false;
     }
 
-    addGroup(event) {
+    addGroup = (event) => {
       this.props.actions.addGroup(this.props.path);
       event.preventDefault();
       return false;
     }
 
-    addRule(event) {
+    addRule = (event) => {
       this.props.actions.addRule(this.props.path);
       event.preventDefault();
       return false;
@@ -79,10 +79,10 @@ export default (Group) => {
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={conjunctionOptions}
               selectedConjunction={this.props.conjunction}
-              setConjunction={this.setConjunction.bind(this)}
-              removeSelf={this.removeSelf.bind(this)}
-              addGroup={this.addGroup.bind(this)}
-              addRule={this.addRule.bind(this)}
+              setConjunction={this.setConjunction}
+              removeSelf={this.removeSelf}
+              addGroup={this.addGroup}
+              addRule={this.addRule}
               config={this.props.config}
               tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
@@ -97,10 +97,10 @@ export default (Group) => {
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={conjunctionOptions}
               selectedConjunction={this.props.conjunction}
-              setConjunction={this.setConjunction.bind(this)}
-              removeSelf={this.removeSelf.bind(this)}
-              addGroup={this.addGroup.bind(this)}
-              addRule={this.addRule.bind(this)}
+              setConjunction={this.setConjunction}
+              removeSelf={this.removeSelf}
+              addGroup={this.addGroup}
+              addRule={this.addRule}
               config={this.props.config}
               tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}

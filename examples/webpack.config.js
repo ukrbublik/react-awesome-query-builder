@@ -50,10 +50,5 @@ module.exports = {
                 data.request = path.resolve(__dirname, '../modules/' + suffix);
             }
         ),
-        new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-            "window.jQuery": "jquery"
-        })
     ]
 };

@@ -30,9 +30,6 @@ export default (Builder, CanMoveFn = null) => {
             }
         };
 
-        this.onDrag = this._onDrag.bind(this);
-        this.onDragEnd = this._onDragEnd.bind(this);
-
         this.componentWillReceiveProps(props);
     }
 
@@ -63,7 +60,7 @@ export default (Builder, CanMoveFn = null) => {
                   startDragging.clientY += (plY - oldPlY);
                   startDragging.clientX += (plX - oldPlX);
 
-                  this._onDrag(this.mousePos, false);
+                  this.onDrag(this.mousePos, false);
               }
             }
         }
@@ -106,7 +103,7 @@ export default (Builder, CanMoveFn = null) => {
       return el;
     }
 
-    onDragStart (id, dom, e) {
+    onDragStart = (id, dom, e) => {
       var treeEl = dom.closest('.query-builder');
       treeEl.classList.add("qb-dragging");
       var treeElContainer = treeEl.closest('.query-builder-container');
@@ -160,8 +157,8 @@ export default (Builder, CanMoveFn = null) => {
     }
 
 
-    _onDrag (e, doHandleDrag = true) {
-      var dragging = this.draggingInfo;
+    onDrag = (e, doHandleDrag = true) => {
+      var dragging = Object.assign({}, this.draggingInfo);
       var startDragging = this.dragStartInfo;
       var paddingLeft = dragging.paddingLeft; //this.props.paddingLeft;
       var treeElContainer = startDragging.treeElContainer;
@@ -207,13 +204,12 @@ export default (Builder, CanMoveFn = null) => {
         if (e.preventDefault)
           e.preventDefault();
       }
-
       this.setState({
         dragging: dragging
       });
     }
 
-    _onDragEnd() {
+    onDragEnd = () => {
       var treeEl = this.dragStartInfo.treeEl;
       this.draggingInfo = {
         id: null,
@@ -462,7 +458,7 @@ export default (Builder, CanMoveFn = null) => {
       return <Builder
           {...this.props}
           dragging={this.state.dragging}
-          onDragStart={this.onDragStart.bind(this)}
+          onDragStart={this.onDragStart}
       />;
     }
 

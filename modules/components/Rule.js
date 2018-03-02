@@ -15,6 +15,7 @@ import {getFieldConfig, getFieldPath, getFieldPathLabels, getOperatorConfig, get
 import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 @RuleContainer
@@ -40,14 +41,14 @@ export default class Rule extends Component {
         treeNodesCnt: PropTypes.number,
     };
 
-    shouldComponentUpdate = shallowCompare;
+    shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
     constructor(props) {
         super(props);
         this.state = {};
     }
 
-    handleDraggerMouseDown (e) {
+    handleDraggerMouseDown = (e) => {
         var nodeId = this.props.id;
         var dom = this.refs.rule;
 
@@ -97,7 +98,7 @@ export default class Rule extends Component {
                 {/*<div className="rule--body">*/}
                     {/*<Row>*/}
                         { this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 &&
-                            <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown.bind(this)} ><Icon type="bars" /> </span>
+                            <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} ><Icon type="bars" /> </span>
                         }
                         {true ? (
                             <Col key={"fields"} className="rule--field">

@@ -44,11 +44,11 @@ export default class Field extends Component {
       );
   }
 
-  handleFieldMenuSelect({key, keyPath}) {
+  handleFieldMenuSelect = ({key, keyPath}) => {
     this.props.setField(key);
   }
 
-  handleFieldSelect(key) {
+  handleFieldSelect = (key) => {
     this.props.setField(key);
   }
 
@@ -178,7 +178,7 @@ export default class Field extends Component {
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
-            onChange={this.handleFieldSelect.bind(this)}
+            onChange={this.handleFieldSelect}
             value={this.props.selectedField || undefined}
             filterOption={(input, option) => this.filterOption(input, option)}
             {...customProps}
@@ -201,7 +201,7 @@ export default class Field extends Component {
         <Menu
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={selectedFieldKeys}
-            onClick={this.handleFieldMenuSelect.bind(this)}
+            onClick={this.handleFieldMenuSelect}
             {...customProps}
         >{fieldMenuItems}</Menu>
     );

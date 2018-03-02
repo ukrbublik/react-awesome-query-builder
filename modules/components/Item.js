@@ -11,7 +11,6 @@ const typeMap = {
       id={props.id}
       path={props.path}
       actions={props.actions}
-      tree={props.tree}
       treeNodesCnt={props.treeNodesCnt}
       config={props.config}
       onDragStart={props.onDragStart}

@@ -75,7 +75,6 @@
     "expect": "^1.15.2",
     "file-loader": "^0.8.5",
     "history": "^1.13",
-    "jquery": "^3.0.0",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.2",
     "karma-cli": "^0.1.2",

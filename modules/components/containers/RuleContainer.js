@@ -4,6 +4,8 @@ import shallowCompare from 'react-addons-shallow-compare';
 import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
 import Immutable from 'immutable';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 
 export default (Rule) => {
   return class RuleContainer extends Component {
@@ -28,32 +30,34 @@ export default (Rule) => {
         this.componentWillReceiveProps(props);
     }
 
-    shouldComponentUpdate = shallowCompare;
+    shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
     componentWillReceiveProps(nextProps) {
     }
 
-    removeSelf() {
+    dummyFn = () => {}
+
+    removeSelf = () => {
       this.props.actions.removeRule(this.props.path);
     }
 
-    setField(field) {
+    setField = (field) => {
       this.props.actions.setField(this.props.path, field);
     }
 
-    setOperator(operator) {
+    setOperator = (operator) => {
       this.props.actions.setOperator(this.props.path, operator);
     }
 
-    setOperatorOption(name, value) {
+    setOperatorOption = (name, value) => {
       this.props.actions.setOperatorOption(this.props.path, name, value);
     }
 
-    setValue(delta, value, type) {
+    setValue = (delta, value, type) => {
         this.props.actions.setValue(this.props.path, delta, value, type);
     }
 
-    setValueSrc(delta, srcKey) {
+    setValueSrc = (delta, srcKey) => {
         this.props.actions.setValueSrc(this.props.path, delta, srcKey);
     }
 
@@ -71,18 +75,16 @@ export default (Rule) => {
             <Rule
               key={"dragging"}
               id={this.props.id}
-              removeSelf={this.removeSelf.bind(this)}
-              setField={() => {}}
-              setOperator={() => {}}
-              setOperatorOption={() => {}}
-              removeSelf={() => {}}
+              setField={this.dummyFn}
+              setOperator={this.dummyFn}
+              setOperatorOption={this.dummyFn}
+              removeSelf={this.dummyFn}
               selectedField={this.props.field || null}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
               valueSrc={this.props.valueSrc || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
-              tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
               renderType={'dragging'}
@@ -91,19 +93,18 @@ export default (Rule) => {
             <Rule
               key={this.props.id}
               id={this.props.id}
-              removeSelf={this.removeSelf.bind(this)}
-              setField={this.setField.bind(this)}
-              setOperator={this.setOperator.bind(this)}
-              setOperatorOption={this.setOperatorOption.bind(this)}
-              setValue={this.setValue.bind(this)}
-              setValueSrc={this.setValueSrc.bind(this)}
+              removeSelf={this.removeSelf}
+              setField={this.setField}
+              setOperator={this.setOperator}
+              setOperatorOption={this.setOperatorOption}
+              setValue={this.setValue}
+              setValueSrc={this.setValueSrc}
               selectedField={this.props.field || null}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
               valueSrc={this.props.valueSrc || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
-              tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}

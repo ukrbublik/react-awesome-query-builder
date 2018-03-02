@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Input, Col } from 'antd';
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class TextWidget extends Component {
   static propTypes = {
@@ -13,7 +14,9 @@ export default class TextWidget extends Component {
     customProps: PropTypes.object,
   };
 
-  handleChange() {
+  shouldComponentUpdate = shallowCompare;
+
+  handleChange = () => {
     this.props.setValue(ReactDOM.findDOMNode(this.refs.text).value);
   }
 
@@ -29,7 +32,7 @@ export default class TextWidget extends Component {
           type={"text"}
           value={this.props.value || null}
           placeholder={this.props.placeholder}
-          onChange={this.handleChange.bind(this)}
+          onChange={this.handleChange}
           {...customProps}
         />
       </Col>

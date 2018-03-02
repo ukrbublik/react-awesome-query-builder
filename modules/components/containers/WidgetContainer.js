@@ -26,6 +26,26 @@ export default (Widget) => {
             setValueSrc: PropTypes.func,
         };
 
+        constructor(props) {
+            super(props);
+
+            this._setValueHandlers = {};
+        }
+
+        _getSetValueHandler = (delta, widgetType) => {
+            const k = ''+widgetType+'#'+delta;
+            let h = this._setValueHandlers[k];
+            if (!h) {
+                h = this._setValue.bind(this, delta, widgetType);
+                this._setValueHandlers[k] = h;
+            }
+            return h;
+        }
+
+        _setValue = (delta, widgetType, value) => {
+            this.props.setValue(delta, value, widgetType);
+        }
+
         shouldComponentUpdate = shallowCompare;
 
         renderWidget(delta, valueSrc, widget) {
@@ -37,7 +57,7 @@ export default (Widget) => {
 
             if (!widgetFactory)
                 return '?';
-
+            
             let widgetProps = Object.assign({}, fieldWidgetProps, {
                 config: this.props.config,
                 field: this.props.field,
@@ -46,7 +66,7 @@ export default (Widget) => {
                 value: this.props.value.get(delta),
                 label: valueLabel.label,
                 placeholder: valueLabel.placeholder,
-                setValue: (value) => this.props.setValue(delta, value, widgetType)
+                setValue: this._getSetValueHandler(delta, widgetType),
             });
 
             if (widget == 'field') {

@@ -47,7 +47,7 @@ export default class Group extends Component {
 
   shouldComponentUpdate = shallowCompare;
 
-  handleDraggerMouseDown (e) {
+  handleDraggerMouseDown = (e) => {
     var nodeId = this.props.id;
     var dom = this.refs.group;
     if (this.props.onDragStart) {
@@ -152,7 +152,7 @@ export default class Group extends Component {
             </ButtonGroup>
           }
           { this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
-              <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown.bind(this)} > <Icon type="bars" /> </span>
+              <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} > <Icon type="bars" /> </span>
           }
         </div>
       {this.isGroupTopPosition() && this.renderGroup(this.getGroupPositionClass())}

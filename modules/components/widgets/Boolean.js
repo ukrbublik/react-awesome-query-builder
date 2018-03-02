@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Switch, Icon } from 'antd';
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class BooleanWidget extends Component {
     static propTypes = {
@@ -14,7 +15,9 @@ export default class BooleanWidget extends Component {
         customProps: PropTypes.object,
     }
 
-    handleChange(val) {
+    shouldComponentUpdate = shallowCompare;
+
+    handleChange = (val) => {
         this.props.setValue(val);
     }
 
@@ -36,7 +39,7 @@ export default class BooleanWidget extends Component {
                 checkedChildren={this.props.labelYes || null}
                 unCheckedChildren={this.props.labelNo || null}
                 checked={this.props.value || null}
-                onChange={this.handleChange.bind(this)}
+                onChange={this.handleChange}
                 {...customProps}
             />
         );

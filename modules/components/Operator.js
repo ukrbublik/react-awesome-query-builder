@@ -46,11 +46,11 @@ export default class Operator extends Component {
       return Object.assign({}, {label: this.props.selectedOperator}, this.operatorOptions[this.props.selectedOperator] || {});
   }
 
-  handleOperatorMenuSelect({key, keyPath}) {
+  handleOperatorMenuSelect = ({key, keyPath}) => {
       this.props.setOperator(key);
   }
 
-  handleOperatorSelect(key) {
+  handleOperatorSelect = (key) => {
       this.props.setOperator(key);
   }
 
@@ -110,7 +110,7 @@ export default class Operator extends Component {
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
-            onChange={this.handleOperatorSelect.bind(this)}
+            onChange={this.handleOperatorSelect}
             value={this.props.selectedOperator || undefined}
         >{fieldSelectItems}</Select>
     );
@@ -126,7 +126,7 @@ export default class Operator extends Component {
         <Menu
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={[selectedOpKey]}
-            onClick={this.handleOperatorMenuSelect.bind(this)}
+            onClick={this.handleOperatorMenuSelect}
         >{opMenuItems}</Menu>
     );
     let opToggler = this.buildMenuToggler(placeholder);

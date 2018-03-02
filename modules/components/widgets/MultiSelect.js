@@ -6,6 +6,7 @@ import { Select } from 'antd';
 import {getFieldConfig} from '../../utils/configUtils';
 import {calcTextWidth} from '../../utils/stuff';
 const Option = Select.Option;
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class MultiSelectWidget extends Component {
   static propTypes = {
@@ -17,7 +18,9 @@ export default class MultiSelectWidget extends Component {
     customProps: PropTypes.object,
   };
 
-  handleChange(val) {
+  shouldComponentUpdate = shallowCompare;
+
+  handleChange = (val) => {
     this.props.setValue(val);
   }
 
@@ -69,7 +72,7 @@ export default class MultiSelectWidget extends Component {
             placeholder={this.placeholder}
             size={size}
             value={value || undefined}  //note: (bug?) null forces placeholder to hide
-            onChange={this.handleChange.bind(this)}
+            onChange={this.handleChange}
             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             {...customProps}
           >{options}
