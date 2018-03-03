@@ -5,6 +5,7 @@ import {createStore} from 'redux';
 import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
+import {fixPathsInTree} from '../utils/treeUtils';
 import {bindActionCreators} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import { LocaleProvider } from 'antd';
@@ -23,6 +24,8 @@ class ConnectedQuery extends Component {
     constructor(props) {
         super(props);
 
+        this._updateActions(props);
+
         this.validatedTree = this.validateTree(props, props.config, props.tree);
         if (props.tree !== this.validatedTree) {
             props.onChange && props.onChange(this.validatedTree);
@@ -30,7 +33,14 @@ class ConnectedQuery extends Component {
     }
 
     validateTree (props, oldConfig, oldTree) {
-        return validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
+        let tree = validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
+        tree = fixPathsInTree(tree);
+        return tree;
+    }
+
+    _updateActions (props) {
+      const {config, dispatch} = props;
+      this.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -38,7 +48,13 @@ class ConnectedQuery extends Component {
         const oldTree = this.props.tree;
         const oldConfig = this.props.config;
         const newTree = nextProps.tree;
+        const newConfig = this.props.config;
         const oldValidatedTree = this.validatedTree;
+
+        if (oldConfig != newConfig) {
+            this._updateActions(nextProps);
+        }
+
         this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
         let validatedTreeChanged = oldValidatedTree !== this.validatedTree 
             && JSON.stringify(oldValidatedTree) != JSON.stringify(this.validatedTree);
@@ -56,7 +72,7 @@ class ConnectedQuery extends Component {
         return <div>
             {get_children({
                 tree: this.validatedTree,
-                actions: bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch),
+                actions: this.actions,
                 config: config,
                 dispatch: dispatch
             })}

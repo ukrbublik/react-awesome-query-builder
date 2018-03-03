@@ -157,6 +157,10 @@ export default class ValueField extends Component {
       return toggler;
   }
 
+  filterOption = (input, option) => {
+    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+  }
+
   render() {
     if (this.props.renderAsDropdown)
         return this.renderAsDropdown();
@@ -182,7 +186,7 @@ export default class ValueField extends Component {
               size={this.props.config.settings.renderSize || "small"}
               onChange={this.handleFieldSelect}
               value={this.props.value || undefined}
-              filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+              filterOption={this.filterOption}
               {...customProps}
           >{fieldSelectItems}</Select>
     );

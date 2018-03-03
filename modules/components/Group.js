@@ -10,6 +10,8 @@ const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const classNames = require('classnames');
 import Immutable from 'immutable';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 
 export const groupActionsPositionList = {
   topLeft: 'group--actions--tl',
@@ -25,7 +27,7 @@ const defaultPosition = 'topRight'
 @GroupContainer
 export default class Group extends Component {
   static propTypes = {
-    tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+    //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     treeNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
@@ -45,7 +47,27 @@ export default class Group extends Component {
     setConjunction: PropTypes.func.isRequired,
   };
 
-  shouldComponentUpdate = shallowCompare;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+
+  constructor(props) {
+    super(props);
+
+    this._setConjunctionHandlers = {};
+  }
+
+  _getSetConjunctionHandler = (itemKey = null) => {
+    const k = ''+itemKey;
+    let h = this._setConjunctionHandlers[k];
+    if (!h) {
+      h = this._setConjunction.bind(this, itemKey)
+      this._setConjunctionHandlers[k] = h;
+    }
+    return h;
+  }
+
+  _setConjunction = (itemKey, e) => {
+    this.props.setConjunction(e, itemKey);
+  }
 
   handleDraggerMouseDown = (e) => {
     var nodeId = this.props.id;
@@ -131,6 +153,7 @@ export default class Group extends Component {
             >
               {map(this.props.conjunctionOptions, (item, index) => (
                 <RadioButton
+                  key={item.id}
                   value={item.key}
                   //checked={item.checked}
                 >{item.label}</RadioButton>
@@ -146,7 +169,7 @@ export default class Group extends Component {
                   disabled={this.props.children.size < 2}
                   key={item.id}
                   type={item.checked ? "primary" : null}
-                  onClick={(ev) => this.props.setConjunction(ev, item.key)}
+                  onClick={this._getSetConjunctionHandler(item.key)}
                 >{item.label}</Button>
               ))}
             </ButtonGroup>

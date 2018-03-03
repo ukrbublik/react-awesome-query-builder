@@ -37,7 +37,7 @@ export default (OperatorOptions) => {
             field: this.props.selectedField,
             operator: this.props.selectedOperator,
             options: this.props.operatorOptions,
-            setOption: (name, value) => this.props.setOperatorOption(name, value)
+            setOption: this.props.setOperatorOption,
           }))}
         </OperatorOptions>
       );

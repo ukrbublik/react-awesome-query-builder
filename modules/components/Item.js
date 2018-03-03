@@ -4,6 +4,8 @@ import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import Rule from './Rule';
 import Group from './Group';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 
 const typeMap = {
   rule: (props) => (
@@ -23,7 +25,7 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}
-      tree={props.tree}
+      //tree={props.tree}
       treeNodesCnt={props.treeNodesCnt}
       onDragStart={props.onDragStart}
       dragging={props.dragging}
@@ -32,13 +34,14 @@ const typeMap = {
         <Item
           key={item.get('id')}
           id={item.get('id')}
-          path={props.path.push(item.get('id'))}
+          //path={props.path.push(item.get('id'))}
+          path={item.get('path')}
           type={item.get('type')}
           properties={item.get('properties')}
           config={props.config}
           actions={props.actions}
           children1={item.get('children1')}
-          tree={props.tree}
+          //tree={props.tree}
           treeNodesCnt={props.treeNodesCnt}
           onDragStart={props.onDragStart}
           dragging={props.dragging}
@@ -50,7 +53,7 @@ const typeMap = {
 
 export default class Item extends Component {
   static propTypes = {
-    tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+    //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
@@ -63,7 +66,7 @@ export default class Item extends Component {
     dragging: PropTypes.object, //{id, x, y, w, h}
   };
 
-  shouldComponentUpdate = shallowCompare;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   render() {
     const { type, ...props } = this.props;

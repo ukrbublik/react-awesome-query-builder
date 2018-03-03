@@ -23,6 +23,10 @@ export default class SelectWidget extends Component {
     this.props.setValue(val);
   }
 
+  filterOption = (input, option) => {
+    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+  }
+
   render() {
     let size = this.props.config.settings.renderSize || "small";
     let placeholder = this.props.placeholder || "Select option";
@@ -43,7 +47,7 @@ export default class SelectWidget extends Component {
             size={size}
             value={this.props.value || undefined} //note: (bug?) null forces placeholder to hide
             onChange={this.handleChange}
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={this.filterOption}
             {...customProps}
           >{options}
         </Select>

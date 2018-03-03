@@ -11,6 +11,8 @@ const DropdownButton = Dropdown.Button;
 import map from 'lodash/map';
 import last from 'lodash/last';
 import keys from 'lodash/keys';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 
 export default class Field extends Component {
   static propTypes = {
@@ -30,7 +32,7 @@ export default class Field extends Component {
     //let prevProps = this.props;
   }
 
-  shouldComponentUpdate = shallowCompare;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   curField() {
       return this.props.selectedField ? getFieldConfig(this.props.selectedField, this.props.config) : null;
@@ -52,7 +54,7 @@ export default class Field extends Component {
     this.props.setField(key);
   }
 
-  filterOption(input, option) {
+  filterOption = (input, option) => {
     const isInChildren = option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 
     const isInValue    = option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0 
     let isInGroupLabel = false 
@@ -180,7 +182,7 @@ export default class Field extends Component {
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleFieldSelect}
             value={this.props.selectedField || undefined}
-            filterOption={(input, option) => this.filterOption(input, option)}
+            filterOption={this.filterOption}
             {...customProps}
         >{fieldSelectItems}</Select>
     );

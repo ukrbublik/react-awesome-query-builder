@@ -30,7 +30,7 @@ export default class Builder extends Component {
         actions={this.props.actions}
         dispatch={this.props.dispatch}
         children1={this.props.tree.get('children1')}
-        tree={this.props.tree}
+        //tree={this.props.tree}
         treeNodesCnt={treeNodesCnt}
         onDragStart={this.props.onDragStart}
         dragging={this.props.dragging}

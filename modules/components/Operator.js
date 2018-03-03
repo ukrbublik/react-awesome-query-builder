@@ -13,6 +13,8 @@ import last from 'lodash/last';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 
 export default class Operator extends Component {
   static propTypes = {
@@ -24,7 +26,7 @@ export default class Operator extends Component {
     setOperator: PropTypes.func.isRequired,
   };
 
-  shouldComponentUpdate = shallowCompare;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   constructor(props) {
       super(props);

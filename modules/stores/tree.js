@@ -1,5 +1,5 @@
 import Immutable from 'immutable';
-import {expandTreePath, expandTreeSubpath, getItemByPath} from '../utils/treeUtils';
+import {expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree} from '../utils/treeUtils';
 import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from '../utils/defaultUtils';
 import {getFirstOperator} from '../utils/configUtils';
 import * as constants from '../constants';
@@ -28,6 +28,7 @@ const addNewGroup = (state, path, properties, config) => {
     // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
     state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config).merge(properties || {}));
+    state = fixPathsInTree(state);
     return state;
 };
 
@@ -46,6 +47,7 @@ const removeGroup = (state, path, config) => {
     if (isEmptyGroup && !canLeaveEmpty) {
         state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
     }
+    state = fixPathsInTree(state);
     return state;
 };
 
@@ -63,6 +65,7 @@ const removeRule = (state, path, config) => {
     if (isEmptyGroup && !canLeaveEmpty) {
         state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
     }
+    state = fixPathsInTree(state);
     return state;
 };
 
@@ -82,16 +85,22 @@ const setConjunction = (state, path, conjunction) =>
  * @param {Immutable.OrderedMap} properties
  */
 const addItem = (state, path, type, id, properties) => {
-    return state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
+    state = state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
         [id]: new Immutable.Map({type, id, properties})
-    }))};
+    }));
+    state = fixPathsInTree(state);
+    return state;
+};
 
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
  */
-const removeItem = (state, path) =>
-    state.deleteIn(expandTreePath(path));
+const removeItem = (state, path) => {
+    state = state.deleteIn(expandTreePath(path));
+    state = fixPathsInTree(state);
+    return state;
+}
 
 /**
  * @param {Immutable.Map} state
@@ -169,6 +178,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
     if (!isTargetInsideSource)
         state = state.updateIn(expandTreePath(targetPath, 'children1'), (oldChildren) => newTargetChildren);
 
+    state = fixPathsInTree(state);
     return state;
 };
 

@@ -4,11 +4,13 @@ import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
 import Immutable from 'immutable';
 var stringify = require('json-stringify-safe');
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 
 export default (Group) => {
   return class GroupContainer extends Component {
     static propTypes = {
-      tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+      //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
       config: PropTypes.object.isRequired,
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
       path: PropTypes.instanceOf(Immutable.List).isRequired,
@@ -20,7 +22,7 @@ export default (Group) => {
       treeNodesCnt: PropTypes.number,
     };
 
-    shouldComponentUpdate = shallowCompare;
+    shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
     setConjunction = (e = null, conj = null) => {
       if (!conj && e) {
@@ -84,7 +86,7 @@ export default (Group) => {
               addGroup={this.addGroup}
               addRule={this.addRule}
               config={this.props.config}
-              tree={this.props.tree}
+              //tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
               renderType={'dragging'}
@@ -102,7 +104,7 @@ export default (Group) => {
               addGroup={this.addGroup}
               addRule={this.addRule}
               config={this.props.config}
-              tree={this.props.tree}
+              //tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}
