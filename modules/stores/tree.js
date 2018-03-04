@@ -8,11 +8,10 @@ import omit from 'lodash/omit';
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getValueSourcesForFieldOp} from "../utils/configUtils";
 import {defaultValue, eqArrSet} from "../utils/stuff";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
-
 var stringify = require('json-stringify-safe');
 
-const hasChildren = (tree, path) =>
-tree.getIn(expandTreePath(path, 'children1')).size > 0;
+
+const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')).size > 0;
 
 /**
  * @param {object} config
@@ -470,51 +469,81 @@ const setOperatorOption = (state, path, name, value) => {
     return state.setIn(expandTreePath(path, 'properties', 'operatorOptions', name), value);
 };
 
+
+const emptyDrag = {
+  dragging: {
+    id: null,
+    x: null,
+    y: null,
+    w: null,
+    h: null
+  },
+  mousePos: {},
+  dragStart: {
+    id: null,
+  },
+};
+
+
 /**
  * @param {Immutable.Map} state
  * @param {object} action
  */
 export default (config) => {
-    return (state = defaultRoot(config), action) => {
+    const emptyTree = defaultRoot(config);
+    const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
+    
+    return (state = emptyState, action) => {
         switch (action.type) {
             case constants.SET_TREE:
-                return action.tree;
+                return Object.assign({}, state, {tree: action.tree});
 
             case constants.ADD_NEW_GROUP:
-                return addNewGroup(state, action.path, action.properties, action.config);
+                return Object.assign({}, state, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
 
             case constants.ADD_GROUP:
-                return addItem(state, action.path, 'group', action.id, action.properties);
+                return Object.assign({}, state, {tree: addItem(state.tree, action.path, 'group', action.id, action.properties)});
 
             case constants.REMOVE_GROUP:
-                return removeGroup(state, action.path, action.config);
+                return Object.assign({}, state, {tree: removeGroup(state.tree, action.path, action.config)});
 
             case constants.ADD_RULE:
-                return addItem(state, action.path, 'rule', action.id, action.properties);
+                return Object.assign({}, state, {tree: addItem(state.tree, action.path, 'rule', action.id, action.properties)});
 
             case constants.REMOVE_RULE:
-                return removeRule(state, action.path, action.config);
+                return Object.assign({}, state, {tree: removeRule(state.tree, action.path, action.config)});
 
             case constants.SET_CONJUNCTION:
-                return setConjunction(state, action.path, action.conjunction);
+                return Object.assign({}, state, {tree: setConjunction(state.tree, action.path, action.conjunction)});
 
             case constants.SET_FIELD:
-                return setField(state, action.path, action.field, action.config);
+                return Object.assign({}, state, {tree: setField(state.tree, action.path, action.field, action.config)});
 
             case constants.SET_OPERATOR:
-                return setOperator(state, action.path, action.operator, action.config);
+                return Object.assign({}, state, {tree: setOperator(state.tree, action.path, action.operator, action.config)});
 
             case constants.SET_VALUE:
-                return setValue(state, action.path, action.delta, action.value, action.valueType, action.config);
+                return Object.assign({}, state, {tree: setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config)});
 
             case constants.SET_VALUE_SRC:
-                return setValueSrc(state, action.path, action.delta, action.srcKey);
+                return Object.assign({}, state, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey)});
 
             case constants.SET_OPERATOR_OPTION:
-                return setOperatorOption(state, action.path, action.name, action.value);
+                return Object.assign({}, state, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
 
             case constants.MOVE_ITEM:
-                return moveItem(state, action.fromPath, action.toPath, action.placement, action.config);
+                return Object.assign({}, state, {tree: moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config)});
+
+
+            case constants.SET_DRAG_START:
+                return Object.assign({}, state, {dragStart: action.dragStart, dragging: action.dragging, mousePos: action.mousePos});
+
+            case constants.SET_DRAG_PROGRESS:
+                return Object.assign({}, state, {mousePos: action.mousePos, dragging: action.dragging});
+
+            case constants.SET_DRAG_END:
+                return Object.assign({}, state, emptyDrag);
+
 
             default:
                 return state;

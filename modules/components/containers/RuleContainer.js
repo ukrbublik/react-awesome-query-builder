@@ -5,10 +5,11 @@ import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
 import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {Provider, Connector, connect} from 'react-redux';
 
 
 export default (Rule) => {
-  return class RuleContainer extends Component {
+  class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
       config: PropTypes.object.isRequired,
@@ -16,12 +17,13 @@ export default (Rule) => {
       operator: PropTypes.string,
       field: PropTypes.string,
       actions: PropTypes.object.isRequired, //{removeRule: Funciton, setField, setOperator, setOperatorOption, setValue, setValueSrc, ...}
-      dragging: PropTypes.object, //{id, x, y, w, h}
       onDragStart: PropTypes.func,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
       operatorOptions: PropTypes.object,
       treeNodesCnt: PropTypes.number,
+      //connected:
+      //dragging: PropTypes.object, //{id, x, y, w, h}
     };
 
     constructor(props) {
@@ -29,8 +31,6 @@ export default (Rule) => {
 
         this.componentWillReceiveProps(props);
     }
-
-    shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
     componentWillReceiveProps(nextProps) {
     }
@@ -62,6 +62,34 @@ export default (Rule) => {
     }
 
 
+    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    //shouldComponentUpdate = this.pureShouldComponentUpdate;
+    
+    shouldComponentUpdate(nextProps, nextState) {
+        let prevProps = this.props;
+        let prevState = this.state;
+
+        let should = this.pureShouldComponentUpdate(nextProps, nextState);
+        if (should) {
+          if (prevState == nextState && prevProps != nextProps) {
+            let chs = [];
+            for (let k in nextProps) {
+                let changed = (nextProps[k] != prevProps[k]);
+                if (k == 'dragging' && (nextProps.dragging.id || prevProps.dragging.id) != nextProps.id) {
+                  changed = false; //dragging another item -> ignore
+                }
+                if (changed) {
+                  chs.push(k);
+                }
+            }
+            if (!chs.length)
+                should = false;
+          }
+        }
+
+        return should;
+    }
+
     render() {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
       let isGroup = fieldConfig && fieldConfig.type == '!struct';
@@ -71,9 +99,10 @@ export default (Rule) => {
           className={'group-or-rule-container rule-container'}
           data-id={this.props.id}
         >
-          {[this.props.dragging && this.props.dragging.id == this.props.id ? (
+          {[(
             <Rule
               key={"dragging"}
+              isForDrag={true}
               id={this.props.id}
               setField={this.dummyFn}
               setOperator={this.dummyFn}
@@ -87,9 +116,8 @@ export default (Rule) => {
               config={this.props.config}
               treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
-              renderType={'dragging'}
             />
-          ) : null, (
+          ), (
             <Rule
               key={this.props.id}
               id={this.props.id}
@@ -108,11 +136,24 @@ export default (Rule) => {
               treeNodesCnt={this.props.treeNodesCnt}
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}
-              renderType={this.props.dragging && this.props.dragging.id == this.props.id ? 'placeholder' : null}
             />
           )]}
         </div>
       );
     }
+
   };
+
+
+  const ConnectedRuleContainer = connect(
+      (state) => {
+          return {
+            dragging: state.dragging,
+          }
+      }
+  )(RuleContainer);
+
+
+  return ConnectedRuleContainer;
+
 };

@@ -81,8 +81,10 @@ class ConnectedQuery extends Component {
 }
 
 const QueryContainer = connect(
-    (tree) => {
-        return {tree: tree}
+    (state) => {
+        return {
+          tree: state.tree,
+        }
     },
 )(ConnectedQuery);
 
@@ -114,10 +116,10 @@ export default class Query extends Component {
             tree: props.value,
         };
 
-        const tree = createTreeStore(config);
+        const store = createTreeStore(config);
 
         this.state = {
-            store: createStore(tree)
+            store: createStore(store)
         };
     }
 

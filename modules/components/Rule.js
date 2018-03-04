@@ -16,16 +16,17 @@ import size from 'lodash/size';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
 import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {Provider, Connector, connect} from 'react-redux';
 
 
 @RuleContainer
-export default class Rule extends Component {
+class Rule extends Component {
     static propTypes = {
+        isForDrag: PropTypes.bool,
         selectedField: PropTypes.string,
         selectedOperator: PropTypes.string,
         operatorOptions: PropTypes.object,
         config: PropTypes.object.isRequired,
-        dragging: PropTypes.object, //{id, x, y, w, h}
         onDragStart: PropTypes.func,
         renderType: PropTypes.string, //'dragging', 'placeholder', null
         value: PropTypes.any, //depends on widget
@@ -39,13 +40,16 @@ export default class Rule extends Component {
         setValue: PropTypes.func,
         setValueSrc: PropTypes.func,
         treeNodesCnt: PropTypes.number,
+        //connected:
+        dragging: PropTypes.object, //{id, x, y, w, h}
     };
 
-    shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    shouldComponentUpdate = this.pureShouldComponentUpdate;
+
 
     constructor(props) {
         super(props);
-        this.state = {};
     }
 
     handleDraggerMouseDown = (e) => {
@@ -57,7 +61,21 @@ export default class Rule extends Component {
         }
     }
 
+    getRenderType (props) {
+      let renderType;
+      if (props.dragging && props.dragging.id == props.id) {
+        renderType = props.isForDrag ? 'dragging' : 'placeholder';
+      } else {
+        renderType = props.isForDrag ? null : 'normal';
+      }
+      return renderType;
+    }
+
     render () {
+        let renderType = this.getRenderType(this.props);
+        if (!renderType)
+          return null;
+
         const selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
         const selectedFieldConfig = getFieldConfig(this.props.selectedField, this.props.config);
         const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == '!struct';
@@ -67,7 +85,7 @@ export default class Rule extends Component {
         const selectedFieldWidgetConfig = getFieldWidgetConfig(this.props.config, this.props.selectedField, this.props.selectedOperator) || {};
 
         let styles = {};
-        if (this.props.renderType == 'dragging') {
+        if (renderType == 'dragging') {
             styles = {
                 top: this.props.dragging.y,
                 left: this.props.dragging.x,
@@ -78,8 +96,8 @@ export default class Rule extends Component {
         return (
             <div
                 className={classNames("rule", "group-or-rule",
-                    this.props.renderType == 'placeholder' ? 'qb-placeholder' : null,
-                    this.props.renderType == 'dragging' ? 'qb-draggable' : null,
+                    renderType == 'placeholder' ? 'qb-placeholder' : null,
+                    renderType == 'dragging' ? 'qb-draggable' : null,
                 )}
                 style={styles}
                 ref="rule"
@@ -173,3 +191,5 @@ export default class Rule extends Component {
     }
 
 }
+
+export default Rule;
