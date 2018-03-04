@@ -6,6 +6,7 @@ import {getFieldConfig} from '../../utils/configUtils';
 import {calcTextWidth} from '../../utils/stuff';
 import { Select } from 'antd';
 const Option = Select.Option;
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class SelectWidget extends Component {
   static propTypes = {
@@ -16,8 +17,14 @@ export default class SelectWidget extends Component {
     customProps: PropTypes.object,
   };
 
-  handleChange(val) {
+  shouldComponentUpdate = shallowCompare;
+
+  handleChange = (val) => {
     this.props.setValue(val);
+  }
+
+  filterOption = (input, option) => {
+    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
   render() {
@@ -39,8 +46,8 @@ export default class SelectWidget extends Component {
             placeholder={placeholder}
             size={size}
             value={this.props.value || undefined} //note: (bug?) null forces placeholder to hide
-            onChange={this.handleChange.bind(this)}
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            onChange={this.handleChange}
+            filterOption={this.filterOption}
             {...customProps}
           >{options}
         </Select>

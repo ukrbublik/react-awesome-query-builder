@@ -1,8 +1,81 @@
 import Immutable from 'immutable';
 import clone from 'clone';
 
-export const getFlatTree = (tree) => {
 
+/**
+ * @param {Immutable.List} path
+ * @param {...string} suffix
+ */
+export const expandTreePath = (path, ...suffix) =>
+  path.interpose('children1').withMutations((list) => {
+    list.skip(1);
+    list.push.apply(list, suffix);
+    return list;
+  });
+
+
+/**
+ * @param {Immutable.List} path
+ * @param {...string} suffix
+ */
+export const expandTreeSubpath = (path, ...suffix) =>
+  path.interpose('children1').withMutations((list) => {
+    list.push.apply(list, suffix);
+    return list;
+  });
+
+
+/**
+ * @param {Immutable.Map} path
+ * @param {Immutable.List} path
+ */
+export const getItemByPath = (tree, path) => {
+    let children = new Immutable.OrderedMap({ [tree.get('id')] : tree });
+    let res = tree;
+    path.forEach((id) => {
+        res = children.get(id);
+        children = res.get('children1');
+    });
+    return res;
+};
+
+
+/**
+ * Set correct `path` in every item
+ * @param {Immutable.Map} tree
+ * @return {Immutable.Map} tree
+ */
+export const fixPathsInTree = (tree) => {
+    let newTree = tree;
+
+    function _processNode (item, path, lev) {
+        const id = item.get('id');
+        const itemPath = path.push(item.get('id'));
+        const currItemPath = item.get('path');
+        if (!currItemPath || !currItemPath.equals(itemPath)) {
+          newTree = newTree.setIn(expandTreePath(itemPath, 'path'), itemPath)
+        }
+
+        const children = item.get('children1');
+        if (children) {
+            children.map((child, childId) => {
+                _processNode(child, itemPath, lev + 1);
+            });
+        }
+    };
+
+    _processNode(tree, new Immutable.List(), 0);
+
+
+    return newTree;
+};
+
+
+/**
+ * @param {Immutable.Map} tree
+ * @return {Object} {flat, items}
+ */
+export const getFlatTree = (tree) => {
     let flat = [];
     let items = {};
     let realHeight = 0;
@@ -85,42 +158,4 @@ export const getTotalNodesCountInTree = (tree) => {
     _processNode(tree, [], 0);
 
     return cnt;
-};
-
-
-/**
- * @param {Immutable.List} path
- * @param {...string} suffix
- */
-export const expandTreePath = (path, ...suffix) =>
-  path.interpose('children1').withMutations((list) => {
-    list.skip(1);
-    list.push.apply(list, suffix);
-    return list;
-  });
-
-
-/**
- * @param {Immutable.List} path
- * @param {...string} suffix
- */
-export const expandTreeSubpath = (path, ...suffix) =>
-  path.interpose('children1').withMutations((list) => {
-    list.push.apply(list, suffix);
-    return list;
-  });
-
-
-/**
- * @param {Immutable.Map} path
- * @param {Immutable.List} path
- */
-export const getItemByPath = (tree, path) => {
-    let children = new Immutable.OrderedMap({ [tree.get('id')] : tree });
-    let res = tree;
-    path.forEach((id) => {
-        res = children.get(id);
-        children = res.get('children1');
-    });
-    return res;
 };

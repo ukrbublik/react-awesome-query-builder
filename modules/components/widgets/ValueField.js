@@ -34,11 +34,11 @@ export default class ValueField extends Component {
       return Object.assign({}, {label: this.props.value}, getFieldConfig(this.props.value, this.props.config) || {});
   }
 
-  handleFieldMenuSelect({key, keyPath}) {
+  handleFieldMenuSelect = ({key, keyPath}) => {
     this.props.setValue(key);
   }
 
-  handleFieldSelect(key) {
+  handleFieldSelect = (key) => {
     this.props.setValue(key);
   }
 
@@ -157,6 +157,10 @@ export default class ValueField extends Component {
       return toggler;
   }
 
+  filterOption = (input, option) => {
+    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+  }
+
   render() {
     if (this.props.renderAsDropdown)
         return this.renderAsDropdown();
@@ -180,9 +184,9 @@ export default class ValueField extends Component {
               ref="field"
               placeholder={placeholder}
               size={this.props.config.settings.renderSize || "small"}
-              onChange={this.handleFieldSelect.bind(this)}
+              onChange={this.handleFieldSelect}
               value={this.props.value || undefined}
-              filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+              filterOption={this.filterOption}
               {...customProps}
           >{fieldSelectItems}</Select>
     );
@@ -203,7 +207,7 @@ export default class ValueField extends Component {
         <Menu
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={selectedFieldKeys}
-            onClick={this.handleFieldMenuSelect.bind(this)}
+            onClick={this.handleFieldMenuSelect}
             {...customProps}
         >{fieldMenuItems}</Menu>
     );

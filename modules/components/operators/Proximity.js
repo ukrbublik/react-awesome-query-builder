@@ -22,7 +22,7 @@ export default class Proximity extends Component {
 
   shouldComponentUpdate = shallowCompare;
 
-  handleChange(value) {
+  handleChange = (value) => {
     this.props.setOption('proximity', value);
   }
 
@@ -45,7 +45,7 @@ export default class Proximity extends Component {
             ref="proximity"
             placeholder={this.props.optionPlaceholder || "Select words between"}
             value={selectedProximity != null ? ""+selectedProximity : ""}
-            onChange={this.handleChange.bind(this)}
+            onChange={this.handleChange}
           >
             {range(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map((item) => (
               <Option key={""+item} value={""+item}>{item}</Option>

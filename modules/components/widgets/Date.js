@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { DatePicker } from 'antd';
 const { MonthPicker, RangePicker } = DatePicker;
 import moment from 'moment';
+import shallowCompare from 'react-addons-shallow-compare';
 
 
 export default class DateWidget extends Component {
@@ -16,6 +17,8 @@ export default class DateWidget extends Component {
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
     };
+
+    shouldComponentUpdate = shallowCompare;
 
     constructor(props) {
         super(props);
@@ -34,7 +37,7 @@ export default class DateWidget extends Component {
         valueFormat: 'YYYY-MM-DD',
     };
 
-    handleChange(_value) {
+    handleChange = (_value) => {
         const {setValue, valueFormat} = this.props;
         const value = _value && _value.isValid() ? _value.format(valueFormat) : null;
         if (value || _value === null)
@@ -53,7 +56,7 @@ export default class DateWidget extends Component {
                 size={this.props.config.settings.renderSize || "small"}
                 format={dateFormat}
                 value={dateValue}
-                onChange={this.handleChange.bind(this)}
+                onChange={this.handleChange}
                 ref="datetime"
                 {...customProps}
             />

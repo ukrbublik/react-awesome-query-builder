@@ -26,9 +26,45 @@ export default (Widget) => {
             setValueSrc: PropTypes.func,
         };
 
+        constructor(props) {
+            super(props);
+
+            this._setValueHandlers = {};
+            this._setValueSrcHandlers = {};
+        }
+
+        _getSetValueHandler = (delta, widgetType) => {
+            const k = ''+widgetType+'#'+delta;
+            let h = this._setValueHandlers[k];
+            if (!h) {
+                h = this._setValue.bind(this, delta, widgetType);
+                this._setValueHandlers[k] = h;
+            }
+            return h;
+        }
+
+        _getSetValueSrcHandler = (delta) => {
+            const k = ''+delta;
+            let h = this._setValueSrcHandlers[k];
+            if (!h) {
+                h = this._onChangeValueSrc.bind(this, delta);
+                this._setValueSrcHandlers[k] = h;
+            }
+            return h;
+        }
+
+        _setValue = (delta, widgetType, value) => {
+            this.props.setValue(delta, value, widgetType);
+        }
+
+        _onChangeValueSrc = (delta, e) => {
+            let srcKey = e.target.value;
+            this.props.setValueSrc(delta, srcKey);
+        }
+
         shouldComponentUpdate = shallowCompare;
 
-        renderWidget(delta, valueSrc, widget) {
+        renderWidget = (delta, valueSrc, widget) => {
             const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
             const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
             const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
@@ -37,7 +73,7 @@ export default (Widget) => {
 
             if (!widgetFactory)
                 return '?';
-
+            
             let widgetProps = Object.assign({}, fieldWidgetProps, {
                 config: this.props.config,
                 field: this.props.field,
@@ -46,7 +82,7 @@ export default (Widget) => {
                 value: this.props.value.get(delta),
                 label: valueLabel.label,
                 placeholder: valueLabel.placeholder,
-                setValue: (value) => this.props.setValue(delta, value, widgetType)
+                setValue: this._getSetValueHandler(delta, widgetType),
             });
 
             if (widget == 'field') {
@@ -56,7 +92,7 @@ export default (Widget) => {
             return widgetFactory(widgetProps);
         }
 
-        renderValueSorces(delta, valueSources, valueSrc) {
+        renderValueSorces = (delta, valueSources, valueSrc) => {
             const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
             const valueSourcesInfo = this.props.config.settings.valueSourcesInfo;
             const valueSourcesPopupTitle = this.props.config.settings.valueSourcesPopupTitle;
@@ -71,7 +107,7 @@ export default (Widget) => {
                  key={'valuesrc-'+delta}
                  value={valueSrc || "value"}
                  size={this.props.config.settings.renderSize || "small"}
-                 onChange={(e) => {let srcKey = e.target.value; return this.props.setValueSrc(delta, srcKey);}}
+                 onChange={this._getSetValueSrcHandler(delta)}
               >
                   {valueSources.map(srcKey => (
                         <RadioButton
@@ -138,7 +174,7 @@ export default (Widget) => {
                                     {settings.showLabels ?
                                         <label>&nbsp;</label>
                                     : null}
-                                    {this.renderValueSorces.call(this, delta, valueSources, valueSrc)}
+                                    {this.renderValueSorces(delta, valueSources, valueSrc)}
                                 </div>
                             ));
 
@@ -147,7 +183,7 @@ export default (Widget) => {
                                 {settings.showLabels ?
                                     <label>{valueLabel.label}</label>
                                 : null}
-                                {this.renderWidget.call(this, delta, valueSrc, widget)}
+                                {this.renderWidget(delta, valueSrc, widget)}
                             </div>
                         ));
 
