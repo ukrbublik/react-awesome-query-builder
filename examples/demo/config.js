@@ -23,15 +23,15 @@ export default {
             formatConj: (children, conj, not, isForDisplay) => {
                 return children.size > 1 ? 
                     (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
-                    : children.first();
+                  : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
             },
         },
         OR: {
             label: 'Or',
-            formatConj: (children, conj, isForDisplay) => {
+            formatConj: (children, conj, not, isForDisplay) => {
                 return children.size > 1 ? 
-                    '(' + children.join(' '+ (isForDisplay ? "OR" : "||") +' ') + ')' 
-                    : children.first();
+                    (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "OR" : "||") +' ') + ')' 
+                  : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
             },
         },
     },
