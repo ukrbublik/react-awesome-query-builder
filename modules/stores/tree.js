@@ -71,6 +71,14 @@ const removeRule = (state, path, config) => {
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
+ * @param {bool} not
+ */
+const setNot = (state, path, not) =>
+    state.setIn(expandTreePath(path, 'properties', 'not'), not);
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
  * @param {string} conjunction
  */
 const setConjunction = (state, path, conjunction) =>
@@ -515,6 +523,9 @@ export default (config) => {
 
             case constants.SET_CONJUNCTION:
                 return Object.assign({}, state, {tree: setConjunction(state.tree, action.path, action.conjunction)});
+
+            case constants.SET_NOT:
+                return Object.assign({}, state, {tree: setNot(state.tree, action.path, action.not)});
 
             case constants.SET_FIELD:
                 return Object.assign({}, state, {tree: setField(state.tree, action.path, action.field, action.config)});

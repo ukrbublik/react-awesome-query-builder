@@ -20,9 +20,9 @@ export default {
     conjunctions: {
         AND: {
             label: 'And',
-            formatConj: (children, conj, isForDisplay) => {
+            formatConj: (children, conj, not, isForDisplay) => {
                 return children.size > 1 ? 
-                    '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
+                    (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
                     : children.first();
             },
         },

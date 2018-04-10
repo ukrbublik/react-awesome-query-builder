@@ -16,6 +16,7 @@ export default (Group) => {
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
       path: PropTypes.instanceOf(Immutable.List).isRequired,
       id: PropTypes.string.isRequired,
+      not: PropTypes.bool,
       conjunction: PropTypes.string,
       children1: PropTypes.instanceOf(Immutable.OrderedMap),
       onDragStart: PropTypes.func,
@@ -84,6 +85,10 @@ export default (Group) => {
       this.props.actions.setConjunction(this.props.path, conj);
     }
 
+    setNot(e = null, not = null) {
+      this.props.actions.setNot(this.props.path, not);
+    }
+
     dummyFn = () => {}
 
     removeSelf = (event) => {
@@ -126,8 +131,10 @@ export default (Group) => {
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
+              not={this.props.not}
               selectedConjunction={this.props.conjunction}
               setConjunction={this.dummyFn}
+              setNot={this.dummyFn}
               removeSelf={this.dummyFn}
               addGroup={this.dummyFn}
               addRule={this.dummyFn}
@@ -145,8 +152,10 @@ export default (Group) => {
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
+              not={this.props.not}
               selectedConjunction={this.props.conjunction}
               setConjunction={this.setConjunction}
+              setNot={this.setNot.bind(this)}
               removeSelf={this.removeSelf}
               addGroup={this.addGroup}
               addRule={this.addRule}

@@ -11,6 +11,7 @@ export const queryString = (item, config, isForDisplay = false) => {
 
     if (type === 'group' && children && children.size) {
         const conjunction = properties.get('conjunction');
+        const not = properties.get('not');
         const conjunctionDefinition = config.conjunctions[conjunction];
 
         const list = children
@@ -19,7 +20,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         if (!list.size)
             return undefined;
 
-        return conjunctionDefinition.formatConj(list, conjunction, isForDisplay);
+        return conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
     } else if (type === 'rule') {
         let field = properties.get('field');
         const operator = properties.get('operator');
