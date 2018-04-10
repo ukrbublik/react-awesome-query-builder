@@ -11,7 +11,7 @@ const RadioGroup = Radio.Group;
 const classNames = require('classnames');
 import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {Provider, Connector, connect} from 'react-redux';
+import { Provider, Connector, connect } from 'react-redux';
 import Item from './Item';
 
 
@@ -35,6 +35,7 @@ class Group extends Component {
     conjunctionOptions: PropTypes.object.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
+    not: PropTypes.bool,
     selectedConjunction: PropTypes.string,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
@@ -46,6 +47,7 @@ class Group extends Component {
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
+    setNot: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
     //connected:
     dragging: PropTypes.object, //{id, x, y, w, h}
@@ -61,7 +63,7 @@ class Group extends Component {
   }
 
   _getSetConjunctionHandler = (itemKey = null) => {
-    const k = ''+itemKey;
+    const k = '' + itemKey;
     let h = this._setConjunctionHandlers[k];
     if (!h) {
       h = this._setConjunction.bind(this, itemKey)
@@ -91,7 +93,7 @@ class Group extends Component {
     return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, 'top')
   }
 
-  getRenderType (props) {
+  getRenderType(props) {
     let renderType;
     if (props.dragging && props.dragging.id == props.id) {
       renderType = props.isForDrag ? 'dragging' : 'placeholder';
@@ -135,21 +137,21 @@ class Group extends Component {
   renderChildren = () => {
     let props = this.props;
     return props.children1 ? props.children1.map((item) => (
-        <Item
-          key={item.get('id')}
-          id={item.get('id')}
-          //path={props.path.push(item.get('id'))}
-          path={item.get('path')}
-          type={item.get('type')}
-          properties={item.get('properties')}
-          config={props.config}
-          actions={props.actions}
-          children1={item.get('children1')}
-          //tree={props.tree}
-          treeNodesCnt={props.treeNodesCnt}
-          onDragStart={props.onDragStart}
-        />
-      )).toList() : null;
+      <Item
+        key={item.get('id')}
+        id={item.get('id')}
+        //path={props.path.push(item.get('id'))}
+        path={item.get('path')}
+        type={item.get('type')}
+        properties={item.get('properties')}
+        config={props.config}
+        actions={props.actions}
+        children1={item.get('children1')}
+        //tree={props.tree}
+        treeNodesCnt={props.treeNodesCnt}
+        onDragStart={props.onDragStart}
+      />
+    )).toList() : null;
   }
 
   renderHeader = () => {
@@ -157,9 +159,9 @@ class Group extends Component {
     return (
       <div className={classNames(
         "group--conjunctions",
-        this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--conj' : ''
+        // this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--conj' : ''
       )}>
-        { this.props.config.settings.renderConjsAsRadios ?
+        {this.props.config.settings.renderConjsAsRadios ?
           <RadioGroup
             disabled={this.props.children1.size < 2}
             value={this.props.selectedConjunction}
@@ -170,7 +172,7 @@ class Group extends Component {
               <RadioButton
                 key={item.id}
                 value={item.key}
-                //checked={item.checked}
+              //checked={item.checked}
               >{item.label}</RadioButton>
             ))}
           </RadioGroup>
@@ -179,6 +181,10 @@ class Group extends Component {
             size={this.props.config.settings.renderSize || "small"}
             disabled={this.props.children1.size < 2}
           >
+            <Button
+              onClick={(ev) => this.props.setNot(ev, !this.props.not)}
+              type={this.props.not ? "primary" : null}
+            >Not</Button>
             {map(this.props.conjunctionOptions, (item, index) => (
               <Button
                 disabled={this.props.children1.size < 2}
@@ -189,8 +195,8 @@ class Group extends Component {
             ))}
           </ButtonGroup>
         }
-        { this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
-            <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} > <Icon type="bars" /> </span>
+        {this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
+          <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} > <Icon type="bars" /> </span>
         }
       </div>
     );
@@ -221,8 +227,8 @@ class Group extends Component {
         data-id={this.props.id}
       >
         <div className="group--header">
-            {this.renderHeader()}
-            {this.isGroupTopPosition() && this.renderGroup(this.getGroupPositionClass())}
+          {this.renderHeader()}
+          {this.isGroupTopPosition() && this.renderGroup(this.getGroupPositionClass())}
         </div>
         {this.props.children1 ? (
           <div className={classNames(
@@ -231,9 +237,9 @@ class Group extends Component {
           )}>{this.renderChildren()}</div>
         ) : null}
         {!this.isGroupTopPosition() && (
-            <div className='group--footer'>
-              {this.renderGroup(this.getGroupPositionClass())}
-            </div>
+          <div className='group--footer'>
+            {this.renderGroup(this.getGroupPositionClass())}
+          </div>
         )}
       </div>
     );
