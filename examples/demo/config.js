@@ -667,6 +667,8 @@ export default {
         deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",
+        notLabel: "Not",
+        showNot: true,
         delGroupLabel: null,
         canLeaveEmptyGroup: true, //after deletion
         formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {

@@ -181,10 +181,12 @@ class Group extends Component {
             size={this.props.config.settings.renderSize || "small"}
             disabled={this.props.children1.size < 2}
           >
-            <Button
-              onClick={(ev) => this.props.setNot(ev, !this.props.not)}
-              type={this.props.not ? "primary" : null}
-            >Not</Button>
+            {this.props.config.settings.showNot &&
+              <Button
+                onClick={(ev) => this.props.setNot(ev, !this.props.not)}
+                type={this.props.not ? "primary" : null}
+              >{this.props.config.settings.notLabel}</Button>
+            }
             {map(this.props.conjunctionOptions, (item, index) => (
               <Button
                 disabled={this.props.children1.size < 2}

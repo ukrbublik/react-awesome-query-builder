@@ -106,7 +106,7 @@ export default {
       // isForDisplay - false by default, for building query string for SQL/expression/etc., 
       //  true can be used to format query string displayed on collapsed query group 
       //  (not used for now, see Issue #2)
-      formatConj: (Immultable.List children, string conj, bool isForDisplay) => string,
+      formatConj: (Immultable.List children, string conj, bool not, bool isForDisplay) => string,
     },
     'OR': ...same as for 'AND'
   },
@@ -275,6 +275,8 @@ export default {
     fieldSeparatorDisplay: '->', //used for toggler's text for renderFieldAndOpAsDropdown==true
     //Show labels under all ui fields?
     showLabels: false,
+    //Show NOT together with AND/OR?
+    showNot: true,
     //Next options are for localization:
     valueLabel: "Value",
     valuePlaceholder: "Value",
@@ -285,6 +287,7 @@ export default {
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
+    notLabel: "Not",
     delGroupLabel: null,
     valueSourcesPopupTitle: "Select value source",
     //Leave empty group after deletion or add 1 clean rule immediately?
