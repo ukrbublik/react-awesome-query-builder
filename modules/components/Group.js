@@ -108,20 +108,21 @@ class Group extends Component {
       <div className={`group--actions ${position}`}>
         <ButtonGroup
           size={this.props.config.settings.renderSize || "small"}
-        >
+        >{!this.props.config.settings.readonlyMode &&
           <Button
             icon="plus"
             className="action action--ADD-RULE"
             onClick={this.props.addRule}
           >{this.props.config.settings.addRuleLabel || "Add rule"}</Button>
-          {this.props.allowFurtherNesting ? (
+          }
+          {!this.props.config.settings.readonlyMode && this.props.allowFurtherNesting ? (
             <Button
               className="action action--ADD-GROUP"
               icon="plus-circle-o"
               onClick={this.props.addGroup}
             >{this.props.config.settings.addGroupLabel || "Add group"}</Button>
           ) : null}
-          {!this.props.isRoot ? (
+          {!this.props.config.settings.readonlyMode && !this.props.isRoot ? (
             <Button
               type="danger"
               icon="delete"
