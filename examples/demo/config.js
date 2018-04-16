@@ -667,6 +667,7 @@ export default {
         deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",
+        readonlyMode: false,
         notLabel: "Not",
         showNot: true,
         delGroupLabel: null,

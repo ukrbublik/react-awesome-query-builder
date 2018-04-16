@@ -104,14 +104,16 @@ class Rule extends Component {
                 data-id={this.props.id}
             >
                 <div className="rule--header">
-                    <Button
-                        type="danger"
-                        icon="delete"
-                        onClick={this.props.removeSelf}
-                        size={this.props.config.settings.renderSize || "small"}
-                    >
-                        {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}
-                    </Button>
+                    {!this.props.config.settings.readonlyMode &&
+                        <Button
+                            type="danger"
+                            icon="delete"
+                            onClick={this.props.removeSelf}
+                            size={this.props.config.settings.renderSize || "small"}
+                        >
+                            {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}
+                        </Button>
+                    }
                 </div>
                 {/*<div className="rule--body">*/}
                     {/*<Row>*/}
