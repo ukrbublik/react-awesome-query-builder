@@ -29,7 +29,7 @@ export const calcTextWidth = function(str, font) {
   }
   div = document.body.appendChild(div);
   var w = div.offsetWidth;
-  div.remove();
+  document.body.removeChild(div);
   return w;
 }
 
