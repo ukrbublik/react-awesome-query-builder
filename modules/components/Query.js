@@ -8,6 +8,7 @@ import {extendConfig} from "../utils/configUtils";
 import {fixPathsInTree} from '../utils/treeUtils';
 import {bindActionCreators} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
+import {queryString} from "../utils/queryString";
 import { LocaleProvider } from 'antd';
 import Immutable from 'immutable';
 
@@ -125,13 +126,13 @@ export default class Query extends Component {
 
     // handle case when value property changes
     componentWillReceiveProps(nextProps) {
-      var tree = nextProps.value;
-      var oldTree = this.props.tree;
-      if (tree !== oldTree) {
-        //TODO: This causes infinite loop! Dispatch in updating lifecycle methods is evil!
-        //this.state.store.dispatch(
-        //  actions.tree.setTree(this.props.config, tree)
-        //)
+      var previousQueryString = queryString(this.props.value, this.props);
+      var nextQueryString = queryString(nextProps.value, nextProps);
+
+      if (previousQueryString !== nextQueryString) {
+        this.state.store.dispatch(
+          actions.tree.setTree(nextProps, nextProps.value)
+        );
       }
     }
 
