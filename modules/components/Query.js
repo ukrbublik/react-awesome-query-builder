@@ -9,6 +9,7 @@ import {fixPathsInTree} from '../utils/treeUtils';
 import {bindActionCreators} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import {queryString} from "../utils/queryString";
+import {defaultRoot} from "../utils/defaultUtils";
 import { LocaleProvider } from 'antd';
 import Immutable from 'immutable';
 
