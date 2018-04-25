@@ -126,13 +126,18 @@ export default class Query extends Component {
 
     // handle case when value property changes
     componentWillReceiveProps(nextProps) {
-      var previousQueryString = queryString(this.props.value, this.props);
-      var nextQueryString = queryString(nextProps.value, nextProps);
+      let getQueryStringForProps = (props) => props.value != null
+          ? queryString(props.value, props)
+          : '';
+      let previousQueryString = getQueryStringForProps(this.props);
+      let nextQueryString = getQueryStringForProps(nextProps);
 
+      // compare stringified trees
       if (previousQueryString !== nextQueryString) {
-        this.state.store.dispatch(
-          actions.tree.setTree(nextProps, nextProps.value)
-        );
+          let nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
+          this.state.store.dispatch(
+              actions.tree.setTree(nextProps, nextTree);
+          );
       }
     }
 
