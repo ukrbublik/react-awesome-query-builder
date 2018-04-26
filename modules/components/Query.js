@@ -137,7 +137,7 @@ export default class Query extends Component {
       if (previousQueryString !== nextQueryString) {
           let nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
           this.state.store.dispatch(
-              actions.tree.setTree(nextProps, nextTree);
+              actions.tree.setTree(nextProps, nextTree)
           );
       }
     }
