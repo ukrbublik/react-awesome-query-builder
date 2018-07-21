@@ -35,11 +35,11 @@ export default class MultiSelectWidget extends Component {
 
   onPropsChanged (props) {
     let placeholder = this.props.placeholder || "Select option";
-    let placeholderWidth = calcTextWidth(placeholder, '12px');
+    let placeholderWidth = calcTextWidth(placeholder, '14px');
     const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
     let optionsMaxWidth = 0;
     map(fieldDefinition.listValues, (label, value) => {
-      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(label, '12px'));
+      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(label, '14px'));
     });
 
     this.placeholder = placeholder;
@@ -58,10 +58,10 @@ export default class MultiSelectWidget extends Component {
 
     return (
         <Select
-            multiple
+            mode={"multiple"}
             style={{
-              minWidth: value ? null : this.placeholderWidth + 30,
-              width: this.props.value ? null : this.placeholderWidth + 30,
+              minWidth: value ? null : this.placeholderWidth + 40,
+              width: this.props.value ? null : this.placeholderWidth + 40,
             }}
             dropdownStyle={{
               width: this.optionsMaxWidth + 40,
