@@ -172,7 +172,7 @@ export default class ValueField extends Component {
     let dropdownPlacement = this.props.config.settings.dropdownPlacement;
     let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
-    let placeholderWidth = calcTextWidth(placeholder, '12px');
+    let placeholderWidth = calcTextWidth(placeholder, '14px');
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
 
@@ -180,7 +180,7 @@ export default class ValueField extends Component {
           <Select
               dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
               dropdownMatchSelectWidth={false}
-              style={{ width: this.props.value ? null : placeholderWidth + 36 }}
+              style={{ width: this.props.value ? null : placeholderWidth + 48 }}
               ref="field"
               placeholder={placeholder}
               size={this.props.config.settings.renderSize || "small"}

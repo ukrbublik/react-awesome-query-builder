@@ -34,12 +34,12 @@ export default class SelectWidget extends Component {
     const options = map(fieldDefinition.listValues, (label, value) => {
       return (<Option key={value} value={value}>{label}</Option>);
     });
-    let placeholderWidth = calcTextWidth(placeholder, '12px');
+    let placeholderWidth = calcTextWidth(placeholder, '14px');
     let customProps = this.props.customProps || {};
 
     return (
         <Select
-            style={{ width: this.props.value ? null : placeholderWidth + 36 }}
+            style={{ width: this.props.value ? null : placeholderWidth + 48 }}
             key={"widget-select"}
             dropdownMatchSelectWidth={false}
             ref="val"

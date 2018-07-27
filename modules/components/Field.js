@@ -118,7 +118,7 @@ export default class Field extends Component {
               return <Option
                 key={prefix+fieldKey}
                 value={prefix+fieldKey}
-                groupLabel={optGroupLabel}
+                grouplabel={optGroupLabel}
               >
                 {label}
               </Option>;
@@ -167,7 +167,7 @@ export default class Field extends Component {
     let fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
     let selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
     selectText = truncateString(selectText, maxLabelsLength);
-    let selectWidth = calcTextWidth(selectText, '12px');
+    let selectWidth = calcTextWidth(selectText, '14px');
     //let tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
@@ -176,7 +176,7 @@ export default class Field extends Component {
         <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 36 }}
+            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 48 }}
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}

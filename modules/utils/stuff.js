@@ -18,7 +18,7 @@ export const bindActionCreators = (actionCreators, config, dispatch) =>
 
 
 export const calcTextWidth = function(str, font) {
-  var f = font || '12px';
+  var f = font || '14px';
   var div = document.createElement("div");
   div.innerHTML = str;
   var css = {
