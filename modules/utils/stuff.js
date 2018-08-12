@@ -18,11 +18,11 @@ export const bindActionCreators = (actionCreators, config, dispatch) =>
 
 
 export const calcTextWidth = function(str, font) {
-  var f = font || '12px';
+  var f = '1.3em';
   var div = document.createElement("div");
   div.innerHTML = str;
   var css = {
-    'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f
+    'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font-size': f
   };
   for (let k in css) {
     div.style[k] = css[k];
