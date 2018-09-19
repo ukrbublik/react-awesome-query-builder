@@ -5,7 +5,6 @@
 	"stage-0"
     ],
     "plugins": [
-        ["react-hot-loader/babel"],
         ["transform-decorators-legacy"],
         ["import", { libraryName: "antd", style: "css" }],
         ["transform-es2015-modules-commonjs", {

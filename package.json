@@ -1,9 +1,6 @@
 {
-  "publishConfig": {
-    "registry": "http://nexus.pinecone.int/repository/npm-hosted/"
-  },
   "name": "react-awesome-query-builder",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactAwesomeQueryBuilder.js",
@@ -34,7 +31,7 @@
   },
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "dependencies": {
-    "antd": "^3.7.0",
+    "antd": "^3.9.0",
     "classnames": "^2.2.5",
     "clone": "^2.1.1",
     "immutable": "^3.7.6",
