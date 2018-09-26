@@ -1,5 +1,6 @@
 'use strict';
 export {queryBuilderFormat} from './queryBuilderFormat'
+export {mongodbFormat} from './mongodbFormat'
 export {queryString} from './queryString'
 export {validateTree} from './validation'
 export {

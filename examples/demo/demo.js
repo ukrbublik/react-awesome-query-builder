@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
-const {queryBuilderFormat, queryString} = Utils;
+const {queryBuilderFormat, queryString, mongodbFormat} = Utils;
 import config from './config';
 var stringify = require('json-stringify-safe');
 import '../../css/reset.scss';
@@ -69,6 +69,13 @@ export default class DemoQueryBuilder extends Component {
                   <pre style={jsonStyle}>
                     {stringify(queryString(props.tree, props.config, true), undefined, 2)}
                   </pre>
+                </div>
+                <hr/>
+                <div>
+                  mongodbFormat: 
+                    <pre style={jsonStyle}>
+                      {stringify(mongodbFormat(props.tree, props.config), undefined, 2)}
+                    </pre>
                 </div>
                 <hr/>
                 <div>

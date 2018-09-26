@@ -24,6 +24,7 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 - Values of fields can be compared with values -or- another fields (of same type)
 - Reordering support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/)
+- Export to MongoDb or SQL
 
 
 ### Demo
@@ -70,6 +71,7 @@ class DemoQueryBuilder extends Component {
                     <Builder {...props} />
                 </div>
                 <div>Query string: {QbUtils.queryString(props.tree, props.config)}</div>
+                <div>Mongodb query: {QbUtils.mongodbFormat(props.tree, props.config)}</div>
             </div>
         )
     }
@@ -107,6 +109,9 @@ export default {
       //  true can be used to format query string displayed on collapsed query group 
       //  (not used for now, see Issue #2)
       formatConj: (Immultable.List children, string conj, bool not, bool isForDisplay) => string,
+      reversedConj: 'OR', //'AND' reverses to 'OR'
+      //for building mongodb query:
+      mongoConj: '$and',
     },
     'OR': ...same as for 'AND'
   },
@@ -198,9 +203,12 @@ export default {
       isUnary: true,
       //(for building query string) function to format rule
       // value - string (already formatted value) for cardinality==1 
-      // -or- Immutable.List of strings for cardinality!=1
+      // -or- Immutable.List of strings for cardinality>1
       formatOp: (string field, string op, mixed value, string valueSrc, string valueType, 
         Object opDef, Object operatorOptions, bool isForDisplay) => string,
+      //(for building mongodb query) function to format rule
+      // value - mixed for cardinality==1 -or- Array for cardinality>2 
+      mongoFormatOp: (string field, string op, mixed value) => object,
       //for cardinality==2 ('between')
       valueLabels: ['Value from', {label: 'Value to', placeholder: 'Enter value to'}],
       textSeparators: [null, 'and'],
@@ -215,6 +223,8 @@ export default {
       factory: (props) => <TextWidget {...props} />, //React component
       //(for building query string) function to format widget's value
       formatValue: (mixed val, Object fieldDef, Object wgtDef, bool isForDisplay) => string,
+      //(for building mongodb query) function to convert widget's value
+      mongoFormatValue: (mixed val, Object fieldDef, Object wgtDef) => object,
       //func to validate widget's value
       validateValue: (mixed val, Object fieldDef) => bool,
       //Options:
