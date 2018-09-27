@@ -33,12 +33,16 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 ![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)
 
 
-### Install & use
+### Install
 Install: `npm i react-awesome-query-builder`
 
 See `examples/demo` as example of usage and configuration.
 
 For full reordering support you need to add class `query-builder-container` for dom-element which is holding your querybuilder component AND has scrolling. If there is no such dom-element (only body) you can do nothing.
+
+Current version uses antd v2.
+To use antd v3 look at this branch: [antd-3](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-3)
+
 
 ## Use
 ```javascript
@@ -82,6 +86,7 @@ class DemoQueryBuilder extends Component {
     }
 }
 ```
+
 
 ## Config format
 ```javascript
@@ -356,6 +361,7 @@ Scripts:
 
 The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
 
+Pull Requests are always welcomed :)
 
 ### License
 MIT. See also `LICENSE.txt`
