@@ -20,18 +20,22 @@ export default {
     conjunctions: {
         AND: {
             label: 'And',
-            formatConj: (children, conj, isForDisplay) => {
+            mongoConj: '$and',
+            reversedConj: 'OR',
+            formatConj: (children, conj, not, isForDisplay) => {
                 return children.size > 1 ? 
-                    '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
-                    : children.first();
+                    (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
+                  : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
             },
         },
         OR: {
             label: 'Or',
-            formatConj: (children, conj, isForDisplay) => {
+            mongoConj: '$or',
+            reversedConj: 'AND',
+            formatConj: (children, conj, not, isForDisplay) => {
                 return children.size > 1 ? 
-                    '(' + children.join(' '+ (isForDisplay ? "OR" : "||") +' ') + ')' 
-                    : children.first();
+                    (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "OR" : "||") +' ') + ')' 
+                  : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
             },
         },
     },
@@ -364,31 +368,37 @@ export default {
             label: '==',
             labelForFormat: '==',
             reversedOp: 'not_equal',
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$eq' : value } }),
         },
         not_equal: {
             label: '!=',
             labelForFormat: '!=',
             reversedOp: 'equal',
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$ne' : value } }),
         },
         less: {
             label: '<',
             labelForFormat: '<',
             reversedOp: 'greater_or_equal',
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$lt' : value } }),
         },
         less_or_equal: {
             label: '<=',
             labelForFormat: '<=',
             reversedOp: 'greater',
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$lte' : value } }),
         },
         greater: {
             label: '>',
             labelForFormat: '>',
             reversedOp: 'less_or_equal',
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$gt' : value } }),
         },
         greater_or_equal: {
             label: '>=',
             labelForFormat: '>=',
             reversedOp: 'less',
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$gte' : value } }),
         },
 
         between: {
@@ -403,6 +413,7 @@ export default {
                 else
                     return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
             },
+            mongoFormatOp: (field, op, values) => ({ [field] : {'$gte': values[0], '$lte': values[1]} }),
             valueLabels: [
                 'Value from', 
                 'Value to'
@@ -418,6 +429,7 @@ export default {
             labelForFormat: 'NOT BETWEEN',
             cardinality: 2,
             reversedOp: 'between',
+            mongoFormatOp: (field, op, values) => ({ [field] : {'$not' : {'$gte': values[0], '$lte': values[1] }} }),
             valueLabels: [
                 'Value from', 
                 'Value to'
@@ -438,6 +450,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
             },
+            mongoFormatOp: (field, op) => ({ [field] : { '$exists' : false } }),
         },
         is_not_empty: {
             isUnary: true,
@@ -448,6 +461,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
             },
+            mongoFormatOp: (field, op) => ({ [field] : { '$exists' : true } }),
         },
         select_equals: {
             label: '==',
@@ -455,6 +469,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == ${value}`;
             },
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$eq' : value } }),
             reversedOp: 'select_not_equals',
         },
         select_not_equals: {
@@ -463,6 +478,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return `${field} != ${value}`;
             },
+            mongoFormatOp: (field, op, value) => ({ [field] : { '$ne' : value } }),
             reversedOp: 'select_equals',
         },
         select_any_in: {
@@ -474,6 +490,7 @@ export default {
                 else
                     return `${field} IN (${values})`;
             },
+            mongoFormatOp: (field, op, values) => ({ [field] : { '$in' : values } }),
             reversedOp: 'select_not_any_in',
         },
         select_not_any_in: {
@@ -485,6 +502,7 @@ export default {
                 else
                     return `${field} NOT IN (${values})`;
             },
+            mongoFormatOp: (field, op, values) => ({ [field] : { '$nin' : values } }),
             reversedOp: 'select_any_in',
         },
         multiselect_equals: {
@@ -496,6 +514,7 @@ export default {
                 else
                     return `${field} == ${values}`;
             },
+            mongoFormatOp: (field, op, values) => ({ [field] : { '$eq' : values } }),
             reversedOp: 'multiselect_not_equals',
         },
         multiselect_not_equals: {
@@ -507,6 +526,7 @@ export default {
                 else
                     return `${field} != ${values}`;
             },
+            mongoFormatOp: (field, op, values) => ({ [field] : { '$ne' : values } }),
             reversedOp: 'multiselect_equals',
         },
 
@@ -526,6 +546,7 @@ export default {
             let val2 = values.get(1);
             return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
           },
+          mongoFormatOp: (field, op, values) => (undefined),
           options: {
             optionLabel: "Near",
             optionTextBefore: "Near",
@@ -558,6 +579,7 @@ export default {
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 return isForDisplay ? val : JSON.stringify(val);
             },
+            //mongoFormatValue: (val, fieldDef, wgtDef) => (Number(val)),
         },
         select: {
             type: "select",
@@ -667,6 +689,9 @@ export default {
         deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",
+        readonlyMode: false,
+        notLabel: "Not",
+        showNot: true,
         delGroupLabel: null,
         canLeaveEmptyGroup: true, //after deletion
         formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {

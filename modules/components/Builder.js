@@ -12,28 +12,41 @@ export default class Builder extends Component {
     tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
-    //dispatch: PropTypes.func.isRequired,
     onDragStart: PropTypes.func,
-    dragging: PropTypes.object, //{id, x, y, w, h}
   };
+
+  constructor(props) {
+    super(props);
+
+    this._updPath(props);
+  }
+
+  // componentWillReceiveProps (props) {
+  //   let prevProps = this.props;
+  //   this._updPath(props);
+  // }
+
+  _updPath (props) {
+    const id = props.tree.get('id');
+    this.path = Immutable.List.of(id);
+  }
 
   render() {
     const treeNodesCnt = getTotalNodesCountInTree(this.props.tree);
     const id = this.props.tree.get('id');
     return (
-      <Item key={id}
+      <Item 
+        key={id}
         id={id}
-        path={Immutable.List.of(id)}
+        path={this.path}
         type={this.props.tree.get('type')}
         properties={this.props.tree.get('properties')}
         config={this.props.config}
         actions={this.props.actions}
-        dispatch={this.props.dispatch}
         children1={this.props.tree.get('children1')}
-        tree={this.props.tree}
+        //tree={this.props.tree}
         treeNodesCnt={treeNodesCnt}
         onDragStart={this.props.onDragStart}
-        dragging={this.props.dragging}
       >
       </Item>
     );

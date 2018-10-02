@@ -11,6 +11,7 @@ export const queryString = (item, config, isForDisplay = false) => {
 
     if (type === 'group' && children && children.size) {
         const conjunction = properties.get('conjunction');
+        const not = properties.get('not');
         const conjunctionDefinition = config.conjunctions[conjunction];
 
         const list = children
@@ -19,7 +20,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         if (!list.size)
             return undefined;
 
-        return conjunctionDefinition.formatConj(list, conjunction, isForDisplay);
+        return conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
     } else if (type === 'rule') {
         let field = properties.get('field');
         const operator = properties.get('operator');
@@ -68,7 +69,7 @@ export const queryString = (item, config, isForDisplay = false) => {
                     let args = [
                         currentValue,
                         pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                        omit(fieldWidgetDefinition, ['formatValue']), //useful options: valueFormat for date/time
+                        omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue']), //useful options: valueFormat for date/time
                         isForDisplay
                     ];
                     if (valueSrc == 'field') {
@@ -123,7 +124,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             formattedValue,
             (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
             (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-            omit(operatorDefinition, ['formatOp']),
+            omit(operatorDefinition, ['formatOp', 'mongoFormatOp']),
             operatorOptions,
             isForDisplay
         ];

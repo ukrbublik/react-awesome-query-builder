@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "0.1.36",
+  "version": "0.1.44",
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactAwesomeQueryBuilder.js",
@@ -16,6 +16,7 @@
     "build-examples": "cd examples && webpack --config webpack.config.js",
     "examples": "cd examples && webpack-dev-server --config webpack.config.js -d --hot --inline --display-error-details --colors --history-api-fallback --no-info --port 3001"
   },
+  "readme": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
@@ -75,7 +76,6 @@
     "expect": "^1.15.2",
     "file-loader": "^0.8.5",
     "history": "^1.13",
-    "jquery": "^3.0.0",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.2",
     "karma-cli": "^0.1.2",

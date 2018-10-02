@@ -1,7 +1,6 @@
 import uuid from '../utils/uuid';
 import {expandTreePath} from '../utils/treeUtils';
 import {defaultRuleProperties, defaultGroupProperties} from '../utils/defaultUtils';
-
 import * as constants from '../constants';
 import Immutable from 'immutable';
 

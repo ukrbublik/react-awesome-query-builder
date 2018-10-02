@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Input, Col } from 'antd';
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class TextWidget extends Component {
   constructor(props) {
@@ -45,6 +46,8 @@ export default class TextWidget extends Component {
     });
   }
 
+
+  shouldComponentUpdate = shallowCompare;
 
   handleChange(val) {
     const { value } = ReactDOM.findDOMNode(this.textRef);

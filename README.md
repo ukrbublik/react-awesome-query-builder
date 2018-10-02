@@ -24,6 +24,7 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 - Values of fields can be compared with values -or- another fields (of same type)
 - Reordering support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/)
+- Export to MongoDb or SQL
 
 
 ### Demo
@@ -32,12 +33,16 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 ![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)
 
 
-### Install & use
+### Install
 Install: `npm i react-awesome-query-builder`
 
 See `examples/demo` as example of usage and configuration.
 
 For full reordering support you need to add class `query-builder-container` for dom-element which is holding your querybuilder component AND has scrolling. If there is no such dom-element (only body) you can do nothing.
+
+Current version uses antd v2.
+To use antd v3 look at this branch: [antd-3](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-3)
+
 
 ## Use
 ```javascript
@@ -70,6 +75,7 @@ class DemoQueryBuilder extends Component {
                     <Builder {...props} />
                 </div>
                 <div>Query string: {QbUtils.queryString(props.tree, props.config)}</div>
+                <div>Mongodb query: {QbUtils.mongodbFormat(props.tree, props.config)}</div>
             </div>
         )
     }
@@ -80,6 +86,7 @@ class DemoQueryBuilder extends Component {
     }
 }
 ```
+
 
 ## Config format
 ```javascript
@@ -106,7 +113,10 @@ export default {
       // isForDisplay - false by default, for building query string for SQL/expression/etc., 
       //  true can be used to format query string displayed on collapsed query group 
       //  (not used for now, see Issue #2)
-      formatConj: (Immultable.List children, string conj, bool isForDisplay) => string,
+      formatConj: (Immultable.List children, string conj, bool not, bool isForDisplay) => string,
+      reversedConj: 'OR', //'AND' reverses to 'OR'
+      //for building mongodb query:
+      mongoConj: '$and',
     },
     'OR': ...same as for 'AND'
   },
@@ -198,9 +208,12 @@ export default {
       isUnary: true,
       //(for building query string) function to format rule
       // value - string (already formatted value) for cardinality==1 
-      // -or- Immutable.List of strings for cardinality!=1
+      // -or- Immutable.List of strings for cardinality>1
       formatOp: (string field, string op, mixed value, string valueSrc, string valueType, 
         Object opDef, Object operatorOptions, bool isForDisplay) => string,
+      //(for building mongodb query) function to format rule
+      // value - mixed for cardinality==1 -or- Array for cardinality>2 
+      mongoFormatOp: (string field, string op, mixed value) => object,
       //for cardinality==2 ('between')
       valueLabels: ['Value from', {label: 'Value to', placeholder: 'Enter value to'}],
       textSeparators: [null, 'and'],
@@ -215,6 +228,8 @@ export default {
       factory: (props) => <TextWidget {...props} />, //React component
       //(for building query string) function to format widget's value
       formatValue: (mixed val, Object fieldDef, Object wgtDef, bool isForDisplay) => string,
+      //(for building mongodb query) function to convert widget's value
+      mongoFormatValue: (mixed val, Object fieldDef, Object wgtDef) => object,
       //func to validate widget's value
       validateValue: (mixed val, Object fieldDef) => bool,
       //Options:
@@ -275,6 +290,8 @@ export default {
     fieldSeparatorDisplay: '->', //used for toggler's text for renderFieldAndOpAsDropdown==true
     //Show labels under all ui fields?
     showLabels: false,
+    //Show NOT together with AND/OR?
+    showNot: true,
     //Next options are for localization:
     valueLabel: "Value",
     valuePlaceholder: "Value",
@@ -285,6 +302,8 @@ export default {
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
+    readonlyMode: false,
+    notLabel: "Not",
     delGroupLabel: null,
     valueSourcesPopupTitle: "Select value source",
     //Leave empty group after deletion or add 1 clean rule immediately?
@@ -342,6 +361,7 @@ Scripts:
 
 The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
 
+Pull Requests are always welcomed :)
 
 ### License
 MIT. See also `LICENSE.txt`

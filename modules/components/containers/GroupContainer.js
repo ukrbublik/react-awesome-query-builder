@@ -4,25 +4,79 @@ import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
 import Immutable from 'immutable';
 var stringify = require('json-stringify-safe');
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {Provider, Connector, connect} from 'react-redux';
+
 
 export default (Group) => {
-  return class GroupContainer extends Component {
+  class GroupContainer extends Component {
     static propTypes = {
-      tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+      //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
       config: PropTypes.object.isRequired,
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
       path: PropTypes.instanceOf(Immutable.List).isRequired,
       id: PropTypes.string.isRequired,
+      not: PropTypes.bool,
       conjunction: PropTypes.string,
-      children: PropTypes.instanceOf(Immutable.List),
-      dragging: PropTypes.object, //{id, x, y, w, h}
+      children1: PropTypes.instanceOf(Immutable.OrderedMap),
       onDragStart: PropTypes.func,
       treeNodesCnt: PropTypes.number,
     };
 
-    shouldComponentUpdate = shallowCompare;
+    constructor(props) {
+      super(props);
 
-    setConjunction(e = null, conj = null) {
+      this.conjunctionOptions = this._getConjunctionOptions(props);
+    }
+
+    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    //shouldComponentUpdate = this.pureShouldComponentUpdate;
+
+    shouldComponentUpdate(nextProps, nextState) {
+        let prevProps = this.props;
+        let prevState = this.state;
+
+        let should = this.pureShouldComponentUpdate(nextProps, nextState);
+        if (should) {
+          if (prevState == nextState && prevProps != nextProps) {
+            let chs = [];
+            for (let k in nextProps) {
+                let changed = (nextProps[k] != prevProps[k]);
+                if (k == 'dragging' && (nextProps.dragging.id || prevProps.dragging.id) != nextProps.id) {
+                  changed = false; //dragging another item -> ignore
+                }
+                if (changed) {
+                  chs.push(k);
+                }
+            }
+            if (!chs.length)
+                should = false;
+          }
+        }
+        
+        return should;
+    }
+
+    componentWillReceiveProps(nextProps) {
+      const {config, id, conjunction} = nextProps;
+      const oldConfig = this.props.config;
+      const oldConjunction = this.props.conjunction;
+      if (oldConfig != config || oldConjunction != conjunction) {
+        this.conjunctionOptions = this._getConjunctionOptions(nextProps);
+      }
+    }
+
+    _getConjunctionOptions (props) {
+      return mapValues(props.config.conjunctions, (item, index) => ({
+        id: `conjunction-${props.id}-${index}`,
+        name: `conjunction[${props.id}]`,
+        key: index,
+        label: item.label,
+        checked: index === props.conjunction,
+      }));
+    }
+
+    setConjunction = (e = null, conj = null) => {
       if (!conj && e) {
         //for RadioGroup
         conj = e.target.value;
@@ -31,19 +85,25 @@ export default (Group) => {
       this.props.actions.setConjunction(this.props.path, conj);
     }
 
-    removeSelf(event) {
+    setNot(e = null, not = null) {
+      this.props.actions.setNot(this.props.path, not);
+    }
+
+    dummyFn = () => {}
+
+    removeSelf = (event) => {
       this.props.actions.removeGroup(this.props.path);
       event.preventDefault();
       return false;
     }
 
-    addGroup(event) {
+    addGroup = (event) => {
       this.props.actions.addGroup(this.props.path);
       event.preventDefault();
       return false;
     }
 
-    addRule(event) {
+    addRule = (event) => {
       this.props.actions.addRule(this.props.path);
       event.preventDefault();
       return false;
@@ -58,59 +118,71 @@ export default (Group) => {
       const allowFurtherNesting = typeof maxNesting === 'undefined' || currentNesting < maxNesting;
       const isRoot = currentNesting == 1;
 
-      const conjunctionOptions = mapValues(this.props.config.conjunctions, (item, index) => ({
-        id: `conjunction-${this.props.id}-${index}`,
-        name: `conjunction[${this.props.id}]`,
-        key: index,
-        label: item.label,
-        checked: index === this.props.conjunction,
-      }));
-
       return (
         <div
           className={'group-or-rule-container group-container'}
           data-id={this.props.id}
         >
-          {[this.props.dragging && this.props.dragging.id == this.props.id ? (
+          {[(
             <Group
               key={"dragging"}
+              isForDrag={true}
               id={this.props.id}
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
-              conjunctionOptions={conjunctionOptions}
+              conjunctionOptions={this.conjunctionOptions}
+              not={this.props.not}
               selectedConjunction={this.props.conjunction}
-              setConjunction={this.setConjunction.bind(this)}
-              removeSelf={this.removeSelf.bind(this)}
-              addGroup={this.addGroup.bind(this)}
-              addRule={this.addRule.bind(this)}
+              setConjunction={this.dummyFn}
+              setNot={this.dummyFn}
+              removeSelf={this.dummyFn}
+              addGroup={this.dummyFn}
+              addRule={this.dummyFn}
               config={this.props.config}
-              tree={this.props.tree}
+              children1={this.props.children1}
+              actions={this.props.actions}
+              //tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
-              renderType={'dragging'}
-            >{this.props.children}</Group>
-          ) : null, (
+            />
+          ), (
             <Group
               key={this.props.id}
               id={this.props.id}
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
-              conjunctionOptions={conjunctionOptions}
+              conjunctionOptions={this.conjunctionOptions}
+              not={this.props.not}
               selectedConjunction={this.props.conjunction}
-              setConjunction={this.setConjunction.bind(this)}
-              removeSelf={this.removeSelf.bind(this)}
-              addGroup={this.addGroup.bind(this)}
-              addRule={this.addRule.bind(this)}
+              setConjunction={this.setConjunction}
+              setNot={this.setNot.bind(this)}
+              removeSelf={this.removeSelf}
+              addGroup={this.addGroup}
+              addRule={this.addRule}
               config={this.props.config}
-              tree={this.props.tree}
+              children1={this.props.children1}
+              actions={this.props.actions}
+              //tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}
-              renderType={this.props.dragging && this.props.dragging.id == this.props.id ? 'placeholder' : null}
-            >{this.props.children}</Group>
+            />
           )]}
         </div>
       );
     }
+
   };
+
+  const ConnectedGroupContainer = connect(
+      (state) => {
+          return {
+            dragging: state.dragging,
+          }
+      }
+  )(GroupContainer);
+
+
+  return ConnectedGroupContainer;
+
 };

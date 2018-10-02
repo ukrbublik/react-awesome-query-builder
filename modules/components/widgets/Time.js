@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { TimePicker } from 'antd';
 import moment from 'moment';
 import { LocaleProvider } from 'antd';
+import shallowCompare from 'react-addons-shallow-compare';
 
 
 export default class TimeWidget extends Component {
@@ -17,6 +18,8 @@ export default class TimeWidget extends Component {
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
     };
+
+    shouldComponentUpdate = shallowCompare;
 
     constructor(props) {
         super(props);
@@ -35,7 +38,7 @@ export default class TimeWidget extends Component {
     };
 
 
-    handleChange(_value) {
+    handleChange = (_value) => {
         const {setValue, valueFormat} = this.props;
         const value = _value && _value.isValid() ? _value.format(valueFormat) : null;
         if (value || _value === null)
@@ -55,7 +58,7 @@ export default class TimeWidget extends Component {
                 placeholder={this.props.placeholder}
                 format={timeFormat}
                 value={dateValue}
-                onChange={this.handleChange.bind(this)}
+                onChange={this.handleChange}
                 ref="datetime"
                 {...customProps}
             />

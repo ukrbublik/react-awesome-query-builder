@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { InputNumber, Col } from 'antd';
 import 'antd/lib/date-picker/style';
 import {getFieldConfig} from '../../utils/configUtils';
+import shallowCompare from 'react-addons-shallow-compare';
 
 export default class NumberWidget extends Component {
   constructor( props ) {
@@ -47,12 +48,15 @@ export default class NumberWidget extends Component {
     });
   }
 
+  shouldComponentUpdate = shallowCompare;
+
   handleChange(val) {
     const { minTimeOutSetValue } = this.props;
     // Set value in local state
     this.setState({
       localValue:val
     });
+
     if (val === '')
       val = undefined;
     const { lastSetValueTime } = this.state;
@@ -103,7 +107,7 @@ export default class NumberWidget extends Component {
           max={max}
           step={step}
           placeholder={this.props.placeholder}
-          onChange={this.handleChange.bind(this)}
+          onChange={this.handleChange}
           {...customProps}
         />
       </Col>

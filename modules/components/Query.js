@@ -5,8 +5,11 @@ import {createStore} from 'redux';
 import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
+import {fixPathsInTree} from '../utils/treeUtils';
 import {bindActionCreators} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
+import {queryString} from "../utils/queryString";
+import {defaultRoot} from "../utils/defaultUtils";
 import { LocaleProvider } from 'antd';
 import Immutable from 'immutable';
 
@@ -23,6 +26,8 @@ class ConnectedQuery extends Component {
     constructor(props) {
         super(props);
 
+        this._updateActions(props);
+
         this.validatedTree = this.validateTree(props, props.config, props.tree);
         if (props.tree !== this.validatedTree) {
             props.onChange && props.onChange(this.validatedTree);
@@ -30,7 +35,14 @@ class ConnectedQuery extends Component {
     }
 
     validateTree (props, oldConfig, oldTree) {
-        return validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
+        let tree = validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
+        tree = fixPathsInTree(tree);
+        return tree;
+    }
+
+    _updateActions (props) {
+      const {config, dispatch} = props;
+      this.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -38,7 +50,13 @@ class ConnectedQuery extends Component {
         const oldTree = this.props.tree;
         const oldConfig = this.props.config;
         const newTree = nextProps.tree;
+        const newConfig = this.props.config;
         const oldValidatedTree = this.validatedTree;
+
+        if (oldConfig != newConfig) {
+            this._updateActions(nextProps);
+        }
+
         this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
         let validatedTreeChanged = oldValidatedTree !== this.validatedTree 
             && JSON.stringify(oldValidatedTree) != JSON.stringify(this.validatedTree);
@@ -56,7 +74,7 @@ class ConnectedQuery extends Component {
         return <div>
             {get_children({
                 tree: this.validatedTree,
-                actions: bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch),
+                actions: this.actions,
                 config: config,
                 dispatch: dispatch
             })}
@@ -65,8 +83,10 @@ class ConnectedQuery extends Component {
 }
 
 const QueryContainer = connect(
-    (tree) => {
-        return {tree: tree}
+    (state) => {
+        return {
+          tree: state.tree,
+        }
     },
 )(ConnectedQuery);
 
@@ -98,23 +118,31 @@ export default class Query extends Component {
             tree: props.value,
         };
 
-        const tree = createTreeStore(config);
+        const store = createTreeStore(config);
 
         this.state = {
-            store: createStore(tree)
+            store: createStore(store)
         };
     }
 
     // handle case when value property changes
     componentWillReceiveProps(nextProps) {
-      var tree = nextProps.value;
-      var oldTree = this.props.tree;
-      if (tree !== oldTree) {
-        //TODO: This causes infinite loop! Dispatch in updating lifecycle methods is evil!
-        //this.state.store.dispatch(
-        //  actions.tree.setTree(this.props.config, tree)
-        //)
-      }
+        if (this.props.dontDispatchOnNewProps)
+            return;
+
+        let getQueryStringForProps = (props) => props.value != null
+            ? queryString(props.value, props)
+            : '';
+        let previousQueryString = getQueryStringForProps(this.props);
+        let nextQueryString = getQueryStringForProps(nextProps);
+
+        // compare stringified trees
+        if (previousQueryString !== nextQueryString) {
+            let nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
+            this.state.store.dispatch(
+                actions.tree.setTree(nextProps, nextTree)
+            );
+        }
     }
 
     render() {

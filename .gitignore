@@ -11,4 +11,5 @@ examples/*.woff
 examples/*.woff2
 examples/bundle.js
 examples/bundle.js.map
+.DS_Store
 
