@@ -213,7 +213,7 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
         && (!changedField 
             || changedField == 'field' && !config.settings.clearValueOnChangeField 
             || changedField == 'operator' && !config.settings.clearValueOnChangeOp)
-        && (currentFieldConfig.type == newFieldConfig.type) 
+        && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
         && JSON.stringify(currentWidgets.slice(0, commonWidgetsCnt)) == JSON.stringify(newWidgets.slice(0, commonWidgetsCnt))
     ;
 
@@ -259,7 +259,7 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
         if (canReuseValue) {
             if (i < currentValueType.size)
                 v = currentValueType.get(i);
-        } else if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.defaultValue !== undefined) {
+        } else if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
             v = firstWidgetConfig.type;
         }
         return v;
@@ -353,9 +353,9 @@ const setField = (state, path, newField, config) => {
         const lastOp = newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
         let newOperator = null;
         const availOps = getOperatorsForField(config, newField);
-        if (availOps.length == 1)
+        if (availOps && availOps.length == 1)
             newOperator = availOps[0];
-        else if (availOps.length > 1) {
+        else if (availOps && availOps.length > 1) {
             for (let strategy of config.settings.setOpOnChangeField || []) {
                 if (strategy == 'keep')
                     newOperator = lastOp;
@@ -417,7 +417,8 @@ const setValue = (state, path, delta, value, valueType, config) => {
     const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
-    let isValid = _validateValue(config, field, operator, value, valueType, valueSrc);
+    const calculatedValueType = valueType||(valueSrc==='field' && value?getFieldConfig(value, config).type:valueType);
+    let isValid = _validateValue(config, field, operator, value, calculatedValueType, valueSrc);
 
     if (isValid) {
         if (typeof value === "undefined") {
@@ -425,7 +426,7 @@ const setValue = (state, path, delta, value, valueType, config) => {
             state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
         } else {
             state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), valueType);
+            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
         }
     }
 
