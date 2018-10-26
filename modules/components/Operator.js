@@ -133,7 +133,7 @@ export default class Operator extends Component {
     );
     let opToggler = this.buildMenuToggler(placeholder);
 
-
+    
     return (
       <Dropdown
           overlay={opMenu}

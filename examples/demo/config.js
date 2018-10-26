@@ -1,8 +1,10 @@
 import React from 'react';
-import {Widgets, Operators} from 'react-awesome-query-builder';
+import { Widgets, Operators } from 'react-awesome-query-builder';
+
 const {
     TextWidget,
     NumberWidget,
+    SliderWidget,
     SelectWidget,
     MultiSelectWidget,
     DateWidget,
@@ -11,7 +13,8 @@ const {
     DateTimeWidget,
     ValueFieldWidget
 } = Widgets;
-const {ProximityOperator} = Operators;
+
+const { ProximityOperator } = Operators;
 import moment from 'moment';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
@@ -23,9 +26,9 @@ export default {
             mongoConj: '$and',
             reversedConj: 'OR',
             formatConj: (children, conj, not, isForDisplay) => {
-                return children.size > 1 ? 
-                    (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "AND" : "&&") +' ') + ')' 
-                  : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+                return children.size > 1 ?
+                    (not ? "NOT " : "") + '(' + children.join(' ' + (isForDisplay ? "AND" : "&&") + ' ') + ')'
+                    : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
             },
         },
         OR: {
@@ -33,9 +36,9 @@ export default {
             mongoConj: '$or',
             reversedConj: 'AND',
             formatConj: (children, conj, not, isForDisplay) => {
-                return children.size > 1 ? 
-                    (not ? "NOT " : "") + '(' + children.join(' '+ (isForDisplay ? "OR" : "||") +' ') + ')' 
-                  : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+                return children.size > 1 ?
+                    (not ? "NOT " : "") + '(' + children.join(' ' + (isForDisplay ? "OR" : "||") + ' ') + ')'
+                    : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
             },
         },
     },
@@ -70,10 +73,11 @@ export default {
             operators: ['equal', 'not_equal'],
             defaultOperator: 'not_equal',
             mainWidgetProps: {
-                formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("__"+JSON.stringify(val)),
+                formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("__" + JSON.stringify(val)),
                 valueLabel: "Name2",
                 valuePlaceholder: "Enter name2",
                 validateValue: (val, fieldDef) => {
+                    console.log('name2 ... val...', val);
                     return (val != 'test2');
                 },
             },
@@ -84,6 +88,19 @@ export default {
             fieldSettings: {
                 min: -1,
                 max: 5
+            },
+        },
+        slider: {
+            label: 'Slider',
+            type: 'slider',
+            fieldSettings: {
+                min: 0,
+                max: 1000,
+                step: 10,
+                marks: {
+                    0: <strong>0</strong>,
+                    1000: <strong>1000</strong>
+                }
             },
         },
         date: {
@@ -102,7 +119,7 @@ export default {
                     opProps: {
                         between: {
                             valueLabels: [
-                                'Time from', 
+                                'Time from',
                                 'Time to'
                             ],
                         },
@@ -200,7 +217,7 @@ export default {
                         'proximity'
                     ],
                     widgetProps: {
-                        formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("_"+JSON.stringify(val)),
+                        formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("_" + JSON.stringify(val)),
                         valueLabel: "Text",
                         valuePlaceholder: "Enter text",
                     }
@@ -237,6 +254,22 @@ export default {
                     widgetProps: {
                         valueLabel: "Number2",
                         valuePlaceholder: "Enter number2",
+                    }
+                }
+            },
+        },
+        slider: {
+            valueSources: ['value'],
+            widgets: {
+                slider: {
+                    operators: [
+                        "range",
+                        // "not_between",
+                    ],
+                    defaultOperator: 'range',
+                    widgetProps: {
+                        valueLabel: "Slider",
+                        valuePlaceholder: "Move Slider",
                     }
                 }
             },
@@ -295,8 +328,8 @@ export default {
                     opProps: {
                         between: {
                             valueLabels: [
-                                {label: 'Date from', placeholder: 'Enrer datetime from'},
-                                {label: 'Date to', placeholder: 'Enter datetime to'},
+                                { label: 'Date from', placeholder: 'Enrer datetime from' },
+                                { label: 'Date to', placeholder: 'Enter datetime to' },
                             ],
                         },
                     },
@@ -368,37 +401,37 @@ export default {
             label: '==',
             labelForFormat: '==',
             reversedOp: 'not_equal',
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$eq' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
         },
         not_equal: {
             label: '!=',
             labelForFormat: '!=',
             reversedOp: 'equal',
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$ne' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } }),
         },
         less: {
             label: '<',
             labelForFormat: '<',
             reversedOp: 'greater_or_equal',
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$lt' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$lt': value } }),
         },
         less_or_equal: {
             label: '<=',
             labelForFormat: '<=',
             reversedOp: 'greater',
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$lte' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$lte': value } }),
         },
         greater: {
             label: '>',
             labelForFormat: '>',
             reversedOp: 'less_or_equal',
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$gt' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$gt': value } }),
         },
         greater_or_equal: {
             label: '>=',
             labelForFormat: '>=',
             reversedOp: 'less',
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$gte' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$gte': value } }),
         },
 
         between: {
@@ -413,9 +446,9 @@ export default {
                 else
                     return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
             },
-            mongoFormatOp: (field, op, values) => ({ [field] : {'$gte': values[0], '$lte': values[1]} }),
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
             valueLabels: [
-                'Value from', 
+                'Value from',
                 'Value to'
             ],
             textSeparators: [
@@ -429,9 +462,9 @@ export default {
             labelForFormat: 'NOT BETWEEN',
             cardinality: 2,
             reversedOp: 'between',
-            mongoFormatOp: (field, op, values) => ({ [field] : {'$not' : {'$gte': values[0], '$lte': values[1] }} }),
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$not': { '$gte': values[0], '$lte': values[1] } } }),
             valueLabels: [
-                'Value from', 
+                'Value from',
                 'Value to'
             ],
             textSeparators: [
@@ -450,7 +483,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
             },
-            mongoFormatOp: (field, op) => ({ [field] : { '$exists' : false } }),
+            mongoFormatOp: (field, op) => ({ [field]: { '$exists': false } }),
         },
         is_not_empty: {
             isUnary: true,
@@ -461,7 +494,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
             },
-            mongoFormatOp: (field, op) => ({ [field] : { '$exists' : true } }),
+            mongoFormatOp: (field, op) => ({ [field]: { '$exists': true } }),
         },
         select_equals: {
             label: '==',
@@ -469,7 +502,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return `${field} == ${value}`;
             },
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$eq' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
             reversedOp: 'select_not_equals',
         },
         select_not_equals: {
@@ -478,7 +511,7 @@ export default {
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
                 return `${field} != ${value}`;
             },
-            mongoFormatOp: (field, op, value) => ({ [field] : { '$ne' : value } }),
+            mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } }),
             reversedOp: 'select_equals',
         },
         select_any_in: {
@@ -490,7 +523,7 @@ export default {
                 else
                     return `${field} IN (${values})`;
             },
-            mongoFormatOp: (field, op, values) => ({ [field] : { '$in' : values } }),
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$in': values } }),
             reversedOp: 'select_not_any_in',
         },
         select_not_any_in: {
@@ -502,7 +535,7 @@ export default {
                 else
                     return `${field} NOT IN (${values})`;
             },
-            mongoFormatOp: (field, op, values) => ({ [field] : { '$nin' : values } }),
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$nin': values } }),
             reversedOp: 'select_any_in',
         },
         multiselect_equals: {
@@ -514,7 +547,7 @@ export default {
                 else
                     return `${field} == ${values}`;
             },
-            mongoFormatOp: (field, op, values) => ({ [field] : { '$eq' : values } }),
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$eq': values } }),
             reversedOp: 'multiselect_not_equals',
         },
         multiselect_not_equals: {
@@ -526,36 +559,51 @@ export default {
                 else
                     return `${field} != ${values}`;
             },
-            mongoFormatOp: (field, op, values) => ({ [field] : { '$ne' : values } }),
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$ne': values } }),
             reversedOp: 'multiselect_equals',
         },
 
+        range: {
+            label: 'Range',
+            labelForFormat: 'RANGE',
+            cardinality: 1,
+            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                return `${field} == ${values}`;
+            },
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
+            valueLabels: [
+                'Value from',
+                'Value to'
+            ],
+            reversedOp: 'not_between',
+        },
+
         proximity: {
-          label: 'Proximity search',
-          cardinality: 2,
-          valueLabels: [
-            {label: 'Word 1', placeholder: 'Enter first word'},
-            'Word 2'
-          ],
-          textSeparators: [
-            //'Word 1',
-            //'Word 2'
-          ],
-          formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-            let val1 = values.first();
-            let val2 = values.get(1);
-            return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
-          },
-          mongoFormatOp: (field, op, values) => (undefined),
-          options: {
-            optionLabel: "Near",
-            optionTextBefore: "Near",
-            optionPlaceholder: "Select words between",
-            factory: (props) => <ProximityOperator {...props} />,
-            defaults: {
-              proximity: 2
+            label: 'Proximity search',
+            cardinality: 2,
+            valueLabels: [
+                { label: 'Word 1', placeholder: 'Enter first word' },
+                'Word 2'
+            ],
+            textSeparators: [
+                //'Word 1',
+                //'Word 2'
+            ],
+            formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+                let val1 = values.first();
+                let val2 = values.get(1);
+                return `${field} ${val1} NEAR/${operatorOptions.get('proximity')} ${val2}`;
+            },
+            mongoFormatOp: (field, op, values) => (undefined),
+            options: {
+                optionLabel: "Near",
+                optionTextBefore: "Near",
+                optionPlaceholder: "Select words between",
+                factory: (props) => <ProximityOperator {...props} />,
+                defaults: {
+                    proximity: 2
+                }
             }
-          }
         },
     },
     widgets: {
@@ -564,7 +612,7 @@ export default {
             valueSrc: 'value',
             factory: (props) => <TextWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-                return isForDisplay ? '"'+val+'"' : JSON.stringify(val);
+                return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
             },
             validateValue: (val, fieldDef) => {
                 return (val != "test");
@@ -581,13 +629,24 @@ export default {
             },
             //mongoFormatValue: (val, fieldDef, wgtDef) => (Number(val)),
         },
+        slider: {
+            type: "slider",
+            valueSrc: 'value',
+            factory: (props) => <SliderWidget {...props} />,
+            valueLabel: "Slider",
+            valuePlaceholder: "Move Slider",
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                console.log('range val...', val);
+                return isForDisplay ? val : JSON.stringify(val);
+            },
+        },
         select: {
             type: "select",
             valueSrc: 'value',
             factory: (props) => <SelectWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 let valLabel = fieldDef.listValues[val];
-                return isForDisplay ? '"'+valLabel+'"' : JSON.stringify(val);
+                return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
             },
         },
         multiselect: {
@@ -596,7 +655,7 @@ export default {
             factory: (props) => <MultiSelectWidget {...props} />,
             formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
                 let valsLabels = vals.map(v => fieldDef.listValues[v]);
-                return isForDisplay ? valsLabels.map(v => '"'+v+'"') : vals.map(v => JSON.stringify(v));
+                return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
             },
         },
         date: {
@@ -607,7 +666,7 @@ export default {
             valueFormat: 'YYYY-MM-DD',
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 let dateVal = moment(val, wgtDef.valueFormat);
-                return isForDisplay ? '"'+dateVal.format(wgtDef.dateFormat)+'"' : JSON.stringify(val);
+                return isForDisplay ? '"' + dateVal.format(wgtDef.dateFormat) + '"' : JSON.stringify(val);
             },
         },
         time: {
@@ -618,7 +677,7 @@ export default {
             valueFormat: 'HH:mm:ss',
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 let dateVal = moment(val, wgtDef.valueFormat);
-                return isForDisplay ? '"'+dateVal.format(wgtDef.timeFormat)+'"' : JSON.stringify(val);
+                return isForDisplay ? '"' + dateVal.format(wgtDef.timeFormat) + '"' : JSON.stringify(val);
             },
         },
         datetime: {
@@ -630,7 +689,7 @@ export default {
             valueFormat: 'YYYY-MM-DD HH:mm:ss',
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 let dateVal = moment(val, wgtDef.valueFormat);
-                return isForDisplay ? '"'+dateVal.format(wgtDef.dateFormat + ' ' + wgtDef.timeFormat)+'"' : JSON.stringify(val);
+                return isForDisplay ? '"' + dateVal.format(wgtDef.dateFormat + ' ' + wgtDef.timeFormat) + '"' : JSON.stringify(val);
             },
         },
         boolean: {
