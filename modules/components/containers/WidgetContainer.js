@@ -158,7 +158,7 @@ export default (Widget) => {
                             let sep = operatorDefinition.textSeparators[delta];
                             if (sep) {
                                 parts.push((
-                                    <div key={"widget-separators-"+delta} className="widget--sep" style={{width:'500px'}}>
+                                    <div key={"widget-separators-"+delta} className="widget--sep" >
                                         {settings.showLabels ?
                                             <label>&nbsp;</label>
                                             : null}

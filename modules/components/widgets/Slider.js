@@ -10,6 +10,7 @@ export default class SliderWidget extends Component {
 
   state = {
     inputValue: 1,
+    slectedMarkerValue: 50,
   }
 
   static propTypes = {
@@ -30,8 +31,7 @@ export default class SliderWidget extends Component {
     if (val === '')
       val = undefined;
     this.props.setValue(val);
-    
-    console.log('handleChange...', val);
+    this.setState({ slectedMarkerValue: val });
   }
 
   defaultProps = {
@@ -42,47 +42,36 @@ export default class SliderWidget extends Component {
       0: <strong>0</strong>,
       100: <strong>100</strong>
     },
-    included: true
+    included: true,
+    defaultValue: 50
   };
 
   render() {
     const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
     const fieldSettings = fieldDefinition.fieldSettings || {};
 
+    let defaultValue = fieldSettings.defaultValue === null ? this.defaultProps.defaultValue : fieldSettings.defaultValue;
     const min = fieldSettings.min === null ? this.defaultProps.min : fieldSettings.min;
     const max = fieldSettings.max === null ? this.defaultProps.max : fieldSettings.max;
     const step = fieldSettings.step === undefined ? this.defaultProps.step : fieldSettings.step;
     const marks = fieldSettings.marks === undefined ? this.defaultProps.marks : fieldSettings.marks;
-    //console.log('min: , max:, marks ...fieldSettings...',min, max, marks, fieldSettings);
-    let customProps = this.props.customProps || {};
 
+    let customProps = this.props.customProps || {};
     return (
       <Col>
         <Slider
-          // defaultValue={100}
+          defaultValue={defaultValue}
           marks={marks}
           min={min}
           max={max}
           included={false}
           step={step}
-          // range = {true} 
-          // defaultValue={[100, 200]}
+          //range={range}
           width='500px'
           onChange={this.handleChange}
-        //markerLabel={[0, 100]}
-        //maximumTrackStyle={{ backgroundColor: 'red', height: 10 }}
-        //minimumTrackStyle={{ backgroundColor: 'blue', height: 10 }}
-        // handleStyle={{
-        //   borderColor: 'blue',
-        //   height: 28,
-        //   width: 28,
-        //   marginLeft: -14,
-        //   marginTop: -9,
-        //   backgroundColor: 'black',
-        // }}
-        {...customProps}
-
+          {...customProps}
         />
+        <view><input type='text' readOnly value={this.state.slectedMarkerValue}></input></view>
       </Col>
     );
   }

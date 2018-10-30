@@ -90,19 +90,23 @@ export default {
                 max: 5
             },
         },
+
         slider: {
             label: 'Slider',
             type: 'slider',
             fieldSettings: {
                 min: 0,
-                max: 1000,
-                step: 10,
+                max: 100,
+                defaultValue: 50,
+                step: 1,
                 marks: {
-                    0: <strong>0</strong>,
-                    1000: <strong>1000</strong>
-                }
+                    0: <strong>0%</strong>,
+                    100: <strong>100%</strong>
+                },
+                range: true
             },
         },
+        
         date: {
             label: 'Date',
             type: 'date',
@@ -263,10 +267,10 @@ export default {
             widgets: {
                 slider: {
                     operators: [
-                        "range",
-                        // "not_between",
+                        "sliderValue"
+                        // , "sliderRange"
                     ],
-                    defaultOperator: 'range',
+                    defaultOperator: 'sliderValue',
                     widgetProps: {
                         valueLabel: "Slider",
                         valuePlaceholder: "Move Slider",
@@ -433,7 +437,6 @@ export default {
             reversedOp: 'less',
             mongoFormatOp: (field, op, value) => ({ [field]: { '$gte': value } }),
         },
-
         between: {
             label: 'Between',
             labelForFormat: 'BETWEEN',
@@ -473,7 +476,6 @@ export default {
             ],
             reversedOp: 'between',
         },
-
         is_empty: {
             isUnary: true,
             label: 'Is Empty',
@@ -563,12 +565,29 @@ export default {
             reversedOp: 'multiselect_equals',
         },
 
-        range: {
-            label: 'Range',
-            labelForFormat: 'RANGE',
+        sliderValue: {
+            label: '==',
+            labelForFormat: '==',
             cardinality: 1,
             formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                console.log('value from and To ...', values);
                 return `${field} == ${values}`;
+            },
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
+            valueLabels: [],
+        },
+        sliderRange: {
+            label: 'in',
+            labelForFormat: 'IN',
+            cardinality: 1,
+            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                let valFrom = values.first();
+                let valTo = values.get(1);
+                console.log('value from and To ...', values);
+                if (isForDisplay)
+                    return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+                else
+                    return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
             },
             mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
             valueLabels: [
@@ -629,6 +648,7 @@ export default {
             },
             //mongoFormatValue: (val, fieldDef, wgtDef) => (Number(val)),
         },
+
         slider: {
             type: "slider",
             valueSrc: 'value',
@@ -636,10 +656,10 @@ export default {
             valueLabel: "Slider",
             valuePlaceholder: "Move Slider",
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-                console.log('range val...', val);
                 return isForDisplay ? val : JSON.stringify(val);
             },
         },
+
         select: {
             type: "select",
             valueSrc: 'value',
