@@ -5,6 +5,7 @@ const {
     TextWidget,
     NumberWidget,
     SliderWidget,
+    RangeWidget,
     SelectWidget,
     MultiSelectWidget,
     DateWidget,
@@ -103,10 +104,24 @@ export default {
                     0: <strong>0%</strong>,
                     100: <strong>100%</strong>
                 },
-                range: true
             },
         },
         
+        range: {
+            label: 'Range',
+            type: 'rangeType',
+            fieldSettings: {
+                min: 0,
+                max: 100,
+                defaultValue: [20, 50],
+                step: 1,
+                marks: {
+                    0: <strong>0 Km</strong>,
+                    100: <strong>100 KM</strong>
+                },
+            },
+        },
+
         date: {
             label: 'Date',
             type: 'date',
@@ -268,12 +283,26 @@ export default {
                 slider: {
                     operators: [
                         "sliderValue"
-                        // , "sliderRange"
                     ],
                     defaultOperator: 'sliderValue',
                     widgetProps: {
                         valueLabel: "Slider",
                         valuePlaceholder: "Move Slider",
+                    }
+                }
+            },
+        },
+        rangeType: {
+            valueSources: ['value'],
+            widgets: {
+                range: {
+                    operators: [
+                        "rangeValue"
+                    ],
+                    defaultOperator: 'rangeValue',
+                    widgetProps: {
+                        valueLabel: "Range",
+                        valuePlaceholder: "Select range",
                     }
                 }
             },
@@ -442,6 +471,7 @@ export default {
             labelForFormat: 'BETWEEN',
             cardinality: 2,
             formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                console.log('number field values ...', values);
                 let valFrom = values.first();
                 let valTo = values.get(1);
                 if (isForDisplay)
@@ -570,7 +600,7 @@ export default {
             labelForFormat: '==',
             cardinality: 1,
             formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
-                console.log('value from and To ...', values);
+                console.log('slider value ...', values);
                 return `${field} == ${values}`;
             },
             mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
@@ -593,6 +623,32 @@ export default {
             valueLabels: [
                 'Value from',
                 'Value to'
+            ],
+            reversedOp: 'not_between',
+        },
+
+        rangeValue: {
+            label: 'In',
+            labelForFormat: 'IN',
+            cardinality: 1,
+            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                console.log('range value from ',  values ,'and To ...', values);
+                return `${field} == ${values}`;
+                // let valFrom = values.first();
+                // let valTo = values.get(1);
+                // if (isForDisplay)
+                //     return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+                // else
+                //     return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+            },
+            mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
+            valueLabels: [
+                'Range from',
+                'Range to'
+            ],
+            textSeparators: [
+                null,
+                'and'
             ],
             reversedOp: 'not_between',
         },
@@ -656,6 +712,18 @@ export default {
             valueLabel: "Slider",
             valuePlaceholder: "Move Slider",
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                //console.log("inside Silder ", val);
+                return isForDisplay ? val : JSON.stringify(val);
+            },
+        },
+        range: {
+            type: "rangeType",
+            valueSrc: 'value',
+            factory: (props) => <RangeWidget {...props} />,
+            valueLabel: "Range",
+            valuePlaceholder: "Select Range",
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+                console.log("inside range ", val);
                 return isForDisplay ? val : JSON.stringify(val);
             },
         },
