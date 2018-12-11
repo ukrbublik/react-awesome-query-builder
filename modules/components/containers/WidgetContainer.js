@@ -84,7 +84,7 @@ export default (Widget) => {
                 placeholder: valueLabel.placeholder,
                 setValue: this._getSetValueHandler(delta, widgetType),
             });
-
+            
             if (widget == 'field') {
                 //
             }
@@ -103,20 +103,20 @@ export default (Widget) => {
                 return null;
 
             let content = (
-              <RadioGroup
-                 key={'valuesrc-'+delta}
-                 value={valueSrc || "value"}
-                 size={this.props.config.settings.renderSize || "small"}
-                 onChange={this._getSetValueSrcHandler(delta)}
-              >
-                  {valueSources.map(srcKey => (
+                <RadioGroup
+                    key={'valuesrc-'+delta}
+                    value={valueSrc || "value"}
+                    size={this.props.config.settings.renderSize || "small"}
+                    onChange={this._getSetValueSrcHandler(delta)}
+                >
+                    {valueSources.map(srcKey => (
                         <RadioButton
-                          key={srcKey}
-                          value={srcKey}
-                          //checked={item.checked}
+                            key={srcKey}
+                            value={srcKey}
+                        //checked={item.checked}
                         >{valueSourcesInfo[srcKey].label}</RadioButton>
-                  ))}
-              </RadioGroup>
+                    ))}
+                </RadioGroup>
             );
 
             return (
@@ -158,10 +158,10 @@ export default (Widget) => {
                             let sep = operatorDefinition.textSeparators[delta];
                             if (sep) {
                                 parts.push((
-                                    <div key={"widget-separators-"+delta} className="widget--sep">
+                                    <div key={"widget-separators-"+delta} className="widget--sep" >
                                         {settings.showLabels ?
                                             <label>&nbsp;</label>
-                                        : null}
+                                            : null}
                                         <span>{sep}</span>
                                     </div>
                                 ));
@@ -173,7 +173,7 @@ export default (Widget) => {
                                 <div key={"valuesrc-"+this.props.field+"-"+delta} className="widget--valuesrc">
                                     {settings.showLabels ?
                                         <label>&nbsp;</label>
-                                    : null}
+                                        : null}
                                     {this.renderValueSorces(delta, valueSources, valueSrc)}
                                 </div>
                             ));
@@ -182,7 +182,7 @@ export default (Widget) => {
                             <div key={"widget-"+this.props.field+"-"+delta} className="widget--widget">
                                 {settings.showLabels ?
                                     <label>{valueLabel.label}</label>
-                                : null}
+                                    : null}
                                 {this.renderWidget(delta, valueSrc, widget)}
                             </div>
                         ));
