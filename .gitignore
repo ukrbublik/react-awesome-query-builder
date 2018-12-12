@@ -3,3 +3,5 @@ tests/
 scripts/
 build/npm/
 examples/
+package-lock.json
+.DS_Store
