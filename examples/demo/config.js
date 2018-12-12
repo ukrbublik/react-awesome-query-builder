@@ -74,7 +74,7 @@ export default {
             operators: ['equal', 'not_equal'],
             defaultOperator: 'not_equal',
             mainWidgetProps: {
-                formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("__" + JSON.stringify(val)),
+                formatValue: (val, fieldDef, wgtDef, isForDisplay) => (JSON.stringify(val)),
                 valueLabel: "Name2",
                 valuePlaceholder: "Enter name2",
                 validateValue: (val, fieldDef) => {
@@ -251,7 +251,7 @@ export default {
                         'proximity'
                     ],
                     widgetProps: {
-                        formatValue: (val, fieldDef, wgtDef, isForDisplay) => ("_" + JSON.stringify(val)),
+                        formatValue: (val, fieldDef, wgtDef, isForDisplay) => (JSON.stringify(val)),
                         valueLabel: "Text",
                         valuePlaceholder: "Enter text",
                     }
