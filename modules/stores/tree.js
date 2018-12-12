@@ -434,7 +434,7 @@ const setValue = (state, path, delta, value, valueType, config) => {
     const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
-    const calculatedValueType = valueType||(valueSrc==='field' && value?getFieldConfig(value, config).type:valueType);
+    const calculatedValueType = valueType || (valueSrc === 'field' && value ? getFieldConfig(value, config).type : valueType);
     let isValid = _validateValue(config, field, operator, value, calculatedValueType, valueSrc);
 
     if (isValid) {

@@ -71,7 +71,7 @@ export default class ValueField extends Component {
           let fn = config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig);
-          if (!canUse)
+            if (!canUse)
             delete list[rightFieldKey];
         }
       }
