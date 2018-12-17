@@ -3,6 +3,7 @@ import map from 'lodash/map';
 import range from 'lodash/range';
 import uuid from './uuid';
 import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
+import {_getNewValueForFieldOp} from '../stores/tree'
 
 
 export const defaultField = (config, canGetFirst = true) => {
@@ -12,7 +13,12 @@ export const defaultField = (config, canGetFirst = true) => {
 
 export const defaultOperator = (config, field, canGetFirst = true) => {
   let fieldConfig = getFieldConfig(field, config);
-  let fieldDefaultOperator = fieldConfig && fieldConfig.defaultOperator || (canGetFirst ? getFirstOperator(config, field) : null);
+  let fieldOperators = fieldConfig && fieldConfig.operators || [];
+  let fieldDefaultOperator = fieldConfig && fieldConfig.defaultOperator;
+  if (!fieldOperators.includes(fieldDefaultOperator))
+    fieldDefaultOperator = null;
+  if (!fieldDefaultOperator && canGetFirst)
+    fieldDefaultOperator = getFirstOperator(config, field)
   let op = typeof config.settings.defaultOperator === 'function' ?
     config.settings.defaultOperator(field, fieldConfig) : fieldDefaultOperator;
   return op;
@@ -35,8 +41,7 @@ export const defaultRuleProperties = (config) => {
     field = defaultField(config);
     operator = defaultOperator(config, field);
   }
-
-  return new Immutable.Map({
+  let current = new Immutable.Map({
     field: field,
     operator: operator,
     value: new Immutable.List(),
@@ -44,6 +49,16 @@ export const defaultRuleProperties = (config) => {
     //used for complex operators like proximity
     operatorOptions: defaultOperatorOptions(config, operator, field),
   });
+  
+  if (field && operator) {
+    let {newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, field, operator, 'operator');
+    current = current
+        .set('value', newValue)
+        .set('valueSrc', newValueSrc)
+        .set('valueType', newValueType);
+  }
+
+  return current; 
 };
 
 //------------

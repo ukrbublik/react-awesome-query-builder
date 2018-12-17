@@ -33,11 +33,11 @@ export default (Widget) => {
             this._setValueSrcHandlers = {};
         }
 
-        _getSetValueHandler = (delta, widgetType) => {
-            const k = ''+widgetType+'#'+delta;
+        _getSetValueHandler = (isSpecialRange, delta, widgetType) => {
+            const k = ''+widgetType+'#'+(isSpecialRange ? 'r' : delta);
             let h = this._setValueHandlers[k];
             if (!h) {
-                h = this._setValue.bind(this, delta, widgetType);
+                h = this._setValue.bind(this, isSpecialRange, delta, widgetType);
                 this._setValueHandlers[k] = h;
             }
             return h;
@@ -53,8 +53,16 @@ export default (Widget) => {
             return h;
         }
 
-        _setValue = (delta, widgetType, value) => {
-            this.props.setValue(delta, value, widgetType);
+        _setValue = (isSpecialRange, delta, widgetType, value) => {
+            if (isSpecialRange && Array.isArray(value)) {
+                const oldRange = [this.props.value.get(0), this.props.value.get(1)];
+                if (oldRange[0] != value[0])
+                    this.props.setValue(0, value[0], widgetType);
+                if (oldRange[1] != value[1])
+                    this.props.setValue(1, value[1], widgetType);
+            } else {
+                this.props.setValue(delta, value, widgetType);
+            }
         }
 
         _onChangeValueSrc = (delta, e) => {
@@ -64,27 +72,49 @@ export default (Widget) => {
 
         shouldComponentUpdate = shallowCompare;
 
-        renderWidget = (delta, valueSrc, widget) => {
+        renderWidget = (isSpecialRange, delta, valueSrc, widget, operatorDefinition) => {
             const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
             const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
-            const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta);
+            const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta, null, isSpecialRange);
+            let valueLabels = null;
+            let textSeparators = null;
+            if (isSpecialRange) {
+                valueLabels = [
+                    getValueLabel(this.props.config, this.props.field, this.props.operator, 0),
+                    getValueLabel(this.props.config, this.props.field, this.props.operator, 1)
+                ];
+                valueLabels = {
+                    placeholder: [ valueLabels[0].placeholder, valueLabels[1].placeholder ],
+                    label: [ valueLabels[0].label, valueLabels[1].label ],
+                };
+                textSeparators = operatorDefinition.textSeparators;
+            }
             const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
             const widgetType = widgetDefinition.type;
 
             if (!widgetFactory)
                 return '?';
             
+            let value = isSpecialRange ? 
+                [this.props.value.get(0), this.props.value.get(1)] 
+                : this.props.value.get(delta)
+            ;
+            if (isSpecialRange && value[0] === undefined && value[1] === undefined)
+                value = undefined;
             let widgetProps = Object.assign({}, fieldWidgetProps, {
                 config: this.props.config,
                 field: this.props.field,
                 operator: this.props.operator,
                 delta: delta,
-                value: this.props.value.get(delta),
+                isSpecialRange: isSpecialRange,
+                value: value,
                 label: valueLabel.label,
                 placeholder: valueLabel.placeholder,
-                setValue: this._getSetValueHandler(delta, widgetType),
+                placeholders: valueLabels ? valueLabels.placeholder : null,
+                textSeparators: textSeparators,
+                setValue: this._getSetValueHandler(isSpecialRange, delta, widgetType),
             });
-
+            
             if (widget == 'field') {
                 //
             }
@@ -103,20 +133,20 @@ export default (Widget) => {
                 return null;
 
             let content = (
-              <RadioGroup
-                 key={'valuesrc-'+delta}
-                 value={valueSrc || "value"}
-                 size={this.props.config.settings.renderSize || "small"}
-                 onChange={this._getSetValueSrcHandler(delta)}
-              >
-                  {valueSources.map(srcKey => (
+                <RadioGroup
+                    key={'valuesrc-'+delta}
+                    value={valueSrc || "value"}
+                    size={this.props.config.settings.renderSize || "small"}
+                    onChange={this._getSetValueSrcHandler(delta)}
+                >
+                    {valueSources.map(srcKey => (
                         <RadioButton
-                          key={srcKey}
-                          value={srcKey}
-                          //checked={item.checked}
+                            key={srcKey}
+                            value={srcKey}
+                        //checked={item.checked}
                         >{valueSourcesInfo[srcKey].label}</RadioButton>
-                  ))}
-              </RadioGroup>
+                    ))}
+                </RadioGroup>
             );
 
             return (
@@ -137,7 +167,10 @@ export default (Widget) => {
             if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
                 return null;
             }
-            const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+            const isSpecialRange = operatorDefinition.isSpecialRange;
+            const isSpecialRangeForSrcField = isSpecialRange && (this.props.valueSrc.get(0) == 'field' || this.props.valueSrc.get(1) == 'field');
+            const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
+            const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition.cardinality, 1);
             if (cardinality === 0) {
                 return null;
             }
@@ -150,18 +183,22 @@ export default (Widget) => {
                         //if (!valueSrc && valueSources.length == 1) {
                         //    this.props.setValueSrc(delta, valueSources[0]);
                         //}
-                        const widget = getWidgetForFieldOp(this.props.config, this.props.field, this.props.operator, valueSrc);
-                        const widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
-                        const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta, valueSrc);
+                        let widget = getWidgetForFieldOp(this.props.config, this.props.field, this.props.operator, valueSrc);
+                        let widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
+                        if (isSpecialRangeForSrcField) {
+                            widget = widgetDefinition.singleWidget;
+                            widgetDefinition = getFieldWidgetConfig(this.props.config, this.props.field, this.props.operator, widget, valueSrc);
+                        }
+                        const valueLabel = getValueLabel(this.props.config, this.props.field, this.props.operator, delta, valueSrc, isTrueSpecialRange);
                         let parts = [];
                         if (operatorDefinition.textSeparators) {
                             let sep = operatorDefinition.textSeparators[delta];
                             if (sep) {
                                 parts.push((
-                                    <div key={"widget-separators-"+delta} className="widget--sep">
+                                    <div key={"widget-separators-"+delta} className="widget--sep" >
                                         {settings.showLabels ?
                                             <label>&nbsp;</label>
-                                        : null}
+                                            : null}
                                         <span>{sep}</span>
                                     </div>
                                 ));
@@ -173,7 +210,7 @@ export default (Widget) => {
                                 <div key={"valuesrc-"+this.props.field+"-"+delta} className="widget--valuesrc">
                                     {settings.showLabels ?
                                         <label>&nbsp;</label>
-                                    : null}
+                                        : null}
                                     {this.renderValueSorces(delta, valueSources, valueSrc)}
                                 </div>
                             ));
@@ -182,8 +219,8 @@ export default (Widget) => {
                             <div key={"widget-"+this.props.field+"-"+delta} className="widget--widget">
                                 {settings.showLabels ?
                                     <label>{valueLabel.label}</label>
-                                : null}
-                                {this.renderWidget(delta, valueSrc, widget)}
+                                    : null}
+                                {this.renderWidget(isTrueSpecialRange, delta, valueSrc, widget, operatorDefinition)}
                             </div>
                         ));
 

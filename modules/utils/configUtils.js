@@ -213,11 +213,11 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
     return mergedConfig;
 };
 
-export const getValueLabel = (config, field, operator, delta, valueSrc = null) => {
+export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
     const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
     const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
 
-    const cardinality = mergedOpConfig.cardinality;
+    const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
     let ret = null;
     if (cardinality > 1) {
         const valueLabels =  mergedOpConfig.valueLabels;
@@ -265,13 +265,14 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
         }
     }
     widgets.sort((w1, w2) => {
-        let w1Main = w1 == fieldConfig.mainWidget;
-        let w2Main = w2 == fieldConfig.mainWidget;
+        let w1Main = w1 == fieldConfig.mainWidget || fieldConfig.preferWidgets && fieldConfig.preferWidgets.indexOf(w1) != -1;
+        let w2Main = w2 == fieldConfig.mainWidget|| fieldConfig.preferWidgets && fieldConfig.preferWidgets.indexOf(w2) != -1;
         if (w1 != w2) {
-            return w1 ? -1 : +1;
+            return w1Main ? -1 : +1;
         }
         return 0;
     });
+    
     return {widgets, valueSrcs};
 };
 
@@ -287,5 +288,8 @@ export const getValueSourcesForFieldOp = (config, field, operator) => {
 
 export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
     let {widgets, valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
-    return widgets.length ? widgets[0] : null;
+    let widget = null;
+    if (widgets.length)
+        widget = widgets[0];
+    return widget;
 };

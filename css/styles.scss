@@ -100,6 +100,22 @@
     padding-right: 10px;
 }
 
+/* slider */
+.ant-tooltip-inner {
+  min-height: 18px;
+}
+.ant-slider {
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+.ant-slider-with-marks {
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+.ant-slider-track {
+  visibility: visible !important;
+}
+
 /******************************************************************************/
 /** GROUP *********************************************************************/
 /******************************************************************************/
