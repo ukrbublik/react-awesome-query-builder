@@ -8,7 +8,7 @@ export default (OperatorOptions) => {
   return class OperatorOptionsContainer extends Component {
     static propTypes = {
       config: PropTypes.object.isRequired,
-      operatorOptions: PropTypes.instanceOf(Immutable.Map).isRequired,
+      operatorOptions: PropTypes.any.isRequired,
       selectedField: PropTypes.string.isRequired,
       selectedOperator: PropTypes.string.isRequired,
       //actions

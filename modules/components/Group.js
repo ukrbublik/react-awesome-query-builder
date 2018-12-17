@@ -39,9 +39,9 @@ class Group extends Component {
     selectedConjunction: PropTypes.string,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
-    path: PropTypes.instanceOf(Immutable.List),
+    path: PropTypes.any,
     onDragStart: PropTypes.func,
-    children1: PropTypes.instanceOf(Immutable.OrderedMap),
+    children1: PropTypes.any,
     //actions
     addRule: PropTypes.func.isRequired,
     addGroup: PropTypes.func.isRequired,
