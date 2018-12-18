@@ -14,11 +14,11 @@ export default (Group) => {
       //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
       config: PropTypes.object.isRequired,
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
-      path: PropTypes.instanceOf(Immutable.List).isRequired,
+      path: PropTypes.any.isRequired,
       id: PropTypes.string.isRequired,
       not: PropTypes.bool,
       conjunction: PropTypes.string,
-      children1: PropTypes.instanceOf(Immutable.OrderedMap),
+      children1: PropTypes.any,
       onDragStart: PropTypes.func,
       treeNodesCnt: PropTypes.number,
     };
