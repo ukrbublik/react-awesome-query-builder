@@ -8,7 +8,7 @@ var stringify = require('json-stringify-safe');
 export default class Preview extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    tree: PropTypes.any.isRequired,
+    tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
   };
 
   shouldComponentUpdate = shallowCompare;

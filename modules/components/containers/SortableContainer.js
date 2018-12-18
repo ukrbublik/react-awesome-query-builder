@@ -16,7 +16,7 @@ export default (Builder, CanMoveFn = null) => {
   class ConnectedSortableContainer extends Component {
 
     static propTypes = {
-      tree: PropTypes.any.isRequired,
+      tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
       actions: PropTypes.object.isRequired, // {moveItem: Function, ..}
       //... see Builder
     };

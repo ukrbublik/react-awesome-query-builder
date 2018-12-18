@@ -17,8 +17,8 @@ export default (Widget) => {
     return class WidgetContainer extends Component {
         static propTypes = {
             config: PropTypes.object.isRequired,
-            value: PropTypes.any.isRequired,
-            valueSrc: PropTypes.any.isRequired,
+            value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
+            valueSrc: PropTypes.any.isRequired, //instanceOf(Immutable.List)
             field: PropTypes.string.isRequired,
             operator: PropTypes.string.isRequired,
             //actions

@@ -42,9 +42,9 @@ class Item extends Component {
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
-    path: PropTypes.any.isRequired,
-    properties: PropTypes.any.isRequired,
-    children1: PropTypes.any,
+    path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
+    properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
+    children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     actions: PropTypes.object.isRequired,
     treeNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
