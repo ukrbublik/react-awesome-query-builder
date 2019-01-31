@@ -9,7 +9,7 @@ import {getTotalNodesCountInTree} from "../utils/treeUtils";
 @SortableContainer
 export default class Builder extends Component {
   static propTypes = {
-    tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+    tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     config: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     onDragStart: PropTypes.func,

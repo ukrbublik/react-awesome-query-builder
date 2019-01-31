@@ -11,7 +11,7 @@ export default class Proximity extends Component {
     config: PropTypes.object.isRequired,
     setOption: PropTypes.func.isRequired,
     defaults: PropTypes.object.isRequired,
-    options: PropTypes.instanceOf(Immutable.Map).isRequired,
+    options: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     minProximity: PropTypes.number,
     maxProximity: PropTypes.number,
     optionPlaceholder: PropTypes.string,
