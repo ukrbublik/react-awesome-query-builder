@@ -1,3 +1,4 @@
+import { List } from 'immutable';
 import React from 'react';
 import { Widgets, Operators } from 'react-awesome-query-builder';
 
@@ -746,7 +747,10 @@ export default {
         multiselect: {
             type: "multiselect",
             valueSrc: 'value',
-            factory: (props) => <MultiSelectWidget {...props} />,
+            factory: (props) => {
+                if (List.isList(props.value)) props.value = props.value.toJS();
+                return <MultiSelectWidget {...props} />
+            },
             formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
                 let valsLabels = vals.map(v => fieldDef.listValues[v]);
                 return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
