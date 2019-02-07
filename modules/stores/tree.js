@@ -205,7 +205,7 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
     const currentOperator = current.get('operator');
     let currentValue = current.get('value');
     if (currentValue !== undefined && currentValue.get(0) !== undefined && Immutable.List.isList(currentValue.get(0))) {
-        currentValue = Immutable.List.of(currentValue.get(0).toJS())
+        currentValue = Immutable.List.of(currentValue.get(0).toJS());
     } // Unwrap nested Immutable Lists for use with tree conversion using Immutable-js toJS() and fromJS()
     const currentValueSrc = current.get('valueSrc', new Immutable.List());
     const currentValueType = current.get('valueType', new Immutable.List());

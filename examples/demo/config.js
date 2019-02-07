@@ -749,7 +749,7 @@ export default {
             valueSrc: 'value',
             factory: (props) => {
                 if (List.isList(props.value)) props.value = props.value.toJS();
-                return <MultiSelectWidget {...props} />
+                return <MultiSelectWidget {...props} />;
             },
             formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
                 let valsLabels = vals.map(v => fieldDef.listValues[v]);
