@@ -87,6 +87,11 @@ class DemoQueryBuilder extends Component {
 }
 ```
 
+Use can save tree as serialized Immutable object with `transit.toJSON`/`transit.fromJSON` 
+-or- as plain JS, see `loadTree = function(serTree) {...}` 
+at `examples/demo/demo.js` (using `Immutable.fromJS` with a little trick)
+
+
 
 ## Config format
 ```javascript
