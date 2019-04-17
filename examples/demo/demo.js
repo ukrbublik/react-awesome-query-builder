@@ -23,7 +23,7 @@ if (!seriazlieAsImmutable) {
         let tree = JSON.parse(serTree);
         return fromJS(tree, function (key, value) {
           let outValue;
-          if (key == 'value' && value.get(0).toJS !== undefined)
+          if (key == 'value' && value.get(0) && value.get(0).toJS !== undefined)
             outValue = Immutable.List.of(value.get(0).toJS());
           else
             outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
