@@ -265,8 +265,8 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
         }
     }
     widgets.sort((w1, w2) => {
-        let w1Main = w1 == fieldConfig.mainWidget || fieldConfig.preferWidgets && fieldConfig.preferWidgets.indexOf(w1) != -1;
-        let w2Main = w2 == fieldConfig.mainWidget|| fieldConfig.preferWidgets && fieldConfig.preferWidgets.indexOf(w2) != -1;
+        let w1Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w1) != -1 : w1 == fieldConfig.mainWidget;
+        let w2Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w2) != -1 : w2 == fieldConfig.mainWidget;
         if (w1 != w2) {
             return w1Main ? -1 : +1;
         }

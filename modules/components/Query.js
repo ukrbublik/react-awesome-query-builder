@@ -19,7 +19,7 @@ class ConnectedQuery extends Component {
         config: PropTypes.object.isRequired,
         onChange: PropTypes.func,
         get_children: PropTypes.func,
-        tree: PropTypes.instanceOf(Immutable.Map),
+        tree: PropTypes.any, //instanceOf(Immutable.Map)
         //dispatch: PropTypes.func.isRequired,
     };
 
@@ -103,7 +103,7 @@ export default class Query extends Component {
 
         onChange: PropTypes.func,
         get_children: PropTypes.func,
-        value: PropTypes.instanceOf(Immutable.Map),
+        value: PropTypes.any, //instanceOf(Immutable.Map)
     };
 
     constructor(props, context) {
