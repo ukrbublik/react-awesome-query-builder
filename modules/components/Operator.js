@@ -12,7 +12,6 @@ import map from 'lodash/map';
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
-import mapValues from 'lodash/mapValues';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
@@ -39,9 +38,9 @@ export default class Operator extends Component {
 
   onPropsChanged (props) {
       let fieldConfig = getFieldConfig(props.selectedField, props.config);
-      this.operatorOptions = mapValues(pickBy(props.config.operators, (item, key) =>
+      this.operatorOptions = pickBy(props.config.operators, (item, key) =>
           fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
-      ));
+      );
   }
 
   curOpOpts() {
