@@ -1,12 +1,5 @@
-@mixin force_nomargin {
+.force_nomargin {
   margin: 0px !important;
-}
-
-%force_nomargin {
-  @include force_nomargin;
-}
-
-.group, .rule {
 }
 
 .rule {
@@ -18,7 +11,7 @@
 }
 
 .group--children {
-  @extend %force_nomargin;
+  .force_nomargin();
   padding-left: 10px !important;
 
   & > .group-or-rule-container > .group-or-rule {
@@ -30,7 +23,7 @@
 }
 
 .group--conjunctions {
-  @extend %force_nomargin;
+  .force_nomargin();
   margin-left: 4px !important;
 }
 

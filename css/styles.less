@@ -1,9 +1,9 @@
-@mixin flex{
+.flex{
   display: flex;
   align-items: center;
 }
 
-@mixin clearfix {
+.clearfix {
   &:after {
     content: "";
     display: table;
@@ -11,24 +11,12 @@
   }
 }
 
-@mixin noselect {
+.noselect {
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-%noselect {
-  @include noselect;
-}
-
-%clearfix {
-  @include clearfix;
-}
-
-%flex{
-  @include flex;
 }
 
 .query-builder {
@@ -84,7 +72,7 @@
 }
 
 .qb-draggable {
-  @extend %noselect;
+  .noselect();
   pointer-events: none;
   position: absolute;
   opacity: 0.7;
@@ -121,7 +109,7 @@
 /******************************************************************************/
 .group--header,
 .group--footer{
-  @extend %flex;
+  .flex()
 }
 
 .group--children {
@@ -186,19 +174,14 @@
 }
 
 .qb-drag-handler {
-  @extend %noselect;
+  .noselect();
   cursor: -webkit-grabbing;
   cursor: grabbing;
 }
 
 .group--header,
 .group--footer {
-  padding: {
-    top: 10px;
-    right: 5px;
-    bottom: 10px;
-    left: 10px;
-  }
+  padding: '10px 5px 10px 10px';
 }
 
 .group--conjunctions.hide--conj {
@@ -233,7 +216,7 @@
 /******************************************************************************/
 
 .rule--header {
-  @extend %clearfix;
+  .clearfix();
   float: right;
 }
 
