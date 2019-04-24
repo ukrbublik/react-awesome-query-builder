@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import map from 'lodash/map';
+import { map } from 'lodash';
 import { Select } from 'antd';
 import {getFieldConfig} from '../../utils/configUtils';
 import {calcTextWidth} from '../../utils/stuff';

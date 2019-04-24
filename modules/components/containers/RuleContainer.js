@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
-import size from 'lodash/size';
+import { size } from 'lodash';
 import {getFieldConfig} from "../../utils/configUtils";
 import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';

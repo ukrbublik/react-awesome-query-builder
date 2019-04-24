@@ -1,14 +1,12 @@
 'use strict';
 import Immutable from 'immutable';
 import uuid from "./uuid";
-import isArray from 'lodash/isArray'
+import { isArray, omit, pick } from 'lodash';
 import {defaultValue} from "./stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, 
     getFieldPath, getFieldPathLabels, fieldWidgetDefinition
 } from './configUtils';
-import omit from 'lodash/omit';
-import pick from 'lodash/pick';
 
 /*
  Build tree to http://querybuilder.js.org/ like format

@@ -1,14 +1,13 @@
 'use strict';
 import Immutable from 'immutable';
 import uuid from "./uuid";
-import isArray from 'lodash/isArray'
+import { isArray } from 'lodash'
 import {defaultValue} from "./stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, 
     getFieldPath, getFieldPathLabels, fieldWidgetDefinition
 } from './configUtils';
-import omit from 'lodash/omit';
-import pick from 'lodash/pick';
+import { omit, pick } from 'lodash';
 
 export const mongodbFormat = (item, config, _not = false) => {
     const type = item.get('type');

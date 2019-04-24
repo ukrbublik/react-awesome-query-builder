@@ -1,6 +1,5 @@
 import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
-import omit from 'lodash/omit';
-import pick from 'lodash/pick';
+import { omit, pick } from 'lodash';
 import {defaultValue} from "./stuff";
 
 export const queryString = (item, config, isForDisplay = false) => {

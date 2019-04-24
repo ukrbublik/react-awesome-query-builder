@@ -1,4 +1,4 @@
-import mapValues from 'lodash/mapValues';
+import { mapValues } from 'lodash';
 
 
 // RegExp.quote = function (str) {

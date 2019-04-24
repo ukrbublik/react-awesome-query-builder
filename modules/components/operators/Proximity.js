@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
-import range from 'lodash/range';
+import { range } from 'lodash';
 import { Select } from 'antd';
 const Option = Select.Option;
 import Immutable from 'immutable';

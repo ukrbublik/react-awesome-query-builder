@@ -4,10 +4,7 @@ import {
 } from './configUtils';
 import {defaultValue} from "../utils/stuff";
 import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from '../utils/defaultUtils';
-import omit from 'lodash/omit';
-import pick from 'lodash/pick';
-import pickBy from 'lodash/pickBy';
-import mapValues from 'lodash/mapValues';
+import { omit, pick, pickBy, mapValues } from 'lodash';
 import Immutable from 'immutable';
 import {_getNewValueForFieldOp} from "../stores/tree";
 

@@ -1,10 +1,5 @@
 'use strict';
-import last from 'lodash/last';
-import pick from 'lodash/pick';
-import pickBy from 'lodash/pickBy';
-import merge from 'lodash/merge';
-import mergeWith from 'lodash/mergeWith';
-import cloneDeep from 'lodash/cloneDeep';
+import { last, pick, pickBy, merge, mergeWith, cloneDeep } from 'lodash';
 
 export const extendConfig = (config) => {
     //operators, defaultOperator - merge

@@ -4,7 +4,7 @@ import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultO
 import {getFirstOperator} from '../utils/configUtils';
 import * as constants from '../constants';
 import uuid from '../utils/uuid';
-import omit from 'lodash/omit';
+import { omit } from 'lodash';
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getValueSourcesForFieldOp} from "../utils/configUtils";
 import {defaultValue, eqArrSet} from "../utils/stuff";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";

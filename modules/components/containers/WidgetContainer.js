@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
-import range from 'lodash/range';
-import map from 'lodash/map';
+import { range, map } from 'lodash';
 import {
     getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp

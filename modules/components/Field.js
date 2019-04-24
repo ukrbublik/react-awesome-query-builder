@@ -8,9 +8,7 @@ const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import map from 'lodash/map';
-import last from 'lodash/last';
-import keys from 'lodash/keys';
+import { map, last, keys } from 'lodash';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
