@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
-import map from 'lodash/map';
-import startsWith from 'lodash/startsWith'
+import { map, startsWith } from 'lodash';
 import GroupContainer from './containers/GroupContainer';
 import { Row, Col, Icon, Button, Radio } from 'antd';
 const ButtonGroup = Button.Group;
