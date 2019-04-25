@@ -1,7 +1,7 @@
 'use strict';
 import Immutable from 'immutable';
 import uuid from "./uuid";
-import { isArray } from 'lodash'
+import { isArray, isNull } from 'lodash'
 import {defaultValue} from "./stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, 
@@ -74,6 +74,8 @@ export const mongodbFormat = (item, config, _not = false) => {
         if (fieldDefinition.tableName) {
           const regex = new RegExp(field.split(config.settings.fieldSeparator)[0])
           field = field.replace(regex, fieldDefinition.tableName)
+        } else if (isNull(fieldDefinition.tableName)) {
+          field = field.substr(_.indexOf(field, '.') + 1)
         }
 
         //format value

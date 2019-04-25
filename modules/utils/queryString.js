@@ -1,5 +1,5 @@
 import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
-import { omit, pick } from 'lodash';
+import { omit, pick, isNull } from 'lodash';
 import {defaultValue} from "./stuff";
 
 export const queryString = (item, config, isForDisplay = false) => {
@@ -108,7 +108,10 @@ export const queryString = (item, config, isForDisplay = false) => {
         if (fieldDefinition.tableName) {
           const regex = new RegExp(field.split(fieldSeparator)[0])
           field = field.replace(regex, fieldDefinition.tableName)
+        } else if (isNull(fieldDefinition.tableName)) {
+            field = field.substr(_.indexOf(field, '.') + 1)
         }
+
         let fieldParts = field.split(fieldSeparator);
         //let fieldKeys = getFieldPath(field, config);
         let fieldPartsLabels = getFieldPathLabels(field, config);

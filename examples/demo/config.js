@@ -52,7 +52,7 @@ export default {
           // label: 'Subname', //'subname' should be used instead
           label2: 'MemberName', // only for menu's toggler
           type: 'text',
-          tableName: 't1',
+          tableName: null,
           operators: ['equal']
         },
         prox1: {
