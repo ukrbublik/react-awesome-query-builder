@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
-import { map, startsWith } from 'lodash';
+import { map, startsWith, get } from 'lodash';
 import GroupContainer from './containers/GroupContainer';
 import { Row, Col, Icon, Button, Radio } from 'antd';
 const ButtonGroup = Button.Group;
@@ -59,6 +59,8 @@ class Group extends Component {
     super(props);
 
     this._setConjunctionHandlers = {};
+    // 初始化显示条件组的第一个
+    this._getSetConjunctionHandler(get(this.props.conjunctionOptions, '[0].key'));
   }
 
   _getSetConjunctionHandler = (itemKey = null) => {
@@ -179,7 +181,7 @@ class Group extends Component {
           :
           <ButtonGroup
             size={this.props.config.settings.renderSize || "small"}
-            disabled={this.props.children1.size < 2}
+            disabled={false && this.props.children1.size < 2}
           >
             {this.props.config.settings.showNot &&
               <Button
@@ -189,7 +191,7 @@ class Group extends Component {
             }
             {map(this.props.conjunctionOptions, (item, index) => (
               <Button
-                disabled={this.props.children1.size < 2}
+                disabled={false && this.props.children1.size < 2}
                 key={item.id}
                 type={item.checked ? "primary" : null}
                 onClick={this._getSetConjunctionHandler(item.key)}
