@@ -114,7 +114,7 @@ class Group extends Component {
             onClick={this.props.addRule}
           >{this.props.config.settings.addRuleLabel || "Add rule"}</Button>
           }
-          {!this.props.config.settings.readonlyMode && this.props.allowFurtherNesting ? (
+          {!this.props.config.settings.readonlyMode && this.props.config.settings.showAddGroup && this.props.allowFurtherNesting ? (
             <Button
               className="action action--ADD-GROUP"
               icon="plus-circle-o"

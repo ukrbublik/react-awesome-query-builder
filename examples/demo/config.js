@@ -851,6 +851,7 @@ export default {
     readonlyMode: false,
     notLabel: 'Not',
     showNot: true,
+    showAddGroup: true,
     delGroupLabel: null,
     canLeaveEmptyGroup: true,
     formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
