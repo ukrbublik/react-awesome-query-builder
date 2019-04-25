@@ -51,14 +51,14 @@ export default class DemoQueryBuilder extends Component {
               <div>
                 stringFormat:
                 <pre style={jsonStyle}>
-                  {stringify(queryString(props.tree, props.config), undefined, 2)}
+                  {queryString(props.tree, props.config)}
                 </pre>
               </div>
               <hr/>
               <div>
                 humanStringFormat:
                 <pre style={jsonStyle}>
-                  {stringify(queryString(props.tree, props.config, true), undefined, 2)}
+                  {queryString(props.tree, props.config, true)}
                 </pre>
               </div>
               <hr/>
@@ -98,11 +98,20 @@ export default class DemoQueryBuilder extends Component {
       return (
           <div>
             <Query
-              // value={loadTree(initValue)}
+              value={loadTree(initValue)}
               { ...configProps }
               get_children={this.getChildren}
+              onChange={this.onChange.bind(this)}
             />
           </div>
       );
+    }
+
+    onChange(tree) {
+      const data = {
+        tree: transit.toJSON(tree),
+        json: JSON.stringify(queryBuilderFormat(tree, config))
+      };
+      console.log(data, 'data');
     }
 }
