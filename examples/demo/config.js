@@ -53,7 +53,7 @@ export default {
           label2: 'MemberName', // only for menu's toggler
           type: 'text',
           tableName: null,
-          operators: ['equal']
+          // operators: ['equal']
         },
         prox1: {
           label: 'prox1',
@@ -61,6 +61,10 @@ export default {
           operators: ['proximity']
         }
       }
+    },
+    mixin: {
+      label: 'mixin',
+      type: 'mixin'
     },
     prox2: {
       label: 'prox2',
@@ -88,19 +92,7 @@ export default {
       fieldSettings: {
         min: -1,
         max: 5
-      },
-      operators: [
-        'equal',
-        'not_equal',
-        'less',
-        'less_or_equal',
-        'greater',
-        'greater_or_equal',
-        'between',
-        'not_between',
-        'is_empty',
-        'is_not_empty'
-      ]
+      }
     },
     slider: {
       label: 'Slider',
@@ -118,7 +110,7 @@ export default {
         'is_empty',
         'is_not_empty'
       ],
-      valueSources: ['value', 'field'],
+      // valueSources: ['value', 'field'],
       fieldSettings: {
         min: 0,
         max: 100,
@@ -168,12 +160,12 @@ export default {
     datetime: {
       label: 'DateTime',
       type: 'datetime',
-      valueSources: ['field']
+      // valueSources: ['field']
     },
     datetime2: {
       label: 'DateTime2',
       type: 'datetime',
-      valueSources: ['value']
+      // valueSources: ['value']
     },
     color: {
       label: 'Color',
@@ -239,6 +231,27 @@ export default {
     }
   },
   types: {
+    mixin: {
+      widgets: {
+        text: {
+          defaultOperator: 'equal',
+          operators: [
+            'equal',
+            'not_equal',
+            'less',
+            'less_or_equal',
+            'greater',
+            'greater_or_equal',
+            'between',
+            'not_between',
+            'contains',
+            'not_contains',
+            'startswith',
+            'not_startswith'
+          ]
+        }
+      }
+    },
     text: {
       widgets: {
         text: {
@@ -270,7 +283,7 @@ export default {
     },
     number: {
       mainWidget: 'number',
-      valueSources: ['value', 'field'],
+      // valueSources: ['value', 'field'],
       defaultOperator: 'equal',
       widgets: {
         number: {
@@ -520,6 +533,30 @@ export default {
         'and'
       ],
       reversedOp: 'between'
+    },
+    contains: {
+      label: 'Contains',
+      labelForFormat: 'Contains',
+      reversedOp: 'not_contains',
+      mongoFormatOp: () => {}
+    },
+    not_contains: {
+      label: 'Not Contains',
+      labelForFormat: 'Not Contains',
+      reversedOp: 'contains',
+      mongoFormatOp: () => {}
+    },
+    startswith: {
+      label: 'StartsWith',
+      labelForFormat: 'StartsWith',
+      reversedOp: 'not_startswith',
+      mongoFormatOp: () => {}
+    },
+    not_startswith: {
+      label: 'Not StartsWith',
+      labelForFormat: 'Not StartsWith',
+      reversedOp: 'startswith',
+      mongoFormatOp: () => {}
     },
     range_between: {
       label: 'Between',
@@ -871,11 +908,11 @@ export default {
     valueSourcesInfo: {
       value: {
         label: 'Value'
-      },
-      field: {
-        label: 'Field',
-        widget: 'field'
       }
+      // field: {
+      //   label: 'Field',
+      //   widget: 'field'
+      // }
     },
     valueSourcesPopupTitle: 'Select value source',
     canReorder: true,
