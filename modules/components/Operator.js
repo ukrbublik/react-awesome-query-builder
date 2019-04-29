@@ -20,6 +20,7 @@ export default class Operator extends Component {
     renderAsDropdown: PropTypes.bool,
     //actions
     setOperator: PropTypes.func.isRequired,
+    customProps: PropTypes.object,
   };
 
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -110,6 +111,7 @@ export default class Operator extends Component {
             size={this.props.config.settings.renderSize || "small"}
             onChange={this.handleOperatorSelect}
             value={this.props.selectedOperator || undefined}
+            {...this.props.customProps}
         >{fieldSelectItems}</Select>
     );
 
@@ -125,6 +127,7 @@ export default class Operator extends Component {
             //size={this.props.config.settings.renderSize || "small"}
             selectedKeys={[selectedOpKey]}
             onClick={this.handleOperatorMenuSelect}
+            {...this.props.customProps}
         >{opMenuItems}</Menu>
     );
     let opToggler = this.buildMenuToggler(placeholder);

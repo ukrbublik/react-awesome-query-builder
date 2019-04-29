@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
-import { range, map } from 'lodash';
+import { range, map, merge } from 'lodash';
 import {
     getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
@@ -116,6 +116,15 @@ export default (Widget) => {
             
             if (widget == 'field') {
                 //
+            }
+
+            // add readonly mode support
+            if (this.props.config.settings.readonlyMode) {
+                widgetProps = merge(widgetProps, {
+                    customProps: {
+                        disabled: true
+                    }
+                });
             }
 
             return widgetFactory(widgetProps);

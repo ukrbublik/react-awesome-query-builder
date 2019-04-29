@@ -12,7 +12,7 @@ const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
 import {getFieldConfig, getFieldPath, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
-import { size } from 'lodash';
+import { size, merge } from 'lodash';
 var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
 import PureRenderMixin from 'react-addons-pure-render-mixin';
@@ -131,7 +131,11 @@ class Rule extends Component {
                                     selectedField={this.props.selectedField}
                                     setField={this.props.setField}
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
-                                    customProps={this.props.config.settings.customFieldSelectProps}
+                                    customProps={
+                                        merge(this.props.config.settings.customFieldSelectProps, {
+                                            disabled: !!this.props.config.settings.readonlyMode
+                                        })
+                                    }
                                 />
                             </Col>
                         ) : null}
@@ -147,6 +151,7 @@ class Rule extends Component {
                                     selectedOperator={this.props.selectedOperator}
                                     setOperator={this.props.setOperator}
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
+                                    customProps={{disabled: !!this.props.config.settings.readonlyMode}}
                                 />
                             </Col>
                         )}
