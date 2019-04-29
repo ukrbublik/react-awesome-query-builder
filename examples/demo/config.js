@@ -53,7 +53,6 @@ export default {
           label2: 'MemberName', // only for menu's toggler
           type: 'text',
           tableName: null
-          // operators: ['equal']
         },
         prox1: {
           label: 'prox1',
@@ -75,8 +74,6 @@ export default {
     name2: {
       label: 'Name 2',
       type: 'text',
-      operators: ['equal', 'not_equal'],
-      defaultOperator: 'not_equal',
       mainWidgetProps: {
         formatValue: (val, fieldDef, wgtDef, isForDisplay) => (JSON.stringify(val)),
         valueLabel: 'Name2',
@@ -885,7 +882,7 @@ export default {
     deleteLabel: null,
     addGroupLabel: 'Add group',
     addRuleLabel: 'Add rule',
-    readonlyMode: true,
+    readonlyMode: false,
     notLabel: 'Not',
     showNot: true,
     showAddGroup: true,
