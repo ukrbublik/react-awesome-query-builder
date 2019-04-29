@@ -52,7 +52,7 @@ export default {
           // label: 'Subname', //'subname' should be used instead
           label2: 'MemberName', // only for menu's toggler
           type: 'text',
-          tableName: null,
+          tableName: null
           // operators: ['equal']
         },
         prox1: {
@@ -159,12 +159,12 @@ export default {
     },
     datetime: {
       label: 'DateTime',
-      type: 'datetime',
+      type: 'datetime'
       // valueSources: ['field']
     },
     datetime2: {
       label: 'DateTime2',
-      type: 'datetime',
+      type: 'datetime'
       // valueSources: ['value']
     },
     color: {
@@ -536,25 +536,25 @@ export default {
     },
     contains: {
       label: 'Contains',
-      labelForFormat: 'Contains',
+      labelForFormat: 'contains',
       reversedOp: 'not_contains',
       mongoFormatOp: () => {}
     },
     not_contains: {
       label: 'Not Contains',
-      labelForFormat: 'Not Contains',
+      labelForFormat: 'not_contains',
       reversedOp: 'contains',
       mongoFormatOp: () => {}
     },
     startswith: {
       label: 'StartsWith',
-      labelForFormat: 'StartsWith',
+      labelForFormat: 'startswith',
       reversedOp: 'not_startswith',
       mongoFormatOp: () => {}
     },
     not_startswith: {
       label: 'Not StartsWith',
-      labelForFormat: 'Not StartsWith',
+      labelForFormat: 'not_startswith',
       reversedOp: 'startswith',
       mongoFormatOp: () => {}
     },
@@ -885,7 +885,7 @@ export default {
     deleteLabel: null,
     addGroupLabel: 'Add group',
     addRuleLabel: 'Add rule',
-    readonlyMode: false,
+    readonlyMode: true,
     notLabel: 'Not',
     showNot: true,
     showAddGroup: true,

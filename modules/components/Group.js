@@ -181,17 +181,18 @@ class Group extends Component {
           :
           <ButtonGroup
             size={this.props.config.settings.renderSize || "small"}
-            disabled={false && this.props.children1.size < 2}
+            disabled={this.props.config.settings.readonlyMode}
           >
             {this.props.config.settings.showNot &&
               <Button
                 onClick={(ev) => this.props.setNot(ev, !this.props.not)}
                 type={this.props.not ? "primary" : null}
+                disabled={this.props.config.settings.readonlyMode}
               >{this.props.config.settings.notLabel}</Button>
             }
             {map(this.props.conjunctionOptions, (item, index) => (
               <Button
-                disabled={false && this.props.children1.size < 2}
+                disabled={this.props.config.settings.readonlyMode}
                 key={item.id}
                 type={item.checked ? "primary" : null}
                 onClick={this._getSetConjunctionHandler(item.key)}
