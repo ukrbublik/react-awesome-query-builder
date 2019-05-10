@@ -13,7 +13,7 @@ export default (Rule) => {
     static propTypes = {
       id: PropTypes.string.isRequired,
       config: PropTypes.object.isRequired,
-      path: PropTypes.instanceOf(Immutable.List).isRequired,
+      path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       operator: PropTypes.string,
       field: PropTypes.string,
       actions: PropTypes.object.isRequired, //{removeRule: Funciton, setField, setOperator, setOperatorOption, setValue, setValueSrc, ...}
