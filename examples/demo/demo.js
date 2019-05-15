@@ -36,7 +36,7 @@ if (!seriazlieAsImmutable) {
 } else {
   serializeTree = transit.toJSON;
   loadTree = transit.fromJSON;
-  initValue = '["~#iM",["type","group","id","9a99988a-0123-4456-b89a-b1607f326fd8","children1",["~#iOM",["8ab98baa-0123-4456-b89a-b16a57536c73",["^0",["type","rule","id","8ab98baa-0123-4456-b89a-b16a57536c73","properties",["^0",["field","members.subname","operator","equal","value",["~#iL",["1"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"valueType",["^2",["text"]]]],"path",["^2",["9a99988a-0123-4456-b89a-b1607f326fd8","8ab98baa-0123-4456-b89a-b16a57536c73"]]]],"b88bb8ab-0123-4456-b89a-b16a67428a2d",["^0",["type","rule","id","b88bb8ab-0123-4456-b89a-b16a67428a2d","properties",["^0",["field","mixin","operator","equal","value",["^2",["2"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"valueType",["^2",["text"]]]],"path",["^2",["9a99988a-0123-4456-b89a-b1607f326fd8","b88bb8ab-0123-4456-b89a-b16a67428a2d"]]]]]],"properties",["^0",["conjunction","AND","not",false]],"path",["^2",["9a99988a-0123-4456-b89a-b1607f326fd8"]]]]';
+  initValue = null;
 }
 
 export default class DemoQueryBuilder extends Component {

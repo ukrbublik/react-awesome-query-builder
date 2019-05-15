@@ -53,6 +53,7 @@ export default {
           label2: 'MemberName', // only for menu's toggler
           type: 'text',
           tableName: null
+          // operators: ['eq']
         },
         prox1: {
           label: 'prox1',
@@ -69,11 +70,13 @@ export default {
       label: 'prox2',
       type: 'text',
       operators: ['proximity'],
-      defaultOperator: 'not_equal' // will not be used
+      defaultOperator: 'neq' // will not be used
     },
     name2: {
       label: 'Name 2',
       type: 'text',
+      operators: ['eq', 'neq'],
+      defaultOperator: 'neq',
       mainWidgetProps: {
         formatValue: (val, fieldDef, wgtDef, isForDisplay) => (JSON.stringify(val)),
         valueLabel: 'Name2',
@@ -96,12 +99,12 @@ export default {
       type: 'number',
       preferWidgets: ['slider', 'rangeslider'],
       operators: [
-        'equal',
-        'not_equal',
-        'less',
-        'less_or_equal',
-        'greater',
-        'greater_or_equal',
+        'eq',
+        'neq',
+        'lt',
+        'le',
+        'gt',
+        'ge',
         'range_between',
         'range_not_between',
         'is_empty',
@@ -129,13 +132,13 @@ export default {
     date: {
       label: 'Date',
       type: 'date',
-      operators: ['greater', 'less'],
-      defaultOperator: 'less'
+      operators: ['gt', 'lt'],
+      defaultOperator: 'lt'
     },
     time: {
       label: 'Time',
       type: 'time',
-      operators: ['greater_or_equal', 'less_or_equal', 'between'],
+      operators: ['ge', 'le', 'between'],
       defaultOperator: 'between',
       widgets: {
         time: {
@@ -231,20 +234,24 @@ export default {
     mixin: {
       widgets: {
         text: {
-          defaultOperator: 'equal',
+          defaultOperator: 'eq',
           operators: [
-            'equal',
-            'not_equal',
-            'less',
-            'less_or_equal',
-            'greater',
-            'greater_or_equal',
+            'eq',
+            'neq',
+            'lt',
+            'le',
+            'gt',
+            'ge',
+            'contain',
+            'ncontain',
+            'startwith',
+            'nstartwith'
+          ]
+        },
+        number: {
+          operators: [
             'between',
-            'not_between',
-            'contains',
-            'not_contains',
-            'startswith',
-            'not_startswith'
+            'not_between'
           ]
         }
       }
@@ -254,8 +261,8 @@ export default {
         text: {
           defaultOperator: 'is_empty',
           operators: [
-            'equal',
-            'not_equal',
+            'eq',
+            'neq',
             'is_empty',
             'is_not_empty',
             'proximity'
@@ -268,8 +275,8 @@ export default {
         },
         field: {
           operators: [
-            'equal',
-            'not_equal',
+            'eq',
+            'neq',
             // note that unary ops will be excluded anyway, see getWidgetsForFieldOp()
             // 'is_empty',
             // 'is_not_empty',
@@ -281,16 +288,16 @@ export default {
     number: {
       mainWidget: 'number',
       // valueSources: ['value', 'field'],
-      defaultOperator: 'equal',
+      defaultOperator: 'eq',
       widgets: {
         number: {
           operators: [
-            'equal',
-            'not_equal',
-            'less',
-            'less_or_equal',
-            'greater',
-            'greater_or_equal',
+            'eq',
+            'neq',
+            'lt',
+            'le',
+            'gt',
+            'ge',
             'between',
             'not_between',
             'is_empty',
@@ -303,12 +310,12 @@ export default {
         },
         slider: {
           operators: [
-            'equal',
-            'not_equal',
-            'less',
-            'less_or_equal',
-            'greater',
-            'greater_or_equal'
+            'eq',
+            'neq',
+            'lt',
+            'le',
+            'gt',
+            'ge'
           ],
           widgetProps: {
             valueLabel: 'Slider',
@@ -337,12 +344,12 @@ export default {
       widgets: {
         date: {
           operators: [
-            'equal',
-            'not_equal',
-            'less',
-            'less_or_equal',
-            'greater',
-            'greater_or_equal',
+            'eq',
+            'neq',
+            'lt',
+            'le',
+            'gt',
+            'ge',
             'between',
             'not_between',
             'is_empty',
@@ -355,12 +362,12 @@ export default {
       widgets: {
         time: {
           operators: [
-            'equal',
-            'not_equal',
-            'less',
-            'less_or_equal',
-            'greater',
-            'greater_or_equal',
+            'eq',
+            'neq',
+            'lt',
+            'le',
+            'gt',
+            'ge',
             'between',
             'not_between',
             'is_empty',
@@ -373,12 +380,12 @@ export default {
       widgets: {
         datetime: {
           operators: [
-            'equal',
-            'not_equal',
-            'less',
-            'less_or_equal',
-            'greater',
-            'greater_or_equal',
+            'eq',
+            'neq',
+            'lt',
+            'le',
+            'gt',
+            'ge',
             'between',
             'not_between',
             'is_empty',
@@ -438,7 +445,7 @@ export default {
       widgets: {
         boolean: {
           operators: [
-            'equal'
+            'eq'
           ],
           widgetProps: {
             // you can enable this if you don't use fields as value sources
@@ -448,48 +455,48 @@ export default {
         },
         field: {
           operators: [
-            'equal',
-            'not_equal'
+            'eq',
+            'neq'
           ]
         }
       }
     }
   },
   operators: {
-    equal: {
+    eq: {
       label: '==',
       labelForFormat: '==',
-      reversedOp: 'not_equal',
+      reversedOp: 'neq',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } })
     },
-    not_equal: {
+    neq: {
       label: '!=',
       labelForFormat: '!=',
-      reversedOp: 'equal',
+      reversedOp: 'eq',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } })
     },
-    less: {
+    lt: {
       label: '<',
       labelForFormat: '<',
-      reversedOp: 'greater_or_equal',
+      reversedOp: 'ge',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$lt': value } })
     },
-    less_or_equal: {
+    le: {
       label: '<=',
       labelForFormat: '<=',
-      reversedOp: 'greater',
+      reversedOp: 'gt',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$lte': value } })
     },
-    greater: {
+    gt: {
       label: '>',
       labelForFormat: '>',
-      reversedOp: 'less_or_equal',
+      reversedOp: 'le',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$gt': value } })
     },
-    greater_or_equal: {
+    ge: {
       label: '>=',
       labelForFormat: '>=',
-      reversedOp: 'less',
+      reversedOp: 'lt',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$gte': value } })
     },
     between: {
@@ -531,28 +538,28 @@ export default {
       ],
       reversedOp: 'between'
     },
-    contains: {
+    contain: {
       label: 'Contains',
-      labelForFormat: 'contains',
-      reversedOp: 'not_contains',
+      labelForFormat: 'contain',
+      reversedOp: 'ncontain',
       mongoFormatOp: () => {}
     },
-    not_contains: {
+    ncontain: {
       label: 'Not Contains',
-      labelForFormat: 'not_contains',
-      reversedOp: 'contains',
+      labelForFormat: 'ncontain',
+      reversedOp: 'contain',
       mongoFormatOp: () => {}
     },
-    startswith: {
+    startwith: {
       label: 'StartsWith',
-      labelForFormat: 'startswith',
-      reversedOp: 'not_startswith',
+      labelForFormat: 'startwith',
+      reversedOp: 'nstartwith',
       mongoFormatOp: () => {}
     },
-    not_startswith: {
+    nstartwith: {
       label: 'Not StartsWith',
-      labelForFormat: 'not_startswith',
-      reversedOp: 'startswith',
+      labelForFormat: 'nstartwith',
+      reversedOp: 'startwith',
       mongoFormatOp: () => {}
     },
     range_between: {

@@ -8,7 +8,7 @@ const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import { map, last, keys } from 'lodash';
+import { map, last, keys, toString } from 'lodash';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
@@ -53,15 +53,19 @@ export default class Field extends Component {
   }
 
   filterOption = (input, option) => {
-    const isInChildren = option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 
-    const isInValue    = option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0 
-    let isInGroupLabel = false 
+    const isContain = v => toString(v).toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const { children, value, groupLabel } = option.props;
+    return isContain(groupLabel) || isContain(children) || isContain(value);
 
-    if (option.props.groupLabel) {
-      isInGroupLabel = option.props.groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0
-    }
+    // const isInChildren = option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 
+    // const isInValue    = option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0 
+    // let isInGroupLabel = false 
 
-    return(isInChildren || isInValue || isInGroupLabel)
+    // if (option.props.groupLabel) {
+    //   isInGroupLabel = option.props.groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    // }
+
+    // return(isInChildren || isInValue || isInGroupLabel)
   }
 
   getFieldDisplayLabel(field, fieldKey) {
