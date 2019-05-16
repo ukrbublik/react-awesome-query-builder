@@ -37,7 +37,10 @@ if (!seriazlieAsImmutable) {
 } else {
   serializeTree = transit.toJSON;
   loadTree = transit.fromJSON;
-  initValue = '["~#iM",["type","group","id","89ab9b9a-0123-4456-b89a-b16aba36078f","children1",["~#iOM",["898aa9aa-89ab-4cde-b012-316abea443df",["^0",["type","group","id","898aa9aa-89ab-4cde-b012-316abea443df","properties",["^0",["conjunction","AND"]],"path",["~#iL",["89ab9b9a-0123-4456-b89a-b16aba36078f","898aa9aa-89ab-4cde-b012-316abea443df"]],"children1",["^1",["abb9a898-4567-489a-bcde-f16abea443df",["^0",["type","rule","id","abb9a898-4567-489a-bcde-f16abea443df","properties",["^0",["field","name2","operator","neq","value",["^2",["2"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"conjunction","AND","valueType",["^2",["text"]]]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f","898aa9aa-89ab-4cde-b012-316abea443df","abb9a898-4567-489a-bcde-f16abea443df"]]]]]]]]]],"properties",["^0",["conjunction","AND"]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f"]]]]';
+  initValue = '["~#iM",["type","group","id","89ab9b9a-0123-4456-b89a-b16aba36078f","children1",["~#iOM",["b9babbab-cdef-4012-b456-716abf62169d",["^0",["type","rule","id","b9babbab-cdef-4012-b456-716abf62169d","properties",["^0",["field","name2","operator","neq","value",["~#iL",["1"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"valueType",["^2",["text"]]]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f","b9babbab-cdef-4012-b456-716abf62169d"]]]]]],"properties",["^0",["conjunction","AND"]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f"]]]]';
+
+  loadTree = fromJSON;
+  initValue = '{"usedFields":["mixin"],"rules":[{"id":"b8a99b99-0123-4456-b89a-b16abf5ee05c","field":"mixin","type":"mixin","input":"text","operator":"eq","values":[{"type":"text","value":"1"}]},{"rules":[{"id":"9b8a8abb-cdef-4012-b456-716abf859b50","field":"mixin","type":"mixin","input":"text","operator":"le","values":[{"type":"text","value":"2"}]}],"condition":"AND"}],"condition":"AND"}';
 }
 
 export default class DemoQueryBuilder extends Component {
@@ -55,6 +58,9 @@ export default class DemoQueryBuilder extends Component {
           };
         }
       })();
+
+      console.log('tree', props.tree);
+      console.log('trans.tree', transFromJSON);
 
       return (
           <div style={{padding: '10px'}}>
@@ -84,10 +90,20 @@ export default class DemoQueryBuilder extends Component {
               </div>
               <hr/> */}
               <div>
-                queryBuilderFormat:
-                  <pre style={jsonStyle}>
-                    {stringify(queryBuilderJSON, undefined, 2)}
-                  </pre>
+                <Row>
+                  <Col span={12}>
+                    queryBuilderFormat:
+                    <pre style={jsonStyle}>
+                      {stringify(queryBuilderJSON, undefined, 2)}
+                    </pre>
+                  </Col>
+                  <Col span={12}>
+                    queryBuilderFormat:
+                    <pre style={jsonStyle}>
+                      {stringify(queryBuilderJSON)}
+                    </pre>
+                  </Col>
+                </Row>
               </div>
               <hr/>
               <div>

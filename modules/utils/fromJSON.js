@@ -1,30 +1,29 @@
-import { Map, OrderedMap } from 'immutable';
+import { Map, List, OrderedMap } from 'immutable';
 import { get, map, isArray, isString, each, isEmpty } from 'lodash';
 import uuid from './uuid';
 
 export default function fromJSON(data, config, options = {}) {
   const json = isString(data) ? JSON.parse(data) : (data || {});
-  console.log(json, 'json');
   if (options.type === 'rule') {
     const { id = uuid(), field, operator, values, operatorOptions = null } = json;
-    const path = (options.path || []).concat(id);
+    const path = (options.path || new List()).concat(id);
     return new Map({
       type: 'rule',
       id,
-      properties: {
+      properties: new Map({
         field,
         operator,
-        value: map(values, 'value'),
-        valueSrc: map(values, () => 'value'),
+        value: new List(map(values, 'value')),
+        valueSrc: new List(map(values, () => 'value')),
         operatorOptions,
-        valueType: map(values, 'type')
-      },
+        valueType: new List(map(values, 'type'))
+      }),
       path
     });
   }
 
   const { id = uuid(), rules, condition, not } = json;
-  const path = (options.path || []).concat(id);
+  const path = (options.path || new List()).concat(id);
   return new Map({
     type: 'group',
     id,
@@ -42,10 +41,10 @@ export default function fromJSON(data, config, options = {}) {
       }
       return undefined;
     })(),
-    properties: {
+    properties: new Map({
       conjunction: condition,
       not
-    },
+    }),
     path
   });
 }
