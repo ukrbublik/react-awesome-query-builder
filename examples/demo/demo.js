@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { Row, Col } from 'antd';
 import {Query, Builder, Utils} from '../../modules';
 import config from './config';
 // import '../../css/reset.less';
@@ -7,7 +8,7 @@ import '../../css/compact_styles.less';
 import '../../css/denormalize.less';
 import { fromJS } from 'immutable';
 
-const {queryBuilderFormat, queryString, mongodbFormat} = Utils;
+const {queryBuilderFormat, queryString, mongodbFormat, fromJSON} = Utils;
 const stringify = require('json-stringify-safe');
 const Immutable = require('immutable');
 const transit = require('transit-immutable-js');
@@ -36,19 +37,32 @@ if (!seriazlieAsImmutable) {
 } else {
   serializeTree = transit.toJSON;
   loadTree = transit.fromJSON;
-  initValue = null;
+  initValue = '["~#iM",["type","group","id","89ab9b9a-0123-4456-b89a-b16aba36078f","children1",["~#iOM",["898aa9aa-89ab-4cde-b012-316abea443df",["^0",["type","group","id","898aa9aa-89ab-4cde-b012-316abea443df","properties",["^0",["conjunction","AND"]],"path",["~#iL",["89ab9b9a-0123-4456-b89a-b16aba36078f","898aa9aa-89ab-4cde-b012-316abea443df"]],"children1",["^1",["abb9a898-4567-489a-bcde-f16abea443df",["^0",["type","rule","id","abb9a898-4567-489a-bcde-f16abea443df","properties",["^0",["field","name2","operator","neq","value",["^2",["2"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"conjunction","AND","valueType",["^2",["text"]]]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f","898aa9aa-89ab-4cde-b012-316abea443df","abb9a898-4567-489a-bcde-f16abea443df"]]]]]]]]]],"properties",["^0",["conjunction","AND"]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f"]]]]';
 }
 
 export default class DemoQueryBuilder extends Component {
     getChildren(props) {
       const jsonStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
+
+      const queryBuilderJSON = queryBuilderFormat(props.tree, props.config);
+      const transFromJSON = (() => {
+        try {
+          return fromJSON(JSON.stringify(queryBuilderJSON), props.config);
+        } catch (error) {
+          console.log('transFromJSON.error', error);
+          return {
+            error
+          };
+        }
+      })();
+
       return (
           <div style={{padding: '10px'}}>
               <div className="query-builder">
                   <Builder {...props} />
               </div>
               <br />
-              <div>
+              {/* <div>
                 stringFormat:
                 <pre style={jsonStyle}>
                   {queryString(props.tree, props.config)}
@@ -68,19 +82,29 @@ export default class DemoQueryBuilder extends Component {
                     {stringify(mongodbFormat(props.tree, props.config), undefined, 2)}
                   </pre>
               </div>
-              <hr/>
+              <hr/> */}
               <div>
                 queryBuilderFormat:
                   <pre style={jsonStyle}>
-                    {stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)}
+                    {stringify(queryBuilderJSON, undefined, 2)}
                   </pre>
               </div>
               <hr/>
               <div>
-                Tree:
-                <pre style={jsonStyle}>
-                  {stringify(props.tree, undefined, 2)}
-                </pre>
+                <Row>
+                  <Col span={12}>
+                    Tree:
+                    <pre style={jsonStyle}>
+                      {stringify(props.tree, undefined, 2)}
+                    </pre>
+                  </Col>
+                  <Col span={12}>
+                    Tree:
+                    <pre style={jsonStyle}>
+                      {stringify(transFromJSON, undefined, 2)}
+                    </pre>
+                  </Col>
+                </Row>
               </div>
               <hr/>
               <div>
