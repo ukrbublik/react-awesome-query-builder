@@ -6,6 +6,7 @@ import config from './config';
 import '../../css/styles.less';
 import '../../css/compact_styles.less';
 import '../../css/denormalize.less';
+// import '../../css/bdh.less';
 import { fromJS } from 'immutable';
 
 const {queryBuilderFormat, queryString, mongodbFormat, fromJSON} = Utils;
@@ -37,10 +38,10 @@ if (!seriazlieAsImmutable) {
 } else {
   serializeTree = transit.toJSON;
   loadTree = transit.fromJSON;
-  initValue = '["~#iM",["type","group","id","89ab9b9a-0123-4456-b89a-b16aba36078f","children1",["~#iOM",["b9babbab-cdef-4012-b456-716abf62169d",["^0",["type","rule","id","b9babbab-cdef-4012-b456-716abf62169d","properties",["^0",["field","name2","operator","neq","value",["~#iL",["1"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"valueType",["^2",["text"]]]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f","b9babbab-cdef-4012-b456-716abf62169d"]]]]]],"properties",["^0",["conjunction","AND"]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f"]]]]';
+  initValue = '["~#iM",["type","group","id","89ab9b9a-0123-4456-b89a-b16aba36078f","children1",["~#iOM",["aa98b889-89ab-4cde-b012-316ac473d51d",["^0",["type","group","id","aa98b889-89ab-4cde-b012-316ac473d51d","properties",["^0",["conjunction","AND"]],"path",["~#iL",["89ab9b9a-0123-4456-b89a-b16aba36078f","aa98b889-89ab-4cde-b012-316ac473d51d"]],"children1",["^1",["aba999b9-4567-489a-bcde-f16ac473d51d",["^0",["type","rule","id","aba999b9-4567-489a-bcde-f16ac473d51d","properties",["^0",["field","mixin","operator","eq","value",["^2",["2"]],"valueSrc",["^2",["value"]],"operatorOptions",null,"conjunction","AND","valueType",["^2",["text"]]]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f","aa98b889-89ab-4cde-b012-316ac473d51d","aba999b9-4567-489a-bcde-f16ac473d51d"]]]]]]]]]],"properties",["^0",["conjunction","AND"]],"path",["^2",["89ab9b9a-0123-4456-b89a-b16aba36078f"]]]]';
 
   loadTree = fromJSON;
-  initValue = '{"usedFields":["mixin"],"rules":[{"id":"b8a99b99-0123-4456-b89a-b16abf5ee05c","field":"mixin","type":"mixin","input":"text","operator":"eq","values":[{"type":"text","value":"1"}]},{"rules":[{"id":"9b8a8abb-cdef-4012-b456-716abf859b50","field":"mixin","type":"mixin","input":"text","operator":"le","values":[{"type":"text","value":"2"}]}],"condition":"AND"}],"condition":"AND"}';
+  initValue = '{"usedFields":["mixin"],"rules":[{"rules":[{"id":"aba999b9-4567-489a-bcde-f16ac473d51d","field":"mixin","type":"mixin","input":"text","operator":"eq","values":[{"type":"text","value":"2"}]}],"condition":"AND"}],"condition":"AND"}';
 }
 
 export default class DemoQueryBuilder extends Component {

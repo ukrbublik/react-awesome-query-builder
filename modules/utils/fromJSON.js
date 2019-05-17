@@ -31,7 +31,8 @@ export default function fromJSON(data, config, options = {}) {
       if (!isEmpty(rules)) {
         let item = new OrderedMap();
         each(rules, rule => {
-          item = item.set(get(rule, 'id', uuid()), fromJSON(rule, config, {
+          const ruleId = get(rule, 'id', uuid());
+          item = item.set(ruleId, fromJSON({ id: ruleId, ...rule }, config, {
             type: isArray(rule.rules) ? 'group' : 'rule',
             // type: 'rule',
             path
