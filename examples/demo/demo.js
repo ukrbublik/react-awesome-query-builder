@@ -69,7 +69,7 @@ export default class DemoQueryBuilder extends Component {
                   <Builder {...props} />
               </div>
               <br />
-              {/* <div>
+              <div>
                 stringFormat:
                 <pre style={jsonStyle}>
                   {queryString(props.tree, props.config)}
@@ -89,7 +89,7 @@ export default class DemoQueryBuilder extends Component {
                     {stringify(mongodbFormat(props.tree, props.config), undefined, 2)}
                   </pre>
               </div>
-              <hr/> */}
+              <hr/>
               <div>
                 <Row>
                   <Col span={12}>
@@ -139,7 +139,7 @@ export default class DemoQueryBuilder extends Component {
       return (
           <div>
             <Query
-              value={loadTree(initValue)}
+              value={undefined}
               { ...configProps }
               get_children={this.getChildren}
               onChange={this.onChange.bind(this)}
