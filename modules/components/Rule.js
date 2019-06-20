@@ -106,7 +106,7 @@ class Rule extends Component {
                 <div className="rule--header">
                     {!this.props.config.settings.readonlyMode && 
                         this.props.config.settings.deleteLabel === null ? (
-                            <Icon type="close-circle" className="action--DELETE-RULE" onClick={this.props.removeSelf} size={this.props.config.settings.renderSize || "small"} />
+                            <Icon type="close-circle" theme="filled" className="action--DELETE-RULE" onClick={this.props.removeSelf} size={this.props.config.settings.renderSize || "small"} />
                         ) : (
                             <Button
                                 type="danger"
