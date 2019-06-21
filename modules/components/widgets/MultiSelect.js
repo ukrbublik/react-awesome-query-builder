@@ -60,11 +60,11 @@ export default class MultiSelectWidget extends Component {
         <Select
             mode={"multiple"}
             style={{
-              minWidth: value ? null : this.placeholderWidth + 40,
-              width: this.props.value ? null : this.placeholderWidth + 40,
+              minWidth: value ? null : this.placeholderWidth + 60,
+              width: this.props.value ? null : this.placeholderWidth + 60,
             }}
             dropdownStyle={{
-              width: this.optionsMaxWidth + 40,
+              width: this.optionsMaxWidth + 60,
             }}
             key={"widget-multiselect"}
             dropdownMatchSelectWidth={false}
