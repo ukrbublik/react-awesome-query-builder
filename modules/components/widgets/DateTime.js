@@ -31,7 +31,7 @@ export default class DateTimeWidget extends Component {
             setValue(null);
         }
 
-        moment.locale(this.props.config.settings.locale.short);
+        this.props.config.settings.locale.moment && moment.locale(this.props.config.settings.locale.moment);
     }
 
     static defaultProps = {

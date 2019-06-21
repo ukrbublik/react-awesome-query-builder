@@ -320,8 +320,7 @@ export default {
   // 设置
   settings: {
     locale: {
-      short: 'en',
-      full: 'en-US',
+      moment: 'en',
       antd: enUS
     },
     maxLabelsLength: 50,
