@@ -20,11 +20,13 @@ const {
 
 const { ProximityOperator } = Operators
 
+const fm = v => (v || '').split('.').pop()
+
 export default {
   // 逻辑关系（Group中条件的与非）
   conjunctions: {
     AND: {
-      label: 'And',
+      label: fm('common.logic.and'),
       mongoConj: '$and',
       reversedConj: 'OR',
       formatConj: (children, conj, not, isForDisplay) => {
@@ -34,7 +36,7 @@ export default {
       }
     },
     OR: {
-      label: 'Or',
+      label: fm('common.logic.or'),
       mongoConj: '$or',
       reversedConj: 'AND',
       formatConj: (children, conj, not, isForDisplay) => {
@@ -46,6 +48,11 @@ export default {
   },
   // 字段（表达式左边）
   fields: {
+    tag: {
+      label: 'tag',
+      type: 'tag',
+      defaultOperator: 'eq'
+    },
     dataset_0: {
       label: 'Dataset_0',
       type: '!struct',
@@ -65,6 +72,19 @@ export default {
   },
   // 字段类型（字段类型影响操作符和格式化结果）
   types: {
+    tag: {
+      widgets: {
+        tag: {
+          defaultOperator: 'eq',
+          operators: [
+            'eq'
+          ],
+          widgetProps: {
+            customProps: {}
+          }
+        }
+      }
+    },
     text: {
       widgets: {
         text: {
@@ -83,9 +103,7 @@ export default {
             'nexists'
           ],
           widgetProps: {
-            formatValue: (val, fieldDef, wgtDef, isForDisplay) => (JSON.stringify(val)),
-            valueLabel: 'Text',
-            valuePlaceholder: 'Enter text'
+            formatValue: (val, fieldDef, wgtDef, isForDisplay) => (JSON.stringify(val))
           }
         },
         multiselect: {
@@ -105,6 +123,7 @@ export default {
     array: {
       widgets: {
         multiselect: {
+          defaultOperator: 'intersection',
           operators: [
             'intersection',
             'nintersection',
@@ -124,43 +143,43 @@ export default {
   // 操作符（表达式中间）
   operators: {
     eq: {
-      label: '==',
+      label: fm('form.builder.operator.eq'),
       labelForFormat: '==',
       reversedOp: 'neq',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } })
     },
     neq: {
-      label: '!=',
+      label: fm('form.builder.operator.neq'),
       labelForFormat: '!=',
       reversedOp: 'eq',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } })
     },
     lt: {
-      label: '<',
+      label: fm('form.builder.operator.lt'),
       labelForFormat: '<',
       reversedOp: 'ge',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$lt': value } })
     },
     le: {
-      label: '<=',
+      label: fm('form.builder.operator.le'),
       labelForFormat: '<=',
       reversedOp: 'gt',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$lte': value } })
     },
     gt: {
-      label: '>',
+      label: fm('form.builder.operator.gt'),
       labelForFormat: '>',
       reversedOp: 'le',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$gt': value } })
     },
     ge: {
-      label: '>=',
+      label: fm('form.builder.operator.ge'),
       labelForFormat: '>=',
       reversedOp: 'lt',
       mongoFormatOp: (field, op, value) => ({ [field]: { '$gte': value } })
     },
     between: {
-      label: 'Between',
+      label: fm('form.builder.operator.between'),
       labelForFormat: 'BETWEEN',
       cardinality: 2,
       formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
@@ -174,57 +193,57 @@ export default {
       },
       mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
       valueLabels: [
-        'Value from',
-        'Value to'
+        fm('form.builder.operator.betweenFrom'),
+        fm('form.builder.operator.betweenTo')
       ],
       textSeparators: [
         null,
-        'and'
+        fm('form.builder.operator.betweenAnd')
       ],
       reversedOp: 'not_between'
     },
     not_between: {
-      label: 'Not between',
+      label: fm('form.builder.operator.notBetween'),
       labelForFormat: 'NOT BETWEEN',
       cardinality: 2,
       mongoFormatOp: (field, op, values) => ({ [field]: { '$not': { '$gte': values[0], '$lte': values[1] } } }),
       valueLabels: [
-        'Value from',
-        'Value to'
+        fm('form.builder.operator.betweenFrom'),
+        fm('form.builder.operator.betweenTo')
       ],
       textSeparators: [
         null,
-        'and'
+        fm('form.builder.operator.betweenAnd')
       ],
       reversedOp: 'between'
     },
     contains: {
-      label: 'Contains',
+      label: fm('form.builder.operator.contains'),
       labelForFormat: 'contains',
       reversedOp: 'ncontains',
       mongoFormatOp: () => {}
     },
     ncontains: {
-      label: 'Not Contains',
+      label: fm('form.builder.operator.ncontains'),
       labelForFormat: 'ncontains',
       reversedOp: 'contains',
       mongoFormatOp: () => {}
     },
     startwith: {
-      label: 'StartsWith',
+      label: fm('form.builder.operator.startwith'),
       labelForFormat: 'startwith',
       reversedOp: 'nstartwith',
       mongoFormatOp: () => {}
     },
     nstartwith: {
-      label: 'Not StartsWith',
+      label: fm('form.builder.operator.nstartwith'),
       labelForFormat: 'nstartwith',
       reversedOp: 'startwith',
       mongoFormatOp: () => {}
     },
     exists: {
       isUnary: true,
-      label: 'Is Exists',
+      label: fm('form.builder.operator.exists'),
       labelForFormat: 'IS EXISTS',
       cardinality: 0,
       reversedOp: 'nexists',
@@ -235,7 +254,7 @@ export default {
     },
     nexists: {
       isUnary: true,
-      label: 'Is Not Exists',
+      label: fm('form.builder.operator.nexists'),
       labelForFormat: 'IS NOT EXISTS',
       cardinality: 0,
       reversedOp: 'exists',
@@ -245,7 +264,7 @@ export default {
       mongoFormatOp: (field, op) => ({ [field]: { '$exists': false } })
     },
     in: {
-      label: 'In',
+      label: fm('form.builder.operator.in'),
       labelForFormat: 'IN',
       formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
         if (valueSrc === 'value') {
@@ -257,7 +276,7 @@ export default {
       mongoFormatOp: (field, op, values) => ({ [field]: { '$in': values } })
     },
     intersection: {
-      label: 'intersection',
+      label: fm('form.builder.operator.intersection'),
       labelForFormat: 'Intersection',
       formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
         if (valueSrc === 'value') {
@@ -269,7 +288,7 @@ export default {
       mongoFormatOp: (field, op, values) => ({})
     },
     nintersection: {
-      label: 'nintersection',
+      label: fm('form.builder.operator.nintersection'),
       labelForFormat: 'Nintersection',
       formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
         if (valueSrc === 'value') {
@@ -281,7 +300,7 @@ export default {
       mongoFormatOp: (field, op, values) => ({})
     },
     issubset: {
-      label: 'issubset',
+      label: fm('form.builder.operator.issubset'),
       labelForFormat: 'Issubset',
       formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
         if (valueSrc === 'value') {
@@ -295,6 +314,14 @@ export default {
   },
   // 组建（表达式右边）
   widgets: {
+    tag: {
+      type: 'tag',
+      valueSrc: 'value',
+      factory: (props) => <TextWidget {...props} />,
+      formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+        return isForDisplay ? '\'' + val + '\'' : JSON.stringify(val)
+      }
+    },
     text: {
       type: 'text',
       valueSrc: 'value',
@@ -335,25 +362,27 @@ export default {
     setOpOnChangeField: ['keep', 'default'],
     clearValueOnChangeField: false,
     clearValueOnChangeOp: false,
-    setDefaultFieldAndOp: false,
+    setDefaultFieldAndOp: true,
+    defaultField: 'tag',
+    defaultOperator: () => 'eq',
     maxNesting: 10,
     fieldSeparator: '.',
     fieldSeparatorDisplay: '->',
     showLabels: false,
-    valueLabel: 'Value',
-    valuePlaceholder: 'Value',
-    fieldLabel: 'Field',
-    operatorLabel: 'Operator',
-    fieldPlaceholder: 'Select field',
-    operatorPlaceholder: 'Select operator',
+    valueLabel: fm('form.builder.value'),
+    valuePlaceholder: fm('form.builder.valuePlaceholder'),
+    fieldLabel: fm('form.builder.field'),
+    operatorLabel: fm('form.builder.operator'),
+    fieldPlaceholder: fm('form.builder.fieldPlaceholder'),
+    operatorPlaceholder: fm('form.builder.operatorPlaceholder'),
     deleteLabel: null,
-    addGroupLabel: 'Add group',
-    addRuleLabel: 'Add rule',
+    addGroupLabel: fm('form.builder.addGroup'),
+    addRuleLabel: fm('form.builder.addRule'),
     readonlyMode: false,
-    notLabel: 'Not',
+    notLabel: fm('common.logic.not'),
     showNot: true,
     showAddGroup: true,
-    delGroupLabel: null,
+    delGroupLabel: fm('form.builder.removeGroup'),
     canLeaveEmptyGroup: true,
     formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
       if (isForDisplay) {
