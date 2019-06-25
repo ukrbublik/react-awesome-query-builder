@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
-import { range, map, merge } from 'lodash';
+import { range, merge } from 'lodash';
 import {
     getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
@@ -101,6 +101,7 @@ export default (Widget) => {
             if (isSpecialRange && value[0] === undefined && value[1] === undefined)
                 value = undefined;
             let widgetProps = Object.assign({}, fieldWidgetProps, {
+                path: this.props.path,
                 config: this.props.config,
                 field: this.props.field,
                 operator: this.props.operator,

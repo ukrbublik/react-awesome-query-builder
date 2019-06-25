@@ -31,7 +31,7 @@ class Rule extends Component {
         renderType: PropTypes.string, //'dragging', 'placeholder', null
         value: PropTypes.any, //depends on widget
         valueSrc: PropTypes.any,
-        //path: PropTypes.instanceOf(Immutable.List),
+        path: PropTypes.any, //(Immutable.List),
         //actions
         setField: PropTypes.func,
         setOperator: PropTypes.func,
@@ -181,6 +181,7 @@ class Rule extends Component {
                                   config={this.props.config}
                                   setValue={this.props.setValue}
                                   setValueSrc={this.props.setValueSrc}
+                                  path={this.props.path}
                                 />
                             </Col>
                         }
