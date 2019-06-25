@@ -51,7 +51,8 @@ export default {
     tag: {
       label: 'tag',
       type: 'tag',
-      defaultOperator: 'eq'
+      defaultOperator: 'eq',
+      valueSources: ['value']
     },
     dataset_0: {
       label: 'Dataset_0',

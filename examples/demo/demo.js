@@ -53,15 +53,15 @@ export default class DemoQueryBuilder extends Component {
         try {
           return fromJSON(JSON.stringify(queryBuilderJSON), props.config);
         } catch (error) {
-          console.log('transFromJSON.error', error);
+          // console.log('transFromJSON.error', error);
           return {
             error
           };
         }
       })();
 
-      console.log('tree', props.tree);
-      console.log('trans.tree', transFromJSON);
+      // console.log('tree', props.tree);
+      // console.log('trans.tree', transFromJSON);
 
       return (
           <div style={{padding: '10px'}}>
@@ -153,6 +153,6 @@ export default class DemoQueryBuilder extends Component {
         tree: transit.toJSON(tree),
         json: JSON.stringify(queryBuilderFormat(tree, config))
       };
-      console.log(data, 'data');
+      // console.log(data, 'data');
     }
 }
