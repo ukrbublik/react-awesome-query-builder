@@ -32,6 +32,7 @@ class Rule extends Component {
         value: PropTypes.any, //depends on widget
         valueSrc: PropTypes.any,
         path: PropTypes.any, //(Immutable.List),
+        groupPath: PropTypes.any, //(Immutable.List),
         //actions
         setField: PropTypes.func,
         setOperator: PropTypes.func,
@@ -182,6 +183,7 @@ class Rule extends Component {
                                   setValue={this.props.setValue}
                                   setValueSrc={this.props.setValueSrc}
                                   path={this.props.path}
+                                  groupPath={this.props.groupPath}
                                 />
                             </Col>
                         }

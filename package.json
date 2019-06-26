@@ -1,6 +1,6 @@
 {
   "name": "react-query-builder-antd3",
-  "version": "0.2.27",
+  "version": "0.2.30",
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactAwesomeQueryBuilder.js",

@@ -18,6 +18,7 @@ export default class TextWidget extends Component {
 
   handleChange = () => {
     this.props.setValue(ReactDOM.findDOMNode(this.refs.text).value);
+    // this.props.actions.addRule(this.props.groupPath);
   }
 
   render() {

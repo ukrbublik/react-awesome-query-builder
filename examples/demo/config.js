@@ -3,6 +3,7 @@ import moment from 'moment'
 import enUS from 'antd/lib/locale-provider/en_US'
 // import ru_RU from 'antd/lib/locale-provider/ru_RU'
 import { Widgets, Operators } from '../../modules'
+import { addRule } from '../../modules/actions/tree'
 
 const {
   TextWidget,
@@ -321,7 +322,8 @@ export default {
       factory: (props) => <TextWidget {...props} />,
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
         return isForDisplay ? '\'' + val + '\'' : JSON.stringify(val)
-      }
+      },
+      actions: { addRule }
     },
     text: {
       type: 'text',

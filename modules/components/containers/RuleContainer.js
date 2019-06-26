@@ -117,6 +117,7 @@ export default (Rule) => {
               treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
               path={this.props.path}
+              groupPath={this.props.groupPath}
             />
           ), (
             <Rule
@@ -138,6 +139,7 @@ export default (Rule) => {
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}
               path={this.props.path}
+              groupPath={this.props.groupPath}
             />
           )]}
         </div>

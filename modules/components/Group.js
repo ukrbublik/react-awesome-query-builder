@@ -144,6 +144,7 @@ class Group extends Component {
         id={item.get('id')}
         //path={props.path.push(item.get('id'))}
         path={item.get('path')}
+        groupPath={this.props.path}
         type={item.get('type')}
         properties={item.get('properties')}
         config={props.config}

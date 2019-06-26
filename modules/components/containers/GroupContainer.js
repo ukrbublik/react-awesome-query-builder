@@ -144,6 +144,7 @@ export default (Group) => {
               //tree={this.props.tree}
               treeNodesCnt={this.props.treeNodesCnt}
               dragging={this.props.dragging}
+              path={this.props.path}
             />
           ), (
             <Group
@@ -166,6 +167,7 @@ export default (Group) => {
               treeNodesCnt={this.props.treeNodesCnt}
               onDragStart={this.props.onDragStart}
               dragging={this.props.dragging}
+              path={this.props.path}
             />
           )]}
         </div>

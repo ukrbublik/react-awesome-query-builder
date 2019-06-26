@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
@@ -8,12 +9,13 @@ import {
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
 import {defaultValue} from "../../utils/stuff";
+import {bindActionCreators} from "../../utils/stuff";
 import { Icon, Popover, Button, Radio } from 'antd';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
 export default (Widget) => {
-    return class WidgetContainer extends Component {
+    return connect()(class WidgetContainer extends Component {
         static propTypes = {
             config: PropTypes.object.isRequired,
             value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
@@ -102,6 +104,7 @@ export default (Widget) => {
                 value = undefined;
             let widgetProps = Object.assign({}, fieldWidgetProps, {
                 path: this.props.path,
+                groupPath: this.props.groupPath,
                 config: this.props.config,
                 field: this.props.field,
                 operator: this.props.operator,
@@ -114,6 +117,10 @@ export default (Widget) => {
                 textSeparators: textSeparators,
                 setValue: this._getSetValueHandler(isSpecialRange, delta, widgetType),
             });
+
+            if (widgetProps.actions) {
+                widgetProps.actions = bindActionCreators({...widgetProps.actions}, widgetProps.config, this.props.dispatch);
+            }
             
             if (widget == 'field') {
                 //
@@ -238,5 +245,5 @@ export default (Widget) => {
                 </Widget>
             );
         }
-    };
+    });
 };

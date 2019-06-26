@@ -121,7 +121,10 @@ export default class Query extends Component {
         const store = createTreeStore(config);
 
         this.state = {
-            store: createStore(store)
+            store: createStore(
+                store,
+                window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+            )
         };
     }
 

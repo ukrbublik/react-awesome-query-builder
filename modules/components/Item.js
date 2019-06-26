@@ -14,6 +14,7 @@ const typeMap = {
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}
+      groupPath={props.groupPath}
       actions={props.actions}
       treeNodesCnt={props.treeNodesCnt}
       config={props.config}
