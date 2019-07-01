@@ -137,6 +137,7 @@ class Rule extends Component {
                                     selectedField={this.props.selectedField}
                                     setField={this.props.setField}
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
+                                    renderFieldAsLabel={this.props.config.settings.renderFieldAsLabel}
                                     customProps={
                                         merge(this.props.config.settings.customFieldSelectProps, {
                                             disabled: !!this.props.config.settings.readonlyMode

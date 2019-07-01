@@ -173,9 +173,14 @@ export default class Field extends Component {
     //let tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
+    const renderFieldAsLabel = this.props.renderFieldAsLabel;
 
-    let fieldSelect = (
-        <Select
+    if (renderFieldAsLabel && this.props.selectedField) {
+        return <span {...customProps}>
+            {fieldDisplayLabel || this.props.selectedField || undefined}
+        </span>;
+    } else {
+        return <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
             style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 48 }}
@@ -186,10 +191,8 @@ export default class Field extends Component {
             value={this.props.selectedField || undefined}
             filterOption={this.filterOption}
             {...customProps}
-        >{fieldSelectItems}</Select>
-    );
-
-    return fieldSelect;
+        >{fieldSelectItems}</Select>;
+    }
   }
 
   renderAsDropdown() {

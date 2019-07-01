@@ -70,10 +70,48 @@ export default {
           tableName: null
         }
       }
+    },
+    dateRange: {
+      label: 'dateRange',
+      type: 'dateRange'
+    },
+    frequencyRange: {
+      label: 'frequencyRange',
+      type: 'frequencyRange'
     }
   },
   // 字段类型（字段类型影响操作符和格式化结果）
   types: {
+    dateRange: {
+      widgets: {
+        number: {
+          operators: [
+            'gt',
+            'ge',
+            'lt',
+            'le'
+          ]
+        },
+        date: {
+          operators: [
+            'between'
+          ]
+        }
+      }
+    },
+    frequencyRange: {
+      widgets: {
+        number: {
+          operators: [
+            'gt',
+            'ge',
+            'lt',
+            'le',
+            'between'
+          ]
+        }
+      }
+    },
     tag: {
       widgets: {
         tag: {
@@ -345,6 +383,27 @@ export default {
         let valsLabels = vals.map(v => fieldDef.listValues && fieldDef.listValues[v] ? fieldDef.listValues[v] : v)
         return isForDisplay ? valsLabels.map(v => '\'' + v + '\'') : vals.map(v => JSON.stringify(v))
       }
+    },
+    number: {
+      type: 'number',
+      valueSrc: 'value',
+      factory: (props) => <NumberWidget {...props} />,
+      valueLabel: 'Number',
+      valuePlaceholder: 'Enter number',
+      formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+        return isForDisplay ? val : JSON.stringify(val)
+      }
+    },
+    date: {
+      type: 'date',
+      valueSrc: 'value',
+      factory: (props) => <DateWidget {...props} />,
+      dateFormat: 'DD.MM.YYYY',
+      valueFormat: 'YYYY-MM-DD',
+      formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+        let dateVal = moment(val, wgtDef.valueFormat)
+        return isForDisplay ? '\'' + dateVal.format(wgtDef.dateFormat) + '\'' : JSON.stringify(val)
+      }
     }
   },
   // 设置
@@ -358,6 +417,7 @@ export default {
     renderSize: 'small',
     renderConjsAsRadios: false,
     renderFieldAndOpAsDropdown: false,
+    renderFieldAsLabel: true,
     customFieldSelectProps: {
       showSearch: true
     },
@@ -365,9 +425,10 @@ export default {
     setOpOnChangeField: ['keep', 'default'],
     clearValueOnChangeField: false,
     clearValueOnChangeOp: false,
-    setDefaultFieldAndOp: true,
-    defaultField: 'tag',
-    defaultOperator: () => 'eq',
+    setDefaultFieldAndOp: false,
+    // setDefaultFieldAndOp: true,
+    // defaultField: 'tag',
+    // defaultOperator: () => 'eq',
     maxNesting: 10,
     fieldSeparator: '.',
     fieldSeparatorDisplay: '->',
