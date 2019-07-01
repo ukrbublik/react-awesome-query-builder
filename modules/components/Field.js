@@ -176,7 +176,8 @@ export default class Field extends Component {
     const renderFieldAsLabel = this.props.renderFieldAsLabel;
 
     if (renderFieldAsLabel && this.props.selectedField) {
-        return <span {...customProps}>
+        const { showSearch, ...others } = customProps;
+        return <span {...others}>
             {fieldDisplayLabel || this.props.selectedField || undefined}
         </span>;
     } else {
