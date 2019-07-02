@@ -69,7 +69,8 @@ export const queryString = (item, config, isForDisplay = false) => {
                         currentValue,
                         pick(fieldDefinition, ['fieldSettings', 'listValues']),
                         omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue']), //useful options: valueFormat for date/time
-                        isForDisplay
+                        isForDisplay,
+                        index: ind
                     ];
                     if (valueSrc == 'field') {
                         let valFieldDefinition = getFieldConfig(currentValue, config) || {}; 

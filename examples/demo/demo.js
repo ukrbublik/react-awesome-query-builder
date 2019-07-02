@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { Row, Col } from 'antd';
 import {Query, Builder, Utils} from '../../modules';
-import config from './config';
+import config from './config.sample';
 // import config from './config';
 // import '../../css/reset.less';
 import '../../css/styles.less';
