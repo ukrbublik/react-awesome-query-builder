@@ -55,15 +55,19 @@ export default class Field extends Component {
   }
 
   filterOption = (input, option) => {
-    const isInChildren = option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0 
-    const isInValue    = option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0 
-    let isInGroupLabel = false 
+    const { value, groupLabel } = option.props;
 
-    if (option.props.groupLabel) {
-      isInGroupLabel = option.props.groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    let isInValue = false;
+    if (typeof value === 'string') {
+        isInValue = value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     }
 
-    return(isInChildren || isInValue || isInGroupLabel)
+    let isInGroupLabel = false;
+    if (typeof groupLabel === 'string') {
+        isInGroupLabel = groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    }
+
+    return isInValue || isInGroupLabel;
   }
 
   getFieldDisplayLabel(field, fieldKey) {
