@@ -55,7 +55,12 @@ export default class Field extends Component {
   }
 
   filterOption = (input, option) => {
-    const { value, groupLabel } = option.props;
+    const { value, groupLabel, children } = option.props;
+
+    let isInChildren = false;
+    if (typeof children === 'string') {
+        isInChildren = children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    }
 
     let isInValue = false;
     if (typeof value === 'string') {
@@ -67,7 +72,7 @@ export default class Field extends Component {
         isInGroupLabel = groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0;
     }
 
-    return isInValue || isInGroupLabel;
+    return isInChildren || isInValue || isInGroupLabel;
   }
 
   getFieldDisplayLabel(field, fieldKey) {
