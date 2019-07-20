@@ -114,6 +114,7 @@ export default class RangeWidget extends Component {
           <Slider
             ref="slider"
             value={value}
+            tipFormatter={(val) => (val != undefined ? val.toString() : '')}
             min={min}
             max={max}
             step={step}

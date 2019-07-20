@@ -67,6 +67,7 @@ export default class SliderWidget extends Component {
           <Slider
             ref="slider"
             value={value}
+            tipFormatter={(val) => (val != undefined ? val.toString() : undefined)}
             min={min}
             max={max}
             included={false}

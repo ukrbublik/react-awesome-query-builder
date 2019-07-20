@@ -53,7 +53,7 @@ class ConnectedQuery extends Component {
         const newConfig = nextProps.config;
         const oldValidatedTree = this.validatedTree;
 
-        if (oldConfig != newConfig) {
+        if (oldConfig !== newConfig) {
             this._updateActions(nextProps);
         }
 
