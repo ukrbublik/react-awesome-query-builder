@@ -9,12 +9,8 @@ Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
 
 Using awesome [Ant Design](https://ant.design/) for widgets
 
-Master branch uses [antd v2](https://2x.ant.design/docs/react/introduce) (because of more compact style) and versions `0.1.*`.
-For [antd v3](https://ant.design/docs/react/introduce) see [branch antd-3](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-3) and versions `0.2.*`. 
-
-[![](https://api.gh-polls.com/poll/01DAHPN5RDV9NVFXT2TBRCB43Y/Merge%20antd-3%20branch%20into%20master%2C%20forget%20about%20antd%202)](https://api.gh-polls.com/poll/01DAHPN5RDV9NVFXT2TBRCB43Y/Merge%20antd-3%20branch%20into%20master%2C%20forget%20about%20antd%202/vote)
-[![](https://api.gh-polls.com/poll/01DAHPN5RDV9NVFXT2TBRCB43Y/Keep%20as%20is%3A%20antd%202%20in%20master%2C%20antd%203%20in%20separate%20branch)](https://api.gh-polls.com/poll/01DAHPN5RDV9NVFXT2TBRCB43Y/Keep%20as%20is%3A%20antd%202%20in%20master%2C%20antd%203%20in%20separate%20branch/vote)
-[![](https://api.gh-polls.com/poll/01DAHPN5RDV9NVFXT2TBRCB43Y/Switch%20master%20to%20antd%203%2C%20create%20separate%20branch%20for%20antd%202)](https://api.gh-polls.com/poll/01DAHPN5RDV9NVFXT2TBRCB43Y/Switch%20master%20to%20antd%203%2C%20create%20separate%20branch%20for%20antd%202/vote)
+Master branch uses [antd v3](https://ant.design/docs/react/introduce) (because of more compact style).
+For [antd v2](https://2x.ant.design/docs/react/introduce) see [branch antd-2](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-2) and versions `0.1.*`. 
 
 
 ### Features
