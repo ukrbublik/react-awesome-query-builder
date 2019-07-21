@@ -3,14 +3,12 @@
 
 User-friendly React component to build queries.
 
-Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
-
 Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
 
 Using awesome [Ant Design](https://ant.design/) for widgets
 
-Master branch uses [antd v3](https://ant.design/docs/react/introduce) (because of more compact style).
-For [antd v2](https://2x.ant.design/docs/react/introduce) see [branch antd-2](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-2) and versions `0.1.*`. 
+Master branch uses [antd v3](https://ant.design/docs/react/introduce).
+For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compact style) see [branch antd-2](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-2) and versions `0.1.*`. 
 
 
 ### Features
@@ -371,3 +369,4 @@ Pull Requests are always welcomed :)
 ### License
 MIT. See also `LICENSE.txt`
 
+Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
