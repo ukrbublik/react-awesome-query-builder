@@ -307,6 +307,18 @@ export default {
     addRuleLabel: "Add rule",
     readonlyMode: false,
     notLabel: "Not",
+    //If you want to ask confirmation of removing non-empty rule/group, add these options
+    //List of all valid properties: https://ant.design/components/modal/#API
+    removeRuleConfirmOptions: {
+        title: 'Are you sure delete this rule?',
+        okText: 'Yes',
+        okType: 'danger',
+    },
+    removeGroupConfirmOptions: {
+        title: 'Are you sure delete this group?',
+        okText: 'Yes',
+        okType: 'danger',
+    },
     delGroupLabel: null,
     valueSourcesPopupTitle: "Select value source",
     //Leave empty group after deletion or add 1 clean rule immediately?

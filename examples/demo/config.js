@@ -844,6 +844,16 @@ export default {
         addRuleLabel: "Add rule",
         readonlyMode: false,
         notLabel: "Not",
+        removeRuleConfirmOptions: {
+            title: 'Are you sure delete this rule?',
+            okText: 'Yes',
+            okType: 'danger',
+        },
+        removeGroupConfirmOptions: {
+            title: 'Are you sure delete this group?',
+            okText: 'Yes',
+            okType: 'danger',
+        },
         showNot: true,
         delGroupLabel: null,
         canLeaveEmptyGroup: true, //after deletion
