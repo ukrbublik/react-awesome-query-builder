@@ -7,7 +7,8 @@ import Field from './Field';
 import Operator from './Operator';
 import Widget from './Widget';
 import OperatorOptions from './OperatorOptions';
-import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
+import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button, Modal } from 'antd';
+const { confirm } = Modal;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
@@ -71,6 +72,29 @@ class Rule extends Component {
       return renderType;
     }
 
+    removeSelf = () => {
+      const confirmOptions = this.props.config.settings.removeRuleConfirmOptions;
+      const doRemove = () => {
+        this.props.removeSelf();
+      };
+      if (confirmOptions && !this.isEmptyCurrentRule()) {
+        confirm({...confirmOptions,
+          onOk: doRemove,
+          onCancel: null
+        });
+      } else {
+        doRemove();
+      }
+    }
+
+    isEmptyCurrentRule = () => {
+        return !(
+            this.props.selectedField !== null &&
+            this.props.selectedOperator !== null &&
+            this.props.value.filter((val) => val !== undefined).size > 0
+        );
+    }
+
     render () {
         let renderType = this.getRenderType(this.props);
         if (!renderType)
@@ -108,7 +132,7 @@ class Rule extends Component {
                         <Button
                             type="danger"
                             icon="delete"
-                            onClick={this.props.removeSelf}
+                            onClick={this.removeSelf}
                             size={this.props.config.settings.renderSize || "small"}
                         >
                             {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}

@@ -4,7 +4,8 @@ import shallowCompare from 'react-addons-shallow-compare';
 import map from 'lodash/map';
 import startsWith from 'lodash/startsWith'
 import GroupContainer from './containers/GroupContainer';
-import { Row, Col, Icon, Button, Radio } from 'antd';
+import { Row, Col, Icon, Button, Radio, Modal } from 'antd';
+const { confirm } = Modal;
 const ButtonGroup = Button.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -103,6 +104,47 @@ class Group extends Component {
     return renderType;
   }
 
+  removeSelf = () => {
+    const confirmOptions = this.props.config.settings.removeGroupConfirmOptions;
+    const doRemove = () => {
+      this.props.removeSelf();
+    };
+    if (confirmOptions && !this.isEmptyCurrentGroup()) {
+      confirm({...confirmOptions,
+        onOk: doRemove,
+        onCancel: null
+      });
+    } else {
+      doRemove();
+    }
+  }
+
+  isEmptyCurrentGroup = () => {
+    const children = this.props.children1;
+    return children.size == 0 ||
+      children.size == 1 && this.isEmpty(children.first());
+  }
+
+  isEmpty = (item) => {
+    return item.get("type") == "group" ? this.isEmptyGroup(item) : this.isEmptyRule(item);
+  }
+
+  isEmptyGroup = (group) => {
+    const children = group.get("children1");
+    return children.size == 0 ||
+      children.size == 1 && this.isEmpty(children.first());
+  }
+
+  isEmptyRule = (rule) => {
+    const properties = rule.get('properties');
+    console.log(rule.toJS(), properties.toJS());
+      return !(
+          properties.get("field") !== null &&
+          properties.get("operator") !== null &&
+          properties.get("value").filter((val) => val !== undefined).size > 0
+      );
+  }
+
   renderGroup = (position) => {
     return (
       <div className={`group--actions ${position}`}>
@@ -127,7 +169,7 @@ class Group extends Component {
               type="danger"
               icon="delete"
               className="action action--ADD-DELETE"
-              onClick={this.props.removeSelf}
+              onClick={this.removeSelf}
             >{this.props.config.settings.delGroupLabel !== undefined ? this.props.config.settings.delGroupLabel : "Delete"}</Button>
           ) : null}
         </ButtonGroup>

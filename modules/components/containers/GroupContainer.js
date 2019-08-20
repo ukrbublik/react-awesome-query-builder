@@ -91,22 +91,16 @@ export default (Group) => {
 
     dummyFn = () => {}
 
-    removeSelf = (event) => {
+    removeSelf = () => {
       this.props.actions.removeGroup(this.props.path);
-      event.preventDefault();
-      return false;
     }
 
-    addGroup = (event) => {
+    addGroup = () => {
       this.props.actions.addGroup(this.props.path);
-      event.preventDefault();
-      return false;
     }
 
-    addRule = (event) => {
+    addRule = () => {
       this.props.actions.addRule(this.props.path);
-      event.preventDefault();
-      return false;
     }
 
     render() {
