@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { TimePicker } from 'antd';
 import moment from 'moment';
-import { LocaleProvider } from 'antd';
 import shallowCompare from 'react-addons-shallow-compare';
 
 
