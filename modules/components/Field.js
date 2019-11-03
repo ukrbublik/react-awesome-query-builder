@@ -92,16 +92,20 @@ export default class Field extends Component {
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
           let label = this.getFieldDisplayLabel(field, fieldKey);
+          let tooltip = field.tooltip;
+          let option = label;
+          if (tooltip != undefined)
+            option = <Tooltip title={tooltip}>{label}</Tooltip>;
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <SubMenu
                   key={prefix+fieldKey}
-                  title={<span>{label} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
+                  title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
               >
                   {this.buildMenuItems(field.subfields, subpath)}
               </SubMenu>
           } else {
-              return <MenuItem key={prefix+fieldKey}>{label}</MenuItem>;
+              return <MenuItem key={prefix+fieldKey}>{option}</MenuItem>;
           }
       });
   }
@@ -115,21 +119,26 @@ export default class Field extends Component {
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
           let label = this.getFieldDisplayLabel(field, fieldKey);
+          let tooltip = field.tooltip;
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
               return <OptGroup
                   key={prefix+fieldKey}
                   label={label}
+                  title={tooltip}
               >
                   {this.buildSelectItems(field.subfields, subpath, label)}
               </OptGroup>
           } else {
+              let option = label;
+              if (tooltip != undefined)
+                option = <Tooltip title={tooltip}>{label}</Tooltip>;
               return <Option
                 key={prefix+fieldKey}
                 value={prefix+fieldKey}
                 grouplabel={optGroupLabel}
               >
-                {label}
+                {option}
               </Option>;
           }
       });

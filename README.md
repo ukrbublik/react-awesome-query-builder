@@ -126,8 +126,9 @@ export default {
   
   fields: {
     //Example of atomic field:
-    name: {
+    qty: {
       label: 'Quantity',
+      tooltip: 'This is quantity',
       type: 'number', //one of types described below in section 'types'
       //Settings for widgets
       // Available settings for Number widget: min, max, step

@@ -46,6 +46,7 @@ export default {
     fields: {
         members: {
             label: 'Members',
+            tooltip: 'Group of fields',
             type: '!struct',
             subfields: {
                 subname: {
@@ -56,17 +57,12 @@ export default {
                     operators: ['equal'],
                 },
                 prox1: {
-                    label: 'prox1',
+                    label: 'prox',
+                    tooltip: 'Proximity search',
                     type: 'text',
                     operators: ['proximity'],
                 },
             }
-        },
-        prox2: {
-            label: 'prox2',
-            type: 'text',
-            operators: ['proximity'],
-            defaultOperator: 'not_equal', //will not be used
         },
         name2: {
             label: 'Name 2',
