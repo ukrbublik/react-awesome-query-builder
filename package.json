@@ -1,6 +1,16 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "0.2.53",
+  "version": "0.2.55",
+  "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
+  "keywords": [
+    "reactjs",
+    "react-component",
+    "react-components",
+    "query-builder",
+    "react",
+    "antd",
+    "antdesign"
+  ],
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactAwesomeQueryBuilder.js",
@@ -21,9 +31,9 @@
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
   },
-  "author": "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "contributors": [
-    "ukrbubik"
+    "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)"
   ],
   "license": "MIT",
   "bugs": {
