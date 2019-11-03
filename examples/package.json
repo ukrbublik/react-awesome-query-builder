@@ -8,6 +8,13 @@
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
   },
+  "files": [
+    "demo/config.js",
+    "demo/demo.js",
+    "index.html",
+    "sandbox.js",
+    "README.md"
+  ],
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
