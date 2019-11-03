@@ -168,12 +168,12 @@ export default {
         datetime: {
             label: 'DateTime',
             type: 'datetime',
-            valueSources: ['field']
+            valueSources: ['value']
         },
         datetime2: {
             label: 'DateTime2',
             type: 'datetime',
-            valueSources: ['value']
+            valueSources: ['field']
         },
         color: {
             label: 'Color',

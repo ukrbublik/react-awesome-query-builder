@@ -216,7 +216,8 @@ export default {
         Object opDef, Object operatorOptions, bool isForDisplay) => string,
       //(for building mongodb query) function to format rule
       // value - mixed for cardinality==1 -or- Array for cardinality>2 
-      mongoFormatOp: (string field, string op, mixed value) => object,
+      mongoFormatOp: (string field, string op, mixed value, string valueSrc, string valueType, 
+        Object opDef, Object operatorOptions) => object,
       //for cardinality==2 ('between')
       valueLabels: ['Value from', {label: 'Value to', placeholder: 'Enter value to'}],
       textSeparators: [null, 'and'],
