@@ -1,6 +1,8 @@
 # react-awesome-query-builder
 [![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder) [![github](https://img.shields.io/github/package-json/v/ukrbublik/react-awesome-query-builder.svg)](https://github.com/ukrbublik/react-awesome-query-builder/packages/48416) [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://github.com/ukrbublik/react-awesome-query-builder)
 
+[![Open in codesandbox.io](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/react-awesome-query-builder-demo-64wwx?fontsize=14&module=%2Fdemo%2Fconfig.js)
+
 User-friendly React component to build queries.
 
 Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
@@ -10,8 +12,11 @@ Using awesome [Ant Design](https://ant.design/) for widgets
 Master branch uses [antd v3](https://ant.design/docs/react/introduce).
 For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compact style) see [branch antd-2](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-2) and versions `0.1.*`. 
 
+[Demo](https://ukrbublik.github.io/react-awesome-query-builder)
+
 
 ### Features
+[![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)](https://ukrbublik.github.io/react-awesome-query-builder)
 - Highly configurable
 - Fields can be of type:
   - simple (string, number, bool, date/time/datetime, list)
@@ -26,12 +31,6 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Reordering support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/)
 - Export to MongoDb or SQL
-
-
-### Demo
-[Live Demo](https://ukrbublik.github.io/react-awesome-query-builder)
-
-![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)
 
 
 ### Install
