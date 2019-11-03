@@ -44,11 +44,9 @@ export const mongodbFormat = (item, config, _not = false) => {
         return resultQuery;
     } else if (type === 'rule') {
         let operator = properties.get('operator');
-        let options = properties.get('operatorOptions');
+        let operatorOptions = properties.get('operatorOptions');
         let field = properties.get('field');
         let value = properties.get('value');
-        let valueSrc = properties.get('valueSrc');
-        let valueType = properties.get('valueType');
 
         if (field == null || operator == null)
             return undefined;
@@ -57,14 +55,8 @@ export const mongodbFormat = (item, config, _not = false) => {
         let operatorDefinition = getOperatorConfig(config, operator, field) || {};
         let reversedOp = operatorDefinition.reversedOp;
         let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-        const fieldType = fieldDefinition.type;
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-        const widget = getWidgetForFieldOp(config, field, operator);
-        const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget), ['factory']);
         const typeConfig = config.types[fieldDefinition.type] || {};
-        // let operatorOptions = options ? options.toJS() : null;
-        // if (operatorOptions && !Object.keys(operatorOptions).length)
-        //     operatorOptions = null;
 
         if (_not) {
             [operator, reversedOp] = [reversedOp, operator];
@@ -78,7 +70,8 @@ export const mongodbFormat = (item, config, _not = false) => {
         }
 
         //format value
-        //let valueTypes = [];
+        let valueSrcs = [];
+        let valueTypes = [];
         let hasUndefinedValues = false;
         value = value.map((currentValue, ind) => {
             if (currentValue === undefined) {
@@ -89,9 +82,9 @@ export const mongodbFormat = (item, config, _not = false) => {
             const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
+            let ret;
             if (valueSrc == 'field') {
                 console.error("Field as right-hand operand is not supported for mongodb export");
-                return undefined;
             } else {
                 if (typeof fieldWidgetDefinition.mongoFormatValue === 'function') {
                     let fn = fieldWidgetDefinition.mongoFormatValue;
@@ -100,11 +93,14 @@ export const mongodbFormat = (item, config, _not = false) => {
                         pick(fieldDefinition, ['fieldSettings', 'listValues']),
                         omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue']), //useful options: valueFormat for date/time
                     ];
-                    return fn(...args);
+                    ret = fn(...args);
+                } else {
+                    ret = currentValue;
                 }
-                return currentValue;
             }
-            //valueTypes.push(valueType);
+            valueSrcs.push(valueSrc);
+            valueTypes.push(valueType);
+            return ret;
         });
         if (value.size < cardinality || hasUndefinedValues)
             return undefined;
@@ -116,11 +112,12 @@ export const mongodbFormat = (item, config, _not = false) => {
             field,
             operator,
             formattedValue,
-            // omit(operatorDefinition, ['formatOp', 'mongoFormatOp']),
-            // operatorOptions,
+            (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
+            (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
+            omit(operatorDefinition, ['formatOp', 'mongoFormatOp']),
+            operatorOptions,
         ];
         let ruleQuery = fn(...args);
-
         return ruleQuery;
     }
     return undefined;

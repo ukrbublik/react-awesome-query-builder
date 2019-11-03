@@ -49,6 +49,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
+            let ret;
             if (valueSrc == 'field') {
                 //format field
                 const rightField = currentValue;
@@ -62,7 +63,7 @@ export const queryString = (item, config, isForDisplay = false) => {
                     let fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
                     formattedField = config.settings.formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
                 }
-                return formattedField;
+                ret = formattedField;
             } else {
                 if (typeof fieldWidgetDefinition.formatValue === 'function') {
                     let fn = fieldWidgetDefinition.formatValue;
@@ -76,12 +77,14 @@ export const queryString = (item, config, isForDisplay = false) => {
                         let valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
                         args.push(valFieldDefinition);
                     }
-                    return fn(...args);
+                    ret = fn(...args);
+                } else {
+                    ret = currentValue;
                 }
-                return currentValue;
             }
             valueSrcs.push(valueSrc);
             valueTypes.push(valueType);
+            return ret;
         });
         if (hasUndefinedValues || value.size < cardinality)
             return undefined;
