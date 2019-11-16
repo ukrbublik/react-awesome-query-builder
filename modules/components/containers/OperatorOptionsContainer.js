@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getOperatorConfig} from "../../utils/configUtils";
 

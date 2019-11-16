@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
-import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {Provider, Connector, connect} from 'react-redux';
+import {connect} from 'react-redux';
 
 
 export default (Group) => {
@@ -20,6 +18,8 @@ export default (Group) => {
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
       onDragStart: PropTypes.func,
       treeNodesCnt: PropTypes.number,
+      //connected:
+      dragging: PropTypes.object, //{id, x, y, w, h}
     };
 
     constructor(props) {
@@ -53,7 +53,6 @@ export default (Group) => {
                 should = false;
           }
         }
-        
         return should;
     }
 
@@ -104,6 +103,7 @@ export default (Group) => {
     }
 
     render() {
+      const isDraggingMe = this.props.dragging.id == this.props.id;
       const currentNesting = this.props.path.size;
       const maxNesting = this.props.config.settings.maxNesting;
 
@@ -117,51 +117,52 @@ export default (Group) => {
           className={'group-or-rule-container group-container'}
           data-id={this.props.id}
         >
-          {[(
-            <Group
-              key={"dragging"}
-              isForDrag={true}
-              id={this.props.id}
-              isRoot={isRoot}
-              allowFurtherNesting={allowFurtherNesting}
-              conjunctionOptions={this.conjunctionOptions}
-              not={this.props.not}
-              selectedConjunction={this.props.conjunction}
-              setConjunction={this.dummyFn}
-              setNot={this.dummyFn}
-              removeSelf={this.dummyFn}
-              addGroup={this.dummyFn}
-              addRule={this.dummyFn}
-              config={this.props.config}
-              children1={this.props.children1}
-              actions={this.props.actions}
-              //tree={this.props.tree}
-              treeNodesCnt={this.props.treeNodesCnt}
-              dragging={this.props.dragging}
-            />
-          ), (
-            <Group
-              key={this.props.id}
-              id={this.props.id}
-              isRoot={isRoot}
-              allowFurtherNesting={allowFurtherNesting}
-              conjunctionOptions={this.conjunctionOptions}
-              not={this.props.not}
-              selectedConjunction={this.props.conjunction}
-              setConjunction={this.setConjunction}
-              setNot={this.setNot}
-              removeSelf={this.removeSelf}
-              addGroup={this.addGroup}
-              addRule={this.addRule}
-              config={this.props.config}
-              children1={this.props.children1}
-              actions={this.props.actions}
-              //tree={this.props.tree}
-              treeNodesCnt={this.props.treeNodesCnt}
-              onDragStart={this.props.onDragStart}
-              dragging={this.props.dragging}
-            />
-          )]}
+        {[
+          isDraggingMe ? <Group
+            key={"dragging"}
+            id={this.props.id}
+            isDraggingMe={isDraggingMe}
+            isDraggingTempo={true}
+            dragging={this.props.dragging}
+            isRoot={isRoot}
+            allowFurtherNesting={allowFurtherNesting}
+            conjunctionOptions={this.conjunctionOptions}
+            not={this.props.not}
+            selectedConjunction={this.props.conjunction}
+            setConjunction={this.dummyFn}
+            setNot={this.dummyFn}
+            removeSelf={this.dummyFn}
+            addGroup={this.dummyFn}
+            addRule={this.dummyFn}
+            config={this.props.config}
+            children1={this.props.children1}
+            actions={this.props.actions}
+            //tree={this.props.tree}
+            treeNodesCnt={this.props.treeNodesCnt}
+          /> : null
+        ,
+          <Group
+            key={this.props.id}
+            id={this.props.id}
+            isDraggingMe={isDraggingMe}
+            onDragStart={this.props.onDragStart}
+            isRoot={isRoot}
+            allowFurtherNesting={allowFurtherNesting}
+            conjunctionOptions={this.conjunctionOptions}
+            not={this.props.not}
+            selectedConjunction={this.props.conjunction}
+            setConjunction={this.setConjunction}
+            setNot={this.setNot}
+            removeSelf={this.removeSelf}
+            addGroup={this.addGroup}
+            addRule={this.addRule}
+            config={this.props.config}
+            children1={this.props.children1}
+            actions={this.props.actions}
+            //tree={this.props.tree}
+            treeNodesCnt={this.props.treeNodesCnt}
+          />
+        ]}
         </div>
       );
     }

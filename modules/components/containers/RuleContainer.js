@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
-import size from 'lodash/size';
 import {getFieldConfig} from "../../utils/configUtils";
-import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {Provider, Connector, connect} from 'react-redux';
+import {connect} from 'react-redux';
 
 
 export default (Rule) => {
@@ -23,7 +20,7 @@ export default (Rule) => {
       operatorOptions: PropTypes.object,
       treeNodesCnt: PropTypes.number,
       //connected:
-      //dragging: PropTypes.object, //{id, x, y, w, h}
+      dragging: PropTypes.object, //{id, x, y, w, h}
     };
 
     constructor(props) {
@@ -87,11 +84,11 @@ export default (Rule) => {
                 should = false;
           }
         }
-
         return should;
     }
 
     render() {
+      const isDraggingMe = this.props.dragging.id == this.props.id;
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
       const _isGroup = fieldConfig && fieldConfig.type == '!struct';
 
@@ -100,45 +97,46 @@ export default (Rule) => {
           className={'group-or-rule-container rule-container'}
           data-id={this.props.id}
         >
-          {[(
-            <Rule
-              key={"dragging"}
-              isForDrag={true}
-              id={this.props.id}
-              setField={this.dummyFn}
-              setOperator={this.dummyFn}
-              setOperatorOption={this.dummyFn}
-              removeSelf={this.dummyFn}
-              selectedField={this.props.field || null}
-              selectedOperator={this.props.operator || null}
-              value={this.props.value || null}
-              valueSrc={this.props.valueSrc || null}
-              operatorOptions={this.props.operatorOptions}
-              config={this.props.config}
-              treeNodesCnt={this.props.treeNodesCnt}
-              dragging={this.props.dragging}
-            />
-          ), (
-            <Rule
-              key={this.props.id}
-              id={this.props.id}
-              removeSelf={this.removeSelf}
-              setField={this.setField}
-              setOperator={this.setOperator}
-              setOperatorOption={this.setOperatorOption}
-              setValue={this.setValue}
-              setValueSrc={this.setValueSrc}
-              selectedField={this.props.field || null}
-              selectedOperator={this.props.operator || null}
-              value={this.props.value || null}
-              valueSrc={this.props.valueSrc || null}
-              operatorOptions={this.props.operatorOptions}
-              config={this.props.config}
-              treeNodesCnt={this.props.treeNodesCnt}
-              onDragStart={this.props.onDragStart}
-              dragging={this.props.dragging}
-            />
-          )]}
+        {[
+          isDraggingMe ? <Rule
+            key={"dragging"}
+            id={this.props.id}
+            isDraggingMe={isDraggingMe}
+            isDraggingTempo={true}
+            dragging={this.props.dragging}
+            setField={this.dummyFn}
+            setOperator={this.dummyFn}
+            setOperatorOption={this.dummyFn}
+            removeSelf={this.dummyFn}
+            selectedField={this.props.field || null}
+            selectedOperator={this.props.operator || null}
+            value={this.props.value || null}
+            valueSrc={this.props.valueSrc || null}
+            operatorOptions={this.props.operatorOptions}
+            config={this.props.config}
+            treeNodesCnt={this.props.treeNodesCnt}
+          /> : null
+        ,
+          <Rule
+            key={this.props.id}
+            id={this.props.id}
+            isDraggingMe={isDraggingMe}
+            onDragStart={this.props.onDragStart}
+            removeSelf={this.removeSelf}
+            setField={this.setField}
+            setOperator={this.setOperator}
+            setOperatorOption={this.setOperatorOption}
+            setValue={this.setValue}
+            setValueSrc={this.setValueSrc}
+            selectedField={this.props.field || null}
+            selectedOperator={this.props.operator || null}
+            value={this.props.value || null}
+            valueSrc={this.props.valueSrc || null}
+            operatorOptions={this.props.operatorOptions}
+            config={this.props.config}
+            treeNodesCnt={this.props.treeNodesCnt}
+          />
+        ]}
         </div>
       );
     }
