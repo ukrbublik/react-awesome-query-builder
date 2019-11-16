@@ -33,7 +33,7 @@ export default (Builder, CanMoveFn = null) => {
         this.tree = getFlatTree(nextProps.tree);
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(_prevProps, _prevState) {
         var dragging = this.props.dragging;
         var startDragging = this.props.dragStart;
         if (startDragging && startDragging.id) {
@@ -41,12 +41,14 @@ export default (Builder, CanMoveFn = null) => {
             if (dragging.itemInfo) {
               if (dragging.itemInfo.index != startDragging.itemInfo.index || dragging.itemInfo.parent != startDragging.itemInfo.parent) {
                 var treeEl = startDragging.treeEl;
+                var treeElContainer = startDragging.treeElContainer;
                 var plhEl = this._getPlaceholderNodeEl(treeEl, true);
                 if (plhEl) {
                     var plX = plhEl.getBoundingClientRect().left + window.scrollX;
                     var plY = plhEl.getBoundingClientRect().top + window.scrollY;
                     var oldPlX = startDragging.plX;
                     var oldPlY = startDragging.plY;
+                    var scrollTop = treeElContainer.scrollTop;
                     startDragging.plX = plX;
                     startDragging.plY = plY;
                     startDragging.itemInfo = clone(dragging.itemInfo);
@@ -54,6 +56,7 @@ export default (Builder, CanMoveFn = null) => {
                     startDragging.x = plhEl.offsetLeft;
                     startDragging.clientY += (plY - oldPlY);
                     startDragging.clientX += (plX - oldPlX);
+                    startDragging.scrollTop = scrollTop;
 
                     this.onDrag(this.props.mousePos, false);
                 }
@@ -106,9 +109,9 @@ export default (Builder, CanMoveFn = null) => {
       if (!treeElContainer)
           treeElContainer = dom.closest('body');
       var scrollTop = treeElContainer.scrollTop;
-
-      var dragEl = this._getDraggableNodeEl(treeEl);
-      var plhEl = this._getPlaceholderNodeEl(treeEl);
+      
+      var _dragEl = this._getDraggableNodeEl(treeEl);
+      var _plhEl = this._getPlaceholderNodeEl(treeEl);
 
       var tmpAllGroups = treeEl.querySelectorAll('.group--children');
       var anyGroup = tmpAllGroups.length ? tmpAllGroups[0] : null;
@@ -215,13 +218,10 @@ export default (Builder, CanMoveFn = null) => {
 
     handleDrag (dragInfo, e, canMoveFn) {
       var itemInfo = dragInfo.itemInfo;
-      var newItemInfo = null;
       var paddingLeft = dragInfo.paddingLeft;
 
       var moveInfo = null;
       var treeEl = this.props.dragStart.treeEl;
-      //var treeElContainer = this.props.dragStart.treeElContainer;
-      //var scrollTop = treeElContainer.scrollTop;
       var dragId = dragInfo.id;
       var dragEl = this._getDraggableNodeEl(treeEl);
       var plhEl = this._getPlaceholderNodeEl(treeEl);
@@ -325,7 +325,7 @@ export default (Builder, CanMoveFn = null) => {
             if (trgRect) {
               var dragLeftOffset = dragRect.left - treeRect.left;
               var trgLeftOffset = trgRect.left - treeRect.left;
-              var trgLev = trgLeftOffset / paddingLeft;
+              var _trgLev = trgLeftOffset / paddingLeft;
               var dragLev = Math.max(0, Math.round(dragLeftOffset / paddingLeft));
               var availMoves = [];
               if (isSamePos) {
