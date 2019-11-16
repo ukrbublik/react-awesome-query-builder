@@ -206,6 +206,7 @@
 }
 
 .group--actions {
+  margin-left: 10px;
   flex: 1;
   display: flex;
   &--tl,
@@ -226,17 +227,39 @@
   &--br{
     justify-content: flex-end;
   }
+
+  .action--DELETE {
+    margin-top: -1px;
+  }
+}
+
+
+.group--drag-handler {
+  margin-left: 8px;
 }
 
 /******************************************************************************/
 /** RULE **********************************************************************/
 /******************************************************************************/
 
-.rule--header {
-  @extend %clearfix;
-  float: right;
+.rule {
+  flex: 1;
+  display: flex;
 }
 
+//"remove" button
+.rule--header {
+  @extend %clearfix;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.rule--drag-handler {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
 
 .rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
 .widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep {
@@ -316,36 +339,3 @@ div.tooltip-inner {
   }
 }
 
-/******************************************************************************/
-/** ACTION ********************************************************************/
-/******************************************************************************/
-
-/*
-.action {
-  display: inline-block;
-  background-color: #5cb85c;
-  border: 1px solid #4cae4c;
-  cursor: pointer;
-  color: white;
-  padding: 0.2rem 0.4rem;
-  text-decoration: none;
-
-  &:first-child {
-    border-radius: 3px 0 0 3px;
-    border-left-width: 1px;
-  }
-
-  &:last-child {
-    border-radius: 0 3px 3px 0;
-  }
-
-  &:first-child:last-child {
-    border-radius: 3px;
-  }
-}
-
-.action--DELETE {
-  background-color: #d9534f;
-  border-color: #d43f3a;
-}
-*/

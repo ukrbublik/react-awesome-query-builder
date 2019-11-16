@@ -839,7 +839,9 @@ export default {
         deleteLabel: null,
         addGroupLabel: "Add group",
         addRuleLabel: "Add rule",
-        readonlyMode: false,
+        immutableGroupsMode: false,
+        canReorder: true,
+        canRegroup: true,
         notLabel: "Not",
         removeRuleConfirmOptions: {
             title: 'Are you sure delete this rule?',
@@ -876,7 +878,6 @@ export default {
             }
         },
         valueSourcesPopupTitle: "Select value source",
-        canReorder: true,
         canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
             //for type == 'select'/'multiselect' you can check listValues
             return true;

@@ -4,8 +4,8 @@ const classNames = require('classnames');
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
-export default (Group) => {
-  return class DraggableGroup extends Component {
+export default (className) => (GroupOrRule) => {
+  return class Draggable extends Component {
     static propTypes = {
         isDraggingTempo: PropTypes.bool,
         isDraggingMe: PropTypes.bool,
@@ -21,12 +21,12 @@ export default (Group) => {
     }
 
     handleDraggerMouseDown = (e) => {
-      var nodeId = this.props.id;
-      var dom = this.refs.group;
-      
-      if (this.props.onDragStart) {
-        this.props.onDragStart(nodeId, dom, e);
-      }
+        var nodeId = this.props.id;
+        var dom = this.refs.wrapper;
+
+        if (this.props.onDragStart) {
+          this.props.onDragStart(nodeId, dom, e);
+        }
     }
 
     render () {
@@ -49,24 +49,24 @@ export default (Group) => {
             };
         }
 
-        const className = classNames("group", "group-or-rule",
+        const cn = classNames(className, "group-or-rule",
           isDraggingMe && isDraggingTempo ? 'qb-draggable' : null,
           isDraggingMe && !isDraggingTempo ? 'qb-placeholder' : null,
         );
 
         return (
           <div
-              className={className}
-              style={styles}
-              ref="group"
-              data-id={this.props.id}
+            className={cn}
+            style={styles}
+            ref="wrapper"
+            data-id={this.props.id}
           >
-              <Group
-                handleDraggerMouseDown={this.handleDraggerMouseDown}
-                isDraggingMe={isDraggingMe}
-                isDraggingTempo={isDraggingTempo}
-                {...otherProps}
-              />
+            <GroupOrRule
+              handleDraggerMouseDown={this.handleDraggerMouseDown}
+              isDraggingMe={isDraggingMe}
+              isDraggingTempo={isDraggingTempo}
+              {...otherProps}
+            />
           </div>
         );
     }

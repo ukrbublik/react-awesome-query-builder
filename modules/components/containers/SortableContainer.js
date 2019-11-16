@@ -213,21 +213,22 @@ export default (Builder, CanMoveFn = null) => {
 
 
     handleDrag (dragInfo, e, canMoveFn) {
-      var itemInfo = dragInfo.itemInfo;
-      var paddingLeft = dragInfo.paddingLeft;
+      const canMoveBeforeAfterGroup = true;
+      const itemInfo = dragInfo.itemInfo;
+      const paddingLeft = dragInfo.paddingLeft;
 
-      var moveInfo = null;
-      var treeEl = this.props.dragStart.treeEl;
-      var dragId = dragInfo.id;
-      var dragEl = this._getDraggableNodeEl(treeEl);
-      var plhEl = this._getPlaceholderNodeEl(treeEl);
+      let moveInfo = null;
+      const treeEl = this.props.dragStart.treeEl;
+      const dragId = dragInfo.id;
+      const dragEl = this._getDraggableNodeEl(treeEl);
+      const plhEl = this._getPlaceholderNodeEl(treeEl);
       if (dragEl && plhEl) {
-        var dragRect = dragEl.getBoundingClientRect();
-        var plhRect = plhEl.getBoundingClientRect();
+        const dragRect = dragEl.getBoundingClientRect();
+        const plhRect = plhEl.getBoundingClientRect();
         if (!plhRect.width) {
             return;
         }
-        var dragDirs = {hrz: 0, vrt: 0};
+        let dragDirs = {hrz: 0, vrt: 0};
         if (dragRect.top < plhRect.top)
           dragDirs.vrt = -1; //up
         else if (dragRect.bottom > plhRect.bottom)
@@ -237,28 +238,29 @@ export default (Builder, CanMoveFn = null) => {
         else if (dragRect.left < plhRect.left)
           dragDirs.hrz = -1; //left
 
-        var treeRect = treeEl.getBoundingClientRect();
-        var trgCoord = {
+        const treeRect = treeEl.getBoundingClientRect();
+        const trgCoord = {
           x: treeRect.left + (treeRect.right - treeRect.left) / 2,
           y: dragDirs.vrt >= 0 ? dragRect.bottom : dragRect.top,
         };
-        var hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
-        var hovCNodeEl = hovNodeEl ? hovNodeEl.closest('.group-or-rule-container') : null;
+        const hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
+        const hovCNodeEl = hovNodeEl ? hovNodeEl.closest('.group-or-rule-container') : null;
         if (!hovCNodeEl) {
           console.log('out of tree bounds!');
         } else {
-          var isGroup = hovCNodeEl.classList.contains('group-container');
-          var hovNodeId = hovCNodeEl.getAttribute('data-id');
-          var hovEl = hovCNodeEl;
-          var doAppend = false;
-          var doPrepend = false;
+          const isGroup = hovCNodeEl.classList.contains('group-container');
+          const hovNodeId = hovCNodeEl.getAttribute('data-id');
+          const hovEl = hovCNodeEl;
+          let doAppend = false;
+          let doPrepend = false;
           if (hovEl) {
-            var hovRect = hovEl.getBoundingClientRect();
-            var hovHeight = hovRect.bottom - hovRect.top;
-            var hovII = this.tree.items[hovNodeId];
-            var trgRect = null,
+            const hovRect = hovEl.getBoundingClientRect();
+            const hovHeight = hovRect.bottom - hovRect.top;
+            const hovII = this.tree.items[hovNodeId];
+            let trgRect = null,
                 trgEl = null,
-                trgII = null;
+                trgII = null,
+                altII = null; //for canMoveBeforeAfterGroup
 
             if (dragDirs.vrt == 0) {
               trgII = itemInfo;
@@ -269,11 +271,11 @@ export default (Builder, CanMoveFn = null) => {
               if (isGroup) {
                 if (dragDirs.vrt > 0) { //down
                     //take group header (for prepend only)
-                    var hovInnerEl = hovCNodeEl.getElementsByClassName('group--header');
-                    var hovEl2 = hovInnerEl.length ? hovInnerEl[0] : null;
-                    var hovRect2 = hovEl2.getBoundingClientRect();
-                    var hovHeight2 = hovRect2.bottom - hovRect2.top;
-                    var isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
+                    const hovInnerEl = hovCNodeEl.getElementsByClassName('group--header');
+                    const hovEl2 = hovInnerEl.length ? hovInnerEl[0] : null;
+                    const hovRect2 = hovEl2.getBoundingClientRect();
+                    const hovHeight2 = hovRect2.bottom - hovRect2.top;
+                    const isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
                     if (isOverHover && hovII.top > dragInfo.itemInfo.top) {
                       trgII = hovII;
                       trgRect = hovRect2;
@@ -284,7 +286,7 @@ export default (Builder, CanMoveFn = null) => {
                   if (hovII.lev >= itemInfo.lev) {
                     //take whole group
                     //todo: 5 is magic for now (bottom margin), configure it!
-                    var isClimbToHover = ((hovRect.bottom - dragRect.top) >= 2);
+                    const isClimbToHover = ((hovRect.bottom - dragRect.top) >= 2);
                     if (isClimbToHover && hovII.top < dragInfo.itemInfo.top) {
                         trgII = hovII;
                         trgRect = hovRect;
@@ -293,37 +295,45 @@ export default (Builder, CanMoveFn = null) => {
                     }
                   }
                 }
-                if (!doPrepend && !doAppend) {
+                if (!doPrepend && !doAppend || canMoveBeforeAfterGroup) {
                   //take whole group and check if we can move before/after group
-                  var isOverHover = (dragDirs.vrt < 0 //up
+                  const isOverHover = (dragDirs.vrt < 0 //up
                     ? ((hovRect.bottom - dragRect.top) > (hovHeight-5))
                     : ((dragRect.bottom - hovRect.top) > (hovHeight-5)));
                   if (isOverHover) {
-                    trgII = hovII;
-                    trgRect = hovRect;
-                    trgEl = hovEl;
+                    if (!doPrepend && !doAppend) {
+                      trgII = hovII;
+                      trgRect = hovRect;
+                      trgEl = hovEl;
+                    }
+                    if (canMoveBeforeAfterGroup) {
+                      altII = hovII;
+                    }
                   }
                 }
               } else {
                 //check if we can move before/after group
-                  var isOverHover = (dragDirs.vrt < 0 //up
-                    ? ((hovRect.bottom - dragRect.top) > hovHeight/2)
-                    : ((dragRect.bottom - hovRect.top) > hovHeight/2));
-                  if (isOverHover) {
-                    trgII = hovII;
-                    trgRect = hovRect;
-                    trgEl = hovEl;
-                  }
+                const isOverHover = (dragDirs.vrt < 0 //up
+                  ? ((hovRect.bottom - dragRect.top) > hovHeight/2)
+                  : ((dragRect.bottom - hovRect.top) > hovHeight/2));
+                if (isOverHover) {
+                  trgII = hovII;
+                  trgRect = hovRect;
+                  trgEl = hovEl;
+                }
               }
             }
 
-            var isSamePos = (trgII && trgII.id == dragId);
+            const isSamePos = (trgII && trgII.id == dragId);
             if (trgRect) {
-              var dragLeftOffset = dragRect.left - treeRect.left;
-              var trgLeftOffset = trgRect.left - treeRect.left;
-              var _trgLev = trgLeftOffset / paddingLeft;
-              var dragLev = Math.max(0, Math.round(dragLeftOffset / paddingLeft));
-              var availMoves = [];
+              const dragLeftOffset = dragRect.left - treeRect.left;
+              const trgLeftOffset = trgRect.left - treeRect.left;
+              const _trgLev = trgLeftOffset / paddingLeft;
+              const dragLev = Math.max(0, Math.round(dragLeftOffset / paddingLeft));
+
+              //find all possible moves
+              let availMoves = [];
+              let altMoves = []; //alternatively can move after/before group, if can't move into it
               if (isSamePos) {
                 //do nothing
               } else {
@@ -333,28 +343,36 @@ export default (Builder, CanMoveFn = null) => {
                     } else if (doPrepend) {
                       availMoves.push([constants.PLACEMENT_PREPEND, trgII, trgII.lev+1]);
                     }
+                    //alt
+                    if (canMoveBeforeAfterGroup && altII) {
+                      if (dragDirs.vrt > 0) { //down
+                        altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
+                      } else if (dragDirs.vrt < 0) { //up
+                        altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
+                      }
+                    }
                 }
                 if (!doAppend && !doPrepend) {
-                    if (dragDirs.vrt < 0) {
-                      availMoves.push([constants.PLACEMENT_BEFORE, trgII, trgII.lev]);
-                    } else if (dragDirs.vrt > 0) {
-                      availMoves.push([constants.PLACEMENT_AFTER, trgII, trgII.lev]);
-                    }
+                  if (dragDirs.vrt < 0) { //up
+                    availMoves.push([constants.PLACEMENT_BEFORE, trgII, trgII.lev]);
+                  } else if (dragDirs.vrt > 0) { //down
+                    availMoves.push([constants.PLACEMENT_AFTER, trgII, trgII.lev]);
+                  }
                 }
               }
 
               //sanitize
               availMoves = availMoves.filter(am => {
-                var placement = am[0];
-                var trg = am[1];
+                const placement = am[0];
+                const trg = am[1];
                 if ((placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) && trg.parent == null)
                   return false;
                 if (trg.collapsed && (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND))
                   return false;
 
-                var isInside = (trg.id == itemInfo.id);
+                let isInside = (trg.id == itemInfo.id);
                 if (!isInside) {
-                  var tmp = trg;
+                  let tmp = trg;
                   while (tmp.parent) {
                     tmp = this.tree.items[tmp.parent];
                     if (tmp.id == itemInfo.id) {
@@ -365,9 +383,9 @@ export default (Builder, CanMoveFn = null) => {
                 }
                 return !isInside;
               }).map(am => {
-                var placement = am[0],
+                const placement = am[0],
                   toII = am[1];
-                var toParentII = null;
+                let toParentII = null;
                 if (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND)
                   toParentII = toII;
                 else
@@ -378,21 +396,24 @@ export default (Builder, CanMoveFn = null) => {
                 return am;
               });
 
-              var bestMode = null;
-              availMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
-              var levs = availMoves.map(am => am[2]);
-              var curLev = itemInfo.lev;
-              var allLevs = levs.concat(curLev);
-              var closestDragLev = null;
+              let bestMode = null;
+              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
+              if (canMoveBeforeAfterGroup && filteredMoves.length == 0 && altMoves.length > 0) {
+                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
+              }
+              const levs = filteredMoves.map(am => am[2]);
+              const curLev = itemInfo.lev;
+              const allLevs = levs.concat(curLev);
+              let closestDragLev = null;
               if (allLevs.indexOf(dragLev) != -1)
                 closestDragLev = dragLev;
               else if (dragLev > Math.max(...allLevs))
                 closestDragLev = Math.max(...allLevs);
               else if (dragLev < Math.min(...allLevs))
                 closestDragLev = Math.min(...allLevs);
-              bestMode = availMoves.find(am => am[2] == closestDragLev);
-              if (!isSamePos && !bestMode && availMoves.length)
-                bestMode = availMoves[0];
+              bestMode = filteredMoves.find(am => am[2] == closestDragLev);
+              if (!isSamePos && !bestMode && filteredMoves.length)
+                bestMode = filteredMoves[0];
               moveInfo = bestMode;
             }
           }
@@ -409,12 +430,18 @@ export default (Builder, CanMoveFn = null) => {
     }
 
     canMove (fromII, toII, placement, toParentII, canMoveFn) {
-      if(!fromII || !toII)
+      if (!fromII || !toII)
         return false;
-      if(fromII.id === toII.id)
+      if (fromII.id === toII.id)
         return false;
 
-      var res = true;
+      const canRegroup = this.props.config.settings.canRegroup;
+      const isStructChange = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND
+        || fromII.parent != toII.parent;
+      if (!canRegroup && isStructChange)
+        return false;
+
+      let res = true;
       if (canMoveFn)
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);
       return res;
