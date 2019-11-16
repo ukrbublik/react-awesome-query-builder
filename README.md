@@ -140,6 +140,7 @@ export default {
         yellow: 'Yellow',
         green: 'Green',
       },
+      allowCustomValues: true, //default is false, can be true for MultiSelect widget
       //(optional) You can override here some options of config of corresponding type:
       // 'operators', 'defaultOperator', 'widgets', 'valueSources' (see below at section 'types')
     },

@@ -224,6 +224,7 @@ export default {
                 green: 'Green',
                 orange: 'Orange'
             },
+            allowCustomValues: true
         },
         stock: {
             label: 'In stock',

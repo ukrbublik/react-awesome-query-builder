@@ -45,6 +45,7 @@ export default class MultiSelectWidget extends Component {
     this.placeholder = placeholder;
     this.placeholderWidth = placeholderWidth;
     this.optionsMaxWidth = optionsMaxWidth;
+    this.allowCustomValues = fieldDefinition.allowCustomValues;
   }
 
   render() {
@@ -58,7 +59,7 @@ export default class MultiSelectWidget extends Component {
 
     return (
         <Select
-            mode={"multiple"}
+            mode={this.allowCustomValues ? "tags" : "multiple"}
             style={{
               minWidth: value ? null : this.placeholderWidth + 40,
               width: this.props.value ? null : this.placeholderWidth + 40,
