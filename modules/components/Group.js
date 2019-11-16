@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import map from 'lodash/map';
 import startsWith from 'lodash/startsWith'
 import GroupContainer from './containers/GroupContainer';
-import DraggableGroup from './containers/DraggableGroup';
+import Draggable from './containers/Draggable';
 import { Icon, Button, Radio, Modal } from 'antd';
 const { confirm } = Modal;
 const ButtonGroup = Button.Group;
@@ -26,7 +26,7 @@ export const groupActionsPositionList = {
 const defaultPosition = 'topRight'
 
 @GroupContainer
-@DraggableGroup
+@Draggable("group")
 class Group extends Component {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
@@ -130,7 +130,7 @@ class Group extends Component {
     return [
         <div key="group-header" className="group--header">
           {this.renderHeader()}
-          {this.isGroupTopPosition() && this.renderGroup(this.getGroupPositionClass())}
+          {this.isGroupTopPosition() && this.renderActions(this.getGroupPositionClass())}
         </div>
     , this.props.children1 &&
         <div key="group-children" className={classNames(
@@ -139,38 +139,48 @@ class Group extends Component {
         )}>{this.renderChildren()}</div>
     , !this.isGroupTopPosition() &&
         <div key="group-footer" className='group--footer'>
-          {this.renderGroup(this.getGroupPositionClass())}
+          {this.renderActions(this.getGroupPositionClass())}
         </div>
     ];
   }
 
-  renderGroup = (position) => {
+  renderActions = (position) => {
+    const immutableGroupsMode = this.props.config.settings.immutableGroupsMode;
+    const addRuleLabel = this.props.config.settings.addRuleLabel || "Add rule";
+    const addGroupLabel = this.props.config.settings.addGroupLabel || "Add group";
+    const delGroupLabel = this.props.config.settings.delGroupLabel !== undefined ? this.props.config.settings.delGroupLabel : "Delete";
+
+    const addRuleBtn = !immutableGroupsMode &&
+      <Button
+        key="group-add-rule"
+        icon="plus"
+        className="action action--ADD-RULE"
+        onClick={this.props.addRule}
+      >{addRuleLabel}</Button>;
+    const addGroupBtn = !immutableGroupsMode && this.props.allowFurtherNesting &&
+      <Button
+        key="group-add-group"
+        className="action action--ADD-GROUP"
+        icon="plus-circle-o"
+        onClick={this.props.addGroup}
+      >{addGroupLabel}</Button>;
+    const delGroupBtn = !immutableGroupsMode && !this.props.isRoot &&
+      <Button
+        key="group-del"
+        type="danger"
+        icon="delete"
+        className="action action--DELETE"
+        onClick={this.removeSelf}
+      >{delGroupLabel}</Button>;
+
     return (
       <div className={`group--actions ${position}`}>
         <ButtonGroup
           size={this.props.config.settings.renderSize || "small"}
-        >{!this.props.config.settings.readonlyMode &&
-          <Button
-            icon="plus"
-            className="action action--ADD-RULE"
-            onClick={this.props.addRule}
-          >{this.props.config.settings.addRuleLabel || "Add rule"}</Button>
-          }
-          {!this.props.config.settings.readonlyMode && this.props.allowFurtherNesting ? (
-            <Button
-              className="action action--ADD-GROUP"
-              icon="plus-circle-o"
-              onClick={this.props.addGroup}
-            >{this.props.config.settings.addGroupLabel || "Add group"}</Button>
-          ) : null}
-          {!this.props.config.settings.readonlyMode && !this.props.isRoot ? (
-            <Button
-              type="danger"
-              icon="delete"
-              className="action action--ADD-DELETE"
-              onClick={this.removeSelf}
-            >{this.props.config.settings.delGroupLabel !== undefined ? this.props.config.settings.delGroupLabel : "Delete"}</Button>
-          ) : null}
+        >
+          {addRuleBtn}
+          {addGroupBtn}
+          {delGroupBtn}
         </ButtonGroup>
       </div>
     )
@@ -197,51 +207,65 @@ class Group extends Component {
   }
 
   renderHeader = () => {
-    let renderConjsAsRadios = false;
+    const conjsRadios = () => (
+      <RadioGroup
+        key="group-conjs-radios"
+        disabled={this.props.children1.size < 2}
+        value={this.props.selectedConjunction}
+        size={this.props.config.settings.renderSize || "small"}
+        onChange={this.props.setConjunction}
+      >
+        {map(this.props.conjunctionOptions, (item, index) => (
+          <RadioButton
+            key={item.id}
+            value={item.key}
+          //checked={item.checked}
+          >{item.label}</RadioButton>
+        ))}
+      </RadioGroup>
+    );
+
+    const conjsButtons = () => (
+      <ButtonGroup
+        key="group-conjs-buttons"
+        size={this.props.config.settings.renderSize || "small"}
+        disabled={this.props.children1.size < 2}
+      >
+        {this.props.config.settings.showNot &&
+          <Button
+            key={"group-not"}
+            onClick={(ev) => this.props.setNot(ev, !this.props.not)}
+            type={this.props.not ? "primary" : null}
+          >{this.props.config.settings.notLabel}</Button>
+        }
+        {map(this.props.conjunctionOptions, (item, index) => (
+          <Button
+            disabled={this.props.children1.size < 2}
+            key={item.id}
+            type={item.checked ? "primary" : null}
+            onClick={this._getSetConjunctionHandler(item.key)}
+          >{item.label}</Button>
+        ))}
+      </ButtonGroup>
+    );
+
+    const conjs = this.props.config.settings.renderConjsAsRadios ? conjsRadios() : conjsButtons();
+
+    const showDragIcon = this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot;
+    const drag = showDragIcon &&
+      <span
+        key="group-drag-icon"
+        className={"qb-drag-handler group--drag-handler"}
+        onMouseDown={this.props.handleDraggerMouseDown}
+      ><Icon type="bars" /> </span>;
+
     return (
       <div className={classNames(
         "group--conjunctions",
         // this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--conj' : ''
       )}>
-        {this.props.config.settings.renderConjsAsRadios ?
-          <RadioGroup
-            disabled={this.props.children1.size < 2}
-            value={this.props.selectedConjunction}
-            size={this.props.config.settings.renderSize || "small"}
-            onChange={this.props.setConjunction}
-          >
-            {map(this.props.conjunctionOptions, (item, index) => (
-              <RadioButton
-                key={item.id}
-                value={item.key}
-              //checked={item.checked}
-              >{item.label}</RadioButton>
-            ))}
-          </RadioGroup>
-          :
-          <ButtonGroup
-            size={this.props.config.settings.renderSize || "small"}
-            disabled={this.props.children1.size < 2}
-          >
-            {this.props.config.settings.showNot &&
-              <Button
-                onClick={(ev) => this.props.setNot(ev, !this.props.not)}
-                type={this.props.not ? "primary" : null}
-              >{this.props.config.settings.notLabel}</Button>
-            }
-            {map(this.props.conjunctionOptions, (item, index) => (
-              <Button
-                disabled={this.props.children1.size < 2}
-                key={item.id}
-                type={item.checked ? "primary" : null}
-                onClick={this._getSetConjunctionHandler(item.key)}
-              >{item.label}</Button>
-            ))}
-          </ButtonGroup>
-        }
-        {this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
-          <span className={"qb-drag-handler"} onMouseDown={this.props.handleDraggerMouseDown} > <Icon type="bars" /> </span>
-        }
+        {conjs}
+        {drag}
       </div>
     );
   }

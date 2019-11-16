@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import RuleContainer from './containers/RuleContainer';
-import DraggableRule from './containers/DraggableRule';
+import Draggable from './containers/Draggable';
 import Field from './Field';
 import Operator from './Operator';
 import Widget from './Widget';
@@ -14,7 +14,7 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 @RuleContainer
-@DraggableRule
+@Draggable("rule")
 class Rule extends Component {
     static propTypes = {
         selectedField: PropTypes.string,
@@ -82,22 +82,7 @@ class Rule extends Component {
         const showWidget = isFieldAndOpSelected;
         const showOperatorOptions = isFieldAndOpSelected && selectedOperatorHasOptions;
 
-        return [
-            <div key="rule-header" className="rule--header">
-                {!this.props.config.settings.readonlyMode &&
-                    <Button
-                        type="danger"
-                        icon="delete"
-                        onClick={this.removeSelf}
-                        size={this.props.config.settings.renderSize || "small"}
-                    >
-                        {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}
-                    </Button>
-                }
-            </div>
-        , showDragIcon &&
-            <span key="rule-drag-icon" className={"qb-drag-handler"} onMouseDown={this.props.handleDraggerMouseDown} ><Icon type="bars" /> </span>
-        ,
+        const field = 
             <Col key={"fields"} className="rule--field">
                 { this.props.config.settings.showLabels &&
                     <label>{this.props.config.settings.fieldLabel || "Field"}</label>
@@ -110,8 +95,8 @@ class Rule extends Component {
                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
                     customProps={this.props.config.settings.customFieldSelectProps}
                 />
-            </Col>
-        , showOperator &&
+            </Col>;
+        const operator = showOperator &&
             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                 { this.props.config.settings.showLabels &&
                     <label>{this.props.config.settings.operatorLabel || "Operator"}</label>
@@ -124,8 +109,8 @@ class Rule extends Component {
                     setOperator={this.props.setOperator}
                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
                 />
-            </Col>
-        , showOperatorLabel &&
+            </Col>;
+        const hiddenOperator = showOperatorLabel &&
             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                 <div className="rule--operator">
                     {this.props.config.settings.showLabels ?
@@ -133,8 +118,8 @@ class Rule extends Component {
                     : null}
                     <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
                 </div>
-            </Col>
-        , showWidget &&
+            </Col>;
+        const widget = showWidget &&
             <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
                 <Widget
                     key="values"
@@ -146,8 +131,8 @@ class Rule extends Component {
                     setValue={this.props.setValue}
                     setValueSrc={this.props.setValueSrc}
                 />
-            </Col>
-        , showOperatorOptions &&
+            </Col>;
+        const operatorOptions = showOperatorOptions &&
             <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
                 <OperatorOptions
                     key="operatorOptions"
@@ -157,7 +142,45 @@ class Rule extends Component {
                     setOperatorOption={this.props.setOperatorOption}
                     config={this.props.config}
                 />
-            </Col>
+            </Col>;
+
+        const parts = [
+            field,
+            operator,
+            hiddenOperator,
+            widget,
+            operatorOptions
+        ];
+
+        const drag = showDragIcon &&
+            <span
+                key="rule-drag-icon"
+                className={"qb-drag-handler rule--drag-handler"}
+                onMouseDown={this.props.handleDraggerMouseDown}
+            ><Icon type="bars" /> </span>
+        ;
+
+        const del = (
+            <div key="rule-header" className="rule--header">
+            {!this.props.config.settings.immutableGroupsMode &&
+                <Button
+                    type="danger"
+                    icon="delete"
+                    onClick={this.removeSelf}
+                    size={this.props.config.settings.renderSize || "small"}
+                >
+                    {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}
+                </Button>
+            }
+            </div>
+        );
+
+        const body = <div key="rule-body" className="rule--body">{parts}</div>;
+
+        return [
+            drag,
+            body,
+            del
         ];
     }
 
