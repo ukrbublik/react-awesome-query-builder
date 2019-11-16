@@ -1,91 +1,94 @@
 'use strict';
 import last from 'lodash/last';
-import pick from 'lodash/pick';
-import pickBy from 'lodash/pickBy';
 import merge from 'lodash/merge';
 import mergeWith from 'lodash/mergeWith';
-import cloneDeep from 'lodash/cloneDeep';
 
 export const extendConfig = (config) => {
     //operators, defaultOperator - merge
     //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
-    //extend 'types' path
-    for (let type in config.types) {
-        let typeConfig = config.types[type];
-        let operators = null, defaultOperator = null;
-        typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != 'field')[0];
-        for (let widget in typeConfig.widgets) {
-            let typeWidgetConfig = typeConfig.widgets[widget];
-            if (typeWidgetConfig.operators) {
-                if (!operators)
-                    operators = [];
-                operators = operators.concat(typeWidgetConfig.operators.slice());
-            }
-            if (typeWidgetConfig.defaultOperator)
-                defaultOperator = typeWidgetConfig.defaultOperator;
-            if (widget == typeConfig.mainWidget) {
-                typeWidgetConfig = merge({}, {widgetProps: typeConfig.mainWidgetProps || {}}, typeWidgetConfig);
-            }
-            typeConfig.widgets[widget] = typeWidgetConfig;
-        }
-        if (!typeConfig.valueSources)
-            typeConfig.valueSources = Object.keys(config.settings.valueSourcesInfo);
-        for (let valueSrc of typeConfig.valueSources) {
-            if (valueSrc != 'value' && !typeConfig.widgets[valueSrc]) {
-                typeConfig.widgets[valueSrc] = {
-                };
-            }
-        }
-        if (!typeConfig.operators && operators)
-            typeConfig.operators = Array.from(new Set(operators)); //unique
-        if (!typeConfig.defaultOperator && defaultOperator)
-            typeConfig.defaultOperator = defaultOperator;
-        config.types[type] = typeConfig;
-    }
+    _extendTypesConfig(config.types, config);
 
-    //extend 'fields' path
-    function _extendFieldConfig(fieldConfig) {
-        let operators = null, defaultOperator = null;
-        let typeConfig = config.types[fieldConfig.type];
-        if (fieldConfig.type != '!struct') {
-            if (!fieldConfig.widgets)
-                fieldConfig.widgets = {};
-            fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
-            fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
-            for (let widget in typeConfig.widgets) {
-                let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
-                if (fieldWidgetConfig.operators) {
-                    if (!operators)
-                        operators = [];
-                    operators = operators.concat(fieldWidgetConfig.operators.slice());
-                }
-                if (fieldWidgetConfig.defaultOperator)
-                    defaultOperator = fieldWidgetConfig.defaultOperator;
-                if (widget == fieldConfig.mainWidget) {
-                    fieldWidgetConfig = merge({}, {widgetProps: fieldConfig.mainWidgetProps || {}}, fieldWidgetConfig);
-                }
-                fieldConfig.widgets[widget] = fieldWidgetConfig;
-            }
-            if (!fieldConfig.operators && operators)
-                fieldConfig.operators = Array.from(new Set(operators));
-            if (!fieldConfig.defaultOperator && defaultOperator)
-                fieldConfig.defaultOperator = defaultOperator;
-        }
-    };
-    function _extendFieldsConfig(subconfig) {
-        for (let field in subconfig) {
-            _extendFieldConfig(subconfig[field]);
-            if (subconfig[field].subfields) {
-                _extendFieldsConfig(subconfig[field].subfields);
-            }
-        }
-    }
-    _extendFieldsConfig(config.fields);
-    //console.log(config); 
+    _extendFieldsConfig(config.fields, config);
+    
     return config;
 };
 
+function _extendTypesConfig(typesConfig, config) {
+    for (let type in typesConfig) {
+        let typeConfig = typesConfig[type];
+        _extendTypeConfig(typeConfig, config);
+    }
+};
+
+function _extendTypeConfig(typeConfig, config) {
+    let operators = null, defaultOperator = null;
+    typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != 'field')[0];
+    for (let widget in typeConfig.widgets) {
+        let typeWidgetConfig = typeConfig.widgets[widget];
+        if (typeWidgetConfig.operators) {
+            if (!operators)
+                operators = [];
+            operators = operators.concat(typeWidgetConfig.operators.slice());
+        }
+        if (typeWidgetConfig.defaultOperator)
+            defaultOperator = typeWidgetConfig.defaultOperator;
+        if (widget == typeConfig.mainWidget) {
+            typeWidgetConfig = merge({}, {widgetProps: typeConfig.mainWidgetProps || {}}, typeWidgetConfig);
+        }
+        typeConfig.widgets[widget] = typeWidgetConfig;
+    }
+    if (!typeConfig.valueSources)
+        typeConfig.valueSources = Object.keys(config.settings.valueSourcesInfo);
+    for (let valueSrc of typeConfig.valueSources) {
+        if (valueSrc != 'value' && !typeConfig.widgets[valueSrc]) {
+            typeConfig.widgets[valueSrc] = {
+            };
+        }
+    }
+    if (!typeConfig.operators && operators)
+        typeConfig.operators = Array.from(new Set(operators)); //unique
+    if (!typeConfig.defaultOperator && defaultOperator)
+        typeConfig.defaultOperator = defaultOperator;
+};
+
+function _extendFieldsConfig(subconfig, config) {
+    for (let field in subconfig) {
+        _extendFieldConfig(subconfig[field], config);
+        if (subconfig[field].subfields) {
+            _extendFieldsConfig(subconfig[field].subfields, config);
+        }
+    }
+};
+
+function _extendFieldConfig(fieldConfig, config) {
+    let operators = null, defaultOperator = null;
+    let typeConfig = config.types[fieldConfig.type];
+    if (fieldConfig.type != '!struct') {
+        if (!fieldConfig.widgets)
+            fieldConfig.widgets = {};
+        fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
+        fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
+        for (let widget in typeConfig.widgets) {
+            let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
+            if (fieldWidgetConfig.operators) {
+                if (!operators)
+                    operators = [];
+                operators = operators.concat(fieldWidgetConfig.operators.slice());
+            }
+            if (fieldWidgetConfig.defaultOperator)
+                defaultOperator = fieldWidgetConfig.defaultOperator;
+            if (widget == fieldConfig.mainWidget) {
+                fieldWidgetConfig = merge({}, {widgetProps: fieldConfig.mainWidgetProps || {}}, fieldWidgetConfig);
+            }
+            fieldConfig.widgets[widget] = fieldWidgetConfig;
+        }
+        if (!fieldConfig.operators && operators)
+            fieldConfig.operators = Array.from(new Set(operators));
+        if (!fieldConfig.defaultOperator && defaultOperator)
+            fieldConfig.defaultOperator = defaultOperator;
+    }
+};
 
 export const getFieldRawConfig = (field, config) => {
     if (!field || field == ':empty:')
@@ -119,7 +122,7 @@ export const getFieldConfig = (field, config) => {
 
     //merge, but don't merge operators (rewrite instead)
     const typeConfig = config.types[fieldConfig.type] || {};
-    let ret = mergeWith({}, typeConfig, fieldConfig || {}, (objValue, srcValue, key, object, source, stack) => {
+    let ret = mergeWith({}, typeConfig, fieldConfig || {}, (objValue, srcValue, _key, _object, _source, _stack) => {
         if (Array.isArray(objValue)) {
             return srcValue;
         }
@@ -166,7 +169,7 @@ export const getFieldPath = (field, config) => {
     const fieldSeparator = config.settings.fieldSeparator;
     return field
         .split(fieldSeparator)
-        .map((curr, ind, arr) => arr.slice(0, ind+1))
+        .map((_curr, ind, arr) => arr.slice(0, ind+1))
         .map((parts) => parts.join(fieldSeparator));
 };
 
@@ -176,7 +179,7 @@ export const getFieldPathLabels = (field, config) => {
     const fieldSeparator = config.settings.fieldSeparator;
     return field
         .split(fieldSeparator)
-        .map((curr, ind, arr) => arr.slice(0, ind+1))
+        .map((_curr, ind, arr) => arr.slice(0, ind+1))
         .map((parts) => parts.join(fieldSeparator))
         .map(part => {
             const cnf = getFieldConfig(part, config);
@@ -247,7 +250,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
     if (!field || !operator)
         return {widgets, valueSrcs};
     const fieldConfig = getFieldConfig(field, config);
-    //const typeConfig = config.types[fieldConfig.type] || {};
+    const _typeConfig = config.types[fieldConfig.type] || {};
     const opConfig = config.operators[operator];
     if (fieldConfig && fieldConfig.widgets) {
         for (let widget in fieldConfig.widgets) {
@@ -266,7 +269,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
     }
     widgets.sort((w1, w2) => {
         let w1Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w1) != -1 : w1 == fieldConfig.mainWidget;
-        let w2Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w2) != -1 : w2 == fieldConfig.mainWidget;
+        let _w2Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w2) != -1 : w2 == fieldConfig.mainWidget;
         if (w1 != w2) {
             return w1Main ? -1 : +1;
         }
@@ -277,17 +280,17 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
 };
 
 export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {
-    let {widgets, valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
+    const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
     return widgets;
 };
 
 export const getValueSourcesForFieldOp = (config, field, operator) => {
-    let {widgets, valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
+    const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
     return valueSrcs;
 };
 
 export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
-    let {widgets, valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
+    const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
     let widget = null;
     if (widgets.length)
         widget = widgets[0];

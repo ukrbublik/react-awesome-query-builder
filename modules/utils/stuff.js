@@ -1,6 +1,9 @@
 import mapValues from 'lodash/mapValues';
 
 
+export const SELECT_WIDTH_OFFSET_RIGHT = 48;
+const DEFAULT_FONT = '14px';
+
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 // };
@@ -18,7 +21,7 @@ export const bindActionCreators = (actionCreators, config, dispatch) =>
 
 
 export const calcTextWidth = function(str, font) {
-  var f = font || '14px';
+  var f = font || DEFAULT_FONT;
   var div = document.createElement("div");
   div.innerHTML = str;
   var css = {

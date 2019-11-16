@@ -4,7 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare';
 import {
   getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../../utils/configUtils";
-import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS} from "../../utils/stuff";
+import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -172,7 +172,7 @@ export default class ValueField extends Component {
     let dropdownPlacement = this.props.config.settings.dropdownPlacement;
     let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
     let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
-    let placeholderWidth = calcTextWidth(placeholder, '14px');
+    let placeholderWidth = calcTextWidth(placeholder);
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
 
@@ -180,7 +180,7 @@ export default class ValueField extends Component {
           <Select
               dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
               dropdownMatchSelectWidth={false}
-              style={{ width: this.props.value ? null : placeholderWidth + 48 }}
+              style={{ width: this.props.value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
               ref="field"
               placeholder={placeholder}
               size={this.props.config.settings.renderSize || "small"}

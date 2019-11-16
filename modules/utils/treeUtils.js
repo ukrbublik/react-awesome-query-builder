@@ -1,5 +1,4 @@
 import Immutable from 'immutable';
-import clone from 'clone';
 
 
 /**
@@ -49,7 +48,7 @@ export const fixPathsInTree = (tree) => {
     let newTree = tree;
 
     function _processNode (item, path, lev) {
-        const id = item.get('id');
+        const _id = item.get('id');
         const itemPath = path.push(item.get('id'));
         const currItemPath = item.get('path');
         if (!currItemPath || !currItemPath.equals(itemPath)) {
@@ -58,7 +57,7 @@ export const fixPathsInTree = (tree) => {
 
         const children = item.get('children1');
         if (children) {
-            children.map((child, childId) => {
+            children.map((child, _childId) => {
                 _processNode(child, itemPath, lev + 1);
             });
         }
@@ -85,26 +84,26 @@ export const getFlatTree = (tree) => {
         const collapsed = item.get('collapsed');
         const id = item.get('id');
         const children = item.get('children1');
-        const childrenIds = children ? children.map((child, childId) => childId) : null;
+        const childrenIds = children ? children.map((_child, childId) => childId) : null;
 
-        let itemsBefore = flat.length;
-        let top = realHeight;
+        const itemsBefore = flat.length;
+        const top = realHeight;
         flat.push(id);
         if (!insideCollapsed)
             realHeight += 1;
         info.height = (info.height || 0) + 1;
         if (children) {
             let subinfo = {};
-            children.map((child, childId) => {
+            children.map((child, _childId) => {
                 _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo);
             });
             if (!collapsed) {
                 info.height = (info.height || 0) + (subinfo.height || 0);
             }
         }
-        let itemsAfter = flat.length;
-        let bottom = realHeight;
-        let height = info.height;
+        const itemsAfter = flat.length;
+        const _bottom = realHeight;
+        const height = info.height;
 
         items[id] = {
             type: type,
@@ -128,8 +127,8 @@ export const getFlatTree = (tree) => {
     _flatizeTree(tree, [], false, 0, {});
 
     for (let i = 0 ; i < flat.length ; i++) {
-        let prevId = i > 0 ? flat[i-1] : null;
-        let nextId = i < (flat.length-1) ? flat[i+1] : null;
+        const prevId = i > 0 ? flat[i-1] : null;
+        const nextId = i < (flat.length-1) ? flat[i+1] : null;
         let item = items[flat[i]];
         item.prev = prevId;
         item.next = nextId;

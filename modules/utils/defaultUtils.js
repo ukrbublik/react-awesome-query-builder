@@ -1,6 +1,4 @@
 import Immutable from 'immutable';
-import map from 'lodash/map';
-import range from 'lodash/range';
 import uuid from './uuid';
 import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
 import {_getNewValueForFieldOp} from '../stores/tree'
