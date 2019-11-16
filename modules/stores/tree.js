@@ -18,7 +18,6 @@ const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')
  * @param {object} properties
  */
 const addNewGroup = (state, path, properties, config) => {
-    //console.log("Adding group");
     const groupUuid = uuid();
     state = addItem(state, path, 'group', groupUuid, defaultGroupProperties(config).merge(properties || {}));
 
@@ -39,9 +38,9 @@ const removeGroup = (state, path, config) => {
     state = removeItem(state, path);
 
     const parentPath = path.slice(0, -1);
-    let isEmptyGroup = !hasChildren(state, parentPath);
-    let isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-    let canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
+    const isEmptyGroup = !hasChildren(state, parentPath);
+    const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
+    const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
     if (isEmptyGroup && !canLeaveEmpty) {
         state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
     }
@@ -57,9 +56,9 @@ const removeRule = (state, path, config) => {
     state = removeItem(state, path);
 
     const parentPath = path.slice(0, -1);
-    let isEmptyGroup = !hasChildren(state, parentPath);
-    let isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-    let canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
+    const isEmptyGroup = !hasChildren(state, parentPath);
+    const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
+    const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
     if (isEmptyGroup && !canLeaveEmpty) {
         state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
     }
@@ -116,25 +115,25 @@ const removeItem = (state, path) => {
  * @param {object} config
  */
 const moveItem = (state, fromPath, toPath, placement, config) => {
-    let from = getItemByPath(state, fromPath);
-    let sourcePath = fromPath.pop();
-    let source = fromPath.size > 1 ? getItemByPath(state, sourcePath) : null;
-    let sourceChildren = source ? source.get('children1') : null;
+    const from = getItemByPath(state, fromPath);
+    const sourcePath = fromPath.pop();
+    const source = fromPath.size > 1 ? getItemByPath(state, sourcePath) : null;
+    const sourceChildren = source ? source.get('children1') : null;
 
-    let to = getItemByPath(state, toPath);
-    let targetPath = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? toPath : toPath.pop();
-    let target = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? 
+    const to = getItemByPath(state, toPath);
+    const targetPath = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? toPath : toPath.pop();
+    const target = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? 
         to
         : toPath.size > 1 ? getItemByPath(state, targetPath) : null;
-    let targetChildren = target ? target.get('children1') : null;
+    const targetChildren = target ? target.get('children1') : null;
 
     if (!source || !target)
         return state;
 
-    let isSameParent = (source.get('id') == target.get('id'));
-    let isSourceInsideTarget = targetPath.size < sourcePath.size 
+    const isSameParent = (source.get('id') == target.get('id'));
+    const isSourceInsideTarget = targetPath.size < sourcePath.size 
         && deepCompare(targetPath.toArray(), sourcePath.toArray().slice(0, targetPath.size));
-    let isTargetInsideSource = targetPath.size > sourcePath.size 
+    const isTargetInsideSource = targetPath.size > sourcePath.size 
         && deepCompare(sourcePath.toArray(), targetPath.toArray().slice(0, sourcePath.size));
     let sourceSubpathFromTarget = null;
     let targetSubpathFromSource = null;
@@ -150,13 +149,12 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
     if (isSameParent) {
         newTargetChildren = newSourceChildren;
     } else if (isSourceInsideTarget) {
-        newTargetChildren = newTargetChildren.updateIn(expandTreeSubpath(sourceSubpathFromTarget, 'children1'), (oldChildren) => newSourceChildren);
+        newTargetChildren = newTargetChildren.updateIn(expandTreeSubpath(sourceSubpathFromTarget, 'children1'), (_oldChildren) => newSourceChildren);
     }
 
     if (placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) {
         newTargetChildren = Immutable.OrderedMap().withMutations(r => {
-            let itemId, item, i = 0, size = newTargetChildren.size;
-            for ([itemId, item] of newTargetChildren.entries()) {
+            for (let [itemId, item] of newTargetChildren.entries()) {
                 if (itemId == to.get('id') && placement == constants.PLACEMENT_BEFORE) {
                     r.set(from.get('id'), from);
                 }
@@ -175,14 +173,14 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
     }
 
     if (isTargetInsideSource) {
-        newSourceChildren = newSourceChildren.updateIn(expandTreeSubpath(targetSubpathFromSource, 'children1'), (oldChildren) => newTargetChildren);
+        newSourceChildren = newSourceChildren.updateIn(expandTreeSubpath(targetSubpathFromSource, 'children1'), (_oldChildren) => newTargetChildren);
         newSourceChildren = newSourceChildren.delete(from.get('id'));
     }
 
     if (!isSameParent && !isSourceInsideTarget)
-        state = state.updateIn(expandTreePath(sourcePath, 'children1'), (oldChildren) => newSourceChildren);
+        state = state.updateIn(expandTreePath(sourcePath, 'children1'), (_oldChildren) => newSourceChildren);
     if (!isTargetInsideSource)
-        state = state.updateIn(expandTreePath(targetPath, 'children1'), (oldChildren) => newTargetChildren);
+        state = state.updateIn(expandTreePath(targetPath, 'children1'), (_oldChildren) => newTargetChildren);
 
     state = fixPathsInTree(state);
     return state;
@@ -206,20 +204,20 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
     const currentValueSrc = current.get('valueSrc', new Immutable.List());
     const currentValueType = current.get('valueType', new Immutable.List());
 
-    const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
+    const _currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
     const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
     const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
     const currentFieldConfig = getFieldConfig(currentField, oldConfig);
     const currentWidgets = Array.from({length: operatorCardinality}, (_ignore, i) => {
-        let vs = currentValueSrc.get(i) || null;
-        let w = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
+        const vs = currentValueSrc.get(i) || null;
+        const w = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
         return w;
     });
 
     const newFieldConfig = getFieldConfig(newField, config);
     const newWidgets = Array.from({length: operatorCardinality}, (_ignore, i) => {
-        let vs = currentValueSrc.get(i) || null;
-        let w = getWidgetForFieldOp(config, newField, newOperator, vs);
+        const vs = currentValueSrc.get(i) || null;
+        const w = getWidgetForFieldOp(config, newField, newOperator, vs);
         return w;
     });
     const commonWidgetsCnt = Math.min(newWidgets.length, currentWidgets.length);
@@ -285,14 +283,14 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
 };
 
 const _validateValue = (config, field, operator, value, valueType, valueSrc) => {
-    let v = value,
+    const v = value,
         vType = valueType,
         vSrc = valueSrc;
     const fieldConfig = getFieldConfig(field, config);
-    let w = getWidgetForFieldOp(config, field, operator, vSrc);
-    let wConfig = config.widgets[w];
-    let wType = wConfig.type;
-    let fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, vSrc), ['factory', 'formatValue']);
+    const w = getWidgetForFieldOp(config, field, operator, vSrc);
+    const wConfig = config.widgets[w];
+    const wType = wConfig.type;
+    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, vSrc), ['factory', 'formatValue']);
     let isValid = true;
     if (v != null) {
         const rightFieldDefinition = (vSrc == 'field' ? getFieldConfig(v, config) : null);
@@ -331,9 +329,9 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
                 }
             }
         }
-        let fn = fieldWidgetDefinition.validateValue;
+        const fn = fieldWidgetDefinition.validateValue;
         if (typeof fn == 'function') {
-            let args = [
+            const args = [
                 v, 
                 //field,
                 fieldConfig,
@@ -356,12 +354,12 @@ const setField = (state, path, newField, config) => {
         return removeItem(state, path);
 
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
-        const currentField = current.get('field');
         const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');
-        //const currentValue = current.get('value');
-        //const currentValueSrc = current.get('valueSrc', new Immutable.List());
-        //const currentValueType = current.get('valueType', new Immutable.List());
+        const _currentField = current.get('field');
+        const _currentValue = current.get('value');
+        const _currentValueSrc = current.get('valueSrc', new Immutable.List());
+        const _currentValueType = current.get('valueType', new Immutable.List());
 
         // If the newly selected field supports the same operator the rule currently
         // uses, keep it selected.
@@ -384,8 +382,8 @@ const setField = (state, path, newField, config) => {
             }
         }
 
-        let {canReuseValue, newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, newField, newOperator, 'field');
-        let newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
+        const {canReuseValue, newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, newField, newOperator, 'field');
+        const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
 
         return current
             .set('field', newField)
@@ -404,14 +402,14 @@ const setField = (state, path, newField, config) => {
  */
 const setOperator = (state, path, newOperator, config) => {
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
-        const currentValue = current.get('value', new Immutable.List());
-        const currentValueSrc = current.get('valueSrc', new Immutable.List());
         const currentField = current.get('field');
-        const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');
+        const _currentValue = current.get('value', new Immutable.List());
+        const _currentValueSrc = current.get('valueSrc', new Immutable.List());
+        const _currentOperator = current.get('operator');
 
-        let {canReuseValue, newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, currentField, newOperator, 'operator');
-        let newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
+        const {canReuseValue, newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, currentField, newOperator, 'operator');
+        const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
 
         return current
             .set('operator', newOperator)
@@ -434,7 +432,7 @@ const setValue = (state, path, delta, value, valueType, config) => {
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
     const calculatedValueType = valueType || (valueSrc === 'field' && value ? getFieldConfig(value, config).type : valueType);
-    let isValid = _validateValue(config, field, operator, value, calculatedValueType, valueSrc);
+    const isValid = _validateValue(config, field, operator, value, calculatedValueType, valueSrc);
 
     if (isValid) {
         if (typeof value === "undefined") {
