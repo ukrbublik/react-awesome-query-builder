@@ -63,7 +63,6 @@ export default (Rule) => {
 
 
     pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    //shouldComponentUpdate = this.pureShouldComponentUpdate;
     
     shouldComponentUpdate(nextProps, nextState) {
         let prevProps = this.props;
@@ -72,10 +71,12 @@ export default (Rule) => {
         let should = this.pureShouldComponentUpdate(nextProps, nextState);
         if (should) {
           if (prevState == nextState && prevProps != nextProps) {
+            const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
+            const isDraggingMe = draggingId == nextProps.id;
             let chs = [];
             for (let k in nextProps) {
                 let changed = (nextProps[k] != prevProps[k]);
-                if (k == 'dragging' && (nextProps.dragging.id || prevProps.dragging.id) != nextProps.id) {
+                if (k == 'dragging' && !isDraggingMe) {
                   changed = false; //dragging another item -> ignore
                 }
                 if (changed) {
@@ -92,7 +93,7 @@ export default (Rule) => {
 
     render() {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
-      let isGroup = fieldConfig && fieldConfig.type == '!struct';
+      const _isGroup = fieldConfig && fieldConfig.type == '!struct';
 
       return (
         <div

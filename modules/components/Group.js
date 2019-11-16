@@ -55,7 +55,33 @@ class Group extends Component {
   };
 
   pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-  shouldComponentUpdate = this.pureShouldComponentUpdate;
+    
+  shouldComponentUpdate(nextProps, nextState) {
+      let prevProps = this.props;
+      let prevState = this.state;
+
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
+      if (should) {
+        if (prevState == nextState && prevProps != nextProps) {
+          const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
+          const isDraggingMe = draggingId == nextProps.id;
+          let chs = [];
+          for (let k in nextProps) {
+              let changed = (nextProps[k] != prevProps[k]);
+              if (k == 'dragging' && isDraggingMe && !nextProps.isForDrag) {
+                  changed = false; //don't re-render source rule while dragging its drag-copy
+              }
+              if (changed) {
+                chs.push(k);
+              }
+          }
+          if (!chs.length)
+              should = false;
+        }
+      }
+
+      return should;
+  }
 
   constructor(props) {
     super(props);
