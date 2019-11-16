@@ -14,7 +14,6 @@ const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
 import {getFieldConfig, getFieldPath, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import size from 'lodash/size';
-var stringify = require('json-stringify-safe');
 const classNames = require('classnames');
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {Provider, Connector, connect} from 'react-redux';

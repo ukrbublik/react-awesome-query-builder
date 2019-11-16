@@ -6,7 +6,7 @@ import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
 import {fixPathsInTree} from '../utils/treeUtils';
-import {bindActionCreators} from "../utils/stuff";
+import {bindActionCreators, deepCompare} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import {queryString} from "../utils/queryString";
 import {defaultRoot} from "../utils/defaultUtils";
@@ -59,7 +59,7 @@ class ConnectedQuery extends Component {
 
         this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
         let validatedTreeChanged = oldValidatedTree !== this.validatedTree 
-            && JSON.stringify(oldValidatedTree) != JSON.stringify(this.validatedTree);
+            && !deepCompare(oldValidatedTree, this.validatedTree);
         if (validatedTreeChanged) {
             onChange && onChange(this.validatedTree);
             this.setState({treeChanged: true})

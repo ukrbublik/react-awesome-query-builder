@@ -21,9 +21,6 @@ export const PLACEMENT_BEFORE = 'before';
 export const PLACEMENT_APPEND = 'append';
 export const PLACEMENT_PREPEND = 'prepend';
 
-// export const SET_DRAGGING = 'SET_DRAGGING';
-// export const SET_DRAG_START = 'SET_DRAG_START';
-// export const SET_MOUSE_POS = 'SET_MOUSE_POS';
 export const SET_DRAG_PROGRESS = 'SET_DRAG_PROGRESS';
 export const SET_DRAG_START = 'SET_DRAG_START';
 export const SET_DRAG_END = 'SET_DRAG_END';
