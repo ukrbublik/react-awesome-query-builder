@@ -1,4 +1,5 @@
 import mapValues from 'lodash/mapValues';
+var stringify = require('json-stringify-safe');
 
 
 export const SELECT_WIDTH_OFFSET_RIGHT = 48;
@@ -77,6 +78,10 @@ export const BUILT_IN_PLACEMENTS = {
       adjustY: 1,
     },
   },
+};
+
+export const deepCompare = function(v1, v2) {
+  return JSON.stringify(v1) == JSON.stringify(v2);
 };
 
 //Do sets have same values?

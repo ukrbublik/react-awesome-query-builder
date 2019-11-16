@@ -6,9 +6,8 @@ import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import omit from 'lodash/omit';
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getValueSourcesForFieldOp} from "../utils/configUtils";
-import {defaultValue, eqArrSet} from "../utils/stuff";
+import {defaultValue, deepCompare} from "../utils/stuff";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
-var stringify = require('json-stringify-safe');
 
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')).size > 0;
@@ -134,9 +133,9 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
 
     let isSameParent = (source.get('id') == target.get('id'));
     let isSourceInsideTarget = targetPath.size < sourcePath.size 
-        && JSON.stringify(targetPath.toArray()) == JSON.stringify(sourcePath.toArray().slice(0, targetPath.size));
+        && deepCompare(targetPath.toArray(), sourcePath.toArray().slice(0, targetPath.size));
     let isTargetInsideSource = targetPath.size > sourcePath.size 
-        && JSON.stringify(sourcePath.toArray()) == JSON.stringify(targetPath.toArray().slice(0, sourcePath.size));
+        && deepCompare(sourcePath.toArray(), targetPath.toArray().slice(0, sourcePath.size));
     let sourceSubpathFromTarget = null;
     let targetSubpathFromSource = null;
     if (isSourceInsideTarget) {
@@ -231,7 +230,7 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
             || changedField == 'field' && !config.settings.clearValueOnChangeField 
             || changedField == 'operator' && !config.settings.clearValueOnChangeOp)
         && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
-        && JSON.stringify(currentWidgets.slice(0, commonWidgetsCnt)) == JSON.stringify(newWidgets.slice(0, commonWidgetsCnt))
+        && deepCompare(currentWidgets.slice(0, commonWidgetsCnt), newWidgets.slice(0, commonWidgetsCnt))
     ;
 
     if (canReuseValue) {

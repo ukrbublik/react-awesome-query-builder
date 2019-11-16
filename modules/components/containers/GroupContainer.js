@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import mapValues from 'lodash/mapValues';
 import Immutable from 'immutable';
-var stringify = require('json-stringify-safe');
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {Provider, Connector, connect} from 'react-redux';
 

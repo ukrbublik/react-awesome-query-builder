@@ -1,7 +1,7 @@
 import {
 	getFieldConfig, getOperatorsForField, getOperatorConfig
 } from './configUtils';
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, deepCompare} from "../utils/stuff";
 import {defaultOperatorOptions} from '../utils/defaultUtils';
 import {_getNewValueForFieldOp} from "../stores/tree";
 
@@ -120,7 +120,7 @@ function _validateRule (item, _path, meta, c) {
 		valueSrc: valueSrc ? valueSrc.toJS() : null,
 		value: value ? value.toJS() : null,
 	};
-	const sanitized = JSON.stringify(oldSerialized) != JSON.stringify(newSerialized);
+	const sanitized = !deepCompare(oldSerialized, newSerialized);
 	const isValid = field && operator && value && !value.find((v, _ind) => (v === undefined));
 	if (sanitized)
 		meta.sanitized = true;
