@@ -1,18 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import map from 'lodash/map';
 import startsWith from 'lodash/startsWith'
 import GroupContainer from './containers/GroupContainer';
-import { Row, Col, Icon, Button, Radio, Modal } from 'antd';
+import DraggableGroup from './containers/DraggableGroup';
+import { Icon, Button, Radio, Modal } from 'antd';
 const { confirm } = Modal;
 const ButtonGroup = Button.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const classNames = require('classnames');
-import Immutable from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import { Provider, Connector, connect } from 'react-redux';
 import Item from './Item';
 
 
@@ -28,9 +26,9 @@ export const groupActionsPositionList = {
 const defaultPosition = 'topRight'
 
 @GroupContainer
+@DraggableGroup
 class Group extends Component {
   static propTypes = {
-    isForDrag: PropTypes.bool,
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     treeNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
@@ -41,46 +39,22 @@ class Group extends Component {
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
     path: PropTypes.any, //instanceOf(Immutable.List)
-    onDragStart: PropTypes.func,
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
+    isDraggingMe: PropTypes.bool,
+    isDraggingTempo: PropTypes.bool,
     //actions
+    handleDraggerMouseDown: PropTypes.func,
+    onDragStart: PropTypes.func,
     addRule: PropTypes.func.isRequired,
     addGroup: PropTypes.func.isRequired,
     removeSelf: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
-    //connected:
-    dragging: PropTypes.object, //{id, x, y, w, h}
   };
 
   pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    
-  shouldComponentUpdate(nextProps, nextState) {
-      let prevProps = this.props;
-      let prevState = this.state;
-
-      let should = this.pureShouldComponentUpdate(nextProps, nextState);
-      if (should) {
-        if (prevState == nextState && prevProps != nextProps) {
-          const isDraggingMe = nextProps.dragging.id == prevProps.dragging.id && nextProps.dragging.id == nextProps.id;
-          let chs = [];
-          for (let k in nextProps) {
-              let changed = (nextProps[k] != prevProps[k]);
-              if (k == 'dragging' && isDraggingMe && !nextProps.isForDrag) {
-                  changed = false; //don't re-render source rule while dragging its drag-copy
-              }
-              if (changed) {
-                chs.push(k);
-              }
-          }
-          if (!chs.length)
-              should = false;
-        }
-      }
-
-      return should;
-  }
+  shouldComponentUpdate = this.pureShouldComponentUpdate;
 
   constructor(props) {
     super(props);
@@ -102,14 +76,6 @@ class Group extends Component {
     this.props.setConjunction(e, itemKey);
   }
 
-  handleDraggerMouseDown = (e) => {
-    var nodeId = this.props.id;
-    var dom = this.refs.group;
-    if (this.props.onDragStart) {
-      this.props.onDragStart(nodeId, dom, e);
-    }
-  }
-
   getGroupPositionClass = () => {
     const { groupActionsPosition } = this.props.config.settings
     return groupActionsPositionList[groupActionsPosition] || groupActionsPositionList[defaultPosition]
@@ -117,16 +83,6 @@ class Group extends Component {
 
   isGroupTopPosition = () => {
     return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, 'top')
-  }
-
-  getRenderType(props) {
-    let renderType;
-    if (props.dragging && props.dragging.id == props.id) {
-      renderType = props.isForDrag ? 'dragging' : 'placeholder';
-    } else {
-      renderType = props.isForDrag ? null : 'normal';
-    }
-    return renderType;
   }
 
   removeSelf = () => {
@@ -168,6 +124,24 @@ class Group extends Component {
           properties.get("operator") !== null &&
           properties.get("value").filter((val) => val !== undefined).size > 0
       );
+  }
+
+  render() {
+    return [
+        <div key="group-header" className="group--header">
+          {this.renderHeader()}
+          {this.isGroupTopPosition() && this.renderGroup(this.getGroupPositionClass())}
+        </div>
+    , this.props.children1 &&
+        <div key="group-children" className={classNames(
+          "group--children",
+          this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : ''
+        )}>{this.renderChildren()}</div>
+    , !this.isGroupTopPosition() &&
+        <div key="group-footer" className='group--footer'>
+          {this.renderGroup(this.getGroupPositionClass())}
+        </div>
+    ];
   }
 
   renderGroup = (position) => {
@@ -266,51 +240,8 @@ class Group extends Component {
           </ButtonGroup>
         }
         {this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
-          <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} > <Icon type="bars" /> </span>
+          <span className={"qb-drag-handler"} onMouseDown={this.props.handleDraggerMouseDown} > <Icon type="bars" /> </span>
         }
-      </div>
-    );
-  }
-
-  render() {
-    let renderType = this.getRenderType(this.props);
-    if (!renderType)
-      return null;
-
-    let styles = {};
-    if (renderType == 'dragging') {
-      styles = {
-        top: this.props.dragging.y,
-        left: this.props.dragging.x,
-        width: this.props.dragging.w
-      };
-    }
-
-    return (
-      <div
-        className={classNames("group", "group-or-rule",
-          renderType == 'placeholder' ? 'qb-placeholder' : null,
-          renderType == 'dragging' ? 'qb-draggable' : null,
-        )}
-        style={styles}
-        ref="group"
-        data-id={this.props.id}
-      >
-        <div className="group--header">
-          {this.renderHeader()}
-          {this.isGroupTopPosition() && this.renderGroup(this.getGroupPositionClass())}
-        </div>
-        {this.props.children1 ? (
-          <div className={classNames(
-            "group--children",
-            this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : ''
-          )}>{this.renderChildren()}</div>
-        ) : null}
-        {!this.isGroupTopPosition() && (
-          <div className='group--footer'>
-            {this.renderGroup(this.getGroupPositionClass())}
-          </div>
-        )}
       </div>
     );
   }

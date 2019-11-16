@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import { createStore } from 'redux';
-import {Provider, Connector, connect} from 'react-redux';
+import {connect} from 'react-redux';
 import shallowCompare from 'react-addons-shallow-compare';
-import size from 'lodash/size';
-import {getFieldConfig} from "../../utils/configUtils";
 import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from '../../constants';
 import clone from 'clone';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
 import * as actions from '../../actions';
 
 
