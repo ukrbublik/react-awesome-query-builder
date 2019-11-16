@@ -306,7 +306,7 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
             if (vType != wType) {
                 isValid = false;
             }
-            if (fieldConfig && fieldConfig.listValues) {
+            if (fieldConfig && fieldConfig.listValues && !fieldConfig.allowCustomValues) {
                 if (v instanceof Array) {
                     for (let _v of v) {
                         if (fieldConfig.listValues[_v] == undefined) {
