@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS} from "../utils/stuff";
+import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT} from "../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
@@ -185,7 +185,7 @@ export default class Field extends Component {
     let fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
     let selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
     selectText = truncateString(selectText, maxLabelsLength);
-    let selectWidth = calcTextWidth(selectText, '14px');
+    let selectWidth = calcTextWidth(selectText);
     //let tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
@@ -194,7 +194,7 @@ export default class Field extends Component {
         <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 48 }}
+            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT }}
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}

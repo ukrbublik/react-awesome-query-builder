@@ -1,11 +1,7 @@
 'use strict';
-import Immutable from 'immutable';
-import uuid from "./uuid";
-import isArray from 'lodash/isArray'
 import {defaultValue} from "./stuff";
 import {
-    getFieldConfig, getWidgetForFieldOp, getValueSourcesForFieldOp, getOperatorConfig, getFieldWidgetConfig, 
-    getFieldPath, getFieldPathLabels, fieldWidgetDefinition
+    getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig
 } from './configUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
@@ -14,7 +10,6 @@ export const mongodbFormat = (item, config, _not = false) => {
     const type = item.get('type');
     const properties = item.get('properties');
     const children = item.get('children1');
-    const id = item.get('id')
 
     if (type === 'group' && children && children.size) {
         let resultQuery = {};
@@ -28,23 +23,20 @@ export const mongodbFormat = (item, config, _not = false) => {
         const mongoConj = conjunctionDefinition.mongoConj;
 
         const list = children
-            .map((currentChild) => {
-                return mongodbFormat(currentChild, config, not)
-            })
+            .map((currentChild) => mongodbFormat(currentChild, config, not))
             .filter((currentChild) => typeof currentChild !== 'undefined')
         if (!list.size)
             return undefined;
 
-        if (list.size == 1) {
+        if (list.size == 1)
             resultQuery = list.first();
-        } else {
+        else
             resultQuery[mongoConj] = list.toList();
-        }
 
         return resultQuery;
     } else if (type === 'rule') {
         let operator = properties.get('operator');
-        let operatorOptions = properties.get('operatorOptions');
+        const operatorOptions = properties.get('operatorOptions');
         let field = properties.get('field');
         let value = properties.get('value');
 
@@ -56,7 +48,6 @@ export const mongodbFormat = (item, config, _not = false) => {
         let reversedOp = operatorDefinition.reversedOp;
         let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-        const typeConfig = config.types[fieldDefinition.type] || {};
 
         if (_not) {
             [operator, reversedOp] = [reversedOp, operator];
@@ -87,8 +78,8 @@ export const mongodbFormat = (item, config, _not = false) => {
                 console.error("Field as right-hand operand is not supported for mongodb export");
             } else {
                 if (typeof fieldWidgetDefinition.mongoFormatValue === 'function') {
-                    let fn = fieldWidgetDefinition.mongoFormatValue;
-                    let args = [
+                    const fn = fieldWidgetDefinition.mongoFormatValue;
+                    const args = [
                         currentValue,
                         pick(fieldDefinition, ['fieldSettings', 'listValues']),
                         omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue']), //useful options: valueFormat for date/time
@@ -104,11 +95,11 @@ export const mongodbFormat = (item, config, _not = false) => {
         });
         if (value.size < cardinality || hasUndefinedValues)
             return undefined;
-        let formattedValue = cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
+        const formattedValue = cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
         
         //build rule
-        let fn = operatorDefinition.mongoFormatOp;
-        let args = [
+        const fn = operatorDefinition.mongoFormatOp;
+        const args = [
             field,
             operator,
             formattedValue,
@@ -117,7 +108,7 @@ export const mongodbFormat = (item, config, _not = false) => {
             omit(operatorDefinition, ['formatOp', 'mongoFormatOp']),
             operatorOptions,
         ];
-        let ruleQuery = fn(...args);
+        const ruleQuery = fn(...args);
         return ruleQuery;
     }
     return undefined;
