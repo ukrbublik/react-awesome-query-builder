@@ -29,7 +29,6 @@ export default (Group) => {
     }
 
     pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    //shouldComponentUpdate = this.pureShouldComponentUpdate;
 
     shouldComponentUpdate(nextProps, nextState) {
         let prevProps = this.props;
@@ -38,10 +37,12 @@ export default (Group) => {
         let should = this.pureShouldComponentUpdate(nextProps, nextState);
         if (should) {
           if (prevState == nextState && prevProps != nextProps) {
+            const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
+            const isDraggingMe = draggingId == nextProps.id;
             let chs = [];
             for (let k in nextProps) {
                 let changed = (nextProps[k] != prevProps[k]);
-                if (k == 'dragging' && (nextProps.dragging.id || prevProps.dragging.id) != nextProps.id) {
+                if (k == 'dragging' && !isDraggingMe) {
                   changed = false; //dragging another item -> ignore
                 }
                 if (changed) {
@@ -84,7 +85,7 @@ export default (Group) => {
       this.props.actions.setConjunction(this.props.path, conj);
     }
 
-    setNot(e = null, not = null) {
+    setNot = (e = null, not = null) => {
       this.props.actions.setNot(this.props.path, not);
     }
 
@@ -148,7 +149,7 @@ export default (Group) => {
               not={this.props.not}
               selectedConjunction={this.props.conjunction}
               setConjunction={this.setConjunction}
-              setNot={this.setNot.bind(this)}
+              setNot={this.setNot}
               removeSelf={this.removeSelf}
               addGroup={this.addGroup}
               addRule={this.addRule}
