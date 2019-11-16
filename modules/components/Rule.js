@@ -53,8 +53,7 @@ class Rule extends Component {
         let should = this.pureShouldComponentUpdate(nextProps, nextState);
         if (should) {
           if (prevState == nextState && prevProps != nextProps) {
-            const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
-            const isDraggingMe = draggingId == nextProps.id;
+            const isDraggingMe = nextProps.dragging.id == prevProps.dragging.id && nextProps.dragging.id == nextProps.id;
             let chs = [];
             for (let k in nextProps) {
                 let changed = (nextProps[k] != prevProps[k]);
