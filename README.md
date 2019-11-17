@@ -38,8 +38,6 @@ Install: `npm i react-awesome-query-builder`
 
 See `examples/demo` as example of usage and configuration.
 
-For full reordering support you need to add class `query-builder-container` for dom-element which is holding your querybuilder component AND has scrolling. If there is no such dom-element (only body) you can do nothing.
-
 
 ## Usage
 ```javascript
@@ -50,24 +48,23 @@ import 'react-awesome-query-builder/css/antd.less';
 import 'react-awesome-query-builder/css/styles.scss';
 import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
 
+const initValue = {"id": QbUtils.uuid(), "type": "group"};
+
 class DemoQueryBuilder extends Component {
-    render() {                
+    render() {
         return (
-            <div>
-                <Query 
-                  {...config} 
-                  //you can pass object here, see treeJSON at onChange
-                  //value=transit.fromJSON(treeJSON)
-                  get_children={this.getChildren}
-                  onChange={this.onChange}
-                ></Query>
-            </div>
+            <Query
+              {...config}
+              get_children={this.getChildren}
+              onChange={this.onChange}
+              value={QbUtils.loadTree(initValue)}
+            ></Query>
         );
     }
     
     getChildren(props) {
         return (
-            <div>
+            <div className="query-builder-container">
                 <div className="query-builder">
                     <Builder {...props} />
                 </div>
@@ -77,16 +74,17 @@ class DemoQueryBuilder extends Component {
         )
     }
     
-    onChange(tree) {
-      //here you can save tree object: 
-      //var treeJSON = transit.toJSON(tree)
+    onChange(immutableTree) {
+      let tree = QbUtils.getTree(immutableTree);
+      //here you can save tree
     }
 }
 ```
 
-Use can save tree as serialized Immutable object with `transit.toJSON`/`transit.fromJSON` 
--or- as plain JS, see `loadTree = function(serTree) {...}` 
-at `examples/demo/demo.js` (using `Immutable.fromJS` with a little trick)
+- Use can save query data in `onChange` callback. 
+  Note that value will be in Immutable format, so you can use `QbUtils.getTree()` to convert it into JS object.
+  You can store it on backend, and load after by passing in `value` prop.
+- You can pass `value` prop in `<Query>` for initial load
 
 
 ## Config format

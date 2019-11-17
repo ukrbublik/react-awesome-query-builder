@@ -2,22 +2,26 @@ import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetCo
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {defaultValue} from "./stuff";
+import {defaultConjunction} from './defaultUtils';
+import {Map} from 'immutable';
 
 export const queryString = (item, config, isForDisplay = false) => {
     const type = item.get('type');
-    const properties = item.get('properties');
+    const properties = item.get('properties') || new Map();
     const children = item.get('children1');
 
     if (type === 'group' && children && children.size) {
-        const conjunction = properties.get('conjunction');
         const not = properties.get('not');
-        const conjunctionDefinition = config.conjunctions[conjunction];
-
         const list = children
             .map((currentChild) => queryString(currentChild, config, isForDisplay))
             .filter((currentChild) => typeof currentChild !== 'undefined');
         if (!list.size)
             return undefined;
+
+        let conjunction = properties.get('conjunction');
+        if (!conjunction && list.size < 2)
+            conjunction = defaultConjunction(config);
+        const conjunctionDefinition = config.conjunctions[conjunction];
 
         return conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
     } else if (type === 'rule') {

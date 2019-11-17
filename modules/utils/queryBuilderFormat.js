@@ -3,6 +3,8 @@ import {defaultValue} from "./stuff";
 import {
     getFieldConfig, getOperatorConfig
 } from './configUtils';
+import {defaultConjunction} from './defaultUtils';
+import {Map} from 'immutable';
 
 /*
  Build tree to http://querybuilder.js.org/ like format
@@ -53,19 +55,21 @@ export const queryBuilderFormat = (item, config) => {
 //meta is mutable
 const _queryBuilderFormat = (item, config, meta) => {
     const type = item.get('type');
-    const properties = item.get('properties');
+    const properties = item.get('properties') || new Map();
     const children = item.get('children1');
     const id = item.get('id');
 
     if (type === 'group' && children && children.size) {
-        const conjunction = properties.get('conjunction');
-        const not = properties.get('not');
-
         const list = children
             .map((currentChild) => _queryBuilderFormat(currentChild, config, meta))
             .filter((currentChild) => typeof currentChild !== 'undefined');
         if (!list.size)
             return undefined;
+
+        let conjunction = properties.get('conjunction');
+        if (!conjunction && list.size < 2)
+            conjunction = defaultConjunction(config);
+        const not = properties.get('not');
 
         let resultQuery = {};
         resultQuery['rules'] = list.toList();
