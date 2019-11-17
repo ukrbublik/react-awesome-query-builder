@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import WidgetContainer from './containers/WidgetContainer';
-import { Row, Col } from 'antd';
+import { Col } from 'antd';
+import shallowCompare from 'react-addons-shallow-compare';
 
 @WidgetContainer
 export default class Widget extends Component {

@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
-import shallowCompare from 'react-addons-shallow-compare';
 import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from '../../constants';
 import clone from 'clone';
 import PropTypes from 'prop-types';
 import * as actions from '../../actions';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 export default (Builder, CanMoveFn = null) => {
-  class ConnectedSortableContainer extends Component {
+  class SortableContainer extends Component {
 
     static propTypes = {
       tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
@@ -23,7 +23,29 @@ export default (Builder, CanMoveFn = null) => {
         this.componentWillReceiveProps(props);
     }
 
-    shouldComponentUpdate = shallowCompare;
+    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    shouldComponentUpdate(nextProps, nextState) {
+      let prevProps = this.props;
+      let prevState = this.state;
+  
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
+      if (should) {
+        if (prevState == nextState && prevProps != nextProps) {
+          let chs = [];
+          for (let k in nextProps) {
+              let changed = (nextProps[k] != prevProps[k]);
+              if (changed) {
+                //don't render <Builder> on dragging - appropriate redux-connected components will do it
+                if(k != 'dragging' && k != 'mousePos')
+                  chs.push(k);
+              }
+          }
+          if (!chs.length)
+              should = false;
+        }
+      }
+      return should;
+    }
 
     componentWillReceiveProps(nextProps) {
         this.tree = getFlatTree(nextProps.tree);
@@ -114,7 +136,7 @@ export default (Builder, CanMoveFn = null) => {
       let treeEl = dom.closest('.query-builder');
       treeEl.classList.add("qb-dragging");
       let treeElContainer = treeEl.closest('.query-builder-container') || treeEl;
-      treeElContainer = this._getScrollParent(treeElContainer);
+      treeElContainer = this._getScrollParent(treeElContainer) || dom.closest('body');
       const scrollTop = treeElContainer.scrollTop;
       
       const _dragEl = this._getDraggableNodeEl(treeEl);
@@ -472,7 +494,7 @@ export default (Builder, CanMoveFn = null) => {
 
   }
 
-  const SortableContainer = connect(
+  const ConnectedSortableContainer = connect(
       (state) => {
           return {
             dragging: state.dragging,
@@ -484,9 +506,10 @@ export default (Builder, CanMoveFn = null) => {
         setDragProgress: actions.drag.setDragProgress,
         setDragEnd: actions.drag.setDragEnd,
       }
-  )(ConnectedSortableContainer);
+  )(SortableContainer);
+  ConnectedSortableContainer.displayName = "ConnectedSortableContainer";
 
-  return SortableContainer;
+  return ConnectedSortableContainer;
 
 }
 

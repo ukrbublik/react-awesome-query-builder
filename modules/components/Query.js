@@ -11,10 +11,9 @@ import {validateTree} from "../utils/validation";
 import {queryString} from "../utils/queryString";
 import {defaultRoot} from "../utils/defaultUtils";
 import { ConfigProvider } from 'antd';
-import Immutable from 'immutable';
 
 
-class ConnectedQuery extends Component {
+class Query extends Component {
     static propTypes = {
         config: PropTypes.object.isRequired,
         onChange: PropTypes.func,
@@ -46,10 +45,10 @@ class ConnectedQuery extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const {tree, onChange} = nextProps;
+        const {onChange} = nextProps;
         const oldTree = this.props.tree;
         const oldConfig = this.props.config;
-        const newTree = nextProps.tree;
+        const _newTree = nextProps.tree;
         const newConfig = nextProps.config;
         const oldValidatedTree = this.validatedTree;
 
@@ -70,7 +69,6 @@ class ConnectedQuery extends Component {
 
     render() {
         const {config, tree, get_children, dispatch, ...props} = this.props;
-        const validatedTree = this.validatedTree;
         return <div>
             {get_children({
                 tree: this.validatedTree,
@@ -82,16 +80,17 @@ class ConnectedQuery extends Component {
     }
 }
 
-const QueryContainer = connect(
+const ConnectedQuery = connect(
     (state) => {
         return {
           tree: state.tree,
         }
     },
-)(ConnectedQuery);
+)(Query);
+ConnectedQuery.displayName = "ConnectedQuery";
 
 
-export default class Query extends Component {
+export default class QueryContainer extends Component {
     static propTypes = {
         //config
         conjunctions: PropTypes.object.isRequired,
@@ -153,7 +152,7 @@ export default class Query extends Component {
         return (
             <ConfigProvider locale={config.settings.locale.antd}>
                 <Provider store={this.state.store}>
-                    <QueryContainer
+                    <ConnectedQuery
                       store={this.state.store}
                       get_children={get_children}
                       config={config}

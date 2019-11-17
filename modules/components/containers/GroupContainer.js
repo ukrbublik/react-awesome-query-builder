@@ -176,8 +176,7 @@ export default (Group) => {
           }
       }
   )(GroupContainer);
-
+  ConnectedGroupContainer.displayName = "ConnectedGroupContainer";
 
   return ConnectedGroupContainer;
-
 };

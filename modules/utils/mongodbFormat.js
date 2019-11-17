@@ -22,7 +22,7 @@ export const mongodbFormat = (item, config, _not = false) => {
             return undefined;
 
         let conjunction = properties.get('conjunction');
-        if (!conjunction && list.size < 2)
+        if (!conjunction)
             conjunction = defaultConjunction(config);
         let conjunctionDefinition = config.conjunctions[conjunction];
         if (not) {
