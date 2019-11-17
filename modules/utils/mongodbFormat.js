@@ -3,36 +3,39 @@ import {defaultValue} from "./stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig
 } from './configUtils';
+import {defaultConjunction} from './defaultUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
+import {Map} from 'immutable';
 
 export const mongodbFormat = (item, config, _not = false) => {
     const type = item.get('type');
-    const properties = item.get('properties');
+    const properties = item.get('properties') || new Map();
     const children = item.get('children1');
 
     if (type === 'group' && children && children.size) {
-        let resultQuery = {};
-        let conjunction = properties.get('conjunction');
-        let conjunctionDefinition = config.conjunctions[conjunction];
         const not = _not ? !(properties.get('not')) : (properties.get('not'));
-        if (not) {
-            conjunction = conjunctionDefinition.reversedConj;
-            conjunctionDefinition = config.conjunctions[conjunction];
-        }
-        const mongoConj = conjunctionDefinition.mongoConj;
-
         const list = children
             .map((currentChild) => mongodbFormat(currentChild, config, not))
             .filter((currentChild) => typeof currentChild !== 'undefined')
         if (!list.size)
             return undefined;
 
+        let conjunction = properties.get('conjunction');
+        if (!conjunction && list.size < 2)
+            conjunction = defaultConjunction(config);
+        let conjunctionDefinition = config.conjunctions[conjunction];
+        if (not) {
+            conjunction = conjunctionDefinition.reversedConj;
+            conjunctionDefinition = config.conjunctions[conjunction];
+        }
+        const mongoConj = conjunctionDefinition.mongoConj;
+
+        let resultQuery = {};
         if (list.size == 1)
             resultQuery = list.first();
         else
             resultQuery[mongoConj] = list.toList();
-
         return resultQuery;
     } else if (type === 'rule') {
         let operator = properties.get('operator');

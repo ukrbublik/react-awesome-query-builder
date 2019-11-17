@@ -1,82 +1,16 @@
 import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
-const {queryBuilderFormat, queryString, mongodbFormat} = Utils;
+const {queryBuilderFormat, queryString, mongodbFormat, getTree, loadTree, uuid} = Utils;
 import config from './config';
+import initValue from './init_value';
 var stringify = require('json-stringify-safe');
-const Immutable = require('immutable');
-const transit = require('transit-immutable-js');
-import { fromJS } from 'immutable';
-
-// https://github.com/ukrbublik/react-awesome-query-builder/issues/69
-var seriazlieAsImmutable = true;
-
-var serializeTree, loadTree, initValue;
-if (!seriazlieAsImmutable) {
-    serializeTree = function(tree) {
-        return JSON.stringify(tree.toJS());
-    };
-    loadTree = function(serTree) {
-        let tree = JSON.parse(serTree);
-        return fromJS(tree, function (key, value) {
-          let outValue;
-          if (key == 'value' && value.get(0) && value.get(0).toJS !== undefined)
-            outValue = Immutable.List.of(value.get(0).toJS());
-          else
-            outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
-          return outValue;
-        });
-    };
-    initValue = '{"type":"group","id":"9a99988a-0123-4456-b89a-b1607f326fd8","children1":{"a98ab9b9-cdef-4012-b456-71607f326fd9":{"type":"rule","id":"a98ab9b9-cdef-4012-b456-71607f326fd9","properties":{"field":"multicolor","operator":"multiselect_equals","value":[["yellow","green"]],"valueSrc":["value"],"operatorOptions":null,"valueType":["multiselect"]},"path":["9a99988a-0123-4456-b89a-b1607f326fd8","a98ab9b9-cdef-4012-b456-71607f326fd9"]}},"properties":{"conjunction":"AND","not":false},"path":["9a99988a-0123-4456-b89a-b1607f326fd8"]}'
-} else {
-    serializeTree = transit.toJSON;
-    loadTree = transit.fromJSON;
-    initValue = '["~#iM",["type","group","id","9a99988a-0123-4456-b89a-b1607f326fd8","children1",["~#iOM",["a98ab9b9-cdef-4012-b456-71607f326fd9",["^0",["type","rule","id","a98ab9b9-cdef-4012-b456-71607f326fd9","properties",["^0",["field","multicolor","operator","multiselect_equals","value",["~#iL",[["yellow","green"]]],"valueSrc",["^2",["value"]],"operatorOptions",null,"valueType",["^2",["multiselect"]]]],"path",["^2",["9a99988a-0123-4456-b89a-b1607f326fd8","a98ab9b9-cdef-4012-b456-71607f326fd9"]]]]]],"properties",["^0",["conjunction","AND","not",false]],"path",["^2",["9a99988a-0123-4456-b89a-b1607f326fd8"]]]]'
-}
-
-
-/*
-let ruleset = {
-    "condition": "AND",
-    "rules": [
-        {
-            "id": "name",
-            "field": "name",
-            "type": "string",
-            "input": "text",
-            "operator": "less",
-            "value": "test name"
-        },
-        {
-            "condition": "OR",
-            "rules": [
-                {
-                    "id": "category",
-                    "field": "date",
-                    "type": "date",
-                    "input": "date",
-                    "operator": "equal",
-                    "value": "2012-01-12"
-                },
-                {
-                    "id": "category",
-                    "field": "name",
-                    "type": "string",
-                    "input": "text",
-                    "operator": "equal",
-                    "value": "1"
-                }
-            ]
-        }
-    ]
-}
-*/
-
+var emptyInitValue = {"id": uuid(), "type": "group"};
 
 export default class DemoQueryBuilder extends Component {
     getChildren(props) {
         const jsonStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' } 
         return (
-            <div style={{padding: '10px'}}>
+            <div className="query-builder-container" style={{padding: '10px', overflow: "scroll", height: "400px"}}>
                 <div className="query-builder">
                     <Builder {...props} />
                 </div>
@@ -119,7 +53,7 @@ export default class DemoQueryBuilder extends Component {
                 <div>
                   Serialized Tree: 
                   <div style={jsonStyle}>
-                    {serializeTree(props.tree)}
+                    {stringify(getTree(props.tree))}
                   </div>
                 </div>
             </div>
@@ -128,15 +62,17 @@ export default class DemoQueryBuilder extends Component {
 
     render() {
         const {tree, ...config_props} = config;
+        let value = initValue;
+        if (!tree || Object.keys(tree).length === 0)
+          value = emptyInitValue;
                 
         return (
-            <div>
                 <Query 
-                    value={loadTree(initValue)}
+                    value={loadTree(value)}
                     {...config_props} 
                     get_children={this.getChildren}
+                    onChange={this.onChange}
                 > </Query>
-            </div>
         );
     }
 }
