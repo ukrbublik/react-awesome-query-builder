@@ -33,7 +33,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Export to MongoDb or SQL
 
 
-### Install
+## Getting started
 Install: `npm i react-awesome-query-builder`
 
 See `examples/demo` as example of usage and configuration.
@@ -41,14 +41,14 @@ See `examples/demo` as example of usage and configuration.
 For full reordering support you need to add class `query-builder-container` for dom-element which is holding your querybuilder component AND has scrolling. If there is no such dom-element (only body) you can do nothing.
 
 
-## Use
+## Usage
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, Utils as QbUtils} from 'react-awesome-query-builder';
 import config from './config'; //see below 'Config format'
+import 'react-awesome-query-builder/css/antd.less';
 import 'react-awesome-query-builder/css/styles.scss';
-import 'react-awesome-query-builder/css/compact_styles.scss';
-import 'react-awesome-query-builder/css/denormalize.scss';
+import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
 
 class DemoQueryBuilder extends Component {
     render() {                
@@ -87,7 +87,6 @@ class DemoQueryBuilder extends Component {
 Use can save tree as serialized Immutable object with `transit.toJSON`/`transit.fromJSON` 
 -or- as plain JS, see `loadTree = function(serTree) {...}` 
 at `examples/demo/demo.js` (using `Immutable.fromJS` with a little trick)
-
 
 
 ## Config format
@@ -307,7 +306,8 @@ export default {
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
-    readonlyMode: false,
+    //Not allow to add/delete rules or groups, but allow change
+    immutableGroupsMode: false,
     notLabel: "Not",
     //If you want to ask confirmation of removing non-empty rule/group, add these options
     //List of all valid properties: https://ant.design/components/modal/#API
@@ -350,6 +350,9 @@ export default {
     },
     //Activate reordering support for rules and groups of rules?
     canReorder: true,
+    //Allow move rules (or groups) in/out groups during reorder?
+    //(False - allow "safe" reorder, means only reorder at same level)
+    canRegroup: true,
     //(For comparing field with field) Function for building right list of fields to compare
     canCompareFieldWithField: (string leftField, Object leftFieldConfig, string rightField, 
       Object rightFieldConfig) => {
@@ -360,6 +363,7 @@ export default {
 }
 
 ```
+
 
 ### Development
 To build the component locally, clone this repo then run:
