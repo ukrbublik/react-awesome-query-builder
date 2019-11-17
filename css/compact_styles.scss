@@ -27,7 +27,14 @@
         width: 7px;
     }
   }
+  
+  & > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        top: -7px;
+      }
+  }
 }
+
 
 .group--conjunctions {
   @extend %force_nomargin;
@@ -38,14 +45,6 @@
     margin-bottom: 5px;
     padding-right: 5px;
 }
-
-/*
-.query-builder.qb-dragging {
-    .group-or-rule-container {
-        margin-bottom: 10px;
-    }
-}
-*/
 
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 5px;
