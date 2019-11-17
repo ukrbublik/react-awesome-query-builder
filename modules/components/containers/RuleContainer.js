@@ -151,8 +151,7 @@ export default (Rule) => {
           }
       }
   )(RuleContainer);
-
+  ConnectedRuleContainer.displayName = "ConnectedRuleContainer";
 
   return ConnectedRuleContainer;
-
 };

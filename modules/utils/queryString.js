@@ -19,7 +19,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             return undefined;
 
         let conjunction = properties.get('conjunction');
-        if (!conjunction && list.size < 2)
+        if (!conjunction)
             conjunction = defaultConjunction(config);
         const conjunctionDefinition = config.conjunctions[conjunction];
 

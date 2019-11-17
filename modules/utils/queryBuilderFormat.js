@@ -67,7 +67,7 @@ const _queryBuilderFormat = (item, config, meta) => {
             return undefined;
 
         let conjunction = properties.get('conjunction');
-        if (!conjunction && list.size < 2)
+        if (!conjunction)
             conjunction = defaultConjunction(config);
         const not = properties.get('not');
 

@@ -49,7 +49,7 @@ export default class RangeWidget extends Component {
     this.props.setValue(value);
   }
 
-  defaultProps = {
+  static defaultProps = {
     min: 0,
     max: 100,
     step: 10,

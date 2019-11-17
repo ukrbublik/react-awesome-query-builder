@@ -49,14 +49,14 @@
     "lodash": "^4.6",
     "moment": "^2.12.0",
     "prop-types": "^15.6.0",
-    "react-transition-group": "^1.2.1",
+    "rc-align": "2.3.5",
     "react-addons-pure-render-mixin": "^15.0.0",
     "react-addons-shallow-compare": "^15.0.0",
     "react-redux": "^5.0.0",
+    "react-transition-group": "^1.2.1",
     "redux": "^3.7.2",
     "transit-immutable-js": "^0.7.0",
-    "transit-js": "^0.8.846",
-    "rc-align": "2.3.5"
+    "transit-js": "^0.8.846"
   },
   "peerDependencies": {
     "react": "^0.14.6 || ^15.0.0 || ^16.4.1 ",

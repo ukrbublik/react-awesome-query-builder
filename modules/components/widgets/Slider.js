@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 import { Slider, InputNumber, Col, Row } from 'antd';
 import 'antd/lib/date-picker/style';
 import { getFieldConfig } from '../../utils/configUtils';
@@ -31,7 +30,9 @@ export default class SliderWidget extends Component {
     this.props.setValue(val);
   }
 
-  defaultProps = {
+  tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
+
+  static defaultProps = {
     min: 0,
     max: 100,
     step: 10,
@@ -67,7 +68,7 @@ export default class SliderWidget extends Component {
           <Slider
             ref="slider"
             value={value}
-            tipFormatter={(val) => (val != undefined ? val.toString() : undefined)}
+            tipFormatter={this.tipFormatter}
             min={min}
             max={max}
             included={false}
