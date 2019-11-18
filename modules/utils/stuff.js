@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues';
 var stringify = require('json-stringify-safe');
+import Immutable, { Map } from 'immutable';
 
 
 export const SELECT_WIDTH_OFFSET_RIGHT = 48;
@@ -81,7 +82,11 @@ export const BUILT_IN_PLACEMENTS = {
 };
 
 export const deepCompare = function(v1, v2) {
-  return JSON.stringify(v1) == JSON.stringify(v2);
+  if (Map.isMap(v1)) {
+    return v1.equals(v2);
+  } else {
+    return JSON.stringify(v1) == JSON.stringify(v2);
+  }
 };
 
 //Do sets have same values?

@@ -1,3 +1,5 @@
+import Immutable, { Map } from 'immutable';
+
 export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState) => {
   const prevProps = self.props;
   const prevState = self.state;
@@ -28,13 +30,15 @@ export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState
   return should;
 };
 
-function shallowEqual(a, b, deep = false) {
+export const shallowEqual = (a, b, deep = false) => {
   if (Array.isArray(a))
     return shallowEqualArrays(a, b, deep);
+  else if (Map.isMap(a))
+    return a.equals(b);
   else if (typeof a == 'object')
     return shallowEqualObjects(a, b, deep);
   else
-  return a === b;
+    return a === b;
 };
 
 function shallowEqualArrays(arrA, arrB, deep = false) {

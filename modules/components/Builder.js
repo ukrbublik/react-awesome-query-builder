@@ -18,7 +18,26 @@ export default class Builder extends Component {
   };
 
   pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-  shouldComponentUpdate = this.pureShouldComponentUpdate;
+  shouldComponentUpdate(nextProps, nextState) {
+      const prevProps = this.props;
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
+      if (should) {
+        let chs = [];
+        for (let k in nextProps) {
+            let changed = (nextProps[k] !== prevProps[k]);
+            if (changed && k != '__isInternalValueChange') {
+              chs.push(k);
+            }
+        }
+        if (!chs.length)
+            should = false;
+        
+        //optimize render
+        if (chs.length == 1 && chs[0] == 'tree' && nextProps.__isInternalValueChange)
+            should = false;
+      }
+      return should;
+  }
 
   constructor(props) {
     super(props);
@@ -47,8 +66,7 @@ export default class Builder extends Component {
         //tree={this.props.tree}
         treeNodesCnt={treeNodesCnt}
         onDragStart={this.props.onDragStart}
-      >
-      </Item>
+      />
     );
   }
 }

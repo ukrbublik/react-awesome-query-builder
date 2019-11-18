@@ -1,26 +1,63 @@
 import React, {Component} from 'react';
 import {Query, Builder, Preview, Utils} from 'react-awesome-query-builder';
 const {queryBuilderFormat, queryString, mongodbFormat, getTree, loadTree, uuid} = Utils;
-import config from './config';
+const stringify = require('json-stringify-safe');
+import throttle from 'lodash/throttle';
+import Immutable from 'immutable';
+window.Immutable = Immutable
+
+import loadedConfig from './config';
 import initValue from './init_value';
-var stringify = require('json-stringify-safe');
-var emptyInitValue = {"id": uuid(), "type": "group"};
+const emptyInitValue = {"id": uuid(), "type": "group"};
+const queryInitValue = initValue && Object.keys(initValue).length > 0 ? initValue : emptyInitValue;
+
 
 export default class DemoQueryBuilder extends Component {
+    state = {
+      tree: loadTree(queryInitValue),
+      config: null
+    };
+
+    render() {        
+      return (
+        <div>
+          <Query 
+              {...loadedConfig} 
+              value={/* todo!!!! this.state.tree*/ loadTree(queryInitValue)}
+              onChange={this.onChange}
+              get_children={this.getChildren}
+          />
+          <div className="query-builder-result">
+            {this.renderResult(this.state)}
+          </div>
+        </div>
+      );
+    }
+
     getChildren = (props) => {
         return (
-            <div className="query-builder-container" style={{padding: '10px', overflow: "scroll", height: "400px"}}>
+            <div className="query-builder-container" style={{padding: '10px'}}>
                 <div className="query-builder">
                     <Builder {...props} />
-                </div>
-                <div className="query-builder-result">
-                  {this.renderResult(props)}
                 </div>
             </div>
         )
     }
+    
+    onChange = (immutableTree, config) => {
+      this.immutableTree = immutableTree;
+      this.tree = getTree(immutableTree); //can be saved to backend
+      this.config = config;
+      this.updateResult();
+    }
+
+    updateResult = throttle(() => {
+      this.setState({tree: this.immutableTree, config: this.config});
+    }, 100) //todo: try to remove throlttle & sync
 
     renderResult = (props) => {
+      if (!props.tree || !props.config)
+        return;
       const jsonStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' } 
       return (
         <div>
@@ -70,19 +107,4 @@ export default class DemoQueryBuilder extends Component {
       );
     }
 
-    render() {
-        const {tree, ...config_props} = config;
-        let value = initValue;
-        if (!tree || Object.keys(tree).length === 0)
-          value = emptyInitValue;
-                
-        return (
-                <Query 
-                    value={loadTree(value)}
-                    {...config_props} 
-                    get_children={this.getChildren}
-                    onChange={this.onChange}
-                > </Query>
-        );
-    }
 }

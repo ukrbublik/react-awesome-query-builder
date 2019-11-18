@@ -74,7 +74,8 @@ export default (Builder, CanMoveFn = null) => {
                     startDragging.x = plhEl.offsetLeft;
                     startDragging.clientY += (plY - oldPlY);
                     startDragging.clientX += (plX - oldPlX);
-                    startDragging.scrollTop = scrollTop;
+                    if (treeElContainer != document.body)
+                      startDragging.scrollTop = scrollTop;
 
                     this.onDrag(this.props.mousePos, false);
                 }
@@ -136,7 +137,7 @@ export default (Builder, CanMoveFn = null) => {
       let treeEl = dom.closest('.query-builder');
       treeEl.classList.add("qb-dragging");
       let treeElContainer = treeEl.closest('.query-builder-container') || treeEl;
-      treeElContainer = this._getScrollParent(treeElContainer) || dom.closest('body');
+      treeElContainer = this._getScrollParent(treeElContainer) || document.body;
       const scrollTop = treeElContainer.scrollTop;
       
       const _dragEl = this._getDraggableNodeEl(treeEl);
