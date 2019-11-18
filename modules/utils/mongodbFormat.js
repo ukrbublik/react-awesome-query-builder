@@ -58,9 +58,10 @@ export const mongodbFormat = (item, config, _not = false) => {
         }
 
         //format field
+        let fieldName = field;
         if (fieldDefinition.tableName) {
           const regex = new RegExp(field.split(config.settings.fieldSeparator)[0])
-          field = field.replace(regex, fieldDefinition.tableName)
+          fieldName = field.replace(regex, fieldDefinition.tableName)
         }
 
         //format value
@@ -103,7 +104,7 @@ export const mongodbFormat = (item, config, _not = false) => {
         //build rule
         const fn = operatorDefinition.mongoFormatOp;
         const args = [
-            field,
+            fieldName,
             operator,
             formattedValue,
             (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),

@@ -4,6 +4,7 @@ import { Slider, InputNumber, Col, Row } from 'antd';
 import 'antd/lib/date-picker/style';
 import { getFieldConfig } from '../../utils/configUtils';
 import shallowCompare from 'react-addons-shallow-compare';
+const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends Component {
 
@@ -27,7 +28,9 @@ export default class SliderWidget extends Component {
   handleChange = (val) => {
     if (val === '')
       val = undefined;
-    this.props.setValue(val);
+    if (__isInternal)
+      this.setState({internalValue: val});
+    this.props.setValue(val, __isInternal);
   }
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
@@ -43,7 +46,9 @@ export default class SliderWidget extends Component {
     const fieldSettings = fieldDefinition.fieldSettings || {};
     const customProps = this.props.customProps || {};
 
-    let value = this.props.value != undefined ? this.props.value : null;
+    let value = __isInternal ? this.state.internalValue : this.props.value;
+    if (value == undefined)
+      value = null;
     const min = fieldSettings.min === null ? this.defaultProps.min : fieldSettings.min;
     const max = fieldSettings.max === null ? this.defaultProps.max : fieldSettings.max;
     const step = fieldSettings.step === undefined ? this.defaultProps.step : fieldSettings.step;

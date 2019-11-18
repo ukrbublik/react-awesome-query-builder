@@ -426,8 +426,9 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {integer} delta
  * @param {*} value
  * @param {string} valueType
+ * @param {boolean} __isInternal
  */
-const setValue = (state, path, delta, value, valueType, config) => {
+const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
     const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
@@ -439,8 +440,11 @@ const setValue = (state, path, delta, value, valueType, config) => {
             state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
             state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
         } else {
+            const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
+            const isLastEmpty = lastValue == undefined;
             state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
             state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+            state.__isInternalValueChange = __isInternal && !isLastEmpty;
         }
     }
 
@@ -498,60 +502,65 @@ const emptyDrag = {
 export default (config) => {
     const emptyTree = defaultRoot(config);
     const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
+    const unset = {__isInternalValueChange: undefined};
     
     return (state = emptyState, action) => {
         switch (action.type) {
             case constants.SET_TREE:
-                return Object.assign({}, state, {tree: action.tree});
+                return Object.assign({}, state, {...unset}, {tree: action.tree});
 
             case constants.ADD_NEW_GROUP:
-                return Object.assign({}, state, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
+                return Object.assign({}, state, {...unset}, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
 
             case constants.ADD_GROUP:
-                return Object.assign({}, state, {tree: addItem(state.tree, action.path, 'group', action.id, action.properties)});
+                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'group', action.id, action.properties)});
 
             case constants.REMOVE_GROUP:
-                return Object.assign({}, state, {tree: removeGroup(state.tree, action.path, action.config)});
+                return Object.assign({}, state, {...unset}, {tree: removeGroup(state.tree, action.path, action.config)});
 
             case constants.ADD_RULE:
-                return Object.assign({}, state, {tree: addItem(state.tree, action.path, 'rule', action.id, action.properties)});
+                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'rule', action.id, action.properties)});
 
             case constants.REMOVE_RULE:
-                return Object.assign({}, state, {tree: removeRule(state.tree, action.path, action.config)});
+                return Object.assign({}, state, {...unset}, {tree: removeRule(state.tree, action.path, action.config)});
 
             case constants.SET_CONJUNCTION:
-                return Object.assign({}, state, {tree: setConjunction(state.tree, action.path, action.conjunction)});
+                return Object.assign({}, state, {...unset}, {tree: setConjunction(state.tree, action.path, action.conjunction)});
 
             case constants.SET_NOT:
-                return Object.assign({}, state, {tree: setNot(state.tree, action.path, action.not)});
+                return Object.assign({}, state, {...unset}, {tree: setNot(state.tree, action.path, action.not)});
 
             case constants.SET_FIELD:
-                return Object.assign({}, state, {tree: setField(state.tree, action.path, action.field, action.config)});
+                return Object.assign({}, state, {...unset}, {tree: setField(state.tree, action.path, action.field, action.config)});
 
             case constants.SET_OPERATOR:
-                return Object.assign({}, state, {tree: setOperator(state.tree, action.path, action.operator, action.config)});
+                return Object.assign({}, state, {...unset}, {tree: setOperator(state.tree, action.path, action.operator, action.config)});
 
             case constants.SET_VALUE:
-                return Object.assign({}, state, {tree: setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config)});
+                let set = {};
+                const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.__isInternal);
+                if (tree.__isInternalValueChange)
+                    set.__isInternalValueChange = true;
+                return Object.assign({}, state, {...unset, ...set}, {tree});
 
             case constants.SET_VALUE_SRC:
-                return Object.assign({}, state, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey)});
+                return Object.assign({}, state, {...unset}, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey)});
 
             case constants.SET_OPERATOR_OPTION:
-                return Object.assign({}, state, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
+                return Object.assign({}, state, {...unset}, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
 
             case constants.MOVE_ITEM:
-                return Object.assign({}, state, {tree: moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config)});
+                return Object.assign({}, state, {...unset}, {tree: moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config)});
 
 
             case constants.SET_DRAG_START:
-                return Object.assign({}, state, {dragStart: action.dragStart, dragging: action.dragging, mousePos: action.mousePos});
+                return Object.assign({}, state, {...unset}, {dragStart: action.dragStart, dragging: action.dragging, mousePos: action.mousePos});
 
             case constants.SET_DRAG_PROGRESS:
-                return Object.assign({}, state, {mousePos: action.mousePos, dragging: action.dragging});
+                return Object.assign({}, state, {...unset}, {mousePos: action.mousePos, dragging: action.dragging});
 
             case constants.SET_DRAG_END:
-                return Object.assign({}, state, emptyDrag);
+                return Object.assign({}, state, {...unset}, emptyDrag);
 
 
             default:

@@ -9,7 +9,6 @@ import OperatorOptions from './OperatorOptions';
 import { Col, Icon, Button, Modal } from 'antd';
 const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
-import {liteShouldComponentUpdate} from "../utils/renderUtils";
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
