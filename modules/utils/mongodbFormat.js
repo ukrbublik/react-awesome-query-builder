@@ -103,6 +103,8 @@ export const mongodbFormat = (item, config, _not = false) => {
         
         //build rule
         const fn = operatorDefinition.mongoFormatOp;
+        if(!fn)
+            return undefined;
         const args = [
             fieldName,
             operator,
