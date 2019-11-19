@@ -1,9 +1,11 @@
-import Immutable from 'immutable';
+import Immutable, { fromJS, Map } from 'immutable';
+const transit = require('transit-immutable-js');
 
 
 /**
  * @param {Immutable.List} path
  * @param {...string} suffix
+ * @return {Immutable.List}
  */
 export const expandTreePath = (path, ...suffix) =>
   path.interpose('children1').withMutations((list) => {
@@ -16,6 +18,7 @@ export const expandTreePath = (path, ...suffix) =>
 /**
  * @param {Immutable.List} path
  * @param {...string} suffix
+ * @return {Immutable.List}
  */
 export const expandTreeSubpath = (path, ...suffix) =>
   path.interpose('children1').withMutations((list) => {
@@ -27,6 +30,7 @@ export const expandTreeSubpath = (path, ...suffix) =>
 /**
  * @param {Immutable.Map} path
  * @param {Immutable.List} path
+ * @return {Immutable.Map}
  */
 export const getItemByPath = (tree, path) => {
     let children = new Immutable.OrderedMap({ [tree.get('id')] : tree });
@@ -36,6 +40,34 @@ export const getItemByPath = (tree, path) => {
         children = res.get('children1');
     });
     return res;
+};
+
+
+/**
+ * Remove `path` in every item
+ * @param {Immutable.Map} tree
+ * @return {Immutable.Map} tree
+ */
+export const removePathsInTree = (tree) => {
+    let newTree = tree;
+
+    function _processNode (item, path) {
+        const itemPath = path.push(item.get('id'));
+        if (item.get('path')) {
+          newTree = newTree.removeIn(expandTreePath(itemPath, 'path'))
+        }
+
+        const children = item.get('children1');
+        if (children) {
+            children.map((child, _childId) => {
+                _processNode(child, itemPath);
+            });
+        }
+    };
+
+    _processNode(tree, new Immutable.List());
+
+    return newTree;
 };
 
 
@@ -138,6 +170,10 @@ export const getFlatTree = (tree) => {
 };
 
 
+/**
+ * @param {Immutable.Map} tree
+ * @return {Integer}
+ */
 export const getTotalNodesCountInTree = (tree) => {
     if (!tree)
         return -1;
@@ -157,4 +193,71 @@ export const getTotalNodesCountInTree = (tree) => {
     _processNode(tree, [], 0);
 
     return cnt;
+};
+
+
+//----------
+
+
+export const getTree = (immutableTree, light = true) => {
+    let tree = immutableTree;
+    tree = tree.toJS();
+    if (light)
+      tree = _lightTree(tree);
+    return tree;
+};
+  
+export const loadTree = (serTree) => {
+    if (Map.isMap(serTree)) {
+        return serTree;
+    } else if (typeof serTree == "object") {
+        return _fromJS(serTree);
+    } else if (typeof serTree == "string" && serTree.startsWith('["~#iM"')) {
+        //tip: old versions of RAQB were saving tree with `transit.toJSON()`
+        // https://github.com/ukrbublik/react-awesome-query-builder/issues/69
+        return transit.fromJSON(serTree);
+    } else if (typeof serTree == "string") {
+        return _fromJS(JSON.parse(serTree));
+    } else throw "Can't load tree!";
+};
+  
+function _fromJS(tree) {
+    return fromJS(tree, function (key, value) {
+        let outValue;
+        if (key == 'value' && value.get(0) && value.get(0).toJS !== undefined)
+            outValue = Immutable.List.of(value.get(0).toJS());
+        else
+            outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
+        return outValue;
+    });
+};
+
+
+// Remove fields that can be calced: "id", "path"
+// Remove empty fields: "operatorOptions"
+function _lightTree (tree) {
+    let newTree = tree;
+
+    function _processNode (item, itemId) {
+        if (item.path)
+            delete item.path;
+        if (itemId)
+            delete item.id;
+        let properties = item.properties;
+        if (properties) {
+            if (properties.operatorOptions == null)
+                delete properties.operatorOptions;
+        }
+
+        const children = item.children1;
+        if (children) {
+            for (let id in children) {
+                _processNode(children[id], id);
+            }
+        }
+    };
+
+    _processNode(tree, null);
+
+    return newTree;
 };
