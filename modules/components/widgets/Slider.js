@@ -25,6 +25,16 @@ export default class SliderWidget extends Component {
 
   shouldComponentUpdate = shallowCompare;
 
+  constructor(props) {
+      super(props);
+
+      this.state.internalValue = props.value;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({internalValue: nextProps.value});
+  }
+
   handleChange = (val) => {
     if (val === '')
       val = undefined;

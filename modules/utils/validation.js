@@ -10,32 +10,38 @@ export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroup
 	const c = {
 		config, oldConfig, removeEmptyGroups, removeInvalidRules
 	};
-	return _validateItem(tree, [], {}, c);
+	return _validateItem(tree, [], null, {}, c);
 };
 
-function _validateItem (item, path, meta, c) {
+function _validateItem (item, path, itemId, meta, c) {
 	const type = item.get('type');
 	const children = item.get('children1');
 
 	if (type === 'group' && children && children.size) {
-		return _validateGroup(item, path, meta, c);
+		return _validateGroup(item, path, itemId, meta, c);
 	} else if (type === 'rule') {
-		return _validateRule(item, path, meta, c);
+		return _validateRule(item, path, itemId, meta, c);
 	} else {
 		return item;
 	}
 };
 
-function _validateGroup (item, path, meta, c) {
+function _validateGroup (item, path, itemId, meta, c) {
 	const {removeEmptyGroups} = c;
-	const id = item.get('id');
+	let id = item.get('id');
 	let children = item.get('children1');
 	const oldChildren = children;
+
+	if (!id && itemId) {
+		id = itemId;
+		item = item.set('id', id);
+		meta.sanitized = true;
+	}
 
 	//validate children
 	let submeta = {};
 	children = children
-		.map( (currentChild) => _validateItem(currentChild, path.concat(id), submeta, c) );
+		.map( (currentChild, childId) => _validateItem(currentChild, path.concat(id), childId, submeta, c) );
 	if (removeEmptyGroups)
 		children = children.filter((currentChild) => (currentChild != undefined));
 	let sanitized = submeta.sanitized || (oldChildren.size != children.size);
@@ -52,8 +58,9 @@ function _validateGroup (item, path, meta, c) {
 };
 
 
-function _validateRule (item, _path, meta, c) {
+function _validateRule (item, path, itemId, meta, c) {
 	const {removeInvalidRules, config, oldConfig} = c;
+	let id = item.get('id');
 	let properties = item.get('properties');
 	let field = properties.get('field');
 	let operator = properties.get('operator');
@@ -68,6 +75,12 @@ function _validateRule (item, _path, meta, c) {
 		value: value ? value.toJS() : null,
 	};
 	let _wasValid = field && operator && value && !value.find((v, ind) => (v === undefined));
+
+	if (!id && itemId) {
+		id = itemId;
+		item = item.set('id', id);
+		meta.sanitized = true;
+	}
 
 	//validate field
 	const fieldDefinition = field ? getFieldConfig(field, config) : null;
