@@ -6,8 +6,7 @@ import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
 import {fixPathsInTree} from '../utils/treeUtils';
-import {bindActionCreators, deepCompare} from "../utils/stuff";
-import {shallowEqual} from '../utils/renderUtils';
+import {bindActionCreators, shallowEqual, immutableEqual} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import {defaultRoot} from "../utils/defaultUtils";
 import {liteShouldComponentUpdate} from "../utils/renderUtils";
@@ -64,7 +63,7 @@ class Query extends PureComponent {
             this.validatedTree = this.validateTree(nextProps, this.props);
         }
 
-        const validatedTreeChanged = !this.validatedTree.equals(oldValidatedTree);
+        const validatedTreeChanged = !immutableEqual(this.validatedTree, oldValidatedTree);
         if (validatedTreeChanged) {
             onChange && onChange(this.validatedTree, newConfig);
         }
@@ -129,7 +128,7 @@ export default class QueryContainer extends Component {
     shouldComponentUpdate = liteShouldComponentUpdate(this, {
         value: (nextValue, prevValue, state) => {
             const storeValue = state.store.getState().tree;
-            return !storeValue.equals(nextValue) && !prevValue.equals(nextValue);
+            return !immutableEqual(storeValue, nextValue) && !immutableEqual(prevValue, nextValue);
         }
     });
 
@@ -148,7 +147,7 @@ export default class QueryContainer extends Component {
         
         // compare trees
         const storeValue = this.state.store.getState().tree;
-        const isTreeChnaged = !nextProps.value.equals(this.props.value) && !nextProps.value.equals(storeValue);
+        const isTreeChnaged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
         if (isTreeChnaged) {
             const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
             const validatedTree = validateAndFixTree(nextTree, null, nextConfig, oldConfig);
