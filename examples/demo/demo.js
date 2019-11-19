@@ -18,31 +18,27 @@ export default class DemoQueryBuilder extends Component {
       config: null
     };
 
-    render() {
-      return (
-        <div>
-          <Query 
-              {...loadedConfig} 
-              value={this.state.tree}
-              onChange={this.onChange}
-              get_children={this.getChildren}
-          />
-          <div className="query-builder-result">
-            {this.renderResult(this.state)}
-          </div>
+    render = () => (
+      <div>
+        <Query 
+            {...loadedConfig} 
+            value={this.state.tree}
+            onChange={this.onChange}
+            get_children={this.renderBuilder}
+        />
+        <div className="query-builder-result">
+          {this.renderResult(this.state)}
         </div>
-      );
-    }
+      </div>
+    )
 
-    getChildren = (props) => {
-        return (
-            <div className="query-builder-container" style={{padding: '10px'}}>
-                <div className="query-builder">
-                    <Builder {...props} />
-                </div>
+    renderBuilder = (props) => (
+        <div className="query-builder-container" style={{padding: '10px'}}>
+            <div className="query-builder">
+                <Builder {...props} />
             </div>
-        )
-    }
+        </div>
+    )
     
     onChange = (immutableTree, config) => {
       this.immutableTree = immutableTree;
@@ -53,10 +49,10 @@ export default class DemoQueryBuilder extends Component {
 
     updateResult = throttle(() => {
       this.setState({tree: this.immutableTree, config: this.config});
-    }, 1000)
+    }, 100)
 
-    renderResult = (props) => {
-      if (!props.tree || !props.config)
+    renderResult = ({tree, config}) => {
+      if (!tree || !config)
         return;
       const jsonStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' } 
       return (
@@ -65,42 +61,42 @@ export default class DemoQueryBuilder extends Component {
           <div>
             stringFormat: 
             <pre style={jsonStyle}>
-              {stringify(queryString(props.tree, props.config), undefined, 2)}
+              {stringify(queryString(tree, config), undefined, 2)}
             </pre>
           </div>
           <hr/>
           <div>
             humanStringFormat: 
             <pre style={jsonStyle}>
-              {stringify(queryString(props.tree, props.config, true), undefined, 2)}
+              {stringify(queryString(tree, config, true), undefined, 2)}
             </pre>
           </div>
           <hr/>
           <div>
             mongodbFormat: 
               <pre style={jsonStyle}>
-                {stringify(mongodbFormat(props.tree, props.config), undefined, 2)}
+                {stringify(mongodbFormat(tree, config), undefined, 2)}
               </pre>
           </div>
           <hr/>
           <div>
             queryBuilderFormat: 
               <pre style={jsonStyle}>
-                {stringify(queryBuilderFormat(props.tree, props.config), undefined, 2)}
+                {stringify(queryBuilderFormat(tree, config), undefined, 2)}
               </pre>
           </div>
           <hr/>
           <div>
             Tree: 
             <pre style={jsonStyle}>
-              {stringify(props.tree, undefined, 2)}
+              {stringify(tree, undefined, 2)}
             </pre>
           </div>
           <hr/>
           <div>
             Serialized Tree: 
             <div style={jsonStyle}>
-              {stringify(getTree(props.tree))}
+              {stringify(getTree(tree))}
             </div>
           </div>
         </div>
