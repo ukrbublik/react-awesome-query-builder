@@ -121,12 +121,16 @@ export default (Builder, CanMoveFn = null) => {
       return el;
     }
 
+    _isScrollable(node) {
+      const overflowY = window.getComputedStyle(node)['overflow-y'];
+      return (overflowY === 'scroll' || overflowY === 'auto') && (node.scrollHeight > node.offsetHeight);
+    }
+
     _getScrollParent(node) {
-      if (node == null) {
+      if (node == null)
         return null;
-      }
     
-      if (node.scrollHeight > node.clientHeight) {
+      if (node === document.body || this._isScrollable(node)) {
         return node;
       } else {
         return this._getScrollParent(node.parentNode);

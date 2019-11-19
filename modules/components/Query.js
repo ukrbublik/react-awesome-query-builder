@@ -9,7 +9,6 @@ import {fixPathsInTree} from '../utils/treeUtils';
 import {bindActionCreators, deepCompare} from "../utils/stuff";
 import {shallowEqual} from '../utils/renderUtils';
 import {validateTree} from "../utils/validation";
-import {queryString} from "../utils/queryString";
 import {defaultRoot} from "../utils/defaultUtils";
 import {liteShouldComponentUpdate} from "../utils/renderUtils";
 import pick from 'lodash/pick';
@@ -39,12 +38,12 @@ class Query extends PureComponent {
 
         this._updateActions(props);
 
-        this.validatedTree = this.validateTree(props, props.config, props.tree);
+        this.validatedTree = this.validateTree(props, props);
         props.onChange && props.onChange(this.validatedTree, props.config);
     }
 
-    validateTree (props, oldConfig, oldTree) {
-        return validateAndFixTree(props.tree, oldTree, props.config, oldConfig);
+    validateTree (props, oldProps) {
+        return validateAndFixTree(props.tree, oldProps.tree, props.config, oldProps.config);
     }
 
     _updateActions (props) {
@@ -54,35 +53,20 @@ class Query extends PureComponent {
 
     componentWillReceiveProps(nextProps) {
         const {onChange} = nextProps;
-        const oldTree = this.props.tree;
         const oldConfig = this.props.config;
-        const _newTree = nextProps.tree;
+        const newTree = nextProps.tree;
         const newConfig = nextProps.config;
         const oldValidatedTree = this.validatedTree;
 
+        this.validatedTree = newTree;
         if (oldConfig !== newConfig) {
             this._updateActions(nextProps);
+            this.validatedTree = this.validateTree(nextProps, this.props);
         }
 
-        if (nextProps.__isInternalValueChange) {
-            this.validatedTree = nextProps.tree;
+        const validatedTreeChanged = !this.validatedTree.equals(oldValidatedTree);
+        if (validatedTreeChanged) {
             onChange && onChange(this.validatedTree, newConfig);
-        } else {
-            this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
-            //todo: should validate here OR just at value= prop ????
-            console.log(111, 
-                this.validatedTree == oldValidatedTree,
-                nextProps.tree == oldTree,
-                this.validatedTree.equals(this.validateTree(nextProps, oldConfig, oldTree))
-            )
-            let validatedTreeChanged = oldValidatedTree !== this.validatedTree 
-                && !deepCompare(oldValidatedTree, this.validatedTree);
-            if (validatedTreeChanged) {
-                onChange && onChange(this.validatedTree, newConfig);
-                this.setState({treeChanged: true})
-            } else {
-                this.setState({treeChanged: false})
-            }
         }
     }
 
@@ -138,11 +122,17 @@ export default class QueryContainer extends Component {
 
         this.state = {
             store: createStore(store),
-            config: extendedConfig
+            config: extendedConfig,
         };
     }
 
-    // handle case when value property changes
+    shouldComponentUpdate = liteShouldComponentUpdate(this, {
+        value: (nextValue, prevValue, state) => {
+            const storeValue = state.store.getState().tree;
+            return !storeValue.equals(nextValue) && !prevValue.equals(nextValue);
+        }
+    });
+
     componentWillReceiveProps(nextProps) {
         if (this.props.dontDispatchOnNewProps)
             return;
@@ -150,19 +140,16 @@ export default class QueryContainer extends Component {
         // compare configs
         const oldConfig = pick(this.props, configKeys);
         let nextConfig = pick(nextProps, configKeys);
-        if (!shallowEqual(oldConfig, nextConfig)) {
+        const isConfigChanged = !shallowEqual(oldConfig, nextConfig, false);
+        if (isConfigChanged) {
             nextConfig = extendConfig(config);
             this.setState({config: nextConfig});
         }
-
-        const getQueryStringForProps = (props) => props.value != null
-            ? queryString(props.value, props)
-            : '';
-        const previousQueryString = getQueryStringForProps(this.props);
-        const nextQueryString = getQueryStringForProps(nextProps);
-
-        // compare stringified (for simplicity) trees, then validate & set
-        if (previousQueryString !== nextQueryString) {
+        
+        // compare trees
+        const storeValue = this.state.store.getState().tree;
+        const isTreeChnaged = !nextProps.value.equals(this.props.value) && !nextProps.value.equals(storeValue);
+        if (isTreeChnaged) {
             const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
             const validatedTree = validateAndFixTree(nextTree, null, nextConfig, oldConfig);
             this.state.store.dispatch(

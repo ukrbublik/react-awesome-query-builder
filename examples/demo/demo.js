@@ -18,12 +18,12 @@ export default class DemoQueryBuilder extends Component {
       config: null
     };
 
-    render() {        
+    render() {
       return (
         <div>
           <Query 
               {...loadedConfig} 
-              value={/* todo!!!! this.state.tree*/ loadTree(queryInitValue)}
+              value={this.state.tree}
               onChange={this.onChange}
               get_children={this.getChildren}
           />
@@ -53,7 +53,7 @@ export default class DemoQueryBuilder extends Component {
 
     updateResult = throttle(() => {
       this.setState({tree: this.immutableTree, config: this.config});
-    }, 100) //todo: try to remove throlttle & sync
+    }, 1000)
 
     renderResult = (props) => {
       if (!props.tree || !props.config)
