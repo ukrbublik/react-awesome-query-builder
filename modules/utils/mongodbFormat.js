@@ -25,8 +25,9 @@ export const mongodbFormat = (item, config, _not = false) => {
         if (!conjunction)
             conjunction = defaultConjunction(config);
         let conjunctionDefinition = config.conjunctions[conjunction];
-        if (not) {
-            conjunction = conjunctionDefinition.reversedConj;
+        const reversedConj = conjunctionDefinition.reversedConj;
+        if (not && reversedConj) {
+            conjunction = reversedConj;
             conjunctionDefinition = config.conjunctions[conjunction];
         }
         const mongoConj = conjunctionDefinition.mongoConj;

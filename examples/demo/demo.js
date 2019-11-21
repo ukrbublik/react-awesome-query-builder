@@ -7,15 +7,15 @@ import Immutable from 'immutable';
 window.Immutable = Immutable
 
 import loadedConfig from './config';
-import initValue from './init_value';
+import loadedInitValue from './init_value';
 const emptyInitValue = {"id": uuid(), "type": "group"};
-const queryInitValue = initValue && Object.keys(initValue).length > 0 ? initValue : emptyInitValue;
+const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 
 
 export default class DemoQueryBuilder extends Component {
     state = {
-      tree: loadTree(queryInitValue),
+      tree: loadTree(initValue),
       config: loadedConfig
     };
 

@@ -36,58 +36,171 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 ## Getting started
 Install: `npm i react-awesome-query-builder`
 
-See `examples/demo` as example of usage and configuration.
+See [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) as example of usage and configuration.
 
 
 ## Usage
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, Utils as QbUtils} from 'react-awesome-query-builder';
-import config from './config'; //see below 'Config format'
 import 'react-awesome-query-builder/css/antd.less';
 import 'react-awesome-query-builder/css/styles.scss';
 import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
 
-const initValue = {"id": QbUtils.uuid(), "type": "group"};
+// You need to provide your own config. See below 'Config format'
+import loadedConfig from './config';
+// You can load query value from your backend storage (for saving see `Query.onChange()`)
+const queryValue = {"id": QbUtils.uuid(), "type": "group"};
 
 class DemoQueryBuilder extends Component {
-    render() {
-        return (
-            <Query
-              {...config}
-              get_children={this.getChildren}
-              onChange={this.onChange}
-              value={QbUtils.loadTree(initValue)}
-            ></Query>
-        );
-    }
+    state = {
+      tree: loadTree(queryValue),
+      config: loadedConfig
+    };
     
-    getChildren(props) {
-        return (
-            <div className="query-builder-container">
-                <div className="query-builder">
-                    <Builder {...props} />
-                </div>
-                <div>Query string: {QbUtils.queryString(props.tree, props.config)}</div>
-                <div>Mongodb query: {QbUtils.mongodbFormat(props.tree, props.config)}</div>
-            </div>
-        )
-    }
+    render = () => (
+      <div>
+        <Query
+            {...loadedConfig} 
+            value={this.state.tree}
+            onChange={this.onChange}
+            get_children={this.renderBuilder}
+        />
+        {this.renderResult(this.state)}
+      </div>
+    )
+
+    renderBuilder = (props) => (
+      <div className="query-builder-container" style={{padding: '10px'}}>
+        <div className="query-builder">
+            <Builder {...props} />
+        </div>
+      </div>
+    )
+
+    renderResult = ({tree: immutableTree, config}) => (
+      <div className="query-builder-result">
+          <div>Query string: {QbUtils.queryString(immutableTree, config)}</div>
+          <div>Mongodb query: {QbUtils.mongodbFormat(immutableTree, config)}</div>
+      </div>
+    )
     
-    onChange(immutableTree) {
-      let tree = QbUtils.getTree(immutableTree);
-      //here you can save tree
+    onChange = (immutableTree, config) => {
+      // Tip: for better performance you can apply `throttle` - see `examples/demo`
+      this.setState({tree: immutableTree, config: config});
+
+      const jsonTree = QbUtils.getTree(immutableTree);
+      // `jsonTree` can be saved to backend, and later loaded to `queryValue`
     }
 }
 ```
 
-- Use can save query data in `onChange` callback. 
-  Note that value will be in Immutable format, so you can use `QbUtils.getTree()` to convert it into JS object.
-  You can store it on backend, and load after by passing in `value` prop.
-- You can pass `value` prop in `<Query>` for initial load
+- Please wrap `<Builder />` in `div.query-builder`.  
+  Wrapping in `div.query-builder-container` in not necessary, but if you want to make query builder scrollable, it's best place to apply appropriate styles.
+- Use can save query value in `onChange` callback.  
+  Note that value will be in [`Immutable`](https://immutable-js.github.io/immutable-js/) format, so you can use `QbUtils.getTree()` to convert it into JS object.  
+  You can store it on backend, and load later by passing in `value` prop of `<Query />`.
 
 
 ## Config format
+Has 6 sections:
+```javascript
+{
+  conjunctions,
+  fields,
+  types,
+  operators,
+  widgets,
+  settings,
+}
+```
+Each section is described below.  
+There are functions in it for building query string: `formatConj`, `formatValue`, `formatOp`, which are used for `QbUtils.queryString()`.
+They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true).  
+Also there are similar `mongoConj` `mongoFormatValue`, `mongoFormatOp` for building MongoDb query with `QbUtils.mongodbFormat()`.  
+
+### config.conjunctions
+```javascript
+{
+  'AND': {
+    label: 'And',
+    formatConj: (children, conj, not, isForDisplay) => (
+      (not ? 'NOT ' : '') + '(' + children.join(' || ') + ')'
+    ),
+    reversedConj: 'OR',
+    mongoConj: '$and',
+  },
+  'OR': {...},
+}
+```
+where `AND` and `OR` - available conjuctions (logical operators). You can add `NOR` if you want.
+
+| key          | requred              | meaning       |
+| ------------ | -------------------- | ------------- |
+| label        | +                    | Label to be displayed in conjunctions swicther |
+| formatConj   | +                    | Function to join rules into group with conjunction. |
+|              |                      | `(Immultable.List children, string conj, bool not, bool isForDisplay) => string` |
+|              |                      | `children` - list of already formatted queries (strings) to be joined with conjuction |
+| mongoConj    | + for MongoDB format | [Name](https://docs.mongodb.com/manual/reference/operator/query-logical/) of logical operator for MongoDb |
+| reversedConj |                      | Opposite logical operator. |
+|              |                      | Can be used to optimize `!(A || B)` to `!A && !B` (done for MongoDB format) |
+
+
+### config.types
+```javascript
+```
+
+### config.operators
+```javascript
+```
+
+### config.fields
+```javascript
+{
+  // simple
+  qty: {
+    type: 'number',
+    label: 'Quantity',
+  },
+  // complex
+  user: {
+    type: '!struct', // special keyword for comlex fields
+    label: 'User',
+    subfields: {
+      // subfields of complex field
+      name: {
+        type: 'text',
+        label: 'Name',
+        label2: 'User name', //optional, see below
+      },
+    },
+  },
+  ...
+}
+```
+
+| key          | requred            | default | meaning       |
+| ------------ | ------------------ | ------- | ------------- |
+| type         | +                  | | One of types described in [config.types](#configtypes) or `!struct` for complex field |
+| subfields    | + for `!struct` type | |  Config for subfields of complex field (multiple nesting is supported) |
+| label        | +                  | |  Label to be displayed in field list |
+|              |                    | |  (If not specified, fields's key will be used instead) |
+| label2       |                    | |  Can be optionally specified for nested fields. |
+|              |                    | |  By default, if nested field is selected (eg. `name` of `user` in example above), select component will have tootip like `User -> Subname` |
+|              |                    | |  (path constructed by joining `label`s with delimeter `->` specified by `config.settings.fieldSeparatorDisplay`) |
+|              |                    | |  That tooltip text can be overriden by setting `label2`, so it will become `User name`. 
+| tooptip      |                    | |  Optional tooltip to be displayed in field list by hovering on item |
+| listValues   | + for `Select`/`MultiSelect` widgets | | List of values for Select widget. |
+|              |                     | | Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options |
+| allowCustomValues | - for `MultiSelect` widget | false | If true, user can provide own options in multiselect, otherwise they will be limited to `listValues` |
+| fieldSettings | | | Settings for widgets. Example: `{min: 1, max: 10}` |
+|               | | | Available settings for Number widget: `min`, `max`, `step` |
+| operators, defaultOperator, widgets, valueSources | | | (optional) You can override some options of config of corresponding type (see below at section 'types') ??? |
+| mainWidgetProps | | | ??? |
+| preferWidgets | | | ??? |
+
+
+### config.widgets
 ```javascript
 import {Widgets, Operators} from 'react-awesome-query-builder';
 const {
@@ -102,60 +215,22 @@ const {
     ValueFieldWidget
 } = Widgets;
 import en_US from 'antd/lib/locale-provider/en_US';
+```
 
+### config.settings
+```javascript
+```
+
+
+
+
+=======================================================================
+
+
+## Config format
+```javascript
 export default {
-  conjunctions: {
-    'AND': {
-      label: 'And', //label for conjunctions swicther
-      //(for building query string) function to join rules into group
-      // children - list of already formatted queries (strings) to be joined with conjuction
-      // isForDisplay - false by default, for building query string for SQL/expression/etc., 
-      //  true can be used to format query string displayed on collapsed query group 
-      //  (not used for now, see Issue #2)
-      formatConj: (Immultable.List children, string conj, bool not, bool isForDisplay) => string,
-      reversedConj: 'OR', //'AND' reverses to 'OR'
-      //for building mongodb query:
-      mongoConj: '$and',
-    },
-    'OR': ...same as for 'AND'
-  },
-  
-  fields: {
-    //Example of atomic field:
-    qty: {
-      label: 'Quantity',
-      tooltip: 'This is quantity',
-      type: 'number', //one of types described below in section 'types'
-      //Settings for widgets
-      // Available settings for Number widget: min, max, step
-      fieldSettings: {
-          min: 2,
-      },
-      //List of values for Select widget
-      listValues: {
-        //<key>: <label to display at list of options>,
-        yellow: 'Yellow',
-        green: 'Green',
-      },
-      allowCustomValues: true, //default is false, can be true for MultiSelect widget
-      //(optional) You can override here some options of config of corresponding type:
-      // 'operators', 'defaultOperator', 'widgets', 'valueSources' (see below at section 'types')
-    },
-    //Example of special struct field:
-    members: { //key of field
-      label: 'Members', //label to display at list of fields
-      type: '!struct', //special type for struct
-      subfields: { //only for type == '!struct'
-        subname: { //key of subfield
-          label: 'Subname', //label for list of fields
-          //label for field menu's toggler (for config.renderFieldAndOpAsDropdown == true)
-          label2: 'MemberName',
-          type: 'text', //one of types described below in section 'types'
-        },
-      },
-    },
-    ...other fields
-  },
+
   
   types: {
     number: { //type key
@@ -363,7 +438,7 @@ export default {
 ```
 
 
-### Development
+## Development
 To build the component locally, clone this repo then run:
 
 `npm install`
@@ -382,7 +457,8 @@ The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github
 
 Pull Requests are always welcomed :)
 
-### License
+
+## License
 MIT. See also `LICENSE.txt`
 
 Forked from [https://github.com/fubhy/react-query-builder](https://github.com/fubhy/react-query-builder)
