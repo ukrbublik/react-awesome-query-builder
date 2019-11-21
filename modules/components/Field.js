@@ -186,7 +186,7 @@ export default class Field extends Component {
     let selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
     selectText = truncateString(selectText, maxLabelsLength);
     let selectWidth = calcTextWidth(selectText);
-    let _tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
+    let fullLabel = this.curFieldOpts().label2 || selectedFieldFullLabel;
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
 
@@ -204,6 +204,10 @@ export default class Field extends Component {
             {...customProps}
         >{fieldSelectItems}</Select>
     );
+
+    if (fullLabel && fullLabel != this.curFieldOpts().label && !this.curFieldOpts().tooltip) {
+        fieldSelect = <Tooltip title={fullLabel}>{fieldSelect}</Tooltip>;
+    }
 
     return fieldSelect;
   }
