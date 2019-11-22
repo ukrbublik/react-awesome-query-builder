@@ -17,11 +17,11 @@ export const extendConfig = (config) => {
 function _extendTypesConfig(typesConfig, config) {
     for (let type in typesConfig) {
         let typeConfig = typesConfig[type];
-        _extendTypeConfig(typeConfig, config);
+        _extendTypeConfig(type, typeConfig, config);
     }
 };
 
-function _extendTypeConfig(typeConfig, config) {
+function _extendTypeConfig(type, typeConfig, config) {
     let operators = null, defaultOperator = null;
     typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != 'field')[0];
     for (let widget in typeConfig.widgets) {
@@ -54,14 +54,14 @@ function _extendTypeConfig(typeConfig, config) {
 
 function _extendFieldsConfig(subconfig, config) {
     for (let field in subconfig) {
-        _extendFieldConfig(subconfig[field], config);
+        _extendFieldConfig(field, subconfig[field], config);
         if (subconfig[field].subfields) {
             _extendFieldsConfig(subconfig[field].subfields, config);
         }
     }
 };
 
-function _extendFieldConfig(fieldConfig, config) {
+function _extendFieldConfig(field, fieldConfig, config) {
     let operators = null, defaultOperator = null;
     let typeConfig = config.types[fieldConfig.type];
     if (fieldConfig.type != '!struct') {
@@ -255,7 +255,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
     if (fieldConfig && fieldConfig.widgets) {
         for (let widget in fieldConfig.widgets) {
             let widgetConfig = fieldConfig.widgets[widget];
-            let widgetValueSrc = config.widgets[widget].valueSrc;
+            let widgetValueSrc = config.widgets[widget].valueSrc || 'value';
             let canAdd = widgetConfig.operators ? widgetConfig.operators.indexOf(operator) != -1 : valueSrc != 'value';
             canAdd = canAdd && (!valueSrc || valueSrc == widgetValueSrc);
             if (opConfig.isUnary && (widgetValueSrc != 'value'))

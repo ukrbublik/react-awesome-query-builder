@@ -7,7 +7,6 @@ import shallowCompare from 'react-addons-shallow-compare';
 const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends Component {
-
   state = {
   }
 
@@ -48,7 +47,7 @@ export default class SliderWidget extends Component {
   static defaultProps = {
     min: 0,
     max: 100,
-    step: 10,
+    step: 1,
   };
 
   render() {
@@ -59,10 +58,10 @@ export default class SliderWidget extends Component {
     let value = __isInternal ? this.state.internalValue : this.props.value;
     if (value == undefined)
       value = null;
-    const min = fieldSettings.min === null ? this.defaultProps.min : fieldSettings.min;
-    const max = fieldSettings.max === null ? this.defaultProps.max : fieldSettings.max;
-    const step = fieldSettings.step === undefined ? this.defaultProps.step : fieldSettings.step;
-    const marks = fieldSettings.marks === undefined ? this.defaultProps.marks : fieldSettings.marks;
+    const min = fieldSettings.min === null ? this.props.min : fieldSettings.min;
+    const max = fieldSettings.max === null ? this.props.max : fieldSettings.max;
+    const step = fieldSettings.step === undefined ? this.props.step : fieldSettings.step;
+    const marks = fieldSettings.marks === undefined ? this.props.marks : fieldSettings.marks;
 
     return (
       <Col style={{display: 'inline-flex'}}>

@@ -53,7 +53,7 @@ export default {
                     //label: 'Subname', //'subname' should be used instead
                     label2: 'MemberName', //only for menu's toggler
                     type: 'text',
-                    tableName: 't1',
+                    tableName: 't1', // PR #18, PR #20
                     operators: ['equal'],
                 },
                 prox1: {
@@ -174,6 +174,8 @@ export default {
         color: {
             label: 'Color',
             type: 'select',
+            valueSources: ['value'],
+            defaultOperator: 'select_equals',
             operators: [
                 'select_equals',
                 'select_not_equals',
@@ -682,7 +684,7 @@ export default {
                 return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
             },
             validateValue: (val, fieldDef) => {
-                return (val != "test");
+                return (val.length < 10);
             },
         },
         number: {
@@ -694,7 +696,6 @@ export default {
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 return isForDisplay ? val : JSON.stringify(val);
             },
-            //mongoFormatValue: (val, fieldDef, wgtDef) => (Number(val)),
         },
         slider: {
             type: "number",
@@ -722,18 +723,9 @@ export default {
                 width: '300px'
             },
             singleWidget: 'slider',
-            valueLabels: [
-                'Value from',
-                'Value to'
-            ],
-            textSeparators: [
-                null,
-                'and'
-            ],
         },
         select: {
             type: "select",
-            valueSrc: 'value',
             factory: (props) => <SelectWidget {...props} />,
             formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
                 let valLabel = fieldDef.listValues[val];
