@@ -62,10 +62,10 @@ export default class RangeWidget extends Component {
 
     let value = this.props.value != undefined ? this.props.value : undefined;
     let [valueFrom, valueTo] = value || [null, null];
-    const min = fieldSettings.min === null ? this.defaultProps.min : fieldSettings.min;
-    const max = fieldSettings.max === null ? this.defaultProps.max : fieldSettings.max;
-    const step = fieldSettings.step === undefined ? this.defaultProps.step : fieldSettings.step;
-    const marks = fieldSettings.marks === undefined ? this.defaultProps.marks : fieldSettings.marks;
+    const min = fieldSettings.min === null ? this.props.min : fieldSettings.min;
+    const max = fieldSettings.max === null ? this.props.max : fieldSettings.max;
+    const step = fieldSettings.step === undefined ? this.props.step : fieldSettings.step;
+    const marks = fieldSettings.marks === undefined ? this.props.marks : fieldSettings.marks;
 
     if (value && (valueFrom == undefined || valueTo == undefined)) {
       // happens if we change value source - this leads to incomplete slider value, fix it:

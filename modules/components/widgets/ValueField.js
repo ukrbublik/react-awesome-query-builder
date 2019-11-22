@@ -169,14 +169,17 @@ export default class ValueField extends Component {
   }
 
   renderAsSelect() {
-    let dropdownPlacement = this.props.config.settings.dropdownPlacement;
-    let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
-    let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
-    let placeholderWidth = calcTextWidth(placeholder);
-    let fieldSelectItems = this.buildSelectItems(fieldOptions);
-    let customProps = this.props.customProps || {};
+    const leftFieldConfig = getFieldConfig(this.props.field, this.props.config);
+    const leftFieldWidgetField = leftFieldConfig.widgets.field;
+    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    const dropdownPlacement = this.props.config.settings.dropdownPlacement;
+    const fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
+    const placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || this.props.config.settings.fieldPlaceholder;
+    const placeholderWidth = calcTextWidth(placeholder);
+    const fieldSelectItems = this.buildSelectItems(fieldOptions);
+    const customProps = this.props.customProps || {};
 
-    let fieldSelect = (
+    const fieldSelect = (
           <Select
               dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
               dropdownMatchSelectWidth={false}
@@ -195,11 +198,14 @@ export default class ValueField extends Component {
   }
 
   renderAsDropdown() {
+    const leftFieldConfig = getFieldConfig(this.props.field, this.props.config);
+    const leftFieldWidgetField = leftFieldConfig.widgets.field;
+    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
     let selectedFieldKeys = getFieldPath(this.props.value, this.props.config);
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.value, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
-    let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
+    let placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || this.props.config.settings.fieldPlaceholder;
     let customProps = this.props.customProps || {};
 
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
