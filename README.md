@@ -39,6 +39,7 @@ Install: `npm i react-awesome-query-builder`
 See [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) as example of usage and configuration.
 
 
+
 ## Usage
 ```javascript
 import React, {Component} from 'react';
@@ -102,6 +103,7 @@ class DemoQueryBuilder extends Component {
   You can store it on backend, and load later by passing in `value` prop of `<Query />`.
 
 
+
 ## Config format
 Has 6 sections:
 ```javascript
@@ -118,6 +120,7 @@ Each section is described below.
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, which are used for `QbUtils.queryString()`. 
 They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true).  
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue` for building MongoDb query with `QbUtils.mongodbFormat()`.  
+
 
 
 ### config.conjunctions
@@ -145,6 +148,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |              |                      |  Can be used to optimize `!(A || B)` to `!A && !B` (done for MongoDB format) |
 
 
+
 ### config.operators
 ```javascript
 import {Operators} from 'react-awesome-query-builder';
@@ -165,9 +169,6 @@ const { ProximityOperator } = Operators;
 }
 ```
 
-There is special `proximity` operator, its options are rendered with `<ProximityOperator />`.  
-See [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js)  
-
 | key            | requred                | default | meaning       |
 | -------------- | ---------------------- | ------- | ------------- |
 | label          | +                      |         | Label to be displayed in operators select component |
@@ -185,6 +186,11 @@ See [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/t
 | textSeparators | + for `cardinality==2` |         | `[null, 'and']` |
 | options        |                        |         | See `proximity` operator |
 | isSpecialRange |                        | false   | Special for `cardinality==2`. Used to show 1 range widget instead of 2 widgets (see `range_between` operator for `rangeslider` widget in demo) |
+
+
+There is also special `proximity` operator, its options are rendered with `<ProximityOperator />`.  
+See [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js)  
+
 
 
 ### config.widgets
@@ -224,10 +230,6 @@ const {
 },
 ```
 
-There is special `field` widget (actually key name is defined in `config.settings.valueSourcesInfo.field.widget`), rendered by `<ValueFieldWidget />`.  
-It can be used to compare field with another field of same type.  
-To enable this feature set `valueSources` of type to `['value', 'field'']` (see below in [config.types](#configtypes)).  
-
 | key              | requred                | default   | meaning       |
 | ---------------- | ---------------------- | --------- | ------------- |
 | type             | +                      |           | One of types described in [config.types](#configtypes) |
@@ -247,6 +249,11 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 | customProps      |                        |           | You can pass any props directly to widget with `customProps`, for example enable search for [`<Select />`](https://ant.design/components/select/) widget: `widgetProps: {customProps: {showSearch: true}}` |
 | singleWidget     |                        |           | Special option for `rangeslider` widget (`<RangeWidget />`), value equals to `slider` (`<SliderWidget />`) to connect them. |
 |                  |                        |           |  Used together with operator `range_between` having `isSpecialRange=true` option. |
+
+There is special `field` widget (actually key name is defined in `config.settings.valueSourcesInfo.field.widget`), rendered by `<ValueFieldWidget />`.  
+It can be used to compare field with another field of same type.  
+To enable this feature set `valueSources` of type to `['value', 'field'']` (see below in [config.types](#configtypes)).  
+
 
 
 ### config.types
@@ -280,6 +287,7 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
   ..
 }
 ```
+
 | key                                    | requred  | default | meaning       |
 | -------------------------------------- | -------- | ------- | ------------- |
 | `valueSources`                         |   | keys of `valueSourcesInfo` at [config.settings](#configsettings) | Array with values `'value'`, `'field'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type (see special `field` widget). |
@@ -291,6 +299,7 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 | `widgets.<widget>.operators`           | + |  | List of operators for widget, described in [config.operators](#configoperators) |
 | `widgets.<widget>.widgetProps`         |   |  | Can be used to override config of corresponding widget specified in [config.widgets](#configwidgets). Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM. |
 | `widgets.<widget>.opProps.<operator>`  |   |  | Can be used to override config of operator for widget. Example: `opProps: { between: {valueLabels: ['Time from', 'Time to']} }` for building range of times. |
+
 
 
 ### config.fields
@@ -338,6 +347,7 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 | `mainWidgetProps`   |                                        |        | Shorthand for `widgets.<main>.widgetProps` |
 | `preferWidgets`     |                                        |        | See usecase at [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js) for `slider` field. |
 |                     |                                        |        |  Its type is `number`. There are 3 widgets defined for number type: `number` (default), `slider`, `rangeslider`. So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider instead of number input for current field. |
+
 
 
 ### config.settings
@@ -420,6 +430,7 @@ import en_US from 'antd/lib/locale-provider/en_US';
 
 
 Localization:
+
 | key                       | example       |
 | ------------------------- | ------------- |
 | `valueLabel`              | Value |
