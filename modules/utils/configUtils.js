@@ -72,6 +72,7 @@ function _extendFieldsConfig(subconfig, config) {
 function _extendFieldConfig(field, fieldConfig, config) {
     let operators = null, defaultOperator = null;
     let typeConfig = config.types[fieldConfig.type];
+    const excludeOperators = fieldConfig.excludeOperators || [];
     if (fieldConfig.type != '!struct') {
         if (!fieldConfig.widgets)
             fieldConfig.widgets = {};
@@ -80,15 +81,15 @@ function _extendFieldConfig(field, fieldConfig, config) {
         for (let widget in typeConfig.widgets) {
             let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
             let typeWidgetConfig = typeConfig.widgets[widget] || {};
-            let shouldIncludeOperators = fieldConfig.preferWidgets && (widget == 'field' || fieldConfig.preferWidgets.includes(widget));
+            let shouldIncludeOperators = fieldConfig.preferWidgets && (widget == 'field' || fieldConfig.preferWidgets.includes(widget)) || excludeOperators.length > 0;
             if (fieldWidgetConfig.operators) {
                 if (!operators)
                     operators = [];
-                operators = operators.concat(fieldWidgetConfig.operators.slice());
+                operators = operators.concat(fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o)));
             } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
                 if (!operators)
                     operators = [];
-                operators = operators.concat(typeWidgetConfig.operators.slice());
+                operators = operators.concat(typeWidgetConfig.operators.filter(o => !excludeOperators.includes(o)));
             }
             if (fieldWidgetConfig.defaultOperator)
                 defaultOperator = fieldWidgetConfig.defaultOperator;
@@ -97,6 +98,7 @@ function _extendFieldConfig(field, fieldConfig, config) {
             }
             fieldConfig.widgets[widget] = fieldWidgetConfig;
         }
+        console.log(excludeOperators, operators)
         if (!fieldConfig.operators && operators)
             fieldConfig.operators = Array.from(new Set(operators));
         if (!fieldConfig.defaultOperator && defaultOperator)

@@ -137,7 +137,7 @@ const myConfig = {
 |                     |                                        |        |  So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input. |
 | `operators`, `defaultOperator`, `widgets`, `valueSources` |  |        | You can override config of corresponding type (see below at section [config.types](#configtypes)) |
 | `mainWidgetProps`   |                                        |        | Shorthand for `widgets.<main>.widgetProps` |
-
+| `excludeOperators`  |                                        |        | Can exclude some operators, eg. `proximity` for `text` type |
 
 
 ### config.settings
