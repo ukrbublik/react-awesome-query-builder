@@ -77,6 +77,7 @@ const _queryBuilderFormat = (item, config, meta) => {
         resultQuery['not'] = not;
         return resultQuery;
     } else if (type === 'rule') {
+        const {fieldSeparator} = config.settings;
         const operator = properties.get('operator');
         const options = properties.get('operatorOptions');
         let field = properties.get('field');
@@ -102,9 +103,11 @@ const _queryBuilderFormat = (item, config, meta) => {
         const typeConfig = config.types[fieldDefinition.type] || {};
 
         //format field
+        let fieldName = field;
         if (fieldDefinition.tableName) {
-          const regex = new RegExp(field.split(config.settings.fieldSeparator)[0])
-          field = field.replace(regex, fieldDefinition.tableName)
+            let fieldParts = Array.isArray(field) ? [...field] : field.split(fieldSeparator);
+            fieldParts[0] = fieldDefinition.tableName;
+            fieldName = fieldParts.join(fieldSeparator);
         }
 
         if (value.size < cardinality)
@@ -134,7 +137,7 @@ const _queryBuilderFormat = (item, config, meta) => {
         
         let ruleQuery = {
             id,
-            field,
+            fieldName,
             type: fieldType,
             input: typeConfig.mainWidget,
             operator,

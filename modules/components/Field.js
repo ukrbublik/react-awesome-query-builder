@@ -1,244 +1,128 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT} from "../utils/stuff";
-import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
-const { Option, OptGroup } = Select;
-const SubMenu = Menu.SubMenu;
-const MenuItem = Menu.Item;
-const DropdownButton = Dropdown.Button;
-import map from 'lodash/map';
+import {truncateString} from "../utils/stuff";
+import {default as FieldSelect} from "./widgets/FieldSelect";
+import {default as FieldDropdown} from "./widgets/FieldDropdown";
+import {default as FieldCascader} from "./widgets/FieldCascader";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
+import pick from 'lodash/pick';
 
 
-export default class Field extends Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    selectedField: PropTypes.string,
-    renderAsDropdown: PropTypes.bool,
-    customProps: PropTypes.object,
-    //actions
-    setField: PropTypes.func.isRequired,
-  };
+export default class Field extends PureComponent {
+    static propTypes = {
+        config: PropTypes.object.isRequired,
+        selectedField: PropTypes.string,
+        renderAsDropdown: PropTypes.bool,
+        customProps: PropTypes.object,
+        //actions
+        setField: PropTypes.func.isRequired,
+    };
 
-  constructor(props) {
-      super(props);
-  }
+    constructor(props) {
+        super(props);
 
-  componentWillReceiveProps (nextProps) {
-    //let prevProps = this.props;
-  }
-
-  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-
-  curField() {
-      return this.props.selectedField ? getFieldConfig(this.props.selectedField, this.props.config) : null;
-  }
-
-  curFieldOpts() {
-      return Object.assign({}, {
-          label: this.props.selectedField,
-        },
-        this.curField() || {}
-      );
-  }
-
-  handleFieldMenuSelect = ({key, keyPath}) => {
-    this.props.setField(key);
-  }
-
-  handleFieldSelect = (key) => {
-    this.props.setField(key);
-  }
-
-  filterOption = (input, option) => {
-    const { value, groupLabel, children } = option.props;
-
-    let isInChildren = false;
-    if (typeof children === 'string') {
-        isInChildren = children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+        this.componentWillReceiveProps(props);
     }
 
-    let isInValue = false;
-    if (typeof value === 'string') {
-        isInValue = value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    componentWillReceiveProps(nextProps) {
+        const prevProps = this.props;
+        const keysForMeta = ["selectedField", "config", "customProps"];
+        const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+
+        if (needUpdateMeta) {
+            this.meta = this.getMeta(nextProps);
+        }
     }
 
-    let isInGroupLabel = false;
-    if (typeof groupLabel === 'string') {
-        isInGroupLabel = groupLabel.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    getMeta({selectedField, config, customProps}) {
+        const selectedKey = selectedField;
+        const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder} = config.settings;
+        const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
+        const isFieldSelected = !!selectedField;
+        const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
+        const selectedOpts = currField || {};
+
+        const selectedKeys = getFieldPath(selectedKey, config);
+        const selectedPath = getFieldPath(selectedKey, config, true);
+        const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
+        const partsLabels = getFieldPathLabels(selectedKey, config);
+        let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
+        if (selectedFullLabel == selectedLabel)
+            selectedFullLabel = null;
+        const selectedAltLabel = selectedOpts.label2;
+
+        const items = this.buildOptions(config, config.fields);
+
+        return {
+            placeholder, items,
+            selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+        };
     }
 
-    return isInChildren || isInValue || isInGroupLabel;
-  }
-
-  getFieldDisplayLabel(field, fieldKey) {
-      let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
-      let label = field.label || last(fieldKey.split(fieldSeparator));
-      label = truncateString(label, maxLabelsLength);
-      return label;
-  }
-
-  buildMenuItems(fields, path = null) {
-      let fieldSeparator = this.props.config.settings.fieldSeparator;
-      if (!fields)
-          return null;
-      let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
-
-      return keys(fields).map(fieldKey => {
-          let field = fields[fieldKey];
-          let label = this.getFieldDisplayLabel(field, fieldKey);
-          let tooltip = field.tooltip;
-          let option = label;
-          if (tooltip != undefined)
-            option = <Tooltip title={tooltip}>{label}</Tooltip>;
-          if (field.type == "!struct") {
-              let subpath = (path ? path : []).concat(fieldKey);
-              return <SubMenu
-                  key={prefix+fieldKey}
-                  title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
-              >
-                  {this.buildMenuItems(field.subfields, subpath)}
-              </SubMenu>
-          } else {
-              return <MenuItem key={prefix+fieldKey}>{option}</MenuItem>;
-          }
-      });
-  }
-
-  buildSelectItems(fields, path = null, optGroupLabel = null) {
-      let fieldSeparator = this.props.config.settings.fieldSeparator;
-      if (!fields)
-          return null;
-      let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
-
-      return keys(fields).map(fieldKey => {
-          let field = fields[fieldKey];
-          let label = this.getFieldDisplayLabel(field, fieldKey);
-          let tooltip = field.tooltip;
-          if (field.type == "!struct") {
-              let subpath = (path ? path : []).concat(fieldKey);
-              return <OptGroup
-                  key={prefix+fieldKey}
-                  label={label}
-                  title={tooltip}
-              >
-                  {this.buildSelectItems(field.subfields, subpath, label)}
-              </OptGroup>
-          } else {
-              let option = label;
-              if (tooltip != undefined)
-                option = <Tooltip title={tooltip}>{label}</Tooltip>;
-              return <Option
-                key={prefix+fieldKey}
-                value={prefix+fieldKey}
-                grouplabel={optGroupLabel}
-              >
-                {option}
-              </Option>;
-          }
-      });
-  }
-
-  buildMenuToggler(label, fullLabel, customLabel) {
-      let btnLabel = customLabel ? customLabel : label;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
-      btnLabel = truncateString(btnLabel, maxLabelsLength);
-      var toggler =
-          <Button
-              size={this.props.config.settings.renderSize}
-          >
-              {btnLabel} <Icon type="down" />
-          </Button>;
-
-      if (fullLabel && fullLabel != label) {
-          toggler = <Tooltip
-                  placement="top"
-                  title={fullLabel}
-              >
-              {toggler}
-              </Tooltip>;
-      }
-
-      return toggler;
-  }
-
-  render() {
-    if (this.props.renderAsDropdown)
-        return this.renderAsDropdown();
-    else
-        return this.renderAsSelect();
-  }
-
-  renderAsSelect() {
-    let isFieldSelected = !!this.props.selectedField;
-    let dropdownPlacement = this.props.config.settings.dropdownPlacement;
-    let maxLabelsLength = this.props.config.settings.maxLabelsLength;
-    let fieldOptions = this.props.config.fields;
-    let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
-    let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
-    let placeholder = !isFieldSelected ? this.props.config.settings.fieldPlaceholder : null;
-    let fieldDisplayLabel = isFieldSelected ? this.getFieldDisplayLabel(this.curField(), this.props.selectedField) : null;
-    let selectText = isFieldSelected ? fieldDisplayLabel : placeholder;
-    selectText = truncateString(selectText, maxLabelsLength);
-    let selectWidth = calcTextWidth(selectText);
-    let fullLabel = this.curFieldOpts().label2 || selectedFieldFullLabel;
-    let fieldSelectItems = this.buildSelectItems(fieldOptions);
-    let customProps = this.props.customProps || {};
-
-    let fieldSelect = (
-        <Select
-            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
-            dropdownMatchSelectWidth={false}
-            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT }}
-            ref="field"
-            placeholder={placeholder}
-            size={this.props.config.settings.renderSize}
-            onChange={this.handleFieldSelect}
-            value={this.props.selectedField || undefined}
-            filterOption={this.filterOption}
-            {...customProps}
-        >{fieldSelectItems}</Select>
-    );
-
-    if (fullLabel && fullLabel != this.curFieldOpts().label && !this.curFieldOpts().tooltip) {
-        fieldSelect = <Tooltip title={fullLabel}>{fieldSelect}</Tooltip>;
+    getFieldLabel(fieldOpts, fieldKey, config) {
+        if (!fieldKey) return null;
+        let fieldSeparator = config.settings.fieldSeparator;
+        let maxLabelsLength = config.settings.maxLabelsLength;
+        let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+        let label = fieldOpts.label || last(fieldParts);
+        label = truncateString(label, maxLabelsLength);
+        return label;
     }
 
-    return fieldSelect;
-  }
+    buildOptions(config, fields, path = null, optGroupLabel = null) {
+        if (!fields)
+            return null;
+        const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+        const prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
-  renderAsDropdown() {
-    let fieldOptions = this.props.config.fields;
-    let selectedFieldKeys = getFieldPath(this.props.selectedField, this.props.config);
-    let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
-    let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
-    let placeholder = this.curFieldOpts().label || this.props.config.settings.fieldPlaceholder;
-    let customProps = this.props.customProps || {};
+        return keys(fields).map(fieldKey => {
+            const field = fields[fieldKey];
+            const label = this.getFieldLabel(field, fieldKey, config);
+            const partsLabels = getFieldPathLabels(fieldKey, config);
+            let fullLabel = partsLabels.join(fieldSeparatorDisplay);
+            if (fullLabel == label)
+                fullLabel = null;
+            const altLabel = field.label2;
+            const tooltip = field.tooltip;
+            const subpath = (path ? path : []).concat(fieldKey);
 
-    let fieldMenuItems = this.buildMenuItems(fieldOptions);
-    let fieldMenu = (
-        <Menu
-            //size={this.props.config.settings.renderSize}
-            selectedKeys={selectedFieldKeys}
-            onClick={this.handleFieldMenuSelect}
-            {...customProps}
-        >{fieldMenuItems}</Menu>
-    );
-    let fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);
+            if (field.type == "!struct") {
+                return {
+                    key: fieldKey,
+                    path: prefix+fieldKey,
+                    label,
+                    fullLabel,
+                    altLabel,
+                    tooltip,
+                    items: this.buildOptions(config, field.subfields, subpath, label)
+                };
+            } else {
+                return {
+                    key: fieldKey,
+                    path: prefix+fieldKey,
+                    label,
+                    fullLabel,
+                    altLabel,
+                    tooltip,
+                    grouplabel: optGroupLabel
+                };
+            }
+        });
+    }
 
-    return (
-      <Dropdown
-          overlay={fieldMenu}
-          trigger={['click']}
-          placement={this.props.config.settings.dropdownPlacement}
-      >
-          {fieldToggler}
-      </Dropdown>
-    );
-  }
+    render() {
+        const renderProps = {
+            ...pick(this.props, ['config', 'customProps', 'setField']),
+            ...this.meta
+        };
+
+        //return <FieldCascader {...renderProps} />;
+        if (this.props.renderAsDropdown)
+            return <FieldDropdown {...renderProps} />;
+        else
+            return <FieldSelect {...renderProps} />;
+    }
+
 }

@@ -37,7 +37,7 @@ export const queryString = (item, config, isForDisplay = false) => {
         const reversedOp = operatorDefinition.reversedOp;
         const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-        const fieldSeparator = config.settings.fieldSeparator;
+        const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
 
         //format value
         let valueSrcs = [];
@@ -59,10 +59,10 @@ export const queryString = (item, config, isForDisplay = false) => {
                 let formattedField = null;
                 if (rightField) {
                     const rightFieldDefinition = getFieldConfig(rightField, config) || {};
-                    const fieldParts = rightField.split(fieldSeparator);
+                    const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
                     const _fieldKeys = getFieldPath(rightField, config);
                     const fieldPartsLabels = getFieldPathLabels(rightField, config);
-                    const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
+                    const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
                     const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
                     const formatField = config.settings.formatField || defaultSettings.formatField;
                     formattedField = formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
@@ -113,17 +113,19 @@ export const queryString = (item, config, isForDisplay = false) => {
             return undefined;
         
         //format field
+        let fieldName = field;
+        const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
         if (fieldDefinition.tableName) {
-          const regex = new RegExp(field.split(fieldSeparator)[0])
-          field = field.replace(regex, fieldDefinition.tableName)
+            const fieldPartsCopy = [...fieldParts];
+            fieldPartsCopy[0] = fieldDefinition.tableName;
+            fieldName = fieldPartsCopy.join(fieldSeparator);
         }
-        const fieldParts = field.split(fieldSeparator);
         const _fieldKeys = getFieldPath(field, config);
         const fieldPartsLabels = getFieldPathLabels(field, config);
         const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
         const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
         const formatField = config.settings.formatField || defaultSettings.formatField;
-        const formattedField = formatField(field, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
+        const formattedField = formatField(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
         
         //format expr
         const args = [

@@ -91,7 +91,8 @@ export default class ValueField extends Component {
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
-          let label = field.label || last(fieldKey.split(fieldSeparator));
+          let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+          let label = field.label || last(fieldParts);
           label = truncateString(label, maxLabelsLength);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
@@ -116,7 +117,8 @@ export default class ValueField extends Component {
 
       return keys(fields).map(fieldKey => {
           let field = fields[fieldKey];
-          let label = field.label || last(fieldKey.split(fieldSeparator));
+          let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+          let label = field.label || last(fieldParts);
           label = truncateString(label, maxLabelsLength);
           if (field.type == "!struct") {
               let subpath = (path ? path : []).concat(fieldKey);
