@@ -7,7 +7,7 @@ export default class FieldCascader extends PureComponent {
   static propTypes = {
       config: PropTypes.object.isRequired,
       customProps: PropTypes.object,
-      items: PropTypes.array,
+      items: PropTypes.array.isRequired,
       placeholder: PropTypes.string,
       selectedKey: PropTypes.string,
       selectedKeys: PropTypes.array,
@@ -35,9 +35,9 @@ export default class FieldCascader extends PureComponent {
       const keysForFilter = ['label', 'key', 'altLabel'];
       customProps2.showSearch = {
         filter: (inputValue, path) => 
-          path.some(option => {
+          path.some(option => (
             keysForFilter.map(k => option[k]).join("\0").toLowerCase().indexOf(inputValue.toLowerCase()) > -1
-          })
+          ))
       };
     }
 

@@ -1,4 +1,10 @@
 import en_US from 'antd/lib/locale-provider/en_US';
+import * as Widgets from '../components/widgets/index.js';
+const {
+  FieldSelect,
+  FieldDropdown,
+  FieldCascader
+} = Widgets;
 
 export const settings = {
   formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
@@ -7,6 +13,13 @@ export const settings = {
     else
         return field;
   },
+
+  renderField: (props) => <FieldSelect {...props} />,
+  // renderField: (props) => <FieldDropdown {...props} />,
+  // renderField: (props) => <FieldCascader {...props} />,
+
+  renderOperator: (props) => <FieldSelect {...props} />,
+  // renderOperator: (props) => <FieldDropdown {...props} />,
 
   valueSourcesInfo: {
       value: {},

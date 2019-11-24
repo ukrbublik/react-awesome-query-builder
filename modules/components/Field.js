@@ -2,9 +2,6 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
 import {truncateString} from "../utils/stuff";
-import {default as FieldSelect} from "./widgets/FieldSelect";
-import {default as FieldDropdown} from "./widgets/FieldDropdown";
-import {default as FieldCascader} from "./widgets/FieldCascader";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import pick from 'lodash/pick';
@@ -14,7 +11,6 @@ export default class Field extends PureComponent {
     static propTypes = {
         config: PropTypes.object.isRequired,
         selectedField: PropTypes.string,
-        renderAsDropdown: PropTypes.bool,
         customProps: PropTypes.object,
         //actions
         setField: PropTypes.func.isRequired,
@@ -28,7 +24,7 @@ export default class Field extends PureComponent {
 
     componentWillReceiveProps(nextProps) {
         const prevProps = this.props;
-        const keysForMeta = ["selectedField", "config", "customProps"];
+        const keysForMeta = ["selectedField", "config"];
         const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
         if (needUpdateMeta) {
@@ -36,7 +32,7 @@ export default class Field extends PureComponent {
         }
     }
 
-    getMeta({selectedField, config, customProps}) {
+    getMeta({selectedField, config}) {
         const selectedKey = selectedField;
         const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder} = config.settings;
         const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
@@ -113,16 +109,15 @@ export default class Field extends PureComponent {
     }
 
     render() {
+        const {config, customProps, setField} = this.props;
+        const {renderField} = config.settings;
         const renderProps = {
-            ...pick(this.props, ['config', 'customProps', 'setField']),
+            config, 
+            customProps, 
+            setField,
             ...this.meta
         };
-
-        //return <FieldCascader {...renderProps} />;
-        if (this.props.renderAsDropdown)
-            return <FieldDropdown {...renderProps} />;
-        else
-            return <FieldSelect {...renderProps} />;
+        return renderField(renderProps);
     }
 
 }

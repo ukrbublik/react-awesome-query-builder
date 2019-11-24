@@ -15,6 +15,7 @@ const {
     BooleanWidget,
     TimeWidget,
     DateTimeWidget,
+
     ValueFieldWidget
 } = Widgets;
 const { ProximityOperator } = Operators;

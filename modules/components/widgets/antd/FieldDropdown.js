@@ -10,7 +10,7 @@ export default class FieldDropdown extends PureComponent {
   static propTypes = {
       config: PropTypes.object.isRequired,
       customProps: PropTypes.object,
-      items: PropTypes.array,
+      items: PropTypes.array.isRequired,
       placeholder: PropTypes.string,
       selectedKey: PropTypes.string,
       selectedKeys: PropTypes.array,

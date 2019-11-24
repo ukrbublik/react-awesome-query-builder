@@ -1,15 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
-import { Slider, InputNumber, Col, Row } from 'antd';
+import { Slider, InputNumber, Col } from 'antd';
 import 'antd/lib/date-picker/style';
-import { getFieldConfig } from '../../utils/configUtils';
-import shallowCompare from 'react-addons-shallow-compare';
 
-export default class RangeWidget extends Component {
-
-  state = {
-  }
+export default class RangeWidget extends PureComponent {
 
   static propTypes = {
     setValue: PropTypes.func.isRequired,
@@ -23,16 +17,26 @@ export default class RangeWidget extends Component {
     field: PropTypes.string.isRequired,
     value: PropTypes.array,
     customProps: PropTypes.object,
+    fieldDefinition: PropTypes.object,
   };
 
-  shouldComponentUpdate = shallowCompare;
+  static defaultProps = {
+    min: 0,
+    max: 100,
+    step: 1,
+  };
 
+  state = {
+  }
+  
   handleChange = (value) => {
     this.props.setValue(value);
   }
 
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
+    if (valueFrom == '' || valueFrom == null)
+      valueFrom = value[0];
     value = [...value];
     value[0] = valueFrom;
     if (value[1] == undefined)
@@ -42,6 +46,8 @@ export default class RangeWidget extends Component {
   
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
+    if (valueTo == '' || valueTo == null)
+      valueTo = value[1];
     value = [...value];
     value[1] = valueTo;
     if (value[0] == undefined)
@@ -49,25 +55,21 @@ export default class RangeWidget extends Component {
     this.props.setValue(value);
   }
 
-  static defaultProps = {
-    min: 0,
-    max: 100,
-    step: 10,
-  };
+  tipFormatter = (val) => (val != undefined ? val.toString() : '')
 
   render() {
-    const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
-    const fieldSettings = fieldDefinition.fieldSettings || {};
-    const customProps = this.props.customProps || {};
+    const {config, placeholder, placeholders, fieldDefinition, customProps, value,  min, max, step, marks, textSeparators} = this.props;
+    const {renderSize} = config.settings;
+    const {fieldSettings} = fieldDefinition || {};
+    const _customProps = customProps || {};
+    const _value = value != undefined ? value : undefined;
+    const [valueFrom, valueTo] = _value || [null, null];
+    const _min = fieldSettings.min != null ? fieldSettings.min : min;
+    const _max = fieldSettings.max != null ? fieldSettings.max : max;
+    const _step = fieldSettings.step != null ? fieldSettings.step : step;
+    const _marks = fieldSettings.marks != null ? fieldSettings.marks : marks;
 
-    let value = this.props.value != undefined ? this.props.value : undefined;
-    let [valueFrom, valueTo] = value || [null, null];
-    const min = fieldSettings.min === null ? this.props.min : fieldSettings.min;
-    const max = fieldSettings.max === null ? this.props.max : fieldSettings.max;
-    const step = fieldSettings.step === undefined ? this.props.step : fieldSettings.step;
-    const marks = fieldSettings.marks === undefined ? this.props.marks : fieldSettings.marks;
-
-    if (value && (valueFrom == undefined || valueTo == undefined)) {
+    if (_value && (valueFrom == undefined || valueTo == undefined)) {
       // happens if we change value source - this leads to incomplete slider value, fix it:
       if (valueFrom == undefined)
         this.handleChangeTo(valueTo);
@@ -80,48 +82,48 @@ export default class RangeWidget extends Component {
       <Col style={{display: 'inline-flex'}}>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
-            size={this.props.config.settings.renderSize}
+            size={renderSize}
             ref="numFrom"
             key="numFrom"
             value={valueFrom}
-            min={min}
-            max={max}
-            step={step}
-            placeholder={this.props.placeholders[0]}
+            min={_min}
+            max={_max}
+            step={_step}
+            placeholder={placeholders[0]}
             onChange={this.handleChangeFrom}
             {...customProps}
           />
         </Col>
         <Col style={{float: 'left', marginRight: '5px', lineHeight: '20px'}}>
-          <span>{ this.props.textSeparators[1] }</span>
+          <span>{ textSeparators[1] }</span>
         </Col>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
-            size={this.props.config.settings.renderSize}
+            size={renderSize}
             ref="numTo"
             key="numTo"
             value={valueTo}
-            min={min}
-            max={max}
-            marks={marks}
-            step={step}
-            placeholder={this.props.placeholders[1]}
+            min={_min}
+            max={_max}
+            marks={_marks}
+            step={_step}
+            placeholder={placeholders[1]}
             onChange={this.handleChangeTo}
             {...customProps}
           />
         </Col>
-        <Col style={{float: 'left', width: customProps.width || '300px'}}>
+        <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
             ref="slider"
-            value={value}
-            tipFormatter={(val) => (val != undefined ? val.toString() : '')}
-            min={min}
-            max={max}
-            step={step}
-            marks={marks}
+            value={_value}
+            tipFormatter={this.tipFormatter}
+            min={_min}
+            max={_max}
+            step={_step}
+            marks={_marks}
             included={false}
             range={true}
-            //placeholder={this.props.placeholder}
+            //placeholder={placeholder}
             onChange={this.handleChange}
             {...customProps}
           />
