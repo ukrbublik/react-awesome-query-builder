@@ -136,25 +136,25 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 }
 ```
 
-| key            | requred                | default | meaning       |
-| -------------- | ---------------------- | ------- | ------------- |
-| label          | +                      |         | Label to be displayed in operators select component |
-| reversedOp     | +                      |         | Opposite operator. |
-| isUnary        |                        | false   | true for `is_empty` operator only |
-| cardinality    |                        | 1       | Number of right operands (1 for binary, 2 for `between`) |
-| formatOp       | +                      |         | Function for formatting query string, used to join operands into rule. |
-|                |                        |         |  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, bool isForDisplay) => string` |
-|                |                        |         |  `value` - string (already formatted value) for `cardinality==1` -or- `Immutable.List` of strings for `cardinality>1`  |
-| labelForFormat |                        |         | If `formatOp` is missing, `labelForFormat` will be used to join operands when building query string |
-| mongoFormatOp  | + for MongoDB format   |         | Function for formatting MongoDb query, used to join operands into rule. |
-|                |                        |         |  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` |
-|                |                        |         |  `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` |
-| valueLabels    | + for `cardinality==2` |         | Labels to be displayed on top of 2 values widgets if `config.settings.showLabels` is true |
-|                |                        |         |  Example: `['Value from', {label: 'Value to', placeholder: 'Enter value to'}]` |
-| textSeparators | + for `cardinality==2` |         | Labels to be displayed before each 2 values widgets |
-|                |                        |         |  Example: `[null, 'and']` |
-| options        |                        |         | Special for `proximity` operator |
-| isSpecialRange |                        | false   | Special for `cardinality==2`. Used to show 1 range widget instead of 2 widgets (see `range_between` operator for `rangeslider` widget in demo) |
+| key              | requred                | default | meaning       |
+| ---------------- | ---------------------- | ------- | ------------- |
+| `label`          | +                      |         | Label to be displayed in operators select component |
+| `reversedOp`     | +                      |         | Opposite operator. |
+| `isUnary`        |                        | false   | true for `is_empty` operator only |
+| `cardinality`    |                        | 1       | Number of right operands (1 for binary, 2 for `between`) |
+| `formatOp`       | +                      |         | Function for formatting query string, used to join operands into rule. |
+|                  |                        |         |  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, bool isForDisplay) => string` |
+|                  |                        |         |  `value` - string (already formatted value) for `cardinality==1` -or- `Immutable.List` of strings for `cardinality>1`  |
+| `labelForFormat` |                        |         | If `formatOp` is missing, `labelForFormat` will be used to join operands when building query string |
+| `mongoFormatOp`  | + for MongoDB format   |         | Function for formatting MongoDb query, used to join operands into rule. |
+|                  |                        |         |  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` |
+|                  |                        |         |  `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` |
+| `valueLabels`    | + for `cardinality==2` |         | Labels to be displayed on top of 2 values widgets if `config.settings.showLabels` is true |
+|                  |                        |         |  Example: `['Value from', {label: 'Value to', placeholder: 'Enter value to'}]` |
+| `textSeparators` | + for `cardinality==2` |         | Labels to be displayed before each 2 values widgets |
+|                  |                        |         |  Example: `[null, 'and']` |
+| `options`        |                        |         | Special for `proximity` operator |
+| `isSpecialRange` |                        | false   | Special for `cardinality==2`. Used to show 1 range widget instead of 2 widgets (see `range_between` operator for `rangeslider` widget in demo) |
 
 
 There is also special `proximity` operator, its options are rendered with `<ProximityOperator>`.  
@@ -223,7 +223,6 @@ const {
 | `customProps`         |                        |           | You can pass any props directly to widget with `customProps`, for example enable search for [`<Select>`](https://ant.design/components/select/) widget: `widgetProps: {customProps: {showSearch: true}}` |
 | `singleWidget`        |                        |           | Special option for `rangeslider` widget (`<RangeWidget>`), value equals to `slider` (`<SliderWidget>`) to connect them. |
 |                       |                        |           |  Used together with operator `range_between` having `isSpecialRange=true` option. |
-
 
 There is special `field` widget, rendered by `<ValueFieldWidget>`.  
 It can be used to compare field with another field of same type.  
