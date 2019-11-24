@@ -116,7 +116,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |                |                      |  `children` - list of already formatted queries (strings) to be joined with conjuction |
 | `mongoConj`    | + for MongoDB format | [Name](https://docs.mongodb.com/manual/reference/operator/query-logical/) of logical operator for MongoDb |
 | `reversedConj` |                      | Opposite logical operator. |
-|                |                      |  Can be used to optimize `!(A || B)` to `!A && !B` (done for MongoDB format) |
+|                |                      |  Can be used to optimize `!(A OR B)` to `!A && !B` (done for MongoDB format) |
 
 
 
