@@ -10,6 +10,7 @@ Each section is described below:
 - [types](#configtypes)
 - [settings](#configsettings)
 - [fields](#configfields)
+
 Usually it's enough to just reuse [basic config](#basic-config), provide your own [fields](#configfields) and maybe change some [settings](#configsettings).  
 Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).  
 
