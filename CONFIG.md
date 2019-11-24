@@ -217,9 +217,9 @@ import en_US from 'antd/lib/locale-provider/en_US';
 |                                 |                |  `parts` - list of fields's keys for struct field |
 |                                 |                |  `label2` - field's `label2` OR parts joined by `fieldSeparatorDisplay` |
 |                                 |                |  Default impl will just return `field` (or `label2` for `isForDisplay==true`) |
-| `canCompareFieldWithField`  |                  |           | For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field |
-|                             |                  |           |  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` |
-|                             |                  |           |  For type == `select`/`multiselect` you can optionally check `listValues` |
+| `canCompareFieldWithField`      |                | For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field |
+|                                 |                |  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` |
+|                                 |                |  For type == `select`/`multiselect` you can optionally check `listValues` |
 
 
 Localization:
