@@ -3,6 +3,7 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {defaultValue} from "./stuff";
 import {defaultConjunction} from './defaultUtils';
+import {settings as defaultSettings} from '../config/default';
 import {Map} from 'immutable';
 
 export const queryString = (item, config, isForDisplay = false) => {
@@ -63,7 +64,8 @@ export const queryString = (item, config, isForDisplay = false) => {
                     const fieldPartsLabels = getFieldPathLabels(rightField, config);
                     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
                     const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
-                    formattedField = config.settings.formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
+                    const formatField = config.settings.formatField || defaultSettings.formatField;
+                    formattedField = formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
                 }
                 ret = formattedField;
             } else {
@@ -120,7 +122,8 @@ export const queryString = (item, config, isForDisplay = false) => {
         const fieldPartsLabels = getFieldPathLabels(field, config);
         const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
         const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
-        const formattedField = config.settings.formatField(field, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
+        const formatField = config.settings.formatField || defaultSettings.formatField;
+        const formattedField = formatField(field, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
         
         //format expr
         const args = [

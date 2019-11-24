@@ -1,5 +1,7 @@
 import Immutable, { fromJS, Map } from 'immutable';
 const transit = require('transit-immutable-js');
+import {validateTree} from "./validation";
+import {extendConfig} from "./configUtils";
 
 
 /**
@@ -220,6 +222,11 @@ export const loadTree = (serTree) => {
         return _fromJS(JSON.parse(serTree));
     } else throw "Can't load tree!";
 };
+
+export const checkTree = (tree, config) => {
+    const extendedConfig = extendConfig(config);
+    return validateTree(tree, null, extendedConfig, extendedConfig, true, true);
+}
   
 function _fromJS(tree) {
     return fromJS(tree, function (key, value) {

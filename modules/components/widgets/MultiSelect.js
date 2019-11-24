@@ -34,7 +34,7 @@ export default class MultiSelectWidget extends Component {
   }
 
   onPropsChanged (props) {
-    let placeholder = this.props.placeholder || "Select option";
+    let placeholder = this.props.placeholder;
     let placeholderWidth = calcTextWidth(placeholder);
     const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
     let optionsMaxWidth = 0;
@@ -50,7 +50,7 @@ export default class MultiSelectWidget extends Component {
 
   render() {
     let customProps = this.props.customProps || {};
-    let size = this.props.config.settings.renderSize || "small";
+    let size = this.props.config.settings.renderSize;
     const fieldDefinition = getFieldConfig(this.props.field, this.props.config);
     const options = map(fieldDefinition.listValues, (label, value) => {
       return (<Option key={value} value={value}>{label}</Option>);

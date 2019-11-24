@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import uuid from './uuid';
 import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
-import {_getNewValueForFieldOp} from '../stores/tree'
+import {_getNewValueForFieldOp} from '../stores/tree';
 
 
 export const defaultField = (config, canGetFirst = true) => {
@@ -91,3 +91,4 @@ export const defaultRoot = (config) => {
     properties: defaultGroupProperties(config)
   });
 }
+

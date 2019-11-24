@@ -27,7 +27,7 @@ export default class TextWidget extends Component {
       <Col>
         <Input
           key="widget-text"
-          size={this.props.config.settings.renderSize || "small"}
+          size={this.props.config.settings.renderSize}
           ref="text"
           type={"text"}
           value={this.props.value || null}

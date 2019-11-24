@@ -222,7 +222,7 @@ class ConjsButtons extends PureComponent {
     return (
       <ButtonGroup
         key="group-conjs-buttons"
-        size={config.settings.renderSize || "small"}
+        size={config.settings.renderSize}
         disabled={disabled}
       >
         {config.settings.showNot &&
@@ -254,7 +254,7 @@ class ConjsRadios extends PureComponent {
         key="group-conjs-radios"
         disabled={disabled}
         value={selectedConjunction}
-        size={config.settings.renderSize || "small"}
+        size={config.settings.renderSize}
         onChange={setConjunction}
       >
         {map(conjunctionOptions, (item, index) => (
@@ -275,9 +275,9 @@ class Actions extends PureComponent {
     const {config, position, addRule, addGroup, allowFurtherNesting, isRoot, removeSelf} = this.props;
 
     const immutableGroupsMode = config.settings.immutableGroupsMode;
-    const addRuleLabel = config.settings.addRuleLabel || "Add rule";
-    const addGroupLabel = config.settings.addGroupLabel || "Add group";
-    const delGroupLabel = config.settings.delGroupLabel !== undefined ? config.settings.delGroupLabel : "Delete";
+    const addRuleLabel = config.settings.addRuleLabel;
+    const addGroupLabel = config.settings.addGroupLabel;
+    const delGroupLabel = config.settings.delGroupLabel;
 
     const addRuleBtn = !immutableGroupsMode &&
       <Button
@@ -305,7 +305,7 @@ class Actions extends PureComponent {
     return (
       <div className={`group--actions ${position}`}>
         <ButtonGroup
-          size={config.settings.renderSize || "small"}
+          size={config.settings.renderSize}
         >
           {addRuleBtn}
           {addGroupBtn}

@@ -68,7 +68,7 @@ export default class Operator extends Component {
   buildMenuToggler(label) {
       var toggler =
           <Button
-              size={this.props.config.settings.renderSize || "small"}
+              size={this.props.config.settings.renderSize}
           >
               {label} <Icon type="down" />
           </Button>;
@@ -111,7 +111,7 @@ export default class Operator extends Component {
             style={{ width: this.props.selectedOperator ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
             ref="field"
             placeholder={placeholder}
-            size={this.props.config.settings.renderSize || "small"}
+            size={this.props.config.settings.renderSize}
             onChange={this.handleOperatorSelect}
             value={this.props.selectedOperator || undefined}
         >{fieldSelectItems}</Select>
@@ -126,7 +126,7 @@ export default class Operator extends Component {
     let opMenuItems = this.buildMenuItems(this.operatorOptions);
     let opMenu = (
         <Menu
-            //size={this.props.config.settings.renderSize || "small"}
+            //size={this.props.config.settings.renderSize}
             selectedKeys={[selectedOpKey]}
             onClick={this.handleOperatorMenuSelect}
         >{opMenuItems}</Menu>

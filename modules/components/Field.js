@@ -77,7 +77,7 @@ export default class Field extends Component {
 
   getFieldDisplayLabel(field, fieldKey) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
       let label = field.label || last(fieldKey.split(fieldSeparator));
       label = truncateString(label, maxLabelsLength);
       return label;
@@ -146,11 +146,11 @@ export default class Field extends Component {
 
   buildMenuToggler(label, fullLabel, customLabel) {
       let btnLabel = customLabel ? customLabel : label;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
       btnLabel = truncateString(btnLabel, maxLabelsLength);
       var toggler =
           <Button
-              size={this.props.config.settings.renderSize || "small"}
+              size={this.props.config.settings.renderSize}
           >
               {btnLabel} <Icon type="down" />
           </Button>;
@@ -177,7 +177,7 @@ export default class Field extends Component {
   renderAsSelect() {
     let isFieldSelected = !!this.props.selectedField;
     let dropdownPlacement = this.props.config.settings.dropdownPlacement;
-    let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+    let maxLabelsLength = this.props.config.settings.maxLabelsLength;
     let fieldOptions = this.props.config.fields;
     let selectedFieldPartsLabels = getFieldPathLabels(this.props.selectedField, this.props.config);
     let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
@@ -197,7 +197,7 @@ export default class Field extends Component {
             style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT }}
             ref="field"
             placeholder={placeholder}
-            size={this.props.config.settings.renderSize || "small"}
+            size={this.props.config.settings.renderSize}
             onChange={this.handleFieldSelect}
             value={this.props.selectedField || undefined}
             filterOption={this.filterOption}
@@ -223,7 +223,7 @@ export default class Field extends Component {
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
     let fieldMenu = (
         <Menu
-            //size={this.props.config.settings.renderSize || "small"}
+            //size={this.props.config.settings.renderSize}
             selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldMenuSelect}
             {...customProps}
