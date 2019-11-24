@@ -353,6 +353,10 @@ const setField = (state, path, newField, config) => {
     if (!newField)
         return removeItem(state, path);
 
+    const fieldSeparator = config.settings.fieldSeparator;
+    if (Array.isArray(newField))
+        newField = newField.join(fieldSeparator);
+
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');

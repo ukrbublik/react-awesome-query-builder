@@ -39,6 +39,7 @@ export const mongodbFormat = (item, config, _not = false) => {
             resultQuery[mongoConj] = list.toList();
         return resultQuery;
     } else if (type === 'rule') {
+        const {fieldSeparator} = config.settings;
         let operator = properties.get('operator');
         const operatorOptions = properties.get('operatorOptions');
         let field = properties.get('field');
@@ -61,8 +62,9 @@ export const mongodbFormat = (item, config, _not = false) => {
         //format field
         let fieldName = field;
         if (fieldDefinition.tableName) {
-          const regex = new RegExp(field.split(config.settings.fieldSeparator)[0])
-          fieldName = field.replace(regex, fieldDefinition.tableName)
+          let fieldParts = Array.isArray(field) ? [...field] : field.split(fieldSeparator);
+          fieldParts[0] = fieldDefinition.tableName;
+          fieldName = fieldParts.join(fieldSeparator);
         }
 
         //format value

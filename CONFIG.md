@@ -123,9 +123,9 @@ const myConfig = {
 | `label`             | +                                      |        | Label to be displayed in field list |
 |                     |                                        |        |  (If not specified, fields's key will be used instead) |
 | `label2`            |                                        |        | Can be optionally specified for nested fields. |
-|                     |                                        |        |  By default, if nested field is selected (eg. `name` of `user` in example above), select component will have tootip like `User -> Subname` |
+|                     |                                        |        |  By default, if nested field is selected (eg. `name` of `user` in example above), select component will show `user` with tootip like `User -> Subname` |
 |                     |                                        |        |  (path constructed by joining `label`s with delimeter `->` specified by `config.settings.fieldSeparatorDisplay`) |
-|                     |                                        |        |  That tooltip text can be overriden by setting `label2`, so it will become `User name`. 
+|                     |                                        |        |  Select text `user` can be confusing, so can be overriden by setting `label2` to something like `User name`. 
 | `tooptip`           |                                        |        | Optional tooltip to be displayed in field list by hovering on item |
 | `listValues`        | + for `Select`/`MultiSelect` widgets   |        | List of values for Select widget. |
 |                     |                                        |        |  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options |
@@ -211,8 +211,8 @@ import en_US from 'antd/lib/locale-provider/en_US';
 |                                 |                |  return smth like `"NOT(" + q + ")"` |
 | `formatField`                   |                | Function for formatting query string, used to format field |
 |                                 |                |  `(string field, Array parts, string label2, Object fieldDefinition, Object config, bool isForDisplay) => string` |
-|                                 |                |  `parts` - for struct field |
-|                                 |                |  `label2` - with using of `fieldSeparatorDisplay` |
+|                                 |                |  `parts` - list of fields's keys for struct field |
+|                                 |                |  `label2` - field's `label2` OR parts joined by `fieldSeparatorDisplay` |
 |                                 |                |  Default impl will just return `field` (or `label2` for `isForDisplay==true`) |
 | `canCompareFieldWithField`  |                  |           | For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field |
 |                             |                  |           |  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` |

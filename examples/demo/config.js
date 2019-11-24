@@ -150,6 +150,8 @@ const settings = {
     // showLabels: true,
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
+
+    renderFieldAndOpAsDropdown: false
 };
 
 //////////////////////////////////////////////////////////////////////

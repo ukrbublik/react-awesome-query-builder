@@ -108,7 +108,7 @@ export const getFieldRawConfig = (field, config) => {
     if (!field || field == ':empty:')
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
-    const parts = field.split(fieldSeparator);
+    const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
     let fields = config.fields;
     let fieldConfig = null;
     for (let i = 0 ; i < parts.length ; i++) {
@@ -177,22 +177,25 @@ export const getFirstOperator = (config, field) => {
   return fieldOps ? fieldOps[0] : null;
 };
 
-export const getFieldPath = (field, config) => {
+export const getFieldPath = (field, config, onlyKeys = false) => {
     if (!field || field == ':empty:')
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
-    return field
-        .split(fieldSeparator)
-        .map((_curr, ind, arr) => arr.slice(0, ind+1))
-        .map((parts) => parts.join(fieldSeparator));
+    const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
+    if (onlyKeys)
+        return parts;
+    else
+        return parts
+            .map((_curr, ind, arr) => arr.slice(0, ind+1))
+            .map((parts) => parts.join(fieldSeparator));
 };
 
 export const getFieldPathLabels = (field, config) => {
     if (!field || field == ':empty:')
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
-    return field
-        .split(fieldSeparator)
+    const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
+    return parts
         .map((_curr, ind, arr) => arr.slice(0, ind+1))
         .map((parts) => parts.join(fieldSeparator))
         .map(part => {
