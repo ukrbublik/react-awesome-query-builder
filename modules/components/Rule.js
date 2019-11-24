@@ -63,10 +63,12 @@ class Rule extends Component {
         const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField);
         const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
         const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
+        const isOnlyValue = selectedField && selectedFieldConfig.valueSources.length == 1 && selectedFieldConfig.valueSources[0] == 'value';
+        const hideOperator = selectedFieldWidgetConfig.hideOperator && isOnlyValue;
 
         const showDragIcon = config.settings.canReorder && treeNodesCnt > 2;
-        const showOperator = selectedField && !selectedFieldWidgetConfig.hideOperator;
-        const showOperatorLabel = selectedField && selectedFieldWidgetConfig.hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
+        const showOperator = selectedField && !hideOperator;
+        const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
         const showWidget = isFieldAndOpSelected;
         const showOperatorOptions = isFieldAndOpSelected && selectedOperatorHasOptions;
 
@@ -104,7 +106,7 @@ class Rule extends Component {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
         } = this.meta;
-        const deleteText = this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete";
+        const deleteText = this.props.config.settings.deleteLabel;
 
         const field = 
             <FieldWrapper
@@ -173,7 +175,7 @@ class Rule extends Component {
                     type="danger"
                     icon="delete"
                     onClick={this.removeSelf}
-                    size={this.props.config.settings.renderSize || "small"}
+                    size={this.props.config.settings.renderSize}
                 >
                     {deleteText}
                 </Button>
@@ -199,7 +201,7 @@ class FieldWrapper extends PureComponent {
         return (
             <Col className="rule--field">
                 { config.settings.showLabels &&
-                    <label>{config.settings.fieldLabel || "Field"}</label>
+                    <label>{config.settings.fieldLabel}</label>
                 }
                 <Field
                     config={config}
@@ -223,7 +225,7 @@ class OperatorWrapper extends PureComponent {
         const operator = showOperator &&
             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                 { config.settings.showLabels &&
-                    <label>{config.settings.operatorLabel || "Operator"}</label>
+                    <label>{config.settings.operatorLabel}</label>
                 }
                 <Operator
                     key="operator"

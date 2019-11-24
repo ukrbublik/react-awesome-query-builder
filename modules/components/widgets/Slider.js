@@ -56,18 +56,19 @@ export default class SliderWidget extends Component {
     const customProps = this.props.customProps || {};
 
     let value = __isInternal ? this.state.internalValue : this.props.value;
-    if (value == undefined)
-      value = null;
     const min = fieldSettings.min === null ? this.props.min : fieldSettings.min;
     const max = fieldSettings.max === null ? this.props.max : fieldSettings.max;
     const step = fieldSettings.step === undefined ? this.props.step : fieldSettings.step;
     const marks = fieldSettings.marks === undefined ? this.props.marks : fieldSettings.marks;
-
+    if (value == undefined)
+      value = null;
+    const sliderValue = value == null && min ? min : value;
+      
     return (
       <Col style={{display: 'inline-flex'}}>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
-            size={this.props.config.settings.renderSize || "small"}
+            size={this.props.config.settings.renderSize}
             ref="num"
             value={value}
             min={min}
@@ -81,7 +82,7 @@ export default class SliderWidget extends Component {
         <Col style={{float: 'left', width: customProps.width || '300px'}}>
           <Slider
             ref="slider"
-            value={value}
+            value={sliderValue}
             tipFormatter={this.tipFormatter}
             min={min}
             max={max}

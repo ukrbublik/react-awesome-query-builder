@@ -53,7 +53,7 @@ export default class TimeWidget extends Component {
             <TimePicker
                 use12Hours={use12Hours}
                 key="widget-time"
-                size={this.props.config.settings.renderSize || "small"}
+                size={this.props.config.settings.renderSize}
                 placeholder={this.props.placeholder}
                 format={timeFormat}
                 value={dateValue}

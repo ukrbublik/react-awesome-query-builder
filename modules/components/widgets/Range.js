@@ -80,7 +80,7 @@ export default class RangeWidget extends Component {
       <Col style={{display: 'inline-flex'}}>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
-            size={this.props.config.settings.renderSize || "small"}
+            size={this.props.config.settings.renderSize}
             ref="numFrom"
             key="numFrom"
             value={valueFrom}
@@ -97,7 +97,7 @@ export default class RangeWidget extends Component {
         </Col>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
-            size={this.props.config.settings.renderSize || "small"}
+            size={this.props.config.settings.renderSize}
             ref="numTo"
             key="numTo"
             value={valueTo}

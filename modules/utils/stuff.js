@@ -39,7 +39,7 @@ export const calcTextWidth = function(str, font) {
 }
 
 export const truncateString = (str, n, useWordBoundary) => {
-    if (str.length <= n) { return str; }
+    if (!n || str.length <= n) { return str; }
     var subString = str.substr(0, n-1);
     return (useWordBoundary 
        ? subString.substr(0, subString.lastIndexOf(' ')) 

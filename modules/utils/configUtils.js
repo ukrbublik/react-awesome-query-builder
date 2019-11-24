@@ -2,15 +2,22 @@
 import last from 'lodash/last';
 import merge from 'lodash/merge';
 import mergeWith from 'lodash/mergeWith';
+import {settings as defaultSettings} from '../config/default';
+import moment from 'moment';
+
 
 export const extendConfig = (config) => {
     //operators, defaultOperator - merge
     //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
+    config.settings = merge({}, defaultSettings, config.settings);
+
     _extendTypesConfig(config.types, config);
 
     _extendFieldsConfig(config.fields, config);
     
+    moment.locale(config.settings.locale.short);
+
     return config;
 };
 
@@ -29,6 +36,7 @@ function _extendTypeConfig(type, typeConfig, config) {
         if (typeWidgetConfig.operators) {
             if (!operators)
                 operators = [];
+            
             operators = operators.concat(typeWidgetConfig.operators.slice());
         }
         if (typeWidgetConfig.defaultOperator)
@@ -71,10 +79,16 @@ function _extendFieldConfig(field, fieldConfig, config) {
         fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
         for (let widget in typeConfig.widgets) {
             let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
+            let typeWidgetConfig = typeConfig.widgets[widget] || {};
+            let shouldIncludeOperators = fieldConfig.preferWidgets && (widget == 'field' || fieldConfig.preferWidgets.includes(widget));
             if (fieldWidgetConfig.operators) {
                 if (!operators)
                     operators = [];
                 operators = operators.concat(fieldWidgetConfig.operators.slice());
+            } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
+                if (!operators)
+                    operators = [];
+                operators = operators.concat(typeWidgetConfig.operators.slice());
             }
             if (fieldWidgetConfig.defaultOperator)
                 defaultOperator = fieldWidgetConfig.defaultOperator;
@@ -191,12 +205,18 @@ export const getOperatorConfig = (config, operator, field = null) => {
     if (!operator)
         return null;
     const opConfig = config.operators[operator];
+    const reversedOperator = opConfig.reversedOp;
+    //const revOpConfig = config.operators[reversedOperator];
     if (field) {
         const fieldConfig = getFieldConfig(field, config);
         const widget = getWidgetForFieldOp(config, field, operator);
+        const widgetConfig = config.widgets[widget] || {};
         const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
+        const widgetOpProps = (widgetConfig.opProps || {})[operator];
+        //const widgetRevOpProps = (widgetConfig.opProps || {})[reversedOperator];
         const fieldWidgetOpProps = (fieldWidgetConfig.opProps || {})[operator];
-        const mergedOpConfig = merge({}, opConfig, fieldWidgetOpProps);
+        //const fieldWidgetRevOpProps = (fieldWidgetConfig.opProps || {})[reversedOperator];
+        const mergedOpConfig = merge({}, opConfig, widgetOpProps, fieldWidgetOpProps);
         return mergedOpConfig;
     } else {
         return opConfig;
@@ -223,7 +243,7 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
     const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
     let ret = null;
     if (cardinality > 1) {
-        const valueLabels =  mergedOpConfig.valueLabels;
+        const valueLabels = fieldWidgetConfig.valueLabels || mergedOpConfig.valueLabels;
         if (valueLabels)
             ret = valueLabels[delta];
         if (ret && typeof ret != 'object') {
@@ -231,14 +251,14 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
         }
         if (!ret) {
             ret = {
-                label: (config.settings.valueLabel || "Value") + " " + (delta+1),
-                placeholder: (config.settings.valuePlaceholder || "Value") + " " + (delta+1),
+                label: config.settings.valueLabel + " " + (delta+1),
+                placeholder: config.settings.valuePlaceholder + " " + (delta+1),
             }
         }
     } else {
         ret = {
-            label: fieldWidgetConfig.valueLabel || config.settings.valueLabel || "Value", 
-            placeholder: fieldWidgetConfig.valuePlaceholder || config.settings.valuePlaceholder || "Value",
+            label: fieldWidgetConfig.valueLabel || config.settings.valueLabel, 
+            placeholder: fieldWidgetConfig.valuePlaceholder || config.settings.valuePlaceholder,
         };
     }
     return ret;

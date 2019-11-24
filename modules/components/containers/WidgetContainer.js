@@ -267,7 +267,7 @@ class ValueSources extends PureComponent {
         let content = (
             <RadioGroup
                 value={valueSrc || "value"}
-                size={config.settings.renderSize || "small"}
+                size={config.settings.renderSize}
                 onChange={setValueSrcHandler}
             >
                 {valueSources.map(srcKey => (

@@ -4,20 +4,31 @@ import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import { Select } from 'antd';
 const Option = Select.Option;
-import Immutable from 'immutable';
+import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from '../../utils/stuff';
 
 export default class Proximity extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     setOption: PropTypes.func.isRequired,
-    defaults: PropTypes.object.isRequired,
     options: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     minProximity: PropTypes.number,
     maxProximity: PropTypes.number,
+    defaultProximity: PropTypes.number,
     optionPlaceholder: PropTypes.string,
     optionTextBefore: PropTypes.string,
     optionLabel: PropTypes.string,
+    customProps: PropTypes.object,
     //children
+  };
+
+  static defaultProps = {
+    customProps: {},
+    minProximity: 2,
+    maxProximity: 10,
+    //defaultProximity: 2,
+    optionPlaceholder: "Select words between",
+    optionLabel: "Words between",
+    optionTextBefore: null,
   };
 
   shouldComponentUpdate = shallowCompare;
@@ -27,27 +38,37 @@ export default class Proximity extends Component {
   }
 
   render() {
-    const selectedProximity = this.props.options.get('proximity', this.props.defaults.proximity);
+    const {
+      defaultProximity, options, config: {settings}, optionLabel, optionPlaceholder, customProps, minProximity, maxProximity, optionTextBefore
+    } = this.props;
+    const obsoleteDefaultProximity = this.props.defaults ? this.props.defaults.proximity : undefined;
+    const {dropdownPlacement, showLabels, renderSize} = settings;
+    const selectedProximity = options.get('proximity', defaultProximity || obsoleteDefaultProximity);
+    const placeholderWidth = calcTextWidth(optionPlaceholder);
+
     return (
       <div className="operator--PROXIMITY">
         <div className="operator--options">
-          { this.props.config.settings.showLabels &&
-            <label>{this.props.optionLabel || "Words between"}</label>
+          { showLabels &&
+            <label>{optionLabel}</label>
           }
-          { !this.props.config.settings.showLabels && this.props.optionTextBefore &&
+          { !showLabels && optionTextBefore &&
             <div className="operator--options--sep">
-                <span>{this.props.optionTextBefore}</span>
+                <span>{optionTextBefore}</span>
             </div>
           }
           <Select
+            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            size={this.props.config.settings.renderSize || "small"}
+            size={renderSize}
+            style={{ width: selectedProximity ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
             ref="proximity"
-            placeholder={this.props.optionPlaceholder || "Select words between"}
-            value={selectedProximity != null ? ""+selectedProximity : ""}
+            placeholder={optionPlaceholder}
+            value={selectedProximity != null ? ""+selectedProximity : undefined}
             onChange={this.handleChange}
+            {...customProps}
           >
-            {range(this.props.minProximity || 2, (this.props.maxProximity || 10) + 1).map((item) => (
+            {range(minProximity, maxProximity + 1).map((item) => (
               <Option key={""+item} value={""+item}>{item}</Option>
             ))}
           </Select>

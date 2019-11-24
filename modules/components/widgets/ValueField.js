@@ -43,7 +43,7 @@ export default class ValueField extends Component {
   }
 
   //tip: empty groups are ok for antd
-  filterFields(config, fields, leftFieldFullkey, operator) {
+  filterFields(config, fields, leftFieldFullkey, operator, canCompareFieldWithField) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
@@ -68,7 +68,7 @@ export default class ValueField extends Component {
           _filter(subfields, subpath);
         } else {
           let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
-          let fn = config.settings.canCompareFieldWithField;
+          let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig);
             if (!canUse)
@@ -84,7 +84,7 @@ export default class ValueField extends Component {
 
   buildMenuItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
@@ -109,7 +109,7 @@ export default class ValueField extends Component {
 
   buildSelectItems(fields, path = null) {
       let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength || 100;
+      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
       if (!fields)
           return null;
       let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
@@ -140,7 +140,7 @@ export default class ValueField extends Component {
   buildMenuToggler(label, fullLabel, customLabel) {
       var toggler =
           <Button
-              size={this.props.config.settings.renderSize || "small"}
+              size={this.props.config.settings.renderSize}
           >
               {customLabel ? customLabel : label} <Icon type="down" />
           </Button>;
@@ -169,26 +169,29 @@ export default class ValueField extends Component {
   }
 
   renderAsSelect() {
-    const leftFieldConfig = getFieldConfig(this.props.field, this.props.config);
+    const {
+      config, field, operator, value, customProps,
+      canCompareFieldWithField
+    } = this.props;
+    const leftFieldConfig = getFieldConfig(field, config);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    const dropdownPlacement = this.props.config.settings.dropdownPlacement;
-    const fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
-    const placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || this.props.config.settings.fieldPlaceholder;
+    const dropdownPlacement = config.settings.dropdownPlacement;
+    const fieldOptions = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
+    const placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || config.settings.fieldPlaceholder;
     const placeholderWidth = calcTextWidth(placeholder);
     const fieldSelectItems = this.buildSelectItems(fieldOptions);
-    const customProps = this.props.customProps || {};
 
     const fieldSelect = (
           <Select
               dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
               dropdownMatchSelectWidth={false}
-              style={{ width: this.props.value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
+              style={{ width: value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
               ref="field"
               placeholder={placeholder}
-              size={this.props.config.settings.renderSize || "small"}
+              size={config.settings.renderSize}
               onChange={this.handleFieldSelect}
-              value={this.props.value || undefined}
+              value={value || undefined}
               filterOption={this.filterOption}
               {...customProps}
           >{fieldSelectItems}</Select>
@@ -198,20 +201,23 @@ export default class ValueField extends Component {
   }
 
   renderAsDropdown() {
-    const leftFieldConfig = getFieldConfig(this.props.field, this.props.config);
+    const {
+      config, field, operator, value, customProps,
+      canCompareFieldWithField
+    } = this.props;
+    const leftFieldConfig = getFieldConfig(field, config);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    let fieldOptions = this.filterFields(this.props.config, this.props.config.fields, this.props.field, this.props.operator);
-    let selectedFieldKeys = getFieldPath(this.props.value, this.props.config);
-    let selectedFieldPartsLabels = getFieldPathLabels(this.props.value, this.props.config);
-    let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(this.props.config.settings.fieldSeparatorDisplay) : null;
-    let placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || this.props.config.settings.fieldPlaceholder;
-    let customProps = this.props.customProps || {};
+    let fieldOptions = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
+    let selectedFieldKeys = getFieldPath(value, config);
+    let selectedFieldPartsLabels = getFieldPathLabels(value, config);
+    let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
+    let placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || config.settings.fieldPlaceholder;
 
     let fieldMenuItems = this.buildMenuItems(fieldOptions);
     let fieldMenu = (
         <Menu
-            //size={this.props.config.settings.renderSize || "small"}
+            //size={config.settings.renderSize}
             selectedKeys={selectedFieldKeys}
             onClick={this.handleFieldMenuSelect}
             {...customProps}
@@ -223,7 +229,7 @@ export default class ValueField extends Component {
         <Dropdown
             overlay={fieldMenu}
             trigger={['click']}
-            placement={this.props.config.settings.dropdownPlacement}
+            placement={config.settings.dropdownPlacement}
         >
             {fieldToggler}
         </Dropdown>

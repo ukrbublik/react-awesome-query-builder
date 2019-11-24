@@ -30,8 +30,6 @@ export default class DateTimeWidget extends Component {
         if (mValue && !mValue.isValid()) {
             setValue(null);
         }
-
-        moment.locale(this.props.config.settings.locale.short);
     }
 
     static defaultProps = {
@@ -59,7 +57,7 @@ export default class DateTimeWidget extends Component {
                 use12Hours={use12Hours}
                 showTime={{ format: timeFormat }}
                 placeholder={this.props.placeholder}
-                size={this.props.config.settings.renderSize || "small"}
+                size={this.props.config.settings.renderSize}
                 format={dateFormat + ' ' + timeFormat}
                 value={dateValue}
                 onChange={this.handleChange}

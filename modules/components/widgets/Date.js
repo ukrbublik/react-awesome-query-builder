@@ -28,8 +28,6 @@ export default class DateWidget extends Component {
         if (mValue && !mValue.isValid()) {
             setValue(null);
         }
-
-        moment.locale(this.props.config.settings.locale.short);
     }
 
     static defaultProps = {
@@ -53,7 +51,7 @@ export default class DateWidget extends Component {
             <DatePicker
                 key="widget-date"
                 placeholder={this.props.placeholder}
-                size={this.props.config.settings.renderSize || "small"}
+                size={this.props.config.settings.renderSize}
                 format={dateFormat}
                 value={dateValue}
                 onChange={this.handleChange}

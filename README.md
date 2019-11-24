@@ -42,26 +42,66 @@ See [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/t
 ## Usage
 ```javascript
 import React, {Component} from 'react';
-import {Query, Builder, Utils as QbUtils} from 'react-awesome-query-builder';
+import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
 import 'react-awesome-query-builder/css/antd.less';
 import 'react-awesome-query-builder/css/styles.scss';
 import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
 
 // You need to provide your own config. See below 'Config format'
-import loadedConfig from './config';
+const config = {
+  ...BasicConfig,
+  fields: {
+    qty: {
+        label: 'Qty',
+        type: 'number',
+        fieldSettings: {
+            min: 0,
+        },
+        valueSources: ['value'],
+        preferWidgets: ['number'],
+    },
+    price: {
+        label: 'Price',
+        type: 'number',
+        valueSources: ['value'],
+        fieldSettings: {
+            min: 10,
+            max: 100,
+        },
+        preferWidgets: ['slider', 'rangeslider'],
+    },
+    color: {
+        label: 'Color',
+        type: 'select',
+        valueSources: ['value'],
+        listValues: {
+            yellow: 'Yellow',
+            green: 'Green',
+            orange: 'Orange'
+        },
+    },
+    is_promotion: {
+        label: 'Promo?',
+        type: 'boolean',
+        operators: ['equal'],
+        valueSources: ['value'],
+    },
+  }
+};
+
 // You can load query value from your backend storage (for saving see `Query.onChange()`)
 const queryValue = {"id": QbUtils.uuid(), "type": "group"};
 
 class DemoQueryBuilder extends Component {
     state = {
-      tree: loadTree(queryValue),
-      config: loadedConfig
+      tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
+      config: config
     };
     
     render = () => (
       <div>
         <Query
-            {...loadedConfig} 
+            {...config} 
             value={this.state.tree}
             onChange={this.onChange}
             get_children={this.renderBuilder}
@@ -80,8 +120,8 @@ class DemoQueryBuilder extends Component {
 
     renderResult = ({tree: immutableTree, config}) => (
       <div className="query-builder-result">
-          <div>Query string: {QbUtils.queryString(immutableTree, config)}</div>
-          <div>Mongodb query: {QbUtils.mongodbFormat(immutableTree, config)}</div>
+          <div>Query string: <pre>{JSON.stringify(QbUtils.queryString(immutableTree, config))}</pre></div>
+          <div>Mongodb query: <pre>{JSON.stringify(QbUtils.mongodbFormat(immutableTree, config))}</pre></div>
       </div>
     )
     
@@ -90,6 +130,7 @@ class DemoQueryBuilder extends Component {
       this.setState({tree: immutableTree, config: config});
 
       const jsonTree = QbUtils.getTree(immutableTree);
+      console.log(jsonTree);
       // `jsonTree` can be saved to backend, and later loaded to `queryValue`
     }
 }
@@ -123,7 +164,19 @@ Scripts:
 
 The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
 
+Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)
+
+
+## Changelog
+- 1.0
+  - optimized renders & dragging
+  - added: `allowCustomValues` (issue #88)
+  - added: `canRegroup`
+  - rename: `readonlyMode` -> `immutableGroupsMode`
+  - rename: `get_children` -> `renderBuilder`  ####### todo (old  name is supported)
+  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported)
+  - removed: unused `<Preview />` component and `.query-preview` class
 
 
 ## License

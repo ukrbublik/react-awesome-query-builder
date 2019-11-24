@@ -43,7 +43,7 @@
 /** COMMON ********************************************************************/
 /******************************************************************************/
 
-.query-builder, .query-preview {
+.query-builder {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.25;
@@ -56,15 +56,6 @@
   button {
     pointer-events: none;
   }
-}
-
-.query-preview {
-  font-size: 14px;
-  background: rgba(250, 240, 210, 0.5);
-  border: 1px solid #DCC896;
-  min-height: 1rem;
-  display: block;
-  padding: 1rem;
 }
 
 .group {
