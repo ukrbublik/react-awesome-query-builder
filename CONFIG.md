@@ -224,6 +224,7 @@ const {
 | `singleWidget`        |                        |           | Special option for `rangeslider` widget (`<RangeWidget>`), value equals to `slider` (`<SliderWidget>`) to connect them. |
 |                       |                        |           |  Used together with operator `range_between` having `isSpecialRange=true` option. |
 
+
 There is special `field` widget, rendered by `<ValueFieldWidget>`.  
 It can be used to compare field with another field of same type.  
 To enable this feature set `valueSources` of type to `['value', 'field'']` (see below in [config.types](#configtypes)).  
