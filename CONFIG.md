@@ -143,6 +143,8 @@ const myConfig = {
 ### config.settings
 ```javascript
 import en_US from 'antd/lib/locale-provider/en_US';
+import {Widgets} from 'react-awesome-query-builder';
+const { FieldCascader, FieldDropdown } = Widgets;
 ```
 ```javascript
 {
@@ -160,6 +162,8 @@ import en_US from 'antd/lib/locale-provider/en_US';
       full: 'ru-RU',
       antd: ru_RU,
   },
+  renderField: (props) => <FieldCascader {...props} />,
+  renderOperator: (props) => <FieldDropdown {...props} />,
   fieldSeparator: '.',
   fieldSeparatorDisplay: '->',
   canReorder: true,
