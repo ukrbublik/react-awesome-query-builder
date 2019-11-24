@@ -232,6 +232,7 @@ const WidgetFactory = ({
     const widgetProps = Object.assign({}, fieldWidgetProps, {
         config: config,
         field: field,
+        fieldDefinition: fieldDefinition,
         operator: operator,
         delta: delta,
         isSpecialRange: isSpecialRange,
@@ -246,7 +247,7 @@ const WidgetFactory = ({
     if (widget == 'field') {
         //
     }
-
+    
     return widgetFactory(widgetProps);
 };
 

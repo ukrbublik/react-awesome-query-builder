@@ -151,7 +151,6 @@ const settings = {
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
 
-    renderFieldAndOpAsDropdown: false
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -174,7 +173,7 @@ const fields = {
                 tooltip: 'Proximity search',
                 type: 'text',
                 operators: ['proximity'],
-            },
+            }
         }
     },
     name2: {

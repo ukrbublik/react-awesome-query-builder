@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Tooltip, Select } from 'antd';
-import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/stuff";
+import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../utils/stuff";
 import PropTypes from 'prop-types';
 const { Option, OptGroup } = Select;
 import keys from 'lodash/keys';
@@ -10,7 +10,7 @@ export default class FieldSelect extends PureComponent {
   static propTypes = {
       config: PropTypes.object.isRequired,
       customProps: PropTypes.object,
-      items: PropTypes.array,
+      items: PropTypes.array.isRequired,
       placeholder: PropTypes.string,
       selectedKey: PropTypes.string,
       selectedKeys: PropTypes.array,

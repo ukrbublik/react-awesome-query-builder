@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Input, Col } from 'antd';
-import shallowCompare from 'react-addons-shallow-compare';
 
-export default class TextWidget extends Component {
+export default class TextWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
@@ -14,24 +13,24 @@ export default class TextWidget extends Component {
     customProps: PropTypes.object,
   };
 
-  shouldComponentUpdate = shallowCompare;
-
   handleChange = () => {
     this.props.setValue(ReactDOM.findDOMNode(this.refs.text).value);
   }
 
   render() {
-    let customProps = this.props.customProps || {};
+    const {config, placeholder, customProps, value} = this.props;
+    const {renderSize} = config.settings;
+    const _value = value != undefined ? value : null;
 
     return (
       <Col>
         <Input
           key="widget-text"
-          size={this.props.config.settings.renderSize}
+          size={renderSize}
           ref="text"
           type={"text"}
-          value={this.props.value || null}
-          placeholder={this.props.placeholder}
+          value={_value}
+          placeholder={placeholder}
           onChange={this.handleChange}
           {...customProps}
         />

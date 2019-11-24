@@ -433,6 +433,10 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {boolean} __isInternal
  */
 const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
+    const fieldSeparator = config.settings.fieldSeparator;
+    if (valueSrc === 'field' && Array.isArray(value))
+        value = value.join(fieldSeparator);
+
     const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;

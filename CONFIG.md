@@ -131,7 +131,7 @@ const myConfig = {
 |                     |                                        |        |  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options |
 | `allowCustomValues` | - for `MultiSelect` widget             | false  | If true, user can provide own options in multiselect, otherwise they will be limited to `listValues` |
 | `fieldSettings`     |                                        |        | Settings for widgets. Example: `{min: 1, max: 10}` |
-|                     |                                        |        |  Available settings for Number widget: `min`, `max`, `step` |
+|                     |                                        |        |  Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` |
 | `preferWidgets`     |                                        |        | See usecase at [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js) for `slider` field. |
 |                     |                                        |        |  Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. |
 |                     |                                        |        |  So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input. |
@@ -178,6 +178,10 @@ import en_US from 'antd/lib/locale-provider/en_US';
 
 | key                             | default        | meaning       |
 | ------------------------------- | -------------- | ------------- |
+| `renderField`                   | `(props) => <FieldSelect {...props} />`  | Render fields |
+|                                 |                | Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader` (from `Widgets`) |
+| `renderOperator`                | `(props) => <FieldSelect {...props} />`  | Render fields |
+|                                 |                | Available widgets: `FieldSelect`, `FieldDropdown` |
 | `valueSourcesInfo`              | `{value: {}}`  | Values of fields can be compared with values or another fields. |
 |                                 |                |  If you want to enable this feature, add `field` like in example above |
 | `locale`                        | en             | Locale used for AntDesign widgets |
@@ -195,7 +199,6 @@ import en_US from 'antd/lib/locale-provider/en_US';
 | `dropdownPlacement`             | `bottomLeft`   | Placement of antdesign's [dropdown](https://ant.design/components/dropdown/) pop-up menu |
 | `renderSize`                    | `small`        | Size of AntDesign components - `small` or `large` |
 | `renderConjsAsRadios`           | false          | How to render conjunctions switcher?  true - use `RadioGroup`, false - use `ButtonGroup` |
-| `renderFieldAndOpAsDropdown`    | false          | How to render fields/ops list?  true - use `Dropdown`/`Menu`, false - use `Select` |
 | `customFieldSelectProps`        | `{}`           | You can pass props to `Select` field widget. Example: `{showSearch: true}` |
 | `groupActionsPosition`          | `topRight`     | You can change the position of the group actions to the following: |
 |                                 |                |   `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight` |

@@ -1,26 +1,18 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import {
   getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../../utils/configUtils";
-import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/stuff";
-import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
-const { Option, OptGroup } = Select;
-const SubMenu = Menu.SubMenu;
-const MenuItem = Menu.Item;
-const DropdownButton = Dropdown.Button;
-import map from 'lodash/map';
+import {truncateString} from "../../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import clone from 'clone';
 
 //tip: this.props.value - right value, this.props.field - left value
 
-export default class ValueField extends Component {
+export default class ValueField extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    renderAsDropdown: PropTypes.bool,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
     value: PropTypes.string,
@@ -28,21 +20,62 @@ export default class ValueField extends Component {
     customProps: PropTypes.object,
   };
 
-  shouldComponentUpdate = shallowCompare;
+  constructor(props) {
+      super(props);
 
-  curFieldOpts() {
-      return Object.assign({}, {label: this.props.value}, getFieldConfig(this.props.value, this.props.config) || {});
+      this.componentWillReceiveProps(props);
   }
 
-  handleFieldMenuSelect = ({key, keyPath}) => {
-    this.props.setValue(key);
+  componentWillReceiveProps(nextProps) {
+      const prevProps = this.props;
+      const keysForItems = ["config", "field", "operator"];
+      const keysForMeta = ["config", "field", "operator", "value"];
+      const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+      const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+
+      if (needUpdateItems) {
+          this.items = this.getItems(nextProps);
+      }
+      if (needUpdateMeta) {
+          this.meta = this.getMeta(nextProps);
+      }
   }
 
-  handleFieldSelect = (key) => {
-    this.props.setValue(key);
+  getItems({config, field, operator}) {
+    const {canCompareFieldWithField} = config.settings;
+    const filteredFields = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
+    const items = this.buildOptions(config, filteredFields);
+    return items;
   }
 
-  //tip: empty groups are ok for antd
+  getMeta({config, field, operator, value}) {
+    const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
+    const selectedKey = value;
+    const isFieldSelected = !!value;
+
+    const leftFieldConfig = getFieldConfig(field, config);
+    const leftFieldWidgetField = leftFieldConfig.widgets.field;
+    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    const placeholder = !isFieldSelected ? (leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder) : null;
+
+    const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
+    const selectedOpts = currField || {};
+
+    const selectedKeys = getFieldPath(selectedKey, config);
+    const selectedPath = getFieldPath(selectedKey, config, true);
+    const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
+    const partsLabels = getFieldPathLabels(selectedKey, config);
+    let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
+    if (selectedFullLabel == selectedLabel)
+        selectedFullLabel = null;
+    const selectedAltLabel = selectedOpts.label2;
+
+    return {
+      placeholder,
+      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+    };
+  }
+
   filterFields(config, fields, leftFieldFullkey, operator, canCompareFieldWithField) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
@@ -65,16 +98,18 @@ export default class ValueField extends Component {
         let rightFieldFullkey = subpath.join(fieldSeparator);
         let rightFieldConfig = getFieldConfig(rightFieldFullkey, config);
         if (rightFieldConfig.type == "!struct") {
-          _filter(subfields, subpath);
+          if(_filter(subfields, subpath) == 0)
+            delete list[rightFieldKey];
         } else {
           let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig);
-            if (!canUse)
+          if (!canUse)
             delete list[rightFieldKey];
         }
       }
+      return keys(list).length;
     }
 
     _filter(fields, []);
@@ -82,159 +117,68 @@ export default class ValueField extends Component {
     return fields;
   }
 
-  buildMenuItems(fields, path = null) {
-      let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
-      if (!fields)
-          return null;
-      let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
+  buildOptions(config, fields, path = null, optGroupLabel = null) {
+    if (!fields)
+        return null;
+    const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
-      return keys(fields).map(fieldKey => {
-          let field = fields[fieldKey];
-          let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-          let label = field.label || last(fieldParts);
-          label = truncateString(label, maxLabelsLength);
-          if (field.type == "!struct") {
-              let subpath = (path ? path : []).concat(fieldKey);
-              return <SubMenu
-                  key={prefix+fieldKey}
-                  title={<span>{label} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
-              >
-                  {this.buildMenuItems(field.subfields, subpath)}
-              </SubMenu>
-          } else {
-              return <MenuItem key={prefix+fieldKey}>{label}</MenuItem>;
-          }
-      });
+    return keys(fields).map(fieldKey => {
+        const field = fields[fieldKey];
+        const label = this.getFieldLabel(field, fieldKey, config);
+        const partsLabels = getFieldPathLabels(fieldKey, config);
+        let fullLabel = partsLabels.join(fieldSeparatorDisplay);
+        if (fullLabel == label)
+            fullLabel = null;
+        const altLabel = field.label2;
+        const tooltip = field.tooltip;
+        const subpath = (path ? path : []).concat(fieldKey);
+
+        if (field.type == "!struct") {
+            return {
+                key: fieldKey,
+                path: prefix+fieldKey,
+                label,
+                fullLabel,
+                altLabel,
+                tooltip,
+                items: this.buildOptions(config, field.subfields, subpath, label)
+            };
+        } else {
+            return {
+                key: fieldKey,
+                path: prefix+fieldKey,
+                label,
+                fullLabel,
+                altLabel,
+                tooltip,
+                grouplabel: optGroupLabel
+            };
+        }
+    });
   }
 
-  buildSelectItems(fields, path = null) {
-      let fieldSeparator = this.props.config.settings.fieldSeparator;
-      let maxLabelsLength = this.props.config.settings.maxLabelsLength;
-      if (!fields)
-          return null;
-      let prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
-
-      return keys(fields).map(fieldKey => {
-          let field = fields[fieldKey];
-          let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-          let label = field.label || last(fieldParts);
-          label = truncateString(label, maxLabelsLength);
-          if (field.type == "!struct") {
-              let subpath = (path ? path : []).concat(fieldKey);
-              return <OptGroup
-                  key={prefix+fieldKey}
-                  label={label}
-              >
-                  {this.buildSelectItems(field.subfields, subpath)}
-              </OptGroup>
-          } else {
-              return <Option
-                key={prefix+fieldKey}
-                value={prefix+fieldKey}
-              >
-                {label}
-              </Option>;
-          }
-      });
-  }
-
-  buildMenuToggler(label, fullLabel, customLabel) {
-      var toggler =
-          <Button
-              size={this.props.config.settings.renderSize}
-          >
-              {customLabel ? customLabel : label} <Icon type="down" />
-          </Button>;
-
-      if (fullLabel && fullLabel != label) {
-          toggler = <Tooltip
-                  placement="top"
-                  title={fullLabel}
-              >
-              {toggler}
-              </Tooltip>;
-      }
-
-      return toggler;
-  }
-
-  filterOption = (input, option) => {
-    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+  getFieldLabel(fieldOpts, fieldKey, config) {
+      if (!fieldKey) return null;
+      let fieldSeparator = config.settings.fieldSeparator;
+      let maxLabelsLength = config.settings.maxLabelsLength;
+      let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+      let label = fieldOpts.label || last(fieldParts);
+      label = truncateString(label, maxLabelsLength);
+      return label;
   }
 
   render() {
-    if (this.props.renderAsDropdown)
-        return this.renderAsDropdown();
-    else
-        return this.renderAsSelect();
+      const {config, customProps, setValue} = this.props;
+      const {renderField} = config.settings;
+      const renderProps = {
+          config,
+          customProps,
+          setField: setValue,
+          items: this.items,
+          ...this.meta
+      };
+      return renderField(renderProps);
   }
 
-  renderAsSelect() {
-    const {
-      config, field, operator, value, customProps,
-      canCompareFieldWithField
-    } = this.props;
-    const leftFieldConfig = getFieldConfig(field, config);
-    const leftFieldWidgetField = leftFieldConfig.widgets.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    const dropdownPlacement = config.settings.dropdownPlacement;
-    const fieldOptions = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
-    const placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || config.settings.fieldPlaceholder;
-    const placeholderWidth = calcTextWidth(placeholder);
-    const fieldSelectItems = this.buildSelectItems(fieldOptions);
-
-    const fieldSelect = (
-          <Select
-              dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
-              dropdownMatchSelectWidth={false}
-              style={{ width: value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
-              ref="field"
-              placeholder={placeholder}
-              size={config.settings.renderSize}
-              onChange={this.handleFieldSelect}
-              value={value || undefined}
-              filterOption={this.filterOption}
-              {...customProps}
-          >{fieldSelectItems}</Select>
-    );
-
-    return fieldSelect;
-  }
-
-  renderAsDropdown() {
-    const {
-      config, field, operator, value, customProps,
-      canCompareFieldWithField
-    } = this.props;
-    const leftFieldConfig = getFieldConfig(field, config);
-    const leftFieldWidgetField = leftFieldConfig.widgets.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    let fieldOptions = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
-    let selectedFieldKeys = getFieldPath(value, config);
-    let selectedFieldPartsLabels = getFieldPathLabels(value, config);
-    let selectedFieldFullLabel = selectedFieldPartsLabels ? selectedFieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
-    let placeholder = this.curFieldOpts().label || leftFieldWidgetFieldProps.valuePlaceholder || config.settings.fieldPlaceholder;
-
-    let fieldMenuItems = this.buildMenuItems(fieldOptions);
-    let fieldMenu = (
-        <Menu
-            //size={config.settings.renderSize}
-            selectedKeys={selectedFieldKeys}
-            onClick={this.handleFieldMenuSelect}
-            {...customProps}
-        >{fieldMenuItems}</Menu>
-    );
-    let fieldToggler = this.buildMenuToggler(placeholder, selectedFieldFullLabel, this.curFieldOpts().label2);
-
-    return (
-        <Dropdown
-            overlay={fieldMenu}
-            trigger={['click']}
-            placement={config.settings.dropdownPlacement}
-        >
-            {fieldToggler}
-        </Dropdown>
-    );
-  }
 }

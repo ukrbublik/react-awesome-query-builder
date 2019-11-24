@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
 import {calcTextWidth, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT} from "../utils/stuff";
 import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
@@ -13,135 +12,82 @@ import last from 'lodash/last';
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
-export default class Operator extends Component {
+export default class Operator extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string,
-    renderAsDropdown: PropTypes.bool,
     //actions
     setOperator: PropTypes.func.isRequired,
   };
 
-  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-
   constructor(props) {
       super(props);
-      this.onPropsChanged(props);
+
+      this.componentWillReceiveProps(props);
   }
 
-  componentWillReceiveProps (props) {
-      this.onPropsChanged(props);
+  componentWillReceiveProps(nextProps) {
+      const prevProps = this.props;
+      const keysForMeta = ["config", "selectedField", "selectedOperator"];
+      const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+
+      if (needUpdateMeta) {
+          this.meta = this.getMeta(nextProps);
+      }
   }
 
-  onPropsChanged (props) {
-      let fieldConfig = getFieldConfig(props.selectedField, props.config);
-      this.operatorOptions = mapValues(pickBy(props.config.operators, (item, key) =>
-          fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
-      ));
+  getMeta({config, selectedField, selectedOperator}) {
+    const fieldConfig = getFieldConfig(selectedField, config);
+    const operatorOptions = mapValues(pickBy(config.operators, (item, key) =>
+        fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
+    ));
+      
+    const items = this.buildOptions(config, operatorOptions);
+
+    const isOpSelected = !!selectedOperator;
+    const currOp = isOpSelected ? operatorOptions[selectedOperator] : null;
+    const selectedOpts = currOp || {};
+    const placeholder = this.props.config.settings.operatorPlaceholder;
+    const selectedKey = selectedOperator;
+    const selectedKeys = isOpSelected ? [selectedKey] : null;
+    const selectedPath = selectedKeys;
+    const selectedLabel = selectedOpts.label;
+
+    return {
+        placeholder, items,
+        selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts
+    };
   }
 
-  curOpOpts() {
-      return Object.assign({}, {label: this.props.selectedOperator}, this.operatorOptions[this.props.selectedOperator] || {});
-  }
+  buildOptions(config, fields) {
+    if (!fields)
+        return null;
 
-  handleOperatorMenuSelect = ({key, keyPath}) => {
-      this.props.setOperator(key);
-  }
-
-  handleOperatorSelect = (key) => {
-      this.props.setOperator(key);
-  }
-
-  buildMenuItems(fields) {
-      if (!fields)
-          return null;
-      return keys(fields).map(fieldKey => {
-          let field = fields[fieldKey];
-          return <MenuItem key={fieldKey}>{field.label}</MenuItem>;
-      });
-  }
-
-  buildMenuToggler(label) {
-      var toggler =
-          <Button
-              size={this.props.config.settings.renderSize}
-          >
-              {label} <Icon type="down" />
-          </Button>;
-
-      return toggler;
-  }
-
-  buildSelectItems(fields) {
-      if (!fields)
-          return null;
-      return keys(fields).map(fieldKey => {
-          let field = fields[fieldKey];
-          return <Option
-            key={fieldKey}
-            value={fieldKey}
-          >
-            {field.label}
-          </Option>;
-      });
+    return keys(fields).map(fieldKey => {
+        const field = fields[fieldKey];
+        const label = field.label;
+        return {
+            key: fieldKey,
+            path: fieldKey,
+            label,
+        };
+    });
   }
 
   render() {
-    if (this.props.renderAsDropdown)
-        return this.renderAsDropdown();
-    else
-        return this.renderAsSelect();
+      const {config, customProps, setOperator} = this.props;
+      const {renderOperator} = config.settings;
+      const renderProps = {
+          config, 
+          customProps, 
+          setField: setOperator,
+          ...this.meta
+      };
+      return renderOperator(renderProps);
   }
 
-  renderAsSelect() {
-    let dropdownPlacement = this.props.config.settings.dropdownPlacement;
-    let selectedOpKey = this.props.selectedOperator;
-    let opMenuItems = this.buildMenuItems(this.operatorOptions);
-    let placeholder = this.curOpOpts().label || this.props.config.settings.operatorPlaceholder;
-    let placeholderWidth = calcTextWidth(placeholder);
-    let fieldSelectItems = this.buildSelectItems(this.operatorOptions);
-    let opSelect = (
-        <Select
-            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
-            dropdownMatchSelectWidth={false}
-            style={{ width: this.props.selectedOperator ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
-            ref="field"
-            placeholder={placeholder}
-            size={this.props.config.settings.renderSize}
-            onChange={this.handleOperatorSelect}
-            value={this.props.selectedOperator || undefined}
-        >{fieldSelectItems}</Select>
-    );
 
-    return opSelect;
-  }
-
-  renderAsDropdown() {
-    let selectedOpKey = this.props.selectedOperator;
-    let placeholder = this.curOpOpts().label || this.props.config.settings.operatorPlaceholder;
-    let opMenuItems = this.buildMenuItems(this.operatorOptions);
-    let opMenu = (
-        <Menu
-            //size={this.props.config.settings.renderSize}
-            selectedKeys={[selectedOpKey]}
-            onClick={this.handleOperatorMenuSelect}
-        >{opMenuItems}</Menu>
-    );
-    let opToggler = this.buildMenuToggler(placeholder);
-
-    
-    return (
-      <Dropdown
-          overlay={opMenu}
-          trigger={['click']}
-          placement={this.props.config.settings.dropdownPlacement}
-      >
-          {opToggler}
-      </Dropdown>
-    );
-  }
 }

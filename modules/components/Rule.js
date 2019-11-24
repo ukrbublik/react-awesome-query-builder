@@ -207,7 +207,6 @@ class FieldWrapper extends PureComponent {
                     config={config}
                     selectedField={selectedField}
                     setField={setField}
-                    renderAsDropdown={config.settings.renderFieldAndOpAsDropdown}
                     customProps={config.settings.customFieldSelectProps}
                 />
             </Col>
@@ -233,7 +232,6 @@ class OperatorWrapper extends PureComponent {
                     selectedField={selectedField}
                     selectedOperator={selectedOperator}
                     setOperator={setOperator}
-                    renderAsDropdown={config.settings.renderFieldAndOpAsDropdown}
                 />
             </Col>;
         const hiddenOperator = showOperatorLabel &&
