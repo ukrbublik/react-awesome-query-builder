@@ -2,18 +2,24 @@
 Has 6 sections:
 ```javascript
 {
-  conjunctions,
-  operators,
-  widgets,
-  types,
-  settings,
-  fields,
+  [conjunctions](#configconjunctions),
+  [operators](#configoperators),
+  [widgets](#configwidgets),
+  [types](#configtypes),
+  [settings](#configsettings),
+  [fields](#configfields),
 }
 ```
 Each section is described below.  
+Usually it's enough to just reuse [basic config](#basic-config), provide your own [fields](#configfields) and maybe change some [settings](#configsettings).  
+Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).  
+
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, which are used for `QbUtils.queryString()`.  
 They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true).  
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue` for building MongoDb query with `QbUtils.mongodbFormat()`.  
+
+Example: [`demo config`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js)  
+
 
 
 ## Basic config
@@ -68,15 +74,9 @@ const {
       multiselect,
       boolean,
     },
-    settings: defaultSettings
+    settings
 } = BasicConfig;
-```
 
-You can reuse basic config with your modifications.  
-For example, you can override some options or add your own types/widgets/operators (or even conjunctions like XOR or NOR).  
-See example in demo.  
-
-```javascript
 const myConfig = {
   ...BasicConfig, // reuse basic config
 
@@ -90,8 +90,158 @@ const myConfig = {
 };
 ```
 
-## Example
-[`demo config`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js)
+
+### config.fields
+```javascript
+{
+  // simple
+  qty: {
+    type: 'number',
+    label: 'Quantity',
+  },
+  // complex
+  user: {
+    type: '!struct', // special keyword for comlex fields
+    label: 'User',
+    subfields: {
+      // subfields of complex field
+      name: {
+        type: 'text',
+        label: 'Name',
+        label2: 'User name', //optional, see below
+      },
+    },
+  },
+  ...
+}
+```
+
+| key                 | requred                                | default | meaning       |
+| ------------------- | -------------------------------------- | ------- | ------------- |
+| `type`              | +                                      |        | One of types described in [config.types](#configtypes) or `!struct` for complex field |
+| `subfields`         | + for `!struct` type                   |        | Config for subfields of complex field (multiple nesting is supported) |
+| `label`             | +                                      |        | Label to be displayed in field list |
+|                     |                                        |        |  (If not specified, fields's key will be used instead) |
+| `label2`            |                                        |        | Can be optionally specified for nested fields. |
+|                     |                                        |        |  By default, if nested field is selected (eg. `name` of `user` in example above), select component will have tootip like `User -> Subname` |
+|                     |                                        |        |  (path constructed by joining `label`s with delimeter `->` specified by `config.settings.fieldSeparatorDisplay`) |
+|                     |                                        |        |  That tooltip text can be overriden by setting `label2`, so it will become `User name`. 
+| `tooptip`           |                                        |        | Optional tooltip to be displayed in field list by hovering on item |
+| `listValues`        | + for `Select`/`MultiSelect` widgets   |        | List of values for Select widget. |
+|                     |                                        |        |  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options |
+| `allowCustomValues` | - for `MultiSelect` widget             | false  | If true, user can provide own options in multiselect, otherwise they will be limited to `listValues` |
+| `fieldSettings`     |                                        |        | Settings for widgets. Example: `{min: 1, max: 10}` |
+|                     |                                        |        |  Available settings for Number widget: `min`, `max`, `step` |
+| `preferWidgets`     |                                        |        | See usecase at [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js) for `slider` field. |
+|                     |                                        |        |  Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. |
+|                     |                                        |        |  So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input. |
+| `operators`, `defaultOperator`, `widgets`, `valueSources` |  |        | You can override config of corresponding type (see below at section [config.types](#configtypes)) |
+| `mainWidgetProps`   |                                        |        | Shorthand for `widgets.<main>.widgetProps` |
+
+
+
+### config.settings
+```javascript
+import en_US from 'antd/lib/locale-provider/en_US';
+```
+```javascript
+{
+  valueSourcesInfo: {
+    value: {
+      label: "Value"
+    },
+    field: {
+      label: "Field",
+      widget: "field",
+    }
+  },
+  locale: {
+      short: 'ru',
+      full: 'ru-RU',
+      antd: ru_RU,
+  },
+  fieldSeparator: '.',
+  fieldSeparatorDisplay: '->',
+  canReorder: true,
+  canRegroup: true,
+  hideConjForOne: true,
+  maxNesting: 10,
+  showLabels: false,
+  showNot: true,
+  setOpOnChangeField: ['keep', 'default'],
+  customFieldSelectProps: {
+      showSearch: true
+  },
+  ...
+}
+```
+
+| key                             | default        | meaning       |
+| ------------------------------- | -------------- | ------------- |
+| `valueSourcesInfo`              | `{value: {}}`  | Values of fields can be compared with values or another fields. |
+|                                 |                |  If you want to enable this feature, add `field` like in example above |
+| `locale`                        | en             | Locale used for AntDesign widgets |
+| `fieldSeparator`                | `.`            | Separaor for struct fields. Also used for formatting |
+| `fieldSeparatorDisplay`         | `->`           | Separaor for struct fields to show at field's select tooltip. |
+| `canReorder`                    | true           | Activate reordering support for rules and groups of rules? |
+| `canRegroup`                    | true           | Allow move rules (or groups) in/out groups during reorder? |
+|                                 |                |  False - allow "safe" reorder, means only reorder at same level |
+| `showLabels`                    | false          | Show labels under all fields? |
+| `showNot`                       | true           | Show `NOT` together with `AND`/`OR`? |
+| `hideConjForOne`                | true           | Don't show conjunctions switcher for only 1 rule? |
+| `maxNesting`                    |                | Max nesting for rule groups. |
+|                                 |                | Set `1` if you don't want to use groups at all. This will remove also `Add group` button. |
+| `maxLabelsLength`               | 100            | To shorten long labels of fields/values (by length, i.e. number of chars) |
+| `dropdownPlacement`             | `bottomLeft`   | Placement of antdesign's [dropdown](https://ant.design/components/dropdown/) pop-up menu |
+| `renderSize`                    | `small`        | Size of AntDesign components - `small` or `large` |
+| `renderConjsAsRadios`           | false          | How to render conjunctions switcher?  true - use `RadioGroup`, false - use `ButtonGroup` |
+| `renderFieldAndOpAsDropdown`    | false          | How to render fields/ops list?  true - use `Dropdown`/`Menu`, false - use `Select` |
+| `customFieldSelectProps`        | `{}`           | You can pass props to `Select` field widget. Example: `{showSearch: true}` |
+| `groupActionsPosition`          | `topRight`     | You can change the position of the group actions to the following: |
+|                                 |                |   `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight` |
+| `setOpOnChangeField`            | `['keep', 'default']` | Strategies for selecting operator for new field (used by order until success): |
+|                                 |                |  `default` (default if present), `keep` (keep prev from last field), `first`, `none` |
+| `clearValueOnChangeField`       | false          | Clear value on field change? false - if prev & next fields have same type (widget), keep |
+| `clearValueOnChangeOp`          | false          | Clear value on operator change? |
+| `immutableGroupsMode`           | false          | Not allow to add/delete rules or groups, but allow change |
+| `canLeaveEmptyGroup`            | false          | Leave empty group after deletion or add 1 clean rule immediately? |
+| `formatReverse`                 |                | Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. |
+|                                 |                |  `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` |
+|                                 |                |  `q` - already formatted rule for opposite operator (which have `formatOp`) |
+|                                 |                |  return smth like `"NOT(" + q + ")"` |
+| `formatField`                   |                | Function for formatting query string, used to format field |
+|                                 |                |  `(string field, Array parts, string label2, Object fieldDefinition, Object config, bool isForDisplay) => string` |
+|                                 |                |  `parts` - for struct field |
+|                                 |                |  `label2` - with using of `fieldSeparatorDisplay` |
+|                                 |                |  Default impl will just return `field` (or `label2` for `isForDisplay==true`) |
+| `canCompareFieldWithField`  |                  |           | For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field |
+|                             |                  |           |  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` |
+|                             |                  |           |  For type == `select`/`multiselect` you can optionally check `listValues` |
+
+
+Localization:
+
+| key                       | default       |
+| ------------------------- | ------------- |
+| `valueLabel`              | Value |
+| `valuePlaceholder`        | Value |
+| `fieldLabel`              | Field |
+| `operatorLabel`           | Operator |
+| `fieldPlaceholder`        | Select field |
+| `operatorPlaceholder`     | Select operator |
+| `deleteLabel`             | `null` |
+| `delGroupLabel`           | `null` |
+| `addGroupLabel`           | Add group |
+| `addRuleLabel`            | Add rule |
+| `notLabel`                | Not |
+| `valueSourcesPopupTitle`  | Select value source |
+| `removeRuleConfirmOptions`         | If you want to ask confirmation of removing non-empty rule/group, add these options. List of all valid properties is [here](https://ant.design/components/modal/#API) |
+| `removeRuleConfirmOptions.title`   | Are you sure delete this rule? |
+| `removeRuleConfirmOptions.okText`  | Yes |
+| `removeRuleConfirmOptions.okType`  | `danger` |
+| `removeGroupConfirmOptions.title`  | Are you sure delete this group? |
+| `removeGroupConfirmOptions.okText` | Yes |
+| `removeGroupConfirmOptions.okType` | `danger` |
 
 
 ### config.conjunctions
@@ -268,156 +418,4 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 | `widgets.<widget>.widgetProps`         |   |  | Can be used to override config of corresponding widget specified in [config.widgets](#configwidgets). Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM. |
 | `widgets.<widget>.opProps.<operator>`  |   |  | Can be used to override config of operator for widget. Example: `opProps: { between: {valueLabels: ['Time from', 'Time to']} }` for building range of times. |
 
-
-
-### config.fields
-```javascript
-{
-  // simple
-  qty: {
-    type: 'number',
-    label: 'Quantity',
-  },
-  // complex
-  user: {
-    type: '!struct', // special keyword for comlex fields
-    label: 'User',
-    subfields: {
-      // subfields of complex field
-      name: {
-        type: 'text',
-        label: 'Name',
-        label2: 'User name', //optional, see below
-      },
-    },
-  },
-  ...
-}
-```
-
-| key                 | requred                                | default | meaning       |
-| ------------------- | -------------------------------------- | ------- | ------------- |
-| `type`              | +                                      |        | One of types described in [config.types](#configtypes) or `!struct` for complex field |
-| `subfields`         | + for `!struct` type                   |        | Config for subfields of complex field (multiple nesting is supported) |
-| `label`             | +                                      |        | Label to be displayed in field list |
-|                     |                                        |        |  (If not specified, fields's key will be used instead) |
-| `label2`            |                                        |        | Can be optionally specified for nested fields. |
-|                     |                                        |        |  By default, if nested field is selected (eg. `name` of `user` in example above), select component will have tootip like `User -> Subname` |
-|                     |                                        |        |  (path constructed by joining `label`s with delimeter `->` specified by `config.settings.fieldSeparatorDisplay`) |
-|                     |                                        |        |  That tooltip text can be overriden by setting `label2`, so it will become `User name`. 
-| `tooptip`           |                                        |        | Optional tooltip to be displayed in field list by hovering on item |
-| `listValues`        | + for `Select`/`MultiSelect` widgets   |        | List of values for Select widget. |
-|                     |                                        |        |  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options |
-| `allowCustomValues` | - for `MultiSelect` widget             | false  | If true, user can provide own options in multiselect, otherwise they will be limited to `listValues` |
-| `fieldSettings`     |                                        |        | Settings for widgets. Example: `{min: 1, max: 10}` |
-|                     |                                        |        |  Available settings for Number widget: `min`, `max`, `step` |
-| `operators`, `defaultOperator`, `widgets`, `valueSources` |  |        | You can override config of corresponding type (see below at section [config.types](#configtypes)) |
-| `mainWidgetProps`   |                                        |        | Shorthand for `widgets.<main>.widgetProps` |
-| `preferWidgets`     |                                        |        | See usecase at [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js) for `slider` field. |
-|                     |                                        |        |  Its type is `number`. There are 3 widgets defined for number type: `number` (default), `slider`, `rangeslider`. So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider instead of number input for current field. |
-
-
-
-### config.settings
-```javascript
-import en_US from 'antd/lib/locale-provider/en_US';
-```
-```javascript
-{
-  valueSourcesInfo: {
-    value: {
-      label: "Value"
-    },
-    field: {
-      label: "Field",
-      widget: "field",
-    }
-  },
-  locale: {
-      short: 'ru',
-      full: 'ru-RU',
-      antd: ru_RU,
-  },
-  fieldSeparator: '.',
-  fieldSeparatorDisplay: '->',
-  canReorder: true,
-  canRegroup: true,
-  hideConjForOne: true,
-  maxNesting: 10,
-  showLabels: false,
-  showNot: true,
-  setOpOnChangeField: ['keep', 'default'],
-  customFieldSelectProps: {
-      showSearch: true
-  },
-  ...
-}
-```
-
-| key                             | default        | meaning       |
-| ------------------------------- | -------------- | ------------- |
-| `valueSourcesInfo`              | `{value: {}}`  | Values of fields can be compared with values or another fields. |
-|                                 |                |  If you want to enable this feature, add `field` like in example above |
-| `locale`                        | en             | Locale used for AntDesign widgets |
-| `fieldSeparator`                | `.`            | Separaor for struct fields. Also used for formatting |
-| `fieldSeparatorDisplay`         | `->`           | Separaor for struct fields to show at field's select tooltip. |
-| `canReorder`                    | true           | Activate reordering support for rules and groups of rules? |
-| `canRegroup`                    | true           | Allow move rules (or groups) in/out groups during reorder? |
-|                                 |                |  False - allow "safe" reorder, means only reorder at same level |
-| `showLabels`                    | false          | Show labels under all fields? |
-| `showNot`                       | true           | Show `NOT` together with `AND`/`OR`? |
-| `hideConjForOne`                | true           | Don't show conjunctions switcher for only 1 rule? |
-| `maxNesting`                    |                | Max nesting for rule groups. |
-|                                 |                | Set `1` if you don't want to use groups at all. This will remove also `Add group` button. |
-| `maxLabelsLength`               | 100            | To shorten long labels of fields/values (by length, i.e. number of chars) |
-| `dropdownPlacement`             | `bottomLeft`   | Placement of antdesign's [dropdown](https://ant.design/components/dropdown/) pop-up menu |
-| `renderSize`                    | `small`        | Size of AntDesign components - `small` or `large` |
-| `renderConjsAsRadios`           | false          | How to render conjunctions switcher?  true - use `RadioGroup`, false - use `ButtonGroup` |
-| `renderFieldAndOpAsDropdown`    | false          | How to render fields/ops list?  true - use `Dropdown`/`Menu`, false - use `Select` |
-| `customFieldSelectProps`        | `{}`           | You can pass props to `Select` field widget. Example: `{showSearch: true}` |
-| `groupActionsPosition`          | `topRight`     | You can change the position of the group actions to the following: |
-|                                 |                |   `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight` |
-| `setOpOnChangeField`            | `['keep', 'default']` | Strategies for selecting operator for new field (used by order until success): |
-|                                 |                |  `default` (default if present), `keep` (keep prev from last field), `first`, `none` |
-| `clearValueOnChangeField`       | false          | Clear value on field change? false - if prev & next fields have same type (widget), keep |
-| `clearValueOnChangeOp`          | false          | Clear value on operator change? |
-| `immutableGroupsMode`           | false          | Not allow to add/delete rules or groups, but allow change |
-| `canLeaveEmptyGroup`            | false          | Leave empty group after deletion or add 1 clean rule immediately? |
-| `formatReverse`                 |                | Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. |
-|                                 |                |  `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` |
-|                                 |                |  `q` - already formatted rule for opposite operator (which have `formatOp`) |
-|                                 |                |  return smth like `"NOT(" + q + ")"` |
-| `formatField`                   |                | Function for formatting query string, used to format field |
-|                                 |                |  `(string field, Array parts, string label2, Object fieldDefinition, Object config, bool isForDisplay) => string` |
-|                                 |                |  `parts` - for struct field |
-|                                 |                |  `label2` - with using of `fieldSeparatorDisplay` |
-|                                 |                |  Default impl will just return `field` (or `label2` for `isForDisplay==true`) |
-| `canCompareFieldWithField`  |                  |           | For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field |
-|                             |                  |           |  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` |
-|                             |                  |           |  For type == `select`/`multiselect` you can optionally check `listValues` |
-
-
-Localization:
-
-| key                       | default       |
-| ------------------------- | ------------- |
-| `valueLabel`              | Value |
-| `valuePlaceholder`        | Value |
-| `fieldLabel`              | Field |
-| `operatorLabel`           | Operator |
-| `fieldPlaceholder`        | Select field |
-| `operatorPlaceholder`     | Select operator |
-| `deleteLabel`             | `null` |
-| `delGroupLabel`           | `null` |
-| `addGroupLabel`           | Add group |
-| `addRuleLabel`            | Add rule |
-| `notLabel`                | Not |
-| `valueSourcesPopupTitle`  | Select value source |
-| `removeRuleConfirmOptions`         | If you want to ask confirmation of removing non-empty rule/group, add these options. List of all valid properties is [here](https://ant.design/components/modal/#API) |
-| `removeRuleConfirmOptions.title`   | Are you sure delete this rule? |
-| `removeRuleConfirmOptions.okText`  | Yes |
-| `removeRuleConfirmOptions.okType`  | `danger` |
-| `removeGroupConfirmOptions.title`  | Are you sure delete this group? |
-| `removeGroupConfirmOptions.okText` | Yes |
-| `removeGroupConfirmOptions.okType` | `danger` |
 
