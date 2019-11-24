@@ -180,7 +180,7 @@ import en_US from 'antd/lib/locale-provider/en_US';
 | ------------------------------- | -------------- | ------------- |
 | `renderField`                   | `(props) => <FieldSelect {...props} />`  | Render fields |
 |                                 |                | Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (from `Widgets`) |
-| `renderOperator`                | `(props) => <FieldSelect {...props} />`  | Render fields |
+| `renderOperator`                | `(props) => <FieldSelect {...props} />`  | Render operators |
 |                                 |                | Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect` |
 | `valueSourcesInfo`              | `{value: {}}`  | Values of fields can be compared with values or another fields. |
 |                                 |                |  If you want to enable this feature, add `field` like in example above |
