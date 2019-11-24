@@ -3,7 +3,8 @@ import * as Widgets from '../components/widgets/index.js';
 const {
   FieldSelect,
   FieldDropdown,
-  FieldCascader
+  FieldCascader,
+  VanillaFieldSelect
 } = Widgets;
 
 export const settings = {
@@ -17,9 +18,11 @@ export const settings = {
   renderField: (props) => <FieldSelect {...props} />,
   // renderField: (props) => <FieldDropdown {...props} />,
   // renderField: (props) => <FieldCascader {...props} />,
+  // renderField: (props) => <VanillaFieldSelect {...props} />,
 
   renderOperator: (props) => <FieldSelect {...props} />,
   // renderOperator: (props) => <FieldDropdown {...props} />,
+  // renderOperator: (props) => <VanillaFieldSelect {...props} />,
 
   valueSourcesInfo: {
       value: {},

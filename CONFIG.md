@@ -179,9 +179,9 @@ import en_US from 'antd/lib/locale-provider/en_US';
 | key                             | default        | meaning       |
 | ------------------------------- | -------------- | ------------- |
 | `renderField`                   | `(props) => <FieldSelect {...props} />`  | Render fields |
-|                                 |                | Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader` (from `Widgets`) |
+|                                 |                | Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (from `Widgets`) |
 | `renderOperator`                | `(props) => <FieldSelect {...props} />`  | Render fields |
-|                                 |                | Available widgets: `FieldSelect`, `FieldDropdown` |
+|                                 |                | Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect` |
 | `valueSourcesInfo`              | `{value: {}}`  | Values of fields can be compared with values or another fields. |
 |                                 |                |  If you want to enable this feature, add `field` like in example above |
 | `locale`                        | en             | Locale used for AntDesign widgets |
