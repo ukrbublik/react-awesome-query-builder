@@ -1,0 +1,42 @@
+name: Update GitHub pages
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  page_build:
+    name: Update GitHub pages
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: master
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - run: npm install
+    - name: Build examples
+      run: npm run build-examples
+    - name: Copy build
+      run: |
+        rm -rf /tmp/react-awesome-query-builder
+        mkdir /tmp/react-awesome-query-builder
+        mkdir /tmp/react-awesome-query-builder/gh-pages
+        cp ./examples/bundle.js ./examples/bundle.js.map /tmp/react-awesome-query-builder/gh-pages
+    - uses: actions/checkout@v1
+      with:
+        ref: gh-pages
+    - name: Commit build
+      run: |
+        cp -R /tmp/react-awesome-query-builder/gh-pages/* .
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ./bundle.js
+        git add ./bundle.js.map
+        git commit -m "update to ${GITHUB_SHA}"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        branch: gh-pages
+        github_token: ${{ secrets.GITHUB_TOKEN }}

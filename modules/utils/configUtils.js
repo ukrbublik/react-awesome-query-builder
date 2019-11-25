@@ -98,7 +98,6 @@ function _extendFieldConfig(field, fieldConfig, config) {
             }
             fieldConfig.widgets[widget] = fieldWidgetConfig;
         }
-        console.log(excludeOperators, operators)
         if (!fieldConfig.operators && operators)
             fieldConfig.operators = Array.from(new Set(operators));
         if (!fieldConfig.defaultOperator && defaultOperator)
