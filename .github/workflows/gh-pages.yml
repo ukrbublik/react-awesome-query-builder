@@ -2,7 +2,7 @@ name: Update GitHub pages
 
 on:
   release:
-    types: [published]
+    types: [created]
 
 jobs:
   page_build:
