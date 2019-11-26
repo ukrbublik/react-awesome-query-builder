@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.2
+  - Fixed bug with running examples app via react-scripts
 - 1.0.1
   - Fixed bug with importing React
 - 1.0.0
