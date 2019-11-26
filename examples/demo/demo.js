@@ -25,7 +25,7 @@ export default class DemoQueryBuilder extends Component {
             {...loadedConfig} 
             value={this.state.tree}
             onChange={this.onChange}
-            get_children={this.renderBuilder}
+            renderBuilder={this.renderBuilder}
         />
         <div className="query-builder-result">
           {this.renderResult(this.state)}

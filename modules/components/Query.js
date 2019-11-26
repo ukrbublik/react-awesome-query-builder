@@ -27,7 +27,7 @@ class Query extends PureComponent {
     static propTypes = {
         config: PropTypes.object.isRequired,
         onChange: PropTypes.func,
-        get_children: PropTypes.func,
+        renderBuilder: PropTypes.func,
         tree: PropTypes.any, //instanceOf(Immutable.Map)
         //dispatch: PropTypes.func.isRequired,
     };
@@ -70,7 +70,7 @@ class Query extends PureComponent {
     }
 
     render() {
-        const {config, get_children, dispatch, __isInternalValueChange} = this.props;
+        const {config, renderBuilder, dispatch, __isInternalValueChange} = this.props;
         const builderProps = {
             tree: this.validatedTree,
             actions: this.actions,
@@ -79,7 +79,7 @@ class Query extends PureComponent {
             __isInternalValueChange
         };
 
-        return get_children(builderProps);
+        return renderBuilder(builderProps);
     }
 }
 
@@ -105,7 +105,7 @@ export default class QueryContainer extends Component {
         settings: PropTypes.object.isRequired,
 
         onChange: PropTypes.func,
-        get_children: PropTypes.func,
+        renderBuilder: PropTypes.func,
         value: PropTypes.any, //instanceOf(Immutable.Map)
     };
 
@@ -158,7 +158,8 @@ export default class QueryContainer extends Component {
     }
 
     render() {
-        const {get_children, onChange} = this.props;
+        // `get_children` is deprecated!
+        const {renderBuilder, get_children, onChange} = this.props;
         const {config, store} = this.state;
 
         return (
@@ -168,7 +169,7 @@ export default class QueryContainer extends Component {
                       store={store}
                       config={config}
                       onChange={onChange}
-                      get_children={get_children}
+                      renderBuilder={renderBuilder || get_children}
                     />
                 </Provider>
             </ConfigProvider>

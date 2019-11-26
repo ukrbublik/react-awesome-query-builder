@@ -104,7 +104,7 @@ class DemoQueryBuilder extends Component {
             {...config} 
             value={this.state.tree}
             onChange={this.onChange}
-            get_children={this.renderBuilder}
+            renderBuilder={this.renderBuilder}
         />
         {this.renderResult(this.state)}
       </div>
@@ -174,7 +174,7 @@ Pull Requests are always welcomed :)
   - added: `allowCustomValues` (issue #88)
   - added: `canRegroup`
   - rename: `readonlyMode` -> `immutableGroupsMode`
-  - rename: `get_children` -> `renderBuilder`  ####### todo (old  name is supported)
+  - rename: `get_children` -> `renderBuilder`
   - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported)
   - removed: unused `<Preview />` component and `.query-preview` class
   - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField`
