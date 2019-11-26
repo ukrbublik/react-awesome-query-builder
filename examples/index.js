@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import Demo from './demo/demo.js';
+import Demo from './src/demo/demo.js';
 import { hot } from 'react-hot-loader'
 
 import '../css/antd.less';
