@@ -1,5 +1,7 @@
 # Changelog
-- 1.0
+- 1.0.1
+  - Fixed bug with importing React
+- 1.0.0
   - optimized renders & dragging
   - added: `allowCustomValues` (issue #88)
   - added: `canRegroup`
