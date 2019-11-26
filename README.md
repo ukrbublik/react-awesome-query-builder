@@ -144,7 +144,7 @@ class DemoQueryBuilder extends Component {
 
 
 ## Config format
-See [`CONFIG.md`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.md)
+See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
 
 
 ## Development
