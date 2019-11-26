@@ -147,6 +147,10 @@ class DemoQueryBuilder extends Component {
 See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
 
 
+## Changelog
+See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CHANGELOG.md)
+
+
 ## Development
 To build the component locally, clone this repo then run:
 
@@ -166,19 +170,6 @@ The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)
-
-
-## Changelog
-- 1.0
-  - optimized renders & dragging
-  - added: `allowCustomValues` (issue #88)
-  - added: `canRegroup`
-  - rename: `readonlyMode` -> `immutableGroupsMode`
-  - rename: `get_children` -> `renderBuilder`
-  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported)
-  - removed: unused `<Preview />` component and `.query-preview` class
-  - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField`
-  - added `renderOperator`
 
 
 ## License

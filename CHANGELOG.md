@@ -1,0 +1,11 @@
+# Changelog
+- 1.0
+  - optimized renders & dragging
+  - added: `allowCustomValues` (issue #88)
+  - added: `canRegroup`
+  - rename: `readonlyMode` -> `immutableGroupsMode`
+  - rename: `get_children` -> `renderBuilder`
+  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported)
+  - removed: unused `<Preview />` component and `.query-preview` class
+  - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField`
+  - added `renderOperator`
