@@ -1,15 +1,18 @@
 # Changelog
+- 1.0.3
+  - Completely removed auto-loading of antd styles (issue #50)
 - 1.0.2
   - Fixed bug with running examples app via react-scripts
 - 1.0.1
   - Fixed bug with importing React
 - 1.0.0
-  - optimized renders & dragging
+  - Don't include AntDesign styles automatically (issues #50, #93)
   - added: `allowCustomValues` (issue #88)
+  - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField` (issue #109)
+  - added `renderOperator` (issue #89)
+  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported) (issue #61)
   - added: `canRegroup`
   - rename: `readonlyMode` -> `immutableGroupsMode`
   - rename: `get_children` -> `renderBuilder`
-  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported)
   - removed: unused `<Preview />` component and `.query-preview` class
-  - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField`
-  - added `renderOperator`
+  - optimized renders & dragging

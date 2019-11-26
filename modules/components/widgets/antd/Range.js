@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Slider, InputNumber, Col } from 'antd';
-import 'antd/lib/date-picker/style';
 
 export default class RangeWidget extends PureComponent {
 

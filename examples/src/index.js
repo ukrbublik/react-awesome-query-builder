@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import Demo from "./demo/demo.js";
 
 
-// import 'react-awesome-query-builder/css/antd.less';'; //todo: why not working?
+// import 'react-awesome-query-builder/css/antd.less'; // need to enable LESS loader
 import "antd/dist/antd.css";
 import 'react-awesome-query-builder/css/styles.scss';
 

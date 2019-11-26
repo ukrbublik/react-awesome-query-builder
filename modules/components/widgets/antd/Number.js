@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { InputNumber, Col } from 'antd';
-import 'antd/lib/date-picker/style';
 
 export default class NumberWidget extends PureComponent {
   static propTypes = {

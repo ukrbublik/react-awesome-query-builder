@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
-import shallowCompare from 'react-addons-shallow-compare';
 import Rule from './Rule';
 import Group from './Group';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {Provider, Connector, connect} from 'react-redux';
 
 
 const typeMap = {

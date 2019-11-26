@@ -1,14 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {calcTextWidth, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT} from "../utils/stuff";
-import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
-const { Option, OptGroup } = Select;
-const SubMenu = Menu.SubMenu;
-const MenuItem = Menu.Item;
-const DropdownButton = Dropdown.Button;
-import map from 'lodash/map';
-import last from 'lodash/last';
+import {getFieldConfig} from "../utils/configUtils";
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';

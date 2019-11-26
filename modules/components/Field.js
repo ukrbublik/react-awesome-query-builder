@@ -4,7 +4,6 @@ import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configU
 import {truncateString} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
-import pick from 'lodash/pick';
 
 
 export default class Field extends PureComponent {
