@@ -2,6 +2,16 @@
 :toc-placement!:
 toc::[]
 
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+
+
 = Config format
 
 Has 6 sections:
@@ -20,9 +30,10 @@ There are functions for building query string: `formatConj`, `formatValue`, `for
 They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue` for building MongoDb query with `QbUtils.mongodbFormat()`.
 
-Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`demo config`]
+TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`demo config`]
 
 
+{nbsp} +
 
 == Basic config
 
@@ -96,6 +107,8 @@ const myConfig = {
 
 
 
+{nbsp} +
+
 == Sections
 
 [[configfields]]
@@ -153,6 +166,8 @@ const myConfig = {
 
 
 
+{nbsp} +
+{nbsp} +
 [[configsettings]]
 === config.settings
 
@@ -274,6 +289,8 @@ Localization:
 
 
 
+{nbsp} +
+{nbsp} +
 [[configconjunctions]]
 === config.conjunctions
 
@@ -306,6 +323,8 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 
 
 
+{nbsp} +
+{nbsp} +
 [[configoperators]]
 === config.operators
 
@@ -347,6 +366,8 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |isSpecialRange | |false |Special for `cardinality==2`. Used to show 1 range widget instead of 2 widgets (see `range_between` operator for `rangeslider` widget in demo)
 |===
 
+[NOTE]
+====
 There is also special `proximity` operator, its options are rendered with `<ProximityOperator>`.
 
 [source,javascript]
@@ -355,9 +376,12 @@ import {Operators: {ProximityOperator}} from 'react-awesome-query-builder';
 ----
 
 See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`examples/demo`]
+====
 
 
 
+{nbsp} +
+{nbsp} +
 [[configwidgets]]
 === config.widgets
 
@@ -424,12 +448,14 @@ const {
   Used together with operator `range_between` having `isSpecialRange=true` option.
 |===
 
-There is special `field` widget, rendered by `<ValueFieldWidget>`. +
+NOTE: There is special `field` widget, rendered by `<ValueFieldWidget>`. +
 It can be used to compare field with another field of same type. +
 To enable this feature set `valueSources` of type to `['value', 'field'']` (see below in link:#configtypes[config.types]).
 
 
 
+{nbsp} +
+{nbsp} +
 [[configtypes]]
 === config.types
 
