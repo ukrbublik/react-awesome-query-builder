@@ -1,5 +1,6 @@
 import en_US from 'antd/lib/locale-provider/en_US';
 import * as Widgets from '../components/widgets/index.js';
+import React from "react";
 const {
   FieldSelect,
   FieldDropdown,
