@@ -25,7 +25,7 @@
   "homepage": "https://ukrbublik.github.io/react-awesome-query-builder/",
   "dependencies": {
     "react": "16.8.6",
-    "react-awesome-query-builder": "^1.0.0",
+    "react-awesome-query-builder": "^1.0.1",
     "react-dom": "16.8.6",
     "react-scripts": "3.0.1"
   }

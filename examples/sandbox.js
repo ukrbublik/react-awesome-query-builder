@@ -3,9 +3,8 @@ import ReactDOM from "react-dom";
 import Demo from "./demo/demo.js";
 
 
-import 'react-awesome-query-builder/css/reset.scss';
+import 'react-awesome-query-builder/css/antd.less';
 import 'react-awesome-query-builder/css/styles.scss';
-import 'react-awesome-query-builder/css/denormalize.scss';
 
 function App() {
   return (
