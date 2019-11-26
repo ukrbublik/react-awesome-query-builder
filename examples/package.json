@@ -2,31 +2,44 @@
   "name": "react-awesome-query-builder-demo",
   "version": "0.2.0",
   "description": "Demo for react-awesome-query-builder",
-  "main": "sandbox.js",
+  "main": "src/index.js",
   "readme": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
   },
   "files": [
-    "demo/config.js",
-    "demo/demo.js",
-    "index.html",
-    "sandbox.js",
+    "public/index.html",
+    "src/index.js",
+    "src/demo/config.js",
+    "src/demo/demo.js",
+    "src/demo/init_value.js",
     "README.md"
   ],
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
+    "build": "SKIP_PREFLIGHT_CHECK=true react-scripts build",
+    "test": "SKIP_PREFLIGHT_CHECK=true react-scripts test --env=jsdom",
+    "eject": "SKIP_PREFLIGHT_CHECK=true react-scripts eject"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "homepage": "https://ukrbublik.github.io/react-awesome-query-builder/",
   "dependencies": {
-    "react": "16.8.6",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "react-awesome-query-builder": "^1.0.1",
-    "react-dom": "16.8.6",
     "react-scripts": "3.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
