@@ -165,7 +165,6 @@ Scripts:
 - `npm run build-global` - Builds with webpack the self contained pack of the component. Output path: `build/global`
 - `npm run build-examples` - Builds with webpack the examples. Output path: `examples`
 - `npm run examples` - Builds with webpack the examples and runs a dev-server on localhost:3001.
-- `sh ./scripts/gh-pages.sh` - Update gh pages
 
 The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
 
