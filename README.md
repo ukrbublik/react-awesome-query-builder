@@ -44,6 +44,7 @@ Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-buil
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
 import 'react-awesome-query-builder/css/antd.less';
+// or import "antd/dist/antd.css";
 import 'react-awesome-query-builder/css/styles.scss';
 import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
 
