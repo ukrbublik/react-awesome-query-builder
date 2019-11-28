@@ -30,7 +30,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Values of fields can be compared with values -or- another fields (of same type)
 - Reordering support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/)
-- Export to MongoDb or SQL
+- Export to MongoDb, SQL or your custom format
 
 
 ## Getting started
