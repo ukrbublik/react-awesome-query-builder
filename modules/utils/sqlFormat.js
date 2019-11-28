@@ -63,7 +63,7 @@ export const sqlFormat = (item, config) => {
         const reversedOp = operatorDefinition.reversedOp;
         const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-        const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+        const {fieldSeparator} = config.settings;
 
         //format value
         let valueSrcs = [];
@@ -88,8 +88,7 @@ export const sqlFormat = (item, config) => {
                     const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
                     const _fieldKeys = getFieldPath(rightField, config);
                     const fieldPartsLabels = getFieldPathLabels(rightField, config);
-                    const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
-                    const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
+                    const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
                     const formatField = config.settings.formatField || defaultSettings.formatField;
                     let rightFieldName = rightField;
                     if (rightFieldDefinition.tableName) {
@@ -97,7 +96,7 @@ export const sqlFormat = (item, config) => {
                         fieldPartsCopy[0] = rightFieldDefinition.tableName;
                         rightFieldName = fieldPartsCopy.join(fieldSeparator);
                     }
-                    formattedField = formatField(rightFieldName, fieldParts, fieldLabel2, rightFieldDefinition, config);
+                    formattedField = formatField(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config);
                 }
                 ret = formattedField;
             } else {
@@ -142,13 +141,14 @@ export const sqlFormat = (item, config) => {
             const _operator = operatorDefinition.sqlOp || operator;
             if (cardinality == 0) {
                 fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-                    return `${field} ${_operator}}`;
+                    return `${field} ${_operator}`;
                 };
             } else if (cardinality == 1) {
                 fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions) => {
                     return `${field} ${_operator} ${value}`;
                 };
             } else if (cardinality == 2) {
+                // between
                 fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
                     const valFrom = values.first();
                     const valTo = values.get(1);
@@ -169,10 +169,9 @@ export const sqlFormat = (item, config) => {
         }
         const _fieldKeys = getFieldPath(field, config);
         const fieldPartsLabels = getFieldPathLabels(field, config);
-        const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
-        const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
+        const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparator) : null;
         const formatField = config.settings.formatField || defaultSettings.formatField;
-        const formattedField = formatField(fieldName, fieldParts, fieldLabel2, fieldDefinition, config);
+        const formattedField = formatField(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
         
         //format expr
         const args = [
