@@ -36,7 +36,7 @@ export const mongodbFormat = (item, config, _not = false) => {
         if (list.size == 1)
             resultQuery = list.first();
         else
-            resultQuery[mongoConj] = list.toList();
+            resultQuery[mongoConj] = list.toList().toJS();
         return resultQuery;
     } else if (type === 'rule') {
         const {fieldSeparator} = config.settings;
@@ -89,8 +89,12 @@ export const mongodbFormat = (item, config, _not = false) => {
                     const args = [
                         currentValue,
                         pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                        omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue']), //useful options: valueFormat for date/time
+                        omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']), //useful options: valueFormat for date/time
                     ];
+                    if (true) {
+                        args.push(operator);
+                        args.push(operatorDefinition);
+                    }
                     ret = fn(...args);
                 } else {
                     ret = currentValue;
@@ -114,7 +118,7 @@ export const mongodbFormat = (item, config, _not = false) => {
             formattedValue,
             (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
             (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-            omit(operatorDefinition, ['formatOp', 'mongoFormatOp']),
+            omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp']),
             operatorOptions,
         ];
         const ruleQuery = fn(...args);

@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
 
-const {queryBuilderFormat, queryString, mongodbFormat, getTree, checkTree, loadTree, uuid} = Utils;
+const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const stringify = require('json-stringify-safe');
 window.Immutable = Immutable;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
@@ -68,6 +68,13 @@ export default class DemoQueryBuilder extends Component {
           <pre style={preStyle}>
             {stringify(queryString(immutableTree, config, true), undefined, 2)}
           </pre>
+        </div>
+        <hr/>
+        <div>
+          sqlFormat: 
+            <pre style={preStyle}>
+              {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            </pre>
         </div>
         <hr/>
         <div>

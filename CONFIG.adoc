@@ -29,6 +29,7 @@ Optionally you can override some options in basic config or add your own types/w
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, which are used for `QbUtils.queryString()`. +
 They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue` for building MongoDb query with `QbUtils.mongodbFormat()`.
+And `sqlFormatConj`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse` for building SQL where query with `QbUtils.sqlFormat()`.
 
 TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`demo config`]
 
@@ -52,6 +53,8 @@ const {
         less_or_equal,
         greater,
         greater_or_equal,
+        like,
+        not_like,
         between,
         not_between,
         range_between, // like `between`, but for slider
@@ -317,6 +320,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `(Immultable.List children, string conj, bool not, bool isForDisplay) => string` +
   `children` - list of already formatted queries (strings) to be joined with conjuction
 |mongoConj |+ for MongoDB format |https://docs.mongodb.com/manual/reference/operator/query-logical/[Name] of logical operator for MongoDb
+|sqlFormatConj |+ for SQL format |See `formatConj`
 |reversedConj | |Opposite logical operator. +
   Can be used to optimize `!(A OR B)` to `!A && !B` (done for MongoDB format)
 |===
@@ -356,6 +360,10 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `value` - string (already formatted value) for `cardinality==1` -or- `Immutable.List` of strings for `cardinality>1`
 |labelForFormat | | |If `formatOp` is missing, `labelForFormat` will be used to join operands when building query string
 |mongoFormatOp |+ for MongoDB format | |Function for formatting MongoDb query, used to join operands into rule. +
+  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` +
+  `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
+|sqlOp |+ for SQL format | |Operator name in SQL
+|sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query if just `sqlOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
 |valueLabels |+ for `cardinality==2` | |Labels to be displayed on top of 2 values widgets if `config.settings.showLabels` is true +
@@ -430,9 +438,11 @@ const {
 |valueSrc | |`'value'` |`'value'` or `'field'` (only for special `field` widget)
 |factory |+ | |React function component
 |formatValue |+ | |Function for formatting widget's value in query string. +
-  `(mixed val, Object fieldDef, Object wgtDef, bool isForDisplay) => string`
+  `(mixed val, Object fieldDef, Object wgtDef, bool isForDisplay, string op, Object opDef) => string`
 |mongoFormatValue |- for MongoDB format |v => v |Function for formatting widget's value in MongoDb query. +
-  `(mixed val, Object fieldDef, Object wgtDef) => object`
+  `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => object`
+|sqlFormatValue |- for SQL format |`v => SqlString.escape(v)` |Function for formatting widget's value in SQL WHERE query. +
+  `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
 |validateValue | | |Function to validate entered value. +
  `(mixed val, Object fieldDef) => boolean`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true

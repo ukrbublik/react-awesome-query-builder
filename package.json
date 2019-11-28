@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "reactjs",
@@ -55,6 +55,7 @@
     "react-redux": "^5.0.0",
     "react-transition-group": "^1.2.1",
     "redux": "^3.7.2",
+    "sqlstring": "^2.3.1",
     "transit-immutable-js": "^0.7.0",
     "transit-js": "^0.8.846"
   },

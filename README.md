@@ -123,6 +123,7 @@ class DemoQueryBuilder extends Component {
       <div className="query-builder-result">
           <div>Query string: <pre>{JSON.stringify(QbUtils.queryString(immutableTree, config))}</pre></div>
           <div>Mongodb query: <pre>{JSON.stringify(QbUtils.mongodbFormat(immutableTree, config))}</pre></div>
+          <div>SQL where: <pre>{JSON.stringify(QbUtils.sqlFormat(immutableTree, config))}</pre></div>
       </div>
     )
     

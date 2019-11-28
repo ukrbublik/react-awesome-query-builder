@@ -177,3 +177,7 @@ function shallowEqualObjects(objA, objB, deep = false) {
 
   return true;
 }
+
+export const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&'); // $& means the whole matched string
+}

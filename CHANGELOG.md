@@ -1,4 +1,8 @@
 # Changelog
+- 1.0.4
+  - Added `QbUtils.sqlFormat()`
+  - Added `like` and `not_like` operators
+  - Added 2 params `string op, Object opDef` to end of `formatValue`, `mongoFormatValue`
 - 1.0.3
   - Completely removed auto-loading of antd styles (issue #50)
 - 1.0.2
