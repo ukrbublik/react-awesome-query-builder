@@ -1,6 +1,6 @@
 # Changelog
 - 1.0.4
-  - Added `QbUtils.sqlFormat()`
+  - Added `QbUtils.sqlFormat()` (issue #29)
   - Added `like` and `not_like` operators
   - Added 2 params `string op, Object opDef` to end of `formatValue`, `mongoFormatValue`
 - 1.0.3
