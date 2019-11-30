@@ -2,11 +2,6 @@
 import Immutable from 'immutable';
 import {ElementType, FunctionComponent, ComponentClass, ReactElement, Factory} from 'react';
 
-type TypedMap<T> = {
-  [key: string]: T;
-};
-type Empty = null | undefined;
-
 
 // type ElementType<P = any> =
 // {
@@ -47,65 +42,162 @@ type Empty = null | undefined;
 // }
 
 
-export type ImmutableTree = Immutable.Map<String, String|Object>;
-export type JsonTree = Object;
-export type MongoQuery = Object;
-
-export type Builder = ElementType<BuilderProps>;
-export type Query = ElementType<QueryProps>;
-
-export type Conjunctions = TypedMap<Object>;
-export type Operators = TypedMap<Object>;
-export type Types = TypedMap<Object>;
 
 ////////////////
 // common
 /////////////////
 
+type Optional<T> = {
+  [P in keyof T]?: T[P];
+}
+type TypedMap<T> = {
+  [key: string]: T;
+};
+type Empty = null | undefined;
+
 type ValueSource = "value" | "field";
-export type ValidateValue = (val: any, fieldDef: Object) => Boolean;
+type ValidateValue = (val: any, fieldDef: Object) => Boolean;
 
-/////////////////
-// Widgets
-/////////////////
-
-export type FormatValue = () => String; //.....
-export type SqlFormatValue = () => String; //.....
-export type MongoFormatValue = () => String; //.....
-
-export interface WidgetProps {
-  //....
+export interface FieldSettings {
+  //.....todo    min max
 };
-interface BaseWidget {
-  type: String,
-  factory: Factory<WidgetProps>, //???
-  formatValue: FormatValue,
-  valueSrc?: ValueSource,
-  validateValue?: ValidateValue,
+
+////////////////
+// Query, Builder, Utils, Config
+/////////////////
+
+export type ImmutableTree = Immutable.Map<String, String|Object>;
+export type JsonTree = Object;
+export type MongoQuery = Object;
+
+export interface Utils {
+  queryBuilderFormat(tree: ImmutableTree, config: Config): String;
+  queryString(tree: ImmutableTree, config: Config, isForDisplay?: Boolean): String;
+  sqlFormat(tree: ImmutableTree, config: Config): String;
+  mongodbFormat(tree: ImmutableTree, config: Config): MongoQuery;
+  getTree(tree: ImmutableTree): JsonTree;
+  loadTree(tree: JsonTree): ImmutableTree;
+  checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  uuid(): String;
+};
+
+export interface BuilderProps {
+  tree: ImmutableTree,
+  config: Config,
+  actions: {[key: string]: Function},
+};
+
+export interface QueryProps {
+  conjunctions: Conjunctions;
+  operators: Operators;
+  widgets: Widgets;
+  types: Types;
+  settings: Settings;
+  fields: Fields;
+  value: ImmutableTree;
+  onChange(immutableTree: ImmutableTree, config: Config): void;
+  renderBuilder(props: BuilderProps): ReactElement;
+};
+
+export type Builder = ElementType<BuilderProps>;
+export type Query = ElementType<QueryProps>;
+
+export interface Config {
+  conjunctions: Conjunctions,
+  operators: Operators,
+  widgets: Widgets,
+  types: Types,
+  settings: Settings,
+  fields: Fields,
+};
+
+
+/////////////////
+// Widgets, WidgetProps
+/////////////////
+
+type FormatValue = () => String; //.....todo
+type SqlFormatValue = () => String; //.....todo
+type MongoFormatValue = () => String; //.....todo
+
+interface BaseWidgetSettings {
   customProps?: {},
-  valuePlaceholder?: String,
-  valueLabel?: String,
-  sqlFormatValue: SqlFormatValue,
-  mongoFormatValue: MongoFormatValue,
 };
-export interface SimpleWidget extends BaseWidget {
-};
-export interface DateWidget extends BaseWidget {
+interface DateWidgetSettings extends BaseWidgetSettings {
   timeFormat?: String,
   dateFormat?: String,
   valueFormat?: String,
   use12Hours?: Boolean,
 };
-export interface BooleanWidget extends BaseWidget {
+interface BooleanWidgetSettings extends BaseWidgetSettings {
   labelYes?: Boolean,
   labelNo?: Boolean,
 };
-export interface RangeWidget extends BaseWidget {
+export type WidgetSettings = DateWidgetSettings | BooleanWidgetSettings | BaseWidgetSettings;
+
+interface BaseWidgetProps {
+  value: any,
+  setValue(val: any): void,
+  placeholder: String,
+  field: String,
+  operator: String,
+  fieldDefinition: Field
+  config: Config,
+  delta: Number,
+};
+export interface RangeWidgetProps extends BaseWidgetProps {
+  placeholders: Array<String>,
+  textSeparators: Array<String>,
+};
+type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings & WidgetSettings;
+
+interface BaseWidget {
+  type: String,
+  factory: Factory<WidgetProps>,
+  valueSrc?: ValueSource,
+  valuePlaceholder?: String,
+  valueLabel?: String,
+  validateValue?: ValidateValue,
+  formatValue: FormatValue,
+  sqlFormatValue: SqlFormatValue,
+  mongoFormatValue: MongoFormatValue,
+};
+interface RangeWidget extends BaseWidget {
   singleWidget?: String,
 };
 
-export type Widget = DateWidget | BooleanWidget | RangeWidget | SimpleWidget;
+export type Widget = (RangeWidget | BaseWidget) & WidgetSettings;
 export type Widgets = TypedMap<Widget>;
+
+
+/////////////////
+// Conjunctions
+/////////////////
+
+interface Conjunction {
+  //...todo
+};
+export type Conjunctions = TypedMap<Conjunction>;
+
+
+/////////////////
+// Types
+/////////////////
+
+interface Type {
+  //...todo
+};
+export type Types = TypedMap<Type>;
+
+
+/////////////////
+// Operators
+/////////////////
+
+interface Operator {
+  //...todo
+};
+export type Operators = TypedMap<Operator>;
 
 
 /////////////////
@@ -113,24 +205,19 @@ export type Widgets = TypedMap<Widget>;
 /////////////////
 
 type FieldType = String | "!struct";
-export interface WidgetConfigForType {
-  widgetProps?: WidgetConfig,
-  opProps?: OpProps,
+
+interface WidgetConfigForType {
+  widgetProps?: Optional<Widget>,
+  opProps?: Optional<Operator>,
   operators?: Array<String>,
 };
-export interface OpProps {
-};
-export interface WidgetConfig {
-  valueLabel?: String,
-  valuePlaceholder?: String,
-  validateValue?: ValidateValue
-};
+
 interface BaseField {
   type: FieldType,
   label?: String,
   tooltip?: String,
 };
-export interface SimpleField extends BaseField {
+interface SimpleField extends BaseField {
   label2?: String,
   operators?: Array<String>,
   defaultOperator?: String,
@@ -138,27 +225,39 @@ export interface SimpleField extends BaseField {
   preferWidgets?: Array<String>,
   valueSources?: Array<ValueSource>,
   tableName?: String,
-  fieldSettings?: {},
+  fieldSettings?: FieldSettings,
   widgets?: TypedMap<WidgetConfigForType>,
-  mainWidgetProps?: WidgetConfig,
+  mainWidgetProps?: Optional<Widget>,
 };
-export interface FieldGroup extends BaseField {
+interface FieldGroup extends BaseField {
   type: "!struct",
   subfields: Fields,
 };
-export interface FieldWithValues extends SimpleField {
+interface FieldWithValues extends SimpleField {
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
 };
-export type Field = FieldGroup | FieldWithValues;
-export type Fields = TypedMap<Field>;
+
+export type Field = FieldWithValues | SimpleField;
+export type FieldOrGroup = FieldGroup | Field;
+export type Fields = TypedMap<FieldOrGroup>;
+
 
 /////////////////
-// Settings
+// FieldProps
 /////////////////
 
-type FieldItem = {items?: FieldItems, key: String, path?: String, label: String, fullLabel?: String, altLabel?: String, tooltip?: String};
+type FieldItem = {
+  items?: FieldItems, 
+  key: String, 
+  path?: String, 
+  label: String, 
+  fullLabel?: String, 
+  altLabel?: String, 
+  tooltip?: String
+};
 type FieldItems = TypedMap<FieldItem>;
+
 export interface FieldProps {
   items: FieldItems,
   setField(path: String): void,
@@ -173,6 +272,11 @@ export interface FieldProps {
   placeholder?: String,
   selectedOpts?: {tooltip?: String},
 }
+
+
+/////////////////
+// Settings
+/////////////////
 
 type ValueSourcesInfo = {[vs in ValueSource]: {label: String, widget?: String}};
 
@@ -206,31 +310,35 @@ export interface LocaleSettings {
   },
 };
 
-export interface Settings extends LocaleSettings {
+export interface MainSettings {
   renderField?: Factory<FieldProps>;
   renderOperator?: Factory<FieldProps>;
   valueSourcesInfo?: ValueSourcesInfo,
   maxNesting?: Number,
   canLeaveEmptyGroup?: Boolean,
+  //....todo
 };
+
+export type Settings = LocaleSettings & MainSettings;
 
 /////////////////
 
 
-export interface ReadyWidgets {
+
+
+
+
+
+
+
+
+
+
+interface ReadyWidgets {
   FieldSelect: ElementType<FieldProps>,
   FieldDropdown: ElementType<FieldProps>,
   FieldCascader: ElementType<FieldProps>,
   VanillaFieldSelect: ElementType<FieldProps>
-};
-
-export interface Config {
-  conjunctions: Conjunctions,
-  operators: Operators,
-  widgets: Widgets,
-  types: Types,
-  settings: Settings,
-  fields: Fields,
 };
 
 export interface OperatorProximity {
@@ -257,34 +365,6 @@ export interface BasicConfig extends Config {
   }
 };
 
-export interface Utils {
-  queryBuilderFormat(tree: ImmutableTree, config: Config): String;
-  queryString(tree: ImmutableTree, config: Config, isForDisplay?: Boolean): String;
-  sqlFormat(tree: ImmutableTree, config: Config): String;
-  mongodbFormat(tree: ImmutableTree, config: Config): MongoQuery;
-  getTree(tree: ImmutableTree): JsonTree;
-  loadTree(tree: JsonTree): ImmutableTree;
-  checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
-  uuid(): String;
-};
-
-export interface BuilderProps {
-  tree: ImmutableTree,
-  config: Config,
-  actions: Map<String, Function>,
-};
-
-export interface QueryProps {
-  conjunctions: Conjunctions;
-  operators: Operators;
-  widgets: Widgets;
-  types: Types;
-  settings: Settings;
-  fields: Fields;
-  value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config): void;
-  renderBuilder(props: BuilderProps): ReactElement;
-};
 
 export const BasicConfig: BasicConfig;
 export const Utils: Utils;

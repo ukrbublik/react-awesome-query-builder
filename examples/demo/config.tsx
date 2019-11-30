@@ -104,7 +104,7 @@ const types = {
             boolean: {
                 widgetProps: {
                     hideOperator: true,
-                    operatorInlineLabel: "is",
+                    operatorInlineLabel: "is"
                 }
             },
         },
