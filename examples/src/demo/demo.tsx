@@ -5,16 +5,26 @@ import Immutable from 'immutable';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
 
+type ImmutableTree = Immutable.Map<String, String|Object>;
+
 const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const stringify = require('json-stringify-safe');
-window.Immutable = Immutable;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 
 const emptyInitValue = {"id": uuid(), "type": "group"};
 const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
 
 
-export default class DemoQueryBuilder extends Component {
+
+interface DemoQueryBuilderState {
+  tree: Object;
+  config: Object;
+}
+
+export default class DemoQueryBuilder extends Component<Object, DemoQueryBuilderState> {
+    private immutableTree: ImmutableTree;
+    private config: Object;
+
     state = {
       tree: checkTree(loadTree(initValue), loadedConfig),
       config: loadedConfig
@@ -34,7 +44,7 @@ export default class DemoQueryBuilder extends Component {
       </div>
     )
 
-    renderBuilder = (props) => (
+    renderBuilder = (props: Object) => (
         <div className="query-builder-container" style={{padding: '10px'}}>
             <div className="query-builder">
                 <Builder {...props} />
@@ -42,7 +52,7 @@ export default class DemoQueryBuilder extends Component {
         </div>
     )
     
-    onChange = (immutableTree, config) => {
+    onChange = (immutableTree: ImmutableTree, config: Object) => {
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();
@@ -53,7 +63,7 @@ export default class DemoQueryBuilder extends Component {
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
 
-    renderResult = ({tree: immutableTree, config}) => (
+    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Object}) => (
       <div>
         <br />
         <div>

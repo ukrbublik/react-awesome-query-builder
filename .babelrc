@@ -1,18 +1,17 @@
 {
     "presets": [
-        "react",
-        "es2015",
-	    "stage-0"
+        "@babel/preset-typescript",
+        "@babel/preset-env",
+        "@babel/preset-react"
     ],
     "plugins": [
-        ["transform-decorators-legacy"],
+        "@babel/plugin-proposal-class-properties",
+        ["@babel/plugin-proposal-decorators", {
+            "decoratorsBeforeExport": true
+        }],
         ["import", {
             "libraryName": "antd",
             "style": false
-        }],
-        ["transform-es2015-modules-commonjs", {
-            "allowTopLevelThis": true,
-            "loose": true
         }]
     ]
 }

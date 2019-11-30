@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import {getOperatorConfig} from "../../utils/configUtils";
 
 export default (OperatorOptions) => {
-  return class OperatorOptionsContainer extends Component {
+  return class OperatorOptionsContainer extends PureComponent {
     static propTypes = {
       config: PropTypes.object.isRequired,
       operatorOptions: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
@@ -13,8 +12,6 @@ export default (OperatorOptions) => {
       //actions
       setOperatorOption: PropTypes.func.isRequired,
     };
-
-    shouldComponentUpdate = shallowCompare;
 
     render() {
       if (!this.props.selectedOperator)

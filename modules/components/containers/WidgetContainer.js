@@ -1,6 +1,5 @@
 import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import shallowCompare from 'react-addons-shallow-compare';
 import range from 'lodash/range';
 import {
     getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
@@ -14,7 +13,7 @@ import pick from 'lodash/pick';
 
 
 export default (Widget) => {
-    return class WidgetContainer extends Component {
+    return class WidgetContainer extends PureComponent {
         static propTypes = {
             config: PropTypes.object.isRequired,
             value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
@@ -31,8 +30,6 @@ export default (Widget) => {
 
             this.componentWillReceiveProps(props);
         }
-
-        shouldComponentUpdate = shallowCompare;
 
         componentWillReceiveProps(nextProps) {
             const prevProps = this.props;

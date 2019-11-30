@@ -1,54 +1,93 @@
 var webpack = require('webpack');
 var path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+var plugins = [];
+if (process.env.NODE_ENV != "development") {
+    plugins = [
+        new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
+        //new BundleAnalyzerPlugin(),
+    ];
+}
 
 module.exports = {
+    plugins,
+    mode: process.env.NODE_ENV || "development",
     devtool: 'source-map',
     entry: './index',
     output: {
         path: __dirname,
         filename: 'bundle.js'
     },
-    resolveLoader: {
-        modulesDirectories: ['node_modules']
-    },
     resolve: {
-        extensions: ['', '.js']
+        alias: {
+            'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
+        },
+        extensions: ['.tsx', '.ts', '.js']
     },
     module: {
-        loaders: [
+        rules: [
             {
-                test: /\.js$/,
-                loaders: ['babel-loader'],
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                exclude: /node_modules/,
+            },
+            {
+                test: /\.jsx?$/,
+                loaders: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env', '@babel/preset-react'],
+                  plugins: [
+                    [ "@babel/plugin-proposal-decorators", { "legacy": true } ],
+                    [ "@babel/plugin-proposal-class-properties", {
+                      "loose": true
+                    }],
+                    "@babel/plugin-transform-runtime",
+                    ["import", {
+                        "libraryName": "antd",
+                        "style": false,
+                        "libraryDirectory": "es"
+                    }]
+                  ]
+                },
                 exclude: /node_modules/
             },
             {
                 test: /\.css$/,
-                loader: "style!css"
+                use: ["style-loader", "css-loader"]
             },
             {
                 test: /\.scss$/,
-                loader: "style!css!sass"
+                use: [{
+                    loader: "style-loader"
+                }, {
+                    loader: "css-loader"
+                }, {
+                    loader: "sass-loader"
+                }]
             },
             {
                 test: /\.less$/,
-                loader: "style!css!less"
+                use: [{
+                    loader: "style-loader"
+                }, {
+                    loader: "css-loader"
+                }, {
+                    loader: "less-loader",
+                    options: {
+                        javascriptEnabled: true
+                    }
+                }]
             },
             {
                 test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "url-loader?limit=10000&minetype=application/font-woff"
             },
             {
-                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader"
+                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                loader: "file-loader"
             }
 
         ]
-    },
-    plugins: [
-        new webpack.NormalModuleReplacementPlugin(
-            /^react-awesome-query-builder/, function (data) {
-                const suffix = data.request.substring('react-awesome-query-builder'.length);
-                data.request = path.resolve(__dirname, '../modules/' + suffix);
-            }
-        ),
-    ]
+    }
 };
