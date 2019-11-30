@@ -1,5 +1,4 @@
 import mapValues from 'lodash/mapValues';
-var stringify = require('json-stringify-safe');
 import Immutable, { Map } from 'immutable';
 
 

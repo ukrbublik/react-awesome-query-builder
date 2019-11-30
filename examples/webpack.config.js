@@ -20,6 +20,10 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
+        modules: [
+            'node_modules',
+            path.resolve(__dirname, '../node_modules'),
+        ],
         alias: {
             'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
         },

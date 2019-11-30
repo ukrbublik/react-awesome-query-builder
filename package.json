@@ -13,7 +13,7 @@
   ],
   "main1": "modules",
   "main": "build/npm/lib",
-  "main2": "build/global/ReactAwesomeQueryBuilder.js",
+  "types": "modules/index.d.ts",
   "browserify1": {
     "transform": [
       "babelify"
@@ -45,7 +45,6 @@
     "classnames": "^2.2.5",
     "clone": "^2.1.1",
     "immutable": "^3.7.6",
-    "json-stringify-safe": "^5.0.1",
     "lodash": "^4.6",
     "moment": "^2.24.0",
     "prop-types": "^15.6.0",

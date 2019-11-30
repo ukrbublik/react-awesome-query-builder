@@ -92,7 +92,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         modules: [
             'node_modules',
-            __dirname,
+            //__dirname,
             __dirname + '/node_modules',
         ],
         alias: {

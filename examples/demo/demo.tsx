@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
-import {Query, Builder, BasicConfig, Utils} from 'react-awesome-query-builder';
+import {
+  Query, Builder, BasicConfig, Utils, 
+  ImmutableTree, Config, BuilderProps
+} from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
-import Immutable from 'immutable';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
-
-type ImmutableTree = Immutable.Map<String, String|Object>;
+const stringify = JSON.stringify;
 
 const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
-const stringify = require('json-stringify-safe');
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 
 const emptyInitValue = {"id": uuid(), "type": "group"};
@@ -17,13 +17,13 @@ const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? l
 
 
 interface DemoQueryBuilderState {
-  tree: Object;
-  config: Object;
+  tree: ImmutableTree;
+  config: Config;
 }
 
-export default class DemoQueryBuilder extends Component<Object, DemoQueryBuilderState> {
+export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
-    private config: Object;
+    private config: Config;
 
     state = {
       tree: checkTree(loadTree(initValue), loadedConfig),
@@ -32,8 +32,8 @@ export default class DemoQueryBuilder extends Component<Object, DemoQueryBuilder
 
     render = () => (
       <div>
-        <Query 
-            {...loadedConfig} 
+        <Query
+            {...loadedConfig}
             value={this.state.tree}
             onChange={this.onChange}
             renderBuilder={this.renderBuilder}
@@ -44,15 +44,15 @@ export default class DemoQueryBuilder extends Component<Object, DemoQueryBuilder
       </div>
     )
 
-    renderBuilder = (props: Object) => (
-        <div className="query-builder-container" style={{padding: '10px'}}>
-            <div className="query-builder">
-                <Builder {...props} />
-            </div>
-        </div>
+    renderBuilder = (props: BuilderProps) => (
+      <div className="query-builder-container" style={{padding: '10px'}}>
+          <div className="query-builder">
+              <Builder {...props} />
+          </div>
+      </div>
     )
     
-    onChange = (immutableTree: ImmutableTree, config: Object) => {
+    onChange = (immutableTree: ImmutableTree, config: Config) => {
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();
@@ -63,7 +63,7 @@ export default class DemoQueryBuilder extends Component<Object, DemoQueryBuilder
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
 
-    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Object}) => (
+    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => (
       <div>
         <br />
         <div>
