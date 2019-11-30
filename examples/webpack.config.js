@@ -23,7 +23,7 @@ module.exports = {
         alias: {
             'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
         },
-        extensions: ['.tsx', '.ts', '.js']
+        extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
     module: {
         rules: [
