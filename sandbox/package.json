@@ -2,7 +2,7 @@
   "name": "react-awesome-query-builder-demo",
   "version": "0.2.0",
   "description": "Demo for react-awesome-query-builder",
-  "main": "src/index.tsx",
+  "main": "src/index.jsx",
   "readme": "README.md",
   "repository": {
     "type": "git",
