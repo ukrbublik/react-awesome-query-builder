@@ -12,7 +12,6 @@ export default class Proximity extends PureComponent {
     options: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     minProximity: PropTypes.number,
     maxProximity: PropTypes.number,
-    defaultProximity: PropTypes.number,
     optionPlaceholder: PropTypes.string,
     optionTextBefore: PropTypes.string,
     optionLabel: PropTypes.string,
@@ -24,7 +23,6 @@ export default class Proximity extends PureComponent {
     customProps: {},
     minProximity: 2,
     maxProximity: 10,
-    //defaultProximity: 2,
     optionPlaceholder: "Select words between",
     optionLabel: "Words between",
     optionTextBefore: null,
@@ -36,11 +34,11 @@ export default class Proximity extends PureComponent {
 
   render() {
     const {
-      defaultProximity, options, config: {settings}, optionLabel, optionPlaceholder, customProps, minProximity, maxProximity, optionTextBefore
+      defaults, options, config: {settings}, optionLabel, optionPlaceholder, customProps, minProximity, maxProximity, optionTextBefore
     } = this.props;
-    const obsoleteDefaultProximity = this.props.defaults ? this.props.defaults.proximity : undefined;
+    const defaultProximity = defaults ? defaults.proximity : undefined;
     const {dropdownPlacement, showLabels, renderSize} = settings;
-    const selectedProximity = options.get('proximity', defaultProximity || obsoleteDefaultProximity);
+    const selectedProximity = options.get('proximity', defaultProximity);
     const placeholderWidth = calcTextWidth(optionPlaceholder);
 
     return (

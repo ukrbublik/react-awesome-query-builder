@@ -45,7 +45,9 @@ const operators = {
             optionPlaceholder: "Select words between", // placeholder for "near" selectbox
             minProximity: 2,
             maxProximity: 10,
-            defaultProximity: 2,
+            defaults: {
+                proximity: 2
+            },
             customProps: {}
         }
     },

@@ -339,7 +339,7 @@ const operators = {
       formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
           const val1 = values.first();
           const val2 = values.get(1);
-          const prox = operatorOptions.get('proximity') || opDef.options.defaultProximity;
+          const prox = operatorOptions.get('proximity');
           return `${field} ${val1} NEAR/${prox} ${val2}`;
       },
       sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
@@ -347,7 +347,7 @@ const operators = {
           const val2 = values.get(1);
           const _val1 = SqlString.trim(val1);
           const _val2 = SqlString.trim(val2);
-          const prox = operatorOptions.get('proximity') || opDef.options.defaultProximity;
+          const prox = operatorOptions.get('proximity');
           return `CONTAINS(${field}, 'NEAR((${_val1}, ${_val2}), ${prox})')`;
       },
       mongoFormatOp: (field, op, values) => (undefined), // not supported
@@ -358,7 +358,9 @@ const operators = {
           factory: (props) => <ProximityOperator {...props} />,
           minProximity: 2,
           maxProximity: 10,
-          defaultProximity: 2,
+          defaults: {
+              proximity: 2
+          },
       }
   },
 };

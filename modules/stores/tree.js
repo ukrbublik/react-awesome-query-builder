@@ -15,7 +15,7 @@ const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')
 /**
  * @param {object} config
  * @param {Immutable.List} path
- * @param {object} properties
+ * @param {Immutable.Map} properties
  */
 const addNewGroup = (state, path, properties, config) => {
     const groupUuid = uuid();
@@ -24,7 +24,7 @@ const addNewGroup = (state, path, properties, config) => {
     const groupPath = path.push(groupUuid);
     // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
-    state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config).merge(properties || {}));
+    state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config));
     state = fixPathsInTree(state);
     return state;
 };
@@ -32,7 +32,7 @@ const addNewGroup = (state, path, properties, config) => {
 /**
  * @param {object} config
  * @param {Immutable.List} path
- * @param {object} properties
+ * @param {Immutable.Map} properties
  */
 const removeGroup = (state, path, config) => {
     state = removeItem(state, path);

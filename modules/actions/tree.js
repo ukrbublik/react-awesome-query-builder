@@ -16,7 +16,7 @@ export const setTree = (config, tree) => ({
 /**
  * @param {object} config
  * @param {Immutable.List} path
- * @param {object} properties
+ * @param {Immutable.Map} properties
  */
 export const addRule = (config, path, properties) => ({
   type: constants.ADD_RULE,
@@ -38,7 +38,7 @@ export const removeRule = (config, path) => ({
 /**
  * @param {object} config
  * @param {Immutable.List} path
- * @param {object} properties
+ * @param {Immutable.Map} properties
  */
 export const addGroup = (config, path, properties) => ({
     type: constants.ADD_NEW_GROUP,
