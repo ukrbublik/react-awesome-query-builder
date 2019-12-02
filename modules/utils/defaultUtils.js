@@ -55,7 +55,6 @@ export const defaultRuleProperties = (config) => {
         .set('valueSrc', newValueSrc)
         .set('valueType', newValueType);
   }
-
   return current; 
 };
 

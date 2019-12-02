@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {
   Query, Builder, BasicConfig, Utils, 
-  ImmutableTree, Config, BuilderProps
+  ImmutableTree, Config, BuilderProps, JsonTree
 } from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
 import loadedConfig from './config';
@@ -11,8 +11,8 @@ const stringify = JSON.stringify;
 const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 
-const emptyInitValue = {"id": uuid(), "type": "group"};
-const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
+const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
+const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 
 
 

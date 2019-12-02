@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import merge from 'lodash/merge';
 import {
-    Widgets, Operators, BasicConfig,
-    OperatorProximity, Settings, FieldProps, FieldItem, LocaleSettings, Fields, Field, Config
+    Widgets, BasicConfig,
+    // types:
+    Operators, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity,
 } from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
@@ -10,11 +11,11 @@ const {
     FieldSelect,
     FieldDropdown,
     FieldCascader,
-    VanillaFieldSelect
+    VanillaFieldSelect,
   } = Widgets;
 
-const conjunctions = {
-    ...BasicConfig.conjunctions
+const conjunctions: Conjunctions = {
+    ...BasicConfig.conjunctions,
 };
 
 const proximity: OperatorProximity = {
@@ -41,7 +42,7 @@ const proximity: OperatorProximity = {
     }
 };
 
-const operators = {
+const operators: Operators = {
     ...BasicConfig.operators,
     // examples of  overriding
     between: {
@@ -57,6 +58,7 @@ const operators = {
     },
     proximity,
 };
+
 
 const widgets: Widgets = {
     ...BasicConfig.widgets,
@@ -77,7 +79,7 @@ const widgets: Widgets = {
         ...BasicConfig.widgets.rangeslider,
         customProps: {
             width: '300px'
-        }
+        },
     },
     date: {
         ...BasicConfig.widgets.date,
@@ -94,11 +96,11 @@ const widgets: Widgets = {
         timeFormat: 'HH:mm',
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
-    },
+    }
 };
 
 
-const types = {
+const types: Types = {
     ...BasicConfig.types,
     // examples of  overriding
     boolean: merge(BasicConfig.types.boolean, {

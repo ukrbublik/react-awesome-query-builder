@@ -77,13 +77,13 @@ export const queryString = (item, config, isForDisplay = false) => {
                         omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']), //useful options: valueFormat for date/time
                         isForDisplay
                     ];
-                    if (valueSrc == 'field') {
-                        const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
-                        args.push(valFieldDefinition);
-                    }
                     if (true) {
                         args.push(operator);
                         args.push(operatorDefinition);
+                    }
+                    if (valueSrc == 'field') {
+                        const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
+                        args.push(valFieldDefinition);
                     }
                     ret = fn(...args);
                 } else {

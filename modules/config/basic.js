@@ -538,10 +538,10 @@ const widgets = {
   field: {
       valueSrc: 'field',
       factory: (props) => <ValueFieldWidget {...props} />,
-      formatValue: (val, fieldDef, wgtDef, isForDisplay, valFieldDef) => {
-          return isForDisplay ? (valFieldDef.label || val) : val;
+      formatValue: (val, fieldDef, wgtDef, isForDisplay, op, opDef, rightFieldDef) => {
+          return isForDisplay ? (rightFieldDef.label || val) : val;
       },
-      sqlFormatValue: (val, fieldDef, wgtDef, valFieldDef, op, opDef) => {
+      sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef) => {
           return val;
       },
       valueLabel: "Field to compare",
