@@ -1,3 +1,3 @@
 cd examples
 npm i
-npm build
+npm run build

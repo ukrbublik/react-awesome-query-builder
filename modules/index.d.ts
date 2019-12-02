@@ -7,6 +7,9 @@ import {ElementType, ReactElement, Factory} from 'react';
 // common
 /////////////////
 
+type MongoValue = any;
+type RuleValue = Boolean | Number | String | Date | Array<String> | any;
+
 type Optional<T> = {
   [P in keyof T]?: T[P];
 }
@@ -92,10 +95,10 @@ export interface Config {
 // Widgets, WidgetProps
 /////////////////
 
-type FormatValue =         (val: any, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =      (val: any, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
-type MongoFormatValue =    (val: any, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => any;
-type ValidateValue =       (val: any, fieldDef: Field) => Boolean;
+type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
+type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
+type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
+type ValidateValue =       (val: RuleValue, fieldDef: Field) => Boolean;
 
 interface BaseWidgetSettings {
   customProps?: {},
