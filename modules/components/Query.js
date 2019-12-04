@@ -141,7 +141,7 @@ export default class QueryContainer extends Component {
         let nextConfig = pick(nextProps, configKeys);
         const isConfigChanged = !shallowEqual(oldConfig, nextConfig, false);
         if (isConfigChanged) {
-            nextConfig = extendConfig(config);
+            nextConfig = extendConfig(nextConfig);
             this.setState({config: nextConfig});
         }
         
