@@ -24,7 +24,7 @@
     "build-global": "./scripts/build-global.sh",
     "build-npm": "./scripts/build-npm.sh",
     "build-examples": "./scripts/build-examples.sh",
-    "examples": "./scripts/examples.sh"
+    "examples": "cd examples && npm i && npm start"
   },
   "readme": "README.md",
   "repository": {
