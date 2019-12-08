@@ -6,21 +6,24 @@ const __isInternal = true; //true to optimize render
 export default class SliderWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    min: PropTypes.number,
-    max: PropTypes.number,
-    step: PropTypes.number,
     placeholder: PropTypes.string,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
     value: PropTypes.number,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    // from fieldSettings:
+    min: PropTypes.number,
+    max: PropTypes.number,
+    step: PropTypes.number,
+    marks: PropTypes.object,
   };
 
   static defaultProps = {
     min: 0,
     max: 100,
     step: 1,
+    marks: undefined,
   };
 
   state = {
@@ -47,15 +50,9 @@ export default class SliderWidget extends PureComponent {
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
 
   render() {
-    const {config, placeholder, fieldDefinition, customProps, value,  min, max, step, marks} = this.props;
+    const {config, placeholder, customProps, value,  min, max, step, marks} = this.props;
     const {renderSize} = config.settings;
-    const {fieldSettings} = fieldDefinition || {};
     const _customProps = customProps || {};
-    
-    const _min = fieldSettings.min != null ? fieldSettings.min : min;
-    const _max = fieldSettings.max != null ? fieldSettings.max : max;
-    const _step = fieldSettings.step != null ? fieldSettings.step : step;
-    const _marks = fieldSettings.marks != null ? fieldSettings.marks : marks;
 
     let _value = __isInternal ? this.state.internalValue : value;
     if (_value == undefined)
@@ -69,9 +66,9 @@ export default class SliderWidget extends PureComponent {
             size={renderSize}
             ref="num"
             value={_value}
-            min={_min}
-            max={_max}
-            step={_step}
+            min={min}
+            max={max}
+            step={step}
             placeholder={placeholder}
             onChange={this.handleChange}
             {...customProps}
@@ -82,11 +79,11 @@ export default class SliderWidget extends PureComponent {
             ref="slider"
             value={sliderValue}
             tipFormatter={this.tipFormatter}
-            min={_min}
-            max={_max}
+            min={min}
+            max={max}
             included={false}
-            step={_step}
-            marks={_marks}
+            step={step}
+            marks={marks}
             onChange={this.handleChange}
             {...customProps}
           />

@@ -15,7 +15,7 @@ const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')
 /**
  * @param {object} config
  * @param {Immutable.List} path
- * @param {object} properties
+ * @param {Immutable.Map} properties
  */
 const addNewGroup = (state, path, properties, config) => {
     const groupUuid = uuid();
@@ -24,7 +24,7 @@ const addNewGroup = (state, path, properties, config) => {
     const groupPath = path.push(groupUuid);
     // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
-    state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config).merge(properties || {}));
+    state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config));
     state = fixPathsInTree(state);
     return state;
 };
@@ -32,7 +32,7 @@ const addNewGroup = (state, path, properties, config) => {
 /**
  * @param {object} config
  * @param {Immutable.List} path
- * @param {object} properties
+ * @param {Immutable.Map} properties
  */
 const removeGroup = (state, path, config) => {
     state = removeItem(state, path);
@@ -251,8 +251,13 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
         if (canReuseValue) {
             if (i < currentValue.size)
                 v = currentValue.get(i);
-        } else if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.defaultValue !== undefined) {
-            v = firstWidgetConfig.defaultValue;
+        } else if (operatorCardinality == 1 && (firstWidgetConfig || newFieldConfig)) {
+            if (newFieldConfig.defaultValue !== undefined)
+                v = newFieldConfig.defaultValue;
+            else if (newFieldConfig.fieldSettings && newFieldConfig.fieldSettings.defaultValue !== undefined)
+                v = newFieldConfig.fieldSettings.defaultValue;
+            else if (firstWidgetConfig.defaultValue !== undefined)
+                v = firstWidgetConfig.defaultValue;
         }
         return v;
     }));
@@ -303,24 +308,24 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
             if (vType != wType) {
                 isValid = false;
             }
-            if (fieldConfig && fieldConfig.listValues && !fieldConfig.allowCustomValues) {
-                if (v instanceof Array) {
-                    for (let _v of v) {
-                        if (fieldConfig.listValues[_v] == undefined) {
-                            //prev value is not in new list of values!
-                            isValid = false;
-                            break;
-                        }
-                    }
-                } else {
-                    if (fieldConfig.listValues[v] == undefined) {
-                        //prev value is not in new list of values!
-                        isValid = false;
-                    }
-                }
-            }
             const fieldSettings = fieldConfig.fieldSettings;
             if (fieldSettings) {
+                if (fieldSettings.listValues && !fieldSettings.allowCustomValues) {
+                    if (v instanceof Array) {
+                        for (let _v of v) {
+                            if (fieldSettings.listValues[_v] == undefined) {
+                                //prev value is not in new list of values!
+                                isValid = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        if (fieldSettings.listValues[v] == undefined) {
+                            //prev value is not in new list of values!
+                            isValid = false;
+                        }
+                    }
+                }
                 if (fieldSettings.min != null) {
                     isValid = isValid && (v >= fieldSettings.min);
                 }

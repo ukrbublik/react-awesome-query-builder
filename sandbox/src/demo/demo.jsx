@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils} from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
-import Immutable from 'immutable';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
 
 const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const stringify = require('json-stringify-safe');
-window.Immutable = Immutable;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 
 const emptyInitValue = {"id": uuid(), "type": "group"};

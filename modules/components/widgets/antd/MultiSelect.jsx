@@ -14,6 +14,9 @@ export default class MultiSelectWidget extends PureComponent {
     placeholder: PropTypes.string,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    // from fieldSettings:
+    listValues: PropTypes.object,
+    allowCustomValues: PropTypes.bool,
   };
 
   constructor(props) {
@@ -26,15 +29,15 @@ export default class MultiSelectWidget extends PureComponent {
   }
 
   onPropsChanged (props) {
-    const {fieldDefinition} = props;
+    const {listValues} = props;
 
     let optionsMaxWidth = 0;
-    map(fieldDefinition.listValues, (label, value) => {
+    map(listValues, (label, value) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(label));
     });
     this.optionsMaxWidth = optionsMaxWidth;
 
-    this.options = map(fieldDefinition.listValues, (label, value) => {
+    this.options = map(listValues, (label, value) => {
       return (<Option key={value} value={value}>{label}</Option>);
     });
   }
@@ -50,9 +53,8 @@ export default class MultiSelectWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, fieldDefinition, customProps, value} = this.props;
+    const {config, placeholder, allowCustomValues, customProps, value} = this.props;
     const {renderSize} = config.settings;
-    const {allowCustomValues} = fieldDefinition || {};
     const placeholderWidth = calcTextWidth(placeholder);
     const _value = value && value.length ? value : undefined;
     const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;

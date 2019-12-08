@@ -7,13 +7,14 @@ import moment from 'moment';
 export default class DateWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        dateFormat: PropTypes.string,
-        valueFormat: PropTypes.string,
         value: PropTypes.string, //in valueFormat
         field: PropTypes.string.isRequired,
         config: PropTypes.object.isRequired,
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
+        // from fieldSettings:
+        dateFormat: PropTypes.string,
+        valueFormat: PropTypes.string,
     };
 
     constructor(props) {

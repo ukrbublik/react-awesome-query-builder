@@ -13,6 +13,8 @@ export default class SelectWidget extends PureComponent {
     value: PropTypes.string, //key in listValues
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    // from fieldSettings:
+    listValues: PropTypes.object,
   };
 
   constructor(props) {
@@ -25,15 +27,15 @@ export default class SelectWidget extends PureComponent {
   }
 
   onPropsChanged (props) {
-    const {fieldDefinition} = props;
+    const {listValues} = props;
 
     let optionsMaxWidth = 0;
-    map(fieldDefinition.listValues, (label, value) => {
+    map(listValues, (label, value) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(label));
     });
     this.optionsMaxWidth = optionsMaxWidth;
 
-    this.options = map(fieldDefinition.listValues, (label, value) => {
+    this.options = map(listValues, (label, value) => {
       return (<Option key={value} value={value}>{label}</Option>);
     });
   }
@@ -47,7 +49,7 @@ export default class SelectWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, fieldDefinition, customProps, value} = this.props;
+    const {config, placeholder, customProps, value} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;

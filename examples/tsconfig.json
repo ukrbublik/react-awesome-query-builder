@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2017"
+    ],
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "exclude": ["node_modules"]
+}

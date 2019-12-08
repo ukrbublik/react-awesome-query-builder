@@ -1,45 +1,18 @@
 {
-  "name": "react-awesome-query-builder-demo",
+  "name": "react-awesome-query-builder-demo-local",
   "version": "0.2.0",
-  "description": "Demo for react-awesome-query-builder",
-  "main": "src/index.js",
-  "readme": "README.md",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
-  },
-  "files": [
-    "public/index.html",
-    "src/index.js",
-    "src/demo/config.js",
-    "src/demo/demo.js",
-    "src/demo/init_value.js",
-    "README.md"
-  ],
+  "description": "Local hot-reloadable demo for react-awesome-query-builder",
+  "main": "index.tsx",
   "scripts": {
-    "start": "SKIP_PREFLIGHT_CHECK=true react-scripts start",
-    "build": "SKIP_PREFLIGHT_CHECK=true react-scripts build",
-    "test": "SKIP_PREFLIGHT_CHECK=true react-scripts test --env=jsdom",
-    "eject": "SKIP_PREFLIGHT_CHECK=true react-scripts eject"
+    "start": "webpack-dev-server --config webpack.config.js -d --hot --inline --display-error-details --colors --history-api-fallback --no-info --port 3001",
+    "build": "webpack --config webpack.config.js"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "homepage": "https://ukrbublik.github.io/react-awesome-query-builder/",
   "dependencies": {
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-awesome-query-builder": "^1.0.1",
-    "react-scripts": "3.0.1"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react-awesome-query-builder": "file:..",
+    "webpack": "^4.41.2",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   }
 }

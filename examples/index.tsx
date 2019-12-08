@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import Demo from './src/demo/demo.js';
-import { hot } from 'react-hot-loader'
+import Demo from './demo/demo';
+import { hot } from 'react-hot-loader/root'
 
 import '../css/antd.less';
 import '../css/styles.scss';
@@ -31,12 +31,11 @@ class App extends Component {
 }
 
 
-const  AppContainer = hot(module)(App);
+const  AppContainer = hot(App);
 
 ReactDOM.render((
     <AppContainer>
         <Demo />
     </AppContainer>
 ), document.getElementById('root'));
-
 

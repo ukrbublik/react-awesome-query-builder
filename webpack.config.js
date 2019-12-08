@@ -1,32 +1,39 @@
 var webpack = require('webpack');
+var path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require('compression-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 var plugins = [
-    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-    })
+    }),
+    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
+    //new BundleAnalyzerPlugin(),
 ];
 
+var optimization = {};
+
 if (process.env.COMPRESS) {
-    plugins.push(
-        new webpack.optimize.UglifyJsPlugin({
-            output: {
-                comments: false
-            },
-            compressor: {
-                screw_ie8: true,
-                warnings: false
-            }
-        })
-    );
+    plugins = [
+        ...plugins,
+        new CompressionPlugin()
+    ];
+    optimization.minimizer = [new UglifyJsPlugin()];
 }
 
 module.exports = {
+    plugins,
+    optimization,
+    mode: process.env.NODE_ENV || "development",
     output: {
-        library: 'ReactQueryBuilder',
-        libraryTarget: 'umd'
+        library: 'ReactAwesomeQueryBuilder',
+        libraryTarget: 'umd',
+        path: path.resolve(__dirname, 'build/global'),
+        filename: 'ReactAwesomeQueryBuilder' + (process.env.COMPRESS ? '.min' : '') + '.js',
     },
-    _externals: [{
+    externals: [{
         react: {
             root: 'React',
             commonjs2: 'react',
@@ -41,40 +48,59 @@ module.exports = {
         }
     }],
     module: {
-        loaders: [
+        rules: [
+            {
+                test: /\.tsx?$/,
+                loader: 'ts-loader',
+                exclude: /node_modules/,
+            },
             {
                 test: /\.jsx?$/,
-                loaders: ['babel-loader'],
+                loader: 'babel-loader',
                 exclude: /node_modules/
             },
             {
                 test: /\.css$/,
-                loader: "style!css"
+                use: ["style-loader", "css-loader"]
             },
             {
                 test: /\.scss$/,
-                loader: "style!css!sass"
+                use: [{
+                    loader: "style-loader"
+                }, {
+                    loader: "css-loader"
+                }, {
+                    loader: "sass-loader"
+                }]
             },
             {
                 test: /\.less$/,
-                loader: "style!css!less"
+                use: [{
+                    loader: "style-loader"
+                }, {
+                    loader: "css-loader"
+                }, {
+                    loader: "less-loader",
+                    options: {
+                        javascriptEnabled: true
+                    }
+                }]
             }
         ],
     },
     resolve: {
-        extensions: ['', '.js'],
-        modulesDirectories: [
+        extensions: ['.tsx', '.ts', '.js', '.jsx'],
+        modules: [
             'node_modules',
-            __dirname,
+            //__dirname,
             __dirname + '/node_modules',
         ],
         alias: {
-            'ReactQueryBuilder': __dirname + 'modules/',
+            'ReactAwesomeQueryBuilder': __dirname + 'modules/',
             'immutable': 'immutable'
         }
     },
     node: {
         Buffer: false
-    },
-    plugins: plugins
+    }
 };

@@ -1,21 +1,21 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { DatePicker } from 'antd';
+import { TimePicker } from 'antd';
 import moment from 'moment';
 
 
-export default class DateTimeWidget extends PureComponent {
+export default class TimeWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        timeFormat: PropTypes.string,
-        dateFormat: PropTypes.string,
-        valueFormat: PropTypes.string,
         value: PropTypes.string, //in valueFormat
         config: PropTypes.object.isRequired,
         field: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
-        use12Hours: PropTypes.bool,
         customProps: PropTypes.object,
+        // from fieldSettings:
+        timeFormat: PropTypes.string,
+        valueFormat: PropTypes.string,
+        use12Hours: PropTypes.bool,
     };
 
     constructor(props) {
@@ -30,10 +30,10 @@ export default class DateTimeWidget extends PureComponent {
 
     static defaultProps = {
         timeFormat: 'HH:mm',
-        dateFormat: 'YYYY-MM-DD',
-        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'HH:mm:ss',
         use12Hours: false,
     };
+
 
     handleChange = (_value) => {
         const {setValue, valueFormat} = this.props;
@@ -43,20 +43,18 @@ export default class DateTimeWidget extends PureComponent {
     }
 
     render() {
-        const {placeholder, customProps, value, valueFormat, dateFormat, timeFormat, use12Hours, config} = this.props;
+        const {placeholder, customProps, value, valueFormat, timeFormat, use12Hours, config} = this.props;
         const {renderSize} = config.settings;
-        const dateValue = value ? moment(value, valueFormat) : null;
-        const dateTimeFrmat = dateFormat + ' ' + timeFormat;
+        const timeValue = value ? moment(value, valueFormat) : null;
 
         return (
-            <DatePicker
-                key="widget-datetime"
+            <TimePicker
                 use12Hours={use12Hours}
-                showTime={{ format: timeFormat }}
-                placeholder={placeholder}
+                key="widget-time"
                 size={renderSize}
-                format={dateTimeFrmat}
-                value={dateValue}
+                placeholder={placeholder}
+                format={timeFormat}
+                value={timeValue}
                 onChange={this.handleChange}
                 ref="datetime"
                 {...customProps}

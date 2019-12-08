@@ -107,13 +107,13 @@ export const sqlFormat = (item, config) => {
                         pick(fieldDefinition, ['fieldSettings', 'listValues']),
                         omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']), //useful options: valueFormat for date/time
                     ];
-                    if (valueSrc == 'field') {
-                        const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
-                        args.push(valFieldDefinition);
-                    }
                     if (true) {
                         args.push(operator);
                         args.push(operatorDefinition);
+                    }
+                    if (valueSrc == 'field') {
+                        const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
+                        args.push(valFieldDefinition);
                     }
                     ret = fn(...args);
                 } else {

@@ -157,8 +157,10 @@ const myConfig = {
 |listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
   Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
 |allowCustomValues |- for `MultiSelect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
-|fieldSettings | | |Settings for widgets. Example: `{min: 1, max: 10}` +
-  Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks`
+|defaultValue | | |Default value
+|fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
+  Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
+  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
