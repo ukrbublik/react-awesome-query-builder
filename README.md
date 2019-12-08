@@ -37,7 +37,8 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 ## Getting started
 Install: `npm i react-awesome-query-builder`  
 See [basic usage](#usage) below.  
-Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) for more advanced usage and configuration.
+Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) (TS) or [`sandbox/src/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox/src/demo) (JS) for more advanced usage and configuration.
+
 
 
 ## Usage
