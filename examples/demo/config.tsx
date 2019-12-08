@@ -246,6 +246,9 @@ const fields: Fields = {
         label: 'Date',
         type: 'date',
         valueSources: ['value'],
+        fieldSettings: {
+            dateFormat: 'DD-MM-YYYY',
+        }
     },
     time: {
         label: 'Time',
@@ -298,6 +301,11 @@ const fields: Fields = {
         valueSources: ['value'],
         label: 'In stock',
         type: 'boolean',
+        defaultValue: true,
+        fieldSettings: {
+            labelYes: "+",
+            labelNo: "-"
+        }
     },
 };
 

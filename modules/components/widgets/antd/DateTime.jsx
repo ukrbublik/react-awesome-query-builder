@@ -7,15 +7,16 @@ import moment from 'moment';
 export default class DateTimeWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        timeFormat: PropTypes.string,
-        dateFormat: PropTypes.string,
-        valueFormat: PropTypes.string,
         value: PropTypes.string, //in valueFormat
         config: PropTypes.object.isRequired,
         field: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
-        use12Hours: PropTypes.bool,
         customProps: PropTypes.object,
+        // from fieldSettings:
+        timeFormat: PropTypes.string,
+        dateFormat: PropTypes.string,
+        valueFormat: PropTypes.string,
+        use12Hours: PropTypes.bool,
     };
 
     constructor(props) {

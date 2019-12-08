@@ -6,9 +6,6 @@ export default class RangeWidget extends PureComponent {
 
   static propTypes = {
     setValue: PropTypes.func.isRequired,
-    min: PropTypes.number,
-    max: PropTypes.number,
-    step: PropTypes.number,
     placeholder: PropTypes.string,
     placeholders: PropTypes.array,
     textSeparators: PropTypes.array,
@@ -17,12 +14,18 @@ export default class RangeWidget extends PureComponent {
     value: PropTypes.array,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    // from fieldSettings:
+    min: PropTypes.number,
+    max: PropTypes.number,
+    step: PropTypes.number,
+    marks: PropTypes.object,
   };
 
   static defaultProps = {
     min: 0,
     max: 100,
     step: 1,
+    marks: undefined,
   };
 
   state = {
@@ -57,16 +60,11 @@ export default class RangeWidget extends PureComponent {
   tipFormatter = (val) => (val != undefined ? val.toString() : '')
 
   render() {
-    const {config, placeholder, placeholders, fieldDefinition, customProps, value,  min, max, step, marks, textSeparators} = this.props;
+    const {config, placeholder, placeholders, customProps, value,  min, max, step, marks, textSeparators} = this.props;
     const {renderSize} = config.settings;
-    const {fieldSettings} = fieldDefinition || {};
     const _customProps = customProps || {};
     const _value = value != undefined ? value : undefined;
     const [valueFrom, valueTo] = _value || [null, null];
-    const _min = fieldSettings.min != null ? fieldSettings.min : min;
-    const _max = fieldSettings.max != null ? fieldSettings.max : max;
-    const _step = fieldSettings.step != null ? fieldSettings.step : step;
-    const _marks = fieldSettings.marks != null ? fieldSettings.marks : marks;
 
     if (_value && (valueFrom == undefined || valueTo == undefined)) {
       // happens if we change value source - this leads to incomplete slider value, fix it:
@@ -85,9 +83,9 @@ export default class RangeWidget extends PureComponent {
             ref="numFrom"
             key="numFrom"
             value={valueFrom}
-            min={_min}
-            max={_max}
-            step={_step}
+            min={min}
+            max={max}
+            step={step}
             placeholder={placeholders[0]}
             onChange={this.handleChangeFrom}
             {...customProps}
@@ -102,10 +100,9 @@ export default class RangeWidget extends PureComponent {
             ref="numTo"
             key="numTo"
             value={valueTo}
-            min={_min}
-            max={_max}
-            marks={_marks}
-            step={_step}
+            min={min}
+            max={max}
+            step={step}
             placeholder={placeholders[1]}
             onChange={this.handleChangeTo}
             {...customProps}
@@ -116,10 +113,10 @@ export default class RangeWidget extends PureComponent {
             ref="slider"
             value={_value}
             tipFormatter={this.tipFormatter}
-            min={_min}
-            max={_max}
-            step={_step}
-            marks={_marks}
+            min={min}
+            max={max}
+            step={step}
+            marks={marks}
             included={false}
             range={true}
             //placeholder={placeholder}

@@ -34,7 +34,7 @@ type JsonRule = {
   properties: {
     field: String | Empty,
     operator: String | Empty,
-    value: Array<any>,
+    value: Array<RuleValue>,
     valueSrc: Array<ValueSource>,
     valueType: Array<String>,
     operatorOptions?: {}
@@ -100,39 +100,32 @@ type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op:
 type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
 type ValidateValue =       (val: RuleValue, fieldDef: Field) => Boolean;
 
-interface BaseWidgetSettings {
-  customProps?: {},
-};
-interface DateWidgetSettings extends BaseWidgetSettings {
-  timeFormat?: String,
-  dateFormat?: String,
-  valueFormat?: String,
-  use12Hours?: Boolean,
-};
-interface BooleanWidgetSettings extends BaseWidgetSettings {
-  labelYes?: ReactElement | String,
-  labelNo?: ReactElement | String,
-  defaultValue?: Boolean,
-};
-export type WidgetSettings = DateWidgetSettings | BooleanWidgetSettings | BaseWidgetSettings;
-
 interface BaseWidgetProps {
-  value: any,
-  setValue(val: any): void,
+  value: RuleValue,
+  setValue(val: RuleValue): void,
   placeholder: String,
   field: String,
   operator: String,
   fieldDefinition: Field,
   config: Config,
-  delta: Number,
+  delta?: Number,
+  customProps?: {},
 };
 interface RangeWidgetProps extends BaseWidgetProps {
   placeholders: Array<String>,
   textSeparators: Array<String>,
 };
-export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings & WidgetSettings;
+export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
 
-export interface BaseWidget extends BaseWidgetSettings {
+export type TextWidgetProps = BaseWidgetProps & BasicFieldSettings;
+export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
+export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
+export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
+export type SelectWidgetProps = BaseWidgetProps & SelectFieldSettings;
+export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
+
+export interface BaseWidget {
+  customProps?: {},
   type: String,
   factory: Factory<WidgetProps>,
   valueSrc?: ValueSource,
@@ -143,11 +136,12 @@ export interface BaseWidget extends BaseWidgetSettings {
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
 };
-export interface RangeWidget extends BaseWidget {
+export interface RangeableWidget extends BaseWidget {
   singleWidget?: String,
   valueLabels?: Array<String | {label: String, placeholder: String}>,
 };
-export interface FieldWidget extends BaseWidgetSettings {
+export interface FieldWidget {
+  customProps?: {},
   valueSrc: "field",
   valuePlaceholder?: String,
   valueLabel?: String,
@@ -155,10 +149,14 @@ export interface FieldWidget extends BaseWidgetSettings {
   formatValue: FormatValue, // with rightFieldDef
   sqlFormatValue: SqlFormatValue, // with rightFieldDef
 };
-export type DateWidget = BaseWidget & DateWidgetSettings;
-export type BooleanWidget = BaseWidget & BooleanWidgetSettings;
 
-export type Widget = FieldWidget | RangeWidget | DateWidget | BooleanWidget | BaseWidget;
+export type TextWidget = BaseWidget & BasicFieldSettings;
+export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
+export type BooleanWidget = BaseWidget & BooleanFieldSettings;
+export type NumberWidget = RangeableWidget & NumberFieldSettings;
+export type SelectWidget = BaseWidget & SelectFieldSettings;
+
+export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget  | RangeableWidget | BaseWidget;
 export type Widgets = TypedMap<Widget>;
 
 
@@ -183,9 +181,9 @@ export type Conjunctions = TypedMap<Conjunction>;
 // Operators
 /////////////////
 
-type FormatOperator = (field: String, op: String, vals: any, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}, isForDisplay?: Boolean) => String;
-type MongoFormatOperator = (field: string, op: String, vals: any, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
-type SqlFormatOperator = (field: String, op: String, vals: any, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => String;
+type FormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}, isForDisplay?: Boolean) => String;
+type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
+type SqlFormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => String;
 
 interface ProximityConfig {
   optionLabel: String,
@@ -270,7 +268,21 @@ interface NumberFieldSettings extends BasicFieldSettings {
   step?: Number,
   marks?: {[mark: number]: ReactElement | String}
 };
-export type FieldSettings = NumberFieldSettings | BasicFieldSettings;
+interface DateTimeFieldSettings extends BasicFieldSettings {
+  timeFormat?: String,
+  dateFormat?: String,
+  valueFormat?: String,
+  use12Hours?: Boolean,
+};
+interface SelectFieldSettings extends BasicFieldSettings {
+  listValues?: TypedMap<String>,
+  allowCustomValues?: Boolean,
+}
+interface BooleanFieldSettings extends BasicFieldSettings {
+  labelYes?: ReactElement | String,
+  labelNo?: ReactElement | String,
+};
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | BooleanFieldSettingss | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
@@ -287,19 +299,19 @@ interface SimpleField extends BaseField {
   valueSources?: Array<ValueSource>,
   tableName?: String,
   fieldSettings?: FieldSettings,
+  defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,
   mainWidgetProps?: Optional<Widget>,
+  //obsolete - moved to FieldSettings
+  listValues?: TypedMap<String>,
+  allowCustomValues?: Boolean,
 };
 interface FieldGroup extends BaseField {
   type: "!struct",
   subfields: Fields,
 };
-interface FieldWithValues extends SimpleField {
-  listValues?: TypedMap<String>,
-  allowCustomValues?: Boolean,
-};
 
-export type Field = FieldWithValues | SimpleField;
+export type Field = SimpleField;
 type FieldOrGroup = FieldGroup | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
@@ -450,15 +462,15 @@ export interface BasicConfig extends Config {
     proximity: OperatorProximity,
   },
   widgets: {
-    text: BaseWidget,
-    number: BaseWidget,
-    slider: BaseWidget,
-    rangeslider: RangeWidget,
-    select: BaseWidget,
-    multiselect: BaseWidget,
-    date: DateWidget,
-    time: DateWidget,
-    datetime: DateWidget,
+    text: TextWidget,
+    number: NumberWidget,
+    slider: NumberWidget,
+    rangeslider: NumberWidget,
+    select: SelectWidget,
+    multiselect: SelectWidget,
+    date: DateTimeWidget,
+    time: DateTimeWidget,
+    datetime: DateTimeWidget,
     boolean: BooleanWidget,
     field: FieldWidget,
   },
@@ -488,16 +500,16 @@ interface ReadyWidgets {
 
   ValueFieldWidget: ElementType<WidgetProps>,
 
-  TextWidget: ElementType<WidgetProps>,
-  NumberWidget: ElementType<WidgetProps>,
-  SliderWidget: ElementType<WidgetProps>,
-  RangeWidget: ElementType<WidgetProps>,
-  SelectWidget: ElementType<WidgetProps>,
-  MultiSelectWidget: ElementType<WidgetProps>,
-  DateWidget: ElementType<WidgetProps>,
-  BooleanWidget: ElementType<WidgetProps>,
-  TimeWidget: ElementType<WidgetProps>,
-  DateTimeWidget: ElementType<WidgetProps>,
+  TextWidget: ElementType<TextWidgetProps>,
+  NumberWidget: ElementType<NumberWidgetProps>,
+  SliderWidget: ElementType<NumberWidgetProps>,
+  RangeWidget: ElementType<RangeSliderWidgetProps>,
+  SelectWidget: ElementType<SelectWidgetProps>,
+  MultiSelectWidget: ElementType<SelectWidgetProps>,
+  DateWidget: ElementType<DateTimeWidgetProps>,
+  TimeWidget: ElementType<DateTimeWidgetProps>,
+  DateTimeWidget: ElementType<DateTimeWidgetProps>,
+  BooleanWidget: ElementType<BooleanWidgetProps>,
 };
 
 

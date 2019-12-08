@@ -102,6 +102,16 @@ function _extendFieldConfig(field, fieldConfig, config) {
             fieldConfig.operators = Array.from(new Set(operators));
         if (!fieldConfig.defaultOperator && defaultOperator)
             fieldConfig.defaultOperator = defaultOperator;
+
+        const keysToPutInFieldSettings = ['listValues', 'allowCustomValues'];
+        if (!fieldConfig.fieldSettings)
+            fieldConfig.fieldSettings = {};
+        for (const k of keysToPutInFieldSettings) {
+            if (fieldConfig[k]) {
+                fieldConfig.fieldSettings[k] = fieldConfig[k];
+                delete fieldConfig[k];
+            }
+        }
     }
 };
 

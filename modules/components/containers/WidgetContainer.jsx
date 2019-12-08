@@ -226,7 +226,8 @@ const WidgetFactory = ({
     ;
     if (isSpecialRange && value[0] === undefined && value[1] === undefined)
         value = undefined;
-    const widgetProps = Object.assign({}, fieldWidgetProps, {
+    const {fieldSettings} = fieldDefinition || {};
+    const widgetProps = Object.assign({}, fieldWidgetProps, fieldSettings, {
         config: config,
         field: field,
         fieldDefinition: fieldDefinition,

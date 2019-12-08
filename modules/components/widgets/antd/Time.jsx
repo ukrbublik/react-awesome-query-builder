@@ -7,14 +7,15 @@ import moment from 'moment';
 export default class TimeWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        timeFormat: PropTypes.string,
-        valueFormat: PropTypes.string,
-        use12Hours: PropTypes.bool,
         value: PropTypes.string, //in valueFormat
         config: PropTypes.object.isRequired,
         field: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
+        // from fieldSettings:
+        timeFormat: PropTypes.string,
+        valueFormat: PropTypes.string,
+        use12Hours: PropTypes.bool,
     };
 
     constructor(props) {

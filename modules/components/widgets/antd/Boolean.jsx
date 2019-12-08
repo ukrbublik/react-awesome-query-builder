@@ -5,12 +5,13 @@ import { Switch, Icon } from 'antd';
 export default class BooleanWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        labelYes: PropTypes.string,
-        labelNo: PropTypes.string,
         value: PropTypes.bool,
         config: PropTypes.object.isRequired,
         field: PropTypes.string.isRequired,
         customProps: PropTypes.object,
+        // from fieldSettings:
+        labelYes: PropTypes.string,
+        labelNo: PropTypes.string,
     }
 
     handleChange = (val) => {

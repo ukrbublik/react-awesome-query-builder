@@ -3,6 +3,9 @@
   - Added TypeScript support (`examples` uses TS, `sandbox` uses JS)
   - Updated Babel, Webpack
   - For `field` widget slightly changed format of `formatValue()` and `sqlFormatValue()` functions - argument `rightFieldDef` is now last one
+  - Added `defaultValue` in field config
+  - All `fieldSettings` will be now passed to widget props
+  - `listValues` and `allowCustomValues` moved inside `fieldSettings`
 - 1.0.4
   - Added `QbUtils.sqlFormat()` (issue #29)
   - Added `like` and `not_like` operators
