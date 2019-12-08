@@ -282,7 +282,7 @@ interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | String,
   labelNo?: ReactElement | String,
 };
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | BooleanFieldSettingss | BasicFieldSettings;
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
