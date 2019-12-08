@@ -1,22 +1,22 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
-  getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
-} from "../../utils/configUtils";
-import {truncateString} from "../../utils/stuff";
+  getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
+} from "../utils/configUtils";
+import {truncateString} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import clone from 'clone';
 
 //tip: this.props.value - right value, this.props.field - left value
 
-export default class ValueField extends PureComponent {
+export default class FuncSelect extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
     value: PropTypes.string,
-    operator: PropTypes.string,
+    operator: PropTypes.string.isRequired,
     customProps: PropTypes.object,
   };
 
@@ -42,46 +42,45 @@ export default class ValueField extends PureComponent {
   }
 
   getItems({config, field, operator}) {
-    const {canCompareFieldWithField} = config.settings;
-    const filteredFields = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
-    const items = this.buildOptions(config, filteredFields);
+    const {canUseFuncForField} = config.settings;
+    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField);
+    const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
 
   getMeta({config, field, operator, value}) {
-    const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
-    const selectedKey = value;
-    const isFieldSelected = !!value;
+    const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
+    const selectedFuncKey = value;
+    const isFuncSelected = !!value;
 
     const leftFieldConfig = getFieldConfig(field, config);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    const placeholder = !isFieldSelected ? (leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder) : null;
+    const placeholder = !isFuncSelected ? funcPlaceholder : null;
 
-    const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
-    const selectedOpts = currField || {};
+    const currFunc = isFuncSelected ? getFuncConfig(selectedFuncKey, config) : null;
+    const selectedOpts = currFunc || {};
 
-    const selectedKeys = getFieldPath(selectedKey, config);
-    const selectedPath = getFieldPath(selectedKey, config, true);
-    const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
-    const partsLabels = getFieldPathLabels(selectedKey, config);
+    const selectedKeys = getFieldPath(selectedFuncKey, config);
+    const selectedPath = getFieldPath(selectedFuncKey, config, true);
+    const selectedLabel = this.getFuncLabel(currFunc, selectedFuncKey, config);
+    const partsLabels = getFieldPathLabels(selectedFuncKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel)
         selectedFullLabel = null;
-    const selectedAltLabel = selectedOpts.label2;
 
     return {
       placeholder,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+      selectedKey: selectedFuncKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedFullLabel,
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, operator, canCompareFieldWithField) {
-    fields = clone(fields);
+  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField) {
+    funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
     let expectedType;
-    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
     if (widget) {
       let widgetConfig = config.widgets[widget];
       let widgetType = widgetConfig.type;
@@ -92,65 +91,61 @@ export default class ValueField extends PureComponent {
     }
 
     function _filter(list, path) {
-      for (let rightFieldKey in list) {
-        let subfields = list[rightFieldKey].subfields;
-        let subpath = (path ? path : []).concat(rightFieldKey);
-        let rightFieldFullkey = subpath.join(fieldSeparator);
-        let rightFieldConfig = getFieldConfig(rightFieldFullkey, config);
-        if (rightFieldConfig.type == "!struct") {
+      for (let funcKey in list) {
+        let subfields = list[funcKey].subfields;
+        let subpath = (path ? path : []).concat(funcKey);
+        let funcFullkey = subpath.join(fieldSeparator);
+        let funcConfig = getFuncConfig(funcFullkey, config);
+        if (funcConfig.type == "!struct") {
           if(_filter(subfields, subpath) == 0)
-            delete list[rightFieldKey];
+            delete list[funcKey];
         } else {
-          let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
-          let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
-          if (fn)
-            canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig);
+          let canUse = funcConfig.returnType == expectedType;
+          if (canUseFuncForField)
+            canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
           if (!canUse)
-            delete list[rightFieldKey];
+            delete list[funcKey];
         }
       }
       return keys(list).length;
     }
 
-    _filter(fields, []);
+    _filter(funcs, []);
 
-    return fields;
+    return funcs;
   }
 
-  buildOptions(config, fields, path = null, optGroupLabel = null) {
-    if (!fields)
+  buildOptions(config, funcs, path = null, optGroupLabel = null) {
+    if (!funcs)
         return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
 
-    return keys(fields).map(fieldKey => {
-        const field = fields[fieldKey];
-        const label = this.getFieldLabel(field, fieldKey, config);
-        const partsLabels = getFieldPathLabels(fieldKey, config);
+    return keys(funcs).map(funcKey => {
+        const func = funcs[funcKey];
+        const label = this.getFuncLabel(func, funcKey, config);
+        const partsLabels = getFieldPathLabels(funcKey, config);
         let fullLabel = partsLabels.join(fieldSeparatorDisplay);
         if (fullLabel == label)
             fullLabel = null;
-        const altLabel = field.label2;
-        const tooltip = field.tooltip;
-        const subpath = (path ? path : []).concat(fieldKey);
+        const tooltip = func.tooltip;
+        const subpath = (path ? path : []).concat(funcKey);
 
-        if (field.type == "!struct") {
+        if (func.type == "!struct") {
             return {
-                key: fieldKey,
-                path: prefix+fieldKey,
+                key: funcKey,
+                path: prefix+funcKey,
                 label,
                 fullLabel,
-                altLabel,
                 tooltip,
-                items: this.buildOptions(config, field.subfields, subpath, label)
+                items: this.buildOptions(config, func.subfields, subpath, label)
             };
         } else {
             return {
-                key: fieldKey,
-                path: prefix+fieldKey,
+                key: funcKey,
+                path: prefix+funcKey,
                 label,
                 fullLabel,
-                altLabel,
                 tooltip,
                 grouplabel: optGroupLabel
             };
@@ -158,19 +153,19 @@ export default class ValueField extends PureComponent {
     });
   }
 
-  getFieldLabel(fieldOpts, fieldKey, config) {
-      if (!fieldKey) return null;
+  getFuncLabel(funcOpts, funcKey, config) {
+      if (!funcKey) return null;
       let fieldSeparator = config.settings.fieldSeparator;
       let maxLabelsLength = config.settings.maxLabelsLength;
-      let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-      let label = fieldOpts.label || last(fieldParts);
+      let funcParts = Array.isArray(funcKey) ? funcKey : funcKey.split(fieldSeparator);
+      let label = funcOpts.label || last(funcParts);
       label = truncateString(label, maxLabelsLength);
       return label;
   }
 
   render() {
       const {config, customProps, setValue} = this.props;
-      const {renderField} = config.settings;
+      const {renderFunc} = config.settings;
       const renderProps = {
           config,
           customProps,
@@ -178,7 +173,7 @@ export default class ValueField extends PureComponent {
           items: this.items,
           ...this.meta
       };
-      return renderField(renderProps);
+      return renderFunc(renderProps);
   }
 
 }

@@ -18,7 +18,9 @@ const {
     TimeWidget,
     DateTimeWidget,
 
-    ValueFieldWidget
+    ValueFieldWidget,
+
+    FuncWidget
 } = Widgets;
 const { ProximityOperator } = Operators;
 
@@ -549,7 +551,22 @@ const widgets = {
       customProps: {
           showSearch: true
       }
-  }
+  },
+  func: {
+    valueSrc: 'func',
+    factory: (props) => <FuncWidget {...props} />,
+    // formatValue: (val, fieldDef, wgtDef, isForDisplay, op, opDef, rightFieldDef) => {
+    //     return isForDisplay ? (rightFieldDef.label || val) : val;
+    // },
+    // sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef) => {
+    //     return val;
+    // },
+    valueLabel: "Function",
+    valuePlaceholder: "Select function",
+    customProps: {
+        showSearch: true
+    }
+},
 };
 
 //----------------------------  types

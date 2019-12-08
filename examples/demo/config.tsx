@@ -3,7 +3,7 @@ import merge from 'lodash/merge';
 import {
     Widgets, BasicConfig,
     // types:
-    Operators, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity,
+    Operators, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
@@ -127,6 +127,7 @@ const localeSettings: LocaleSettings = {
     fieldLabel: "Field",
     operatorLabel: "Operator",
     fieldPlaceholder: "Select field",
+    funcPlaceholder: "Select function",
     operatorPlaceholder: "Select operator",
     deleteLabel: null,
     addGroupLabel: "Add group",
@@ -157,6 +158,10 @@ const settings: Settings = {
         field: {
             label: "Field",
             widget: "field",
+        },
+        func: {
+            label: "Function",
+            widget: "func",
         }
     },
     // canReorder: true,
@@ -168,6 +173,7 @@ const settings: Settings = {
     // renderField: (props) => <FieldCascader {...props} />,
     
     renderOperator: (props) => <FieldDropdown {...props} />,
+    renderFunc: (props) => <FieldDropdown {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -309,6 +315,57 @@ const fields: Fields = {
     },
 };
 
+//////////////////////////////////////////////////////////////////////
+
+const funcs: Funcs = {
+    SUM: {
+        label: 'Sum',
+        returnType: 'number',
+        args: {
+            a: {
+                type: 'number',
+                valueSources: ['value', 'field'],
+                fieldSettings: {
+                    min: 0,
+                    max: 100,
+                }
+            },
+            b: {
+                type: 'number',
+                valueSources: ['value'],
+                fieldSettings: {
+                    min: 0,
+                    max: 100,
+                }
+            },
+            c: {
+                type: 'number',
+                defaultValue: 44,
+                valueSources: ['const'],
+            }
+        }
+    },
+    LOWER: {
+        label: 'Lowercase',
+        returnType: 'text',
+        args: {
+            str: {
+                type: 'text',
+                valueSources: ['value', 'field'],
+            },
+            opt: {
+                type: 'select',
+                defaultValue: 'opt1',
+                listValues: {
+                    opt1: 'Opt1',
+                    opt2: 'Opt2',
+                },
+            }
+        }
+    }
+};
+
+
 const config: Config = {
     conjunctions,
     operators,
@@ -316,6 +373,7 @@ const config: Config = {
     types,
     settings,
     fields,
+    funcs
 };
 
 export default config;

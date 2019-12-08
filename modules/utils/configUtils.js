@@ -115,12 +115,12 @@ function _extendFieldConfig(field, fieldConfig, config) {
     }
 };
 
-export const getFieldRawConfig = (field, config) => {
+export const getFieldRawConfig = (field, config, fieldsKey = 'fields', subfieldsKey = 'subfields') => {
     if (!field || field == ':empty:')
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
     const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-    let fields = config.fields;
+    let fields = config[fieldsKey];
     let fieldConfig = null;
     for (let i = 0 ; i < parts.length ; i++) {
         const part = parts[i];
@@ -130,12 +130,21 @@ export const getFieldRawConfig = (field, config) => {
         if (i == parts.length-1) {
             fieldConfig = tmpFieldConfig;
         } else {
-            fields = tmpFieldConfig.subfields;
+            fields = tmpFieldConfig[subfieldsKey];
             if (!fields)
                 return null;
         }
     }
     return fieldConfig;
+};
+
+export const getFuncConfig = (func, config) => {
+    if (!func)
+        return null;
+    const funcConfig = getFieldRawConfig(func, config, 'funcs', 'subfields');
+    if (!funcConfig)
+        return null; //throw new Error("Can't find func " + func + ", please check your config");
+    return funcConfig;
 };
 
 export const getFieldConfig = (field, config) => {

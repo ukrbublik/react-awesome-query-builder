@@ -25,6 +25,8 @@ export const settings = {
   // renderOperator: (props) => <FieldDropdown {...props} />,
   // renderOperator: (props) => <VanillaFieldSelect {...props} />,
 
+  renderFunc: (props) => <FieldSelect {...props} />,
+
   valueSourcesInfo: {
       value: {},
   },
@@ -50,6 +52,7 @@ export const settings = {
   fieldLabel: "Field",
   operatorLabel: "Operator",
   fieldPlaceholder: "Select field",
+  funcPlaceholder: "Select function",
   operatorPlaceholder: "Select operator",
   deleteLabel: null,
   addGroupLabel: "Add group",

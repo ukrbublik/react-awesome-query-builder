@@ -18,7 +18,7 @@ type TypedMap<T> = {
 };
 type Empty = null | undefined;
 
-type ValueSource = "value" | "field";
+type ValueSource = "value" | "field" | "func" | "const";
 
 type JsonGroup = {
   type: "group",
@@ -73,6 +73,7 @@ export interface QueryProps {
   types: Types;
   settings: Settings;
   fields: Fields;
+  funcs?: Fincs;
   value: ImmutableTree;
   onChange(immutableTree: ImmutableTree, config: Config): void;
   renderBuilder(props: BuilderProps): ReactElement;
@@ -88,6 +89,7 @@ export interface Config {
   types: Types,
   settings: Settings,
   fields: Fields,
+  funcs?: Funcs,
 };
 
 
@@ -289,12 +291,8 @@ interface BaseField {
   label?: String,
   tooltip?: String,
 };
-interface SimpleField extends BaseField {
+interface ValueField extends BaseField {
   type: String,
-  label2?: String,
-  operators?: Array<String>,
-  defaultOperator?: String,
-  excludeOperators?: Array<String>,
   preferWidgets?: Array<String>,
   valueSources?: Array<ValueSource>,
   tableName?: String,
@@ -305,6 +303,12 @@ interface SimpleField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
+};
+interface SimpleField extends ValueField {
+  label2?: String,
+  operators?: Array<String>,
+  defaultOperator?: String,
+  excludeOperators?: Array<String>,
 };
 interface FieldGroup extends BaseField {
   type: "!struct",
@@ -351,13 +355,13 @@ export interface FieldProps {
 // Settings
 /////////////////
 
-type ValueSourcesInfo = {[vs in ValueSource]: {label: String, widget?: String}};
+type ValueSourcesInfo = {[vs in ValueSource]?: {label: String, widget?: String}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: String, op: String, reversedOp: String, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: Boolean) => String;
 type FormatField = (field: String, parts: Array<String>, label2: String, fieldDefinition: Field, config: Config, isForDisplay: Boolean) => String;
-type CanCompareFieldWithField = (leftField: String, leftFieldConfig: Field, rightField: String, rightFieldConfig: Field) => Boolean;
+type CanCompareFieldWithField = (leftField: String, leftFieldConfig: Field, rightField: String, rightFieldConfig: Field, op: String) => Boolean;
 
 export interface LocaleSettings {
   locale?: {
@@ -370,6 +374,7 @@ export interface LocaleSettings {
   fieldLabel?: String,
   operatorLabel?: String,
   fieldPlaceholder?: String,
+  funcPlaceholder?: String,
   operatorPlaceholder?: String,
   deleteLabel?: String,
   addGroupLabel?: String,
@@ -392,6 +397,7 @@ export interface LocaleSettings {
 export interface RenderSettings {
   renderField?: Factory<FieldProps>;
   renderOperator?: Factory<FieldProps>;
+  renderFunc?: Factory<FieldProps>;
   renderConjsAsRadios?: Boolean,
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
@@ -427,6 +433,20 @@ export interface MainSettings {
 }
 
 export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & FormatSettings & MainSettings;
+
+
+/////////////////
+// Funcs
+/////////////////
+
+export interface Func {
+  label?: String,
+  returnType: String,
+  args: TypedMap<FuncArg>
+};
+export interface FuncArg extends ValueField {
+};
+export type Funcs = TypedMap<Func>;
 
 
 /////////////////

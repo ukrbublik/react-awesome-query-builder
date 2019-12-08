@@ -300,6 +300,6 @@ export default {
     widgets,
     types,
     settings,
-    fields: fields,
+    fields,
 };
 
