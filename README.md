@@ -31,6 +31,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Reordering support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/)
 - Export to MongoDb, SQL or your custom format
+- TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo))
 
 
 ## Getting started
