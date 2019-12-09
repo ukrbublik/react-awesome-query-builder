@@ -5,9 +5,11 @@
         "@babel/preset-react"
     ],
     "plugins": [
-        "@babel/plugin-proposal-class-properties",
         ["@babel/plugin-proposal-decorators", {
-            "decoratorsBeforeExport": true
+            "legacy": true
+        }],
+        ["@babel/plugin-proposal-class-properties", {
+            "loose": true
         }],
         ["import", {
             "libraryName": "antd",

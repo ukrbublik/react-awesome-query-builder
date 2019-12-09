@@ -1,5 +1,7 @@
 # Changelog
-- 1.0.5
+- 1.0.7
+  - Fixed Babel
+- 1.0.6
   - Added TypeScript support (`examples` uses TS, `sandbox` uses JS)
   - Updated Babel, Webpack
   - For `field` widget slightly changed format of `formatValue()` and `sqlFormatValue()` functions - argument `rightFieldDef` is now last one
