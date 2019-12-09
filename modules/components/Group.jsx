@@ -1,33 +1,21 @@
 import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import map from 'lodash/map';
 import startsWith from 'lodash/startsWith'
 import GroupContainer from './containers/GroupContainer';
 import Draggable from './containers/Draggable';
-import { Icon, Button, Radio, Modal } from 'antd';
+import { Icon, Modal } from 'antd';
 const { confirm } = Modal;
-const ButtonGroup = Button.Group;
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
 const classNames = require('classnames');
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 import Item from './Item';
+import {ConjsRadios, ConjsButtons} from './Conjs';
+import {Actions} from './Actions';
 
+const defaultPosition = 'topRight';
 
-export const groupActionsPositionList = {
-  topLeft: 'group--actions--tl',
-  topCenter: 'group--actions--tc',
-  topRight: 'group--actions--tr',
-  bottomLeft: 'group--actions--bl',
-  bottomCenter: 'group--actions--bc',
-  bottomRight: 'group--actions--br'
-}
-
-const defaultPosition = 'topRight'
 
 @GroupContainer
 @Draggable("group")
-class Group extends Component {
+class Group extends PureComponent {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     treeNodesCnt: PropTypes.number,
@@ -52,18 +40,6 @@ class Group extends Component {
     setNot: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
   };
-
-  pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-  shouldComponentUpdate = this.pureShouldComponentUpdate;
-
-  constructor(props) {
-    super(props);
-  }
-
-  getGroupPositionClass = () => {
-    const { groupActionsPosition } = this.props.config.settings
-    return groupActionsPositionList[groupActionsPosition] || groupActionsPositionList[defaultPosition]
-  }
 
   isGroupTopPosition = () => {
     return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, 'top')
@@ -102,7 +78,6 @@ class Group extends Component {
 
   isEmptyRule = (rule) => {
     const properties = rule.get('properties');
-    console.log(rule.toJS(), properties.toJS());
       return !(
           properties.get("field") !== null &&
           properties.get("operator") !== null &&
@@ -130,10 +105,8 @@ class Group extends Component {
   }
 
   renderActions = () => {
-    const position = this.getGroupPositionClass();
     return <Actions
       config={this.props.config}
-      position={position}
       addRule={this.props.addRule}
       addGroup={this.props.addGroup}
       allowFurtherNesting={this.props.allowFurtherNesting}
@@ -196,125 +169,4 @@ class Group extends Component {
 }
 
 
-class ConjsButtons extends PureComponent {
-  constructor(props) {
-    super(props);
-
-    this._setConjunctionHandlers = {};
-  }
-
-  _setConjunction = (itemKey, e) => {
-    this.props.setConjunction(e, itemKey);
-  }
-
-  _getSetConjunctionHandler = (itemKey = null) => {
-    const k = '' + itemKey;
-    let h = this._setConjunctionHandlers[k];
-    if (!h) {
-      h = this._setConjunction.bind(this, itemKey)
-      this._setConjunctionHandlers[k] = h;
-    }
-    return h;
-  }
-
-  render() {
-    const {disabled, not, setNot, conjunctionOptions, config} = this.props;
-    return (
-      <ButtonGroup
-        key="group-conjs-buttons"
-        size={config.settings.renderSize}
-        disabled={disabled}
-      >
-        {config.settings.showNot &&
-          <Button
-            key={"group-not"}
-            onClick={(ev) => setNot(ev, !this.props.not)}
-            type={not ? "primary" : null}
-          >{config.settings.notLabel}</Button>
-        }
-        {map(conjunctionOptions, (item, index) => (
-          <Button
-            disabled={disabled}
-            key={item.id}
-            type={item.checked ? "primary" : null}
-            onClick={this._getSetConjunctionHandler(item.key)}
-          >{item.label}</Button>
-        ))}
-      </ButtonGroup>
-    );
-  }
-}
-
-
-class ConjsRadios extends PureComponent {
-  render() {
-    const {disabled, selectedConjunction, setConjunction, conjunctionOptions, config} = this.props;
-    return (
-      <RadioGroup
-        key="group-conjs-radios"
-        disabled={disabled}
-        value={selectedConjunction}
-        size={config.settings.renderSize}
-        onChange={setConjunction}
-      >
-        {map(conjunctionOptions, (item, index) => (
-          <RadioButton
-            key={item.id}
-            value={item.key}
-          //checked={item.checked}
-          >{item.label}</RadioButton>
-        ))}
-      </RadioGroup>
-    );
-  }
-}
-
-
-class Actions extends PureComponent {
-  render() {
-    const {config, position, addRule, addGroup, allowFurtherNesting, isRoot, removeSelf} = this.props;
-
-    const immutableGroupsMode = config.settings.immutableGroupsMode;
-    const addRuleLabel = config.settings.addRuleLabel;
-    const addGroupLabel = config.settings.addGroupLabel;
-    const delGroupLabel = config.settings.delGroupLabel;
-
-    const addRuleBtn = !immutableGroupsMode &&
-      <Button
-        key="group-add-rule"
-        icon="plus"
-        className="action action--ADD-RULE"
-        onClick={addRule}
-      >{addRuleLabel}</Button>;
-    const addGroupBtn = !immutableGroupsMode && allowFurtherNesting &&
-      <Button
-        key="group-add-group"
-        className="action action--ADD-GROUP"
-        icon="plus-circle-o"
-        onClick={addGroup}
-      >{addGroupLabel}</Button>;
-    const delGroupBtn = !immutableGroupsMode && !isRoot &&
-      <Button
-        key="group-del"
-        type="danger"
-        icon="delete"
-        className="action action--DELETE"
-        onClick={removeSelf}
-      >{delGroupLabel}</Button>;
-
-    return (
-      <div className={`group--actions ${position}`}>
-        <ButtonGroup
-          size={config.settings.renderSize}
-        >
-          {addRuleBtn}
-          {addGroupBtn}
-          {delGroupBtn}
-        </ButtonGroup>
-      </div>
-    )
-  }
-}
-
 export default Group;
-

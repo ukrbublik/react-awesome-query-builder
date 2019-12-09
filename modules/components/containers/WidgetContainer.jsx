@@ -6,9 +6,7 @@ import {
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
 import {defaultValue} from "../../utils/stuff";
-import { Icon, Popover, Button, Radio } from 'antd';
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
+import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
 
 
@@ -18,11 +16,13 @@ export default (Widget) => {
             config: PropTypes.object.isRequired,
             value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
             valueSrc: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-            field: PropTypes.string.isRequired,
+            field: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
             operator: PropTypes.string.isRequired,
             //actions
             setValue: PropTypes.func,
             setValueSrc: PropTypes.func,
+            //
+            isFuncArg: PropTypes.bool,
         };
 
         constructor(props) {
@@ -33,7 +33,7 @@ export default (Widget) => {
 
         componentWillReceiveProps(nextProps) {
             const prevProps = this.props;
-            const keysForMeta = ["config", "field", "operator", "valueSrc"];
+            const keysForMeta = ["config", "field", "operator", "valueSrc", "isFuncArg"];
             const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
             if (needUpdateMeta) {
@@ -58,12 +58,12 @@ export default (Widget) => {
             this.props.setValueSrc(delta, srcKey);
         }
 
-        getMeta({config, field, operator, valueSrc: valueSrcs}) {
+        getMeta({config, field, operator, valueSrc: valueSrcs, isFuncArg}) {
+            const fieldDefinition = getFieldConfig(field, config);
             const defaultWidget = getWidgetForFieldOp(config, field, operator);
             const _widgets = getWidgetsForFieldOp(config, field, operator);
-            const fieldDefinition = getFieldConfig(field, config);
             const operatorDefinition = getOperatorConfig(config, operator, field);
-            if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
+            if (fieldDefinition == null || operatorDefinition == null) {
                 return null;
             }
             const isSpecialRange = operatorDefinition.isSpecialRange;
@@ -217,8 +217,9 @@ const WidgetFactory = ({
 }) => {
     const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
 
-    if (!widgetFactory)
+    if (!widgetFactory) {
         return '?';
+    }
     
     let value = isSpecialRange ? 
         [immValue.get(0), immValue.get(1)] 
@@ -248,44 +249,3 @@ const WidgetFactory = ({
     
     return widgetFactory(widgetProps);
 };
-
-
-class ValueSources extends PureComponent {
-    render() {
-        const {config, valueSources, valueSrc, setValueSrcHandler} = this.props;
-        
-        const valueSourcesInfo = config.settings.valueSourcesInfo;
-        const valueSourcesPopupTitle = config.settings.valueSourcesPopupTitle;
-        //const fieldDefinition = getFieldConfig(field, config);
-        //let valueSources = fieldDefinition.valueSources;
-        //let valueSources = getValueSourcesForFieldOp(config, field, operator);
-
-        if (!valueSources || Object.keys(valueSources).length == 1)
-            return null;
-
-        let content = (
-            <RadioGroup
-                value={valueSrc || "value"}
-                size={config.settings.renderSize}
-                onChange={setValueSrcHandler}
-            >
-                {valueSources.map(srcKey => (
-                    <RadioButton
-                        key={srcKey}
-                        value={srcKey}
-                    //checked={item.checked}
-                    >{valueSourcesInfo[srcKey].label}</RadioButton>
-                ))}
-            </RadioGroup>
-        );
-
-        return (
-            <span>
-                <Popover content={content} title={valueSourcesPopupTitle}>
-                    <Icon type="ellipsis" />
-                </Popover>
-            </span>
-        );
-    }
-}
-

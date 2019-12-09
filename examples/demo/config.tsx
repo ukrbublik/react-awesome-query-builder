@@ -350,6 +350,7 @@ const funcs: Funcs = {
         returnType: 'text',
         args: {
             str: {
+                label: "String",
                 type: 'text',
                 valueSources: ['value', 'field'],
             },

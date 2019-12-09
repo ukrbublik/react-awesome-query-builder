@@ -150,6 +150,8 @@ export const getFuncConfig = (func, config) => {
 export const getFieldConfig = (field, config) => {
     if (!field || field == ':empty:')
         return null;
+    if (typeof field == "object")
+        return field;
     const fieldConfig = getFieldRawConfig(field, config);
     if (!fieldConfig)
         return null; //throw new Error("Can't find field " + field + ", please check your config");
@@ -210,7 +212,11 @@ export const getFieldPath = (field, config, onlyKeys = false) => {
             .map((parts) => parts.join(fieldSeparator));
 };
 
-export const getFieldPathLabels = (field, config) => {
+export const getFuncPathLabels = (field, config) => {
+    return getFieldPathLabels(field, config, 'funcs', 'subfields');
+};
+
+export const getFieldPathLabels = (field, config, fieldsKey = 'fields', subfieldsKey = 'subfields') => {
     if (!field || field == ':empty:')
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
@@ -219,7 +225,7 @@ export const getFieldPathLabels = (field, config) => {
         .map((_curr, ind, arr) => arr.slice(0, ind+1))
         .map((parts) => parts.join(fieldSeparator))
         .map(part => {
-            const cnf = getFieldConfig(part, config);
+            const cnf = getFieldRawConfig(part, config, fieldsKey, subfieldsKey);
             return cnf && cnf.label || last(part.split(fieldSeparator))
         });
 };
@@ -292,8 +298,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator, valueSrc = null)
     let valueSrcs = [];
     if (!field || !operator)
         return {widgets, valueSrcs};
-    const fieldConfig = getFieldConfig(field, config);
-    const _typeConfig = config.types[fieldConfig.type] || {};
+    const fieldConfig = typeof field == "object" ? field : getFieldConfig(field, config);
     const opConfig = config.operators[operator];
     if (fieldConfig && fieldConfig.widgets) {
         for (let widget in fieldConfig.widgets) {

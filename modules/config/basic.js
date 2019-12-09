@@ -564,7 +564,7 @@ const widgets = {
     valueLabel: "Function",
     valuePlaceholder: "Select function",
     customProps: {
-        showSearch: true
+        //showSearch: true
     }
 },
 };

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
-  getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
+  getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getFuncPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../utils/configUtils";
 import {truncateString} from "../utils/stuff";
 import last from 'lodash/last';
@@ -12,12 +12,12 @@ import clone from 'clone';
 
 export default class FuncSelect extends PureComponent {
   static propTypes = {
-    setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
-    value: PropTypes.string,
     operator: PropTypes.string.isRequired,
     customProps: PropTypes.object,
+    value: PropTypes.string,
+    setValue: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -29,7 +29,7 @@ export default class FuncSelect extends PureComponent {
   componentWillReceiveProps(nextProps) {
       const prevProps = this.props;
       const keysForItems = ["config", "field", "operator"];
-      const keysForMeta = ["config", "field", "operator", "value"];
+      const keysForMeta = ["config", "field", "value"];
       const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -48,7 +48,7 @@ export default class FuncSelect extends PureComponent {
     return items;
   }
 
-  getMeta({config, field, operator, value}) {
+  getMeta({config, field, value}) {
     const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
@@ -64,7 +64,7 @@ export default class FuncSelect extends PureComponent {
     const selectedKeys = getFieldPath(selectedFuncKey, config);
     const selectedPath = getFieldPath(selectedFuncKey, config, true);
     const selectedLabel = this.getFuncLabel(currFunc, selectedFuncKey, config);
-    const partsLabels = getFieldPathLabels(selectedFuncKey, config);
+    const partsLabels = getFuncPathLabels(selectedFuncKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel)
         selectedFullLabel = null;
@@ -124,7 +124,7 @@ export default class FuncSelect extends PureComponent {
     return keys(funcs).map(funcKey => {
         const func = funcs[funcKey];
         const label = this.getFuncLabel(func, funcKey, config);
-        const partsLabels = getFieldPathLabels(funcKey, config);
+        const partsLabels = getFuncPathLabels(funcKey, config);
         let fullLabel = partsLabels.join(fieldSeparatorDisplay);
         if (fullLabel == label)
             fullLabel = null;
