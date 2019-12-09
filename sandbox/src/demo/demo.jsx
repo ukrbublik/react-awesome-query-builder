@@ -5,7 +5,7 @@ import loadedConfig from './config';
 import loadedInitValue from './init_value';
 
 const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
-const stringify = require('json-stringify-safe');
+const stringify = JSON.stringify;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 
 const emptyInitValue = {"id": uuid(), "type": "group"};

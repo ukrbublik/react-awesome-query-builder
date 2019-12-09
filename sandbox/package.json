@@ -19,7 +19,7 @@
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-awesome-query-builder": "^1.0.4",
+    "react-awesome-query-builder": "^1.0.7",
     "react-scripts": "3.0.1"
   },
   "browserslist": {
