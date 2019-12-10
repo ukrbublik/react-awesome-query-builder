@@ -9,9 +9,14 @@ import Widget from './Widget';
 
 
 const ArgWidget = ({funcKey, argKey, argDefinition, setValue, setValueSrc, ...props}) => {
-  const _setValue = (v) => setValue(argKey, v);
-  const _setValueSrc = (vs) => setValueSrc(argKey, vs);
-  return <Widget {...props} setValue={_setValue} setValueSrc={_setValueSrc} field={argDefinition} isFuncArg={true} />;
+  //todo: memo
+  const _setValue = (d, v, wt) => {
+    setValue(argKey, v)
+  };
+  const _setValueSrc = (d, vs, wt) => {
+    setValueSrc(argKey, vs)
+  };
+  return <Widget {...props} setValue={_setValue} setValueSrc={_setValueSrc} isFuncArg={true} />;
 };
 
 export default class FuncWidget extends PureComponent {
@@ -54,6 +59,7 @@ export default class FuncWidget extends PureComponent {
 
   setFunc = (funcKey) => {
     let value = this.props.value || {};
+    value = {...value};
     value.func = funcKey;
     value.args = {};
     //todo: set default args
@@ -63,6 +69,7 @@ export default class FuncWidget extends PureComponent {
   setArgValue = (argKey, argVal) => {
     let value = this.props.value || {};
     if (value.func) {
+      value = {...value};
       let arg = value.args[argKey] || {};
       arg.value = argVal;
       value.args[argKey] = arg;
@@ -73,11 +80,12 @@ export default class FuncWidget extends PureComponent {
   setArgValueSrc = (argKey, argValSrc) => {
     let value = this.props.value || {};
     if (value.func) {
+      value = {...value};
       let arg = value.args[argKey] || {};
       arg.valueSrc = argValSrc;
       delete arg.value;
       value.args[argKey] = arg;
-      this.props.setValue(value);
+      //this.props.setValue(value);
     }
   };
 
@@ -119,14 +127,15 @@ export default class FuncWidget extends PureComponent {
   renderArgVal = (funcKey, argKey, argDefinition) => {
     const {config, field, operator, value} = this.props;
     const {args} = value || {};
-    const argVal = args ? args[argKey] : undefined;
-
+    const arg = args[argKey];
+    const argVal = arg ? arg.value : undefined;
+    const argValSrc = arg && arg.valueSrc || 'value';
     const widgetProps = {
       config, 
-      field: argKey, 
+      field: {func: funcKey, arg: argKey}, 
       operator: null, //todo!!! default?
-      value: Immutable.List(argVal), //todo
-      valueSrc: Immutable.List('value'), //todo
+      value: Immutable.List([argVal]), //todo
+      valueSrc: Immutable.List([argValSrc]), //todo
       setValue: this.setArgValue,
       setValueSrc: this.setArgValueSrc,
       funcKey,

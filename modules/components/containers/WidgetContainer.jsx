@@ -9,6 +9,7 @@ import {defaultValue} from "../../utils/stuff";
 import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
 
+const funcArgDummyOpDef = {cardinality: 1};
 
 export default (Widget) => {
     return class WidgetContainer extends PureComponent {
@@ -17,7 +18,7 @@ export default (Widget) => {
             value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
             valueSrc: PropTypes.any.isRequired, //instanceOf(Immutable.List)
             field: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-            operator: PropTypes.string.isRequired,
+            operator: PropTypes.string,
             //actions
             setValue: PropTypes.func,
             setValueSrc: PropTypes.func,
@@ -62,7 +63,7 @@ export default (Widget) => {
             const fieldDefinition = getFieldConfig(field, config);
             const defaultWidget = getWidgetForFieldOp(config, field, operator);
             const _widgets = getWidgetsForFieldOp(config, field, operator);
-            const operatorDefinition = getOperatorConfig(config, operator, field);
+            const operatorDefinition = isFuncArg ? funcArgDummyOpDef : getOperatorConfig(config, operator, field);
             if (fieldDefinition == null || operatorDefinition == null) {
                 return null;
             }
