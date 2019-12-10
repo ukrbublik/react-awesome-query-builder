@@ -141,7 +141,8 @@ export default (Widget) => {
         }
 
         render() {
-            const {config, field, operator, value} = this.props;
+            const {config, field, isFuncArg, leftField, operator, value} = this.props;
+            const _field = isFuncArg ? leftField : field;
             const {settings} = config;
             const meta = this.meta;
             if (!meta)
@@ -176,7 +177,7 @@ export default (Widget) => {
                             </div>
 
                         const sources = valueSources.length > 1 &&
-                            <div key={"valuesrc-"+field+"-"+delta} className="widget--valuesrc">
+                            <div key={"valuesrc-"+_field+"-"+delta} className="widget--valuesrc">
                                 {sourceLabel}
                                 <ValueSources
                                     key={'valuesrc-'+delta}
@@ -184,14 +185,14 @@ export default (Widget) => {
                                     valueSources={valueSources}
                                     valueSrc={valueSrc}
                                     config={config}
-                                    field={field}
+                                    field={_field}
                                     operator={operator}
                                     setValueSrcHandler={setValueSrcHandler}
                                 />
                             </div>
 
                         const widgetCmp = 
-                            <div key={"widget-"+field+"-"+delta} className="widget--widget">
+                            <div key={"widget-"+_field+"-"+delta} className="widget--widget">
                                 {widgetLabel}
                                 <WidgetFactory
                                     delta={delta}
@@ -199,7 +200,7 @@ export default (Widget) => {
                                     {...pick(meta, ['isSpecialRange', 'fieldDefinition'])}
                                     {...pick(widgets[delta], ['widget', 'widgetDefinition', 'widgetValueLabel', 'valueLabels', 'textSeparators', 'setValueHandler'])}
                                     config={config}
-                                    field={field}
+                                    field={_field}
                                     operator={operator}
                                 />
                             </div>

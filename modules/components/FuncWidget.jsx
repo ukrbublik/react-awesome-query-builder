@@ -7,16 +7,15 @@ import FuncSelect from './FuncSelect';import {
 import { Col } from 'antd';
 import Widget from './Widget';
 
-//todo: set source ; use fields
-//todo: see Immutable.List - don't use js
-//why default arg val not working?
+// todo *must*
+// 1. default arg val
+// 2. Immutable
+// 3. format!!!
 
-//todo: set default args
-//todo: owerride separators
+//todo: settings: separators
 //todo: settings showLabels
-//todo: func in func????
-//todo: support infinite args (... [+]) ???
-//todo: format!
+//todo: ??? func in func
+//todo: ??? support infinite args (... [+])
 
 export default class FuncWidget extends PureComponent {
   static propTypes = {
