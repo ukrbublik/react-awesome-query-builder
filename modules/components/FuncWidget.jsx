@@ -7,17 +7,16 @@ import FuncSelect from './FuncSelect';import {
 import { Col } from 'antd';
 import Widget from './Widget';
 
+//todo: set source ; use fields
+//todo: see Immutable.List - don't use js
+//why default arg val not working?
 
-const ArgWidget = ({funcKey, argKey, argDefinition, setValue, setValueSrc, ...props}) => {
-  //todo: memo
-  const _setValue = (d, v, wt) => {
-    setValue(argKey, v)
-  };
-  const _setValueSrc = (d, vs, wt) => {
-    setValueSrc(argKey, vs)
-  };
-  return <Widget {...props} setValue={_setValue} setValueSrc={_setValueSrc} isFuncArg={true} />;
-};
+//todo: set default args
+//todo: owerride separators
+//todo: settings showLabels
+//todo: func in func????
+//todo: support infinite args (... [+]) ???
+//todo: format!
 
 export default class FuncWidget extends PureComponent {
   static propTypes = {
@@ -62,7 +61,6 @@ export default class FuncWidget extends PureComponent {
     value = {...value};
     value.func = funcKey;
     value.args = {};
-    //todo: set default args
     this.props.setValue(value);
   };
 
@@ -85,7 +83,7 @@ export default class FuncWidget extends PureComponent {
       arg.valueSrc = argValSrc;
       delete arg.value;
       value.args[argKey] = arg;
-      //this.props.setValue(value);
+      this.props.setValue(value);
     }
   };
 
@@ -106,6 +104,9 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgLabel = (argKey, argDefinition) => {
+    const {config} = this.props;
+    const forceShow = argDefinition.type == 'boolean' && !config.settings.showLabels;
+    if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label">
           {argDefinition.label || argKey}
@@ -113,10 +114,10 @@ export default class FuncWidget extends PureComponent {
     );
   };
 
-//todo: owerride separators
-//todo: settings showLabels
-
   renderArgLabelSep = (argKey, argDefinition) => {
+    const {config} = this.props;
+    const forceShow = argDefinition.type == 'boolean' && !config.settings.showLabels;
+    if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label-sep">
           {":"}
@@ -133,9 +134,10 @@ export default class FuncWidget extends PureComponent {
     const widgetProps = {
       config, 
       field: {func: funcKey, arg: argKey}, 
-      operator: null, //todo!!! default?
-      value: Immutable.List([argVal]), //todo
-      valueSrc: Immutable.List([argValSrc]), //todo
+      leftField: field,
+      operator: null,
+      value: Immutable.List([argVal]),
+      valueSrc: Immutable.List([argValSrc]),
       setValue: this.setArgValue,
       setValueSrc: this.setArgValueSrc,
       funcKey,
@@ -207,7 +209,35 @@ export default class FuncWidget extends PureComponent {
       </Col>
     );
   }
+}
 
-  //todo: support infinite args (... [+]) ???
 
+class ArgWidget extends PureComponent {
+  static propTypes = {
+    funcKey: PropTypes.string.isRequired,
+    argKey: PropTypes.string.isRequired,
+    setValue: PropTypes.func.isRequired,
+    setValueSrc: PropTypes.func.isRequired,
+  };
+
+  setValue = (_delta, value, _widgetType) => {
+    const {setValue, argKey} = this.props;
+    setValue(argKey, value);
+  }
+
+  setValueSrc = (_delta, valueSrc, _widgetType) => {
+    const {setValueSrc, argKey} = this.props;
+    setValueSrc(argKey, valueSrc);
+  }
+
+  render() {
+    return (
+      <Widget
+        {...this.props} 
+        setValue={this.setValue} 
+        setValueSrc={this.setValueSrc} 
+        isFuncArg={true}
+      />
+    );
+  }
 }

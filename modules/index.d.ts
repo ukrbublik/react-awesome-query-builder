@@ -442,7 +442,7 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & For
 export interface Func {
   label?: String,
   returnType: String,
-  args: TypedMap<FuncArg>
+  args: TypedMap<FuncArg>,
 };
 export interface FuncArg extends ValueField {
 };

@@ -17,7 +17,15 @@ export default (Widget) => {
             config: PropTypes.object.isRequired,
             value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
             valueSrc: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-            field: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+            leftField: PropTypes.string, //for isFuncArg
+            field: PropTypes.oneOfType([
+                PropTypes.string, 
+                //for isFuncArg:
+                PropTypes.shape({
+                    func: PropTypes.string,
+                    arg: PropTypes.string
+                })
+            ]).isRequired,
             operator: PropTypes.string,
             //actions
             setValue: PropTypes.func,
@@ -34,7 +42,7 @@ export default (Widget) => {
 
         componentWillReceiveProps(nextProps) {
             const prevProps = this.props;
-            const keysForMeta = ["config", "field", "operator", "valueSrc", "isFuncArg"];
+            const keysForMeta = ["config", "field", "leftField", "operator", "valueSrc", "isFuncArg"];
             const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
             if (needUpdateMeta) {

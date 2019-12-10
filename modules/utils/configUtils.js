@@ -307,9 +307,12 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
 };
 
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
+    const isFuncArg = typeof field == "object" && field.arg;
+    const {showLabels} = config.settings;
+    const fieldConfig = getFieldConfig(field, config);
     const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
     const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
-
+    
     const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
     let ret = null;
     if (cardinality > 1) {
@@ -326,9 +329,18 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
             }
         }
     } else {
+        let label = fieldWidgetConfig.valueLabel;
+        let placeholder = fieldWidgetConfig.valuePlaceholder;
+        if (isFuncArg) {
+            if (!label)
+                label = fieldConfig.label || field.arg;
+            if (!placeholder && !showLabels)
+                placeholder = fieldConfig.label || field.arg;
+        }
+
         ret = {
-            label: fieldWidgetConfig.valueLabel || config.settings.valueLabel, 
-            placeholder: fieldWidgetConfig.valuePlaceholder || config.settings.valuePlaceholder,
+            label: label || config.settings.valueLabel, 
+            placeholder: placeholder || config.settings.valuePlaceholder,
         };
     }
     return ret;

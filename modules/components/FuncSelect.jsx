@@ -68,7 +68,7 @@ export default class FuncSelect extends PureComponent {
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel)
         selectedFullLabel = null;
-
+    
     return {
       placeholder,
       selectedKey: selectedFuncKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedFullLabel,

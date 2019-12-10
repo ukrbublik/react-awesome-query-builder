@@ -361,6 +361,9 @@ const funcs: Funcs = {
                     opt1: 'Opt1',
                     opt2: 'Opt2',
                 },
+            },
+            opt_bool: {
+                type: 'boolean',
             }
         }
     }
