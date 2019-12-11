@@ -259,6 +259,10 @@
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
 }
+.widget--valuesrc {
+  margin-right: -8px;
+  transform: rotate(90deg);
+}
 .operator--options--sep {
   margin-right: 10px;
 }

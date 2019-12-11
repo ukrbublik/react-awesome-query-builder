@@ -31,7 +31,7 @@ export const settings = {
       value: {},
   },
   fieldSeparator: '.',
-  fieldSeparatorDisplay: '->',
+  fieldSeparatorDisplay: '.',
   renderSize: "small",
   maxLabelsLength: 100,
   hideConjForOne: true,

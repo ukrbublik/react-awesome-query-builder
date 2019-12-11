@@ -51,7 +51,7 @@ export default class FieldDropdown extends PureComponent {
     });
   }
 
-  renderMenuToggler(togglerLabel, fullLabel, config) {
+  renderMenuToggler(togglerLabel, tooltipText, config) {
       let toggler =
           <Button
               size={config.settings.renderSize}
@@ -59,11 +59,11 @@ export default class FieldDropdown extends PureComponent {
               {togglerLabel} <Icon type="down" />
           </Button>;
 
-      if (fullLabel) {
+      if (tooltipText) {
           toggler = 
               <Tooltip
                   placement="top"
-                  title={fullLabel}
+                  title={tooltipText}
               >
                   {toggler}
               </Tooltip>;
@@ -89,7 +89,10 @@ export default class FieldDropdown extends PureComponent {
         >{fieldMenuItems}</Menu>
     );
     const togglerLabel = selectedAltLabel || selectedLabel || placeholder;
-    const fieldToggler = this.renderMenuToggler(togglerLabel, selectedFullLabel, config);
+    let tooltipText = selectedFullLabel;
+    if (tooltipText == selectedLabel)
+      tooltipText = null;
+    const fieldToggler = this.renderMenuToggler(togglerLabel, tooltipText, config);
 
     return (
       <Dropdown

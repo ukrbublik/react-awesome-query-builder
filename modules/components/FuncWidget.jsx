@@ -8,7 +8,9 @@ import { Col } from 'antd';
 import Widget from './Widget';
 
 // todo *must*
-// 1. default arg val
+// 1. default arg val - setFunction @ tree.js
+//    when change field & tryig to reuse funcion - check that this field is not in depends 
+//    also validate min & max when change field (debt)
 // 2. Immutable
 // 3. format!!!
 
