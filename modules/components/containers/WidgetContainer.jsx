@@ -193,10 +193,11 @@ export default (Widget) => {
 
                         const widgetCmp = 
                             <div key={"widget-"+_field+"-"+delta} className="widget--widget">
-                                {widgetLabel}
+                                {valueSrc == 'func' ? null : widgetLabel}
                                 <WidgetFactory
                                     delta={delta}
                                     value={value}
+                                    isFuncArg={isFuncArg}
                                     {...pick(meta, ['isSpecialRange', 'fieldDefinition'])}
                                     {...pick(widgets[delta], ['widget', 'widgetDefinition', 'widgetValueLabel', 'valueLabels', 'textSeparators', 'setValueHandler'])}
                                     config={config}
@@ -219,7 +220,7 @@ export default (Widget) => {
 
 
 const WidgetFactory = ({
-    delta,
+    delta, isFuncArg,
     value: immValue,
     isSpecialRange, fieldDefinition,
     widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
@@ -245,6 +246,7 @@ const WidgetFactory = ({
         operator: operator,
         delta: delta,
         isSpecialRange: isSpecialRange,
+        isFuncArg: isFuncArg,
         value: value,
         label: widgetValueLabel.label,
         placeholder: widgetValueLabel.placeholder,

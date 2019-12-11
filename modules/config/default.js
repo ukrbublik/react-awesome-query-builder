@@ -51,6 +51,7 @@ export const settings = {
   valuePlaceholder: "Value",
   fieldLabel: "Field",
   operatorLabel: "Operator",
+  funcLabel: "Function",
   fieldPlaceholder: "Select field",
   funcPlaceholder: "Select function",
   operatorPlaceholder: "Select operator",

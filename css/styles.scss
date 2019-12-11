@@ -261,6 +261,8 @@
 }
 .widget--valuesrc {
   margin-right: -8px;
+}
+.widget--valuesrc span i {
   transform: rotate(90deg);
 }
 .operator--options--sep {
@@ -349,6 +351,9 @@ div.tooltip-inner {
 }
 .rule--func--bracket-before {
   margin-left: 5px;
+}
+.rule--func--arg-value > .rule--widget {
+  margin-left: -10px;
 }
 .rule--func--arg-sep {
   margin-left: 3px;

@@ -375,6 +375,7 @@ export interface LocaleSettings {
   operatorLabel?: String,
   fieldPlaceholder?: String,
   funcPlaceholder?: String,
+  funcLabel?: String,
   operatorPlaceholder?: String,
   deleteLabel?: String,
   addGroupLabel?: String,

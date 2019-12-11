@@ -96,9 +96,14 @@ export default class FuncWidget extends PureComponent {
       setValue: this.setFunc,
       config, field, operator, customProps,
     };
+    const {showLabels, funcLabel} = config.settings;
+    const widgetLabel = showLabels ?
+        <label>{funcLabel}</label>
+        : null;
 
     return (
       <Col key="func" className="rule--func">
+        {widgetLabel}
         <FuncSelect {...selectProps} />
       </Col>
     );

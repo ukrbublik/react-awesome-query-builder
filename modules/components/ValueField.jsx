@@ -28,7 +28,7 @@ export default class ValueField extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
       const prevProps = this.props;
-      const keysForItems = ["config", "field", "operator"];
+      const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
       const keysForMeta = ["config", "field", "operator", "value"];
       const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
@@ -48,7 +48,7 @@ export default class ValueField extends PureComponent {
     return items;
   }
 
-  getMeta({config, field, operator, value}) {
+  getMeta({config, field, operator, value, placeholder: customPlaceholder, isFuncArg}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
@@ -56,8 +56,8 @@ export default class ValueField extends PureComponent {
     const leftFieldConfig = getFieldConfig(field, config);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    const placeholder = !isFieldSelected ? (leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder) : null;
-
+    const placeholder = isFieldSelected ? null 
+      : (isFuncArg && customPlaceholder || leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder);
     const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
     const selectedOpts = currField || {};
 

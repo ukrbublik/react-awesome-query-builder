@@ -126,6 +126,7 @@ const localeSettings: LocaleSettings = {
     valuePlaceholder: "Value",
     fieldLabel: "Field",
     operatorLabel: "Operator",
+    funcLabel: "Function",
     fieldPlaceholder: "Select field",
     funcPlaceholder: "Select function",
     operatorPlaceholder: "Select operator",
@@ -357,6 +358,7 @@ const funcs: Funcs = {
             opt: {
                 type: 'select',
                 defaultValue: 'opt1',
+                valueSources: ['value'],
                 listValues: {
                     opt1: 'Opt1',
                     opt2: 'Opt2',
