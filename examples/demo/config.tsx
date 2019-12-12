@@ -305,7 +305,6 @@ const fields: Fields = {
         allowCustomValues: true
     },
     stock: {
-        valueSources: ['value'],
         label: 'In stock',
         type: 'boolean',
         defaultValue: true,

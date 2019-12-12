@@ -8,6 +8,7 @@ import {
 import {defaultValue} from "../../utils/stuff";
 import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
+import Immutable from 'immutable';
 
 const funcArgDummyOpDef = {cardinality: 1};
 
@@ -15,23 +16,18 @@ export default (Widget) => {
     return class WidgetContainer extends PureComponent {
         static propTypes = {
             config: PropTypes.object.isRequired,
-            value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-            valueSrc: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-            leftField: PropTypes.string, //for isFuncArg
-            field: PropTypes.oneOfType([
-                PropTypes.string, 
-                //for isFuncArg:
-                PropTypes.shape({
-                    func: PropTypes.string,
-                    arg: PropTypes.string
-                })
-            ]).isRequired,
+            value: PropTypes.any, //instanceOf(Immutable.List)
+            valueSrc: PropTypes.any, //instanceOf(Immutable.List)
+            field: PropTypes.string,
             operator: PropTypes.string,
             //actions
             setValue: PropTypes.func,
             setValueSrc: PropTypes.func,
-            //
+            // for isFuncArg
             isFuncArg: PropTypes.bool,
+            fieldFunc: PropTypes.string,
+            fieldArg: PropTypes.string,
+            leftField: PropTypes.string,
         };
 
         constructor(props) {
@@ -42,8 +38,15 @@ export default (Widget) => {
 
         componentWillReceiveProps(nextProps) {
             const prevProps = this.props;
-            const keysForMeta = ["config", "field", "leftField", "operator", "valueSrc", "isFuncArg"];
-            const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+            const keysForMeta = ["config", "field", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg"];
+            const needUpdateMeta = !this.meta || 
+                keysForMeta
+                    .map(k => (
+                        nextProps[k] !== prevProps[k] 
+                        //tip: for isFuncArg we need to wrap value in Imm list
+                        || k == 'isFuncArg' && nextProps['isFuncArg'] && nextProps['value'] !== prevProps['value'])
+                    )
+                    .filter(ch => ch).length > 0;
 
             if (needUpdateMeta) {
                 this.meta = this.getMeta(nextProps);
@@ -67,7 +70,15 @@ export default (Widget) => {
             this.props.setValueSrc(delta, srcKey);
         }
 
-        getMeta({config, field, operator, valueSrc: valueSrcs, isFuncArg}) {
+        getMeta({config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, isFuncArg, leftField}) {
+            const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
+            let _valueSrcs = valueSrcs;
+            let _values = values;
+            if (isFuncArg) {
+                _valueSrcs = Immutable.List([valueSrcs]);
+                _values = Immutable.List([values]);
+            }
+
             const fieldDefinition = getFieldConfig(field, config);
             const defaultWidget = getWidgetForFieldOp(config, field, operator);
             const _widgets = getWidgetsForFieldOp(config, field, operator);
@@ -76,17 +87,17 @@ export default (Widget) => {
                 return null;
             }
             const isSpecialRange = operatorDefinition.isSpecialRange;
-            const isSpecialRangeForSrcField = isSpecialRange && (valueSrcs.get(0) == 'field' || valueSrcs.get(1) == 'field');
+            const isSpecialRangeForSrcField = isSpecialRange && (_valueSrcs.get(0) == 'field' || _valueSrcs.get(1) == 'field');
             const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
             const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition.cardinality, 1);
             if (cardinality === 0) {
                 return null;
             }
 
-            const valueSources = getValueSourcesForFieldOp(config, field, operator);
+            const valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition, isFuncArg ? leftField : null);
 
             const widgets = range(0, cardinality).map(delta => {
-                const valueSrc = valueSrcs.get(delta) || null;
+                const valueSrc = _valueSrcs.get(delta) || null;
                 let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
                 let widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
                 if (isSpecialRangeForSrcField) {
@@ -136,21 +147,24 @@ export default (Widget) => {
                 isSpecialRange: isTrueSpecialRange,
                 cardinality,
                 valueSources,
-                widgets
+                widgets,
+                _values, //correct for isFuncArg
+                _field: field, //correct for isFuncArg
             };
         }
 
         render() {
-            const {config, field, isFuncArg, leftField, operator, value} = this.props;
-            const _field = isFuncArg ? leftField : field;
-            const {settings} = config;
+            const {config, isFuncArg, leftField, operator, value: values} = this.props;
             const meta = this.meta;
             if (!meta)
                 return null;
             const {
-                defaultWidget, cardinality, valueSources, widgets
+                defaultWidget, cardinality, valueSources, widgets, _values, _field
             } = meta;
-
+            const value = isFuncArg ? _values : values;
+            const field = isFuncArg ? leftField : _field;
+            const {settings} = config;
+            
             return (
                 <Widget name={defaultWidget} config={config}>
                     {range(0, cardinality).map(delta => {
@@ -177,7 +191,7 @@ export default (Widget) => {
                             </div>
 
                         const sources = valueSources.length > 1 &&
-                            <div key={"valuesrc-"+_field+"-"+delta} className="widget--valuesrc">
+                            <div key={"valuesrc-"+field+"-"+delta} className="widget--valuesrc">
                                 {sourceLabel}
                                 <ValueSources
                                     key={'valuesrc-'+delta}
@@ -185,14 +199,14 @@ export default (Widget) => {
                                     valueSources={valueSources}
                                     valueSrc={valueSrc}
                                     config={config}
-                                    field={_field}
+                                    field={field}
                                     operator={operator}
                                     setValueSrcHandler={setValueSrcHandler}
                                 />
                             </div>
 
                         const widgetCmp = 
-                            <div key={"widget-"+_field+"-"+delta} className="widget--widget">
+                            <div key={"widget-"+field+"-"+delta} className="widget--widget">
                                 {valueSrc == 'func' ? null : widgetLabel}
                                 <WidgetFactory
                                     delta={delta}
@@ -201,7 +215,7 @@ export default (Widget) => {
                                     {...pick(meta, ['isSpecialRange', 'fieldDefinition'])}
                                     {...pick(widgets[delta], ['widget', 'widgetDefinition', 'widgetValueLabel', 'valueLabels', 'textSeparators', 'setValueHandler'])}
                                     config={config}
-                                    field={_field}
+                                    field={field}
                                     operator={operator}
                                 />
                             </div>

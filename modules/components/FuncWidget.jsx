@@ -6,18 +6,13 @@ import FuncSelect from './FuncSelect';import {
 } from "../utils/configUtils";
 import { Col } from 'antd';
 import Widget from './Widget';
+import {setFunc, setArgValue, setArgValueSrc} from '../stores/tree';
 
 // todo *must*
-// 1. default arg val - setFunction @ tree.js
-//    when change field & tryig to reuse funcion - check that this field is not in depends 
-//    also validate min & max when change field (debt)
-// 2. Immutable
+// 1. see "//todo: defaults"
+// 2. on change field check user fields in func!!!
 // 3. format!!!
-
-//todo: settings: separators
-//todo: settings showLabels
-//todo: ??? func in func
-//todo: ??? support infinite args (... [+])
+// 4. config separators
 
 export default class FuncWidget extends PureComponent {
   static propTypes = {
@@ -25,10 +20,7 @@ export default class FuncWidget extends PureComponent {
     field: PropTypes.string.isRequired,
     operator: PropTypes.string.isRequired,
     customProps: PropTypes.object,
-    value: PropTypes.shape({
-      func: PropTypes.string,
-      args: PropTypes.object,
-    }),
+    value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
     setValue: PropTypes.func.isRequired,
   };
 
@@ -49,7 +41,7 @@ export default class FuncWidget extends PureComponent {
   }
 
   getMeta({config, field, operator, value}) {
-    const {func: funcKey} = value || {};
+    const funcKey = value ? value.get('func') : null;
     const funcDefinition = funcKey ? getFuncConfig(funcKey, config) : null;
 
     return {
@@ -58,39 +50,20 @@ export default class FuncWidget extends PureComponent {
   }
 
   setFunc = (funcKey) => {
-    let value = this.props.value || {};
-    value = {...value};
-    value.func = funcKey;
-    value.args = {};
-    this.props.setValue(value);
+    this.props.setValue( setFunc(this.props.value, funcKey) );
   };
 
   setArgValue = (argKey, argVal) => {
-    let value = this.props.value || {};
-    if (value.func) {
-      value = {...value};
-      let arg = value.args[argKey] || {};
-      arg.value = argVal;
-      value.args[argKey] = arg;
-      this.props.setValue(value);
-    }
+    this.props.setValue( setArgValue(this.props.value, argKey, argVal) );
   };
 
   setArgValueSrc = (argKey, argValSrc) => {
-    let value = this.props.value || {};
-    if (value.func) {
-      value = {...value};
-      let arg = value.args[argKey] || {};
-      arg.valueSrc = argValSrc;
-      delete arg.value;
-      value.args[argKey] = arg;
-      this.props.setValue(value);
-    }
+    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc) );
   };
 
   renderFuncSelect = () => {
     const {config, field, operator, customProps, value} = this.props;
-    const {func: funcKey} = value || {};
+    const funcKey = value ? value.get('func') : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
@@ -133,23 +106,25 @@ export default class FuncWidget extends PureComponent {
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
     const {config, field, operator, value} = this.props;
-    const {args} = value || {};
-    const arg = args[argKey];
-    const argVal = arg ? arg.value : undefined;
-    const argValSrc = arg && arg.valueSrc || 'value';
+    const arg = value ? value.getIn(['args', argKey]) : null;
+    const argVal = arg ? arg.get('value') : undefined;
+    const argValSrc = arg ? (arg.get('valueSrc') || 'value') : undefined;
+
     const widgetProps = {
       config, 
-      field: {func: funcKey, arg: argKey}, 
+      fieldFunc: funcKey,
+      fieldArg: argKey,
       leftField: field,
       operator: null,
-      value: Immutable.List([argVal]),
-      valueSrc: Immutable.List([argValSrc]),
+      value: argVal,
+      valueSrc: argValSrc,
       setValue: this.setArgValue,
       setValueSrc: this.setArgValueSrc,
       funcKey,
       argKey,
       argDefinition,
     };
+    //tip: value & valueSrc will be converted to Immutable.List at WidgetContainer
 
     return (
       <Col className="rule--func--arg-value">

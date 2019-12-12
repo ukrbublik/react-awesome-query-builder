@@ -493,6 +493,29 @@ const setOperatorOption = (state, path, name, value) => {
 };
 
 
+export const setFunc = (value, funcKey) => {
+    value = value || new Immutable.Map();
+    value = value.set('func', funcKey);
+    value = value.set('args', new Immutable.Map());
+    //todo: defaults
+    return value;
+};
+
+export const setArgValue = (value, argKey, argVal) => {
+    if (value && value.get('func')) {
+        value = value.setIn(['args', argKey, 'value'], argVal);
+    }
+    return value;
+};
+
+export const setArgValueSrc = (value, argKey, argValSrc) => {
+    if (value && value.get('func')) {
+        value = value.setIn(['args', argKey], new Immutable.Map({valueSrc: argValSrc}));
+    }
+    return value;
+};
+
+
 const emptyDrag = {
   dragging: {
     id: null,

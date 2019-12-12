@@ -68,6 +68,12 @@ const operators = {
       labelForFormat: '==',
       sqlOp: '=',
       reversedOp: 'not_equal',
+      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+          if (isForDisplay)
+              return value == 'No' ? `NOT ${field}` : `${field}`;
+          else
+              return `${field} ${opDef.label} ${value}`;
+      },
       mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
   },
   not_equal: {
@@ -75,6 +81,12 @@ const operators = {
       labelForFormat: '!=',
       sqlOp: '<>',
       reversedOp: 'equal',
+      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+          if (isForDisplay)
+              return value == 'No' ? `${field}` : `NOT ${field}`;
+          else
+              return `${field} ${opDef.label} ${value}`;
+      },
       mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } }),
   },
   less: {

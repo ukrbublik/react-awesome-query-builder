@@ -63,6 +63,7 @@ function _extendTypeConfig(type, typeConfig, config) {
 };
 
 function _extendFieldsConfig(subconfig, config) {
+    config._fieldsCntByType = {};
     for (let field in subconfig) {
         _extendFieldConfig(subconfig[field], config);
         if (subconfig[field].subfields) {
@@ -73,8 +74,14 @@ function _extendFieldsConfig(subconfig, config) {
 
 function _extendFuncArgsConfig(subconfig, config) {
     if (!subconfig) return;
+    config._funcsCntByType = {};
     for (let funcKey in subconfig) {
         const funcDef = subconfig[funcKey];
+        if (funcDef.returnType) {
+            if (!config._funcsCntByType[funcDef.returnType])
+                config._funcsCntByType[funcDef.returnType] = 0;
+            config._funcsCntByType[funcDef.returnType]++;
+        }
         for (let argKey in funcDef.args) {
             _extendFieldConfig(funcDef.args[argKey], config, true);
         }
@@ -89,6 +96,12 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
     const typeConfig = config.types[fieldConfig.type];
     const excludeOperators = fieldConfig.excludeOperators || [];
     if (fieldConfig.type != '!struct') {
+        if (!isFuncArg) {
+            if (!config._fieldsCntByType[fieldConfig.type])
+                config._fieldsCntByType[fieldConfig.type] = 0;
+            config._fieldsCntByType[fieldConfig.type]++;
+        }
+
         if (!fieldConfig.widgets)
             fieldConfig.widgets = {};
         fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
@@ -390,9 +403,18 @@ export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) =
     return widgets;
 };
 
-export const getValueSourcesForFieldOp = (config, field, operator) => {
+export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null, leftFieldForFunc = null) => {
     const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
-    return valueSrcs;
+    const filteredValueSrcs = valueSrcs.filter(vs => {
+        if (vs == "field" && fieldDefinition) {
+            return config._fieldsCntByType[fieldDefinition.type] > 1;
+        }
+        if (vs == "func" && fieldDefinition) {
+            return config._funcsCntByType[fieldDefinition.type] > 0;
+        }
+        return true;
+    });
+    return filteredValueSrcs;
 };
 
 export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
