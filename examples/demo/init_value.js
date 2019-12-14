@@ -15,6 +15,9 @@ export default
               "str": {
                 "valueSrc": "field",
                 "value": "user.login"
+              },
+              "opt": {
+                "value": "opt3"
               }
             }
           }
@@ -23,7 +26,7 @@ export default
           "func"
         ],
         "valueType": [
-          null
+          "text"
         ]
       }
     },
@@ -53,6 +56,26 @@ export default
         ],
         "valueSrc": [
           "value"
+        ],
+        "valueType": [
+          "number"
+        ]
+      }
+    },
+    "aabbab8a-cdef-4012-b456-716e85c65e1c": {
+      "type": "rule",
+      "properties": {
+        "field": "num",
+        "operator": "equal",
+        "value": [
+          {
+            "func": "SUM",
+            "args": {
+            }
+          }
+        ],
+        "valueSrc": [
+          "func"
         ],
         "valueType": [
           "number"

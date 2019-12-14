@@ -4,6 +4,7 @@ import pick from 'lodash/pick';
 import {defaultValue} from "./stuff";
 import {defaultConjunction} from './defaultUtils';
 import {settings as defaultSettings} from '../config/default';
+import {completeValue} from './funcUtils';
 import {Map} from 'immutable';
 let SqlString = require('sqlstring');
 
@@ -70,12 +71,13 @@ export const sqlFormat = (item, config) => {
         let valueTypes = [];
         let hasUndefinedValues = false;
         let value = properties.get('value').map((currentValue, ind) => {
+            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
+            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
+            currentValue = completeValue(currentValue, valueSrc, config);
             if (currentValue === undefined) {
                 hasUndefinedValues = true;
                 return undefined;
             }
-            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
-            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
             let ret;

@@ -4,6 +4,7 @@ import {
     getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig
 } from './configUtils';
 import {defaultConjunction} from './defaultUtils';
+import {completeValue} from './funcUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {Map} from 'immutable';
@@ -72,12 +73,13 @@ export const mongodbFormat = (item, config, _not = false) => {
         let valueTypes = [];
         let hasUndefinedValues = false;
         value = value.map((currentValue, ind) => {
+            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
+            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
+            currentValue = completeValue(currentValue, valueSrc, config);
             if (currentValue === undefined) {
                 hasUndefinedValues = true;
                 return undefined;
             }
-            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
-            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
             let ret;

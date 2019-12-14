@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import uuid from './uuid';
 import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
-import {_getNewValueForFieldOp} from '../stores/tree';
+import {getNewValueForFieldOp} from '../stores/tree';
 
 
 export const defaultField = (config, canGetFirst = true) => {
@@ -49,7 +49,7 @@ export const defaultRuleProperties = (config) => {
   });
   
   if (field && operator) {
-    let {newValue, newValueSrc, newValueType} = _getNewValueForFieldOp (config, config, current, field, operator, 'operator');
+    let {newValue, newValueSrc, newValueType} = getNewValueForFieldOp(config, config, current, field, operator, 'operator', false);
     current = current
         .set('value', newValue)
         .set('valueSrc', newValueSrc)

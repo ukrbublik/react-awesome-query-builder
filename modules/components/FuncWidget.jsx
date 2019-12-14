@@ -6,12 +6,8 @@ import FuncSelect from './FuncSelect';import {
 } from "../utils/configUtils";
 import { Col } from 'antd';
 import Widget from './Widget';
-import {setFunc, setArgValue, setArgValueSrc} from '../stores/tree';
+import {setFunc, setArgValue, setArgValueSrc} from '../utils/funcUtils';
 
-// todo *must*
-// 1. see "//todo: defaults"
-// 3. format!!!
-// 4. config separators
 
 export default class FuncWidget extends PureComponent {
   static propTypes = {
@@ -49,7 +45,7 @@ export default class FuncWidget extends PureComponent {
   }
 
   setFunc = (funcKey) => {
-    this.props.setValue( setFunc(this.props.value, funcKey) );
+    this.props.setValue( setFunc(this.props.value, funcKey, this.props.config) );
   };
 
   setArgValue = (argKey, argVal) => {
@@ -83,7 +79,8 @@ export default class FuncWidget extends PureComponent {
 
   renderArgLabel = (argKey, argDefinition) => {
     const {config} = this.props;
-    const forceShow = argDefinition.type == 'boolean' && !config.settings.showLabels;
+    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == 'const';
+    const forceShow = !config.settings.showLabels && (argDefinition.type == 'boolean' || isConst);
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label">
@@ -94,7 +91,8 @@ export default class FuncWidget extends PureComponent {
 
   renderArgLabelSep = (argKey, argDefinition) => {
     const {config} = this.props;
-    const forceShow = argDefinition.type == 'boolean' && !config.settings.showLabels;
+    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == 'const';
+    const forceShow = !config.settings.showLabels && (argDefinition.type == 'boolean' || isConst);
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label-sep">

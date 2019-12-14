@@ -364,6 +364,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
     let valueSrcs = [];
     if (!field)
         return {widgets, valueSrcs};
+    const isFuncArg = typeof field == 'object';
     const fieldConfig = getFieldConfig(field, config);
     const opConfig = operator ? config.operators[operator] : null;
     if (fieldConfig && fieldConfig.widgets) {
@@ -372,7 +373,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
             const widgetValueSrc = config.widgets[widget].valueSrc || 'value';
             let canAdd = true;
             if (!widgetConfig.operators)
-                canAdd = canAdd && (valueSrc != 'value'); //if can't check operators, don't add
+                canAdd = canAdd && (valueSrc != 'value' || isFuncArg); //if can't check operators, don't add
             if (widgetConfig.operators && operator)
                 canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
             if (valueSrc && valueSrc != widgetValueSrc)

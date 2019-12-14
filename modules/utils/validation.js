@@ -3,7 +3,7 @@ import {
 } from './configUtils';
 import {defaultValue, deepEqual} from "../utils/stuff";
 import {defaultOperatorOptions} from '../utils/defaultUtils';
-import {_getNewValueForFieldOp} from "../stores/tree";
+import {getNewValueForFieldOp} from "../stores/tree";
 
 
 export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups = false, removeInvalidRules = false) => {
@@ -120,7 +120,7 @@ function _validateRule (item, path, itemId, meta, c) {
 	valueSrc = properties.get('valueSrc');
 	value = properties.get('value');
 	let {newValue, newValueSrc} = 
-			_getNewValueForFieldOp(config, oldConfig, properties, field, operator, null);
+			getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, true);
 	value = newValue;
 	valueSrc = newValueSrc;
 	properties = properties.set('value', value);

@@ -356,8 +356,8 @@ const funcs: Funcs = {
             },
             opt: {
                 type: 'select',
-                defaultValue: 'opt1',
                 valueSources: ['value'],
+                defaultValue: 'opt2',
                 listValues: {
                     opt1: 'Opt1',
                     opt2: 'Opt2',
@@ -365,6 +365,7 @@ const funcs: Funcs = {
             },
             opt_bool: {
                 type: 'boolean',
+                defaultValue: true,
             }
         }
     }

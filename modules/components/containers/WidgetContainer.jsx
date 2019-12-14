@@ -209,6 +209,7 @@ export default (Widget) => {
                             <div key={"widget-"+field+"-"+delta} className="widget--widget">
                                 {valueSrc == 'func' ? null : widgetLabel}
                                 <WidgetFactory
+                                    valueSrc={valueSrc}
                                     delta={delta}
                                     value={value}
                                     isFuncArg={isFuncArg}
@@ -223,7 +224,7 @@ export default (Widget) => {
                         return [
                             sep,
                             sources,
-                            widgetCmp
+                            widgetCmp,
                         ];
                     })}
                 </Widget>
@@ -234,13 +235,15 @@ export default (Widget) => {
 
 
 const WidgetFactory = ({
-    delta, isFuncArg,
+    delta, isFuncArg, valueSrc,
     value: immValue,
     isSpecialRange, fieldDefinition,
     widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
-    config, field, operator
+    config, field, operator,
 }) => {
     const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+    const isConst = isFuncArg && fieldDefinition.valueSources && fieldDefinition.valueSources.length == 1 && fieldDefinition.valueSources[0] == 'const';
+    const defaultValue = fieldDefinition.defaultValue;
 
     if (!widgetFactory) {
         return '?';
@@ -271,6 +274,18 @@ const WidgetFactory = ({
     
     if (widget == 'field') {
         //
+    }
+
+    if (isConst && defaultValue) {
+        if (typeof defaultValue == "boolean") {
+            return defaultValue ? (widgetProps.labelYes || "YES") : (widgetProps.labelNo || "NO");
+        } else if (fieldSettings.listValues) {
+            if (Array.isArray(defaultValue))
+                return defaultValue.map(v => fieldSettings.listValues[v] || v).join(', ');
+            else
+                return (fieldSettings.listValues[defaultValue] || defaultValue);  
+        }
+        return ""+defaultValue;
     }
     
     return widgetFactory(widgetProps);
