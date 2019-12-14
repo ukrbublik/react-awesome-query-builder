@@ -9,7 +9,15 @@ export default
         "field": "user.firstName",
         "operator": "equal",
         "value": [
-          null
+          {
+            "func": "LOWER",
+            "args": {
+              "str": {
+                "valueSrc": "field",
+                "value": "user.login"
+              }
+            }
+          }
         ],
         "valueSrc": [
           "func"

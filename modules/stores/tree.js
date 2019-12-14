@@ -6,7 +6,7 @@ import * as constants from '../constants';
 import uuid from '../utils/uuid';
 import omit from 'lodash/omit';
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getValueSourcesForFieldOp} from "../utils/configUtils";
-import {defaultValue, deepCompare} from "../utils/stuff";
+import {defaultValue, deepEqual} from "../utils/stuff";
 import {getOperatorsForField, getWidgetForFieldOp} from "../utils/configUtils";
 
 
@@ -132,9 +132,9 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
 
     const isSameParent = (source.get('id') == target.get('id'));
     const isSourceInsideTarget = targetPath.size < sourcePath.size 
-        && deepCompare(targetPath.toArray(), sourcePath.toArray().slice(0, targetPath.size));
+        && deepEqual(targetPath.toArray(), sourcePath.toArray().slice(0, targetPath.size));
     const isTargetInsideSource = targetPath.size > sourcePath.size 
-        && deepCompare(sourcePath.toArray(), targetPath.toArray().slice(0, sourcePath.size));
+        && deepEqual(sourcePath.toArray(), targetPath.toArray().slice(0, sourcePath.size));
     let sourceSubpathFromTarget = null;
     let targetSubpathFromSource = null;
     if (isSourceInsideTarget) {
@@ -228,7 +228,7 @@ export const _getNewValueForFieldOp = function (config, oldConfig = null, curren
             || changedField == 'field' && !config.settings.clearValueOnChangeField 
             || changedField == 'operator' && !config.settings.clearValueOnChangeOp)
         && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
-        && deepCompare(currentWidgets.slice(0, commonWidgetsCnt), newWidgets.slice(0, commonWidgetsCnt))
+        && deepEqual(currentWidgets.slice(0, commonWidgetsCnt), newWidgets.slice(0, commonWidgetsCnt))
     ;
 
     if (canReuseValue) {
@@ -301,6 +301,12 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
         const rightFieldDefinition = (vSrc == 'field' ? getFieldConfig(v, config) : null);
         if (vSrc == 'field') {
             if (v == field || !rightFieldDefinition) {
+                //can't compare field with itself or no such field
+                isValid = false;
+            }
+        } else if (vSrc == 'func') {
+            const [usedFields, badFields] = _getUsedFieldsInFuncValue(v, config);
+            if (badFields.length > 0 || usedFields.filter(f => f == field).length > 0) {
                 //can't compare field with itself or no such field
                 isValid = false;
             }
@@ -492,7 +498,11 @@ const setOperatorOption = (state, path, name, value) => {
     return state.setIn(expandTreePath(path, 'properties', 'operatorOptions', name), value);
 };
 
-
+/**
+ * Used @ FuncWidget
+ * @param {Immutable.Map} value 
+ * @param {string} funcKey 
+ */
 export const setFunc = (value, funcKey) => {
     value = value || new Immutable.Map();
     value = value.set('func', funcKey);
@@ -501,6 +511,12 @@ export const setFunc = (value, funcKey) => {
     return value;
 };
 
+/**
+ * Used @ FuncWidget
+ * @param {Immutable.Map} value 
+ * @param {string} argKey 
+ * @param {*} argVal 
+ */
 export const setArgValue = (value, argKey, argVal) => {
     if (value && value.get('func')) {
         value = value.setIn(['args', argKey, 'value'], argVal);
@@ -508,6 +524,12 @@ export const setArgValue = (value, argKey, argVal) => {
     return value;
 };
 
+/**
+ * Used @ FuncWidget
+ * @param {Immutable.Map} value 
+ * @param {string} argKey 
+ * @param {string} argValSrc 
+ */
 export const setArgValueSrc = (value, argKey, argValSrc) => {
     if (value && value.get('func')) {
         value = value.setIn(['args', argKey], new Immutable.Map({valueSrc: argValSrc}));
@@ -515,6 +537,36 @@ export const setArgValueSrc = (value, argKey, argValSrc) => {
     return value;
 };
 
+/**
+ * @param {*} value 
+ * @return {array} - [usedFields, badFields]
+ */
+const _getUsedFieldsInFuncValue = (value, config) => {
+    let usedFields = [];
+    let badFields = [];
+
+    let _traverse = (value) => {
+        if (!value) return;
+        for (let arg of value.get('args').values()) {
+            if (arg.get('valueSrc') == 'field') {
+                const rightField = arg.get('value');
+                if (rightField) {
+                    const rightFieldDefinition = config ? getFieldConfig(rightField, config) : undefined;
+                    if (config && !rightFieldDefinition)
+                        badFields.push(rightField);
+                    else
+                        usedFields.push(rightField);
+                }
+            } else if (arg.get('valueSrc') == 'func') {
+                _traverse(arg.get('value'));
+            }
+        }
+    };
+
+    _traverse(value, usedFields);
+
+    return [usedFields, badFields];
+};
 
 const emptyDrag = {
   dragging: {

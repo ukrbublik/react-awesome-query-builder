@@ -10,7 +10,6 @@ import {setFunc, setArgValue, setArgValueSrc} from '../stores/tree';
 
 // todo *must*
 // 1. see "//todo: defaults"
-// 2. on change field check user fields in func!!!
 // 3. format!!!
 // 4. config separators
 
