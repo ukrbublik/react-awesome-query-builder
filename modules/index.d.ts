@@ -410,6 +410,7 @@ export interface RenderSettings {
 };
 
 export interface BehaviourSettings {
+  valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField,
   canReorder?: Boolean,
   canRegroup?: Boolean,
@@ -422,18 +423,14 @@ export interface BehaviourSettings {
   immutableGroupsMode?: Boolean,
 };
 
-export interface FormatSettings {
+export interface OtherSettings {
+  fieldSeparator?: String,
   fieldSeparatorDisplay?: String,
   formatReverse?: FormatReverse,
   formatField?: FormatField,
 };
 
-export interface MainSettings {
-  valueSourcesInfo?: ValueSourcesInfo,
-  fieldSeparator?: String,
-}
-
-export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & FormatSettings & MainSettings;
+export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & OtherSettings;
 
 
 /////////////////

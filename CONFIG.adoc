@@ -208,8 +208,6 @@ const { FieldCascader, FieldDropdown } = Widgets;
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
   renderFunc: (props) => <FieldDropdown {...props} />,
-  fieldSeparator: '.',
-  fieldSeparatorDisplay: '->',
   canReorder: true,
   canRegroup: true,
   hideConjForOne: true,
@@ -224,42 +222,58 @@ const { FieldCascader, FieldDropdown } = Widgets;
 }
 ----
 
+Behaviour settings:
+
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|renderField |`(props) => <FieldSelect {...props} />` |Render fields +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (from `Widgets`)
-|renderOperator |`(props) => <FieldSelect {...props} />` |Render operators +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
-|renderFunc |`(props) => <FieldSelect {...props} />` |Render functions +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
 |valueSourcesInfo |`{value: {}}` |By default fields can be compared with values. +
   If you want to enable comparing with another fields, add `field` like in example above. +
   If you want to enable comparing with result of function, add `func` like in example above.
-|locale |en |Locale used for AntDesign widgets
-|fieldSeparator |`.` |Separaor for struct fields. Also used for formatting
-|fieldSeparatorDisplay |`->` |Separaor for struct fields to show at field's select tooltip.
 |canReorder |true |Activate reordering support for rules and groups of rules?
 |canRegroup |true |Allow move rules (or groups) in/out groups during reorder? +
   False - allow "safe" reorder, means only reorder at same level
-|showLabels |false |Show labels under all fields?
 |showNot |true |Show `NOT` together with `AND`/`OR`?
-|hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxNesting | |Max nesting for rule groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
-|maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
-|dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
-|renderSize |`small` |Size of AntDesign components - `small` or `large`
-|renderConjsAsRadios |false |How to render conjunctions switcher? true - use `RadioGroup`, false - use `ButtonGroup`
-|customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
-|groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
- `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
+|immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change
 |setOpOnChangeField |`['keep', 'default']` |Strategies for selecting operator for new field (used by order until success): +
   `default` (default if present), `keep` (keep prev from last field), `first`, `none`
 |clearValueOnChangeField |false |Clear value on field change? false - if prev & next fields have same type (widget), keep
 |clearValueOnChangeOp |false |Clear value on operator change?
-|immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change
 |canLeaveEmptyGroup |false |Leave empty group after deletion or add 1 clean rule immediately?
+|canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
+  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
+  For type == `select`/`multiselect` you can optionally check `listValues`
+|===
+
+Render settings:
+
+[cols="1m,1,3a",options="header",]
+|===
+|key |default |meaning
+|renderSize |`small` |Size of AntDesign components - `small` or `large`
+|renderField |`(props) => <FieldSelect {...props} />` |Render fields list +
+  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (from `Widgets`)
+|renderOperator |`(props) => <FieldSelect {...props} />` |Render operators list +
+  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+|renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
+  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+|showLabels |false |Show labels above all fields?
+|hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
+|maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
+|dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
+|renderConjsAsRadios |false |How to render conjunctions switcher? true - use `RadioGroup`, false - use `ButtonGroup`
+|customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
+|groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
+ `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
+|===
+
+Other settings:
+
+[cols="1m,1,3a",options="header",]
+|===
+|key |default |meaning
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +
@@ -269,9 +283,8 @@ const { FieldCascader, FieldDropdown } = Widgets;
   `parts` - list of fields's keys for struct field +
   `label2` - field's `label2` OR parts joined by `fieldSeparatorDisplay` +
   Default impl will just return `field` (or `label2` for `isForDisplay==true`)
-|canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
-  `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
-  For type == `select`/`multiselect` you can optionally check `listValues`
+|fieldSeparator |`.` |Separaor for struct fields. Also used for formatting
+|fieldSeparatorDisplay |`.` |Separaor for struct fields to show at field's select tooltip.
 |===
 
 Localization:
