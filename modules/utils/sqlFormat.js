@@ -74,11 +74,9 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             const formattedArgVal = sqlFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
             formattedArgs.push([argKey, formattedArgVal]);
         }
-        if (typeof fieldWidgetDefinition.sqlFormatFunc === 'function') {
-            const fn = fieldWidgetDefinition.sqlFormatFunc;
+        if (typeof funcConfig.sqlFormatFunc === 'function') {
+            const fn = funcConfig.sqlFormatFunc;
             const args = [
-                funcKey,
-                funcConfig,
                 formattedArgs
             ];
             ret = fn(...args);
@@ -91,7 +89,8 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             const args = [
                 currentValue,
                 pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue', 'sqlFormatFunc']), //useful options: valueFormat for date/time
+                //useful options: valueFormat for date/time
+                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']),
             ];
             if (operator) {
                 args.push(operator);

@@ -45,11 +45,9 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
             const argName = isForDisplay && argConfig.label || argKey;
             formattedArgs.push([argName, formattedArgVal]); 
         }
-        if (typeof fieldWidgetDefinition.formatFunc === 'function') {
-            const fn = fieldWidgetDefinition.formatFunc;
+        if (typeof funcConfig.formatFunc === 'function') {
+            const fn = funcConfig.formatFunc;
             const args = [
-                funcKey,
-                funcConfig,
                 formattedArgs,
                 isForDisplay
             ];
@@ -63,7 +61,8 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
             const args = [
                 currentValue,
                 pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue', 'sqlFormatFunc']), //useful options: valueFormat for date/time
+                //useful options: valueFormat for date/time
+                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']),
                 isForDisplay
             ];
             if (operator) {

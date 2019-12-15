@@ -318,35 +318,9 @@ const fields: Fields = {
 //////////////////////////////////////////////////////////////////////
 
 const funcs: Funcs = {
-    SUM: {
-        label: 'Sum',
-        returnType: 'number',
-        args: {
-            a: {
-                type: 'number',
-                valueSources: ['value', 'field'],
-                fieldSettings: {
-                    min: 0,
-                    max: 100,
-                }
-            },
-            b: {
-                type: 'number',
-                valueSources: ['value'],
-                fieldSettings: {
-                    min: 0,
-                    max: 100,
-                }
-            },
-            c: {
-                type: 'number',
-                defaultValue: 44,
-                valueSources: ['const'],
-            }
-        }
-    },
     LOWER: {
         label: 'Lowercase',
+        mongoFunc: '$toLower',
         returnType: 'text',
         args: {
             str: {
@@ -354,19 +328,6 @@ const funcs: Funcs = {
                 type: 'text',
                 valueSources: ['value', 'field'],
             },
-            opt: {
-                type: 'select',
-                valueSources: ['value'],
-                defaultValue: 'opt2',
-                listValues: {
-                    opt1: 'Opt1',
-                    opt2: 'Opt2',
-                },
-            },
-            opt_bool: {
-                type: 'boolean',
-                defaultValue: true,
-            }
         }
     }
 };

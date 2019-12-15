@@ -6,7 +6,7 @@ export default
     "a98ab9b9-cdef-4012-b456-71607f326fd9": {
       "type": "rule",
       "properties": {
-        "field": "user.firstName",
+        "field": "user.login",
         "operator": "equal",
         "value": [
           {
@@ -14,10 +14,7 @@ export default
             "args": {
               "str": {
                 "valueSrc": "field",
-                "value": "user.login"
-              },
-              "opt": {
-                "value": "opt3"
+                "value": "user.firstName"
               }
             }
           }
@@ -56,26 +53,6 @@ export default
         ],
         "valueSrc": [
           "value"
-        ],
-        "valueType": [
-          "number"
-        ]
-      }
-    },
-    "aabbab8a-cdef-4012-b456-716e85c65e1c": {
-      "type": "rule",
-      "properties": {
-        "field": "num",
-        "operator": "equal",
-        "value": [
-          {
-            "func": "SUM",
-            "args": {
-            }
-          }
-        ],
-        "valueSrc": [
-          "func"
         ],
         "valueType": [
           "number"

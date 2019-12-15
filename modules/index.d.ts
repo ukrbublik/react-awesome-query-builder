@@ -184,7 +184,7 @@ export type Conjunctions = TypedMap<Conjunction>;
 /////////////////
 
 type FormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}, isForDisplay?: Boolean) => String;
-type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
+type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, useExpr?: Boolean, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
 type SqlFormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => String;
 
 interface ProximityConfig {
@@ -440,11 +440,20 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & For
 // Funcs
 /////////////////
 
+type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => String;
+type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: Boolean) => String;
+type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => String;
+
 export interface Func {
-  label?: String,
-  sqlFunc?: String,
   returnType: String,
   args: TypedMap<FuncArg>,
+  label?: String,
+  sqlFunc?: String,
+  mongoFunc?: String,
+  mongoArgsAsObject?: Boolean,
+  formatFunc?: FormatFunc,
+  sqlFormatFunc?: SqlFormatFunc,
+  mongoFormatFunc?: MongoFormatFunc,
 };
 export interface FuncArg extends ValueField {
 };
