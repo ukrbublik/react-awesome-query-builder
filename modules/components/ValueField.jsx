@@ -134,6 +134,9 @@ export default class ValueField extends PureComponent {
         const tooltip = field.tooltip;
         const subpath = (path ? path : []).concat(fieldKey);
 
+        if (field.hideForCompare)
+            return undefined;
+
         if (field.type == "!struct") {
             return {
                 key: fieldKey,
@@ -155,7 +158,7 @@ export default class ValueField extends PureComponent {
                 grouplabel: optGroupLabel
             };
         }
-    });
+    }).filter(o => !!o);
   }
 
   getFieldLabel(fieldOpts, fieldKey, config) {

@@ -168,6 +168,8 @@ const myConfig = {
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
 |mainWidgetProps | | |Shorthand for `widgets.<main>.widgetProps`
 |excludeOperators | | |Can exclude some operators, eg. `proximity` for `text` type
+|hideForSelect | |false |If true, field will appear only at right side (when you compare field with another field)
+|hideForCompare | |false |If true, field will appear only at left side
 |===
 
 
