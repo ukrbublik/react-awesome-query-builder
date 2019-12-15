@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.10
+  - Fix when using cascader for func selection
 - 1.0.9
   - Allow group of functions (like with fields - `type == '!struct'` and `subfields`)
 - 1.0.8
