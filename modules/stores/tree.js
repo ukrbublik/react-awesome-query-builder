@@ -209,19 +209,25 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
     const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
     const currentFieldConfig = getFieldConfig(currentField, oldConfig);
-    const currentWidgets = Array.from({length: operatorCardinality}, (_ignore, i) => {
-        const vs = currentValueSrc.get(i) || null;
-        const w = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
-        return w;
-    });
-
     const newFieldConfig = getFieldConfig(newField, config);
-    const newWidgets = Array.from({length: operatorCardinality}, (_ignore, i) => {
+
+    // get widgets info
+    const widgetsMeta = Array.from({length: operatorCardinality}, (_ignore, i) => {
         const vs = currentValueSrc.get(i) || null;
-        const w = getWidgetForFieldOp(config, newField, newOperator, vs);
-        return w;
+        const currentWidgets = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
+        const newWidgets = getWidgetForFieldOp(config, newField, newOperator, vs);
+        // need to also check value widgets if we changed operator and current value source was 'field'
+        // cause for select type op '=' requires single value and op 'in' requires array value
+        const currentValueWidgets = vs == 'value' ? currentWidgets : getWidgetForFieldOp(oldConfig, currentField, currentOperator, 'value');
+        const newValueWidgets = vs == 'value' ? newWidgets : getWidgetForFieldOp(config, newField, newOperator, 'value');
+        return {currentWidgets, newWidgets, currentValueWidgets, newValueWidgets};
     });
+    const currentWidgets = widgetsMeta.map(({currentWidgets}) => currentWidgets);
+    const newWidgets = widgetsMeta.map(({newWidgets}) => newWidgets);
+    const currentValueWidgets = widgetsMeta.map(({currentValueWidgets}) => currentValueWidgets);
+    const newValueWidgets = widgetsMeta.map(({newValueWidgets}) => newValueWidgets);
     const commonWidgetsCnt = Math.min(newWidgets.length, currentWidgets.length);
+    const reusableWidgets = newValueWidgets.filter(w => currentValueWidgets.includes(w));
     const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
     const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
     let canReuseValue = currentField && currentOperator && newOperator 
@@ -229,7 +235,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
             || changedField == 'field' && !config.settings.clearValueOnChangeField 
             || changedField == 'operator' && !config.settings.clearValueOnChangeOp)
         && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
-        && deepEqual(currentWidgets.slice(0, commonWidgetsCnt), newWidgets.slice(0, commonWidgetsCnt))
+        && reusableWidgets.length > 0;
     ;
 
     let valueFixes = {};
