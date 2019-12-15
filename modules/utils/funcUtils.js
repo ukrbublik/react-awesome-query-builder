@@ -30,6 +30,7 @@ export const completeFuncValue = (value, config) => {
       if (!funcConfig)
         return undefined;
       let complValue = value;
+      let tmpHasOptional = false;
       for (const argKey in funcConfig.args) {
           const argConfig = funcConfig.args[argKey];
           const args = complValue.get('args');
@@ -43,9 +44,16 @@ export const completeFuncValue = (value, config) => {
             } else if (completeArgValue !== argValue) {
               complValue = complValue.setIn(['args', argKey, 'value'], completeArgValue);
             }
+            if (tmpHasOptional) {
+              // has gap
+              return undefined;
+            }
           } else if (argConfig.defaultValue !== undefined) {
             complValue = complValue.setIn(['args', argKey, 'value'], argConfig.defaultValue);
             complValue = complValue.setIn(['args', argKey, 'valueSrc'], 'value');
+          } else if (argConfig.isOptional) {
+            // optional
+            tmpHasOptional = true;
           } else {
             // missing value
             return undefined;

@@ -453,6 +453,7 @@ export interface Func {
   mongoFormatFunc?: MongoFormatFunc,
 };
 export interface FuncArg extends ValueField {
+  isOptional?: Boolean,
 };
 export type Funcs = TypedMap<Func>;
 

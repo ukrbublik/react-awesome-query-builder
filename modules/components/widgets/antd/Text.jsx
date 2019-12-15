@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 import { Input, Col } from 'antd';
 
 export default class TextWidget extends PureComponent {
@@ -13,8 +12,10 @@ export default class TextWidget extends PureComponent {
     customProps: PropTypes.object,
   };
 
-  handleChange = () => {
-    this.props.setValue(ReactDOM.findDOMNode(this.refs.text).value);
+  handleChange = (ev) => {
+    const v = ev.target.value;
+    const val = v === '' ? undefined : v; // don't allow empty value
+    this.props.setValue(val);
   }
 
   render() {

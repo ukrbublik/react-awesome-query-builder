@@ -57,8 +57,10 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
             if (argValue != undefined && formattedArgVal === undefined)
                 return [undefined, false];
             argsCnt++;
-            lastArg = formattedArgVal;
-            formattedArgs[argName] = formattedArgVal; 
+            if (formattedArgVal !== undefined) { // skip optional in the end
+                formattedArgs[argName] = formattedArgVal;
+                lastArg = formattedArgVal;
+            }
         }
         if (typeof funcConfig.mongoFormatFunc === 'function') {
             const fn = funcConfig.mongoFormatFunc;
@@ -67,12 +69,10 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
             ];
             ret = fn(...args);
         } else {
-            if (argsCnt == 0)
-                ret = { [funcName]: {} };
-            else if (argsCnt == 1)
-                ret = { [funcName]: lastArg };
-            else if (mongoArgsAsObject)
+            if (mongoArgsAsObject)
                 ret = { [funcName]: formattedArgs };
+            else if (argsCnt == 1 && lastArg !== undefined)
+                ret = { [funcName]: lastArg };
             else
                 ret = { [funcName]: Object.values(formattedArgs) };
         }

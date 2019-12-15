@@ -274,6 +274,7 @@ Other settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
+|locale |en |Locale used for AntDesign widgets
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +
@@ -577,7 +578,7 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 |mongoFunc |+ for MongoDB format |same as func key |Func name in Mongo
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
-|args.<arg>.label | | |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
+|args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]
 |args.<arg>.valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`, `'const'`. +
   `const` requires `defaultValue`
@@ -585,4 +586,5 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 |args.<arg>.listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
   Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
 |args.<arg>.fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}`
+|args.<arg>.isOptional | |false |Last args can be optional
 |===

@@ -43,7 +43,8 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
             const formattedArgVal = formatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay);
             const argName = isForDisplay && argConfig.label || argKey;
-            formattedArgs.push([argName, formattedArgVal]); 
+            if (formattedArgVal !== undefined) // skip optional in the end
+                formattedArgs.push([argName, formattedArgVal]); 
         }
         if (typeof funcConfig.formatFunc === 'function') {
             const fn = funcConfig.formatFunc;

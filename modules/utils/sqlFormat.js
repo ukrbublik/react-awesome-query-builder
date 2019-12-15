@@ -72,7 +72,8 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             const argValue = argVal ? argVal.get('value') : undefined;
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
             const formattedArgVal = sqlFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
-            formattedArgs.push([argKey, formattedArgVal]);
+            if (formattedArgVal !== undefined) // skip optional in the end
+                formattedArgs.push([argKey, formattedArgVal]);
         }
         if (typeof funcConfig.sqlFormatFunc === 'function') {
             const fn = funcConfig.sqlFormatFunc;
