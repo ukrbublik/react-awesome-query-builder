@@ -46,7 +46,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
     renderBuilder = (props: BuilderProps) => (
       <div className="query-builder-container" style={{padding: '10px'}}>
-          <div className="query-builder">
+          <div className="query-builder qb-lite">
               <Builder {...props} />
           </div>
       </div>

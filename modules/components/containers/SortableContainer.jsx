@@ -139,6 +139,7 @@ export default (Builder, CanMoveFn = null) => {
 
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest('.query-builder');
+      document.body.classList.add("qb-dragging");
       treeEl.classList.add("qb-dragging");
       let treeElContainer = treeEl.closest('.query-builder-container') || treeEl;
       treeElContainer = this._getScrollParent(treeElContainer) || document.body;
@@ -243,6 +244,7 @@ export default (Builder, CanMoveFn = null) => {
       this.props.setDragEnd();
 
       treeEl.classList.remove("qb-dragging");
+      document.body.classList.remove("qb-dragging");
       this._cacheEls = {};
 
       window.removeEventListener('mousemove', this.onDrag);

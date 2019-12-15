@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.11
+  - Added css-class `qb-lite` for query builder (see readme if you wanna use it)
 - 1.0.10
   - Fix when using cascader for func selection
 - 1.0.9

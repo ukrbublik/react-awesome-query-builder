@@ -43,6 +43,13 @@
 /** COMMON ********************************************************************/
 /******************************************************************************/
 
+
+body.qb-dragging {
+  .ant-tooltip {
+    display: none;
+  }
+}
+
 .query-builder {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
@@ -362,4 +369,82 @@ div.tooltip-inner {
 .rule--func--arg-label-sep {
   margin-left: 1px;
   margin-right: 6px;
+}
+
+
+/******************************************************************************/
+/** Minimalism ****************************************************************/
+/******************************************************************************/
+
+
+@mixin visible_only_for_hovered_group($what) {
+  #{$what} {
+    transition: opacity 0.2s;
+  }
+  .group--header:hover .group--header,
+  .group--header:not(:hover) {
+    #{$what} {
+      opacity: 0;
+    }
+  }
+}
+
+@mixin display_only_for_hovered_group($inactive, $active) {
+  #{$inactive} {
+    transition: padding 0.2s;
+  }
+  .group--header:hover .group--header,
+  .group--header:not(:hover) {
+    #{$inactive} {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+  }
+}
+
+@mixin show_only_for_hovered_rule($what) {
+  #{$what} {
+    transition: opacity 0.2s;
+  }
+  .rule:hover .rule,
+  .rule:not(:hover) {
+    #{$what} {
+      opacity: 0;
+    }
+  }
+}
+
+@mixin force_unvisible($what) {
+  #{$what} {
+    opacity: 0 !important;
+  }
+}
+
+@mixin force_not_display($what) {
+  #{$what} {
+    width: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+  }
+}
+
+$group_actions: ".group--drag-handler", ".group--actions";
+$inactive_conjs: ".group--conjunctions .ant-btn:not(.ant-btn-primary)";
+$active_conjs: ".group--conjunctions .ant-btn.ant-btn-primary";
+$rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
+
+
+
+.qb-lite {
+  @include visible_only_for_hovered_group($group_actions);
+  @include display_only_for_hovered_group($inactive_conjs, $active_conjs);
+  @include show_only_for_hovered_rule($rule_actions);
+
+  &.qb-dragging {
+    @include force_unvisible(#{$rule_actions, $group_actions});
+    @include force_not_display($inactive_conjs);
+  }
 }
