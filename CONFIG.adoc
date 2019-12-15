@@ -81,6 +81,7 @@ const {
       datetime,
       boolean,
       field, // to compare field with another field of same type
+      func, // to compare field with result of function
     },
     types: {
       text,
@@ -230,8 +231,11 @@ const { FieldCascader, FieldDropdown } = Widgets;
   Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (from `Widgets`)
 |renderOperator |`(props) => <FieldSelect {...props} />` |Render operators +
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
-|valueSourcesInfo |`{value: {}}` |Values of fields can be compared with values or another fields. +
-  If you want to enable this feature, add `field` like in example above
+|renderFunc |`(props) => <FieldSelect {...props} />` |Render functions +
+  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+|valueSourcesInfo |`{value: {}}` |By default fields can be compared with values. +
+  If you want to enable comparing with another fields, add `field` like in example above. +
+  If you want to enable comparing with result of function, add `func` like in example above.
 |locale |en |Locale used for AntDesign widgets
 |fieldSeparator |`.` |Separaor for struct fields. Also used for formatting
 |fieldSeparatorDisplay |`->` |Separaor for struct fields to show at field's select tooltip.
@@ -446,7 +450,6 @@ const {
 |===
 |key |requred |default |meaning
 |type |+ | |One of types described in link:#configtypes[config.types]
-|valueSrc | |`'value'` |`'value'` or `'field'` (only for special `field` widget)
 |factory |+ | |React function component
 |formatValue |+ | |Function for formatting widget's value in query string. +
   `(mixed val, Object fieldDef, Object wgtDef, bool isForDisplay, string op, Object opDef) => string`
@@ -473,6 +476,10 @@ NOTE: There is special `field` widget, rendered by `<ValueFieldWidget>`. +
 It can be used to compare field with another field of same type. +
 To enable this feature set `valueSources` of type to `['value', 'field'']` (see below in link:#configtypes[config.types]).
 
+NOTE: There is special `func` widget, rendered by `<FuncWidget>`. +
+It can be used to compare field with result of function (see link:#configfuncs[config.funcs]). +
+To enable this feature set `valueSources` of type to `['value', 'func'']` (see below in link:#configtypes[config.types]).
+
 
 
 {nbsp} +
@@ -484,7 +491,7 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 ----
 {
   time: {
-      valueSources: ['value', 'field'],
+      valueSources: ['value', 'field', 'func'],
       defaultOperator: 'equal',
       widgets: {
           time: {
@@ -509,12 +516,11 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 [cols="1m,1,1,5a",options="header",]
 |===
 |key |requred |default |meaning
-|valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type (see special `field` widget).
+|valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
   Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`examples/demo`] - it has 3 widhets `number`, `slider`, `rangeslider`. +
-  Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`. +
-  Also if `'field'` is included in `valueSources`, there will be special widget `field` you can also configure.
+  Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
 |widgets.<widget>.opProps.<operator> | | |Can be used to override config of operator for widget. Example: `opProps: { between: {valueLabels: ['Time from', 'Time to']} }` for building range of times.
@@ -549,20 +555,19 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 [cols="1m,1,1,5a",options="header",]
 |===
 |key |requred |default |meaning
-|label | |same as func key |Label to be displayed in functions list +
-  (If not specified, fields's key will be used instead)
-|formatFunc | |For `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression. +
+|returnType |+ | |One of types described in link:#configtypes[config.types]
+|label | |same as func key |Label to be displayed in functions list
+|formatFunc | |For `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression in query rule. +
   `(Object args, bool isForDisplay) => string` +
   `args` - map `{<arg name> => <arg value>}``
-|sqlFunc | |same as func key |Func name in SQL
-|mongoFunc | |same as func key |Func name in Mongo
+|sqlFunc |+ for SQL format |same as func key |Func name in SQL
+|mongoFunc |+ for MongoDB format |same as func key |Func name in Mongo
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
-|returnType |+ | |One of types described in link:#configtypes[config.types]
-|args.* | | |Arguments of function. Config is almost same as for link:#configfields[config.fields]
+|args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | | |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]
 |args.<arg>.valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`, `'const'`. +
-  `const` is special for args, requires `defaultValue`
+  `const` requires `defaultValue`
 |args.<arg>.defaultValue | | |Default value
 |args.<arg>.listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
   Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
