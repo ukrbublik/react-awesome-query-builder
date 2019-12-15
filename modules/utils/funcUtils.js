@@ -106,7 +106,12 @@ const getUsedFieldsInFuncValue = (value, config) => {
  * @param {object} config 
  */
 export const setFunc = (value, funcKey, config) => {
+  const fieldSeparator = config.settings.fieldSeparator;
   value = value || new Immutable.Map();
+  if (Array.isArray(funcKey)) {
+    // fix for cascader
+    funcKey = funcKey.join(fieldSeparator);
+  }
   value = value.set('func', funcKey);
   value = value.set('args', new Immutable.Map());
 
