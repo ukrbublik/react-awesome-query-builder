@@ -31,7 +31,7 @@ They have common param `isForDisplay` - false by default, true will be used for 
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `sqlFunc` for building SQL where query with `QbUtils.sqlFormat()`.
 
-TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`demo config`]
+TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`demo config`]
 
 
 {nbsp} +
