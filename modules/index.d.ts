@@ -504,6 +504,7 @@ export interface BasicConfig extends Config {
     datetime: DateTimeWidget,
     boolean: BooleanWidget,
     field: FieldWidget,
+    func: FieldWidget,
   },
   types: {
     text: Type,

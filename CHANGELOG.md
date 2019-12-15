@@ -1,6 +1,6 @@
 # Changelog
 - 1.0.8
-  - Added support for functions as value source
+  - Added support for your custom functions as value source (args can be values/fields/funcs), see new section `funcs` in `config`
   - Improved Mongo format: now can compare with field & use funcs with help of `$expr`
   - (breaking) `mongoFormatOp` - inserted arg `useExpr` at 4th position
 - 1.0.7

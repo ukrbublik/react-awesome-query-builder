@@ -600,7 +600,7 @@ const widgets = {
     customProps: {
         //showSearch: true
     }
-},
+  },
 };
 
 //----------------------------  types
@@ -822,6 +822,10 @@ const settings = {
       field: {
           label: "Field",
           widget: "field",
+      },
+      func: {
+          label: "Function",
+          widget: "func",
       }
   },
   customFieldSelectProps: {

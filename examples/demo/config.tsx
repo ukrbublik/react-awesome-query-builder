@@ -96,7 +96,13 @@ const widgets: Widgets = {
         timeFormat: 'HH:mm',
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
-    }
+    },
+    func: {
+        ...BasicConfig.widgets.func,
+        customProps: {
+            showSearch: true
+        }
+    },
 };
 
 
@@ -174,7 +180,7 @@ const settings: Settings = {
     // renderField: (props) => <FieldCascader {...props} />,
     
     renderOperator: (props) => <FieldDropdown {...props} />,
-    renderFunc: (props) => <FieldDropdown {...props} />,
+    renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////

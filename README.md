@@ -20,16 +20,19 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Highly configurable
 - Fields can be of type:
   - simple (string, number, bool, date/time/datetime, list)
-  - structs (will be displayed in selectbox as tree of members)
-  - custom type (dev should add its own widget component for this) (it's not complex, you can add slider for example)
+  - structs (will be displayed in selectbox as tree)
+  - custom type (dev should add its own widget component in config for this)
 - Comparison operators can be:
   - binary (== != < > ..)
   - unary (is empty, is null)
   - 'between' (for numbers)
   - complex operators like 'proximity'
-- Values of fields can be compared with values -or- another fields (of same type)
-- Reordering support for rules and groups of rules
-- Using awesome [Ant Design](https://ant.design/)
+- Values of fields can be compared with:
+  - values
+  - another fields (of same type)
+  - function (argumentss also can be values/fields/funcs)
+- Reordering (drag-n-drop) support for rules and groups of rules
+- Using awesome [Ant Design](https://ant.design/) (but using custom widgets of another framework is possible)
 - Export to MongoDb, SQL or your custom format
 - TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo))
 

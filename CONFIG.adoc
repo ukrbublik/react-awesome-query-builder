@@ -18,7 +18,7 @@ Has 7 sections:
 
 [source,javascript]
 ----
-{conjunctions, operators, widgets, types, functions, settings, fields}
+{conjunctions, operators, widgets, types, funcs, settings, fields}
 ----
 
 Each section is described below.
@@ -524,8 +524,8 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 
 {nbsp} +
 {nbsp} +
-[[configfunctions]]
-=== config.functions
+[[configfuncs]]
+=== config.funcs
 
 [source,javascript]
 ----
