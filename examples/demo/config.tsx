@@ -177,8 +177,8 @@ const settings: Settings = {
     // showLabels: true,
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
-    // renderField: (props) => <FieldCascader {...props} />,
-    
+
+    //renderField: (props) => <FieldCascader {...props} />,
     renderOperator: (props) => <FieldDropdown {...props} />,
     renderFunc: (props) => <FieldSelect {...props} />,
 };

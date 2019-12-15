@@ -151,9 +151,9 @@ const myConfig = {
 |label |+ | |Label to be displayed in field list +
   (If not specified, fields's key will be used instead)
 |label2 | | |Can be optionally specified for nested fields. +
-  By default, if nested field is selected (eg. `name` of `user` in example above), select component will show `user` with tootip like `User -> Subname` +
-  (path constructed by joining `label`s with delimeter `->` specified by `config.settings.fieldSeparatorDisplay`) +
-  Select text `user` can be confusing, so can be overriden by setting `label2` to something like `User name`.
+  By default, if nested field is selected (eg. `name` of `user` in example above), `<FieldDropdown>` component will show `name`. +
+  Just `name` can be confusing, so can be overriden by setting `label2` to something like `User name`. +
+  As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
 |tooptip | | |Optional tooltip to be displayed in field list by hovering on item
 |listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
   Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
@@ -559,7 +559,7 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 |label | |same as func key |Label to be displayed in functions list
 |formatFunc | |For `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression in query rule. +
   `(Object args, bool isForDisplay) => string` +
-  `args` - map `{<arg name> => <arg value>}``
+  where `args` is map `{<arg name> => <arg value>}``
 |sqlFunc |+ for SQL format |same as func key |Func name in SQL
 |mongoFunc |+ for MongoDB format |same as func key |Func name in Mongo
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
