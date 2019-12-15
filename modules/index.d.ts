@@ -443,6 +443,12 @@ type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => String;
 type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: Boolean) => String;
 type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => String;
 
+interface FuncGroup {
+  type?: "!struct",
+  label?: String,
+  subfields: TypedMap<Func>,
+}
+
 export interface Func {
   returnType: String,
   args: TypedMap<FuncArg>,
@@ -457,7 +463,7 @@ export interface Func {
 export interface FuncArg extends ValueField {
   isOptional?: Boolean,
 };
-export type Funcs = TypedMap<Func>;
+export type Funcs = TypedMap<Func | FuncGroup>;
 
 
 /////////////////

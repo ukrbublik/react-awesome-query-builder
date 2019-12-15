@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.9
+  - Allow group of functions (like with fields - `type == '!struct'` and `subfields`)
 - 1.0.8
   - Added support for your custom functions as value source (args can be values/fields/funcs), see new section `funcs` in `config`
   - Improved Mongo format: now can compare with field & use funcs with help of `$expr`
