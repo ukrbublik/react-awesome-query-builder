@@ -83,6 +83,9 @@ export default class Field extends PureComponent {
             const tooltip = field.tooltip;
             const subpath = (path ? path : []).concat(fieldKey);
 
+            if (field.hideForSelect)
+                return undefined;
+
             if (field.type == "!struct") {
                 return {
                     key: fieldKey,
@@ -104,7 +107,7 @@ export default class Field extends PureComponent {
                     grouplabel: optGroupLabel
                 };
             }
-        });
+        }).filter(o => !!o);
     }
 
     render() {

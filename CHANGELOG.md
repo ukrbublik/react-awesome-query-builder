@@ -3,6 +3,7 @@
   - Added support for your custom functions as value source (args can be values/fields/funcs), see new section `funcs` in `config`
   - Improved Mongo format: now can compare with field & use funcs with help of `$expr`
   - (breaking) `mongoFormatOp` - inserted arg `useExpr` at 4th position
+  - Added `hideForSelect`, `hideForCompare` for field config
 - 1.0.7
   - Fixed Babel
 - 1.0.6

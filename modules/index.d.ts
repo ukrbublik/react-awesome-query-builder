@@ -303,6 +303,8 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
+  hideForSelect?: Boolean,
+  hideForCompare?: Boolean,
 };
 interface SimpleField extends ValueField {
   label2?: String,
