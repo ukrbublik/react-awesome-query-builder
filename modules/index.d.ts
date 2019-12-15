@@ -18,7 +18,7 @@ type TypedMap<T> = {
 };
 type Empty = null | undefined;
 
-type ValueSource = "value" | "field";
+type ValueSource = "value" | "field" | "func" | "const";
 
 type JsonGroup = {
   type: "group",
@@ -73,6 +73,7 @@ export interface QueryProps {
   types: Types;
   settings: Settings;
   fields: Fields;
+  funcs?: Fincs;
   value: ImmutableTree;
   onChange(immutableTree: ImmutableTree, config: Config): void;
   renderBuilder(props: BuilderProps): ReactElement;
@@ -88,6 +89,7 @@ export interface Config {
   types: Types,
   settings: Settings,
   fields: Fields,
+  funcs?: Funcs,
 };
 
 
@@ -182,7 +184,7 @@ export type Conjunctions = TypedMap<Conjunction>;
 /////////////////
 
 type FormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}, isForDisplay?: Boolean) => String;
-type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
+type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, useExpr?: Boolean, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
 type SqlFormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => String;
 
 interface ProximityConfig {
@@ -289,12 +291,8 @@ interface BaseField {
   label?: String,
   tooltip?: String,
 };
-interface SimpleField extends BaseField {
+interface ValueField extends BaseField {
   type: String,
-  label2?: String,
-  operators?: Array<String>,
-  defaultOperator?: String,
-  excludeOperators?: Array<String>,
   preferWidgets?: Array<String>,
   valueSources?: Array<ValueSource>,
   tableName?: String,
@@ -305,6 +303,12 @@ interface SimpleField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
+};
+interface SimpleField extends ValueField {
+  label2?: String,
+  operators?: Array<String>,
+  defaultOperator?: String,
+  excludeOperators?: Array<String>,
 };
 interface FieldGroup extends BaseField {
   type: "!struct",
@@ -351,13 +355,13 @@ export interface FieldProps {
 // Settings
 /////////////////
 
-type ValueSourcesInfo = {[vs in ValueSource]: {label: String, widget?: String}};
+type ValueSourcesInfo = {[vs in ValueSource]?: {label: String, widget?: String}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: String, op: String, reversedOp: String, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: Boolean) => String;
 type FormatField = (field: String, parts: Array<String>, label2: String, fieldDefinition: Field, config: Config, isForDisplay: Boolean) => String;
-type CanCompareFieldWithField = (leftField: String, leftFieldConfig: Field, rightField: String, rightFieldConfig: Field) => Boolean;
+type CanCompareFieldWithField = (leftField: String, leftFieldConfig: Field, rightField: String, rightFieldConfig: Field, op: String) => Boolean;
 
 export interface LocaleSettings {
   locale?: {
@@ -370,6 +374,8 @@ export interface LocaleSettings {
   fieldLabel?: String,
   operatorLabel?: String,
   fieldPlaceholder?: String,
+  funcPlaceholder?: String,
+  funcLabel?: String,
   operatorPlaceholder?: String,
   deleteLabel?: String,
   addGroupLabel?: String,
@@ -392,6 +398,7 @@ export interface LocaleSettings {
 export interface RenderSettings {
   renderField?: Factory<FieldProps>;
   renderOperator?: Factory<FieldProps>;
+  renderFunc?: Factory<FieldProps>;
   renderConjsAsRadios?: Boolean,
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
@@ -403,6 +410,7 @@ export interface RenderSettings {
 };
 
 export interface BehaviourSettings {
+  valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField,
   canReorder?: Boolean,
   canRegroup?: Boolean,
@@ -415,18 +423,39 @@ export interface BehaviourSettings {
   immutableGroupsMode?: Boolean,
 };
 
-export interface FormatSettings {
+export interface OtherSettings {
+  fieldSeparator?: String,
   fieldSeparatorDisplay?: String,
   formatReverse?: FormatReverse,
   formatField?: FormatField,
 };
 
-export interface MainSettings {
-  valueSourcesInfo?: ValueSourcesInfo,
-  fieldSeparator?: String,
-}
+export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & OtherSettings;
 
-export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & FormatSettings & MainSettings;
+
+/////////////////
+// Funcs
+/////////////////
+
+type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => String;
+type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: Boolean) => String;
+type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => String;
+
+export interface Func {
+  returnType: String,
+  args: TypedMap<FuncArg>,
+  label?: String,
+  sqlFunc?: String,
+  mongoFunc?: String,
+  mongoArgsAsObject?: Boolean,
+  formatFunc?: FormatFunc,
+  sqlFormatFunc?: SqlFormatFunc,
+  mongoFormatFunc?: MongoFormatFunc,
+};
+export interface FuncArg extends ValueField {
+  isOptional?: Boolean,
+};
+export type Funcs = TypedMap<Func>;
 
 
 /////////////////
@@ -473,6 +502,7 @@ export interface BasicConfig extends Config {
     datetime: DateTimeWidget,
     boolean: BooleanWidget,
     field: FieldWidget,
+    func: FieldWidget,
   },
   types: {
     text: Type,
@@ -499,6 +529,8 @@ interface ReadyWidgets {
   VanillaFieldSelect: ElementType<FieldProps>,
 
   ValueFieldWidget: ElementType<WidgetProps>,
+
+  FuncWidget: ElementType<WidgetProps>,
 
   TextWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,

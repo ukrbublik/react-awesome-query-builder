@@ -25,11 +25,13 @@ export const settings = {
   // renderOperator: (props) => <FieldDropdown {...props} />,
   // renderOperator: (props) => <VanillaFieldSelect {...props} />,
 
+  renderFunc: (props) => <FieldSelect {...props} />,
+
   valueSourcesInfo: {
       value: {},
   },
   fieldSeparator: '.',
-  fieldSeparatorDisplay: '->',
+  fieldSeparatorDisplay: '.',
   renderSize: "small",
   maxLabelsLength: 100,
   hideConjForOne: true,
@@ -49,7 +51,9 @@ export const settings = {
   valuePlaceholder: "Value",
   fieldLabel: "Field",
   operatorLabel: "Operator",
+  funcLabel: "Function",
   fieldPlaceholder: "Select field",
+  funcPlaceholder: "Select function",
   operatorPlaceholder: "Select operator",
   deleteLabel: null,
   addGroupLabel: "Add group",

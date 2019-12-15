@@ -259,6 +259,12 @@
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
 }
+.widget--valuesrc {
+  margin-right: -8px;
+}
+.widget--valuesrc span i {
+  transform: rotate(90deg);
+}
 .operator--options--sep {
   margin-right: 10px;
 }
@@ -330,3 +336,30 @@ div.tooltip-inner {
   }
 }
 
+/******************************************************************************/
+/** FUNC **********************************************************************/
+/******************************************************************************/
+
+.rule--func--wrapper, .rule--func, .rule--func--args, .rule--func--arg, .rule--func--arg-value, 
+.rule--func--bracket-before, .rule--func--bracket-after, .rule--func--arg-sep,
+.rule--func--arg-label, .rule--func--arg-label-sep {
+  display: inline-block;
+}
+.rule--func--bracket-before, .rule--func--bracket-after {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.rule--func--bracket-before {
+  margin-left: 5px;
+}
+.rule--func--arg-value > .rule--widget {
+  margin-left: -10px;
+}
+.rule--func--arg-sep {
+  margin-left: 3px;
+  margin-right: 6px;
+}
+.rule--func--arg-label-sep {
+  margin-left: 1px;
+  margin-right: 6px;
+}

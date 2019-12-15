@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Rule from './Rule';
 import Group from './Group';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 const typeMap = {
@@ -33,7 +32,7 @@ const typeMap = {
 };
 
 
-class Item extends Component {
+class Item extends PureComponent {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
@@ -46,9 +45,6 @@ class Item extends Component {
     treeNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
   };
-
-  pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-  shouldComponentUpdate = this.pureShouldComponentUpdate;
 
   render() {
     const { type, ...props } = this.props;

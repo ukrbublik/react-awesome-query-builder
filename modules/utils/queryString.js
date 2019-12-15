@@ -1,10 +1,86 @@
-import {getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels} from './configUtils';
+import {
+    getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels, getFuncConfig
+} from './configUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {defaultValue} from "./stuff";
 import {defaultConjunction} from './defaultUtils';
 import {settings as defaultSettings} from '../config/default';
+import {completeValue} from './funcUtils';
 import {Map} from 'immutable';
+
+const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay) => {
+    if (currentValue === undefined)
+        return undefined;
+    const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+    let ret;
+    if (valueSrc == 'field') {
+        //format field
+        const rightField = currentValue;
+        let formattedField = null;
+        if (rightField) {
+            const rightFieldDefinition = getFieldConfig(rightField, config) || {};
+            const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
+            const _fieldKeys = getFieldPath(rightField, config);
+            const fieldPartsLabels = getFieldPathLabels(rightField, config);
+            const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
+            const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
+            const formatField = config.settings.formatField || defaultSettings.formatField;
+            formattedField = formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
+        }
+        ret = formattedField;
+    } else if (valueSrc == 'func') {
+        const funcKey = currentValue.get('func');
+        const args = currentValue.get('args');
+        const funcConfig = getFuncConfig(funcKey, config);
+        const funcName = isForDisplay && funcConfig.label || funcKey;
+        const formattedArgs = [];
+        for (const argKey in funcConfig.args) {
+            const argConfig = funcConfig.args[argKey];
+            const fieldDef = getFieldConfig(argConfig, config);
+            const argVal = args ? args.get(argKey) : undefined;
+            const argValue = argVal ? argVal.get('value') : undefined;
+            const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
+            const formattedArgVal = formatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay);
+            const argName = isForDisplay && argConfig.label || argKey;
+            if (formattedArgVal !== undefined) // skip optional in the end
+                formattedArgs.push([argName, formattedArgVal]); 
+        }
+        if (typeof funcConfig.formatFunc === 'function') {
+            const fn = funcConfig.formatFunc;
+            const args = [
+                formattedArgs,
+                isForDisplay
+            ];
+            ret = fn(...args);
+        } else {
+            ret = `${funcName}(${formattedArgs.map(([k, v]) => (isForDisplay ? `${k}: ${v}` : `${v}`)).join(', ')})`;
+        }
+    } else {
+        if (typeof fieldWidgetDefinition.formatValue === 'function') {
+            const fn = fieldWidgetDefinition.formatValue;
+            const args = [
+                currentValue,
+                pick(fieldDefinition, ['fieldSettings', 'listValues']),
+                //useful options: valueFormat for date/time
+                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']),
+                isForDisplay
+            ];
+            if (operator) {
+                args.push(operator);
+                args.push(operatorDefinition);
+            }
+            if (valueSrc == 'field') {
+                const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
+                args.push(valFieldDefinition);
+            }
+            ret = fn(...args);
+        } else {
+            ret = currentValue;
+        }
+    }
+    return ret;
+};
 
 export const queryString = (item, config, isForDisplay = false) => {
     const type = item.get('type');
@@ -37,62 +113,26 @@ export const queryString = (item, config, isForDisplay = false) => {
         const reversedOp = operatorDefinition.reversedOp;
         const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-        const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+        const {fieldSeparator} = config.settings;
 
         //format value
         let valueSrcs = [];
         let valueTypes = [];
         let hasUndefinedValues = false;
         let value = properties.get('value').map((currentValue, ind) => {
-            if (currentValue === undefined) {
+            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
+            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
+            currentValue = completeValue(currentValue, valueSrc, config);
+            const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+            const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
+            let fv = formatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay);
+            if (fv === undefined) {
                 hasUndefinedValues = true;
                 return undefined;
             }
-            const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
-            const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
-            const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-            const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
-            let ret;
-            if (valueSrc == 'field') {
-                //format field
-                const rightField = currentValue;
-                let formattedField = null;
-                if (rightField) {
-                    const rightFieldDefinition = getFieldConfig(rightField, config) || {};
-                    const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
-                    const _fieldKeys = getFieldPath(rightField, config);
-                    const fieldPartsLabels = getFieldPathLabels(rightField, config);
-                    const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
-                    const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
-                    const formatField = config.settings.formatField || defaultSettings.formatField;
-                    formattedField = formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
-                }
-                ret = formattedField;
-            } else {
-                if (typeof fieldWidgetDefinition.formatValue === 'function') {
-                    const fn = fieldWidgetDefinition.formatValue;
-                    const args = [
-                        currentValue,
-                        pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                        omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']), //useful options: valueFormat for date/time
-                        isForDisplay
-                    ];
-                    if (true) {
-                        args.push(operator);
-                        args.push(operatorDefinition);
-                    }
-                    if (valueSrc == 'field') {
-                        const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
-                        args.push(valFieldDefinition);
-                    }
-                    ret = fn(...args);
-                } else {
-                    ret = currentValue;
-                }
-            }
             valueSrcs.push(valueSrc);
             valueTypes.push(valueType);
-            return ret;
+            return fv;
         });
         if (hasUndefinedValues || value.size < cardinality)
             return undefined;
@@ -140,7 +180,8 @@ export const queryString = (item, config, isForDisplay = false) => {
             (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
             omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp']),
             operatorOptions,
-            isForDisplay
+            isForDisplay,
+            fieldDefinition,
         ];
         let ret = fn(...args);
         if (isRev) {

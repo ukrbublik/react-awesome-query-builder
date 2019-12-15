@@ -6,19 +6,24 @@ export default
     "a98ab9b9-cdef-4012-b456-71607f326fd9": {
       "type": "rule",
       "properties": {
-        "field": "multicolor",
-        "operator": "multiselect_equals",
+        "field": "user.login",
+        "operator": "equal",
         "value": [
-          [
-            "yellow",
-            "green"
-          ]
+          {
+            "func": "LOWER",
+            "args": {
+              "str": {
+                "valueSrc": "field",
+                "value": "user.firstName"
+              }
+            }
+          }
         ],
         "valueSrc": [
-          "value"
+          "func"
         ],
         "valueType": [
-          "multiselect"
+          "text"
         ]
       }
     },

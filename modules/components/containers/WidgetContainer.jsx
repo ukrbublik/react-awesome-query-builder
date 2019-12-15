@@ -6,23 +6,28 @@ import {
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
 import {defaultValue} from "../../utils/stuff";
-import { Icon, Popover, Button, Radio } from 'antd';
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
+import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
+import Immutable from 'immutable';
 
+const funcArgDummyOpDef = {cardinality: 1};
 
 export default (Widget) => {
     return class WidgetContainer extends PureComponent {
         static propTypes = {
             config: PropTypes.object.isRequired,
-            value: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-            valueSrc: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-            field: PropTypes.string.isRequired,
-            operator: PropTypes.string.isRequired,
+            value: PropTypes.any, //instanceOf(Immutable.List)
+            valueSrc: PropTypes.any, //instanceOf(Immutable.List)
+            field: PropTypes.string,
+            operator: PropTypes.string,
             //actions
             setValue: PropTypes.func,
             setValueSrc: PropTypes.func,
+            // for isFuncArg
+            isFuncArg: PropTypes.bool,
+            fieldFunc: PropTypes.string,
+            fieldArg: PropTypes.string,
+            leftField: PropTypes.string,
         };
 
         constructor(props) {
@@ -33,8 +38,15 @@ export default (Widget) => {
 
         componentWillReceiveProps(nextProps) {
             const prevProps = this.props;
-            const keysForMeta = ["config", "field", "operator", "valueSrc"];
-            const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+            const keysForMeta = ["config", "field", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg"];
+            const needUpdateMeta = !this.meta || 
+                keysForMeta
+                    .map(k => (
+                        nextProps[k] !== prevProps[k] 
+                        //tip: for isFuncArg we need to wrap value in Imm list
+                        || k == 'isFuncArg' && nextProps['isFuncArg'] && nextProps['value'] !== prevProps['value'])
+                    )
+                    .filter(ch => ch).length > 0;
 
             if (needUpdateMeta) {
                 this.meta = this.getMeta(nextProps);
@@ -58,26 +70,34 @@ export default (Widget) => {
             this.props.setValueSrc(delta, srcKey);
         }
 
-        getMeta({config, field, operator, valueSrc: valueSrcs}) {
+        getMeta({config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, isFuncArg, leftField}) {
+            const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
+            let _valueSrcs = valueSrcs;
+            let _values = values;
+            if (isFuncArg) {
+                _valueSrcs = Immutable.List([valueSrcs]);
+                _values = Immutable.List([values]);
+            }
+
+            const fieldDefinition = getFieldConfig(field, config);
             const defaultWidget = getWidgetForFieldOp(config, field, operator);
             const _widgets = getWidgetsForFieldOp(config, field, operator);
-            const fieldDefinition = getFieldConfig(field, config);
-            const operatorDefinition = getOperatorConfig(config, operator, field);
-            if (typeof fieldDefinition === 'undefined' || typeof operatorDefinition === 'undefined') {
+            const operatorDefinition = isFuncArg ? funcArgDummyOpDef : getOperatorConfig(config, operator, field);
+            if (fieldDefinition == null || operatorDefinition == null) {
                 return null;
             }
             const isSpecialRange = operatorDefinition.isSpecialRange;
-            const isSpecialRangeForSrcField = isSpecialRange && (valueSrcs.get(0) == 'field' || valueSrcs.get(1) == 'field');
+            const isSpecialRangeForSrcField = isSpecialRange && (_valueSrcs.get(0) == 'field' || _valueSrcs.get(1) == 'field');
             const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
             const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition.cardinality, 1);
             if (cardinality === 0) {
                 return null;
             }
 
-            const valueSources = getValueSourcesForFieldOp(config, field, operator);
+            const valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition, isFuncArg ? leftField : null);
 
             const widgets = range(0, cardinality).map(delta => {
-                const valueSrc = valueSrcs.get(delta) || null;
+                const valueSrc = _valueSrcs.get(delta) || null;
                 let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
                 let widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
                 if (isSpecialRangeForSrcField) {
@@ -127,20 +147,24 @@ export default (Widget) => {
                 isSpecialRange: isTrueSpecialRange,
                 cardinality,
                 valueSources,
-                widgets
+                widgets,
+                _values, //correct for isFuncArg
+                _field: field, //correct for isFuncArg
             };
         }
 
         render() {
-            const {config, field, operator, value} = this.props;
-            const {settings} = config;
+            const {config, isFuncArg, leftField, operator, value: values} = this.props;
             const meta = this.meta;
             if (!meta)
                 return null;
             const {
-                defaultWidget, cardinality, valueSources, widgets
+                defaultWidget, cardinality, valueSources, widgets, _values, _field
             } = meta;
-
+            const value = isFuncArg ? _values : values;
+            const field = isFuncArg ? leftField : _field;
+            const {settings} = config;
+            
             return (
                 <Widget name={defaultWidget} config={config}>
                     {range(0, cardinality).map(delta => {
@@ -183,10 +207,12 @@ export default (Widget) => {
 
                         const widgetCmp = 
                             <div key={"widget-"+field+"-"+delta} className="widget--widget">
-                                {widgetLabel}
+                                {valueSrc == 'func' ? null : widgetLabel}
                                 <WidgetFactory
+                                    valueSrc={valueSrc}
                                     delta={delta}
                                     value={value}
+                                    isFuncArg={isFuncArg}
                                     {...pick(meta, ['isSpecialRange', 'fieldDefinition'])}
                                     {...pick(widgets[delta], ['widget', 'widgetDefinition', 'widgetValueLabel', 'valueLabels', 'textSeparators', 'setValueHandler'])}
                                     config={config}
@@ -198,7 +224,7 @@ export default (Widget) => {
                         return [
                             sep,
                             sources,
-                            widgetCmp
+                            widgetCmp,
                         ];
                     })}
                 </Widget>
@@ -209,16 +235,19 @@ export default (Widget) => {
 
 
 const WidgetFactory = ({
-    delta,
+    delta, isFuncArg, valueSrc,
     value: immValue,
     isSpecialRange, fieldDefinition,
     widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
-    config, field, operator
+    config, field, operator,
 }) => {
     const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
+    const isConst = isFuncArg && fieldDefinition.valueSources && fieldDefinition.valueSources.length == 1 && fieldDefinition.valueSources[0] == 'const';
+    const defaultValue = fieldDefinition.defaultValue;
 
-    if (!widgetFactory)
+    if (!widgetFactory) {
         return '?';
+    }
     
     let value = isSpecialRange ? 
         [immValue.get(0), immValue.get(1)] 
@@ -234,6 +263,7 @@ const WidgetFactory = ({
         operator: operator,
         delta: delta,
         isSpecialRange: isSpecialRange,
+        isFuncArg: isFuncArg,
         value: value,
         label: widgetValueLabel.label,
         placeholder: widgetValueLabel.placeholder,
@@ -245,47 +275,18 @@ const WidgetFactory = ({
     if (widget == 'field') {
         //
     }
+
+    if (isConst && defaultValue) {
+        if (typeof defaultValue == "boolean") {
+            return defaultValue ? (widgetProps.labelYes || "YES") : (widgetProps.labelNo || "NO");
+        } else if (fieldSettings.listValues) {
+            if (Array.isArray(defaultValue))
+                return defaultValue.map(v => fieldSettings.listValues[v] || v).join(', ');
+            else
+                return (fieldSettings.listValues[defaultValue] || defaultValue);  
+        }
+        return ""+defaultValue;
+    }
     
     return widgetFactory(widgetProps);
 };
-
-
-class ValueSources extends PureComponent {
-    render() {
-        const {config, valueSources, valueSrc, setValueSrcHandler} = this.props;
-        
-        const valueSourcesInfo = config.settings.valueSourcesInfo;
-        const valueSourcesPopupTitle = config.settings.valueSourcesPopupTitle;
-        //const fieldDefinition = getFieldConfig(field, config);
-        //let valueSources = fieldDefinition.valueSources;
-        //let valueSources = getValueSourcesForFieldOp(config, field, operator);
-
-        if (!valueSources || Object.keys(valueSources).length == 1)
-            return null;
-
-        let content = (
-            <RadioGroup
-                value={valueSrc || "value"}
-                size={config.settings.renderSize}
-                onChange={setValueSrcHandler}
-            >
-                {valueSources.map(srcKey => (
-                    <RadioButton
-                        key={srcKey}
-                        value={srcKey}
-                    //checked={item.checked}
-                    >{valueSourcesInfo[srcKey].label}</RadioButton>
-                ))}
-            </RadioGroup>
-        );
-
-        return (
-            <span>
-                <Popover content={content} title={valueSourcesPopupTitle}>
-                    <Icon type="ellipsis" />
-                </Popover>
-            </span>
-        );
-    }
-}
-

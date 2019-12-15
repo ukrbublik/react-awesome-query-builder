@@ -14,7 +14,7 @@ import pick from 'lodash/pick';
 import { ConfigProvider } from 'antd';
 
 
-const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings"];
+const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs"];
 
 const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
     let tree = validateTree(newTree, _oldTree, newConfig, oldConfig, true, true);

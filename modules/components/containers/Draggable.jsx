@@ -1,20 +1,16 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 const classNames = require('classnames');
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 export default (className) => (GroupOrRule) => {
-  return class Draggable extends Component {
+  return class Draggable extends PureComponent {
     static propTypes = {
         isDraggingTempo: PropTypes.bool,
         isDraggingMe: PropTypes.bool,
         onDragStart: PropTypes.func,
         dragging: PropTypes.object, //{id, x, y, w, h}
     };
-
-    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    shouldComponentUpdate = this.pureShouldComponentUpdate;
 
     constructor(props) {
         super(props);

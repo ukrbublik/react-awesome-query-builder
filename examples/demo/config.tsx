@@ -3,7 +3,7 @@ import merge from 'lodash/merge';
 import {
     Widgets, BasicConfig,
     // types:
-    Operators, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity,
+    Operators, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
@@ -96,7 +96,13 @@ const widgets: Widgets = {
         timeFormat: 'HH:mm',
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
-    }
+    },
+    func: {
+        ...BasicConfig.widgets.func,
+        customProps: {
+            showSearch: true
+        }
+    },
 };
 
 
@@ -126,7 +132,9 @@ const localeSettings: LocaleSettings = {
     valuePlaceholder: "Value",
     fieldLabel: "Field",
     operatorLabel: "Operator",
+    funcLabel: "Function",
     fieldPlaceholder: "Select field",
+    funcPlaceholder: "Select function",
     operatorPlaceholder: "Select operator",
     deleteLabel: null,
     addGroupLabel: "Add group",
@@ -157,6 +165,10 @@ const settings: Settings = {
         field: {
             label: "Field",
             widget: "field",
+        },
+        func: {
+            label: "Function",
+            widget: "func",
         }
     },
     // canReorder: true,
@@ -165,9 +177,10 @@ const settings: Settings = {
     // showLabels: true,
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
-    // renderField: (props) => <FieldCascader {...props} />,
-    
+
+    //renderField: (props) => <FieldCascader {...props} />,
     renderOperator: (props) => <FieldDropdown {...props} />,
+    renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -298,7 +311,6 @@ const fields: Fields = {
         allowCustomValues: true
     },
     stock: {
-        valueSources: ['value'],
         label: 'In stock',
         type: 'boolean',
         defaultValue: true,
@@ -309,6 +321,24 @@ const fields: Fields = {
     },
 };
 
+//////////////////////////////////////////////////////////////////////
+
+const funcs: Funcs = {
+    LOWER: {
+        label: 'Lowercase',
+        mongoFunc: '$toLower',
+        returnType: 'text',
+        args: {
+            str: {
+                label: "String",
+                type: 'text',
+                valueSources: ['value', 'field'],
+            },
+        }
+    }
+};
+
+
 const config: Config = {
     conjunctions,
     operators,
@@ -316,6 +346,7 @@ const config: Config = {
     types,
     settings,
     fields,
+    funcs
 };
 
 export default config;

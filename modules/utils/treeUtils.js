@@ -231,9 +231,15 @@ export const checkTree = (tree, config) => {
 function _fromJS(tree) {
     return fromJS(tree, function (key, value) {
         let outValue;
-        if (key == 'value' && value.get(0) && value.get(0).toJS !== undefined)
-            outValue = Immutable.List.of(value.get(0).toJS());
-        else
+        if (key == 'value' && value.get(0) && value.get(0).toJS !== undefined) {
+            const valueJs = value.get(0).toJS();
+            if (valueJs.func) {
+                outValue = value.toOrderedMap();
+            } else {
+                // only for raw values keep JS representation
+                outValue = Immutable.List.of(valueJs);
+            }
+        } else
             outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
         return outValue;
     });

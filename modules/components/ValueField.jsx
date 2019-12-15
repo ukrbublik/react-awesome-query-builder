@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
   getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
-} from "../../utils/configUtils";
-import {truncateString} from "../../utils/stuff";
+} from "../utils/configUtils";
+import {truncateString} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import clone from 'clone';
@@ -28,7 +28,7 @@ export default class ValueField extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
       const prevProps = this.props;
-      const keysForItems = ["config", "field", "operator"];
+      const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
       const keysForMeta = ["config", "field", "operator", "value"];
       const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
@@ -48,7 +48,7 @@ export default class ValueField extends PureComponent {
     return items;
   }
 
-  getMeta({config, field, operator, value}) {
+  getMeta({config, field, operator, value, placeholder: customPlaceholder, isFuncArg}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
@@ -56,8 +56,8 @@ export default class ValueField extends PureComponent {
     const leftFieldConfig = getFieldConfig(field, config);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
-    const placeholder = !isFieldSelected ? (leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder) : null;
-
+    const placeholder = isFieldSelected ? null 
+      : (isFuncArg && customPlaceholder || leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder);
     const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
     const selectedOpts = currField || {};
 
@@ -81,7 +81,7 @@ export default class ValueField extends PureComponent {
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
     let expectedType;
-    let widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
     if (widget) {
       let widgetConfig = config.widgets[widget];
       let widgetType = widgetConfig.type;
@@ -104,7 +104,7 @@ export default class ValueField extends PureComponent {
           let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
-            canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig);
+            canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
           if (!canUse)
             delete list[rightFieldKey];
         }

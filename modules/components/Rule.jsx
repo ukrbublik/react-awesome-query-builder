@@ -9,12 +9,11 @@ import OperatorOptions from './OperatorOptions';
 import { Col, Icon, Button, Modal } from 'antd';
 const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 @RuleContainer
 @Draggable("rule")
-class Rule extends Component {
+class Rule extends PureComponent {
     static propTypes = {
         selectedField: PropTypes.string,
         selectedOperator: PropTypes.string,
@@ -35,9 +34,6 @@ class Rule extends Component {
         setValueSrc: PropTypes.func,
         treeNodesCnt: PropTypes.number,
     };
-
-    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    shouldComponentUpdate = this.pureShouldComponentUpdate;
 
     constructor(props) {
         super(props);

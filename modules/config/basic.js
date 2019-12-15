@@ -18,7 +18,9 @@ const {
     TimeWidget,
     DateTimeWidget,
 
-    ValueFieldWidget
+    ValueFieldWidget,
+
+    FuncWidget
 } = Widgets;
 const { ProximityOperator } = Operators;
 
@@ -60,48 +62,88 @@ const conjunctions = {
 
 //----------------------------  operators
 
+// helpers for mongo format
+const mongoFormatOp1 = (mop, mc,  field, _op, value, useExpr) => {
+    return !useExpr
+        ? { [field]: { [mop]: mc(value) } } 
+        : { [mop]: ["$"+field, mc(value)] };
+};
+
+const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
+    if (not) {
+        return !useExpr
+            ? { [field]: { '$not': { [mops[0]]: values[0], [mops[1]]: values[1] } } } 
+            : {'$not':
+                {'$and': [
+                    { [mops[0]]: [ "$"+field, values[0] ] },
+                    { [mops[1]]: [ "$"+field, values[1] ] },
+                ]}
+              };
+    } else {
+        return !useExpr
+            ? { [field]: { [mops[0]]: values[0], [mops[1]]: values[1] } } 
+            : {'$and': [
+                { [mops[0]]: [ "$"+field, values[0] ] },
+                { [mops[1]]: [ "$"+field, values[1] ] },
+              ]};
+    }
+};
+
+
 const operators = {
   equal: {
       label: '==',
       labelForFormat: '==',
       sqlOp: '=',
       reversedOp: 'not_equal',
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
+      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
+          if (valueTypes == 'boolean' && isForDisplay)
+              return value == 'No' ? `NOT ${field}` : `${field}`;
+          else
+              return `${field} ${opDef.label} ${value}`;
+      },
+      mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v),
   },
   not_equal: {
       label: '!=',
       labelForFormat: '!=',
       sqlOp: '<>',
       reversedOp: 'equal',
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } }),
+      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
+          if (valueTypes == 'boolean' && isForDisplay)
+              return value == 'No' ? `${field}` : `NOT ${field}`;
+          else
+              return `${field} ${opDef.label} ${value}`;
+      },
+      mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => v),
   },
   less: {
       label: '<',
       labelForFormat: '<',
       sqlOp: '<',
       reversedOp: 'greater_or_equal',
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$lt': value } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$lt', v => v),
   },
   less_or_equal: {
       label: '<=',
       labelForFormat: '<=',
       sqlOp: '<=',
       reversedOp: 'greater',
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$lte': value } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$lte', v => v),
   },
   greater: {
       label: '>',
       labelForFormat: '>',
       sqlOp: '>',
       reversedOp: 'less_or_equal',
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$gt': value } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$gt', v => v),
   },
   greater_or_equal: {
       label: '>=',
       labelForFormat: '>=',
       sqlOp: '>=',
       reversedOp: 'less',
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$gte': value } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$gte', v => v),
   },
   like: {
       label: 'Like',
@@ -113,7 +155,7 @@ const operators = {
             return `${field} LIKE ${values}`;
         } else return undefined; // not supported
       },
-      mongoFormatOp: (field, op, value) => ({ [field]: new RegExp(escapeRegExp(value)) }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => new RegExp(escapeRegExp(v))),
   },
   not_like: {
       label: 'Not like',
@@ -125,7 +167,7 @@ const operators = {
             return `${field} NOT LIKE ${values}`;
         } else return undefined; // not supported
       },
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': new RegExp(escapeRegExp(value)) } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => new RegExp(escapeRegExp(v))),
   },
   between: {
       label: 'Between',
@@ -140,7 +182,7 @@ const operators = {
           else
               return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
       },
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
+      mongoFormatOp: mongoFormatOp2.bind(null, ['$gte', '$lte'], false),
       valueLabels: [
           'Value from',
           'Value to'
@@ -156,7 +198,7 @@ const operators = {
       labelForFormat: 'NOT BETWEEN',
       sqlOp: 'NOT BETWEEN',
       cardinality: 2,
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$not': { '$gte': values[0], '$lte': values[1] } } }),
+      mongoFormatOp: mongoFormatOp2.bind(null, ['$gte', '$lte'], true),
       valueLabels: [
           'Value from',
           'Value to'
@@ -181,7 +223,7 @@ const operators = {
           else
               return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
       },
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$gte': values[0], '$lte': values[1] } }),
+      mongoFormatOp: mongoFormatOp2.bind(null, ['$gte', '$lte'], false),
       valueLabels: [
           'Value from',
           'Value to'
@@ -198,7 +240,7 @@ const operators = {
       sqlOp: 'NOT BETWEEN',
       cardinality: 2,
       isSpecialRange: true, // to show 1 range widget instead of 2
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$not': { '$gte': values[0], '$lte': values[1] } } }),
+      mongoFormatOp: mongoFormatOp2.bind(null, ['$gte', '$lte'], true),
       valueLabels: [
           'Value from',
           'Value to'
@@ -219,7 +261,7 @@ const operators = {
       formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
           return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
       },
-      mongoFormatOp: (field, op) => ({ [field]: { '$exists': false } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$exists', v => false),
   },
   is_not_empty: {
       isUnary: true,
@@ -231,7 +273,7 @@ const operators = {
       formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
           return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
       },
-      mongoFormatOp: (field, op) => ({ [field]: { '$exists': true } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$exists', v => true),
   },
   select_equals: {
       label: '==',
@@ -240,7 +282,7 @@ const operators = {
       formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
           return `${field} == ${value}`;
       },
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v),
       reversedOp: 'select_not_equals',
   },
   select_not_equals: {
@@ -250,7 +292,7 @@ const operators = {
       formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
           return `${field} != ${value}`;
       },
-      mongoFormatOp: (field, op, value) => ({ [field]: { '$ne': value } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => v),
       reversedOp: 'select_equals',
   },
   select_any_in: {
@@ -266,7 +308,7 @@ const operators = {
       sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
           return `${field} IN (${values.join(', ')})`;
       },
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$in': values } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$in', v => v),
       reversedOp: 'select_not_any_in',
   },
   select_not_any_in: {
@@ -282,7 +324,7 @@ const operators = {
       sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
           return `${field} NOT IN (${values.join(', ')})`;
       },
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$nin': values } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$nin', v => v),
       reversedOp: 'select_any_in',
   },
   multiselect_equals: {
@@ -302,7 +344,7 @@ const operators = {
           else
               return undefined; //not supported
       },
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$eq': values } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v),
       reversedOp: 'multiselect_not_equals',
   },
   multiselect_not_equals: {
@@ -322,7 +364,7 @@ const operators = {
           else
               return undefined; //not supported
       },
-      mongoFormatOp: (field, op, values) => ({ [field]: { '$ne': values } }),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => v),
       reversedOp: 'multiselect_equals',
   },
   proximity: {
@@ -549,7 +591,16 @@ const widgets = {
       customProps: {
           showSearch: true
       }
-  }
+  },
+  func: {
+    valueSrc: 'func',
+    factory: (props) => <FuncWidget {...props} />,
+    valueLabel: "Function",
+    valuePlaceholder: "Select function",
+    customProps: {
+        //showSearch: true
+    }
+  },
 };
 
 //----------------------------  types
@@ -771,6 +822,10 @@ const settings = {
       field: {
           label: "Field",
           widget: "field",
+      },
+      func: {
+          label: "Function",
+          widget: "func",
       }
   },
   customFieldSelectProps: {

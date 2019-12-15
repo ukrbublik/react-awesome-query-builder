@@ -55,6 +55,8 @@ export default class FieldCascader extends PureComponent {
     );
 
     let tooltipText = selectedOpts.tooltip || selectedAltLabel;
+    if (tooltipText == selectedLabel)
+      tooltipText = null;
     if (tooltipText) {
         res = <Tooltip title={tooltipText}>{res}</Tooltip>;
     }

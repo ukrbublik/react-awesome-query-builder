@@ -48,6 +48,9 @@ export default class FieldSelect extends PureComponent {
       const dropdownPlacement = config.settings.dropdownPlacement;
       const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
       const width = isFieldSelected && !showSearch ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
+      let tooltipText = selectedAltLabel || selectedFullLabel;
+      if (tooltipText == selectedLabel)
+        tooltipText = null;
 
       const fieldSelectItems = this.renderSelectItems(items);
 
@@ -66,8 +69,8 @@ export default class FieldSelect extends PureComponent {
           >{fieldSelectItems}</Select>
       );
 
-      if (selectedFullLabel && selectedFullLabel != selectedLabel && !selectedOpts.tooltip) {
-        res = <Tooltip title={selectedFullLabel}>{res}</Tooltip>;
+      if (tooltipText && !selectedOpts.tooltip) {
+        res = <Tooltip title={tooltipText}>{res}</Tooltip>;
       }
 
       return res;

@@ -90,6 +90,12 @@ const widgets = {
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
     },
+    func: {
+        ...BasicConfig.widgets.func,
+        customProps: {
+            showSearch: true
+        }
+    },
 };
 
 
@@ -150,6 +156,10 @@ const settings = {
         field: {
             label: "Field",
             widget: "field",
+        },
+        func: {
+            label: "Function",
+            widget: "func",
         }
     },
     // canReorder: true,
@@ -160,7 +170,7 @@ const settings = {
     canLeaveEmptyGroup: true, //after deletion
     // renderField: (props) => <FieldCascader {...props} />,
     renderOperator: (props) => <FieldDropdown {...props} />,
-
+    renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -288,11 +298,28 @@ const fields = {
         allowCustomValues: true
     },
     stock: {
-        valueSources: ['value'],
         label: 'In stock',
         type: 'boolean',
     },
 };
+
+//////////////////////////////////////////////////////////////////////
+
+const funcs = {
+    LOWER: {
+        label: 'Lowercase',
+        mongoFunc: '$toLower',
+        returnType: 'text',
+        args: {
+            str: {
+                label: "String",
+                type: 'text',
+                valueSources: ['value', 'field'],
+            },
+        }
+    }
+};
+
 
 export default {
     conjunctions,
@@ -300,6 +327,7 @@ export default {
     widgets,
     types,
     settings,
-    fields: fields,
+    fields,
+    funcs,
 };
 

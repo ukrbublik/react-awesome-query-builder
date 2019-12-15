@@ -4,6 +4,7 @@ import {
     getFieldConfig, getOperatorConfig
 } from './configUtils';
 import {defaultConjunction} from './defaultUtils';
+import {completeValue} from './funcUtils';
 import {Map} from 'immutable';
 
 /*

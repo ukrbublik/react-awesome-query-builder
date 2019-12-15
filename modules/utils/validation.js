@@ -1,9 +1,9 @@
 import {
 	getFieldConfig, getOperatorsForField, getOperatorConfig
 } from './configUtils';
-import {defaultValue, deepCompare} from "../utils/stuff";
+import {defaultValue, deepEqual} from "../utils/stuff";
 import {defaultOperatorOptions} from '../utils/defaultUtils';
-import {_getNewValueForFieldOp} from "../stores/tree";
+import {getNewValueForFieldOp} from "../stores/tree";
 
 
 export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups = false, removeInvalidRules = false) => {
@@ -120,7 +120,7 @@ function _validateRule (item, path, itemId, meta, c) {
 	valueSrc = properties.get('valueSrc');
 	value = properties.get('value');
 	let {newValue, newValueSrc} = 
-			_getNewValueForFieldOp(config, oldConfig, properties, field, operator, null);
+			getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, true);
 	value = newValue;
 	valueSrc = newValueSrc;
 	properties = properties.set('value', value);
@@ -133,7 +133,7 @@ function _validateRule (item, path, itemId, meta, c) {
 		valueSrc: valueSrc ? valueSrc.toJS() : null,
 		value: value ? value.toJS() : null,
 	};
-	const sanitized = !deepCompare(oldSerialized, newSerialized);
+	const sanitized = !deepEqual(oldSerialized, newSerialized);
 	const isValid = field && operator && value && !value.find((v, _ind) => (v === undefined));
 	if (sanitized)
 		meta.sanitized = true;

@@ -88,7 +88,7 @@ export const immutableEqual = function(v1, v2) {
   }
 };
 
-export const deepCompare = function(v1, v2) {
+export const deepEqual = function(v1, v2) {
   if (v1 === v2) {
     return true;
   } else if (Map.isMap(v1)) {

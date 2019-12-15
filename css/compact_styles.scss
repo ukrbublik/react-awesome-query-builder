@@ -49,6 +49,9 @@
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 5px;
 }
+.widget--valuesrc {
+  margin-right: -3px;
+}
 .operator--options--sep {
   margin-right: 5px;
 }
@@ -57,3 +60,7 @@
   padding-left: 0;
 }
 
+
+.rule--func--arg-value > .rule--widget {
+  margin-left: -5px;
+}
