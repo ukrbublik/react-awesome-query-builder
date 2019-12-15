@@ -14,11 +14,11 @@ endif::[]
 
 = Config format
 
-Has 6 sections:
+Has 7 sections:
 
 [source,javascript]
 ----
-{conjunctions, operators, widgets, types, settings, fields}
+{conjunctions, operators, widgets, types, functions, settings, fields}
 ----
 
 Each section is described below.
@@ -193,6 +193,10 @@ const { FieldCascader, FieldDropdown } = Widgets;
     field: {
       label: "Field",
       widget: "field",
+    },
+    func: {
+        label: "Function",
+        widget: "func",
     }
   },
   locale: {
@@ -202,6 +206,7 @@ const { FieldCascader, FieldDropdown } = Widgets;
   },
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
+  renderFunc: (props) => <FieldDropdown {...props} />,
   fieldSeparator: '.',
   fieldSeparatorDisplay: '->',
   canReorder: true,
@@ -274,7 +279,9 @@ Localization:
 |valuePlaceholder |Value
 |fieldLabel |Field
 |operatorLabel |Operator
+|funcLabel |Function
 |fieldPlaceholder |Select field
+|funcPlaceholder |Select function
 |operatorPlaceholder |Select operator
 |deleteLabel |`null`
 |delGroupLabel |`null`
@@ -407,7 +414,8 @@ const {
     BooleanWidget,
     TimeWidget,
     DateTimeWidget,
-    ValueFieldWidget
+    ValueFieldWidget,
+    FuncWidget
 } = Widgets;
 ----
 
@@ -509,4 +517,46 @@ To enable this feature set `valueSources` of type to `['value', 'field'']` (see 
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
 |widgets.<widget>.opProps.<operator> | | |Can be used to override config of operator for widget. Example: `opProps: { between: {valueLabels: ['Time from', 'Time to']} }` for building range of times.
+|===
+
+
+
+{nbsp} +
+{nbsp} +
+[[configfunctions]]
+=== config.functions
+
+[source,javascript]
+----
+{
+  LOWER: {
+    label: 'Lowercase',
+    returnType: 'text',
+    args: {
+      str: {
+        type: 'text',
+        valueSources: ['value', 'field'],
+      }
+    }
+  },
+  ..
+}
+----
+
+[cols="1m,1,1,5a",options="header",]
+|===
+|key |requred |default |meaning
+|label | |same as func key |Label to be displayed in functions list +
+  (If not specified, fields's key will be used instead)
+|sqlFunc | |same as func key |Func name in SQL
+|returnType |+ | |One of types described in link:#configtypes[config.types]
+|args.* | | |Arguments of function. Config is almost same as for link:#configfields[config.fields]
+|args.<arg>.label | | |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
+|args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]
+|args.<arg>.valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`, `'const'`. +
+  `const` is special for args, requires `defaultValue`
+|args.<arg>.defaultValue | | |Default value
+|args.<arg>.listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
+  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
+|args.<arg>.fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}`
 |===

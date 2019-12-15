@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.8
+  - Added support for functions as value source
 - 1.0.7
   - Fixed Babel
 - 1.0.6

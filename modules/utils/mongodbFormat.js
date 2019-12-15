@@ -1,13 +1,69 @@
 'use strict';
 import {defaultValue} from "./stuff";
 import {
-    getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig
+    getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from './configUtils';
 import {defaultConjunction} from './defaultUtils';
 import {completeValue} from './funcUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {Map} from 'immutable';
+
+const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+    if (currentValue === undefined)
+        return undefined;
+    const {fieldSeparator} = config.settings;
+    let ret;
+    if (valueSrc == 'field') {
+        console.error("Field as right-hand operand is not supported for mongodb export");
+    } else if (valueSrc == 'func') {
+        const funcKey = currentValue.get('func');
+        const args = currentValue.get('args');
+        const funcConfig = getFuncConfig(funcKey, config);
+        const funcName = funcConfig.mongoFunc || funcKey;
+        const formattedArgs = {};
+        for (const argKey in funcConfig.args) {
+            const argConfig = funcConfig.args[argKey];
+            const fieldDef = getFieldConfig(argConfig, config);
+            const argVal = args ? args.get(argKey) : undefined;
+            const argValue = argVal ? argVal.get('value') : undefined;
+            const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
+            const argName = argKey;
+            const formattedArgVal = mongoFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+            if (argValue != undefined && formattedArgVal === undefined)
+                return undefined;
+            formattedArgs[argName] = formattedArgVal; 
+        }
+        if (typeof fieldWidgetDefinition.mongoFormatFunc === 'function') {
+            const fn = fieldWidgetDefinition.mongoFormatFunc;
+            const args = [
+                funcKey,
+                funcConfig,
+                formattedArgs,
+            ];
+            ret = fn(...args);
+        } else {
+            ret = { [funcName]: formattedArgs };
+        }
+    } else {
+        if (typeof fieldWidgetDefinition.mongoFormatValue === 'function') {
+            const fn = fieldWidgetDefinition.mongoFormatValue;
+            const args = [
+                currentValue,
+                pick(fieldDefinition, ['fieldSettings', 'listValues']),
+                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue', 'sqlFormatFunc']), //useful options: valueFormat for date/time
+            ];
+            if (operator) {
+                args.push(operator);
+                args.push(operatorDefinition);
+            }
+            ret = fn(...args);
+        } else {
+            ret = currentValue;
+        }
+    }
+    return ret;
+}
 
 export const mongodbFormat = (item, config, _not = false) => {
     const type = item.get('type');
@@ -76,35 +132,16 @@ export const mongodbFormat = (item, config, _not = false) => {
             const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
             const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
             currentValue = completeValue(currentValue, valueSrc, config);
-            if (currentValue === undefined) {
+            const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+            const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
+            let fv = mongoFormatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+            if (fv === undefined) {
                 hasUndefinedValues = true;
                 return undefined;
             }
-            const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-            const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
-            let ret;
-            if (valueSrc == 'field') {
-                console.error("Field as right-hand operand is not supported for mongodb export");
-            } else {
-                if (typeof fieldWidgetDefinition.mongoFormatValue === 'function') {
-                    const fn = fieldWidgetDefinition.mongoFormatValue;
-                    const args = [
-                        currentValue,
-                        pick(fieldDefinition, ['fieldSettings', 'listValues']),
-                        omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']), //useful options: valueFormat for date/time
-                    ];
-                    if (true) {
-                        args.push(operator);
-                        args.push(operatorDefinition);
-                    }
-                    ret = fn(...args);
-                } else {
-                    ret = currentValue;
-                }
-            }
             valueSrcs.push(valueSrc);
             valueTypes.push(valueType);
-            return ret;
+            return fv;
         });
         if (value.size < cardinality || hasUndefinedValues)
             return undefined;

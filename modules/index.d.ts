@@ -442,6 +442,7 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & For
 
 export interface Func {
   label?: String,
+  sqlFunc?: String,
   returnType: String,
   args: TypedMap<FuncArg>,
 };
@@ -520,6 +521,8 @@ interface ReadyWidgets {
   VanillaFieldSelect: ElementType<FieldProps>,
 
   ValueFieldWidget: ElementType<WidgetProps>,
+
+  FuncWidget: ElementType<WidgetProps>,
 
   TextWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,

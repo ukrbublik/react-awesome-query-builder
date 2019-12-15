@@ -68,8 +68,8 @@ const operators = {
       labelForFormat: '==',
       sqlOp: '=',
       reversedOp: 'not_equal',
-      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
-          if (isForDisplay)
+      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
+          if (valueTypes == 'boolean' && isForDisplay)
               return value == 'No' ? `NOT ${field}` : `${field}`;
           else
               return `${field} ${opDef.label} ${value}`;
@@ -81,8 +81,8 @@ const operators = {
       labelForFormat: '!=',
       sqlOp: '<>',
       reversedOp: 'equal',
-      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
-          if (isForDisplay)
+      formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
+          if (valueTypes == 'boolean' && isForDisplay)
               return value == 'No' ? `${field}` : `NOT ${field}`;
           else
               return `${field} ${opDef.label} ${value}`;
@@ -567,12 +567,6 @@ const widgets = {
   func: {
     valueSrc: 'func',
     factory: (props) => <FuncWidget {...props} />,
-    // formatValue: (val, fieldDef, wgtDef, isForDisplay, op, opDef, rightFieldDef) => {
-    //     return isForDisplay ? (rightFieldDef.label || val) : val;
-    // },
-    // sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef) => {
-    //     return val;
-    // },
     valueLabel: "Function",
     valuePlaceholder: "Select function",
     customProps: {
