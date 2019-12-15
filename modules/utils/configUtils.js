@@ -87,15 +87,17 @@ function _extendFuncArgsConfig(subconfig, config) {
         }
 
         // isOptional can be only in the end
-        const argKeys = Object.keys(funcDef.args);
-        let tmpIsOptional = true;
-        for (const argKey of argKeys.reverse()) {
-            const argDef = funcDef.args[argKey];
-            if (!tmpIsOptional && argDef.isOptional) {
-                delete argDef.isOptional;
+        if (funcDef.args) {
+            const argKeys = Object.keys(funcDef.args);
+            let tmpIsOptional = true;
+            for (const argKey of argKeys.reverse()) {
+                const argDef = funcDef.args[argKey];
+                if (!tmpIsOptional && argDef.isOptional) {
+                    delete argDef.isOptional;
+                }
+                if (!argDef.isOptional)
+                    tmpIsOptional = false;
             }
-            if (!argDef.isOptional)
-                tmpIsOptional = false;
         }
 
         if (funcDef.subfields) {
