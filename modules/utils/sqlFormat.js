@@ -64,7 +64,7 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
         const args = currentValue.get('args');
         const funcConfig = getFuncConfig(funcKey, config);
         const funcName = funcConfig.sqlFunc || funcKey;
-        const formattedArgs = [];
+        const formattedArgs = {};
         for (const argKey in funcConfig.args) {
             const argConfig = funcConfig.args[argKey];
             const fieldDef = getFieldConfig(argConfig, config);
@@ -73,7 +73,7 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
             const formattedArgVal = sqlFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
             if (formattedArgVal !== undefined) // skip optional in the end
-                formattedArgs.push([argKey, formattedArgVal]);
+                formattedArgs[argKey] = formattedArgVal;
         }
         if (typeof funcConfig.sqlFormatFunc === 'function') {
             const fn = funcConfig.sqlFormatFunc;
@@ -82,7 +82,7 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             ];
             ret = fn(...args);
         } else {
-            ret = `${funcName}(${formattedArgs.map(([k, v]) => v).join(', ')})`;
+            ret = `${funcName}(${Object.entries(formattedArgs).map(([k, v]) => v).join(', ')})`;
         }
     } else {
         if (typeof fieldWidgetDefinition.sqlFormatValue === 'function') {

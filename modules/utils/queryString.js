@@ -34,7 +34,8 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
         const args = currentValue.get('args');
         const funcConfig = getFuncConfig(funcKey, config);
         const funcName = isForDisplay && funcConfig.label || funcKey;
-        const formattedArgs = [];
+        const formattedArgs = {};
+        const formattedArgsWithNames = {};
         for (const argKey in funcConfig.args) {
             const argConfig = funcConfig.args[argKey];
             const fieldDef = getFieldConfig(argConfig, config);
@@ -43,8 +44,10 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
             const formattedArgVal = formatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay);
             const argName = isForDisplay && argConfig.label || argKey;
-            if (formattedArgVal !== undefined) // skip optional in the end
-                formattedArgs.push([argName, formattedArgVal]); 
+            if (formattedArgVal !== undefined) { // skip optional in the end
+                formattedArgs[argKey] = formattedArgVal;
+                formattedArgsWithNames[argName] = formattedArgVal;
+            }
         }
         if (typeof funcConfig.formatFunc === 'function') {
             const fn = funcConfig.formatFunc;
@@ -54,7 +57,7 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
             ];
             ret = fn(...args);
         } else {
-            ret = `${funcName}(${formattedArgs.map(([k, v]) => (isForDisplay ? `${k}: ${v}` : `${v}`)).join(', ')})`;
+            ret = `${funcName}(${Object.entries(formattedArgsWithNames).map(([k, v]) => (isForDisplay ? `${k}: ${v}` : `${v}`)).join(', ')})`;
         }
     } else {
         if (typeof fieldWidgetDefinition.formatValue === 'function') {

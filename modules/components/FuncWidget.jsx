@@ -130,27 +130,27 @@ export default class FuncWidget extends PureComponent {
     );
   };
 
-  renderArgSep = (argKey, argDefinition, argIndex) => {
+  renderArgSep = (argKey, argDefinition, argIndex, {renderSeps}) => {
     if (!argIndex) return null;
     return (
       <Col className="rule--func--arg-sep">
-        {", "}
+        {renderSeps ? renderSeps[argIndex - 1] : ", "}
       </Col>
     );
   };
 
-  renderBracketBefore = (funcDefinition) => {
+  renderBracketBefore = ({renderBrackets}) => {
     return (
       <Col key="before_args" className="rule--func--bracket-before">
-        {"("}
+        {renderBrackets ? renderBrackets[0] : "("}
       </Col>
     );
   };
 
-  renderBracketAfter = (funcDefinition) => {
+  renderBracketAfter = ({renderBrackets}) => {
     return (
       <Col key="after_args" className="rule--func--bracket-after">
-        {")"}
+        {renderBrackets ? renderBrackets[1] : ")"}
       </Col>
     );
   };
@@ -167,7 +167,7 @@ export default class FuncWidget extends PureComponent {
         <Col key="args" className="rule--func--args">
           {Object.keys(args).map((argKey, argIndex) => (
             <Col key={`arg-${argKey}-${argIndex}`} className="rule--func--arg">
-              {this.renderArgSep(argKey, args[argKey], argIndex)}
+              {this.renderArgSep(argKey, args[argKey], argIndex, funcDefinition)}
               {this.renderArgLabel(argKey, args[argKey])}
               {this.renderArgLabelSep(argKey, args[argKey])}
               {this.renderArgVal(funcKey, argKey, args[argKey])}

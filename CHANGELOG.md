@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.12
+  - Added `sqlFormatFunc`, `mongoFormatFunc`, `renderBrackets`, `renderSeps` (for func), `funcs` (for field)
 - 1.0.11
   - Added css-class `qb-lite` for query builder (see readme if you wanna use it)
 - 1.0.10

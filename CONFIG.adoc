@@ -145,7 +145,7 @@ const myConfig = {
 
 [cols="1m,1,1,5a",options="header"]
 |===
-|key |requred |default |meaning
+|key |required |default |meaning
 |type |+ | |One of types described in link:#configtypes[config.types] or `!struct` for complex field
 |subfields |+ for `!struct` type | |Config for subfields of complex field (multiple nesting is supported)
 |label |+ | |Label to be displayed in field list +
@@ -168,6 +168,7 @@ const myConfig = {
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
 |mainWidgetProps | | |Shorthand for `widgets.<main>.widgetProps`
 |excludeOperators | | |Can exclude some operators, eg. `proximity` for `text` type
+|funcs | | |If comparing with funcs is enabled for this field (`valueSources` contains `func`), you can also limit list of funcs to be compared (by default will be available all funcs from link:#configfuncs[config.funcs] with `returnType` matching field's `type`)
 |hideForSelect | |false |If true, field will appear only at right side (when you compare field with another field)
 |hideForCompare | |false |If true, field will appear only at left side
 |===
@@ -343,7 +344,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 
 [cols="1m,1,4a",options="header",]
 |===
-|key |requred |meaning
+|key |required |meaning
 |label |+ |Label to be displayed in conjunctions swicther
 |formatConj |+ |Function for formatting query, used to join rules into group with conjunction. +
   `(Immultable.List children, string conj, bool not, bool isForDisplay) => string` +
@@ -379,7 +380,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 
 [cols="1m,1,1,5a",options="header",]
 |===
-|key |requred |default |meaning
+|key |required |default |meaning
 |label |+ | |Label to be displayed in operators select component
 |reversedOp |+ | |Opposite operator.
 |isUnary | |false |true for `is_empty` operator only
@@ -464,7 +465,7 @@ const {
 
 [cols="1m,1,1,5a",options="header",]
 |===
-|key |requred |default |meaning
+|key |required |default |meaning
 |type |+ | |One of types described in link:#configtypes[config.types]
 |factory |+ | |React function component
 |formatValue |+ | |Function for formatting widget's value in query string. +
@@ -483,9 +484,7 @@ const {
 |valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to format value to be passed in `formatValue()`. Example: `YYYY-MM-DD HH:mm`
 |labelYes, labelNo | | |Option for `<BooleanWidget>`
 |customProps | | |You can pass any props directly to widget with `customProps`. +
-  For example enable search for https://ant.design/components/select/[`<Select>`] widget: `widgetProps: {customProps: {showSearch: true}}`
-|singleWidget | | |Special option for `rangeslider` widget (`<RangeWidget>`), value equals to `slider` (`<SliderWidget>`) to connect them. +
-  Used together with operator `range_between` having `isSpecialRange=true` option.
+  For example enable search for https://ant.design/components/select/[`<Select>`] widget: `customProps: {showSearch: true}`
 |===
 
 NOTE: There is special `field` widget, rendered by `<ValueFieldWidget>`. +
@@ -531,7 +530,7 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 
 [cols="1m,1,1,5a",options="header",]
 |===
-|key |requred |default |meaning
+|key |required |default |meaning
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
@@ -570,15 +569,18 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 
 [cols="1m,1,1,5a",options="header",]
 |===
-|key |requred |default |meaning
+|key |required |default |meaning
 |returnType |+ | |One of types described in link:#configtypes[config.types]
 |label | |same as func key |Label to be displayed in functions list
-|formatFunc | |For `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression in query rule. +
+|formatFunc | |Example: for `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression in query rule. +
   `(Object args, bool isForDisplay) => string` +
-  where `args` is map `{<arg name> => <arg value>}``
-|sqlFunc |+ for SQL format |same as func key |Func name in SQL
-|mongoFunc |+ for MongoDB format |same as func key |Func name in Mongo
+  where `args` is object `{<arg name> : <arg value>}`
+|sqlFunc |- for SQL format |same as func key |Func name in SQL
+|sqlFormatFunc |- for SQL format | |Can be used instead of `sqlFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
+  Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
+|mongoFunc |- for MongoDB format |same as func key |Func name in Mongo
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
+|mongoFormatFunc |- for MongoDB format | |Can be used instead of `mongoFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression object.
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]
@@ -589,4 +591,6 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
   Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
 |args.<arg>.fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}`
 |args.<arg>.isOptional | |false |Last args can be optional
+|renderBrackets | |`['(', ')']` |Can render custom function brackets in UI (or not render).
+|renderSeps | |`[', ']` |Can render custom arguments separators in UI (other than `,`).
 |===

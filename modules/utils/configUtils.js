@@ -426,7 +426,11 @@ export const getValueSourcesForFieldOp = (config, field, operator, fieldDefiniti
             return config._fieldsCntByType[fieldDefinition.type] > 1;
         }
         if (vs == "func" && fieldDefinition) {
-            return config._funcsCntByType[fieldDefinition.type] > 0;
+            if (!config._funcsCntByType[fieldDefinition.type])
+                return false;
+            if (fieldDefinition.funcs)
+                return fieldDefinition.funcs.length > 0;
+            return true;
         }
         return true;
     });

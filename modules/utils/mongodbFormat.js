@@ -52,13 +52,12 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
             const argVal = args ? args.get(argKey) : undefined;
             const argValue = argVal ? argVal.get('value') : undefined;
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
-            const argName = argKey;
             const [formattedArgVal, _argUseExpr] = mongoFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
             if (argValue != undefined && formattedArgVal === undefined)
                 return [undefined, false];
             argsCnt++;
             if (formattedArgVal !== undefined) { // skip optional in the end
-                formattedArgs[argName] = formattedArgVal;
+                formattedArgs[argKey] = formattedArgVal;
                 lastArg = formattedArgVal;
             }
         }
