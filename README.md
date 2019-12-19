@@ -146,7 +146,7 @@ class DemoQueryBuilder extends Component {
 - Please wrap `<Builder />` in `div.query-builder`.  
   Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
   Wrapping in `div.query-builder-container` in not necessary, but if you want to make query builder scrollable, it's best place to apply appropriate styles.
-- Use can save query value in `onChange` callback.  
+- You can save query value in `onChange` callback.  
   Note that value will be in [`Immutable`](https://immutable-js.github.io/immutable-js/) format, so you can use `QbUtils.getTree()` to convert it into JS object.  
   You can store it on backend, and load later by passing in `value` prop of `<Query />`.
 

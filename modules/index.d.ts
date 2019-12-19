@@ -295,6 +295,7 @@ interface ValueField extends BaseField {
   type: String,
   preferWidgets?: Array<String>,
   valueSources?: Array<ValueSource>,
+  funcs?: Array<String>,
   tableName?: String,
   fieldSettings?: FieldSettings,
   defaultValue?: RuleValue,
@@ -441,7 +442,7 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & Oth
 
 type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => String;
 type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: Boolean) => String;
-type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => String;
+type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
 
 interface FuncGroup {
   type?: "!struct",
@@ -459,6 +460,8 @@ export interface Func {
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,
+  renderBrackets?: Array<ReactElement | String>,
+  renderSeps?: Array<ReactElement | String>,
 };
 export interface FuncArg extends ValueField {
   isOptional?: Boolean,

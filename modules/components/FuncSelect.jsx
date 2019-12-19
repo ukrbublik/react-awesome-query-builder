@@ -101,6 +101,8 @@ export default class FuncSelect extends PureComponent {
             delete list[funcKey];
         } else {
           let canUse = funcConfig.returnType == expectedType;
+          if (leftFieldConfig.funcs)
+            canUse = canUse && leftFieldConfig.funcs.includes(funcFullkey);
           if (canUseFuncForField)
             canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
           if (!canUse)
