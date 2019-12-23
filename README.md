@@ -149,6 +149,9 @@ class DemoQueryBuilder extends Component {
 - You can save query value in `onChange` callback.  
   Note that value will be in [`Immutable`](https://immutable-js.github.io/immutable-js/) format, so you can use `QbUtils.getTree()` to convert it into JS object.  
   You can store it on backend, and load later by passing in `value` prop of `<Query />`.
+- If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
+  - use prop `disableEnforceFocus={true}` for dialog or popver
+  - set css `.MuiPopover-root, .MuiDialog-root { z-index: 1000; }`
 
 
 ## Config format
