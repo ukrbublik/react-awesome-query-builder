@@ -151,7 +151,7 @@ class DemoQueryBuilder extends Component {
   You can store it on backend, and load later by passing in `value` prop of `<Query />`.
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
-  - set css `.MuiPopover-root, .MuiDialog-root { z-index: 1000; }`
+  - set css `.MuiPopover-root, .MuiDialog-root { z-index: 1000 !important; }`
 
 
 ## Config format
