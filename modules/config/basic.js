@@ -103,6 +103,7 @@ const operators = {
               return `${field} ${opDef.label} ${value}`;
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v),
+      jsonLogic: '==',
   },
   not_equal: {
       label: '!=',
@@ -116,6 +117,7 @@ const operators = {
               return `${field} ${opDef.label} ${value}`;
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => v),
+      jsonLogic: '!=',
   },
   less: {
       label: '<',
@@ -123,6 +125,7 @@ const operators = {
       sqlOp: '<',
       reversedOp: 'greater_or_equal',
       mongoFormatOp: mongoFormatOp1.bind(null, '$lt', v => v),
+      jsonLogic: '<',
   },
   less_or_equal: {
       label: '<=',
@@ -130,6 +133,7 @@ const operators = {
       sqlOp: '<=',
       reversedOp: 'greater',
       mongoFormatOp: mongoFormatOp1.bind(null, '$lte', v => v),
+      jsonLogic: '<=',
   },
   greater: {
       label: '>',
@@ -137,6 +141,7 @@ const operators = {
       sqlOp: '>',
       reversedOp: 'less_or_equal',
       mongoFormatOp: mongoFormatOp1.bind(null, '$gt', v => v),
+      jsonLogic: '>',
   },
   greater_or_equal: {
       label: '>=',
@@ -144,6 +149,7 @@ const operators = {
       sqlOp: '>=',
       reversedOp: 'less',
       mongoFormatOp: mongoFormatOp1.bind(null, '$gte', v => v),
+      jsonLogic: '>=',
   },
   like: {
       label: 'Like',
@@ -156,6 +162,7 @@ const operators = {
         } else return undefined; // not supported
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => new RegExp(escapeRegExp(v))),
+      jsonLogic: (field, op, val) => ({ "in": [val, field] }),
   },
   not_like: {
       label: 'Not like',
@@ -192,6 +199,7 @@ const operators = {
           'and'
       ],
       reversedOp: 'not_between',
+      jsonLogic: (field, op, vals) => ({ "<=": [vals[0], field, vals[1]] }),
   },
   not_between: {
       label: 'Not between',
@@ -233,6 +241,7 @@ const operators = {
           'and'
       ],
       reversedOp: 'range_not_between',
+      jsonLogic: (field, op, vals) => ({ "<=": [vals[0], field, vals[1]] }),
   },
   range_not_between: {
       label: 'Not between',
@@ -262,6 +271,7 @@ const operators = {
           return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$exists', v => false),
+      jsonLogic: "!",
   },
   is_not_empty: {
       isUnary: true,
@@ -274,6 +284,7 @@ const operators = {
           return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$exists', v => true),
+      jsonLogic: "!!",
   },
   select_equals: {
       label: '==',
@@ -284,6 +295,7 @@ const operators = {
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v),
       reversedOp: 'select_not_equals',
+      jsonLogic: "==",
   },
   select_not_equals: {
       label: '!=',
@@ -294,6 +306,7 @@ const operators = {
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => v),
       reversedOp: 'select_equals',
+      jsonLogic: "!=",
   },
   select_any_in: {
       label: 'Any in',
@@ -310,6 +323,7 @@ const operators = {
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$in', v => v),
       reversedOp: 'select_not_any_in',
+      jsonLogic: "in",
   },
   select_not_any_in: {
       label: 'Not in',
@@ -346,6 +360,10 @@ const operators = {
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v),
       reversedOp: 'multiselect_not_equals',
+      jsonLogic: (field, op, vals) => ({
+        // it's not "equals", but "includes" operator - just for example
+        "all": [ field, {"in": [{"var": ""}, vals]} ]
+      }),
   },
   multiselect_not_equals: {
       label: 'Not equals',
@@ -393,6 +411,7 @@ const operators = {
           return `CONTAINS(${field}, 'NEAR((${_val1}, ${_val2}), ${prox})')`;
       },
       mongoFormatOp: (field, op, values) => (undefined), // not supported
+      jsonLogic: undefined, // not supported
       options: {
           optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
           optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
@@ -519,6 +538,7 @@ const widgets = {
           const dateVal = moment(val, wgtDef.valueFormat);
           return SqlString.escape(dateVal.format('YYYY-MM-DD'));
       },
+      jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
   },
   time: {
       type: "time",
@@ -539,6 +559,11 @@ const widgets = {
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
           const dateVal = moment(val, wgtDef.valueFormat);
           return SqlString.escape(dateVal.format('HH:mm:ss'));
+      },
+      jsonLogic: (val, fieldDef, wgtDef) => {
+        // return seconds of day
+        const dateVal = moment(val, wgtDef.valueFormat);
+        return dateVal.get('hour') * 60 * 60 + dateVal.get('minute') * 60 + dateVal.get('second');
       },
   },
   datetime: {
@@ -562,6 +587,7 @@ const widgets = {
           const dateVal = moment(val, wgtDef.valueFormat);
           return SqlString.escape(dateVal.toDate());
       },
+      jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
   },
   boolean: {
       type: "boolean",

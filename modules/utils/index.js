@@ -1,5 +1,6 @@
 'use strict';
 export {queryBuilderFormat} from './queryBuilderFormat'
+export {jsonLogicFormat} from './jsonLogicFormat'
 export {mongodbFormat} from './mongodbFormat'
 export {sqlFormat} from './sqlFormat'
 export {queryString} from './queryString'

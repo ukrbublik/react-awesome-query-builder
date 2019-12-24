@@ -8,8 +8,9 @@ import loadedConfig from './config';
 import loadedInitValue from './init_value';
 const stringify = JSON.stringify;
 
-const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
+const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
+const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
@@ -63,51 +64,73 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
 
-    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => (
-      <div>
-        <br />
+    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
+      const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+
+      return (
         <div>
-          stringFormat: 
-          <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config), undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-          humanStringFormat: 
-          <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config, true), undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-          sqlFormat: 
+
+          <div>
+            <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogic</a>: 
+              { errors ? 
+                <pre style={preErrorStyle}>
+                  {stringify(errors, undefined, 2)}
+                </pre> 
+              : 
+                <pre style={preStyle}>
+                  {stringify(logic, undefined, 2)}
+                  <br />
+                  <hr />
+                  {stringify(data, undefined, 2)}
+                </pre>
+              }
+          </div>
+          <hr/>
+
+          <br />
+          <div>
+            stringFormat: 
             <pre style={preStyle}>
-              {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+              {stringify(queryString(immutableTree, config), undefined, 2)}
             </pre>
-        </div>
-        <hr/>
-        <div>
-          mongodbFormat: 
+          </div>
+          <hr/>
+          <div>
+            humanStringFormat: 
             <pre style={preStyle}>
-              {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+              {stringify(queryString(immutableTree, config, true), undefined, 2)}
             </pre>
-        </div>
-        <hr/>
-        <div>
-          Tree: 
-          <pre style={preStyle}>
-            {stringify(getTree(immutableTree), undefined, 2)}
-          </pre>
-        </div>
-        {/* <hr/>
-        <div>
-          queryBuilderFormat: 
+          </div>
+          <hr/>
+          <div>
+            sqlFormat: 
+              <pre style={preStyle}>
+                {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+              </pre>
+          </div>
+          <hr/>
+          <div>
+            mongodbFormat: 
+              <pre style={preStyle}>
+                {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+              </pre>
+          </div>
+          <hr/>
+          <div>
+            Tree: 
             <pre style={preStyle}>
-              {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
+              {stringify(getTree(immutableTree), undefined, 2)}
             </pre>
-        </div> */}
-      </div>
-    )
+          </div>
+          {/* <hr/>
+          <div>
+            queryBuilderFormat: 
+              <pre style={preStyle}>
+                {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
+              </pre>
+          </div> */}
+        </div>
+      )
+  }
 
 }

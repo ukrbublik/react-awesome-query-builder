@@ -401,11 +401,13 @@ const _validateNormalValue = (leftField, field, value, valueSrc, valueType, conf
  * 
  */
 const _validateFieldValue = (leftField, field, value, _valueSrc, valueType, config, operator = null, isEndValue = false, canFix = false) => {
-    let fixedValue = value;
+    const {fieldSeparator} = config.settings;
+    const leftFieldStr = Array.isArray(leftField) ? leftField.join(fieldSeparator) : leftField;
+    const rightFieldStr = Array.isArray(value) ? value.join(fieldSeparator) : value;
     const rightFieldDefinition = getFieldConfig(value, config);
     if (!rightFieldDefinition)
         return [`Unknown field ${value}`, value];
-    if (value == leftField)
+    if (rightFieldStr == leftFieldStr)
         return [`Can't compare field ${leftField} with itself`, value];
     if (valueType && valueType != rightFieldDefinition.type)
         return [`Field ${value} is of type ${rightFieldDefinition.type}, but expected ${valueType}`, value];

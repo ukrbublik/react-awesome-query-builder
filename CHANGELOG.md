@@ -1,4 +1,6 @@
 # Changelog
+- 1.0.13
+  - Added [JsonLogic](http://jsonlogic.com) support
 - 1.0.12
   - Added `sqlFormatFunc`, `mongoFormatFunc`, `renderBrackets`, `renderSeps` (for func), `funcs` (for field)
 - 1.0.11

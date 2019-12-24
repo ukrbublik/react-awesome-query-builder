@@ -8,6 +8,16 @@ import {ElementType, ReactElement, Factory} from 'react';
 /////////////////
 
 type MongoValue = any;
+
+type JsonLogicResult = {
+  logic?: JsonLogicTree,
+  data?: Object,
+  errors?: Array<string>
+};
+type JsonLogicTree = Object;
+type JsonLogicValue = any;
+type JsonLogicField = { "var": String };
+
 type RuleValue = Boolean | Number | String | Date | Array<String> | any;
 
 type Optional<T> = {
@@ -50,6 +60,7 @@ export type ImmutableTree = ImmutableMap<String, String|Object>;
 /////////////////
 
 export interface Utils {
+  jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: Boolean): String;
   sqlFormat(tree: ImmutableTree, config: Config): String;
@@ -186,6 +197,7 @@ export type Conjunctions = TypedMap<Conjunction>;
 type FormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}, isForDisplay?: Boolean) => String;
 type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, useExpr?: Boolean, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
 type SqlFormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => String;
+type JsonLogicFormatOperator = (field: JsonLogicField, op: String, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: {}) => JsonLogicTree;
 
 interface ProximityConfig {
   optionLabel: String,
@@ -217,6 +229,7 @@ interface BaseOperator {
   mongoFormatOp?: MongoFormatOperator,
   sqlOp?: String,
   sqlFormatOp?: SqlFormatOperator,
+  jsonLogic?: String | JsonLogicFormatOperator,
 };
 interface UnaryOperator extends BaseOperator {
   isUnary: true,
@@ -457,6 +470,7 @@ export interface Func {
   sqlFunc?: String,
   mongoFunc?: String,
   mongoArgsAsObject?: Boolean,
+  jsonLogic?: String,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,

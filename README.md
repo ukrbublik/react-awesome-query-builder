@@ -33,7 +33,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
   - function (argumentss also can be values/fields/funcs)
 - Reordering (drag-n-drop) support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/) (but using custom widgets of another framework is possible)
-- Export to MongoDb, SQL or your custom format
+- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
 - TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo))
 
 
