@@ -168,8 +168,8 @@ const myConfig = {
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
 |mainWidgetProps | | |Shorthand for `widgets.<main>.widgetProps`
-|excludeOperators | | |Can exclude some operators, eg. `proximity` for `text` type
-|funcs | | |If comparing with funcs is enabled for this field (`valueSources` contains `func`), you can also limit list of funcs to be compared (by default will be available all funcs from link:#configfuncs[config.funcs] with `returnType` matching field's `type`)
+|excludeOperators | | |Can exclude some operators. Example: `['proximity']` for `text` type
+|funcs | | |If comparing with funcs is enabled for this field (`valueSources` contains `'func'`), you can also limit list of funcs to be compared (by default will be available all funcs from link:#configfuncs[config.funcs] with `returnType` matching field's `type`)
 |hideForSelect | |false |If true, field will appear only at right side (when you compare field with another field)
 |hideForCompare | |false |If true, field will appear only at left side
 |===
@@ -288,8 +288,8 @@ Other settings:
   `parts` - list of fields's keys for struct field +
   `label2` - field's `label2` OR parts joined by `fieldSeparatorDisplay` +
   Default impl will just return `field` (or `label2` for `isForDisplay==true`)
-|fieldSeparator |`.` |Separaor for struct fields. Also used for formatting
-|fieldSeparatorDisplay |`.` |Separaor for struct fields to show at field's select tooltip.
+|fieldSeparator |`.` |Separator for struct fields.
+|fieldSeparatorDisplay |`.` |Separator for struct fields in UI.
 |===
 
 Localization:
@@ -398,7 +398,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query if just `sqlOp` is not enough. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
-|jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String -or- function for JsonLogic. +
+|jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (eg. `'<'`) -or- function for advanced formatting  +
   `(object field, string op, mixed value, Object opDef, Object operatorOptions) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `field` - already formatted `{"var": <some field>}`
@@ -406,8 +406,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   Example: `['Value from', {label: 'Value to', placeholder: 'Enter value to'}]`
 |textSeparators |+ for `cardinality==2` | |Labels to be displayed before each 2 values widgets +
   Example: `[null, 'and']`
-|options | | |Special for `proximity` operator
-|isSpecialRange | |false |Special for `cardinality==2`. Used to show 1 range widget instead of 2 widgets (see `range_between` operator for `rangeslider` widget in demo)
+|options | | |Special for `proximity` operator (see demo for details)
 |===
 
 [NOTE]
@@ -579,7 +578,7 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 |key |required |default |meaning
 |returnType |+ | |One of types described in link:#configtypes[config.types]
 |label | |same as func key |Label to be displayed in functions list
-|formatFunc | |Example: for `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression in query rule. +
+|formatFunc | |Example result: for `isForDisplay==false` - `FUNC(val1, val2)`, for `isForDisplay==true` - `FUNC(arg1: val1, arg2: val2)` |Function for formatting func expression in query rule. +
   `(Object args, bool isForDisplay) => string` +
   where `args` is object `{<arg name> : <arg value>}`
 |sqlFunc |- for SQL format |same as func key |Func name in SQL
