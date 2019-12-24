@@ -230,6 +230,7 @@ interface BaseOperator {
   sqlOp?: String,
   sqlFormatOp?: SqlFormatOperator,
   jsonLogic?: String | JsonLogicFormatOperator,
+  valueSources?: Array<ValueSource>,
 };
 interface UnaryOperator extends BaseOperator {
   isUnary: true,
