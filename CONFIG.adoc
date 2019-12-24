@@ -30,7 +30,7 @@ There are functions for building query string: `formatConj`, `formatValue`, `for
 They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `sqlFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
-And `jsonLogic` for http://jsonlogic.com[JsonLogic]. 
+And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
 TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`demo config`]
 
@@ -586,9 +586,9 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 |sqlFormatFunc |- for SQL format | |Can be used instead of `sqlFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
 |mongoFunc |- for MongoDB format |same as func key |Func name in Mongo
-|jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |Func name for JsonLogic
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
 |mongoFormatFunc |- for MongoDB format | |Can be used instead of `mongoFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression object.
+|jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (function name) or function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression for JsonLogic.
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]

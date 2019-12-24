@@ -64,7 +64,6 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
       const funcKey = currentValue.get('func');
       const args = currentValue.get('args');
       const funcConfig = getFuncConfig(funcKey, config);
-      const funcName = funcConfig.jsonLogic || funcKey;
       if (!funcConfig.jsonLogic) {
         meta.errors.push(`Func ${funcKey} is not supported`);
         return undefined;
@@ -83,7 +82,16 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
               formattedArgs[argKey] = formattedArgVal;
           }
       }
-      ret = { [funcName]: Object.values(formattedArgs) };
+      if (typeof funcConfig.jsonLogic === 'function') {
+          const fn = funcConfig.jsonLogic;
+          const args = [
+              formattedArgs,
+          ];
+          ret = fn(...args);
+      } else {
+        const funcName = funcConfig.jsonLogic || funcKey;
+        ret = { [funcName]: Object.values(formattedArgs) };
+      }
   } else {
     if (typeof fieldWidgetDefinition.jsonLogic === 'function') {
         const fn = fieldWidgetDefinition.jsonLogic;
@@ -138,7 +146,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
         }
         return resultQuery;
     } else if (type === 'rule') {
-        const operator = properties.get('operator');
+        let operator = properties.get('operator');
         let operatorOptions = properties.get('operatorOptions');
         operatorOptions = operatorOptions ? operatorOptions.toJS() : null;
         if (operatorOptions && !Object.keys(operatorOptions).length)
@@ -213,7 +221,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
           };
         }
         const args = [
-            fieldName,
+            formattedField,
             operator,
             formattedValue,
             omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp', 'jsonLogic']),

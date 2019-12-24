@@ -6,8 +6,8 @@ import {
 import throttle from 'lodash/throttle';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
-const stringify = JSON.stringify;
 
+const stringify = JSON.stringify;
 const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
@@ -69,25 +69,6 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
       return (
         <div>
-
-          <div>
-            <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogic</a>: 
-              { errors ? 
-                <pre style={preErrorStyle}>
-                  {stringify(errors, undefined, 2)}
-                </pre> 
-              : 
-                <pre style={preStyle}>
-                  {stringify(logic, undefined, 2)}
-                  <br />
-                  <hr />
-                  {stringify(data, undefined, 2)}
-                </pre>
-              }
-          </div>
-          <hr/>
-
-          <br />
           <div>
             stringFormat: 
             <pre style={preStyle}>
@@ -114,6 +95,24 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
               <pre style={preStyle}>
                 {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
               </pre>
+          </div>
+          <hr/>
+          <div>
+            <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
+              { errors ? 
+                <pre style={preErrorStyle}>
+                  {stringify(errors, undefined, 2)}
+                </pre> 
+              : 
+                <pre style={preStyle}>
+                  // Rule:<br />
+                  {stringify(logic, undefined, 2)}
+                  <br />
+                  <hr />
+                  // Data:<br />
+                  {stringify(data, undefined, 2)}
+                </pre>
+              }
           </div>
           <hr/>
           <div>

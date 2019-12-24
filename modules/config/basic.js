@@ -64,9 +64,12 @@ const conjunctions = {
 
 // helpers for mongo format
 const mongoFormatOp1 = (mop, mc,  field, _op, value, useExpr) => {
+    const mv = mc(value);
+    if (mv === undefined)
+        return undefined;
     return !useExpr
-        ? { [field]: { [mop]: mc(value) } } 
-        : { [mop]: ["$"+field, mc(value)] };
+        ? { [field]: { [mop]: mv } } 
+        : { [mop]: ["$"+field, mv] };
 };
 
 const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
@@ -161,7 +164,7 @@ const operators = {
             return `${field} LIKE ${values}`;
         } else return undefined; // not supported
       },
-      mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => new RegExp(escapeRegExp(v))),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => (typeof v == 'string' ? new RegExp(escapeRegExp(v)) : undefined)),
       jsonLogic: (field, op, val) => ({ "in": [val, field] }),
   },
   not_like: {
@@ -174,7 +177,7 @@ const operators = {
             return `${field} NOT LIKE ${values}`;
         } else return undefined; // not supported
       },
-      mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => new RegExp(escapeRegExp(v))),
+      mongoFormatOp: mongoFormatOp1.bind(null, '$ne', v => (typeof v == 'string' ? new RegExp(escapeRegExp(v)) : undefined)),
   },
   between: {
       label: 'Between',

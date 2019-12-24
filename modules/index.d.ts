@@ -456,6 +456,7 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & Oth
 type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => String;
 type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: Boolean) => String;
 type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
+type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
 
 interface FuncGroup {
   type?: "!struct",
@@ -470,7 +471,7 @@ export interface Func {
   sqlFunc?: String,
   mongoFunc?: String,
   mongoArgsAsObject?: Boolean,
-  jsonLogic?: String,
+  jsonLogic?: String | JsonLogicFormatFunc,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,

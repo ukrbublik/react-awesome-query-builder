@@ -237,7 +237,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
         && reusableWidgets.length > 0;
     ;
-
+    
     let valueFixes = {};
     if (canReuseValue) {
         for (let i = 0 ; i < commonWidgetsCnt ; i++) {
