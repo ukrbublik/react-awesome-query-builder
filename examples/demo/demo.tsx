@@ -66,69 +66,69 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
     renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
       const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
-
       return (
+      <div>
+        <br />
         <div>
-          <div>
-            stringFormat: 
-            <pre style={preStyle}>
-              {stringify(queryString(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-            humanStringFormat: 
-            <pre style={preStyle}>
-              {stringify(queryString(immutableTree, config, true), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-            sqlFormat: 
-              <pre style={preStyle}>
-                {stringify(sqlFormat(immutableTree, config), undefined, 2)}
-              </pre>
-          </div>
-          <hr/>
-          <div>
-            mongodbFormat: 
-              <pre style={preStyle}>
-                {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
-              </pre>
-          </div>
-          <hr/>
-          <div>
-            <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
-              { errors ? 
-                <pre style={preErrorStyle}>
-                  {stringify(errors, undefined, 2)}
-                </pre> 
-              : 
-                <pre style={preStyle}>
-                  // Rule:<br />
-                  {stringify(logic, undefined, 2)}
-                  <br />
-                  <hr />
-                  // Data:<br />
-                  {stringify(data, undefined, 2)}
-                </pre>
-              }
-          </div>
-          <hr/>
-          <div>
-            Tree: 
-            <pre style={preStyle}>
-              {stringify(getTree(immutableTree), undefined, 2)}
-            </pre>
-          </div>
-          {/* <hr/>
-          <div>
-            queryBuilderFormat: 
-              <pre style={preStyle}>
-                {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
-              </pre>
-          </div> */}
+          stringFormat: 
+          <pre style={preStyle}>
+            {stringify(queryString(immutableTree, config), undefined, 2)}
+          </pre>
         </div>
+        <hr/>
+        <div>
+          humanStringFormat: 
+          <pre style={preStyle}>
+            {stringify(queryString(immutableTree, config, true), undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
+          sqlFormat: 
+            <pre style={preStyle}>
+              {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            </pre>
+        </div>
+        <hr/>
+        <div>
+          mongodbFormat: 
+            <pre style={preStyle}>
+              {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+            </pre>
+        </div>
+        <hr/>
+        <div>
+          <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
+            { errors ? 
+              <pre style={preErrorStyle}>
+                {stringify(errors, undefined, 2)}
+              </pre> 
+            : 
+              <pre style={preStyle}>
+                // Rule:<br />
+                {stringify(logic, undefined, 2)}
+                <br />
+                <hr />
+                // Data:<br />
+                {stringify(data, undefined, 2)}
+              </pre>
+            }
+        </div>
+        <hr/>
+        <div>
+          Tree: 
+          <pre style={preStyle}>
+            {stringify(getTree(immutableTree), undefined, 2)}
+          </pre>
+        </div>
+        {/* <hr/>
+        <div>
+          queryBuilderFormat: 
+            <pre style={preStyle}>
+              {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
+            </pre>
+        </div> */}
+      </div>
       )
   }
 

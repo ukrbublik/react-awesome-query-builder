@@ -52,7 +52,9 @@ export default class DemoQueryBuilder extends Component {
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
 
-    renderResult = ({tree: immutableTree, config}) => (
+    renderResult = ({tree: immutableTree, config}) => {
+      const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+      return (
       <div>
         <br />
         <div>
@@ -115,6 +117,7 @@ export default class DemoQueryBuilder extends Component {
             </pre>
         </div> */}
       </div>
-    )
+    );
+    }
 
 }
