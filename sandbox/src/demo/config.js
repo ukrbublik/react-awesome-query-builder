@@ -310,6 +310,7 @@ const funcs = {
     LOWER: {
         label: 'Lowercase',
         mongoFunc: '$toLower',
+        jsonLogic: ({str}) => ({ "method": [ str, "toLowerCase" ] }),
         returnType: 'text',
         args: {
             str: {
@@ -325,6 +326,7 @@ const funcs = {
         formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
         sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
         mongoFormatFunc: ({coef, bias, val}) => ({'$sum': [{'$multiply': [coef, val]}, bias]}),
+        jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
         renderBrackets: ['', ''],
         renderSeps: [' * ', ' + '],
         args: {
