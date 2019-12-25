@@ -217,7 +217,7 @@ export const getFuncArgConfig = (funcKey, argKey, config) => {
 export const getFieldConfig = (field, config) => {
     if (!field || field == ':empty:')
         return null;
-    if (typeof field == "object" && !field.func)
+    if (typeof field == "object" && !field.func && !!field.type)
         return field;
     if (typeof field == "object" && field.func && field.arg)
         return getFuncArgConfig(field.func, field.arg, config);
@@ -379,7 +379,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
     let valueSrcs = [];
     if (!field)
         return {widgets, valueSrcs};
-    const isFuncArg = typeof field == 'object';
+    const isFuncArg = typeof field == 'object' && !!field.type;
     const fieldConfig = getFieldConfig(field, config);
     const opConfig = operator ? config.operators[operator] : null;
     if (fieldConfig && fieldConfig.widgets) {
@@ -397,7 +397,10 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
                 canAdd = false;
             if (canAdd) {
                 widgets.push(widget);
-                if (fieldConfig.valueSources && fieldConfig.valueSources.indexOf(widgetValueSrc) != -1 && !valueSrcs.find(v => v == widgetValueSrc))
+                let canAddValueSrc = fieldConfig.valueSources && fieldConfig.valueSources.indexOf(widgetValueSrc) != -1;
+                if (opConfig && opConfig.valueSources && opConfig.valueSources.indexOf(widgetValueSrc) == -1)
+                    canAddValueSrc = false;
+                if (canAddValueSrc && !valueSrcs.find(v => v == widgetValueSrc))
                     valueSrcs.push(widgetValueSrc);
             }
         }

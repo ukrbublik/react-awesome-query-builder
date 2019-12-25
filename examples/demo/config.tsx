@@ -178,7 +178,7 @@ const settings: Settings = {
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
 
-    //renderField: (props) => <FieldCascader {...props} />,
+    // renderField: (props) => <FieldCascader {...props} />,
     renderOperator: (props) => <FieldDropdown {...props} />,
     renderFunc: (props) => <FieldSelect {...props} />,
 };
@@ -328,6 +328,7 @@ const funcs: Funcs = {
     LOWER: {
         label: 'Lowercase',
         mongoFunc: '$toLower',
+        jsonLogic: ({str}) => ({ "method": [ str, "toLowerCase" ] }),
         returnType: 'text',
         args: {
             str: {
@@ -343,6 +344,7 @@ const funcs: Funcs = {
         formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
         sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
         mongoFormatFunc: ({coef, bias, val}) => ({'$sum': [{'$multiply': [coef, val]}, bias]}),
+        jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
         renderBrackets: ['', ''],
         renderSeps: [' * ', ' + '],
         args: {

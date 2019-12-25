@@ -4,9 +4,10 @@ import throttle from 'lodash/throttle';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
 
-const {queryBuilderFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const stringify = JSON.stringify;
+const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
+const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue = {"id": uuid(), "type": "group"};
 const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
@@ -51,7 +52,9 @@ export default class DemoQueryBuilder extends Component {
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
 
-    renderResult = ({tree: immutableTree, config}) => (
+    renderResult = ({tree: immutableTree, config}) => {
+      const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+      return (
       <div>
         <br />
         <div>
@@ -83,6 +86,24 @@ export default class DemoQueryBuilder extends Component {
         </div>
         <hr/>
         <div>
+          <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
+            { errors ? 
+              <pre style={preErrorStyle}>
+                {stringify(errors, undefined, 2)}
+              </pre> 
+            : 
+              <pre style={preStyle}>
+                // Rule:<br />
+                {stringify(logic, undefined, 2)}
+                <br />
+                <hr />
+                // Data:<br />
+                {stringify(data, undefined, 2)}
+              </pre>
+            }
+        </div>
+        <hr/>
+        <div>
           Tree: 
           <pre style={preStyle}>
             {stringify(getTree(immutableTree), undefined, 2)}
@@ -96,6 +117,7 @@ export default class DemoQueryBuilder extends Component {
             </pre>
         </div> */}
       </div>
-    )
+    );
+    }
 
 }

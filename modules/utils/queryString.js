@@ -26,7 +26,8 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
             const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
             const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
             const formatField = config.settings.formatField || defaultSettings.formatField;
-            formattedField = formatField(rightField, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
+            const rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
+            formattedField = formatField(rightFieldName, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
         }
         ret = formattedField;
     } else if (valueSrc == 'func') {
@@ -66,7 +67,7 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
                 currentValue,
                 pick(fieldDefinition, ['fieldSettings', 'listValues']),
                 //useful options: valueFormat for date/time
-                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']),
+                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue', 'jsonLogic']),
                 isForDisplay
             ];
             if (operator) {
@@ -121,7 +122,6 @@ export const queryString = (item, config, isForDisplay = false) => {
         //format value
         let valueSrcs = [];
         let valueTypes = [];
-        let hasUndefinedValues = false;
         let value = properties.get('value').map((currentValue, ind) => {
             const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
             const valueType = properties.get('valueType') ? properties.get('valueType').get(ind) : null;
@@ -129,14 +129,13 @@ export const queryString = (item, config, isForDisplay = false) => {
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
             let fv = formatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay);
-            if (fv === undefined) {
-                hasUndefinedValues = true;
-                return undefined;
+            if (fv !== undefined) {
+                valueSrcs.push(valueSrc);
+                valueTypes.push(valueType);
             }
-            valueSrcs.push(valueSrc);
-            valueTypes.push(valueType);
             return fv;
         });
+        const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
         if (hasUndefinedValues || value.size < cardinality)
             return undefined;
         const formattedValue = (cardinality == 1 ? value.first() : value);
@@ -181,7 +180,7 @@ export const queryString = (item, config, isForDisplay = false) => {
             formattedValue,
             (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
             (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-            omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp']),
+            omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp', 'jsonLogic']),
             operatorOptions,
             isForDisplay,
             fieldDefinition,

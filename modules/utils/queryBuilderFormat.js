@@ -85,14 +85,7 @@ const _queryBuilderFormat = (item, config, meta) => {
         let value = properties.get('value');
         let valueSrc = properties.get('valueSrc');
         let valueType = properties.get('valueType');
-
-        let hasUndefinedValues = false;
-        value.map((currentValue, ind) => {
-            if (currentValue === undefined) {
-                hasUndefinedValues = true;
-                return undefined;
-            }
-        });
+        const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
 
         if (field == null || operator == null || hasUndefinedValues)
             return undefined;

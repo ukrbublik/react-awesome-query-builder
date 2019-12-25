@@ -18,7 +18,6 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
     if (valueSrc == 'field') {
         //format field
         const rightField = currentValue;
-        let formattedField = null;
         if (rightField) {
             const rightFieldDefinition = getFieldConfig(rightField, config) || {};
             const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
@@ -26,16 +25,16 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
             const fieldPartsLabels = getFieldPathLabels(rightField, config);
             const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
             const formatField = config.settings.formatField || defaultSettings.formatField;
-            let rightFieldName = rightField;
+            let rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
             // if (rightFieldDefinition.tableName) {
             //     const fieldPartsCopy = [...fieldParts];
             //     fieldPartsCopy[0] = rightFieldDefinition.tableName;
             //     rightFieldName = fieldPartsCopy.join(fieldSeparator);
             // }
-            formattedField = formatField(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
+            const formattedField = formatField(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
+            ret = "$" + formattedField;
+            useExpr = true;
         }
-        ret = "$" + formattedField;
-        useExpr = true;
     } else if (valueSrc == 'func') {
         useExpr = true;
         const funcKey = currentValue.get('func');
@@ -82,7 +81,7 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
                 currentValue,
                 pick(fieldDefinition, ['fieldSettings', 'listValues']),
                 //useful options: valueFormat for date/time
-                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue']),
+                omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue', 'jsonLogic']),
             ];
             if (operator) {
                 args.push(operator);
@@ -127,7 +126,6 @@ export const mongodbFormat = (item, config, _not = false) => {
             resultQuery[mongoConj] = list.toList().toJS();
         return resultQuery;
     } else if (type === 'rule') {
-        const {fieldSeparator} = config.settings;
         let operator = properties.get('operator');
         const operatorOptions = properties.get('operatorOptions');
         let field = properties.get('field');
@@ -158,7 +156,6 @@ export const mongodbFormat = (item, config, _not = false) => {
         //format value
         let valueSrcs = [];
         let valueTypes = [];
-        let hasUndefinedValues = false;
         let useExpr = false;
         value = value.map((currentValue, ind) => {
             const valueSrc = properties.get('valueSrc') ? properties.get('valueSrc').get(ind) : null;
@@ -167,22 +164,21 @@ export const mongodbFormat = (item, config, _not = false) => {
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
             const [fv, _useExpr] = mongoFormatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
-            if (fv === undefined) {
-                hasUndefinedValues = true;
-                return undefined;
+            if (fv !== undefined) {
+                useExpr = useExpr || _useExpr;
+                valueSrcs.push(valueSrc);
+                valueTypes.push(valueType);
             }
-            useExpr = useExpr || _useExpr;
-            valueSrcs.push(valueSrc);
-            valueTypes.push(valueType);
             return fv;
         });
+        const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
         if (value.size < cardinality || hasUndefinedValues)
             return undefined;
         const formattedValue = cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
         
         //build rule
         const fn = operatorDefinition.mongoFormatOp;
-        if(!fn)
+        if (!fn)
             return undefined;
         const args = [
             fieldName,
@@ -191,7 +187,7 @@ export const mongodbFormat = (item, config, _not = false) => {
             useExpr,
             (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
             (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-            omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp']),
+            omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp', 'jsonLogic']),
             operatorOptions,
         ];
         let ruleQuery = fn(...args);
