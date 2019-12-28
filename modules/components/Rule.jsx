@@ -148,12 +148,19 @@ class Rule extends PureComponent {
                     config={this.props.config}
                 />
             </Col>;
+        
+        const afterValue = this.props.config.settings.renderAfterRuleValue && 
+            <Col key={"after-value-for-" +this.props.selectedOperator} className="rule--after-value">
+                {typeof this.props.config.settings.renderAfterRuleValue === 'function' && this.props.config.settings.renderAfterRuleValue(this.props)}
+                {typeof this.props.config.settings.renderAfterRuleValue !== 'function' && this.props.config.settings.renderAfterRuleValue}
+            </Col>
 
         const parts = [
             field,
             operator,
             widget,
-            operatorOptions
+            operatorOptions,
+            afterValue,
         ];
 
         const drag = showDragIcon &&
