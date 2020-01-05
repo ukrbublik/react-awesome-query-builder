@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {
   Query, Builder, BasicConfig, Utils, 
+  //types:
   ImmutableTree, Config, BuilderProps, JsonTree
 } from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';

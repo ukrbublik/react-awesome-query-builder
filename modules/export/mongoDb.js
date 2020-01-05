@@ -1,10 +1,10 @@
 'use strict';
-import {defaultValue} from "./stuff";
+import {defaultValue} from "../utils/stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels, getFuncConfig
-} from './configUtils';
-import {defaultConjunction} from './defaultUtils';
-import {completeValue} from './funcUtils';
+} from '../utils/configUtils';
+import {defaultConjunction} from '../utils/defaultUtils';
+import {completeValue} from '../utils/funcUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {Map} from 'immutable';
@@ -96,6 +96,7 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
 }
 
 export const mongodbFormat = (item, config, _not = false) => {
+    if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');

@@ -1,8 +1,8 @@
 import React from 'react';
-import * as Widgets from '../components/widgets/index.js';
+import * as Widgets from '../components/widgets';
 import * as Operators from '../components/operators';
-import {SqlString} from '../utils/sqlFormat.js';
-import {escapeRegExp} from '../utils/stuff.js';
+import {SqlString} from '../utils/sql';
+import {escapeRegExp} from '../utils/stuff';
 import moment from 'moment';
 import {settings as defaultSettings} from '../config/default';
 

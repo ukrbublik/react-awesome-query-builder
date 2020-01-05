@@ -1,43 +1,18 @@
 import {
     getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels, getFuncConfig
-} from './configUtils';
+} from '../utils/configUtils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
-import {defaultValue} from "./stuff";
-import {defaultConjunction} from './defaultUtils';
+import {defaultValue} from "../utils/stuff";
+import {defaultConjunction} from '../utils/defaultUtils';
 import {settings as defaultSettings} from '../config/default';
-import {completeValue} from './funcUtils';
+import {completeValue} from '../utils/funcUtils';
 import {Map} from 'immutable';
-let SqlString = require('sqlstring');
 
-
-SqlString.trim = (val) => {
-    if (val.charAt(0) == "'")
-        return val.substring(1, val.length-1);
-    else
-        return val;
-};
-
-SqlString.escapeLike = (val) => {
-    // normal escape
-    let res = SqlString.escape(val);
-    // unwrap ''
-    res = SqlString.trim(res);
-    // escape % and _
-    res = res.replace(/[%_]/g, '\\$&');
-    // wrap with % for LIKE
-    res = "%" + res + "%";
-    // wrap ''
-    res = "'" + res + "'";
-    return res;
-};
-
-export {SqlString};
-
-const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay) => {
     if (currentValue === undefined)
         return undefined;
-    const {fieldSeparator} = config.settings;
+    const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     let ret;
     if (valueSrc == 'field') {
         //format field
@@ -48,50 +23,52 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
             const _fieldKeys = getFieldPath(rightField, config);
             const fieldPartsLabels = getFieldPathLabels(rightField, config);
-            const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
+            const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
+            const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
             const formatField = config.settings.formatField || defaultSettings.formatField;
-            let rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
-            if (rightFieldDefinition.tableName) {
-                const fieldPartsCopy = [...fieldParts];
-                fieldPartsCopy[0] = rightFieldDefinition.tableName;
-                rightFieldName = fieldPartsCopy.join(fieldSeparator);
-            }
-            formattedField = formatField(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config);
+            const rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
+            formattedField = formatField(rightFieldName, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
         }
         ret = formattedField;
     } else if (valueSrc == 'func') {
         const funcKey = currentValue.get('func');
         const args = currentValue.get('args');
         const funcConfig = getFuncConfig(funcKey, config);
-        const funcName = funcConfig.sqlFunc || funcKey;
+        const funcName = isForDisplay && funcConfig.label || funcKey;
         const formattedArgs = {};
+        const formattedArgsWithNames = {};
         for (const argKey in funcConfig.args) {
             const argConfig = funcConfig.args[argKey];
             const fieldDef = getFieldConfig(argConfig, config);
             const argVal = args ? args.get(argKey) : undefined;
             const argValue = argVal ? argVal.get('value') : undefined;
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
-            const formattedArgVal = sqlFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
-            if (formattedArgVal !== undefined) // skip optional in the end
+            const formattedArgVal = formatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay);
+            const argName = isForDisplay && argConfig.label || argKey;
+            if (formattedArgVal !== undefined) { // skip optional in the end
                 formattedArgs[argKey] = formattedArgVal;
+                formattedArgsWithNames[argName] = formattedArgVal;
+            }
         }
-        if (typeof funcConfig.sqlFormatFunc === 'function') {
-            const fn = funcConfig.sqlFormatFunc;
+        if (typeof funcConfig.formatFunc === 'function') {
+            const fn = funcConfig.formatFunc;
             const args = [
-                formattedArgs
+                formattedArgs,
+                isForDisplay
             ];
             ret = fn(...args);
         } else {
-            ret = `${funcName}(${Object.entries(formattedArgs).map(([k, v]) => v).join(', ')})`;
+            ret = `${funcName}(${Object.entries(formattedArgsWithNames).map(([k, v]) => (isForDisplay ? `${k}: ${v}` : `${v}`)).join(', ')})`;
         }
     } else {
-        if (typeof fieldWidgetDefinition.sqlFormatValue === 'function') {
-            const fn = fieldWidgetDefinition.sqlFormatValue;
+        if (typeof fieldWidgetDefinition.formatValue === 'function') {
+            const fn = fieldWidgetDefinition.formatValue;
             const args = [
                 currentValue,
                 pick(fieldDefinition, ['fieldSettings', 'listValues']),
                 //useful options: valueFormat for date/time
                 omit(fieldWidgetDefinition, ['formatValue', 'mongoFormatValue', 'sqlFormatValue', 'jsonLogic']),
+                isForDisplay
             ];
             if (operator) {
                 args.push(operator);
@@ -103,13 +80,14 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             }
             ret = fn(...args);
         } else {
-            ret = SqlString.escape(currentValue);
+            ret = currentValue;
         }
     }
     return ret;
 };
 
-export const sqlFormat = (item, config) => {
+export const queryString = (item, config, isForDisplay = false) => {
+    if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');
@@ -117,7 +95,7 @@ export const sqlFormat = (item, config) => {
     if (type === 'group' && children && children.size) {
         const not = properties.get('not');
         const list = children
-            .map((currentChild) => sqlFormat(currentChild, config))
+            .map((currentChild) => queryString(currentChild, config, isForDisplay))
             .filter((currentChild) => typeof currentChild !== 'undefined');
         if (!list.size)
             return undefined;
@@ -127,7 +105,7 @@ export const sqlFormat = (item, config) => {
             conjunction = defaultConjunction(config);
         const conjunctionDefinition = config.conjunctions[conjunction];
 
-        return conjunctionDefinition.sqlFormatConj(list, conjunction, not);
+        return conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
     } else if (type === 'rule') {
         let field = properties.get('field');
         const operator = properties.get('operator');
@@ -151,7 +129,7 @@ export const sqlFormat = (item, config) => {
             currentValue = completeValue(currentValue, valueSrc, config);
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
-            let fv = sqlFormatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+            let fv = formatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay);
             if (fv !== undefined) {
                 valueSrcs.push(valueSrc);
                 valueTypes.push(valueType);
@@ -165,31 +143,18 @@ export const sqlFormat = (item, config) => {
 
         //find fn to format expr
         let isRev = false;
-        let fn = operatorDefinition.sqlFormatOp;
+        let fn = operatorDefinition.formatOp;
         if (!fn && reversedOp) {
-            fn = revOperatorDefinition.sqlFormatOp;
+            fn = revOperatorDefinition.formatOp;
             if (fn) {
                 isRev = true;
             }
         }
-        if (!fn) {
-            const _operator = operatorDefinition.sqlOp || operator;
-            if (cardinality == 0) {
-                fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-                    return `${field} ${_operator}`;
-                };
-            } else if (cardinality == 1) {
-                fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions) => {
-                    return `${field} ${_operator} ${value}`;
-                };
-            } else if (cardinality == 2) {
-                // between
-                fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-                    const valFrom = values.first();
-                    const valTo = values.get(1);
-                    return `${field} ${_operator} ${valFrom} AND ${valTo}`;
-                };
-            }
+        if (!fn && cardinality == 1) {
+            let _operator = operatorDefinition.labelForFormat || operator;
+            fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+                return `${field} ${_operator} ${values}`;
+            };
         }
         if (!fn)
             return undefined;
@@ -204,9 +169,10 @@ export const sqlFormat = (item, config) => {
         }
         const _fieldKeys = getFieldPath(field, config);
         const fieldPartsLabels = getFieldPathLabels(field, config);
-        const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparator) : null;
+        const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
+        const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
         const formatField = config.settings.formatField || defaultSettings.formatField;
-        const formattedField = formatField(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
+        const formattedField = formatField(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
         
         //format expr
         const args = [
@@ -217,10 +183,12 @@ export const sqlFormat = (item, config) => {
             (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
             omit(operatorDefinition, ['formatOp', 'mongoFormatOp', 'sqlFormatOp', 'jsonLogic']),
             operatorOptions,
+            isForDisplay,
+            fieldDefinition,
         ];
         let ret = fn(...args);
         if (isRev) {
-            ret = config.settings.sqlFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+            ret = config.settings.formatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay);
         }
         return ret;
     }
