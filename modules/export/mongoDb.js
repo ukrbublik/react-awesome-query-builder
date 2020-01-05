@@ -120,11 +120,28 @@ export const mongodbFormat = (item, config, _not = false) => {
         }
         const mongoConj = conjunctionDefinition.mongoConj;
 
-        let resultQuery = {};
+        let resultQuery;
         if (list.size == 1)
             resultQuery = list.first();
-        else
-            resultQuery[mongoConj] = list.toList().toJS();
+        else {
+            const rules = list.toList().toJS();
+            const canShort = (mongoConj == '$and');
+            if (canShort) {
+                resultQuery = rules.reduce((acc, rule) => {
+                    if (!acc) return undefined;
+                    for (let k in rule) {
+                        if (k[0] == '$') {
+                            acc = undefined;
+                            break;
+                        }
+                        acc[k] = rule[k];
+                    }
+                    return acc;
+                }, {});
+            }
+            if (!resultQuery) // can't be shorten
+                resultQuery = { [mongoConj] : rules };
+        }
         return resultQuery;
     } else if (type === 'rule') {
         let operator = properties.get('operator');

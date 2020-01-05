@@ -1,4 +1,8 @@
 # Changelog
+- 1.1.1
+  - Optimized `$eq` and `$and` in MongoDb query export
+  - Fixed error if query value is empty
+  - Added API in readme
 - 1.1.0
   - Added [JsonLogic](http://jsonlogic.com) support
 - 1.0.12
