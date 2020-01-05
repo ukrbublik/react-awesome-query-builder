@@ -186,7 +186,7 @@ Wrapping in `div.query-builder-container` in not necessary, but if you want to m
   Convert query value to SQL where string.
   #### jsonLogicFormat(immutableValue, config) -> {logic, data, errors}
   Convert query value to [JsonLogic](http://jsonlogic.com) format. 
-  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with empty values.
+  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with empty (null) values.
 
 
 ## Config format

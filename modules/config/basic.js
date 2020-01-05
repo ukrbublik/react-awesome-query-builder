@@ -72,6 +72,8 @@ const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
             ? { [field]: { "$not": { [mop]: mv } } } 
             : { "$not": { [mop]: ["$"+field, mv] } };
     } else {
+        if (!useExpr && mop == '$eq')
+            return { [field]: mv }; // short form
         return !useExpr
             ? { [field]: { [mop]: mv } } 
             : { [mop]: ["$"+field, mv] };
