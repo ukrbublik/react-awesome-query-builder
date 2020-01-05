@@ -39,7 +39,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 
 ## Getting started
 Install: `npm i react-awesome-query-builder`  
-See [basic usage](#usage) below.  
+See [basic usage](#usage) and [API](#api) below.  
 Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) (TS) or [`sandbox/src/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox/src/demo) (JS) for more advanced usage and configuration.
 
 
@@ -98,6 +98,7 @@ const config = {
 // You can load query value from your backend storage (for saving see `Query.onChange()`)
 const queryValue = {"id": QbUtils.uuid(), "type": "group"};
 
+
 class DemoQueryBuilder extends Component {
     state = {
       tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
@@ -144,15 +145,48 @@ class DemoQueryBuilder extends Component {
 }
 ```
 
-- Please wrap `<Builder />` in `div.query-builder`.  
-  Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
-  Wrapping in `div.query-builder-container` in not necessary, but if you want to make query builder scrollable, it's best place to apply appropriate styles.
-- You can save query value in `onChange` callback.  
-  Note that value will be in [`Immutable`](https://immutable-js.github.io/immutable-js/) format, so you can use `QbUtils.getTree()` to convert it into JS object.  
-  You can store it on backend, and load later by passing in `value` prop of `<Query />`.
+
+## API
+
+### `<Query />`
+Props:
+- `{...config}` - destructured query [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
+- `value` - query value in [Immutable](https://immutable-js.github.io/immutable-js/) format
+- `onChange` - callback when value changed. Params: `value` (in Immutable format), `config`.
+- `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
+
+*Notes*:
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 1000 !important; }`
+
+### `<Builder />`
+Render this component only in `Query.renderBuilder()`.  
+Please wrap `<Builder />` in `div.query-builder`.  
+Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
+Wrapping in `div.query-builder-container` in not necessary, but if you want to make query builder scrollable, it's best place to apply appropriate styles.
+
+### Utils
+- Save, load:
+  #### getTree(immutableValue) -> Object
+  Convert query value from Immutable format to JS format. 
+  You can use it to save value on backend in `onChange` callback of `<Query>`.
+  #### loadTree(jsValue, config) -> Immutable
+  Convert query value from Immutable format to JS format. 
+  You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
+  #### checkTree(immutableValue, config) -> immutableValue
+  Validate query value corresponding to config. 
+  Invalid parts of query (eg. if field was removed from config) will be deleted.
+- Export:
+  #### queryString(immutableValue, config, isForDisplay) -> String
+  Convert query value to custom string representation. `isForDisplay` = true can be used to make string more "human readable".
+  #### mongodbFormat(immutableValue, config) -> Object
+  Convert query value to MongoDb query object.
+  #### sqlFormat(immutableValue, config) -> String
+  Convert query value to SQL where string.
+  #### jsonLogicFormat(immutableValue, config) -> {logic, data, errors}
+  Convert query value to [JsonLogic](http://jsonlogic.com) format. 
+  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with empty values.
 
 
 ## Config format

@@ -1,10 +1,10 @@
 'use strict';
-import {defaultValue} from "./stuff";
+import {defaultValue} from "../utils/stuff";
 import {
     getFieldConfig, getOperatorConfig
-} from './configUtils';
-import {defaultConjunction} from './defaultUtils';
-import {completeValue} from './funcUtils';
+} from '../utils/configUtils';
+import {defaultConjunction} from '../utils/defaultUtils';
+import {completeValue} from '../utils/funcUtils';
 import {Map} from 'immutable';
 
 /*
@@ -55,6 +55,7 @@ export const queryBuilderFormat = (item, config) => {
 
 //meta is mutable
 const _queryBuilderFormat = (item, config, meta) => {
+    if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');

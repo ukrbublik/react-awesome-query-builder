@@ -1,10 +1,10 @@
 'use strict';
-import {defaultValue} from "./stuff";
+import {defaultValue} from "../utils/stuff";
 import {
     getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
-} from './configUtils';
-import {defaultConjunction} from './defaultUtils';
-import {completeValue} from './funcUtils';
+} from '../utils/configUtils';
+import {defaultConjunction} from '../utils/defaultUtils';
+import {completeValue} from '../utils/funcUtils';
 import {Map} from 'immutable';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
@@ -115,6 +115,7 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
 
 //meta is mutable
 const jsonLogicFormatItem = (item, config, meta) => {
+    if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');

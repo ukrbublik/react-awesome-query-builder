@@ -60,14 +60,17 @@ export type ImmutableTree = ImmutableMap<String, String|Object>;
 /////////////////
 
 export interface Utils {
+  // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: Boolean): String;
   sqlFormat(tree: ImmutableTree, config: Config): String;
   mongodbFormat(tree: ImmutableTree, config: Config): Object;
+  // load
   getTree(tree: ImmutableTree): JsonTree;
   loadTree(tree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  // other
   uuid(): String;
 };
 
