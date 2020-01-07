@@ -14,7 +14,6 @@ export const loadFromJsonLogic = (logicTree, config) => {
   const extendedConfig = extendConfig(config);
   const conv = buildConv(extendedConfig);
   const jsTree = convertFromLogic(logicTree, conv, extendedConfig, 'rule', meta);
-  console.log(1, jsTree)
   const immTree = jsTree ? loadTree(jsTree) : undefined;
   if (meta.errors.length)
     console.warn("Errors while importing from JsonLogic:", meta.errors);
