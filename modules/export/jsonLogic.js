@@ -17,7 +17,7 @@ export const jsonLogicFormat = (item, config) => {
         errors: []
     };
     
-    let logic = jsonLogicFormatItem(item, config, meta);
+    const logic = jsonLogicFormatItem(item, config, meta);
     
     // build empty data
     const {errors, usedFields} = meta;
@@ -76,8 +76,10 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
           const argValue = argVal ? argVal.get('value') : undefined;
           const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
           const formattedArgVal = jsonLogicFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
-          if (argValue != undefined && formattedArgVal === undefined)
+          if (argValue != undefined && formattedArgVal === undefined) {
+              meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
               return undefined;
+          }
           if (formattedArgVal !== undefined) { // skip optional in the end
               formattedArgs[argKey] = formattedArgVal;
           }
@@ -185,7 +187,8 @@ const jsonLogicFormatItem = (item, config, meta) => {
           [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
         }
         if (!operatorDefinition.jsonLogic) {
-          meta.errors.push(`Operator ${operator} is not supported`);
+          //tip: it's warning, not error
+          meta.errors.push(`Operator ${operator} is not explicitly supported`);
         }
 
         // format value

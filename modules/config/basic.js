@@ -423,7 +423,7 @@ const operators = {
           const prox = operatorOptions.get('proximity');
           return `CONTAINS(${field}, 'NEAR((${_val1}, ${_val2}), ${prox})')`;
       },
-      mongoFormatOp: (field, op, values) => (undefined), // not supported
+      mongoFormatOp: undefined, // not supported
       jsonLogic: undefined, // not supported
       options: {
           optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
