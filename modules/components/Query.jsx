@@ -147,8 +147,8 @@ export default class QueryContainer extends Component {
         
         // compare trees
         const storeValue = this.state.store.getState().tree;
-        const isTreeChnaged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
-        if (isTreeChnaged) {
+        const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
+        if (isTreeChanged) {
             const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
             const validatedTree = validateAndFixTree(nextTree, null, nextConfig, oldConfig);
             this.state.store.dispatch(

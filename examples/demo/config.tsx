@@ -328,7 +328,8 @@ const funcs: Funcs = {
     LOWER: {
         label: 'Lowercase',
         mongoFunc: '$toLower',
-        jsonLogic: ({str}) => ({ "method": [ str, "toLowerCase" ] }),
+        jsonLogic: "toLowerCase",
+        jsonLogicIsMethod: true,
         returnType: 'text',
         args: {
             str: {

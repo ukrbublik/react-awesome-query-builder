@@ -173,7 +173,9 @@ const operators = {
         } else return undefined; // not supported
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(v) : undefined), false),
-      jsonLogic: (field, op, val) => ({ "in": [val, field] }),
+      //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
+      jsonLogic: "in",
+      _jsonLogicIsRevArgs: true,
       valueSources: ['value'],
   },
   not_like: {
@@ -212,7 +214,7 @@ const operators = {
           'and'
       ],
       reversedOp: 'not_between',
-      jsonLogic: (field, op, vals) => ({ "<=": [vals[0], field, vals[1]] }),
+      jsonLogic: "<=",
   },
   not_between: {
       label: 'Not between',
@@ -254,7 +256,7 @@ const operators = {
           'and'
       ],
       reversedOp: 'range_not_between',
-      jsonLogic: (field, op, vals) => ({ "<=": [vals[0], field, vals[1]] }),
+      jsonLogic: "<=",
   },
   range_not_between: {
       label: 'Not between',
@@ -274,7 +276,6 @@ const operators = {
       reversedOp: 'range_between',
   },
   is_empty: {
-      isUnary: true,
       label: 'Is empty',
       labelForFormat: 'IS EMPTY',
       sqlOp: 'IS EMPTY',
@@ -287,7 +288,6 @@ const operators = {
       jsonLogic: "!",
   },
   is_not_empty: {
-      isUnary: true,
       label: 'Is not empty',
       labelForFormat: 'IS NOT EMPTY',
       sqlOp: 'IS NOT EMPTY',

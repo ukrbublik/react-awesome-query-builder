@@ -82,6 +82,7 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
               formattedArgs[argKey] = formattedArgVal;
           }
       }
+      const formattedArgsArr = Object.values(formattedArgs);
       if (typeof funcConfig.jsonLogic === 'function') {
           const fn = funcConfig.jsonLogic;
           const args = [
@@ -90,7 +91,17 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
           ret = fn(...args);
       } else {
         const funcName = funcConfig.jsonLogic || funcKey;
-        ret = { [funcName]: Object.values(formattedArgs) };
+        const isMethod = !!funcConfig.jsonLogicIsMethod;
+        if (isMethod) {
+          const [obj, ...params] = formattedArgsArr;
+          if (params.length) {
+            ret = { "method": [ obj, funcName, params ] };
+          } else {
+            ret = { "method": [ obj, funcName ] };
+          }
+        } else {
+          ret = { [funcName]: formattedArgsArr };
+        }
       }
   } else {
     if (typeof fieldWidgetDefinition.jsonLogic === 'function') {
@@ -164,6 +175,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
         let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const _fieldType = fieldDefinition.type || "undefined";
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+        const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
 
         // check op
         let isRev = false;
@@ -212,11 +224,16 @@ const jsonLogicFormatItem = (item, config, meta) => {
           formatteOp = operatorDefinition.jsonLogic;
         let fn = typeof operatorDefinition.jsonLogic == 'function' ? operatorDefinition.jsonLogic : null
         if (!fn) {
+          const rangeOps = ['<', '<=', '>', '>='];
           fn = (field, op, val, opDef, opOpts) => {
             if (cardinality == 0)
               return { [formatteOp]: formattedField };
+            else if (cardinality == 1 && isReverseArgs)
+              return { [formatteOp]: [formattedValue, formattedField] };
             else if (cardinality == 1)
               return { [formatteOp]: [formattedField, formattedValue] };
+            else if (cardinality == 2 && rangeOps.includes(formatteOp))
+              return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
             else
               return { [formatteOp]: [formattedField, ...formattedValue] };
           };

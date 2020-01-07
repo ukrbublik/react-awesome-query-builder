@@ -169,12 +169,12 @@ Wrapping in `div.query-builder-container` in not necessary, but if you want to m
 ### Utils
 - Save, load:
   #### getTree(immutableValue) -> Object
-  Convert query value from Immutable format to JS format. 
+  Convert query value from internal Immutable format to JS format. 
   You can use it to save value on backend in `onChange` callback of `<Query>`.
   #### loadTree(jsValue, config) -> Immutable
-  Convert query value from Immutable format to JS format. 
+  Convert query value from JS format to internal Immutable format. 
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
-  #### checkTree(immutableValue, config) -> immutableValue
+  #### checkTree(immutableValue, config) -> Immutable
   Validate query value corresponding to config. 
   Invalid parts of query (eg. if field was removed from config) will be deleted.
 - Export:
@@ -186,7 +186,11 @@ Wrapping in `div.query-builder-container` in not necessary, but if you want to m
   Convert query value to SQL where string.
   #### jsonLogicFormat(immutableValue, config) -> {logic, data, errors}
   Convert query value to [JsonLogic](http://jsonlogic.com) format. 
-  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with empty (null) values.
+  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
+- Import:
+  #### loadFromJsonLogic(jsonLogicObject, config) -> Immutable
+  Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
+
 
 
 ## Config format
