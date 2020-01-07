@@ -2,6 +2,7 @@ import uuid from '../utils/uuid';
 import {defaultValue} from "../utils/stuff";
 import {getFieldConfig, extendConfig, getWidgetForFieldOp} from "../utils/configUtils";
 import {loadTree} from "./tree";
+import {defaultConjunction} from '../utils/defaultUtils';
 import moment from 'moment';
 
 // http://jsonlogic.com/
@@ -13,7 +14,10 @@ export const loadFromJsonLogic = (logicTree, config) => {
   };
   const extendedConfig = extendConfig(config);
   const conv = buildConv(extendedConfig);
-  const jsTree = convertFromLogic(logicTree, conv, extendedConfig, 'rule', meta);
+  let jsTree = convertFromLogic(logicTree, conv, extendedConfig, 'rule', meta);
+  if (jsTree && jsTree.type != "group") {
+    jsTree = wrapInDefaultConj(jsTree, extendedConfig);
+  }
   const immTree = jsTree ? loadTree(jsTree) : undefined;
   if (meta.errors.length)
     console.warn("Errors while importing from JsonLogic:", meta.errors);
@@ -92,6 +96,11 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined) return undefined;
   
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
+
+  if (isLogic(val)) {
+    meta.errors.push(`Unexpected logic in value: ${JSON.stringify(val)}`);
+    return undefined;
+  }
 
   // number of seconds -> time string
   if (fieldConfig && fieldConfig.type == "time" && typeof val == "number") {
@@ -227,6 +236,18 @@ const convertConj = (op, vals, conv, config, not, meta) => {
   return undefined;
 };
 
+const wrapInDefaultConj = (rule, config) => {
+  return {
+    type: "group",
+    id: uuid(),
+    children1: { [rule.id]: rule },
+    properties: {
+      conjunction: defaultConjunction(config),
+      not: false
+    }
+  };
+};
+
 const convertOp = (op, vals, conv, config, not, meta) => {
   if (!op) return undefined;
   const arity = vals.length;
@@ -270,7 +291,7 @@ const convertOp = (op, vals, conv, config, not, meta) => {
         }
         opKey = opKeys[0];
       }
-
+      
       oks.push({
         field, fieldConfig, opKey, args
       });
@@ -302,7 +323,7 @@ const convertOp = (op, vals, conv, config, not, meta) => {
   const convertedArgs = args
     .map(v => convertFromLogic(v, conv, config, 'val', meta, false, fieldConfig, widget));
   if (convertedArgs.filter(v => v === undefined).length) {
-    meta.errors.push(`Undefined arg for field ${field} and op ${opKey}`);
+    //meta.errors.push(`Undefined arg for field ${field} and op ${opKey}`);
     return undefined;
   }
 
