@@ -83,11 +83,13 @@ export interface Utils {
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: Boolean): String;
   sqlFormat(tree: ImmutableTree, config: Config): String;
   mongodbFormat(tree: ImmutableTree, config: Config): Object;
-  // load
+  // load, save
   getTree(tree: ImmutableTree): JsonTree;
-  loadTree(tree: JsonTree): ImmutableTree;
+  loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   getFlatTree(tree: ImmutableTree): FlatTree;
+  // import
+  loadFromJsonLogic(logicTree: JsonLogicTree, config: Config): ImmutableTree;
   // other
   uuid(): String;
 };
@@ -167,6 +169,7 @@ export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 export interface BaseWidget {
   customProps?: {},
   type: String,
+  jsType?: String,
   factory: Factory<WidgetProps>,
   valueSrc?: ValueSource,
   valuePlaceholder?: String,
@@ -249,7 +252,6 @@ export interface ProximityOptions extends ProximityConfig {
 interface BaseOperator {
   label: String,
   reversedOp: String,
-  isUnary?: Boolean,
   cardinality?: Number,
   formatOp?: FormatOperator,
   labelForFormat?: String,
@@ -257,13 +259,14 @@ interface BaseOperator {
   sqlOp?: String,
   sqlFormatOp?: SqlFormatOperator,
   jsonLogic?: String | JsonLogicFormatOperator,
+  _jsonLogicIsRevArgs?: Boolean,
   valueSources?: Array<ValueSource>,
 };
 interface UnaryOperator extends BaseOperator {
-  isUnary: true,
+  //cardinality: 0,
 };
 interface BinaryOperator extends BaseOperator {
-  isUnary?: false,
+  //cardinality: 1,
 };
 interface Operator2 extends BaseOperator {
   //cardinality: 2
@@ -500,6 +503,7 @@ export interface Func {
   mongoFunc?: String,
   mongoArgsAsObject?: Boolean,
   jsonLogic?: String | JsonLogicFormatFunc,
+  jsonLogicIsMethod?: Boolean,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,

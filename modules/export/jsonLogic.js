@@ -17,7 +17,7 @@ export const jsonLogicFormat = (item, config) => {
         errors: []
     };
     
-    let logic = jsonLogicFormatItem(item, config, meta);
+    const logic = jsonLogicFormatItem(item, config, meta);
     
     // build empty data
     const {errors, usedFields} = meta;
@@ -38,9 +38,8 @@ export const jsonLogicFormat = (item, config) => {
       }
     }
     
-    return errors.length ? {
-      errors
-    } : {
+    return {
+      errors,
       logic,
       data,
     };
@@ -76,12 +75,15 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
           const argValue = argVal ? argVal.get('value') : undefined;
           const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
           const formattedArgVal = jsonLogicFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
-          if (argValue != undefined && formattedArgVal === undefined)
+          if (argValue != undefined && formattedArgVal === undefined) {
+              meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
               return undefined;
+          }
           if (formattedArgVal !== undefined) { // skip optional in the end
               formattedArgs[argKey] = formattedArgVal;
           }
       }
+      const formattedArgsArr = Object.values(formattedArgs);
       if (typeof funcConfig.jsonLogic === 'function') {
           const fn = funcConfig.jsonLogic;
           const args = [
@@ -90,7 +92,17 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
           ret = fn(...args);
       } else {
         const funcName = funcConfig.jsonLogic || funcKey;
-        ret = { [funcName]: Object.values(formattedArgs) };
+        const isMethod = !!funcConfig.jsonLogicIsMethod;
+        if (isMethod) {
+          const [obj, ...params] = formattedArgsArr;
+          if (params.length) {
+            ret = { "method": [ obj, funcName, params ] };
+          } else {
+            ret = { "method": [ obj, funcName ] };
+          }
+        } else {
+          ret = { [funcName]: formattedArgsArr };
+        }
       }
   } else {
     if (typeof fieldWidgetDefinition.jsonLogic === 'function') {
@@ -164,6 +176,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
         let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
         const _fieldType = fieldDefinition.type || "undefined";
         const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+        const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
 
         // check op
         let isRev = false;
@@ -174,6 +187,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
         }
         if (!operatorDefinition.jsonLogic) {
           meta.errors.push(`Operator ${operator} is not supported`);
+          return undefined;
         }
 
         // format value
@@ -212,11 +226,16 @@ const jsonLogicFormatItem = (item, config, meta) => {
           formatteOp = operatorDefinition.jsonLogic;
         let fn = typeof operatorDefinition.jsonLogic == 'function' ? operatorDefinition.jsonLogic : null
         if (!fn) {
+          const rangeOps = ['<', '<=', '>', '>='];
           fn = (field, op, val, opDef, opOpts) => {
             if (cardinality == 0)
               return { [formatteOp]: formattedField };
+            else if (cardinality == 1 && isReverseArgs)
+              return { [formatteOp]: [formattedValue, formattedField] };
             else if (cardinality == 1)
               return { [formatteOp]: [formattedField, formattedValue] };
+            else if (cardinality == 2 && rangeOps.includes(formatteOp))
+              return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
             else
               return { [formatteOp]: [formattedField, ...formattedValue] };
           };

@@ -10,6 +10,9 @@ export const extendConfig = (config) => {
     //operators, defaultOperator - merge
     //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
+    if (config.__extended)
+        return config;
+    
     config.settings = merge({}, defaultSettings, config.settings);
 
     _extendTypesConfig(config.types, config);
@@ -19,6 +22,12 @@ export const extendConfig = (config) => {
     _extendFuncArgsConfig(config.funcs, config);
     
     moment.locale(config.settings.locale.short);
+
+    Object.defineProperty(config, "__extended", {
+        enumerable: false,
+        writable: false,
+        value: true
+    });
 
     return config;
 };
@@ -32,7 +41,7 @@ function _extendTypesConfig(typesConfig, config) {
 
 function _extendTypeConfig(type, typeConfig, config) {
     let operators = null, defaultOperator = null;
-    typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != 'field')[0];
+    typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != 'field' && w != 'func')[0];
     for (let widget in typeConfig.widgets) {
         let typeWidgetConfig = typeConfig.widgets[widget];
         if (typeWidgetConfig.operators) {
@@ -164,7 +173,7 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
 };
 
 export const getFieldRawConfig = (field, config, fieldsKey = 'fields', subfieldsKey = 'subfields') => {
-    if (!field || field == ':empty:')
+    if (!field)
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
     const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -215,7 +224,7 @@ export const getFuncArgConfig = (funcKey, argKey, config) => {
 };
 
 export const getFieldConfig = (field, config) => {
-    if (!field || field == ':empty:')
+    if (!field)
         return null;
     if (typeof field == "object" && !field.func && !!field.type)
         return field;
@@ -269,7 +278,7 @@ export const getFirstOperator = (config, field) => {
 };
 
 export const getFieldPath = (field, config, onlyKeys = false) => {
-    if (!field || field == ':empty:')
+    if (!field)
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
     const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -286,7 +295,7 @@ export const getFuncPathLabels = (field, config) => {
 };
 
 export const getFieldPathLabels = (field, config, fieldsKey = 'fields', subfieldsKey = 'subfields') => {
-    if (!field || field == ':empty:')
+    if (!field)
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
     const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -393,7 +402,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
                 canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
             if (valueSrc && valueSrc != widgetValueSrc)
                 canAdd = false;
-            if (opConfig && opConfig.isUnary && (widgetValueSrc != 'value'))
+            if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc != 'value'))
                 canAdd = false;
             if (canAdd) {
                 widgets.push(widget);

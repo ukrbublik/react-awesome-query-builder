@@ -34,7 +34,7 @@ export default class DateWidget extends PureComponent {
 
     handleChange = (_value) => {
         const {setValue, valueFormat} = this.props;
-        const value = _value && _value.isValid() ? _value.format(valueFormat) : null;
+        const value = _value && _value.isValid() ? _value.format(valueFormat) : undefined;
         if (value || _value === null)
             setValue(value);
     }

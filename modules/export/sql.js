@@ -11,7 +11,20 @@ import {Map} from 'immutable';
 import {SqlString} from '../utils/sql';
 
 
-const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+export const sqlFormat = (tree, config) => {
+    let meta = {
+        errors: []
+    };
+
+    const res = sqlFormatItem(tree, config, meta);
+
+    if (meta.errors.length)
+      console.warn("Errors while exporting to SQL:", meta.errors);
+    return res;
+};
+
+//meta is mutable
+const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
     if (currentValue === undefined)
         return undefined;
     const {fieldSeparator} = config.settings;
@@ -48,9 +61,14 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
             const argVal = args ? args.get(argKey) : undefined;
             const argValue = argVal ? argVal.get('value') : undefined;
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
-            const formattedArgVal = sqlFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
-            if (formattedArgVal !== undefined) // skip optional in the end
+            const formattedArgVal = sqlFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+            if (argValue != undefined && formattedArgVal === undefined) {
+                meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+                return undefined;
+            }
+            if (formattedArgVal !== undefined) { // skip optional in the end
                 formattedArgs[argKey] = formattedArgVal;
+            }
         }
         if (typeof funcConfig.sqlFormatFunc === 'function') {
             const fn = funcConfig.sqlFormatFunc;
@@ -86,7 +104,8 @@ const sqlFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDe
     return ret;
 };
 
-export const sqlFormat = (item, config) => {
+//meta is mutable
+const sqlFormatItem = (item, config, meta) => {
     if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
@@ -95,7 +114,7 @@ export const sqlFormat = (item, config) => {
     if (type === 'group' && children && children.size) {
         const not = properties.get('not');
         const list = children
-            .map((currentChild) => sqlFormat(currentChild, config))
+            .map((currentChild) => sqlFormatItem(currentChild, config, meta))
             .filter((currentChild) => typeof currentChild !== 'undefined');
         if (!list.size)
             return undefined;
@@ -129,7 +148,7 @@ export const sqlFormat = (item, config) => {
             currentValue = completeValue(currentValue, valueSrc, config);
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
-            let fv = sqlFormatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+            let fv = sqlFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
             if (fv !== undefined) {
                 valueSrcs.push(valueSrc);
                 valueTypes.push(valueType);
@@ -169,8 +188,10 @@ export const sqlFormat = (item, config) => {
                 };
             }
         }
-        if (!fn)
+        if (!fn) {
+            meta.errors.push(`Operator ${operator} is not supported`);
             return undefined;
+        }
         
         //format field
         let fieldName = field;

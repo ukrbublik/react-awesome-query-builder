@@ -1,10 +1,12 @@
 # Changelog
+- 1.1.2
+  - Added import from [JsonLogic](http://jsonlogic.com)
 - 1.1.1
   - Optimized `$eq` and `$and` in MongoDb query export
   - Fixed error if query value is empty
   - Added API in readme
 - 1.1.0
-  - Added [JsonLogic](http://jsonlogic.com) support
+  - Added export to [JsonLogic](http://jsonlogic.com)
 - 1.0.12
   - Added `sqlFormatFunc`, `mongoFormatFunc`, `renderBrackets`, `renderSeps` (for func), `funcs` (for field)
 - 1.0.11

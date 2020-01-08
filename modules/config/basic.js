@@ -173,7 +173,9 @@ const operators = {
         } else return undefined; // not supported
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(v) : undefined), false),
-      jsonLogic: (field, op, val) => ({ "in": [val, field] }),
+      //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
+      jsonLogic: "in",
+      _jsonLogicIsRevArgs: true,
       valueSources: ['value'],
   },
   not_like: {
@@ -212,7 +214,7 @@ const operators = {
           'and'
       ],
       reversedOp: 'not_between',
-      jsonLogic: (field, op, vals) => ({ "<=": [vals[0], field, vals[1]] }),
+      jsonLogic: "<=",
   },
   not_between: {
       label: 'Not between',
@@ -254,7 +256,7 @@ const operators = {
           'and'
       ],
       reversedOp: 'range_not_between',
-      jsonLogic: (field, op, vals) => ({ "<=": [vals[0], field, vals[1]] }),
+      jsonLogic: "<=",
   },
   range_not_between: {
       label: 'Not between',
@@ -274,7 +276,6 @@ const operators = {
       reversedOp: 'range_between',
   },
   is_empty: {
-      isUnary: true,
       label: 'Is empty',
       labelForFormat: 'IS EMPTY',
       sqlOp: 'IS EMPTY',
@@ -287,7 +288,6 @@ const operators = {
       jsonLogic: "!",
   },
   is_not_empty: {
-      isUnary: true,
       label: 'Is not empty',
       labelForFormat: 'IS NOT EMPTY',
       sqlOp: 'IS NOT EMPTY',
@@ -423,7 +423,7 @@ const operators = {
           const prox = operatorOptions.get('proximity');
           return `CONTAINS(${field}, 'NEAR((${_val1}, ${_val2}), ${prox})')`;
       },
-      mongoFormatOp: (field, op, values) => (undefined), // not supported
+      mongoFormatOp: undefined, // not supported
       jsonLogic: undefined, // not supported
       options: {
           optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
@@ -444,6 +444,7 @@ const operators = {
 const widgets = {
   text: {
       type: "text",
+      jsType: "string",
       valueSrc: 'value',
       valueLabel: "String",
       valuePlaceholder: "Enter string",
@@ -457,6 +458,7 @@ const widgets = {
   },
   number: {
       type: "number",
+      jsType: "number",
       valueSrc: 'value',
       factory: (props) => <NumberWidget {...props} />,
       valueLabel: "Number",
@@ -474,6 +476,7 @@ const widgets = {
   },
   slider: {
       type: "number",
+      jsType: "number",
       valueSrc: 'value',
       factory: (props) => <SliderWidget {...props} />,
       valueLabel: "Number",
@@ -487,6 +490,7 @@ const widgets = {
   },
   rangeslider: {
       type: "number",
+      jsType: "number",
       valueSrc: 'value',
       factory: (props) => <RangeWidget {...props} />,
       valueLabel: "Range",
@@ -505,6 +509,7 @@ const widgets = {
   },
   select: {
       type: "select",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <SelectWidget {...props} />,
       valueLabel: "Value",
@@ -519,6 +524,7 @@ const widgets = {
   },
   multiselect: {
       type: "multiselect",
+      jsType: "array",
       valueSrc: 'value',
       factory: (props) => <MultiSelectWidget {...props} />,
       valueLabel: "Values",
@@ -533,6 +539,7 @@ const widgets = {
   },
   date: {
       type: "date",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <DateWidget {...props} />,
       dateFormat: 'DD.MM.YYYY',
@@ -555,6 +562,7 @@ const widgets = {
   },
   time: {
       type: "time",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <TimeWidget {...props} />,
       timeFormat: 'HH:mm',
@@ -581,6 +589,7 @@ const widgets = {
   },
   datetime: {
       type: "datetime",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <DateTimeWidget {...props} />,
       timeFormat: 'HH:mm',
@@ -604,6 +613,7 @@ const widgets = {
   },
   boolean: {
       type: "boolean",
+      jsType: "boolean",
       valueSrc: 'value',
       factory: (props) => <BooleanWidget {...props} />,
       labelYes: "Yes",

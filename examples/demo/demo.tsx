@@ -2,19 +2,23 @@ import React, {Component} from 'react';
 import {
   Query, Builder, BasicConfig, Utils, 
   //types:
-  ImmutableTree, Config, BuilderProps, JsonTree, RuleResultProps
+  ImmutableTree, Config, BuilderProps, JsonTree, RuleResultProps, JsonLogicTree
 } from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
+import loadedInitLogic from './init_logic';
 
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, getFlatTree } = Utils;
+const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, getFlatTree, uuid, loadFromJsonLogic } = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
+const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
+const initTree = checkTree(loadTree(initValue), loadedConfig);
+//const initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same
 
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
@@ -28,7 +32,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     private ruleResults: RuleResultProps [];
 
     state = {
-      tree: checkTree(loadTree(initValue), loadedConfig),
+      tree: initTree, 
       config: loadedConfig,
       ruleResults: []
     };
@@ -123,11 +127,12 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
-            { errors ? 
+            { errors.length > 0 && 
               <pre style={preErrorStyle}>
                 {stringify(errors, undefined, 2)}
               </pre> 
-            : 
+            }
+            { !!logic &&
               <pre style={preStyle}>
                 // Rule:<br />
                 {stringify(logic, undefined, 2)}
