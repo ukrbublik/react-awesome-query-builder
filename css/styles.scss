@@ -259,7 +259,12 @@ body.qb-dragging {
   margin-right: 8px;
 }
 
-.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
+.rule--result {
+  right: 20%;
+  position: absolute;
+}
+
+.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .rule--result,
 .widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep {
   display: inline-block;
 }
