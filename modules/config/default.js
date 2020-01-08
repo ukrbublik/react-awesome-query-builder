@@ -1,5 +1,6 @@
 import en_US from 'antd/lib/locale-provider/en_US';
 import * as Widgets from '../components/widgets';
+import RuleResult from '../components/RuleResult';
 import React from "react";
 const {
   FieldSelect,
@@ -11,9 +12,9 @@ const {
 export const settings = {
   formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
     if (isForDisplay)
-        return label2;
+      return label2;
     else
-        return field;
+      return field;
   },
 
   renderField: (props) => <FieldSelect {...props} />,
@@ -26,9 +27,10 @@ export const settings = {
   // renderOperator: (props) => <VanillaFieldSelect {...props} />,
 
   renderFunc: (props) => <FieldSelect {...props} />,
+  renderResult: (props) => <RuleResult {...props} emptyValue={"?"} />,
 
   valueSourcesInfo: {
-      value: {},
+    value: {},
   },
   fieldSeparator: '.',
   fieldSeparatorDisplay: '.',
@@ -63,4 +65,7 @@ export const settings = {
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
+
+  showRuleResults: true,
+  showGroupResults: true,
 };
