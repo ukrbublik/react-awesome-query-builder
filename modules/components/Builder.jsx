@@ -5,7 +5,7 @@ import Item from '../components/Item';
 import SortableContainer from './containers/SortableContainer';
 import {getTotalNodesCountInTree} from "../utils/treeUtils";
 import uuid from "../utils/uuid";
-import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {pureShouldComponentUpdate} from "../utils/renderUtils";
 
 
 @SortableContainer
@@ -17,10 +17,9 @@ export default class Builder extends Component {
     onDragStart: PropTypes.func,
   };
 
-  pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   shouldComponentUpdate(nextProps, nextState) {
       const prevProps = this.props;
-      let should = this.pureShouldComponentUpdate(nextProps, nextState);
+      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
       if (should) {
         let chs = [];
         for (let k in nextProps) {

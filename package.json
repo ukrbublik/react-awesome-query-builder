@@ -48,7 +48,6 @@
     "lodash": "^4.6",
     "moment": "^2.24.0",
     "prop-types": "^15.6.0",
-    "react-addons-pure-render-mixin": "^15.0.0",
     "react-redux": "^5.0.0",
     "redux": "^3.5.0",
     "sqlstring": "^2.3.1",
@@ -57,7 +56,6 @@
   },
   "peerDependencies": {
     "react": "^0.14.6 || ^15.0.0 || ^16.4.1 ",
-    "react-addons-pure-render-mixin": "^0.14.6 || ^15.0.0 || ^16.4.1",
     "react-dom": "^0.14.6 || ^15.0.0 || ^16.4.1",
     "react-redux": "^4.0.6 || ^5.0.0",
     "redux": "^3.0.5"
