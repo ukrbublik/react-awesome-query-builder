@@ -5,7 +5,7 @@ import {
     getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
-import {defaultValue} from "../../utils/stuff";
+import {defaultValue, useOnPropsChange} from "../../utils/stuff";
 import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
 import Immutable from 'immutable';
@@ -32,11 +32,12 @@ export default (Widget) => {
 
         constructor(props) {
             super(props);
+            useOnPropsChange(this);
 
-            this.componentWillReceiveProps(props);
+            this.onPropsChanged(props);
         }
 
-        componentWillReceiveProps(nextProps) {
+        onPropsChanged(nextProps) {
             const prevProps = this.props;
             const keysForMeta = ["config", "field", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg"];
             const needUpdateMeta = !this.meta || 

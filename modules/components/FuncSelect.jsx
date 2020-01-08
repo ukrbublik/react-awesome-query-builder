@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {
   getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getFuncPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../utils/configUtils";
-import {truncateString} from "../utils/stuff";
+import {truncateString, useOnPropsChange} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import clone from 'clone';
@@ -22,11 +22,12 @@ export default class FuncSelect extends PureComponent {
 
   constructor(props) {
       super(props);
+      useOnPropsChange(this);
 
-      this.componentWillReceiveProps(props);
+      this.onPropsChanged(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  onPropsChanged(nextProps) {
       const prevProps = this.props;
       const keysForItems = ["config", "field", "operator"];
       const keysForMeta = ["config", "field", "value"];

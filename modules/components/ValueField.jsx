@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
-  getFieldConfig, getFieldPath, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
+  getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp
 } from "../utils/configUtils";
-import {truncateString} from "../utils/stuff";
+import {truncateString, useOnPropsChange} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 import clone from 'clone';
@@ -22,11 +22,12 @@ export default class ValueField extends PureComponent {
 
   constructor(props) {
       super(props);
+      useOnPropsChange(this);
 
-      this.componentWillReceiveProps(props);
+      this.onPropsChanged(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  onPropsChanged(nextProps) {
       const prevProps = this.props;
       const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
       const keysForMeta = ["config", "field", "operator", "value"];

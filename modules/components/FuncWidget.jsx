@@ -7,6 +7,7 @@ import FuncSelect from './FuncSelect';import {
 import { Col } from 'antd';
 import Widget from './Widget';
 import {setFunc, setArgValue, setArgValueSrc} from '../utils/funcUtils';
+import {useOnPropsChange} from "../utils/stuff";
 
 
 export default class FuncWidget extends PureComponent {
@@ -21,11 +22,12 @@ export default class FuncWidget extends PureComponent {
 
   constructor(props) {
       super(props);
+      useOnPropsChange(this);
 
-      this.componentWillReceiveProps(props);
+      this.onPropsChanged(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  onPropsChanged(nextProps) {
       const prevProps = this.props;
       const keysForMeta = ["config", "field", "operator", "value"];
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;

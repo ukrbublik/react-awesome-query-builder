@@ -6,7 +6,7 @@ import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
 import {fixPathsInTree} from '../utils/treeUtils';
-import {bindActionCreators, shallowEqual, immutableEqual} from "../utils/stuff";
+import {bindActionCreators, shallowEqual, immutableEqual, useOnPropsChange} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import {defaultRoot} from "../utils/defaultUtils";
 import {liteShouldComponentUpdate} from "../utils/renderUtils";
@@ -34,6 +34,7 @@ class Query extends PureComponent {
 
     constructor(props) {
         super(props);
+        useOnPropsChange(this);
 
         this._updateActions(props);
 
@@ -50,7 +51,7 @@ class Query extends PureComponent {
       this.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
     }
 
-    componentWillReceiveProps(nextProps) {
+    onPropsChanged(nextProps) {
         const {onChange} = nextProps;
         const oldConfig = this.props.config;
         const newTree = nextProps.tree;
@@ -111,6 +112,7 @@ export default class QueryContainer extends Component {
 
     constructor(props, context) {
         super(props, context);
+        useOnPropsChange(this);
 
         const config = pick(props, configKeys);
         const extendedConfig = extendConfig(config);
@@ -132,7 +134,7 @@ export default class QueryContainer extends Component {
         }
     });
 
-    componentWillReceiveProps(nextProps) {
+    onPropsChanged(nextProps) {
         if (this.props.dontDispatchOnNewProps)
             return;
         

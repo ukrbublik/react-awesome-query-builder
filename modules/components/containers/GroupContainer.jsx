@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import mapValues from 'lodash/mapValues';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {connect} from 'react-redux';
+import {useOnPropsChange} from "../../utils/stuff";
 
 
 export default (Group) => {
@@ -24,6 +25,7 @@ export default (Group) => {
 
     constructor(props) {
       super(props);
+      useOnPropsChange(this);
 
       this.conjunctionOptions = this._getConjunctionOptions(props);
     }
@@ -56,7 +58,7 @@ export default (Group) => {
         return should;
     }
 
-    componentWillReceiveProps(nextProps) {
+    onPropsChanged(nextProps) {
       const {config, id, conjunction} = nextProps;
       const oldConfig = this.props.config;
       const oldConjunction = this.props.conjunction;

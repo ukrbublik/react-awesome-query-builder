@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import map from 'lodash/map';
-import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
+import {useOnPropsChange, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
 import { Select } from 'antd';
 const Option = Select.Option;
 
@@ -19,10 +19,7 @@ export default class SelectWidget extends PureComponent {
 
   constructor(props) {
       super(props);
-      this.onPropsChanged(props);
-  }
-
-  componentWillReceiveProps (props) {
+      useOnPropsChange(this);
       this.onPropsChanged(props);
   }
 

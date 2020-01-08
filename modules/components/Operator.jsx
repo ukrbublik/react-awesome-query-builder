@@ -4,6 +4,7 @@ import {getFieldConfig} from "../utils/configUtils";
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
+import {useOnPropsChange} from "../utils/stuff";
 
 
 export default class Operator extends PureComponent {
@@ -17,11 +18,12 @@ export default class Operator extends PureComponent {
 
   constructor(props) {
       super(props);
+      useOnPropsChange(this);
 
-      this.componentWillReceiveProps(props);
+      this.onPropsChanged(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  onPropsChanged(nextProps) {
       const prevProps = this.props;
       const keysForMeta = ["config", "selectedField", "selectedOperator"];
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;

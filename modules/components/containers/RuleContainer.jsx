@@ -25,11 +25,6 @@ export default (Rule) => {
 
     constructor(props) {
         super(props);
-
-        this.componentWillReceiveProps(props);
-    }
-
-    componentWillReceiveProps(nextProps) {
     }
 
     dummyFn = () => {}
