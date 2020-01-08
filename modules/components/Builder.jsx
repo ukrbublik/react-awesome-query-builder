@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Immutable, {Map} from 'immutable';
+import Immutable, { Map } from 'immutable';
 import Item from '../components/Item';
 import SortableContainer from './containers/SortableContainer';
-import {getTotalNodesCountInTree} from "../utils/treeUtils";
+import { getTotalNodesCountInTree } from "../utils/treeUtils";
 import uuid from "../utils/uuid";
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
@@ -15,27 +15,28 @@ export default class Builder extends Component {
     config: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     onDragStart: PropTypes.func,
+    customData: PropTypes.any,
   };
 
   pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
   shouldComponentUpdate(nextProps, nextState) {
-      const prevProps = this.props;
-      let should = this.pureShouldComponentUpdate(nextProps, nextState);
-      if (should) {
-        let chs = [];
-        for (let k in nextProps) {
-            let changed = (nextProps[k] !== prevProps[k]);
-            if (changed && k != '__isInternalValueChange') {
-              chs.push(k);
-            }
+    const prevProps = this.props;
+    let should = this.pureShouldComponentUpdate(nextProps, nextState);
+    if (should) {
+      let chs = [];
+      for (let k in nextProps) {
+        let changed = (nextProps[k] !== prevProps[k]);
+        if (changed && k != '__isInternalValueChange') {
+          chs.push(k);
         }
-        if (!chs.length)
-            should = false;
-        //optimize render
-        if (chs.length == 1 && chs[0] == 'tree' && nextProps.__isInternalValueChange)
-            should = false;
       }
-      return should;
+      if (!chs.length)
+        should = false;
+      //optimize render
+      if (chs.length == 1 && chs[0] == 'tree' && nextProps.__isInternalValueChange)
+        should = false;
+    }
+    return should;
   }
 
   constructor(props) {
@@ -44,7 +45,7 @@ export default class Builder extends Component {
     this._updPath(props);
   }
 
-  _updPath (props) {
+  _updPath(props) {
     const id = props.tree.get('id');
     this.path = Immutable.List.of(id);
   }
@@ -53,7 +54,7 @@ export default class Builder extends Component {
     const treeNodesCnt = getTotalNodesCountInTree(this.props.tree);
     const id = this.props.tree.get('id');
     return (
-      <Item 
+      <Item
         key={id}
         id={id}
         path={this.path}
@@ -65,6 +66,7 @@ export default class Builder extends Component {
         //tree={this.props.tree}
         treeNodesCnt={treeNodesCnt}
         onDragStart={this.props.onDragStart}
+        customData={this.props.customData}
       />
     );
   }

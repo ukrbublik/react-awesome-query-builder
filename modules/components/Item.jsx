@@ -6,7 +6,7 @@ import Group from './Group';
 
 const typeMap = {
   rule: (props) => (
-    <Rule 
+    <Rule
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}
@@ -14,10 +14,11 @@ const typeMap = {
       treeNodesCnt={props.treeNodesCnt}
       config={props.config}
       onDragStart={props.onDragStart}
+      customData={props.customData}
     />
   ),
   group: (props) => (
-    <Group 
+    <Group
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}
@@ -27,6 +28,7 @@ const typeMap = {
       treeNodesCnt={props.treeNodesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
+      customData={props.customData}
     />
   )
 };
@@ -44,6 +46,7 @@ class Item extends PureComponent {
     actions: PropTypes.object.isRequired,
     treeNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
+    customData: PropTypes.any,
   };
 
   render() {

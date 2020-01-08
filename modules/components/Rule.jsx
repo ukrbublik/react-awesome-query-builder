@@ -8,7 +8,7 @@ import Widget from './Widget';
 import OperatorOptions from './OperatorOptions';
 import { Col, Icon, Button, Modal } from 'antd';
 const { confirm } = Modal;
-import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
+import { getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig } from "../utils/configUtils";
 
 
 @RuleContainer
@@ -33,6 +33,7 @@ class Rule extends PureComponent {
         setValue: PropTypes.func,
         setValueSrc: PropTypes.func,
         treeNodesCnt: PropTypes.number,
+        customData: PropTypes.any,
     };
 
     constructor(props) {
@@ -51,7 +52,7 @@ class Rule extends PureComponent {
         }
     }
 
-    getMeta({selectedField, selectedOperator, config, treeNodesCnt}) {
+    getMeta({ selectedField, selectedOperator, config, treeNodesCnt }) {
         const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
         const selectedFieldConfig = getFieldConfig(selectedField, config);
         const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == '!struct';
@@ -67,26 +68,28 @@ class Rule extends PureComponent {
         const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
         const showWidget = isFieldAndOpSelected;
         const showOperatorOptions = isFieldAndOpSelected && selectedOperatorHasOptions;
+        const showRuleResults = config.settings.showRuleResults || false;
 
         return {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
-            showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
+            showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions, showRuleResults
         };
     }
 
     removeSelf = () => {
-      const confirmOptions = this.props.config.settings.removeRuleConfirmOptions;
-      const doRemove = () => {
-        this.props.removeSelf();
-      };
-      if (confirmOptions && !this.isEmptyCurrentRule()) {
-        confirm({...confirmOptions,
-          onOk: doRemove,
-          onCancel: null
-        });
-      } else {
-        doRemove();
-      }
+        const confirmOptions = this.props.config.settings.removeRuleConfirmOptions;
+        const doRemove = () => {
+            this.props.removeSelf();
+        };
+        if (confirmOptions && !this.isEmptyCurrentRule()) {
+            confirm({
+                ...confirmOptions,
+                onOk: doRemove,
+                onCancel: null
+            });
+        } else {
+            doRemove();
+        }
     }
 
     isEmptyCurrentRule = () => {
@@ -97,21 +100,21 @@ class Rule extends PureComponent {
         );
     }
 
-    render () {
+    render() {
         const {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
-            showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
+            showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions, showRuleResults
         } = this.meta;
         const deleteText = this.props.config.settings.deleteLabel;
 
-        const field = 
+        const field =
             <FieldWrapper
                 key="field"
                 config={this.props.config}
                 selectedField={this.props.selectedField}
                 setField={this.props.setField}
             />;
-        const operator = 
+        const operator =
             <OperatorWrapper
                 key="operator"
                 config={this.props.config}
@@ -125,7 +128,7 @@ class Rule extends PureComponent {
             />;
 
         const widget = showWidget &&
-            <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
+            <Col key={"widget-for-" + this.props.selectedOperator} className="rule--value">
                 <Widget
                     key="values"
                     field={this.props.selectedField}
@@ -138,7 +141,7 @@ class Rule extends PureComponent {
                 />
             </Col>;
         const operatorOptions = showOperatorOptions &&
-            <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
+            <Col key={"op-options-for-" + this.props.selectedOperator} className="rule--operator-options">
                 <OperatorOptions
                     key="operatorOptions"
                     selectedField={this.props.selectedField}
@@ -148,12 +151,21 @@ class Rule extends PureComponent {
                     config={this.props.config}
                 />
             </Col>;
+        const ruleResult = showRuleResults &&
+            <RuleResultWrapper
+                key="rule-result"
+                ruleId={this.props.id}
+                config={this.props.config}
+                selectedField={this.props.selectedField}
+                customData={this.props.customData}
+            />;
 
         const parts = [
             field,
             operator,
             widget,
-            operatorOptions
+            operatorOptions,
+            ruleResult
         ];
 
         const drag = showDragIcon &&
@@ -162,20 +174,20 @@ class Rule extends PureComponent {
                 className={"qb-drag-handler rule--drag-handler"}
                 onMouseDown={this.props.handleDraggerMouseDown}
             ><Icon type="bars" /> </span>
-        ;
+            ;
 
         const del = (
             <div key="rule-header" className="rule--header">
-            {!this.props.config.settings.immutableGroupsMode &&
-                <Button
-                    type="danger"
-                    icon="delete"
-                    onClick={this.removeSelf}
-                    size={this.props.config.settings.renderSize}
-                >
-                    {deleteText}
-                </Button>
-            }
+                {!this.props.config.settings.immutableGroupsMode &&
+                    <Button
+                        type="danger"
+                        icon="delete"
+                        onClick={this.removeSelf}
+                        size={this.props.config.settings.renderSize}
+                    >
+                        {deleteText}
+                    </Button>
+                }
             </div>
         );
 
@@ -193,10 +205,10 @@ class Rule extends PureComponent {
 
 class FieldWrapper extends PureComponent {
     render() {
-        const {config, selectedField, setField} = this.props;
+        const { config, selectedField, setField } = this.props;
         return (
             <Col className="rule--field">
-                { config.settings.showLabels &&
+                {config.settings.showLabels &&
                     <label>{config.settings.fieldLabel}</label>
                 }
                 <Field
@@ -214,12 +226,12 @@ class FieldWrapper extends PureComponent {
 class OperatorWrapper extends PureComponent {
     render() {
         const {
-            config, selectedField, selectedOperator, setOperator, 
+            config, selectedField, selectedOperator, setOperator,
             selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig
         } = this.props;
         const operator = showOperator &&
-            <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
-                { config.settings.showLabels &&
+            <Col key={"operators-for-" + (selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+                {config.settings.showLabels &&
                     <label>{config.settings.operatorLabel}</label>
                 }
                 <Operator
@@ -231,11 +243,11 @@ class OperatorWrapper extends PureComponent {
                 />
             </Col>;
         const hiddenOperator = showOperatorLabel &&
-            <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+            <Col key={"operators-for-" + (selectedFieldPartsLabels || []).join("_")} className="rule--operator">
                 <div className="rule--operator">
                     {config.settings.showLabels ?
                         <label>&nbsp;</label>
-                    : null}
+                        : null}
                     <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
                 </div>
             </Col>;
@@ -243,6 +255,27 @@ class OperatorWrapper extends PureComponent {
             operator,
             hiddenOperator
         ];
+    }
+}
+
+export class RuleResultWrapper extends PureComponent {
+    render() {
+        const { ruleId, config, selectedField, customData } = this.props;
+        const { customProps } = config.settings.customFieldSelectProps;
+        const { renderResult } = config.settings;
+        const ruleResult = customData.ruleResults.find(x => x.ruleId == ruleId);
+        const renderProps = {
+            ruleId,
+            config,
+            selectedField,
+            ruleResult,
+            customProps
+        };
+        return (
+            <Col className="rule--result">
+                {renderResult(renderProps)}
+            </Col>
+        );
     }
 }
 

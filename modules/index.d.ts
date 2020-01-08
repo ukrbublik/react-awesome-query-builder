@@ -1,6 +1,6 @@
 
-import {List as ImmutableList, Map as ImmutableMap} from 'immutable';
-import {ElementType, ReactElement, Factory} from 'react';
+import { List as ImmutableList, Map as ImmutableMap, OrderedMap } from 'immutable';
+import { ElementType, ReactElement, Factory } from 'react';
 
 
 ////////////////
@@ -33,7 +33,7 @@ type ValueSource = "value" | "field" | "func" | "const";
 type JsonGroup = {
   type: "group",
   id?: String,
-  children1?: {[id: string]: JsonGroup|JsonRule},
+  children1?: { [id: string]: JsonGroup | JsonRule },
   properties?: {
     conjunction: String,
     not?: Boolean,
@@ -50,9 +50,26 @@ type JsonRule = {
     operatorOptions?: {}
   }
 };
+type FlatTreeItem = {
+  type: String,
+  index: Number,
+  id: String,
+  path: String,
+  parent: String,
+  prev: String,
+  next: String,
+  leaf: Boolean,
+  lev: Number,
+  children: OrderedMap,
+};
+type FlatTree = {
+  flat: Array<String>,
+  items: Array<FlatTreeItem>,
+};
+
 export type JsonTree = JsonGroup;
 
-export type ImmutableTree = ImmutableMap<String, String|Object>;
+export type ImmutableTree = ImmutableMap<String, String | Object>;
 
 
 ////////////////
@@ -70,6 +87,7 @@ export interface Utils {
   getTree(tree: ImmutableTree): JsonTree;
   loadTree(tree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  getFlatTree(tree: ImmutableTree): FlatTree;
   // other
   uuid(): String;
 };
@@ -77,7 +95,8 @@ export interface Utils {
 export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
-  actions: {[key: string]: Function},
+  actions: { [key: string]: Function },
+  customData: any,
 };
 
 export interface QueryProps {
@@ -106,15 +125,20 @@ export interface Config {
   funcs?: Funcs,
 };
 
+interface RuleResultProps {
+  ruleId: string,
+  filtered?: number,
+  total?: number,
+};
 
 /////////////////
 // Widgets, WidgetProps
 /////////////////
 
-type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
-type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
-type ValidateValue =       (val: RuleValue, fieldDef: Field) => Boolean;
+type FormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
+type SqlFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
+type MongoFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
+type ValidateValue = (val: RuleValue, fieldDef: Field) => Boolean;
 
 interface BaseWidgetProps {
   value: RuleValue,
@@ -154,7 +178,7 @@ export interface BaseWidget {
 };
 export interface RangeableWidget extends BaseWidget {
   singleWidget?: String,
-  valueLabels?: Array<String | {label: String, placeholder: String}>,
+  valueLabels?: Array<String | { label: String, placeholder: String }>,
 };
 export interface FieldWidget {
   customProps?: {},
@@ -172,7 +196,7 @@ export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
 export type SelectWidget = BaseWidget & SelectFieldSettings;
 
-export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget  | RangeableWidget | BaseWidget;
+export type Widget = FieldWidget | TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget | RangeableWidget | BaseWidget;
 export type Widgets = TypedMap<Widget>;
 
 
@@ -209,7 +233,7 @@ interface ProximityConfig {
   minProximity: Number,
   maxProximity: Number,
   defaults: {
-      proximity: Number,
+    proximity: Number,
   },
   customProps?: {},
 };
@@ -244,7 +268,7 @@ interface BinaryOperator extends BaseOperator {
 interface Operator2 extends BaseOperator {
   //cardinality: 2
   textSeparators: Array<String>,
-  valueLabels: Array<String | {label: String, placeholder: String}>,
+  valueLabels: Array<String | { label: String, placeholder: String }>,
   isSpecialRange?: Boolean,
 };
 interface OperatorProximity extends Operator2 {
@@ -285,7 +309,7 @@ interface NumberFieldSettings extends BasicFieldSettings {
   min?: Number,
   max?: Number,
   step?: Number,
-  marks?: {[mark: number]: ReactElement | String}
+  marks?: { [mark: number]: ReactElement | String }
 };
 interface DateTimeFieldSettings extends BasicFieldSettings {
   timeFormat?: String,
@@ -345,12 +369,12 @@ export type Fields = TypedMap<FieldOrGroup>;
 /////////////////
 
 export type FieldItem = {
-  items?: FieldItems, 
-  key: String, 
-  path?: String, 
-  label: String, 
-  fullLabel?: String, 
-  altLabel?: String, 
+  items?: FieldItems,
+  key: String,
+  path?: String,
+  label: String,
+  fullLabel?: String,
+  altLabel?: String,
   tooltip?: String
 };
 type FieldItems = TypedMap<FieldItem>;
@@ -367,7 +391,7 @@ export interface FieldProps {
   config?: Config,
   customProps?: {},
   placeholder?: String,
-  selectedOpts?: {tooltip?: String},
+  selectedOpts?: { tooltip?: String },
 }
 
 
@@ -375,7 +399,7 @@ export interface FieldProps {
 // Settings
 /////////////////
 
-type ValueSourcesInfo = {[vs in ValueSource]?: {label: String, widget?: String}};
+type ValueSourcesInfo = { [vs in ValueSource]?: { label: String, widget?: String } };
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
@@ -404,9 +428,9 @@ export interface LocaleSettings {
   notLabel?: String,
   valueSourcesPopupTitle?: String,
   removeRuleConfirmOptions?: {
-      title?: String,
-      okText?: String,
-      okType?: String,
+    title?: String,
+    okText?: String,
+    okType?: String,
   },
   removeGroupConfirmOptions?: {
     title?: String,

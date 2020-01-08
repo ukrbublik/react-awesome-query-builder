@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {getFieldConfig} from "../../utils/configUtils";
+import { getFieldConfig } from "../../utils/configUtils";
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 
 export default (Rule) => {
@@ -21,18 +21,20 @@ export default (Rule) => {
       treeNodesCnt: PropTypes.number,
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
+      //custom client data props
+      customData: PropTypes.any,
     };
 
     constructor(props) {
-        super(props);
+      super(props);
 
-        this.componentWillReceiveProps(props);
+      this.componentWillReceiveProps(props);
     }
 
     componentWillReceiveProps(nextProps) {
     }
 
-    dummyFn = () => {}
+    dummyFn = () => { }
 
     removeSelf = () => {
       this.props.actions.removeRule(this.props.path);
@@ -51,40 +53,40 @@ export default (Rule) => {
     }
 
     setValue = (delta, value, type, __isInternal) => {
-        this.props.actions.setValue(this.props.path, delta, value, type, __isInternal);
+      this.props.actions.setValue(this.props.path, delta, value, type, __isInternal);
     }
 
     setValueSrc = (delta, srcKey) => {
-        this.props.actions.setValueSrc(this.props.path, delta, srcKey);
+      this.props.actions.setValueSrc(this.props.path, delta, srcKey);
     }
 
 
     pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    
-    shouldComponentUpdate(nextProps, nextState) {
-        let prevProps = this.props;
-        let prevState = this.state;
 
-        let should = this.pureShouldComponentUpdate(nextProps, nextState);
-        if (should) {
-          if (prevState == nextState && prevProps != nextProps) {
-            const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
-            const isDraggingMe = draggingId == nextProps.id;
-            let chs = [];
-            for (let k in nextProps) {
-                let changed = (nextProps[k] != prevProps[k]);
-                if (k == 'dragging' && !isDraggingMe) {
-                  changed = false; //dragging another item -> ignore
-                }
-                if (changed) {
-                  chs.push(k);
-                }
+    shouldComponentUpdate(nextProps, nextState) {
+      let prevProps = this.props;
+      let prevState = this.state;
+
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
+      if (should) {
+        if (prevState == nextState && prevProps != nextProps) {
+          const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
+          const isDraggingMe = draggingId == nextProps.id;
+          let chs = [];
+          for (let k in nextProps) {
+            let changed = (nextProps[k] != prevProps[k]);
+            if (k == 'dragging' && !isDraggingMe) {
+              changed = false; //dragging another item -> ignore
             }
-            if (!chs.length)
-                should = false;
+            if (changed) {
+              chs.push(k);
+            }
           }
+          if (!chs.length)
+            should = false;
         }
-        return should;
+      }
+      return should;
     }
 
     render() {
@@ -97,46 +99,48 @@ export default (Rule) => {
           className={'group-or-rule-container rule-container'}
           data-id={this.props.id}
         >
-        {[
-          isDraggingMe ? <Rule
-            key={"dragging"}
-            id={this.props.id}
-            isDraggingMe={isDraggingMe}
-            isDraggingTempo={true}
-            dragging={this.props.dragging}
-            setField={this.dummyFn}
-            setOperator={this.dummyFn}
-            setOperatorOption={this.dummyFn}
-            removeSelf={this.dummyFn}
-            selectedField={this.props.field || null}
-            selectedOperator={this.props.operator || null}
-            value={this.props.value || null}
-            valueSrc={this.props.valueSrc || null}
-            operatorOptions={this.props.operatorOptions}
-            config={this.props.config}
-            treeNodesCnt={this.props.treeNodesCnt}
-          /> : null
-        ,
-          <Rule
-            key={this.props.id}
-            id={this.props.id}
-            isDraggingMe={isDraggingMe}
-            onDragStart={this.props.onDragStart}
-            removeSelf={this.removeSelf}
-            setField={this.setField}
-            setOperator={this.setOperator}
-            setOperatorOption={this.setOperatorOption}
-            setValue={this.setValue}
-            setValueSrc={this.setValueSrc}
-            selectedField={this.props.field || null}
-            selectedOperator={this.props.operator || null}
-            value={this.props.value || null}
-            valueSrc={this.props.valueSrc || null}
-            operatorOptions={this.props.operatorOptions}
-            config={this.props.config}
-            treeNodesCnt={this.props.treeNodesCnt}
-          />
-        ]}
+          {[
+            isDraggingMe ? <Rule
+              key={"dragging"}
+              id={this.props.id}
+              isDraggingMe={isDraggingMe}
+              isDraggingTempo={true}
+              dragging={this.props.dragging}
+              setField={this.dummyFn}
+              setOperator={this.dummyFn}
+              setOperatorOption={this.dummyFn}
+              removeSelf={this.dummyFn}
+              selectedField={this.props.field || null}
+              selectedOperator={this.props.operator || null}
+              value={this.props.value || null}
+              valueSrc={this.props.valueSrc || null}
+              operatorOptions={this.props.operatorOptions}
+              config={this.props.config}
+              treeNodesCnt={this.props.treeNodesCnt}
+              customData={this.props.customData}
+            /> : null
+            ,
+            <Rule
+              key={this.props.id}
+              id={this.props.id}
+              isDraggingMe={isDraggingMe}
+              onDragStart={this.props.onDragStart}
+              removeSelf={this.removeSelf}
+              setField={this.setField}
+              setOperator={this.setOperator}
+              setOperatorOption={this.setOperatorOption}
+              setValue={this.setValue}
+              setValueSrc={this.setValueSrc}
+              selectedField={this.props.field || null}
+              selectedOperator={this.props.operator || null}
+              value={this.props.value || null}
+              valueSrc={this.props.valueSrc || null}
+              operatorOptions={this.props.operatorOptions}
+              config={this.props.config}
+              treeNodesCnt={this.props.treeNodesCnt}
+              customData={this.props.customData}
+            />
+          ]}
         </div>
       );
     }
@@ -145,11 +149,11 @@ export default (Rule) => {
 
 
   const ConnectedRuleContainer = connect(
-      (state) => {
-          return {
-            dragging: state.dragging,
-          }
+    (state) => {
+      return {
+        dragging: state.dragging,
       }
+    }
   )(RuleContainer);
   ConnectedRuleContainer.displayName = "ConnectedRuleContainer";
 

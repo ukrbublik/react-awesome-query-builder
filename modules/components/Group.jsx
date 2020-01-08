@@ -7,8 +7,9 @@ import { Icon, Modal } from 'antd';
 const { confirm } = Modal;
 const classNames = require('classnames');
 import Item from './Item';
-import {ConjsRadios, ConjsButtons} from './Conjs';
-import {Actions} from './Actions';
+import { ConjsRadios, ConjsButtons } from './Conjs';
+import { Actions } from './Actions';
+import { RuleResultWrapper } from './Rule';
 
 const defaultPosition = 'topRight';
 
@@ -39,6 +40,7 @@ class Group extends PureComponent {
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
+    customData: PropTypes.any,
   };
 
   isGroupTopPosition = () => {
@@ -51,7 +53,8 @@ class Group extends PureComponent {
       this.props.removeSelf();
     };
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
-      confirm({...confirmOptions,
+      confirm({
+        ...confirmOptions,
         onOk: doRemove,
         onCancel: null
       });
@@ -78,29 +81,32 @@ class Group extends PureComponent {
 
   isEmptyRule = (rule) => {
     const properties = rule.get('properties');
-      return !(
-          properties.get("field") !== null &&
-          properties.get("operator") !== null &&
-          properties.get("value").filter((val) => val !== undefined).size > 0
-      );
+    return !(
+      properties.get("field") !== null &&
+      properties.get("operator") !== null &&
+      properties.get("value").filter((val) => val !== undefined).size > 0
+    );
   }
 
   render() {
     const isGroupTopPosition = this.isGroupTopPosition();
+    const { showGroupResults } = this.props.config.settings;
+
     return [
-        <div key="group-header" className="group--header">
-          {this.renderHeader()}
-          {isGroupTopPosition && this.renderActions()}
-        </div>
-    , this.props.children1 &&
-        <div key="group-children" className={classNames(
-          "group--children",
-          this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : ''
-        )}>{this.renderChildren()}</div>
-    , !isGroupTopPosition &&
-        <div key="group-footer" className='group--footer'>
-          {this.renderActions()}
-        </div>
+      <div key="group-header" className="group--header">
+        {this.renderHeader()}
+        {showGroupResults && this.renderRuleResult()}
+        {isGroupTopPosition && this.renderActions()}
+      </div>
+      , this.props.children1 &&
+      <div key="group-children" className={classNames(
+        "group--children",
+        this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : ''
+      )}>{this.renderChildren()}</div>
+      , !isGroupTopPosition &&
+      <div key="group-footer" className='group--footer'>
+        {this.renderActions()}
+      </div>
     ];
   }
 
@@ -131,6 +137,7 @@ class Group extends PureComponent {
         //tree={props.tree}
         treeNodesCnt={props.treeNodesCnt}
         onDragStart={props.onDragStart}
+        customData={props.customData}
       />
     )).toList() : null;
   }
@@ -165,6 +172,15 @@ class Group extends PureComponent {
         {drag}
       </div>
     );
+  }
+
+  renderRuleResult = () => {
+    return <RuleResultWrapper
+      key="rule-result"
+      ruleId={this.props.id}
+      config={this.props.config}
+      customData={this.props.customData}
+    />
   }
 }
 
