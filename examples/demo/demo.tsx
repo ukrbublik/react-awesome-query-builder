@@ -100,11 +100,12 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
-            { errors ? 
+            { errors.length && 
               <pre style={preErrorStyle}>
                 {stringify(errors, undefined, 2)}
               </pre> 
-            : 
+            }
+            { logic &&
               <pre style={preStyle}>
                 // Rule:<br />
                 {stringify(logic, undefined, 2)}

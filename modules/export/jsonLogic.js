@@ -38,9 +38,8 @@ export const jsonLogicFormat = (item, config) => {
       }
     }
     
-    return errors.length ? {
-      errors
-    } : {
+    return {
+      errors,
       logic,
       data,
     };
@@ -187,8 +186,8 @@ const jsonLogicFormatItem = (item, config, meta) => {
           [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
         }
         if (!operatorDefinition.jsonLogic) {
-          //tip: it's warning, not error
-          meta.errors.push(`Operator ${operator} is not explicitly supported`);
+          meta.errors.push(`Operator ${operator} is not supported`);
+          return undefined;
         }
 
         // format value

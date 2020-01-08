@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import uuid from './uuid';
 import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from './configUtils';
-import {getNewValueForFieldOp} from '../stores/tree';
+import {getNewValueForFieldOp} from '../utils/validation';
 
 
 export const defaultField = (config, canGetFirst = true) => {

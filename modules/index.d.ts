@@ -145,6 +145,7 @@ export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 export interface BaseWidget {
   customProps?: {},
   type: String,
+  jsType?: String,
   factory: Factory<WidgetProps>,
   valueSrc?: ValueSource,
   valuePlaceholder?: String,

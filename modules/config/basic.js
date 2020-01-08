@@ -444,6 +444,7 @@ const operators = {
 const widgets = {
   text: {
       type: "text",
+      jsType: "string",
       valueSrc: 'value',
       valueLabel: "String",
       valuePlaceholder: "Enter string",
@@ -457,6 +458,7 @@ const widgets = {
   },
   number: {
       type: "number",
+      jsType: "number",
       valueSrc: 'value',
       factory: (props) => <NumberWidget {...props} />,
       valueLabel: "Number",
@@ -474,6 +476,7 @@ const widgets = {
   },
   slider: {
       type: "number",
+      jsType: "number",
       valueSrc: 'value',
       factory: (props) => <SliderWidget {...props} />,
       valueLabel: "Number",
@@ -487,6 +490,7 @@ const widgets = {
   },
   rangeslider: {
       type: "number",
+      jsType: "number",
       valueSrc: 'value',
       factory: (props) => <RangeWidget {...props} />,
       valueLabel: "Range",
@@ -505,6 +509,7 @@ const widgets = {
   },
   select: {
       type: "select",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <SelectWidget {...props} />,
       valueLabel: "Value",
@@ -519,6 +524,7 @@ const widgets = {
   },
   multiselect: {
       type: "multiselect",
+      jsType: "array",
       valueSrc: 'value',
       factory: (props) => <MultiSelectWidget {...props} />,
       valueLabel: "Values",
@@ -533,6 +539,7 @@ const widgets = {
   },
   date: {
       type: "date",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <DateWidget {...props} />,
       dateFormat: 'DD.MM.YYYY',
@@ -555,6 +562,7 @@ const widgets = {
   },
   time: {
       type: "time",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <TimeWidget {...props} />,
       timeFormat: 'HH:mm',
@@ -581,6 +589,7 @@ const widgets = {
   },
   datetime: {
       type: "datetime",
+      jsType: "string",
       valueSrc: 'value',
       factory: (props) => <DateTimeWidget {...props} />,
       timeFormat: 'HH:mm',
@@ -604,6 +613,7 @@ const widgets = {
   },
   boolean: {
       type: "boolean",
+      jsType: "boolean",
       valueSrc: 'value',
       factory: (props) => <BooleanWidget {...props} />,
       labelYes: "Yes",
