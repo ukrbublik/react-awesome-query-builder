@@ -34,6 +34,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Reordering (drag-n-drop) support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/) (but using custom widgets of another framework is possible)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
+- Import from [JsonLogic](http://jsonlogic.com)
 - TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo))
 
 
@@ -151,7 +152,7 @@ class DemoQueryBuilder extends Component {
 ### `<Query />`
 Props:
 - `{...config}` - destructured query [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
-- `value` - query value in [Immutable](https://immutable-js.github.io/immutable-js/) format
+- `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
 - `onChange` - callback when value changed. Params: `value` (in Immutable format), `config`.
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
