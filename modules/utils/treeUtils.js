@@ -192,4 +192,3 @@ export const getTotalNodesCountInTree = (tree) => {
 
     return cnt;
 };
-

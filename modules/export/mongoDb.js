@@ -9,7 +9,20 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import {Map} from 'immutable';
 
-const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+export const mongodbFormat = (tree, config) => {
+    let meta = {
+        errors: []
+    };
+
+    const res = mongodbFormatItem(tree, config, meta);
+
+    if (meta.errors.length)
+      console.warn("Errors while exporting to MongoDb:", meta.errors);
+    return res;
+};
+
+//meta is mutable
+const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
     if (currentValue === undefined)
         return [undefined, false];
     const {fieldSeparator} = config.settings;
@@ -51,9 +64,11 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
             const argVal = args ? args.get(argKey) : undefined;
             const argValue = argVal ? argVal.get('value') : undefined;
             const argValueSrc = argVal ? argVal.get('valueSrc') : undefined;
-            const [formattedArgVal, _argUseExpr] = mongoFormatValue(config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
-            if (argValue != undefined && formattedArgVal === undefined)
+            const [formattedArgVal, _argUseExpr] = mongoFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+            if (argValue != undefined && formattedArgVal === undefined) {
+                meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
                 return [undefined, false];
+            }
             argsCnt++;
             if (formattedArgVal !== undefined) { // skip optional in the end
                 formattedArgs[argKey] = formattedArgVal;
@@ -95,7 +110,8 @@ const mongoFormatValue = (config, currentValue, valueSrc, valueType, fieldWidget
     return [ret, useExpr];
 }
 
-export const mongodbFormat = (item, config, _not = false) => {
+//meta is mutable
+const mongodbFormatItem = (item, config, meta, _not = false) => {
     if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
@@ -104,7 +120,7 @@ export const mongodbFormat = (item, config, _not = false) => {
     if (type === 'group' && children && children.size) {
         const not = _not ? !(properties.get('not')) : (properties.get('not'));
         const list = children
-            .map((currentChild) => mongodbFormat(currentChild, config, not))
+            .map((currentChild) => mongodbFormatItem(currentChild, config, meta, not))
             .filter((currentChild) => typeof currentChild !== 'undefined')
         if (!list.size)
             return undefined;
@@ -181,7 +197,7 @@ export const mongodbFormat = (item, config, _not = false) => {
             currentValue = completeValue(currentValue, valueSrc, config);
             const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
             const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ['factory']);
-            const [fv, _useExpr] = mongoFormatValue(config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+            const [fv, _useExpr] = mongoFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
             if (fv !== undefined) {
                 useExpr = useExpr || _useExpr;
                 valueSrcs.push(valueSrc);
@@ -196,8 +212,10 @@ export const mongodbFormat = (item, config, _not = false) => {
         
         //build rule
         const fn = operatorDefinition.mongoFormatOp;
-        if (!fn)
+        if (!fn) {
+            meta.errors.push(`Operator ${operator} is not supported`);
             return undefined;
+        }
         const args = [
             fieldName,
             operator,

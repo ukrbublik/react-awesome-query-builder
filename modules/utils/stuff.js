@@ -11,7 +11,7 @@ const DEFAULT_FONT = '14px';
 
 
 export const defaultValue = (value, _default) => {
-    return (typeof value === "undefined") ? _default || undefined : value
+    return (typeof value === "undefined") ? _default : value;
 }
 
 

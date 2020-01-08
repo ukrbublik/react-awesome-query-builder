@@ -371,7 +371,6 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
     reversedOp: 'not_equal',
     labelForFormat: '==',
     cardinality: 1,
-    isUnary: false,
     formatOp: (field, _op, value, _valueSrc, _valueType, opDef) => `${field} ${opDef.labelForFormat} ${value}`,
     mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
   },
@@ -384,7 +383,6 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |key |required |default |meaning
 |label |+ | |Label to be displayed in operators select component
 |reversedOp |+ | |Opposite operator.
-|isUnary | |false |true for `is_empty` operator only
 |cardinality | |1 |Number of right operands (1 for binary, 2 for `between`)
 |formatOp |+ | |Function for formatting query string, used to join operands into rule. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, bool isForDisplay) => string` +
