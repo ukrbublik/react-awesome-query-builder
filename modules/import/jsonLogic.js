@@ -73,7 +73,9 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
-  if (op == "!") {
+  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isLogic(vals[0]) && Object.keys(vals[0])[0] == 'var');
+  const isRev = op == "!" && !isNotOp;
+  if (isRev) {
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget);
   } else if(expectedType == 'val') {
     ret = convertField(op, vals, conv, config, not, meta) 
