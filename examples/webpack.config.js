@@ -40,35 +40,39 @@ module.exports = {
     },
     module: {
         rules: [
+            // {
+            //     test: /\.tsx?$/,
+            //     loader: 'ts-loader',
+            //     exclude: /node_modules/,
+            // },
             {
-                test: /\.tsx?$/,
-                loader: 'ts-loader',
-                exclude: /node_modules/,
-            },
-            {
-                test: /\.jsx?$/,
+                test: /\.[jt]sx?$/,
                 loaders: 'babel-loader',
                 options: {
-                  presets: ['@babel/preset-env', '@babel/preset-react'],
-                  plugins: [
-                    ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                    ["@babel/plugin-proposal-class-properties", { "loose": true }],
-                    // "@babel/plugin-transform-runtime", // use 'react-hot-loader/webpack' instead
-                    "react-hot-loader/babel",
-                    ["import", {
-                        "libraryName": "antd",
-                        "style": false,
-                        "libraryDirectory": "es"
-                    }],
-                  ]
+                    presets: [
+                        '@babel/preset-env', 
+                        '@babel/preset-react',
+                        '@babel/preset-typescript', // or can use 'ts-loader' instead
+                    ],
+                    plugins: [
+                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                        ["@babel/plugin-proposal-class-properties", { "loose": true }],
+                        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
+                        "react-hot-loader/babel",
+                        ["import", {
+                            "libraryName": "antd",
+                            "style": false,
+                            "libraryDirectory": "es"
+                        }],
+                    ]
                 },
                 exclude: /node_modules/
             },
-            {
-                test: /\.jsx?$/,
-                use: 'react-hot-loader/webpack',
-                exclude: /node_modules/
-            },
+            // {
+            //     test: /\.jsx?$/,
+            //     use: 'react-hot-loader/webpack',
+            //     exclude: /node_modules/
+            // },
             {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"]
