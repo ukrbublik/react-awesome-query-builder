@@ -20,7 +20,7 @@ module.exports = {
         historyApiFallback: true,
     },
     entry: [
-        'react-hot-loader/patch',
+        //'react-hot-loader/patch', // seems like excess
         './index',
     ],
     output: {
