@@ -51,6 +51,13 @@ export default class SliderWidget extends PureComponent {
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
 
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
+    // RHL fix
+    if (this.props.cacheBusterProp && __isInternal) {
+      nextState.internalValue = this.state.internalValue;
+    }
+  }
+
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks} = this.props;
     const {renderSize} = config.settings;
