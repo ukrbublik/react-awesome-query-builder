@@ -4,7 +4,7 @@
   "description": "Local hot-reloadable demo for react-awesome-query-builder",
   "main": "index.tsx",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.js -d --hot --inline --display-error-details --colors --history-api-fallback --no-info --port 3001",
+    "start": "NODE_ENV=development webpack-dev-server --config webpack.config.js --hot --color --display-error-details --no-info",
     "build": "webpack --config webpack.config.js"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",

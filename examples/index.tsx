@@ -1,7 +1,8 @@
+import { hot } from 'react-hot-loader/root';
+import { AppContainer } from 'react-hot-loader';
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Demo from './demo/demo';
-import { hot } from 'react-hot-loader/root'
 
 import '../css/antd.less';
 import '../css/styles.scss';
@@ -19,23 +20,11 @@ import '../css/styles.scss';
 import '../css/denormalize.scss';
 */
 
-window.React = React;
-
-
-class App extends Component {
-    render() {
-        return (
-            <div>{this.props.children}</div>
-        );
-    }
-}
-
-
-const  AppContainer = hot(App);
+const HotDemo = hot(Demo);
+const rootElement = window.document.getElementById('root');
 
 ReactDOM.render((
     <AppContainer>
-        <Demo />
+        <HotDemo />
     </AppContainer>
-), document.getElementById('root'));
-
+), rootElement);
