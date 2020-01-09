@@ -9,7 +9,7 @@ import OperatorOptions from './OperatorOptions';
 import { Col, Icon, Button, Modal } from 'antd';
 const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
-import {useOnPropsChange} from "../utils/stuff";
+import {useOnPropsChanged} from "../utils/stuff";
 
 
 @RuleContainer
@@ -38,7 +38,7 @@ class Rule extends PureComponent {
 
     constructor(props) {
         super(props);
-        useOnPropsChange(this);
+        useOnPropsChanged(this);
 
         this.onPropsChanged(props);
     }

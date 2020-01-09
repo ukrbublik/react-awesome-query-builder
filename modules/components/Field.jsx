@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {truncateString, useOnPropsChange} from "../utils/stuff";
+import {truncateString, useOnPropsChanged} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 
@@ -17,7 +17,7 @@ export default class Field extends PureComponent {
 
     constructor(props) {
         super(props);
-        useOnPropsChange(this);
+        useOnPropsChanged(this);
 
         this.onPropsChanged(props);
     }

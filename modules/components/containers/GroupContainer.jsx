@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import mapValues from 'lodash/mapValues';
 import {pureShouldComponentUpdate} from "../../utils/renderUtils";
 import {connect} from 'react-redux';
-import {useOnPropsChange} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/stuff";
 
 
 export default (Group) => {
@@ -25,7 +25,7 @@ export default (Group) => {
 
     constructor(props) {
       super(props);
-      useOnPropsChange(this);
+      useOnPropsChanged(this);
 
       this.conjunctionOptions = this._getConjunctionOptions(props);
     }

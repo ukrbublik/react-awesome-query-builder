@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import map from 'lodash/map';
 import { Select } from 'antd';
-import {useOnPropsChange, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
+import {useOnPropsChanged, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends PureComponent {
@@ -21,7 +21,7 @@ export default class MultiSelectWidget extends PureComponent {
 
   constructor(props) {
       super(props);
-      useOnPropsChange(this);
+      useOnPropsChanged(this);
       this.onPropsChanged(props);
   }
 

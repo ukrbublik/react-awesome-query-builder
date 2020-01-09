@@ -6,7 +6,7 @@ import clone from 'clone';
 import PropTypes from 'prop-types';
 import * as actions from '../../actions';
 import {pureShouldComponentUpdate} from "../../utils/renderUtils";
-import {useOnPropsChange} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/stuff";
 
 
 export default (Builder, CanMoveFn = null) => {
@@ -20,7 +20,7 @@ export default (Builder, CanMoveFn = null) => {
 
     constructor(props) {
         super(props);
-        useOnPropsChange(this);
+        useOnPropsChanged(this);
 
         this.onPropsChanged(props);
     }

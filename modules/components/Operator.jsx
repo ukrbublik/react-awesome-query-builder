@@ -4,7 +4,7 @@ import {getFieldConfig} from "../utils/configUtils";
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
-import {useOnPropsChange} from "../utils/stuff";
+import {useOnPropsChanged} from "../utils/stuff";
 
 
 export default class Operator extends PureComponent {
@@ -18,7 +18,7 @@ export default class Operator extends PureComponent {
 
   constructor(props) {
       super(props);
-      useOnPropsChange(this);
+      useOnPropsChanged(this);
 
       this.onPropsChanged(props);
   }

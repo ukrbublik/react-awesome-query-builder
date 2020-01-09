@@ -7,7 +7,7 @@ import FuncSelect from './FuncSelect';import {
 import { Col } from 'antd';
 import Widget from './Widget';
 import {setFunc, setArgValue, setArgValueSrc} from '../utils/funcUtils';
-import {useOnPropsChange} from "../utils/stuff";
+import {useOnPropsChanged} from "../utils/stuff";
 
 
 export default class FuncWidget extends PureComponent {
@@ -22,7 +22,7 @@ export default class FuncWidget extends PureComponent {
 
   constructor(props) {
       super(props);
-      useOnPropsChange(this);
+      useOnPropsChanged(this);
 
       this.onPropsChanged(props);
   }

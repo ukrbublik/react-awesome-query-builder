@@ -187,7 +187,7 @@ const canUseUnsafe = () => {
   return v[0] >= 16 && v[1] >= 3;
 };
 
-export const useOnPropsChange = (obj) => {
+export const useOnPropsChanged = (obj) => {
   if (canUseUnsafe) {
     obj.UNSAFE_componentWillReceiveProps = obj.onPropsChanged;
   } else {

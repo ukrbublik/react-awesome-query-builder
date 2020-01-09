@@ -6,7 +6,7 @@ import {Provider, Connector, connect} from 'react-redux';
 import * as actions from '../actions';
 import {extendConfig} from "../utils/configUtils";
 import {fixPathsInTree} from '../utils/treeUtils';
-import {bindActionCreators, shallowEqual, immutableEqual, useOnPropsChange} from "../utils/stuff";
+import {bindActionCreators, shallowEqual, immutableEqual, useOnPropsChanged} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import {defaultRoot} from "../utils/defaultUtils";
 import {liteShouldComponentUpdate} from "../utils/renderUtils";
@@ -34,7 +34,7 @@ class Query extends PureComponent {
 
     constructor(props) {
         super(props);
-        useOnPropsChange(this);
+        useOnPropsChanged(this);
 
         this._updateActions(props);
 
@@ -112,7 +112,7 @@ export default class QueryContainer extends Component {
 
     constructor(props, context) {
         super(props, context);
-        useOnPropsChange(this);
+        useOnPropsChanged(this);
 
         const config = pick(props, configKeys);
         const extendedConfig = extendConfig(config);
