@@ -160,7 +160,7 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
                 fieldConfig.defaultOperator = defaultOperator;
         }
 
-        const keysToPutInFieldSettings = ['listValues', 'allowCustomValues'];
+        const keysToPutInFieldSettings = ['listValues', 'allowCustomValues','multiple'];
         if (!fieldConfig.fieldSettings)
             fieldConfig.fieldSettings = {};
         for (const k of keysToPutInFieldSettings) {

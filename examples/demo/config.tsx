@@ -311,6 +311,12 @@ const fields: Fields = {
         },
         allowCustomValues: true
     },
+    selecttree: {
+        label: 'Select colorsxx',
+        type: 'treeselect',
+        listValues:  { value: "1", label: "Andebyx", group: "Andeby" },//{ value: "1", label: "Andebyx", group: "Andeby", children: { value: "1", label: "Anders And", group: "Andeby" } },
+        multiple: true
+    },
     stock: {
         label: 'In stock',
         type: 'boolean',

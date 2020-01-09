@@ -299,6 +299,7 @@ interface DateTimeFieldSettings extends BasicFieldSettings {
 interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
+  multiple?: Boolean,
 }
 interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | String,
@@ -324,6 +325,7 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
+  multiple?: Boolean,
   hideForSelect?: Boolean,
   hideForCompare?: Boolean,
 };
@@ -526,6 +528,8 @@ export interface BasicConfig extends Config {
     select_not_any_in: BinaryOperator,
     multiselect_equals: BinaryOperator,
     multiselect_not_equals: BinaryOperator,
+    treeselect_equals: BinaryOperator,
+    treeselect_not_equals: BinaryOperator,
     proximity: OperatorProximity,
   },
   widgets: {
@@ -535,6 +539,7 @@ export interface BasicConfig extends Config {
     rangeslider: NumberWidget,
     select: SelectWidget,
     multiselect: SelectWidget,
+    treeselect: TreeSelectWidget,
     date: DateTimeWidget,
     time: DateTimeWidget,
     datetime: DateTimeWidget,
@@ -550,6 +555,7 @@ export interface BasicConfig extends Config {
     datetime: Type,
     select: Type,
     multiselect: Type,
+    treeselect: Type,
     boolean: Type,
   },
   settings: Settings,
@@ -576,6 +582,7 @@ interface ReadyWidgets {
   RangeWidget: ElementType<RangeSliderWidgetProps>,
   SelectWidget: ElementType<SelectWidgetProps>,
   MultiSelectWidget: ElementType<SelectWidgetProps>,
+  TreeWidget: ElementType<SelectWidgetProps>,
   DateWidget: ElementType<DateTimeWidgetProps>,
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,

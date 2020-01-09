@@ -13,6 +13,7 @@ const {
     RangeWidget,
     SelectWidget,
     MultiSelectWidget,
+    TreeSelectWidget,
     DateWidget,
     BooleanWidget,
     TimeWidget,
@@ -537,6 +538,21 @@ const widgets = {
           return vals.map(v => SqlString.escape(v));
       },
   },
+  treeselect: {
+      type: "treeselect",
+      jsType: "array",
+      valueSrc: 'value',
+      factory: (props) => <TreeSelectWidget {...props} />,
+      valueLabel: "Values",
+      valuePlaceholder: "Select values",
+      formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
+          let valsLabels = vals.map(v => fieldDef.fieldSettings.listValues[v]);
+          return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
+      },
+      sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
+          return vals.map(v => SqlString.escape(v));
+      },
+  },
   date: {
       type: "date",
       jsType: "string",
@@ -805,6 +821,17 @@ const types = {
       defaultOperator: 'multiselect_equals',
       widgets: {
           multiselect: {
+              operators: [
+                  'multiselect_equals',
+                  'multiselect_not_equals',
+              ]
+          }
+      },
+  },
+  treeselect: {
+      defaultOperator: 'multiselect_equals',
+      widgets: {
+          treeselect: {
               operators: [
                   'multiselect_equals',
                   'multiselect_not_equals',
