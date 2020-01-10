@@ -92,6 +92,7 @@ class Group extends PureComponent {
           {this.renderHeader()}
           {isGroupTopPosition && this.renderBeforeActions()}
           {isGroupTopPosition && this.renderActions()}
+          {isGroupTopPosition && this.renderAfterActions()}
         </div>
     , this.props.children1 &&
         <div key="group-children" className={classNames(
@@ -102,6 +103,7 @@ class Group extends PureComponent {
         <div key="group-footer" className='group--footer'>
           {this.renderBeforeActions()}
           {this.renderActions()}
+          {this.renderAfterActions()}
         </div>
     ];
   }
@@ -116,6 +118,18 @@ class Group extends PureComponent {
       return <BeforeActions {...this.props}/>
     }
     return BeforeActions;
+  }
+
+  renderAfterActions = ()=>{
+    const AfterActions = this.props.config.settings.renderAfterActions;
+    if (typeof AfterActions === 'undefined') {
+      return null;
+    }
+
+    if(typeof AfterActions === 'function') {
+      return <AfterActions {...this.props}/>
+    }
+    return AfterActions;
   }
 
   renderActions = () => {

@@ -424,6 +424,10 @@ export interface RenderSettings {
   hideConjForOne?: Boolean,
   maxLabelsLength?: Number,
   customFieldSelectProps?: {},
+  renderBeforeWidget?:Factory<FieldProps>;
+  renderAfterWidget?:Factory<FieldProps>;
+  renderBeforeActions?:Factory<FieldProps>;
+  renderAfterActions?:Factory<FieldProps>;
 };
 
 export interface BehaviourSettings {

@@ -148,19 +148,26 @@ class Rule extends PureComponent {
                     config={this.props.config}
                 />
             </Col>;
-        
-        const afterValue = this.props.config.settings.renderAfterRuleValue && 
-            <Col key={"after-value-for-" +this.props.selectedOperator} className="rule--after-value">
-                {typeof this.props.config.settings.renderAfterRuleValue === 'function' && this.props.config.settings.renderAfterRuleValue(this.props)}
-                {typeof this.props.config.settings.renderAfterRuleValue !== 'function' && this.props.config.settings.renderAfterRuleValue}
-            </Col>
+
+        const beforeWidget = this.props.config.settings.renderBeforeWidget && 
+            <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
+                {typeof this.props.config.settings.renderBeforeWidget === 'function' && this.props.config.settings.renderBeforeWidget(this.props)}
+                {typeof this.props.config.settings.renderBeforeWidget !== 'function' && this.props.config.settings.renderBeforeWidget}
+            </Col>;
+
+        const afterWidget = this.props.config.settings.renderAfterWidget && 
+            <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
+                {typeof this.props.config.settings.renderAfterWidget === 'function' && this.props.config.settings.renderAfterWidget(this.props)}
+                {typeof this.props.config.settings.renderAfterWidget !== 'function' && this.props.config.settings.renderAfterWidget}
+            </Col>;
 
         const parts = [
             field,
             operator,
+            beforeWidget,
             widget,
+            afterWidget,
             operatorOptions,
-            afterValue,
         ];
 
         const drag = showDragIcon &&
