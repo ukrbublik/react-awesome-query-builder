@@ -546,7 +546,7 @@ const widgets = {
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-          let valsLabels = vals.map(v => fieldDef.fieldSettings.listValues[v]);
+          let valsLabels = vals.map(v => fieldDef.fieldSettings.treeData[v]);
           return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
       },
       sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {

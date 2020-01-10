@@ -299,7 +299,9 @@ interface DateTimeFieldSettings extends BasicFieldSettings {
 interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
-  multiple?: Boolean,
+  treeData?: any,  
+  treeMultiple?: Boolean,
+  treeExpandAll?: Boolean,
 }
 interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | String,
@@ -325,7 +327,6 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: TypedMap<String>,
   allowCustomValues?: Boolean,
-  multiple?: Boolean,
   hideForSelect?: Boolean,
   hideForCompare?: Boolean,
 };

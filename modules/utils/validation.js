@@ -238,7 +238,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, confi
 	
 	const fieldSettings = fieldConfig.fieldSettings;
 	if (fieldSettings) {
-			if (fieldSettings.listValues && !fieldSettings.allowCustomValues && !fieldSettings.multiple) {
+			if (fieldSettings.listValues && !fieldSettings.allowCustomValues) {
 					if (value instanceof Array) {
 							for (let v of value) {
 									if (fieldSettings.listValues[v] == undefined) {

@@ -312,10 +312,14 @@ const fields: Fields = {
         allowCustomValues: true
     },
     selecttree: {
-        label: 'Select colorsxx',
-        type: 'treeselect',
-        listValues:  { value: "1", label: "Andebyx", group: "Andeby" },//{ value: "1", label: "Andebyx", group: "Andeby", children: { value: "1", label: "Anders And", group: "Andeby" } },
-        multiple: true
+        label: 'Select tree',
+        type: 'treeselect',      
+        fieldSettings: {   
+            treeMultiple: true,
+            treeExpandAll: true, 
+            treeData: [ { value: "1", title: "Warm colors", group: "WarmColors", children: [ {value: "2", title: "Red", group: "WarmColors"}, {value: "3", title: "Orange", group: "WarmColors"} ] },
+                        { value: "4", title: "Cool colors", group: "CoolColors", children: [ {value: "5", title: "Green" }, {value: "6", title: "Blue", group: "SubCoolColors", children: [{ value: "7", title: "Sub blue", group: "SubSubCoolColors", children: [ {value: "8", title: "Sub sub blue and a long text"} ]}]} ] } ]            
+        }
     },
     stock: {
         label: 'In stock',
