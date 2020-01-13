@@ -844,7 +844,7 @@ const types = {
       },
   },
   treeselect: {
-    mainWidget: "select",
+    mainWidget: "treeselect",
     defaultOperator: 'select_equals',
     widgets: {
         treeselect: {

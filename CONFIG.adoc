@@ -157,7 +157,7 @@ const myConfig = {
   As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
 |tooptip | | |Optional tooltip to be displayed in field list by hovering on item
 |listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
-  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
+  Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]`
 |allowCustomValues |- for `MultiSelect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
 |defaultValue | | |Default value
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
