@@ -102,7 +102,7 @@ class Rule extends PureComponent {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
         } = this.meta;
-        const deleteText = this.props.config.settings.deleteLabel;
+        const {deleteLabel, renderBeforeWidget, renderAfterWidget} = this.props.config.settings;
 
         const field = 
             <FieldWrapper
@@ -149,16 +149,14 @@ class Rule extends PureComponent {
                 />
             </Col>;
 
-        const beforeWidget = this.props.config.settings.renderBeforeWidget && 
+        const beforeWidget = renderBeforeWidget && 
             <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
-                {typeof this.props.config.settings.renderBeforeWidget === 'function' && this.props.config.settings.renderBeforeWidget(this.props)}
-                {typeof this.props.config.settings.renderBeforeWidget !== 'function' && this.props.config.settings.renderBeforeWidget}
+                {typeof renderBeforeWidget === 'function' ? renderBeforeWidget(this.props) : renderBeforeWidget}
             </Col>;
 
-        const afterWidget = this.props.config.settings.renderAfterWidget && 
+        const afterWidget = renderAfterWidget && 
             <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
-                {typeof this.props.config.settings.renderAfterWidget === 'function' && this.props.config.settings.renderAfterWidget(this.props)}
-                {typeof this.props.config.settings.renderAfterWidget !== 'function' && this.props.config.settings.renderAfterWidget}
+                {typeof renderAfterWidget === 'function' ? renderAfterWidget(this.props) : renderAfterWidget}
             </Col>;
 
         const parts = [
@@ -187,7 +185,7 @@ class Rule extends PureComponent {
                     onClick={this.removeSelf}
                     size={this.props.config.settings.renderSize}
                 >
-                    {deleteText}
+                    {deleteLabel}
                 </Button>
             }
             </div>

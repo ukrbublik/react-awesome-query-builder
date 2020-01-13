@@ -108,28 +108,20 @@ class Group extends PureComponent {
     ];
   }
 
-  renderBeforeActions = ()=>{
+  renderBeforeActions = () => {
     const BeforeActions = this.props.config.settings.renderBeforeActions;
-    if (typeof BeforeActions === 'undefined') {
+    if (BeforeActions == undefined)
       return null;
-    }
 
-    if(typeof BeforeActions === 'function') {
-      return <BeforeActions {...this.props}/>
-    }
-    return BeforeActions;
+    return typeof BeforeActions === 'function' ? <BeforeActions {...this.props}/> : BeforeActions;
   }
 
-  renderAfterActions = ()=>{
+  renderAfterActions = () => {
     const AfterActions = this.props.config.settings.renderAfterActions;
-    if (typeof AfterActions === 'undefined') {
+    if (AfterActions == undefined)
       return null;
-    }
 
-    if(typeof AfterActions === 'function') {
-      return <AfterActions {...this.props}/>
-    }
-    return AfterActions;
+    return typeof AfterActions === 'function' ? <AfterActions {...this.props}/> : AfterActions;
   }
 
   renderActions = () => {

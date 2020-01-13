@@ -260,7 +260,8 @@ body.qb-dragging {
 }
 
 .rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
-.widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep {
+.widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep,
+.rule--before-widget, .rule--after-widget {
   display: inline-block;
 }
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
