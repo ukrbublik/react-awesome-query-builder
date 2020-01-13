@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import map from "lodash/map";
 import { TreeSelect, Select } from "antd";
-import { flatizeTreeData, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
+import { useOnPropsChanged, flatizeTreeData, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
 const Option = Select.Option;
 
 export default class TreeSelectWidget extends PureComponent {
@@ -21,11 +21,8 @@ export default class TreeSelectWidget extends PureComponent {
 
   constructor(props) {
     super(props);
+    useOnPropsChanged(this);
     this.onPropsChanged(props);  
-  }
-
-  componentWillReceiveProps(props) {
-     this.onPropsChanged(props);
   }
 
   onPropsChanged(props) {
