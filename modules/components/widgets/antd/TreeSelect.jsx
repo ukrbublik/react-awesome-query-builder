@@ -2,22 +2,21 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import map from "lodash/map";
 import { TreeSelect, Select } from "antd";
-import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
+import { flatizeTreeData, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
 const Option = Select.Option;
 
 export default class TreeSelectWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
-    value: PropTypes.array,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
     field: PropTypes.string.isRequired,
     placeholder: PropTypes.string,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
     // from fieldSettings:
-    listValues: PropTypes.object,
+    listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     treeMultiple: PropTypes.bool,
-    treeData: PropTypes.any,
   };
 
   constructor(props) {
@@ -30,10 +29,10 @@ export default class TreeSelectWidget extends PureComponent {
   }
 
   onPropsChanged(props) {
-    const { treeData } = props;
+    const { listValues } = props;
 
     let optionsMaxWidth = 0;
-    map(treeData, (title, value) => {
+    map(listValues, (title, value) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title));
     });
     this.optionsMaxWidth = optionsMaxWidth;
@@ -41,9 +40,7 @@ export default class TreeSelectWidget extends PureComponent {
 
   handleChange = (val) => {
     if (!this.props.treeMultiple) {
-      const valArr = [];
-      valArr.push(val);
-      this.props.setValue(valArr);
+      this.props.setValue(val);
       return;
     }
     if (val && !val.length) {
@@ -66,7 +63,7 @@ export default class TreeSelectWidget extends PureComponent {
       customProps,
       value,
       treeMultiple,
-      treeData,
+      listValues,
       treeExpandAll
     } = this.props;
     const { renderSize } = config.settings;
@@ -93,12 +90,13 @@ export default class TreeSelectWidget extends PureComponent {
             ref="val"
             placeholder={placeholder}
             size={renderSize}
-            treeData={treeData}
+            treeData={listValues}
+            treeDataSimpleMode={{id: "value", pId: "parent"}}
             value={_value}
             onChange={this.handleChange}
             treeDefaultExpandAll={treeExpandAll}
-            >
-        </TreeSelect>
+            {...customProps}
+        />
     );
   }
 }

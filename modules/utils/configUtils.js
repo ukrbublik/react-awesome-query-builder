@@ -4,6 +4,7 @@ import merge from 'lodash/merge';
 import mergeWith from 'lodash/mergeWith';
 import {settings as defaultSettings} from '../config/default';
 import moment from 'moment';
+import {flatizeTreeData} from './stuff';
 
 
 export const extendConfig = (config) => {
@@ -168,6 +169,10 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
                 fieldConfig.fieldSettings[k] = fieldConfig[k];
                 delete fieldConfig[k];
             }
+        }
+
+        if (fieldConfig.fieldSettings.listValues) {
+            flatizeTreeData(fieldConfig.fieldSettings.listValues);
         }
     }
 };

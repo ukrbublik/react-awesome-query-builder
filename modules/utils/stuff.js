@@ -182,6 +182,7 @@ export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&'); // $& means the whole matched string
 }
 
+
 const canUseUnsafe = () => {
   const v = React.version.split('.').map(parseInt.bind(null, 10));
   return v[0] >= 16 && v[1] >= 3;
@@ -198,3 +199,73 @@ export const useOnPropsChanged = (obj) => {
     };
   }
 };
+
+
+const isObject = (v) => (typeof v == 'object' && v !== null);
+const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
+
+// listValues can be {<value>: <title>, ..} or [{value, title}, ..] or [value, ..]
+export const getItemInValueList = (listValues, value) => {
+  if (Array.isArray(listValues)) {
+    return listValues.map(v => listValue(v)).find(v => v.value === value);
+  } else {
+    return listValues[value] !== undefined ? listValue(value, listValues[value]) : undefined;
+  }
+};
+
+export const getTitleInValueList = (listValues, value) => {
+  const it = getItemInValueList(listValues, value);
+  return it !== undefined ? it.title : undefined;
+};
+
+export const mapListValues = (listValues, fun) => {
+  let ret = [];
+  if (Array.isArray(listValues)) {
+    for (let v of listValues) {
+      ret.push(fun(listValue(v)));
+    }
+  } else {
+    for (let value in listValues) {
+      ret.push(fun(listValue(value, listValues[value])));
+    }
+  }
+  return ret;
+};
+
+
+// converts from treeData to treeDataSimpleMode
+// ! modifies value of `treeData`
+export const flatizeTreeData = (treeData, mp) => {
+  if (typeof mp != 'object') {
+    mp = {id: "value", pId: "parent", rootPId: undefined};
+  }
+
+  let rind = 0;
+
+  const _flatize = (node, root, lev) => {
+    if (lev == 1)
+      node[mp.pId] = mp.rootPId; //optional?
+    if (node.children) {
+      for (let c of node.children) {
+        c[mp.pId] = node[mp.id];
+        root.splice(rind++, 0, c); //instead of just push
+        _flatize(c, root, lev + 1);
+      }
+      delete node.children;
+    }
+  };
+
+  if (Array.isArray(treeData)) {
+    for (let c of treeData) {
+      if (!isObject(c))
+        continue;
+      if (c[mp.pId] !== undefined && c[mp.pId] != mp.rootPId)
+        continue; //because we pushed
+      rind++;
+      _flatize(c, treeData, 1);
+    }
+  }
+
+  return treeData;
+};
+

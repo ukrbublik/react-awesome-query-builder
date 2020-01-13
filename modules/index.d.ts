@@ -282,6 +282,20 @@ export type Types = TypedMap<Type>;
 
 type FieldType = String | "!struct";
 
+interface ListItem {
+  value: any,
+  title?: String,
+};
+interface TreeItem extends ListItem {
+  children?: Array<TreeItem>,
+  parent?: any,
+  disabled?: Boolean,
+  selectable?: Boolean,
+  checkable?: Boolean,
+};
+type TreeData = Array<TreeItem>;
+type ListValues = TypedMap<String> | Array<ListItem> | Array<String>;
+
 interface BasicFieldSettings {
 }
 interface NumberFieldSettings extends BasicFieldSettings {
@@ -297,9 +311,11 @@ interface DateTimeFieldSettings extends BasicFieldSettings {
   use12Hours?: Boolean,
 };
 interface SelectFieldSettings extends BasicFieldSettings {
-  listValues?: TypedMap<String>,
+  listValues?: ListValues,
   allowCustomValues?: Boolean,
-  treeData?: any,  
+}
+interface TreeSelectFieldSettings extends BasicFieldSettings {
+  listValues?: TreeData,  
   treeMultiple?: Boolean,
   treeExpandAll?: Boolean,
 }
@@ -307,7 +323,7 @@ interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | String,
   labelNo?: ReactElement | String,
 };
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
@@ -324,11 +340,11 @@ interface ValueField extends BaseField {
   defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,
   mainWidgetProps?: Optional<Widget>,
-  //obsolete - moved to FieldSettings
-  listValues?: TypedMap<String>,
-  allowCustomValues?: Boolean,
   hideForSelect?: Boolean,
   hideForCompare?: Boolean,
+  //obsolete - moved to FieldSettings
+  listValues?: ListValues,
+  allowCustomValues?: Boolean,
 };
 interface SimpleField extends ValueField {
   label2?: String,

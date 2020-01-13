@@ -141,7 +141,7 @@ export default class QueryContainer extends Component {
         // compare configs
         const oldConfig = pick(this.props, configKeys);
         let nextConfig = pick(nextProps, configKeys);
-        const isConfigChanged = !shallowEqual(oldConfig, nextConfig, false);
+        const isConfigChanged = !shallowEqual(oldConfig, nextConfig, true);
         if (isConfigChanged) {
             nextConfig = extendConfig(nextConfig);
             this.setState({config: nextConfig});

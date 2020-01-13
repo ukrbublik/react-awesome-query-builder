@@ -285,11 +285,17 @@ const fields: Fields = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange'
-        },
+        // listValues: {
+        //     yellow: 'Yellow',
+        //     green: 'Green',
+        //     orange: 'Orange'
+        // },
+        // listValues: [
+        //     {value: 'yellow', title: 'Yellow'},
+        //     {value: 'green', title: 'Green'},
+        //     {value: 'orange', title: 'Orange'}
+        // ],
+        listValues: ['yellow', 'green', 'orange'],
     },
     color2: {
         label: 'Color2',
@@ -313,12 +319,23 @@ const fields: Fields = {
     },
     selecttree: {
         label: 'Select tree',
-        type: 'treeselect',      
-        fieldSettings: {   
-            treeMultiple: true,
-            treeExpandAll: true, 
-            treeData: [ { value: "1", title: "Warm colors", group: "WarmColors", children: [ {value: "2", title: "Red", group: "WarmColors"}, {value: "3", title: "Orange", group: "WarmColors"} ] },
-                        { value: "4", title: "Cool colors", group: "CoolColors", children: [ {value: "5", title: "Green" }, {value: "6", title: "Blue", group: "SubCoolColors", children: [{ value: "7", title: "Sub blue", group: "SubSubCoolColors", children: [ {value: "8", title: "Sub sub blue and a long text"} ]}]} ] } ]            
+        type: 'treeselect',
+        fieldSettings: {
+            treeExpandAll: true,
+            listValues: [
+                { value: "1", title: "Warm colors", children: [
+                    { value: "2", title: "Red" }, 
+                    { value: "3", title: "Orange" }
+                ] },
+                { value: "4", title: "Cool colors", children: [
+                    { value: "5", title: "Green" }, 
+                    { value: "6", title: "Blue", children: [
+                        { value: "7", title: "Sub blue", children: [
+                            { value: "8", title: "Sub sub blue and a long text" }
+                        ] }
+                    ] }
+                ] }
+            ]
         }
     },
     stock: {
