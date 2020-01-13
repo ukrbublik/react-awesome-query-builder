@@ -149,11 +149,25 @@ class Rule extends PureComponent {
                 />
             </Col>;
 
+        const beforeWidget = this.props.config.settings.renderBeforeWidget && 
+            <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
+                {typeof this.props.config.settings.renderBeforeWidget === 'function' && this.props.config.settings.renderBeforeWidget(this.props)}
+                {typeof this.props.config.settings.renderBeforeWidget !== 'function' && this.props.config.settings.renderBeforeWidget}
+            </Col>;
+
+        const afterWidget = this.props.config.settings.renderAfterWidget && 
+            <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
+                {typeof this.props.config.settings.renderAfterWidget === 'function' && this.props.config.settings.renderAfterWidget(this.props)}
+                {typeof this.props.config.settings.renderAfterWidget !== 'function' && this.props.config.settings.renderAfterWidget}
+            </Col>;
+
         const parts = [
             field,
             operator,
+            beforeWidget,
             widget,
-            operatorOptions
+            afterWidget,
+            operatorOptions,
         ];
 
         const drag = showDragIcon &&
