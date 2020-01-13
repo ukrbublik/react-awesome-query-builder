@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Slider, InputNumber, Col } from 'antd';
+import {useOnPropsChanged} from '../../../utils/stuff';
 const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends PureComponent {
@@ -31,11 +32,12 @@ export default class SliderWidget extends PureComponent {
 
   constructor(props) {
       super(props);
+      useOnPropsChanged(this);
 
       this.state.internalValue = props.value;
   }
 
-  componentWillReceiveProps(nextProps) {
+  onPropsChanged(nextProps) {
     this.setState({internalValue: nextProps.value});
   }
 
@@ -48,6 +50,13 @@ export default class SliderWidget extends PureComponent {
   }
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
+
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
+    // RHL fix
+    if (this.props.cacheBusterProp && __isInternal) {
+      nextState.internalValue = this.state.internalValue;
+    }
+  }
 
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks} = this.props;

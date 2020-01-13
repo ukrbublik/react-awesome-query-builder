@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {truncateString} from "../utils/stuff";
+import {truncateString, useOnPropsChanged} from "../utils/stuff";
 import last from 'lodash/last';
 import keys from 'lodash/keys';
 
@@ -17,11 +17,12 @@ export default class Field extends PureComponent {
 
     constructor(props) {
         super(props);
+        useOnPropsChanged(this);
 
-        this.componentWillReceiveProps(props);
+        this.onPropsChanged(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    onPropsChanged(nextProps) {
         const prevProps = this.props;
         const keysForMeta = ["selectedField", "config"];
         const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {getFieldConfig} from "../../utils/configUtils";
-import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {pureShouldComponentUpdate} from "../../utils/renderUtils";
 import {connect} from 'react-redux';
 
 
@@ -25,11 +25,6 @@ export default (Rule) => {
 
     constructor(props) {
         super(props);
-
-        this.componentWillReceiveProps(props);
-    }
-
-    componentWillReceiveProps(nextProps) {
     }
 
     dummyFn = () => {}
@@ -58,14 +53,11 @@ export default (Rule) => {
         this.props.actions.setValueSrc(this.props.path, delta, srcKey);
     }
 
-
-    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-    
     shouldComponentUpdate(nextProps, nextState) {
         let prevProps = this.props;
         let prevState = this.state;
 
-        let should = this.pureShouldComponentUpdate(nextProps, nextState);
+        let should = pureShouldComponentUpdate(this)(nextProps, nextState);
         if (should) {
           if (prevState == nextState && prevProps != nextProps) {
             const draggingId = (nextProps.dragging.id || prevProps.dragging.id);

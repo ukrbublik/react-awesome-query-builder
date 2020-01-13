@@ -5,7 +5,8 @@ import * as constants from '../../constants';
 import clone from 'clone';
 import PropTypes from 'prop-types';
 import * as actions from '../../actions';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {pureShouldComponentUpdate} from "../../utils/renderUtils";
+import {useOnPropsChanged} from "../../utils/stuff";
 
 
 export default (Builder, CanMoveFn = null) => {
@@ -19,16 +20,20 @@ export default (Builder, CanMoveFn = null) => {
 
     constructor(props) {
         super(props);
+        useOnPropsChanged(this);
 
-        this.componentWillReceiveProps(props);
+        this.onPropsChanged(props);
     }
 
-    pureShouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+    onPropsChanged(nextProps) {
+        this.tree = getFlatTree(nextProps.tree);
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
       let prevProps = this.props;
       let prevState = this.state;
   
-      let should = this.pureShouldComponentUpdate(nextProps, nextState);
+      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
           let chs = [];
@@ -45,10 +50,6 @@ export default (Builder, CanMoveFn = null) => {
         }
       }
       return should;
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.tree = getFlatTree(nextProps.tree);
     }
 
     componentDidUpdate(_prevProps, _prevState) {

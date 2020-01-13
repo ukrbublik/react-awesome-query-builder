@@ -13,8 +13,16 @@ if (process.env.NODE_ENV != "development") {
 module.exports = {
     plugins,
     mode: process.env.NODE_ENV || "development",
-    devtool: 'source-map',
-    entry: './index',
+    devtool: 'inline-source-map',
+    devServer: {
+        port: 3001,
+        inline: true,
+        historyApiFallback: true,
+    },
+    entry: [
+        //'react-hot-loader/patch', // seems like excess
+        './index',
+    ],
     output: {
         path: __dirname,
         filename: 'bundle.js'
@@ -26,36 +34,45 @@ module.exports = {
         ],
         alias: {
             'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
+            'react-dom': '@hot-loader/react-dom',
         },
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
     module: {
         rules: [
+            // {
+            //     test: /\.tsx?$/,
+            //     loader: 'ts-loader',
+            //     exclude: /node_modules/,
+            // },
             {
-                test: /\.tsx?$/,
-                loader: 'ts-loader',
-                exclude: /node_modules/,
-            },
-            {
-                test: /\.jsx?$/,
+                test: /\.[jt]sx?$/,
                 loaders: 'babel-loader',
                 options: {
-                  presets: ['@babel/preset-env', '@babel/preset-react'],
-                  plugins: [
-                    [ "@babel/plugin-proposal-decorators", { "legacy": true } ],
-                    [ "@babel/plugin-proposal-class-properties", {
-                      "loose": true
-                    }],
-                    "@babel/plugin-transform-runtime",
-                    ["import", {
-                        "libraryName": "antd",
-                        "style": false,
-                        "libraryDirectory": "es"
-                    }]
-                  ]
+                    presets: [
+                        '@babel/preset-env', 
+                        '@babel/preset-react',
+                        '@babel/preset-typescript', // or can use 'ts-loader' instead
+                    ],
+                    plugins: [
+                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                        ["@babel/plugin-proposal-class-properties", { "loose": true }],
+                        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
+                        "react-hot-loader/babel",
+                        ["import", {
+                            "libraryName": "antd",
+                            "style": false,
+                            "libraryDirectory": "es"
+                        }],
+                    ]
                 },
                 exclude: /node_modules/
             },
+            // {
+            //     test: /\.jsx?$/,
+            //     use: 'react-hot-loader/webpack',
+            //     exclude: /node_modules/
+            // },
             {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"]

@@ -9,6 +9,7 @@ import OperatorOptions from './OperatorOptions';
 import { Col, Icon, Button, Modal } from 'antd';
 const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
+import {useOnPropsChanged} from "../utils/stuff";
 
 
 @RuleContainer
@@ -37,11 +38,12 @@ class Rule extends PureComponent {
 
     constructor(props) {
         super(props);
+        useOnPropsChanged(this);
 
-        this.componentWillReceiveProps(props);
+        this.onPropsChanged(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    onPropsChanged(nextProps) {
         const prevProps = this.props;
         const keysForMeta = ["selectedField", "selectedOperator", "config", "treeNodesCnt"];
         const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;

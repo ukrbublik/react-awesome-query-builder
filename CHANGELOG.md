@@ -1,4 +1,7 @@
 # Changelog
+- 1.1.3
+  - Fixed console warnings
+  - Fixed dev hot reload: now state is preserving
 - 1.1.2
   - Added import from [JsonLogic](http://jsonlogic.com)
 - 1.1.1

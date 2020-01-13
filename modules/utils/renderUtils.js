@@ -1,4 +1,3 @@
-import Immutable, { Map } from 'immutable';
 import {shallowEqual} from "./stuff";
 
 export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState) => {
@@ -30,3 +29,10 @@ export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState
   }
   return should;
 };
+
+export const pureShouldComponentUpdate = (self) => function(nextProps, nextState) {
+  return (
+    !shallowEqual(self.props, nextProps) ||
+    !shallowEqual(self.state, nextState)
+  );
+}

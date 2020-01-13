@@ -1,5 +1,6 @@
 import mapValues from 'lodash/mapValues';
 import Immutable, { Map } from 'immutable';
+import React from 'react';
 
 
 export const SELECT_WIDTH_OFFSET_RIGHT = 48;
@@ -180,3 +181,16 @@ function shallowEqualObjects(objA, objB, deep = false) {
 export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&'); // $& means the whole matched string
 }
+
+const canUseUnsafe = () => {
+  const v = React.version.split('.').map(parseInt.bind(null, 10));
+  return v[0] >= 16 && v[1] >= 3;
+};
+
+export const useOnPropsChanged = (obj) => {
+  if (canUseUnsafe) {
+    obj.UNSAFE_componentWillReceiveProps = obj.onPropsChanged;
+  } else {
+    obj.componentWillReceiveProps = obj.onPropsChanged;
+  }
+};
