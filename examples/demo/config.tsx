@@ -103,6 +103,12 @@ const widgets: Widgets = {
             showSearch: true
         }
     },
+    treeselect: {
+        ...BasicConfig.widgets.treeselect,
+        customProps: {
+            showSearch: true
+        }
+    },
 };
 
 
@@ -323,7 +329,6 @@ const fields: Fields = {
         type: 'treeselect',
         fieldSettings: {
             treeExpandAll: true,
-            treeSelectOnlyLeafs: true,
             // * deep format (will be auto converted to flat format):
             // listValues: [
             //     { value: "1", title: "Warm colors", children: [

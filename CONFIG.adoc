@@ -161,11 +161,13 @@ const myConfig = {
   As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |listValues |+ for (multi)select, tree (multi)select | |List of values for Select widget. +
-  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` +
-  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]`
+  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
+   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
+  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
+   (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
 |allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
 |treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
-|treeSelectOnlyLeafs |- for `treeselect` widget|false |Can select only leafs or any node?
+|treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
 |defaultValue | | |Default value
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +

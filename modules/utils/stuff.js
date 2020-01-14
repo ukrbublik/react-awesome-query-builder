@@ -312,7 +312,7 @@ const getChildrenInListValues = (listValues, value) => {
 const extendTreeData = (treeData, fieldSettings, isMulti) => {
   for (let node of treeData) {
     node.path = getPathInListValues(treeData, node.value);
-    if (fieldSettings.treeSelectOnlyLeafs) {
+    if (fieldSettings.treeSelectOnlyLeafs != false) {
       const childrenValues = getChildrenInListValues(treeData, node.value);
       if (!isMulti) {
         node.selectable = (childrenValues.length == 0);

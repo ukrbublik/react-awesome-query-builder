@@ -548,8 +548,6 @@ export interface BasicConfig extends Config {
     select_not_any_in: BinaryOperator,
     multiselect_equals: BinaryOperator,
     multiselect_not_equals: BinaryOperator,
-    treeselect_equals: BinaryOperator,
-    treeselect_not_equals: BinaryOperator,
     proximity: OperatorProximity,
   },
   widgets: {

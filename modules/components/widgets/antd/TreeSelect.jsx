@@ -91,7 +91,7 @@ export default class TreeSelectWidget extends PureComponent {
               width: width,
             }}
             dropdownStyle={{
-              width: useAutoWidth ? "auto" : dropdownWidth,
+              width: useAutoWidth ? "auto" : dropdownWidth + 10,
               paddingRight: '10px'
             }}
             multiple={treeMultiple}

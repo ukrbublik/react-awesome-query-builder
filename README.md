@@ -81,11 +81,11 @@ const config = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange'
-        },
+        listValues: [
+          { value: 'yellow', title: 'Yellow' },
+          { value: 'green', title: 'Green' },
+          { value: 'orange', title: 'Orange' }
+        ],
     },
     is_promotion: {
         label: 'Promo?',
