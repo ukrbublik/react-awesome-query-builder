@@ -13,7 +13,7 @@ if (process.env.NODE_ENV != "development") {
 module.exports = {
     plugins,
     mode: process.env.NODE_ENV || "development",
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     devServer: {
         port: 3001,
         inline: true,
