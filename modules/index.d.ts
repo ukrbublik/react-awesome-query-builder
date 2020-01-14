@@ -140,6 +140,7 @@ export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
 export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
 export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
 export type SelectWidgetProps = BaseWidgetProps & SelectFieldSettings;
+export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 
 export interface BaseWidget {
@@ -174,8 +175,9 @@ export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
 export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
 export type SelectWidget = BaseWidget & SelectFieldSettings;
+export type TreeSelectWidget = BaseWidget & TreeSelectFieldSettings;
 
-export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget  | RangeableWidget | BaseWidget;
+export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget | TreeSelectWidget  | RangeableWidget | BaseWidget;
 export type Widgets = TypedMap<Widget>;
 
 
@@ -291,6 +293,7 @@ interface TreeItem extends ListItem {
   parent?: any,
   disabled?: Boolean,
   selectable?: Boolean,
+  disableCheckbox?: Boolean,
   checkable?: Boolean,
 };
 type TreeData = Array<TreeItem>;
@@ -315,8 +318,7 @@ interface SelectFieldSettings extends BasicFieldSettings {
   allowCustomValues?: Boolean,
 }
 interface TreeSelectFieldSettings extends BasicFieldSettings {
-  listValues?: TreeData,  
-  treeMultiple?: Boolean,
+  listValues?: TreeData,
   treeExpandAll?: Boolean,
   treeSelectOnlyLeafs?:  Boolean,
 }
@@ -558,6 +560,7 @@ export interface BasicConfig extends Config {
     select: SelectWidget,
     multiselect: SelectWidget,
     treeselect: TreeSelectWidget,
+    treemultiselect: TreeSelectWidget,
     date: DateTimeWidget,
     time: DateTimeWidget,
     datetime: DateTimeWidget,
@@ -574,6 +577,7 @@ export interface BasicConfig extends Config {
     select: Type,
     multiselect: Type,
     treeselect: Type,
+    treemultiselect: Type,
     boolean: Type,
   },
   settings: Settings,
@@ -600,7 +604,7 @@ interface ReadyWidgets {
   RangeWidget: ElementType<RangeSliderWidgetProps>,
   SelectWidget: ElementType<SelectWidgetProps>,
   MultiSelectWidget: ElementType<SelectWidgetProps>,
-  TreeWidget: ElementType<SelectWidgetProps>,
+  TreeSelectWidget: ElementType<TreeSelectWidgetProps>,
   DateWidget: ElementType<DateTimeWidgetProps>,
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
