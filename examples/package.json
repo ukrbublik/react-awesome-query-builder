@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --config webpack.config.js --hot --color --display-error-details --no-info",
-    "build": "webpack --config webpack.config.js"
+    "build": "NODE_ENV=production webpack --config webpack.config.js"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {

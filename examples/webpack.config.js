@@ -1,19 +1,23 @@
 var webpack = require('webpack');
 var path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const isProd = (process.env.NODE_ENV != "development");
 
 var plugins = [];
-if (process.env.NODE_ENV != "development") {
+if (isProd) {
     plugins = [
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
         //new BundleAnalyzerPlugin(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || "development")
+        }),
     ];
 }
 
 module.exports = {
     plugins,
     mode: process.env.NODE_ENV || "development",
-    devtool: 'source-map',
+    devtool: isProd ? 'source-map' : 'source-map',
     devServer: {
         port: 3001,
         inline: true,
