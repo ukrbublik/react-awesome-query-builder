@@ -255,28 +255,38 @@ export const defaultTreeDataMap = {id: "value", pId: "parent", rootPId: undefine
 export const flatizeTreeData = (treeData) => {
   const tdm = defaultTreeDataMap;
 
-  let rind = 0;
+  let rind;
+  let len;
 
   const _flatize = (node, root, lev) => {
     if (node.children) {
       if (lev == 1)
         node[tdm.pId] = tdm.rootPId; //optional?
+      const childrenCount = node.children.length;
       for (let c of node.children) {
         c[tdm.pId] = node[tdm.id];
-        root.splice(rind++, 0, c); //instead of just push
+        rind++;
+        root.splice(rind, 0, c); //instead of just push
+        len++;
         _flatize(c, root, lev + 1);
       }
       delete node.children;
+      if (childrenCount == 0) {
+        root.splice(rind, 1);
+        rind--;
+        len--;
+      }
     }
   };
 
   if (Array.isArray(treeData)) {
-    for (let c of treeData) {
+    len = treeData.length;
+    for (rind = 0 ; rind < len ; rind++) {
+      const c = treeData[rind];
       if (!isObject(c))
         continue;
       if (c[tdm.pId] !== undefined && c[tdm.pId] != tdm.rootPId)
-        continue; //because we pushed
-      rind++;
+        continue; //not lev 1
       _flatize(c, treeData, 1);
     }
   }
@@ -302,9 +312,11 @@ const getChildrenInListValues = (listValues, value) => {
 const extendTreeData = (treeData, fieldSettings, isMulti) => {
   for (let node of treeData) {
     node.path = getPathInListValues(treeData, node.value);
-    if (fieldSettings.onlyLeafsSelectable && !isMulti) {
+    if (fieldSettings.treeSelectOnlyLeafs) {
       const childrenValues = getChildrenInListValues(treeData, node.value);
-      node.selectable = (childrenValues.length == 0);
+      if (!isMulti) {
+        node.selectable = (childrenValues.length == 0);
+      }
     }
   }
   return treeData;

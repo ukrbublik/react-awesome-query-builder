@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { TreeSelect } from "antd";
-import { useOnPropsChanged, defaultTreeDataMap, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
+import { useOnPropsChanged, defaultTreeDataMap, mapListValues, getTitleInListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
 
 export default class TreeSelectWidget extends PureComponent {
   static propTypes = {
@@ -47,7 +47,15 @@ export default class TreeSelectWidget extends PureComponent {
       this.props.setValue(undefined); //not allow []
       return;
     }
+    if (typeof val[0] == 'object' && val[0].value !== undefined) {
+      //`treeCheckStrictly` is on
+      val = val.map(v => v.value)
+    }
     this.props.setValue(val);
+  }
+
+  filterTreeNode = (input, option) => {
+    return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
 
@@ -55,15 +63,21 @@ export default class TreeSelectWidget extends PureComponent {
     const {
       config,
       placeholder,
-      customProps,
+      customProps = {},
       value,
       treeMultiple,
       listValues,
       treeExpandAll
     } = this.props;
+    const treeCheckStrictly = customProps.treeCheckStrictly || false;
     const { renderSize } = config.settings;
     const placeholderWidth = calcTextWidth(placeholder) + 6;
-    const _value = value && value.length ? value : undefined;
+    let _value = value != undefined ? value : undefined;
+    if (treeCheckStrictly && _value !== undefined) {
+      if (treeMultiple) {
+        _value = _value.map(v => ({value: v, label: getTitleInListValues(listValues, v)}));
+      }
+    }
     const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownMinWidth = 100;
     const dropdownMaxWidth = 800;
@@ -89,6 +103,7 @@ export default class TreeSelectWidget extends PureComponent {
             size={renderSize}
             treeData={listValues}
             treeDataSimpleMode={defaultTreeDataMap}
+            filterTreeNode={this.filterTreeNode}
             value={_value}
             onChange={this.handleChange}
             treeDefaultExpandAll={treeExpandAll}

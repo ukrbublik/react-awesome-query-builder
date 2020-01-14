@@ -323,7 +323,7 @@ const fields: Fields = {
         type: 'treeselect',
         fieldSettings: {
             treeExpandAll: true,
-            onlyLeafsSelectable: true,
+            treeSelectOnlyLeafs: true,
             // * deep format (will be auto converted to flat format):
             // listValues: [
             //     { value: "1", title: "Warm colors", children: [
@@ -348,7 +348,7 @@ const fields: Fields = {
                   { value: "5", title: "Green", parent: "4" },
                   { value: "6", title: "Blue", parent: "4" },
                     { value: "7", title: "Sub blue", parent: "6" },
-                      { value: "8", title: "Sub sub blue and a long text 1111 2222 3333", parent: "7" },
+                      { value: "8", title: "Sub sub blue and a long text", parent: "7" },
             ],
         }
     },

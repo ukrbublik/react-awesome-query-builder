@@ -318,7 +318,7 @@ interface TreeSelectFieldSettings extends BasicFieldSettings {
   listValues?: TreeData,  
   treeMultiple?: Boolean,
   treeExpandAll?: Boolean,
-  onlyLeafsSelectable?:  Boolean,
+  treeSelectOnlyLeafs?:  Boolean,
 }
 interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | String,
