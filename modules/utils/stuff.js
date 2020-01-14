@@ -189,8 +189,12 @@ const canUseUnsafe = () => {
 
 export const useOnPropsChanged = (obj) => {
   if (canUseUnsafe) {
-    obj.UNSAFE_componentWillReceiveProps = obj.onPropsChanged;
+    obj.UNSAFE_componentWillReceiveProps = (nextProps) => {
+      obj.onPropsChanged(nextProps);
+    };
   } else {
-    obj.componentWillReceiveProps = obj.onPropsChanged;
+    obj.componentWillReceiveProps = (nextProps) => {
+      obj.onPropsChanged(nextProps);
+    };
   }
 };

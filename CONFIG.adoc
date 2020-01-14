@@ -271,6 +271,10 @@ Render settings:
 |customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
  `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
+|renderBeforeWidget| | 
+|renderAfterWidget| | 
+|renderBeforeActions| | 
+|renderAfterActions| | 
 |===
 
 Other settings:

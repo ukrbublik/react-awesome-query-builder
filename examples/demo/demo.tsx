@@ -15,11 +15,18 @@ const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' 
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
-const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
-const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
+let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;;
+let initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
+let initTree;
+initTree = checkTree(loadTree(initValue), loadedConfig);
+//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
-const initTree = checkTree(loadTree(initValue), loadedConfig);
-//const initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same
+const updateEvent = new CustomEvent('update', { detail: {
+  config: loadedConfig,
+  _initTree: initTree,
+  _initValue: initValue,
+} });
+window.dispatchEvent(updateEvent);
 
 
 interface DemoQueryBuilderState {
@@ -31,6 +38,14 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     private immutableTree: ImmutableTree;
     private config: Config;
 
+    componentDidMount() {
+      window.addEventListener('update', this.onConfigChanged);
+    }
+
+    componentWillUnmount() {
+      window.removeEventListener('update', this.onConfigChanged);
+    }
+
     state = {
       tree: initTree, 
       config: loadedConfig
@@ -39,16 +54,40 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     render = () => (
       <div>
         <Query
-            {...loadedConfig}
+            {...this.state.config}
             value={this.state.tree}
             onChange={this.onChange}
             renderBuilder={this.renderBuilder}
         />
+
+        <button onClick={this.resetValue}>reset</button>
+        <button onClick={this.clearValue}>clear</button>
+
         <div className="query-builder-result">
           {this.renderResult(this.state)}
         </div>
       </div>
     )
+
+    onConfigChanged = ({detail: {config, _initTree, _initValue}}: CustomEvent) => {
+      this.setState({
+        config,
+      });
+      initTree = _initTree;
+      initValue = _initValue;
+    }
+
+    resetValue = () => {
+      this.setState({
+        tree: initTree, 
+      });
+    };
+
+    clearValue = () => {
+      this.setState({
+        tree: loadTree(emptyInitValue), 
+      });
+    };
 
     renderBuilder = (props: BuilderProps) => (
       <div className="query-builder-container" style={{padding: '10px'}}>
