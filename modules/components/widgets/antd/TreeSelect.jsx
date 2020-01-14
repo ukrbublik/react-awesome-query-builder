@@ -1,9 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import map from "lodash/map";
-import { TreeSelect, Select } from "antd";
-import { useOnPropsChanged, flatizeTreeData, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
-const Option = Select.Option;
+import { TreeSelect } from "antd";
+import { useOnPropsChanged, defaultTreeDataMap, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
 
 export default class TreeSelectWidget extends PureComponent {
   static propTypes = {
@@ -26,11 +24,16 @@ export default class TreeSelectWidget extends PureComponent {
   }
 
   onPropsChanged(props) {
-    const { listValues } = props;
+    const { listValues, treeMultiple } = props;
 
     let optionsMaxWidth = 0;
-    map(listValues, (title, value) => {
-      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title));
+    const initialOffset = (treeMultiple ? (24 + 22) : 24); // arrow + checkbox for leftmost item
+    const offset = 20;
+    const padding = 5 * 2;
+    mapListValues(listValues, ({title, value, path}) => {
+      optionsMaxWidth = Math.max(optionsMaxWidth, 
+        calcTextWidth(title, null) + padding + (path ? path.length : 0) * offset + initialOffset
+      );
     });
     this.optionsMaxWidth = optionsMaxWidth;
   }
@@ -47,11 +50,6 @@ export default class TreeSelectWidget extends PureComponent {
     this.props.setValue(val);
   }
 
-  filterOption = (input, option) => {
-    return (
-      option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-    );
-  };
 
   render() {
     const {
@@ -64,10 +62,13 @@ export default class TreeSelectWidget extends PureComponent {
       treeExpandAll
     } = this.props;
     const { renderSize } = config.settings;
-    const placeholderWidth = calcTextWidth(placeholder);
+    const placeholderWidth = calcTextWidth(placeholder) + 6;
     const _value = value && value.length ? value : undefined;
     const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const dropdownMinWidth = 100;
+    const dropdownMaxWidth = 800;
+    const useAutoWidth = false; //tip: "auto" is good, but width will jump on expand/collapse
+    const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
     return (      
         <TreeSelect
@@ -76,9 +77,8 @@ export default class TreeSelectWidget extends PureComponent {
               width: width,
             }}
             dropdownStyle={{
-              width: "auto",
-              minWidth:  dropdownWidth,
-              overflow: "hidden"
+              width: useAutoWidth ? "auto" : dropdownWidth,
+              paddingRight: '10px'
             }}
             multiple={treeMultiple}
             treeCheckable={treeMultiple}
@@ -88,7 +88,7 @@ export default class TreeSelectWidget extends PureComponent {
             placeholder={placeholder}
             size={renderSize}
             treeData={listValues}
-            treeDataSimpleMode={{id: "value", pId: "parent"}}
+            treeDataSimpleMode={defaultTreeDataMap}
             value={_value}
             onChange={this.handleChange}
             treeDefaultExpandAll={treeExpandAll}

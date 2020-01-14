@@ -27,7 +27,7 @@ export default class SelectWidget extends PureComponent {
 
     let optionsMaxWidth = 0;
     mapListValues(listValues, ({title, value}) => {
-      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title));
+      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title, null));
     });
     this.optionsMaxWidth = optionsMaxWidth;
 

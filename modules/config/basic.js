@@ -2,7 +2,7 @@ import React from 'react';
 import * as Widgets from '../components/widgets';
 import * as Operators from '../components/operators';
 import {SqlString} from '../utils/sql';
-import {escapeRegExp, getTitleInValueList} from '../utils/stuff';
+import {escapeRegExp, getTitleInListValues} from '../utils/stuff';
 import moment from 'moment';
 import {settings as defaultSettings} from '../config/default';
 
@@ -516,7 +516,7 @@ const widgets = {
       valueLabel: "Value",
       valuePlaceholder: "Select value",
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-          let valLabel = getTitleInValueList(fieldDef.fieldSettings.listValues, val);
+          let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues, val);
           return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
       },
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
@@ -531,7 +531,7 @@ const widgets = {
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-          let valsLabels = vals.map(v => getTitleInValueList(fieldDef.fieldSettings.listValues, v));
+          let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues, v));
           return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
       },
       sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
@@ -546,7 +546,7 @@ const widgets = {
       valueLabel: "Value",
       valuePlaceholder: "Select value",
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-        let valLabel = getTitleInValueList(fieldDef.fieldSettings.listValues, val);
+        let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues, val);
         return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
       },
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
@@ -561,7 +561,7 @@ const widgets = {
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-          let valsLabels = vals.map(v => getTitleInValueList(fieldDef.fieldSettings.listValues, v));
+          let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues, v));
           return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
       },
       sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {

@@ -285,17 +285,18 @@ const fields: Fields = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
+        // * old format:
         // listValues: {
         //     yellow: 'Yellow',
         //     green: 'Green',
         //     orange: 'Orange'
         // },
-        // listValues: [
-        //     {value: 'yellow', title: 'Yellow'},
-        //     {value: 'green', title: 'Green'},
-        //     {value: 'orange', title: 'Orange'}
-        // ],
-        listValues: ['yellow', 'green', 'orange'],
+        // * new format:
+        listValues: [
+            { value: 'yellow', title: 'Yellow' },
+            { value: 'green', title: 'Green' },
+            { value: 'orange', title: 'Orange' }
+        ],
     },
     color2: {
         label: 'Color2',
@@ -318,8 +319,42 @@ const fields: Fields = {
         allowCustomValues: true
     },
     selecttree: {
-        label: 'Select tree',
+        label: 'Color (tree)',
         type: 'treeselect',
+        fieldSettings: {
+            treeExpandAll: true,
+            onlyLeafsSelectable: true,
+            // * deep format (will be auto converted to flat format):
+            // listValues: [
+            //     { value: "1", title: "Warm colors", children: [
+            //         { value: "2", title: "Red" }, 
+            //         { value: "3", title: "Orange" }
+            //     ] },
+            //     { value: "4", title: "Cool colors", children: [
+            //         { value: "5", title: "Green" }, 
+            //         { value: "6", title: "Blue", children: [
+            //             { value: "7", title: "Sub blue", children: [
+            //                 { value: "8", title: "Sub sub blue and a long text" }
+            //             ] }
+            //         ] }
+            //     ] }
+            // ],
+            // * flat format:
+            listValues: [
+                { value: "1", title: "Warm colors" },
+                  { value: "2", title: "Red", parent: "1" },
+                  { value: "3", title: "Orange", parent: "1" },
+                { value: "4", title: "Cool colors" },
+                  { value: "5", title: "Green", parent: "4" },
+                  { value: "6", title: "Blue", parent: "4" },
+                    { value: "7", title: "Sub blue", parent: "6" },
+                      { value: "8", title: "Sub sub blue and a long text 1111 2222 3333", parent: "7" },
+            ],
+        }
+    },
+    multiselecttree: {
+        label: 'Colors (tree)',
+        type: 'treemultiselect',
         fieldSettings: {
             treeExpandAll: true,
             listValues: [
