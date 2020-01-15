@@ -3,19 +3,24 @@ import {Query, Builder, BasicConfig, Utils} from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
+import loadedInitLogic from './init_logic';
 
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid} = Utils;
+const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue = {"id": uuid(), "type": "group"};
 const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
+const initLogic = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
+let initTree;
+initTree = checkTree(loadTree(initValue), loadedConfig);
+//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 
 export default class DemoQueryBuilder extends Component {
     state = {
-      tree: checkTree(loadTree(initValue), loadedConfig),
+      tree: initTree,
       config: loadedConfig
     };
 
@@ -27,11 +32,27 @@ export default class DemoQueryBuilder extends Component {
             onChange={this.onChange}
             renderBuilder={this.renderBuilder}
         />
+
+        <button onClick={this.resetValue}>reset</button>
+        <button onClick={this.clearValue}>clear</button>
+
         <div className="query-builder-result">
           {this.renderResult(this.state)}
         </div>
       </div>
     )
+
+    resetValue = () => {
+      this.setState({
+        tree: initTree, 
+      });
+    };
+
+    clearValue = () => {
+      this.setState({
+        tree: loadTree(emptyInitValue), 
+      });
+    };
 
     renderBuilder = (props) => (
         <div className="query-builder-container" style={{padding: '10px'}}>
@@ -87,11 +108,12 @@ export default class DemoQueryBuilder extends Component {
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank">jsonLogicFormat</a>: 
-            { errors ? 
+            { errors.length > 0 && 
               <pre style={preErrorStyle}>
                 {stringify(errors, undefined, 2)}
               </pre> 
-            : 
+            }
+            { !!logic &&
               <pre style={preStyle}>
                 // Rule:<br />
                 {stringify(logic, undefined, 2)}

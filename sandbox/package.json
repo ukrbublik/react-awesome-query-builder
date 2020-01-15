@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder-demo",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "Demo for react-awesome-query-builder",
   "main": "src/index.jsx",
   "readme": "README.md",
@@ -19,7 +19,7 @@
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-awesome-query-builder": "^1.1.3",
+    "react-awesome-query-builder": "^1.2.0",
     "react-scripts": "3.0.1"
   },
   "browserslist": {
