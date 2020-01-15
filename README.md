@@ -178,27 +178,27 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
 ### `Utils`
 - Save, load:
-  #### getTree(immutableValue) -> Object
+  #### getTree (immutableValue) -> Object
   Convert query value from internal Immutable format to JS format. 
   You can use it to save value on backend in `onChange` callback of `<Query>`.
-  #### loadTree(jsValue, config) -> Immutable
+  #### loadTree (jsValue, config) -> Immutable
   Convert query value from JS format to internal Immutable format. 
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
-  #### checkTree(immutableValue, config) -> Immutable
+  #### checkTree (immutableValue, config) -> Immutable
   Validate query value corresponding to config. 
   Invalid parts of query (eg. if field was removed from config) will be deleted.
 - Export:
-  #### queryString(immutableValue, config, isForDisplay) -> String
+  #### queryString (immutableValue, config, isForDisplay) -> String
   Convert query value to custom string representation. `isForDisplay` = true can be used to make string more "human readable".
-  #### mongodbFormat(immutableValue, config) -> Object
+  #### mongodbFormat (immutableValue, config) -> Object
   Convert query value to MongoDb query object.
-  #### sqlFormat(immutableValue, config) -> String
+  #### sqlFormat (immutableValue, config) -> String
   Convert query value to SQL where string.
-  #### jsonLogicFormat(immutableValue, config) -> {logic, data, errors}
+  #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}
   Convert query value to [JsonLogic](http://jsonlogic.com) format. 
   If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
 - Import:
-  #### loadFromJsonLogic(jsonLogicObject, config) -> Immutable
+  #### loadFromJsonLogic (jsonLogicObject, config) -> Immutable
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
 
 
@@ -220,10 +220,9 @@ To build the component locally, clone this repo then run:
 Then open localhost:3001 in a browser.
 
 Scripts:
-- `npm run build-npm` - Builds a npm module. Output path: `build/npm`
-- `npm run build-global` - Builds with webpack the self contained pack of the component. Output path: `build/global`
-- `npm run build-examples` - Builds with webpack the examples. Output path: `examples`
 - `npm run examples` - Builds with webpack the examples and runs a dev-server on localhost:3001.
+- `npm run build-examples` - Builds with webpack the examples. Output path: `examples`
+- `npm run build-npm` - Builds a npm module. Output path: `build/npm`
 
 The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
 
