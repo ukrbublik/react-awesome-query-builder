@@ -118,6 +118,9 @@ body.qb-dragging {
 .ant-select-tree-dropdown > div[role="listbox"] {
   outline: none;
 }
+ul.ant-select-selection__rendered {
+  margin-right: 11px;
+}
 
 /******************************************************************************/
 /** GROUP *********************************************************************/
