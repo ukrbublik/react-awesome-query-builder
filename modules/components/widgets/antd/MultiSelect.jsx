@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import map from 'lodash/map';
 import { Select } from 'antd';
-import {useOnPropsChanged, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
+import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends PureComponent {
@@ -15,7 +14,7 @@ export default class MultiSelectWidget extends PureComponent {
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
     // from fieldSettings:
-    listValues: PropTypes.object,
+    listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     allowCustomValues: PropTypes.bool,
   };
 
@@ -29,13 +28,13 @@ export default class MultiSelectWidget extends PureComponent {
     const {listValues} = props;
 
     let optionsMaxWidth = 0;
-    map(listValues, (label, value) => {
-      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(label));
+    mapListValues(listValues, ({title, value}) => {
+      optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title, null));
     });
     this.optionsMaxWidth = optionsMaxWidth;
 
-    this.options = map(listValues, (label, value) => {
-      return (<Option key={value} value={value}>{label}</Option>);
+    this.options = mapListValues(listValues, ({title, value}) => {
+      return (<Option key={value} value={value}>{title}</Option>);
     });
   }
 

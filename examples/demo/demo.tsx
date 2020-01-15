@@ -15,7 +15,7 @@ const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' 
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
-let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;;
+let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 let initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree;
 initTree = checkTree(loadTree(initValue), loadedConfig);

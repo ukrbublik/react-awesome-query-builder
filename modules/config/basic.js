@@ -2,7 +2,7 @@ import React from 'react';
 import * as Widgets from '../components/widgets';
 import * as Operators from '../components/operators';
 import {SqlString} from '../utils/sql';
-import {escapeRegExp} from '../utils/stuff';
+import {escapeRegExp, getTitleInListValues} from '../utils/stuff';
 import moment from 'moment';
 import {settings as defaultSettings} from '../config/default';
 
@@ -13,6 +13,7 @@ const {
     RangeWidget,
     SelectWidget,
     MultiSelectWidget,
+    TreeSelectWidget,
     DateWidget,
     BooleanWidget,
     TimeWidget,
@@ -515,7 +516,7 @@ const widgets = {
       valueLabel: "Value",
       valuePlaceholder: "Select value",
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-          let valLabel = fieldDef.fieldSettings.listValues[val];
+          let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues, val);
           return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
       },
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
@@ -530,7 +531,37 @@ const widgets = {
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-          let valsLabels = vals.map(v => fieldDef.fieldSettings.listValues[v]);
+          let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues, v));
+          return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
+      },
+      sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
+          return vals.map(v => SqlString.escape(v));
+      },
+  },
+  treeselect: {
+      type: "treeselect",
+      jsType: "string",
+      valueSrc: 'value',
+      factory: (props) => <TreeSelectWidget {...props} />,
+      valueLabel: "Value",
+      valuePlaceholder: "Select value",
+      formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+        let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues, val);
+        return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
+      },
+      sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+          return SqlString.escape(val);
+      },
+  },
+  treemultiselect: {
+      type: "treemultiselect",
+      jsType: "array",
+      valueSrc: 'value',
+      factory: (props) => <TreeSelectWidget {...props} treeMultiple={true} />,
+      valueLabel: "Values",
+      valuePlaceholder: "Select values",
+      formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
+          let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues, v));
           return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
       },
       sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
@@ -809,6 +840,35 @@ const types = {
                   'multiselect_equals',
                   'multiselect_not_equals',
               ]
+          }
+      },
+  },
+  treeselect: {
+    mainWidget: "treeselect",
+    defaultOperator: 'select_equals',
+    widgets: {
+        treeselect: {
+            operators: [
+                'select_equals',
+                'select_not_equals'
+            ],
+        },
+        treemultiselect: {
+            operators: [
+                'select_any_in',
+                'select_not_any_in'
+            ],
+        },
+    },
+  },
+  treemultiselect: {
+      defaultOperator: 'multiselect_equals',
+      widgets: {
+        treemultiselect: {
+              operators: [
+                  'multiselect_equals',
+                  'multiselect_not_equals',
+              ],
           }
       },
   },

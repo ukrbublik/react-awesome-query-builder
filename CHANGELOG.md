@@ -1,4 +1,8 @@
 # Changelog
+- 1.2.0
+  - Added `treeselect` and `treemultiselect` types
+  - Changed format of `listValues` from `{<value>: <title>}` to `[{value, title}]` (old is supported). 
+    Tree select also use `listValues`, format is compatible with simple select - `[{value, title, parent}]`
 - 1.1.3
   - Fixed console warnings
   - Fixed dev hot reload: now state is preserving

@@ -2,7 +2,7 @@ import {
 	getFieldConfig, getOperatorsForField, getOperatorConfig, 
 	getWidgetForFieldOp, getFieldWidgetConfig, getFuncConfig, getValueSourcesForFieldOp,
 } from './configUtils';
-import {defaultValue, deepEqual} from "../utils/stuff";
+import {defaultValue, deepEqual, getTitleInListValues} from "../utils/stuff";
 import {defaultOperatorOptions} from '../utils/defaultUtils';
 import omit from 'lodash/omit';
 import Immutable from 'immutable';
@@ -241,12 +241,12 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, confi
 			if (fieldSettings.listValues && !fieldSettings.allowCustomValues) {
 					if (value instanceof Array) {
 							for (let v of value) {
-									if (fieldSettings.listValues[v] == undefined) {
+									if (getTitleInListValues(fieldSettings.listValues, v) == undefined) {
 											return [`Value ${v} is not in list of values`, value];
 									}
 							}
 					} else {
-							if (fieldSettings.listValues[value] == undefined) {
+							if (getTitleInListValues(fieldSettings.listValues, value) == undefined) {
 									return [`Value ${value} is not in list of values`, value];
 							}
 					}

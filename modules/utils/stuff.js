@@ -4,7 +4,8 @@ import React from 'react';
 
 
 export const SELECT_WIDTH_OFFSET_RIGHT = 48;
-const DEFAULT_FONT = '14px';
+const DEFAULT_FONT_SIZE = '14px';
+const DEFAULT_FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
@@ -22,12 +23,12 @@ export const bindActionCreators = (actionCreators, config, dispatch) =>
   );
 
 
-export const calcTextWidth = function(str, font) {
-  var f = font || DEFAULT_FONT;
+export const calcTextWidth = function(str, fontFamily = DEFAULT_FONT_FAMILY, fontSize = DEFAULT_FONT_SIZE) {
   var div = document.createElement("div");
   div.innerHTML = str;
   var css = {
-    'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 'font': f
+    'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 
+    'font-size': fontSize, 'font-family': fontFamily
   };
   for (let k in css) {
     div.style[k] = css[k];
@@ -182,6 +183,7 @@ export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&'); // $& means the whole matched string
 }
 
+
 const canUseUnsafe = () => {
   const v = React.version.split('.').map(parseInt.bind(null, 10));
   return v[0] >= 16 && v[1] >= 3;
@@ -198,3 +200,136 @@ export const useOnPropsChanged = (obj) => {
     };
   }
 };
+
+
+const isObject = (v) => (typeof v == 'object' && v !== null);
+const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
+
+// convert {<value>: <title>, ..} or [value, ..] to normal [{value, title}, ..]
+const listValuesToArray = (listValuesObj) => {
+  if (!isObject(listValuesObj))
+    return listValuesObj;
+  if (Array.isArray(listValuesObj))
+    return listValuesObj.map(v => listValue(v));
+  
+  let listValuesArr = [];
+  for (let v in listValuesObj) {
+    const title = listValuesObj[v];
+    listValuesArr.push(listValue(v, title));
+  }
+  return listValuesArr;
+};
+
+// listValues can be {<value>: <title>, ..} or [{value, title}, ..] or [value, ..]
+export const getItemInListValues = (listValues, value) => {
+  if (Array.isArray(listValues)) {
+    return listValues.map(v => listValue(v)).find(v => v.value === value);
+  } else {
+    return listValues[value] !== undefined ? listValue(value, listValues[value]) : undefined;
+  }
+};
+
+export const getTitleInListValues = (listValues, value) => {
+  const it = getItemInListValues(listValues, value);
+  return it !== undefined ? it.title : undefined;
+};
+
+export const mapListValues = (listValues, fun) => {
+  let ret = [];
+  if (Array.isArray(listValues)) {
+    for (let v of listValues) {
+      ret.push(fun(listValue(v)));
+    }
+  } else {
+    for (let value in listValues) {
+      ret.push(fun(listValue(value, listValues[value])));
+    }
+  }
+  return ret;
+};
+
+export const defaultTreeDataMap = {id: "value", pId: "parent", rootPId: undefined};
+
+// converts from treeData to treeDataSimpleMode format (https://ant.design/components/tree-select/)
+// ! modifies value of `treeData`
+export const flatizeTreeData = (treeData) => {
+  const tdm = defaultTreeDataMap;
+
+  let rind;
+  let len;
+
+  const _flatize = (node, root, lev) => {
+    if (node.children) {
+      if (lev == 1)
+        node[tdm.pId] = tdm.rootPId; //optional?
+      const childrenCount = node.children.length;
+      for (let c of node.children) {
+        c[tdm.pId] = node[tdm.id];
+        rind++;
+        root.splice(rind, 0, c); //instead of just push
+        len++;
+        _flatize(c, root, lev + 1);
+      }
+      delete node.children;
+      if (childrenCount == 0) {
+        root.splice(rind, 1);
+        rind--;
+        len--;
+      }
+    }
+  };
+
+  if (Array.isArray(treeData)) {
+    len = treeData.length;
+    for (rind = 0 ; rind < len ; rind++) {
+      const c = treeData[rind];
+      if (!isObject(c))
+        continue;
+      if (c[tdm.pId] !== undefined && c[tdm.pId] != tdm.rootPId)
+        continue; //not lev 1
+      _flatize(c, treeData, 1);
+    }
+  }
+  
+  return treeData;
+};
+
+const getPathInListValues = (listValues, value) => {
+  const tdm = defaultTreeDataMap;
+  const it = getItemInListValues(listValues, value);
+  const parentId = it ? it[tdm.pId] : undefined;
+  const parent = parentId ? listValues.find(v => v[tdm.id] === parentId) : undefined;
+  return parent ? [parent.value, ...getPathInListValues(listValues, parent.value)] : [];
+};
+
+const getChildrenInListValues = (listValues, value) => {
+  const tdm = defaultTreeDataMap;
+  const it = getItemInListValues(listValues, value);
+  return it ? listValues.filter(v => v[tdm.pId] === it[tdm.id]).map(v => v.value) : [];
+};
+
+// ! modifies value of `treeData`
+const extendTreeData = (treeData, fieldSettings, isMulti) => {
+  for (let node of treeData) {
+    node.path = getPathInListValues(treeData, node.value);
+    if (fieldSettings.treeSelectOnlyLeafs != false) {
+      const childrenValues = getChildrenInListValues(treeData, node.value);
+      if (!isMulti) {
+        node.selectable = (childrenValues.length == 0);
+      }
+    }
+  }
+  return treeData;
+};
+
+export const normalizeListValues = (listValues, type, fieldSettings) => {
+  const isTree = ['treeselect', 'treemultiselect'].includes(type);
+  const isMulti = ['multiselect', 'treemultiselect'].includes(type);
+  if (isTree) {
+    listValues = listValuesToArray(listValues);
+    listValues = flatizeTreeData(listValues);
+    listValues = extendTreeData(listValues, fieldSettings, isMulti);
+  }
+  return listValues;
+};
+

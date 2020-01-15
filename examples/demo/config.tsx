@@ -103,6 +103,12 @@ const widgets: Widgets = {
             showSearch: true
         }
     },
+    treeselect: {
+        ...BasicConfig.widgets.treeselect,
+        customProps: {
+            showSearch: true
+        }
+    },
 };
 
 
@@ -285,11 +291,18 @@ const fields: Fields = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange'
-        },
+        // * old format:
+        // listValues: {
+        //     yellow: 'Yellow',
+        //     green: 'Green',
+        //     orange: 'Orange'
+        // },
+        // * new format:
+        listValues: [
+            { value: 'yellow', title: 'Yellow' },
+            { value: 'green', title: 'Green' },
+            { value: 'orange', title: 'Orange' }
+        ],
     },
     color2: {
         label: 'Color2',
@@ -310,6 +323,60 @@ const fields: Fields = {
             orange: 'Orange'
         },
         allowCustomValues: true
+    },
+    selecttree: {
+        label: 'Color (tree)',
+        type: 'treeselect',
+        fieldSettings: {
+            treeExpandAll: true,
+            // * deep format (will be auto converted to flat format):
+            // listValues: [
+            //     { value: "1", title: "Warm colors", children: [
+            //         { value: "2", title: "Red" }, 
+            //         { value: "3", title: "Orange" }
+            //     ] },
+            //     { value: "4", title: "Cool colors", children: [
+            //         { value: "5", title: "Green" }, 
+            //         { value: "6", title: "Blue", children: [
+            //             { value: "7", title: "Sub blue", children: [
+            //                 { value: "8", title: "Sub sub blue and a long text" }
+            //             ] }
+            //         ] }
+            //     ] }
+            // ],
+            // * flat format:
+            listValues: [
+                { value: "1", title: "Warm colors" },
+                  { value: "2", title: "Red", parent: "1" },
+                  { value: "3", title: "Orange", parent: "1" },
+                { value: "4", title: "Cool colors" },
+                  { value: "5", title: "Green", parent: "4" },
+                  { value: "6", title: "Blue", parent: "4" },
+                    { value: "7", title: "Sub blue", parent: "6" },
+                      { value: "8", title: "Sub sub blue and a long text", parent: "7" },
+            ],
+        }
+    },
+    multiselecttree: {
+        label: 'Colors (tree)',
+        type: 'treemultiselect',
+        fieldSettings: {
+            treeExpandAll: true,
+            listValues: [
+                { value: "1", title: "Warm colors", children: [
+                    { value: "2", title: "Red" }, 
+                    { value: "3", title: "Orange" }
+                ] },
+                { value: "4", title: "Cool colors", children: [
+                    { value: "5", title: "Green" }, 
+                    { value: "6", title: "Blue", children: [
+                        { value: "7", title: "Sub blue", children: [
+                            { value: "8", title: "Sub sub blue and a long text" }
+                        ] }
+                    ] }
+                ] }
+            ]
+        }
     },
     stock: {
         label: 'In stock',

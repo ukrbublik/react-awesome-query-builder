@@ -5,7 +5,7 @@ import {
     getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
-import {defaultValue, useOnPropsChanged} from "../../utils/stuff";
+import {getTitleInListValues, defaultValue, useOnPropsChanged} from "../../utils/stuff";
 import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
 import Immutable from 'immutable';
@@ -282,9 +282,9 @@ const WidgetFactory = ({
             return defaultValue ? (widgetProps.labelYes || "YES") : (widgetProps.labelNo || "NO");
         } else if (fieldSettings.listValues) {
             if (Array.isArray(defaultValue))
-                return defaultValue.map(v => fieldSettings.listValues[v] || v).join(', ');
+                return defaultValue.map(v => getTitleInListValues(fieldSettings.listValues, v) || v).join(', ');
             else
-                return (fieldSettings.listValues[defaultValue] || defaultValue);  
+                return (getTitleInListValues(fieldSettings.listValues, defaultValue) || defaultValue);  
         }
         return ""+defaultValue;
     }

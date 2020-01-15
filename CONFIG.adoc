@@ -77,6 +77,8 @@ const {
       rangeslider,
       select,
       multiselect,
+      treeselect,
+      treemultiselect,
       date,
       time,
       datetime,
@@ -92,6 +94,8 @@ const {
       datetime,
       select,
       multiselect,
+      treeselect,
+      treemultiselect,
       boolean,
     },
     settings
@@ -155,10 +159,15 @@ const myConfig = {
   By default, if nested field is selected (eg. `name` of `user` in example above), `<FieldDropdown>` component will show `name`. +
   Just `name` can be confusing, so can be overriden by setting `label2` to something like `User name`. +
   As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
-|tooptip | | |Optional tooltip to be displayed in field list by hovering on item
-|listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
-  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
-|allowCustomValues |- for `MultiSelect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
+|tooltip | | |Optional tooltip to be displayed in field list by hovering on item
+|listValues |+ for (multi)select, tree (multi)select | |List of values for Select widget. +
+  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
+   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
+  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
+   (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
+|allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
+|treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
+|treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
 |defaultValue | | |Default value
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
@@ -438,6 +447,7 @@ const {
     NumberWidget,
     SelectWidget,
     MultiSelectWidget,
+    TreeSelectWidget,
     DateWidget,
     BooleanWidget,
     TimeWidget,
@@ -596,8 +606,9 @@ To enable this feature set `valueSources` of type to `['value', 'func'']` (see b
 |args.<arg>.valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`, `'const'`. +
   `const` requires `defaultValue`
 |args.<arg>.defaultValue | | |Default value
-|args.<arg>.listValues |+ for `Select`, `MultiSelect` widgets | |List of values for Select widget. +
-  Example: `{ yellow: 'Yellow', green: 'Green' }` where `Yellow` - label to display at list of options
+|args.<arg>.listValues |+ for (multi)select, tree (multi)select widgets | |List of values for Select widget. +
+  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` +
+  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]`
 |args.<arg>.fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}`
 |args.<arg>.isOptional | |false |Last args can be optional
 |renderBrackets | |`['(', ')']` |Can render custom function brackets in UI (or not render).

@@ -140,6 +140,7 @@ export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
 export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
 export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
 export type SelectWidgetProps = BaseWidgetProps & SelectFieldSettings;
+export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 
 export interface BaseWidget {
@@ -174,8 +175,9 @@ export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
 export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
 export type SelectWidget = BaseWidget & SelectFieldSettings;
+export type TreeSelectWidget = BaseWidget & TreeSelectFieldSettings;
 
-export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget  | RangeableWidget | BaseWidget;
+export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget | TreeSelectWidget  | RangeableWidget | BaseWidget;
 export type Widgets = TypedMap<Widget>;
 
 
@@ -282,6 +284,21 @@ export type Types = TypedMap<Type>;
 
 type FieldType = String | "!struct";
 
+interface ListItem {
+  value: any,
+  title?: String,
+};
+interface TreeItem extends ListItem {
+  children?: Array<TreeItem>,
+  parent?: any,
+  disabled?: Boolean,
+  selectable?: Boolean,
+  disableCheckbox?: Boolean,
+  checkable?: Boolean,
+};
+type TreeData = Array<TreeItem>;
+type ListValues = TypedMap<String> | Array<ListItem> | Array<String>;
+
 interface BasicFieldSettings {
 }
 interface NumberFieldSettings extends BasicFieldSettings {
@@ -297,14 +314,19 @@ interface DateTimeFieldSettings extends BasicFieldSettings {
   use12Hours?: Boolean,
 };
 interface SelectFieldSettings extends BasicFieldSettings {
-  listValues?: TypedMap<String>,
+  listValues?: ListValues,
   allowCustomValues?: Boolean,
+}
+interface TreeSelectFieldSettings extends BasicFieldSettings {
+  listValues?: TreeData,
+  treeExpandAll?: Boolean,
+  treeSelectOnlyLeafs?:  Boolean,
 }
 interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | String,
   labelNo?: ReactElement | String,
 };
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
@@ -321,11 +343,11 @@ interface ValueField extends BaseField {
   defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,
   mainWidgetProps?: Optional<Widget>,
-  //obsolete - moved to FieldSettings
-  listValues?: TypedMap<String>,
-  allowCustomValues?: Boolean,
   hideForSelect?: Boolean,
   hideForCompare?: Boolean,
+  //obsolete - moved to FieldSettings
+  listValues?: ListValues,
+  allowCustomValues?: Boolean,
 };
 interface SimpleField extends ValueField {
   label2?: String,
@@ -535,6 +557,8 @@ export interface BasicConfig extends Config {
     rangeslider: NumberWidget,
     select: SelectWidget,
     multiselect: SelectWidget,
+    treeselect: TreeSelectWidget,
+    treemultiselect: TreeSelectWidget,
     date: DateTimeWidget,
     time: DateTimeWidget,
     datetime: DateTimeWidget,
@@ -550,6 +574,8 @@ export interface BasicConfig extends Config {
     datetime: Type,
     select: Type,
     multiselect: Type,
+    treeselect: Type,
+    treemultiselect: Type,
     boolean: Type,
   },
   settings: Settings,
@@ -576,6 +602,7 @@ interface ReadyWidgets {
   RangeWidget: ElementType<RangeSliderWidgetProps>,
   SelectWidget: ElementType<SelectWidgetProps>,
   MultiSelectWidget: ElementType<SelectWidgetProps>,
+  TreeSelectWidget: ElementType<TreeSelectWidgetProps>,
   DateWidget: ElementType<DateTimeWidgetProps>,
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
