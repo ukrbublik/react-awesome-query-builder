@@ -162,12 +162,21 @@ Props:
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 1000 !important; }`
 
 ### `<Builder />`
-Render this component only in `Query.renderBuilder()`.  
-Please wrap `<Builder />` in `div.query-builder`.  
+Render this component only inside `Query.renderBuilder()` like in example above:
+```js
+  renderBuilder = (props) => (
+    <div className="query-builder-container">
+      <div className="query-builder qb-lite">
+          <Builder {...props} />
+      </div>
+    </div>
+  )
+```
+Wrapping `<Builder />` in `div.query-builder` is necessary.  
 Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
-Wrapping in `div.query-builder-container` in not necessary, but if you want to make query builder scrollable, it's best place to apply appropriate styles.
+Wrapping in `div.query-builder-container` is necessary if you put query builder inside scrollable block.  
 
-### Utils
+### `Utils`
 - Save, load:
   #### getTree(immutableValue) -> Object
   Convert query value from internal Immutable format to JS format. 
