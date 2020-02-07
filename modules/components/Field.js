@@ -174,6 +174,7 @@ export default class Field extends Component {
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
     let customProps = this.props.customProps || {};
     const renderFieldAsLabel = this.props.renderFieldAsLabel;
+    const fieldAddWidth = this.props.config.settings.fieldAddWidth || 48
 
     if (renderFieldAsLabel && this.props.selectedField) {
         const { showSearch, ...others } = customProps;
@@ -184,7 +185,7 @@ export default class Field extends Component {
         return <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + 48 }}
+            style={{ width: isFieldSelected && !customProps.showSearch ? null : selectWidth + fieldAddWidth }}
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}

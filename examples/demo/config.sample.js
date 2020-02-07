@@ -885,6 +885,7 @@ export default {
     fieldLabel: 'Field',
     operatorLabel: 'Operator',
     fieldPlaceholder: 'Select field',
+    fieldAddWidth: 48,
     operatorPlaceholder: 'Select operator',
     deleteLabel: null,
     addGroupLabel: 'Add group',

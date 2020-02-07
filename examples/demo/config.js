@@ -432,6 +432,7 @@ export default {
     maxNesting: 10,
     fieldSeparator: '.',
     fieldSeparatorDisplay: '->',
+    fieldAddWidth: 100,
     showLabels: false,
     valueLabel: fm('form.builder.value'),
     valuePlaceholder: fm('form.builder.valuePlaceholder'),
