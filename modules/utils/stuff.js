@@ -170,7 +170,7 @@ function shallowEqualObjects(objA, objB, deep = false) {
 
   for (var i = 0; i < len; i++) {
     var key = aKeys[i];
-    var isEqual = deep ? shallowEqual(objA[key], objB[key]) : objA[key] === objB[key];
+    var isEqual = deep ? shallowEqual(objA[key], objB[key], deep) : objA[key] === objB[key];
     if (!isEqual) {
       return false;
     }
