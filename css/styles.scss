@@ -93,11 +93,6 @@ body.qb-dragging {
     border: 1px dashed gray;
 }
 
-.group-or-rule-container {
-    margin-bottom: 10px;
-    padding-right: 10px;
-}
-
 /* slider */
 .ant-tooltip-inner {
   min-height: 18px;
@@ -195,16 +190,6 @@ ul.ant-select-selection__rendered {
   @extend %noselect;
   cursor: -webkit-grabbing;
   cursor: grabbing;
-}
-
-.group--header,
-.group--footer {
-  padding: {
-    top: 10px;
-    right: 5px;
-    bottom: 10px;
-    left: 10px;
-  }
 }
 
 .group--conjunctions.hide--conj {
@@ -456,4 +441,38 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
     @include force_unvisible(#{$rule_actions, $group_actions});
     @include force_not_display($inactive_conjs);
   }
+}
+
+
+
+/******************************************************************************/
+/** Vertical padding ****************************************************************/
+/******************************************************************************/
+
+
+.group--header,
+.group--footer {
+  padding: {
+    left: 10px;
+    right: 5px;
+  }
+  margin: {
+    top: 10px;
+    bottom: 10px;
+  }
+}
+.group-or-rule-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+  &:first-child {
+    margin-top: 0px;
+  }
+  &:last-child {
+    margin-bottom: 0px;
+  }
+}
+.group--children {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

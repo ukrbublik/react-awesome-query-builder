@@ -42,8 +42,20 @@
 }
 
 .group-or-rule-container {
-    margin-bottom: 5px;
-    padding-right: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-right: 5px;
+}
+.group--children {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+.group--header,
+.group--footer {
+  margin: {
+    top: 5px !important;
+    bottom: 5px !important;
+  }
 }
 
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
@@ -56,8 +68,11 @@
   margin-right: 5px;
 }
 .group--header {
-  padding: 5px;
-  padding-left: 0;
+  padding: {
+    left: 0;
+    right: 5px;
+  }
+  margin: 0;
 }
 
 
