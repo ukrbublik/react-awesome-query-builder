@@ -8,7 +8,7 @@ const { confirm } = Modal;
 const classNames = require('classnames');
 import Item from './Item';
 import {ConjsRadios, ConjsButtons} from './Conjs';
-import {Actions} from './Actions';
+import {GroupActions} from './GroupActions';
 
 const defaultPosition = 'topRight';
 
@@ -149,19 +149,22 @@ export class Group extends PureComponent {
   }
 
   renderActions() {
-    const {isRoot, config, addRule, addGroup} = this.props;
+    const {config, addRule, addGroup} = this.props;
 
-    return <Actions
+    return <GroupActions
       config={config}
       addRule={addRule}
       addGroup={addGroup}
-      isRoot={isRoot}
       canAddGroup={this.canAddGroup()}
+      canAddRule={this.canAddRule()}
+      canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
     />;
   }
 
   canAddGroup = () => this.props.allowFurtherNesting;
+  canAddRule = () => true;
+  canDeleteGroup = () => !this.props.isRoot;
 
   renderChildren() {
     const {children1} = this.props;
@@ -170,12 +173,13 @@ export class Group extends PureComponent {
 
   renderItem(item) {
     const props = this.props;
-    const {config, actions, onDragStart, treeNodesCnt, children1} = props;
+    const {config, actions, onDragStart} = props;
     const isRuleGroup = item.get('type') == 'group' && item.getIn(['properties', 'field']) != null;
     const type = isRuleGroup ? 'rule_group' : item.get('type');
-
+    
     return (
       <Item
+        {...this.extraPropsForItem(item)}
         key={item.get('id')}
         id={item.get('id')}
         //path={props.path.push(item.get('id'))}
@@ -192,8 +196,13 @@ export class Group extends PureComponent {
     );
   };
 
+  extraPropsForItem(_item) {
+    return {};
+  }
+
   reordableNodesCnt() {
     const {treeNodesCnt} = this.props;
+    console.log(1, treeNodesCnt)
     return treeNodesCnt;
   }
 

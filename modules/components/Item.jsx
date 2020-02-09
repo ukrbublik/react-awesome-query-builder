@@ -15,6 +15,7 @@ const typeMap = {
       treeNodesCnt={props.treeNodesCnt}
       config={props.config}
       onDragStart={props.onDragStart}
+      parentField={props.parentField}
     />
   ),
   group: (props) => (
@@ -28,6 +29,7 @@ const typeMap = {
       treeNodesCnt={props.treeNodesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
+      parentField={null}
     />
   ),
   rule_group: (props) => (
@@ -41,6 +43,7 @@ const typeMap = {
       treeNodesCnt={props.treeNodesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
+      parentField={props.parentField}
     />
   )
 };
@@ -58,6 +61,7 @@ class Item extends PureComponent {
     actions: PropTypes.object.isRequired,
     treeNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
+    parentField: PropTypes.string, //from RuleGroup
   };
 
   render() {

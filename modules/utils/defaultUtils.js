@@ -4,9 +4,10 @@ import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from
 import {getNewValueForFieldOp} from '../utils/validation';
 
 
-export const defaultField = (config, canGetFirst = true) => {
+export const defaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
   return typeof config.settings.defaultField === 'function' ?
-    config.settings.defaultField() : (config.settings.defaultField || (canGetFirst ? getFirstField(config) : null));
+    config.settings.defaultField(parentRuleGroupPath) : 
+    (config.settings.defaultField || (canGetFirst ? getFirstField(config, parentRuleGroupPath) : null));
 };
 
 export const defaultOperator = (config, field, canGetFirst = true) => {
@@ -33,10 +34,10 @@ export const defaultOperatorOptions = (config, operator, field) => {
   ) : null;
 };
 
-export const defaultRuleProperties = (config) => {
+export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
   let field = null, operator = null;
-  if (config.settings.setDefaultFieldAndOp) {
-    field = defaultField(config);
+  if (config.settings.setDefaultFieldAndOp || !!parentRuleGroupPath) {
+    field = defaultField(config, true, parentRuleGroupPath);
     operator = defaultOperator(config, field);
   }
   let current = new Immutable.Map({

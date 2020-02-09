@@ -24,6 +24,7 @@ class Rule extends PureComponent {
         valueSrc: PropTypes.any,
         isDraggingMe: PropTypes.bool,
         isDraggingTempo: PropTypes.bool,
+        parentField: PropTypes.string, //from RuleGroup
         //path: PropTypes.instanceOf(Immutable.List),
         //actions
         handleDraggerMouseDown: PropTypes.func,
@@ -112,6 +113,7 @@ class Rule extends PureComponent {
                 config={this.props.config}
                 selectedField={this.props.selectedField}
                 setField={this.props.setField}
+                parentField={this.props.parentField}
             />;
         const operator = 
             <OperatorWrapper
@@ -205,9 +207,9 @@ class Rule extends PureComponent {
 }
 
 
-class FieldWrapper extends PureComponent {
+export class FieldWrapper extends PureComponent {
     render() {
-        const {config, selectedField, setField} = this.props;
+        const {config, selectedField, setField, parentField} = this.props;
         return (
             <Col className="rule--field">
                 { config.settings.showLabels &&
@@ -216,6 +218,7 @@ class FieldWrapper extends PureComponent {
                 <Field
                     config={config}
                     selectedField={selectedField}
+                    parentField={parentField}
                     setField={setField}
                     customProps={config.settings.customFieldSelectProps}
                 />

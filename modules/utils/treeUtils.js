@@ -182,19 +182,17 @@ export const getTotalNodesCountInTree = (tree) => {
     function _processNode (item, path, lev) {
         const id = item.get('id');
         const children = item.get('children1');
+        const isRuleGroup = item.get('type') == 'rule_group';
         cnt++;
-        if (children) {
-            children.map((child, childId) => {
-                const isRuleGroup = child.get('type') == 'group' && child.getIn(['properties', 'field']) != null;
-                //tip: rules in rule-group can be reordered only inside
-                if (!isRuleGroup) {
-                    _processNode(child, path.concat(id), lev + 1);
-                }
+        //tip: rules in rule-group can be reordered only inside
+        if (children && !isRuleGroup) {
+            children.map((child, _childId) => {
+                _processNode(child, path.concat(id), lev + 1);
             });
         }
     };
 
     _processNode(tree, [], 0);
-
+    
     return cnt - 1; // -1 for root
 };

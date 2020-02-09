@@ -10,6 +10,7 @@ export default class Field extends PureComponent {
     static propTypes = {
         config: PropTypes.object.isRequired,
         selectedField: PropTypes.string,
+        parentField: PropTypes.string,
         customProps: PropTypes.object,
         //actions
         setField: PropTypes.func.isRequired,
@@ -24,7 +25,7 @@ export default class Field extends PureComponent {
 
     onPropsChanged(nextProps) {
         const prevProps = this.props;
-        const keysForMeta = ["selectedField", "config"];
+        const keysForMeta = ["selectedField", "config", "parentField"];
         const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
         if (needUpdateMeta) {
@@ -32,9 +33,9 @@ export default class Field extends PureComponent {
         }
     }
 
-    getMeta({selectedField, config}) {
+    getMeta({selectedField, config, parentField}) {
         const selectedKey = selectedField;
-        const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder} = config.settings;
+        const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
         const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
         const isFieldSelected = !!selectedField;
         const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
@@ -45,11 +46,14 @@ export default class Field extends PureComponent {
         const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
         const partsLabels = getFieldPathLabels(selectedKey, config);
         let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
-        if (selectedFullLabel == selectedLabel)
+        if (selectedFullLabel == selectedLabel || parentField)
             selectedFullLabel = null;
         const selectedAltLabel = selectedOpts.label2;
 
-        const items = this.buildOptions(config, config.fields);
+        const parentFieldPath = typeof parentField == 'string' ? parentField.split(fieldSeparator) : parentField;
+        const parentFieldConfig = parentField ? getFieldConfig(parentField, config) : null;
+        const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
+        const items = this.buildOptions(parentFieldPath, config, sourceFields, parentFieldPath);
 
         return {
             placeholder, items,
@@ -67,7 +71,7 @@ export default class Field extends PureComponent {
         return label;
     }
 
-    buildOptions(config, fields, path = null, optGroupLabel = null) {
+    buildOptions(parentFieldPath, config, fields, path = null, optGroupLabel = null) {
         if (!fields)
             return null;
         const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
@@ -78,12 +82,12 @@ export default class Field extends PureComponent {
             const label = this.getFieldLabel(field, fieldKey, config);
             const partsLabels = getFieldPathLabels(fieldKey, config);
             let fullLabel = partsLabels.join(fieldSeparatorDisplay);
-            if (fullLabel == label)
+            if (fullLabel == label || parentFieldPath)
                 fullLabel = null;
             const altLabel = field.label2;
             const tooltip = field.tooltip;
             const subpath = (path ? path : []).concat(fieldKey);
-
+            
             if (field.hideForSelect)
                 return undefined;
 
@@ -95,7 +99,7 @@ export default class Field extends PureComponent {
                     fullLabel,
                     altLabel,
                     tooltip,
-                    items: this.buildOptions(config, field.subfields, subpath, label)
+                    items: this.buildOptions(parentFieldPath, config, field.subfields, subpath, label)
                 };
             } else {
                 return {

@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import GroupContainer from './containers/GroupContainer';
 import Draggable from './containers/Draggable';
 import {Group} from './Group';
+import {RuleGroupActions} from './RuleGroupActions';
+import {FieldWrapper} from './Rule';
+import {useOnPropsChanged} from "../utils/stuff";
 
 
 @GroupContainer
@@ -10,8 +13,19 @@ import {Group} from './Group';
 class RuleGroup extends Group {
   static propTypes = {
     ...Group.propTypes,
-    selectedField: PropTypes.string, // for RuleGroup
+    selectedField: PropTypes.string,
+    parentField: PropTypes.string,
+    setField: PropTypes.func,
   };
+
+  constructor(props) {
+      super(props);
+      useOnPropsChanged(this);
+      this.onPropsChanged(props);
+  }
+
+  onPropsChanged(nextProps) {
+  }
 
   childrenClassName = () => 'rule_group--children';
   
@@ -19,6 +33,8 @@ class RuleGroup extends Group {
   renderFooterWrapper = () => null;
   renderConjs = () => null;
   canAddGroup = () => false;
+  canAddRule = () => true;
+  canDeleteGroup = () => false;
 
   reordableNodesCnt() {
     const {children1} = this.props;
@@ -29,11 +45,40 @@ class RuleGroup extends Group {
     return (
       <div>
         {this.renderDrag()}
+        {this.renderField()}
         {this.renderActions()}
         {super.renderChildrenWrapper()}
       </div>
     );
-  };
+  }
+
+  renderField() {
+    return <FieldWrapper
+      key="field"
+      config={this.props.config}
+      selectedField={this.props.selectedField}
+      setField={this.props.setField}
+      parentField={this.props.parentField}
+    />;
+  }
+
+  renderActions() {
+    const {config, addRule} = this.props;
+
+    return <RuleGroupActions
+      config={config}
+      addRule={addRule}
+      canAddRule={this.canAddRule()}
+      canDeleteGroup={this.canDeleteGroup()}
+      removeSelf={this.removeSelf}
+    />;
+  }
+
+  extraPropsForItem(_item) {
+    return {
+      parentField: this.props.selectedField
+    };
+  }
 }
 
 
