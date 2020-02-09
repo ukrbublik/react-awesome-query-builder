@@ -19,6 +19,7 @@ export default (Group) => {
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
       onDragStart: PropTypes.func,
       treeNodesCnt: PropTypes.number,
+      selectedField: PropTypes.string, // for RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
     };
@@ -139,6 +140,7 @@ export default (Group) => {
             actions={this.props.actions}
             //tree={this.props.tree}
             treeNodesCnt={this.props.treeNodesCnt}
+            selectedField={this.props.field || null}
           /> : null
         ,
           <Group
@@ -161,6 +163,7 @@ export default (Group) => {
             actions={this.props.actions}
             //tree={this.props.tree}
             treeNodesCnt={this.props.treeNodesCnt}
+            selectedField={this.props.field || null}
           />
         ]}
         </div>

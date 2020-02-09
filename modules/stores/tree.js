@@ -200,6 +200,22 @@ const setField = (state, path, newField, config) => {
     if (Array.isArray(newField))
         newField = newField.join(fieldSeparator);
 
+    const newFieldConfig = getFieldConfig(newField, config);
+    const isRuleGroup = newFieldConfig.type == '!group';
+
+    if (isRuleGroup) {
+        state = state.setIn(expandTreePath(path, 'type'), 'group');
+        let groupProperties = defaultGroupProperties(config).merge({
+            field: newField,
+        });
+        state = state.setIn(expandTreePath(path, 'properties'), groupProperties);
+        state = state.setIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap());
+        //state = addItem(state, path, 'rule', uuid(), defaultRuleProperties(config));
+        //state = fixPathsInTree(state);
+
+        return state;
+    }
+
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');
@@ -210,7 +226,6 @@ const setField = (state, path, newField, config) => {
 
         // If the newly selected field supports the same operator the rule currently
         // uses, keep it selected.
-        const newFieldConfig = getFieldConfig(newField, config);
         const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
         let newOperator = null;
         const availOps = getOperatorsForField(config, newField);

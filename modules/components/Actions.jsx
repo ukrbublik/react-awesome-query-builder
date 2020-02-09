@@ -15,7 +15,7 @@ const defaultPosition = 'topRight';
 
 export class Actions extends PureComponent {
   render() {
-    const {config: {settings}, addRule, addGroup, allowFurtherNesting, isRoot, removeSelf} = this.props;
+    const {config: {settings}, addRule, addGroup, isRoot, canAddGroup, removeSelf} = this.props;
     const {immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, renderSize, groupActionsPosition} = settings;
     const position = groupActionsPositionList[groupActionsPosition || defaultPosition];
 
@@ -26,7 +26,7 @@ export class Actions extends PureComponent {
         className="action action--ADD-RULE"
         onClick={addRule}
       >{addRuleLabel}</Button>;
-    const addGroupBtn = !immutableGroupsMode && allowFurtherNesting &&
+    const addGroupBtn = !immutableGroupsMode && canAddGroup &&
       <Button
         key="group-add-group"
         className="action action--ADD-GROUP"

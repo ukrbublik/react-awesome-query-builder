@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Rule from './Rule';
 import Group from './Group';
+import RuleGroup from './RuleGroup';
 
 
 const typeMap = {
@@ -18,6 +19,19 @@ const typeMap = {
   ),
   group: (props) => (
     <Group 
+      {...props.properties.toObject()}
+      id={props.id}
+      path={props.path}
+      actions={props.actions}
+      config={props.config}
+      //tree={props.tree}
+      treeNodesCnt={props.treeNodesCnt}
+      onDragStart={props.onDragStart}
+      children1={props.children1}
+    />
+  ),
+  rule_group: (props) => (
+    <RuleGroup 
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}

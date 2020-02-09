@@ -314,14 +314,16 @@ export default (Builder, CanMoveFn = null) => {
                     //take group header (for prepend only)
                     const hovInnerEl = hovCNodeEl.getElementsByClassName('group--header');
                     const hovEl2 = hovInnerEl.length ? hovInnerEl[0] : null;
-                    const hovRect2 = hovEl2.getBoundingClientRect();
-                    const hovHeight2 = hovRect2.bottom - hovRect2.top;
-                    const isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
-                    if (isOverHover && hovII.top > dragInfo.itemInfo.top) {
-                      trgII = hovII;
-                      trgRect = hovRect2;
-                      trgEl = hovEl2;
-                      doPrepend = true;
+                    if (hovEl2) {
+                      const hovRect2 = hovEl2.getBoundingClientRect();
+                      const hovHeight2 = hovRect2.bottom - hovRect2.top;
+                      const isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
+                      if (isOverHover && hovII.top > dragInfo.itemInfo.top) {
+                        trgII = hovII;
+                        trgRect = hovRect2;
+                        trgEl = hovEl2;
+                        doPrepend = true;
+                      }
                     }
                 } else if (dragDirs.vrt < 0) { //up
                   if (hovII.lev >= itemInfo.lev) {

@@ -120,7 +120,7 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
     let operators = null, defaultOperator = null;
     const typeConfig = config.types[fieldConfig.type];
     const excludeOperators = fieldConfig.excludeOperators || [];
-    if (fieldConfig.type != '!struct') {
+    if (fieldConfig.type != '!struct' && fieldConfig.type != '!group') {
         if (!isFuncArg) {
             if (!config._fieldsCntByType[fieldConfig.type])
                 config._fieldsCntByType[fieldConfig.type] = 0;
@@ -257,7 +257,7 @@ export const getFirstField = (config) => {
     key = Object.keys(config.fields)[0];
     firstField = config.fields[key];
     keysPath.push(key);
-    while (firstField.type == '!struct') {
+    while (firstField.type == '!struct' || firstField.type == '!group') {
         const subfields = firstField.subfields;
         if (!subfields || !Object.keys(subfields).length) {
             firstField = key = null;

@@ -81,6 +81,11 @@ body.qb-dragging {
   position: relative;
 }
 
+.rule_group {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f9f1dd;
+}
+
 .qb-draggable {
   @extend %noselect;
   pointer-events: none;
@@ -136,7 +141,7 @@ ul.ant-select-selection__rendered {
 
      &::after {
         top: 50%;
-        border-width: 0 0 0 2px;    
+        border-width: 0 0 0 2px;
     }
 
     &::before, &::after {
@@ -153,6 +158,16 @@ ul.ant-select-selection__rendered {
     }
   }
 
+
+  &.rule-group > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: 4px 0 0 0;
+        border-width: 2 0 0 2px;
+      }
+  }
 
   & > .group-or-rule-container:first-child > .group-or-rule {
       &::before {
@@ -228,6 +243,15 @@ ul.ant-select-selection__rendered {
 .group--drag-handler {
   margin-left: 8px;
 }
+
+/******************************************************************************/
+/** RULE_GROUP *********************************************************************/
+/******************************************************************************/
+
+.rule_group {
+  
+}
+
 
 /******************************************************************************/
 /** RULE **********************************************************************/

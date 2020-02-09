@@ -64,7 +64,7 @@ class Rule extends PureComponent {
         const isOnlyValue = selectedField && selectedFieldConfig.valueSources.length == 1 && selectedFieldConfig.valueSources[0] == 'value';
         const hideOperator = selectedFieldWidgetConfig.hideOperator && isOnlyValue;
 
-        const showDragIcon = config.settings.canReorder && treeNodesCnt > 2;
+        const showDragIcon = config.settings.canReorder && treeNodesCnt > 1;
         const showOperator = selectedField && !hideOperator;
         const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
         const showWidget = isFieldAndOpSelected;

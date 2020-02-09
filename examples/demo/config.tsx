@@ -223,6 +223,16 @@ const fields: Fields = {
             }
         }
     },
+    group: {
+        label: 'Group',
+        type: '!group',
+        subfields: {
+            sub1: {
+                label: 'sub1',
+                type: 'text',
+            }
+        }
+    },
     prox1: {
         label: 'prox',
         tooltip: 'Proximity search',

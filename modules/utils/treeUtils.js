@@ -169,6 +169,7 @@ export const getFlatTree = (tree) => {
 
 
 /**
+ * Returns count of reorderable(!) nodes
  * @param {Immutable.Map} tree
  * @return {Integer}
  */
@@ -183,12 +184,16 @@ export const getTotalNodesCountInTree = (tree) => {
         cnt++;
         if (children) {
             children.map((child, childId) => {
-                _processNode(child, path.concat(id), lev + 1);
+                const isRuleGroup = child.get('type') == 'group' && child.getIn(['properties', 'field']) != null;
+                //tip: rules in rule-group can be reordered only inside
+                if (!isRuleGroup) {
+                    _processNode(child, path.concat(id), lev + 1);
+                }
             });
         }
     };
 
     _processNode(tree, [], 0);
 
-    return cnt;
+    return cnt - 1; // -1 for root
 };
