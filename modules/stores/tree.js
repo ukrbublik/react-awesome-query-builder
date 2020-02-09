@@ -204,7 +204,7 @@ const setField = (state, path, newField, config) => {
     const isRuleGroup = newFieldConfig.type == '!group';
 
     if (isRuleGroup) {
-        state = state.setIn(expandTreePath(path, 'type'), 'group');
+        state = state.setIn(expandTreePath(path, 'type'), 'rule_group');
         let groupProperties = defaultGroupProperties(config).merge({
             field: newField,
         });

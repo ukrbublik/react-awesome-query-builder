@@ -13,7 +13,7 @@ class RuleGroup extends Group {
     selectedField: PropTypes.string, // for RuleGroup
   };
 
-  childrenClassName = () => 'rule-group';
+  childrenClassName = () => 'rule_group--children';
   
   renderHeaderWrapper = () => null;
   renderFooterWrapper = () => null;

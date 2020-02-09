@@ -109,7 +109,7 @@ export const getFlatTree = (tree) => {
     let items = {};
     let realHeight = 0;
 
-    function _flatizeTree (item, path, insideCollapsed, lev, info) {
+    function _flatizeTree (item, path, insideCollapsed, lev, info, parentType) {
         const type = item.get('type');
         const collapsed = item.get('collapsed');
         const id = item.get('id');
@@ -125,7 +125,7 @@ export const getFlatTree = (tree) => {
         if (children) {
             let subinfo = {};
             children.map((child, _childId) => {
-                _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo);
+                _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo, type);
             });
             if (!collapsed) {
                 info.height = (info.height || 0) + (subinfo.height || 0);
@@ -134,10 +134,11 @@ export const getFlatTree = (tree) => {
         const itemsAfter = flat.length;
         const _bottom = realHeight;
         const height = info.height;
-
+        
         items[id] = {
             type: type,
             parent: path.length ? path[path.length-1] : null,
+            parentType: parentType,
             path: path.concat(id),
             lev: lev,
             leaf: !children,
@@ -154,7 +155,7 @@ export const getFlatTree = (tree) => {
         };
     }
 
-    _flatizeTree(tree, [], false, 0, {});
+    _flatizeTree(tree, [], false, 0, {}, null);
 
     for (let i = 0 ; i < flat.length ; i++) {
         const prevId = i > 0 ? flat[i-1] : null;

@@ -159,7 +159,7 @@ ul.ant-select-selection__rendered {
   }
 
 
-  &.rule-group > .group-or-rule-container:first-child > .group-or-rule {
+  &.rule_group--children > .group-or-rule-container:first-child > .group-or-rule {
       &::before {
         display: none;
       }

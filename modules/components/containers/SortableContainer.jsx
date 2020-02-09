@@ -479,11 +479,15 @@ export default (Builder, CanMoveFn = null) => {
         return false;
 
       const canRegroup = this.props.config.settings.canRegroup;
-      const isStructChange = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND
-        || fromII.parent != toII.parent;
-      if (!canRegroup && isStructChange)
+      const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
+      const isParentChange = fromII.parent != toII.parent;
+      const isStructChange = isPend || isParentChange;
+      const isForbiddenStructChange = fromII.parentType == 'rule_group' || toII.type == 'rule_group' 
+        || toII.parentType == 'rule_group';
+      
+      if (isStructChange && (!canRegroup || isForbiddenStructChange))
         return false;
-
+      
       let res = true;
       if (canMoveFn)
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);
