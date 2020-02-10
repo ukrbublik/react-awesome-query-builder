@@ -30,7 +30,7 @@ For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compac
 - Values of fields can be compared with:
   - values
   - another fields (of same type)
-  - function (argumentss also can be values/fields/funcs)
+  - function (arguments also can be values/fields/funcs)
 - Reordering (drag-n-drop) support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/) (but using custom widgets of another framework is possible)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
