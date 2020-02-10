@@ -14,7 +14,7 @@ export const mongodbFormat = (tree, config) => {
         errors: []
     };
 
-    const res = mongodbFormatItem(tree, config, meta);
+    const res = mongodbFormatItem([], tree, config, meta);
 
     if (meta.errors.length)
       console.warn("Errors while exporting to MongoDb:", meta.errors);
@@ -111,20 +111,22 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
 }
 
 //meta is mutable
-const mongodbFormatItem = (item, config, meta, _not = false) => {
+const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');
+    const {fieldSeparator} = config.settings;
 
-    if (type === 'group' && children && children.size) {
+    if ((type === 'group' || type === 'rule_group') && children && children.size) {
         const not = _not ? !(properties.get('not')) : (properties.get('not'));
         const list = children
-            .map((currentChild) => mongodbFormatItem(currentChild, config, meta, not))
+            .map((currentChild) => mongodbFormatItem([...parents, item], currentChild, config, meta, not))
             .filter((currentChild) => typeof currentChild !== 'undefined')
         if (!list.size)
             return undefined;
 
+        let field = type === 'rule_group' ? properties.get('field') : null;
         let conjunction = properties.get('conjunction');
         if (!conjunction)
             conjunction = defaultConjunction(config);
@@ -158,6 +160,9 @@ const mongodbFormatItem = (item, config, meta, _not = false) => {
             if (!resultQuery) // can't be shorten
                 resultQuery = { [mongoConj] : rules };
         }
+        if (field) {
+            resultQuery = { [field]: {'$elemMatch': resultQuery} };
+        }
         return resultQuery;
     } else if (type === 'rule') {
         let operator = properties.get('operator');
@@ -179,8 +184,21 @@ const mongodbFormatItem = (item, config, meta, _not = false) => {
             [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
         }
 
+        const hasParentRuleGroup = parents.filter(it => it.get('type') == 'rule_group').length > 0;
+        const parentPath = parents
+            .filter(it => it.get('type') == 'rule_group')
+            .map(it => it.get('properties').get('field'))
+            .join(fieldSeparator);
+
         //format field
         let fieldName = field;
+        if (hasParentRuleGroup) {
+            if (parentPath.length > 0 && fieldName.indexOf(parentPath+".") == 0) {
+                fieldName = fieldName.slice((parentPath+".").length);
+            } else {
+                meta.errors.push(`Can't cut group from field ${fieldName}`);
+            }
+        }
         // if (fieldDefinition.tableName) {
         //   let fieldParts = Array.isArray(field) ? [...field] : field.split(fieldSeparator);
         //   fieldParts[0] = fieldDefinition.tableName;

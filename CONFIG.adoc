@@ -151,8 +151,9 @@ const myConfig = {
 [cols="1m,1,1,5a",options="header"]
 |===
 |key |required |default |meaning
-|type |+ | |One of types described in link:#configtypes[config.types] or `!struct` for complex field
-|subfields |+ for `!struct` type | |Config for subfields of complex field (multiple nesting is supported)
+|type |+ | |One of types described in link:#configtypes[config.types] or `!struct`/`!group` for complex field +
+ (`!group` can be used with https://docs.mongodb.com/manual/reference/operator/query/elemMatch/[elemMatch] in MongoDb)
+|subfields |+ for `!struct`/`!group` type | |Config for subfields of complex field (multiple nesting is supported)
 |label |+ | |Label to be displayed in field list +
   (If not specified, fields's key will be used instead)
 |label2 | | |Can be optionally specified for nested fields. +

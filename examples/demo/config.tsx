@@ -223,12 +223,22 @@ const fields: Fields = {
             }
         }
     },
-    group: {
-        label: 'Group',
+    results: {
+        label: 'Results',
         type: '!group',
         subfields: {
-            sub: {
-                type: 'text',
+            product: {
+                type: 'select',
+                listValues: ['abc', 'def', 'xyz'],
+                valueSources: ['value'],
+            },
+            score: {
+                type: 'number',
+                fieldSettings: {
+                    min: 0,
+                    max: 100
+                },
+                valueSources: ['value'],
             }
         }
     },

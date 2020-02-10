@@ -33,10 +33,18 @@ type ValueSource = "value" | "field" | "func" | "const";
 type JsonGroup = {
   type: "group",
   id?: String,
-  children1?: {[id: string]: JsonGroup|JsonRule},
+  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup},
   properties?: {
     conjunction: String,
     not?: Boolean,
+  }
+};
+type JsonRuleGroup = {
+  type: "rule_group",
+  id?: String,
+  children1?: {[id: string]: JsonRuleGroup|JsonRule},
+  properties?: {
+    field: String | Empty,
   }
 };
 type JsonRule = {

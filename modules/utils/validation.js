@@ -34,7 +34,7 @@ function validateItem (item, path, itemId, meta, c) {
 	const type = item.get('type');
 	const children = item.get('children1');
 
-	if (type === 'group' && children && children.size) {
+	if ((type === 'group' || type === 'rule_group') && children && children.size) {
 		return validateGroup(item, path, itemId, meta, c);
 	} else if (type === 'rule') {
 		return validateRule(item, path, itemId, meta, c);

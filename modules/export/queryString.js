@@ -92,7 +92,7 @@ export const queryString = (item, config, isForDisplay = false) => {
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');
 
-    if (type === 'group' && children && children.size) {
+    if ((type === 'group' || type === 'rule_group') && children && children.size) {
         const not = properties.get('not');
         const list = children
             .map((currentChild) => queryString(currentChild, config, isForDisplay))

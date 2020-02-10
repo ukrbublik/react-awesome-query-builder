@@ -132,7 +132,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');
 
-    if (type === 'group' && children && children.size) {
+    if ((type === 'group' || type === 'rule_group') && children && children.size) {
         const list = children
             .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta))
             .filter((currentChild) => typeof currentChild !== 'undefined');

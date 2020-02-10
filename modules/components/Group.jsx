@@ -71,7 +71,7 @@ export class Group extends PureComponent {
   }
 
   isEmpty(item) {
-    return item.get("type") == "group" ? this.isEmptyGroup(item) : this.isEmptyRule(item);
+    return (item.get("type") == "group" || item.get("type") == "rule_group") ? this.isEmptyGroup(item) : this.isEmptyRule(item);
   }
 
   isEmptyGroup(group) {
