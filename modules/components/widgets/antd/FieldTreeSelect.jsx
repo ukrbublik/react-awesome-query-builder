@@ -57,12 +57,16 @@ export default class FieldTreeSelect extends PureComponent {
               value: _path,
               title: option,
               children: this.getTreeData(items, fn),
-              selectable: false
+              selectable: false,
+              altLabel: altLabel,
+              label: label,
             };
         } else {
           return {
             value: _path,
             title: option,
+            altLabel: altLabel,
+            label: label,
           };
         }
     });
@@ -72,13 +76,14 @@ export default class FieldTreeSelect extends PureComponent {
       this.props.setField(key);
   }
 
-  // filterOption = (input, option) => {
-  //     const keysForFilter = ['title', 'value', 'grouplabel', 'children'];
-  //     const valueForFilter = keysForFilter
-  //       .map(k => (typeof option.props[k] == 'string' ? option.props[k] : ''))
-  //       .join("\0");
-  //     return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  // }
+  filterTreeNode = (input, option) => {
+      const keysForFilter = ['title', 'value', 'label', 'altLabel'];
+      const valueForFilter = 
+        keysForFilter
+        .map(k => (typeof option.props[k] == 'string' ? option.props[k] : ''))
+        .join("\0");
+      return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+  }
 
   render() {
       const {
@@ -123,7 +128,7 @@ export default class FieldTreeSelect extends PureComponent {
               ref="field"
               size={renderSize}
               placeholder={placeholder}
-              filterOption={this.filterOption}
+              filterTreeNode={this.filterTreeNode}
               treeDefaultExpandedKeys={treeDefaultExpandedKeys}
               {...customProps}
           />
