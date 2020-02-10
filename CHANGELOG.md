@@ -1,4 +1,6 @@
 # Changelog
+- 1.3.0
+  - Added support of `!group`
 - 1.2.0
   - Added `treeselect` and `treemultiselect` types
   - Changed format of `listValues` from `{<value>: <title>}` to `[{value, title}]` (old is supported). 

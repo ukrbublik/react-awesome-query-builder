@@ -109,7 +109,7 @@ export const getFlatTree = (tree) => {
     let items = {};
     let realHeight = 0;
 
-    function _flatizeTree (item, path, insideCollapsed, lev, info) {
+    function _flatizeTree (item, path, insideCollapsed, lev, info, parentType) {
         const type = item.get('type');
         const collapsed = item.get('collapsed');
         const id = item.get('id');
@@ -125,7 +125,7 @@ export const getFlatTree = (tree) => {
         if (children) {
             let subinfo = {};
             children.map((child, _childId) => {
-                _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo);
+                _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo, type);
             });
             if (!collapsed) {
                 info.height = (info.height || 0) + (subinfo.height || 0);
@@ -134,10 +134,11 @@ export const getFlatTree = (tree) => {
         const itemsAfter = flat.length;
         const _bottom = realHeight;
         const height = info.height;
-
+        
         items[id] = {
             type: type,
             parent: path.length ? path[path.length-1] : null,
+            parentType: parentType,
             path: path.concat(id),
             lev: lev,
             leaf: !children,
@@ -154,7 +155,7 @@ export const getFlatTree = (tree) => {
         };
     }
 
-    _flatizeTree(tree, [], false, 0, {});
+    _flatizeTree(tree, [], false, 0, {}, null);
 
     for (let i = 0 ; i < flat.length ; i++) {
         const prevId = i > 0 ? flat[i-1] : null;
@@ -169,6 +170,7 @@ export const getFlatTree = (tree) => {
 
 
 /**
+ * Returns count of reorderable(!) nodes
  * @param {Immutable.Map} tree
  * @return {Integer}
  */
@@ -180,15 +182,17 @@ export const getTotalNodesCountInTree = (tree) => {
     function _processNode (item, path, lev) {
         const id = item.get('id');
         const children = item.get('children1');
+        const isRuleGroup = item.get('type') == 'rule_group';
         cnt++;
-        if (children) {
-            children.map((child, childId) => {
+        //tip: rules in rule-group can be reordered only inside
+        if (children && !isRuleGroup) {
+            children.map((child, _childId) => {
                 _processNode(child, path.concat(id), lev + 1);
             });
         }
     };
 
     _processNode(tree, [], 0);
-
-    return cnt;
+    
+    return cnt - 1; // -1 for root
 };

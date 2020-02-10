@@ -120,7 +120,7 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
     let operators = null, defaultOperator = null;
     const typeConfig = config.types[fieldConfig.type];
     const excludeOperators = fieldConfig.excludeOperators || [];
-    if (fieldConfig.type != '!struct') {
+    if (fieldConfig.type != '!struct' && fieldConfig.type != '!group') {
         if (!isFuncArg) {
             if (!config._fieldsCntByType[fieldConfig.type])
                 config._fieldsCntByType[fieldConfig.type] = 0;
@@ -183,6 +183,8 @@ export const getFieldRawConfig = (field, config, fieldsKey = 'fields', subfields
     const fieldSeparator = config.settings.fieldSeparator;
     const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
     let fields = config[fieldsKey];
+    if (!fields)
+        return null;
     let fieldConfig = null;
     for (let i = 0 ; i < parts.length ; i++) {
         const part = parts[i];
@@ -250,25 +252,23 @@ export const getFieldConfig = (field, config) => {
     return ret;
 };
 
-export const getFirstField = (config) => {
+export const getFirstField = (config, parentRuleGroupPath = null) => {
   const fieldSeparator = config.settings.fieldSeparator;
-  let firstField = null, key = null, keysPath = [];
-  if (Object.keys(config.fields).length > 0) {
-    key = Object.keys(config.fields)[0];
-    firstField = config.fields[key];
-    keysPath.push(key);
-    while (firstField.type == '!struct') {
-        const subfields = firstField.subfields;
-        if (!subfields || !Object.keys(subfields).length) {
-            firstField = key = null;
-            break;
-        }
-        key = Object.keys(subfields)[0];
-        keysPath.push(key);
-        firstField = subfields[key];
+  const parentPathArr = typeof parentRuleGroupPath == 'string' ? parentRuleGroupPath.split(fieldSeparator) : parentRuleGroupPath;
+  const parentField = parentRuleGroupPath ? getFieldRawConfig(parentRuleGroupPath, config) : config;
+
+  let firstField = parentField, key = null, keysPath = [];
+  do {
+    const subfields = firstField === config ? config.fields : firstField.subfields;
+    if (!subfields || !Object.keys(subfields).length) {
+      firstField = key = null;
+      break;
     }
-  }
-  return keysPath.join(fieldSeparator);
+    key = Object.keys(subfields)[0];
+    keysPath.push(key);
+    firstField = subfields[key];
+  } while (firstField.type == '!struct' || firstField.type == '!group');
+  return (parentPathArr || []).concat(keysPath).join(fieldSeparator);
 };
 
 export const getOperatorsForField = (config, field) => {

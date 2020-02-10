@@ -24,6 +24,7 @@ class Rule extends PureComponent {
         valueSrc: PropTypes.any,
         isDraggingMe: PropTypes.bool,
         isDraggingTempo: PropTypes.bool,
+        parentField: PropTypes.string, //from RuleGroup
         //path: PropTypes.instanceOf(Immutable.List),
         //actions
         handleDraggerMouseDown: PropTypes.func,
@@ -64,7 +65,7 @@ class Rule extends PureComponent {
         const isOnlyValue = selectedField && selectedFieldConfig.valueSources.length == 1 && selectedFieldConfig.valueSources[0] == 'value';
         const hideOperator = selectedFieldWidgetConfig.hideOperator && isOnlyValue;
 
-        const showDragIcon = config.settings.canReorder && treeNodesCnt > 2;
+        const showDragIcon = config.settings.canReorder && treeNodesCnt > 1;
         const showOperator = selectedField && !hideOperator;
         const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
         const showWidget = isFieldAndOpSelected;
@@ -109,9 +110,11 @@ class Rule extends PureComponent {
         const field = 
             <FieldWrapper
                 key="field"
+                classname={"rule--field"}
                 config={this.props.config}
                 selectedField={this.props.selectedField}
                 setField={this.props.setField}
+                parentField={this.props.parentField}
             />;
         const operator = 
             <OperatorWrapper
@@ -205,17 +208,18 @@ class Rule extends PureComponent {
 }
 
 
-class FieldWrapper extends PureComponent {
+export class FieldWrapper extends PureComponent {
     render() {
-        const {config, selectedField, setField} = this.props;
+        const {config, selectedField, setField, parentField, classname} = this.props;
         return (
-            <Col className="rule--field">
+            <Col className={classname}>
                 { config.settings.showLabels &&
                     <label>{config.settings.fieldLabel}</label>
                 }
                 <Field
                     config={config}
                     selectedField={selectedField}
+                    parentField={parentField}
                     setField={setField}
                     customProps={config.settings.customFieldSelectProps}
                 />

@@ -98,7 +98,7 @@ export default class ValueField extends PureComponent {
         let subpath = (path ? path : []).concat(rightFieldKey);
         let rightFieldFullkey = subpath.join(fieldSeparator);
         let rightFieldConfig = getFieldConfig(rightFieldFullkey, config);
-        if (rightFieldConfig.type == "!struct") {
+        if (rightFieldConfig.type == "!struct" || rightFieldConfig.type == "!group") {
           if(_filter(subfields, subpath) == 0)
             delete list[rightFieldKey];
         } else {
@@ -138,7 +138,7 @@ export default class ValueField extends PureComponent {
         if (field.hideForCompare)
             return undefined;
 
-        if (field.type == "!struct") {
+        if (field.type == "!struct" || field.type == "!group") {
             return {
                 key: fieldKey,
                 path: prefix+fieldKey,

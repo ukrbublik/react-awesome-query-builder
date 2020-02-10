@@ -19,6 +19,7 @@ export default (Rule) => {
       valueSrc: PropTypes.any,
       operatorOptions: PropTypes.object,
       treeNodesCnt: PropTypes.number,
+      parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
     };
@@ -101,6 +102,7 @@ export default (Rule) => {
             setOperatorOption={this.dummyFn}
             removeSelf={this.dummyFn}
             selectedField={this.props.field || null}
+            parentField={this.props.parentField || null}
             selectedOperator={this.props.operator || null}
             value={this.props.value || null}
             valueSrc={this.props.valueSrc || null}
@@ -121,6 +123,7 @@ export default (Rule) => {
             setValue={this.setValue}
             setValueSrc={this.setValueSrc}
             selectedField={this.props.field || null}
+            parentField={this.props.parentField || null}
             selectedOperator={this.props.operator || null}
             value={this.props.value || null}
             valueSrc={this.props.valueSrc || null}

@@ -8,14 +8,12 @@ const { confirm } = Modal;
 const classNames = require('classnames');
 import Item from './Item';
 import {ConjsRadios, ConjsButtons} from './Conjs';
-import {Actions} from './Actions';
+import {GroupActions} from './GroupActions';
 
 const defaultPosition = 'topRight';
 
 
-@GroupContainer
-@Draggable("group")
-class Group extends PureComponent {
+export class Group extends PureComponent {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     treeNodesCnt: PropTypes.number,
@@ -41,11 +39,17 @@ class Group extends PureComponent {
     actions: PropTypes.object.isRequired,
   };
 
-  isGroupTopPosition = () => {
+  constructor(props) {
+    super(props);
+
+    this.removeSelf = this.removeSelf.bind(this);
+  }
+
+  isGroupTopPosition() {
     return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, 'top')
   }
 
-  removeSelf = () => {
+  removeSelf() {
     const confirmOptions = this.props.config.settings.removeGroupConfirmOptions;
     const doRemove = () => {
       this.props.removeSelf();
@@ -60,23 +64,23 @@ class Group extends PureComponent {
     }
   }
 
-  isEmptyCurrentGroup = () => {
+  isEmptyCurrentGroup() {
     const children = this.props.children1;
     return children.size == 0 ||
       children.size == 1 && this.isEmpty(children.first());
   }
 
-  isEmpty = (item) => {
-    return item.get("type") == "group" ? this.isEmptyGroup(item) : this.isEmptyRule(item);
+  isEmpty(item) {
+    return (item.get("type") == "group" || item.get("type") == "rule_group") ? this.isEmptyGroup(item) : this.isEmptyRule(item);
   }
 
-  isEmptyGroup = (group) => {
+  isEmptyGroup(group) {
     const children = group.get("children1");
     return children.size == 0 ||
       children.size == 1 && this.isEmpty(children.first());
   }
 
-  isEmptyRule = (rule) => {
+  isEmptyRule(rule) {
     const properties = rule.get('properties');
       return !(
           properties.get("field") !== null &&
@@ -86,26 +90,47 @@ class Group extends PureComponent {
   }
 
   render() {
+    return <>
+      {this.renderHeaderWrapper()}
+      {this.renderChildrenWrapper()}
+      {this.renderFooterWrapper()}
+    </>;
+  }
+
+  renderChildrenWrapper() {
+    return this.props.children1 && (
+      <div key="group-children" className={classNames(
+        "group--children",
+        this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : '',
+        this.props.children1.size < 2 ? 'one--child' : '',
+        this.childrenClassName()
+      )}>{this.renderChildren()}</div>
+    );
+  }
+
+  childrenClassName = () => '';
+
+  renderHeaderWrapper() {
     const isGroupTopPosition = this.isGroupTopPosition();
-    return [
-        <div key="group-header" className="group--header">
-          {this.renderHeader()}
-          {isGroupTopPosition && this.renderBeforeActions()}
-          {isGroupTopPosition && this.renderActions()}
-          {isGroupTopPosition && this.renderAfterActions()}
-        </div>
-    , this.props.children1 &&
-        <div key="group-children" className={classNames(
-          "group--children",
-          this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : ''
-        )}>{this.renderChildren()}</div>
-    , !isGroupTopPosition &&
-        <div key="group-footer" className='group--footer'>
-          {this.renderBeforeActions()}
-          {this.renderActions()}
-          {this.renderAfterActions()}
-        </div>
-    ];
+    return (
+      <div key="group-header" className="group--header">
+       {this.renderHeader()}
+       {isGroupTopPosition && this.renderBeforeActions()}
+       {isGroupTopPosition && this.renderActions()}
+       {isGroupTopPosition && this.renderAfterActions()}
+     </div>
+    );
+  }
+
+  renderFooterWrapper() {
+    const isGroupTopPosition = this.isGroupTopPosition();
+    return !isGroupTopPosition && (
+      <div key="group-footer" className='group--footer'>
+        {this.renderBeforeActions()}
+        {this.renderActions()}
+        {this.renderAfterActions()}
+      </div>
+    );
   }
 
   renderBeforeActions = () => {
@@ -124,69 +149,109 @@ class Group extends PureComponent {
     return typeof AfterActions === 'function' ? <AfterActions {...this.props}/> : AfterActions;
   }
 
-  renderActions = () => {
-    return <Actions
-      config={this.props.config}
-      addRule={this.props.addRule}
-      addGroup={this.props.addGroup}
-      allowFurtherNesting={this.props.allowFurtherNesting}
-      isRoot={this.props.isRoot}
+  renderActions() {
+    const {config, addRule, addGroup} = this.props;
+
+    return <GroupActions
+      config={config}
+      addRule={addRule}
+      addGroup={addGroup}
+      canAddGroup={this.canAddGroup()}
+      canAddRule={this.canAddRule()}
+      canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
     />;
   }
 
-  renderChildren = () => {
+  canAddGroup = () => this.props.allowFurtherNesting;
+  canAddRule = () => true;
+  canDeleteGroup = () => !this.props.isRoot;
+
+  renderChildren() {
+    const {children1} = this.props;
+    return children1 ? children1.map(this.renderItem.bind(this)).toList() : null;
+  }
+
+  renderItem(item) {
     const props = this.props;
-    return props.children1 ? props.children1.map((item) => (
+    const {config, actions, onDragStart} = props;
+    const isRuleGroup = item.get('type') == 'group' && item.getIn(['properties', 'field']) != null;
+    const type = isRuleGroup ? 'rule_group' : item.get('type');
+    
+    return (
       <Item
+        {...this.extraPropsForItem(item)}
         key={item.get('id')}
         id={item.get('id')}
         //path={props.path.push(item.get('id'))}
         path={item.get('path')}
-        type={item.get('type')}
+        type={type}
         properties={item.get('properties')}
-        config={props.config}
-        actions={props.actions}
+        config={config}
+        actions={actions}
         children1={item.get('children1')}
         //tree={props.tree}
-        treeNodesCnt={props.treeNodesCnt}
-        onDragStart={props.onDragStart}
+        treeNodesCnt={this.reordableNodesCnt()}
+        onDragStart={onDragStart}
       />
-    )).toList() : null;
+    );
+  };
+
+  extraPropsForItem(_item) {
+    return {};
   }
 
-  renderHeader = () => {
-    const Conjs = this.props.config.settings.renderConjsAsRadios ? ConjsRadios : ConjsButtons;
+  reordableNodesCnt() {
+    const {treeNodesCnt} = this.props;
+    return treeNodesCnt;
+  }
 
-    const conjs = <Conjs
-      disabled={this.props.children1.size < 2}
-      selectedConjunction={this.props.selectedConjunction}
-      setConjunction={this.props.setConjunction}
-      conjunctionOptions={this.props.conjunctionOptions}
-      config={this.props.config}
-      not={this.props.not}
-      setNot={this.props.setNot}
-    />;
-
-    const showDragIcon = this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot;
+  renderDrag() {
+    const {
+      config, isRoot, treeNodesCnt,
+      handleDraggerMouseDown
+    } = this.props;
+    const reordableNodesCnt = treeNodesCnt;
+    const showDragIcon = config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
     const drag = showDragIcon &&
       <span
         key="group-drag-icon"
         className={"qb-drag-handler group--drag-handler"}
-        onMouseDown={this.props.handleDraggerMouseDown}
+        onMouseDown={handleDraggerMouseDown}
       ><Icon type="bars" /> </span>;
+    return drag;
+  }
 
+  renderConjs() {
+    const {
+      config, children1,
+      selectedConjunction, setConjunction, conjunctionOptions, not, setNot
+    } = this.props;
+
+    const Conjs = config.settings.renderConjsAsRadios ? ConjsRadios : ConjsButtons;
+    const conjs = <Conjs
+      disabled={children1.size < 2}
+      selectedConjunction={selectedConjunction}
+      setConjunction={setConjunction}
+      conjunctionOptions={conjunctionOptions}
+      config={config}
+      not={not}
+      setNot={setNot}
+    />;
+    return conjs;
+  }
+
+  renderHeader() {
     return (
       <div className={classNames(
         "group--conjunctions",
-        // this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--conj' : ''
+        // children1.size < 2 && config.settings.hideConjForOne ? 'hide--conj' : ''
       )}>
-        {conjs}
-        {drag}
+        {this.renderConjs()}
+        {this.renderDrag()}
       </div>
     );
   }
 }
 
-
-export default Group;
+export default GroupContainer(Draggable("group")(Group));

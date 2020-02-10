@@ -61,7 +61,7 @@ const _queryBuilderFormat = (item, config, meta) => {
     const children = item.get('children1');
     const id = item.get('id');
 
-    if (type === 'group' && children && children.size) {
+    if ((type === 'group' || type === 'rule_group') && children && children.size) {
         const list = children
             .map((currentChild) => _queryBuilderFormat(currentChild, config, meta))
             .filter((currentChild) => typeof currentChild !== 'undefined');

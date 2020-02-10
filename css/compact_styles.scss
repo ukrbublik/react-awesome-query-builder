@@ -16,6 +16,9 @@
 .group {
   padding-left: 0px;
 }
+.rule_group {
+  padding-left: 5px;
+}
 
 .group--children {
   @extend %force_nomargin;
@@ -42,13 +45,45 @@
 }
 
 .group-or-rule-container {
-    margin-bottom: 5px;
-    padding-right: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-right: 5px;
+}
+.group--children {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+.group--header,
+.group--footer {
+  margin: {
+    top: 5px !important;
+    bottom: 5px !important;
+  }
 }
 
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 5px;
 }
+
+.rule_group {
+  .group--actions {
+    margin-left: 5px;
+  }
+  .rule_group--children {
+    padding-left: 10px !important;
+    &.one--child {
+      padding-left: 5px !important;
+    }
+
+    & > .group-or-rule-container > .group-or-rule {
+      &::before, &::after {
+          left: -7px;
+          width: 7px;
+      }
+    }
+  }
+}
+
 .widget--valuesrc {
   margin-right: -3px;
 }
@@ -56,10 +91,16 @@
   margin-right: 5px;
 }
 .group--header {
-  padding: 5px;
-  padding-left: 0;
+  padding: {
+    left: 0;
+    right: 5px;
+  }
+  margin: 0;
 }
 
+.group--drag-handler {
+  margin-left: 5px;
+}
 
 .rule--func--arg-value > .rule--widget {
   margin-left: -5px;

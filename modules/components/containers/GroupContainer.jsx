@@ -19,6 +19,8 @@ export default (Group) => {
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
       onDragStart: PropTypes.func,
       treeNodesCnt: PropTypes.number,
+      selectedField: PropTypes.string, // for RuleGroup
+      parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
     };
@@ -102,6 +104,11 @@ export default (Group) => {
       this.props.actions.addRule(this.props.path);
     }
 
+    // for RuleGroup
+    setField = (field) => {
+      this.props.actions.setField(this.props.path, field);
+    }
+
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const currentNesting = this.props.path.size;
@@ -134,11 +141,14 @@ export default (Group) => {
             removeSelf={this.dummyFn}
             addGroup={this.dummyFn}
             addRule={this.dummyFn}
+            setField={this.dummyFn}
             config={this.props.config}
             children1={this.props.children1}
             actions={this.props.actions}
             //tree={this.props.tree}
             treeNodesCnt={this.props.treeNodesCnt}
+            selectedField={this.props.field || null}
+            parentField={this.props.parentField || null}
           /> : null
         ,
           <Group
@@ -156,11 +166,14 @@ export default (Group) => {
             removeSelf={this.removeSelf}
             addGroup={this.addGroup}
             addRule={this.addRule}
+            setField={this.setField}
             config={this.props.config}
             children1={this.props.children1}
             actions={this.props.actions}
             //tree={this.props.tree}
             treeNodesCnt={this.props.treeNodesCnt}
+            selectedField={this.props.field || null}
+            parentField={this.props.parentField || null}
           />
         ]}
         </div>

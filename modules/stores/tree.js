@@ -55,12 +55,20 @@ const removeGroup = (state, path, config) => {
 const removeRule = (state, path, config) => {
     state = removeItem(state, path);
 
-    const parentPath = path.slice(0, -1);
+    const parentPath = path.pop();
+    const parent = state.getIn(expandTreePath(parentPath));
+    const parentProperties = parent.get('properties');
+    const parentField = parentProperties.get('field');
+    const isParentRuleGroup = parent.get('type') == 'rule_group';
     const isEmptyGroup = !hasChildren(state, parentPath);
     const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-    const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
-    if (isEmptyGroup && !canLeaveEmpty) {
-        state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
+    const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup ? true : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
+    if (isEmptyGroup) {
+        if (isParentRuleGroup) {
+            state = state.deleteIn(expandTreePath(parentPath));
+        } else if (!canLeaveEmpty) {
+            state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config, parentField));
+        }
     }
     state = fixPathsInTree(state);
     return state;
@@ -200,6 +208,30 @@ const setField = (state, path, newField, config) => {
     if (Array.isArray(newField))
         newField = newField.join(fieldSeparator);
 
+    const currentType = state.getIn(expandTreePath(path, 'type'));
+    const wasRuleGroup = currentType == 'rule_group';
+    const newFieldConfig = getFieldConfig(newField, config);
+    const isRuleGroup = newFieldConfig.type == '!group';
+
+    if (wasRuleGroup && !isRuleGroup) {
+        state = state.setIn(expandTreePath(path, 'type'), 'rule');
+        state = state.deleteIn(expandTreePath(path, 'children1'));
+        state = state.setIn(expandTreePath(path, 'properties'), new Immutable.OrderedMap());
+    }
+
+    if (isRuleGroup) {
+        state = state.setIn(expandTreePath(path, 'type'), 'rule_group');
+        let groupProperties = defaultGroupProperties(config).merge({
+            field: newField,
+        });
+        state = state.setIn(expandTreePath(path, 'properties'), groupProperties);
+        state = state.setIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap());
+        state = addItem(state, path, 'rule', uuid(), defaultRuleProperties(config, newField));
+        state = fixPathsInTree(state);
+
+        return state;
+    }
+
     return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
         const currentOperator = current.get('operator');
         const currentOperatorOptions = current.get('operatorOptions');
@@ -210,7 +242,6 @@ const setField = (state, path, newField, config) => {
 
         // If the newly selected field supports the same operator the rule currently
         // uses, keep it selected.
-        const newFieldConfig = getFieldConfig(newField, config);
         const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
         let newOperator = null;
         const availOps = getOperatorsForField(config, newField);

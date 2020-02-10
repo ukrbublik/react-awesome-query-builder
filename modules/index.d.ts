@@ -33,10 +33,18 @@ type ValueSource = "value" | "field" | "func" | "const";
 type JsonGroup = {
   type: "group",
   id?: String,
-  children1?: {[id: string]: JsonGroup|JsonRule},
+  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup},
   properties?: {
     conjunction: String,
     not?: Boolean,
+  }
+};
+type JsonRuleGroup = {
+  type: "rule_group",
+  id?: String,
+  children1?: {[id: string]: JsonRuleGroup|JsonRule},
+  properties?: {
+    field: String | Empty,
   }
 };
 type JsonRule = {
@@ -282,7 +290,7 @@ export type Types = TypedMap<Type>;
 // Fields
 /////////////////
 
-type FieldType = String | "!struct";
+type FieldType = String | "!struct" | "!group";
 
 interface ListItem {
   value: any,
@@ -355,13 +363,17 @@ interface SimpleField extends ValueField {
   defaultOperator?: String,
   excludeOperators?: Array<String>,
 };
-interface FieldGroup extends BaseField {
+interface FieldStruct extends BaseField {
   type: "!struct",
+  subfields: Fields,
+};
+interface FieldGroup extends BaseField {
+  type: "!group",
   subfields: Fields,
 };
 
 export type Field = SimpleField;
-type FieldOrGroup = FieldGroup | Field;
+type FieldOrGroup = FieldStruct | FieldGroup | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
 

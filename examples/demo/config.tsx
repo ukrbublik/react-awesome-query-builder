@@ -223,6 +223,25 @@ const fields: Fields = {
             }
         }
     },
+    results: {
+        label: 'Results',
+        type: '!group',
+        subfields: {
+            product: {
+                type: 'select',
+                listValues: ['abc', 'def', 'xyz'],
+                valueSources: ['value'],
+            },
+            score: {
+                type: 'number',
+                fieldSettings: {
+                    min: 0,
+                    max: 100
+                },
+                valueSources: ['value'],
+            }
+        }
+    },
     prox1: {
         label: 'prox',
         tooltip: 'Proximity search',

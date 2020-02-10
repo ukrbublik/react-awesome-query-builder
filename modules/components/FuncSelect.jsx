@@ -23,7 +23,7 @@ export default class FuncSelect extends PureComponent {
   constructor(props) {
       super(props);
       useOnPropsChanged(this);
-
+      
       this.onPropsChanged(props);
   }
 
