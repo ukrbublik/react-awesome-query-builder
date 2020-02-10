@@ -102,6 +102,7 @@ export class Group extends PureComponent {
       <div key="group-children" className={classNames(
         "group--children",
         this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : '',
+        this.props.children1.size < 2 ? 'one--child' : '',
         this.childrenClassName()
       )}>{this.renderChildren()}</div>
     );
@@ -202,7 +203,6 @@ export class Group extends PureComponent {
 
   reordableNodesCnt() {
     const {treeNodesCnt} = this.props;
-    console.log(1, treeNodesCnt)
     return treeNodesCnt;
   }
 

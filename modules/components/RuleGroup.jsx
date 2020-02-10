@@ -43,18 +43,19 @@ class RuleGroup extends Group {
 
   renderChildrenWrapper() {
     return (
-      <div>
+      <>
         {this.renderDrag()}
         {this.renderField()}
         {this.renderActions()}
         {super.renderChildrenWrapper()}
-      </div>
+      </>
     );
   }
 
   renderField() {
     return <FieldWrapper
       key="field"
+      classname={"group--field"}
       config={this.props.config}
       selectedField={this.props.selectedField}
       setField={this.props.setField}

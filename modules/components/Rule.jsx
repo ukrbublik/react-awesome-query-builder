@@ -110,6 +110,7 @@ class Rule extends PureComponent {
         const field = 
             <FieldWrapper
                 key="field"
+                classname={"rule--field"}
                 config={this.props.config}
                 selectedField={this.props.selectedField}
                 setField={this.props.setField}
@@ -209,9 +210,9 @@ class Rule extends PureComponent {
 
 export class FieldWrapper extends PureComponent {
     render() {
-        const {config, selectedField, setField, parentField} = this.props;
+        const {config, selectedField, setField, parentField, classname} = this.props;
         return (
-            <Col className="rule--field">
+            <Col className={classname}>
                 { config.settings.showLabels &&
                     <label>{config.settings.fieldLabel}</label>
                 }

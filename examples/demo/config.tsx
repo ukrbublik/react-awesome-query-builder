@@ -227,8 +227,7 @@ const fields: Fields = {
         label: 'Group',
         type: '!group',
         subfields: {
-            sub1: {
-                label: 'sub1',
+            sub: {
                 type: 'text',
             }
         }

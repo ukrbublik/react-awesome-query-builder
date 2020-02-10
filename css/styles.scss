@@ -207,6 +207,15 @@ ul.ant-select-selection__rendered {
   cursor: grabbing;
 }
 
+.group--drag-handler {
+  margin-right: 8px;
+}
+.group--conjunctions {
+  .group--drag-handler {
+    margin-left: 10px;
+  }
+}
+
 .group--conjunctions.hide--conj {
     opacity: 0.3;
 }
@@ -240,18 +249,50 @@ ul.ant-select-selection__rendered {
 }
 
 
-.group--drag-handler {
-  margin-left: 8px;
-}
-
 /******************************************************************************/
 /** RULE_GROUP *********************************************************************/
 /******************************************************************************/
 
 .rule_group {
-  
-}
+  display: flex;
+  padding-left: 10px;
 
+  .group--drag-handler {
+    align-self: center;
+  }
+  .group--field {
+    align-self: center;
+  }
+  .group--actions {
+    align-self: center;
+    flex: 0;
+  }
+
+  .rule_group--children {
+    flex: 1;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+    .group-or-rule-container {
+      margin-bottom: 5px;
+      margin-top: 5px;
+      padding-right: 5px;
+    }
+
+    padding-left: 18px;
+    &.one--child {
+      padding-left: 10px;
+    }
+
+    & > .group-or-rule-container > .group-or-rule {
+      &::before, &::after {
+          left: -10px;
+          width: 10px;
+          height: calc(50% + 8px);
+      }
+    }
+  }
+}
 
 /******************************************************************************/
 /** RULE **********************************************************************/
@@ -276,7 +317,7 @@ ul.ant-select-selection__rendered {
   margin-right: 8px;
 }
 
-.rule--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
+.rule--field, .group--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
 .widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep,
 .rule--before-widget, .rule--after-widget {
   display: inline-block;
@@ -298,7 +339,7 @@ div.tooltip-inner {
   max-width: 500px;
 }
 
-.rule--field, .rule--operator, .widget--widget {
+.rule--field, .group--field, .rule--operator, .widget--widget {
   label {
     display: block;
     font-weight: bold;
@@ -400,7 +441,9 @@ div.tooltip-inner {
     transition: opacity 0.2s;
   }
   .group--header:hover .group--header,
-  .group--header:not(:hover) {
+  .group--header:not(:hover),
+  .rule_group:hover .rule_group,
+  .rule_group:not(:hover) {
     #{$what} {
       opacity: 0;
     }
@@ -412,7 +455,9 @@ div.tooltip-inner {
     transition: padding 0.2s;
   }
   .group--header:hover .group--header,
-  .group--header:not(:hover) {
+  .group--header:not(:hover),
+  .rule_group:hover .rule_group,
+  .rule_group:not(:hover) {
     #{$inactive} {
       width: 0;
       padding: 0;
@@ -490,10 +535,10 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
   margin-bottom: 10px;
   padding-right: 10px;
   &:first-child {
-    margin-top: 0px;
+    margin-top: 0px !important;
   }
   &:last-child {
-    margin-bottom: 0px;
+    margin-bottom: 0px !important;
   }
 }
 .group--children {
