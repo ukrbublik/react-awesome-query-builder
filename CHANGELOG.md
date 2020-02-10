@@ -1,4 +1,6 @@
 # Changelog
+- 1.3.1
+  - Added `FieldTreeSelect`
 - 1.3.0
   - Added support of `!group`
 - 1.2.0

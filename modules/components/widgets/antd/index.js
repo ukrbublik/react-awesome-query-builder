@@ -13,3 +13,4 @@ export { default as TreeSelectWidget } from "./TreeSelect";
 export { default as FieldSelect } from "./FieldSelect";
 export { default as FieldDropdown } from "./FieldDropdown";
 export { default as FieldCascader } from "./FieldCascader";
+export { default as FieldTreeSelect } from "./FieldTreeSelect";

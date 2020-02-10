@@ -100,6 +100,6 @@ export default class FieldSelect extends PureComponent {
             </Option>;
         }
     });
-}
+  }
 
 }
