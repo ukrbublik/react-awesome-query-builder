@@ -59,6 +59,7 @@ export default class FieldTreeSelect extends PureComponent {
               children: this.getTreeData(items, fn),
               selectable: false,
               altLabel: altLabel,
+              fullLabel: fullLabel,
               label: label,
             };
         } else {
@@ -66,6 +67,7 @@ export default class FieldTreeSelect extends PureComponent {
             value: _path,
             title: option,
             altLabel: altLabel,
+            fullLabel: fullLabel,
             label: label,
           };
         }
@@ -77,7 +79,7 @@ export default class FieldTreeSelect extends PureComponent {
   }
 
   filterTreeNode = (input, option) => {
-      const keysForFilter = ['title', 'value', 'label', 'altLabel'];
+      const keysForFilter = ['title', 'value', 'label', 'altLabel', 'fullLabel'];
       const valueForFilter = 
         keysForFilter
         .map(k => (typeof option.props[k] == 'string' ? option.props[k] : ''))

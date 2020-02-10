@@ -28,7 +28,7 @@ export default class FieldSelect extends PureComponent {
   }
 
   filterOption = (input, option) => {
-      const keysForFilter = ['title', 'value', 'grouplabel', 'children'];
+      const keysForFilter = ['title', 'value', 'grouplabel', 'label'];
       const valueForFilter = keysForFilter
         .map(k => (typeof option.props[k] == 'string' ? option.props[k] : ''))
         .join("\0");
@@ -95,6 +95,7 @@ export default class FieldSelect extends PureComponent {
                 value={_path}
                 title={altLabel}
                 grouplabel={grouplabel}
+                label={label}
             >
                 {option}
             </Option>;
