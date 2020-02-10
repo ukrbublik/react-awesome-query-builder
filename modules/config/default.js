@@ -5,6 +5,7 @@ const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
+  FieldTreeSelect,
   VanillaFieldSelect
 } = Widgets;
 
@@ -19,6 +20,7 @@ export const settings = {
   renderField: (props) => <FieldSelect {...props} />,
   // renderField: (props) => <FieldDropdown {...props} />,
   // renderField: (props) => <FieldCascader {...props} />,
+  // renderField: (props) => <FieldTreeSelect {...props} />,
   // renderField: (props) => <VanillaFieldSelect {...props} />,
 
   renderOperator: (props) => <FieldSelect {...props} />,

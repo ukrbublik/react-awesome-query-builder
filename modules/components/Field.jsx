@@ -80,7 +80,7 @@ export default class Field extends PureComponent {
         return keys(fields).map(fieldKey => {
             const field = fields[fieldKey];
             const label = this.getFieldLabel(field, fieldKey, config);
-            const partsLabels = getFieldPathLabels(fieldKey, config);
+            const partsLabels = getFieldPathLabels(prefix+fieldKey, config);
             let fullLabel = partsLabels.join(fieldSeparatorDisplay);
             if (fullLabel == label || parentFieldPath)
                 fullLabel = null;

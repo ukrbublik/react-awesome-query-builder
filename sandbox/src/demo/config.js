@@ -7,6 +7,7 @@ const {
     FieldSelect,
     FieldDropdown,
     FieldCascader,
+    FieldTreeSelect,
     VanillaFieldSelect
   } = Widgets;
 
