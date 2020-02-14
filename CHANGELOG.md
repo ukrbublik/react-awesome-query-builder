@@ -1,4 +1,6 @@
 # Changelog
+- 1.3.2
+  - Bugfix
 - 1.3.1
   - Added `FieldTreeSelect`
 - 1.3.0

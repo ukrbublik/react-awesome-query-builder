@@ -57,8 +57,7 @@ const removeRule = (state, path, config) => {
 
     const parentPath = path.pop();
     const parent = state.getIn(expandTreePath(parentPath));
-    const parentProperties = parent.get('properties');
-    const parentField = parentProperties.get('field');
+    const parentField = parent.getIn(['properties', 'field']);
     const isParentRuleGroup = parent.get('type') == 'rule_group';
     const isEmptyGroup = !hasChildren(state, parentPath);
     const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
