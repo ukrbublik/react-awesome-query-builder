@@ -74,6 +74,7 @@ const _queryBuilderFormat = (item, config, meta) => {
         const not = properties.get('not');
 
         let resultQuery = {};
+        resultQuery['id'] = id;
         resultQuery['rules'] = list.toList();
         resultQuery['condition'] = conjunction.toUpperCase();
         resultQuery['not'] = not;
