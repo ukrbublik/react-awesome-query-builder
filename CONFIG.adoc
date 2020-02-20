@@ -508,11 +508,11 @@ const {
 
 NOTE: There is special `field` widget, rendered by `<ValueFieldWidget>`. +
 It can be used to compare field with another field of same type. +
-To enable this feature set `valueSources` of type to `['value', 'field'']` (see below in link:#configtypes[config.types]).
+To enable this feature set `valueSources` of type to `['value', 'field']` (see below in link:#configtypes[config.types]).
 
 NOTE: There is special `func` widget, rendered by `<FuncWidget>`. +
 It can be used to compare field with result of function (see link:#configfuncs[config.funcs]). +
-To enable this feature set `valueSources` of type to `['value', 'func'']` (see below in link:#configtypes[config.types]).
+To enable this feature set `valueSources` of type to `['value', 'func']` (see below in link:#configtypes[config.types]).
 
 
 
