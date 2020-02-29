@@ -122,6 +122,14 @@ const types: Types = {
                 widgetProps: {
                     hideOperator: true,
                     operatorInlineLabel: "is"
+                },
+                opProps: {
+                    equal: {
+                        label: "is"
+                    },
+                    not_equal: {
+                        label: "is not"
+                    }
                 }
             },
         },
