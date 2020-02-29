@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import {getFieldConfig} from "../utils/configUtils";
+import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
 import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import mapValues from 'lodash/mapValues';
@@ -37,7 +37,7 @@ export default class Operator extends PureComponent {
     const fieldConfig = getFieldConfig(selectedField, config);
     const operatorOptions = mapValues(pickBy(config.operators, (item, key) =>
         fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
-    ));
+    ), (_opts, op) => getOperatorConfig(config, op, selectedField));
       
     const items = this.buildOptions(config, operatorOptions);
 
