@@ -20,6 +20,7 @@ export default (Widget) => {
             valueSrc: PropTypes.any, //instanceOf(Immutable.List)
             field: PropTypes.string,
             operator: PropTypes.string,
+            readonly: PropTypes.bool,
             //actions
             setValue: PropTypes.func,
             setValueSrc: PropTypes.func,
@@ -155,7 +156,7 @@ export default (Widget) => {
         }
 
         render() {
-            const {config, isFuncArg, leftField, operator, value: values} = this.props;
+            const {config, isFuncArg, leftField, operator, value: values, readonly} = this.props;
             const meta = this.meta;
             if (!meta)
                 return null;
@@ -203,6 +204,7 @@ export default (Widget) => {
                                     field={field}
                                     operator={operator}
                                     setValueSrcHandler={setValueSrcHandler}
+                                    readonly={readonly}
                                 />
                             </div>
 
@@ -219,6 +221,7 @@ export default (Widget) => {
                                     config={config}
                                     field={field}
                                     operator={operator}
+                                    readonly={readonly}
                                 />
                             </div>
 
@@ -240,7 +243,7 @@ const WidgetFactory = ({
     value: immValue,
     isSpecialRange, fieldDefinition,
     widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
-    config, field, operator,
+    config, field, operator, readonly,
 }) => {
     const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
     const isConst = isFuncArg && fieldDefinition.valueSources && fieldDefinition.valueSources.length == 1 && fieldDefinition.valueSources[0] == 'const';
@@ -271,6 +274,7 @@ const WidgetFactory = ({
         placeholders: valueLabels ? valueLabels.placeholder : null,
         textSeparators: textSeparators,
         setValue: setValueHandler,
+        readonly: readonly,
     });
     
     if (widget == 'field') {

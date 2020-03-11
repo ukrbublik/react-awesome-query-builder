@@ -19,6 +19,7 @@ export default class FieldDropdown extends PureComponent {
       selectedAltLabel: PropTypes.string,
       selectedFullLabel: PropTypes.string,
       selectedOpts: PropTypes.object,
+      readonly: PropTypes.bool,
       //actions
       setField: PropTypes.func.isRequired,
   };
@@ -51,10 +52,11 @@ export default class FieldDropdown extends PureComponent {
     });
   }
 
-  renderMenuToggler(togglerLabel, tooltipText, config) {
+  renderMenuToggler(togglerLabel, tooltipText, config, readonly) {
       let toggler =
           <Button
               size={config.settings.renderSize}
+              disabled={readonly}
           >
               {togglerLabel} <Icon type="down" />
           </Button>;
@@ -75,7 +77,7 @@ export default class FieldDropdown extends PureComponent {
   render() {
     const {
         config, customProps, items, placeholder,
-        selectedKeys, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+        selectedKeys, selectedLabel, selectedOpts, readonly, selectedAltLabel, selectedFullLabel,
     } = this.props;
 
     const fieldMenuItems = this.renderMenuItems(items);
@@ -92,9 +94,9 @@ export default class FieldDropdown extends PureComponent {
     let tooltipText = selectedFullLabel;
     if (tooltipText == selectedLabel)
       tooltipText = null;
-    const fieldToggler = this.renderMenuToggler(togglerLabel, tooltipText, config);
+    const fieldToggler = this.renderMenuToggler(togglerLabel, tooltipText, config, readonly);
 
-    return (
+    return readonly ? fieldToggler : (
       <Dropdown
           overlay={fieldMenu}
           trigger={['click']}

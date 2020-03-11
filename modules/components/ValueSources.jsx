@@ -5,7 +5,7 @@ const RadioGroup = Radio.Group;
 
 export class ValueSources extends PureComponent {
   render() {
-      const {config, valueSources, valueSrc, setValueSrcHandler} = this.props;
+      const {config, valueSources, valueSrc, setValueSrcHandler, readonly} = this.props;
       
       const valueSourcesInfo = config.settings.valueSourcesInfo;
       const valueSourcesPopupTitle = config.settings.valueSourcesPopupTitle;
@@ -13,7 +13,7 @@ export class ValueSources extends PureComponent {
       //let valueSources = fieldDefinition.valueSources;
       //let valueSources = getValueSourcesForFieldOp(config, field, operator);
 
-      if (!valueSources || Object.keys(valueSources).length == 1)
+      if (!valueSources || Object.keys(valueSources).length == 1 || readonly)
           return null;
 
       let content = (
@@ -21,6 +21,7 @@ export class ValueSources extends PureComponent {
               value={valueSrc || "value"}
               size={config.settings.renderSize}
               onChange={setValueSrcHandler}
+              disabled={readonly}
           >
               {valueSources.map(srcKey => (
                   <RadioButton

@@ -18,6 +18,7 @@ export default class FieldTreeSelect extends PureComponent {
       selectedAltLabel: PropTypes.string,
       selectedFullLabel: PropTypes.string,
       selectedOpts: PropTypes.object,
+      readonly: PropTypes.bool,
       //actions
       setField: PropTypes.func.isRequired,
   };
@@ -90,7 +91,7 @@ export default class FieldTreeSelect extends PureComponent {
   render() {
       const {
         config, customProps = {}, placeholder,
-        selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+        selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
       } = this.props;
       const { renderSize, fieldSeparator } = config.settings;
       
@@ -132,6 +133,7 @@ export default class FieldTreeSelect extends PureComponent {
               placeholder={placeholder}
               filterTreeNode={this.filterTreeNode}
               treeDefaultExpandedKeys={treeDefaultExpandedKeys}
+              disabled={readonly}
               {...customProps}
           />
       );

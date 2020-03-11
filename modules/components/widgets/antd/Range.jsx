@@ -14,6 +14,7 @@ export default class RangeWidget extends PureComponent {
     value: PropTypes.array,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    readonly: PropTypes.bool,
     // from fieldSettings:
     min: PropTypes.number,
     max: PropTypes.number,
@@ -60,7 +61,7 @@ export default class RangeWidget extends PureComponent {
   tipFormatter = (val) => (val != undefined ? val.toString() : '')
 
   render() {
-    const {config, placeholder, placeholders, customProps, value,  min, max, step, marks, textSeparators} = this.props;
+    const {config, placeholder, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
     const {renderSize} = config.settings;
     const _customProps = customProps || {};
     const _value = value != undefined ? value : undefined;
@@ -79,6 +80,7 @@ export default class RangeWidget extends PureComponent {
       <Col style={{display: 'inline-flex'}}>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
+            disabled={readonly}
             size={renderSize}
             ref="numFrom"
             key="numFrom"
@@ -96,6 +98,7 @@ export default class RangeWidget extends PureComponent {
         </Col>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
+            disabled={readonly}
             size={renderSize}
             ref="numTo"
             key="numTo"
@@ -110,6 +113,7 @@ export default class RangeWidget extends PureComponent {
         </Col>
         <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
+            disabled={readonly}
             ref="slider"
             value={_value}
             tipFormatter={this.tipFormatter}

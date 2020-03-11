@@ -9,6 +9,7 @@ export default (OperatorOptions) => {
       operatorOptions: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
       selectedField: PropTypes.string.isRequired,
       selectedOperator: PropTypes.string.isRequired,
+      readonly: PropTypes.bool,
       //actions
       setOperatorOption: PropTypes.func.isRequired,
     };
@@ -34,6 +35,7 @@ export default (OperatorOptions) => {
             operator: this.props.selectedOperator,
             options: this.props.operatorOptions,
             setOption: this.props.setOperatorOption,
+            readonly: this.props.readonly,
           }))}
         </OperatorOptions>
       );

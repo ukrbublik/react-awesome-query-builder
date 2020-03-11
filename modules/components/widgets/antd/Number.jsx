@@ -11,6 +11,7 @@ export default class NumberWidget extends PureComponent {
     value: PropTypes.number,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    readonly: PropTypes.bool,
     // from fieldSettings:
     min: PropTypes.number,
     max: PropTypes.number,
@@ -30,13 +31,14 @@ export default class NumberWidget extends PureComponent {
   };
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step} = this.props;
+    const {config, placeholder, customProps, value,  min, max, step, readonly} = this.props;
     const {renderSize} = config.settings;
     const _value = value != undefined ? value : undefined;
 
     return (
       <Col>
         <InputNumber
+          disabled={readonly}
           key="widget-number"
           size={renderSize}
           ref="num"

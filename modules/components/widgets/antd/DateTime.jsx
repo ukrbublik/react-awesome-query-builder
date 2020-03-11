@@ -12,6 +12,7 @@ export default class DateTimeWidget extends PureComponent {
         field: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
+        readonly: PropTypes.bool,
         // from fieldSettings:
         timeFormat: PropTypes.string,
         dateFormat: PropTypes.string,
@@ -44,13 +45,14 @@ export default class DateTimeWidget extends PureComponent {
     }
 
     render() {
-        const {placeholder, customProps, value, valueFormat, dateFormat, timeFormat, use12Hours, config} = this.props;
+        const {placeholder, customProps, value, valueFormat, dateFormat, timeFormat, use12Hours, config, readonly} = this.props;
         const {renderSize} = config.settings;
         const dateValue = value ? moment(value, valueFormat) : null;
         const dateTimeFrmat = dateFormat + ' ' + timeFormat;
 
         return (
             <DatePicker
+                disabled={readonly}
                 key="widget-datetime"
                 use12Hours={use12Hours}
                 showTime={{ format: timeFormat }}

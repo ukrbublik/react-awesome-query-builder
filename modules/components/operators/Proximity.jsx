@@ -16,6 +16,7 @@ export default class Proximity extends PureComponent {
     optionTextBefore: PropTypes.string,
     optionLabel: PropTypes.string,
     customProps: PropTypes.object,
+    readonly: PropTypes.bool,
     //children
   };
 
@@ -34,7 +35,8 @@ export default class Proximity extends PureComponent {
 
   render() {
     const {
-      defaults, options, config: {settings}, optionLabel, optionPlaceholder, customProps, minProximity, maxProximity, optionTextBefore
+      defaults, options, config: {settings}, optionLabel, optionPlaceholder, customProps, 
+      minProximity, maxProximity, optionTextBefore, readonly
     } = this.props;
     const defaultProximity = defaults ? defaults.proximity : undefined;
     const {dropdownPlacement, showLabels, renderSize} = settings;
@@ -61,6 +63,7 @@ export default class Proximity extends PureComponent {
             placeholder={optionPlaceholder}
             value={selectedProximity != null ? ""+selectedProximity : undefined}
             onChange={this.handleChange}
+            disabled={readonly}
             {...customProps}
           >
             {range(minProximity, maxProximity + 1).map((item) => (

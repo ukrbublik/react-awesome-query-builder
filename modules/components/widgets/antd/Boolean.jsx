@@ -9,6 +9,7 @@ export default class BooleanWidget extends PureComponent {
         config: PropTypes.object.isRequired,
         field: PropTypes.string.isRequired,
         customProps: PropTypes.object,
+        readonly: PropTypes.bool,
         // from fieldSettings:
         labelYes: PropTypes.string,
         labelNo: PropTypes.string,
@@ -24,7 +25,7 @@ export default class BooleanWidget extends PureComponent {
     }
 
     render() {
-        const {customProps, value,  labelYes, labelNo} = this.props;
+        const {customProps, value,  labelYes, labelNo, readonly} = this.props;
         
         return (
             <Switch
@@ -33,6 +34,7 @@ export default class BooleanWidget extends PureComponent {
                 unCheckedChildren={labelNo || null}
                 checked={value || null}
                 onChange={this.handleChange}
+                disabled={readonly}
                 {...customProps}
             />
         );

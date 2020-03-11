@@ -13,6 +13,7 @@ export default class MultiSelectWidget extends PureComponent {
     placeholder: PropTypes.string,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    readonly: PropTypes.bool,
     // from fieldSettings:
     listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     allowCustomValues: PropTypes.bool,
@@ -49,7 +50,7 @@ export default class MultiSelectWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, allowCustomValues, customProps, value} = this.props;
+    const {config, placeholder, allowCustomValues, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
     const _value = value && value.length ? value : undefined;
@@ -58,6 +59,7 @@ export default class MultiSelectWidget extends PureComponent {
     
     return (
         <Select
+            disabled={readonly}
             mode={allowCustomValues ? "tags" : "multiple"}
             style={{
               minWidth: width,

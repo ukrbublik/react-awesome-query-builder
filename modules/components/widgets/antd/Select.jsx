@@ -12,6 +12,7 @@ export default class SelectWidget extends PureComponent {
     value: PropTypes.string, //key in listValues
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    readonly: PropTypes.bool,
     // from fieldSettings:
     listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   };
@@ -45,7 +46,7 @@ export default class SelectWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value} = this.props;
+    const {config, placeholder, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
@@ -54,6 +55,7 @@ export default class SelectWidget extends PureComponent {
 
     return (
         <Select
+            disabled={readonly}
             style={{ width }}
             key={"widget-select"}
             dropdownMatchSelectWidth={false}

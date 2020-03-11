@@ -227,16 +227,18 @@ export class Group extends PureComponent {
       config, children1,
       selectedConjunction, setConjunction, conjunctionOptions, not, setNot
     } = this.props;
+    const {immutableGroupsMode, renderConjsAsRadios} = config.settings;
 
-    const Conjs = config.settings.renderConjsAsRadios ? ConjsRadios : ConjsButtons;
+    const Conjs = renderConjsAsRadios ? ConjsRadios : ConjsButtons;
     const conjs = <Conjs
       disabled={children1.size < 2}
       selectedConjunction={selectedConjunction}
-      setConjunction={setConjunction}
+      setConjunction={immutableGroupsMode ? null : setConjunction}
       conjunctionOptions={conjunctionOptions}
       config={config}
       not={not}
-      setNot={setNot}
+      setNot={immutableGroupsMode ? null : setNot}
+      readonly={immutableGroupsMode}
     />;
     return conjs;
   }
