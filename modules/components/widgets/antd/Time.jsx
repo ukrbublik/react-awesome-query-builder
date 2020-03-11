@@ -12,6 +12,7 @@ export default class TimeWidget extends PureComponent {
         field: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
+        readonly: PropTypes.bool,
         // from fieldSettings:
         timeFormat: PropTypes.string,
         valueFormat: PropTypes.string,
@@ -46,12 +47,13 @@ export default class TimeWidget extends PureComponent {
     }
 
     render() {
-        const {placeholder, customProps, value, valueFormat, timeFormat, use12Hours, config} = this.props;
+        const {placeholder, customProps, value, valueFormat, timeFormat, use12Hours, config, readonly} = this.props;
         const {renderSize} = config.settings;
         const timeValue = value ? moment(value, valueFormat) : null;
 
         return (
             <TimePicker
+                disabled={readonly}
                 use12Hours={use12Hours}
                 key="widget-time"
                 size={renderSize}

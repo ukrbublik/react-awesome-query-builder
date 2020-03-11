@@ -1,4 +1,6 @@
-export default ({items, setField, selectedKey}) => {
+import React from 'react';
+
+export default ({items, setField, selectedKey, readonly}) => {
   const renderOptions = (fields) => (
     Object.keys(fields).map(fieldKey => {
         const field = fields[fieldKey];
@@ -17,6 +19,7 @@ export default ({items, setField, selectedKey}) => {
     <select 
       onChange={onChange}
       value={selectedKey}
+      disabled={readonly}
     >{renderOptions(items)}</select>
   );
 };

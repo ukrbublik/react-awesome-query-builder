@@ -18,6 +18,7 @@ export default class ValueField extends PureComponent {
     value: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
+    readonly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -173,12 +174,13 @@ export default class ValueField extends PureComponent {
   }
 
   render() {
-      const {config, customProps, setValue} = this.props;
+      const {config, customProps, setValue, readonly} = this.props;
       const {renderField} = config.settings;
       const renderProps = {
           config,
           customProps,
           setField: setValue,
+          readonly,
           items: this.items,
           ...this.meta
       };

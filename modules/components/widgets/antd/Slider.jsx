@@ -13,6 +13,7 @@ export default class SliderWidget extends PureComponent {
     value: PropTypes.number,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    readonly: PropTypes.bool,
     // from fieldSettings:
     min: PropTypes.number,
     max: PropTypes.number,
@@ -59,7 +60,7 @@ export default class SliderWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step, marks} = this.props;
+    const {config, placeholder, customProps, value,  min, max, step, marks, readonly} = this.props;
     const {renderSize} = config.settings;
     const _customProps = customProps || {};
 
@@ -72,6 +73,7 @@ export default class SliderWidget extends PureComponent {
       <Col style={{display: 'inline-flex'}}>
         <Col style={{float: 'left', marginRight: '5px'}}>
           <InputNumber
+            disabled={readonly}
             size={renderSize}
             ref="num"
             value={_value}
@@ -85,6 +87,7 @@ export default class SliderWidget extends PureComponent {
         </Col>
         <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
+            disabled={readonly}
             ref="slider"
             value={sliderValue}
             tipFormatter={this.tipFormatter}

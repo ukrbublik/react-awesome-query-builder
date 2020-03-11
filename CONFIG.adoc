@@ -251,6 +251,9 @@ Behaviour settings:
 |maxNesting | |Max nesting for rule groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
 |immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change
+|immutableFieldsMode |false |Not allow to change fields
+|immutableOpsMode |false |Not allow to change operators
+|immutableValuesMode |false |Not allow to change values
 |setOpOnChangeField |`['keep', 'default']` |Strategies for selecting operator for new field (used by order until success): +
   `default` (default if present), `keep` (keep prev from last field), `first`, `none`
 |clearValueOnChangeField |false |Clear value on field change? false - if prev & next fields have same type (widget), keep

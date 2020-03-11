@@ -1,4 +1,6 @@
 # Changelog
+- 1.3.6
+  - Added config options to disable inputs: `immutableFieldsMode`, `immutableOpsMode`, `immutableValuesMode` 
 - 1.3.5
   - Issue #158
 - 1.3.3

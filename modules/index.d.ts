@@ -136,6 +136,7 @@ interface BaseWidgetProps {
   config: Config,
   delta?: Number,
   customProps?: {},
+  readonly?: Boolean,
 };
 interface RangeWidgetProps extends BaseWidgetProps {
   placeholders: Array<String>,
@@ -405,6 +406,7 @@ export interface FieldProps {
   customProps?: {},
   placeholder?: String,
   selectedOpts?: {tooltip?: String},
+  readonly?: Boolean,
 }
 
 
@@ -482,6 +484,9 @@ export interface BehaviourSettings {
   clearValueOnChangeOp?: Boolean,
   canLeaveEmptyGroup?: Boolean,
   immutableGroupsMode?: Boolean,
+  immutableFieldsMode?: Boolean,
+  immutableOpsMode?: Boolean,
+  immutableValuesMode?: Boolean,
 };
 
 export interface OtherSettings {

@@ -12,6 +12,7 @@ export default class DateWidget extends PureComponent {
         config: PropTypes.object.isRequired,
         placeholder: PropTypes.string,
         customProps: PropTypes.object,
+        readonly: PropTypes.bool,
         // from fieldSettings:
         dateFormat: PropTypes.string,
         valueFormat: PropTypes.string,
@@ -40,12 +41,13 @@ export default class DateWidget extends PureComponent {
     }
 
     render() {
-        const {placeholder, customProps, value, valueFormat, dateFormat, config} = this.props;
+        const {placeholder, customProps, value, valueFormat, dateFormat, config, readonly} = this.props;
         const {renderSize} = config.settings;
         const dateValue = value ? moment(value, valueFormat) : null;
 
         return (
             <DatePicker
+                disabled={readonly}
                 key="widget-date"
                 placeholder={placeholder}
                 size={renderSize}

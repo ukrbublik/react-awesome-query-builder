@@ -12,6 +12,7 @@ export default class Field extends PureComponent {
         selectedField: PropTypes.string,
         parentField: PropTypes.string,
         customProps: PropTypes.object,
+        readonly: PropTypes.bool,
         //actions
         setField: PropTypes.func.isRequired,
     };
@@ -56,7 +57,7 @@ export default class Field extends PureComponent {
         const items = this.buildOptions(parentFieldPath, config, sourceFields, parentFieldPath);
 
         return {
-            placeholder, items,
+            placeholder, items, parentField,
             selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
         };
     }
@@ -116,11 +117,12 @@ export default class Field extends PureComponent {
     }
 
     render() {
-        const {config, customProps, setField} = this.props;
+        const {config, customProps, setField, readonly} = this.props;
         const {renderField} = config.settings;
         const renderProps = {
             config, 
             customProps, 
+            readonly,
             setField,
             ...this.meta
         };

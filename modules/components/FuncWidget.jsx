@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import FuncSelect from './FuncSelect';import {
+import FuncSelect from './FuncSelect';
+import {
   getFuncConfig
 } from "../utils/configUtils";
 import { Col } from 'antd';
@@ -18,6 +19,7 @@ export default class FuncWidget extends PureComponent {
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
     setValue: PropTypes.func.isRequired,
+    readonly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -59,12 +61,12 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderFuncSelect = () => {
-    const {config, field, operator, customProps, value} = this.props;
+    const {config, field, operator, customProps, value, readonly} = this.props;
     const funcKey = value ? value.get('func') : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
-      config, field, operator, customProps,
+      config, field, operator, customProps, readonly,
     };
     const {showLabels, funcLabel} = config.settings;
     const widgetLabel = showLabels ?
@@ -104,7 +106,7 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, operator, value} = this.props;
+    const {config, field, operator, value, readonly} = this.props;
     const arg = value ? value.getIn(['args', argKey]) : null;
     const argVal = arg ? arg.get('value') : undefined;
     const argValSrc = arg ? (arg.get('valueSrc') || 'value') : undefined;
@@ -122,6 +124,7 @@ export default class FuncWidget extends PureComponent {
       funcKey,
       argKey,
       argDefinition,
+      readonly,
     };
     //tip: value & valueSrc will be converted to Immutable.List at WidgetContainer
 
@@ -198,6 +201,7 @@ class ArgWidget extends PureComponent {
     argKey: PropTypes.string.isRequired,
     setValue: PropTypes.func.isRequired,
     setValueSrc: PropTypes.func.isRequired,
+    readonly: PropTypes.bool,
   };
 
   setValue = (_delta, value, _widgetType) => {

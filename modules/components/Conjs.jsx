@@ -8,8 +8,9 @@ const ButtonGroup = Button.Group;
 
 class ConjsButton extends PureComponent {
   onClick = (e) => {
-    const {item} = this.props;
-    this.props.setConjunction(e, item.key);
+    const {item, setConjunction} = this.props;
+    if (setConjunction)
+      setConjunction(e, item.key);
   }
 
   render() {
@@ -26,26 +27,33 @@ class ConjsButton extends PureComponent {
 
 
 export class ConjsButtons extends PureComponent {
+  setNot = (e) => {
+    const {setNot, not} = this.props;
+    if (setNot)
+      setNot(e, !not);
+  }
+
   render() {
-    const {disabled, not, setNot, conjunctionOptions, config, setConjunction} = this.props;
+    const {readonly, disabled, not, conjunctionOptions, config, setConjunction} = this.props;
     return (
       <ButtonGroup
         key="group-conjs-buttons"
         size={config.settings.renderSize}
-        disabled={disabled}
+        disabled={disabled || readonly}
       >
-        {config.settings.showNot &&
+        {config.settings.showNot && (readonly ? not : true) &&
           <Button
             key={"group-not"}
-            onClick={(ev) => setNot(ev, !this.props.not)}
+            onClick={this.setNot}
             type={not ? "primary" : null}
+            disabled={readonly}
           >{config.settings.notLabel}</Button>
         }
-        {map(conjunctionOptions, (item, index) => (
+        {map(conjunctionOptions, (item, index) => readonly && !item.checked ? null : (
           <ConjsButton
             key={item.id}
             item={item}
-            disabled={disabled}
+            disabled={disabled || readonly}
             setConjunction={setConjunction}
           />
         ))}
@@ -54,10 +62,10 @@ export class ConjsButtons extends PureComponent {
   }
 }
 
-
+// todo: obsolete
 export class ConjsRadios extends PureComponent {
   render() {
-    const {disabled, selectedConjunction, setConjunction, conjunctionOptions, config} = this.props;
+    const {readonly, disabled, selectedConjunction, setConjunction, conjunctionOptions, config} = this.props;
     return (
       <RadioGroup
         key="group-conjs-radios"
@@ -66,7 +74,7 @@ export class ConjsRadios extends PureComponent {
         size={config.settings.renderSize}
         onChange={setConjunction}
       >
-        {map(conjunctionOptions, (item, index) => (
+        {map(conjunctionOptions, (item, index) => readonly && !item.checked ? null : (
           <RadioButton
             key={item.id}
             value={item.key}

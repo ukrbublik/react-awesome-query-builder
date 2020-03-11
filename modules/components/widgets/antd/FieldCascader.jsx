@@ -16,6 +16,7 @@ export default class FieldCascader extends PureComponent {
       selectedAltLabel: PropTypes.string,
       selectedFullLabel: PropTypes.string,
       selectedOpts: PropTypes.object,
+      readonly: PropTypes.bool,
       //actions
       setField: PropTypes.func.isRequired,
   };
@@ -27,7 +28,7 @@ export default class FieldCascader extends PureComponent {
   render() {
     const {
         config, customProps, items, placeholder,
-        selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+        selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, selectedField, parentField, 
     } = this.props;
 
     let customProps2 = {...customProps};
@@ -41,15 +42,19 @@ export default class FieldCascader extends PureComponent {
       };
     }
 
+    const value = parentField && selectedPath && selectedPath.length && selectedPath[0] == parentField ? 
+      selectedPath.slice(1) :
+      selectedPath;
     let res = (
       <Cascader
         fieldNames={{ label: 'label', value: 'key', children: 'items' }}
         options={items}
-        value={selectedPath}
+        value={value}
         onChange={this.onChange}
         allowClear={false}
         placeholder={placeholder}
         size={config.settings.renderSize}
+        disabled={readonly}
         {...customProps2}
       />
     );

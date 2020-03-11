@@ -18,6 +18,7 @@ export default class FuncSelect extends PureComponent {
     customProps: PropTypes.object,
     value: PropTypes.string,
     setValue: PropTypes.func.isRequired,
+    readonly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -167,11 +168,12 @@ export default class FuncSelect extends PureComponent {
   }
 
   render() {
-      const {config, customProps, setValue} = this.props;
+      const {config, customProps, setValue, readonly} = this.props;
       const {renderFunc} = config.settings;
       const renderProps = {
           config,
           customProps,
+          readonly,
           setField: setValue,
           items: this.items,
           ...this.meta

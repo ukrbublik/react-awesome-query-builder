@@ -9,6 +9,7 @@ export default class TextWidget extends PureComponent {
     config: PropTypes.object.isRequired,
     value: PropTypes.string,
     field: PropTypes.string.isRequired,
+    readonly: PropTypes.bool,
     customProps: PropTypes.object,
   };
 
@@ -19,13 +20,14 @@ export default class TextWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value} = this.props;
+    const {config, placeholder, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const _value = value != undefined ? value : null;
 
     return (
       <Col>
         <Input
+          disabled={readonly}
           key="widget-text"
           size={renderSize}
           ref="text"

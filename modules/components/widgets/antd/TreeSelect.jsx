@@ -12,6 +12,7 @@ export default class TreeSelectWidget extends PureComponent {
     placeholder: PropTypes.string,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
+    readonly: PropTypes.bool,
     // from fieldSettings:
     listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     treeMultiple: PropTypes.bool,
@@ -67,7 +68,8 @@ export default class TreeSelectWidget extends PureComponent {
       value,
       treeMultiple,
       listValues,
-      treeExpandAll
+      treeExpandAll,
+      readonly
     } = this.props;
     const treeCheckStrictly = customProps.treeCheckStrictly || false;
     const { renderSize } = config.settings;
@@ -86,6 +88,7 @@ export default class TreeSelectWidget extends PureComponent {
 
     return (      
         <TreeSelect
+            disabled={readonly}
             style={{
               minWidth: width,
               width: width,

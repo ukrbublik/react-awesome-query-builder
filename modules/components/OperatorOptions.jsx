@@ -7,7 +7,7 @@ export default class OperatorOptions extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     name: PropTypes.string.isRequired,
-    children: PropTypes.oneOfType([PropTypes.array, PropTypes.element])
+    children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]),
   };
 
   render() {

@@ -53,6 +53,7 @@ class RuleGroup extends Group {
   }
 
   renderField() {
+    const { immutableFieldsMode } = this.props.config.settings;
     return <FieldWrapper
       key="field"
       classname={"group--field"}
@@ -60,6 +61,7 @@ class RuleGroup extends Group {
       selectedField={this.props.selectedField}
       setField={this.props.setField}
       parentField={this.props.parentField}
+      readonly={immutableFieldsMode}
     />;
   }
 

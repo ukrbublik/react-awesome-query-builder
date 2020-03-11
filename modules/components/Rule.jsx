@@ -11,6 +11,7 @@ const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import {useOnPropsChanged} from "../utils/stuff";
 
+const dummyFn = () => {};
 
 @RuleContainer
 @Draggable("rule")
@@ -105,7 +106,10 @@ class Rule extends PureComponent {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
         } = this.meta;
-        const {deleteLabel, renderBeforeWidget, renderAfterWidget} = this.props.config.settings;
+        const {
+            deleteLabel, renderBeforeWidget, renderAfterWidget, renderSize, 
+            immutableGroupsMode, immutableFieldsMode, immutableOpsMode, immutableValuesMode,
+        } = this.props.config.settings;
 
         const field = 
             <FieldWrapper
@@ -113,8 +117,9 @@ class Rule extends PureComponent {
                 classname={"rule--field"}
                 config={this.props.config}
                 selectedField={this.props.selectedField}
-                setField={this.props.setField}
+                setField={!immutableOpsMode ? this.props.setField : dummyFn}
                 parentField={this.props.parentField}
+                readonly={immutableFieldsMode}
             />;
         const operator = 
             <OperatorWrapper
@@ -122,11 +127,12 @@ class Rule extends PureComponent {
                 config={this.props.config}
                 selectedField={this.props.selectedField}
                 selectedOperator={this.props.selectedOperator}
-                setOperator={this.props.setOperator}
+                setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
                 selectedFieldPartsLabels={selectedFieldPartsLabels}
                 showOperator={showOperator}
                 showOperatorLabel={showOperatorLabel}
                 selectedFieldWidgetConfig={selectedFieldWidgetConfig}
+                readonly={immutableOpsMode}
             />;
 
         const widget = showWidget &&
@@ -138,8 +144,9 @@ class Rule extends PureComponent {
                     value={this.props.value}
                     valueSrc={this.props.valueSrc}
                     config={this.props.config}
-                    setValue={this.props.setValue}
-                    setValueSrc={this.props.setValueSrc}
+                    setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
+                    setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
+                    readonly={immutableValuesMode}
                 />
             </Col>;
         const operatorOptions = showOperatorOptions &&
@@ -149,8 +156,9 @@ class Rule extends PureComponent {
                     selectedField={this.props.selectedField}
                     selectedOperator={this.props.selectedOperator}
                     operatorOptions={this.props.operatorOptions}
-                    setOperatorOption={this.props.setOperatorOption}
+                    setOperatorOption={!immutableOpsMode ? this.props.setOperatorOption : dummyFn}
                     config={this.props.config}
+                    readonly={immutableValuesMode}
                 />
             </Col>;
 
@@ -183,12 +191,12 @@ class Rule extends PureComponent {
 
         const del = (
             <div key="rule-header" className="rule--header">
-            {!this.props.config.settings.immutableGroupsMode &&
+            {!immutableGroupsMode &&
                 <Button
                     type="danger"
                     icon="delete"
                     onClick={this.removeSelf}
-                    size={this.props.config.settings.renderSize}
+                    size={renderSize}
                 >
                     {deleteLabel}
                 </Button>
@@ -210,7 +218,7 @@ class Rule extends PureComponent {
 
 export class FieldWrapper extends PureComponent {
     render() {
-        const {config, selectedField, setField, parentField, classname} = this.props;
+        const {config, selectedField, setField, parentField, classname, readonly} = this.props;
         return (
             <Col className={classname}>
                 { config.settings.showLabels &&
@@ -222,6 +230,7 @@ export class FieldWrapper extends PureComponent {
                     parentField={parentField}
                     setField={setField}
                     customProps={config.settings.customFieldSelectProps}
+                    readonly={readonly}
                 />
             </Col>
         );
@@ -233,7 +242,7 @@ class OperatorWrapper extends PureComponent {
     render() {
         const {
             config, selectedField, selectedOperator, setOperator, 
-            selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig
+            selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly
         } = this.props;
         const operator = showOperator &&
             <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
@@ -246,6 +255,7 @@ class OperatorWrapper extends PureComponent {
                     selectedField={selectedField}
                     selectedOperator={selectedOperator}
                     setOperator={setOperator}
+                    readonly={readonly}
                 />
             </Col>;
         const hiddenOperator = showOperatorLabel &&
