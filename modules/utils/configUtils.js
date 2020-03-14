@@ -315,8 +315,9 @@ export const getFieldPathLabels = (field, config, fieldsKey = 'fields', subfield
         .map((parts) => parts.join(fieldSeparator))
         .map(part => {
             const cnf = getFieldRawConfig(part, config, fieldsKey, subfieldsKey);
-            return cnf && cnf.label || last(part.split(fieldSeparator))
-        });
+            return cnf && cnf.label || cnf && last(part.split(fieldSeparator))
+        })
+        .filter(label => label != null);
 };
 
 export const getOperatorConfig = (config, operator, field = null) => {
