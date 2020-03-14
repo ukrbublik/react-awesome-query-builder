@@ -182,25 +182,31 @@ export const getFieldRawConfig = (field, config, fieldsKey = 'fields', subfields
         return null;
     const fieldSeparator = config.settings.fieldSeparator;
     const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-    let fields = config[fieldsKey];
-    if (!fields)
+    const targetFields = config[fieldsKey];
+    if (!targetFields)
         return null;
+
+    let fields = targetFields;
     let fieldConfig = null;
+    let path = [];
     for (let i = 0 ; i < parts.length ; i++) {
         const part = parts[i];
-        const tmpFieldConfig = fields[part];
-        if (!tmpFieldConfig)
-            return null;
-        if (i == parts.length-1) {
-            fieldConfig = tmpFieldConfig;
-        } else {
-            fields = tmpFieldConfig[subfieldsKey];
-            if (!fields)
-                return null;
+        path.push(part);
+        const pathKey = path.join(fieldSeparator);
+        fieldConfig = fields[pathKey];
+        if (i < parts.length-1) {
+            if (fieldConfig && fieldConfig[subfieldsKey]) {
+                fields = fieldConfig[subfieldsKey];
+                path = [];
+            } else {
+                fieldConfig = null;
+            }
         }
     }
+
     return fieldConfig;
 };
+
 
 export const getFuncConfig = (func, config) => {
     if (!func)
@@ -309,8 +315,9 @@ export const getFieldPathLabels = (field, config, fieldsKey = 'fields', subfield
         .map((parts) => parts.join(fieldSeparator))
         .map(part => {
             const cnf = getFieldRawConfig(part, config, fieldsKey, subfieldsKey);
-            return cnf && cnf.label || last(part.split(fieldSeparator))
-        });
+            return cnf && cnf.label || cnf && last(part.split(fieldSeparator))
+        })
+        .filter(label => label != null);
 };
 
 export const getOperatorConfig = (config, operator, field = null) => {
