@@ -105,7 +105,7 @@ class Rule extends Component {
                 data-id={this.props.id}
             >
                 <div className="rule--header">
-                    {!this.props.config.settings.readonlyMode && 
+                    {!this.props.config.settings.readonlyMode && (
                         this.props.config.settings.deleteLabel === null ? (
                             <Icon type="close-circle" theme="filled" className="action--DELETE-RULE" onClick={this.props.removeSelf} size={this.props.config.settings.renderSize || "small"} />
                         ) : (
@@ -119,7 +119,7 @@ class Rule extends Component {
                                 {this.props.config.settings.deleteLabel !== undefined ? this.props.config.settings.deleteLabel : "Delete"}
                             </Button>
                         )
-                    }
+                    )}
                 </div>
                 {/*<div className="rule--body">*/}
                     {/*<Row>*/}
