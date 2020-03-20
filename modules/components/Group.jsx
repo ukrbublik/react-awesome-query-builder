@@ -11,6 +11,7 @@ import {ConjsRadios, ConjsButtons} from './Conjs';
 import {GroupActions} from './GroupActions';
 
 const defaultPosition = 'topRight';
+const dummyFn = () => {};
 
 
 export class Group extends PureComponent {
@@ -224,23 +225,24 @@ export class Group extends PureComponent {
 
   renderConjs() {
     const {
-      config, children1,
+      config, children1, id,
       selectedConjunction, setConjunction, conjunctionOptions, not, setNot
     } = this.props;
-    const {immutableGroupsMode, renderConjsAsRadios} = config.settings;
+    const {immutableGroupsMode, renderConjs} = config.settings;
 
-    const Conjs = renderConjsAsRadios ? ConjsRadios : ConjsButtons;
-    const conjs = <Conjs
-      disabled={children1.size < 2}
-      selectedConjunction={selectedConjunction}
-      setConjunction={immutableGroupsMode ? null : setConjunction}
-      conjunctionOptions={conjunctionOptions}
-      config={config}
-      not={not}
-      setNot={immutableGroupsMode ? null : setNot}
-      readonly={immutableGroupsMode}
-    />;
-    return conjs;
+    const Conjs = renderConjs || ConjsButtons;
+    const renderProps = {
+      disabled: children1.size < 2,
+      readonly: immutableGroupsMode,
+      selectedConjunction: selectedConjunction,
+      setConjunction: immutableGroupsMode ? dummyFn : setConjunction,
+      conjunctionOptions: conjunctionOptions,
+      config: config,
+      not: not || false,
+      id: id,
+      setNot: immutableGroupsMode ? dummyFn : setNot,
+    };
+    return <Conjs {...renderProps} />;
   }
 
   renderHeader() {

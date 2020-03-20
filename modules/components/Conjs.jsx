@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import map from 'lodash/map';
 import { Button, Radio } from 'antd';
 const RadioButton = Radio.Button;
@@ -7,10 +7,10 @@ const ButtonGroup = Button.Group;
 
 
 class ConjsButton extends PureComponent {
-  onClick = (e) => {
-    const {item, setConjunction} = this.props;
-    if (setConjunction)
-      setConjunction(e, item.key);
+  onClick = (_e) => {
+    const {setConjunction, item} = this.props;
+    const conj = item.key;
+    setConjunction(conj);
   }
 
   render() {
@@ -30,7 +30,7 @@ export class ConjsButtons extends PureComponent {
   setNot = (e) => {
     const {setNot, not} = this.props;
     if (setNot)
-      setNot(e, !not);
+      setNot(!not);
   }
 
   render() {
@@ -64,6 +64,12 @@ export class ConjsButtons extends PureComponent {
 
 // todo: obsolete
 export class ConjsRadios extends PureComponent {
+  setConjunction = (e) => {
+    const {setConjunction} = this.props;
+    const conj = e.target.value;
+    setConjunction(conj);
+  }
+
   render() {
     const {readonly, disabled, selectedConjunction, setConjunction, conjunctionOptions, config} = this.props;
     return (
@@ -72,13 +78,13 @@ export class ConjsRadios extends PureComponent {
         disabled={disabled}
         value={selectedConjunction}
         size={config.settings.renderSize}
-        onChange={setConjunction}
+        onChange={this.setConjunction}
       >
         {map(conjunctionOptions, (item, index) => readonly && !item.checked ? null : (
           <RadioButton
             key={item.id}
             value={item.key}
-          //checked={item.checked}
+            //checked={item.checked}
           >{item.label}</RadioButton>
         ))}
       </RadioGroup>

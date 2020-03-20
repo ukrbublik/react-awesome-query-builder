@@ -1,4 +1,6 @@
 # Changelog
+- 1.4.0
+ - added `renderConjs`
 - 1.3.7
   - Fixed [issue](https://github.com/ukrbublik/react-awesome-query-builder/issues/168) with dot in field name
 - 1.3.6

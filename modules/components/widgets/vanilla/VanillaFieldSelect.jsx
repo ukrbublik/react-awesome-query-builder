@@ -6,20 +6,24 @@ export default ({items, setField, selectedKey, readonly}) => {
         const field = fields[fieldKey];
         const {items, path, label} = field;
         if (items) {
-            return <optgroup label={label}>{renderOptions(items)}</optgroup>;
+            return <optgroup key={path} label={label}>{renderOptions(items)}</optgroup>;
         } else {
-            return <option value={path}>{label}</option>;
+            return <option key={path} value={path}>{label}</option>;
         }
     })
   );
 
   const onChange = e => setField(e.target.value);
-
+  
+  const hasValue = selectedKey != null;
   return (
     <select 
       onChange={onChange}
-      value={selectedKey}
+      value={hasValue ? selectedKey : ""}
       disabled={readonly}
-    >{renderOptions(items)}</select>
+    >
+      {!hasValue && <option disabled value={""}></option>}
+      {renderOptions(items)}
+    </select>
   );
 };

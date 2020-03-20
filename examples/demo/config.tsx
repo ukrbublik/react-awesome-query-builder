@@ -13,6 +13,7 @@ const {
     FieldCascader,
     FieldTreeSelect,
     VanillaFieldSelect,
+    VanillaConjs,
   } = Widgets;
 
 const conjunctions: Conjunctions = {
@@ -196,6 +197,7 @@ const settings: Settings = {
     // renderField: (props) => <FieldCascader {...props} />,
     renderOperator: (props) => <FieldDropdown {...props} />,
     renderFunc: (props) => <FieldSelect {...props} />,
+    // renderConjs: (props) => <VanillaConjs {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////

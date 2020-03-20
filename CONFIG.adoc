@@ -195,7 +195,7 @@ const myConfig = {
 ----
 import en_US from 'antd/lib/locale-provider/en_US';
 import {Widgets} from 'react-awesome-query-builder';
-const { FieldCascader, FieldDropdown } = Widgets;
+const { FieldCascader, FieldDropdown, VanillaConjs } = Widgets;
 ----
 
 [source,javascript]
@@ -222,6 +222,7 @@ const { FieldCascader, FieldDropdown } = Widgets;
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
   renderFunc: (props) => <FieldDropdown {...props} />,
+  renderConjs: (props) => <VanillaConjs {...props} />,
   canReorder: true,
   canRegroup: true,
   hideConjForOne: true,
@@ -276,11 +277,11 @@ Render settings:
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+|renderConjs | |Render conjunctions switcher with NOT checkbox
 |showLabels |false |Show labels above all fields?
 |hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
-|renderConjsAsRadios |false |How to render conjunctions switcher? true - use `RadioGroup`, false - use `ButtonGroup`
 |customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
  `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`

@@ -206,6 +206,25 @@ export interface Conjunction {
 };
 export type Conjunctions = TypedMap<Conjunction>;
 
+export interface ConjunctionOption {
+  id: String,
+  key: String,
+  label: String,
+  checked: Boolean,
+};
+
+export interface ConjsProps {
+  path: String, 
+  readonly?: Boolean,
+  disabled?: Boolean,
+  selectedConjunction?: String,
+  setConjunction(conj: String): void,
+  conjunctionOptions?: Array<ConjunctionOption>,
+  config?: Config,
+  not: Boolean,
+  setNot(not: Boolean): void,
+}
+
 
 /////////////////
 // Operators
@@ -458,7 +477,7 @@ export interface RenderSettings {
   renderField?: Factory<FieldProps>;
   renderOperator?: Factory<FieldProps>;
   renderFunc?: Factory<FieldProps>;
-  renderConjsAsRadios?: Boolean,
+  renderConjs?: Factory<ConjsProps>;
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
@@ -609,6 +628,7 @@ interface ReadyWidgets {
   FieldCascader: ElementType<FieldProps>,
   FieldTreeSelect: ElementType<FieldProps>,
   VanillaFieldSelect: ElementType<FieldProps>,
+  VanillaConjs: ElementType<ConjsProps>,
 
   ValueFieldWidget: ElementType<WidgetProps>,
 
