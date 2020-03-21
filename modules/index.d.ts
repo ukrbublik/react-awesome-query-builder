@@ -134,7 +134,7 @@ interface BaseWidgetProps {
   setValue(val: RuleValue): void,
   placeholder: String,
   field: String,
-  operator: String,
+  operator: string,
   fieldDefinition: Field,
   config: Config,
   delta?: Number,
@@ -376,9 +376,9 @@ type ListValues = TypedMap<String> | Array<ListItem> | Array<String>;
 interface BasicFieldSettings {
 }
 interface NumberFieldSettings extends BasicFieldSettings {
-  min?: Number,
-  max?: Number,
-  step?: Number,
+  min?: number,
+  max?: number,
+  step?: number,
   marks?: {[mark: number]: ReactElement | String}
 };
 interface DateTimeFieldSettings extends BasicFieldSettings {
@@ -714,6 +714,9 @@ interface ReadyWidgets {
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
   BooleanWidget: ElementType<BooleanWidgetProps>,
+
+  // vanilla core widgets
+  VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
 };
 
 

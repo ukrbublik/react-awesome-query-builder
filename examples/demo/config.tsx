@@ -21,6 +21,8 @@ const {
     VanillaValueSources,
     confirm,
     vanillaConfirm,
+
+    VanillaBooleanWidget,
   } = Widgets;
 
 const conjunctions: Conjunctions = {
@@ -118,6 +120,10 @@ const widgets: Widgets = {
             showSearch: true
         }
     },
+    boolean: {
+        ...BasicConfig.widgets.boolean,
+        factory: (props) => <VanillaBooleanWidget {...props} />,
+    },
 };
 
 
@@ -201,10 +207,15 @@ const settings: Settings = {
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
 
-    // renderField: (props) => <FieldCascader {...props} />,
-    renderOperator: (props) => <FieldDropdown {...props} />,
-    renderFunc: (props) => <FieldSelect {...props} />,
-    // renderConjs: (props) => <VanillaConjs {...props} />,
+    renderField: (props) => <VanillaFieldSelect {...props} />,
+    renderOperator: (props) => <VanillaFieldSelect {...props} />,
+    renderFunc: (props) => <VanillaFieldSelect {...props} />,
+    renderConjs: (props) => <VanillaConjs {...props} />,
+    renderButton: (props) => <VanillaButton {...props} />,
+    renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
+    renderProvider: (props) => <VanillaProvider {...props} />,
+    renderValueSources: (props) => <VanillaValueSources {...props} />,
+    renderConfirm: vanillaConfirm,
 };
 
 //////////////////////////////////////////////////////////////////////
