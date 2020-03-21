@@ -1,20 +1,22 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../utils/stuff';
 import { Select } from 'antd';
+import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../../utils/stuff';
 const Option = Select.Option;
 
-export default class SelectWidget extends PureComponent {
+export default class MultiSelectWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), //key in listValues
+    value: PropTypes.array,
+    field: PropTypes.string.isRequired,
+    placeholder: PropTypes.string,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
     readonly: PropTypes.bool,
     // from fieldSettings:
     listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    allowCustomValues: PropTypes.bool,
   };
 
   constructor(props) {
@@ -33,11 +35,13 @@ export default class SelectWidget extends PureComponent {
     this.optionsMaxWidth = optionsMaxWidth;
 
     this.options = mapListValues(listValues, ({title, value}) => {
-      return (<Option key={value+""} value={value+""}>{title}</Option>);
+      return (<Option key={value} value={value}>{title}</Option>);
     });
   }
 
   handleChange = (val) => {
+    if (val && !val.length)
+      val = undefined; //not allow []
     this.props.setValue(val);
   }
 
@@ -46,18 +50,25 @@ export default class SelectWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value, readonly} = this.props;
+    const {config, placeholder, allowCustomValues, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
+    const _value = value && value.length ? value : undefined;
+    const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const width = value ? dropdownWidth : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const _value = value != undefined ? value+"" : undefined;
-
+    
     return (
         <Select
             disabled={readonly}
-            style={{ width }}
-            key={"widget-select"}
+            mode={allowCustomValues ? "tags" : "multiple"}
+            style={{
+              minWidth: width,
+              width: width,
+            }}
+            dropdownStyle={{
+              width: dropdownWidth,
+            }}
+            key={"widget-multiselect"}
             dropdownMatchSelectWidth={false}
             ref="val"
             placeholder={placeholder}

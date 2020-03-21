@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Tooltip, TreeSelect } from 'antd';
-import {useOnPropsChanged, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../utils/stuff";
+import {useOnPropsChanged, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/stuff";
 import PropTypes from 'prop-types';
 import keys from 'lodash/keys';
 
