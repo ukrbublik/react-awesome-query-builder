@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import WidgetContainer from './containers/WidgetContainer';
-import { Col } from 'antd';
+const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
 
 @WidgetContainer
 export default class Widget extends PureComponent {

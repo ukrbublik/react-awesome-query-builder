@@ -1,31 +1,20 @@
 import React, { PureComponent } from 'react';
-import { Button } from 'antd';
-
 
 export class RuleGroupActions extends PureComponent {
   render() {
-    const {config: {settings}, addRule, canAddRule, canDeleteGroup, removeSelf} = this.props;
-    const {immutableGroupsMode, addRuleLabel, delGroupLabel, renderSize} = settings;
-    const _addRuleLabel = "";
+    const {config, addRule, canAddRule, canDeleteGroup, removeSelf} = this.props;
+    const {
+      immutableGroupsMode, addRuleLabel, delGroupLabel,
+      renderButton: Btn
+    } = config.settings;
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule &&
-      <Button
-        key="group-add-rule"
-        icon="plus"
-        className="action action--ADD-RULE"
-        onClick={addRule}
-        size={renderSize}
-      >{_addRuleLabel}</Button>;
-      
-    const delGroupBtn = !immutableGroupsMode && canDeleteGroup &&
-      <Button
-        key="group-del"
-        type="danger"
-        icon="delete"
-        className="action action--DELETE"
-        size={renderSize}
-        onClick={removeSelf}
-      >{delGroupLabel}</Button>;
+    const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn 
+      type="addRuleGroup" onClick={addRule} label={addRuleLabel} config={config}
+    />;
+
+    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && <Btn 
+      type="delRuleGroup" onClick={removeSelf} label={delGroupLabel} config={config}
+    />;
 
     return (
       <div className={`group--actions`}>

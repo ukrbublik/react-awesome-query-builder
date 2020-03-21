@@ -11,7 +11,6 @@ import {validateTree} from "../utils/validation";
 import {defaultRoot} from "../utils/defaultUtils";
 import {liteShouldComponentUpdate} from "../utils/renderUtils";
 import pick from 'lodash/pick';
-import { ConfigProvider } from 'antd';
 
 
 const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs"];
@@ -159,13 +158,16 @@ export default class QueryContainer extends Component {
         }
     }
 
+    withC
+
     render() {
         // `get_children` is deprecated!
-        const {renderBuilder, get_children, onChange} = this.props;
+        const {renderBuilder, get_children, onChange, settings} = this.props;
         const {config, store} = this.state;
+        const {renderProvider: QueryWrapper} = settings;
 
         return (
-            <ConfigProvider locale={config.settings.locale.antd}>
+            <QueryWrapper config={config}>
                 <Provider store={store}>
                     <ConnectedQuery
                       store={store}
@@ -174,7 +176,7 @@ export default class QueryContainer extends Component {
                       renderBuilder={renderBuilder || get_children}
                     />
                 </Provider>
-            </ConfigProvider>
+            </QueryWrapper>
         )
     }
 }

@@ -1,3 +1,4 @@
+import React from 'react';
 export { default as DateWidget } from "./Date";
 export { default as DateTimeWidget } from "./DateTime";
 export { default as TimeWidget } from "./Time";
@@ -14,3 +15,12 @@ export { default as FieldSelect } from "./FieldSelect";
 export { default as FieldDropdown } from "./FieldDropdown";
 export { default as FieldCascader } from "./FieldCascader";
 export { default as FieldTreeSelect } from "./FieldTreeSelect";
+
+export { default as Button } from "./Button";
+export { default as ButtonGroup } from "./ButtonGroup";
+export { default as Conjs } from "./Conjs";
+export { default as ValueSources } from "./ValueSources";
+export { default as confirm } from "./confirm";
+
+import { ConfigProvider } from 'antd';
+export const Provider = ({config, children}) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;

@@ -14,6 +14,13 @@ const {
     FieldTreeSelect,
     VanillaFieldSelect,
     VanillaConjs,
+    VanillaButton,
+    VanillaButtonGroup,
+    VanillaProvider,
+    ValueSources,
+    VanillaValueSources,
+    confirm,
+    vanillaConfirm,
   } = Widgets;
 
 const conjunctions: Conjunctions = {

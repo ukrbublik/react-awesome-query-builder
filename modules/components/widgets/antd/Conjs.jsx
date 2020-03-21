@@ -26,7 +26,7 @@ class ConjsButton extends PureComponent {
 }
 
 
-export class ConjsButtons extends PureComponent {
+export default class ConjsButtons extends PureComponent {
   setNot = (e) => {
     const {setNot, not} = this.props;
     if (setNot)
@@ -49,7 +49,7 @@ export class ConjsButtons extends PureComponent {
             disabled={readonly}
           >{config.settings.notLabel}</Button>
         }
-        {map(conjunctionOptions, (item, index) => readonly && !item.checked ? null : (
+        {map(conjunctionOptions, (item, _index) => readonly && !item.checked ? null : (
           <ConjsButton
             key={item.id}
             item={item}
@@ -62,8 +62,8 @@ export class ConjsButtons extends PureComponent {
   }
 }
 
-// todo: obsolete
-export class ConjsRadios extends PureComponent {
+// obsolete
+class ConjsRadios extends PureComponent {
   setConjunction = (e) => {
     const {setConjunction} = this.props;
     const conj = e.target.value;
@@ -71,7 +71,7 @@ export class ConjsRadios extends PureComponent {
   }
 
   render() {
-    const {readonly, disabled, selectedConjunction, setConjunction, conjunctionOptions, config} = this.props;
+    const {readonly, disabled, selectedConjunction, conjunctionOptions, config} = this.props;
     return (
       <RadioGroup
         key="group-conjs-radios"
@@ -80,7 +80,7 @@ export class ConjsRadios extends PureComponent {
         size={config.settings.renderSize}
         onChange={this.setConjunction}
       >
-        {map(conjunctionOptions, (item, index) => readonly && !item.checked ? null : (
+        {map(conjunctionOptions, (item, _index) => readonly && !item.checked ? null : (
           <RadioButton
             key={item.id}
             value={item.key}

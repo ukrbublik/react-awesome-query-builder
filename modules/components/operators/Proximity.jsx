@@ -1,9 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import range from 'lodash/range';
-import { Select } from 'antd';
-const Option = Select.Option;
-import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from '../../utils/stuff';
 
 export default class Proximity extends PureComponent {
   static propTypes = {
@@ -35,13 +32,15 @@ export default class Proximity extends PureComponent {
 
   render() {
     const {
-      defaults, options, config: {settings}, optionLabel, optionPlaceholder, customProps, 
+      defaults, options, config, optionLabel, optionPlaceholder, customProps, 
       minProximity, maxProximity, optionTextBefore, readonly
     } = this.props;
+    const {settings, widgets} = config;
     const defaultProximity = defaults ? defaults.proximity : undefined;
-    const {dropdownPlacement, showLabels, renderSize} = settings;
+    const {showLabels} = settings;
     const selectedProximity = options.get('proximity', defaultProximity);
-    const placeholderWidth = calcTextWidth(optionPlaceholder);
+    const listValues = range(minProximity, maxProximity + 1).map((item) => ({title: item, value: item}));
+    const Select = widgets.select.factory;
 
     return (
       <div className="operator--PROXIMITY">
@@ -55,21 +54,14 @@ export default class Proximity extends PureComponent {
             </div>
           }
           <Select
-            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
-            dropdownMatchSelectWidth={false}
-            size={renderSize}
-            style={{ width: selectedProximity ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
-            ref="proximity"
+            config={config}
+            value={selectedProximity}
+            listValues={listValues}
+            setValue={this.handleChange}
+            readonly={readonly}
             placeholder={optionPlaceholder}
-            value={selectedProximity != null ? ""+selectedProximity : undefined}
-            onChange={this.handleChange}
-            disabled={readonly}
             {...customProps}
-          >
-            {range(minProximity, maxProximity + 1).map((item) => (
-              <Option key={""+item} value={""+item}>{item}</Option>
-            ))}
-          </Select>
+          />
         </div>
         <div className="operator--widgets">{this.props.children}</div>
       </div>

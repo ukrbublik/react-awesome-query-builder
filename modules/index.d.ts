@@ -26,6 +26,9 @@ type Optional<T> = {
 type TypedMap<T> = {
   [key: string]: T;
 };
+type TypedKeyMap<K, T> = {
+  [key: K]: T;
+};
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
@@ -224,6 +227,49 @@ export interface ConjsProps {
   not: Boolean,
   setNot(not: Boolean): void,
 }
+
+
+/////////////////
+// Rule, Group
+/////////////////
+
+export interface ButtonProps {
+  type: "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup", 
+  onClick(): void, 
+  label: String,
+  config?: Config,
+};
+
+export interface ButtonGroupProps {
+  children: ReactElement,
+  config?: Config,
+};
+
+export interface ProviderProps {
+  children: ReactElement,
+  config?: Config,
+};
+
+export type ValueSourceItem = {
+  label: String, 
+};
+type ValueSourcesItems = TypedKeyMap<ValueSource, ValueSourceItem>;
+
+export interface ValueSourcesProps {
+  config?: Config,
+  valueSources: ValueSourcesItems, 
+  valueSrc?: ValueSource, 
+  setValueSrc(valueSrc: String): void, 
+  readonly?: Boolean,
+  title: String,
+};
+
+export interface ConfirmModalProps {
+  onOk(): void, 
+  okText: String, 
+  cancelText?: String, 
+  title: String,
+};
 
 
 /////////////////
@@ -433,6 +479,8 @@ export interface FieldProps {
 // Settings
 /////////////////
 
+type ConfirmFunc = (opts: ConfirmModalProps) => void;
+
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: String, widget?: String}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
@@ -478,6 +526,11 @@ export interface RenderSettings {
   renderOperator?: Factory<FieldProps>;
   renderFunc?: Factory<FieldProps>;
   renderConjs?: Factory<ConjsProps>;
+  renderButton?: Factory<ButtonProps>;
+  renderButtonGroup?: Factory<ButtonGroupProps>;
+  renderProvider?: Factory<ProviderProps>;
+  renderValueSources?: Factory<ValueSourcesProps>;
+  renderConfirm?: ConfirmFunc;
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
@@ -622,18 +675,34 @@ export interface BasicConfig extends Config {
 // ReadyWidgets
 /////////////////
 
+type ConfirmFunc = (opts: ConfirmModalProps) => void;
+
 interface ReadyWidgets {
+  ValueFieldWidget: ElementType<WidgetProps>,
+  FuncWidget: ElementType<WidgetProps>,
+
+  // antd core widgets
   FieldSelect: ElementType<FieldProps>,
   FieldDropdown: ElementType<FieldProps>,
   FieldCascader: ElementType<FieldProps>,
   FieldTreeSelect: ElementType<FieldProps>,
+  Button: ElementType<ButtonProps>,
+  ButtonGroup: ElementType<ButtonGroupProps>,
+  Conjs: ElementType<ConjsProps>,
+  Provider: ElementType<ProviderProps>,
+  ValueSources: ElementType<ValueSourcesProps>,
+  confirm: ConfirmFunc,
+
+  // vanilla core widgets
   VanillaFieldSelect: ElementType<FieldProps>,
   VanillaConjs: ElementType<ConjsProps>,
+  VanillaButton: ElementType<ButtonProps>,
+  VanillaButtonGroup: ElementType<ButtonGroupProps>,
+  VanillaProvider: ElementType<ProviderProps>,
+  VanillaValueSources: ElementType<ValueSourcesProps>,
+  vanillaConfirm: ConfirmFunc,
 
-  ValueFieldWidget: ElementType<WidgetProps>,
-
-  FuncWidget: ElementType<WidgetProps>,
-
+  // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,

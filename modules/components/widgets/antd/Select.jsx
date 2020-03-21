@@ -8,8 +8,8 @@ export default class SelectWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
-    value: PropTypes.string, //key in listValues
+    field: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), //key in listValues
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
     readonly: PropTypes.bool,
@@ -33,7 +33,7 @@ export default class SelectWidget extends PureComponent {
     this.optionsMaxWidth = optionsMaxWidth;
 
     this.options = mapListValues(listValues, ({title, value}) => {
-      return (<Option key={value} value={value}>{title}</Option>);
+      return (<Option key={value+""} value={value+""}>{title}</Option>);
     });
   }
 
@@ -51,7 +51,7 @@ export default class SelectWidget extends PureComponent {
     const placeholderWidth = calcTextWidth(placeholder);
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const width = value ? dropdownWidth : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const _value = value != undefined ? value : undefined;
+    const _value = value != undefined ? value+"" : undefined;
 
     return (
         <Select

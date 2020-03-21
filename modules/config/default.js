@@ -6,7 +6,18 @@ const {
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
-  VanillaFieldSelect
+  VanillaFieldSelect,
+  Button,
+  ButtonGroup,
+  Conjs,
+  VanillaConjs,
+  VanillaButton,
+  VanillaButtonGroup,
+  Provider,
+  VanillaProvider,
+  ValueSources,
+  confirm,
+  vanillaConfirm,
 } = Widgets;
 
 export const settings = {
@@ -28,6 +39,13 @@ export const settings = {
   // renderOperator: (props) => <VanillaFieldSelect {...props} />,
 
   renderFunc: (props) => <FieldSelect {...props} />,
+  
+  renderConjs: (props) => <Conjs {...props} />,
+  renderButton: (props) => <Button {...props} />,
+  renderButtonGroup: (props) => <ButtonGroup {...props} />,
+  renderProvider: (props) => <Provider {...props} />,
+  renderValueSources: (props) => <ValueSources {...props} />,
+  renderConfirm: confirm,
 
   valueSourcesInfo: {
       value: {},
@@ -60,7 +78,7 @@ export const settings = {
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",
-  delGroupLabel: null,
+  delGroupLabel: "",
   notLabel: "Not",
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,

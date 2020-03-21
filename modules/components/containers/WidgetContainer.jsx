@@ -6,7 +6,6 @@ import {
     getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
 import {getTitleInListValues, defaultValue, useOnPropsChanged} from "../../utils/stuff";
-import {ValueSources} from '../ValueSources';
 import pick from 'lodash/pick';
 import Immutable from 'immutable';
 
@@ -67,8 +66,7 @@ export default (Widget) => {
             }
         }
 
-        _onChangeValueSrc = (delta, e) => {
-            let srcKey = e.target.value;
+        _onChangeValueSrc = (delta, srcKey) => {
             this.props.setValueSrc(delta, srcKey);
         }
 
@@ -166,7 +164,11 @@ export default (Widget) => {
             const value = isFuncArg ? _values : values;
             const field = isFuncArg ? leftField : _field;
             const {settings} = config;
-            
+            const {valueSourcesInfo, renderValueSources: ValueSources} = settings;
+            const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
+                label: valueSourcesInfo[srcKey].label
+            }]);
+
             return (
                 <Widget name={defaultWidget} config={config}>
                     {range(0, cardinality).map(delta => {
@@ -192,19 +194,20 @@ export default (Widget) => {
                                 <span>{sepText}</span>
                             </div>
 
-                        const sources = valueSources.length > 1 &&
+                        const sources = valueSources.length > 1 && !readonly &&
                             <div key={"valuesrc-"+field+"-"+delta} className="widget--valuesrc">
                                 {sourceLabel}
                                 <ValueSources
                                     key={'valuesrc-'+delta}
                                     delta={delta}
-                                    valueSources={valueSources}
+                                    valueSources={valueSourcesOptions}
                                     valueSrc={valueSrc}
                                     config={config}
                                     field={field}
                                     operator={operator}
-                                    setValueSrcHandler={setValueSrcHandler}
+                                    setValueSrc={setValueSrcHandler}
                                     readonly={readonly}
+                                    title={settings.valueSourcesPopupTitle}
                                 />
                             </div>
 
