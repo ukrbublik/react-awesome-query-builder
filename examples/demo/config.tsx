@@ -23,6 +23,7 @@ const {
     vanillaConfirm,
 
     VanillaBooleanWidget,
+    VanillaTextWidget,
   } = Widgets;
 
 const conjunctions: Conjunctions = {
@@ -79,6 +80,7 @@ const widgets: Widgets = {
         validateValue: (val, fieldDef) => {
             return (val.length < 10);
         },
+        factory: (props) => <VanillaTextWidget {...props} />,
     },
     slider: {
         ...BasicConfig.widgets.slider,
