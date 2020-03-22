@@ -12,14 +12,15 @@ const {
     FieldDropdown,
     FieldCascader,
     FieldTreeSelect,
+    ValueSources,
+    confirm,
+
     VanillaFieldSelect,
     VanillaConjs,
     VanillaButton,
     VanillaButtonGroup,
     VanillaProvider,
-    ValueSources,
     VanillaValueSources,
-    confirm,
     vanillaConfirm,
 
     VanillaBooleanWidget,
@@ -27,6 +28,7 @@ const {
     VanillaDateWidget,
     VanillaTimeWidget,
     VanillaDateTimeWidget,
+    VanillaMultiSelectWidget,
   } = Widgets;
 
 const conjunctions: Conjunctions = {
@@ -131,6 +133,10 @@ const widgets: Widgets = {
     boolean: {
         ...BasicConfig.widgets.boolean,
         factory: (props) => <VanillaBooleanWidget {...props} />,
+    },
+    multiselect: {
+        ...BasicConfig.widgets.multiselect,
+        factory: (props) => <VanillaMultiSelectWidget {...props} />,
     },
 };
 
