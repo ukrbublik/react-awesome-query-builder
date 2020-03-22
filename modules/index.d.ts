@@ -722,6 +722,7 @@ interface ReadyWidgets {
   VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
   VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
   VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaSelectWidget: ElementType<SelectWidgetProps>,
 };
 
 
