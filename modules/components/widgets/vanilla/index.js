@@ -4,6 +4,8 @@ import React from 'react';
 export {default as VanillaBooleanWidget} from './value/VanillaBoolean';
 export {default as VanillaTextWidget} from './value/VanillaText';
 export {default as VanillaDateWidget} from './value/VanillaDate';
+export {default as VanillaTimeWidget} from './value/VanillaTime';
+export {default as VanillaDateTimeWidget} from './value/VanillaDateTime';
 
 // field select widget
 export {default as VanillaFieldSelect} from './core/VanillaFieldSelect';

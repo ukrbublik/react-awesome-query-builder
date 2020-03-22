@@ -719,6 +719,8 @@ interface ReadyWidgets {
   VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
   VanillaTextWidget: ElementType<TextWidgetProps>,
   VanillaDateWidget: ElementType<DateTimeWidgetProps>,
+  VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
 };
 
 

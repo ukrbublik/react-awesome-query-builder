@@ -1,8 +1,7 @@
 import React from 'react';
-import moment from 'moment';
 
 export default (props) => {
-  const {value, setValue, config, valueFormat, readonly} = props;
+  const {value, setValue, config, valueFormat, use12Hours, readonly} = props;
 
   const onChange = e => {
     let value = e.target.value;
@@ -12,6 +11,6 @@ export default (props) => {
   };
   
   return (
-    <input type="date"  value={value || ""}  disabled={readonly} onChange={onChange} />
+    <input type="time"  value={value || ""}  disabled={readonly} onChange={onChange} />
   );
 };
