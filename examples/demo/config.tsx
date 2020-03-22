@@ -24,6 +24,7 @@ const {
 
     VanillaBooleanWidget,
     VanillaTextWidget,
+    VanillaDateWidget,
   } = Widgets;
 
 const conjunctions: Conjunctions = {
@@ -98,6 +99,7 @@ const widgets: Widgets = {
         ...BasicConfig.widgets.date,
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD',
+        factory: (props) => <VanillaDateWidget {...props} />,
     },
     time: {
         ...BasicConfig.widgets.time,

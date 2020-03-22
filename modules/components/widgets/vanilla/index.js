@@ -1,8 +1,9 @@
 import React from 'react';
 
 // value widgets
-export {default as VanillaBooleanWidget} from './value/VanillaBooleanWidget';
-export {default as VanillaTextWidget} from './value/VanillaTextWidget';
+export {default as VanillaBooleanWidget} from './value/VanillaBoolean';
+export {default as VanillaTextWidget} from './value/VanillaText';
+export {default as VanillaDateWidget} from './value/VanillaDate';
 
 // field select widget
 export {default as VanillaFieldSelect} from './core/VanillaFieldSelect';

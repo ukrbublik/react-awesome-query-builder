@@ -718,6 +718,7 @@ interface ReadyWidgets {
   // vanilla core widgets
   VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
   VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaDateWidget: ElementType<DateTimeWidgetProps>,
 };
 
 
