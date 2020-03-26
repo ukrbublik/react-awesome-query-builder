@@ -97,7 +97,7 @@ export interface QueryProps {
   types: Types;
   settings: Settings;
   fields: Fields;
-  funcs?: Fincs;
+  funcs?: Funcs;
   value: ImmutableTree;
   onChange(immutableTree: ImmutableTree, config: Config): void;
   renderBuilder(props: BuilderProps): ReactElement;
