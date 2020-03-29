@@ -143,7 +143,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
             resultQuery = list.first();
         else {
             const rules = list.toList().toJS();
-            const canShort = (mongoConj == '$and');
+            const canShort = mongoConj == '$and' && config.settings.canShort;
             if (canShort) {
                 resultQuery = rules.reduce((acc, rule) => {
                     if (!acc) return undefined;
