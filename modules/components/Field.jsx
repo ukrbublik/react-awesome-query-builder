@@ -37,8 +37,8 @@ export default class Field extends PureComponent {
     getMeta({selectedField, config, parentField}) {
         const selectedKey = selectedField;
         const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
-        const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
         const isFieldSelected = !!selectedField;
+        const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
         const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
         const selectedOpts = currField || {};
 
