@@ -14,7 +14,7 @@ export default (className) => (GroupOrRule) => {
 
     constructor(props) {
         super(props);
-        const this.wrapper = React.createRef();
+        this.wrapper = React.createRef();
     }
 
     handleDraggerMouseDown = (e) => {
