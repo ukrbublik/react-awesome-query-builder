@@ -21,6 +21,7 @@ export default class SelectWidget extends PureComponent {
       super(props);
       useOnPropsChanged(this);
       this.onPropsChanged(props);
+      this.val = React.createRef();
   }
 
   onPropsChanged (props) {
@@ -59,7 +60,7 @@ export default class SelectWidget extends PureComponent {
             style={{ width }}
             key={"widget-select"}
             dropdownMatchSelectWidth={false}
-            ref="val"
+            ref={this.val}
             placeholder={placeholder}
             size={renderSize}
             value={_value}
