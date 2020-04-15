@@ -24,6 +24,11 @@ export default class FieldSelect extends PureComponent {
       setField: PropTypes.func.isRequired,
   };
 
+  constructor(props){
+      super(props)
+      this.field = React.createRef();
+  }
+
   onChange = (key) => {
       this.props.setField(key);
   }
@@ -60,7 +65,7 @@ export default class FieldSelect extends PureComponent {
               dropdownAlign={dropdownAlign}
               dropdownMatchSelectWidth={false}
               style={{ width }}
-              ref="field"
+              ref={this.field}
               placeholder={placeholder}
               size={config.settings.renderSize}
               onChange={this.onChange}
