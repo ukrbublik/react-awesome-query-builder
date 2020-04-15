@@ -1,12 +1,13 @@
 import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { DeleteFilled, BarsOutlined } from '@ant-design/icons';
 import RuleContainer from './containers/RuleContainer';
 import Draggable from './containers/Draggable';
 import Field from './Field';
 import Operator from './Operator';
 import Widget from './Widget';
 import OperatorOptions from './OperatorOptions';
-import { Col, Icon, Button, Modal } from 'antd';
+import { Col, Button, Modal } from 'antd';
 const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import {useOnPropsChanged} from "../utils/stuff";
@@ -186,7 +187,7 @@ class Rule extends PureComponent {
                 key="rule-drag-icon"
                 className={"qb-drag-handler rule--drag-handler"}
                 onMouseDown={this.props.handleDraggerMouseDown}
-            ><Icon type="bars" /> </span>
+            ><BarsOutlined /></span>
         ;
 
         const del = (
@@ -194,7 +195,7 @@ class Rule extends PureComponent {
             {!immutableGroupsMode &&
                 <Button
                     type="danger"
-                    icon="delete"
+                    icon={<DeleteFilled />}
                     onClick={this.removeSelf}
                     size={renderSize}
                 >
