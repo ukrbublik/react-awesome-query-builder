@@ -1,6 +1,7 @@
 import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import startsWith from 'lodash/startsWith'
+import { BarsOutlined } from '@ant-design/icons';
 import GroupContainer from './containers/GroupContainer';
 import Draggable from './containers/Draggable';
 import { Icon, Modal } from 'antd';
@@ -218,7 +219,7 @@ export class Group extends PureComponent {
         key="group-drag-icon"
         className={"qb-drag-handler group--drag-handler"}
         onMouseDown={handleDraggerMouseDown}
-      ><Icon type="bars" /> </span>;
+      ><BarsOutlined /> </span>;
     return drag;
   }
 
