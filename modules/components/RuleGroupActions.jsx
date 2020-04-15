@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Button } from 'antd';
-
+import { PlusOutlined, DeleteFilled } from '@ant-design/icons';
 
 export class RuleGroupActions extends PureComponent {
   render() {
@@ -11,7 +11,7 @@ export class RuleGroupActions extends PureComponent {
     const addRuleBtn = !immutableGroupsMode && canAddRule &&
       <Button
         key="group-add-rule"
-        icon="plus"
+        icon={<PlusOutlined />}
         className="action action--ADD-RULE"
         onClick={addRule}
         size={renderSize}
@@ -21,7 +21,7 @@ export class RuleGroupActions extends PureComponent {
       <Button
         key="group-del"
         type="danger"
-        icon="delete"
+        icon={<DeleteFilled />}
         className="action action--DELETE"
         size={renderSize}
         onClick={removeSelf}
