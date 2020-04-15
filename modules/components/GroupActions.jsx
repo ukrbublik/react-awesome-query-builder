@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Button } from 'antd';
+import { PlusOutlined, DeleteFilled } from '@ant-design/icons';
+
 const ButtonGroup = Button.Group;
 
 const groupActionsPositionList = {
@@ -22,7 +24,7 @@ export class GroupActions extends PureComponent {
     const addRuleBtn = !immutableGroupsMode && canAddRule &&
       <Button
         key="group-add-rule"
-        icon="plus"
+        icon={<PlusOutlined />}
         className="action action--ADD-RULE"
         onClick={addRule}
       >{addRuleLabel}</Button>;
@@ -30,14 +32,14 @@ export class GroupActions extends PureComponent {
       <Button
         key="group-add-group"
         className="action action--ADD-GROUP"
-        icon="plus-circle-o"
+        icon={<PlusOutlined />}
         onClick={addGroup}
       >{addGroupLabel}</Button>;
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup &&
       <Button
         key="group-del"
         type="danger"
-        icon="delete"
+        icon={<DeleteFilled />}
         className="action action--DELETE"
         onClick={removeSelf}
       >{delGroupLabel}</Button>;
