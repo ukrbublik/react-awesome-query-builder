@@ -13,6 +13,11 @@ export default class TextWidget extends PureComponent {
     customProps: PropTypes.object,
   };
 
+  constructor(props) {
+    super(props);
+    this.text = React.createRef();
+}
+
   handleChange = (ev) => {
     const v = ev.target.value;
     const val = v === '' ? undefined : v; // don't allow empty value
@@ -30,7 +35,7 @@ export default class TextWidget extends PureComponent {
           disabled={readonly}
           key="widget-text"
           size={renderSize}
-          ref="text"
+          ref={this.text}
           type={"text"}
           value={_value}
           placeholder={placeholder}

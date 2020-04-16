@@ -30,6 +30,11 @@ export default class NumberWidget extends PureComponent {
       step: undefined,
   };
 
+  constructor(props) {
+    super(props);
+    this.num = React.createRef();
+  }
+
   render() {
     const {config, placeholder, customProps, value,  min, max, step, readonly} = this.props;
     const {renderSize} = config.settings;
@@ -41,7 +46,7 @@ export default class NumberWidget extends PureComponent {
           disabled={readonly}
           key="widget-number"
           size={renderSize}
-          ref="num"
+          ref={this.num}
           value={_value}
           min={min}
           max={max}

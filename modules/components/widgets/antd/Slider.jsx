@@ -36,6 +36,8 @@ export default class SliderWidget extends PureComponent {
       useOnPropsChanged(this);
 
       this.state.internalValue = props.value;
+      this.num = React.createRef();
+      this.slider = React.createRef();
   }
 
   onPropsChanged(nextProps) {
@@ -75,7 +77,7 @@ export default class SliderWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            ref="num"
+            ref={this.num}
             value={_value}
             min={min}
             max={max}
@@ -88,7 +90,7 @@ export default class SliderWidget extends PureComponent {
         <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
             disabled={readonly}
-            ref="slider"
+            ref={this.slider}
             value={sliderValue}
             tipFormatter={this.tipFormatter}
             min={min}

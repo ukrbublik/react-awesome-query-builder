@@ -15,6 +15,11 @@ export default class BooleanWidget extends PureComponent {
         labelNo: PropTypes.string,
     }
 
+    constructor(props) {
+        super(props);
+        this.switch = React.createRef();
+    }
+
     handleChange = (val) => {
         this.props.setValue(val);
     }
@@ -29,7 +34,7 @@ export default class BooleanWidget extends PureComponent {
         
         return (
             <Switch
-                ref="switch"
+                ref={this.switch}
                 checkedChildren={labelYes || null}
                 unCheckedChildren={labelNo || null}
                 checked={value || null}

@@ -26,6 +26,7 @@ export default class DateWidget extends PureComponent {
         if (mValue && !mValue.isValid()) {
             setValue(null);
         }
+        this.datetime = React.createRef();
     }
 
     static defaultProps = {
@@ -54,7 +55,7 @@ export default class DateWidget extends PureComponent {
                 format={dateFormat}
                 value={dateValue}
                 onChange={this.handleChange}
-                ref="datetime"
+                ref={this.datetime}
                 {...customProps}
             />
         );

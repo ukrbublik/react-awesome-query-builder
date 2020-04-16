@@ -32,6 +32,13 @@ export default class RangeWidget extends PureComponent {
   state = {
   }
   
+  constructor(props) {
+    super(props);
+    this.numFrom = React.createRef();
+    this.numTo = React.createRef();
+    this.slider = React.createRef();
+  }
+
   handleChange = (value) => {
     this.props.setValue(value);
   }
@@ -82,7 +89,7 @@ export default class RangeWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            ref="numFrom"
+            ref={this.numFrom}
             key="numFrom"
             value={valueFrom}
             min={min}
@@ -100,7 +107,7 @@ export default class RangeWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            ref="numTo"
+            ref={this.numTo}
             key="numTo"
             value={valueTo}
             min={min}
@@ -114,7 +121,7 @@ export default class RangeWidget extends PureComponent {
         <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
             disabled={readonly}
-            ref="slider"
+            ref={this.slider}
             value={_value}
             tipFormatter={this.tipFormatter}
             min={min}

@@ -21,7 +21,8 @@ export default class TreeSelectWidget extends PureComponent {
   constructor(props) {
     super(props);
     useOnPropsChanged(this);
-    this.onPropsChanged(props);  
+    this.onPropsChanged(props);
+    this.val = React.createRef();
   }
 
   onPropsChanged(props) {
@@ -101,7 +102,7 @@ export default class TreeSelectWidget extends PureComponent {
             treeCheckable={treeMultiple}
             key={"widget-treeselect"}
             dropdownMatchSelectWidth={true}
-            ref="val"
+            ref={this.val}
             placeholder={placeholder}
             size={renderSize}
             treeData={listValues}

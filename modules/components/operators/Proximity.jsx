@@ -29,6 +29,12 @@ export default class Proximity extends PureComponent {
     optionTextBefore: null,
   };
 
+
+  constructor(props) {
+    super(props);
+    this.proximity = React.createRef();
+  }
+
   handleChange = (value) => {
     this.props.setOption('proximity', parseInt(value));
   }
@@ -59,7 +65,7 @@ export default class Proximity extends PureComponent {
             dropdownMatchSelectWidth={false}
             size={renderSize}
             style={{ width: selectedProximity ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT }}
-            ref="proximity"
+            ref={this.proximity}
             placeholder={optionPlaceholder}
             value={selectedProximity != null ? ""+selectedProximity : undefined}
             onChange={this.handleChange}

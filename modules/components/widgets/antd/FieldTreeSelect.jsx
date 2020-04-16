@@ -27,6 +27,7 @@ export default class FieldTreeSelect extends PureComponent {
     super(props);
     useOnPropsChanged(this);
     this.onPropsChanged(props);  
+    this.field = React.createRef();
   }
 
   onPropsChanged(props) {
@@ -128,7 +129,7 @@ export default class FieldTreeSelect extends PureComponent {
               treeCheckable={false}
               treeDataSimpleMode={false}
               treeData={this.treeData}
-              ref="field"
+              ref={this.field}
               size={renderSize}
               placeholder={placeholder}
               filterTreeNode={this.filterTreeNode}
