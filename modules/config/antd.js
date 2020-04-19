@@ -1,5 +1,5 @@
 import en_US from 'antd/lib/locale-provider/en_US';
-import * as Widgets from '../components/widgets/antd';
+import * as AntdWidgets from '../components/widgets/antd';
 import BasicConfig from './basic';
 import {getTitleInListValues} from '../utils/stuff';
 import {SqlString} from '../utils/sql';
@@ -16,7 +16,7 @@ const {
   Provider,
   ValueSources,
   confirm,
-} = Widgets;
+} = AntdWidgets;
 const {
   TextWidget,
   NumberWidget,
@@ -29,7 +29,7 @@ const {
   BooleanWidget,
   TimeWidget,
   DateTimeWidget,
-} = Widgets;
+} = AntdWidgets;
 
 
 const settings = {

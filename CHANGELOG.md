@@ -1,7 +1,8 @@
 # Changelog
-- 1.4.0
+- 2.0.0
  - Added `renderConjs`, `renderButton`, `renderButtonGroup`, `renderProvider`, `renderValueSources`, `renderConfirm`
  - Removed coupling with AntDesign. Now it should be possible to use another UI framework.
+ - Added vanilla widgets. Added switcher between `antd` and `vanilla` in demo.
 - 1.3.7
   - Fixed [issue](https://github.com/ukrbublik/react-awesome-query-builder/issues/168) with dot in field name
 - 1.3.6

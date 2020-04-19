@@ -16,14 +16,14 @@ const {
 } = AntdWidgets;
 
 export default (skin) => {
-    const UsedConfig = skin == "vanilla" ? BasicConfig : AntdConfig;
+    const InitialConfig = skin == "vanilla" ? BasicConfig : AntdConfig;
 
     const conjunctions: Conjunctions = {
-        ...UsedConfig.conjunctions,
+        ...InitialConfig.conjunctions,
     };
 
     const proximity: OperatorProximity = {
-        ...UsedConfig.operators.proximity,
+        ...InitialConfig.operators.proximity,
         valueLabels: [
             { label: 'Word 1', placeholder: 'Enter first word' },
             { label: 'Word 2', placeholder: 'Enter second word' },
@@ -33,7 +33,7 @@ export default (skin) => {
             //'Word 2'
         ],
         options: {
-            ...UsedConfig.operators.proximity.options,
+            ...InitialConfig.operators.proximity.options,
             optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
             optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
             optionPlaceholder: "Select words between", // placeholder for "near" selectbox
@@ -47,10 +47,10 @@ export default (skin) => {
     };
 
     const operators: Operators = {
-        ...UsedConfig.operators,
+        ...InitialConfig.operators,
         // examples of  overriding
         between: {
-            ...UsedConfig.operators.between,
+            ...InitialConfig.operators.between,
             valueLabels: [
                 'Value from',
                 'Value to'
@@ -65,50 +65,50 @@ export default (skin) => {
 
 
     const widgets: Widgets = {
-        ...UsedConfig.widgets,
+        ...InitialConfig.widgets,
         // examples of  overriding
         text: {
-            ...UsedConfig.widgets.text,
+            ...InitialConfig.widgets.text,
             validateValue: (val, fieldDef) => {
                 return (val.length < 10);
             },
         },
         slider: {
-            ...UsedConfig.widgets.slider,
+            ...InitialConfig.widgets.slider,
             customProps: {
                 width: '300px'
             }
         },
         rangeslider: {
-            ...UsedConfig.widgets.rangeslider,
+            ...InitialConfig.widgets.rangeslider,
             customProps: {
                 width: '300px'
             },
         },
         date: {
-            ...UsedConfig.widgets.date,
+            ...InitialConfig.widgets.date,
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD',
         },
         time: {
-            ...UsedConfig.widgets.time,
+            ...InitialConfig.widgets.time,
             timeFormat: 'HH:mm',
             valueFormat: 'HH:mm:ss',
         },
         datetime: {
-            ...UsedConfig.widgets.datetime,
+            ...InitialConfig.widgets.datetime,
             timeFormat: 'HH:mm',
             dateFormat: 'DD.MM.YYYY',
             valueFormat: 'YYYY-MM-DD HH:mm:ss',
         },
         func: {
-            ...UsedConfig.widgets.func,
+            ...InitialConfig.widgets.func,
             customProps: {
                 showSearch: true
             }
         },
         treeselect: {
-            ...UsedConfig.widgets.treeselect,
+            ...InitialConfig.widgets.treeselect,
             customProps: {
                 showSearch: true
             }
@@ -117,9 +117,9 @@ export default (skin) => {
 
 
     const types: Types = {
-        ...UsedConfig.types,
+        ...InitialConfig.types,
         // examples of  overriding
-        boolean: merge(UsedConfig.types.boolean, {
+        boolean: merge(InitialConfig.types.boolean, {
             widgets: {
                 boolean: {
                     widgetProps: {
@@ -175,7 +175,7 @@ export default (skin) => {
     };
 
     const settings: Settings = {
-        ...UsedConfig.settings,
+        ...InitialConfig.settings,
         ...localeSettings,
 
         valueSourcesInfo: {
