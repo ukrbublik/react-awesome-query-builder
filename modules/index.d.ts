@@ -454,7 +454,8 @@ export type FieldItem = {
   label: String, 
   fullLabel?: String, 
   altLabel?: String, 
-  tooltip?: String
+  tooltip?: String,
+  disabled?: Boolean,
 };
 type FieldItems = TypedMap<FieldItem>;
 
@@ -493,7 +494,7 @@ export interface LocaleSettings {
   locale?: {
     short: String,
     full: String,
-    antd: Object,
+    antd?: Object,
   },
   valueLabel?: String,
   valuePlaceholder?: String,
@@ -677,10 +678,29 @@ export interface BasicConfig extends Config {
 
 type ConfirmFunc = (opts: ConfirmModalProps) => void;
 
-interface ReadyWidgets {
-  ValueFieldWidget: ElementType<WidgetProps>,
-  FuncWidget: ElementType<WidgetProps>,
+interface VanillaWidgets {
+  // vanilla core widgets
+  VanillaFieldSelect: ElementType<FieldProps>,
+  VanillaConjs: ElementType<ConjsProps>,
+  VanillaButton: ElementType<ButtonProps>,
+  VanillaButtonGroup: ElementType<ButtonGroupProps>,
+  VanillaProvider: ElementType<ProviderProps>,
+  VanillaValueSources: ElementType<ValueSourcesProps>,
+  vanillaConfirm: ConfirmFunc,
 
+  // vanilla core widgets
+  VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
+  VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaDateWidget: ElementType<DateTimeWidgetProps>,
+  VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaNumberWidget: ElementType<NumberWidgetProps>,
+  VanillaSliderWidget: ElementType<NumberWidgetProps>,
+}
+
+interface AntdWidgets {
   // antd core widgets
   FieldSelect: ElementType<FieldProps>,
   FieldDropdown: ElementType<FieldProps>,
@@ -692,15 +712,6 @@ interface ReadyWidgets {
   Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
   confirm: ConfirmFunc,
-
-  // vanilla core widgets
-  VanillaFieldSelect: ElementType<FieldProps>,
-  VanillaConjs: ElementType<ConjsProps>,
-  VanillaButton: ElementType<ButtonProps>,
-  VanillaButtonGroup: ElementType<ButtonGroupProps>,
-  VanillaProvider: ElementType<ProviderProps>,
-  VanillaValueSources: ElementType<ValueSourcesProps>,
-  vanillaConfirm: ConfirmFunc,
 
   // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
@@ -714,17 +725,11 @@ interface ReadyWidgets {
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
   BooleanWidget: ElementType<BooleanWidgetProps>,
+}
 
-  // vanilla core widgets
-  VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
-  VanillaTextWidget: ElementType<TextWidgetProps>,
-  VanillaDateWidget: ElementType<DateTimeWidgetProps>,
-  VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
-  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
-  VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
-  VanillaSelectWidget: ElementType<SelectWidgetProps>,
-  VanillaNumberWidget: ElementType<NumberWidgetProps>,
-  VanillaSliderWidget: ElementType<NumberWidgetProps>,
+interface ReadyWidgets extends VanillaWidgets {
+  ValueFieldWidget: ElementType<WidgetProps>,
+  FuncWidget: ElementType<WidgetProps>,
 };
 
 
@@ -735,3 +740,4 @@ export const Query: Query;
 export const Builder: Builder;
 export const BasicConfig: BasicConfig;
 export const Widgets: ReadyWidgets;
+export const AntdWidgets: AntdWidgets;

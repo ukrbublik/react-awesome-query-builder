@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-  Query, Builder, BasicConfig, Utils, 
+  Query, Builder, Utils, 
   //types:
   ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree
 } from 'react-awesome-query-builder';

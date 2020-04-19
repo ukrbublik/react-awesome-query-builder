@@ -1,22 +1,12 @@
-import en_US from 'antd/lib/locale-provider/en_US';
 import * as Widgets from '../components/widgets';
 import React from "react";
 const {
-  FieldSelect,
-  FieldDropdown,
-  FieldCascader,
-  FieldTreeSelect,
   VanillaFieldSelect,
-  Button,
-  ButtonGroup,
-  Conjs,
   VanillaConjs,
   VanillaButton,
   VanillaButtonGroup,
-  Provider,
   VanillaProvider,
-  ValueSources,
-  confirm,
+  VanillaValueSources,
   vanillaConfirm,
 } = Widgets;
 
@@ -28,24 +18,15 @@ export const settings = {
         return field;
   },
 
-  renderField: (props) => <FieldSelect {...props} />,
-  // renderField: (props) => <FieldDropdown {...props} />,
-  // renderField: (props) => <FieldCascader {...props} />,
-  // renderField: (props) => <FieldTreeSelect {...props} />,
-  // renderField: (props) => <VanillaFieldSelect {...props} />,
-
-  renderOperator: (props) => <FieldSelect {...props} />,
-  // renderOperator: (props) => <FieldDropdown {...props} />,
-  // renderOperator: (props) => <VanillaFieldSelect {...props} />,
-
-  renderFunc: (props) => <FieldSelect {...props} />,
-  
-  renderConjs: (props) => <Conjs {...props} />,
-  renderButton: (props) => <Button {...props} />,
-  renderButtonGroup: (props) => <ButtonGroup {...props} />,
-  renderProvider: (props) => <Provider {...props} />,
-  renderValueSources: (props) => <ValueSources {...props} />,
-  renderConfirm: confirm,
+  renderField: (props) => <VanillaFieldSelect {...props} />,
+  renderOperator: (props) => <VanillaFieldSelect {...props} />,
+  renderFunc: (props) => <VanillaFieldSelect {...props} />,
+  renderConjs: (props) => <VanillaConjs {...props} />,
+  renderButton: (props) => <VanillaButton {...props} />,
+  renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
+  renderProvider: (props) => <VanillaProvider {...props} />,
+  renderValueSources: (props) => <VanillaValueSources {...props} />,
+  renderConfirm: vanillaConfirm,
 
   valueSourcesInfo: {
       value: {},
@@ -65,7 +46,6 @@ export const settings = {
   locale: {
     short: 'en',
     full: 'en-US',
-    antd: en_US,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",

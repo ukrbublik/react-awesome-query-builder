@@ -4,11 +4,11 @@ export default ({items, setField, selectedKey, readonly}) => {
   const renderOptions = (fields) => (
     Object.keys(fields).map(fieldKey => {
         const field = fields[fieldKey];
-        const {items, path, label} = field;
+        const {items, path, label, disabled} = field;
         if (items) {
-            return <optgroup key={path} label={label}>{renderOptions(items)}</optgroup>;
+            return <optgroup disabled={disabled} key={path} label={label}>{renderOptions(items)}</optgroup>;
         } else {
-            return <option key={path} value={path}>{label}</option>;
+            return <option disabled={disabled} key={path} value={path}>{label}</option>;
         }
     })
   );

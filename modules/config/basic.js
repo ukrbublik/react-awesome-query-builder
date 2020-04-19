@@ -7,20 +7,19 @@ import moment from 'moment';
 import {settings as defaultSettings} from '../config/default';
 
 const {
-    TextWidget,
-    NumberWidget,
-    SliderWidget,
-    RangeWidget,
-    SelectWidget,
-    MultiSelectWidget,
-    TreeSelectWidget,
-    DateWidget,
-    BooleanWidget,
-    TimeWidget,
-    DateTimeWidget,
+    //vanilla
+    VanillaBooleanWidget,
+    VanillaTextWidget,
+    VanillaDateWidget,
+    VanillaTimeWidget,
+    VanillaDateTimeWidget,
+    VanillaMultiSelectWidget,
+    VanillaSelectWidget,
+    VanillaNumberWidget,
+    VanillaSliderWidget,
 
+    //common
     ValueFieldWidget,
-
     FuncWidget
 } = Widgets;
 const { ProximityOperator } = Operators;
@@ -449,7 +448,7 @@ const widgets = {
       valueSrc: 'value',
       valueLabel: "String",
       valuePlaceholder: "Enter string",
-      factory: (props) => <TextWidget {...props} />,
+      factory: (props) => <VanillaTextWidget {...props} />,
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
           return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
       },
@@ -461,7 +460,7 @@ const widgets = {
       type: "number",
       jsType: "number",
       valueSrc: 'value',
-      factory: (props) => <NumberWidget {...props} />,
+      factory: (props) => <VanillaNumberWidget {...props} />,
       valueLabel: "Number",
       valuePlaceholder: "Enter number",
       valueLabels: [
@@ -479,7 +478,7 @@ const widgets = {
       type: "number",
       jsType: "number",
       valueSrc: 'value',
-      factory: (props) => <SliderWidget {...props} />,
+      factory: (props) => <VanillaSliderWidget {...props} />,
       valueLabel: "Number",
       valuePlaceholder: "Enter number or move slider",
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -489,30 +488,11 @@ const widgets = {
         return SqlString.escape(val);
       },
   },
-  rangeslider: {
-      type: "number",
-      jsType: "number",
-      valueSrc: 'value',
-      factory: (props) => <RangeWidget {...props} />,
-      valueLabel: "Range",
-      valuePlaceholder: "Select range",
-      valueLabels: [
-          { label: 'Number from', placeholder: 'Enter number from' },
-          { label: 'Number to', placeholder: 'Enter number to' },
-      ],
-      formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-          return isForDisplay ? val : JSON.stringify(val);
-      },
-      sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-        return SqlString.escape(val);
-      },
-      singleWidget: 'slider',
-  },
   select: {
       type: "select",
       jsType: "string",
       valueSrc: 'value',
-      factory: (props) => <SelectWidget {...props} />,
+      factory: (props) => <VanillaSelectWidget {...props} />,
       valueLabel: "Value",
       valuePlaceholder: "Select value",
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -527,37 +507,7 @@ const widgets = {
       type: "multiselect",
       jsType: "array",
       valueSrc: 'value',
-      factory: (props) => <MultiSelectWidget {...props} />,
-      valueLabel: "Values",
-      valuePlaceholder: "Select values",
-      formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-          let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues, v));
-          return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
-      },
-      sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
-          return vals.map(v => SqlString.escape(v));
-      },
-  },
-  treeselect: {
-      type: "treeselect",
-      jsType: "string",
-      valueSrc: 'value',
-      factory: (props) => <TreeSelectWidget {...props} />,
-      valueLabel: "Value",
-      valuePlaceholder: "Select value",
-      formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-        let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues, val);
-        return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
-      },
-      sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-          return SqlString.escape(val);
-      },
-  },
-  treemultiselect: {
-      type: "treemultiselect",
-      jsType: "array",
-      valueSrc: 'value',
-      factory: (props) => <TreeSelectWidget {...props} treeMultiple={true} />,
+      factory: (props) => <VanillaMultiSelectWidget {...props} />,
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
@@ -572,7 +522,7 @@ const widgets = {
       type: "date",
       jsType: "string",
       valueSrc: 'value',
-      factory: (props) => <DateWidget {...props} />,
+      factory: (props) => <VanillaDateWidget {...props} />,
       dateFormat: 'DD.MM.YYYY',
       valueFormat: 'YYYY-MM-DD',
       valueLabel: "Date",
@@ -595,7 +545,7 @@ const widgets = {
       type: "time",
       jsType: "string",
       valueSrc: 'value',
-      factory: (props) => <TimeWidget {...props} />,
+      factory: (props) => <VanillaTimeWidget {...props} />,
       timeFormat: 'HH:mm',
       valueFormat: 'HH:mm:ss',
       valueLabel: "Time",
@@ -622,7 +572,7 @@ const widgets = {
       type: "datetime",
       jsType: "string",
       valueSrc: 'value',
-      factory: (props) => <DateTimeWidget {...props} />,
+      factory: (props) => <VanillaDateTimeWidget {...props} />,
       timeFormat: 'HH:mm',
       dateFormat: 'DD.MM.YYYY',
       valueFormat: 'YYYY-MM-DD HH:mm:ss',
@@ -646,7 +596,7 @@ const widgets = {
       type: "boolean",
       jsType: "boolean",
       valueSrc: 'value',
-      factory: (props) => <BooleanWidget {...props} />,
+      factory: (props) => <VanillaBooleanWidget {...props} />,
       labelYes: "Yes",
       labelNo: "No",
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -742,14 +692,6 @@ const types = {
                   "is_not_empty",
               ],
           },
-          rangeslider: {
-              operators: [
-                  "range_between",
-                  "range_not_between",
-                  "is_empty",
-                  "is_not_empty",
-              ],
-          }
       },
   },
   date: {
@@ -840,35 +782,6 @@ const types = {
                   'multiselect_equals',
                   'multiselect_not_equals',
               ]
-          }
-      },
-  },
-  treeselect: {
-    mainWidget: "treeselect",
-    defaultOperator: 'select_equals',
-    widgets: {
-        treeselect: {
-            operators: [
-                'select_equals',
-                'select_not_equals'
-            ],
-        },
-        treemultiselect: {
-            operators: [
-                'select_any_in',
-                'select_not_any_in'
-            ],
-        },
-    },
-  },
-  treemultiselect: {
-      defaultOperator: 'multiselect_equals',
-      widgets: {
-        treemultiselect: {
-              operators: [
-                  'multiselect_equals',
-                  'multiselect_not_equals',
-              ],
           }
       },
   },

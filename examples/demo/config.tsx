@@ -1,45 +1,27 @@
 import React, {Component} from 'react';
 import merge from 'lodash/merge';
 import {
-    Widgets, BasicConfig,
+    BasicConfig,
     // types:
-    Operators, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
+    Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from 'react-awesome-query-builder';
-import en_US from 'antd/lib/locale-provider/en_US';
-import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import AntdConfig from 'react-awesome-query-builder/config/antd';
+import * as AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
 const {
     FieldSelect,
     FieldDropdown,
     FieldCascader,
     FieldTreeSelect,
-    ValueSources,
-    confirm,
+} = AntdWidgets;
 
-    VanillaFieldSelect,
-    VanillaConjs,
-    VanillaButton,
-    VanillaButtonGroup,
-    VanillaProvider,
-    VanillaValueSources,
-    vanillaConfirm,
-
-    VanillaBooleanWidget,
-    VanillaTextWidget,
-    VanillaDateWidget,
-    VanillaTimeWidget,
-    VanillaDateTimeWidget,
-    VanillaMultiSelectWidget,
-    VanillaSelectWidget,
-    VanillaNumberWidget,
-    VanillaSliderWidget,
-} = Widgets;
+const UsedConfig = AntdConfig;
 
 const conjunctions: Conjunctions = {
-    ...BasicConfig.conjunctions,
+    ...UsedConfig.conjunctions,
 };
 
 const proximity: OperatorProximity = {
-    ...BasicConfig.operators.proximity,
+    ...UsedConfig.operators.proximity,
     valueLabels: [
         { label: 'Word 1', placeholder: 'Enter first word' },
         { label: 'Word 2', placeholder: 'Enter second word' },
@@ -49,7 +31,7 @@ const proximity: OperatorProximity = {
         //'Word 2'
     ],
     options: {
-        ...BasicConfig.operators.proximity.options,
+        ...UsedConfig.operators.proximity.options,
         optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
         optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
         optionPlaceholder: "Select words between", // placeholder for "near" selectbox
@@ -63,10 +45,10 @@ const proximity: OperatorProximity = {
 };
 
 const operators: Operators = {
-    ...BasicConfig.operators,
+    ...UsedConfig.operators,
     // examples of  overriding
     between: {
-        ...BasicConfig.operators.between,
+        ...UsedConfig.operators.between,
         valueLabels: [
             'Value from',
             'Value to'
@@ -81,85 +63,61 @@ const operators: Operators = {
 
 
 const widgets: Widgets = {
-    ...BasicConfig.widgets,
+    ...UsedConfig.widgets,
     // examples of  overriding
     text: {
-        ...BasicConfig.widgets.text,
+        ...UsedConfig.widgets.text,
         validateValue: (val, fieldDef) => {
             return (val.length < 10);
         },
-        factory: (props) => <VanillaTextWidget {...props} />,
     },
-    // slider: {
-    //     ...BasicConfig.widgets.slider,
-    //     customProps: {
-    //         width: '300px'
-    //     }
-    // },
+    slider: {
+        ...UsedConfig.widgets.slider,
+        customProps: {
+            width: '300px'
+        }
+    },
     rangeslider: {
-        ...BasicConfig.widgets.rangeslider,
+        ...UsedConfig.widgets.rangeslider,
         customProps: {
             width: '300px'
         },
     },
     date: {
-        ...BasicConfig.widgets.date,
+        ...UsedConfig.widgets.date,
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD',
-        factory: (props) => <VanillaDateWidget {...props} />,
     },
     time: {
-        ...BasicConfig.widgets.time,
+        ...UsedConfig.widgets.time,
         timeFormat: 'HH:mm',
         valueFormat: 'HH:mm:ss',
-        factory: (props) => <VanillaTimeWidget {...props} />,
     },
     datetime: {
-        ...BasicConfig.widgets.datetime,
+        ...UsedConfig.widgets.datetime,
         timeFormat: 'HH:mm',
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
-        factory: (props) => <VanillaDateTimeWidget {...props} />,
     },
     func: {
-        ...BasicConfig.widgets.func,
+        ...UsedConfig.widgets.func,
         customProps: {
             showSearch: true
         }
     },
     treeselect: {
-        ...BasicConfig.widgets.treeselect,
+        ...UsedConfig.widgets.treeselect,
         customProps: {
             showSearch: true
         }
-    },
-    boolean: {
-        ...BasicConfig.widgets.boolean,
-        factory: (props) => <VanillaBooleanWidget {...props} />,
-    },
-    multiselect: {
-        ...BasicConfig.widgets.multiselect,
-        factory: (props) => <VanillaMultiSelectWidget {...props} />,
-    },
-    select: {
-        ...BasicConfig.widgets.select,
-        factory: (props) => <VanillaSelectWidget {...props} />,
-    },
-    number: {
-        ...BasicConfig.widgets.number,
-        factory: (props) => <VanillaNumberWidget {...props} />,
-    },
-    slider: {
-        ...BasicConfig.widgets.slider,
-        factory: (props) => <VanillaSliderWidget {...props} />,
     },
 };
 
 
 const types: Types = {
-    ...BasicConfig.types,
+    ...UsedConfig.types,
     // examples of  overriding
-    boolean: merge(BasicConfig.types.boolean, {
+    boolean: merge(UsedConfig.types.boolean, {
         widgets: {
             boolean: {
                 widgetProps: {
@@ -184,7 +142,9 @@ const localeSettings: LocaleSettings = {
     locale: {
         short: 'ru',
         full: 'ru-RU',
-        antd: ru_RU,
+        //import en_US from 'antd/lib/locale-provider/en_US';
+        //import ru_RU from 'antd/lib/locale-provider/ru_RU';
+        //antd: ru_RU,
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",
@@ -213,7 +173,7 @@ const localeSettings: LocaleSettings = {
 };
 
 const settings: Settings = {
-    ...BasicConfig.settings,
+    ...UsedConfig.settings,
     ...localeSettings,
 
     valueSourcesInfo: {
@@ -236,15 +196,9 @@ const settings: Settings = {
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
 
-    renderField: (props) => <VanillaFieldSelect {...props} />,
-    renderOperator: (props) => <VanillaFieldSelect {...props} />,
-    renderFunc: (props) => <VanillaFieldSelect {...props} />,
-    renderConjs: (props) => <VanillaConjs {...props} />,
-    renderButton: (props) => <VanillaButton {...props} />,
-    renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
-    renderProvider: (props) => <VanillaProvider {...props} />,
-    renderValueSources: (props) => <VanillaValueSources {...props} />,
-    renderConfirm: vanillaConfirm,
+    // renderField: (props) => <FieldCascader {...props} />,
+    // renderOperator: (props) => <FieldDropdown {...props} />,
+    // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////

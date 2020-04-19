@@ -212,6 +212,11 @@ const setField = (state, path, newField, config) => {
     const newFieldConfig = getFieldConfig(newField, config);
     const isRuleGroup = newFieldConfig.type == '!group';
 
+    if (!newFieldConfig.operators) {
+        console.warn(`Type ${newFieldConfig.type} is not supported`);
+        return state;
+    }
+
     if (wasRuleGroup && !isRuleGroup) {
         state = state.setIn(expandTreePath(path, 'type'), 'rule');
         state = state.deleteIn(expandTreePath(path, 'children1'));

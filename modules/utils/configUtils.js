@@ -121,6 +121,11 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
     const typeConfig = config.types[fieldConfig.type];
     const excludeOperators = fieldConfig.excludeOperators || [];
     if (fieldConfig.type != '!struct' && fieldConfig.type != '!group') {
+        if (!typeConfig) {
+            //console.warn(`No type config for ${fieldConfig.type}`);
+            fieldConfig.disabled = true;
+            return;
+        }
         if (!isFuncArg) {
             if (!config._fieldsCntByType[fieldConfig.type])
                 config._fieldsCntByType[fieldConfig.type] = 0;
