@@ -30,7 +30,6 @@ export default class TextWidget extends PureComponent {
           disabled={readonly}
           key="widget-text"
           size={renderSize}
-          ref="text"
           type={"text"}
           value={_value}
           placeholder={placeholder}

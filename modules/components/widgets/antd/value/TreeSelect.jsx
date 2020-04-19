@@ -56,7 +56,8 @@ export default class TreeSelectWidget extends PureComponent {
   }
 
   filterTreeNode = (input, option) => {
-    return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const dataForFilter = option.props || option; // tip: props was available on antd < 4
+    return dataForFilter.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
 
@@ -83,7 +84,7 @@ export default class TreeSelectWidget extends PureComponent {
     const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownMinWidth = 100;
     const dropdownMaxWidth = 800;
-    const useAutoWidth = false; //tip: "auto" is good, but width will jump on expand/collapse
+    const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
     return (      
@@ -100,8 +101,7 @@ export default class TreeSelectWidget extends PureComponent {
             multiple={treeMultiple}
             treeCheckable={treeMultiple}
             key={"widget-treeselect"}
-            dropdownMatchSelectWidth={true}
-            ref="val"
+            dropdownMatchSelectWidth={false}
             placeholder={placeholder}
             size={renderSize}
             treeData={listValues}

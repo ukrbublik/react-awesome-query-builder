@@ -29,9 +29,10 @@ export default class FieldSelect extends PureComponent {
   }
 
   filterOption = (input, option) => {
+      const dataForFilter = option.props || option; // tip: props was available on antd < 4
       const keysForFilter = ['title', 'value', 'grouplabel', 'label'];
       const valueForFilter = keysForFilter
-        .map(k => (typeof option.props[k] == 'string' ? option.props[k] : ''))
+        .map(k => (typeof dataForFilter[k] == 'string' ? dataForFilter[k] : ''))
         .join("\0");
       return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
@@ -60,7 +61,6 @@ export default class FieldSelect extends PureComponent {
               dropdownAlign={dropdownAlign}
               dropdownMatchSelectWidth={false}
               style={{ width }}
-              ref="field"
               placeholder={placeholder}
               size={config.settings.renderSize}
               onChange={this.onChange}

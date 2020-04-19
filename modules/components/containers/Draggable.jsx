@@ -14,11 +14,12 @@ export default (className) => (GroupOrRule) => {
 
     constructor(props) {
         super(props);
+        this.wrapper = React.createRef();
     }
 
     handleDraggerMouseDown = (e) => {
         var nodeId = this.props.id;
-        var dom = this.refs.wrapper;
+        var dom = this.wrapper.current;
 
         if (this.props.onDragStart) {
           this.props.onDragStart(nodeId, dom, e);
@@ -54,7 +55,7 @@ export default (className) => (GroupOrRule) => {
           <div
             className={cn}
             style={styles}
-            ref="wrapper"
+            ref={this.wrapper}
             data-id={this.props.id}
           >
             <GroupOrRule

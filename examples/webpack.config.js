@@ -40,6 +40,7 @@ module.exports = {
             'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
             'react-dom': '@hot-loader/react-dom',
             'antd': path.resolve(__dirname, 'node_modules/antd'),
+            '@ant-design': path.resolve(__dirname, 'node_modules/@ant-design'),
         },
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },

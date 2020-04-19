@@ -70,7 +70,6 @@ export default class MultiSelectWidget extends PureComponent {
             }}
             key={"widget-multiselect"}
             dropdownMatchSelectWidth={false}
-            ref="val"
             placeholder={placeholder}
             size={renderSize}
             value={_value}

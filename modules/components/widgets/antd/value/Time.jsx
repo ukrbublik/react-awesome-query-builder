@@ -61,7 +61,6 @@ export default class TimeWidget extends PureComponent {
                 format={timeFormat}
                 value={timeValue}
                 onChange={this.handleChange}
-                ref="datetime"
                 {...customProps}
             />
         );

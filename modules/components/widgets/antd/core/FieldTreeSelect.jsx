@@ -80,10 +80,11 @@ export default class FieldTreeSelect extends PureComponent {
   }
 
   filterTreeNode = (input, option) => {
+      const dataForFilter = option.props || option; // tip: props was available on antd < 4
       const keysForFilter = ['title', 'value', 'label', 'altLabel', 'fullLabel'];
       const valueForFilter = 
         keysForFilter
-        .map(k => (typeof option.props[k] == 'string' ? option.props[k] : ''))
+        .map(k => (typeof dataForFilter[k] == 'string' ? dataForFilter[k] : ''))
         .join("\0");
       return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
@@ -106,7 +107,7 @@ export default class FieldTreeSelect extends PureComponent {
       const placeholderWidth = calcTextWidth(placeholder) + 6;
       const isFieldSelected = !!selectedKey;
 
-      const width = isFieldSelected ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+      const minWidth = placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
       const dropdownMinWidth = 100;
       const dropdownMaxWidth = 800;
       const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
@@ -117,8 +118,8 @@ export default class FieldTreeSelect extends PureComponent {
               onChange={this.onChange}
               value={selectedKey || undefined}
               style={{
-                minWidth: width,
-                width: width,
+                minWidth: minWidth,
+                width: isFieldSelected ? null : minWidth,
               }}
               dropdownStyle={{
                 width: useAutoWidth ? "auto" : dropdownWidth + 20,
@@ -128,11 +129,11 @@ export default class FieldTreeSelect extends PureComponent {
               treeCheckable={false}
               treeDataSimpleMode={false}
               treeData={this.treeData}
-              ref="field"
               size={renderSize}
               placeholder={placeholder}
               filterTreeNode={this.filterTreeNode}
               treeDefaultExpandedKeys={treeDefaultExpandedKeys}
+              dropdownMatchSelectWidth={false}
               disabled={readonly}
               {...customProps}
           />

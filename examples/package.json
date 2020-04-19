@@ -10,7 +10,7 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
     "react-awesome-query-builder": "file:..",
-    "antd": "^3.25.0",
+    "antd": "^4.1.2",
     "webpack": "^4.41.2",
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",

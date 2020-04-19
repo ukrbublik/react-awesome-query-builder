@@ -59,7 +59,6 @@ export default class SelectWidget extends PureComponent {
             style={{ width }}
             key={"widget-select"}
             dropdownMatchSelectWidth={false}
-            ref="val"
             placeholder={placeholder}
             size={renderSize}
             value={_value}

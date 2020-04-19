@@ -61,7 +61,6 @@ export default class DateTimeWidget extends PureComponent {
                 format={dateTimeFrmat}
                 value={dateValue}
                 onChange={this.handleChange}
-                ref="datetime"
                 {...customProps}
             />
         );
