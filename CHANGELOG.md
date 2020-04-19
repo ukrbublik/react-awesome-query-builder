@@ -1,4 +1,6 @@
 # Changelog
+- 2.0.1
+ - Fixed issues #187, #194, #182
 - 2.0.0
  - Added `renderConjs`, `renderButton`, `renderButtonGroup`, `renderProvider`, `renderValueSources`, `renderConfirm`
  - Removed coupling with AntDesign. Now it should be possible to use another UI framework.
