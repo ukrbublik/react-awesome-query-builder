@@ -328,7 +328,8 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
     const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
     const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
     const isValid = !validateError;
-    if (isValid && canFix && fixedValue !== value) {
+    if (isValid && fixedValue !== value) {
+        // eg, get exact value from listValues (not string)
         value = fixedValue;
     }
 

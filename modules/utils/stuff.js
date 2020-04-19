@@ -223,7 +223,8 @@ const listValuesToArray = (listValuesObj) => {
 // listValues can be {<value>: <title>, ..} or [{value, title}, ..] or [value, ..]
 export const getItemInListValues = (listValues, value) => {
   if (Array.isArray(listValues)) {
-    return listValues.map(v => listValue(v)).find(v => v.value === value);
+    const values = listValues.map(v => listValue(v));
+    return values.find(v => (v.value === value)) || values.find(v => (`${v.value}` === value));
   } else {
     return listValues[value] !== undefined ? listValue(value, listValues[value]) : undefined;
   }
@@ -232,6 +233,11 @@ export const getItemInListValues = (listValues, value) => {
 export const getTitleInListValues = (listValues, value) => {
   const it = getItemInListValues(listValues, value);
   return it !== undefined ? it.title : undefined;
+};
+
+export const getValueInListValues = (listValues, value) => {
+  const it = getItemInListValues(listValues, value);
+  return it !== undefined ? it.value : undefined;
 };
 
 export const mapListValues = (listValues, fun) => {

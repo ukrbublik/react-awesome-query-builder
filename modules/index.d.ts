@@ -371,7 +371,7 @@ interface TreeItem extends ListItem {
   checkable?: Boolean,
 };
 type TreeData = Array<TreeItem>;
-type ListValues = TypedMap<String> | Array<ListItem> | Array<String>;
+type ListValues = TypedMap<String> | TypedKeyMap<String | number, String> | Array<ListItem> | Array<String | number>;
 
 interface BasicFieldSettings {
 }
