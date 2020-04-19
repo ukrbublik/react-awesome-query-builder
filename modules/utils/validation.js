@@ -114,8 +114,12 @@ function validateRule (item, path, itemId, meta, c) {
 	if (!operatorDefinition)
 		operator = null;
 	const availOps = field ? getOperatorsForField(config, field) : [];
-	if (availOps.indexOf(operator) == -1)
+	if (!availOps) {
+		console.warn(`Type of field ${field} is not supported`);
 		operator = null;
+	} else if (availOps.indexOf(operator) == -1) {
+		operator = null;
+	}
 	if (operator == null) {
 		properties = properties.delete('operatorOptions');
 		properties = properties.delete('valueSrc');

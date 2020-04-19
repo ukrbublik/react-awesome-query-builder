@@ -6,12 +6,17 @@ import Field from './Field';
 import Operator from './Operator';
 import Widget from './Widget';
 import OperatorOptions from './OperatorOptions';
-import { Col, Icon, Button, Modal } from 'antd';
-const { confirm } = Modal;
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import {useOnPropsChanged} from "../utils/stuff";
 
+const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
 const dummyFn = () => {};
+const DragIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray" width="18px" height="18px">
+      <path d="M0 0h24v24H0V0z" fill="none"/>
+      <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+    </svg>
+  );
 
 @RuleContainer
 @Draggable("rule")
@@ -79,12 +84,12 @@ class Rule extends PureComponent {
     }
 
     removeSelf = () => {
-      const confirmOptions = this.props.config.settings.removeRuleConfirmOptions;
+      const {renderConfirm, removeRuleConfirmOptions: confirmOptions} = this.props.config.settings;
       const doRemove = () => {
         this.props.removeSelf();
       };
       if (confirmOptions && !this.isEmptyCurrentRule()) {
-        confirm({...confirmOptions,
+        renderConfirm({...confirmOptions,
           onOk: doRemove,
           onCancel: null
         });
@@ -102,6 +107,7 @@ class Rule extends PureComponent {
     }
 
     render () {
+        const {config} = this.props;
         const {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
@@ -109,13 +115,14 @@ class Rule extends PureComponent {
         const {
             deleteLabel, renderBeforeWidget, renderAfterWidget, renderSize, 
             immutableGroupsMode, immutableFieldsMode, immutableOpsMode, immutableValuesMode,
-        } = this.props.config.settings;
+            renderButton: Btn
+        } = config.settings;
 
         const field = 
             <FieldWrapper
                 key="field"
                 classname={"rule--field"}
-                config={this.props.config}
+                config={config}
                 selectedField={this.props.selectedField}
                 setField={!immutableOpsMode ? this.props.setField : dummyFn}
                 parentField={this.props.parentField}
@@ -124,7 +131,7 @@ class Rule extends PureComponent {
         const operator = 
             <OperatorWrapper
                 key="operator"
-                config={this.props.config}
+                config={config}
                 selectedField={this.props.selectedField}
                 selectedOperator={this.props.selectedOperator}
                 setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
@@ -143,7 +150,7 @@ class Rule extends PureComponent {
                     operator={this.props.selectedOperator}
                     value={this.props.value}
                     valueSrc={this.props.valueSrc}
-                    config={this.props.config}
+                    config={config}
                     setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
                     setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
                     readonly={immutableValuesMode}
@@ -157,7 +164,7 @@ class Rule extends PureComponent {
                     selectedOperator={this.props.selectedOperator}
                     operatorOptions={this.props.operatorOptions}
                     setOperatorOption={!immutableOpsMode ? this.props.setOperatorOption : dummyFn}
-                    config={this.props.config}
+                    config={config}
                     readonly={immutableValuesMode}
                 />
             </Col>;
@@ -186,21 +193,14 @@ class Rule extends PureComponent {
                 key="rule-drag-icon"
                 className={"qb-drag-handler rule--drag-handler"}
                 onMouseDown={this.props.handleDraggerMouseDown}
-            ><Icon type="bars" /> </span>
+            ><DragIcon /> </span>
         ;
 
         const del = (
             <div key="rule-header" className="rule--header">
-            {!immutableGroupsMode &&
-                <Button
-                    type="danger"
-                    icon="delete"
-                    onClick={this.removeSelf}
-                    size={renderSize}
-                >
-                    {deleteLabel}
-                </Button>
-            }
+            {!immutableGroupsMode && <Btn 
+                type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
+            />}
             </div>
         );
 

@@ -1,6 +1,4 @@
 import React, { PureComponent } from 'react';
-import { Button } from 'antd';
-const ButtonGroup = Button.Group;
 
 const groupActionsPositionList = {
   topLeft: 'group--actions--tl',
@@ -15,42 +13,30 @@ const defaultPosition = 'topRight';
 
 export class GroupActions extends PureComponent {
   render() {
-    const {config: {settings}, addRule, addGroup, canAddGroup, canAddRule, canDeleteGroup, removeSelf} = this.props;
-    const {immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, renderSize, groupActionsPosition} = settings;
+    const {config, addRule, addGroup, canAddGroup, canAddRule, canDeleteGroup, removeSelf} = this.props;
+    const {
+      immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
+      renderButton: Btn, renderButtonGroup: BtnGrp
+    } = config.settings;
     const position = groupActionsPositionList[groupActionsPosition || defaultPosition];
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule &&
-      <Button
-        key="group-add-rule"
-        icon="plus"
-        className="action action--ADD-RULE"
-        onClick={addRule}
-      >{addRuleLabel}</Button>;
-    const addGroupBtn = !immutableGroupsMode && canAddGroup &&
-      <Button
-        key="group-add-group"
-        className="action action--ADD-GROUP"
-        icon="plus-circle-o"
-        onClick={addGroup}
-      >{addGroupLabel}</Button>;
-    const delGroupBtn = !immutableGroupsMode && canDeleteGroup &&
-      <Button
-        key="group-del"
-        type="danger"
-        icon="delete"
-        className="action action--DELETE"
-        onClick={removeSelf}
-      >{delGroupLabel}</Button>;
+    const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn
+      type="addRule" onClick={addRule} label={addRuleLabel} config={config}
+    />;
+    const addGroupBtn = !immutableGroupsMode && canAddGroup && <Btn
+      type="addGroup" onClick={addGroup} label={addGroupLabel} config={config}
+    />;
+    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && <Btn
+      type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config}
+    />;
 
     return (
       <div className={`group--actions ${position}`}>
-        <ButtonGroup
-          size={renderSize}
-        >
+        <BtnGrp config={config}>
           {addRuleBtn}
           {addGroupBtn}
           {delGroupBtn}
-        </ButtonGroup>
+        </BtnGrp>
       </div>
     )
   }

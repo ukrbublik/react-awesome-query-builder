@@ -1,12 +1,13 @@
-import en_US from 'antd/lib/locale-provider/en_US';
 import * as Widgets from '../components/widgets';
 import React from "react";
 const {
-  FieldSelect,
-  FieldDropdown,
-  FieldCascader,
-  FieldTreeSelect,
-  VanillaFieldSelect
+  VanillaFieldSelect,
+  VanillaConjs,
+  VanillaButton,
+  VanillaButtonGroup,
+  VanillaProvider,
+  VanillaValueSources,
+  vanillaConfirm,
 } = Widgets;
 
 export const settings = {
@@ -17,17 +18,15 @@ export const settings = {
         return field;
   },
 
-  renderField: (props) => <FieldSelect {...props} />,
-  // renderField: (props) => <FieldDropdown {...props} />,
-  // renderField: (props) => <FieldCascader {...props} />,
-  // renderField: (props) => <FieldTreeSelect {...props} />,
-  // renderField: (props) => <VanillaFieldSelect {...props} />,
-
-  renderOperator: (props) => <FieldSelect {...props} />,
-  // renderOperator: (props) => <FieldDropdown {...props} />,
-  // renderOperator: (props) => <VanillaFieldSelect {...props} />,
-
-  renderFunc: (props) => <FieldSelect {...props} />,
+  renderField: (props) => <VanillaFieldSelect {...props} />,
+  renderOperator: (props) => <VanillaFieldSelect {...props} />,
+  renderFunc: (props) => <VanillaFieldSelect {...props} />,
+  renderConjs: (props) => <VanillaConjs {...props} />,
+  renderButton: (props) => <VanillaButton {...props} />,
+  renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
+  renderProvider: (props) => <VanillaProvider {...props} />,
+  renderValueSources: (props) => <VanillaValueSources {...props} />,
+  renderConfirm: vanillaConfirm,
 
   valueSourcesInfo: {
       value: {},
@@ -47,7 +46,6 @@ export const settings = {
   locale: {
     short: 'en',
     full: 'en-US',
-    antd: en_US,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
@@ -60,7 +58,7 @@ export const settings = {
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",
-  delGroupLabel: null,
+  delGroupLabel: "",
   notLabel: "Not",
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,

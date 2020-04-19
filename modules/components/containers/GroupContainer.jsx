@@ -77,16 +77,11 @@ export default (Group) => {
       }));
     }
 
-    setConjunction = (e = null, conj = null) => {
-      if (!conj && e) {
-        //for RadioGroup
-        conj = e.target.value;
-      }
-
+    setConjunction = (conj = null) => {
       this.props.actions.setConjunction(this.props.path, conj);
     }
 
-    setNot = (e = null, not = null) => {
+    setNot = (not = null) => {
       this.props.actions.setNot(this.props.path, not);
     }
 

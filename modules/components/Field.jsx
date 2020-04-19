@@ -88,12 +88,14 @@ export default class Field extends PureComponent {
             const altLabel = field.label2;
             const tooltip = field.tooltip;
             const subpath = (path ? path : []).concat(fieldKey);
+            const disabled = field.disabled;
             
             if (field.hideForSelect)
                 return undefined;
 
             if (field.type == "!struct") {
                 return {
+                    disabled,
                     key: fieldKey,
                     path: prefix+fieldKey,
                     label,
@@ -104,6 +106,7 @@ export default class Field extends PureComponent {
                 };
             } else {
                 return {
+                    disabled,
                     key: fieldKey,
                     path: prefix+fieldKey,
                     label,

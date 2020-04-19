@@ -1,14 +1,13 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import Immutable from 'immutable';
 import FuncSelect from './FuncSelect';
 import {
   getFuncConfig
 } from "../utils/configUtils";
-import { Col } from 'antd';
 import Widget from './Widget';
 import {setFunc, setArgValue, setArgValueSrc} from '../utils/funcUtils';
 import {useOnPropsChanged} from "../utils/stuff";
+const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
 
 
 export default class FuncWidget extends PureComponent {

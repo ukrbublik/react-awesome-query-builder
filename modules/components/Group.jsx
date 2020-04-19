@@ -3,15 +3,18 @@ import PropTypes from 'prop-types';
 import startsWith from 'lodash/startsWith'
 import GroupContainer from './containers/GroupContainer';
 import Draggable from './containers/Draggable';
-import { Icon, Modal } from 'antd';
-const { confirm } = Modal;
 const classNames = require('classnames');
 import Item from './Item';
-import {ConjsRadios, ConjsButtons} from './Conjs';
 import {GroupActions} from './GroupActions';
 
 const defaultPosition = 'topRight';
-
+const dummyFn = () => {};
+const DragIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray" width="18px" height="18px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+  </svg>
+);
 
 export class Group extends PureComponent {
   static propTypes = {
@@ -50,12 +53,12 @@ export class Group extends PureComponent {
   }
 
   removeSelf() {
-    const confirmOptions = this.props.config.settings.removeGroupConfirmOptions;
+    const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = this.props.config.settings;
     const doRemove = () => {
       this.props.removeSelf();
     };
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
-      confirm({...confirmOptions,
+      renderConfirm({...confirmOptions,
         onOk: doRemove,
         onCancel: null
       });
@@ -218,29 +221,29 @@ export class Group extends PureComponent {
         key="group-drag-icon"
         className={"qb-drag-handler group--drag-handler"}
         onMouseDown={handleDraggerMouseDown}
-      ><Icon type="bars" /> </span>;
+      ><DragIcon /> </span>;
     return drag;
   }
 
   renderConjs() {
     const {
-      config, children1,
+      config, children1, id,
       selectedConjunction, setConjunction, conjunctionOptions, not, setNot
     } = this.props;
-    const {immutableGroupsMode, renderConjsAsRadios} = config.settings;
+    const {immutableGroupsMode, renderConjs: Conjs} = config.settings;
 
-    const Conjs = renderConjsAsRadios ? ConjsRadios : ConjsButtons;
-    const conjs = <Conjs
-      disabled={children1.size < 2}
-      selectedConjunction={selectedConjunction}
-      setConjunction={immutableGroupsMode ? null : setConjunction}
-      conjunctionOptions={conjunctionOptions}
-      config={config}
-      not={not}
-      setNot={immutableGroupsMode ? null : setNot}
-      readonly={immutableGroupsMode}
-    />;
-    return conjs;
+    const renderProps = {
+      disabled: children1.size < 2,
+      readonly: immutableGroupsMode,
+      selectedConjunction: selectedConjunction,
+      setConjunction: immutableGroupsMode ? dummyFn : setConjunction,
+      conjunctionOptions: conjunctionOptions,
+      config: config,
+      not: not || false,
+      id: id,
+      setNot: immutableGroupsMode ? dummyFn : setNot,
+    };
+    return <Conjs {...renderProps} />;
   }
 
   renderHeader() {

@@ -3,23 +3,26 @@ import merge from 'lodash/merge';
 import { Widgets, Operators, BasicConfig } from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import AntdConfig from 'react-awesome-query-builder/config/antd';
+import * as AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
 const {
     FieldSelect,
     FieldDropdown,
     FieldCascader,
     FieldTreeSelect,
-    VanillaFieldSelect
-  } = Widgets;
+} = AntdWidgets;
+const InitialConfig = AntdConfig; // BasicConfig
+
 
 const conjunctions = {
-    ...BasicConfig.conjunctions
+    ...InitialConfig.conjunctions
 };
 
 const operators = {
-    ...BasicConfig.operators,
+    ...InitialConfig.operators,
     // examples of  overriding
     between: {
-        ...BasicConfig.operators.between,
+        ...InitialConfig.operators.between,
         valueLabels: [
             'Value from',
             'Value to'
@@ -30,7 +33,7 @@ const operators = {
         ],
     },
     proximity: {
-        ...BasicConfig.operators.proximity,
+        ...InitialConfig.operators.proximity,
         valueLabels: [
             { label: 'Word 1', placeholder: 'Enter first word' },
             { label: 'Word 2', placeholder: 'Enter second word' },
@@ -40,7 +43,7 @@ const operators = {
             //'Word 2'
         ],
         options: {
-            ...BasicConfig.operators.proximity.options,
+            ...InitialConfig.operators.proximity.options,
             optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
             optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
             optionPlaceholder: "Select words between", // placeholder for "near" selectbox
@@ -55,50 +58,50 @@ const operators = {
 };
 
 const widgets = {
-    ...BasicConfig.widgets,
+    ...InitialConfig.widgets,
     // examples of  overriding
     text: {
-        ...BasicConfig.widgets.text,
+        ...InitialConfig.widgets.text,
         validateValue: (val, fieldDef) => {
             return (val.length < 10);
         },
     },
     slider: {
-        ...BasicConfig.widgets.slider,
+        ...InitialConfig.widgets.slider,
         customProps: {
             width: '300px'
         }
     },
     rangeslider: {
-        ...BasicConfig.widgets.rangeslider,
+        ...InitialConfig.widgets.rangeslider,
         customProps: {
             width: '300px'
         }
     },
     date: {
-        ...BasicConfig.widgets.date,
+        ...InitialConfig.widgets.date,
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD',
     },
     time: {
-        ...BasicConfig.widgets.time,
+        ...InitialConfig.widgets.time,
         timeFormat: 'HH:mm',
         valueFormat: 'HH:mm:ss',
     },
     datetime: {
-        ...BasicConfig.widgets.datetime,
+        ...InitialConfig.widgets.datetime,
         timeFormat: 'HH:mm',
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
     },
     func: {
-        ...BasicConfig.widgets.func,
+        ...InitialConfig.widgets.func,
         customProps: {
             showSearch: true
         }
     },
     treeselect: {
-        ...BasicConfig.widgets.treeselect,
+        ...InitialConfig.widgets.treeselect,
         customProps: {
             showSearch: true
         }
@@ -107,9 +110,9 @@ const widgets = {
 
 
 const types = {
-    ...BasicConfig.types,
+    ...InitialConfig.types,
     // examples of  overriding
-    boolean: merge(BasicConfig.types.boolean, {
+    boolean: merge(InitialConfig.types.boolean, {
         widgets: {
             boolean: {
                 widgetProps: {
@@ -153,7 +156,7 @@ const localeSettings = {
   };
 
 const settings = {
-    ...BasicConfig.settings,
+    ...InitialConfig.settings,
     ...localeSettings,
 
     valueSourcesInfo: {
@@ -175,9 +178,10 @@ const settings = {
     // showLabels: true,
     maxNesting: 3,
     canLeaveEmptyGroup: true, //after deletion
+    
     // renderField: (props) => <FieldCascader {...props} />,
-    renderOperator: (props) => <FieldDropdown {...props} />,
-    renderFunc: (props) => <FieldSelect {...props} />,
+    // renderOperator: (props) => <FieldDropdown {...props} />,
+    // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 //////////////////////////////////////////////////////////////////////

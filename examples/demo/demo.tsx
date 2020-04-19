@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {
-  Query, Builder, BasicConfig, Utils, 
+  Query, Builder, Utils, 
   //types:
   ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree
 } from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
-import loadedConfig from './config';
+import loadConfig from './config';
 import loadedInitValue from './init_value';
 import loadedInitLogic from './init_logic';
 
@@ -14,7 +14,9 @@ const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlForma
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
+const initialSkin = "antd";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
+const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 let initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree;
@@ -32,6 +34,7 @@ window.dispatchEvent(updateEvent);
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
+  skin: String,
 }
 
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
@@ -48,7 +51,8 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
     state = {
       tree: initTree, 
-      config: loadedConfig
+      config: loadedConfig,
+      skin: initialSkin
     };
 
     render = () => (
@@ -60,6 +64,10 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
             renderBuilder={this.renderBuilder}
         />
 
+        <select value={this.state.skin} onChange={this.changeSkin}>
+          <option key="vanilla">vanilla</option>
+          <option key="antd">antd</option>
+        </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
 
@@ -80,6 +88,16 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     resetValue = () => {
       this.setState({
         tree: initTree, 
+      });
+    };
+
+    changeSkin = (e) => {
+      const skin = e.target.value;
+      const config = loadConfig(e.target.value);
+      this.setState({
+        skin,
+        config,
+        tree: checkTree(this.state.tree, config)
       });
     };
 

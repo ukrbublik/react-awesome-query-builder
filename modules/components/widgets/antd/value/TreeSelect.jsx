@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { TreeSelect } from "antd";
-import { useOnPropsChanged, defaultTreeDataMap, mapListValues, getTitleInListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../utils/stuff";
+import { useOnPropsChanged, defaultTreeDataMap, mapListValues, getTitleInListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../../utils/stuff";
 
 export default class TreeSelectWidget extends PureComponent {
   static propTypes = {

@@ -194,8 +194,10 @@ const myConfig = {
 [source,javascript]
 ----
 import en_US from 'antd/lib/locale-provider/en_US';
+import {AntdWidgets} from 'react-awesome-query-builder/components/widgets/antd';
 import {Widgets} from 'react-awesome-query-builder';
-const { FieldCascader, FieldDropdown } = Widgets;
+const { VanillaFieldSelect } = Widgets;
+const { FieldCascader, FieldDropdown } = AntdWidgets;
 ----
 
 [source,javascript]
@@ -271,16 +273,16 @@ Render settings:
 |key |default |meaning
 |renderSize |`small` |Size of AntDesign components - `small` or `large`
 |renderField |`(props) => <FieldSelect {...props} />` |Render fields list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (from `Widgets`)
+  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (see `AntdWidgets` and `Widgets` above)
 |renderOperator |`(props) => <FieldSelect {...props} />` |Render operators list +
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+|renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
 |hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
-|renderConjsAsRadios |false |How to render conjunctions switcher? true - use `RadioGroup`, false - use `ButtonGroup`
 |customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
  `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
@@ -446,18 +448,16 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 [source,javascript]
 ----
 import {Widgets} from 'react-awesome-query-builder';
+import {AntdWidgets} from 'react-awesome-query-builder/components/widgets/antd';
 const {
     TextWidget,
     NumberWidget,
-    SelectWidget,
-    MultiSelectWidget,
-    TreeSelectWidget,
-    DateWidget,
-    BooleanWidget,
-    TimeWidget,
-    DateTimeWidget,
-    ValueFieldWidget,
-    FuncWidget
+    ...
+} = AntdWidgets;
+const {
+    VanillaTextWidget,
+    VanillaNumberWidget,
+    ...
 } = Widgets;
 ----
 

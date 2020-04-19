@@ -26,6 +26,9 @@ type Optional<T> = {
 type TypedMap<T> = {
   [key: string]: T;
 };
+type TypedKeyMap<K, T> = {
+  [key: K]: T;
+};
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
@@ -131,7 +134,7 @@ interface BaseWidgetProps {
   setValue(val: RuleValue): void,
   placeholder: String,
   field: String,
-  operator: String,
+  operator: string,
   fieldDefinition: Field,
   config: Config,
   delta?: Number,
@@ -205,6 +208,68 @@ export interface Conjunction {
   reversedConj?: String,
 };
 export type Conjunctions = TypedMap<Conjunction>;
+
+export interface ConjunctionOption {
+  id: String,
+  key: String,
+  label: String,
+  checked: Boolean,
+};
+
+export interface ConjsProps {
+  path: String, 
+  readonly?: Boolean,
+  disabled?: Boolean,
+  selectedConjunction?: String,
+  setConjunction(conj: String): void,
+  conjunctionOptions?: Array<ConjunctionOption>,
+  config?: Config,
+  not: Boolean,
+  setNot(not: Boolean): void,
+}
+
+
+/////////////////
+// Rule, Group
+/////////////////
+
+export interface ButtonProps {
+  type: "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup", 
+  onClick(): void, 
+  label: String,
+  config?: Config,
+};
+
+export interface ButtonGroupProps {
+  children: ReactElement,
+  config?: Config,
+};
+
+export interface ProviderProps {
+  children: ReactElement,
+  config?: Config,
+};
+
+export type ValueSourceItem = {
+  label: String, 
+};
+type ValueSourcesItems = TypedKeyMap<ValueSource, ValueSourceItem>;
+
+export interface ValueSourcesProps {
+  config?: Config,
+  valueSources: ValueSourcesItems, 
+  valueSrc?: ValueSource, 
+  setValueSrc(valueSrc: String): void, 
+  readonly?: Boolean,
+  title: String,
+};
+
+export interface ConfirmModalProps {
+  onOk(): void, 
+  okText: String, 
+  cancelText?: String, 
+  title: String,
+};
 
 
 /////////////////
@@ -311,9 +376,9 @@ type ListValues = TypedMap<String> | Array<ListItem> | Array<String>;
 interface BasicFieldSettings {
 }
 interface NumberFieldSettings extends BasicFieldSettings {
-  min?: Number,
-  max?: Number,
-  step?: Number,
+  min?: number,
+  max?: number,
+  step?: number,
   marks?: {[mark: number]: ReactElement | String}
 };
 interface DateTimeFieldSettings extends BasicFieldSettings {
@@ -389,7 +454,8 @@ export type FieldItem = {
   label: String, 
   fullLabel?: String, 
   altLabel?: String, 
-  tooltip?: String
+  tooltip?: String,
+  disabled?: Boolean,
 };
 type FieldItems = TypedMap<FieldItem>;
 
@@ -414,6 +480,8 @@ export interface FieldProps {
 // Settings
 /////////////////
 
+type ConfirmFunc = (opts: ConfirmModalProps) => void;
+
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: String, widget?: String}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
@@ -426,7 +494,7 @@ export interface LocaleSettings {
   locale?: {
     short: String,
     full: String,
-    antd: Object,
+    antd?: Object,
   },
   valueLabel?: String,
   valuePlaceholder?: String,
@@ -458,7 +526,12 @@ export interface RenderSettings {
   renderField?: Factory<FieldProps>;
   renderOperator?: Factory<FieldProps>;
   renderFunc?: Factory<FieldProps>;
-  renderConjsAsRadios?: Boolean,
+  renderConjs?: Factory<ConjsProps>;
+  renderButton?: Factory<ButtonProps>;
+  renderButtonGroup?: Factory<ButtonGroupProps>;
+  renderProvider?: Factory<ProviderProps>;
+  renderValueSources?: Factory<ValueSourcesProps>;
+  renderConfirm?: ConfirmFunc;
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
@@ -603,17 +676,44 @@ export interface BasicConfig extends Config {
 // ReadyWidgets
 /////////////////
 
-interface ReadyWidgets {
+type ConfirmFunc = (opts: ConfirmModalProps) => void;
+
+interface VanillaWidgets {
+  // vanilla core widgets
+  VanillaFieldSelect: ElementType<FieldProps>,
+  VanillaConjs: ElementType<ConjsProps>,
+  VanillaButton: ElementType<ButtonProps>,
+  VanillaButtonGroup: ElementType<ButtonGroupProps>,
+  VanillaProvider: ElementType<ProviderProps>,
+  VanillaValueSources: ElementType<ValueSourcesProps>,
+  vanillaConfirm: ConfirmFunc,
+
+  // vanilla core widgets
+  VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
+  VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaDateWidget: ElementType<DateTimeWidgetProps>,
+  VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaNumberWidget: ElementType<NumberWidgetProps>,
+  VanillaSliderWidget: ElementType<NumberWidgetProps>,
+}
+
+interface AntdWidgets {
+  // antd core widgets
   FieldSelect: ElementType<FieldProps>,
   FieldDropdown: ElementType<FieldProps>,
   FieldCascader: ElementType<FieldProps>,
   FieldTreeSelect: ElementType<FieldProps>,
-  VanillaFieldSelect: ElementType<FieldProps>,
+  Button: ElementType<ButtonProps>,
+  ButtonGroup: ElementType<ButtonGroupProps>,
+  Conjs: ElementType<ConjsProps>,
+  Provider: ElementType<ProviderProps>,
+  ValueSources: ElementType<ValueSourcesProps>,
+  confirm: ConfirmFunc,
 
-  ValueFieldWidget: ElementType<WidgetProps>,
-
-  FuncWidget: ElementType<WidgetProps>,
-
+  // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,
@@ -625,6 +725,11 @@ interface ReadyWidgets {
   TimeWidget: ElementType<DateTimeWidgetProps>,
   DateTimeWidget: ElementType<DateTimeWidgetProps>,
   BooleanWidget: ElementType<BooleanWidgetProps>,
+}
+
+interface ReadyWidgets extends VanillaWidgets {
+  ValueFieldWidget: ElementType<WidgetProps>,
+  FuncWidget: ElementType<WidgetProps>,
 };
 
 
@@ -635,3 +740,4 @@ export const Query: Query;
 export const Builder: Builder;
 export const BasicConfig: BasicConfig;
 export const Widgets: ReadyWidgets;
+export const AntdWidgets: AntdWidgets;
