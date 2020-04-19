@@ -212,7 +212,7 @@ const setField = (state, path, newField, config) => {
     const newFieldConfig = getFieldConfig(newField, config);
     const isRuleGroup = newFieldConfig.type == '!group';
 
-    if (!newFieldConfig.operators) {
+    if (!isRuleGroup && !newFieldConfig.operators) {
         console.warn(`Type ${newFieldConfig.type} is not supported`);
         return state;
     }

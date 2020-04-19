@@ -17,7 +17,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
       }
     }
     if (!values.length)
-      values = undefined;
+      values = undefined; //not allow []
     return values;
   };
 

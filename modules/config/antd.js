@@ -87,15 +87,15 @@ const widgets = {
     factory: (props) => <BooleanWidget {...props} />,
   },
   date: {
-    ...BasicConfig.widgets.boolean,
+    ...BasicConfig.widgets.date,
     factory: (props) => <DateWidget {...props} />,
   },
   time: {
-    ...BasicConfig.widgets.boolean,
+    ...BasicConfig.widgets.time,
     factory: (props) => <TimeWidget {...props} />,
   },
   datetime: {
-    ...BasicConfig.widgets.boolean,
+    ...BasicConfig.widgets.datetime,
     factory: (props) => <DateTimeWidget {...props} />,
   },
 

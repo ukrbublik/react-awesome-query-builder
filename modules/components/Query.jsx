@@ -158,8 +158,6 @@ export default class QueryContainer extends Component {
         }
     }
 
-    withC
-
     render() {
         // `get_children` is deprecated!
         const {renderBuilder, get_children, onChange, settings} = this.props;
