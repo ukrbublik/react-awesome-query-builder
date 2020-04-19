@@ -30,6 +30,7 @@ const {
     VanillaDateTimeWidget,
     VanillaMultiSelectWidget,
     VanillaSelectWidget,
+    VanillaNumberWidget,
   } = Widgets;
 
 const conjunctions: Conjunctions = {
@@ -142,6 +143,10 @@ const widgets: Widgets = {
     select: {
         ...BasicConfig.widgets.select,
         factory: (props) => <VanillaSelectWidget {...props} />,
+    },
+    number: {
+        ...BasicConfig.widgets.number,
+        factory: (props) => <VanillaNumberWidget {...props} />,
     },
 };
 

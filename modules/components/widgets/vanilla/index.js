@@ -8,6 +8,7 @@ export {default as VanillaTimeWidget} from './value/VanillaTime';
 export {default as VanillaDateTimeWidget} from './value/VanillaDateTime';
 export {default as VanillaMultiSelectWidget} from './value/VanillaMultiSelect';
 export {default as VanillaSelectWidget} from './value/VanillaSelect';
+export {default as VanillaNumberWidget} from './value/VanillaNumber';
 
 // field select widget
 export {default as VanillaFieldSelect} from './core/VanillaFieldSelect';
