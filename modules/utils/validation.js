@@ -245,11 +245,11 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, confi
 					if (value instanceof Array) {
 							for (let i = 0 ; i < value.length ; i++) {
 								const vv = getItemInListValues(fieldSettings.listValues, value[i]);
-									if (vv == undefined) {
-											return [`Value ${value[i]} is not in list of values`, value];
-									} else {
-										value[i] = vv.value;
-									}
+								if (vv == undefined) {
+										return [`Value ${value[i]} is not in list of values`, value];
+								} else {
+									value[i] = vv.value;
+								}
 							}
 					} else {
 							const vv = getItemInListValues(fieldSettings.listValues, value);
