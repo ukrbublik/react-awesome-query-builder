@@ -21,6 +21,8 @@ export const mongodbFormat = (tree, config) => {
     return res;
 };
 
+const isObject = (v) => (typeof v == 'object' && v !== null && !Array.isArray(v));
+
 //meta is mutable
 const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
     if (currentValue === undefined)
@@ -152,7 +154,24 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
                             acc = undefined;
                             break;
                         }
-                        acc[k] = rule[k];
+                        if (acc[k] == undefined) {
+                            acc[k] = rule[k];
+                        } else {
+                            // https://github.com/ukrbublik/react-awesome-query-builder/issues/182
+                            let prev = acc[k], next = rule[k];
+                            if (!isObject(prev)) {
+                                prev = {'$eq': prev};
+                            }
+                            if (!isObject(next)) {
+                                next = {'$eq': next};
+                            }
+                            const prevOp = Object.keys(prev)[0], nextOp = Object.keys(next)[0];
+                            if (prevOp == nextOp) {
+                                acc = undefined;
+                                break;
+                            }
+                            acc[k] = Object.assign({}, prev, next);
+                        }
                     }
                     return acc;
                 }, {});
