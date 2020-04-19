@@ -20,7 +20,7 @@ export default (className) => (GroupOrRule) => {
     handleDraggerMouseDown = (e) => {
         var nodeId = this.props.id;
         var dom = this.wrapper.current;
-
+        
         if (this.props.onDragStart) {
           this.props.onDragStart(nodeId, dom, e);
         }

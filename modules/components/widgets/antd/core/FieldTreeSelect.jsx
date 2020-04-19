@@ -80,7 +80,7 @@ export default class FieldTreeSelect extends PureComponent {
   }
 
   filterTreeNode = (input, option) => {
-      const dataForFilter = option.props || option; // tip: props was available on antd < 4
+    const dataForFilter = option; // tip: props was available on antd < 4
       const keysForFilter = ['title', 'value', 'label', 'altLabel', 'fullLabel'];
       const valueForFilter = 
         keysForFilter

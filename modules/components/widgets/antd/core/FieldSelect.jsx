@@ -29,7 +29,7 @@ export default class FieldSelect extends PureComponent {
   }
 
   filterOption = (input, option) => {
-      const dataForFilter = option.props || option; // tip: props was available on antd < 4
+    const dataForFilter = option; // tip: props was available on antd < 4
       const keysForFilter = ['title', 'value', 'grouplabel', 'label'];
       const valueForFilter = keysForFilter
         .map(k => (typeof dataForFilter[k] == 'string' ? dataForFilter[k] : ''))
