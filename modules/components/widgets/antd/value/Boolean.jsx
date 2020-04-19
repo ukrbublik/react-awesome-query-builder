@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Switch, Icon } from 'antd';
+import { Switch } from 'antd';
 
 export default class BooleanWidget extends PureComponent {
     static propTypes = {
@@ -20,8 +20,8 @@ export default class BooleanWidget extends PureComponent {
     }
 
     static defaultProps = {
-        labelYes: null, //(<Icon type="check" />),
-        labelNo: null, //(<Icon type="cross" />),
+        labelYes: null, 
+        labelNo: null, 
     }
 
     render() {
@@ -29,7 +29,6 @@ export default class BooleanWidget extends PureComponent {
         
         return (
             <Switch
-                ref="switch"
                 checkedChildren={labelYes || null}
                 unCheckedChildren={labelNo || null}
                 checked={value || null}

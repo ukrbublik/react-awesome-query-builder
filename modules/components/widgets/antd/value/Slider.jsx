@@ -75,7 +75,6 @@ export default class SliderWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            ref="num"
             value={_value}
             min={min}
             max={max}
@@ -88,7 +87,6 @@ export default class SliderWidget extends PureComponent {
         <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
             disabled={readonly}
-            ref="slider"
             value={sliderValue}
             tipFormatter={this.tipFormatter}
             min={min}

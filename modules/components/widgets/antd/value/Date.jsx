@@ -54,7 +54,6 @@ export default class DateWidget extends PureComponent {
                 format={dateFormat}
                 value={dateValue}
                 onChange={this.handleChange}
-                ref="datetime"
                 {...customProps}
             />
         );

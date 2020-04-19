@@ -41,7 +41,6 @@ export default class NumberWidget extends PureComponent {
           disabled={readonly}
           key="widget-number"
           size={renderSize}
-          ref="num"
           value={_value}
           min={min}
           max={max}

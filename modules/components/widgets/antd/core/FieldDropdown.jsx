@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import keys from 'lodash/keys';
-import { Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
+import { Menu, Dropdown, Tooltip, Button } from 'antd';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
+import { DownOutlined } from '@ant-design/icons';
 
 
 export default class FieldDropdown extends PureComponent {
@@ -58,7 +59,7 @@ export default class FieldDropdown extends PureComponent {
               size={config.settings.renderSize}
               disabled={readonly}
           >
-              {togglerLabel} <Icon type="down" />
+              {togglerLabel} <DownOutlined />
           </Button>;
 
       if (tooltipText) {

@@ -82,7 +82,6 @@ export default class RangeWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            ref="numFrom"
             key="numFrom"
             value={valueFrom}
             min={min}
@@ -100,7 +99,6 @@ export default class RangeWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            ref="numTo"
             key="numTo"
             value={valueTo}
             min={min}
@@ -114,7 +112,6 @@ export default class RangeWidget extends PureComponent {
         <Col style={{float: 'left', width: _customProps.width || '300px'}}>
           <Slider
             disabled={readonly}
-            ref="slider"
             value={_value}
             tipFormatter={this.tipFormatter}
             min={min}

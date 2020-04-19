@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
-import { Icon, Popover, Radio } from 'antd';
+import { Popover, Radio } from 'antd';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
+import { EllipsisOutlined } from '@ant-design/icons';
 
 export default class ValueSources extends PureComponent {
   onChange = (e) => {
@@ -31,7 +32,7 @@ export default class ValueSources extends PureComponent {
       return (
           <span>
               <Popover content={content} title={title}>
-                  <Icon type="ellipsis" />
+                <EllipsisOutlined />
               </Popover>
           </span>
       );

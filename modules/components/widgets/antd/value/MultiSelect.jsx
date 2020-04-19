@@ -46,7 +46,8 @@ export default class MultiSelectWidget extends PureComponent {
   }
 
   filterOption = (input, option) => {
-    return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const dataForFilter = option; // tip: props was available on antd < 4
+    return dataForFilter.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
   render() {
@@ -70,7 +71,6 @@ export default class MultiSelectWidget extends PureComponent {
             }}
             key={"widget-multiselect"}
             dropdownMatchSelectWidth={false}
-            ref="val"
             placeholder={placeholder}
             size={renderSize}
             value={_value}
