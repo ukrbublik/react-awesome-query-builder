@@ -2,7 +2,7 @@ import {
 	getFieldConfig, getOperatorsForField, getOperatorConfig, 
 	getWidgetForFieldOp, getFieldWidgetConfig, getFuncConfig, getValueSourcesForFieldOp,
 } from './configUtils';
-import {defaultValue, deepEqual, getTitleInListValues} from "../utils/stuff";
+import {defaultValue, deepEqual, getTitleInListValues, getValueInListValues, getItemInListValues} from "../utils/stuff";
 import {defaultOperatorOptions} from '../utils/defaultUtils';
 import omit from 'lodash/omit';
 import Immutable from 'immutable';
@@ -232,26 +232,31 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, confi
 	const wConfig = config.widgets[w];
 	const wType = wConfig.type;
 	const jsType = wConfig.jsType;
+	const fieldSettings = fieldConfig.fieldSettings;
 
 	if (valueType != wType)
 			return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
-	
-	if (jsType && !isTypeOf(value, jsType)) {
+	if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
 		return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
 	}
-	
-	const fieldSettings = fieldConfig.fieldSettings;
+
 	if (fieldSettings) {
 			if (fieldSettings.listValues && !fieldSettings.allowCustomValues) {
 					if (value instanceof Array) {
-							for (let v of value) {
-									if (getTitleInListValues(fieldSettings.listValues, v) == undefined) {
-											return [`Value ${v} is not in list of values`, value];
+							for (let i = 0 ; i < value.length ; i++) {
+								const vv = getItemInListValues(fieldSettings.listValues, value[i]);
+									if (vv == undefined) {
+											return [`Value ${value[i]} is not in list of values`, value];
+									} else {
+										value[i] = vv.value;
 									}
 							}
 					} else {
-							if (getTitleInListValues(fieldSettings.listValues, value) == undefined) {
-									return [`Value ${value} is not in list of values`, value];
+							const vv = getItemInListValues(fieldSettings.listValues, value);
+							if (vv == undefined) {
+								return [`Value ${value} is not in list of values`, value];
+							} else {
+								value = vv.value;
 							}
 					}
 			}
