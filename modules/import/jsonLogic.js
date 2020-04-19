@@ -34,6 +34,12 @@ const buildConv = (config) => {
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
+    } else if(typeof opConfig.jsonLogic2 == "string") {
+      // example: all-in/1"
+      const opk = opConfig.jsonLogic2 + "/" + defaultValue(opConfig.cardinality, 1);
+      if (!operators[opk])
+        operators[opk] = [];
+      operators[opk].push(opKey);
     }
   }
 
@@ -254,6 +260,15 @@ const convertOp = (op, vals, conv, config, not, meta) => {
   if (!op) return undefined;
   const arity = vals.length;
   const cardinality = arity - 1;
+  if (op == "all") {
+    // special case
+    const op2 = Object.keys(vals[1])[0];
+    vals = [
+      vals[0],
+      vals[1][op2][1]
+    ];
+    op = op + "-" + op2; // example: "all-in"
+  }
   const opk = op + "/" + cardinality;
 
   let oks = [], errors = [];

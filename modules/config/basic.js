@@ -373,6 +373,7 @@ const operators = {
       },
       mongoFormatOp: mongoFormatOp1.bind(null, '$eq', v => v, false),
       reversedOp: 'multiselect_not_equals',
+      jsonLogic2: "all-in",
       jsonLogic: (field, op, vals) => ({
         // it's not "equals", but "includes" operator - just for example
         "all": [ field, {"in": [{"var": ""}, vals]} ]
