@@ -31,7 +31,8 @@ const {
     VanillaMultiSelectWidget,
     VanillaSelectWidget,
     VanillaNumberWidget,
-  } = Widgets;
+    VanillaSliderWidget,
+} = Widgets;
 
 const conjunctions: Conjunctions = {
     ...BasicConfig.conjunctions,
@@ -89,12 +90,12 @@ const widgets: Widgets = {
         },
         factory: (props) => <VanillaTextWidget {...props} />,
     },
-    slider: {
-        ...BasicConfig.widgets.slider,
-        customProps: {
-            width: '300px'
-        }
-    },
+    // slider: {
+    //     ...BasicConfig.widgets.slider,
+    //     customProps: {
+    //         width: '300px'
+    //     }
+    // },
     rangeslider: {
         ...BasicConfig.widgets.rangeslider,
         customProps: {
@@ -147,6 +148,10 @@ const widgets: Widgets = {
     number: {
         ...BasicConfig.widgets.number,
         factory: (props) => <VanillaNumberWidget {...props} />,
+    },
+    slider: {
+        ...BasicConfig.widgets.slider,
+        factory: (props) => <VanillaSliderWidget {...props} />,
     },
 };
 

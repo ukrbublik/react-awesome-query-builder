@@ -724,6 +724,7 @@ interface ReadyWidgets {
   VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
   VanillaSelectWidget: ElementType<SelectWidgetProps>,
   VanillaNumberWidget: ElementType<NumberWidgetProps>,
+  VanillaSliderWidget: ElementType<NumberWidgetProps>,
 };
 
 
