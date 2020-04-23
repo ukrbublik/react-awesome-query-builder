@@ -700,7 +700,7 @@ interface VanillaWidgets {
   VanillaSliderWidget: ElementType<NumberWidgetProps>,
 }
 
-interface AntdWidgets {
+export interface AntdWidgets {
   // antd core widgets
   FieldSelect: ElementType<FieldProps>,
   FieldDropdown: ElementType<FieldProps>,
@@ -740,4 +740,3 @@ export const Query: Query;
 export const Builder: Builder;
 export const BasicConfig: BasicConfig;
 export const Widgets: ReadyWidgets;
-export const AntdWidgets: AntdWidgets;

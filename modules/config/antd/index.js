@@ -1,8 +1,8 @@
 import en_US from 'antd/lib/locale-provider/en_US';
-import * as AntdWidgets from '../components/widgets/antd';
-import BasicConfig from './basic';
-import {getTitleInListValues} from '../utils/stuff';
-import {SqlString} from '../utils/sql';
+import AntdWidgets from '../../components/widgets/antd';
+import BasicConfig from '../basic';
+import {getTitleInListValues} from '../../utils/stuff';
+import {SqlString} from '../../utils/sql';
 import React from 'react';
 
 const {

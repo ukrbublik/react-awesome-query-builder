@@ -1,30 +1,57 @@
 import React from 'react';
 
 // value widgets
-export { default as DateWidget } from "./value/Date";
-export { default as DateTimeWidget } from "./value/DateTime";
-export { default as TimeWidget } from "./value/Time";
-export { default as SelectWidget } from "./value/Select";
-export { default as TextWidget } from "./value/Text";
-export { default as NumberWidget } from "./value/Number";
-export { default as SliderWidget } from "./value/Slider";
-export { default as RangeWidget } from "./value/Range";
-export { default as BooleanWidget } from "./value/Boolean";
-export { default as MultiSelectWidget } from "./value/MultiSelect";
-export { default as TreeSelectWidget } from "./value/TreeSelect";
+import DateWidget from "./value/Date";
+import DateTimeWidget from "./value/DateTime";
+import TimeWidget from "./value/Time";
+import SelectWidget from "./value/Select";
+import TextWidget from "./value/Text";
+import NumberWidget from "./value/Number";
+import SliderWidget from "./value/Slider";
+import RangeWidget from "./value/Range";
+import BooleanWidget from "./value/Boolean";
+import MultiSelectWidget from "./value/MultiSelect";
+import TreeSelectWidget from "./value/TreeSelect";
 
 // field select widgets
-export { default as FieldSelect } from "./core/FieldSelect";
-export { default as FieldDropdown } from "./core/FieldDropdown";
-export { default as FieldCascader } from "./core/FieldCascader";
-export { default as FieldTreeSelect } from "./core/FieldTreeSelect";
+import FieldSelect from "./core/FieldSelect";
+import FieldDropdown from "./core/FieldDropdown";
+import FieldCascader from "./core/FieldCascader";
+import FieldTreeSelect from "./core/FieldTreeSelect";
 
 // core components
-export { default as Button } from "./core/Button";
-export { default as ButtonGroup } from "./core/ButtonGroup";
-export { default as Conjs } from "./core/Conjs";
-export { default as ValueSources } from "./core/ValueSources";
-export { default as confirm } from "./core/confirm";
+import Button from "./core/Button";
+import ButtonGroup from "./core/ButtonGroup";
+import Conjs from "./core/Conjs";
+import ValueSources from "./core/ValueSources";
+import confirm from "./core/confirm";
 
 import { ConfigProvider } from 'antd';
-export const Provider = ({config, children}) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+const Provider = ({config, children}) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+
+export default {
+  DateWidget,
+  DateTimeWidget,
+  TimeWidget,
+  SelectWidget,
+  TextWidget,
+  NumberWidget,
+  SliderWidget,
+  RangeWidget,
+  BooleanWidget,
+  MultiSelectWidget,
+  TreeSelectWidget,
+
+  FieldSelect,
+  FieldDropdown,
+  FieldCascader,
+  FieldTreeSelect,
+
+  Button,
+  ButtonGroup,
+  Conjs,
+  ValueSources,
+  confirm,
+
+  Provider,
+};

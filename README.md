@@ -7,10 +7,7 @@ User-friendly React component to build queries.
 
 Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
 
-Using awesome [Ant Design](https://ant.design/) for widgets
-
-Master branch uses [antd v3](https://ant.design/docs/react/introduce).
-For [antd v2](https://2x.ant.design/docs/react/introduce) (which has more compact style) see [branch antd-2](https://github.com/ukrbublik/react-awesome-query-builder/tree/antd-2) and versions `0.1.*`. 
+Using awesome [Ant Design](https://ant.design/) v4 for widgets
 
 [Demo](https://ukrbublik.github.io/react-awesome-query-builder)
 
@@ -46,9 +43,12 @@ Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-buil
 
 
 ## Usage
-*Note:* From v2.0 antd is now optional (peer) dependency. 
-If you want to use another UI, don't import `config/antd` and `antd.less`. 
-You can use `BasicConfig` for simple UI. 
+**v2 Migration:** 
+From v2.0 antd is now optional (peer) dependency.  
+If you want to use AntDesign widgets, please use `AntdConfig` as base for your config:  
+`import AntdConfig from 'react-awesome-query-builder/config/antd';`  
+If you want to use another UI, don't import `config/antd` and `css/antd.less`.  
+You can use `BasicConfig` for simple UI.  
 
 ```javascript
 import React, {Component} from 'react';

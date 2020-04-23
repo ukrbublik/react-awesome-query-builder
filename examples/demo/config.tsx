@@ -7,7 +7,7 @@ import {
 } from 'react-awesome-query-builder';
 
 import AntdConfig from 'react-awesome-query-builder/config/antd';
-import * as AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
+import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
 const {
     FieldSelect,
     FieldDropdown,

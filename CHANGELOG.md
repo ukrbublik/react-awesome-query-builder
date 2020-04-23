@@ -1,4 +1,6 @@
 # Changelog
+- 2.0.2
+ - Fix for TS
 - 2.0.1
  - Fixed issues #187, #194, #182
 - 2.0.0
