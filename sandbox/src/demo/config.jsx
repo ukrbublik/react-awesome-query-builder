@@ -3,8 +3,8 @@ import merge from 'lodash/merge';
 import { Widgets, Operators, BasicConfig } from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
-import AntdConfig from 'react-awesome-query-builder/config/antd';
-import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
+import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
+import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 const {
     FieldSelect,
     FieldDropdown,

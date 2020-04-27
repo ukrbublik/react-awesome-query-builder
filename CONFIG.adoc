@@ -194,7 +194,7 @@ const myConfig = {
 [source,javascript]
 ----
 import en_US from 'antd/lib/locale-provider/en_US';
-import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
+import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import {Widgets} from 'react-awesome-query-builder';
 const { VanillaFieldSelect } = Widgets;
 const { FieldCascader, FieldDropdown } = AntdWidgets;
@@ -448,7 +448,7 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 [source,javascript]
 ----
 import {Widgets} from 'react-awesome-query-builder';
-import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
+import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 const {
     TextWidget,
     NumberWidget,

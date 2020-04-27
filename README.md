@@ -46,14 +46,14 @@ Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-buil
 **v2 Migration:** 
 From v2.0 antd is now optional (peer) dependency.  
 If you want to use AntDesign widgets, please use `AntdConfig` as base for your config:  
-`import AntdConfig from 'react-awesome-query-builder/config/antd';`  
+`import AntdConfig from 'react-awesome-query-builder/lib/config/antd';`  
 If you want to use another UI, don't import `config/antd` and `css/antd.less`.  
 You can use `BasicConfig` for simple UI.  
 
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
-import AntdConfig from 'react-awesome-query-builder/config/antd';
+import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import 'react-awesome-query-builder/css/antd.less';
 // or import "antd/dist/antd.css";
 import 'react-awesome-query-builder/css/styles.scss';
@@ -228,7 +228,7 @@ Then open localhost:3001 in a browser.
 Scripts:
 - `npm run examples` - Builds with webpack the examples and runs a dev-server on localhost:3001.
 - `npm run build-examples` - Builds with webpack the examples. Output path: `examples`
-- `npm run build-npm` - Builds a npm module. Output path: `build/npm`
+- `npm run build-npm` - Builds a npm module. Output path: `lib`
 
 The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
 

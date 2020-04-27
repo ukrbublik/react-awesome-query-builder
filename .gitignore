@@ -4,6 +4,7 @@ package-lock.json
 .idea
 yarn.lock
 build
+lib
 examples/*.ttf
 examples/*.svg
 examples/*.eot
