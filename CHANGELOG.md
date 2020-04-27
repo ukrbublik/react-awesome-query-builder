@@ -1,5 +1,5 @@
 # Changelog
-- 2.0.3
+- 2.0.4
  - Fixed import
 - 2.0.2
  - Fix for TS

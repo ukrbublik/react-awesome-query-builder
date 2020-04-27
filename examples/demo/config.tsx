@@ -6,8 +6,8 @@ import {
     Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from 'react-awesome-query-builder';
 
-import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
+import AntdConfig from 'react-awesome-query-builder/config/antd';
+import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
 const {
     FieldSelect,
     FieldDropdown,
