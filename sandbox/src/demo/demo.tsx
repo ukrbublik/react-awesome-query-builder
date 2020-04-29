@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
-import {Query, Builder, BasicConfig, Utils} from 'react-awesome-query-builder';
+import {
+  Query, Builder, Utils, 
+  //types:
+  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree
+} from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
 import loadedConfig from './config';
 import loadedInitValue from './init_value';
@@ -10,15 +14,23 @@ const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlForma
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
-const emptyInitValue = {"id": uuid(), "type": "group"};
-const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue : emptyInitValue;
-const initLogic = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
-let initTree;
+const emptyInitValue: JsonTree = {"id": uuid(), "type": "group"};
+const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
+const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
+let initTree: ImmutableTree;
 initTree = checkTree(loadTree(initValue), loadedConfig);
 //initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 
-export default class DemoQueryBuilder extends Component {
+interface DemoQueryBuilderState {
+  tree: ImmutableTree;
+  config: Config;
+}
+
+export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
+    private immutableTree: ImmutableTree;
+    private config: Config;
+    
     state = {
       tree: initTree,
       config: loadedConfig
@@ -54,7 +66,7 @@ export default class DemoQueryBuilder extends Component {
       });
     };
 
-    renderBuilder = (props) => (
+    renderBuilder = (props: BuilderProps) => (
         <div className="query-builder-container" style={{padding: '10px'}}>
             <div className="query-builder qb-lite">
                 <Builder {...props} />
@@ -62,7 +74,7 @@ export default class DemoQueryBuilder extends Component {
         </div>
     )
     
-    onChange = (immutableTree, config) => {
+    onChange = (immutableTree: ImmutableTree, config: Config) => {
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();
@@ -73,7 +85,7 @@ export default class DemoQueryBuilder extends Component {
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
 
-    renderResult = ({tree: immutableTree, config}) => {
+    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
       const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
       return (
       <div>

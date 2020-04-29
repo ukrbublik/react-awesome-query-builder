@@ -17,11 +17,15 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "homepage": "https://ukrbublik.github.io/react-awesome-query-builder/",
   "dependencies": {
+    "@types/node": "^13.13.4",
+    "@types/react": "^16.9.34",
+    "@types/react-dom": "^16.9.7",
+    "antd": "^4.1.2",
     "react": "^16.4.1",
+    "react-awesome-query-builder": "^2.0.5",
     "react-dom": "^16.4.1",
-    "react-awesome-query-builder": "^2.0.3",
     "react-scripts": "3.0.1",
-    "antd": "^4.1.2"
+    "typescript": "^3.8.3"
   },
   "browserslist": {
     "production": [

@@ -1,6 +1,10 @@
 import React from 'react';
 import merge from 'lodash/merge';
-import { Widgets, Operators, BasicConfig } from 'react-awesome-query-builder';
+import {
+    BasicConfig,
+    // types:
+    Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
+} from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
@@ -14,11 +18,36 @@ const {
 const InitialConfig = AntdConfig; // BasicConfig
 
 
-const conjunctions = {
+const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions
 };
 
-const operators = {
+
+const proximity: OperatorProximity = {
+    ...InitialConfig.operators.proximity,
+    valueLabels: [
+        { label: 'Word 1', placeholder: 'Enter first word' },
+        { label: 'Word 2', placeholder: 'Enter second word' },
+    ],
+    textSeparators: [
+        //'Word 1',
+        //'Word 2'
+    ],
+    options: {
+        ...InitialConfig.operators.proximity.options,
+        optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
+        optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
+        optionPlaceholder: "Select words between", // placeholder for "near" selectbox
+        minProximity: 2,
+        maxProximity: 10,
+        defaults: {
+            proximity: 2
+        },
+        customProps: {}
+    }
+};
+
+const operators: Operators = {
     ...InitialConfig.operators,
     // examples of  overriding
     between: {
@@ -32,32 +61,10 @@ const operators = {
             'to'
         ],
     },
-    proximity: {
-        ...InitialConfig.operators.proximity,
-        valueLabels: [
-            { label: 'Word 1', placeholder: 'Enter first word' },
-            { label: 'Word 2', placeholder: 'Enter second word' },
-        ],
-        textSeparators: [
-            //'Word 1',
-            //'Word 2'
-        ],
-        options: {
-            ...InitialConfig.operators.proximity.options,
-            optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
-            optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
-            optionPlaceholder: "Select words between", // placeholder for "near" selectbox
-            minProximity: 2,
-            maxProximity: 10,
-            defaults: {
-                proximity: 2
-            },
-            customProps: {}
-        }
-    },
+    proximity,
 };
 
-const widgets = {
+const widgets: Widgets = {
     ...InitialConfig.widgets,
     // examples of  overriding
     text: {
@@ -109,7 +116,7 @@ const widgets = {
 };
 
 
-const types = {
+const types: Types = {
     ...InitialConfig.types,
     // examples of  overriding
     boolean: merge(InitialConfig.types.boolean, {
@@ -125,7 +132,7 @@ const types = {
 };
 
 
-const localeSettings = {
+const localeSettings: LocaleSettings = {
     locale: {
         short: 'ru',
         full: 'ru-RU',
@@ -155,7 +162,7 @@ const localeSettings = {
     },
   };
 
-const settings = {
+const settings: Settings = {
     ...InitialConfig.settings,
     ...localeSettings,
 
@@ -186,7 +193,7 @@ const settings = {
 
 //////////////////////////////////////////////////////////////////////
 
-const fields = {
+const fields: Fields = {
     user: {
         label: 'User',
         tooltip: 'Group of fields',
@@ -383,7 +390,7 @@ const fields = {
 
 //////////////////////////////////////////////////////////////////////
 
-const funcs = {
+const funcs: Funcs = {
     LOWER: {
         label: 'Lowercase',
         mongoFunc: '$toLower',
@@ -428,14 +435,15 @@ const funcs = {
     },
 };
 
-
-export default {
+const config: Config = {
     conjunctions,
     operators,
     widgets,
     types,
     settings,
     fields,
-    funcs,
+    funcs
 };
+
+export default config;
 

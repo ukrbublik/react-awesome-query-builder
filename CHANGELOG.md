@@ -1,4 +1,6 @@
 # Changelog
+- 2.0.5
+ - Fixed TS types. Updated sandbox to TS
 - 2.0.4
  - Fixed import
 - 2.0.2
