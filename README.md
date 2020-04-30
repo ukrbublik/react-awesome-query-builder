@@ -29,7 +29,8 @@ Using awesome [Ant Design](https://ant.design/) v4 for widgets
   - another fields (of same type)
   - function (arguments also can be values/fields/funcs)
 - Reordering (drag-n-drop) support for rules and groups of rules
-- Using awesome [Ant Design](https://ant.design/) (but using custom widgets of another framework is possible)
+- Using awesome [Ant Design](https://ant.design/) as UI framework with rich features.  
+  (But using custom widgets of another framework is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
 - TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo))
@@ -38,24 +39,22 @@ Using awesome [Ant Design](https://ant.design/) v4 for widgets
 ## Getting started
 Install: `npm i react-awesome-query-builder`  
 See [basic usage](#usage) and [API](#api) below.  
-Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) (TS) or [`sandbox/src/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox/src/demo) (JS) for more advanced usage and configuration.
+Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) or [`sandbox/src/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox/src/demo) for more advanced usage and configuration.
 
+
+## v2 Migration
+From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
+Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
+Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
+Support of other UI frameworks (like Bootstrap, Material UI) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
 
 
 ## Usage
-**v2 Migration:** 
-From v2.0 antd is now optional (peer) dependency.  
-If you want to use AntDesign widgets, please use `AntdConfig` as base for your config:  
-`import AntdConfig from 'react-awesome-query-builder/lib/config/antd';`  
-If you want to use another UI, don't import `config/antd` and `css/antd.less`.  
-You can use `BasicConfig` for simple UI.  
-
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import 'react-awesome-query-builder/css/antd.less';
-// or import "antd/dist/antd.css";
+import 'react-awesome-query-builder/css/antd.less'; // or import "antd/dist/antd.css";
 import 'react-awesome-query-builder/css/styles.scss';
 import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
 const InitialConfig = AntdConfig; // or BasicConfig
@@ -217,12 +216,21 @@ See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/mas
 See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CHANGELOG.md)
 
 
+## Other UI frameworks
+Currently there are 2 collections of widgets:
+- [antdesign widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/antd)
+- [vanilla widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/vanilla)
+
+Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
+You can use vanilla widgets as skeleton.  
+Then to enable new widgets you need to create config overrides like this:
+[antdesign config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd/index.js)
+
+
 ## Development
-To build the component locally, clone this repo then run:
-
-`npm install`
-`npm run examples`
-
+To build the component locally, clone this repo then run:  
+`npm install`  
+`npm run examples`  
 Then open localhost:3001 in a browser.
 
 Scripts:
