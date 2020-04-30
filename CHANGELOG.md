@@ -1,16 +1,16 @@
 # Changelog
 - 2.0.5
- - Fixed TS types. Updated sandbox to TS
+  - Fixed TS types. Updated sandbox to TS
 - 2.0.4
- - Fixed import
+  - Fixed import
 - 2.0.2
- - Fix for TS
+  - Fix for TS
 - 2.0.1
- - Fixed issues #187, #194, #182
+  - Fixed issues #187, #194, #182
 - 2.0.0
- - Added `renderConjs`, `renderButton`, `renderButtonGroup`, `renderProvider`, `renderValueSources`, `renderConfirm`
- - Removed coupling with AntDesign. Now it should be possible to use another UI framework.
- - Added vanilla widgets. Added switcher between `antd` and `vanilla` in demo.
+  - Added `renderConjs`, `renderButton`, `renderButtonGroup`, `renderProvider`, `renderValueSources`, `renderConfirm`
+  - Removed coupling with AntDesign. Now it should be possible to use another UI framework.
+  - Added vanilla widgets. Added switcher between `antd` and `vanilla` in demo.
 - 1.3.7
   - Fixed [issue](https://github.com/ukrbublik/react-awesome-query-builder/issues/168) with dot in field name
 - 1.3.6
