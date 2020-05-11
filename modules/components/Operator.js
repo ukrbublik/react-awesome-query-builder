@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
 import {calcTextWidth, BUILT_IN_PLACEMENTS} from "../utils/stuff";
-import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
+import { Menu, Dropdown, Tooltip, Button, Select } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
@@ -67,7 +68,7 @@ export default class Operator extends Component {
           <Button
               size={this.props.config.settings.renderSize || "small"}
           >
-              {label} <Icon type="down" />
+              {label} <DownOutlined />
           </Button>;
 
       return toggler;

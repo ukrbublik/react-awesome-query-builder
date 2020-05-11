@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import { map, startsWith, get } from 'lodash';
 import GroupContainer from './containers/GroupContainer';
-import { Row, Col, Icon, Button, Radio } from 'antd';
-import { PlusOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Radio } from 'antd';
+import { PlusOutlined, PlusCircleOutlined, DeleteOutlined, BarsOutlined } from '@ant-design/icons';
 const ButtonGroup = Button.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -203,7 +203,7 @@ class Group extends Component {
           </ButtonGroup>
         }
         {this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 && !this.props.isRoot &&
-          <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} > <Icon type="bars" /> </span>
+          <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} > <BarsOutlined /> </span>
         }
       </div>
     );

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import shallowCompare from 'react-addons-shallow-compare';
 import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
 import {calcTextWidth, truncateString, BUILT_IN_PLACEMENTS} from "../utils/stuff";
-import { Menu, Dropdown, Icon, Tooltip, Button, Select } from 'antd';
+import { Menu, Dropdown, Tooltip, Button, Select } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
@@ -136,7 +137,7 @@ export default class Field extends Component {
           <Button
               size={this.props.config.settings.renderSize || "small"}
           >
-              {btnLabel} <Icon type="down" />
+              {btnLabel} <DownOutlined />
           </Button>;
 
       if (fullLabel && fullLabel != label) {

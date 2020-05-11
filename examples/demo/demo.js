@@ -4,9 +4,9 @@ import {Query, Builder, Utils} from '../../modules';
 import config from './config.sample';
 // import config from './config';
 // import '../../css/reset.less';
-import '../../css/styles.less';
-import '../../css/compact_styles.less';
-import '../../css/denormalize.less';
+// import '../../css/styles.less';
+// import '../../css/compact_styles.less';
+// import '../../css/denormalize.less';
 // import '../../css/bdh.less';
 import { fromJS } from 'immutable';
 

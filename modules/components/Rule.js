@@ -8,7 +8,8 @@ import Field from './Field';
 import Operator from './Operator';
 import Widget from './Widget';
 import OperatorOptions from './OperatorOptions';
-import { Row, Col, Menu, Dropdown, Icon, Tooltip, Button } from 'antd';
+import { Row, Col, Menu, Dropdown, Tooltip, Button } from 'antd';
+import { BarsOutlined, CloseCircleOutlined } from '@ant-design/icons';
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
@@ -108,7 +109,7 @@ class Rule extends Component {
                 <div className="rule--header">
                     {!this.props.config.settings.readonlyMode && (
                         this.props.config.settings.deleteLabel === null ? (
-                            <Icon type="close-circle" theme="filled" className="action--DELETE-RULE" onClick={this.props.removeSelf} size={this.props.config.settings.renderSize || "small"} />
+                            <CloseCircleOutlined className="action--DELETE-RULE" onClick={this.props.removeSelf} size={this.props.config.settings.renderSize || "small"} />
                         ) : (
                             <Button
                                 type="danger"
@@ -125,7 +126,7 @@ class Rule extends Component {
                 {/*<div className="rule--body">*/}
                     {/*<Row>*/}
                         { this.props.config.settings.canReorder && this.props.treeNodesCnt > 2 &&
-                            <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} ><Icon type="bars" /> </span>
+                            <span className={"qb-drag-handler"} onMouseDown={this.handleDraggerMouseDown} ><BarsOutlined /> </span>
                         }
                         {true ? (
                             <Col key={"fields"} className="rule--field">

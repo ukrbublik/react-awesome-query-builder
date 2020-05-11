@@ -10,7 +10,8 @@ import {
 } from "../../utils/configUtils";
 import {defaultValue} from "../../utils/stuff";
 import {bindActionCreators} from "../../utils/stuff";
-import { Icon, Popover, Button, Radio } from 'antd';
+import { Popover, Button, Radio } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 
@@ -168,7 +169,7 @@ export default (Widget) => {
             return (
                 <span>
                     <Popover content={content} title={valueSourcesPopupTitle}>
-                        <Icon type="ellipsis" />
+                      <EllipsisOutlined />
                     </Popover>
                 </span>
             );
