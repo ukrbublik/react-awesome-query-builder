@@ -1,6 +1,6 @@
 {
-  "name": "react-query-builder-antd3",
-  "version": "0.2.39",
+  "name": "react-query-builder-antd4",
+  "version": "0.1.0",
   "main1": "modules",
   "main": "build/npm/lib",
   "main2": "build/global/ReactAwesomeQueryBuilder.js",
@@ -31,7 +31,8 @@
   },
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "dependencies": {
-    "antd": "^3.13.2",
+    "antd": "^4.0.0",
+    "@ant-design/icons": "^4.0.0",
     "classnames": "^2.2.6",
     "clone": "^2.1.1",
     "immutable": "^3.7.6",

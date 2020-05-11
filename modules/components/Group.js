@@ -4,6 +4,7 @@ import shallowCompare from 'react-addons-shallow-compare';
 import { map, startsWith, get } from 'lodash';
 import GroupContainer from './containers/GroupContainer';
 import { Row, Col, Icon, Button, Radio } from 'antd';
+import { PlusOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 const ButtonGroup = Button.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -111,7 +112,7 @@ class Group extends Component {
           size={this.props.config.settings.renderSize || "small"}
         >{!this.props.config.settings.readonlyMode &&
           <Button
-            icon="plus"
+            icon={<PlusOutlined />}
             className="action action--ADD-RULE"
             onClick={this.props.addRule}
           >{this.props.config.settings.addRuleLabel || "Add rule"}</Button>
@@ -119,14 +120,14 @@ class Group extends Component {
           {!this.props.config.settings.readonlyMode && this.props.config.settings.showAddGroup && this.props.allowFurtherNesting ? (
             <Button
               className="action action--ADD-GROUP"
-              icon="plus-circle-o"
+              icon={<PlusCircleOutlined />}
               onClick={this.props.addGroup}
             >{this.props.config.settings.addGroupLabel || "Add group"}</Button>
           ) : null}
           {!this.props.config.settings.readonlyMode && !this.props.isRoot ? (
             <Button
               type="danger"
-              icon="delete"
+              icon={<DeleteOutlined />}
               className="action action--ADD-DELETE"
               onClick={this.props.removeSelf}
             >{this.props.config.settings.delGroupLabel !== undefined ? this.props.config.settings.delGroupLabel : "Delete"}</Button>

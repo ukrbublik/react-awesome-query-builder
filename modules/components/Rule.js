@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
+import { DeleteOutlined } from '@ant-design/icons';
 import shallowCompare from 'react-addons-shallow-compare';
 import RuleContainer from './containers/RuleContainer';
 import Field from './Field';
@@ -111,7 +112,7 @@ class Rule extends Component {
                         ) : (
                             <Button
                                 type="danger"
-                                icon="delete"
+                                icon={<DeleteOutlined />}
                                 className="action--DELETE-RULE"
                                 onClick={this.props.removeSelf}
                                 size={this.props.config.settings.renderSize || "small"}
