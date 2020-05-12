@@ -10,7 +10,6 @@ import {bindActionCreators} from "../utils/stuff";
 import {validateTree} from "../utils/validation";
 import {queryString} from "../utils/queryString";
 import {defaultRoot} from "../utils/defaultUtils";
-import { ConfigProvider } from 'antd';
 import Immutable from 'immutable';
 
 
@@ -154,16 +153,14 @@ export default class Query extends Component {
         config = extendConfig(config);
 
         return (
-            <ConfigProvider locale={config.settings.locale.antd}>
-                <Provider store={this.state.store}>
-                    <QueryContainer
-                      store={this.state.store}
-                      get_children={get_children}
-                      config={config}
-                      onChange={onChange}
-                    />
-                </Provider>
-            </ConfigProvider>
+          <Provider store={this.state.store}>
+              <QueryContainer
+                store={this.state.store}
+                get_children={get_children}
+                config={config}
+                onChange={onChange}
+              />
+          </Provider>
         )
     }
 }
