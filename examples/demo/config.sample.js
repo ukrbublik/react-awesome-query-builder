@@ -44,6 +44,10 @@ export default {
     }
   },
   fields: {
+    multi: {
+      label: 'multi',
+      type: 'multi',
+    },
     members: {
       label: 'Members',
       type: '!struct',
@@ -154,7 +158,7 @@ export default {
             timeFormat: 'h:mm:ss A',
             use12Hours: true
           }
-        }
+        },
       }
     },
     datetime: {
@@ -231,6 +235,20 @@ export default {
     }
   },
   types: {
+    multi: {
+      widgets: {
+        multiselect: {
+          operators: ['eq', 'neq'],
+          widgetProps: {
+            customProps: {
+              mode: 'tags',
+              tokenSeparators: [','],
+              allowClear: true,
+            },
+          },
+        },
+      },
+    },
     mixin: {
       widgets: {
         text: {
@@ -795,8 +813,13 @@ export default {
       valueSrc: 'value',
       factory: (props) => <MultiSelectWidget {...props} />,
       formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-        let valsLabels = vals.map(v => fieldDef.listValues[v])
-        return isForDisplay ? valsLabels.map(v => '\'' + v + '\'') : vals.map(v => JSON.stringify(v))
+        vals = vals || [];
+        const valsLabels = vals.map((v) =>
+          fieldDef.listValues && fieldDef.listValues[v] ? fieldDef.listValues[v] : v,
+        );
+        return isForDisplay ? valsLabels.map((v) => `'${v}'`) : vals.map((v) => JSON.stringify(v));
+        // let valsLabels = vals.map(v => fieldDef.listValues[v])
+        // return isForDisplay ? valsLabels.map(v => '\'' + v + '\'') : vals.map(v => JSON.stringify(v))
       }
     },
     date: {

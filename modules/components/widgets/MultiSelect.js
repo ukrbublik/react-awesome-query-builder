@@ -73,7 +73,12 @@ export default class MultiSelectWidget extends Component {
             size={size}
             value={value || undefined}  //note: (bug?) null forces placeholder to hide
             onChange={this.handleChange}
-            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+            filterOption={(input, option) => {
+              if (option.props.children) {
+                return option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+              }
+              return undefined;
+            }}
             {...customProps}
           >{options}
         </Select>
