@@ -1,4 +1,6 @@
 # Changelog
+- 2.0.6
+  - Fixed issue #176
 - 2.0.5
   - Fixed TS types. Updated sandbox to TS
 - 2.0.4
