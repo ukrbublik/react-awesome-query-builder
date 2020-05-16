@@ -560,6 +560,7 @@ export interface BehaviourSettings {
   immutableFieldsMode?: Boolean,
   immutableOpsMode?: Boolean,
   immutableValuesMode?: Boolean,
+  canShortMongoQuery?: Boolean,
 };
 
 export interface OtherSettings {

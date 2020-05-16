@@ -1,4 +1,6 @@
 # Changelog
+- 2.0.7
+  - Added `canShortMongoQuery` to `config.settings`
 - 2.0.6
   - Fixed issue #176
 - 2.0.5
