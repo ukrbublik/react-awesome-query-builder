@@ -17,7 +17,7 @@ export const jsonLogicFormat = (item, config) => {
         errors: []
     };
     
-    const logic = jsonLogicFormatItem(item, config, meta);
+    const logic = jsonLogicFormatItem(item, config, meta, true);
     
     // build empty data
     const {errors, usedFields} = meta;
@@ -126,7 +126,7 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
 }
 
 //meta is mutable
-const jsonLogicFormatItem = (item, config, meta) => {
+const jsonLogicFormatItem = (item, config, meta, isRoot) => {
     if (!item) return undefined;
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
@@ -134,7 +134,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
 
     if ((type === 'group' || type === 'rule_group') && children && children.size) {
         const list = children
-            .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta))
+            .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false))
             .filter((currentChild) => typeof currentChild !== 'undefined');
         if (!list.size)
             return undefined;
@@ -150,7 +150,7 @@ const jsonLogicFormatItem = (item, config, meta) => {
         }
 
         let resultQuery = {};
-        if (list.size == 1)
+        if (list.size == 1 && !isRoot)
             resultQuery = list.first();
         else
             resultQuery[conj] = list.toList().toJS();
