@@ -339,3 +339,18 @@ export const normalizeListValues = (listValues, type, fieldSettings) => {
   return listValues;
 };
 
+export const removePrefixPath = (selectedPath, parentPath) => {
+  if (!selectedPath)
+    return selectedPath;
+  let isPrefix = true;
+  for (let i = 0 ; i < parentPath.length ; i++) {
+    const part = parentPath[i];
+    if (selectedPath[i] !== undefined && part == selectedPath[i]) {
+      //ok
+    } else {
+      isPrefix = false;
+      break;
+    }
+  }
+  return isPrefix ? selectedPath.slice(parentPath.length) : selectedPath;
+};

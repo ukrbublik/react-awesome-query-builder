@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Cascader, Tooltip } from 'antd';
+import {removePrefixPath} from "../../../../utils/stuff";
 
 
 export default class FieldCascader extends PureComponent {
@@ -22,7 +23,10 @@ export default class FieldCascader extends PureComponent {
   };
 
   onChange = (keys) => {
-      this.props.setField(keys);
+    const { parentField } = this.props;
+    const dotNotationToPath = str => str.split('.');
+    const parentPath = parentField ? dotNotationToPath(parentField) : [];
+    this.props.setField([...parentPath, ...keys]);
   }
 
   render() {
@@ -30,7 +34,6 @@ export default class FieldCascader extends PureComponent {
         config, customProps, items, placeholder,
         selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, selectedField, parentField, 
     } = this.props;
-
     let customProps2 = {...customProps};
     if (customProps2.showSearch) {
       const keysForFilter = ['label', 'key', 'altLabel'];
@@ -42,9 +45,9 @@ export default class FieldCascader extends PureComponent {
       };
     }
 
-    const value = parentField && selectedPath && selectedPath.length && selectedPath[0] == parentField ? 
-      selectedPath.slice(1) :
-      selectedPath;
+    const {fieldSeparator} = config.settings;
+    const parentFieldPath = parentField ? parentField.split(fieldSeparator) : [];
+    const value = removePrefixPath(selectedPath, parentFieldPath);
     let res = (
       <Cascader
         fieldNames={{ label: 'label', value: 'key', children: 'items' }}
