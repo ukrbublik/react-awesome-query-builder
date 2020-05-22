@@ -29,12 +29,12 @@ export default class FieldSelect extends PureComponent {
   }
 
   filterOption = (input, option) => {
-    const dataForFilter = option; // tip: props was available on antd < 4
-      const keysForFilter = ['title', 'value', 'grouplabel', 'label'];
-      const valueForFilter = keysForFilter
-        .map(k => (typeof dataForFilter[k] == 'string' ? dataForFilter[k] : ''))
-        .join("\0");
-      return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const dataForFilter = option;
+    const keysForFilter = ['title', 'value', 'grouplabel', 'label'];
+    const valueForFilter = keysForFilter
+    .map(k => (typeof dataForFilter[k] == 'string' ? dataForFilter[k] : ''))
+    .join("\0");
+    return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
   render() {
