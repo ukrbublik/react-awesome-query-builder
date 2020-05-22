@@ -207,7 +207,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 							if (typeof validResult == "string" || validResult === null) {
 									validError = validResult;
 							} else {
-									if (validError == false)
+									if (validResult == false)
 											validError = `Invalid value`;
 							}
 					}
