@@ -1,4 +1,8 @@
 # Changelog
+- 2.0.9
+  - Fixed issues #215, #214, #208
+  - Fixed `validateValue`
+  - Simpler sandbox demo
 - 2.0.8
   - Fixed issue #207
 - 2.0.7
