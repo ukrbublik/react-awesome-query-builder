@@ -173,7 +173,7 @@ const myConfig = {
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
-|preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`examples/demo`] for `slider` field. +
+|preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
@@ -435,7 +435,7 @@ There is also special `proximity` operator, its options are rendered with `<Prox
 import {Operators: {ProximityOperator}} from 'react-awesome-query-builder';
 ----
 
-See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`examples/demo`]
+See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`]
 ====
 
 
@@ -556,7 +556,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.js[`examples/demo`] - it has 3 widhets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] - it has 3 widhets `number`, `slider`, `rangeslider`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
