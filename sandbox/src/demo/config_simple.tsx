@@ -3,7 +3,7 @@ import merge from 'lodash/merge';
 import {
     BasicConfig,
     // types:
-    Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
+    Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, Funcs,
 } from 'react-awesome-query-builder';
 import en_US from 'antd/lib/locale-provider/en_US';
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
@@ -16,7 +16,6 @@ const {
     FieldTreeSelect,
 } = AntdWidgets;
 const InitialConfig = AntdConfig; // or BasicConfig for vanilla design instead of antd
-
 
 
 //////////////////////////////////////////////////////////////////////
@@ -41,7 +40,6 @@ const fields: Fields = {
             },
             login: {
                 type: 'text',
-                tableName: 't1', // PR #18, PR #20
                 excludeOperators: ['proximity'],
                 mainWidgetProps: {
                     valueLabel: "Login",
@@ -53,12 +51,6 @@ const fields: Fields = {
             }
         }
     },
-    prox1: {
-        label: 'prox',
-        tooltip: 'Proximity search',
-        type: 'text',
-        operators: ['proximity'],
-    },
     num: {
         label: 'Number',
         type: 'number',
@@ -67,7 +59,6 @@ const fields: Fields = {
             min: -1,
             max: 5
         },
-        funcs: ['LINEAR_REGRESSION'],
     },
     slider: {
         label: 'Slider',
@@ -118,13 +109,6 @@ const fields: Fields = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        // * old format:
-        // listValues: {
-        //     yellow: 'Yellow',
-        //     green: 'Green',
-        //     orange: 'Orange'
-        // },
-        // * new format:
         listValues: [
             { value: 'yellow', title: 'Yellow' },
             { value: 'green', title: 'Green' },
@@ -156,31 +140,19 @@ const fields: Fields = {
         type: 'treeselect',
         fieldSettings: {
             treeExpandAll: true,
-            // * deep format (will be auto converted to flat format):
-            // listValues: [
-            //     { value: "1", title: "Warm colors", children: [
-            //         { value: "2", title: "Red" }, 
-            //         { value: "3", title: "Orange" }
-            //     ] },
-            //     { value: "4", title: "Cool colors", children: [
-            //         { value: "5", title: "Green" }, 
-            //         { value: "6", title: "Blue", children: [
-            //             { value: "7", title: "Sub blue", children: [
-            //                 { value: "8", title: "Sub sub blue and a long text" }
-            //             ] }
-            //         ] }
-            //     ] }
-            // ],
-            // * flat format:
             listValues: [
-                { value: "1", title: "Warm colors" },
-                  { value: "2", title: "Red", parent: "1" },
-                  { value: "3", title: "Orange", parent: "1" },
-                { value: "4", title: "Cool colors" },
-                  { value: "5", title: "Green", parent: "4" },
-                  { value: "6", title: "Blue", parent: "4" },
-                    { value: "7", title: "Sub blue", parent: "6" },
-                      { value: "8", title: "Sub sub blue and a long text", parent: "7" },
+                { value: "1", title: "Warm colors", children: [
+                    { value: "2", title: "Red" }, 
+                    { value: "3", title: "Orange" }
+                ] },
+                { value: "4", title: "Cool colors", children: [
+                    { value: "5", title: "Green" }, 
+                    { value: "6", title: "Blue", children: [
+                        { value: "7", title: "Sub blue", children: [
+                            { value: "8", title: "Sub sub blue and a long text" }
+                        ] }
+                    ] }
+                ] }
             ],
         }
     },
@@ -224,57 +196,21 @@ const conjunctions: Conjunctions = {
     OR: InitialConfig.conjunctions.OR,
 };
 
-
-const proximity: OperatorProximity = {
-    ...InitialConfig.operators.proximity,
-    valueLabels: [
-        { label: 'Word 1', placeholder: 'Enter first word' },
-        { label: 'Word 2', placeholder: 'Enter second word' },
-    ],
-    textSeparators: [
-        //'Word 1',
-        //'Word 2'
-    ],
-    options: {
-        ...InitialConfig.operators.proximity.options,
-        optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
-        optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
-        optionPlaceholder: "Select words between", // placeholder for "near" selectbox
-        minProximity: 2,
-        maxProximity: 10,
-        defaults: {
-            proximity: 2
-        },
-        customProps: {}
-    }
-};
-
 const operators: Operators = {
     ...InitialConfig.operators,
     // examples of  overriding
     between: {
         ...InitialConfig.operators.between,
-        valueLabels: [
-            'Value from',
-            'Value to'
-        ],
         textSeparators: [
             'from',
             'to'
         ],
     },
-    proximity,
 };
 
 const widgets: Widgets = {
     ...InitialConfig.widgets,
     // examples of  overriding
-    text: {
-        ...InitialConfig.widgets.text,
-        validateValue: (val, fieldDef) => {
-            return (val.length < 10);
-        },
-    },
     slider: {
         ...InitialConfig.widgets.slider,
         customProps: {
@@ -302,12 +238,6 @@ const widgets: Widgets = {
         timeFormat: 'HH:mm',
         dateFormat: 'DD.MM.YYYY',
         valueFormat: 'YYYY-MM-DD HH:mm:ss',
-    },
-    func: {
-        ...InitialConfig.widgets.func,
-        customProps: {
-            showSearch: true
-        }
     },
     treeselect: {
         ...InitialConfig.widgets.treeselect,
@@ -393,51 +323,8 @@ const settings: Settings = {
     // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
+const funcs: Funcs = {};
 
-const funcs: Funcs = {
-    LOWER: {
-        label: 'Lowercase',
-        mongoFunc: '$toLower',
-        jsonLogic: ({str}) => ({ "method": [ str, "toLowerCase" ] }),
-        returnType: 'text',
-        args: {
-            str: {
-                label: "String",
-                type: 'text',
-                valueSources: ['value', 'field'],
-            },
-        }
-    },
-    LINEAR_REGRESSION: {
-        label: 'Linear regression',
-        returnType: 'number',
-        formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
-        sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
-        mongoFormatFunc: ({coef, bias, val}) => ({'$sum': [{'$multiply': [coef, val]}, bias]}),
-        jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
-        renderBrackets: ['', ''],
-        renderSeps: [' * ', ' + '],
-        args: {
-            coef: {
-                label: "Coef",
-                type: 'number',
-                defaultValue: 1,
-                valueSources: ['value'],
-            },
-            val: {
-                label: "Value",
-                type: 'number',
-                valueSources: ['value'],
-            },
-            bias: {
-                label: "Bias",
-                type: 'number',
-                defaultValue: 0,
-                valueSources: ['value'],
-            }
-        }
-    },
-};
 
 
 const config: Config = {
