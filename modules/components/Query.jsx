@@ -38,7 +38,7 @@ class Query extends PureComponent {
         this._updateActions(props);
 
         this.validatedTree = this.validateTree(props, props);
-        props.onChange && props.onChange(this.validatedTree, props.config);
+        //props.onChange && props.onChange(this.validatedTree, props.config);
     }
 
     validateTree (props, oldProps) {
