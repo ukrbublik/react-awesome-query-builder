@@ -1,3 +1,14 @@
+/examples/bundle.js
+/examples/bundle.js.map
+/build/
+/coverage/
+node_modules/
+package-lock.json
+npm-debug.log
+.idea
+.eslintcache
 .gitignore
+.git
 .github
 .vscode
+*.log

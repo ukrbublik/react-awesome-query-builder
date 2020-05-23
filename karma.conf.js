@@ -18,6 +18,7 @@ module.exports = function(config) {
       'karma-sourcemap-loader',
       'karma-webpack',
       'karma-mocha-reporter',
+      'karma-coverage',
     ],
 
     files: [
@@ -30,27 +31,28 @@ module.exports = function(config) {
     ],
     exclude: [],
     preprocessors: {
-      'karma.tests.js': ['webpack', 'sourcemap']
+      'karma.tests.js': ['webpack', 'sourcemap'],
+      'modules/**/*': ['coverage']
     },
     webpack: require('./webpack-test.config'),
     webpackMiddleware: {
       stats: 'errors-only'
     },
 
-    reporters: ['progress'], // 'mocha', 'coverage'
+    reporters: ['progress', 'coverage'],
 
-  //   coverageReporter: {
-  //     dir: 'coverage',
-  //     reporters: [
-  //         { type: 'html', subdir: 'html' },
-  //         { type: 'text-summary' },
-  //         { type: 'lcov' }
-  //     ],
-  //     includeAllSources: true,
-  //     instrumenterOptions: {
-  //         istanbul: { noCompact: true }
-  //     }
-  // },
+    coverageReporter: {
+      dir: 'coverage',
+      reporters: [
+          { type: 'html', subdir: 'html' },
+          { type: 'text-summary' },
+          { type: 'lcov' }
+      ],
+      includeAllSources: true,
+      instrumenterOptions: {
+          istanbul: { noCompact: true }
+      }
+  },
 
     port: 9876,
     colors: true,

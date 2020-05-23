@@ -10,7 +10,7 @@
         }],
         ["@babel/plugin-proposal-class-properties", {
             "loose": true
-        }],
+        }]
     ],
     "env": {
       "test": {

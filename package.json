@@ -20,7 +20,8 @@
     "build-examples": "./scripts/build-examples.sh",
     "examples": "cd examples && npm i && npm start",
     "start": "npm run examples",
-    "test": "karma start karma.conf.js"
+    "test": "karma start karma.conf.js",
+    "codecov": "cat coverage/*/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js"
   },
   "readme": "README.md",
   "repository": {

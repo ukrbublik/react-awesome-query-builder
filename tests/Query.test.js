@@ -1,8 +1,7 @@
-import { mount } from 'enzyme';
 import React from 'react';
+import { mount, shallow } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import sinon from 'sinon';
-import { Tooltip, Select } from 'antd';
 
 import {
   Query, Builder, Utils, BasicConfig,
