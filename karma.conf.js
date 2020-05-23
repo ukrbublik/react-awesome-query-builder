@@ -64,6 +64,6 @@ module.exports = function(config) {
       }
     },
     singleRun: true,
-    concurrency: Infinity
+    concurrency: 1
   })
 }
