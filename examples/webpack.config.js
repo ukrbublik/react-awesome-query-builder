@@ -51,6 +51,11 @@ module.exports = {
             //     loader: 'ts-loader',
             //     exclude: /node_modules/,
             // },
+            // {
+            //     test: /\.jsx?$/,
+            //     use: 'react-hot-loader/webpack',
+            //     exclude: /node_modules/
+            // },
             {
                 test: /\.[jt]sx?$/,
                 loaders: 'babel-loader',
@@ -74,11 +79,6 @@ module.exports = {
                 },
                 exclude: /node_modules/
             },
-            // {
-            //     test: /\.jsx?$/,
-            //     use: 'react-hot-loader/webpack',
-            //     exclude: /node_modules/
-            // },
             {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"]
