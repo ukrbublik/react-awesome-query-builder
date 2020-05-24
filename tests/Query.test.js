@@ -10,7 +10,7 @@ import {
 const {
   uuid, 
   checkTree, loadTree, loadFromJsonLogic, 
-  queryString, sqlFormat, mongodbFormat, jsonLogicFormat
+  queryString, sqlFormat, mongodbFormat, jsonLogicFormat, getTree,
 } = Utils;
 import AntdConfig from 'react-awesome-query-builder/config/antd';
 
@@ -18,15 +18,20 @@ import AntdConfig from 'react-awesome-query-builder/config/antd';
 
 const with_qb = (config, value, valueFormat, checks) => {
   const loadFn = valueFormat == 'JsonLogic' ? loadFromJsonLogic : loadTree;
-  const wrapper = mount(
+  const onChange = sinon.spy();
+  const qb = mount(
     <Query
       {...config}
       value={checkTree(loadFn(value, config), config)}
       renderBuilder={render_builder}
+      onChange={onChange}
     />
   );
-  checks(wrapper);
-  wrapper.unmount();
+
+  checks(qb, onChange);
+  
+  qb.unmount();
+  onChange.resetHistory();
 };
 
 const render_builder = (props) => (
@@ -366,6 +371,52 @@ describe('query with subquery', () => {
     });
   });
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe('interactions', () => {
+  const simple_config_with_number = {
+    ...BasicConfig,
+    fields: {
+      num: {
+        label: 'Number',
+        type: 'number',
+        preferWidgets: ['number'],
+        fieldSettings: {
+          min: -1,
+          max: 5
+        },
+      },
+    },
+  };
+
+  const init_jl_value_with_number = {
+    "and": [{
+      "==": [
+        { "var": "num" },
+        2
+      ]
+    }]
+  };
+
+  it('click on remove single rule will clear it', () => {
+    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--header button')
+        .first()
+        .simulate('click');
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKey = Object.keys(changedTree.children1);
+      expect(childKey.length).to.equal(1);
+      const child = changedTree.children1[childKey];
+      expect(child.properties.field).to.equal(null);
+      expect(child.properties.operator).to.equal(null);
+      expect(child.properties.value).to.eql([]);
+    });
+  });
+
+});
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
