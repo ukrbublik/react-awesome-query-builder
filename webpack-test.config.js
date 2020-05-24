@@ -16,12 +16,22 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: 'ts-loader',
+                use: [{
+                    loader: 'ts-loader',
+                    options: {
+                        cacheDirectory: true,
+                    },
+                }],
                 exclude: /node_modules/,
             },
             {
                 test: /\.jsx?$/,
-                loader: 'babel-loader',
+                use: [{
+                    loader: 'babel-loader',
+                    options: {
+                        cacheDirectory: true,
+                    },
+                }],
                 exclude: /node_modules/
             },
             {
