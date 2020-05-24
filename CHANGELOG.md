@@ -1,4 +1,6 @@
 # Changelog
+- 2.0.10
+  - Fixed bug with missing `funcs` in config
 - 2.0.9
   - Fixed issues #215, #214, #208
   - Fixed `validateValue`
