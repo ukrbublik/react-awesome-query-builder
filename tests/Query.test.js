@@ -15,8 +15,8 @@ const {
 import AntdConfig from 'react-awesome-query-builder/config/antd';
 
 
-describe('import', () => {
-  it('should work', () => {
+describe('library', () => {
+  it('should be imported correctly', () => {
     expect(Query).to.exist;
     expect(Builder).to.exist;
     expect(BasicConfig).to.exist;
@@ -94,58 +94,62 @@ describe('<Query />', () => {
       </div>
   );
 
-  it('should load simple config with empty value', () => {
-    with_qb(simple_config_with_number, empty_value, 'default', (qb) => {
-      expect(qb.find('.query-builder')).to.have.length(1);
+  describe('import', () => {
+    it('should work for simple config with empty value', () => {
+      with_qb(simple_config_with_number, empty_value, 'default', (qb) => {
+        expect(qb.find('.query-builder')).to.have.length(1);
+      });
+    });
+
+    it('should work for simple config with simple value', () => {
+      with_qb(simple_config_with_number, init_value_with_number, 'default', (qb) => {
+        expect(qb.find('.query-builder')).to.have.length(1);
+      });
+    });
+
+    it('should work for simple config with simple value of JsonLogic format', () => {
+      with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb) => {
+        expect(qb.find('.query-builder')).to.have.length(1);
+      });
     });
   });
 
-  it('should load simple config with simple value', () => {
-    with_qb(simple_config_with_number, init_value_with_number, 'default', (qb) => {
-      expect(qb.find('.query-builder')).to.have.length(1);
+  describe('export', () => {
+    it('should work to query string', () => {
+      const config = simple_config_with_number;
+      const tree = checkTree(loadTree(init_value_with_number), config);
+      const res = queryString(tree, config);
+      expect(res).to.equal("num == 2");
+      const res2 = queryString(tree, config, true);
+      expect(res2).to.equal("Number == 2");
     });
-  });
 
-  it('should load simple config with simple value of JsonLogic format', () => {
-    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb) => {
-      expect(qb.find('.query-builder')).to.have.length(1);
+    it('should work to SQL', () => {
+      const config = simple_config_with_number;
+      const tree = checkTree(loadTree(init_value_with_number), config);
+      const res = sqlFormat(tree, config);
+      expect(res).to.equal("num = 2");
     });
-  });
 
-  it('should export to query string', () => {
-    const config = simple_config_with_number;
-    const tree = checkTree(loadTree(init_value_with_number), config);
-    const res = queryString(tree, config);
-    expect(res).to.equal("num == 2");
-    const res2 = queryString(tree, config, true);
-    expect(res2).to.equal("Number == 2");
-  });
-
-  it('should export to SQL', () => {
-    const config = simple_config_with_number;
-    const tree = checkTree(loadTree(init_value_with_number), config);
-    const res = sqlFormat(tree, config);
-    expect(res).to.equal("num = 2");
-  });
-
-  it('should export to MongoDb', () => {
-    const config = simple_config_with_number;
-    const tree = checkTree(loadTree(init_value_with_number), config);
-    const res = mongodbFormat(tree, config);
-    expect(res).to.eql({num: 2});
-  });
-
-  it('should export to JsonLogic', () => {
-    const config = simple_config_with_number;
-    const tree = checkTree(loadTree(init_value_with_number), config);
-    const {logic, data, errors} = jsonLogicFormat(tree, config);
-    expect(logic).to.eql({
-      and: [
-        { '==': [{ "var": "num" }, 2] }
-      ]
+    it('should work to MongoDb', () => {
+      const config = simple_config_with_number;
+      const tree = checkTree(loadTree(init_value_with_number), config);
+      const res = mongodbFormat(tree, config);
+      expect(res).to.eql({num: 2});
     });
-    expect(data).to.eql({num: null});
-    expect(errors).to.eql([]);
+
+    it('should work to JsonLogic', () => {
+      const config = simple_config_with_number;
+      const tree = checkTree(loadTree(init_value_with_number), config);
+      const {logic, data, errors} = jsonLogicFormat(tree, config);
+      expect(logic).to.eql({
+        and: [
+          { '==': [{ "var": "num" }, 2] }
+        ]
+      });
+      expect(data).to.eql({num: null});
+      expect(errors).to.eql([]);
+    });
   });
 
 });
