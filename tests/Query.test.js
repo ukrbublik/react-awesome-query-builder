@@ -279,36 +279,15 @@ describe('query with subquery', () => {
   };
 
   const init_jl_value_with_date_and_time = {
-    "or": [
-      {
-        "==": [
-          {
-            "var": "datetime"
-          },
-          "2020-05-18T21:50:01.000Z"
-        ]
-      },
-      {
-        "and": [
-          {
-            "==": [
-              {
-                "var": "date"
-              },
-              "2020-05-18T21:00:00.000Z"
-            ]
-          },
-          {
-            "==": [
-              {
-                "var": "time"
-              },
-              3000
-            ]
-          }
-        ]
-      }
-    ]
+    "or": [{
+      "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
+    }, {
+      "and": [{
+        "==": [ {  "var": "date" }, "2020-05-18T21:00:00.000Z" ]
+      }, {
+        "==": [ { "var": "time" }, 3000 ]
+      }]
+    }]
   };
 
 
@@ -322,16 +301,16 @@ describe('query with subquery', () => {
 
   describe('export', () => {
     do_export_checks(config_with_date_and_time, init_jl_value_with_date_and_time, 'JsonLogic', {
-      "query": "(datetime == \"2020-05-19 00:50:01\" || (date == \"2020-05-19\" && time == \"00:50:00\"))",
-      "queryHuman": "(DateTime == \"19.05.2020 00:50\" OR (Date == \"19.05.2020\" AND Time == \"00:50\"))",
-      "sql": "(datetime = '2020-05-19 00:50:01.000' OR (date = '2020-05-19' AND time = '00:50:00'))",
+      "query": "(datetime == \"2020-05-18 21:50:01\" || (date == \"2020-05-18\" && time == \"00:50:00\"))",
+      "queryHuman": "(DateTime == \"18.05.2020 21:50\" OR (Date == \"18.05.2020\" AND Time == \"00:50\"))",
+      "sql": "(datetime = '2020-05-18 21:50:01.000' OR (date = '2020-05-18' AND time = '00:50:00'))",
       "mongo": {
         "$or": [
           {
-            "datetime": "2020-05-19 00:50:01"
+            "datetime": "2020-05-18 21:50:01"
           },
           {
-            "date": "2020-05-19",
+            "date": "2020-05-18",
             "time": "00:50:00"
           }
         ]
@@ -353,7 +332,7 @@ describe('query with subquery', () => {
                   {
                     "var": "date"
                   },
-                  "2020-05-18T21:00:00.000Z"
+                  "2020-05-18T00:00:00.000Z"
                 ]
               },
               {
@@ -392,28 +371,92 @@ describe('interactions', () => {
 
   const init_jl_value_with_number = {
     "and": [{
-      "==": [
-        { "var": "num" },
-        2
+      "==": [ { "var": "num" }, 2 ]
+    }]
+  };
+
+  const init_jl_value_with_group = {
+    "or": [{
+      "and": [
+        {
+          "==": [ { "var": "num" }, 1 ]
+        }, {
+          "==": [ { "var": "num" }, 2 ]
+        }
       ]
     }]
   };
 
-  it('click on remove single rule will clear it', () => {
+  it('click on remove single rule will reave empty rule', () => {
     with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
       qb
         .find('.rule .rule--header button')
         .first()
         .simulate('click');
       const changedTree = getTree(onChange.getCall(0).args[0]);
-      const childKey = Object.keys(changedTree.children1);
-      expect(childKey.length).to.equal(1);
-      const child = changedTree.children1[childKey];
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
       expect(child.properties.field).to.equal(null);
       expect(child.properties.operator).to.equal(null);
       expect(child.properties.value).to.eql([]);
     });
+
+    //todo: config - remove completely
   });
+
+  it('click on remove group will reave empty rule', () => {
+    with_qb(simple_config_with_number, init_jl_value_with_group, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.group--children .group .group--header .group--actions button')
+        .at(2)
+        .simulate('click');
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal(null);
+      expect(child.properties.operator).to.equal(null);
+      expect(child.properties.value).to.eql([]);
+    });
+
+    //todo: config - remove completely
+  });
+
+  it('click on add rule will add new empty rule', () => {
+    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.group--actions button')
+        .first()
+        .simulate('click');
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(2);
+    });
+  });
+
+  it('click on add group will add new group with one empty rule', () => {
+    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.group--actions button')
+        .at(1)
+        .simulate('click');
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(2);
+      const child = changedTree.children1[childKeys[1]];
+      expect(child.type).to.equal("group");
+      expect(child.properties.conjunction).to.equal("AND");
+      const subchildKeys = Object.keys(child.children1);
+      const subchild = child.children1[subchildKeys[0]];
+      expect(subchild).to.eql({
+        type: 'rule', 
+        properties: {field: null, operator: null, value: [], valueSrc: []}
+      });
+    });
+  });
+
+  //todo: validation
 
 });
 

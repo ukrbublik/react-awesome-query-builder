@@ -4,6 +4,7 @@ if (puppeteer.executablePath().indexOf('/home/ukrbublik/') == 0) {
 } else {
   process.env.CHROME_BIN = puppeteer.executablePath();
 }
+process.env.TZ = 'Etc/UTC';
 process.env.BABEL_ENV = 'test'; // Set the proper environment for babel
 
 module.exports = function(config) {
