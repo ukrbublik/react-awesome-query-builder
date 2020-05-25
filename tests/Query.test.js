@@ -259,7 +259,7 @@ describe('query with conjunction', () => {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-describe('query with subquery', () => {
+describe('query with subquery and datetime types', () => {
   const config_with_date_and_time = {
     ...BasicConfig,
     fields: {
@@ -350,6 +350,140 @@ describe('query with subquery', () => {
     });
   });
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe('query with select', () => {
+  const config_with_select = {
+    ...BasicConfig,
+    fields: {
+      // new format of listValues
+      color: {
+        label: 'Color',
+        type: 'select',
+        listValues: [
+          { value: 'yellow', title: 'Yellow' },
+          { value: 'green', title: 'Green' },
+          { value: 'orange', title: 'Orange' },
+        ],
+      },
+      // old format of listValues
+      color2: {
+        label: 'Color2',
+        type: 'select',
+        listValues: {
+          yellow: 'Yellow',
+          green: 'Green',
+          orange: 'Orange',
+        },
+      },
+      multicolor: {
+        label: 'Colors',
+        type: 'multiselect',
+        listValues: {
+          yellow: 'Yellow',
+          green: 'Green',
+          orange: 'Orange'
+        },
+        allowCustomValues: false
+      },
+
+    },
+  };
+
+  const init_jl_value_with_select = {
+    "and": [{
+      "==": [ { "var": "color" }, "yellow" ]
+    }, {
+      "all": [ 
+        { "var": "multicolor" },
+        { "in": [ { "var": "" }, [ "yellow", "green" ] ] }
+      ]
+    }]
+  };
+
+
+  describe('import', () => {
+    it('should work with value of JsonLogic format', () => {
+      with_qb(config_with_select, init_jl_value_with_select, 'JsonLogic', (qb) => {
+        expect(qb.find('.query-builder')).to.have.length(1);
+      });
+    });
+  });
+
+  describe('export', () => {
+    do_export_checks(config_with_select, init_jl_value_with_select, 'JsonLogic', {
+      "query": "(color == \"yellow\" && multicolor == [\"yellow\", \"green\"])",
+      "queryHuman": "(Color == \"Yellow\" AND Colors == [\"Yellow\", \"Green\"])",
+      "sql": "(color = 'yellow' AND multicolor = 'yellow,green')",
+      "mongo": {
+        "color": "yellow",
+        "multicolor": [
+          "yellow",
+          "green"
+        ]
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              {
+                "var": "color"
+              },
+              "yellow"
+            ]
+          },
+          {
+            "all": [
+              {
+                "var": "multicolor"
+              },
+              {
+                "in": [
+                  {
+                    "var": ""
+                  },
+                  [
+                    "yellow",
+                    "green"
+                  ]
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe('query with !struct', () => {
+  //todo
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe('query with !group', () => {
+  //todo
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe('query with field compare', () => {
+  //todo
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe('query with func', () => {
+  //todo
+});
+
+//todo: validation
+//todo: widgets - bool, slider
+//todo: antd widgets, treeselect
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -456,7 +590,9 @@ describe('interactions', () => {
     });
   });
 
-  //todo: validation
+  //todo: drag-n-drop
+
+  //todo: change field, op, value
 
 });
 
