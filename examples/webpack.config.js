@@ -9,7 +9,17 @@ if (isProd) {
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
         //new BundleAnalyzerPlugin(),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || "development")
+            'process.env': {
+                NODE_ENV: JSON.stringify(process.env.NODE_ENV || "production"),
+            }
+        }),
+    ];
+} else {
+    plugins = [
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
+            }
         }),
     ];
 }
