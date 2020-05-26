@@ -140,6 +140,7 @@ const exect_queries_before_and_after = (config, init_value_jl, onChange, queries
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// library
 
 describe('library', () => {
   it('should be imported correctly', () => {
@@ -151,6 +152,7 @@ describe('library', () => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// basic query
 
 describe('basic query', () => {
   const simple_config_with_number = {
@@ -234,6 +236,7 @@ describe('basic query', () => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with conjunction
 
 describe('query with conjunction', () => {
   const config_with_number_and_string = {
@@ -311,6 +314,7 @@ describe('query with conjunction', () => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with subquery and datetime types
 
 describe('query with subquery and datetime types', () => {
   const config_with_date_and_time = {
@@ -405,6 +409,7 @@ describe('query with subquery and datetime types', () => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with select
 
 describe('query with select', () => {
   const config_with_select = {
@@ -511,24 +516,28 @@ describe('query with select', () => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with !struct
 
 describe('query with !struct', () => {
   //todo
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with !group
 
 describe('query with !group', () => {
   //todo
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with field compare
 
 describe('query with field compare', () => {
   //todo
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// query with func
 
 describe('query with func', () => {
   //todo
@@ -539,6 +548,7 @@ describe('query with func', () => {
 //todo: antd widgets, treeselect
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// interactions
 
 describe('interactions', () => {
   const simple_config_with_number = {
@@ -572,48 +582,6 @@ describe('interactions', () => {
         }
       ]
     }]
-  };
-
-  const init_jl_value_with_number_and_group = {
-    "or": [
-      { "==": [ { "var": "num" }, 1 ] },
-      { "and": [
-        {
-          "==": [ { "var": "num" }, 2 ]
-        }, {
-          "==": [ { "var": "num" }, 3 ]
-        }
-      ]}
-    ]
-  };
-
-  const init_jl_value_with_number_and_group_3 = {
-    "or": [
-      { "==": [ { "var": "num" }, 1 ] },
-      { "and": [
-        {
-          "==": [ { "var": "num" }, 2 ]
-        }, {
-          "==": [ { "var": "num" }, 3 ]
-        }, {
-          "==": [ { "var": "num" }, 4 ]
-        }
-      ]}
-    ]
-  };
-
-  const init_jl_value_with_numbers_and_group = {
-    "or": [
-      { "==": [ { "var": "num" }, 1 ] },
-      { "==": [ { "var": "num" }, 2 ] },
-      { "and": [
-        {
-          "==": [ { "var": "num" }, 3 ]
-        }, {
-          "==": [ { "var": "num" }, 4 ]
-        }
-      ]}
-    ]
   };
 
   it('click on remove single rule will reave empty rule', () => {
@@ -685,77 +653,158 @@ describe('interactions', () => {
     });
   });
 
-  describe('drag-n-drop', () => {
-    it('should move rule after second rule', () => {
-      with_qb(simple_config_with_number, init_jl_value_with_group, 'JsonLogic', (qb, onChange) => {
-        const firstRule = qb.find('.rule').at(0);
-        const secondRule = qb.find('.rule').at(1);
+  //todo: change field, op, value
 
-        simulate_drag_n_drop(firstRule, secondRule, {
-          "dragRect": {"x":58,"y":113,"width":1525,"height":46,"top":113,"right":1583,"bottom":159,"left":58},
-          "plhRect":  {"x":59,"y":79,"width":1525,"height":46,"top":79,"right":1584,"bottom":125,"left":59},
-          "treeRect": {"x":34,"y":34,"width":1571,"height":336.296875,"top":34,"right":1605,"bottom":370.296875,"left":34},
-          "hovRect":  {"x":59,"y":135,"width":1535,"height":46.296875,"top":135,"right":1594,"bottom":181.296875,"left":59},
-          "startMousePos": {"clientX":81,"clientY":101},
-          "mousePos":      {"clientX":80,"clientY":135}
-        });
+});
 
-        exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_group, onChange, [
-          '(num == 1 && num == 2)',
-          '(num == 2 && num == 1)'
-        ]);
+//////////////////////////////////////////////////////////////////////////////////////////
+// drag-n-drop
+
+describe('drag-n-drop', () => {
+  const simple_config_with_number = {
+    ...BasicConfig,
+    fields: {
+      num: {
+        label: 'Number',
+        type: 'number',
+        preferWidgets: ['number'],
+        fieldSettings: {
+          min: -1,
+          max: 5
+        },
+      },
+    },
+  };
+
+  const simple_config_with_number_without_regroup = {
+    ...simple_config_with_number,
+    settings: {
+      ...BasicConfig.settings,
+      canRegroup: false,
+    }
+  };
+
+  const init_jl_value_with_group = {
+    "or": [{
+      "and": [
+        {
+          "==": [ { "var": "num" }, 1 ]
+        }, {
+          "==": [ { "var": "num" }, 2 ]
+        }
+      ]
+    }]
+  };
+
+  const init_jl_value_with_number_and_group_3 = {
+    "or": [
+      { "==": [ { "var": "num" }, 1 ] },
+      { "and": [
+        {
+          "==": [ { "var": "num" }, 2 ]
+        }, {
+          "==": [ { "var": "num" }, 3 ]
+        }, {
+          "==": [ { "var": "num" }, 4 ]
+        }
+      ]}
+    ]
+  };
+
+  const init_jl_value_with_number_and_group = {
+    "or": [
+      { "==": [ { "var": "num" }, 1 ] },
+      { "and": [
+        {
+          "==": [ { "var": "num" }, 2 ]
+        }, {
+          "==": [ { "var": "num" }, 3 ]
+        }
+      ]}
+    ]
+  };
+
+  const init_jl_value_with_numbers_and_group = {
+    "or": [
+      { "==": [ { "var": "num" }, 1 ] },
+      { "==": [ { "var": "num" }, 2 ] },
+      { "and": [
+        {
+          "==": [ { "var": "num" }, 3 ]
+        }, {
+          "==": [ { "var": "num" }, 4 ]
+        }
+      ]}
+    ]
+  };
+
+  const init_jl_value_with_groups = {
+    "or": [
+      { "and": [
+        {
+          "==": [ { "var": "num" }, 1 ]
+        }, {
+          "==": [ { "var": "num" }, 2 ]
+        }
+      ]}, { "and": [
+        {
+          "==": [ { "var": "num" }, 3 ]
+        }, {
+          "==": [ { "var": "num" }, 4 ]
+        }
+      ]}
+    ]
+  };
+
+  it('should move rule after second rule', () => {
+    with_qb(simple_config_with_number, init_jl_value_with_group, 'JsonLogic', (qb, onChange) => {
+      const firstRule = qb.find('.rule').at(0);
+      const secondRule = qb.find('.rule').at(1);
+
+      simulate_drag_n_drop(firstRule, secondRule, {
+        "dragRect": {"x":58,"y":113,"width":1525,"height":46,"top":113,"right":1583,"bottom":159,"left":58},
+        "plhRect":  {"x":59,"y":79,"width":1525,"height":46,"top":79,"right":1584,"bottom":125,"left":59},
+        "treeRect": {"x":34,"y":34,"width":1571,"height":336.296875,"top":34,"right":1605,"bottom":370.296875,"left":34},
+        "hovRect":  {"x":59,"y":135,"width":1535,"height":46.296875,"top":135,"right":1594,"bottom":181.296875,"left":59},
+        "startMousePos": {"clientX":81,"clientY":101},
+        "mousePos":      {"clientX":80,"clientY":135}
       });
-    });
 
-    it('should move rule out of group', () => {
-      with_qb(simple_config_with_number, init_jl_value_with_number_and_group_3, 'JsonLogic', (qb, onChange) => {
-        const firstRuleInGroup = qb.find('.rule').at(1);
+      exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_group, onChange, [
+        '(num == 1 && num == 2)',
+        '(num == 2 && num == 1)'
+      ]);
+    });
+  });
+
+  it('should move group before rule', () => {
+    with_qb(simple_config_with_number, init_jl_value_with_number_and_group, 'JsonLogic', (qb, onChange) => {
+      const firstRule = qb.find('.rule').at(0);
+      const group = qb.find('.group--children .group').at(0);
+
+      simulate_drag_n_drop(group, firstRule, {
+        "dragRect":{"x":52,"y":102,"width":1525,"height":159,"top":102,"right":1577,"bottom":261,"left":52},
+        "plhRect":{"x":59,"y":135.296875,"width":1525,"height":156,"top":135.296875,"right":1584,"bottom":291.296875,"left":59},
+        "treeRect":{"x":34,"y":34,"width":1571,"height":268.296875,"top":34,"right":1605,"bottom":302.296875,"left":34},
+        "hovRect":{"x":59,"y":79,"width":1535,"height":46.296875,"top":79,"right":1594,"bottom":125.296875,"left":59},
+        "startMousePos":{"clientX":220,"clientY":157},
+        "mousePos":{"clientX":213,"clientY":124}
+      });
+
+      exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_number_and_group, onChange, [
+        '(num == 1 || (num == 2 && num == 3))',
+        '((num == 2 && num == 3) || num == 1)'
+      ]);
+    });
+  });
+
+  it('should move rule into group', () => {
+    const do_test = (config, value, checks) => {
+      with_qb(config, value, 'JsonLogic', (qb, onChange) => {
+        const secondRule = qb.find('.rule').at(1);
         const group = qb.find('.group--children .group').at(0);
         const groupHeader = group.find('.group--header').first();
-
-        simulate_drag_n_drop(firstRuleInGroup, groupHeader, {
-          "dragRect":{"x":81,"y":80,"width":1489,"height":43,"top":80,"right":1570,"bottom":123,"left":81},
-          "plhRect":{"x":84,"y":119,"width":1489,"height":43,"top":119,"right":1573,"bottom":162,"left":84},
-          "treeRect":{"x":34,"y":34,"width":1571,"height":203,"top":34,"right":1605,"bottom":237,"left":34},
-          "hovRect":{"x":59,"y":76,"width":1535,"height":150,"top":76,"right":1594,"bottom":226,"left":59},
-          "startMousePos":{"clientX":107,"clientY":139},
-          "mousePos":{"clientX":104,"clientY":100}
-        });
-
-        exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_number_and_group_3, onChange, [
-          '(num == 1 || (num == 2 && num == 3 && num == 4))',
-          '(num == 1 || num == 2 || (num == 3 && num == 4))'
-        ]);
-      });
-    });
-
-    it('should move group before rule', () => {
-      with_qb(simple_config_with_number, init_jl_value_with_number_and_group, 'JsonLogic', (qb, onChange) => {
-        const firstRule = qb.find('.rule').at(0);
-        const group = qb.find('.group--children .group').at(0);
-
-        simulate_drag_n_drop(group, firstRule, {
-          "dragRect":{"x":52,"y":102,"width":1525,"height":159,"top":102,"right":1577,"bottom":261,"left":52},
-          "plhRect":{"x":59,"y":135.296875,"width":1525,"height":156,"top":135.296875,"right":1584,"bottom":291.296875,"left":59},
-          "treeRect":{"x":34,"y":34,"width":1571,"height":268.296875,"top":34,"right":1605,"bottom":302.296875,"left":34},
-          "hovRect":{"x":59,"y":79,"width":1535,"height":46.296875,"top":79,"right":1594,"bottom":125.296875,"left":59},
-          "startMousePos":{"clientX":220,"clientY":157},
-          "mousePos":{"clientX":213,"clientY":124}
-        });
-
-        exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_number_and_group, onChange, [
-          '(num == 1 || (num == 2 && num == 3))',
-          '((num == 2 && num == 3) || num == 1)'
-        ]);
-      });
-    });
-
-    it('should move rule into group', () => {
-      with_qb(simple_config_with_number, init_jl_value_with_numbers_and_group, 'JsonLogic', (qb, onChange) => {
-        const secondRule = qb.find('.rule').at(1);
-        const group = qb.find('.group--children .group').at(0);
-        const groupHeader = group.find('.group--header').first();
-
+  
         simulate_drag_n_drop(secondRule, groupHeader, {
           "dragRect":{"x":83,"y":167,"width":1525,"height":43,"top":167,"right":1608,"bottom":210,"left":83},
           "plhRect":{"x":59,"y":129,"width":1525,"height":43,"top":129,"right":1584,"bottom":172,"left":59},
@@ -765,19 +814,78 @@ describe('interactions', () => {
           "mousePos":{"clientX":105,"clientY":185}
         });
 
-        exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_numbers_and_group, onChange, [
-          '(num == 1 || num == 2 || (num == 3 && num == 4))',
-          '(num == 1 || (num == 2 && num == 3 && num == 4))'
-        ]);
+        checks(config, value, onChange);
       });
+    };
+
+    do_test(simple_config_with_number, init_jl_value_with_numbers_and_group, (config, value, onChange) => {
+      exect_queries_before_and_after(config, value, onChange, [
+        '(num == 1 || num == 2 || (num == 3 && num == 4))',
+        '(num == 1 || (num == 2 && num == 3 && num == 4))'
+      ]);
+    });
+    
+    do_test(simple_config_with_number_without_regroup, init_jl_value_with_numbers_and_group, (_config, _value, onChange) => {
+      sinon.assert.notCalled(onChange);
     });
   });
 
+  it('should move rule out of group', () => {
+    const do_test = (config, value, checks) => {
+      with_qb(config, value, 'JsonLogic', (qb, onChange) => {
+        const firstRuleInGroup = qb.find('.rule').at(1);
+        const group = qb.find('.group--children .group').at(0);
+        const groupHeader = group.find('.group--header').first();
+  
+        simulate_drag_n_drop(firstRuleInGroup, groupHeader, {
+          "dragRect":{"x":81,"y":80,"width":1489,"height":43,"top":80,"right":1570,"bottom":123,"left":81},
+          "plhRect":{"x":84,"y":119,"width":1489,"height":43,"top":119,"right":1573,"bottom":162,"left":84},
+          "treeRect":{"x":34,"y":34,"width":1571,"height":203,"top":34,"right":1605,"bottom":237,"left":34},
+          "hovRect":{"x":59,"y":76,"width":1535,"height":150,"top":76,"right":1594,"bottom":226,"left":59},
+          "startMousePos":{"clientX":107,"clientY":139},
+          "mousePos":{"clientX":104,"clientY":100}
+        });
+  
+        checks(config, value, onChange);
+      });
+    };
 
-  //todo: change field, op, value
+    do_test(simple_config_with_number, init_jl_value_with_number_and_group_3, (config, value, onChange) => {
+      exect_queries_before_and_after(config, value, onChange, [
+        '(num == 1 || (num == 2 && num == 3 && num == 4))',
+        '(num == 1 || num == 2 || (num == 3 && num == 4))'
+      ]);
+    });
+    
+    do_test(simple_config_with_number_without_regroup, init_jl_value_with_number_and_group_3, (_config, _value, onChange) => {
+      sinon.assert.notCalled(onChange);
+    });
+  });
+
+  it('should move group before group', () => {
+    with_qb(simple_config_with_number_without_regroup, init_jl_value_with_groups, 'JsonLogic', (qb, onChange) => {
+      const firstGroup = qb.find('.group--children .group').at(0);
+      const secondGroup = qb.find('.group--children .group').at(1);
+      const firstGroupHeader = firstGroup.find('.group--header').first();
+      const secondGroupHeader = secondGroup.find('.group--header').first();
+
+      simulate_drag_n_drop(secondGroup, firstGroupHeader, {
+        "dragRect":{"x":55,"y":83,"width":1448,"height":159.296875,"top":83,"right":1503,"bottom":242.296875,"left":55},
+        "plhRect":{"x":59,"y":250.5,"width":1448,"height":159.296875,"top":250.5,"right":1507,"bottom":409.796875,"left":59},
+        "treeRect":{"x":34,"y":34,"width":1494,"height":386.796875,"top":34,"right":1528,"bottom":420.796875,"left":34},
+        "hovRect":{"x":59,"y":79,"width":1458,"height":161.5,"top":79,"right":1517,"bottom":240.5,"left":59},
+        "startMousePos":{"clientX":201,"clientY":272},
+        "mousePos":{"clientX":197,"clientY":104}
+      });
+
+      exect_queries_before_and_after(simple_config_with_number_without_regroup, init_jl_value_with_groups, onChange, [
+        '((num == 1 && num == 2) || (num == 3 && num == 4))',
+        '((num == 3 && num == 4) || (num == 1 && num == 2))'
+      ]);
+    });
+  });
 
 });
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
