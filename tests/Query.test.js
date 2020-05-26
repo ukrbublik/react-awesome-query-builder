@@ -10,14 +10,24 @@ import {
 const {
   uuid, 
   checkTree, loadTree, loadFromJsonLogic, 
-  queryString, sqlFormat, mongodbFormat, jsonLogicFormat, getTree,
+  queryString, sqlFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from 'react-awesome-query-builder/config/antd';
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // utils
 
-const with_qb = (config, value, valueFormat, checks) => {
+const with_qb = (config_fn, value, valueFormat, checks) => {
+  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
+};
+
+const with_qb_skins = (config_fn, value, valueFormat, checks) => {
+  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
+  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
+};
+
+const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
+  const config = config_fn(BasicConfig);
   const loadFn = valueFormat == 'JsonLogic' ? loadFromJsonLogic : loadTree;
   const onChange = sinon.spy();
   let qb;
@@ -50,7 +60,8 @@ const render_builder = (props) => (
 
 const empty_value = {id: uuid(), type: "group"};
 
-const do_export_checks = (config, value, valueFormat, expects) => {
+const do_export_checks = (config_fn, value, valueFormat, expects) => {
+  const config = config_fn(BasicConfig);
   const loadFn = valueFormat == 'JsonLogic' ? loadFromJsonLogic : loadTree;
   const tree = checkTree(loadFn(value, config), config);
   
@@ -77,6 +88,10 @@ const do_export_checks = (config, value, valueFormat, expects) => {
       const safe_logic = JSON.parse(JSON.stringify(logic));
       expect(safe_logic).to.eql(expects["logic"]);
       expect(errors).to.eql([]);
+    });
+
+    it('should work to QueryBuilder', () => {
+      const res = queryBuilderFormat(tree, config);
     });
   } else {
     const {logic, data, errors} = jsonLogicFormat(tree, config);
@@ -129,9 +144,13 @@ const simulate_drag_n_drop = (sourceRule, targetRule, coords) => {
       __mocked_hov_container: targetContainer.instance(),
     })
   );
+  dragHandler.instance().dispatchEvent(
+    createBubbledEvent("mouseup", { ...mousePos })
+  );
 };
 
-const exect_queries_before_and_after = (config, init_value_jl, onChange, queries) => {
+const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
+  const config = config_fn(BasicConfig);
   const initTreeString = queryString(loadFromJsonLogic(init_value_jl, config), config);
   expect(initTreeString).to.equal(queries[0]);
 
@@ -155,7 +174,7 @@ describe('library', () => {
 // basic query
 
 describe('basic query', () => {
-  const simple_config_with_number = {
+  const simple_config_with_number = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       num: {
@@ -168,7 +187,7 @@ describe('basic query', () => {
         },
       },
     },
-  };
+  });
 
   const init_value_with_number = {
     type: "group",
@@ -239,7 +258,7 @@ describe('basic query', () => {
 // query with conjunction
 
 describe('query with conjunction', () => {
-  const config_with_number_and_string = {
+  const config_with_number_and_string = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       num: {
@@ -263,7 +282,7 @@ describe('query with conjunction', () => {
         },
       }
     },
-  };
+  });
 
   const init_jl_value_with_number_and_string = {
     "or": [{
@@ -282,7 +301,7 @@ describe('query with conjunction', () => {
 
   describe('import', () => {
     it('should work with simple value of JsonLogic format', () => {
-      with_qb(config_with_number_and_string, init_jl_value_with_number_and_string, 'JsonLogic', (qb) => {
+      with_qb_skins(config_with_number_and_string, init_jl_value_with_number_and_string, 'JsonLogic', (qb) => {
         expect(qb.find('.query-builder')).to.have.length(1);
       });
     });
@@ -317,7 +336,7 @@ describe('query with conjunction', () => {
 // query with subquery and datetime types
 
 describe('query with subquery and datetime types', () => {
-  const config_with_date_and_time = {
+  const config_with_date_and_time = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       date: {
@@ -333,7 +352,7 @@ describe('query with subquery and datetime types', () => {
         type: 'datetime',
       },
     },
-  };
+  });
 
   const init_jl_value_with_date_and_time = {
     "or": [{
@@ -350,7 +369,7 @@ describe('query with subquery and datetime types', () => {
 
   describe('import', () => {
     it('should work with simple value of JsonLogic format', () => {
-      with_qb(config_with_date_and_time, init_jl_value_with_date_and_time, 'JsonLogic', (qb) => {
+      with_qb_skins(config_with_date_and_time, init_jl_value_with_date_and_time, 'JsonLogic', (qb) => {
         expect(qb.find('.query-builder')).to.have.length(1);
       });
     });
@@ -412,7 +431,7 @@ describe('query with subquery and datetime types', () => {
 // query with select
 
 describe('query with select', () => {
-  const config_with_select = {
+  const config_with_select = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       // new format of listValues
@@ -447,7 +466,7 @@ describe('query with select', () => {
       },
 
     },
-  };
+  });
 
   const init_jl_value_with_select = {
     "and": [{
@@ -463,7 +482,7 @@ describe('query with select', () => {
 
   describe('import', () => {
     it('should work with value of JsonLogic format', () => {
-      with_qb(config_with_select, init_jl_value_with_select, 'JsonLogic', (qb) => {
+      with_qb_skins(config_with_select, init_jl_value_with_select, 'JsonLogic', (qb) => {
         expect(qb.find('.query-builder')).to.have.length(1);
       });
     });
@@ -516,24 +535,221 @@ describe('query with select', () => {
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// query with !struct
+// query with !struct and !group
 
 describe('query with !struct', () => {
-  //todo
+
+  const config_with_struct_and_group = (BasicConfig) => ({
+    ...BasicConfig,
+    fields: {
+      user: {
+        label: 'User',
+        tooltip: 'Group of fields',
+        type: '!struct',
+        subfields: {
+          firstName: {
+            label2: 'Username', //only for menu's toggler
+            type: 'text',
+            mainWidgetProps: {
+              valueLabel: "Name",
+              valuePlaceholder: "Enter name",
+            },
+          },
+          login: {
+            type: 'text',
+            mainWidgetProps: {
+              valueLabel: "Login",
+              valuePlaceholder: "Enter login",
+            },
+          },
+        }
+      },
+      results: {
+        label: 'Results',
+        type: '!group',
+        subfields: {
+          slider: {
+            label: 'Slider',
+            type: 'number',
+            preferWidgets: ['slider', 'rangeslider'],
+            valueSources: ['value', 'field'],
+            fieldSettings: {
+              min: 0,
+              max: 100,
+              step: 1,
+              marks: {
+                0: <strong>0%</strong>,
+                100: <strong>100%</strong>
+              },
+            },
+            //overrides
+            widgets: {
+              slider: {
+                widgetProps: {
+                  valuePlaceholder: "..Slider",
+                }
+              }
+            },
+          },
+          stock: {
+            label: 'In stock',
+            type: 'boolean',
+            defaultValue: true,
+            fieldSettings: {
+              labelYes: "+",
+              labelNo: "-"
+            }
+          },
+        }
+      },
+    }
+  });
+
+  const init_jl_value_with_struct_and_group = {
+    "and": [
+      {
+        "and": [
+          { "==": [ { "var": "results.slider" }, 22 ] },
+          { "<=": [ 13, { "var": "results.slider" }, 36 ] },
+          { "==": [ { "var": "results.stock" }, true ] }
+        ]
+      },
+      { "==": [ { "var": "user.firstName" }, "abc" ] },
+      { "!!": { "var": "user.login" } }
+    ]
+  };
+
+  describe('import', () => {
+    it('should work with value of JsonLogic format', () => {
+      with_qb_skins(config_with_struct_and_group, init_jl_value_with_struct_and_group, 'JsonLogic', (qb) => {
+        expect(qb.find('.query-builder')).to.have.length(1);
+      });
+    });
+  });
+
+  describe('export', () => {
+    do_export_checks(config_with_struct_and_group, init_jl_value_with_struct_and_group, 'JsonLogic', {
+      "query": "((results.slider == 22 && results.stock == true) && user.firstName == \"abc\" && !!user.login)",
+      "queryHuman": "((Results.Slider == 22 AND Results.In stock) AND Username == \"abc\" AND User.login IS NOT EMPTY)",
+      "sql": "((results.slider = 22 AND results.stock = true) AND user.firstName = 'abc' AND user.login IS NOT EMPTY)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "slider": 22,
+            "stock": true
+          }
+        },
+        "user.firstName": "abc",
+        "user.login": {
+          "$exists": true
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "and": [
+              {
+                "==": [
+                  {
+                    "var": "results.slider"
+                  },
+                  22
+                ]
+              },
+              {
+                "==": [
+                  {
+                    "var": "results.stock"
+                  },
+                  true
+                ]
+              }
+            ]
+          },
+          {
+            "==": [
+              {
+                "var": "user.firstName"
+              },
+              "abc"
+            ]
+          },
+          {
+            "!!": {
+              "var": "user.login"
+            }
+          }
+        ]
+      }
+    });
+  });
+
 });
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// query with !group
-
-describe('query with !group', () => {
-  //todo
-});
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // query with field compare
 
 describe('query with field compare', () => {
-  //todo
+  const simple_config_with_number = (BasicConfig) => ({
+    ...BasicConfig,
+    fields: {
+      num: {
+        label: 'Number',
+        type: 'number',
+        preferWidgets: ['number'],
+      },
+      num2: {
+        label: 'Number2',
+        type: 'number',
+        preferWidgets: ['number'],
+      },
+    },
+  });
+
+  const init_jl_value_with_number_field_compare = {
+    "and": [
+      { "==": [ { "var": "num" }, { "var": "num2" } ] }
+    ]
+  };
+
+  describe('import', () => {
+    it('should work with simple value of JsonLogic format', () => {
+      with_qb_skins(simple_config_with_number, init_jl_value_with_number_field_compare, 'JsonLogic', (qb) => {
+        expect(qb.find('.query-builder')).to.have.length(1);
+      });
+    });
+  });
+
+  describe('export', () => {
+    do_export_checks(simple_config_with_number, init_jl_value_with_number_field_compare, 'JsonLogic', {
+      "query": "num == num2",
+      "queryHuman": "Number == Number2",
+      "sql": "num = num2",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            "$num",
+            "$num2"
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              {
+                "var": "num"
+              },
+              {
+                "var": "num2"
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -544,14 +760,13 @@ describe('query with func', () => {
 });
 
 //todo: validation
-//todo: widgets - bool, slider
-//todo: antd widgets, treeselect
+//todo: treeselect
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // interactions
 
 describe('interactions', () => {
-  const simple_config_with_number = {
+  const simple_config_with_number = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       num: {
@@ -564,7 +779,7 @@ describe('interactions', () => {
         },
       },
     },
-  };
+  });
 
   const init_jl_value_with_number = {
     "and": [{
@@ -598,8 +813,6 @@ describe('interactions', () => {
       expect(child.properties.operator).to.equal(null);
       expect(child.properties.value).to.eql([]);
     });
-
-    //todo: config - remove completely
   });
 
   it('click on remove group will reave empty rule', () => {
@@ -616,8 +829,6 @@ describe('interactions', () => {
       expect(child.properties.operator).to.equal(null);
       expect(child.properties.value).to.eql([]);
     });
-
-    //todo: config - remove completely
   });
 
   it('click on add rule will add new empty rule', () => {
@@ -661,7 +872,7 @@ describe('interactions', () => {
 // drag-n-drop
 
 describe('drag-n-drop', () => {
-  const simple_config_with_number = {
+  const simple_config_with_number = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       num: {
@@ -674,15 +885,15 @@ describe('drag-n-drop', () => {
         },
       },
     },
-  };
+  });
 
-  const simple_config_with_number_without_regroup = {
-    ...simple_config_with_number,
+  const simple_config_with_number_without_regroup = (BasicConfig) => ({
+    ...simple_config_with_number(BasicConfig),
     settings: {
       ...BasicConfig.settings,
       canRegroup: false,
     }
-  };
+  });
 
   const init_jl_value_with_group = {
     "or": [{
@@ -770,7 +981,7 @@ describe('drag-n-drop', () => {
         "mousePos":      {"clientX":80,"clientY":135}
       });
 
-      exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_group, onChange, [
+      expect_queries_before_and_after(simple_config_with_number, init_jl_value_with_group, onChange, [
         '(num == 1 && num == 2)',
         '(num == 2 && num == 1)'
       ]);
@@ -791,7 +1002,7 @@ describe('drag-n-drop', () => {
         "mousePos":{"clientX":213,"clientY":124}
       });
 
-      exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_number_and_group, onChange, [
+      expect_queries_before_and_after(simple_config_with_number, init_jl_value_with_number_and_group, onChange, [
         '(num == 1 || (num == 2 && num == 3))',
         '((num == 2 && num == 3) || num == 1)'
       ]);
@@ -819,7 +1030,7 @@ describe('drag-n-drop', () => {
     };
 
     do_test(simple_config_with_number, init_jl_value_with_numbers_and_group, (config, value, onChange) => {
-      exect_queries_before_and_after(config, value, onChange, [
+      expect_queries_before_and_after(config, value, onChange, [
         '(num == 1 || num == 2 || (num == 3 && num == 4))',
         '(num == 1 || (num == 2 && num == 3 && num == 4))'
       ]);
@@ -851,7 +1062,7 @@ describe('drag-n-drop', () => {
     };
 
     do_test(simple_config_with_number, init_jl_value_with_number_and_group_3, (config, value, onChange) => {
-      exect_queries_before_and_after(config, value, onChange, [
+      expect_queries_before_and_after(config, value, onChange, [
         '(num == 1 || (num == 2 && num == 3 && num == 4))',
         '(num == 1 || num == 2 || (num == 3 && num == 4))'
       ]);
@@ -878,7 +1089,7 @@ describe('drag-n-drop', () => {
         "mousePos":{"clientX":197,"clientY":104}
       });
 
-      exect_queries_before_and_after(simple_config_with_number_without_regroup, init_jl_value_with_groups, onChange, [
+      expect_queries_before_and_after(simple_config_with_number_without_regroup, init_jl_value_with_groups, onChange, [
         '((num == 1 && num == 2) || (num == 3 && num == 4))',
         '((num == 3 && num == 4) || (num == 1 && num == 2))'
       ]);
