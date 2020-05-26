@@ -116,7 +116,8 @@ const simulate_drag_n_drop = (sourceRule, targetRule, coords) => {
       __mocked_window: dragHandler.instance(), 
     })
   );
-  targetRule.instance().getBoundingClientRect = () => hovRect;
+  const targetContainer = targetRule.closest('.group-or-rule-container');
+  targetContainer.instance().getBoundingClientRect = () => hovRect;
   dragHandler.instance().dispatchEvent(
     createBubbledEvent("mousemove", {
       ...mousePos,
@@ -125,7 +126,7 @@ const simulate_drag_n_drop = (sourceRule, targetRule, coords) => {
         dragEl.getBoundingClientRect = () => dragRect;
         plhEl.getBoundingClientRect = () => plhRect;
       },
-      __mocked_hov_container: targetRule.instance(),
+      __mocked_hov_container: targetContainer.instance(),
     })
   );
 };
@@ -601,6 +602,20 @@ describe('interactions', () => {
     ]
   };
 
+  const init_jl_value_with_numbers_and_group = {
+    "or": [
+      { "==": [ { "var": "num" }, 1 ] },
+      { "==": [ { "var": "num" }, 2 ] },
+      { "and": [
+        {
+          "==": [ { "var": "num" }, 3 ]
+        }, {
+          "==": [ { "var": "num" }, 4 ]
+        }
+      ]}
+    ]
+  };
+
   it('click on remove single rule will reave empty rule', () => {
     with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
       qb
@@ -696,8 +711,9 @@ describe('interactions', () => {
       with_qb(simple_config_with_number, init_jl_value_with_number_and_group_3, 'JsonLogic', (qb, onChange) => {
         const firstRuleInGroup = qb.find('.rule').at(1);
         const group = qb.find('.group--children .group').at(0);
+        const groupHeader = group.find('.group--header').first();
 
-        simulate_drag_n_drop(firstRuleInGroup, group, {
+        simulate_drag_n_drop(firstRuleInGroup, groupHeader, {
           "dragRect":{"x":81,"y":80,"width":1489,"height":43,"top":80,"right":1570,"bottom":123,"left":81},
           "plhRect":{"x":84,"y":119,"width":1489,"height":43,"top":119,"right":1573,"bottom":162,"left":84},
           "treeRect":{"x":34,"y":34,"width":1571,"height":203,"top":34,"right":1605,"bottom":237,"left":34},
@@ -730,6 +746,28 @@ describe('interactions', () => {
         exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_number_and_group, onChange, [
           '(num == 1 || (num == 2 && num == 3))',
           '((num == 2 && num == 3) || num == 1)'
+        ]);
+      });
+    });
+
+    it('should move rule into group', () => {
+      with_qb(simple_config_with_number, init_jl_value_with_numbers_and_group, 'JsonLogic', (qb, onChange) => {
+        const secondRule = qb.find('.rule').at(1);
+        const group = qb.find('.group--children .group').at(0);
+        const groupHeader = group.find('.group--header').first();
+
+        simulate_drag_n_drop(secondRule, groupHeader, {
+          "dragRect":{"x":83,"y":167,"width":1525,"height":43,"top":167,"right":1608,"bottom":210,"left":83},
+          "plhRect":{"x":59,"y":129,"width":1525,"height":43,"top":129,"right":1584,"bottom":172,"left":59},
+          "treeRect":{"x":34,"y":34,"width":1571,"height":430,"top":34,"right":1605,"bottom":464,"left":34},
+          "hovRect":{"x":59,"y":182,"width":1535,"height":158,"top":182,"right":1594,"bottom":340,"left":59},
+          "startMousePos":{"clientX":81,"clientY":147},
+          "mousePos":{"clientX":105,"clientY":185}
+        });
+
+        exect_queries_before_and_after(simple_config_with_number, init_jl_value_with_numbers_and_group, onChange, [
+          '(num == 1 || num == 2 || (num == 3 && num == 4))',
+          '(num == 1 || (num == 2 && num == 3 && num == 4))'
         ]);
       });
     });
