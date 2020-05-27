@@ -2,6 +2,7 @@ import React from 'react';
 import { mount, shallow } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import sinon from 'sinon';
+import moment from 'moment';
 const stringify = JSON.stringify;
 
 import {
@@ -19,6 +20,10 @@ import AntdConfig from 'react-awesome-query-builder/config/antd';
 
 const with_qb = (config_fn, value, valueFormat, checks) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
+};
+
+const with_qb_ant = (config_fn, value, valueFormat, checks) => {
+  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
 };
 
 const with_qb_skins = (config_fn, value, valueFormat, checks) => {
@@ -156,6 +161,19 @@ const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, que
 
   const changedTreeString = queryString(onChange.getCall(0).args[0], config);
   expect(changedTreeString).to.equal(queries[1]);
+};
+
+const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
+  const config = config_fn(BasicConfig);
+  const {logic: initTreeJl} = jsonLogicFormat(loadFromJsonLogic(init_value_jl, config), config);
+  if (jlogics[0]) {
+    expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));
+    //expect(initTreeJl).to.eql(jlogics[0]);
+  }
+
+  const {logic: changedTreeJl} = jsonLogicFormat(onChange.getCall(changeIndex).args[0], config);
+  expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
+  //expect(changedTreeJl).to.eql(jlogics[1]);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -756,17 +774,155 @@ describe('query with field compare', () => {
 // query with func
 
 describe('query with func', () => {
-  //todo
+  const config_with_funcs = (BasicConfig) => ({
+    ...BasicConfig,
+    funcs: {
+      LOWER: {
+        label: 'Lowercase',
+        mongoFunc: '$toLower',
+        jsonLogic: "toLowerCase",
+        jsonLogicIsMethod: true,
+        returnType: 'text',
+        args: {
+          str: {
+            label: "String",
+            type: 'text',
+            valueSources: ['value', 'field'],
+          },
+        }
+      },
+      LINEAR_REGRESSION: {
+        label: 'Linear regression',
+        returnType: 'number',
+        formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
+        sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
+        mongoFormatFunc: ({coef, bias, val}) => ({'$sum': [{'$multiply': [coef, val]}, bias]}),
+        jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
+        renderBrackets: ['', ''],
+        renderSeps: [' * ', ' + '],
+        args: {
+          coef: {
+            label: "Coef",
+            type: 'number',
+            defaultValue: 1,
+            valueSources: ['value'],
+          },
+          val: {
+            label: "Value",
+            type: 'number',
+            valueSources: ['value'],
+          },
+          bias: {
+            label: "Bias",
+            type: 'number',
+            defaultValue: 0,
+            valueSources: ['value'],
+          }
+        }
+      },
+    },
+    fields: {
+      num: {
+        label: 'Number',
+        type: 'number',
+      },
+      str: {
+        label: 'String',
+        type: 'text',
+      },
+    }
+  });
+
+  const init_jl_value_with_number = {
+    "and": [{
+      "==": [ { "var": "num" }, 2 ]
+    }]
+  };
+  const init_jl_value_with_text = {
+    "and": [{  "==": [ { "var": "str" }, "abc" ]  }]
+  };
+
+  it('set function for number', () => {
+    with_qb(config_with_funcs, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--value .widget--valuesrc select')
+        .simulate('change', { target: { value: 'func' } });
+      qb
+        .find('.rule .rule--value .widget--widget .rule--func select')
+        .simulate('change', { target: { value: 'LINEAR_REGRESSION' } });
+      qb
+        .find('.rule .rule--value .widget--widget .rule--func--args .rule--func--arg')
+        .at(2)
+        .find('input')
+        .simulate('change', { target: { value: '4' } });
+      expect_jlogic_before_and_after(config_with_funcs, init_jl_value_with_number, onChange, [null,
+        { "and": [{ "==": [
+          { "var": "num" }, 
+          { "+": [ { "*": [ 1, 4 ] }, 0 ] }
+        ] }] }
+      ], 2);
+      const updatedTree = onChange.getCall(2).args[0];
+      do_export_checks(config_with_funcs, updatedTree, 'default', {
+        "query": "num == (1 * 4 + 0)",
+        "queryHuman": "Number == (1 * 4 + 0)",
+        "sql": "num = (1 * 4 + 0)",
+        "mongo": {
+          "$expr": {
+            "$eq": [
+              "$num",
+              {
+                "$sum": [
+                  {
+                    "$multiply": [
+                      1,
+                      4
+                    ]
+                  },
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        "logic": {
+          "and": [
+            {
+              "==": [
+                {
+                  "var": "num"
+                },
+                {
+                  "+": [
+                    {
+                      "*": [
+                        1,
+                        4
+                      ]
+                    },
+                    0
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      });
+    });
+  });
+
+
+
 });
 
 //todo: validation
-//todo: treeselect
+//todo: proximity op
+//todo: antd - FieldTreeSelect, FieldCascader, FieldDropdown
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // interactions
 
 describe('interactions', () => {
-  const simple_config_with_number = (BasicConfig) => ({
+  const simple_config_with_numbers_and_str = (BasicConfig) => ({
     ...BasicConfig,
     fields: {
       num: {
@@ -777,6 +933,20 @@ describe('interactions', () => {
           min: -1,
           max: 5
         },
+      },
+      num2: {
+        label: 'Number2',
+        type: 'number',
+        preferWidgets: ['number'],
+      },
+      str: {
+        label: 'String',
+        type: 'text',
+      },
+      str2: {
+        label: 'String',
+        type: 'text',
+        excludeOperators: ['equal'],
       },
     },
   });
@@ -799,8 +969,8 @@ describe('interactions', () => {
     }]
   };
 
-  it('click on remove single rule will reave empty rule', () => {
-    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+  it('click on remove single rule will leave empty rule', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
       qb
         .find('.rule .rule--header button')
         .first()
@@ -815,8 +985,8 @@ describe('interactions', () => {
     });
   });
 
-  it('click on remove group will reave empty rule', () => {
-    with_qb(simple_config_with_number, init_jl_value_with_group, 'JsonLogic', (qb, onChange) => {
+  it('click on remove group will leave empty rule', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_group, 'JsonLogic', (qb, onChange) => {
       qb
         .find('.group--children .group .group--header .group--actions button')
         .at(2)
@@ -832,7 +1002,7 @@ describe('interactions', () => {
   });
 
   it('click on add rule will add new empty rule', () => {
-    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
       qb
         .find('.group--actions button')
         .first()
@@ -844,7 +1014,7 @@ describe('interactions', () => {
   });
 
   it('click on add group will add new group with one empty rule', () => {
-    with_qb(simple_config_with_number, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
       qb
         .find('.group--actions button')
         .at(1)
@@ -854,7 +1024,7 @@ describe('interactions', () => {
       expect(childKeys.length).to.equal(2);
       const child = changedTree.children1[childKeys[1]];
       expect(child.type).to.equal("group");
-      expect(child.properties.conjunction).to.equal("AND");
+      expect(child.properties.conjunction).to.equal("AND"); //default
       const subchildKeys = Object.keys(child.children1);
       const subchild = child.children1[subchildKeys[0]];
       expect(subchild).to.eql({
@@ -864,9 +1034,242 @@ describe('interactions', () => {
     });
   });
 
-  //todo: change field, op, value
+  it('change field to of same type will same op & value', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--field select')
+        .simulate('change', { target: { value: 'num2' } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal('num2');
+      expect(child.properties.operator).to.equal('equal');
+      expect(child.properties.value).to.eql([2]);
+    });
+  });
+
+  it('change field to of another type will flush value and incompatible op', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--field select')
+        .simulate('change', { target: { value: 'str2' } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal('str2');
+      expect(child.properties.operator).to.equal(null);
+      expect(child.properties.value).to.eql([]);
+    });
+  });
+
+  it('change field to of another type will flush value and leave compatible op', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--field select')
+        .simulate('change', { target: { value: 'str' } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal('str');
+      expect(child.properties.operator).to.equal('equal');
+      expect(child.properties.value).to.eql([undefined]);
+    });
+  });
+
+  it('set not', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.group--conjunctions input[type="checkbox"]')
+        .simulate('change', { target: { checked: true } });
+      expect_jlogic_before_and_after(simple_config_with_numbers_and_str, init_jl_value_with_number, onChange, [null,
+        { "!" : { "and": [{ "==": [ { "var": "num" }, 2 ] }] } }
+      ]);
+    });
+  });
+
+  it('change conjunction from AND to OR', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.group--conjunctions input[type="radio"][value="OR"]')
+        .simulate('change', { target: { value: "OR" } });
+      expect_jlogic_before_and_after(simple_config_with_numbers_and_str, init_jl_value_with_number, onChange, [null,
+        { "or": [{ "==": [ { "var": "num" }, 2 ] }] }
+      ]);
+    });
+  });
+
+  it('change value source to another field of same type', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--value .widget--valuesrc select')
+        .simulate('change', { target: { value: 'field' } });
+      qb
+        .find('.rule .rule--value .widget--widget select')
+        .simulate('change', { target: { value: 'num2' } });
+      expect_jlogic_before_and_after(simple_config_with_numbers_and_str, init_jl_value_with_number, onChange, [null,
+        { "and": [{ "==": [ { "var": "num" }, { "var": "num2" } ] }] }
+      ], 1);
+    });
+  });
+
+  it('change op from equal to not_equal', () => {
+    with_qb(simple_config_with_numbers_and_str, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--operator select')
+        .simulate('change', { target: { value: 'not_equal' } });
+      expect_jlogic_before_and_after(simple_config_with_numbers_and_str, init_jl_value_with_number, onChange, [null,
+        { "and": [{ "!=": [ { "var": "num" }, 2 ] }] }
+      ]);
+    });
+  });
 
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// widgets
+
+const config_with_all_types = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      label: 'Number',
+      type: 'number',
+      preferWidgets: ['number'],
+    },
+    str: {
+      label: 'String',
+      type: 'text',
+    },
+    date: {
+      label: 'Date',
+      type: 'date',
+    },
+    time: {
+      label: 'Time',
+      type: 'time',
+    },
+    datetime: {
+      label: 'DateTime',
+      type: 'datetime',
+    },
+    slider: {
+      label: 'Slider',
+      type: 'number',
+      preferWidgets: ['slider', 'rangeslider'],
+      fieldSettings: {
+        min: 0,
+        max: 100,
+        step: 1,
+      },
+    },
+    stock: {
+      label: 'In stock',
+      type: 'boolean',
+      defaultValue: true,
+    },
+    color: {
+      label: 'Color',
+      type: 'select',
+      listValues: [
+        { value: 'yellow', title: 'Yellow' },
+        { value: 'green', title: 'Green' },
+        { value: 'orange', title: 'Orange' },
+      ],
+    },
+    multicolor: {
+      label: 'Colors',
+      type: 'multiselect',
+      listValues: {
+        yellow: 'Yellow',
+        green: 'Green',
+        orange: 'Orange'
+      },
+      allowCustomValues: false
+    },
+  },
+});
+
+const init_jl_value_with_number = {
+  "and": [{  "==": [ { "var": "num" }, 2 ]  }]
+};
+const init_jl_value_with_text = {
+  "and": [{  "==": [ { "var": "str" }, "abc" ]  }]
+};
+const init_jl_value_with_date = {
+  "and": [{  "==": [ { "var": "date" }, "2020-05-26T00:00:00.000Z" ]  }]
+};
+const init_jl_value_with_datetime = {
+  "and": [{  "==": [ { "var": "datetime" }, "2020-05-26T02:30:00.000Z" ]  }]
+};
+
+describe('widgets', () => {
+  it('change number value', () => {
+    with_qb_skins(config_with_all_types, init_jl_value_with_number, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--value .widget--widget input')
+        .simulate('change', { target: { value: '3' } });
+      expect_jlogic_before_and_after(config_with_all_types, init_jl_value_with_number, onChange, [null,
+        { "and": [{ "==": [ { "var": "num" }, 3 ] }] }
+      ]);
+    });
+  });
+
+  it('change text value', () => {
+    with_qb_skins(config_with_all_types, init_jl_value_with_text, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--value .widget--widget input')
+        .simulate('change', { target: { value: 'def' } });
+      expect_jlogic_before_and_after(config_with_all_types, init_jl_value_with_text, onChange, [null,
+        { "and": [{ "==": [ { "var": "str" }, 'def' ] }] }
+      ]);
+    });
+  });
+
+  it('change date value', () => {
+    with_qb(config_with_all_types, init_jl_value_with_date, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--value .widget--widget input')
+        .simulate('change', { target: { value: '2020-05-05' } });
+      expect_jlogic_before_and_after(config_with_all_types, init_jl_value_with_date, onChange, [null,
+        { "and": [{ "==": [ { "var": "date" }, '2020-05-05T00:00:00.000Z' ] }] }
+      ]);
+    });
+  });
+
+  it('change datetime value', () => {
+    with_qb(config_with_all_types, init_jl_value_with_datetime, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('.rule .rule--value .widget--widget input')
+        .simulate('change', { target: { value: '2020-05-05T02:30' } });
+      expect_jlogic_before_and_after(config_with_all_types, init_jl_value_with_datetime, onChange, [null,
+        { "and": [{ "==": [ { "var": "datetime" }, '2020-05-05T02:30:00.000Z' ] }] }
+      ]);
+    });
+  });
+
+  //todo: time, slider, bool, multiselect, select
+});
+
+
+describe('antdesign widgets', () => {
+  it('change date value', () => {
+    with_qb_ant(config_with_all_types, init_jl_value_with_date, 'JsonLogic', (qb, onChange) => {
+      qb
+        .find('DateWidget')
+        .instance()
+        .handleChange(moment('2020-05-05'));
+      expect_jlogic_before_and_after(config_with_all_types, init_jl_value_with_date, onChange, [null,
+        { "and": [{ "==": [ { "var": "date" }, '2020-05-05T00:00:00.000Z' ] }] }
+      ]);
+    });
+  });
+
+  //todo: datetime, time, slider, bool, multiselect, select + treeselect, treemultiselect, range, slider
+});
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // drag-n-drop
