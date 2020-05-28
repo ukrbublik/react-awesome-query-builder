@@ -14,6 +14,12 @@ const {
   queryString, sqlFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from 'react-awesome-query-builder/config/antd';
+import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
+const {
+    FieldDropdown,
+    FieldCascader,
+    FieldTreeSelect,
+} = AntdWidgets;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // utils
@@ -90,9 +96,10 @@ const do_export_checks = (config_fn, value, valueFormat, expects) => {
 
     it('should work to JsonLogic', () => {
       const {logic, data, errors} = jsonLogicFormat(tree, config);
-      const safe_logic = JSON.parse(JSON.stringify(logic));
+      const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
       expect(safe_logic).to.eql(expects["logic"]);
-      expect(errors).to.eql([]);
+      if (expects["logic"])
+        expect(errors).to.eql([]);
     });
 
     it('should work to QueryBuilder', () => {
@@ -910,13 +917,156 @@ describe('query with func', () => {
     });
   });
 
+});
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// config
+
+describe('config', () => {
+  const config_with_struct = (BasicConfig) => ({
+    ...BasicConfig,
+    fields: {
+      user: {
+        label: 'User',
+        tooltip: 'Group of fields',
+        type: '!struct',
+        subfields: {
+          login: {
+            type: 'text',
+          },
+          info: {
+            type: '!struct',
+            subfields: {
+              firstName: {
+                type: 'text',
+              },
+            }
+          }
+        }
+      },
+    },
+  });
+  const config_with_cascader = (AntdConfig) => {
+    const config = config_with_struct(AntdConfig);
+    return {
+      ...config,
+      settings: {
+        ...config.settings,
+        renderField: (props) => <FieldCascader {...props} />,
+      },
+    };
+  };
+  const config_with_tree_select = (AntdConfig) => {
+    const config = config_with_struct(AntdConfig);
+    return {
+      ...config,
+      settings: {
+        ...config.settings,
+        renderField: (props) => <FieldTreeSelect {...props} />,
+      },
+    };
+  };
+  const config_with_dropdown = (AntdConfig) => {
+    const config = config_with_struct(AntdConfig);
+    return {
+      ...config,
+      settings: {
+        ...config.settings,
+        renderField: (props) => <FieldDropdown {...props} />,
+      },
+    };
+  };
+
+  const init_jl_value_with_struct_and_group = {
+    "and": [
+      { "==": [ { "var": "user.info.firstName" }, "abc" ] },
+    ]
+  };
+
+  it('should render select by default', () => {
+    with_qb_ant(config_with_struct, init_jl_value_with_struct_and_group, 'JsonLogic', (qb) => {
+      expect(qb.find('.query-builder')).to.have.length(1);
+      expect(qb.find('.ant-select-selection-item').at(0).text()).to.equal("firstName");
+    });
+  });
+
+  it('should render cascader', () => {
+    with_qb_ant(config_with_cascader, init_jl_value_with_struct_and_group, 'JsonLogic', (qb) => {
+      expect(qb.find('.query-builder')).to.have.length(1);
+      expect(qb.find('.ant-cascader-picker-label').text()).to.equal("User / info / firstName");
+    });
+  });
+
+  it('should render tree select', () => {
+    with_qb_ant(config_with_tree_select, init_jl_value_with_struct_and_group, 'JsonLogic', (qb) => {
+      expect(qb.find('.query-builder')).to.have.length(1);
+      expect(qb.find('.ant-select.ant-tree-select')).to.have.length(1);
+      expect(qb.find('.ant-select-selection-item').at(0).text()).to.equal("firstName");
+    });
+  });
+
+  it('should render tree dropdown', () => {
+    with_qb_ant(config_with_dropdown, init_jl_value_with_struct_and_group, 'JsonLogic', (qb) => {
+      expect(qb.find('.query-builder')).to.have.length(1);
+      expect(qb.find('.ant-dropdown-trigger span').at(0).text().trim()).to.equal("firstName");
+    });
+  });
 
 });
 
-//todo: validation
-//todo: proximity op
-//todo: antd - FieldTreeSelect, FieldCascader, FieldDropdown
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// proximity
+
+describe('proximity', () => {
+  const config_with_prox = (BasicConfig) => ({
+    ...BasicConfig,
+    fields: {
+      str: {
+        label: 'String',
+        type: 'text',
+      },
+    },
+  });
+  
+  const init_value_with_prox = {
+    type: "group",
+    id: uuid(),
+    children1: {
+      [uuid()]: {
+        type: "rule",
+        properties: {
+          field: "str",
+          operator: "proximity",
+          value: [ "a", "b" ],
+          valueSrc: [ "value", "value" ],
+          valueType: [ "text", "text" ],
+          operatorOptions: {
+            proximity: 3
+          }
+        }
+      },
+    },
+    properties: {
+      conjunction: "AND",
+      not: false
+    }
+  };
+
+  it('should import', () => {
+    with_qb(config_with_prox, init_value_with_prox, 'default', (qb) => {
+      expect(qb.find('.query-builder')).to.have.length(1);
+    });
+  });
+
+  describe('export', () => {
+    do_export_checks(config_with_prox, init_value_with_prox, 'default', {
+      "query": "str \"a\" NEAR/3 \"b\"",
+      "queryHuman": "String \"a\" NEAR/3 \"b\"",
+      "sql": "CONTAINS(str, 'NEAR((a, b), 3)')"
+    });
+  });
+});
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // interactions
