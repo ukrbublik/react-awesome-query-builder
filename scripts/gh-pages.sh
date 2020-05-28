@@ -1,4 +1,3 @@
-npm run build-global
 npm run build-examples
 rm -rf /tmp/react-awesome-query-builder
 mkdir /tmp/react-awesome-query-builder
