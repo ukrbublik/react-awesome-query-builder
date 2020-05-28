@@ -986,7 +986,7 @@ describe('config', () => {
   it('should render select by default', () => {
     with_qb_ant(config_with_struct, init_jl_value_with_struct_and_group, 'JsonLogic', (qb) => {
       expect(qb.find('.query-builder')).to.have.length(1);
-      expect(qb.find('.ant-select-selection-item').at(0).text()).to.equal("firstName");
+      expect(qb.find('.ant-select-selection-item').at(0).text()).to.equal("user.info.firstName");
     });
   });
 
