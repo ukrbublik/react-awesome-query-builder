@@ -26,8 +26,9 @@ const typeMap = {
           onDragStart={props.onDragStart}
           parentField={props.parentField}
           validity={props.validity}
+          errorMessage={props.errorMessage}
       />
-      <span style={validationSpanStyle}>Error message</span>
+      <span style={validationSpanStyle}>{props.errorMessage}</span>
     </>
     )
   },
@@ -44,6 +45,7 @@ const typeMap = {
       children1={props.children1}
       parentField={null}
       validity={props.validity}
+      errorMessage={props.errorMessage}
     />
   ),
   rule_group: (props) => (
@@ -59,6 +61,7 @@ const typeMap = {
       children1={props.children1}
       parentField={props.parentField}
       validity={props.validity}
+      errorMessage={props.errorMessage}
     />
   )
 };
@@ -77,7 +80,8 @@ class Item extends PureComponent {
     treeNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
     parentField: PropTypes.string, //from RuleGroup
-    validity:PropTypes.any
+    validity:PropTypes.bool,
+      errorMessage:PropTypes.string
   };
 
   render() {

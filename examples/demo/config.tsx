@@ -219,7 +219,10 @@ export default (skin) => {
                         valueLabel: "Name",
                         valuePlaceholder: "Enter name",
                         validateValue: (val, fieldDef) => {
-                            return (val.length < 10);
+                            const valid = val.length < 4;
+                            let errorMessage = valid ? null : 'Incorrect value';
+
+                            return {valid, errorMessage}
                         },
                     },
                 },
@@ -230,8 +233,11 @@ export default (skin) => {
                     mainWidgetProps: {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
-                        validateValue: (val, fieldDef, field, id) => {
-                            return val.length < 3;
+                        validateValue: (val, fieldDef) => {
+                            const valid = val.length < 4;
+                            let errorMessage = valid ? null : 'Incorrect value';
+
+                            return {valid, errorMessage}
                         },
                     },
                 }
@@ -254,8 +260,10 @@ export default (skin) => {
                     },
                     valueSources: ['value'],
                     mainWidgetProps: {
-                        validateValue: (val, fieldDef, field, id) => {
-                            return val < 3;
+                        validateValue: (val, fieldDef) => {
+                            const valid = val < 3;
+                            let errorMessage = valid ? null : 'Incorrect value';
+                            return {valid, errorMessage}
                         },
                     },
                 }
