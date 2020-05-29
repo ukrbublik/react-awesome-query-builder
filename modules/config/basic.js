@@ -197,12 +197,11 @@ const operators = {
     sqlOp: 'LIKE',
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
       if (valueSrc == 'value') {
-          return `${field} LIKE ${values}%`;
+          return `${field} LIKE ${values}`;
       } else return undefined; // not supported
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(`/^${v}/`) : undefined), false),
-    //jsonLogic: (field, op, val) => ({ "starts_with": [val, field] }),
-    jsonLogic: "starts_with",
+    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? "^" + escapeRegExp(v) : undefined), false),
+    jsonLogic: undefined, // not supported
     valueSources: ['value'],
   },
   ends_with: {
@@ -211,12 +210,11 @@ const operators = {
     sqlOp: 'LIKE',
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
       if (valueSrc == 'value') {
-          return `${field} LIKE %${values}`;
+          return `${field} LIKE ${values}`;
       } else return undefined; // not supported
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(`/${v}$/`) : undefined), false),
-    //jsonLogic: (field, op, val) => ({ "ends_with": [val, field] }),
-    jsonLogic: "ends_with",
+    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(v) + "$" : undefined), false),
+    jsonLogic: undefined, // not supported
     valueSources: ['value'],
   },
   between: {
@@ -482,7 +480,11 @@ const widgets = {
           return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
       },
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-          return (op == 'like' || op == 'not_like') ? SqlString.escapeLike(val) : SqlString.escape(val);
+          if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
+              return SqlString.escapeLike(val, op != 'starts_with', op != 'ends_with');
+          } else {
+              return SqlString.escape(val);
+          }
       },
   },
   number: {
