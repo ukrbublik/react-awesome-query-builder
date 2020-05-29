@@ -230,8 +230,8 @@ export default (skin) => {
                     mainWidgetProps: {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
-                        validateValue: (val, fieldDef) => {
-                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+                        validateValue: (val, fieldDef, field, id) => {
+                            return val.length < 3;
                         },
                     },
                 }
@@ -253,6 +253,11 @@ export default (skin) => {
                         max: 100
                     },
                     valueSources: ['value'],
+                    mainWidgetProps: {
+                        validateValue: (val, fieldDef, field, id) => {
+                            return val < 3;
+                        },
+                    },
                 }
             }
         },
@@ -471,6 +476,7 @@ export default (skin) => {
     };
 
 
+
     const config: Config = {
         conjunctions,
         operators,
@@ -478,7 +484,7 @@ export default (skin) => {
         types,
         settings,
         fields,
-        funcs
+        funcs,
     };
 
     return config;

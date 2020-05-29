@@ -4,7 +4,7 @@
   "description": "Local hot-reloadable demo for react-awesome-query-builder",
   "main": "index.tsx",
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --config webpack.config.js --hot --color --display-error-details --no-info",
+    "start": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.js --hot --color --display-error-details --no-info",
     "build": "NODE_ENV=production webpack --config webpack.config.js"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
@@ -15,5 +15,8 @@
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2"
   }
 }

@@ -326,7 +326,7 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
     const isEndValue = false;
     const canFix = false;
     const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-    const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+    const [validateError, fixedValue, validResult] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
     const isValid = !validateError;
     if (isValid && fixedValue !== value) {
         // eg, get exact value from listValues (not string)
@@ -337,11 +337,13 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
         if (typeof value === "undefined") {
             state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
             state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+            state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
         } else {
             const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
             const isLastEmpty = lastValue == undefined;
             state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
             state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+            state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
             state.__isInternalValueChange = __isInternal && !isLastEmpty;
         }
     }

@@ -169,7 +169,7 @@ function validateRule (item, path, itemId, meta, c) {
 
 
 /**
- * 
+ *
  * @param {bool} canFix true is useful for func values to remove bad args
  * @param {bool} isEndValue false if value is in process of editing by user
  * @param {bool} isRawValue false is used only internally from validateFuncValue
@@ -178,6 +178,7 @@ function validateRule (item, path, itemId, meta, c) {
 export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, canFix = false, isEndValue = false, isRawValue = true) => {
 	let validError = null;
 	let fixedValue = value;
+	let validResult;
 
 	if (value != null) {
 			if (valueSrc == 'field') {
@@ -203,7 +204,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 							];
 							if (valueSrc == 'field')
 									args.push(rightFieldDefinition);
-							const validResult = fn(...args);
+							validResult = fn(...args);
 							if (typeof validResult == "string" || validResult === null) {
 									validError = validResult;
 							} else {
@@ -218,8 +219,8 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 			validError = `Field ${field}: ${validError}`;
 			console.warn("[RAQB validate]", validError);
 	}
-	
-	return [validError, validError ? value : fixedValue];
+
+	return [validError, validError ? value : fixedValue, validResult];
 };
 
 /**

@@ -11,8 +11,8 @@
     "antd",
     "antdesign"
   ],
-  "main1": "modules",
-  "main": "lib",
+  "main": "modules",
+  "mainl": "lib",
   "types": "modules/index.d.ts",
   "browserify1": {
     "transform": [
@@ -21,9 +21,9 @@
   },
   "scripts": {
     "prepublish": "npm run build-npm",
-    "build-global": "./scripts/build-global.sh",
-    "build-npm": "./scripts/build-npm.sh",
-    "build-examples": "./scripts/build-examples.sh",
+    "build-global": ".\\scripts\\build-global.sh",
+    "build-npm": ".\\scripts\\build-npm.sh",
+    "build-examples": ".\\scripts/build-examples.sh",
     "examples": "cd examples && npm i && npm start"
   },
   "readme": "README.md",

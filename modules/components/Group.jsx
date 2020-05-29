@@ -186,6 +186,7 @@ export class Group extends PureComponent {
         {...this.extraPropsForItem(item)}
         key={item.get('id')}
         id={item.get('id')}
+        validity={item.get('properties').get('validity')}
         //path={props.path.push(item.get('id'))}
         path={item.get('path')}
         type={type}
@@ -242,6 +243,7 @@ export class Group extends PureComponent {
       not: not || false,
       id: id,
       setNot: immutableGroupsMode ? dummyFn : setNot,
+        validation: this.props.validation
     };
     return <Conjs {...renderProps} />;
   }
