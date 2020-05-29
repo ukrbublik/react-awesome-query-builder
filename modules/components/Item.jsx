@@ -11,7 +11,7 @@ const typeMap = {
       color: 'red',
       fontFamily: "Arial",
       fontSize: '13px',
-      display: props.validity || props.validity === undefined ? 'none' : 'block',
+      display: (props.validity || props.validity === undefined) && props.config.settings.showErrorMessage? 'none' : 'block',
     };
 
     return  (

@@ -205,8 +205,8 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 							if (valueSrc == 'field')
 									args.push(rightFieldDefinition);
 							validResult = fn(...args);
-							if (typeof validResult.errorMessage == "string" || validResult.errorMessage !== null) {
-									validError = validResult.errorMessage;
+							if (typeof validResult == "string" || validResult !== null) {
+									validError = validResult;
 							} else {
 									if (validError == false)
 											validError = `Invalid value`;
@@ -215,12 +215,12 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 			}
 	}
 
-	if (isRawValue && validError && validResult?.valid) {
+	if (isRawValue && validError && validResult) {
 			validError = `Field ${field}: ${validError}`;
 			console.warn("[RAQB validate]", validError);
 	}
 
-	return [validError, validError ? value : fixedValue, validResult?.valid, validResult?.errorMessage];
+	return [validError, validError ? value : fixedValue, validResult];
 };
 
 /**

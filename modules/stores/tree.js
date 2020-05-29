@@ -316,6 +316,7 @@ const setOperator = (state, path, newOperator, config) => {
  */
 const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
     const fieldSeparator = config.settings.fieldSeparator;
+    const showErrorMessage = config.settings.showErrorMessage;
     const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
     if (valueSrc === 'field' && Array.isArray(value))
         value = value.join(fieldSeparator);
@@ -326,29 +327,40 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
     const isEndValue = false;
     const canFix = false;
     const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-    const [validateError, fixedValue, validResult, errorMessage] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+    const [validateError, fixedValue, errorMessage] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+    const validResult = !errorMessage;
     const isValid = validResult;
     if (isValid && fixedValue !== value) {
         // eg, get exact value from listValues (not string)
         value = fixedValue;
     }
-
-    // if (isValid) {
-        if (typeof value === "undefined") {
-            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
-            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
-            state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-            state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-        } else {
-            const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
-            const isLastEmpty = lastValue == undefined;
-            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
-            state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-            state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-            state.__isInternalValueChange = __isInternal && !isLastEmpty;
+    if (showErrorMessage) {
+        const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
+        const isLastEmpty = lastValue == undefined;
+        state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+        state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
+        state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
+        state.__isInternalValueChange = __isInternal && !isLastEmpty;
+    } else {
+        if (isValid && true) {
+            if (typeof value === "undefined") {
+                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
+                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
+                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
+            } else {
+                const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
+                const isLastEmpty = lastValue == undefined;
+                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
+                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
+                state.__isInternalValueChange = __isInternal && !isLastEmpty;
+            }
         }
-    // }
+    }
+
 
     return state;
 };

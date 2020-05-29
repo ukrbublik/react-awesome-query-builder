@@ -197,7 +197,7 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-
+        showErrorMessage: true
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
@@ -222,7 +222,7 @@ export default (skin) => {
                             const valid = val.length < 4;
                             let errorMessage = valid ? null : 'Incorrect value';
 
-                            return {valid, errorMessage}
+                            return valid
                         },
                     },
                 },
@@ -237,7 +237,7 @@ export default (skin) => {
                             const valid = val.length < 4;
                             let errorMessage = valid ? null : 'Incorrect value';
 
-                            return {valid, errorMessage}
+                            return errorMessage
                         },
                     },
                 }
