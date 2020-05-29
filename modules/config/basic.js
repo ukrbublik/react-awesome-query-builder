@@ -191,6 +191,32 @@ const operators = {
       mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(v) : undefined), true),
       valueSources: ['value'],
   },
+  starts_with: {
+    label: 'Starts with',
+    labelForFormat: 'Starts with',
+    sqlOp: 'LIKE',
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+      if (valueSrc == 'value') {
+          return `${field} LIKE ${values}`;
+      } else return undefined; // not supported
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? "^" + escapeRegExp(v) : undefined), false),
+    jsonLogic: undefined, // not supported
+    valueSources: ['value'],
+  },
+  ends_with: {
+    label: 'Ends with',
+    labelForFormat: 'Ends with',
+    sqlOp: 'LIKE',
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+      if (valueSrc == 'value') {
+          return `${field} LIKE ${values}`;
+      } else return undefined; // not supported
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(v) + "$" : undefined), false),
+    jsonLogic: undefined, // not supported
+    valueSources: ['value'],
+  },
   between: {
       label: 'Between',
       labelForFormat: 'BETWEEN',
@@ -454,7 +480,11 @@ const widgets = {
           return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
       },
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-          return (op == 'like' || op == 'not_like') ? SqlString.escapeLike(val) : SqlString.escape(val);
+          if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
+              return SqlString.escapeLike(val, op != 'starts_with', op != 'ends_with');
+          } else {
+              return SqlString.escape(val);
+          }
       },
   },
   number: {
@@ -648,6 +678,8 @@ const types = {
                   'is_not_empty',
                   'like',
                   'not_like',
+                  'starts_with',
+                  'ends_with',
                   'proximity'
               ],
               widgetProps: {},
