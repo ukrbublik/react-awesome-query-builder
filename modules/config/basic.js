@@ -191,6 +191,34 @@ const operators = {
       mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(v) : undefined), true),
       valueSources: ['value'],
   },
+  starts_with: {
+    label: 'Starts with',
+    labelForFormat: 'Starts with',
+    sqlOp: 'LIKE',
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+      if (valueSrc == 'value') {
+          return `${field} LIKE ${values}%`;
+      } else return undefined; // not supported
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(`/^${v}/`) : undefined), false),
+    //jsonLogic: (field, op, val) => ({ "starts_with": [val, field] }),
+    jsonLogic: "starts_with",
+    valueSources: ['value'],
+  },
+  ends_with: {
+    label: 'Ends with',
+    labelForFormat: 'Ends with',
+    sqlOp: 'LIKE',
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+      if (valueSrc == 'value') {
+          return `${field} LIKE %${values}`;
+      } else return undefined; // not supported
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, '$regex', v => (typeof v == 'string' ? escapeRegExp(`/${v}$/`) : undefined), false),
+    //jsonLogic: (field, op, val) => ({ "ends_with": [val, field] }),
+    jsonLogic: "ends_with",
+    valueSources: ['value'],
+  },
   between: {
       label: 'Between',
       labelForFormat: 'BETWEEN',
@@ -648,6 +676,8 @@ const types = {
                   'is_not_empty',
                   'like',
                   'not_like',
+                  'starts_with',
+                  'ends_with',
                   'proximity'
               ],
               widgetProps: {},

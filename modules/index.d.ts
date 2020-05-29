@@ -627,6 +627,8 @@ export interface BasicConfig extends Config {
     greater_or_equal: BinaryOperator,
     like: BinaryOperator,
     not_like: BinaryOperator,
+    starts_with: BinaryOperator,
+    ends_with: BinaryOperator,
     between: Operator2,
     not_between: Operator2,
     range_between: Operator2,
