@@ -263,7 +263,7 @@ export default (skin) => {
                         validateValue: (val, fieldDef) => {
                             const valid = val < 3;
                             let errorMessage = valid ? null : 'Incorrect value';
-                            return {valid, errorMessage}
+                            return errorMessage
                         },
                     },
                 }
