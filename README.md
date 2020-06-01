@@ -165,7 +165,7 @@ Props:
 *Notes*:
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
-  - set css `.MuiPopover-root, .MuiDialog-root { z-index: 1000 !important; }`
+  - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
 
 ### `<Builder />`
 Render this component only inside `Query.renderBuilder()` like in example above:
