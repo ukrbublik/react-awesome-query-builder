@@ -9,18 +9,10 @@ export default
         "field": "user.login",
         "operator": "equal",
         "value": [
-          {
-            "func": "LOWER",
-            "args": {
-              "str": {
-                "valueSrc": "field",
-                "value": "user.firstName"
-              }
-            }
-          }
+          "batman"
         ],
         "valueSrc": [
-          "func"
+          "value"
         ],
         "valueType": [
           "text"

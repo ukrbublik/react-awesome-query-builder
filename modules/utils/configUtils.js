@@ -83,8 +83,8 @@ function _extendFieldsConfig(subconfig, config) {
 };
 
 function _extendFuncArgsConfig(subconfig, config) {
-    if (!subconfig) return;
     config._funcsCntByType = {};
+    if (!subconfig) return;
     for (let funcKey in subconfig) {
         const funcDef = subconfig[funcKey];
         if (funcDef.returnType) {

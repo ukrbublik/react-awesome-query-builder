@@ -7,7 +7,7 @@ SqlString.trim = (val) => {
         return val;
 };
 
-SqlString.escapeLike = (val) => {
+SqlString.escapeLike = (val, any_start = true, any_end = true) => {
     // normal escape
     let res = SqlString.escape(val);
     // unwrap ''
@@ -15,7 +15,7 @@ SqlString.escapeLike = (val) => {
     // escape % and _
     res = res.replace(/[%_]/g, '\\$&');
     // wrap with % for LIKE
-    res = "%" + res + "%";
+    res = (any_start ? "%" : "") + res + (any_end ? "%" : "");
     // wrap ''
     res = "'" + res + "'";
     return res;

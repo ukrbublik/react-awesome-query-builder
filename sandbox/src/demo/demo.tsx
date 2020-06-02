@@ -5,21 +5,24 @@ import {
   ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree
 } from 'react-awesome-query-builder';
 import throttle from 'lodash/throttle';
-import loadedConfig from './config';
+import loadedConfig from './config_simple'; // <- you can try './config' for more complex examples
 import loadedInitValue from './init_value';
 import loadedInitLogic from './init_logic';
-
 const stringify = JSON.stringify;
 const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
 const emptyInitValue: JsonTree = {"id": uuid(), "type": "group"};
-const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
-const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
 let initTree: ImmutableTree;
+
+// get init value in JsonTree format:
+const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 initTree = checkTree(loadTree(initValue), loadedConfig);
-//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+
+// -OR- alternativaly get init value in JsonLogic format:
+//const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
+//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
 
 
 interface DemoQueryBuilderState {
@@ -78,7 +81,11 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();
-      const jsonTree = getTree(immutableTree); //can be saved to backend
+
+      // `jsonTree` or `logic` can be saved to backend
+      // (and then loaded with `loadTree` or `loadFromJsonLogic` as seen above)
+      const jsonTree = getTree(immutableTree);
+      const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
     }
 
     updateResult = throttle(() => {
@@ -143,13 +150,6 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
             {stringify(getTree(immutableTree), undefined, 2)}
           </pre>
         </div>
-        {/* <hr/>
-        <div>
-          queryBuilderFormat: 
-            <pre style={preStyle}>
-              {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
-            </pre>
-        </div> */}
       </div>
     );
     }
