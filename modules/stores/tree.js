@@ -471,13 +471,13 @@ export default (config) => {
                 return Object.assign({}, state, {...unset}, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
 
             case constants.ADD_GROUP:
-                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'group', action.id, action.properties)});
+                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'group', action.id, action.properties, action.config)});
 
             case constants.REMOVE_GROUP:
                 return Object.assign({}, state, {...unset}, {tree: removeGroup(state.tree, action.path, action.config)});
 
             case constants.ADD_RULE:
-                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'rule', action.id, action.properties)});
+                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'rule', action.id, action.properties, action.config)});
 
             case constants.REMOVE_RULE:
                 return Object.assign({}, state, {...unset}, {tree: removeRule(state.tree, action.path, action.config)});
