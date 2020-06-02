@@ -528,10 +528,6 @@ const widgets = {
       valueFormat: 'YYYY-MM-DD',
       valueLabel: "Date",
       valuePlaceholder: "Enter date",
-      valueLabels: [
-          { label: 'Date from', placeholder: 'Enter date from' },
-          { label: 'Date to', placeholder: 'Enter date to' },
-      ],
       formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
           const dateVal = moment(val, wgtDef.valueFormat);
           return isForDisplay ? '"' + dateVal.format(wgtDef.dateFormat) + '"' : JSON.stringify(val);
@@ -710,6 +706,7 @@ const types = {
                   "not_between",
                   "is_empty",
                   "is_not_empty",
+                  "range",
               ]
           }
       },

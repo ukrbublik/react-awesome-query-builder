@@ -60,7 +60,25 @@ export default (skin) => {
                 'to'
             ],
         },
-        proximity,
+        date_range: {
+            ...InitialConfig.operators.between,
+            label: 'Between',
+            labelForFormat: 'BETWEEN',
+            sqlOp: 'BETWEEN',
+            cardinality: 2,
+            isSpecialRange: true,
+            // cardinality: 2,
+            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                let valFrom = values[0];
+                let valTo = values[1];
+                if (isForDisplay)
+                    return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+                else
+                    return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+            },
+            reversedOp: 'not_between',
+            jsonLogic: "between",
+        },
     };
 
 
@@ -299,6 +317,7 @@ export default (skin) => {
             label: 'Date',
             type: 'date',
             valueSources: ['value'],
+            operators: ['date_range', 'equal', "greater_or_equal"],
             fieldSettings: {
                 dateFormat: 'DD-MM-YYYY',
             }

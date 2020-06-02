@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { DatePicker } from 'antd';
+const { RangePicker } = DatePicker;
 import moment from 'moment';
 
 
 export default class DateWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        value: PropTypes.string, //in valueFormat
+        value: PropTypes.any, //in valueFormat
         field: PropTypes.string.isRequired,
         config: PropTypes.object.isRequired,
         placeholder: PropTypes.string,
@@ -35,27 +36,52 @@ export default class DateWidget extends PureComponent {
 
     handleChange = (_value) => {
         const {setValue, valueFormat} = this.props;
-        const value = _value && _value.isValid() ? _value.format(valueFormat) : undefined;
-        if (value || _value === null)
-            setValue(value);
-    }
+        if (Array.isArray(_value)) {
+            setValue([_value[0].format(valueFormat), _value[1].format(valueFormat)]);
+        } else {
+            const value = _value && _value.isValid() ? _value.format(valueFormat) : undefined;
+            if (value || _value === null)
+                setValue(value);
+        }
+
+    };
 
     render() {
-        const {placeholder, customProps, value, valueFormat, dateFormat, config, readonly} = this.props;
+        const {placeholder, customProps, value, valueFormat, dateFormat, config, readonly, operator} = this.props;
         const {renderSize} = config.settings;
-        const dateValue = value ? moment(value, valueFormat) : null;
+        let dateValue;
+        if (value && Array.isArray(value)) {
+            dateValue = value.map(el => moment(el, valueFormat))
+        } else if (value) {
+            dateValue =  moment(value, valueFormat);
+        } else {
+            dateValue = null;
+        }
 
         return (
-            <DatePicker
-                disabled={readonly}
-                key="widget-date"
-                placeholder={placeholder}
-                size={renderSize}
-                format={dateFormat}
-                value={dateValue}
-                onChange={this.handleChange}
-                {...customProps}
-            />
+            <>
+            {operator === "date_range" ? (
+                <RangePicker
+                    disabled={readonly}
+                    key="widget-date"
+                    size={renderSize}
+                    format={dateFormat}
+                    value={dateValue}
+                    onChange={this.handleChange}
+                    {...customProps}
+                />
+                    ) : (
+                    <DatePicker
+                    disabled={readonly}
+                    key="widget-date"
+                    placeholder={placeholder}
+                    size={renderSize}
+                    format={dateFormat}
+                    value={dateValue}
+                    onChange={this.handleChange}
+                    {...customProps}
+                />)}
+       </>
         );
     }
 }
