@@ -706,7 +706,8 @@ const types = {
                   "not_between",
                   "is_empty",
                   "is_not_empty",
-                  "range",
+                  "date_range",
+                  "not_date_range"
               ]
           }
       },

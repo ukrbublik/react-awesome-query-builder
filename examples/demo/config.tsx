@@ -67,7 +67,6 @@ export default (skin) => {
             sqlOp: 'BETWEEN',
             cardinality: 2,
             isSpecialRange: true,
-            // cardinality: 2,
             formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
                 let valFrom = values[0];
                 let valTo = values[1];
@@ -76,8 +75,26 @@ export default (skin) => {
                 else
                     return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
             },
-            reversedOp: 'not_between',
+            reversedOp: 'not_date_range',
             jsonLogic: "between",
+        },
+        not_date_range: {
+            ...InitialConfig.operators.not_between,
+            label: 'Not between',
+            labelForFormat: 'NOT BETWEEN',
+            sqlOp: 'NOT_BETWEEN',
+            cardinality: 2,
+            isSpecialRange: true,
+            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+                let valFrom = values[0];
+                let valTo = values[1];
+                if (isForDisplay)
+                    return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+                else
+                    return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+            },
+            reversedOp: 'date_range',
+            jsonLogic: "not_between",
         },
     };
 
@@ -215,10 +232,11 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-
+        showErrorMessage: true,
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
+        maxNumberOfRules: 10 // number of rules can be added to the query builder
     };
 
     //////////////////////////////////////////////////////////////////////
@@ -237,7 +255,8 @@ export default (skin) => {
                         valueLabel: "Name",
                         valuePlaceholder: "Enter name",
                         validateValue: (val, fieldDef) => {
-                            return (val.length < 10);
+                            const valid = val.length < 4;
+                            return valid
                         },
                     },
                 },
@@ -249,7 +268,8 @@ export default (skin) => {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
                         validateValue: (val, fieldDef) => {
-                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+                            return val.length < 4;
+
                         },
                     },
                 }
@@ -271,6 +291,11 @@ export default (skin) => {
                         max: 100
                     },
                     valueSources: ['value'],
+                    mainWidgetProps: {
+                        validateValue: (val, fieldDef) => {
+                            return  val < 3;
+                        },
+                    },
                 }
             }
         },
@@ -317,7 +342,7 @@ export default (skin) => {
             label: 'Date',
             type: 'date',
             valueSources: ['value'],
-            operators: ['date_range', 'equal', "greater_or_equal"],
+            operators: ['date_range', 'equal', "greater_or_equal", "not_date_range"],
             fieldSettings: {
                 dateFormat: 'DD-MM-YYYY',
             }
@@ -384,11 +409,11 @@ export default (skin) => {
                 // * deep format (will be auto converted to flat format):
                 // listValues: [
                 //     { value: "1", title: "Warm colors", children: [
-                //         { value: "2", title: "Red" }, 
+                //         { value: "2", title: "Red" },
                 //         { value: "3", title: "Orange" }
                 //     ] },
                 //     { value: "4", title: "Cool colors", children: [
-                //         { value: "5", title: "Green" }, 
+                //         { value: "5", title: "Green" },
                 //         { value: "6", title: "Blue", children: [
                 //             { value: "7", title: "Sub blue", children: [
                 //                 { value: "8", title: "Sub sub blue and a long text" }
@@ -404,8 +429,8 @@ export default (skin) => {
                     { value: "4", title: "Cool colors" },
                     { value: "5", title: "Green", parent: "4" },
                     { value: "6", title: "Blue", parent: "4" },
-                        { value: "7", title: "Sub blue", parent: "6" },
-                        { value: "8", title: "Sub sub blue and a long text", parent: "7" },
+                    { value: "7", title: "Sub blue", parent: "6" },
+                    { value: "8", title: "Sub sub blue and a long text", parent: "7" },
                 ],
             }
         },
@@ -416,17 +441,17 @@ export default (skin) => {
                 treeExpandAll: true,
                 listValues: [
                     { value: "1", title: "Warm colors", children: [
-                        { value: "2", title: "Red" }, 
-                        { value: "3", title: "Orange" }
-                    ] },
+                            { value: "2", title: "Red" },
+                            { value: "3", title: "Orange" }
+                        ] },
                     { value: "4", title: "Cool colors", children: [
-                        { value: "5", title: "Green" }, 
-                        { value: "6", title: "Blue", children: [
-                            { value: "7", title: "Sub blue", children: [
-                                { value: "8", title: "Sub sub blue and a long text" }
-                            ] }
+                            { value: "5", title: "Green" },
+                            { value: "6", title: "Blue", children: [
+                                    { value: "7", title: "Sub blue", children: [
+                                            { value: "8", title: "Sub sub blue and a long text" }
+                                        ] }
+                                ] }
                         ] }
-                    ] }
                 ]
             }
         },
@@ -490,6 +515,7 @@ export default (skin) => {
     };
 
 
+
     const config: Config = {
         conjunctions,
         operators,
@@ -497,7 +523,7 @@ export default (skin) => {
         types,
         settings,
         fields,
-        funcs
+        funcs,
     };
 
     return config;

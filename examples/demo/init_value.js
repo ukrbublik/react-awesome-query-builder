@@ -48,7 +48,7 @@ export default
             "type": "rule",
             "properties": {
                 "field": "date",
-                "operator": "range",
+                "operator": "date_range",
                 "value": [
                     "2020-06-05",
                     "2020-07-16"
