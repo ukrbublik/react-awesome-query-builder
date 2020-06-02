@@ -8,9 +8,21 @@ import {
 } from "../utils/configUtils";
 import {deepEqual} from "../utils/stuff";
 import {validateValue, getNewValueForFieldOp} from "../utils/validation";
-
+import {Utils} from "../index";
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')).size > 0;
+
+const countRules = (children) => {
+    let count = 0;
+    for (let obj in children) {
+        if (children[obj].type === "rule" || children[obj].type === "rule_group") {
+            count += 1 ;
+        } else {
+            count +=  countRules(children[obj].children1)
+        }
+    }
+    return count;
+};
 
 /**
  * @param {object} config
@@ -19,12 +31,16 @@ const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')
  */
 const addNewGroup = (state, path, properties, config) => {
     const groupUuid = uuid();
-    state = addItem(state, path, 'group', groupUuid, defaultGroupProperties(config).merge(properties || {}));
+    const rulesNumber = countRules(Utils.getTree(state).children1);
 
-    const groupPath = path.push(groupUuid);
-    // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
-    state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
-    state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config));
+    if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
+        state = addItem(state, path, 'group', groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
+
+        const groupPath = path.push(groupUuid);
+        // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
+        state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
+        state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config), config);
+    }
     state = fixPathsInTree(state);
     return state;
 };
@@ -96,10 +112,14 @@ const setConjunction = (state, path, conjunction) =>
  * @param {string} id
  * @param {Immutable.OrderedMap} properties
  */
-const addItem = (state, path, type, id, properties) => {
-    state = state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
-        [id]: new Immutable.Map({type, id, properties})
-    }));
+const addItem = (state, path, type, id, properties,config) => {
+    const rulesNumber = countRules(Utils.getTree(state).children1);
+
+    if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
+        state = state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
+            [id]: new Immutable.Map({type, id, properties})
+        }));
+    }
     state = fixPathsInTree(state);
     return state;
 };
@@ -316,6 +336,7 @@ const setOperator = (state, path, newOperator, config) => {
  */
 const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
     const fieldSeparator = config.settings.fieldSeparator;
+    const showErrorMessage = config.settings.showErrorMessage;
     const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
     if (valueSrc === 'field' && Array.isArray(value))
         value = value.join(fieldSeparator);
@@ -326,25 +347,40 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
     const isEndValue = false;
     const canFix = false;
     const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-    const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
-    const isValid = !validateError;
+    const [validateError, fixedValue, errorMessage] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+    const validResult = !errorMessage;
+    const isValid = validResult;
     if (isValid && fixedValue !== value) {
         // eg, get exact value from listValues (not string)
         value = fixedValue;
     }
-
-    if (isValid) {
-        if (typeof value === "undefined") {
-            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
-            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
-        } else {
-            const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
-            const isLastEmpty = lastValue == undefined;
-            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
-            state.__isInternalValueChange = __isInternal && !isLastEmpty;
+    if (showErrorMessage) {
+        const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
+        const isLastEmpty = lastValue == undefined;
+        state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+        state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
+        state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
+        state.__isInternalValueChange = __isInternal && !isLastEmpty;
+    } else {
+        if (isValid && true) {
+            if (typeof value === "undefined") {
+                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
+                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
+                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
+            } else {
+                const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
+                const isLastEmpty = lastValue == undefined;
+                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
+                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
+                state.__isInternalValueChange = __isInternal && !isLastEmpty;
+            }
         }
     }
+
 
     return state;
 };

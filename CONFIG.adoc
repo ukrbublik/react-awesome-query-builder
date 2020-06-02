@@ -261,6 +261,7 @@ Behaviour settings:
 |clearValueOnChangeField |false |Clear value on field change? false - if prev & next fields have same type (widget), keep
 |clearValueOnChangeOp |false |Clear value on operator change?
 |canLeaveEmptyGroup |false |Leave empty group after deletion or add 1 clean rule immediately?
+|maxNumberOfRules |100 |Maximum number of rules which can be added to the query builder
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
