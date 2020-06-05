@@ -111,8 +111,9 @@ const setConjunction = (state, path, conjunction) =>
  * @param {string} type
  * @param {string} id
  * @param {Immutable.OrderedMap} properties
+ * @param {object} config
  */
-const addItem = (state, path, type, id, properties,config) => {
+const addItem = (state, path, type, id, properties, config) => {
     const rulesNumber = countRules(Utils.getTree(state).children1);
 
     if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
@@ -250,7 +251,7 @@ const setField = (state, path, newField, config) => {
         });
         state = state.setIn(expandTreePath(path, 'properties'), groupProperties);
         state = state.setIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap());
-        state = addItem(state, path, 'rule', uuid(), defaultRuleProperties(config, newField));
+        state = addItem(state, path, 'rule', uuid(), defaultRuleProperties(config, newField), config);
         state = fixPathsInTree(state);
 
         return state;
