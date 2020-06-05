@@ -118,7 +118,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     const type = item.get('type');
     const properties = item.get('properties') || new Map();
     const children = item.get('children1');
-    const {fieldSeparator} = config.settings;
+    const {fieldSeparator, canShortMongoQuery} = config.settings;
 
     if ((type === 'group' || type === 'rule_group') && children && children.size) {
         const not = _not ? !(properties.get('not')) : (properties.get('not'));
@@ -145,7 +145,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
             resultQuery = list.first();
         else {
             const rules = list.toList().toJS();
-            const canShort = (mongoConj == '$and');
+            const canShort = canShortMongoQuery && (mongoConj == '$and');
             if (canShort) {
                 resultQuery = rules.reduce((acc, rule) => {
                     if (!acc) return undefined;

@@ -101,11 +101,16 @@ export class Group extends PureComponent {
   }
 
   renderChildrenWrapper() {
-    return this.props.children1 && (
+    const {conjunctionOptions, children1, config} = this.props;
+    const conjunctionCount = Object.keys(conjunctionOptions).length;
+    const showConjs = conjunctionCount > 1 || config.settings.showNot;
+
+    return children1 && (
       <div key="group-children" className={classNames(
         "group--children",
-        this.props.children1.size < 2 && this.props.config.settings.hideConjForOne ? 'hide--line' : '',
-        this.props.children1.size < 2 ? 'one--child' : '',
+        !showConjs ? 'hide--conjs' : '',
+        children1.size < 2 && config.settings.hideConjForOne ? 'hide--line' : '',
+        children1.size < 2 ? 'one--child' : '',
         this.childrenClassName()
       )}>{this.renderChildren()}</div>
     );
@@ -230,7 +235,11 @@ export class Group extends PureComponent {
       config, children1, id,
       selectedConjunction, setConjunction, conjunctionOptions, not, setNot
     } = this.props;
-    const {immutableGroupsMode, renderConjs: Conjs} = config.settings;
+    const {immutableGroupsMode, renderConjs: Conjs, showNot} = config.settings;
+    const conjunctionCount = Object.keys(conjunctionOptions).length;
+    const showConjs = conjunctionCount > 1 || showNot;
+    if (!showConjs)
+      return null;
 
     const renderProps = {
       disabled: children1.size < 2,

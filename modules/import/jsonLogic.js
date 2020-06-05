@@ -225,19 +225,35 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta) => {
 
 const convertConj = (op, vals, conv, config, not, meta) => {
   const conjKey = conv.conjunctions[op];
+  const {fieldSeparator} = config.settings;
   if (conjKey) {
+    let type = "group";
     let children = vals
       .map(v => convertFromLogic(v, conv, config, 'rule', meta, false))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
+    let complexFields = Object.entries(children)
+      .filter(([_k, v]) => v.properties !== undefined && v.properties.field !== undefined && v.properties.field.indexOf(fieldSeparator) != -1)
+      .map(([_k, v]) => (v.properties.field.split(fieldSeparator)));
+    let userGroupFields = complexFields
+      .map(parts => parts.splice(0, parts.length - 1).join(fieldSeparator))
+      .map(f => [f, getFieldConfig(f, config)])
+      .filter(([f, fc]) => fc && fc.type == '!group')
+      .map(([f, fc]) => f);
+    let usedGroup = userGroupFields.length > 0 ? userGroupFields[0] : null;
+    let properties = {
+      conjunction: conjKey,
+      not: not
+    };
+    if (usedGroup) {
+      type = 'rule_group';
+      properties.field = usedGroup;
+    }
     return {
-      type: "group",
+      type: type,
       id: uuid(),
       children1: children,
-      properties: {
-        conjunction: conjKey,
-        not: not
-      }
+      properties: properties
     };
   }
 

@@ -164,7 +164,7 @@ ul.ant-select-selection__rendered {
   }
 
 
-  &.rule_group--children > .group-or-rule-container:first-child > .group-or-rule {
+  &.hide--conjs > .group-or-rule-container:first-child > .group-or-rule {
       &::before {
         display: none;
       }
@@ -174,13 +174,21 @@ ul.ant-select-selection__rendered {
       }
   }
 
+  &.rule_group--children > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: 4px 0 0 0;
+        border-width: 2px 0 0 2px;
+      }
+  }
   & > .group-or-rule-container:first-child > .group-or-rule {
       &::before {
         top: -12px;
         height: calc(50% + 14px);
       }
   }
-
   & > .group-or-rule-container:last-child > .group-or-rule {
       &::before {
         border-radius: 0 0 0 4px;
