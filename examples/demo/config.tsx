@@ -197,11 +197,9 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-        showErrorMessage: true,
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
-        maxNumberOfRules: 10 // number of rules can be added to the query builder
     };
 
     //////////////////////////////////////////////////////////////////////
@@ -220,8 +218,7 @@ export default (skin) => {
                         valueLabel: "Name",
                         valuePlaceholder: "Enter name",
                         validateValue: (val, fieldDef) => {
-                            const valid = val.length < 4;
-                            return valid
+                            return (val.length < 10);
                         },
                     },
                 },
@@ -233,8 +230,7 @@ export default (skin) => {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
                         validateValue: (val, fieldDef) => {
-                            return val.length < 4;
-
+                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
                         },
                     },
                 }
@@ -256,11 +252,6 @@ export default (skin) => {
                         max: 100
                     },
                     valueSources: ['value'],
-                    mainWidgetProps: {
-                        validateValue: (val, fieldDef) => {
-                            return  val < 3;
-                        },
-                    },
                 }
             }
         },
