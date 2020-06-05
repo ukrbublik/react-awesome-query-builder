@@ -384,7 +384,7 @@ interface NumberFieldSettings extends BasicFieldSettings {
 interface DateTimeFieldSettings extends BasicFieldSettings {
   timeFormat?: String,
   dateFormat?: String,
-  valueFormat?: any,
+  valueFormat?: String | String[],
   use12Hours?: Boolean,
 };
 interface SelectFieldSettings extends BasicFieldSettings {
