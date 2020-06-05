@@ -37,7 +37,7 @@ export default class DateWidget extends PureComponent {
     isValidSingleValue = (value) => {
         const {valueFormat} = this.props;
         let v = value ? moment(value, valueFormat) : null;
-        return !(v && !v.isValid());
+        return !v || v && v.isValid();
     };
 
     isValidValue = (value) => {
