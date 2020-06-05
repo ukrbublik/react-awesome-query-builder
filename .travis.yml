@@ -6,3 +6,4 @@ install:
   - npm install
   - npm run build-examples
   - npm test
+  - npm run lint

@@ -234,15 +234,15 @@ Then to enable new widgets you need to create config overrides like this:
 ## Development
 To build the component locally, clone this repo then run:  
 `npm install`  
-`npm run examples`  
+`npm start`  
 Then open localhost:3001 in a browser.
 
 Scripts:
-- `npm run examples` - Builds with webpack the examples and runs a dev-server on localhost:3001.
-- `npm run build-examples` - Builds with webpack the examples. Output path: `examples`
-- `npm run build-npm` - Builds a npm module. Output path: `lib`
-
-The repo sticks in general to the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript).
+- `npm test` - Run tests with Karma and update coverage. Recommended before commits.
+- `npm run lint` - Run ESLint. Recommended before commits.
+- `npm run lint-fix` - Run ESLint with `--fix` option. Recommended before commits.
+- `npm run build-examples` - Build examples with webpack. Output path: `examples`
+- `npm run build-npm` - Build npm module that can be published. Output path: `lib`
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)
