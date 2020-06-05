@@ -49,6 +49,7 @@ export default (skin) => {
     const operators: Operators = {
         ...InitialConfig.operators,
         // examples of  overriding
+        proximity,
         between: {
             ...InitialConfig.operators.between,
             valueLabels: [
@@ -59,42 +60,6 @@ export default (skin) => {
                 'from',
                 'to'
             ],
-        },
-        date_range: {
-            ...InitialConfig.operators.between,
-            label: 'Between',
-            labelForFormat: 'BETWEEN',
-            sqlOp: 'BETWEEN',
-            cardinality: 2,
-            isSpecialRange: true,
-            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
-                let valFrom = values[0];
-                let valTo = values[1];
-                if (isForDisplay)
-                    return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
-                else
-                    return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
-            },
-            reversedOp: 'not_date_range',
-            jsonLogic: "between",
-        },
-        not_date_range: {
-            ...InitialConfig.operators.not_between,
-            label: 'Not between',
-            labelForFormat: 'NOT BETWEEN',
-            sqlOp: 'NOT_BETWEEN',
-            cardinality: 2,
-            isSpecialRange: true,
-            formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
-                let valFrom = values[0];
-                let valTo = values[1];
-                if (isForDisplay)
-                    return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
-                else
-                    return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
-            },
-            reversedOp: 'date_range',
-            jsonLogic: "not_between",
         },
     };
 
@@ -342,7 +307,6 @@ export default (skin) => {
             label: 'Date',
             type: 'date',
             valueSources: ['value'],
-            operators: ['date_range', 'equal', "greater_or_equal", "not_date_range"],
             fieldSettings: {
                 dateFormat: 'DD-MM-YYYY',
             }
@@ -351,7 +315,6 @@ export default (skin) => {
             label: 'Time',
             type: 'time',
             valueSources: ['value'],
-            operators: ['greater_or_equal', 'less_or_equal', 'between'],
             defaultOperator: 'between',
         },
         datetime: {

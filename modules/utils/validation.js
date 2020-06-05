@@ -110,6 +110,11 @@ function validateRule (item, path, itemId, meta, c) {
 
 	//validate operator
 	operator = properties.get('operator');
+	if (operator == 'range_between' || operator == 'range_not_between') {
+		// fix obsolete operators
+		operator = operator == 'range_between' ? 'between' : 'not_between';
+		properties = properties.set('operator', operator);
+	}
 	const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
 	if (!operatorDefinition)
 		operator = null;
@@ -356,42 +361,44 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 	const currentValueSrc = current.get('valueSrc', new Immutable.List());
 	const currentValueType = current.get('valueType', new Immutable.List());
 
-	const _currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
+	//const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
 	const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
+	//const currentOperatorCardinality = currentOperator ? defaultValue(currentOperatorConfig.cardinality, 1) : null;
 	const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
 	const currentFieldConfig = getFieldConfig(currentField, oldConfig);
 	const newFieldConfig = getFieldConfig(newField, config);
 
-	// get widgets info
-	const widgetsMeta = Array.from({length: operatorCardinality}, (_ignore, i) => {
-			const vs = currentValueSrc.get(i) || null;
-			const currentWidgets = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
-			const newWidgets = getWidgetForFieldOp(config, newField, newOperator, vs);
-			// need to also check value widgets if we changed operator and current value source was 'field'
-			// cause for select type op '=' requires single value and op 'in' requires array value
-			const currentValueWidgets = vs == 'value' ? currentWidgets : getWidgetForFieldOp(oldConfig, currentField, currentOperator, 'value');
-			const newValueWidgets = vs == 'value' ? newWidgets : getWidgetForFieldOp(config, newField, newOperator, 'value');
-			return {currentWidgets, newWidgets, currentValueWidgets, newValueWidgets};
-	});
-	const currentWidgets = widgetsMeta.map(({currentWidgets}) => currentWidgets);
-	const newWidgets = widgetsMeta.map(({newWidgets}) => newWidgets);
-	const currentValueWidgets = widgetsMeta.map(({currentValueWidgets}) => currentValueWidgets);
-	const newValueWidgets = widgetsMeta.map(({newValueWidgets}) => newValueWidgets);
-	const commonWidgetsCnt = Math.min(newWidgets.length, currentWidgets.length);
-	const reusableWidgets = newValueWidgets.filter(w => currentValueWidgets.includes(w));
-	const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
-	const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
 	let canReuseValue = currentField && currentOperator && newOperator 
 			&& (!changedField 
 					|| changedField == 'field' && !config.settings.clearValueOnChangeField 
 					|| changedField == 'operator' && !config.settings.clearValueOnChangeOp)
-			&& (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type) 
-			&& reusableWidgets.length > 0;
-	;
+			&& (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
 	
+	// compare old & new widgets
+	for (let i = 0 ; i < operatorCardinality ; i++) {
+		const vs = currentValueSrc.get(i) || null;
+		const currentWidget = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
+		const newWidget = getWidgetForFieldOp(config, newField, newOperator, vs);
+		// need to also check value widgets if we changed operator and current value source was 'field'
+		// cause for select type op '=' requires single value and op 'in' requires array value
+		const currentValueWidget = vs == 'value' ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, 'value');
+		const newValueWidget = vs == 'value' ? newWidget : getWidgetForFieldOp(config, newField, newOperator, 'value');
+		
+		const canReuseWidget = newValueWidget == currentValueWidget 
+			|| (config.settings.convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
+		if (!canReuseWidget)
+			canReuseValue = false;
+	}
+
+	if (currentOperator != newOperator && [currentOperator, newOperator].includes('proximity'))
+		canReuseValue = false;
+
+	const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
+	const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
+
 	let valueFixes = {};
 	if (canReuseValue) {
-			for (let i = 0 ; i < commonWidgetsCnt ; i++) {
+			for (let i = 0 ; i < operatorCardinality ; i++) {
 					const v = currentValue.get(i);
 					const vType = currentValueType.get(i) || null;
 					const vSrc = currentValueSrc.get(i) || null;
@@ -400,7 +407,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 					const [validateError, fixedValue] = validateValue(config, newField, newField, newOperator, v, vType, vSrc, canFix, isEndValue);
 					const isValid = !validateError;
 					if (!isValidSrc || !isValid) {
-							canReuseValue = false;
+							if (v !== undefined)
+								canReuseValue = false;
 							break;
 					} else if (canFix && fixedValue !== v) {
 							valueFixes[i] = fixedValue;

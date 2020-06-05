@@ -8,10 +8,11 @@ import moment from 'moment';
 export default class DateWidget extends PureComponent {
     static propTypes = {
         setValue: PropTypes.func.isRequired,
-        value: PropTypes.string, //in valueFormat
+        value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]) , //in valueFormat
         field: PropTypes.string.isRequired,
         config: PropTypes.object.isRequired,
-        placeholder: PropTypes.arrayOf(PropTypes.string) || PropTypes.string,
+        placeholder: PropTypes.string,
+        placeholders: PropTypes.arrayOf(PropTypes.string),
         customProps: PropTypes.object,
         readonly: PropTypes.bool,
         // from fieldSettings:
@@ -22,10 +23,9 @@ export default class DateWidget extends PureComponent {
     constructor(props) {
         super(props);
 
-        const {valueFormat, value, setValue} = props;
-        let mValue = value ? moment(value, valueFormat) : null;
-        if (mValue && !mValue.isValid()) {
-            setValue(null);
+        const {value, setValue} = props;
+        if (!this.isValidValue(value)) {
+            setValue(this.formatValue(this.getMomentValue(value)));
         }
     }
 
@@ -34,44 +34,76 @@ export default class DateWidget extends PureComponent {
         valueFormat: 'YYYY-MM-DD',
     };
 
-    handleChange = (_value) => {
-        const {setValue, valueFormat} = this.props;
-        if (Array.isArray(_value)) {
-            setValue([_value[0].format(valueFormat), _value[1].format(valueFormat)]);
-        } else {
-            const value = _value && _value.isValid() ? _value.format(valueFormat) : undefined;
-            if (value || _value === null)
-                setValue(value);
-        }
+    isValidSingleValue = (value) => {
+        const {valueFormat} = this.props;
+        let v = value ? moment(value, valueFormat) : null;
+        return !(v && !v.isValid());
+    };
 
+    isValidValue = (value) => {
+        const {isSpecialRange} = this.props;
+        if (isSpecialRange)
+            return value ? value.map(el => this.isValidSingleValue(el)).reduce((res, item) => (res && item), true) : true;
+        else
+            return this.isValidSingleValue(value);
+    };
+
+    getMomentSingleValue = (value) => {
+        const {valueFormat} = this.props;
+        let v = value ? moment(value, valueFormat) : null;
+        if (v && !v.isValid())
+            v = null;
+        return v;
+    };
+
+    getMomentValue = (value) => {
+        const {isSpecialRange} = this.props;
+        if (isSpecialRange)
+            return value ? value.map(el => this.getMomentSingleValue(el)) : [null, null];
+        else
+            return this.getMomentSingleValue(value);
+    };
+
+    formatSingleValue = (value) => {
+        const {valueFormat} = this.props;
+        return value && value.isValid() ? value.format(valueFormat) : undefined;
+    };
+
+    formatValue = (value) => {
+        const {isSpecialRange} = this.props;
+        if (isSpecialRange)
+            return value ? value.map(el => this.formatSingleValue(el)) : [undefined, undefined];
+        else
+            return this.formatSingleValue(value);
+    };
+
+    handleChange = (value) => {
+        const {setValue} = this.props;
+        if (this.isValidValue(value))
+            setValue(this.formatValue(value));
     };
 
     render() {
-        const {placeholder, customProps, value, valueFormat, dateFormat, config, readonly, operator} = this.props;
+        const {placeholder, placeholders, customProps, value, dateFormat, config, readonly, isSpecialRange} = this.props;
         const {renderSize} = config.settings;
-        let dateValue;
-        if (value && Array.isArray(value)) {
-            dateValue = value.map(el => moment(el, valueFormat))
-        } else if (value) {
-            dateValue =  moment(value, valueFormat);
-        } else {
-            dateValue = null;
-        }
+        const dateValue = this.getMomentValue(value);
 
-        return (
-            <>
-            {operator === "date_range" || operator === "not_date_range" ? (
+        if (isSpecialRange) {
+            return (
                 <RangePicker
                     disabled={readonly}
                     key="widget-date"
+                    placeholder={placeholders}
                     size={renderSize}
                     format={dateFormat}
                     value={dateValue}
                     onChange={this.handleChange}
                     {...customProps}
                 />
-                    ) : (
-                    <DatePicker
+            );
+        } else {
+            return (
+                <DatePicker
                     disabled={readonly}
                     key="widget-date"
                     placeholder={placeholder}
@@ -80,8 +112,8 @@ export default class DateWidget extends PureComponent {
                     value={dateValue}
                     onChange={this.handleChange}
                     {...customProps}
-                />)}
-       </>
-        );
+                />
+            );
+        }
     }
 }
