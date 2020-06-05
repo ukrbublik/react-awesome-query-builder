@@ -10,12 +10,17 @@ var plugins = [
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     }),
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
-    //new BundleAnalyzerPlugin(),
 ];
-
 var optimization = {};
 
-if (process.env.COMPRESS) {
+if (process.env.ANALYZE == "1") {
+    plugins = [
+        ...plugins,
+        new BundleAnalyzerPlugin()
+    ];
+}
+
+if (process.env.COMPRESS == "1") {
     plugins = [
         ...plugins,
         new CompressionPlugin()
@@ -26,27 +31,28 @@ if (process.env.COMPRESS) {
 module.exports = {
     plugins,
     optimization,
-    mode: process.env.NODE_ENV || "development",
+    mode:  process.env.NODE_ENV || "development",
     output: {
         library: 'ReactAwesomeQueryBuilder',
         libraryTarget: 'umd',
-        path: path.resolve(__dirname, 'build/global'),
+        path: path.resolve(__dirname, 'build'),
         filename: 'ReactAwesomeQueryBuilder' + (process.env.COMPRESS ? '.min' : '') + '.js',
     },
-    externals: [{
-        react: {
-            root: 'React',
-            commonjs2: 'react',
-            commonjs: 'react',
-            amd: 'react'
+    externals: [
+        {
+            "react": "React",
+            "react-dom": "ReactDOM",
+            "react-redux": "ReactRedux",
+            "redux": "Redux",
+            "immutable": "Immutable",
+            "moment": 'moment',
+            "transit-js": "Transit",
+            "transit-immutable-js": "TransitImmutable",
+            "sqlstring": "sqlstring",
+            "classnames": "classnames",
         },
-        immutable: {
-            root: 'Immutable',
-            commonjs2: 'immutable',
-            commonjs: 'immutable',
-            amd: 'immutable'
-        }
-    }],
+        /^lodash\/.+$/,
+    ],
     module: {
         rules: [
             {
@@ -92,11 +98,10 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         modules: [
             'node_modules',
-            //__dirname,
             __dirname + '/node_modules',
         ],
         alias: {
-            'ReactAwesomeQueryBuilder': __dirname + 'modules/',
+            'ReactAwesomeQueryBuilder': __dirname + '/modules/',
             'immutable': 'immutable'
         }
     },

@@ -42,8 +42,8 @@ export default class SelectWidget extends PureComponent {
   }
 
   filterOption = (input, option) => {
-    const dataForFilter = option; // tip: props was available on antd < 4
-    return dataForFilter.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const dataForFilter = option.children || option.value;
+    return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
   render() {

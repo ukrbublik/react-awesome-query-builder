@@ -56,8 +56,8 @@ export default class TreeSelectWidget extends PureComponent {
   }
 
   filterTreeNode = (input, option) => {
-    const dataForFilter = option; // tip: props was available on antd < 4
-    return dataForFilter.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const dataForFilter = option.title;
+    return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
 

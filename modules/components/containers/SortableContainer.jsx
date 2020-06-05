@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import * as actions from '../../actions';
 import {pureShouldComponentUpdate} from "../../utils/renderUtils";
 import {useOnPropsChanged} from "../../utils/stuff";
+const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
 
 
 export default (Builder, CanMoveFn = null) => {
@@ -182,8 +183,9 @@ export default (Builder, CanMoveFn = null) => {
         clientY: e.clientY,
       };
 
-      window.addEventListener('mousemove', this.onDrag);
-      window.addEventListener('mouseup', this.onDragEnd);
+      const target = e.__mocked_window || window;
+      target.addEventListener('mousemove', this.onDrag);
+      target.addEventListener('mouseup', this.onDragEnd);
 
       this.props.setDragStart(dragStart, dragging, mousePos);
     }
@@ -204,6 +206,17 @@ export default (Builder, CanMoveFn = null) => {
         clientX: e.clientX,
         clientY: e.clientY,
       };
+      const startMousePos = {
+        clientX: startDragging.clientX,
+        clientY: startDragging.clientY,
+      };
+
+      if (e.__mock_dom) {
+        const treeEl = startDragging.treeEl;
+        const dragEl = this._getDraggableNodeEl(treeEl);
+        const plhEl = this._getPlaceholderNodeEl(treeEl);
+        e.__mock_dom({treeEl, dragEl, plhEl});
+      }
 
       //first init plX/plY
       if (!startDragging.plX) {
@@ -227,12 +240,16 @@ export default (Builder, CanMoveFn = null) => {
       dragging.x = pos.x;
       dragging.y = pos.y;
       dragging.paddingLeft = paddingLeft;
+      dragging.mousePos = mousePos;
+      dragging.startMousePos = startMousePos;
+
 
       this.props.setDragProgress(mousePos, dragging);
 
       const moved = doHandleDrag ? this.handleDrag(dragging, e, CanMoveFn) : false;
 
       if (moved) {
+        if (isDev())  console.log('moved');
       } else {
         if (e.preventDefault)
           e.preventDefault();
@@ -263,9 +280,10 @@ export default (Builder, CanMoveFn = null) => {
       const dragId = dragInfo.id;
       const dragEl = this._getDraggableNodeEl(treeEl);
       const plhEl = this._getPlaceholderNodeEl(treeEl);
+      let dragRect, plhRect, hovRect, treeRect;
       if (dragEl && plhEl) {
-        const dragRect = dragEl.getBoundingClientRect();
-        const plhRect = plhEl.getBoundingClientRect();
+        dragRect = dragEl.getBoundingClientRect();
+        plhRect = plhEl.getBoundingClientRect();
         if (!plhRect.width) {
             return;
         }
@@ -279,13 +297,18 @@ export default (Builder, CanMoveFn = null) => {
         else if (dragRect.left < plhRect.left)
           dragDirs.hrz = -1; //left
 
-        const treeRect = treeEl.getBoundingClientRect();
+        treeRect = treeEl.getBoundingClientRect();
         const trgCoord = {
           x: treeRect.left + (treeRect.right - treeRect.left) / 2,
           y: dragDirs.vrt >= 0 ? dragRect.bottom : dragRect.top,
         };
-        const hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
-        const hovCNodeEl = hovNodeEl ? hovNodeEl.closest('.group-or-rule-container') : null;
+        let hovCNodeEl;
+        if (e.__mocked_hov_container) {
+          hovCNodeEl = e.__mocked_hov_container;
+        } else {
+          const hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
+          hovCNodeEl = hovNodeEl ? hovNodeEl.closest('.group-or-rule-container') : null;
+        }
         if (!hovCNodeEl) {
           console.log('out of tree bounds!');
         } else {
@@ -295,7 +318,7 @@ export default (Builder, CanMoveFn = null) => {
           let doAppend = false;
           let doPrepend = false;
           if (hovEl) {
-            const hovRect = hovEl.getBoundingClientRect();
+            hovRect = hovEl.getBoundingClientRect();
             const hovHeight = hovRect.bottom - hovRect.top;
             const hovII = this.tree.items[hovNodeId];
             let trgRect = null,
@@ -403,7 +426,7 @@ export default (Builder, CanMoveFn = null) => {
                   }
                 }
               }
-
+              
               //sanitize
               availMoves = availMoves.filter(am => {
                 const placement = am[0];
@@ -464,8 +487,17 @@ export default (Builder, CanMoveFn = null) => {
       }
 
       if (moveInfo) {
-        //console.log('moveInfo', moveInfo);
+        if (isDev())  console.log('move Info', moveInfo);
         this.move(itemInfo, moveInfo[1], moveInfo[0], moveInfo[3]);
+
+        if (isDev())  console.log("DRAG-N-DROP", JSON.stringify({
+          dragRect,
+          plhRect,
+          treeRect,
+          hovRect,
+          startMousePos: dragInfo.startMousePos,
+          mousePos: dragInfo.mousePos,
+        }));
         return true;
       }
 
@@ -495,7 +527,7 @@ export default (Builder, CanMoveFn = null) => {
     }
 
     move (fromII, toII, placement, toParentII) {
-      //console.log('move', fromII, toII, placement, toParentII);
+      if (isDev())  console.log('move', fromII, toII, placement, toParentII);
       this.props.actions.moveItem(fromII.path, toII.path, placement);
     }
 

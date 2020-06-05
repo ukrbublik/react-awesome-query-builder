@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "2.0.5",
+  "version": "2.0.11",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "reactjs",
@@ -11,20 +11,16 @@
     "antd",
     "antdesign"
   ],
-  "main1": "modules",
   "main": "lib",
-  "types": "modules/index.d.ts",
-  "browserify1": {
-    "transform": [
-      "babelify"
-    ]
-  },
+  "types": "lib/index.d.ts",
   "scripts": {
     "prepublish": "npm run build-npm",
-    "build-global": "./scripts/build-global.sh",
     "build-npm": "./scripts/build-npm.sh",
+    "build-global": "NODE_ENV=production COMPRESS=1 ANALYZE=0 webpack modules/index.js",
     "build-examples": "./scripts/build-examples.sh",
-    "examples": "cd examples && npm i && npm start"
+    "examples": "cd examples && npm i && npm start",
+    "start": "npm run examples",
+    "test": "karma start karma.conf.js"
   },
   "readme": "README.md",
   "repository": {
@@ -70,27 +66,45 @@
     "@babel/preset-env": "^7.7.4",
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-typescript": "^7.7.4",
+    "@hot-loader/react-dom": "^16.4.1",
     "@types/classnames": "^2.2.5",
     "@types/lodash": "^4.6",
     "@types/node": "12.12.14",
     "@types/prop-types": "^15.6.0",
     "@types/react": "^16.4.1",
     "@types/react-dom": "^16.4.1",
+    "antd": "^4.1.2",
     "babel-loader": "^8.0.6",
     "babel-plugin-import": "^1.13.0",
+    "babel-plugin-istanbul": "^6.0.0",
+    "chai": "^4.2.0",
+    "codecov": "^3.7.0",
     "compression-webpack-plugin": "^3.0.1",
     "css-loader": "^3.2.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
     "fibers": "^4.0.2",
     "file-loader": "^5.0.2",
+    "karma": "^5.0.9",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage": "^2.0.2",
+    "karma-es6-shim": "^1.0.0",
+    "karma-mocha": "^2.0.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^4.0.2",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
-    "node-sass": "^4.13.0",
+    "mocha": "^7.2.0",
+    "node-sass": "^4.14.1",
+    "puppeteer": "^3.0.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-hot-loader": "^4.8.8",
-    "@hot-loader/react-dom": "^16.4.1",
     "sass": "^1.23.7",
     "sass-loader": "^8.0.0",
+    "sinon": "^9.0.2",
     "sourcemap": "^0.1.0",
     "style-loader": "^1.0.1",
     "ts-loader": "^6.2.1",
@@ -100,6 +114,6 @@
     "webpack": "^4.41.2",
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
+    "webpack-dev-server": "^3.11.0"
   }
 }
