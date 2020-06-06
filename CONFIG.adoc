@@ -58,8 +58,6 @@ const {
         not_like,
         between,
         not_between,
-        range_between, // like `between`, but for slider
-        range_not_between,
         is_empty,
         is_not_empty,
         select_equals, // like `equal`, but for select

@@ -329,17 +329,13 @@ export const getOperatorConfig = (config, operator, field = null) => {
     if (!operator)
         return null;
     const opConfig = config.operators[operator];
-    const reversedOperator = opConfig.reversedOp;
-    //const revOpConfig = config.operators[reversedOperator];
     if (field) {
         const fieldConfig = getFieldConfig(field, config);
         const widget = getWidgetForFieldOp(config, field, operator);
         const widgetConfig = config.widgets[widget] || {};
         const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
         const widgetOpProps = (widgetConfig.opProps || {})[operator];
-        //const widgetRevOpProps = (widgetConfig.opProps || {})[reversedOperator];
         const fieldWidgetOpProps = (fieldWidgetConfig.opProps || {})[operator];
-        //const fieldWidgetRevOpProps = (fieldWidgetConfig.opProps || {})[reversedOperator];
         const mergedOpConfig = merge({}, opConfig, widgetOpProps, fieldWidgetOpProps);
         return mergedOpConfig;
     } else {

@@ -49,6 +49,7 @@ export default (skin) => {
     const operators: Operators = {
         ...InitialConfig.operators,
         // examples of  overriding
+        proximity,
         between: {
             ...InitialConfig.operators.between,
             valueLabels: [
@@ -60,7 +61,6 @@ export default (skin) => {
                 'to'
             ],
         },
-        proximity,
     };
 
 
@@ -197,7 +197,6 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
@@ -307,7 +306,6 @@ export default (skin) => {
             label: 'Time',
             type: 'time',
             valueSources: ['value'],
-            operators: ['greater_or_equal', 'less_or_equal', 'between'],
             defaultOperator: 'between',
         },
         datetime: {
@@ -365,11 +363,11 @@ export default (skin) => {
                 // * deep format (will be auto converted to flat format):
                 // listValues: [
                 //     { value: "1", title: "Warm colors", children: [
-                //         { value: "2", title: "Red" }, 
+                //         { value: "2", title: "Red" },
                 //         { value: "3", title: "Orange" }
                 //     ] },
                 //     { value: "4", title: "Cool colors", children: [
-                //         { value: "5", title: "Green" }, 
+                //         { value: "5", title: "Green" },
                 //         { value: "6", title: "Blue", children: [
                 //             { value: "7", title: "Sub blue", children: [
                 //                 { value: "8", title: "Sub sub blue and a long text" }
@@ -385,8 +383,8 @@ export default (skin) => {
                     { value: "4", title: "Cool colors" },
                     { value: "5", title: "Green", parent: "4" },
                     { value: "6", title: "Blue", parent: "4" },
-                        { value: "7", title: "Sub blue", parent: "6" },
-                        { value: "8", title: "Sub sub blue and a long text", parent: "7" },
+                    { value: "7", title: "Sub blue", parent: "6" },
+                    { value: "8", title: "Sub sub blue and a long text", parent: "7" },
                 ],
             }
         },
@@ -397,17 +395,17 @@ export default (skin) => {
                 treeExpandAll: true,
                 listValues: [
                     { value: "1", title: "Warm colors", children: [
-                        { value: "2", title: "Red" }, 
-                        { value: "3", title: "Orange" }
-                    ] },
+                            { value: "2", title: "Red" },
+                            { value: "3", title: "Orange" }
+                        ] },
                     { value: "4", title: "Cool colors", children: [
-                        { value: "5", title: "Green" }, 
-                        { value: "6", title: "Blue", children: [
-                            { value: "7", title: "Sub blue", children: [
-                                { value: "8", title: "Sub sub blue and a long text" }
-                            ] }
+                            { value: "5", title: "Green" },
+                            { value: "6", title: "Blue", children: [
+                                    { value: "7", title: "Sub blue", children: [
+                                            { value: "8", title: "Sub sub blue and a long text" }
+                                        ] }
+                                ] }
                         ] }
-                    ] }
                 ]
             }
         },
@@ -471,6 +469,7 @@ export default (skin) => {
     };
 
 
+
     const config: Config = {
         conjunctions,
         operators,
@@ -478,7 +477,7 @@ export default (skin) => {
         types,
         settings,
         fields,
-        funcs
+        funcs,
     };
 
     return config;
