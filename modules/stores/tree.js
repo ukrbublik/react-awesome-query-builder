@@ -327,40 +327,35 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
     const isEndValue = false;
     const canFix = false;
     const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-    const [validateError, fixedValue, errorMessage] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
-    const validResult = !errorMessage;
-    const isValid = validResult;
+    const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+    const isValid = !validateError;
     if (isValid && fixedValue !== value) {
         // eg, get exact value from listValues (not string)
         value = fixedValue;
     }
-    if (showErrorMessage) {
-        const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
-        const isLastEmpty = lastValue == undefined;
-        state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
-        state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-        state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-        state.__isInternalValueChange = __isInternal && !isLastEmpty;
-    } else {
-        if (isValid && true) {
-            if (typeof value === "undefined") {
-                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
-                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
-                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-            } else {
-                const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
-                const isLastEmpty = lastValue == undefined;
-                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
-                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-                state.__isInternalValueChange = __isInternal && !isLastEmpty;
-            }
+    
+    const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
+    const lastError = state.getIn(expandTreePath(path, 'properties', 'errorMessage', delta));
+    const isLastEmpty = lastValue == undefined;
+    const isLastError = !!lastError;
+    if (isValid || showErrorMessage) {
+        // set only good value
+        if (typeof value === "undefined") {
+            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
+            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+        } else {
+            state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
+            state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
+            state.__isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
         }
     }
-
+    if (showErrorMessage) {
+        state = state.setIn(expandTreePath(path, 'properties', 'errorMessage', delta), validateError);
+    }
+    if (__isInternal && (isValid && isLastError || !isValid && !isLastError)) {
+        state = state.setIn(expandTreePath(path, 'properties', 'errorMessage', delta), validateError);
+        state.__isInternalValueChange = false;
+    }
 
     return state;
 };

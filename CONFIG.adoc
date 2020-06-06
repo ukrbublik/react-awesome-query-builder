@@ -254,7 +254,7 @@ Behaviour settings:
 |immutableFieldsMode |false |Not allow to change fields
 |immutableOpsMode |false |Not allow to change operators
 |immutableValuesMode |false |Not allow to change values
-|showErrorMessage |false |Don't show error message in QueryBuilder if validateValue() in field config returns false
+|showErrorMessage |false |Show error message in QueryBuilder if validateValue() in field config returns false
 |setOpOnChangeField |`['keep', 'default']` |Strategies for selecting operator for new field (used by order until success): +
   `default` (default if present), `keep` (keep prev from last field), `first`, `none`
 |clearValueOnChangeField |false |Clear value on field change? false - if prev & next fields have same type (widget), keep

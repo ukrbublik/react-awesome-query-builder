@@ -60,11 +60,12 @@ export default class SliderWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step, marks, readonly} = this.props;
-    const {renderSize} = config.settings;
+    const {config, placeholder, customProps, value,  min, max, step, marks, readonly, errorMessage} = this.props;
+    const {renderSize, showErrorMessage} = config.settings;
     const _customProps = customProps || {};
 
-    let _value = __isInternal ? this.state.internalValue : value;
+    const canUseInternal = showErrorMessage ? true : !errorMessage;
+    let _value = __isInternal && canUseInternal ? this.state.internalValue : value;
     if (_value == undefined)
       _value = null;
     const sliderValue = _value == null && min ? min : _value;

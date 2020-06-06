@@ -197,7 +197,7 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-        showErrorMessage: true
+        showErrorMessage: true,
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
@@ -219,10 +219,7 @@ export default (skin) => {
                         valueLabel: "Name",
                         valuePlaceholder: "Enter name",
                         validateValue: (val, fieldDef) => {
-                            const valid = val.length < 4;
-                            let errorMessage = valid ? null : 'Incorrect value';
-
-                            return valid
+                            return (val.length < 10);
                         },
                     },
                 },
@@ -234,10 +231,7 @@ export default (skin) => {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
                         validateValue: (val, fieldDef) => {
-                            const valid = val.length < 4;
-                            let errorMessage = valid ? null : 'Incorrect value';
-
-                            return errorMessage
+                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
                         },
                     },
                 }
@@ -261,11 +255,9 @@ export default (skin) => {
                     valueSources: ['value'],
                     mainWidgetProps: {
                         validateValue: (val, fieldDef) => {
-                            const valid = val < 3;
-                            let errorMessage = valid ? null : 'Incorrect value';
-                            return errorMessage
+                            return (val < 10);
                         },
-                    },
+                    }
                 }
             }
         },
@@ -304,8 +296,18 @@ export default (skin) => {
                 slider: {
                     widgetProps: {
                         valuePlaceholder: "..Slider",
+                        validateValue: (val, fieldDef) => {
+                            return (val < 30);
+                        },
                     }
-                }
+                },
+                rangeslider: {
+                    widgetProps: {
+                        validateValue: (val, fieldDef) => {
+                            return (val < 30);
+                        },
+                    }
+                },
             },
         },
         date: {

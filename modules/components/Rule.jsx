@@ -31,6 +31,7 @@ class Rule extends PureComponent {
         isDraggingMe: PropTypes.bool,
         isDraggingTempo: PropTypes.bool,
         parentField: PropTypes.string, //from RuleGroup
+        errorMessages: PropTypes.any,
         //path: PropTypes.instanceOf(Immutable.List),
         //actions
         handleDraggerMouseDown: PropTypes.func,
@@ -107,7 +108,7 @@ class Rule extends PureComponent {
     }
 
     render () {
-        const {config} = this.props;
+        const {config, errorMessages} = this.props;
         const {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
@@ -150,6 +151,7 @@ class Rule extends PureComponent {
                     operator={this.props.selectedOperator}
                     value={this.props.value}
                     valueSrc={this.props.valueSrc}
+                    errorMessages={errorMessages}
                     config={config}
                     setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
                     setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
@@ -178,6 +180,10 @@ class Rule extends PureComponent {
             <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
                 {typeof renderAfterWidget === 'function' ? renderAfterWidget(this.props) : renderAfterWidget}
             </Col>;
+        
+        const renderError = (str) => <span>{str}</span>; //todo!
+        const errorMessage = errorMessages && errorMessages.toArray().filter(e => !!e).shift() || null;
+        const error = errorMessage ? renderError(errorMessage) : null;
 
         const parts = [
             field,
@@ -186,6 +192,7 @@ class Rule extends PureComponent {
             widget,
             afterWidget,
             operatorOptions,
+            error,
         ];
 
         const drag = showDragIcon &&

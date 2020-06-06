@@ -31,7 +31,23 @@ export default class RangeWidget extends PureComponent {
 
   state = {
   }
-  
+
+  constructor(props) {
+      super(props);
+
+      const [valueFrom, valueTo] = props.value || [null, null];
+      if (props.value && (valueFrom == undefined || valueTo == undefined)) {
+        // happens if we changed op from '==' to 'between'
+        // (I know, timeout is dirty hack..)
+        setTimeout(() => {
+          if (valueFrom == undefined)
+            this.handleChangeTo(valueTo);
+          if (valueTo == undefined)
+            this.handleChangeFrom(valueFrom);
+        }, 1);
+      }
+  }
+
   handleChange = (value) => {
     this.props.setValue(value);
   }
@@ -66,15 +82,6 @@ export default class RangeWidget extends PureComponent {
     const _customProps = customProps || {};
     const _value = value != undefined ? value : undefined;
     const [valueFrom, valueTo] = _value || [null, null];
-
-    if (_value && (valueFrom == undefined || valueTo == undefined)) {
-      // happens if we change value source - this leads to incomplete slider value, fix it:
-      if (valueFrom == undefined)
-        this.handleChangeTo(valueTo);
-      if (valueTo == undefined)
-        this.handleChangeFrom(valueFrom);
-      return null;
-    }
 
     return (
       <Col style={{display: 'inline-flex'}}>

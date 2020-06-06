@@ -17,6 +17,7 @@ export default (Rule) => {
       onDragStart: PropTypes.func,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
+      errorMessages: PropTypes.any,
       operatorOptions: PropTypes.object,
       treeNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
@@ -106,6 +107,7 @@ export default (Rule) => {
             selectedOperator={this.props.operator || null}
             value={this.props.value || null}
             valueSrc={this.props.valueSrc || null}
+            errorMessages={this.props.errorMessage}
             operatorOptions={this.props.operatorOptions}
             config={this.props.config}
             treeNodesCnt={this.props.treeNodesCnt}
@@ -127,6 +129,7 @@ export default (Rule) => {
             selectedOperator={this.props.operator || null}
             value={this.props.value || null}
             valueSrc={this.props.valueSrc || null}
+            errorMessages={this.props.errorMessage}
             operatorOptions={this.props.operatorOptions}
             config={this.props.config}
             treeNodesCnt={this.props.treeNodesCnt}

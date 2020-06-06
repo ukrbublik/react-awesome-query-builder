@@ -5,33 +5,18 @@ import Group from './Group';
 import RuleGroup from './RuleGroup';
 
 const typeMap = {
-  rule: (props) => {
-
-    const validationSpanStyle = {
-      color: 'red',
-      fontFamily: "Arial",
-      fontSize: '13px',
-      display: (props.validity || props.validity === undefined) && props.config.settings.showErrorMessage? 'none' : 'block',
-    };
-
-    return  (
-        <>
-      <Rule
-          {...props.properties.toObject()}
-          id={props.id}
-          path={props.path}
-          actions={props.actions}
-          treeNodesCnt={props.treeNodesCnt}
-          config={props.config}
-          onDragStart={props.onDragStart}
-          parentField={props.parentField}
-          validity={props.validity}
-          errorMessage={props.errorMessage}
-      />
-      <span style={validationSpanStyle}>{props.errorMessage}</span>
-    </>
-    )
-  },
+  rule: (props) => (
+    <Rule
+      {...props.properties.toObject()}
+      id={props.id}
+      path={props.path}
+      actions={props.actions}
+      treeNodesCnt={props.treeNodesCnt}
+      config={props.config}
+      onDragStart={props.onDragStart}
+      parentField={props.parentField}
+    />
+  ),
   group: (props) => (
     <Group 
       {...props.properties.toObject()}
@@ -44,8 +29,6 @@ const typeMap = {
       onDragStart={props.onDragStart}
       children1={props.children1}
       parentField={null}
-      validity={props.validity}
-      errorMessage={props.errorMessage}
     />
   ),
   rule_group: (props) => (
@@ -60,8 +43,6 @@ const typeMap = {
       onDragStart={props.onDragStart}
       children1={props.children1}
       parentField={props.parentField}
-      validity={props.validity}
-      errorMessage={props.errorMessage}
     />
   )
 };
@@ -80,8 +61,6 @@ class Item extends PureComponent {
     treeNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
     parentField: PropTypes.string, //from RuleGroup
-    validity:PropTypes.bool,
-      errorMessage:PropTypes.string
   };
 
   render() {
