@@ -58,8 +58,6 @@ const {
         not_like,
         between,
         not_between,
-        range_between, // like `between`, but for slider
-        range_not_between,
         is_empty,
         is_not_empty,
         select_equals, // like `equal`, but for select
@@ -197,7 +195,7 @@ import en_US from 'antd/lib/locale-provider/en_US';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import {Widgets} from 'react-awesome-query-builder';
 const { VanillaFieldSelect } = Widgets;
-const { FieldCascader, FieldDropdown } = AntdWidgets;
+const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
 
 [source,javascript]
@@ -274,7 +272,7 @@ Render settings:
 |key |default |meaning
 |renderSize |`small` |Size of AntDesign components - `small` or `large`
 |renderField |`(props) => <FieldSelect {...props} />` |Render fields list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `VanillaFieldSelect` (see `AntdWidgets` and `Widgets` above)
+  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `FieldTreeSelect`, `VanillaFieldSelect` (see `AntdWidgets` and `Widgets` above)
 |renderOperator |`(props) => <FieldSelect {...props} />` |Render operators list +
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +

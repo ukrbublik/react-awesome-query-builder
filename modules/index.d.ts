@@ -567,6 +567,7 @@ export interface BehaviourSettings {
   immutableValuesMode?: Boolean,
   showErrorMessage?: Boolean
   canShortMongoQuery?: Boolean,
+  convertableWidgets?: TypedMap<Array<String>>,
 };
 
 export interface OtherSettings {
@@ -637,8 +638,6 @@ export interface BasicConfig extends Config {
     ends_with: BinaryOperator,
     between: Operator2,
     not_between: Operator2,
-    range_between: Operator2,
-    range_not_between: Operator2,
     is_empty: UnaryOperator,
     is_not_empty: UnaryOperator,
     select_equals: BinaryOperator,

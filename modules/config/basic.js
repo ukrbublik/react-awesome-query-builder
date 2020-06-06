@@ -258,49 +258,6 @@ const operators = {
       ],
       reversedOp: 'between',
   },
-  range_between: {
-      label: 'Between',
-      labelForFormat: 'BETWEEN',
-      sqlOp: 'BETWEEN',
-      cardinality: 2,
-      isSpecialRange: true, // to show 1 range widget instead of 2
-      formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
-          let valFrom = values.first();
-          let valTo = values.get(1);
-          if (isForDisplay)
-              return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
-          else
-              return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
-      },
-      mongoFormatOp: mongoFormatOp2.bind(null, ['$gte', '$lte'], false),
-      valueLabels: [
-          'Value from',
-          'Value to'
-      ],
-      textSeparators: [
-          null,
-          'and'
-      ],
-      reversedOp: 'range_not_between',
-      jsonLogic: "<=",
-  },
-  range_not_between: {
-      label: 'Not between',
-      labelForFormat: 'NOT BETWEEN',
-      sqlOp: 'NOT BETWEEN',
-      cardinality: 2,
-      isSpecialRange: true, // to show 1 range widget instead of 2
-      mongoFormatOp: mongoFormatOp2.bind(null, ['$gte', '$lte'], true),
-      valueLabels: [
-          'Value from',
-          'Value to'
-      ],
-      textSeparators: [
-          null,
-          'and'
-      ],
-      reversedOp: 'range_between',
-  },
   is_empty: {
       label: 'Is empty',
       labelForFormat: 'IS EMPTY',
@@ -465,6 +422,7 @@ const operators = {
       }
   },
 };
+
 
 //----------------------------  widgets
 
@@ -741,7 +699,7 @@ const types = {
                   "between",
                   "not_between",
                   "is_empty",
-                  "is_not_empty",
+                  "is_not_empty"
               ]
           }
       },
