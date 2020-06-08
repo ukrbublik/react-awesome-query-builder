@@ -192,7 +192,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
   #### checkTree (immutableValue, config) -> Immutable
   Validate query value corresponding to config. 
-  Invalid parts of query (eg. if field was removed from config) will be deleted.
+  Invalid parts of query (eg. if field was removed from config) will be always deleted. 
+  Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
+  #### isValidTree (immutableValue) -> Boolean
+  If `showErrorMessage` in config.settings is true, use this method to check is query has bad values.
 - Export:
   #### queryString (immutableValue, config, isForDisplay) -> String
   Convert query value to custom string representation. `isForDisplay` = true can be used to make string more "human readable".

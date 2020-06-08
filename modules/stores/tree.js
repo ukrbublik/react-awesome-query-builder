@@ -354,7 +354,7 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
         const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
         const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, 'properties', 'valueSrc', i + '')) || null));
         
-        if (operatorConfig.validateValues && valueSrcs.filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
+        if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
             const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, 'properties', 'value', i + '')) || null));
             const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS ? values.map(v => fieldWidgetDefinition.toJS(v, fieldWidgetDefinition)) : values;
             const rangeValidateError = operatorConfig.validateValues(jsValues);

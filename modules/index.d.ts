@@ -82,6 +82,7 @@ export interface Utils {
   getTree(tree: ImmutableTree): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  isValidTree(tree: ImmutableTree): boolean;
   // import
   loadFromJsonLogic(logicTree: JsonLogicTree, config: Config): ImmutableTree;
   // other

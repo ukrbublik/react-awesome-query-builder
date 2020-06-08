@@ -466,7 +466,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 			return vs;
 	}));
 	if (showErrorMessage) {
-		if (newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
+		if (newOperatorConfig && newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
 			// last element in `valueError` list is for range validation error
 			const jsValues = firstWidgetConfig && firstWidgetConfig.toJS ? 
 				newValue.toJS().map(v => firstWidgetConfig.toJS(v, firstWidgetConfig)) : 

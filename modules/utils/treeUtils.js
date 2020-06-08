@@ -196,3 +196,27 @@ export const getTotalNodesCountInTree = (tree) => {
     
     return cnt - 1; // -1 for root
 };
+
+export const getTreeBadFields = (tree) => {
+    let badFields = [];
+
+    function _processNode (item, path, lev) {
+        const id = item.get('id');
+        const children = item.get('children1');
+        const valueError = item.getIn(['properties', 'valueError']);
+        const field = item.getIn(['properties', 'field']);
+        if (valueError && valueError.size > 0 && valueError.filter(v => v != null).size > 0) {
+            badFields.push(field);
+        }
+        if (children) {
+            children.map((child, _childId) => {
+                _processNode(child, path.concat(id), lev + 1);
+            });
+        }
+    };
+
+    if (tree)
+        _processNode(tree, [], 0);
+    
+    return Array.from(new Set(badFields));
+};

@@ -10,7 +10,7 @@ import loadedInitValue from './init_value';
 import loadedInitLogic from './init_logic';
 
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic} = Utils;
+const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
 const preStyle = { backgroundColor: 'darkgrey', margin: '10px', padding: '10px' };
 const preErrorStyle = { backgroundColor: 'lightpink', margin: '10px', padding: '10px' };
 
@@ -119,6 +119,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();
+      
       const jsonTree = getTree(immutableTree); //can be saved to backend
     }
 
@@ -127,9 +128,11 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     }, 100)
 
     renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
+      const isValid = isValidTree(immutableTree);
       const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
       return (
       <div>
+        {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
         <br />
         <div>
           stringFormat: 
