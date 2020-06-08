@@ -195,7 +195,7 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-        showErrorMessage: false,
+        showErrorMessage: true,
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
