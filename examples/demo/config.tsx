@@ -195,7 +195,7 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-        showErrorMessage: true,
+        showErrorMessage: false,
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
@@ -255,9 +255,6 @@ export default (skin) => {
                     fieldSettings: {
                         min: 0,
                         max: 100,
-                        validateValue: (val, fieldSettings) => {
-                            return (val < 10);
-                        },
                     },
                     valueSources: ['value'],
                 }
@@ -291,9 +288,6 @@ export default (skin) => {
                 marks: {
                     0: <strong>0%</strong>,
                     100: <strong>100%</strong>
-                },
-                validateValue: (val, fieldSettings) => {
-                    return (val < 30);
                 },
             },
             //overrides

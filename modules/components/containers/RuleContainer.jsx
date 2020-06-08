@@ -85,11 +85,12 @@ export default (Rule) => {
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
+      const {showErrorMessage} = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == '!struct';
 
       const valueError = this.props.valueError;
       const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
-      const hasError = oneValueError != null;
+      const hasError = oneValueError != null && showErrorMessage;
 
       return (
         <div
