@@ -31,24 +31,28 @@ const fields: Fields = {
                 label2: 'Username', //only for menu's toggler
                 type: 'text',
                 excludeOperators: ['proximity'],
+                fieldSettings: {
+                    validateValue: (val, fieldSettings) => {
+                        return (val.length < 10);
+                    },
+                },
                 mainWidgetProps: {
                     valueLabel: "Name",
                     valuePlaceholder: "Enter name",
-                    validateValue: (val, fieldDef) => {
-                        return (val.length < 10);
-                    },
                 },
             },
             login: {
                 type: 'text',
                 tableName: 't1', // PR #18, PR #20
                 excludeOperators: ['proximity'],
+                fieldSettings: {
+                    validateValue: (val, fieldSettings) => {
+                        return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+                    },
+                },
                 mainWidgetProps: {
                     valueLabel: "Login",
                     valuePlaceholder: "Enter login",
-                    validateValue: (val, fieldDef) => {
-                        return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-                    },
                 },
             }
         }
@@ -209,7 +213,7 @@ const fields: Fields = {
         label: 'In stock',
         type: 'boolean',
         defaultValue: true,
-        fieldSettings: {
+        mainWidgetProps: {
             labelYes: "+",
             labelNo: "-"
         }
@@ -271,9 +275,6 @@ const widgets: Widgets = {
     // examples of  overriding
     text: {
         ...InitialConfig.widgets.text,
-        validateValue: (val, fieldDef) => {
-            return (val.length < 10);
-        },
     },
     slider: {
         ...InitialConfig.widgets.slider,

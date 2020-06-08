@@ -69,9 +69,6 @@ export default (skin) => {
         // examples of  overriding
         text: {
             ...InitialConfig.widgets.text,
-            validateValue: (val, fieldDef) => {
-                return (val.length < 10);
-            },
         },
         slider: {
             ...InitialConfig.widgets.slider,
@@ -215,24 +212,28 @@ export default (skin) => {
                     label2: 'Username', //only for menu's toggler
                     type: 'text',
                     excludeOperators: ['proximity'],
+                    fieldSettings: {
+                        validateValue: (val, fieldSettings) => {
+                            return (val.length < 10);
+                        },
+                    },
                     mainWidgetProps: {
                         valueLabel: "Name",
                         valuePlaceholder: "Enter name",
-                        validateValue: (val, fieldDef) => {
-                            return (val.length < 10);
-                        },
                     },
                 },
                 login: {
                     type: 'text',
                     tableName: 't1', // PR #18, PR #20
                     excludeOperators: ['proximity'],
+                    fieldSettings: {
+                        validateValue: (val, fieldSettings) => {
+                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+                        },
+                    },
                     mainWidgetProps: {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
-                        validateValue: (val, fieldDef) => {
-                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-                        },
                     },
                 }
             }
@@ -243,21 +244,21 @@ export default (skin) => {
             subfields: {
                 product: {
                     type: 'select',
-                    listValues: ['abc', 'def', 'xyz'],
+                    fieldSettings: {
+                        listValues: ['abc', 'def', 'xyz'],
+                    },
                     valueSources: ['value'],
                 },
                 score: {
                     type: 'number',
                     fieldSettings: {
                         min: 0,
-                        max: 100
-                    },
-                    valueSources: ['value'],
-                    mainWidgetProps: {
-                        validateValue: (val, fieldDef) => {
+                        max: 100,
+                        validateValue: (val, fieldSettings) => {
                             return (val < 10);
                         },
-                    }
+                    },
+                    valueSources: ['value'],
                 }
             }
         },
@@ -290,22 +291,23 @@ export default (skin) => {
                     0: <strong>0%</strong>,
                     100: <strong>100%</strong>
                 },
+                validateValue: (val, fieldSettings) => {
+                    return (val < 30);
+                },
             },
             //overrides
             widgets: {
                 slider: {
                     widgetProps: {
                         valuePlaceholder: "..Slider",
-                        validateValue: (val, fieldDef) => {
-                            return (val < 30);
-                        },
                     }
                 },
                 rangeslider: {
                     widgetProps: {
-                        validateValue: (val, fieldDef) => {
-                            return (val < 30);
-                        },
+                        valueLabels: [
+                            { label: 'Number from', placeholder: 'from' },
+                            { label: 'Number to', placeholder: 'to' },
+                        ],
                     }
                 },
             },
@@ -316,7 +318,11 @@ export default (skin) => {
             valueSources: ['value'],
             fieldSettings: {
                 dateFormat: 'DD-MM-YYYY',
-            }
+                validateValue: (val, fieldSettings) => {
+                    console.log(1, val, fieldSettings)
+                    return true;
+                },
+            },
         },
         time: {
             label: 'Time',
@@ -338,36 +344,42 @@ export default (skin) => {
             label: 'Color',
             type: 'select',
             valueSources: ['value'],
-            // * old format:
-            // listValues: {
-            //     yellow: 'Yellow',
-            //     green: 'Green',
-            //     orange: 'Orange'
-            // },
-            // * new format:
-            listValues: [
-                { value: 'yellow', title: 'Yellow' },
-                { value: 'green', title: 'Green' },
-                { value: 'orange', title: 'Orange' }
-            ],
+            fieldSettings: {
+                // * old format:
+                // listValues: {
+                //     yellow: 'Yellow',
+                //     green: 'Green',
+                //     orange: 'Orange'
+                // },
+                // * new format:
+                listValues: [
+                    { value: 'yellow', title: 'Yellow' },
+                    { value: 'green', title: 'Green' },
+                    { value: 'orange', title: 'Orange' }
+                ],
+            },
         },
         color2: {
             label: 'Color2',
             type: 'select',
-            listValues: {
-                yellow: 'Yellow',
-                green: 'Green',
-                orange: 'Orange',
-                purple: 'Purple'
-            },
+            fieldSettings: {
+                listValues: {
+                    yellow: 'Yellow',
+                    green: 'Green',
+                    orange: 'Orange',
+                    purple: 'Purple'
+                },
+            }
         },
         multicolor: {
             label: 'Colors',
             type: 'multiselect',
-            listValues: {
-                yellow: 'Yellow',
-                green: 'Green',
-                orange: 'Orange'
+            fieldSettings: {
+                listValues: {
+                    yellow: 'Yellow',
+                    green: 'Green',
+                    orange: 'Orange'
+                },
             },
             allowCustomValues: true
         },
@@ -429,7 +441,7 @@ export default (skin) => {
             label: 'In stock',
             type: 'boolean',
             defaultValue: true,
-            fieldSettings: {
+            mainWidgetProps: {
                 labelYes: "+",
                 labelNo: "-"
             }

@@ -164,10 +164,11 @@ export interface BaseWidget {
   valueSrc?: ValueSource,
   valuePlaceholder?: String,
   valueLabel?: String,
-  validateValue?: ValidateValue,
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
+  //obsolete:
+  validateValue?: ValidateValue,
 };
 export interface RangeableWidget extends BaseWidget {
   singleWidget?: String,
@@ -178,9 +179,10 @@ export interface FieldWidget {
   valueSrc: "field",
   valuePlaceholder?: String,
   valueLabel?: String,
-  validateValue?: ValidateValue,
   formatValue: FormatValue, // with rightFieldDef
   sqlFormatValue: SqlFormatValue, // with rightFieldDef
+  //obsolete:
+  validateValue?: ValidateValue,
 };
 
 export type TextWidget = BaseWidget & BasicFieldSettings;
@@ -375,6 +377,7 @@ type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<String> | TypedKeyMap<String | number, String> | Array<ListItem> | Array<String | number>;
 
 interface BasicFieldSettings {
+  validateValue?: ValidateValue,
 }
 interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,

@@ -204,15 +204,16 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 			if (!validError) {
 					const fieldConfig = getFieldConfig(field, config);
 					const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-					const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ['factory', 'formatValue']);
+					const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ['factory']);
 					const rightFieldDefinition = (valueSrc == 'field' ? getFieldConfig(value, config) : null);
+					const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
 	
 					const fn = fieldWidgetDefinition.validateValue;
 					if (typeof fn == 'function') {
 							const args = [
 									fixedValue, 
 									//field,
-									fieldConfig,
+									fieldSettings,
 							];
 							if (valueSrc == 'field')
 									args.push(rightFieldDefinition);

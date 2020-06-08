@@ -128,6 +128,10 @@ const myConfig = {
   qty: {
     type: 'number',
     label: 'Quantity',
+    fieldSettings: {
+      min: 0,
+      max: 100,
+    }
   },
   // complex
   user: {
@@ -139,6 +143,9 @@ const myConfig = {
         type: 'text',
         label: 'Name',
         label2: 'User name', //optional, see below
+        fieldSettings: {
+          validateValue: (val, _fieldSettings) => (val.length <= 20),
+        }
       },
     },
   },
@@ -171,6 +178,8 @@ const myConfig = {
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
+|fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
+  `(mixed val, Object fieldSettings) => boolean | string | null`
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
@@ -469,7 +478,6 @@ const {
     factory: (props) => <TextWidget {...props} />,
     formatValue: (val, _fieldDef, _wgtDef, isForDisplay) => (isForDisplay ? '"' + val + '"' : JSON.stringify(val)),
     mongoFormatValue: (val, _fieldDef, _wgtDef) => (val),
-    validateValue: (val, _fieldDef) => (val.length < 5),
     // Options:
     valueLabel: "Text",
     valuePlaceholder: "Enter text",
@@ -495,8 +503,6 @@ const {
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
 |jsonLogic |- for http://jsonlogic.com[JsonLogic] |v => v |Function for formatting widget's value for JsonLogic. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
-|validateValue | | |Function to validate entered value. +
-  `(mixed val, Object fieldDef) => boolean`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`

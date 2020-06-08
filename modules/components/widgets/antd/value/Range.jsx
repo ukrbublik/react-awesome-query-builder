@@ -55,29 +55,29 @@ export default class RangeWidget extends PureComponent {
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
     if (valueFrom == '' || valueFrom == null)
-      valueFrom = value[0];
+      valueFrom = undefined; //value[0];
     value = [...value];
     value[0] = valueFrom;
-    if (value[1] == undefined)
-      value[1] = valueFrom;
+    // if (value[1] == undefined)
+    //   value[1] = valueFrom;
     this.props.setValue(value);
   }
   
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
     if (valueTo == '' || valueTo == null)
-      valueTo = value[1];
+      valueTo = undefined; //value[1];
     value = [...value];
     value[1] = valueTo;
-    if (value[0] == undefined)
-      value[0] = valueTo;
+    // if (value[0] == undefined)
+    //   value[0] = valueTo;
     this.props.setValue(value);
   }
 
   tipFormatter = (val) => (val != undefined ? val.toString() : '')
 
   render() {
-    const {config, placeholder, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
+    const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
     const {renderSize} = config.settings;
     const _customProps = customProps || {};
     const _value = value != undefined ? value : undefined;
@@ -127,7 +127,6 @@ export default class RangeWidget extends PureComponent {
             marks={marks}
             included={false}
             range={true}
-            //placeholder={placeholder}
             onChange={this.handleChange}
             {...customProps}
           />
