@@ -5,6 +5,7 @@ import {
     // types:
     Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from 'react-awesome-query-builder';
+import moment from 'moment';
 
 import AntdConfig from 'react-awesome-query-builder/config/antd';
 import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
@@ -319,8 +320,9 @@ export default (skin) => {
             fieldSettings: {
                 dateFormat: 'DD-MM-YYYY',
                 validateValue: (val, fieldSettings) => {
-                    console.log(1, val, fieldSettings)
-                    return true;
+                    // example of date validation
+                    const dateVal = moment(val, fieldSettings.valueFormat);
+                    return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
                 },
             },
         },
