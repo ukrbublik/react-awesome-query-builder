@@ -245,7 +245,7 @@ const operators = {
         if (values[0] != undefined && values[1] != undefined) {
             return values[0] <= values[1] ? null : "Invalid range";
         }
-        return true;
+        return null;
       },
   },
   not_between: {
@@ -267,7 +267,7 @@ const operators = {
         if (values[0] != undefined && values[1] != undefined) {
             return values[0] <= values[1] ? null : "Invalid range";
         }
-        return true;
+        return null;
       },
   },
   is_empty: {
@@ -546,7 +546,10 @@ const widgets = {
           return SqlString.escape(dateVal.format('YYYY-MM-DD'));
       },
       jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
-      toJS: (val, fieldSettings) => (moment(val, fieldSettings.valueFormat).toDate()),
+      toJS: (val, fieldSettings) => {
+          const dateVal = moment(val, fieldSettings.valueFormat);
+          return dateVal.isValid() ? dateVal.toDate() : undefined;
+      },
   },
   time: {
       type: "time",
@@ -577,7 +580,7 @@ const widgets = {
       toJS: (val, fieldSettings) => {
         // return seconds of day
         const dateVal = moment(val, fieldSettings.valueFormat);
-        return dateVal.get('hour') * 60 * 60 + dateVal.get('minute') * 60 + dateVal.get('second');
+        return dateVal.isValid() ? dateVal.get('hour') * 60 * 60 + dateVal.get('minute') * 60 + dateVal.get('second') : undefined;
       },
   },
   datetime: {
@@ -603,7 +606,10 @@ const widgets = {
           return SqlString.escape(dateVal.toDate());
       },
       jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
-      toJS: (val, fieldSettings) => (moment(val, fieldSettings.valueFormat).toDate()),
+      toJS: (val, fieldSettings) => {
+          const dateVal = moment(val, fieldSettings.valueFormat);
+          return dateVal.isValid() ? dateVal.toDate() : undefined;
+      },
   },
   boolean: {
       type: "boolean",
