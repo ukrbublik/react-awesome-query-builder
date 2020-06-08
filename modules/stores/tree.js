@@ -334,10 +334,6 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
 
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
-	const operatorConfig = getOperatorConfig(config, operator, field);
-    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
-    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
 
     const isEndValue = false;
     const canFix = false;
@@ -349,14 +345,20 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
         // eg, get exact value from listValues (not string)
         value = fixedValue;
     }
-    
-    const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, 'properties', 'valueSrc', i + '')) || null));
-    const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, 'properties', 'value', i + '')) || null));
-    const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS ? values.map(v => fieldWidgetDefinition.toJS(v, fieldWidgetDefinition)) : values;
 
-    if (operatorConfig.validateValues && valueSrcs.filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
-        const rangeValidateError = operatorConfig.validateValues(jsValues);
-        if (showErrorMessage) {
+    // Additional validation for range values
+    if (showErrorMessage) {
+        const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+        const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
+        const operatorConfig = getOperatorConfig(config, operator, field);
+        const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+        const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, 'properties', 'valueSrc', i + '')) || null));
+        
+        if (operatorConfig.validateValues && valueSrcs.filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
+            const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, 'properties', 'value', i + '')) || null));
+            const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS ? values.map(v => fieldWidgetDefinition.toJS(v, fieldWidgetDefinition)) : values;
+            const rangeValidateError = operatorConfig.validateValues(jsValues);
+
             state = state.setIn(expandTreePath(path, 'properties', 'valueError', operatorCardinality), rangeValidateError);
         }
     }
@@ -395,15 +397,19 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
  */
 const setValueSrc = (state, path, delta, srcKey, config) => {
     const {showErrorMessage} = config.settings;
-    const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
-    const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
-	const operatorConfig = getOperatorConfig(config, operator, field);
-    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
     state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
     state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+
     if (showErrorMessage) {
+        // clear value error
         state = state.setIn(expandTreePath(path, 'properties', 'valueError', delta), null);
+
+        // if current operator is range, clear possible range error
+        const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
+        const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
+        const operatorConfig = getOperatorConfig(config, operator, field);
+        const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
         if (operatorConfig.validateValues) {
             state = state.setIn(expandTreePath(path, 'properties', 'valueError', operatorCardinality), null);
         }

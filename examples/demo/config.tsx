@@ -289,6 +289,9 @@ export default (skin) => {
                     0: <strong>0%</strong>,
                     100: <strong>100%</strong>
                 },
+                validateValue: (val, fieldSettings) => {
+                    return (val < 50 ? null : "Invalid slider value, see validateValue()");
+                },
             },
             //overrides
             widgets: {
