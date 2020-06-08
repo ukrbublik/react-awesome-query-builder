@@ -251,7 +251,6 @@ export class Group extends PureComponent {
       not: not || false,
       id: id,
       setNot: immutableGroupsMode ? dummyFn : setNot,
-        validation: this.props.validation
     };
     return <Conjs {...renderProps} />;
   }

@@ -17,7 +17,7 @@ export default (Widget) => {
             config: PropTypes.object.isRequired,
             value: PropTypes.any, //instanceOf(Immutable.List)
             valueSrc: PropTypes.any, //instanceOf(Immutable.List)
-            errorMessages: PropTypes.any,
+            valueError: PropTypes.any,
             field: PropTypes.string,
             operator: PropTypes.string,
             readonly: PropTypes.bool,
@@ -155,7 +155,7 @@ export default (Widget) => {
         }
 
         render() {
-            const {config, isFuncArg, leftField, operator, value: values, errorMessages, readonly} = this.props;
+            const {config, isFuncArg, leftField, operator, value: values, valueError, readonly} = this.props;
             const meta = this.meta;
             if (!meta)
                 return null;
@@ -219,7 +219,7 @@ export default (Widget) => {
                                     valueSrc={valueSrc}
                                     delta={delta}
                                     value={value}
-                                    errorMessages={errorMessages}
+                                    valueError={valueError}
                                     isFuncArg={isFuncArg}
                                     {...pick(meta, ['isSpecialRange', 'fieldDefinition'])}
                                     {...pick(widgets[delta], ['widget', 'widgetDefinition', 'widgetValueLabel', 'valueLabels', 'textSeparators', 'setValueHandler'])}
@@ -245,7 +245,7 @@ export default (Widget) => {
 
 const WidgetFactory = ({
     delta, isFuncArg, valueSrc,
-    value: immValue, errorMessages,
+    value: immValue, valueError: immValueError,
     isSpecialRange, fieldDefinition,
     widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
     config, field, operator, readonly,
@@ -262,9 +262,9 @@ const WidgetFactory = ({
         [immValue.get(0), immValue.get(1)] 
         : immValue.get(delta)
     ;
-    const errorMessage = errorMessages && (isSpecialRange ? 
-        [errorMessages.get(0), errorMessages.get(1)]
-        : errorMessages.get(delta)
+    const valueError = immValueError && (isSpecialRange ? 
+        [immValueError.get(0), immValueError.get(1)]
+        : immValueError.get(delta)
     ) || null;
     if (isSpecialRange && value[0] === undefined && value[1] === undefined)
         value = undefined;
@@ -278,7 +278,7 @@ const WidgetFactory = ({
         isSpecialRange: isSpecialRange,
         isFuncArg: isFuncArg,
         value: value,
-        errorMessage: errorMessage,
+        valueError: valueError,
         label: widgetValueLabel.label,
         placeholder: widgetValueLabel.placeholder,
         placeholders: valueLabels ? valueLabels.placeholder : null,

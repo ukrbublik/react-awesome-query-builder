@@ -9,11 +9,6 @@ import {ElementType, ReactElement, Factory} from 'react';
 
 type MongoValue = any;
 
-type Validation = {
-  valid: boolean,
-  errorMessage: string
-};
-
 type JsonLogicResult = {
   logic?: JsonLogicTree,
   data?: Object,
@@ -63,6 +58,7 @@ type JsonRule = {
     value: Array<RuleValue>,
     valueSrc: Array<ValueSource>,
     valueType: Array<String>,
+    valueError?: Array<String>,
     operatorOptions?: {}
   }
 };

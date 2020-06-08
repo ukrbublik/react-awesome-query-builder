@@ -31,7 +31,7 @@ class Rule extends PureComponent {
         isDraggingMe: PropTypes.bool,
         isDraggingTempo: PropTypes.bool,
         parentField: PropTypes.string, //from RuleGroup
-        errorMessages: PropTypes.any,
+        valueError: PropTypes.any,
         //path: PropTypes.instanceOf(Immutable.List),
         //actions
         handleDraggerMouseDown: PropTypes.func,
@@ -108,7 +108,7 @@ class Rule extends PureComponent {
     }
 
     render () {
-        const {config, errorMessages} = this.props;
+        const {config, valueError} = this.props;
         const {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
@@ -151,7 +151,7 @@ class Rule extends PureComponent {
                     operator={this.props.selectedOperator}
                     value={this.props.value}
                     valueSrc={this.props.valueSrc}
-                    errorMessages={errorMessages}
+                    valueError={valueError}
                     config={config}
                     setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
                     setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
@@ -181,9 +181,9 @@ class Rule extends PureComponent {
                 {typeof renderAfterWidget === 'function' ? renderAfterWidget(this.props) : renderAfterWidget}
             </Col>;
         
-        const renderError = (str) => <span>{str}</span>; //todo!
-        const errorMessage = errorMessages && errorMessages.toArray().filter(e => !!e).shift() || null;
-        const error = errorMessage ? renderError(errorMessage) : null;
+        const renderError = (str) => <span>{str}</span>; //todo: render error
+        const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+        const error = oneValueError ? renderError(oneValueError) : null;
 
         const parts = [
             field,
