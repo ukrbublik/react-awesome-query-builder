@@ -212,7 +212,6 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 					if (typeof fn == 'function') {
 							const args = [
 									fixedValue, 
-									//field,
 									fieldSettings,
 							];
 							if (valueSrc == 'field')
@@ -408,7 +407,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 	const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
 
 	let valueFixes = {};
-	let valueErrors = {};
+	let valueErrors = Array.from({length: operatorCardinality}, () => null);
 	if (canReuseValue) {
 			for (let i = 0 ; i < operatorCardinality ; i++) {
 					const v = currentValue.get(i);
@@ -435,11 +434,6 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 	}
 
 	let newValue = null, newValueSrc = null, newValueType = null, newValueError = null;
-	if (showErrorMessage) {
-		newValueError = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-			return valueErrors[i];
-		}));
-	}
 	newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
 			let v = undefined;
 			if (canReuseValue) {
@@ -471,6 +465,19 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 			}
 			return vs;
 	}));
+	if (showErrorMessage) {
+		if (newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
+			// last element in `valueError` list is for range validation error
+			const jsValues = firstWidgetConfig && firstWidgetConfig.toJS ? 
+				newValue.toJS().map(v => firstWidgetConfig.toJS(v, firstWidgetConfig)) : 
+				newValue.toJS();
+			const rangeValidateError = newOperatorConfig.validateValues(jsValues);
+			if (showErrorMessage) {
+				valueErrors.push(rangeValidateError);
+			}
+		}
+		newValueError = new Immutable.List(valueErrors);
+	}
 	newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
 			let vt = null;
 			if (canReuseValue) {

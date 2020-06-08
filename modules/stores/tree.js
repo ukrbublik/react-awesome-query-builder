@@ -9,7 +9,7 @@ import {
 import {deepEqual, defaultValue} from "../utils/stuff";
 import {validateValue, getNewValueForFieldOp} from "../utils/validation";
 import {
-	getOperatorConfig
+	getOperatorConfig, getWidgetForFieldOp, getFieldWidgetConfig
 } from '../utils/configUtils';
 
 
@@ -334,16 +334,31 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
 
     const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
     const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
+	const operatorConfig = getOperatorConfig(config, operator, field);
+    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
 
     const isEndValue = false;
     const canFix = false;
     const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
     const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
-    //todo: need to validate between and put in last delta + 1
+    
     const isValid = !validateError;
     if (isValid && fixedValue !== value) {
         // eg, get exact value from listValues (not string)
         value = fixedValue;
+    }
+    
+    const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, 'properties', 'valueSrc', i + '')) || null));
+    const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, 'properties', 'value', i + '')) || null));
+    const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS ? values.map(v => fieldWidgetDefinition.toJS(v, fieldWidgetDefinition)) : values;
+
+    if (operatorConfig.validateValues && valueSrcs.filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
+        const rangeValidateError = operatorConfig.validateValues(jsValues);
+        if (showErrorMessage) {
+            state = state.setIn(expandTreePath(path, 'properties', 'valueError', operatorCardinality), rangeValidateError);
+        }
     }
     
     const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
@@ -389,7 +404,7 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
     state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
     if (showErrorMessage) {
         state = state.setIn(expandTreePath(path, 'properties', 'valueError', delta), null);
-        if (operatorCardinality > 1) {
+        if (operatorConfig.validateValues) {
             state = state.setIn(expandTreePath(path, 'properties', 'valueError', operatorCardinality), null);
         }
     }

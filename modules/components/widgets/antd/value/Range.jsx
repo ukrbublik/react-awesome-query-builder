@@ -40,10 +40,9 @@ export default class RangeWidget extends PureComponent {
         // happens if we changed op from '==' to 'between'
         // (I know, timeout is dirty hack..)
         setTimeout(() => {
-          if (valueFrom == undefined)
-            this.handleChangeTo(valueTo);
-          if (valueTo == undefined)
-            this.handleChangeFrom(valueFrom);
+          const oneValue = valueFrom || valueTo;
+          const value = [oneValue, oneValue];
+          this.props.setValue(value);
         }, 1);
       }
   }

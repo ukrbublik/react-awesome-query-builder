@@ -117,6 +117,7 @@ const widgets = {
         return SqlString.escape(val);
       },
       singleWidget: 'slider',
+      toJS: (val, fieldSettings) => (val),
   },
   treeselect: {
       type: "treeselect",
@@ -132,6 +133,7 @@ const widgets = {
       sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
           return SqlString.escape(val);
       },
+      toJS: (val, fieldSettings) => (val),
   },
   treemultiselect: {
       type: "treemultiselect",
@@ -147,6 +149,7 @@ const widgets = {
       sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
           return vals.map(v => SqlString.escape(v));
       },
+      toJS: (val, fieldSettings) => (val),
   },
 };
 
