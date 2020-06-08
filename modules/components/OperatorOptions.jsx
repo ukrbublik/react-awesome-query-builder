@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import OperatorOptionsContainer from './containers/OperatorOptionsContainer';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import OperatorOptionsContainer from "./containers/OperatorOptionsContainer";
 
 @OperatorOptionsContainer
 export default class OperatorOptions extends PureComponent {

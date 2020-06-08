@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 export default (props) => {
   const {value, setValue, config, readonly, min, max, step, placeholder} = props;
   const onChange = e => {
     let val = e.target.value;
-    if (val === '' || val === null)
+    if (val === "" || val === null)
       val = undefined;
     else
       val = parseInt(val);

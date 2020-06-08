@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import FuncSelect from './FuncSelect';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import FuncSelect from "./FuncSelect";
 import {
   getFuncConfig
 } from "../utils/configUtils";
-import Widget from './Widget';
-import {setFunc, setArgValue, setArgValueSrc} from '../utils/funcUtils';
+import Widget from "./Widget";
+import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
 import {useOnPropsChanged} from "../utils/stuff";
 const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
 
@@ -22,24 +22,24 @@ export default class FuncWidget extends PureComponent {
   };
 
   constructor(props) {
-      super(props);
-      useOnPropsChanged(this);
+    super(props);
+    useOnPropsChanged(this);
 
-      this.onPropsChanged(props);
+    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
-      const prevProps = this.props;
-      const keysForMeta = ["config", "field", "operator", "value"];
-      const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const prevProps = this.props;
+    const keysForMeta = ["config", "field", "operator", "value"];
+    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
-      if (needUpdateMeta) {
-          this.meta = this.getMeta(nextProps);
-      }
+    if (needUpdateMeta) {
+      this.meta = this.getMeta(nextProps);
+    }
   }
 
   getMeta({config, field, operator, value}) {
-    const funcKey = value ? value.get('func') : null;
+    const funcKey = value ? value.get("func") : null;
     const funcDefinition = funcKey ? getFuncConfig(funcKey, config) : null;
 
     return {
@@ -61,16 +61,16 @@ export default class FuncWidget extends PureComponent {
 
   renderFuncSelect = () => {
     const {config, field, operator, customProps, value, readonly} = this.props;
-    const funcKey = value ? value.get('func') : null;
+    const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
       config, field, operator, customProps, readonly,
     };
     const {showLabels, funcLabel} = config.settings;
-    const widgetLabel = showLabels ?
-        <label>{funcLabel}</label>
-        : null;
+    const widgetLabel = showLabels
+      ? <label>{funcLabel}</label>
+      : null;
 
     return (
       <Col key="func" className="rule--func">
@@ -82,33 +82,33 @@ export default class FuncWidget extends PureComponent {
 
   renderArgLabel = (argKey, argDefinition) => {
     const {config} = this.props;
-    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == 'const';
-    const forceShow = !config.settings.showLabels && (argDefinition.type == 'boolean' || isConst);
+    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == "const";
+    const forceShow = !config.settings.showLabels && (argDefinition.type == "boolean" || isConst);
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label">
-          {argDefinition.label || argKey}
+        {argDefinition.label || argKey}
       </Col>
     );
   };
 
   renderArgLabelSep = (argKey, argDefinition) => {
     const {config} = this.props;
-    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == 'const';
-    const forceShow = !config.settings.showLabels && (argDefinition.type == 'boolean' || isConst);
+    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == "const";
+    const forceShow = !config.settings.showLabels && (argDefinition.type == "boolean" || isConst);
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label-sep">
-          {":"}
+        {":"}
       </Col>
     );
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
     const {config, field, operator, value, readonly} = this.props;
-    const arg = value ? value.getIn(['args', argKey]) : null;
-    const argVal = arg ? arg.get('value') : undefined;
-    const argValSrc = arg ? (arg.get('valueSrc') || 'value') : undefined;
+    const arg = value ? value.getIn(["args", argKey]) : null;
+    const argVal = arg ? arg.get("value") : undefined;
+    const argValSrc = arg ? (arg.get("valueSrc") || "value") : undefined;
 
     const widgetProps = {
       config, 
@@ -129,7 +129,7 @@ export default class FuncWidget extends PureComponent {
 
     return (
       <Col className="rule--func--arg-value">
-          <ArgWidget {...widgetProps} />
+        <ArgWidget {...widgetProps} />
       </Col>
     );
   };

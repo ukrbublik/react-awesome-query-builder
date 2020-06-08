@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly} = props;
 
   const onChange = e => {
     let value = e.target.value;
-    if (value == '')
+    if (value == "")
       value = undefined;
     setValue(value);
   };

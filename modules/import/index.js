@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
-export * from './tree';
-export * from './jsonLogic';
+export * from "./tree";
+export * from "./jsonLogic";

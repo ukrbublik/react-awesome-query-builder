@@ -1,26 +1,26 @@
-import React, { PureComponent } from 'react';
-import { Tooltip, TreeSelect } from 'antd';
+import React, { PureComponent } from "react";
+import { Tooltip, TreeSelect } from "antd";
 import {useOnPropsChanged, BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/stuff";
-import PropTypes from 'prop-types';
-import keys from 'lodash/keys';
+import PropTypes from "prop-types";
+import keys from "lodash/keys";
 
 
 export default class FieldTreeSelect extends PureComponent {
   static propTypes = {
-      config: PropTypes.object.isRequired,
-      customProps: PropTypes.object,
-      items: PropTypes.array.isRequired,
-      placeholder: PropTypes.string,
-      selectedKey: PropTypes.string,
-      selectedKeys: PropTypes.array,
-      selectedPath: PropTypes.array,
-      selectedLabel: PropTypes.string,
-      selectedAltLabel: PropTypes.string,
-      selectedFullLabel: PropTypes.string,
-      selectedOpts: PropTypes.object,
-      readonly: PropTypes.bool,
-      //actions
-      setField: PropTypes.func.isRequired,
+    config: PropTypes.object.isRequired,
+    customProps: PropTypes.object,
+    items: PropTypes.array.isRequired,
+    placeholder: PropTypes.string,
+    selectedKey: PropTypes.string,
+    selectedKeys: PropTypes.array,
+    selectedPath: PropTypes.array,
+    selectedLabel: PropTypes.string,
+    selectedAltLabel: PropTypes.string,
+    selectedFullLabel: PropTypes.string,
+    selectedOpts: PropTypes.object,
+    readonly: PropTypes.bool,
+    //actions
+    setField: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -44,106 +44,106 @@ export default class FieldTreeSelect extends PureComponent {
     this.optionsMaxWidth = optionsMaxWidth;
   }
 
-  getTreeData(fields, fn = nil) {
+  getTreeData(fields, fn = null) {
     return keys(fields).map(fieldKey => {
-        const field = fields[fieldKey];
-        const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
-        if (fn)
-          fn(field);
-        const _path = path || key;
-        const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
+      const field = fields[fieldKey];
+      const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
+      if (fn)
+        fn(field);
+      const _path = path || key;
+      const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
 
-        if (items) {
-            return {
-              value: _path,
-              title: option,
-              children: this.getTreeData(items, fn),
-              selectable: false,
-              altLabel: altLabel,
-              fullLabel: fullLabel,
-              label: label,
-            };
-        } else {
-          return {
-            value: _path,
-            title: option,
-            altLabel: altLabel,
-            fullLabel: fullLabel,
-            label: label,
-          };
-        }
+      if (items) {
+        return {
+          value: _path,
+          title: option,
+          children: this.getTreeData(items, fn),
+          selectable: false,
+          altLabel: altLabel,
+          fullLabel: fullLabel,
+          label: label,
+        };
+      } else {
+        return {
+          value: _path,
+          title: option,
+          altLabel: altLabel,
+          fullLabel: fullLabel,
+          label: label,
+        };
+      }
     });
   }
 
   onChange = (key) => {
-      this.props.setField(key);
+    this.props.setField(key);
   }
 
   filterTreeNode = (input, option) => {
     const dataForFilter = option;
-    const keysForFilter = ['title', 'value', 'label', 'altLabel', 'fullLabel'];
-    const valueForFilter = 
-      keysForFilter
-      .map(k => (typeof dataForFilter[k] == 'string' ? dataForFilter[k] : ''))
-      .join("\0");
+    const keysForFilter = ["title", "value", "label", "altLabel", "fullLabel"];
+    const valueForFilter 
+      = keysForFilter
+        .map(k => (typeof dataForFilter[k] == "string" ? dataForFilter[k] : ""))
+        .join("\0");
     return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
   }
 
   render() {
-      const {
-        config, customProps = {}, placeholder,
-        selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
-      } = this.props;
-      const { renderSize, fieldSeparator } = config.settings;
+    const {
+      config, customProps = {}, placeholder,
+      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
+    } = this.props;
+    const { renderSize, fieldSeparator } = config.settings;
       
-      let tooltipText = selectedAltLabel || selectedFullLabel;
-      if (tooltipText == selectedLabel)
-        tooltipText = null;
-      const selectedPath = selectedKey ? selectedKey.split(fieldSeparator) : null;
-      const treeDefaultExpandedKeys = selectedPath && selectedPath.length > 1 ? 
-        selectedPath.slice(0, -1).map((_key, i) => (selectedPath.slice(0, i+1).join(fieldSeparator))) : 
-        null;
+    let tooltipText = selectedAltLabel || selectedFullLabel;
+    if (tooltipText == selectedLabel)
+      tooltipText = null;
+    const selectedPath = selectedKey ? selectedKey.split(fieldSeparator) : null;
+    const treeDefaultExpandedKeys = selectedPath && selectedPath.length > 1 
+      ? selectedPath.slice(0, -1).map((_key, i) => (selectedPath.slice(0, i+1).join(fieldSeparator))) 
+      : null;
       
-      const placeholderWidth = calcTextWidth(placeholder) + 6;
-      const isFieldSelected = !!selectedKey;
+    const placeholderWidth = calcTextWidth(placeholder) + 6;
+    const isFieldSelected = !!selectedKey;
 
-      const minWidth = placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-      const dropdownMinWidth = 100;
-      const dropdownMaxWidth = 800;
-      const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
-      const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
+    const minWidth = placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const dropdownMinWidth = 100;
+    const dropdownMaxWidth = 800;
+    const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
+    const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
-      let res = (
-          <TreeSelect
-              onChange={this.onChange}
-              value={selectedKey || undefined}
-              style={{
-                minWidth: minWidth,
-                width: isFieldSelected ? null : minWidth,
-              }}
-              dropdownStyle={{
-                width: useAutoWidth ? "auto" : dropdownWidth + 20,
-                paddingRight: '10px'
-              }}
-              multiple={false}
-              treeCheckable={false}
-              treeDataSimpleMode={false}
-              treeData={this.treeData}
-              size={renderSize}
-              placeholder={placeholder}
-              filterTreeNode={this.filterTreeNode}
-              treeDefaultExpandedKeys={treeDefaultExpandedKeys}
-              dropdownMatchSelectWidth={false}
-              disabled={readonly}
-              {...customProps}
-          />
-      );
+    let res = (
+      <TreeSelect
+        onChange={this.onChange}
+        value={selectedKey || undefined}
+        style={{
+          minWidth: minWidth,
+          width: isFieldSelected ? null : minWidth,
+        }}
+        dropdownStyle={{
+          width: useAutoWidth ? "auto" : dropdownWidth + 20,
+          paddingRight: "10px"
+        }}
+        multiple={false}
+        treeCheckable={false}
+        treeDataSimpleMode={false}
+        treeData={this.treeData}
+        size={renderSize}
+        placeholder={placeholder}
+        filterTreeNode={this.filterTreeNode}
+        treeDefaultExpandedKeys={treeDefaultExpandedKeys}
+        dropdownMatchSelectWidth={false}
+        disabled={readonly}
+        {...customProps}
+      />
+    );
 
-      if (tooltipText && !selectedOpts.tooltip) {
-        res = <Tooltip title={tooltipText}>{res}</Tooltip>;
-      }
+    if (tooltipText && !selectedOpts.tooltip) {
+      res = <Tooltip title={tooltipText}>{res}</Tooltip>;
+    }
 
-      return res;
+    return res;
   }
 
 }

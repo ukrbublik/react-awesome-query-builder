@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../../utils/stuff';
-import { Select } from 'antd';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
+import { Select } from "antd";
 const Option = Select.Option;
 
 export default class SelectWidget extends PureComponent {
@@ -18,9 +18,9 @@ export default class SelectWidget extends PureComponent {
   };
 
   constructor(props) {
-      super(props);
-      useOnPropsChanged(this);
-      this.onPropsChanged(props);
+    super(props);
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
   }
 
   onPropsChanged (props) {
@@ -55,19 +55,19 @@ export default class SelectWidget extends PureComponent {
     const _value = value != undefined ? value+"" : undefined;
 
     return (
-        <Select
-            disabled={readonly}
-            style={{ width }}
-            key={"widget-select"}
-            dropdownMatchSelectWidth={false}
-            placeholder={placeholder}
-            size={renderSize}
-            value={_value}
-            onChange={this.handleChange}
-            filterOption={this.filterOption}
-            {...customProps}
-          >{this.options}
-        </Select>
+      <Select
+        disabled={readonly}
+        style={{ width }}
+        key={"widget-select"}
+        dropdownMatchSelectWidth={false}
+        placeholder={placeholder}
+        size={renderSize}
+        value={_value}
+        onChange={this.handleChange}
+        filterOption={this.filterOption}
+        {...customProps}
+      >{this.options}
+      </Select>
     );
   }
 }

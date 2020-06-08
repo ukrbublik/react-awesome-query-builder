@@ -1,10 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import GroupContainer from './containers/GroupContainer';
-import Draggable from './containers/Draggable';
-import {Group} from './Group';
-import {RuleGroupActions} from './RuleGroupActions';
-import {FieldWrapper} from './Rule';
+import React from "react";
+import PropTypes from "prop-types";
+import GroupContainer from "./containers/GroupContainer";
+import Draggable from "./containers/Draggable";
+import {Group} from "./Group";
+import {RuleGroupActions} from "./RuleGroupActions";
+import {FieldWrapper} from "./Rule";
 import {useOnPropsChanged} from "../utils/stuff";
 
 
@@ -19,15 +19,15 @@ class RuleGroup extends Group {
   };
 
   constructor(props) {
-      super(props);
-      useOnPropsChanged(this);
-      this.onPropsChanged(props);
+    super(props);
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
   }
 
-  childrenClassName = () => 'rule_group--children';
+  childrenClassName = () => "rule_group--children";
   
   renderHeaderWrapper = () => null;
   renderFooterWrapper = () => null;

@@ -26,6 +26,11 @@
         "react",
         "babel"
     ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
     "parser": "babel-eslint",
     "rules": {
         "indent": [

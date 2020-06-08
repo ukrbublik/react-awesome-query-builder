@@ -1,12 +1,12 @@
-import React from 'react';
-import moment from 'moment';
+import React from "react";
+import moment from "moment";
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly} = props;
 
   const onChange = e => {
     let value = e.target.value;
-    if (value == '')
+    if (value == "")
       value = undefined;
     else
       value = moment(new Date(value)).format(valueFormat);
@@ -15,7 +15,7 @@ export default (props) => {
 
   let dtValue = value;
   if (!value)
-    dtValue = '';
+    dtValue = "";
   else
     dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
   
