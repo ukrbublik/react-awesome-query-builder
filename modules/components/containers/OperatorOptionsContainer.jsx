@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 import {getOperatorConfig} from "../../utils/configUtils";
 
 export default (OperatorOptions) => {
@@ -18,7 +18,7 @@ export default (OperatorOptions) => {
       if (!this.props.selectedOperator)
         return null;
       const operatorDefinitions = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
-      if (typeof operatorDefinitions.options === 'undefined') {
+      if (typeof operatorDefinitions.options === "undefined") {
         return null;
       }
 
@@ -26,8 +26,8 @@ export default (OperatorOptions) => {
 
       return (
         <OperatorOptions
-            name={this.props.selectedOperator}
-            config={this.props.config}
+          name={this.props.selectedOperator}
+          config={this.props.config}
         >
           {optionsFactory(Object.assign({}, optionsProps, {
             config: this.props.config,

@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import React, { Component } from "react";
+import {connect} from "react-redux";
 import {getFlatTree} from "../../utils/treeUtils";
-import * as constants from '../../constants';
-import clone from 'clone';
-import PropTypes from 'prop-types';
-import * as actions from '../../actions';
+import * as constants from "../../constants";
+import clone from "clone";
+import PropTypes from "prop-types";
+import * as actions from "../../actions";
 import {pureShouldComponentUpdate} from "../../utils/renderUtils";
 import {useOnPropsChanged} from "../../utils/stuff";
 const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
@@ -20,14 +20,14 @@ export default (Builder, CanMoveFn = null) => {
     };
 
     constructor(props) {
-        super(props);
-        useOnPropsChanged(this);
+      super(props);
+      useOnPropsChanged(this);
 
-        this.onPropsChanged(props);
+      this.onPropsChanged(props);
     }
 
     onPropsChanged(nextProps) {
-        this.tree = getFlatTree(nextProps.tree);
+      this.tree = getFlatTree(nextProps.tree);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -39,51 +39,51 @@ export default (Builder, CanMoveFn = null) => {
         if (prevState == nextState && prevProps != nextProps) {
           let chs = [];
           for (let k in nextProps) {
-              let changed = (nextProps[k] != prevProps[k]);
-              if (changed) {
-                //don't render <Builder> on dragging - appropriate redux-connected components will do it
-                if(k != 'dragging' && k != 'mousePos')
-                  chs.push(k);
-              }
+            let changed = (nextProps[k] != prevProps[k]);
+            if (changed) {
+              //don't render <Builder> on dragging - appropriate redux-connected components will do it
+              if(k != "dragging" && k != "mousePos")
+                chs.push(k);
+            }
           }
           if (!chs.length)
-              should = false;
+            should = false;
         }
       }
       return should;
     }
 
     componentDidUpdate(_prevProps, _prevState) {
-        let dragging = this.props.dragging;
-        let startDragging = this.props.dragStart;
-        if (startDragging && startDragging.id) {
-            dragging.itemInfo = this.tree.items[dragging.id];
-            if (dragging.itemInfo) {
-              if (dragging.itemInfo.index != startDragging.itemInfo.index || dragging.itemInfo.parent != startDragging.itemInfo.parent) {
-                const treeEl = startDragging.treeEl;
-                const treeElContainer = startDragging.treeElContainer;
-                const plhEl = this._getPlaceholderNodeEl(treeEl, true);
-                if (plhEl) {
-                    const plX = plhEl.getBoundingClientRect().left + window.scrollX;
-                    const plY = plhEl.getBoundingClientRect().top + window.scrollY;
-                    const oldPlX = startDragging.plX;
-                    const oldPlY = startDragging.plY;
-                    const scrollTop = treeElContainer.scrollTop;
-                    startDragging.plX = plX;
-                    startDragging.plY = plY;
-                    startDragging.itemInfo = clone(dragging.itemInfo);
-                    startDragging.y = plhEl.offsetTop;
-                    startDragging.x = plhEl.offsetLeft;
-                    startDragging.clientY += (plY - oldPlY);
-                    startDragging.clientX += (plX - oldPlX);
-                    if (treeElContainer != document.body)
-                      startDragging.scrollTop = scrollTop;
+      let dragging = this.props.dragging;
+      let startDragging = this.props.dragStart;
+      if (startDragging && startDragging.id) {
+        dragging.itemInfo = this.tree.items[dragging.id];
+        if (dragging.itemInfo) {
+          if (dragging.itemInfo.index != startDragging.itemInfo.index || dragging.itemInfo.parent != startDragging.itemInfo.parent) {
+            const treeEl = startDragging.treeEl;
+            const treeElContainer = startDragging.treeElContainer;
+            const plhEl = this._getPlaceholderNodeEl(treeEl, true);
+            if (plhEl) {
+              const plX = plhEl.getBoundingClientRect().left + window.scrollX;
+              const plY = plhEl.getBoundingClientRect().top + window.scrollY;
+              const oldPlX = startDragging.plX;
+              const oldPlY = startDragging.plY;
+              const scrollTop = treeElContainer.scrollTop;
+              startDragging.plX = plX;
+              startDragging.plY = plY;
+              startDragging.itemInfo = clone(dragging.itemInfo);
+              startDragging.y = plhEl.offsetTop;
+              startDragging.x = plhEl.offsetLeft;
+              startDragging.clientY += (plY - oldPlY);
+              startDragging.clientX += (plX - oldPlX);
+              if (treeElContainer != document.body)
+                startDragging.scrollTop = scrollTop;
 
-                    this.onDrag(this.props.mousePos, false);
-                }
-              }
+              this.onDrag(this.props.mousePos, false);
             }
+          }
         }
+      }
     }
 
     _getNodeElById (treeEl, indexId, ignoreCache = false) {
@@ -102,30 +102,30 @@ export default (Builder, CanMoveFn = null) => {
     _getDraggableNodeEl (treeEl, ignoreCache = false) {
       if (!this._cacheEls)
         this._cacheEls = {};
-      let el = this._cacheEls['draggable'];
+      let el = this._cacheEls["draggable"];
       if (el && document.contains(el) && !ignoreCache)
         return el;
-      const els = treeEl.getElementsByClassName('qb-draggable');
+      const els = treeEl.getElementsByClassName("qb-draggable");
       el = els.length ? els[0] : null;
-      this._cacheEls['draggable'] = el;
+      this._cacheEls["draggable"] = el;
       return el;
     }
 
     _getPlaceholderNodeEl (treeEl, ignoreCache = false) {
       if (!this._cacheEls)
         this._cacheEls = {};
-      let el = this._cacheEls['placeholder'];
+      let el = this._cacheEls["placeholder"];
       if (el && document.contains(el) && !ignoreCache)
         return el;
-      const els = treeEl.getElementsByClassName('qb-placeholder');
+      const els = treeEl.getElementsByClassName("qb-placeholder");
       el = els.length ? els[0] : null;
-      this._cacheEls['placeholder'] = el;
+      this._cacheEls["placeholder"] = el;
       return el;
     }
 
     _isScrollable(node) {
-      const overflowY = window.getComputedStyle(node)['overflow-y'];
-      return (overflowY === 'scroll' || overflowY === 'auto') && (node.scrollHeight > node.offsetHeight);
+      const overflowY = window.getComputedStyle(node)["overflow-y"];
+      return (overflowY === "scroll" || overflowY === "auto") && (node.scrollHeight > node.offsetHeight);
     }
 
     _getScrollParent(node) {
@@ -140,21 +140,21 @@ export default (Builder, CanMoveFn = null) => {
     }
 
     onDragStart = (id, dom, e) => {
-      let treeEl = dom.closest('.query-builder');
+      let treeEl = dom.closest(".query-builder");
       document.body.classList.add("qb-dragging");
       treeEl.classList.add("qb-dragging");
-      let treeElContainer = treeEl.closest('.query-builder-container') || treeEl;
+      let treeElContainer = treeEl.closest(".query-builder-container") || treeEl;
       treeElContainer = this._getScrollParent(treeElContainer) || document.body;
       const scrollTop = treeElContainer.scrollTop;
       
       const _dragEl = this._getDraggableNodeEl(treeEl);
       const _plhEl = this._getPlaceholderNodeEl(treeEl);
 
-      const tmpAllGroups = treeEl.querySelectorAll('.group--children');
+      const tmpAllGroups = treeEl.querySelectorAll(".group--children");
       const anyGroup = tmpAllGroups.length ? tmpAllGroups[0] : null;
       let groupPadding;
       if (anyGroup) {
-        groupPadding = window.getComputedStyle(anyGroup, null).getPropertyValue('padding-left');
+        groupPadding = window.getComputedStyle(anyGroup, null).getPropertyValue("padding-left");
         groupPadding = parseInt(groupPadding);
       }
 
@@ -184,8 +184,8 @@ export default (Builder, CanMoveFn = null) => {
       };
 
       const target = e.__mocked_window || window;
-      target.addEventListener('mousemove', this.onDrag);
-      target.addEventListener('mouseup', this.onDragEnd);
+      target.addEventListener("mousemove", this.onDrag);
+      target.addEventListener("mouseup", this.onDragEnd);
 
       this.props.setDragStart(dragStart, dragging, mousePos);
     }
@@ -223,8 +223,8 @@ export default (Builder, CanMoveFn = null) => {
         const treeEl = startDragging.treeEl;
         const plhEl = this._getPlaceholderNodeEl(treeEl);
         if (plhEl) {
-            startDragging.plX = plhEl.getBoundingClientRect().left + window.scrollX;
-            startDragging.plY = plhEl.getBoundingClientRect().top + window.scrollY;
+          startDragging.plX = plhEl.getBoundingClientRect().left + window.scrollX;
+          startDragging.plY = plhEl.getBoundingClientRect().top + window.scrollY;
         }
       }
 
@@ -249,7 +249,7 @@ export default (Builder, CanMoveFn = null) => {
       const moved = doHandleDrag ? this.handleDrag(dragging, e, CanMoveFn) : false;
 
       if (moved) {
-        if (isDev())  console.log('moved');
+        if (isDev())  console.log("moved");
       } else {
         if (e.preventDefault)
           e.preventDefault();
@@ -265,8 +265,8 @@ export default (Builder, CanMoveFn = null) => {
       document.body.classList.remove("qb-dragging");
       this._cacheEls = {};
 
-      window.removeEventListener('mousemove', this.onDrag);
-      window.removeEventListener('mouseup', this.onDragEnd);
+      window.removeEventListener("mousemove", this.onDrag);
+      window.removeEventListener("mouseup", this.onDragEnd);
     }
 
 
@@ -285,7 +285,7 @@ export default (Builder, CanMoveFn = null) => {
         dragRect = dragEl.getBoundingClientRect();
         plhRect = plhEl.getBoundingClientRect();
         if (!plhRect.width) {
-            return;
+          return;
         }
         let dragDirs = {hrz: 0, vrt: 0};
         if (dragRect.top < plhRect.top)
@@ -307,13 +307,13 @@ export default (Builder, CanMoveFn = null) => {
           hovCNodeEl = e.__mocked_hov_container;
         } else {
           const hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
-          hovCNodeEl = hovNodeEl ? hovNodeEl.closest('.group-or-rule-container') : null;
+          hovCNodeEl = hovNodeEl ? hovNodeEl.closest(".group-or-rule-container") : null;
         }
         if (!hovCNodeEl) {
-          console.log('out of tree bounds!');
+          console.log("out of tree bounds!");
         } else {
-          const isGroup = hovCNodeEl.classList.contains('group-container');
-          const hovNodeId = hovCNodeEl.getAttribute('data-id');
+          const isGroup = hovCNodeEl.classList.contains("group-container");
+          const hovNodeId = hovCNodeEl.getAttribute("data-id");
           const hovEl = hovCNodeEl;
           let doAppend = false;
           let doPrepend = false;
@@ -322,9 +322,9 @@ export default (Builder, CanMoveFn = null) => {
             const hovHeight = hovRect.bottom - hovRect.top;
             const hovII = this.tree.items[hovNodeId];
             let trgRect = null,
-                trgEl = null,
-                trgII = null,
-                altII = null; //for canMoveBeforeAfterGroup
+              trgEl = null,
+              trgII = null,
+              altII = null; //for canMoveBeforeAfterGroup
 
             if (dragDirs.vrt == 0) {
               trgII = itemInfo;
@@ -334,30 +334,30 @@ export default (Builder, CanMoveFn = null) => {
             } else {
               if (isGroup) {
                 if (dragDirs.vrt > 0) { //down
-                    //take group header (for prepend only)
-                    const hovInnerEl = hovCNodeEl.getElementsByClassName('group--header');
-                    const hovEl2 = hovInnerEl.length ? hovInnerEl[0] : null;
-                    if (hovEl2) {
-                      const hovRect2 = hovEl2.getBoundingClientRect();
-                      const hovHeight2 = hovRect2.bottom - hovRect2.top;
-                      const isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
-                      if (isOverHover && hovII.top > dragInfo.itemInfo.top) {
-                        trgII = hovII;
-                        trgRect = hovRect2;
-                        trgEl = hovEl2;
-                        doPrepend = true;
-                      }
+                  //take group header (for prepend only)
+                  const hovInnerEl = hovCNodeEl.getElementsByClassName("group--header");
+                  const hovEl2 = hovInnerEl.length ? hovInnerEl[0] : null;
+                  if (hovEl2) {
+                    const hovRect2 = hovEl2.getBoundingClientRect();
+                    const hovHeight2 = hovRect2.bottom - hovRect2.top;
+                    const isOverHover = ((dragRect.bottom - hovRect2.top) > hovHeight2*3/4);
+                    if (isOverHover && hovII.top > dragInfo.itemInfo.top) {
+                      trgII = hovII;
+                      trgRect = hovRect2;
+                      trgEl = hovEl2;
+                      doPrepend = true;
                     }
+                  }
                 } else if (dragDirs.vrt < 0) { //up
                   if (hovII.lev >= itemInfo.lev) {
                     //take whole group
                     //todo: 5 is magic for now (bottom margin), configure it!
                     const isClimbToHover = ((hovRect.bottom - dragRect.top) >= 2);
                     if (isClimbToHover && hovII.top < dragInfo.itemInfo.top) {
-                        trgII = hovII;
-                        trgRect = hovRect;
-                        trgEl = hovEl;
-                        doAppend = true;
+                      trgII = hovII;
+                      trgRect = hovRect;
+                      trgEl = hovEl;
+                      doAppend = true;
                     }
                   }
                 }
@@ -404,19 +404,19 @@ export default (Builder, CanMoveFn = null) => {
                 //do nothing
               } else {
                 if (isGroup) {
-                    if (doAppend) {
-                      availMoves.push([constants.PLACEMENT_APPEND, trgII, trgII.lev+1]);
-                    } else if (doPrepend) {
-                      availMoves.push([constants.PLACEMENT_PREPEND, trgII, trgII.lev+1]);
+                  if (doAppend) {
+                    availMoves.push([constants.PLACEMENT_APPEND, trgII, trgII.lev+1]);
+                  } else if (doPrepend) {
+                    availMoves.push([constants.PLACEMENT_PREPEND, trgII, trgII.lev+1]);
+                  }
+                  //alt
+                  if (canMoveBeforeAfterGroup && altII) {
+                    if (dragDirs.vrt > 0) { //down
+                      altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
+                    } else if (dragDirs.vrt < 0) { //up
+                      altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
                     }
-                    //alt
-                    if (canMoveBeforeAfterGroup && altII) {
-                      if (dragDirs.vrt > 0) { //down
-                        altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
-                      } else if (dragDirs.vrt < 0) { //up
-                        altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
-                      }
-                    }
+                  }
                 }
                 if (!doAppend && !doPrepend) {
                   if (dragDirs.vrt < 0) { //up
@@ -487,7 +487,7 @@ export default (Builder, CanMoveFn = null) => {
       }
 
       if (moveInfo) {
-        if (isDev())  console.log('move Info', moveInfo);
+        if (isDev())  console.log("move Info", moveInfo);
         this.move(itemInfo, moveInfo[1], moveInfo[0], moveInfo[3]);
 
         if (isDev())  console.log("DRAG-N-DROP", JSON.stringify({
@@ -514,8 +514,8 @@ export default (Builder, CanMoveFn = null) => {
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
-      const isForbiddenStructChange = fromII.parentType == 'rule_group' || toII.type == 'rule_group' 
-        || toII.parentType == 'rule_group';
+      const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
+        || toII.parentType == "rule_group";
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange))
         return false;
@@ -527,35 +527,35 @@ export default (Builder, CanMoveFn = null) => {
     }
 
     move (fromII, toII, placement, toParentII) {
-      if (isDev())  console.log('move', fromII, toII, placement, toParentII);
+      if (isDev())  console.log("move", fromII, toII, placement, toParentII);
       this.props.actions.moveItem(fromII.path, toII.path, placement);
     }
 
     render() {
       return <Builder
-          {...this.props}
-          onDragStart={this.onDragStart}
+        {...this.props}
+        onDragStart={this.onDragStart}
       />;
     }
 
   }
 
   const ConnectedSortableContainer = connect(
-      (state) => {
-          return {
-            dragging: state.dragging,
-            dragStart: state.dragStart,
-            mousePos: state.mousePos,
-          }
-      }, {
-        setDragStart: actions.drag.setDragStart,
-        setDragProgress: actions.drag.setDragProgress,
-        setDragEnd: actions.drag.setDragEnd,
-      }
+    (state) => {
+      return {
+        dragging: state.dragging,
+        dragStart: state.dragStart,
+        mousePos: state.mousePos,
+      };
+    }, {
+      setDragStart: actions.drag.setDragStart,
+      setDragProgress: actions.drag.setDragProgress,
+      setDragEnd: actions.drag.setDragEnd,
+    }
   )(SortableContainer);
   ConnectedSortableContainer.displayName = "ConnectedSortableContainer";
 
   return ConnectedSortableContainer;
 
-}
+};
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // value widgets
 import DateWidget from "./value/Date";
@@ -26,7 +26,7 @@ import Conjs from "./core/Conjs";
 import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
-import { ConfigProvider } from 'antd';
+import { ConfigProvider } from "antd";
 const Provider = ({config, children}) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
 
 export default {

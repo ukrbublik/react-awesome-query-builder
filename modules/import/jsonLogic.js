@@ -1,20 +1,20 @@
-import uuid from '../utils/uuid';
+import uuid from "../utils/uuid";
 import {defaultValue} from "../utils/stuff";
 import {getFieldConfig, extendConfig, getWidgetForFieldOp} from "../utils/configUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction} from '../utils/defaultUtils';
-import moment from 'moment';
+import {defaultConjunction} from "../utils/defaultUtils";
+import moment from "moment";
 
 // http://jsonlogic.com/
 
 //meta is mutable
 export const loadFromJsonLogic = (logicTree, config) => {
   let meta = {
-      errors: []
+    errors: []
   };
   const extendedConfig = extendConfig(config);
   const conv = buildConv(extendedConfig);
-  let jsTree = convertFromLogic(logicTree, conv, extendedConfig, 'rule', meta);
+  let jsTree = convertFromLogic(logicTree, conv, extendedConfig, "rule", meta);
   if (jsTree && jsTree.type != "group") {
     jsTree = wrapInDefaultConj(jsTree, extendedConfig);
   }
@@ -30,7 +30,7 @@ const buildConv = (config) => {
     const opConfig = config.operators[opKey];
     if (typeof opConfig.jsonLogic == "string") {
       // example: "</2", "#in/1"
-      const opk = (opConfig._jsonLogicIsRevArgs ? '#' : '') + opConfig.jsonLogic + "/" + defaultValue(opConfig.cardinality, 1);
+      const opk = (opConfig._jsonLogicIsRevArgs ? "#" : "") + opConfig.jsonLogic + "/" + defaultValue(opConfig.cardinality, 1);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
@@ -53,7 +53,7 @@ const buildConv = (config) => {
   for (let funcKey in config.funcs) {
     const funcConfig = config.funcs[funcKey];
     if (typeof funcConfig.jsonLogic == "string") {
-      const fk = (funcConfig.jsonLogicIsMethod ? '#' : '') + funcConfig.jsonLogic;
+      const fk = (funcConfig.jsonLogicIsMethod ? "#" : "") + funcConfig.jsonLogic;
       if (!funcs[fk])
         funcs[fk] = [];
       funcs[fk].push(funcKey);
@@ -79,15 +79,15 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
-  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isLogic(vals[0]) && Object.keys(vals[0])[0] == 'var');
+  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isLogic(vals[0]) && Object.keys(vals[0])[0] == "var");
   const isRev = op == "!" && !isNotOp;
   if (isRev) {
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget);
-  } else if(expectedType == 'val') {
+  } else if(expectedType == "val") {
     ret = convertField(op, vals, conv, config, not, meta) 
       || convertFunc(op, vals, conv, config, not, fieldConfig, meta) 
       || convertVal(logic, fieldConfig, widget, config, meta);
-  } else if(expectedType == 'rule') {
+  } else if(expectedType == "rule") {
     ret = convertConj(op, vals, conv, config, not, meta) 
     || convertOp(op, vals, conv, config, not, meta);
   }
@@ -180,9 +180,9 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta) => {
     func = op;
     argsArr = vals;
   }
-  const fk = (jsonLogicIsMethod ? '#' : '') + func;
+  const fk = (jsonLogicIsMethod ? "#" : "") + func;
 
-  const funcKeys = conv.funcs[fk];
+  let funcKeys = conv.funcs[fk];
   if (funcKeys) {
     let funcKey = funcKeys[0];
     if (funcKeys.length > 1 && fieldConfig) {
@@ -199,7 +199,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta) => {
     let args = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
       const argConfig = funcConfig.args[argKey];
-      let argVal = convertFromLogic(val, conv, config, 'val', meta, false, argConfig);
+      let argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig);
       if (argVal === undefined) {
         argVal = argConfig.defaultValue;
         if (argVal === undefined) {
@@ -229,7 +229,7 @@ const convertConj = (op, vals, conv, config, not, meta) => {
   if (conjKey) {
     let type = "group";
     let children = vals
-      .map(v => convertFromLogic(v, conv, config, 'rule', meta, false))
+      .map(v => convertFromLogic(v, conv, config, "rule", meta, false))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
     let complexFields = Object.entries(children)
@@ -238,7 +238,7 @@ const convertConj = (op, vals, conv, config, not, meta) => {
     let userGroupFields = complexFields
       .map(parts => parts.splice(0, parts.length - 1).join(fieldSeparator))
       .map(f => [f, getFieldConfig(f, config)])
-      .filter(([f, fc]) => fc && fc.type == '!group')
+      .filter(([f, fc]) => fc && fc.type == "!group")
       .map(([f, fc]) => f);
     let usedGroup = userGroupFields.length > 0 ? userGroupFields[0] : null;
     let properties = {
@@ -246,7 +246,7 @@ const convertConj = (op, vals, conv, config, not, meta) => {
       not: not
     };
     if (usedGroup) {
-      type = 'rule_group';
+      type = "rule_group";
       properties.field = usedGroup;
     }
     return {
@@ -292,7 +292,7 @@ const convertOp = (op, vals, conv, config, not, meta) => {
     let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
     if (opKeys) {
       let jlField, args = [];
-      const rangeOps = ['<', '<=', '>', '>='];
+      const rangeOps = ["<", "<=", ">", ">="];
       if (rangeOps.includes(op) && arity == 3) {
         jlField = vals[1];
         args = [ vals[0], vals[2] ];
@@ -354,7 +354,7 @@ const convertOp = (op, vals, conv, config, not, meta) => {
   const widget = getWidgetForFieldOp(config, field, opKey);
 
   const convertedArgs = args
-    .map(v => convertFromLogic(v, conv, config, 'val', meta, false, fieldConfig, widget));
+    .map(v => convertFromLogic(v, conv, config, "val", meta, false, fieldConfig, widget));
   if (convertedArgs.filter(v => v === undefined).length) {
     //meta.errors.push(`Undefined arg for field ${field} and op ${opKey}`);
     return undefined;
@@ -374,8 +374,8 @@ const convertOp = (op, vals, conv, config, not, meta) => {
 };
 
 const isLogic = (logic) => (
-  typeof logic === "object" && // An object
-  logic !== null && // but not null
-  !Array.isArray(logic) && // and not an array
-  Object.keys(logic).length === 1 // with exactly one key
+  typeof logic === "object" // An object
+  && logic !== null // but not null
+  && !Array.isArray(logic) // and not an array
+  && Object.keys(logic).length === 1 // with exactly one key
 );

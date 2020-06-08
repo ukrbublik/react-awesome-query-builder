@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import WidgetContainer from './containers/WidgetContainer';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import WidgetContainer from "./containers/WidgetContainer";
 const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
 
 @WidgetContainer

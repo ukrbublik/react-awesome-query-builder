@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export default ({type, label, onClick, config}) => {
   const typeToLabel = {

@@ -1,5 +1,5 @@
-import React from 'react';
-import uuid from '../../../../utils/uuid';
+import React from "react";
+import uuid from "../../../../utils/uuid";
 
 export default (props) => {
   const {value, setValue, config, labelYes, labelNo, readonly} = props;

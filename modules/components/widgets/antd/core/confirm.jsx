@@ -1,6 +1,6 @@
-import { Modal } from 'antd';
+import { Modal } from "antd";
 const { confirm } = Modal;
 
-export default (options = {onOk, okText, cancelText, title}) => {
+export default (options) => {
   confirm(options);
-}
+};

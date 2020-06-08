@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { InputNumber, Col } from 'antd';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { InputNumber, Col } from "antd";
 
 export default class NumberWidget extends PureComponent {
   static propTypes = {
@@ -19,15 +19,15 @@ export default class NumberWidget extends PureComponent {
   };
 
   handleChange = (val) => {
-    if (val === '' || val === null)
+    if (val === "" || val === null)
       val = undefined;
     this.props.setValue(val);
   }
 
   static defaultProps = {
-      min: undefined,
-      max: undefined,
-      step: undefined,
+    min: undefined,
+    max: undefined,
+    step: undefined,
   };
 
   render() {

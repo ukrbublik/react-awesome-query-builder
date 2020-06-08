@@ -1,10 +1,10 @@
-import mapValues from 'lodash/mapValues';
-import Immutable, { Map } from 'immutable';
-import React from 'react';
+import mapValues from "lodash/mapValues";
+import Immutable, { Map } from "immutable";
+import React from "react";
 
 
 export const SELECT_WIDTH_OFFSET_RIGHT = 48;
-const DEFAULT_FONT_SIZE = '14px';
+const DEFAULT_FONT_SIZE = "14px";
 const DEFAULT_FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 // RegExp.quote = function (str) {
@@ -13,8 +13,8 @@ const DEFAULT_FONT_FAMILY = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 
 export const defaultValue = (value, _default) => {
-    return (typeof value === "undefined") ? _default : value;
-}
+  return (typeof value === "undefined") ? _default : value;
+};
 
 
 export const bindActionCreators = (actionCreators, config, dispatch) =>
@@ -27,8 +27,8 @@ export const calcTextWidth = function(str, fontFamily = DEFAULT_FONT_FAMILY, fon
   var div = document.createElement("div");
   div.innerHTML = str;
   var css = {
-    'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden', 
-    'font-size': fontSize, 'font-family': fontFamily
+    "position": "absolute", "float": "left", "white-space": "nowrap", "visibility": "hidden", 
+    "font-size": fontSize, "font-family": fontFamily
   };
   for (let k in css) {
     div.style[k] = css[k];
@@ -37,19 +37,19 @@ export const calcTextWidth = function(str, fontFamily = DEFAULT_FONT_FAMILY, fon
   var w = div.offsetWidth;
   document.body.removeChild(div);
   return w;
-}
+};
 
 export const truncateString = (str, n, useWordBoundary) => {
-    if (!n || str.length <= n) { return str; }
-    var subString = str.substr(0, n-1);
-    return (useWordBoundary 
-       ? subString.substr(0, subString.lastIndexOf(' ')) 
-       : subString) + "...";
-}
+  if (!n || str.length <= n) { return str; }
+  var subString = str.substr(0, n-1);
+  return (useWordBoundary 
+    ? subString.substr(0, subString.lastIndexOf(" ")) 
+    : subString) + "...";
+};
 
 export const BUILT_IN_PLACEMENTS = {
   bottomLeft: {
-    points: ['tl', 'bl'],
+    points: ["tl", "bl"],
     offset: [0, 4],
     overflow: {
       adjustX: 0,
@@ -57,7 +57,7 @@ export const BUILT_IN_PLACEMENTS = {
     },
   },
   bottomRight: {
-    points: ['tr', 'br'],
+    points: ["tr", "br"],
     offset: [0, 4],
     overflow: {
       adjustX: 1,
@@ -65,7 +65,7 @@ export const BUILT_IN_PLACEMENTS = {
     },
   },
   topLeft: {
-    points: ['bl', 'tl'],
+    points: ["bl", "tl"],
     offset: [0, -4],
     overflow: {
       adjustX: 0,
@@ -73,7 +73,7 @@ export const BUILT_IN_PLACEMENTS = {
     },
   },
   topRight: {
-    points: ['br', 'tr'],
+    points: ["br", "tr"],
     offset: [0, -4],
     overflow: {
       adjustX: 1,
@@ -102,15 +102,15 @@ export const deepEqual = function(v1, v2) {
 
 //Do sets have same values?
 export const eqSet = function (as, bs) {
-    if (as.size !== bs.size) return false;
-    for (var a of as) if (!bs.has(a)) return false;
-    return true;
+  if (as.size !== bs.size) return false;
+  for (var a of as) if (!bs.has(a)) return false;
+  return true;
 };
 
 
 //Do arrays have same values?
 export const eqArrSet = function (arr1, arr2) {
-    return eqSet(new Set(arr1), new Set(arr2));
+  return eqSet(new Set(arr1), new Set(arr2));
 };
 
 export const shallowEqual = (a, b, deep = false) => {
@@ -120,7 +120,7 @@ export const shallowEqual = (a, b, deep = false) => {
     return shallowEqualArrays(a, b, deep);
   else if (Map.isMap(a))
     return a.equals(b);
-  else if (typeof a == 'object')
+  else if (typeof a == "object")
     return shallowEqualObjects(a, b, deep);
   else
     return a === b;
@@ -180,12 +180,12 @@ function shallowEqualObjects(objA, objB, deep = false) {
 }
 
 export const escapeRegExp = (string) => {
-  return string.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&'); // $& means the whole matched string
-}
+  return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
+};
 
 
 const canUseUnsafe = () => {
-  const v = React.version.split('.').map(parseInt.bind(null, 10));
+  const v = React.version.split(".").map(parseInt.bind(null, 10));
   return v[0] >= 16 && v[1] >= 3;
 };
 
@@ -202,7 +202,7 @@ export const useOnPropsChanged = (obj) => {
 };
 
 
-const isObject = (v) => (typeof v == 'object' && v !== null);
+const isObject = (v) => (typeof v == "object" && v !== null);
 const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
 
 // convert {<value>: <title>, ..} or [value, ..] to normal [{value, title}, ..]
@@ -329,8 +329,8 @@ const extendTreeData = (treeData, fieldSettings, isMulti) => {
 };
 
 export const normalizeListValues = (listValues, type, fieldSettings) => {
-  const isTree = ['treeselect', 'treemultiselect'].includes(type);
-  const isMulti = ['multiselect', 'treemultiselect'].includes(type);
+  const isTree = ["treeselect", "treemultiselect"].includes(type);
+  const isMulti = ["multiselect", "treemultiselect"].includes(type);
   if (isTree) {
     listValues = listValuesToArray(listValues);
     listValues = flatizeTreeData(listValues);

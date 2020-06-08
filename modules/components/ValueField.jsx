@@ -1,12 +1,12 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 import {
   getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp
 } from "../utils/configUtils";
 import {truncateString, useOnPropsChanged} from "../utils/stuff";
-import last from 'lodash/last';
-import keys from 'lodash/keys';
-import clone from 'clone';
+import last from "lodash/last";
+import keys from "lodash/keys";
+import clone from "clone";
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -22,25 +22,25 @@ export default class ValueField extends PureComponent {
   };
 
   constructor(props) {
-      super(props);
-      useOnPropsChanged(this);
+    super(props);
+    useOnPropsChanged(this);
 
-      this.onPropsChanged(props);
+    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
-      const prevProps = this.props;
-      const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
-      const keysForMeta = ["config", "field", "operator", "value"];
-      const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
-      const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const prevProps = this.props;
+    const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
+    const keysForMeta = ["config", "field", "operator", "value"];
+    const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
-      if (needUpdateItems) {
-          this.items = this.getItems(nextProps);
-      }
-      if (needUpdateMeta) {
-          this.meta = this.getMeta(nextProps);
-      }
+    if (needUpdateItems) {
+      this.items = this.getItems(nextProps);
+    }
+    if (needUpdateMeta) {
+      this.meta = this.getMeta(nextProps);
+    }
   }
 
   getItems({config, field, operator}) {
@@ -69,7 +69,7 @@ export default class ValueField extends PureComponent {
     const partsLabels = getFieldPathLabels(selectedKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel)
-        selectedFullLabel = null;
+      selectedFullLabel = null;
     const selectedAltLabel = selectedOpts.label2;
 
     return {
@@ -83,7 +83,7 @@ export default class ValueField extends PureComponent {
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
     let expectedType;
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, 'value');
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     if (widget) {
       let widgetConfig = config.widgets[widget];
       let widgetType = widgetConfig.type;
@@ -123,70 +123,70 @@ export default class ValueField extends PureComponent {
 
   buildOptions(config, fields, path = null, optGroupLabel = null) {
     if (!fields)
-        return null;
+      return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
-    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : '';
+    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
 
     return keys(fields).map(fieldKey => {
-        const field = fields[fieldKey];
-        const label = this.getFieldLabel(field, fieldKey, config);
-        const partsLabels = getFieldPathLabels(fieldKey, config);
-        let fullLabel = partsLabels.join(fieldSeparatorDisplay);
-        if (fullLabel == label)
-            fullLabel = null;
-        const altLabel = field.label2;
-        const tooltip = field.tooltip;
-        const subpath = (path ? path : []).concat(fieldKey);
+      const field = fields[fieldKey];
+      const label = this.getFieldLabel(field, fieldKey, config);
+      const partsLabels = getFieldPathLabels(fieldKey, config);
+      let fullLabel = partsLabels.join(fieldSeparatorDisplay);
+      if (fullLabel == label)
+        fullLabel = null;
+      const altLabel = field.label2;
+      const tooltip = field.tooltip;
+      const subpath = (path ? path : []).concat(fieldKey);
 
-        if (field.hideForCompare)
-            return undefined;
+      if (field.hideForCompare)
+        return undefined;
 
-        if (field.type == "!struct" || field.type == "!group") {
-            return {
-                key: fieldKey,
-                path: prefix+fieldKey,
-                label,
-                fullLabel,
-                altLabel,
-                tooltip,
-                items: this.buildOptions(config, field.subfields, subpath, label)
-            };
-        } else {
-            return {
-                key: fieldKey,
-                path: prefix+fieldKey,
-                label,
-                fullLabel,
-                altLabel,
-                tooltip,
-                grouplabel: optGroupLabel
-            };
-        }
+      if (field.type == "!struct" || field.type == "!group") {
+        return {
+          key: fieldKey,
+          path: prefix+fieldKey,
+          label,
+          fullLabel,
+          altLabel,
+          tooltip,
+          items: this.buildOptions(config, field.subfields, subpath, label)
+        };
+      } else {
+        return {
+          key: fieldKey,
+          path: prefix+fieldKey,
+          label,
+          fullLabel,
+          altLabel,
+          tooltip,
+          grouplabel: optGroupLabel
+        };
+      }
     }).filter(o => !!o);
   }
 
   getFieldLabel(fieldOpts, fieldKey, config) {
-      if (!fieldKey) return null;
-      let fieldSeparator = config.settings.fieldSeparator;
-      let maxLabelsLength = config.settings.maxLabelsLength;
-      let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-      let label = fieldOpts.label || last(fieldParts);
-      label = truncateString(label, maxLabelsLength);
-      return label;
+    if (!fieldKey) return null;
+    let fieldSeparator = config.settings.fieldSeparator;
+    let maxLabelsLength = config.settings.maxLabelsLength;
+    let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+    let label = fieldOpts.label || last(fieldParts);
+    label = truncateString(label, maxLabelsLength);
+    return label;
   }
 
   render() {
-      const {config, customProps, setValue, readonly} = this.props;
-      const {renderField} = config.settings;
-      const renderProps = {
-          config,
-          customProps,
-          setField: setValue,
-          readonly,
-          items: this.items,
-          ...this.meta
-      };
-      return renderField(renderProps);
+    const {config, customProps, setValue, readonly} = this.props;
+    const {renderField} = config.settings;
+    const renderProps = {
+      config,
+      customProps,
+      setField: setValue,
+      readonly,
+      items: this.items,
+      ...this.meta
+    };
+    return renderField(renderProps);
   }
 
 }

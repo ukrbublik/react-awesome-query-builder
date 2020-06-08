@@ -1,13 +1,13 @@
-import React, { Component, PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import startsWith from 'lodash/startsWith'
-import GroupContainer from './containers/GroupContainer';
-import Draggable from './containers/Draggable';
-const classNames = require('classnames');
-import Item from './Item';
-import {GroupActions} from './GroupActions';
+import React, { Component, PureComponent } from "react";
+import PropTypes from "prop-types";
+import startsWith from "lodash/startsWith";
+import GroupContainer from "./containers/GroupContainer";
+import Draggable from "./containers/Draggable";
+const classNames = require("classnames");
+import Item from "./Item";
+import {GroupActions} from "./GroupActions";
 
-const defaultPosition = 'topRight';
+const defaultPosition = "topRight";
 const dummyFn = () => {};
 const DragIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray" width="18px" height="18px">
@@ -49,7 +49,7 @@ export class Group extends PureComponent {
   }
 
   isGroupTopPosition() {
-    return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, 'top')
+    return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, "top");
   }
 
   removeSelf() {
@@ -69,8 +69,8 @@ export class Group extends PureComponent {
 
   isEmptyCurrentGroup() {
     const children = this.props.children1;
-    return children.size == 0 ||
-      children.size == 1 && this.isEmpty(children.first());
+    return children.size == 0
+      || children.size == 1 && this.isEmpty(children.first());
   }
 
   isEmpty(item) {
@@ -79,17 +79,17 @@ export class Group extends PureComponent {
 
   isEmptyGroup(group) {
     const children = group.get("children1");
-    return children.size == 0 ||
-      children.size == 1 && this.isEmpty(children.first());
+    return children.size == 0
+      || children.size == 1 && this.isEmpty(children.first());
   }
 
   isEmptyRule(rule) {
-    const properties = rule.get('properties');
-      return !(
-          properties.get("field") !== null &&
-          properties.get("operator") !== null &&
-          properties.get("value").filter((val) => val !== undefined).size > 0
-      );
+    const properties = rule.get("properties");
+    return !(
+      properties.get("field") !== null
+          && properties.get("operator") !== null
+          && properties.get("value").filter((val) => val !== undefined).size > 0
+    );
   }
 
   render() {
@@ -108,25 +108,25 @@ export class Group extends PureComponent {
     return children1 && (
       <div key="group-children" className={classNames(
         "group--children",
-        !showConjs ? 'hide--conjs' : '',
-        children1.size < 2 && config.settings.hideConjForOne ? 'hide--line' : '',
-        children1.size < 2 ? 'one--child' : '',
+        !showConjs ? "hide--conjs" : "",
+        children1.size < 2 && config.settings.hideConjForOne ? "hide--line" : "",
+        children1.size < 2 ? "one--child" : "",
         this.childrenClassName()
       )}>{this.renderChildren()}</div>
     );
   }
 
-  childrenClassName = () => '';
+  childrenClassName = () => "";
 
   renderHeaderWrapper() {
     const isGroupTopPosition = this.isGroupTopPosition();
     return (
       <div key="group-header" className="group--header">
-       {this.renderHeader()}
-       {isGroupTopPosition && this.renderBeforeActions()}
-       {isGroupTopPosition && this.renderActions()}
-       {isGroupTopPosition && this.renderAfterActions()}
-     </div>
+        {this.renderHeader()}
+        {isGroupTopPosition && this.renderBeforeActions()}
+        {isGroupTopPosition && this.renderActions()}
+        {isGroupTopPosition && this.renderAfterActions()}
+      </div>
     );
   }
 
@@ -146,7 +146,7 @@ export class Group extends PureComponent {
     if (BeforeActions == undefined)
       return null;
 
-    return typeof BeforeActions === 'function' ? <BeforeActions {...this.props}/> : BeforeActions;
+    return typeof BeforeActions === "function" ? <BeforeActions {...this.props}/> : BeforeActions;
   }
 
   renderAfterActions = () => {
@@ -154,7 +154,7 @@ export class Group extends PureComponent {
     if (AfterActions == undefined)
       return null;
 
-    return typeof AfterActions === 'function' ? <AfterActions {...this.props}/> : AfterActions;
+    return typeof AfterActions === "function" ? <AfterActions {...this.props}/> : AfterActions;
   }
 
   renderActions() {
@@ -183,27 +183,27 @@ export class Group extends PureComponent {
   renderItem(item) {
     const props = this.props;
     const {config, actions, onDragStart} = props;
-    const isRuleGroup = item.get('type') == 'group' && item.getIn(['properties', 'field']) != null;
-    const type = isRuleGroup ? 'rule_group' : item.get('type');
+    const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
+    const type = isRuleGroup ? "rule_group" : item.get("type");
     
     return (
       <Item
         {...this.extraPropsForItem(item)}
-        key={item.get('id')}
-        id={item.get('id')}
+        key={item.get("id")}
+        id={item.get("id")}
         //path={props.path.push(item.get('id'))}
-        path={item.get('path')}
+        path={item.get("path")}
         type={type}
-        properties={item.get('properties')}
+        properties={item.get("properties")}
         config={config}
         actions={actions}
-        children1={item.get('children1')}
+        children1={item.get("children1")}
         //tree={props.tree}
         treeNodesCnt={this.reordableNodesCnt()}
         onDragStart={onDragStart}
       />
     );
-  };
+  }
 
   extraPropsForItem(_item) {
     return {};
@@ -221,8 +221,8 @@ export class Group extends PureComponent {
     } = this.props;
     const reordableNodesCnt = treeNodesCnt;
     const showDragIcon = config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
-    const drag = showDragIcon &&
-      <span
+    const drag = showDragIcon
+      && <span
         key="group-drag-icon"
         className={"qb-drag-handler group--drag-handler"}
         onMouseDown={handleDraggerMouseDown}

@@ -4,5 +4,6 @@ node_js:
 before_install:
 install:
   - npm install
-  - npm run build-examples
   - npm test
+  - npm run lint
+  - npm run build-examples

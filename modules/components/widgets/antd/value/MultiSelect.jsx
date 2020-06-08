@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { Select } from 'antd';
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from '../../../../utils/stuff';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { Select } from "antd";
+import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends PureComponent {
@@ -20,9 +20,9 @@ export default class MultiSelectWidget extends PureComponent {
   };
 
   constructor(props) {
-      super(props);
-      useOnPropsChanged(this);
-      this.onPropsChanged(props);
+    super(props);
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
   }
 
   onPropsChanged (props) {
@@ -59,26 +59,26 @@ export default class MultiSelectWidget extends PureComponent {
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
     
     return (
-        <Select
-            disabled={readonly}
-            mode={allowCustomValues ? "tags" : "multiple"}
-            style={{
-              minWidth: width,
-              width: width,
-            }}
-            dropdownStyle={{
-              width: dropdownWidth,
-            }}
-            key={"widget-multiselect"}
-            dropdownMatchSelectWidth={false}
-            placeholder={placeholder}
-            size={renderSize}
-            value={_value}
-            onChange={this.handleChange}
-            filterOption={this.filterOption}
-            {...customProps}
-          >{this.options}
-        </Select>
+      <Select
+        disabled={readonly}
+        mode={allowCustomValues ? "tags" : "multiple"}
+        style={{
+          minWidth: width,
+          width: width,
+        }}
+        dropdownStyle={{
+          width: dropdownWidth,
+        }}
+        key={"widget-multiselect"}
+        dropdownMatchSelectWidth={false}
+        placeholder={placeholder}
+        size={renderSize}
+        value={_value}
+        onChange={this.handleChange}
+        filterOption={this.filterOption}
+        {...customProps}
+      >{this.options}
+      </Select>
     );
   }
 }

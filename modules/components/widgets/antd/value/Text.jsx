@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { Input, Col } from 'antd';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { Input, Col } from "antd";
 
 export default class TextWidget extends PureComponent {
   static propTypes = {
@@ -15,7 +15,7 @@ export default class TextWidget extends PureComponent {
 
   handleChange = (ev) => {
     const v = ev.target.value;
-    const val = v === '' ? undefined : v; // don't allow empty value
+    const val = v === "" ? undefined : v; // don't allow empty value
     this.props.setValue(val);
   }
 
