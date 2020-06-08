@@ -32,6 +32,7 @@ module.exports = {
         port: 3001,
         inline: true,
         historyApiFallback: true,
+        hot: true,
     },
     entry: [
         //'react-hot-loader/patch', // seems like excess

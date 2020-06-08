@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {getFieldConfig} from "../../utils/configUtils";
 import {pureShouldComponentUpdate} from "../../utils/renderUtils";
 import {connect} from 'react-redux';
+const classNames = require('classnames');
 
 
 export default (Rule) => {
@@ -17,6 +18,7 @@ export default (Rule) => {
       onDragStart: PropTypes.func,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
+      valueError: PropTypes.any,
       operatorOptions: PropTypes.object,
       treeNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
@@ -83,11 +85,16 @@ export default (Rule) => {
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
+      const {showErrorMessage} = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == '!struct';
+
+      const valueError = this.props.valueError;
+      const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+      const hasError = oneValueError != null && showErrorMessage;
 
       return (
         <div
-          className={'group-or-rule-container rule-container'}
+          className={classNames('group-or-rule-container', 'rule-container', hasError ? 'rule-with-error' : null)}
           data-id={this.props.id}
         >
         {[
@@ -106,6 +113,7 @@ export default (Rule) => {
             selectedOperator={this.props.operator || null}
             value={this.props.value || null}
             valueSrc={this.props.valueSrc || null}
+            valueError={this.props.valueError || null}
             operatorOptions={this.props.operatorOptions}
             config={this.props.config}
             treeNodesCnt={this.props.treeNodesCnt}
@@ -127,6 +135,7 @@ export default (Rule) => {
             selectedOperator={this.props.operator || null}
             value={this.props.value || null}
             valueSrc={this.props.valueSrc || null}
+            valueError={this.props.valueError || null}
             operatorOptions={this.props.operatorOptions}
             config={this.props.config}
             treeNodesCnt={this.props.treeNodesCnt}

@@ -298,12 +298,14 @@ describe('query with conjunction', () => {
       login: {
         type: 'text',
         excludeOperators: ['proximity'],
+        fieldSettings: {
+          validateValue: (val, fieldSettings) => {
+            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+          },
+        },
         mainWidgetProps: {
           valueLabel: "Login",
           valuePlaceholder: "Enter login",
-          validateValue: (val, fieldDef) => {
-            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-          },
         },
       }
     },
@@ -620,7 +622,7 @@ describe('query with !struct', () => {
             label: 'In stock',
             type: 'boolean',
             defaultValue: true,
-            fieldSettings: {
+            mainWidgetProps: {
               labelYes: "+",
               labelNo: "-"
             }

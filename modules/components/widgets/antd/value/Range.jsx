@@ -31,7 +31,22 @@ export default class RangeWidget extends PureComponent {
 
   state = {
   }
-  
+
+  constructor(props) {
+      super(props);
+
+      const [valueFrom, valueTo] = props.value || [null, null];
+      if (props.value && (valueFrom == undefined || valueTo == undefined)) {
+        // happens if we changed op from '==' to 'between'
+        // (I know, timeout is dirty hack..)
+        setTimeout(() => {
+          const oneValue = valueFrom || valueTo;
+          const value = [oneValue, oneValue];
+          this.props.setValue(value);
+        }, 1);
+      }
+  }
+
   handleChange = (value) => {
     this.props.setValue(value);
   }
@@ -39,42 +54,33 @@ export default class RangeWidget extends PureComponent {
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
     if (valueFrom == '' || valueFrom == null)
-      valueFrom = value[0];
+      valueFrom = undefined; //value[0];
     value = [...value];
     value[0] = valueFrom;
-    if (value[1] == undefined)
-      value[1] = valueFrom;
+    // if (value[1] == undefined)
+    //   value[1] = valueFrom;
     this.props.setValue(value);
   }
   
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
     if (valueTo == '' || valueTo == null)
-      valueTo = value[1];
+      valueTo = undefined; //value[1];
     value = [...value];
     value[1] = valueTo;
-    if (value[0] == undefined)
-      value[0] = valueTo;
+    // if (value[0] == undefined)
+    //   value[0] = valueTo;
     this.props.setValue(value);
   }
 
   tipFormatter = (val) => (val != undefined ? val.toString() : '')
 
   render() {
-    const {config, placeholder, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
+    const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
     const {renderSize} = config.settings;
     const _customProps = customProps || {};
     const _value = value != undefined ? value : undefined;
     const [valueFrom, valueTo] = _value || [null, null];
-
-    if (_value && (valueFrom == undefined || valueTo == undefined)) {
-      // happens if we change value source - this leads to incomplete slider value, fix it:
-      if (valueFrom == undefined)
-        this.handleChangeTo(valueTo);
-      if (valueTo == undefined)
-        this.handleChangeFrom(valueFrom);
-      return null;
-    }
 
     return (
       <Col style={{display: 'inline-flex'}}>
@@ -120,7 +126,6 @@ export default class RangeWidget extends PureComponent {
             marks={marks}
             included={false}
             range={true}
-            //placeholder={placeholder}
             onChange={this.handleChange}
             {...customProps}
           />

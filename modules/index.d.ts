@@ -58,6 +58,7 @@ type JsonRule = {
     value: Array<RuleValue>,
     valueSrc: Array<ValueSource>,
     valueType: Array<String>,
+    valueError?: Array<String>,
     operatorOptions?: {}
   }
 };
@@ -81,6 +82,7 @@ export interface Utils {
   getTree(tree: ImmutableTree): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  isValidTree(tree: ImmutableTree): boolean;
   // import
   loadFromJsonLogic(logicTree: JsonLogicTree, config: Config): ImmutableTree;
   // other
@@ -127,7 +129,7 @@ export interface Config {
 type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
 type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
-type ValidateValue =       (val: RuleValue, fieldDef: Field) => Boolean;
+type ValidateValue =       (val: RuleValue, fieldDef: Field) => boolean | string | null;
 
 interface BaseWidgetProps {
   value: RuleValue,
@@ -163,10 +165,11 @@ export interface BaseWidget {
   valueSrc?: ValueSource,
   valuePlaceholder?: String,
   valueLabel?: String,
-  validateValue?: ValidateValue,
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
+  //obsolete:
+  validateValue?: ValidateValue,
 };
 export interface RangeableWidget extends BaseWidget {
   singleWidget?: String,
@@ -177,9 +180,10 @@ export interface FieldWidget {
   valueSrc: "field",
   valuePlaceholder?: String,
   valueLabel?: String,
-  validateValue?: ValidateValue,
   formatValue: FormatValue, // with rightFieldDef
   sqlFormatValue: SqlFormatValue, // with rightFieldDef
+  //obsolete:
+  validateValue?: ValidateValue,
 };
 
 export type TextWidget = BaseWidget & BasicFieldSettings;
@@ -271,6 +275,9 @@ export interface ConfirmModalProps {
   title: String,
 };
 
+export interface RuleErrorProps {
+  error: String,
+};
 
 /////////////////
 // Operators
@@ -374,6 +381,7 @@ type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<String> | TypedKeyMap<String | number, String> | Array<ListItem> | Array<String | number>;
 
 interface BasicFieldSettings {
+  validateValue?: ValidateValue,
 }
 interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
@@ -539,10 +547,11 @@ export interface RenderSettings {
   hideConjForOne?: Boolean,
   maxLabelsLength?: Number,
   customFieldSelectProps?: {},
-  renderBeforeWidget?:Factory<FieldProps>;
-  renderAfterWidget?:Factory<FieldProps>;
-  renderBeforeActions?:Factory<FieldProps>;
-  renderAfterActions?:Factory<FieldProps>;
+  renderBeforeWidget?: Factory<FieldProps>;
+  renderAfterWidget?: Factory<FieldProps>;
+  renderBeforeActions?: Factory<FieldProps>;
+  renderAfterActions?: Factory<FieldProps>;
+  renderRuleError?: Factory<RuleErrorProps>;
 };
 
 export interface BehaviourSettings {
@@ -560,6 +569,7 @@ export interface BehaviourSettings {
   immutableFieldsMode?: Boolean,
   immutableOpsMode?: Boolean,
   immutableValuesMode?: Boolean,
+  showErrorMessage?: Boolean
   canShortMongoQuery?: Boolean,
   convertableWidgets?: TypedMap<Array<String>>,
 };

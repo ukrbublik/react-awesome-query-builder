@@ -166,7 +166,7 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
                 fieldConfig.defaultOperator = defaultOperator;
         }
 
-        const keysToPutInFieldSettings = ['listValues', 'allowCustomValues'];
+        const keysToPutInFieldSettings = ['listValues', 'allowCustomValues', 'validateValue'];
         if (!fieldConfig.fieldSettings)
             fieldConfig.fieldSettings = {};
         for (const k of keysToPutInFieldSettings) {
@@ -352,7 +352,8 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
     const widgetConfig = config.widgets[widget] || {};
     const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
     const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});
-    const mergedConfig = merge({}, widgetConfig, fieldWidgetProps);
+    const valueFieldSettings = (valueSrc == 'value' || !valueSrc) && fieldConfig && fieldConfig.fieldSettings || {}; // useful to take 'validateValue'
+    const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
     return mergedConfig;
 };
 

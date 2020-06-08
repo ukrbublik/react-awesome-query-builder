@@ -36,7 +36,8 @@ export const defaultOperatorOptions = (config, operator, field) => {
 
 export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
   let field = null, operator = null;
-  if (config.settings.setDefaultFieldAndOp) {
+  const {setDefaultFieldAndOp, showErrorMessage} = config.settings;
+  if (setDefaultFieldAndOp) {
     field = defaultField(config, true, parentRuleGroupPath);
     operator = defaultOperator(config, field);
   }
@@ -48,13 +49,20 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
     //used for complex operators like proximity
     operatorOptions: defaultOperatorOptions(config, operator, field),
   });
+  if (showErrorMessage) {
+    current = current.set('valueError', new Immutable.List());
+  }
   
   if (field && operator) {
-    let {newValue, newValueSrc, newValueType} = getNewValueForFieldOp(config, config, current, field, operator, 'operator', false);
+    let {newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(config, config, current, field, operator, 'operator', false);
     current = current
         .set('value', newValue)
         .set('valueSrc', newValueSrc)
         .set('valueType', newValueType);
+    if (showErrorMessage) {
+      current = current
+          .set('valueError', newValueError);
+    }
   }
   return current; 
 };

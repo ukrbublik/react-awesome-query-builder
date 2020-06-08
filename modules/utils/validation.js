@@ -77,6 +77,7 @@ function validateGroup (item, path, itemId, meta, c) {
 
 function validateRule (item, path, itemId, meta, c) {
 	const {removeInvalidRules, config, oldConfig} = c;
+	const {showErrorMessage} = config.settings;
 	let id = item.get('id');
 	let properties = item.get('properties');
 	let field = properties.get('field');
@@ -84,12 +85,14 @@ function validateRule (item, path, itemId, meta, c) {
 	let operatorOptions = properties.get('operatorOptions');
 	let valueSrc = properties.get('valueSrc');
 	let value = properties.get('value');
+	let valueError = properties.get('valueError');
 	const oldSerialized = {
 		field,
 		operator,
 		operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
 		valueSrc: valueSrc ? valueSrc.toJS() : null,
 		value: value ? value.toJS() : null,
+		valueError: valueError ? valueError.toJS() : null,
 	};
 	let _wasValid = field && operator && value && !value.find((v, ind) => (v === undefined));
 
@@ -145,12 +148,16 @@ function validateRule (item, path, itemId, meta, c) {
 	//validate values
 	valueSrc = properties.get('valueSrc');
 	value = properties.get('value');
-	let {newValue, newValueSrc} = 
+	let {newValue, newValueSrc, newValueError} = 
 			getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, true);
 	value = newValue;
 	valueSrc = newValueSrc;
+	valueError = newValueError;
 	properties = properties.set('value', value);
 	properties = properties.set('valueSrc', valueSrc);
+	if (showErrorMessage) {
+		properties = properties.set('valueError', valueError);
+	}
 
 	const newSerialized = {
 		field,
@@ -158,6 +165,7 @@ function validateRule (item, path, itemId, meta, c) {
 		operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
 		valueSrc: valueSrc ? valueSrc.toJS() : null,
 		value: value ? value.toJS() : null,
+		valueError: valueError ? valueError.toJS() : null,
 	};
 	const sanitized = !deepEqual(oldSerialized, newSerialized);
 	const isValid = field && operator && value && !value.find((v, _ind) => (v === undefined));
@@ -192,36 +200,35 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 			} else if (valueSrc == 'value' || !valueSrc) {
 					[validError, fixedValue] = validateNormalValue(leftField, field, value, valueSrc, valueType, config, operator, isEndValue, canFix);
 			}
-
+			
 			if (!validError) {
 					const fieldConfig = getFieldConfig(field, config);
 					const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-					const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ['factory', 'formatValue']);
+					const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ['factory']);
 					const rightFieldDefinition = (valueSrc == 'field' ? getFieldConfig(value, config) : null);
+					const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
 	
 					const fn = fieldWidgetDefinition.validateValue;
 					if (typeof fn == 'function') {
 							const args = [
 									fixedValue, 
-									//field,
-									fieldConfig,
+									fieldSettings,
 							];
 							if (valueSrc == 'field')
 									args.push(rightFieldDefinition);
 							const validResult = fn(...args);
-							if (typeof validResult == "string" || validResult === null) {
-									validError = validResult;
+							if (typeof validResult == "boolean") {
+								if (validResult == false)
+										validError = `Invalid value`;
 							} else {
-									if (validResult == false)
-											validError = `Invalid value`;
+								validError = validResult;
 							}
 					}
 			}
 	}
 
 	if (isRawValue && validError) {
-			validError = `Field ${field}: ${validError}`;
-			console.warn("[RAQB validate]", validError);
+			console.warn("[RAQB validate]", `Field ${field}: ${validError}`);
 	}
 	
 	return [validError, validError ? value : fixedValue];
@@ -350,7 +357,7 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, config
  * @param {string} newField
  * @param {string} newOperator
  * @param {string} changedField
- * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType}
+ * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError}
  */
 export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedField = null, canFix = true) {
 	if (!oldConfig)
@@ -361,6 +368,9 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 	const currentValueSrc = current.get('valueSrc', new Immutable.List());
 	const currentValueType = current.get('valueType', new Immutable.List());
 
+	//const isValidatingTree = (changedField === null);
+	const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
+
 	//const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
 	const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
 	//const currentOperatorCardinality = currentOperator ? defaultValue(currentOperatorConfig.cardinality, 1) : null;
@@ -370,8 +380,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 
 	let canReuseValue = currentField && currentOperator && newOperator 
 			&& (!changedField 
-					|| changedField == 'field' && !config.settings.clearValueOnChangeField 
-					|| changedField == 'operator' && !config.settings.clearValueOnChangeOp)
+					|| changedField == 'field' && !clearValueOnChangeField 
+					|| changedField == 'operator' && !clearValueOnChangeOp)
 			&& (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
 	
 	// compare old & new widgets
@@ -385,7 +395,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 		const newValueWidget = vs == 'value' ? newWidget : getWidgetForFieldOp(config, newField, newOperator, 'value');
 		
 		const canReuseWidget = newValueWidget == currentValueWidget 
-			|| (config.settings.convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
+			|| (convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
 		if (!canReuseWidget)
 			canReuseValue = false;
 	}
@@ -397,18 +407,25 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 	const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
 
 	let valueFixes = {};
+	let valueErrors = Array.from({length: operatorCardinality}, () => null);
 	if (canReuseValue) {
 			for (let i = 0 ; i < operatorCardinality ; i++) {
 					const v = currentValue.get(i);
 					const vType = currentValueType.get(i) || null;
 					const vSrc = currentValueSrc.get(i) || null;
-					const isValidSrc = (valueSources.find(v => v == vSrc) != null);
+					let isValidSrc = (valueSources.find(v => v == vSrc) != null);
+					if (!isValidSrc && i > 0 && vSrc == null)
+						isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
 					const isEndValue = !canFix;
 					const [validateError, fixedValue] = validateValue(config, newField, newField, newOperator, v, vType, vSrc, canFix, isEndValue);
 					const isValid = !validateError;
-					if (!isValidSrc || !isValid) {
-							if (v !== undefined)
-								canReuseValue = false;
+					if (!isValid && showErrorMessage && changedField != 'field') {
+						// allow bad value
+						// but not on field change - in that case just drop bad value that can't be reused
+						// ? maybe we should also drop bad value on op change?
+						valueErrors[i] = validateError;
+					} else if (!isValidSrc || !isValid) {
+							canReuseValue = false;
 							break;
 					} else if (canFix && fixedValue !== v) {
 							valueFixes[i] = fixedValue;
@@ -416,7 +433,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 			}
 	}
 
-	let newValue = null, newValueSrc = null, newValueType = null;
+	let newValue = null, newValueSrc = null, newValueType = null, newValueError = null;
 	newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
 			let v = undefined;
 			if (canReuseValue) {
@@ -448,6 +465,19 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 			}
 			return vs;
 	}));
+	if (showErrorMessage) {
+		if (newOperatorConfig && newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == 'value' || vs == null).length == operatorCardinality) {
+			// last element in `valueError` list is for range validation error
+			const jsValues = firstWidgetConfig && firstWidgetConfig.toJS ? 
+				newValue.toJS().map(v => firstWidgetConfig.toJS(v, firstWidgetConfig)) : 
+				newValue.toJS();
+			const rangeValidateError = newOperatorConfig.validateValues(jsValues);
+			if (showErrorMessage) {
+				valueErrors.push(rangeValidateError);
+			}
+		}
+		newValueError = new Immutable.List(valueErrors);
+	}
 	newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
 			let vt = null;
 			if (canReuseValue) {
@@ -459,5 +489,5 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 			return vt;
 	}));
 
-	return {canReuseValue, newValue, newValueSrc, newValueType};
+	return {canReuseValue, newValue, newValueSrc, newValueType, newValueError};
 };

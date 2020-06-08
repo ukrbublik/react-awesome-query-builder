@@ -31,6 +31,7 @@ class Rule extends PureComponent {
         isDraggingMe: PropTypes.bool,
         isDraggingTempo: PropTypes.bool,
         parentField: PropTypes.string, //from RuleGroup
+        valueError: PropTypes.any,
         //path: PropTypes.instanceOf(Immutable.List),
         //actions
         handleDraggerMouseDown: PropTypes.func,
@@ -107,7 +108,7 @@ class Rule extends PureComponent {
     }
 
     render () {
-        const {config} = this.props;
+        const {config, valueError} = this.props;
         const {
             selectedFieldPartsLabels, selectedFieldWidgetConfig,
             showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
@@ -115,6 +116,7 @@ class Rule extends PureComponent {
         const {
             deleteLabel, renderBeforeWidget, renderAfterWidget, renderSize, 
             immutableGroupsMode, immutableFieldsMode, immutableOpsMode, immutableValuesMode,
+            renderRuleError, showErrorMessage,
             renderButton: Btn
         } = config.settings;
 
@@ -150,6 +152,7 @@ class Rule extends PureComponent {
                     operator={this.props.selectedOperator}
                     value={this.props.value}
                     valueSrc={this.props.valueSrc}
+                    valueError={valueError}
                     config={config}
                     setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
                     setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
@@ -178,6 +181,12 @@ class Rule extends PureComponent {
             <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
                 {typeof renderAfterWidget === 'function' ? renderAfterWidget(this.props) : renderAfterWidget}
             </Col>;
+        
+        const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+        const error = showErrorMessage && oneValueError && 
+            <div className="rule--error">
+                {renderRuleError ? renderRuleError({error: oneValueError}) : oneValueError}
+            </div>;
 
         const parts = [
             field,
@@ -206,11 +215,15 @@ class Rule extends PureComponent {
 
         const body = <div key="rule-body" className="rule--body">{parts}</div>;
 
-        return [
-            drag,
-            body,
-            del
-        ];
+        return (
+            <>
+                {drag}
+                <div className="rule--body--wrapper">
+                    {body}{error}
+                </div>
+                {del}
+            </>
+        );
     }
 
 }

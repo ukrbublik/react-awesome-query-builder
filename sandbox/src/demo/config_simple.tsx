@@ -33,20 +33,24 @@ const fields: Fields = {
                 mainWidgetProps: {
                     valueLabel: "Name",
                     valuePlaceholder: "Enter name",
-                    validateValue: (val, fieldDef) => {
-                        return (val.length < 10);
+                    fieldSettings: {
+                        validateValue: (val, fieldSettings) => {
+                            return (val.length < 10);
+                        },
                     },
                 },
             },
             login: {
                 type: 'text',
                 excludeOperators: ['proximity'],
+                fieldSettings: {
+                    validateValue: (val, fieldSettings) => {
+                        return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+                    },
+                },
                 mainWidgetProps: {
                     valueLabel: "Login",
                     valuePlaceholder: "Enter login",
-                    validateValue: (val, fieldDef) => {
-                        return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-                    },
                 },
             }
         }
@@ -181,7 +185,7 @@ const fields: Fields = {
         label: 'In stock',
         type: 'boolean',
         defaultValue: true,
-        fieldSettings: {
+        mainWidgetProps: {
             labelYes: "+",
             labelNo: "-"
         }
