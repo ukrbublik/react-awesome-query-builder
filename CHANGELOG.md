@@ -1,5 +1,6 @@
 # Changelog
 - 2.1.0
+  - Added displaying of rule validation errors, see `showErrorMessage` in config.settings
   - `validateValue` moved from widget settings to field's `fieldSettings`
 - 2.0.11
   - Added `starts_with`, `ends_with` operators for text type

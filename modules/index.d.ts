@@ -274,6 +274,9 @@ export interface ConfirmModalProps {
   title: String,
 };
 
+export interface RuleErrorProps {
+  error: String,
+};
 
 /////////////////
 // Operators
@@ -543,10 +546,11 @@ export interface RenderSettings {
   hideConjForOne?: Boolean,
   maxLabelsLength?: Number,
   customFieldSelectProps?: {},
-  renderBeforeWidget?:Factory<FieldProps>;
-  renderAfterWidget?:Factory<FieldProps>;
-  renderBeforeActions?:Factory<FieldProps>;
-  renderAfterActions?:Factory<FieldProps>;
+  renderBeforeWidget?: Factory<FieldProps>;
+  renderAfterWidget?: Factory<FieldProps>;
+  renderBeforeActions?: Factory<FieldProps>;
+  renderAfterActions?: Factory<FieldProps>;
+  renderRuleError?: Factory<RuleErrorProps>;
 };
 
 export interface BehaviourSettings {

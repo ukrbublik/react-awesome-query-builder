@@ -116,6 +116,7 @@ class Rule extends PureComponent {
         const {
             deleteLabel, renderBeforeWidget, renderAfterWidget, renderSize, 
             immutableGroupsMode, immutableFieldsMode, immutableOpsMode, immutableValuesMode,
+            renderRuleError, showErrorMessage,
             renderButton: Btn
         } = config.settings;
 
@@ -181,9 +182,11 @@ class Rule extends PureComponent {
                 {typeof renderAfterWidget === 'function' ? renderAfterWidget(this.props) : renderAfterWidget}
             </Col>;
         
-        const renderError = (str) => <span>{str}</span>; //todo: render error
         const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
-        const error = oneValueError ? renderError(oneValueError) : null;
+        const error = showErrorMessage && oneValueError && 
+            <div className="rule--error">
+                {renderRuleError ? renderRuleError({error: oneValueError}) : oneValueError}
+            </div>;
 
         const parts = [
             field,
@@ -192,7 +195,6 @@ class Rule extends PureComponent {
             widget,
             afterWidget,
             operatorOptions,
-            error,
         ];
 
         const drag = showDragIcon &&
@@ -213,11 +215,15 @@ class Rule extends PureComponent {
 
         const body = <div key="rule-body" className="rule--body">{parts}</div>;
 
-        return [
-            drag,
-            body,
-            del
-        ];
+        return (
+            <>
+                {drag}
+                <div className="rule--body--wrapper">
+                    {body}{error}
+                </div>
+                {del}
+            </>
+        );
     }
 
 }
