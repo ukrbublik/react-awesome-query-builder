@@ -225,6 +225,10 @@ export const with_all_types = (BasicConfig) => ({
       label: "Number",
       type: "number",
       preferWidgets: ["number"],
+      fieldSettings: {
+        min: 0,
+        max: 10,
+      },
     },
     str: {
       label: "String",
@@ -325,6 +329,14 @@ export const simple_with_number_without_regroup = (BasicConfig) => ({
   }
 });
 
+export const with_all_types__show_error = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    showErrorMessage: true,
+  }
+});
+
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   funcs: {
@@ -379,6 +391,10 @@ export const with_funcs = (BasicConfig) => ({
     },
     str: {
       label: "String",
+      type: "text",
+    },
+    str2: {
+      label: "String2",
       type: "text",
     },
   }

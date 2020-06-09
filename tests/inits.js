@@ -46,6 +46,22 @@ export const with_number_and_string = {
   }]
 };
   
+export const with_not_number_and_string = {
+  "!": {
+    "or": [{
+      "<": [
+        { "var": "num" },
+        2
+      ]
+    }, {
+      "==": [
+        { "var": "login" },
+        "ukrbublik"
+      ]
+    }]
+  }
+};
+  
 export const with_date_and_time = {
   "or": [{
     "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]
@@ -58,7 +74,7 @@ export const with_date_and_time = {
   }]
 };
   
-export const with_select = {
+export const with_select_and_multiselect = {
   "and": [{
     "==": [ { "var": "color" }, "yellow" ]
   }, {
@@ -127,8 +143,120 @@ export const with_datetime = {
   "and": [{  "==": [ { "var": "datetime" }, "2020-05-26T02:30:00.000Z" ]  }]
 };
 
+export const with_select = {
+  "and": [{  "==": [ { "var": "color" }, "red" ]  }]
+};
+
+export const with_multiselect = {
+  "and": [
+    {
+      "all": [
+        { "var": "multicolor" },
+        { "in": [ { "var": "" }, [ "green", "orange" ] ] }
+      ]
+    }
+  ]
+};
+
 export const with_treeselect = {
   "and": [{  "==": [ { "var": "selecttree" }, "2" ]  }]
+};
+
+export const with_ops = {
+  "and": [
+    {
+      "!=": [
+        {
+          "var": "num"
+        },
+        2
+      ]
+    },
+    {
+      "in": [
+        "abc",
+        {
+          "var": "str"
+        }
+      ]
+    },
+    {
+      "!": {
+        "in": [
+          "xyz",
+          {
+            "var": "str"
+          }
+        ]
+      }
+    },
+    {
+      "<=": [
+        1,
+        {
+          "var": "num"
+        },
+        2
+      ]
+    },
+    {
+      "!": {
+        "<=": [
+          3,
+          {
+            "var": "num"
+          },
+          4
+        ]
+      }
+    },
+    {
+      "!": {
+        "var": "num"
+      }
+    },
+    {
+      "in": [
+        {
+          "var": "color"
+        },
+        [
+          "yellow"
+        ]
+      ]
+    },
+    {
+      "!": {
+        "in": [
+          {
+            "var": "color"
+          },
+          [
+            "green"
+          ]
+        ]
+      }
+    },
+    {
+      "!": {
+        "all": [
+          {
+            "var": "multicolor"
+          },
+          {
+            "in": [
+              {
+                "var": ""
+              },
+              [
+                "yellow"
+              ]
+            ]
+          }
+        ]
+      }
+    }
+  ]
 };
 
 export const with_multiselecttree = {
@@ -205,6 +333,26 @@ export const with_groups = {
 export const with_nested = {
   "and": [
     { "==": [ { "var": "user.info.firstName" }, "abc" ] },
+  ]
+};
+
+export const with_func_tolower_from_field = {
+  "and": [
+    {
+      "==": [
+        {
+          "var": "str"
+        },
+        {
+          "method": [
+            {
+              "var": "str2"
+            },
+            "toLowerCase"
+          ]
+        }
+      ]
+    }
   ]
 };
 

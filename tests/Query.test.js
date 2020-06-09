@@ -7,7 +7,7 @@ import {
   Query, Builder, Utils, BasicConfig,
 } from "react-awesome-query-builder";
 const {
-  getTree,
+  getTree, isValidTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
 
@@ -139,6 +139,33 @@ describe("query with conjunction", () => {
     });
   });
 
+  describe("export with NOT", () => {
+    export_checks(configs.with_number_and_string, inits.with_not_number_and_string, "JsonLogic", {
+      "query": "NOT (num < 2 || login == \"ukrbublik\")",
+      "queryHuman": "NOT (Number < 2 OR login == \"ukrbublik\")",
+      "sql": "NOT (num < 2 OR login = 'ukrbublik')",
+      "mongo": {
+        "num": {
+          "$gte": 2
+        },
+        "login": {
+          "$ne": "ukrbublik"
+        }
+      },
+      "logic": {
+        "!": {
+          "or": [
+            {
+              "<": [ {"var": "num"}, 2 ]
+            }, {
+              "==": [ {"var": "login"}, "ukrbublik" ]
+            }
+          ]
+        }
+      }
+    });
+  });
+
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -213,14 +240,14 @@ describe("query with select", () => {
 
   describe("import", () => {
     it("should work with value of JsonLogic format", () => {
-      with_qb_skins(configs.with_select, inits.with_select, "JsonLogic", (qb) => {
+      with_qb_skins(configs.with_select, inits.with_select_and_multiselect, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
   });
 
   describe("export", () => {
-    export_checks(configs.with_select, inits.with_select, "JsonLogic", {
+    export_checks(configs.with_select, inits.with_select_and_multiselect, "JsonLogic", {
       "query": "(color == \"yellow\" && multicolor == [\"yellow\", \"green\"])",
       "queryHuman": "(Color == \"Yellow\" AND Colors == [\"Yellow\", \"Green\"])",
       "sql": "(color = 'yellow' AND multicolor = 'yellow,green')",
@@ -387,6 +414,43 @@ describe("query with field compare", () => {
 
 describe("query with func", () => {
 
+  it("loads tree with func from JsonLogic", () => {
+    export_checks(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", {
+      "query": "str == LOWER(str2)",
+      "queryHuman": "String == Lowercase(String: String2)",
+      "sql": "str = LOWER(str2)",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            "$str",
+            {
+              "$toLower": "$str2"
+            }
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              {
+                "var": "str"
+              },
+              {
+                "method": [
+                  {
+                    "var": "str2"
+                  },
+                  "toLowerCase"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
   it("set function for number", () => {
     with_qb(configs.with_funcs, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
@@ -455,6 +519,146 @@ describe("query with func", () => {
     });
   });
 
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// query with ops
+
+describe("query with ops", () => {
+  describe("export", () => {
+    export_checks(configs.with_all_types, inits.with_ops, "JsonLogic", {
+      "query": "(num != 2 && str Like \"abc\" && str Not Like \"xyz\" && num >= 1 && num <= 2 && !(num >= 3 && num <= 4) && !num && color IN (\"yellow\") && color NOT IN (\"green\") && multicolor != [\"yellow\"])",
+      "queryHuman": "(Number != 2 AND String Like \"abc\" AND String Not Like \"xyz\" AND Number >= 1 AND Number <= 2 AND NOT(Number >= 3 AND Number <= 4) AND Number IS EMPTY AND Color IN (\"Yellow\") AND Color NOT IN (\"Green\") AND Colors != [\"Yellow\"])",
+      "sql": "(num <> 2 AND str LIKE '%abc%' AND str NOT LIKE '%xyz%' AND num BETWEEN 1 AND 2 AND num NOT BETWEEN 3 AND 4 AND num IS EMPTY AND color IN ('yellow') AND color NOT IN ('green') AND multicolor != 'yellow')",
+      "mongo": {
+        "num": {
+          "$ne": 2,
+          "$gte": 1,
+          "$lte": 2,
+          "$not": {
+            "$gte": 3,
+            "$lte": 4
+          },
+          "$exists": false
+        },
+        "str": {
+          "$regex": "abc",
+          "$not": {
+            "$regex": "xyz"
+          }
+        },
+        "color": {
+          "$in": [
+            "yellow"
+          ],
+          "$nin": [
+            "green"
+          ]
+        },
+        "multicolor": {
+          "$ne": [
+            "yellow"
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "!=": [
+              {
+                "var": "num"
+              },
+              2
+            ]
+          },
+          {
+            "in": [
+              "abc",
+              {
+                "var": "str"
+              }
+            ]
+          },
+          {
+            "!": {
+              "in": [
+                "xyz",
+                {
+                  "var": "str"
+                }
+              ]
+            }
+          },
+          {
+            "<=": [
+              1,
+              {
+                "var": "num"
+              },
+              2
+            ]
+          },
+          {
+            "!": {
+              "<=": [
+                3,
+                {
+                  "var": "num"
+                },
+                4
+              ]
+            }
+          },
+          {
+            "!": {
+              "var": "num"
+            }
+          },
+          {
+            "in": [
+              {
+                "var": "color"
+              },
+              [
+                "yellow"
+              ]
+            ]
+          },
+          {
+            "!": {
+              "in": [
+                {
+                  "var": "color"
+                },
+                [
+                  "green"
+                ]
+              ]
+            }
+          },
+          {
+            "!": {
+              "all": [
+                {
+                  "var": "multicolor"
+                },
+                {
+                  "in": [
+                    {
+                      "var": ""
+                    },
+                    [
+                      "yellow"
+                    ]
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    });
+  });
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -759,7 +963,36 @@ describe("widgets", () => {
     });
   });
 
-  //todo: time, slider, bool, multiselect, select
+  it("change select value", () => {
+    with_qb(configs.with_all_types, inits.with_select, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find(".rule .rule--value .widget--widget select")
+        .simulate("change", { target: { value: "green" } });
+      expect_jlogic([null, {
+        "and": [{  "==": [ { "var": "color" }, "green" ]  }]
+      }]);
+    });
+  });
+
+  it("change multiselect value", () => {
+    with_qb(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find(".rule .rule--value .widget--widget select")
+        .simulate("change", { target: { options: [ {value: "yellow", selected: true}, {value: "green"}, {value: "orange"} ] } });
+      expect_jlogic([null, {
+        "and": [
+          {
+            "all": [
+              { "var": "multicolor" },
+              { "in": [ { "var": "" }, [ "yellow" ] ] }
+            ]
+          }
+        ]
+      }]);
+    });
+  });
+
+  //todo: time, slider, bool
 });
 
 
@@ -810,6 +1043,29 @@ describe("antdesign widgets", () => {
   //todo: datetime, time, slider, bool, multiselect, select, range, slider
 });
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// validation
+
+describe("validation", () => {
+  it("shows error when change number value to > max", () => {
+    with_qb(configs.with_all_types__show_error, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find(".rule .rule--value .widget--widget input")
+        .simulate("change", { target: { value: "200" } });
+      expect_jlogic([null,
+        { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
+      ]);
+      const changedTree = onChange.getCall(0).args[0];
+      const isValid = isValidTree(changedTree);
+      expect(isValid).to.eq(false);
+      
+      const ruleError = qb.find(".rule--error");
+      expect(ruleError).to.have.length(1);
+      expect(ruleError.first().text()).to.eq("Value 200 > max 10");
+    });
+  });
+});
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // drag-n-drop

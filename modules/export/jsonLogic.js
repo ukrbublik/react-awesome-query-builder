@@ -176,7 +176,6 @@ const jsonLogicFormatItem = (item, config, meta, isRoot) => {
     let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
     const _fieldType = fieldDefinition.type || "undefined";
     const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-    const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
 
     // check op
     let isRev = false;
@@ -191,6 +190,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot) => {
     }
 
     // format value
+    const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
     let valueSrcs = [];
     let valueTypes = [];
     let _usedFields = meta.usedFields;
