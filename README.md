@@ -23,7 +23,7 @@ Using awesome [Ant Design](https://ant.design/) v4 for widgets
 - Comparison operators can be:
   - binary (== != < > ..)
   - unary (is empty, is null)
-  - 'between' (for numbers)
+  - 'between' (for numbers, dates, times)
   - complex operators like 'proximity'
 - Values of fields can be compared with:
   - values
