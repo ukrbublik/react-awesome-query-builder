@@ -102,8 +102,12 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
 
 const convertVal = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined) return undefined;
-  
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
+
+  if (!widgetConfig) {
+    meta.errors.push(`No widget for type ${fieldConfig.type}`);
+    return undefined;
+  }
 
   if (isLogic(val)) {
     meta.errors.push(`Unexpected logic in value: ${JSON.stringify(val)}`);
