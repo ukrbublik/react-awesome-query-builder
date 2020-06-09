@@ -276,6 +276,44 @@ export const with_all_types = (BasicConfig) => ({
       },
       allowCustomValues: false
     },
+    selecttree: {
+      label: "Color (tree)",
+      type: "treeselect",
+      fieldSettings: {
+        treeExpandAll: true,
+        listValues: [
+          { value: "1", title: "Warm colors" },
+          { value: "2", title: "Red", parent: "1" },
+          { value: "3", title: "Orange", parent: "1" },
+          { value: "4", title: "Cool colors" },
+          { value: "5", title: "Green", parent: "4" },
+          { value: "6", title: "Blue", parent: "4" },
+          { value: "7", title: "Sub blue", parent: "6" },
+          { value: "8", title: "Sub sub blue and a long text", parent: "7" },
+        ],
+      }
+    },
+    multiselecttree: {
+      label: "Colors (tree)",
+      type: "treemultiselect",
+      fieldSettings: {
+        treeExpandAll: true,
+        listValues: [
+          { value: "1", title: "Warm colors", children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" }
+          ] },
+          { value: "4", title: "Cool colors", children: [
+            { value: "5", title: "Green" },
+            { value: "6", title: "Blue", children: [
+              { value: "7", title: "Sub blue", children: [
+                { value: "8", title: "Sub sub blue and a long text" }
+              ] }
+            ] }
+          ] }
+        ]
+      }
+    },
   },
 });
 

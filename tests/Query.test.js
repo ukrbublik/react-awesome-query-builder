@@ -14,8 +14,7 @@ import AntdConfig from "react-awesome-query-builder/config/antd";
 import * as configs from "./configs";
 import * as inits from "./inits";
 import {
-  with_qb, with_qb_ant, with_qb_skins, empty_value, export_checks, simulate_drag_n_drop, 
-  expect_queries_before_and_after, expect_jlogic_before_and_after, load_tree,
+  with_qb, with_qb_ant, with_qb_skins, empty_value, export_checks, simulate_drag_n_drop, load_tree,
 } from "./utils";
 
 
@@ -389,7 +388,7 @@ describe("query with field compare", () => {
 describe("query with func", () => {
 
   it("set function for number", () => {
-    with_qb(configs.with_funcs, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_funcs, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--valuesrc select")
         .simulate("change", { target: { value: "func" } });
@@ -401,7 +400,7 @@ describe("query with func", () => {
         .at(2)
         .find("input")
         .simulate("change", { target: { value: "4" } });
-      expect_jlogic_before_and_after(configs.with_funcs, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [
           { "var": "num" }, 
           { "+": [ { "*": [ 1, 4 ] }, 0 ] }
@@ -777,7 +776,38 @@ describe("antdesign widgets", () => {
     });
   });
 
-  //todo: datetime, time, slider, bool, multiselect, select + treeselect, treemultiselect, range, slider
+  it("change treeselect value", () => {
+    with_qb_ant(configs.with_all_types, inits.with_treeselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find("TreeSelectWidget")
+        .instance()
+        .handleChange("5");
+      expect_jlogic([null,
+        { "and": [{  "==": [ { "var": "selecttree" }, "5" ]  }] }
+      ]);
+    });
+  });
+
+  it("change multitreeselect value", () => {
+    with_qb_ant(configs.with_all_types, inits.with_multiselecttree, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find("TreeSelectWidget")
+        .instance()
+        .handleChange(["3"]);
+      expect_jlogic([null, {
+        "and": [
+          {
+            "all": [
+              { "var": "multiselecttree" },
+              { "in": [ { "var": "" }, [ "3" ] ] }
+            ]
+          }
+        ]
+      }]);
+    });
+  });
+
+  //todo: datetime, time, slider, bool, multiselect, select, range, slider
 });
 
 

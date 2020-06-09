@@ -51,10 +51,10 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
 
   const tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
-      expect_jlogic_before_and_after(config_fn, value, onChange, jlogics, changeIndex);
+      expect_jlogic_before_and_after(config, value, onChange, jlogics, changeIndex);
     },
     expect_queries: (queries) => {
-      expect_queries_before_and_after(config_fn, value, onChange, queries);
+      expect_queries_before_and_after(config, value, onChange, queries);
     },
     export_checks: (expects) => {
       do_export_checks(config, tree, expects);
@@ -181,7 +181,7 @@ export const simulate_drag_n_drop = (sourceRule, targetRule, coords) => {
 };
   
 export const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
-  const config = config_fn(BasicConfig);
+  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
   const initTreeString = queryString(loadFromJsonLogic(init_value_jl, config), config);
   expect(initTreeString).to.equal(queries[0]);
   
@@ -190,7 +190,7 @@ export const expect_queries_before_and_after = (config_fn, init_value_jl, onChan
 };
   
 export  const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
-  const config = config_fn(BasicConfig);
+  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
   const {logic: initTreeJl} = jsonLogicFormat(loadFromJsonLogic(init_value_jl, config), config);
   if (jlogics[0]) {
     expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));

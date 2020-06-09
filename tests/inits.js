@@ -127,6 +127,21 @@ export const with_datetime = {
   "and": [{  "==": [ { "var": "datetime" }, "2020-05-26T02:30:00.000Z" ]  }]
 };
 
+export const with_treeselect = {
+  "and": [{  "==": [ { "var": "selecttree" }, "2" ]  }]
+};
+
+export const with_multiselecttree = {
+  "and": [
+    {
+      "all": [
+        { "var": "multiselecttree" },
+        { "in": [ { "var": "" }, [ "2", "5" ] ] }
+      ]
+    }
+  ]
+};
+
 export const with_number_and_group_3 = {
   "or": [
     { "==": [ { "var": "num" }, 1 ] },
