@@ -15,6 +15,7 @@ import * as configs from "./configs";
 import * as inits from "./inits";
 import {
   with_qb, with_qb_ant, with_qb_skins, empty_value, export_checks, simulate_drag_n_drop, load_tree,
+  // warning: don't put `export_checks` inside `it`
 } from "./utils";
 
 
@@ -95,7 +96,7 @@ describe("change props", () => {
     });
   });
 
-  it("load tree with another config", () => {
+  describe("load tree with another config", () => {
     with_qb(configs.simple_with_number, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {export_checks}) => {
       export_checks({
         logic: inits.with_number
@@ -414,7 +415,7 @@ describe("query with field compare", () => {
 
 describe("query with func", () => {
 
-  it("loads tree with func from JsonLogic", () => {
+  describe("loads tree with func from JsonLogic", () => {
     export_checks(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", {
       "query": "str == LOWER(str2)",
       "queryHuman": "String == Lowercase(String: String2)",

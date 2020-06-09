@@ -77,14 +77,6 @@ const render_builder = (props) => (
 );
   
 export const empty_value = {id: uuid(), type: "group"};
-  
-export const export_checks = (config_fn, value, valueFormat, expects) => {
-  const config = config_fn(BasicConfig);
-  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
-  const tree = checkTree(loadFn(value, config), config);
-
-  do_export_checks(config, tree, expects);
-};
 
 export const do_export_checks = (config, tree, expects) => {
   if (expects) {
@@ -103,7 +95,7 @@ export const do_export_checks = (config, tree, expects) => {
         expect(res).to.equal(expects["sql"]);
       });
     }
-  
+    
     if (expects["mongo"] !== undefined) {
       it("should work to MongoDb", () => {
         const res = mongodbFormat(tree, config);
@@ -136,6 +128,14 @@ export const do_export_checks = (config, tree, expects) => {
     console.log(stringify(correct, undefined, 2));
   }
     
+};
+  
+export const export_checks = (config_fn, value, valueFormat, expects) => {
+  const config = config_fn(BasicConfig);
+  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
+  const tree = checkTree(loadFn(value, config), config);
+
+  do_export_checks(config, tree, expects);
 };
   
 const createBubbledEvent = (type, props = {}) => {
