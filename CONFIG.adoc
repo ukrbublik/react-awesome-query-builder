@@ -179,7 +179,7 @@ const myConfig = {
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
 |fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
-  `(mixed val, Object fieldSettings) => boolean | string | null`
+  `(mixed val, Object fieldSettings) => boolean \| string \| null`
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
