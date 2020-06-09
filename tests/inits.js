@@ -96,6 +96,13 @@ export const with_2_numbers = {
   ]
 };
 
+export const with_num_and_num2 = {
+  "and": [
+    { "==": [ { "var": "num" }, 2 ] },
+    { "==": [ { "var": "num2" }, 3 ] }
+  ]
+};
+
 export const with_group = {
   "or": [{
     "and": [

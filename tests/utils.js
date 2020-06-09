@@ -14,6 +14,10 @@ const {
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
 
+export const load_tree = (valueFormat, value, config) => {
+  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
+  return checkTree(loadFn(value, config), config);
+};
 
 export  const with_qb = (config_fn, value, valueFormat, checks) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
@@ -30,22 +34,34 @@ export  const with_qb_skins = (config_fn, value, valueFormat, checks) => {
   
 const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
   const config = config_fn(BasicConfig);
-  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
   const onChange = sinon.spy();
+  const tree = load_tree(valueFormat, value, config);
   let qb;
   
   act(() => {
     qb = mount(
       <Query
         {...config}
-        value={checkTree(loadFn(value, config), config)}
+        value={tree}
         renderBuilder={render_builder}
         onChange={onChange}
       />
     );
   });
+
+  const tasks = {
+    expect_jlogic: (jlogics, changeIndex = 0) => {
+      expect_jlogic_before_and_after(config_fn, value, onChange, jlogics, changeIndex);
+    },
+    expect_queries: (queries) => {
+      expect_queries_before_and_after(config_fn, value, onChange, queries);
+    },
+    export_checks: (expects) => {
+      do_export_checks(config, tree, expects);
+    },
+  };
   
-  checks(qb, onChange);
+  checks(qb, onChange, tasks);
     
   qb.unmount();
     
@@ -62,36 +78,48 @@ const render_builder = (props) => (
   
 export const empty_value = {id: uuid(), type: "group"};
   
-export const do_export_checks = (config_fn, value, valueFormat, expects) => {
+export const export_checks = (config_fn, value, valueFormat, expects) => {
   const config = config_fn(BasicConfig);
   const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
   const tree = checkTree(loadFn(value, config), config);
-    
+
+  do_export_checks(config, tree, expects);
+};
+
+export const do_export_checks = (config, tree, expects) => {
   if (expects) {
-    it("should work to query string", () => {
-      const res = queryString(tree, config);
-      expect(res).to.equal(expects["query"]);
-      const res2 = queryString(tree, config, true);
-      expect(res2).to.equal(expects["queryHuman"]);
-    });
+    if (expects["query"] !== undefined) {
+      it("should work to query string", () => {
+        const res = queryString(tree, config);
+        expect(res).to.equal(expects["query"]);
+        const res2 = queryString(tree, config, true);
+        expect(res2).to.equal(expects["queryHuman"]);
+      });
+    }
   
-    it("should work to SQL", () => {
-      const res = sqlFormat(tree, config);
-      expect(res).to.equal(expects["sql"]);
-    });
+    if (expects["sql"] !== undefined) {
+      it("should work to SQL", () => {
+        const res = sqlFormat(tree, config);
+        expect(res).to.equal(expects["sql"]);
+      });
+    }
   
-    it("should work to MongoDb", () => {
-      const res = mongodbFormat(tree, config);
-      expect(res).to.eql(expects["mongo"]);
-    });
+    if (expects["mongo"] !== undefined) {
+      it("should work to MongoDb", () => {
+        const res = mongodbFormat(tree, config);
+        expect(res).to.eql(expects["mongo"]);
+      });
+    }
   
-    it("should work to JsonLogic", () => {
-      const {logic, data, errors} = jsonLogicFormat(tree, config);
-      const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
-      expect(safe_logic).to.eql(expects["logic"]);
-      if (expects["logic"])
-        expect(errors).to.eql([]);
-    });
+    if (expects["logic"] !== undefined) {
+      it("should work to JsonLogic", () => {
+        const {logic, data, errors} = jsonLogicFormat(tree, config);
+        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
+        expect(safe_logic).to.eql(expects["logic"]);
+        if (expects["logic"])
+          expect(errors).to.eql([]);
+      });
+    }
   
     it("should work to QueryBuilder", () => {
       const res = queryBuilderFormat(tree, config);

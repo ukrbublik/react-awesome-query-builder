@@ -14,8 +14,8 @@ import AntdConfig from "react-awesome-query-builder/config/antd";
 import * as configs from "./configs";
 import * as inits from "./inits";
 import {
-  with_qb, with_qb_ant, with_qb_skins, empty_value, do_export_checks, simulate_drag_n_drop, 
-  expect_queries_before_and_after, expect_jlogic_before_and_after,
+  with_qb, with_qb_ant, with_qb_skins, empty_value, export_checks, simulate_drag_n_drop, 
+  expect_queries_before_and_after, expect_jlogic_before_and_after, load_tree,
 } from "./utils";
 
 
@@ -57,7 +57,7 @@ describe("basic query", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.simple_with_number, inits.tree_with_number, "default", {
+    export_checks(configs.simple_with_number, inits.tree_with_number, "default", {
       query: "num == 2",
       queryHuman: "Number == 2",
       sql: "num = 2",
@@ -67,6 +67,40 @@ describe("basic query", () => {
           { "==": [{ "var": "num" }, 2] }
         ]
       },
+    });
+  });
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// change props
+
+describe("change props", () => {
+  it("change tree via props triggers onChange", () => {
+    with_qb(configs.simple_with_2_numbers, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb.setProps({
+        value: load_tree("JsonLogic", inits.with_number, configs.simple_with_2_numbers(BasicConfig))
+      });
+      expect_jlogic([null, inits.with_number]);
+      expect(onChange.getCall(1)).to.equal(null);
+    });
+  });
+
+  it("change config via props triggers onChange", () => {
+    with_qb(configs.simple_with_2_numbers, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      const config_without_num2 = configs.simple_with_number(BasicConfig);
+      qb.setProps({
+        ...config_without_num2,
+      });
+      expect_jlogic([null, inits.with_number]);
+      expect(onChange.getCall(1)).to.equal(null);
+    });
+  });
+
+  it("load tree with another config", () => {
+    with_qb(configs.simple_with_number, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {export_checks}) => {
+      export_checks({
+        logic: inits.with_number
+      });
     });
   });
 });
@@ -84,7 +118,7 @@ describe("query with conjunction", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.with_number_and_string, inits.with_number_and_string, "JsonLogic", {
+    export_checks(configs.with_number_and_string, inits.with_number_and_string, "JsonLogic", {
       query: '(num < 2 || login == "ukrbublik")',
       queryHuman: '(Number < 2 OR login == "ukrbublik")',
       sql: "(num < 2 OR login = 'ukrbublik')",
@@ -122,7 +156,7 @@ describe("query with subquery and datetime types", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", {
+    export_checks(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", {
       "query": "(datetime == \"2020-05-18 21:50:01\" || (date == \"2020-05-18\" && time == \"00:50:00\"))",
       "queryHuman": "(DateTime == \"18.05.2020 21:50\" OR (Date == \"18.05.2020\" AND Time == \"00:50\"))",
       "sql": "(datetime = '2020-05-18 21:50:01.000' OR (date = '2020-05-18' AND time = '00:50:00'))",
@@ -187,7 +221,7 @@ describe("query with select", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.with_select, inits.with_select, "JsonLogic", {
+    export_checks(configs.with_select, inits.with_select, "JsonLogic", {
       "query": "(color == \"yellow\" && multicolor == [\"yellow\", \"green\"])",
       "queryHuman": "(Color == \"Yellow\" AND Colors == [\"Yellow\", \"Green\"])",
       "sql": "(color = 'yellow' AND multicolor = 'yellow,green')",
@@ -246,7 +280,7 @@ describe("query with !struct", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", {
+    export_checks(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", {
       "query": "((results.slider == 22 && results.stock == true) && user.firstName == \"abc\" && !!user.login)",
       "queryHuman": "((Results.Slider == 22 AND Results.In stock) AND Username == \"abc\" AND User.login IS NOT EMPTY)",
       "sql": "((results.slider = 22 AND results.stock = true) AND user.firstName = 'abc' AND user.login IS NOT EMPTY)",
@@ -319,7 +353,7 @@ describe("query with field compare", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.simple_with_2_numbers, inits.with_number_field_compare, "JsonLogic", {
+    export_checks(configs.simple_with_2_numbers, inits.with_number_field_compare, "JsonLogic", {
       "query": "num == num2",
       "queryHuman": "Number == Number2",
       "sql": "num = num2",
@@ -374,7 +408,7 @@ describe("query with func", () => {
         ] }] }
       ], 2);
       const updatedTree = onChange.getCall(2).args[0];
-      do_export_checks(configs.with_funcs, updatedTree, "default", {
+      export_checks(configs.with_funcs, updatedTree, "default", {
         "query": "num == (1 * 4 + 0)",
         "queryHuman": "Number == (1 * 4 + 0)",
         "sql": "num = (1 * 4 + 0)",
@@ -473,7 +507,7 @@ describe("proximity", () => {
   });
 
   describe("export", () => {
-    do_export_checks(configs.with_prox, inits.with_prox, "default", {
+    export_checks(configs.with_prox, inits.with_prox, "default", {
       "query": "str \"a\" NEAR/3 \"b\"",
       "queryHuman": "String \"a\" NEAR/3 \"b\"",
       "sql": "CONTAINS(str, 'NEAR((a, b), 3)')"
@@ -596,47 +630,47 @@ describe("interactions on vanilla", () => {
   });
 
   it("set not", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find('.group--conjunctions input[type="checkbox"]')
         .simulate("change", { target: { checked: true } });
-      expect_jlogic_before_and_after(configs.simple_with_numbers_and_str, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "!" : { "and": [{ "==": [ { "var": "num" }, 2 ] }] } }
       ]);
     });
   });
 
   it("change conjunction from AND to OR", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find('.group--conjunctions input[type="radio"][value="OR"]')
         .simulate("change", { target: { value: "OR" } });
-      expect_jlogic_before_and_after(configs.simple_with_numbers_and_str, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "or": [{ "==": [ { "var": "num" }, 2 ] }] }
       ]);
     });
   });
 
   it("change value source to another field of same type", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--valuesrc select")
         .simulate("change", { target: { value: "field" } });
       qb
         .find(".rule .rule--value .widget--widget select")
         .simulate("change", { target: { value: "num2" } });
-      expect_jlogic_before_and_after(configs.simple_with_numbers_and_str, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [ { "var": "num" }, { "var": "num2" } ] }] }
       ], 1);
     });
   });
 
   it("change op from equal to not_equal", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--operator select")
         .simulate("change", { target: { value: "not_equal" } });
-      expect_jlogic_before_and_after(configs.simple_with_numbers_and_str, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "!=": [ { "var": "num" }, 2 ] }] }
       ]);
     });
@@ -650,24 +684,24 @@ describe("interactions on vanilla", () => {
 describe("interactions on antd", () => {
 
   it("set not", () => {
-    with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".group--conjunctions .ant-btn-group button")
         .at(0)
         .simulate("click");
-      expect_jlogic_before_and_after(configs.simple_with_numbers_and_str, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "!" : { "and": [{ "==": [ { "var": "num" }, 2 ] }] } }
       ]);
     });
   });
 
   it("change conjunction from AND to OR", () => {
-    with_qb_ant(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange) => {
+    with_qb_ant(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".group--conjunctions .ant-btn-group button")
         .at(2)
         .simulate("click");
-      expect_jlogic_before_and_after(configs.simple_with_numbers_and_str, inits.with_2_numbers, onChange, [null,
+      expect_jlogic([null,
         { "or": [
           { "==": [ { "var": "num" }, 2 ] },
           { "==": [ { "var": "num" }, 3 ] }
@@ -683,44 +717,44 @@ describe("interactions on antd", () => {
 
 describe("widgets", () => {
   it("change number value", () => {
-    with_qb_skins(configs.with_all_types, inits.with_number, "JsonLogic", (qb, onChange) => {
+    with_qb_skins(configs.with_all_types, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "3" } });
-      expect_jlogic_before_and_after(configs.with_all_types, inits.with_number, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [ { "var": "num" }, 3 ] }] }
       ]);
     });
   });
 
   it("change text value", () => {
-    with_qb_skins(configs.with_all_types, inits.with_text, "JsonLogic", (qb, onChange) => {
+    with_qb_skins(configs.with_all_types, inits.with_text, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "def" } });
-      expect_jlogic_before_and_after(configs.with_all_types, inits.with_text, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [ { "var": "str" }, "def" ] }] }
       ]);
     });
   });
 
   it("change date value", () => {
-    with_qb(configs.with_all_types, inits.with_date, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_all_types, inits.with_date, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "2020-05-05" } });
-      expect_jlogic_before_and_after(configs.with_all_types, inits.with_date, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
       ]);
     });
   });
 
   it("change datetime value", () => {
-    with_qb(configs.with_all_types, inits.with_datetime, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_all_types, inits.with_datetime, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "2020-05-05T02:30" } });
-      expect_jlogic_before_and_after(configs.with_all_types, inits.with_datetime, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [ { "var": "datetime" }, "2020-05-05T02:30:00.000Z" ] }] }
       ]);
     });
@@ -732,12 +766,12 @@ describe("widgets", () => {
 
 describe("antdesign widgets", () => {
   it("change date value", () => {
-    with_qb_ant(configs.with_all_types, inits.with_date, "JsonLogic", (qb, onChange) => {
+    with_qb_ant(configs.with_all_types, inits.with_date, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find("DateWidget")
         .instance()
         .handleChange(moment("2020-05-05"));
-      expect_jlogic_before_and_after(configs.with_all_types, inits.with_date, onChange, [null,
+      expect_jlogic([null,
         { "and": [{ "==": [ { "var": "date" }, "2020-05-05T00:00:00.000Z" ] }] }
       ]);
     });
@@ -753,7 +787,7 @@ describe("antdesign widgets", () => {
 describe("drag-n-drop", () => {
 
   it("should move rule after second rule", () => {
-    with_qb(configs.simple_with_number, inits.with_group, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_number, inits.with_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
       const firstRule = qb.find(".rule").at(0);
       const secondRule = qb.find(".rule").at(1);
 
@@ -766,7 +800,7 @@ describe("drag-n-drop", () => {
         "mousePos":      {"clientX":80,"clientY":135}
       });
 
-      expect_queries_before_and_after(configs.simple_with_number, inits.with_group, onChange, [
+      expect_queries([
         "(num == 1 && num == 2)",
         "(num == 2 && num == 1)"
       ]);
@@ -774,7 +808,7 @@ describe("drag-n-drop", () => {
   });
 
   it("should move group before rule", () => {
-    with_qb(configs.simple_with_number, inits.with_number_and_group, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_number, inits.with_number_and_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
       const firstRule = qb.find(".rule").at(0);
       const group = qb.find(".group--children .group").at(0);
 
@@ -787,7 +821,7 @@ describe("drag-n-drop", () => {
         "mousePos":{"clientX":213,"clientY":124}
       });
 
-      expect_queries_before_and_after(configs.simple_with_number, inits.with_number_and_group, onChange, [
+      expect_queries([
         "(num == 1 || (num == 2 && num == 3))",
         "((num == 2 && num == 3) || num == 1)"
       ]);
@@ -796,7 +830,7 @@ describe("drag-n-drop", () => {
 
   it("should move rule into group", () => {
     const do_test = (config, value, checks) => {
-      with_qb(config, value, "JsonLogic", (qb, onChange) => {
+      with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
         const secondRule = qb.find(".rule").at(1);
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
@@ -810,25 +844,25 @@ describe("drag-n-drop", () => {
           "mousePos":{"clientX":105,"clientY":185}
         });
 
-        checks(config, value, onChange);
+        checks(config, value, onChange, tasks);
       });
     };
 
-    do_test(configs.simple_with_number, inits.with_numbers_and_group, (config, value, onChange) => {
-      expect_queries_before_and_after(config, value, onChange, [
+    do_test(configs.simple_with_number, inits.with_numbers_and_group, (config, value, onChange, {expect_queries}) => {
+      expect_queries([
         "(num == 1 || num == 2 || (num == 3 && num == 4))",
         "(num == 1 || (num == 2 && num == 3 && num == 4))"
       ]);
     });
     
-    do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange) => {
+    do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
       sinon.assert.notCalled(onChange);
     });
   });
 
   it("should move rule out of group", () => {
     const do_test = (config, value, checks) => {
-      with_qb(config, value, "JsonLogic", (qb, onChange) => {
+      with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
         const firstRuleInGroup = qb.find(".rule").at(1);
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
@@ -842,24 +876,24 @@ describe("drag-n-drop", () => {
           "mousePos":{"clientX":104,"clientY":100}
         });
   
-        checks(config, value, onChange);
+        checks(config, value, onChange, tasks);
       });
     };
 
-    do_test(configs.simple_with_number, inits.with_number_and_group_3, (config, value, onChange) => {
-      expect_queries_before_and_after(config, value, onChange, [
+    do_test(configs.simple_with_number, inits.with_number_and_group_3, (config, value, onChange, {expect_queries}) => {
+      expect_queries([
         "(num == 1 || (num == 2 && num == 3 && num == 4))",
         "(num == 1 || num == 2 || (num == 3 && num == 4))"
       ]);
     });
     
-    do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange) => {
+    do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange, _tasks) => {
       sinon.assert.notCalled(onChange);
     });
   });
 
   it("should move group before group", () => {
-    with_qb(configs.simple_with_number_without_regroup, inits.with_groups, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.simple_with_number_without_regroup, inits.with_groups, "JsonLogic", (qb, onChange, {expect_queries}) => {
       const firstGroup = qb.find(".group--children .group").at(0);
       const secondGroup = qb.find(".group--children .group").at(1);
       const firstGroupHeader = firstGroup.find(".group--header").first();
@@ -874,7 +908,7 @@ describe("drag-n-drop", () => {
         "mousePos":{"clientX":197,"clientY":104}
       });
 
-      expect_queries_before_and_after(configs.simple_with_number_without_regroup, inits.with_groups, onChange, [
+      expect_queries([
         "((num == 1 && num == 2) || (num == 3 && num == 4))",
         "((num == 3 && num == 4) || (num == 1 && num == 2))"
       ]);
