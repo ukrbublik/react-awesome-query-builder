@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.1
+  - Fixed export of `not_like` op to JsonLogic
 - 2.1.0
   - Added displaying of rule validation errors, see `showErrorMessage` in config.settings
   - Added `QbUtils.isValidTree()`
