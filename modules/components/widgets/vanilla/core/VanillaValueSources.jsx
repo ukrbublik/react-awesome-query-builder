@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) => {
   const renderOptions = (valueSources) => (
     valueSources.map(([srcKey, info]) => (
-        <option key={srcKey} value={srcKey}>{info.label}</option>
+      <option key={srcKey} value={srcKey}>{info.label}</option>
     ))
   );
 

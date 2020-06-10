@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
 export default ({items, setField, selectedKey, readonly}) => {
   const renderOptions = (fields) => (
     Object.keys(fields).map(fieldKey => {
-        const field = fields[fieldKey];
-        const {items, path, label, disabled} = field;
-        if (items) {
-            return <optgroup disabled={disabled} key={path} label={label}>{renderOptions(items)}</optgroup>;
-        } else {
-            return <option disabled={disabled} key={path} value={path}>{label}</option>;
-        }
+      const field = fields[fieldKey];
+      const {items, path, label, disabled} = field;
+      if (items) {
+        return <optgroup disabled={disabled} key={path} label={label}>{renderOptions(items)}</optgroup>;
+      } else {
+        return <option disabled={disabled} key={path} value={path}>{label}</option>;
+      }
     })
   );
 

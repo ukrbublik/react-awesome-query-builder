@@ -1,7 +1,8 @@
-import uuid from '../utils/uuid';
-import {defaultRuleProperties, defaultGroupProperties} from '../utils/defaultUtils';
-import * as constants from '../constants';
-import Immutable from 'immutable';
+import uuid from "../utils/uuid";
+import {defaultRuleProperties, defaultGroupProperties} from "../utils/defaultUtils";
+import * as constants from "../constants";
+import Immutable from "immutable";
+
 
 
 /**

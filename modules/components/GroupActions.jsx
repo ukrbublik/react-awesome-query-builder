@@ -1,14 +1,14 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent } from "react";
 
 const groupActionsPositionList = {
-  topLeft: 'group--actions--tl',
-  topCenter: 'group--actions--tc',
-  topRight: 'group--actions--tr',
-  bottomLeft: 'group--actions--bl',
-  bottomCenter: 'group--actions--bc',
-  bottomRight: 'group--actions--br'
-}
-const defaultPosition = 'topRight';
+  topLeft: "group--actions--tl",
+  topCenter: "group--actions--tc",
+  topRight: "group--actions--tr",
+  bottomLeft: "group--actions--bl",
+  bottomCenter: "group--actions--bc",
+  bottomRight: "group--actions--br"
+};
+const defaultPosition = "topRight";
 
 
 export class GroupActions extends PureComponent {
@@ -38,6 +38,6 @@ export class GroupActions extends PureComponent {
           {delGroupBtn}
         </BtnGrp>
       </div>
-    )
+    );
   }
 }

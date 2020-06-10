@@ -58,8 +58,6 @@ const {
         not_like,
         between,
         not_between,
-        range_between, // like `between`, but for slider
-        range_not_between,
         is_empty,
         is_not_empty,
         select_equals, // like `equal`, but for select
@@ -130,6 +128,10 @@ const myConfig = {
   qty: {
     type: 'number',
     label: 'Quantity',
+    fieldSettings: {
+      min: 0,
+      max: 100,
+    }
   },
   // complex
   user: {
@@ -141,6 +143,9 @@ const myConfig = {
         type: 'text',
         label: 'Name',
         label2: 'User name', //optional, see below
+        fieldSettings: {
+          validateValue: (val, _fieldSettings) => (val.length <= 20),
+        }
       },
     },
   },
@@ -173,6 +178,8 @@ const myConfig = {
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
+|fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
+  `(mixed val, Object fieldSettings) => boolean \| string \| null`
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
@@ -256,6 +263,7 @@ Behaviour settings:
 |immutableFieldsMode |false |Not allow to change fields
 |immutableOpsMode |false |Not allow to change operators
 |immutableValuesMode |false |Not allow to change values
+|showErrorMessage |false |Show error message in QueryBuilder if validateValue() in field config returns false
 |setOpOnChangeField |`['keep', 'default']` |Strategies for selecting operator for new field (used by order until success): +
   `default` (default if present), `keep` (keep prev from last field), `first`, `none`
 |clearValueOnChangeField |false |Clear value on field change? false - if prev & next fields have same type (widget), keep
@@ -279,7 +287,7 @@ Render settings:
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
-|renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
+|renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
 |hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
@@ -471,7 +479,6 @@ const {
     factory: (props) => <TextWidget {...props} />,
     formatValue: (val, _fieldDef, _wgtDef, isForDisplay) => (isForDisplay ? '"' + val + '"' : JSON.stringify(val)),
     mongoFormatValue: (val, _fieldDef, _wgtDef) => (val),
-    validateValue: (val, _fieldDef) => (val.length < 5),
     // Options:
     valueLabel: "Text",
     valuePlaceholder: "Enter text",
@@ -497,8 +504,6 @@ const {
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
 |jsonLogic |- for http://jsonlogic.com[JsonLogic] |v => v |Function for formatting widget's value for JsonLogic. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
-|validateValue | | |Function to validate entered value. +
-  `(mixed val, Object fieldDef) => boolean`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`

@@ -1,1 +1,1 @@
-export { default as ProximityOperator } from './Proximity';
+export { default as ProximityOperator } from "./Proximity";

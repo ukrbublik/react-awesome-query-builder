@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "2.0.11",
+  "version": "2.1.1",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "reactjs",
@@ -20,7 +20,9 @@
     "build-examples": "./scripts/build-examples.sh",
     "examples": "cd examples && npm i && npm start",
     "start": "npm run examples",
-    "test": "karma start karma.conf.js"
+    "test": "karma start karma.conf.js",
+    "lint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --fix ./modules/",
+    "lint": "./node_modules/.bin/eslint --ext .jsx --ext .js ./modules/"
   },
   "readme": "README.md",
   "repository": {
@@ -74,6 +76,7 @@
     "@types/react": "^16.4.1",
     "@types/react-dom": "^16.4.1",
     "antd": "^4.1.2",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-import": "^1.13.0",
     "babel-plugin-istanbul": "^6.0.0",
@@ -83,6 +86,9 @@
     "css-loader": "^3.2.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
+    "eslint": "^7.1.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-react": "^7.20.0",
     "fibers": "^4.0.2",
     "file-loader": "^5.0.2",
     "karma": "^5.0.9",

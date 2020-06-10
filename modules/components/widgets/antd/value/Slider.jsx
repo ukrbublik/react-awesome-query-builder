@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { Slider, InputNumber, Col } from 'antd';
-import {useOnPropsChanged} from '../../../../utils/stuff';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { Slider, InputNumber, Col } from "antd";
+import {useOnPropsChanged} from "../../../../utils/stuff";
 const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends PureComponent {
@@ -32,10 +32,10 @@ export default class SliderWidget extends PureComponent {
   }
 
   constructor(props) {
-      super(props);
-      useOnPropsChanged(this);
+    super(props);
+    useOnPropsChanged(this);
 
-      this.state.internalValue = props.value;
+    this.state.internalValue = props.value;
   }
 
   onPropsChanged(nextProps) {
@@ -43,7 +43,7 @@ export default class SliderWidget extends PureComponent {
   }
 
   handleChange = (val) => {
-    if (val === '')
+    if (val === "")
       val = undefined;
     if (__isInternal)
       this.setState({internalValue: val});
@@ -60,18 +60,19 @@ export default class SliderWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step, marks, readonly} = this.props;
-    const {renderSize} = config.settings;
+    const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
+    const {renderSize, showErrorMessage} = config.settings;
     const _customProps = customProps || {};
 
-    let _value = __isInternal ? this.state.internalValue : value;
+    const canUseInternal = showErrorMessage ? true : !valueError;
+    let _value = __isInternal && canUseInternal ? this.state.internalValue : value;
     if (_value == undefined)
       _value = null;
     const sliderValue = _value == null && min ? min : _value;
       
     return (
-      <Col style={{display: 'inline-flex'}}>
-        <Col style={{float: 'left', marginRight: '5px'}}>
+      <Col style={{display: "inline-flex"}}>
+        <Col style={{float: "left", marginRight: "5px"}}>
           <InputNumber
             disabled={readonly}
             size={renderSize}
@@ -84,7 +85,7 @@ export default class SliderWidget extends PureComponent {
             {...customProps}
           />
         </Col>
-        <Col style={{float: 'left', width: _customProps.width || '300px'}}>
+        <Col style={{float: "left", width: _customProps.width || "300px"}}>
           <Slider
             disabled={readonly}
             value={sliderValue}
@@ -98,7 +99,7 @@ export default class SliderWidget extends PureComponent {
             {...customProps}
           />
         </Col>
-        <Col style={{clear: 'both'}} />
+        <Col style={{clear: "both"}} />
       </Col>
     );
   }

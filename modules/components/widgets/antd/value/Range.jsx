@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { Slider, InputNumber, Col } from 'antd';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { Slider, InputNumber, Col } from "antd";
 
 export default class RangeWidget extends PureComponent {
 
@@ -31,54 +31,60 @@ export default class RangeWidget extends PureComponent {
 
   state = {
   }
-  
+
+  constructor(props) {
+    super(props);
+
+    const [valueFrom, valueTo] = props.value || [null, null];
+    if (props.value && (valueFrom == undefined || valueTo == undefined)) {
+      // happens if we changed op from '==' to 'between'
+      // (I know, timeout is dirty hack..)
+      setTimeout(() => {
+        const oneValue = valueFrom || valueTo;
+        const value = [oneValue, oneValue];
+        this.props.setValue(value);
+      }, 1);
+    }
+  }
+
   handleChange = (value) => {
     this.props.setValue(value);
   }
 
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
-    if (valueFrom == '' || valueFrom == null)
-      valueFrom = value[0];
+    if (valueFrom == "" || valueFrom == null)
+      valueFrom = undefined; //value[0];
     value = [...value];
     value[0] = valueFrom;
-    if (value[1] == undefined)
-      value[1] = valueFrom;
+    // if (value[1] == undefined)
+    //   value[1] = valueFrom;
     this.props.setValue(value);
   }
   
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
-    if (valueTo == '' || valueTo == null)
-      valueTo = value[1];
+    if (valueTo == "" || valueTo == null)
+      valueTo = undefined; //value[1];
     value = [...value];
     value[1] = valueTo;
-    if (value[0] == undefined)
-      value[0] = valueTo;
+    // if (value[0] == undefined)
+    //   value[0] = valueTo;
     this.props.setValue(value);
   }
 
-  tipFormatter = (val) => (val != undefined ? val.toString() : '')
+  tipFormatter = (val) => (val != undefined ? val.toString() : "")
 
   render() {
-    const {config, placeholder, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
+    const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
     const {renderSize} = config.settings;
     const _customProps = customProps || {};
     const _value = value != undefined ? value : undefined;
     const [valueFrom, valueTo] = _value || [null, null];
 
-    if (_value && (valueFrom == undefined || valueTo == undefined)) {
-      // happens if we change value source - this leads to incomplete slider value, fix it:
-      if (valueFrom == undefined)
-        this.handleChangeTo(valueTo);
-      if (valueTo == undefined)
-        this.handleChangeFrom(valueFrom);
-      return null;
-    }
-
     return (
-      <Col style={{display: 'inline-flex'}}>
-        <Col style={{float: 'left', marginRight: '5px'}}>
+      <Col style={{display: "inline-flex"}}>
+        <Col style={{float: "left", marginRight: "5px"}}>
           <InputNumber
             disabled={readonly}
             size={renderSize}
@@ -92,10 +98,10 @@ export default class RangeWidget extends PureComponent {
             {...customProps}
           />
         </Col>
-        <Col style={{float: 'left', marginRight: '5px', lineHeight: '20px'}}>
+        <Col style={{float: "left", marginRight: "5px", lineHeight: "20px"}}>
           <span>{ textSeparators[1] }</span>
         </Col>
-        <Col style={{float: 'left', marginRight: '5px'}}>
+        <Col style={{float: "left", marginRight: "5px"}}>
           <InputNumber
             disabled={readonly}
             size={renderSize}
@@ -109,7 +115,7 @@ export default class RangeWidget extends PureComponent {
             {...customProps}
           />
         </Col>
-        <Col style={{float: 'left', width: _customProps.width || '300px'}}>
+        <Col style={{float: "left", width: _customProps.width || "300px"}}>
           <Slider
             disabled={readonly}
             value={_value}
@@ -120,12 +126,11 @@ export default class RangeWidget extends PureComponent {
             marks={marks}
             included={false}
             range={true}
-            //placeholder={placeholder}
             onChange={this.handleChange}
             {...customProps}
           />
         </Col>
-        <Col style={{clear: 'both'}} />
+        <Col style={{clear: "both"}} />
       </Col>
     );
   }

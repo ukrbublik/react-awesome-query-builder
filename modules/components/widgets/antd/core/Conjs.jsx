@@ -1,8 +1,6 @@
-import React, { PureComponent } from 'react';
-import map from 'lodash/map';
-import { Button, Radio } from 'antd';
-const RadioButton = Radio.Button;
-const RadioGroup = Radio.Group;
+import React, { PureComponent } from "react";
+import map from "lodash/map";
+import { Button, Radio } from "antd";
 const ButtonGroup = Button.Group;
 
 
@@ -42,8 +40,8 @@ export default class ConjsButtons extends PureComponent {
         size={config.settings.renderSize}
         disabled={disabled || readonly}
       >
-        {config.settings.showNot && (readonly ? not : true) &&
-          <Button
+        {config.settings.showNot && (readonly ? not : true)
+          && <Button
             key={"group-not"}
             onClick={this.setNot}
             type={not ? "primary" : null}
@@ -64,6 +62,9 @@ export default class ConjsButtons extends PureComponent {
 }
 
 // obsolete
+/*
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 class ConjsRadios extends PureComponent {
   setConjunction = (e) => {
     const {setConjunction} = this.props;
@@ -92,3 +93,4 @@ class ConjsRadios extends PureComponent {
     );
   }
 }
+*/

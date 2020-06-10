@@ -1,5 +1,5 @@
-import React from 'react';
-import {mapListValues} from '../../../../utils/stuff';
+import React from "react";
+import {mapListValues} from "../../../../utils/stuff";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
   const renderOptions = () => 

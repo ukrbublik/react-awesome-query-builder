@@ -1,13 +1,12 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import Rule from './Rule';
-import Group from './Group';
-import RuleGroup from './RuleGroup';
-
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import Rule from "./Rule";
+import Group from "./Group";
+import RuleGroup from "./RuleGroup";
 
 const typeMap = {
   rule: (props) => (
-    <Rule 
+    <Rule
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}

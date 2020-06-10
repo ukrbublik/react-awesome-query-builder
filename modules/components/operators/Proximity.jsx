@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import range from 'lodash/range';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import range from "lodash/range";
 
 export default class Proximity extends PureComponent {
   static propTypes = {
@@ -27,7 +27,7 @@ export default class Proximity extends PureComponent {
   };
 
   handleChange = (value) => {
-    this.props.setOption('proximity', parseInt(value));
+    this.props.setOption("proximity", parseInt(value));
   }
 
   render() {
@@ -38,19 +38,19 @@ export default class Proximity extends PureComponent {
     const {settings, widgets} = config;
     const defaultProximity = defaults ? defaults.proximity : undefined;
     const {showLabels} = settings;
-    const selectedProximity = options.get('proximity', defaultProximity);
+    const selectedProximity = options.get("proximity", defaultProximity);
     const listValues = range(minProximity, maxProximity + 1).map((item) => ({title: item, value: item}));
     const Select = widgets.select.factory;
 
     return (
       <div className="operator--PROXIMITY">
         <div className="operator--options">
-          { showLabels &&
-            <label>{optionLabel}</label>
+          { showLabels
+            && <label>{optionLabel}</label>
           }
-          { !showLabels && optionTextBefore &&
-            <div className="operator--options--sep">
-                <span>{optionTextBefore}</span>
+          { !showLabels && optionTextBefore
+            && <div className="operator--options--sep">
+              <span>{optionTextBefore}</span>
             </div>
           }
           <Select

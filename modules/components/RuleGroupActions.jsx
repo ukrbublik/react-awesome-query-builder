@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent } from "react";
 
 export class RuleGroupActions extends PureComponent {
   render() {
@@ -17,10 +17,10 @@ export class RuleGroupActions extends PureComponent {
     />;
 
     return (
-      <div className={`group--actions`}>
+      <div className={"group--actions"}>
         {addRuleBtn}
         {/*delGroupBtn*/}
       </div>
-    )
+    );
   }
 }

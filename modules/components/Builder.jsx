@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import Immutable, {Map} from 'immutable';
-import Item from '../components/Item';
-import SortableContainer from './containers/SortableContainer';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import Immutable, {Map} from "immutable";
+import Item from "../components/Item";
+import SortableContainer from "./containers/SortableContainer";
 import {getTotalNodesCountInTree} from "../utils/treeUtils";
 import uuid from "../utils/uuid";
 import {pureShouldComponentUpdate} from "../utils/renderUtils";
@@ -18,23 +18,23 @@ export default class Builder extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-      const prevProps = this.props;
-      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
-      if (should) {
-        let chs = [];
-        for (let k in nextProps) {
-            let changed = (nextProps[k] !== prevProps[k]);
-            if (changed && k != '__isInternalValueChange') {
-              chs.push(k);
-            }
+    const prevProps = this.props;
+    let should = pureShouldComponentUpdate(this)(nextProps, nextState);
+    if (should) {
+      let chs = [];
+      for (let k in nextProps) {
+        let changed = (nextProps[k] !== prevProps[k]);
+        if (changed && k != "__isInternalValueChange") {
+          chs.push(k);
         }
-        if (!chs.length)
-            should = false;
-        //optimize render
-        if (chs.length == 1 && chs[0] == 'tree' && nextProps.__isInternalValueChange)
-            should = false;
       }
-      return should;
+      if (!chs.length)
+        should = false;
+        //optimize render
+      if (chs.length == 1 && chs[0] == "tree" && nextProps.__isInternalValueChange)
+        should = false;
+    }
+    return should;
   }
 
   constructor(props) {
@@ -44,23 +44,23 @@ export default class Builder extends Component {
   }
 
   _updPath (props) {
-    const id = props.tree.get('id');
+    const id = props.tree.get("id");
     this.path = Immutable.List.of(id);
   }
 
   render() {
     const treeNodesCnt = getTotalNodesCountInTree(this.props.tree);
-    const id = this.props.tree.get('id');
+    const id = this.props.tree.get("id");
     return (
       <Item 
         key={id}
         id={id}
         path={this.path}
-        type={this.props.tree.get('type')}
-        properties={this.props.tree.get('properties') || new Map()}
+        type={this.props.tree.get("type")}
+        properties={this.props.tree.get("properties") || new Map()}
         config={this.props.config}
         actions={this.props.actions}
-        children1={this.props.tree.get('children1') || new Map()}
+        children1={this.props.tree.get("children1") || new Map()}
         //tree={this.props.tree}
         treeNodesCnt={treeNodesCnt}
         onDragStart={this.props.onDragStart}

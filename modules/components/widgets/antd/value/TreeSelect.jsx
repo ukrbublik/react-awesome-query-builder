@@ -48,9 +48,9 @@ export default class TreeSelectWidget extends PureComponent {
       this.props.setValue(undefined); //not allow []
       return;
     }
-    if (typeof val[0] == 'object' && val[0].value !== undefined) {
+    if (typeof val[0] == "object" && val[0].value !== undefined) {
       //`treeCheckStrictly` is on
-      val = val.map(v => v.value)
+      val = val.map(v => v.value);
     }
     this.props.setValue(val);
   }
@@ -88,30 +88,30 @@ export default class TreeSelectWidget extends PureComponent {
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
     return (      
-        <TreeSelect
-            disabled={readonly}
-            style={{
-              minWidth: width,
-              width: width,
-            }}
-            dropdownStyle={{
-              width: useAutoWidth ? "auto" : dropdownWidth + 10,
-              paddingRight: '10px'
-            }}
-            multiple={treeMultiple}
-            treeCheckable={treeMultiple}
-            key={"widget-treeselect"}
-            dropdownMatchSelectWidth={false}
-            placeholder={placeholder}
-            size={renderSize}
-            treeData={listValues}
-            treeDataSimpleMode={defaultTreeDataMap}
-            filterTreeNode={this.filterTreeNode}
-            value={_value}
-            onChange={this.handleChange}
-            treeDefaultExpandAll={treeExpandAll}
-            {...customProps}
-        />
+      <TreeSelect
+        disabled={readonly}
+        style={{
+          minWidth: width,
+          width: width,
+        }}
+        dropdownStyle={{
+          width: useAutoWidth ? "auto" : dropdownWidth + 10,
+          paddingRight: "10px"
+        }}
+        multiple={treeMultiple}
+        treeCheckable={treeMultiple}
+        key={"widget-treeselect"}
+        dropdownMatchSelectWidth={false}
+        placeholder={placeholder}
+        size={renderSize}
+        treeData={listValues}
+        treeDataSimpleMode={defaultTreeDataMap}
+        filterTreeNode={this.filterTreeNode}
+        value={_value}
+        onChange={this.handleChange}
+        treeDefaultExpandAll={treeExpandAll}
+        {...customProps}
+      />
     );
   }
 }

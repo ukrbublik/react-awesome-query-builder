@@ -1,3 +1,4 @@
+
 import Immutable from 'immutable';
 import {expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree} from '../utils/treeUtils';
 import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from '../utils/defaultUtils';
@@ -23,6 +24,7 @@ const countRules = (children) => {
     }
     return count;
 };
+
 
 /**
  * @param {object} config
@@ -95,7 +97,7 @@ const removeRule = (state, path, config) => {
  * @param {bool} not
  */
 const setNot = (state, path, not) =>
-    state.setIn(expandTreePath(path, 'properties', 'not'), not);
+  state.setIn(expandTreePath(path, "properties", "not"), not);
 
 /**
  * @param {Immutable.Map} state
@@ -103,7 +105,7 @@ const setNot = (state, path, not) =>
  * @param {string} conjunction
  */
 const setConjunction = (state, path, conjunction) =>
-    state.setIn(expandTreePath(path, 'properties', 'conjunction'), conjunction);
+  state.setIn(expandTreePath(path, "properties", "conjunction"), conjunction);
 
 /**
  * @param {Immutable.Map} state
@@ -143,75 +145,75 @@ const removeItem = (state, path) => {
  * @param {object} config
  */
 const moveItem = (state, fromPath, toPath, placement, config) => {
-    const from = getItemByPath(state, fromPath);
-    const sourcePath = fromPath.pop();
-    const source = fromPath.size > 1 ? getItemByPath(state, sourcePath) : null;
-    const sourceChildren = source ? source.get('children1') : null;
+  const from = getItemByPath(state, fromPath);
+  const sourcePath = fromPath.pop();
+  const source = fromPath.size > 1 ? getItemByPath(state, sourcePath) : null;
+  const sourceChildren = source ? source.get("children1") : null;
 
-    const to = getItemByPath(state, toPath);
-    const targetPath = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? toPath : toPath.pop();
-    const target = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? 
-        to
-        : toPath.size > 1 ? getItemByPath(state, targetPath) : null;
-    const targetChildren = target ? target.get('children1') : null;
+  const to = getItemByPath(state, toPath);
+  const targetPath = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) ? toPath : toPath.pop();
+  const target = (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND) 
+    ? to
+    : toPath.size > 1 ? getItemByPath(state, targetPath) : null;
+  const targetChildren = target ? target.get("children1") : null;
 
-    if (!source || !target)
-        return state;
-
-    const isSameParent = (source.get('id') == target.get('id'));
-    const isSourceInsideTarget = targetPath.size < sourcePath.size 
-        && deepEqual(targetPath.toArray(), sourcePath.toArray().slice(0, targetPath.size));
-    const isTargetInsideSource = targetPath.size > sourcePath.size 
-        && deepEqual(sourcePath.toArray(), targetPath.toArray().slice(0, sourcePath.size));
-    let sourceSubpathFromTarget = null;
-    let targetSubpathFromSource = null;
-    if (isSourceInsideTarget) {
-        sourceSubpathFromTarget = Immutable.List(sourcePath.toArray().slice(targetPath.size));
-    } else if (isTargetInsideSource) {
-        targetSubpathFromSource = Immutable.List(targetPath.toArray().slice(sourcePath.size));
-    }
-
-    let newTargetChildren = targetChildren, newSourceChildren = sourceChildren;
-    if (!isTargetInsideSource)
-        newSourceChildren = newSourceChildren.delete(from.get('id'));
-    if (isSameParent) {
-        newTargetChildren = newSourceChildren;
-    } else if (isSourceInsideTarget) {
-        newTargetChildren = newTargetChildren.updateIn(expandTreeSubpath(sourceSubpathFromTarget, 'children1'), (_oldChildren) => newSourceChildren);
-    }
-
-    if (placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) {
-        newTargetChildren = Immutable.OrderedMap().withMutations(r => {
-            for (let [itemId, item] of newTargetChildren.entries()) {
-                if (itemId == to.get('id') && placement == constants.PLACEMENT_BEFORE) {
-                    r.set(from.get('id'), from);
-                }
-                
-                r.set(itemId, item);
-
-                if (itemId == to.get('id') && placement == constants.PLACEMENT_AFTER) {
-                    r.set(from.get('id'), from);
-                }
-            }
-        });
-    } else if (placement == constants.PLACEMENT_APPEND) {
-        newTargetChildren = newTargetChildren.merge({[from.get('id')]: from});
-    } else if (placement == constants.PLACEMENT_PREPEND) {
-        newTargetChildren = Immutable.OrderedMap({[from.get('id')]: from}).merge(newTargetChildren);
-    }
-
-    if (isTargetInsideSource) {
-        newSourceChildren = newSourceChildren.updateIn(expandTreeSubpath(targetSubpathFromSource, 'children1'), (_oldChildren) => newTargetChildren);
-        newSourceChildren = newSourceChildren.delete(from.get('id'));
-    }
-
-    if (!isSameParent && !isSourceInsideTarget)
-        state = state.updateIn(expandTreePath(sourcePath, 'children1'), (_oldChildren) => newSourceChildren);
-    if (!isTargetInsideSource)
-        state = state.updateIn(expandTreePath(targetPath, 'children1'), (_oldChildren) => newTargetChildren);
-
-    state = fixPathsInTree(state);
+  if (!source || !target)
     return state;
+
+  const isSameParent = (source.get("id") == target.get("id"));
+  const isSourceInsideTarget = targetPath.size < sourcePath.size 
+        && deepEqual(targetPath.toArray(), sourcePath.toArray().slice(0, targetPath.size));
+  const isTargetInsideSource = targetPath.size > sourcePath.size 
+        && deepEqual(sourcePath.toArray(), targetPath.toArray().slice(0, sourcePath.size));
+  let sourceSubpathFromTarget = null;
+  let targetSubpathFromSource = null;
+  if (isSourceInsideTarget) {
+    sourceSubpathFromTarget = Immutable.List(sourcePath.toArray().slice(targetPath.size));
+  } else if (isTargetInsideSource) {
+    targetSubpathFromSource = Immutable.List(targetPath.toArray().slice(sourcePath.size));
+  }
+
+  let newTargetChildren = targetChildren, newSourceChildren = sourceChildren;
+  if (!isTargetInsideSource)
+    newSourceChildren = newSourceChildren.delete(from.get("id"));
+  if (isSameParent) {
+    newTargetChildren = newSourceChildren;
+  } else if (isSourceInsideTarget) {
+    newTargetChildren = newTargetChildren.updateIn(expandTreeSubpath(sourceSubpathFromTarget, "children1"), (_oldChildren) => newSourceChildren);
+  }
+
+  if (placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) {
+    newTargetChildren = Immutable.OrderedMap().withMutations(r => {
+      for (let [itemId, item] of newTargetChildren.entries()) {
+        if (itemId == to.get("id") && placement == constants.PLACEMENT_BEFORE) {
+          r.set(from.get("id"), from);
+        }
+                
+        r.set(itemId, item);
+
+        if (itemId == to.get("id") && placement == constants.PLACEMENT_AFTER) {
+          r.set(from.get("id"), from);
+        }
+      }
+    });
+  } else if (placement == constants.PLACEMENT_APPEND) {
+    newTargetChildren = newTargetChildren.merge({[from.get("id")]: from});
+  } else if (placement == constants.PLACEMENT_PREPEND) {
+    newTargetChildren = Immutable.OrderedMap({[from.get("id")]: from}).merge(newTargetChildren);
+  }
+
+  if (isTargetInsideSource) {
+    newSourceChildren = newSourceChildren.updateIn(expandTreeSubpath(targetSubpathFromSource, "children1"), (_oldChildren) => newTargetChildren);
+    newSourceChildren = newSourceChildren.delete(from.get("id"));
+  }
+
+  if (!isSameParent && !isSourceInsideTarget)
+    state = state.updateIn(expandTreePath(sourcePath, "children1"), (_oldChildren) => newSourceChildren);
+  if (!isTargetInsideSource)
+    state = state.updateIn(expandTreePath(targetPath, "children1"), (_oldChildren) => newTargetChildren);
+
+  state = fixPathsInTree(state);
+  return state;
 };
 
 
@@ -306,25 +308,30 @@ const setField = (state, path, newField, config) => {
  * @param {string} operator
  */
 const setOperator = (state, path, newOperator, config) => {
-    return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
-        const currentField = current.get('field');
-        const currentOperatorOptions = current.get('operatorOptions');
-        const _currentValue = current.get('value', new Immutable.List());
-        const _currentValueSrc = current.get('valueSrc', new Immutable.List());
-        const _currentOperator = current.get('operator');
+  const {showErrorMessage} = config.settings;
+  return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
+    const currentField = current.get("field");
+    const currentOperatorOptions = current.get("operatorOptions");
+    const _currentValue = current.get("value", new Immutable.List());
+    const _currentValueSrc = current.get("valueSrc", new Immutable.List());
+    const _currentOperator = current.get("operator");
 
-        const {canReuseValue, newValue, newValueSrc, newValueType} = getNewValueForFieldOp(
-            config, config, current, currentField, newOperator, 'operator', true
-        );
-        const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
+    const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      config, config, current, currentField, newOperator, "operator", true
+    );
+    if (showErrorMessage) {
+      current = current
+        .set("valueError", newValueError);
+    }
+    const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
 
-        return current
-            .set('operator', newOperator)
-            .set('operatorOptions', newOperatorOptions)
-            .set('value', newValue)
-            .set('valueSrc', newValueSrc)
-            .set('valueType', newValueType);
-    }));
+    return current
+      .set("operator", newOperator)
+      .set("operatorOptions", newOperatorOptions)
+      .set("value", newValue)
+      .set("valueSrc", newValueSrc)
+      .set("valueType", newValueType);
+  }));
 };
 
 /**
@@ -336,54 +343,67 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {boolean} __isInternal
  */
 const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
-    const fieldSeparator = config.settings.fieldSeparator;
-    const showErrorMessage = config.settings.showErrorMessage;
-    const valueSrc = state.getIn(expandTreePath(path, 'properties', 'valueSrc', delta + '')) || null;
-    if (valueSrc === 'field' && Array.isArray(value))
-        value = value.join(fieldSeparator);
 
-    const field = state.getIn(expandTreePath(path, 'properties', 'field')) || null;
-    const operator = state.getIn(expandTreePath(path, 'properties', 'operator')) || null;
+  const {fieldSeparator, showErrorMessage} = config.settings;
+  const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
+  if (valueSrc === "field" && Array.isArray(value))
+    value = value.join(fieldSeparator);
 
-    const isEndValue = false;
-    const canFix = false;
-    const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-    const [validateError, fixedValue, errorMessage] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
-    const validResult = !errorMessage;
-    const isValid = validResult;
-    if (isValid && fixedValue !== value) {
-        // eg, get exact value from listValues (not string)
-        value = fixedValue;
+  const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
+  const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+
+  const isEndValue = false;
+  const canFix = false;
+  const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
+  const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+    
+  const isValid = !validateError;
+  if (isValid && fixedValue !== value) {
+    // eg, get exact value from listValues (not string)
+    value = fixedValue;
+  }
+
+  // Additional validation for range values
+  if (showErrorMessage) {
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
+    const operatorConfig = getOperatorConfig(config, operator, field);
+    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+    const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
+        
+    if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
+      const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
+      const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS ? values.map(v => fieldWidgetDefinition.toJS(v, fieldWidgetDefinition)) : values;
+      const rangeValidateError = operatorConfig.validateValues(jsValues);
+
+      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);
     }
-    if (showErrorMessage) {
-        const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
-        const isLastEmpty = lastValue == undefined;
-        state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-        state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
-        state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-        state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-        state.__isInternalValueChange = __isInternal && !isLastEmpty;
+  }
+    
+  const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta + ""));
+  const lastError = state.getIn(expandTreePath(path, "properties", "valueError", delta));
+  const isLastEmpty = lastValue == undefined;
+  const isLastError = !!lastError;
+  if (isValid || showErrorMessage) {
+    // set only good value
+    if (typeof value === "undefined") {
+      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
     } else {
-        if (isValid && true) {
-            if (typeof value === "undefined") {
-                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
-                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
-                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-            } else {
-                const lastValue = state.getIn(expandTreePath(path, 'properties', 'value', delta + ''));
-                const isLastEmpty = lastValue == undefined;
-                state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), value);
-                state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), calculatedValueType);
-                state = state.setIn(expandTreePath(path, 'properties', 'validity'), validResult);
-                state = state.setIn(expandTreePath(path, 'properties', 'errorMessage'), errorMessage);
-                state.__isInternalValueChange = __isInternal && !isLastEmpty;
-            }
-        }
+      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), value);
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), calculatedValueType);
+      state.__isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
     }
+  }
+  if (showErrorMessage) {
+    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
+  }
+  if (__isInternal && (isValid && isLastError || !isValid && !isLastError)) {
+    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
+    state.__isInternalValueChange = false;
+  }
 
-
-    return state;
+  return state;
 };
 
 /**
@@ -392,16 +412,32 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
  * @param {integer} delta
  * @param {*} srcKey
  */
-const setValueSrc = (state, path, delta, srcKey) => {
-    state = state.setIn(expandTreePath(path, 'properties', 'value', delta + ''), undefined);
-    state = state.setIn(expandTreePath(path, 'properties', 'valueType', delta + ''), null);
+const setValueSrc = (state, path, delta, srcKey, config) => {
+  const {showErrorMessage} = config.settings;
 
-    if (typeof srcKey === "undefined") {
-        state = state.setIn(expandTreePath(path, 'properties', 'valueSrc', delta + ''), null);
-    } else {
-        state = state.setIn(expandTreePath(path, 'properties', 'valueSrc', delta + ''), srcKey);
+  state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
+  state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
+
+  if (showErrorMessage) {
+    // clear value error
+    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), null);
+
+    // if current operator is range, clear possible range error
+    const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
+    const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+    const operatorConfig = getOperatorConfig(config, operator, field);
+    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+    if (operatorConfig.validateValues) {
+      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), null);
     }
-    return state;
+  }
+    
+  if (typeof srcKey === "undefined") {
+    state = state.setIn(expandTreePath(path, "properties", "valueSrc", delta + ""), null);
+  } else {
+    state = state.setIn(expandTreePath(path, "properties", "valueSrc", delta + ""), srcKey);
+  }
+  return state;
 };
 
 /**
@@ -411,7 +447,7 @@ const setValueSrc = (state, path, delta, srcKey) => {
  * @param {*} value
  */
 const setOperatorOption = (state, path, name, value) => {
-    return state.setIn(expandTreePath(path, 'properties', 'operatorOptions', name), value);
+  return state.setIn(expandTreePath(path, "properties", "operatorOptions", name), value);
 };
 
 
@@ -419,24 +455,24 @@ const setOperatorOption = (state, path, name, value) => {
  * 
  */
 const calculateValueType = (value, valueSrc, config) => {
-    let calculatedValueType = null;
-    if (value) {
-        if (valueSrc === 'field') {
-            const fieldConfig = getFieldConfig(value, config);
-            if (fieldConfig) {
-                calculatedValueType = fieldConfig.type;
-            }
-        } else if (valueSrc === 'func') {
-            const funcKey = value.get('func');
-            if (funcKey) {
-                const funcConfig = getFuncConfig(funcKey, config);
-                if (funcConfig) {
-                    calculatedValueType = funcConfig.returnType;
-                }
-            }
+  let calculatedValueType = null;
+  if (value) {
+    if (valueSrc === "field") {
+      const fieldConfig = getFieldConfig(value, config);
+      if (fieldConfig) {
+        calculatedValueType = fieldConfig.type;
+      }
+    } else if (valueSrc === "func") {
+      const funcKey = value.get("func");
+      if (funcKey) {
+        const funcConfig = getFuncConfig(funcKey, config);
+        if (funcConfig) {
+          calculatedValueType = funcConfig.returnType;
         }
+      }
     }
-    return calculatedValueType;
+  }
+  return calculatedValueType;
 };
 
 const emptyDrag = {
@@ -526,4 +562,5 @@ export default (config) => {
                 return state;
         }
     };
+
 };

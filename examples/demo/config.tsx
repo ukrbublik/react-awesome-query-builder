@@ -5,6 +5,7 @@ import {
     // types:
     Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from 'react-awesome-query-builder';
+import moment from 'moment';
 
 import AntdConfig from 'react-awesome-query-builder/config/antd';
 import AntdWidgets from 'react-awesome-query-builder/components/widgets/antd';
@@ -49,6 +50,7 @@ export default (skin) => {
     const operators: Operators = {
         ...InitialConfig.operators,
         // examples of  overriding
+        proximity,
         between: {
             ...InitialConfig.operators.between,
             valueLabels: [
@@ -60,7 +62,6 @@ export default (skin) => {
                 'to'
             ],
         },
-        proximity,
     };
 
 
@@ -69,9 +70,6 @@ export default (skin) => {
         // examples of  overriding
         text: {
             ...InitialConfig.widgets.text,
-            validateValue: (val, fieldDef) => {
-                return (val.length < 10);
-            },
         },
         slider: {
             ...InitialConfig.widgets.slider,
@@ -197,7 +195,7 @@ export default (skin) => {
         // showLabels: true,
         maxNesting: 3,
         canLeaveEmptyGroup: true, //after deletion
-
+        showErrorMessage: true,
         // renderField: (props) => <FieldCascader {...props} />,
         // renderOperator: (props) => <FieldDropdown {...props} />,
         // renderFunc: (props) => <FieldSelect {...props} />,
@@ -216,24 +214,28 @@ export default (skin) => {
                     label2: 'Username', //only for menu's toggler
                     type: 'text',
                     excludeOperators: ['proximity'],
+                    fieldSettings: {
+                        validateValue: (val, fieldSettings) => {
+                            return (val.length < 10);
+                        },
+                    },
                     mainWidgetProps: {
                         valueLabel: "Name",
                         valuePlaceholder: "Enter name",
-                        validateValue: (val, fieldDef) => {
-                            return (val.length < 10);
-                        },
                     },
                 },
                 login: {
                     type: 'text',
                     tableName: 't1', // PR #18, PR #20
                     excludeOperators: ['proximity'],
+                    fieldSettings: {
+                        validateValue: (val, fieldSettings) => {
+                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+                        },
+                    },
                     mainWidgetProps: {
                         valueLabel: "Login",
                         valuePlaceholder: "Enter login",
-                        validateValue: (val, fieldDef) => {
-                            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-                        },
                     },
                 }
             }
@@ -244,14 +246,16 @@ export default (skin) => {
             subfields: {
                 product: {
                     type: 'select',
-                    listValues: ['abc', 'def', 'xyz'],
+                    fieldSettings: {
+                        listValues: ['abc', 'def', 'xyz'],
+                    },
                     valueSources: ['value'],
                 },
                 score: {
                     type: 'number',
                     fieldSettings: {
                         min: 0,
-                        max: 100
+                        max: 100,
                     },
                     valueSources: ['value'],
                 }
@@ -286,6 +290,9 @@ export default (skin) => {
                     0: <strong>0%</strong>,
                     100: <strong>100%</strong>
                 },
+                validateValue: (val, fieldSettings) => {
+                    return (val < 50 ? null : "Invalid slider value, see validateValue()");
+                },
             },
             //overrides
             widgets: {
@@ -293,7 +300,15 @@ export default (skin) => {
                     widgetProps: {
                         valuePlaceholder: "..Slider",
                     }
-                }
+                },
+                rangeslider: {
+                    widgetProps: {
+                        valueLabels: [
+                            { label: 'Number from', placeholder: 'from' },
+                            { label: 'Number to', placeholder: 'to' },
+                        ],
+                    }
+                },
             },
         },
         date: {
@@ -302,13 +317,17 @@ export default (skin) => {
             valueSources: ['value'],
             fieldSettings: {
                 dateFormat: 'DD-MM-YYYY',
-            }
+                validateValue: (val, fieldSettings) => {
+                    // example of date validation
+                    const dateVal = moment(val, fieldSettings.valueFormat);
+                    return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
+                },
+            },
         },
         time: {
             label: 'Time',
             type: 'time',
             valueSources: ['value'],
-            operators: ['greater_or_equal', 'less_or_equal', 'between'],
             defaultOperator: 'between',
         },
         datetime: {
@@ -325,36 +344,42 @@ export default (skin) => {
             label: 'Color',
             type: 'select',
             valueSources: ['value'],
-            // * old format:
-            // listValues: {
-            //     yellow: 'Yellow',
-            //     green: 'Green',
-            //     orange: 'Orange'
-            // },
-            // * new format:
-            listValues: [
-                { value: 'yellow', title: 'Yellow' },
-                { value: 'green', title: 'Green' },
-                { value: 'orange', title: 'Orange' }
-            ],
+            fieldSettings: {
+                // * old format:
+                // listValues: {
+                //     yellow: 'Yellow',
+                //     green: 'Green',
+                //     orange: 'Orange'
+                // },
+                // * new format:
+                listValues: [
+                    { value: 'yellow', title: 'Yellow' },
+                    { value: 'green', title: 'Green' },
+                    { value: 'orange', title: 'Orange' }
+                ],
+            },
         },
         color2: {
             label: 'Color2',
             type: 'select',
-            listValues: {
-                yellow: 'Yellow',
-                green: 'Green',
-                orange: 'Orange',
-                purple: 'Purple'
-            },
+            fieldSettings: {
+                listValues: {
+                    yellow: 'Yellow',
+                    green: 'Green',
+                    orange: 'Orange',
+                    purple: 'Purple'
+                },
+            }
         },
         multicolor: {
             label: 'Colors',
             type: 'multiselect',
-            listValues: {
-                yellow: 'Yellow',
-                green: 'Green',
-                orange: 'Orange'
+            fieldSettings: {
+                listValues: {
+                    yellow: 'Yellow',
+                    green: 'Green',
+                    orange: 'Orange'
+                },
             },
             allowCustomValues: true
         },
@@ -366,11 +391,11 @@ export default (skin) => {
                 // * deep format (will be auto converted to flat format):
                 // listValues: [
                 //     { value: "1", title: "Warm colors", children: [
-                //         { value: "2", title: "Red" }, 
+                //         { value: "2", title: "Red" },
                 //         { value: "3", title: "Orange" }
                 //     ] },
                 //     { value: "4", title: "Cool colors", children: [
-                //         { value: "5", title: "Green" }, 
+                //         { value: "5", title: "Green" },
                 //         { value: "6", title: "Blue", children: [
                 //             { value: "7", title: "Sub blue", children: [
                 //                 { value: "8", title: "Sub sub blue and a long text" }
@@ -386,8 +411,8 @@ export default (skin) => {
                     { value: "4", title: "Cool colors" },
                     { value: "5", title: "Green", parent: "4" },
                     { value: "6", title: "Blue", parent: "4" },
-                        { value: "7", title: "Sub blue", parent: "6" },
-                        { value: "8", title: "Sub sub blue and a long text", parent: "7" },
+                    { value: "7", title: "Sub blue", parent: "6" },
+                    { value: "8", title: "Sub sub blue and a long text", parent: "7" },
                 ],
             }
         },
@@ -398,17 +423,17 @@ export default (skin) => {
                 treeExpandAll: true,
                 listValues: [
                     { value: "1", title: "Warm colors", children: [
-                        { value: "2", title: "Red" }, 
-                        { value: "3", title: "Orange" }
-                    ] },
+                            { value: "2", title: "Red" },
+                            { value: "3", title: "Orange" }
+                        ] },
                     { value: "4", title: "Cool colors", children: [
-                        { value: "5", title: "Green" }, 
-                        { value: "6", title: "Blue", children: [
-                            { value: "7", title: "Sub blue", children: [
-                                { value: "8", title: "Sub sub blue and a long text" }
-                            ] }
+                            { value: "5", title: "Green" },
+                            { value: "6", title: "Blue", children: [
+                                    { value: "7", title: "Sub blue", children: [
+                                            { value: "8", title: "Sub sub blue and a long text" }
+                                        ] }
+                                ] }
                         ] }
-                    ] }
                 ]
             }
         },
@@ -416,7 +441,7 @@ export default (skin) => {
             label: 'In stock',
             type: 'boolean',
             defaultValue: true,
-            fieldSettings: {
+            mainWidgetProps: {
                 labelYes: "+",
                 labelNo: "-"
             }
@@ -472,6 +497,7 @@ export default (skin) => {
     };
 
 
+
     const config: Config = {
         conjunctions,
         operators,
@@ -479,7 +505,7 @@ export default (skin) => {
         types,
         settings,
         fields,
-        funcs
+        funcs,
     };
 
     return config;
