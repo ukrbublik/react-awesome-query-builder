@@ -4,7 +4,7 @@ import Demo from "./demo/demo";
 
 // import 'react-awesome-query-builder/css/antd.less'; // need to enable LESS loader
 import "antd/dist/antd.css";
-import 'react-awesome-query-builder/css/styles.scss';
+import "react-awesome-query-builder/css/styles.scss";
 
 function App() {
   return (
