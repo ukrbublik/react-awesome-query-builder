@@ -3,7 +3,8 @@ import merge from "lodash/merge";
 import {
   BasicConfig,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
+  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs, 
+  DateTimeFieldSettings,
 } from "react-awesome-query-builder";
 import moment from "moment";
 
@@ -319,7 +320,7 @@ export default (skin) => {
       valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
-        validateValue: (val, fieldSettings: any) => {
+        validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
           // example of date validation
           const dateVal = moment(val, fieldSettings.valueFormat);
           return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;

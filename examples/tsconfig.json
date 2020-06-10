@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "sourceMap": true,
+    "outDir": "./ts_out",
     "allowJs": true,
     "skipLibCheck": true,
     "jsx": "react",

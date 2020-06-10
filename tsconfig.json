@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "allowJs": true,
+    "outDir": "./ts_out",
     "skipLibCheck": true,
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
