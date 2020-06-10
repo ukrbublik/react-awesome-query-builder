@@ -33,10 +33,10 @@ const fields: Fields = {
                 mainWidgetProps: {
                     valueLabel: "Name",
                     valuePlaceholder: "Enter name",
-                    fieldSettings: {
-                        validateValue: (val, fieldSettings) => {
-                            return (val.length < 10);
-                        },
+                },
+                fieldSettings: {
+                    validateValue: (val, fieldSettings) => {
+                        return (val.length < 10);
                     },
                 },
             },
@@ -113,31 +113,37 @@ const fields: Fields = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        listValues: [
-            { value: 'yellow', title: 'Yellow' },
-            { value: 'green', title: 'Green' },
-            { value: 'orange', title: 'Orange' }
-        ],
+        fieldSettings: {
+            listValues: [
+                { value: 'yellow', title: 'Yellow' },
+                { value: 'green', title: 'Green' },
+                { value: 'orange', title: 'Orange' }
+            ],
+        }
     },
     color2: {
         label: 'Color2',
         type: 'select',
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange',
-            purple: 'Purple'
-        },
+        fieldSettings: {
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange',
+                purple: 'Purple'
+            },
+        }
     },
     multicolor: {
         label: 'Colors',
         type: 'multiselect',
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange'
+        fieldSettings: {
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+            allowCustomValues: true
         },
-        allowCustomValues: true
     },
     selecttree: {
         label: 'Color (tree)',

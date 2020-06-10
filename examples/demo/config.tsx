@@ -380,8 +380,8 @@ export default (skin) => {
                     green: 'Green',
                     orange: 'Orange'
                 },
-            },
-            allowCustomValues: true
+                allowCustomValues: true,
+            }
         },
         selecttree: {
             label: 'Color (tree)',

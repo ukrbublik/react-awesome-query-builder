@@ -87,11 +87,13 @@ const config = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        listValues: [
-          { value: 'yellow', title: 'Yellow' },
-          { value: 'green', title: 'Green' },
-          { value: 'orange', title: 'Orange' }
-        ],
+        fieldSettings: {
+          listValues: [
+            { value: 'yellow', title: 'Yellow' },
+            { value: 'green', title: 'Green' },
+            { value: 'orange', title: 'Orange' }
+          ],
+        }
     },
     is_promotion: {
         label: 'Promo?',

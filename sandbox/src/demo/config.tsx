@@ -122,38 +122,44 @@ const fields: Fields = {
         label: 'Color',
         type: 'select',
         valueSources: ['value'],
-        // * old format:
-        // listValues: {
-        //     yellow: 'Yellow',
-        //     green: 'Green',
-        //     orange: 'Orange'
-        // },
-        // * new format:
-        listValues: [
-            { value: 'yellow', title: 'Yellow' },
-            { value: 'green', title: 'Green' },
-            { value: 'orange', title: 'Orange' }
-        ],
+        fieldSettings: {
+            // * old format:
+            // listValues: {
+            //     yellow: 'Yellow',
+            //     green: 'Green',
+            //     orange: 'Orange'
+            // },
+            // * new format:
+            listValues: [
+                { value: 'yellow', title: 'Yellow' },
+                { value: 'green', title: 'Green' },
+                { value: 'orange', title: 'Orange' }
+            ],
+        }
     },
     color2: {
         label: 'Color2',
         type: 'select',
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange',
-            purple: 'Purple'
-        },
+        fieldSettings: {
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange',
+                purple: 'Purple'
+            },
+        }
     },
     multicolor: {
         label: 'Colors',
         type: 'multiselect',
-        listValues: {
-            yellow: 'Yellow',
-            green: 'Green',
-            orange: 'Orange'
-        },
-        allowCustomValues: true
+        fieldSettings: {
+            listValues: {
+                yellow: 'Yellow',
+                green: 'Green',
+                orange: 'Orange'
+            },
+            allowCustomValues: true
+        }
     },
     selecttree: {
         label: 'Color (tree)',
