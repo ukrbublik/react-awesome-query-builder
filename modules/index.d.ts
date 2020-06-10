@@ -129,7 +129,7 @@ export interface Config {
 type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
 type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
-type ValidateValue =       (val: RuleValue, fieldDef: Field) => boolean | string | null;
+type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
 
 interface BaseWidgetProps {
   value: RuleValue,

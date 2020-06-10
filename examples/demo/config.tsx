@@ -7,7 +7,9 @@ import {
 } from "react-awesome-query-builder";
 import moment from "moment";
 
+// @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
+// @ts-ignore
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 const {
   FieldSelect,
@@ -317,7 +319,7 @@ export default (skin) => {
       valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
-        validateValue: (val, fieldSettings) => {
+        validateValue: (val, fieldSettings: any) => {
           // example of date validation
           const dateVal = moment(val, fieldSettings.valueFormat);
           return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;

@@ -19,8 +19,9 @@ const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
-const initTree = checkTree(loadTree(initValue), loadedConfig);
-//const initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+let initTree;
+initTree = checkTree(loadTree(initValue), loadedConfig);
+//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 const updateEvent = new CustomEvent("update", { detail: {
   config: loadedConfig,

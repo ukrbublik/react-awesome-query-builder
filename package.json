@@ -12,7 +12,7 @@
     "antdesign"
   ],
   "main": "lib",
-  "types": "lib/index.d.ts",
+  "types": "modules/index.d.ts",
   "scripts": {
     "prepublish": "npm run build-npm",
     "build-npm": "./scripts/build-npm.sh",
