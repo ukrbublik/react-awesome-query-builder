@@ -1,28 +1,29 @@
 
-import Immutable from 'immutable';
-import {expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree} from '../utils/treeUtils';
-import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from '../utils/defaultUtils';
-import * as constants from '../constants';
-import uuid from '../utils/uuid';
+import Immutable from "immutable";
+import {expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree} from "../utils/treeUtils";
+import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from "../utils/defaultUtils";
+import * as constants from "../constants";
+import uuid from "../utils/uuid";
 import {
-    getFirstOperator, getFuncConfig, getFieldConfig, getOperatorsForField
+  getFirstOperator, getFuncConfig, getFieldConfig, getOperatorsForField, getWidgetForFieldOp,
+  getFieldWidgetConfig, getOperatorConfig
 } from "../utils/configUtils";
-import {deepEqual} from "../utils/stuff";
+import {deepEqual, defaultValue} from "../utils/stuff";
 import {validateValue, getNewValueForFieldOp} from "../utils/validation";
 import {Utils} from "../index";
 
-const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, 'children1')).size > 0;
+const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
 
 const countRules = (children) => {
-    let count = 0;
-    for (let obj in children) {
-        if (children[obj].type === "rule" || children[obj].type === "rule_group") {
-            count += 1 ;
-        } else {
-            count +=  countRules(children[obj].children1)
-        }
+  let count = 0;
+  for (let obj in children) {
+    if (children[obj].type === "rule" || children[obj].type === "rule_group") {
+      count += 1 ;
+    } else {
+      count +=  countRules(children[obj].children1);
     }
-    return count;
+  }
+  return count;
 };
 
 
@@ -32,19 +33,19 @@ const countRules = (children) => {
  * @param {Immutable.Map} properties
  */
 const addNewGroup = (state, path, properties, config) => {
-    const groupUuid = uuid();
-    const rulesNumber = countRules(Utils.getTree(state).children1);
+  const groupUuid = uuid();
+  const rulesNumber = countRules(Utils.getTree(state).children1);
 
-    if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
-        state = addItem(state, path, 'group', groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
+  if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
+    state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
 
-        const groupPath = path.push(groupUuid);
-        // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
-        state = state.setIn(expandTreePath(groupPath, 'children1'), new Immutable.OrderedMap());
-        state = addItem(state, groupPath, 'rule', uuid(), defaultRuleProperties(config), config);
-    }
-    state = fixPathsInTree(state);
-    return state;
+    const groupPath = path.push(groupUuid);
+    // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
+    state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
+    state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+  }
+  state = fixPathsInTree(state);
+  return state;
 };
 
 /**
@@ -53,17 +54,17 @@ const addNewGroup = (state, path, properties, config) => {
  * @param {Immutable.Map} properties
  */
 const removeGroup = (state, path, config) => {
-    state = removeItem(state, path);
+  state = removeItem(state, path);
 
-    const parentPath = path.slice(0, -1);
-    const isEmptyGroup = !hasChildren(state, parentPath);
-    const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-    const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
-    if (isEmptyGroup && !canLeaveEmpty) {
-        state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config));
-    }
-    state = fixPathsInTree(state);
-    return state;
+  const parentPath = path.slice(0, -1);
+  const isEmptyGroup = !hasChildren(state, parentPath);
+  const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
+  const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
+  if (isEmptyGroup && !canLeaveEmpty) {
+    state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config));
+  }
+  state = fixPathsInTree(state);
+  return state;
 };
 
 /**
@@ -71,24 +72,24 @@ const removeGroup = (state, path, config) => {
  * @param {Immutable.List} path
  */
 const removeRule = (state, path, config) => {
-    state = removeItem(state, path);
+  state = removeItem(state, path);
 
-    const parentPath = path.pop();
-    const parent = state.getIn(expandTreePath(parentPath));
-    const parentField = parent.getIn(['properties', 'field']);
-    const isParentRuleGroup = parent.get('type') == 'rule_group';
-    const isEmptyGroup = !hasChildren(state, parentPath);
-    const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-    const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup ? true : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
-    if (isEmptyGroup) {
-        if (isParentRuleGroup) {
-            state = state.deleteIn(expandTreePath(parentPath));
-        } else if (!canLeaveEmpty) {
-            state = addItem(state, parentPath, 'rule', uuid(), defaultRuleProperties(config, parentField));
-        }
+  const parentPath = path.pop();
+  const parent = state.getIn(expandTreePath(parentPath));
+  const parentField = parent.getIn(["properties", "field"]);
+  const isParentRuleGroup = parent.get("type") == "rule_group";
+  const isEmptyGroup = !hasChildren(state, parentPath);
+  const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
+  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup ? true : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
+  if (isEmptyGroup) {
+    if (isParentRuleGroup) {
+      state = state.deleteIn(expandTreePath(parentPath));
+    } else if (!canLeaveEmpty) {
+      state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField));
     }
-    state = fixPathsInTree(state);
-    return state;
+  }
+  state = fixPathsInTree(state);
+  return state;
 };
 
 /**
@@ -116,15 +117,15 @@ const setConjunction = (state, path, conjunction) =>
  * @param {object} config
  */
 const addItem = (state, path, type, id, properties, config) => {
-    const rulesNumber = countRules(Utils.getTree(state).children1);
+  const rulesNumber = countRules(Utils.getTree(state).children1);
 
-    if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
-        state = state.mergeIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap({
-            [id]: new Immutable.Map({type, id, properties})
-        }));
-    }
-    state = fixPathsInTree(state);
-    return state;
+  if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
+    state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
+      [id]: new Immutable.Map({type, id, properties})
+    }));
+  }
+  state = fixPathsInTree(state);
+  return state;
 };
 
 /**
@@ -132,10 +133,10 @@ const addItem = (state, path, type, id, properties, config) => {
  * @param {Immutable.List} path
  */
 const removeItem = (state, path) => {
-    state = state.deleteIn(expandTreePath(path));
-    state = fixPathsInTree(state);
-    return state;
-}
+  state = state.deleteIn(expandTreePath(path));
+  state = fixPathsInTree(state);
+  return state;
+};
 
 /**
  * @param {Immutable.Map} state
@@ -223,83 +224,83 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {string} field
  */
 const setField = (state, path, newField, config) => {
-    if (!newField)
-        return removeItem(state, path);
+  if (!newField)
+    return removeItem(state, path);
 
-    const fieldSeparator = config.settings.fieldSeparator;
-    if (Array.isArray(newField))
-        newField = newField.join(fieldSeparator);
+  const fieldSeparator = config.settings.fieldSeparator;
+  if (Array.isArray(newField))
+    newField = newField.join(fieldSeparator);
 
-    const currentType = state.getIn(expandTreePath(path, 'type'));
-    const wasRuleGroup = currentType == 'rule_group';
-    const newFieldConfig = getFieldConfig(newField, config);
-    const isRuleGroup = newFieldConfig.type == '!group';
+  const currentType = state.getIn(expandTreePath(path, "type"));
+  const wasRuleGroup = currentType == "rule_group";
+  const newFieldConfig = getFieldConfig(newField, config);
+  const isRuleGroup = newFieldConfig.type == "!group";
 
-    if (!isRuleGroup && !newFieldConfig.operators) {
-        console.warn(`Type ${newFieldConfig.type} is not supported`);
-        return state;
+  if (!isRuleGroup && !newFieldConfig.operators) {
+    console.warn(`Type ${newFieldConfig.type} is not supported`);
+    return state;
+  }
+
+  if (wasRuleGroup && !isRuleGroup) {
+    state = state.setIn(expandTreePath(path, "type"), "rule");
+    state = state.deleteIn(expandTreePath(path, "children1"));
+    state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
+  }
+
+  if (isRuleGroup) {
+    state = state.setIn(expandTreePath(path, "type"), "rule_group");
+    let groupProperties = defaultGroupProperties(config).merge({
+      field: newField,
+    });
+    state = state.setIn(expandTreePath(path, "properties"), groupProperties);
+    state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
+    state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
+    state = fixPathsInTree(state);
+
+    return state;
+  }
+
+  return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
+    const currentOperator = current.get("operator");
+    const currentOperatorOptions = current.get("operatorOptions");
+    const _currentField = current.get("field");
+    const _currentValue = current.get("value");
+    const _currentValueSrc = current.get("valueSrc", new Immutable.List());
+    const _currentValueType = current.get("valueType", new Immutable.List());
+
+    // If the newly selected field supports the same operator the rule currently
+    // uses, keep it selected.
+    const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
+    let newOperator = null;
+    const availOps = getOperatorsForField(config, newField);
+    if (availOps && availOps.length == 1)
+      newOperator = availOps[0];
+    else if (availOps && availOps.length > 1) {
+      for (let strategy of config.settings.setOpOnChangeField || []) {
+        if (strategy == "keep")
+          newOperator = lastOp;
+        else if (strategy == "default")
+          newOperator = defaultOperator(config, newField, false);
+        else if (strategy == "first")
+          newOperator = getFirstOperator(config, newField);
+        if (newOperator) //found op for strategy
+          break;
+      }
     }
 
-    if (wasRuleGroup && !isRuleGroup) {
-        state = state.setIn(expandTreePath(path, 'type'), 'rule');
-        state = state.deleteIn(expandTreePath(path, 'children1'));
-        state = state.setIn(expandTreePath(path, 'properties'), new Immutable.OrderedMap());
-    }
+    const {canReuseValue, newValue, newValueSrc, newValueType} = getNewValueForFieldOp(
+      config, config, current, newField, newOperator, "field", true
+    );
+    const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
 
-    if (isRuleGroup) {
-        state = state.setIn(expandTreePath(path, 'type'), 'rule_group');
-        let groupProperties = defaultGroupProperties(config).merge({
-            field: newField,
-        });
-        state = state.setIn(expandTreePath(path, 'properties'), groupProperties);
-        state = state.setIn(expandTreePath(path, 'children1'), new Immutable.OrderedMap());
-        state = addItem(state, path, 'rule', uuid(), defaultRuleProperties(config, newField), config);
-        state = fixPathsInTree(state);
-
-        return state;
-    }
-
-    return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
-        const currentOperator = current.get('operator');
-        const currentOperatorOptions = current.get('operatorOptions');
-        const _currentField = current.get('field');
-        const _currentValue = current.get('value');
-        const _currentValueSrc = current.get('valueSrc', new Immutable.List());
-        const _currentValueType = current.get('valueType', new Immutable.List());
-
-        // If the newly selected field supports the same operator the rule currently
-        // uses, keep it selected.
-        const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
-        let newOperator = null;
-        const availOps = getOperatorsForField(config, newField);
-        if (availOps && availOps.length == 1)
-            newOperator = availOps[0];
-        else if (availOps && availOps.length > 1) {
-            for (let strategy of config.settings.setOpOnChangeField || []) {
-                if (strategy == 'keep')
-                    newOperator = lastOp;
-                else if (strategy == 'default')
-                    newOperator = defaultOperator(config, newField, false);
-                else if (strategy == 'first')
-                    newOperator = getFirstOperator(config, newField);
-                if (newOperator) //found op for strategy
-                    break;
-            }
-        }
-
-        const {canReuseValue, newValue, newValueSrc, newValueType} = getNewValueForFieldOp(
-            config, config, current, newField, newOperator, 'field', true
-        );
-        const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
-
-        return current
-            .set('field', newField)
-            .set('operator', newOperator)
-            .set('operatorOptions', newOperatorOptions)
-            .set('value', newValue)
-            .set('valueSrc', newValueSrc)
-            .set('valueType', newValueType);
-    }))
+    return current
+      .set("field", newField)
+      .set("operator", newOperator)
+      .set("operatorOptions", newOperatorOptions)
+      .set("value", newValue)
+      .set("valueSrc", newValueSrc)
+      .set("valueType", newValueType);
+  }));
 };
 
 /**
@@ -495,72 +496,73 @@ const emptyDrag = {
  * @param {object} action
  */
 export default (config) => {
-    const emptyTree = defaultRoot(config);
-    const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
-    const unset = {__isInternalValueChange: undefined};
+  const emptyTree = defaultRoot(config);
+  const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
+  const unset = {__isInternalValueChange: undefined};
     
-    return (state = emptyState, action) => {
-        switch (action.type) {
-            case constants.SET_TREE:
-                return Object.assign({}, state, {...unset}, {tree: action.tree});
+  return (state = emptyState, action) => {
+    switch (action.type) {
+    case constants.SET_TREE:
+      return Object.assign({}, state, {...unset}, {tree: action.tree});
 
-            case constants.ADD_NEW_GROUP:
-                return Object.assign({}, state, {...unset}, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
+    case constants.ADD_NEW_GROUP:
+      return Object.assign({}, state, {...unset}, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
 
-            case constants.ADD_GROUP:
-                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'group', action.id, action.properties, action.config)});
+    case constants.ADD_GROUP:
+      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "group", action.id, action.properties, action.config)});
 
-            case constants.REMOVE_GROUP:
-                return Object.assign({}, state, {...unset}, {tree: removeGroup(state.tree, action.path, action.config)});
+    case constants.REMOVE_GROUP:
+      return Object.assign({}, state, {...unset}, {tree: removeGroup(state.tree, action.path, action.config)});
 
-            case constants.ADD_RULE:
-                return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, 'rule', action.id, action.properties, action.config)});
+    case constants.ADD_RULE:
+      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "rule", action.id, action.properties, action.config)});
 
-            case constants.REMOVE_RULE:
-                return Object.assign({}, state, {...unset}, {tree: removeRule(state.tree, action.path, action.config)});
+    case constants.REMOVE_RULE:
+      return Object.assign({}, state, {...unset}, {tree: removeRule(state.tree, action.path, action.config)});
 
-            case constants.SET_CONJUNCTION:
-                return Object.assign({}, state, {...unset}, {tree: setConjunction(state.tree, action.path, action.conjunction)});
+    case constants.SET_CONJUNCTION:
+      return Object.assign({}, state, {...unset}, {tree: setConjunction(state.tree, action.path, action.conjunction)});
 
-            case constants.SET_NOT:
-                return Object.assign({}, state, {...unset}, {tree: setNot(state.tree, action.path, action.not)});
+    case constants.SET_NOT:
+      return Object.assign({}, state, {...unset}, {tree: setNot(state.tree, action.path, action.not)});
 
-            case constants.SET_FIELD:
-                return Object.assign({}, state, {...unset}, {tree: setField(state.tree, action.path, action.field, action.config)});
+    case constants.SET_FIELD:
+      return Object.assign({}, state, {...unset}, {tree: setField(state.tree, action.path, action.field, action.config)});
 
-            case constants.SET_OPERATOR:
-                return Object.assign({}, state, {...unset}, {tree: setOperator(state.tree, action.path, action.operator, action.config)});
+    case constants.SET_OPERATOR:
+      return Object.assign({}, state, {...unset}, {tree: setOperator(state.tree, action.path, action.operator, action.config)});
 
-            case constants.SET_VALUE:
-                let set = {};
-                const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.__isInternal);
-                if (tree.__isInternalValueChange)
-                    set.__isInternalValueChange = true;
-                return Object.assign({}, state, {...unset, ...set}, {tree});
+    case constants.SET_VALUE: {
+      let set = {};
+      const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.__isInternal);
+      if (tree.__isInternalValueChange)
+        set.__isInternalValueChange = true;
+      return Object.assign({}, state, {...unset, ...set}, {tree});
+    }
 
-            case constants.SET_VALUE_SRC:
-                return Object.assign({}, state, {...unset}, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey)});
+    case constants.SET_VALUE_SRC:
+      return Object.assign({}, state, {...unset}, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey)});
 
-            case constants.SET_OPERATOR_OPTION:
-                return Object.assign({}, state, {...unset}, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
+    case constants.SET_OPERATOR_OPTION:
+      return Object.assign({}, state, {...unset}, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
 
-            case constants.MOVE_ITEM:
-                return Object.assign({}, state, {...unset}, {tree: moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config)});
-
-
-            case constants.SET_DRAG_START:
-                return Object.assign({}, state, {...unset}, {dragStart: action.dragStart, dragging: action.dragging, mousePos: action.mousePos});
-
-            case constants.SET_DRAG_PROGRESS:
-                return Object.assign({}, state, {...unset}, {mousePos: action.mousePos, dragging: action.dragging});
-
-            case constants.SET_DRAG_END:
-                return Object.assign({}, state, {...unset}, emptyDrag);
+    case constants.MOVE_ITEM:
+      return Object.assign({}, state, {...unset}, {tree: moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config)});
 
 
-            default:
-                return state;
-        }
-    };
+    case constants.SET_DRAG_START:
+      return Object.assign({}, state, {...unset}, {dragStart: action.dragStart, dragging: action.dragging, mousePos: action.mousePos});
+
+    case constants.SET_DRAG_PROGRESS:
+      return Object.assign({}, state, {...unset}, {mousePos: action.mousePos, dragging: action.dragging});
+
+    case constants.SET_DRAG_END:
+      return Object.assign({}, state, {...unset}, emptyDrag);
+
+
+    default:
+      return state;
+    }
+  };
 
 };
