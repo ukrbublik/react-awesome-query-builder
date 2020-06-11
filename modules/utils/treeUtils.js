@@ -174,7 +174,7 @@ export const getFlatTree = (tree) => {
  * @param {Immutable.Map} tree
  * @return {Integer}
  */
-export const getTotalNodesCountInTree = (tree) => {
+export const getTotalReordableNodesCountInTree = (tree) => {
   if (!tree)
     return -1;
   let cnt = 0;
