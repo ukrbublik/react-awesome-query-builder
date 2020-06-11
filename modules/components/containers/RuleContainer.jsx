@@ -117,6 +117,7 @@ export default (Rule) => {
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
+              totalRulesCnt={this.props.totalRulesCnt}
             /> : null
             ,
             <Rule
@@ -139,6 +140,7 @@ export default (Rule) => {
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
+              totalRulesCnt={this.props.totalRulesCnt}
             />
           ]}
         </div>

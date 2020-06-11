@@ -142,6 +142,7 @@ export default (Group) => {
               actions={this.props.actions}
               //tree={this.props.tree}
               reordableNodesCnt={this.props.reordableNodesCnt}
+              totalRulesCnt={this.props.totalRulesCnt}
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
             /> : null
@@ -167,6 +168,7 @@ export default (Group) => {
               actions={this.props.actions}
               //tree={this.props.tree}
               reordableNodesCnt={this.props.reordableNodesCnt}
+              totalRulesCnt={this.props.totalRulesCnt}
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
             />

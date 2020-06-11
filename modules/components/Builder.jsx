@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Immutable, {Map} from "immutable";
 import Item from "../components/Item";
 import SortableContainer from "./containers/SortableContainer";
-import {getTotalReordableNodesCountInTree} from "../utils/treeUtils";
+import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../utils/treeUtils";
 import uuid from "../utils/uuid";
 import {pureShouldComponentUpdate} from "../utils/renderUtils";
 
@@ -50,6 +50,7 @@ export default class Builder extends Component {
 
   render() {
     const reordableNodesCnt = getTotalReordableNodesCountInTree(this.props.tree);
+    const totalRulesCnt = getTotalRulesCountInTree(this.props.tree);
     const id = this.props.tree.get("id");
     return (
       <Item 
@@ -63,6 +64,7 @@ export default class Builder extends Component {
         children1={this.props.tree.get("children1") || new Map()}
         //tree={this.props.tree}
         reordableNodesCnt={reordableNodesCnt}
+        totalRulesCnt={totalRulesCnt}
         onDragStart={this.props.onDragStart}
       />
     );

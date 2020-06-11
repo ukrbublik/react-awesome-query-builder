@@ -1,7 +1,12 @@
 
 import Immutable from "immutable";
-import {expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree} from "../utils/treeUtils";
-import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from "../utils/defaultUtils";
+import {
+  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
+  getTotalRulesCountInTree, fixEmptyGroupsInTree
+} from "../utils/treeUtils";
+import {
+  defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot
+} from "../utils/defaultUtils";
 import * as constants from "../constants";
 import uuid from "../utils/uuid";
 import {
@@ -10,21 +15,8 @@ import {
 } from "../utils/configUtils";
 import {deepEqual, defaultValue} from "../utils/stuff";
 import {validateValue, getNewValueForFieldOp} from "../utils/validation";
-import {Utils} from "../index";
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
-
-const countRules = (children) => {
-  let count = 0;
-  for (let obj in children) {
-    if (children[obj].type === "rule" || children[obj].type === "rule_group") {
-      count += 1 ;
-    } else {
-      count +=  countRules(children[obj].children1);
-    }
-  }
-  return count;
-};
 
 
 /**
@@ -34,17 +26,20 @@ const countRules = (children) => {
  */
 const addNewGroup = (state, path, properties, config) => {
   const groupUuid = uuid();
-  const rulesNumber = countRules(Utils.getTree(state).children1);
+  const rulesNumber = getTotalRulesCountInTree(state);
+  const canAddNewRule = !((rulesNumber + 1) > config.settings.maxNumberOfRules);
 
-  if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
-    state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
+  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
 
-    const groupPath = path.push(groupUuid);
-    // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
-    state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
+  const groupPath = path.push(groupUuid);
+  // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
+  state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
+
+  if (canAddNewRule) {
     state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
   }
   state = fixPathsInTree(state);
+  
   return state;
 };
 
@@ -117,9 +112,10 @@ const setConjunction = (state, path, conjunction) =>
  * @param {object} config
  */
 const addItem = (state, path, type, id, properties, config) => {
-  const rulesNumber = countRules(Utils.getTree(state).children1);
+  const rulesNumber = getTotalRulesCountInTree(state);
+  const canAddNewRule = !(type == "rule" && (rulesNumber + 1) > config.settings.maxNumberOfRules);
 
-  if (!config.settings.maxNumberOfRules || rulesNumber < config.settings.maxNumberOfRules) {
+  if (canAddNewRule) {
     state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
       [id]: new Immutable.Map({type, id, properties})
     }));
@@ -451,6 +447,15 @@ const setOperatorOption = (state, path, name, value) => {
   return state.setIn(expandTreePath(path, "properties", "operatorOptions", name), value);
 };
 
+const checkEmptyGroups = (state, config) => {
+  const {canLeaveEmptyGroup} = config.settings;
+  if (!canLeaveEmptyGroup) {
+    state = fixEmptyGroupsInTree(state);
+    console.log(1, state.toJS())
+  }
+  return state;
+};
+
 
 /**
  * 
@@ -557,7 +562,7 @@ export default (config) => {
       return Object.assign({}, state, {...unset}, {mousePos: action.mousePos, dragging: action.dragging});
 
     case constants.SET_DRAG_END:
-      return Object.assign({}, state, {...unset}, emptyDrag);
+      return Object.assign({}, state, {...unset}, {...emptyDrag, tree: checkEmptyGroups(state.tree, config)});
 
 
     default:

@@ -12,6 +12,7 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
       config={props.config}
       onDragStart={props.onDragStart}
       parentField={props.parentField}
@@ -26,6 +27,7 @@ const typeMap = {
       config={props.config}
       //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
       parentField={null}
@@ -40,6 +42,7 @@ const typeMap = {
       config={props.config}
       //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
       parentField={props.parentField}
@@ -65,7 +68,9 @@ class Item extends PureComponent {
 
   render() {
     const { type, ...props } = this.props;
-    return typeMap[type](props);
+    const Cmp = typeMap[type];
+    if (!Cmp) return null;
+    return Cmp(props);
   }
 }
 

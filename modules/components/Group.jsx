@@ -171,8 +171,17 @@ export class Group extends PureComponent {
     />;
   }
 
-  canAddGroup = () => this.props.allowFurtherNesting;
-  canAddRule = () => true;
+  canAddGroup = () => {
+    return this.props.allowFurtherNesting;
+  }
+  canAddRule = () => {
+    const {maxNumberOfRules} = this.props.config.settings;
+    const {totalRulesCnt} = this.props;
+    if (maxNumberOfRules) {
+      return totalRulesCnt < maxNumberOfRules;
+    }
+    return true;
+  };
   canDeleteGroup = () => !this.props.isRoot;
 
   renderChildren() {
@@ -200,6 +209,7 @@ export class Group extends PureComponent {
         children1={item.get("children1")}
         //tree={props.tree}
         reordableNodesCnt={this.reordableNodesCnt()}
+        totalRulesCnt={this.props.totalRulesCnt}
         onDragStart={onDragStart}
       />
     );
