@@ -248,9 +248,7 @@ export default (Builder, CanMoveFn = null) => {
 
       const moved = doHandleDrag ? this.handleDrag(dragging, e, CanMoveFn) : false;
 
-      if (moved) {
-        if (isDev())  console.log("moved");
-      } else {
+      if (!moved) {
         if (e.preventDefault)
           e.preventDefault();
       }
@@ -487,17 +485,16 @@ export default (Builder, CanMoveFn = null) => {
       }
 
       if (moveInfo) {
-        if (isDev())  console.log("move Info", moveInfo);
         this.move(itemInfo, moveInfo[1], moveInfo[0], moveInfo[3]);
 
-        if (isDev())  console.log("DRAG-N-DROP", JSON.stringify({
-          dragRect,
-          plhRect,
-          treeRect,
-          hovRect,
-          startMousePos: dragInfo.startMousePos,
-          mousePos: dragInfo.mousePos,
-        }));
+        // if (isDev())  console.log("DRAG-N-DROP", JSON.stringify({
+        //   dragRect,
+        //   plhRect,
+        //   treeRect,
+        //   hovRect,
+        //   startMousePos: dragInfo.startMousePos,
+        //   mousePos: dragInfo.mousePos,
+        // }));
         return true;
       }
 
@@ -511,11 +508,16 @@ export default (Builder, CanMoveFn = null) => {
         return false;
 
       const canRegroup = this.props.config.settings.canRegroup;
+      const maxNesting = this.props.config.settings.maxNesting;
+      const newLev = toParentII ? toParentII.lev : 0;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
       const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
         || toII.parentType == "rule_group";
+
+      if (maxNesting && (newLev + 1) >= maxNesting)
+        return false;
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange))
         return false;
