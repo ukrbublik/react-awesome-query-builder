@@ -78,7 +78,7 @@ export const fixPathsInTree = (tree) => {
   let newTree = tree;
 
   function _processNode (item, path, lev) {
-    const id = item.get("id");
+    const _id = item.get("id");
     const itemPath = path.push(item.get("id"));
     const currItemPath = item.get("path");
     if (!currItemPath || !currItemPath.equals(itemPath)) {

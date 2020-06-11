@@ -27,7 +27,8 @@ const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")
 const addNewGroup = (state, path, properties, config) => {
   const groupUuid = uuid();
   const rulesNumber = getTotalRulesCountInTree(state);
-  const canAddNewRule = !((rulesNumber + 1) > config.settings.maxNumberOfRules);
+  const {maxNumberOfRules} = config.settings;
+  const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
   state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
 
@@ -113,7 +114,8 @@ const setConjunction = (state, path, conjunction) =>
  */
 const addItem = (state, path, type, id, properties, config) => {
   const rulesNumber = getTotalRulesCountInTree(state);
-  const canAddNewRule = !(type == "rule" && (rulesNumber + 1) > config.settings.maxNumberOfRules);
+  const {maxNumberOfRules} = config.settings;
+  const canAddNewRule = !(type == "rule" && maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
   if (canAddNewRule) {
     state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
@@ -223,7 +225,7 @@ const setField = (state, path, newField, config) => {
   if (!newField)
     return removeItem(state, path);
 
-  const fieldSeparator = config.settings.fieldSeparator;
+  const {fieldSeparator, setOpOnChangeField, showErrorMessage} = config.settings;
   if (Array.isArray(newField))
     newField = newField.join(fieldSeparator);
 
@@ -272,7 +274,7 @@ const setField = (state, path, newField, config) => {
     if (availOps && availOps.length == 1)
       newOperator = availOps[0];
     else if (availOps && availOps.length > 1) {
-      for (let strategy of config.settings.setOpOnChangeField || []) {
+      for (let strategy of setOpOnChangeField || []) {
         if (strategy == "keep")
           newOperator = lastOp;
         else if (strategy == "default")
@@ -284,9 +286,13 @@ const setField = (state, path, newField, config) => {
       }
     }
 
-    const {canReuseValue, newValue, newValueSrc, newValueType} = getNewValueForFieldOp(
+    const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
       config, config, current, newField, newOperator, "field", true
     );
+    if (showErrorMessage) {
+      current = current
+        .set("valueError", newValueError);
+    }
     const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
 
     return current
@@ -340,7 +346,6 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {boolean} __isInternal
  */
 const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
-
   const {fieldSeparator, showErrorMessage} = config.settings;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
   if (valueSrc === "field" && Array.isArray(value))
@@ -447,11 +452,13 @@ const setOperatorOption = (state, path, name, value) => {
   return state.setIn(expandTreePath(path, "properties", "operatorOptions", name), value);
 };
 
+/**
+ * @param {Immutable.Map} state
+ */
 const checkEmptyGroups = (state, config) => {
   const {canLeaveEmptyGroup} = config.settings;
   if (!canLeaveEmptyGroup) {
     state = fixEmptyGroupsInTree(state);
-    console.log(1, state.toJS())
   }
   return state;
 };
@@ -546,7 +553,7 @@ export default (config) => {
     }
 
     case constants.SET_VALUE_SRC:
-      return Object.assign({}, state, {...unset}, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey)});
+      return Object.assign({}, state, {...unset}, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config)});
 
     case constants.SET_OPERATOR_OPTION:
       return Object.assign({}, state, {...unset}, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
