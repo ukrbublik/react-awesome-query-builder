@@ -19,7 +19,7 @@ const DragIcon = () => (
 export class Group extends PureComponent {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
-    treeNodesCnt: PropTypes.number,
+    reordableNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
     isRoot: PropTypes.bool.isRequired,
@@ -171,8 +171,17 @@ export class Group extends PureComponent {
     />;
   }
 
-  canAddGroup = () => this.props.allowFurtherNesting;
-  canAddRule = () => true;
+  canAddGroup = () => {
+    return this.props.allowFurtherNesting;
+  }
+  canAddRule = () => {
+    const {maxNumberOfRules} = this.props.config.settings;
+    const {totalRulesCnt} = this.props;
+    if (maxNumberOfRules) {
+      return totalRulesCnt < maxNumberOfRules;
+    }
+    return true;
+  };
   canDeleteGroup = () => !this.props.isRoot;
 
   renderChildren() {
@@ -199,7 +208,8 @@ export class Group extends PureComponent {
         actions={actions}
         children1={item.get("children1")}
         //tree={props.tree}
-        treeNodesCnt={this.reordableNodesCnt()}
+        reordableNodesCnt={this.reordableNodesCnt()}
+        totalRulesCnt={this.props.totalRulesCnt}
         onDragStart={onDragStart}
       />
     );
@@ -210,16 +220,14 @@ export class Group extends PureComponent {
   }
 
   reordableNodesCnt() {
-    const {treeNodesCnt} = this.props;
-    return treeNodesCnt;
+    return this.props.reordableNodesCnt;
   }
 
   renderDrag() {
     const {
-      config, isRoot, treeNodesCnt,
+      config, isRoot, reordableNodesCnt,
       handleDraggerMouseDown
     } = this.props;
-    const reordableNodesCnt = treeNodesCnt;
     const showDragIcon = config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
     const drag = showDragIcon
       && <span

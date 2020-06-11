@@ -99,6 +99,30 @@ export const fixPathsInTree = (tree) => {
   return newTree;
 };
 
+export const fixEmptyGroupsInTree = (tree) => {
+  let newTree = tree;
+
+  function _processNode (item, path, lev) {
+    const id = item.get("id");
+    const itemPath = path.push(item.get("id"));
+
+    const children = item.get("children1");
+    if (children) {
+      children.map((child, _childId) => {
+        _processNode(child, itemPath, lev + 1);
+      });
+      if (children.size == 0) {
+        newTree = newTree.deleteIn(expandTreePath(itemPath));
+        return;
+      }
+    }
+  }
+
+  _processNode(tree, new Immutable.List(), 0);
+
+
+  return newTree;
+};
 
 /**
  * @param {Immutable.Map} tree
@@ -174,7 +198,7 @@ export const getFlatTree = (tree) => {
  * @param {Immutable.Map} tree
  * @return {Integer}
  */
-export const getTotalNodesCountInTree = (tree) => {
+export const getTotalReordableNodesCountInTree = (tree) => {
   if (!tree)
     return -1;
   let cnt = 0;
@@ -195,6 +219,36 @@ export const getTotalNodesCountInTree = (tree) => {
   _processNode(tree, [], 0);
     
   return cnt - 1; // -1 for root
+};
+
+/**
+ * Returns count of rules (leafs, i.e. don't count groups)
+ * @param {Immutable.Map} tree
+ * @return {Integer}
+ */
+export const getTotalRulesCountInTree = (tree) => {
+  if (!tree)
+    return -1;
+  let cnt = 0;
+
+  function _processNode (item, path, lev) {
+    const id = item.get("id");
+    const children = item.get("children1");
+    const isGroup = item.get("type") == "group";
+    //const isRuleGroup = item.get("type") == "rule_group";
+    if (children && isGroup) {
+      children.map((child, _childId) => {
+        _processNode(child, path.concat(id), lev + 1);
+      });
+    } else {
+      // tip: count rule_group as 1 rule
+      cnt++;
+    }
+  }
+
+  _processNode(tree, [], 0);
+    
+  return cnt;
 };
 
 export const getTreeBadFields = (tree) => {

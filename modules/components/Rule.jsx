@@ -41,7 +41,7 @@ class Rule extends PureComponent {
       removeSelf: PropTypes.func,
       setValue: PropTypes.func,
       setValueSrc: PropTypes.func,
-      treeNodesCnt: PropTypes.number,
+      reordableNodesCnt: PropTypes.number,
     };
 
     constructor(props) {
@@ -53,7 +53,7 @@ class Rule extends PureComponent {
 
     onPropsChanged(nextProps) {
       const prevProps = this.props;
-      const keysForMeta = ["selectedField", "selectedOperator", "config", "treeNodesCnt"];
+      const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt"];
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
       if (needUpdateMeta) {
@@ -61,7 +61,7 @@ class Rule extends PureComponent {
       }
     }
 
-    getMeta({selectedField, selectedOperator, config, treeNodesCnt}) {
+    getMeta({selectedField, selectedOperator, config, reordableNodesCnt}) {
       const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
       const selectedFieldConfig = getFieldConfig(selectedField, config);
       const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
@@ -72,7 +72,7 @@ class Rule extends PureComponent {
       const isOnlyValue = selectedField && selectedFieldConfig.valueSources.length == 1 && selectedFieldConfig.valueSources[0] == "value";
       const hideOperator = selectedFieldWidgetConfig.hideOperator && isOnlyValue;
 
-      const showDragIcon = config.settings.canReorder && treeNodesCnt > 1;
+      const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1;
       const showOperator = selectedField && !hideOperator;
       const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
       const showWidget = isFieldAndOpSelected;

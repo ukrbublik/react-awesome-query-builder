@@ -11,7 +11,8 @@ const typeMap = {
       id={props.id}
       path={props.path}
       actions={props.actions}
-      treeNodesCnt={props.treeNodesCnt}
+      reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
       config={props.config}
       onDragStart={props.onDragStart}
       parentField={props.parentField}
@@ -25,7 +26,8 @@ const typeMap = {
       actions={props.actions}
       config={props.config}
       //tree={props.tree}
-      treeNodesCnt={props.treeNodesCnt}
+      reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
       parentField={null}
@@ -39,7 +41,8 @@ const typeMap = {
       actions={props.actions}
       config={props.config}
       //tree={props.tree}
-      treeNodesCnt={props.treeNodesCnt}
+      reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
       children1={props.children1}
       parentField={props.parentField}
@@ -58,14 +61,16 @@ class Item extends PureComponent {
     properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     actions: PropTypes.object.isRequired,
-    treeNodesCnt: PropTypes.number,
+    reordableNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
     parentField: PropTypes.string, //from RuleGroup
   };
 
   render() {
     const { type, ...props } = this.props;
-    return typeMap[type](props);
+    const Cmp = typeMap[type];
+    if (!Cmp) return null;
+    return Cmp(props);
   }
 }
 

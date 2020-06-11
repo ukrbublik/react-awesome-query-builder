@@ -1,19 +1,23 @@
+
 import Immutable from "immutable";
-import {expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree} from "../utils/treeUtils";
-import {defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot} from "../utils/defaultUtils";
+import {
+  expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
+  getTotalRulesCountInTree, fixEmptyGroupsInTree
+} from "../utils/treeUtils";
+import {
+  defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot
+} from "../utils/defaultUtils";
 import * as constants from "../constants";
 import uuid from "../utils/uuid";
 import {
-  getFirstOperator, getFuncConfig, getFieldConfig, getOperatorsForField
+  getFirstOperator, getFuncConfig, getFieldConfig, getOperatorsForField, getWidgetForFieldOp,
+  getFieldWidgetConfig, getOperatorConfig
 } from "../utils/configUtils";
 import {deepEqual, defaultValue} from "../utils/stuff";
 import {validateValue, getNewValueForFieldOp} from "../utils/validation";
-import {
-  getOperatorConfig, getWidgetForFieldOp, getFieldWidgetConfig
-} from "../utils/configUtils";
-
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
+
 
 /**
  * @param {object} config
@@ -22,13 +26,21 @@ const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")
  */
 const addNewGroup = (state, path, properties, config) => {
   const groupUuid = uuid();
-  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}));
+  const rulesNumber = getTotalRulesCountInTree(state);
+  const {maxNumberOfRules} = config.settings;
+  const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
+
+  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
 
   const groupPath = path.push(groupUuid);
   // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
   state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
-  state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config));
+
+  if (canAddNewRule) {
+    state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+  }
   state = fixPathsInTree(state);
+  
   return state;
 };
 
@@ -45,7 +57,7 @@ const removeGroup = (state, path, config) => {
   const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
   const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
   if (isEmptyGroup && !canLeaveEmpty) {
-    state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config));
+    state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config), config);
   }
   state = fixPathsInTree(state);
   return state;
@@ -69,7 +81,7 @@ const removeRule = (state, path, config) => {
     if (isParentRuleGroup) {
       state = state.deleteIn(expandTreePath(parentPath));
     } else if (!canLeaveEmpty) {
-      state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField));
+      state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField), config);
     }
   }
   state = fixPathsInTree(state);
@@ -98,11 +110,18 @@ const setConjunction = (state, path, conjunction) =>
  * @param {string} type
  * @param {string} id
  * @param {Immutable.OrderedMap} properties
+ * @param {object} config
  */
-const addItem = (state, path, type, id, properties) => {
-  state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
-    [id]: new Immutable.Map({type, id, properties})
-  }));
+const addItem = (state, path, type, id, properties, config) => {
+  const rulesNumber = getTotalRulesCountInTree(state);
+  const {maxNumberOfRules} = config.settings;
+  const canAddNewRule = !(type == "rule" && maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
+
+  if (canAddNewRule) {
+    state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
+      [id]: new Immutable.Map({type, id, properties})
+    }));
+  }
   state = fixPathsInTree(state);
   return state;
 };
@@ -206,7 +225,7 @@ const setField = (state, path, newField, config) => {
   if (!newField)
     return removeItem(state, path);
 
-  const {showErrorMessage, fieldSeparator, setOpOnChangeField} = config.settings;
+  const {fieldSeparator, setOpOnChangeField, showErrorMessage} = config.settings;
   if (Array.isArray(newField))
     newField = newField.join(fieldSeparator);
 
@@ -233,7 +252,7 @@ const setField = (state, path, newField, config) => {
     });
     state = state.setIn(expandTreePath(path, "properties"), groupProperties);
     state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
-    state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField));
+    state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
     state = fixPathsInTree(state);
 
     return state;
@@ -433,6 +452,17 @@ const setOperatorOption = (state, path, name, value) => {
   return state.setIn(expandTreePath(path, "properties", "operatorOptions", name), value);
 };
 
+/**
+ * @param {Immutable.Map} state
+ */
+const checkEmptyGroups = (state, config) => {
+  const {canLeaveEmptyGroup} = config.settings;
+  if (!canLeaveEmptyGroup) {
+    state = fixEmptyGroupsInTree(state);
+  }
+  return state;
+};
+
 
 /**
  * 
@@ -491,13 +521,13 @@ export default (config) => {
       return Object.assign({}, state, {...unset}, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
 
     case constants.ADD_GROUP:
-      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "group", action.id, action.properties)});
+      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "group", action.id, action.properties, action.config)});
 
     case constants.REMOVE_GROUP:
       return Object.assign({}, state, {...unset}, {tree: removeGroup(state.tree, action.path, action.config)});
 
     case constants.ADD_RULE:
-      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "rule", action.id, action.properties)});
+      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "rule", action.id, action.properties, action.config)});
 
     case constants.REMOVE_RULE:
       return Object.assign({}, state, {...unset}, {tree: removeRule(state.tree, action.path, action.config)});
@@ -539,11 +569,12 @@ export default (config) => {
       return Object.assign({}, state, {...unset}, {mousePos: action.mousePos, dragging: action.dragging});
 
     case constants.SET_DRAG_END:
-      return Object.assign({}, state, {...unset}, emptyDrag);
+      return Object.assign({}, state, {...unset}, {...emptyDrag, tree: checkEmptyGroups(state.tree, config)});
 
 
     default:
       return state;
     }
   };
+
 };

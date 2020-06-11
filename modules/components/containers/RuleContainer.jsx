@@ -20,7 +20,7 @@ export default (Rule) => {
       valueSrc: PropTypes.any,
       valueError: PropTypes.any,
       operatorOptions: PropTypes.object,
-      treeNodesCnt: PropTypes.number,
+      reordableNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
@@ -116,7 +116,8 @@ export default (Rule) => {
               valueError={this.props.valueError || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
-              treeNodesCnt={this.props.treeNodesCnt}
+              reordableNodesCnt={this.props.reordableNodesCnt}
+              totalRulesCnt={this.props.totalRulesCnt}
             /> : null
             ,
             <Rule
@@ -138,7 +139,8 @@ export default (Rule) => {
               valueError={this.props.valueError || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
-              treeNodesCnt={this.props.treeNodesCnt}
+              reordableNodesCnt={this.props.reordableNodesCnt}
+              totalRulesCnt={this.props.totalRulesCnt}
             />
           ]}
         </div>

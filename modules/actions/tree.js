@@ -4,6 +4,7 @@ import * as constants from "../constants";
 import Immutable from "immutable";
 
 
+
 /**
  * @param {object} config
  * @param {Immutable.Map} tree
@@ -22,7 +23,8 @@ export const addRule = (config, path, properties) => ({
   type: constants.ADD_RULE,
   path: path,
   id: uuid(),
-  properties: defaultRuleProperties(config).merge(properties || {})
+  properties: defaultRuleProperties(config).merge(properties || {}),
+  config: config
 });
 
 /**
