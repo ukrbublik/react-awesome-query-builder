@@ -61,7 +61,7 @@ const removeGroup = (state, path, config) => {
   const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
   const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
   if (isEmptyGroup && !canLeaveEmpty) {
-    state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config));
+    state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config), config);
   }
   state = fixPathsInTree(state);
   return state;
@@ -85,7 +85,7 @@ const removeRule = (state, path, config) => {
     if (isParentRuleGroup) {
       state = state.deleteIn(expandTreePath(parentPath));
     } else if (!canLeaveEmpty) {
-      state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField));
+      state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField), config);
     }
   }
   state = fixPathsInTree(state);
