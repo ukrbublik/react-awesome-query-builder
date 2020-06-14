@@ -55,17 +55,18 @@ export default class MultiSelectWidget extends Component {
       return (<Option key={value} value={value}>{label}</Option>);
     });
     let value = this.props.value && this.props.value.length ? this.props.value : null;
+    const isCalcWidth = !this.props.config.settings.disableAutoWidth;
 
     return (
         <Select
             mode={"multiple"}
-            style={{
+            style={isCalcWidth ? {
               minWidth: value ? null : this.placeholderWidth + 60,
               width: this.props.value ? null : this.placeholderWidth + 60,
-            }}
-            dropdownStyle={{
+            } : {}}
+            dropdownStyle={isCalcWidth ? {
               width: this.optionsMaxWidth + 60,
-            }}
+            } : {}}
             key={"widget-multiselect"}
             dropdownMatchSelectWidth={false}
             ref="val"

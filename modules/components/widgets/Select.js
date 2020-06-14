@@ -37,10 +37,11 @@ export default class SelectWidget extends Component {
     let placeholderWidth = calcTextWidth(placeholder, '14px');
     let customProps = this.props.customProps || {};
     const fieldAddWidth = this.props.config.settings.fieldAddWidth || 48
+    const isCalcWidth = !this.props.config.settings.disableAutoWidth;
 
     return (
         <Select
-            style={{ width: this.props.value ? null : placeholderWidth + fieldAddWidth }}
+            style={isCalcWidth ? { width: this.props.value ? null : placeholderWidth + fieldAddWidth } : {}}
             key={"widget-select"}
             dropdownMatchSelectWidth={false}
             ref="val"

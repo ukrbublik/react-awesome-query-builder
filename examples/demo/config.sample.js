@@ -44,9 +44,13 @@ export default {
     }
   },
   fields: {
-    multi: {
-      label: 'multi',
-      type: 'multi',
+    'multi.test': {
+      label: 'multi.test',
+      type: 'text',
+    },
+    'a.b.c': {
+      label: 'a.b.c',
+      type: 'text',
     },
     members: {
       label: 'Members',
@@ -886,6 +890,7 @@ export default {
       full: 'en-US',
       antd: enUS
     },
+    disableAutoWidth: false,
     maxLabelsLength: 50,
     hideConjForOne: true,
     renderSize: 'small',
@@ -900,7 +905,7 @@ export default {
     clearValueOnChangeOp: false,
     setDefaultFieldAndOp: false,
     maxNesting: 10,
-    fieldSeparator: '.',
+    fieldSeparator: '->',
     fieldSeparatorDisplay: '->',
     showLabels: false,
     valueLabel: 'Value',

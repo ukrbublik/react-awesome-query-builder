@@ -42,6 +42,9 @@ export default (Rule) => {
     }
 
     setField = (field) => {
+      console.log(': ----------------------------------------')
+      console.log('RuleContainer -> setField -> field', field)
+      console.log(': ----------------------------------------')
       this.props.actions.setField(this.props.path, field);
     }
 

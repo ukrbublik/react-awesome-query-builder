@@ -103,11 +103,13 @@ export default class Operator extends Component {
     let placeholderWidth = calcTextWidth(placeholder, '14px');
     let fieldSelectItems = this.buildSelectItems(this.operatorOptions);
     const fieldAddWidth = this.props.config.settings.fieldAddWidth || 48
+    const isCalcWidth = !this.props.config.settings.disableAutoWidth;
+
     let opSelect = (
         <Select
             dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
             dropdownMatchSelectWidth={false}
-            style={{ width: this.props.selectedOperator ? null : placeholderWidth + fieldAddWidth }}
+            style={isCalcWidth ? { width: this.props.selectedOperator ? null : placeholderWidth + fieldAddWidth } : {}}
             ref="field"
             placeholder={placeholder}
             size={this.props.config.settings.renderSize || "small"}
