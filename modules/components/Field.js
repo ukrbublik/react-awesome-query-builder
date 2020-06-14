@@ -9,7 +9,7 @@ const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import { map, last, keys, toString } from 'lodash';
+import { map, last, keys, toString, isFunction } from 'lodash';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
@@ -173,30 +173,36 @@ export default class Field extends Component {
     let selectWidth = calcTextWidth(selectText, '14px');
     //let tooltip = this.curFieldOpts().label2 || selectedFieldFullLabel || this.curFieldOpts().label;
     let fieldSelectItems = this.buildSelectItems(fieldOptions);
-    let customProps = this.props.customProps || {};
+    let { fieldFactory, ...customProps } = this.props.customProps || {};
     const renderFieldAsLabel = this.props.renderFieldAsLabel;
     const fieldAddWidth = this.props.config.settings.fieldAddWidth || 48
     const isCalcWidth = !this.props.config.settings.disableAutoWidth;
 
-    if (renderFieldAsLabel && this.props.selectedField) {
+    const element = (() => {
+      if (renderFieldAsLabel && this.props.selectedField) {
         const { showSearch, ...others } = customProps;
         return <span {...others}>
             {fieldDisplayLabel || this.props.selectedField || undefined}
         </span>;
-    } else {
-        return <Select
-            dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
-            dropdownMatchSelectWidth={false}
-            style={isCalcWidth ? { width: isFieldSelected && !customProps.showSearch ? null : selectWidth + fieldAddWidth } : {}}
-            ref="field"
-            placeholder={placeholder}
-            size={this.props.config.settings.renderSize || "small"}
-            onChange={this.handleFieldSelect}
-            value={this.props.selectedField || undefined}
-            filterOption={this.filterOption}
-            {...customProps}
-        >{fieldSelectItems}</Select>;
+      } else {
+          return <Select
+              dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
+              dropdownMatchSelectWidth={false}
+              style={isCalcWidth ? { width: isFieldSelected && !customProps.showSearch ? null : selectWidth + fieldAddWidth } : {}}
+              ref="field"
+              placeholder={placeholder}
+              size={this.props.config.settings.renderSize || "small"}
+              onChange={this.handleFieldSelect}
+              value={this.props.selectedField || undefined}
+              filterOption={this.filterOption}
+              {...customProps}
+          >{fieldSelectItems}</Select>;
+      }
+    })();
+    if (isFunction(fieldFactory)) {
+      return fieldFactory(element);
     }
+    return element;
   }
 
   renderAsDropdown() {
