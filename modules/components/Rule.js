@@ -142,7 +142,8 @@ class Rule extends Component {
                                     renderFieldAsLabel={this.props.config.settings.renderFieldAsLabel}
                                     customProps={
                                         merge(this.props.config.settings.customFieldSelectProps, {
-                                            disabled: !!this.props.config.settings.readonlyMode
+                                          disabled: !!this.props.config.settings.readonlyMode,
+                                          fieldFactory: this.props.config.settings.fieldFactory,
                                         })
                                     }
                                 />

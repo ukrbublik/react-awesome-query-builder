@@ -200,7 +200,7 @@ export default class Field extends Component {
       }
     })();
     if (isFunction(fieldFactory)) {
-      return fieldFactory(element);
+      return fieldFactory(element, this.props);
     }
     return element;
   }
