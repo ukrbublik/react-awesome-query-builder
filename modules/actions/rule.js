@@ -15,6 +15,18 @@ export const setField = (config, path, field) => ({
 /**
  * @param {object} config
  * @param {Immutable.List} path
+ * @param {object} options
+ */
+export const setOptions = (config, path, options) => ({
+  type: constants.SET_OPTIONS,
+  path: path,
+  options: options,
+  config: config
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
  * @param {string} operator
  */
 export const setOperator = (config, path, operator) => ({

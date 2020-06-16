@@ -178,31 +178,28 @@ export default class Field extends Component {
     const fieldAddWidth = this.props.config.settings.fieldAddWidth || 48
     const isCalcWidth = !this.props.config.settings.disableAutoWidth;
 
-    const element = (() => {
-      if (renderFieldAsLabel && this.props.selectedField) {
-        const { showSearch, ...others } = customProps;
-        return <span {...others}>
-            {fieldDisplayLabel || this.props.selectedField || undefined}
-        </span>;
-      } else {
-          return <Select
-              dropdownAlign={dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined}
-              dropdownMatchSelectWidth={false}
-              style={isCalcWidth ? { width: isFieldSelected && !customProps.showSearch ? null : selectWidth + fieldAddWidth } : {}}
-              ref="field"
-              placeholder={placeholder}
-              size={this.props.config.settings.renderSize || "small"}
-              onChange={this.handleFieldSelect}
-              value={this.props.selectedField || undefined}
-              filterOption={this.filterOption}
-              {...customProps}
-          >{fieldSelectItems}</Select>;
-      }
-    })();
-    if (isFunction(fieldFactory)) {
-      return fieldFactory(element, this.props);
+    if (renderFieldAsLabel && this.props.selectedField) {
+      const { showSearch, ...others } = customProps;
+      return <span {...others}>
+          {fieldDisplayLabel || this.props.selectedField || undefined}
+      </span>;
     }
-    return element;
+    const selectProps = {
+      dropdownAlign: dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined,
+      dropdownMatchSelectWidth: false,
+      style: isCalcWidth ? { width: isFieldSelected && !customProps.showSearch ? null : selectWidth + fieldAddWidth } : {},
+      placeholder,
+      size: this.props.config.settings.renderSize || "small",
+      onChange: this.handleFieldSelect,
+      value: this.props.selectedField || undefined,
+      filterOption: this.filterOption,
+      ...customProps,
+      children: fieldSelectItems,
+    };
+    if (isFunction(fieldFactory)) {
+      return fieldFactory(selectProps, this.props);
+    }
+    return <Select {...selectProps} />;
   }
 
   renderAsDropdown() {

@@ -350,6 +350,18 @@ const _validateValue = (config, field, operator, value, valueType, valueSrc) => 
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
+ * @param {object} options
+ * @param {*} value
+ */
+const setOptions = (state, path, options = {}) => {
+  return state.updateIn(expandTreePath(path, 'properties'), (map) => map.withMutations((current) => {
+    return current.set('options', Object.assign({}, current.get('options') || {}, options));
+  }));
+};
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
  * @param {string} field
  */
 const setField = (state, path, newField, config) => {
@@ -530,6 +542,9 @@ export default (config) => {
 
             case constants.SET_FIELD:
                 return Object.assign({}, state, {tree: setField(state.tree, action.path, action.field, action.config)});
+
+            case constants.SET_OPTIONS:
+                return Object.assign({}, state, {tree: setOptions(state.tree, action.path, action.options)});
 
             case constants.SET_OPERATOR:
                 return Object.assign({}, state, {tree: setOperator(state.tree, action.path, action.operator, action.config)});

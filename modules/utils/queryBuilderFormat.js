@@ -80,6 +80,7 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         const operator = properties.get('operator');
         const options = properties.get('operatorOptions');
         let field = properties.get('field');
+        const _options = properties.get('options');
         let value = properties.get('value');
         let valueSrc = properties.get('valueSrc');
         let valueType = properties.get('valueType');
@@ -141,6 +142,7 @@ export const queryBuilderFormat = (item, config, rootQuery = null) => {
         var ruleQuery = {
             id,
             field,
+            options: _options,
             type: fieldType,
             input: typeConfig.mainWidget,
             operator,

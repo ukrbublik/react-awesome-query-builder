@@ -7,6 +7,7 @@ export const ADD_NEW_GROUP = 'ADD_NEW_GROUP';
 export const ADD_RULE = 'ADD_RULE';
 export const REMOVE_RULE = 'REMOVE_RULE';
 export const SET_FIELD = 'SET_FIELD';
+export const SET_OPTIONS = 'SET_OPTIONS';
 export const SET_OPERATOR = 'SET_OPERATOR';
 export const SET_VALUE = 'SET_VALUE';
 export const SET_VALUE_SRC = 'SET_VALUE_SRC';

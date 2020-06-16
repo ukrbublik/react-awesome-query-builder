@@ -5,7 +5,7 @@ import uuid from './uuid';
 export default function fromJSON(data, config, options = {}) {
   const json = isString(data) ? JSON.parse(data) : (data || {});
   if (options.type === 'rule') {
-    const { id = uuid(), field, operator, values, operatorOptions = null } = json;
+    const { id = uuid(), field, operator, options: _options = {}, values, operatorOptions = null } = json;
     const path = (options.path || new List()).concat(id);
     return new Map({
       type: 'rule',
@@ -16,7 +16,8 @@ export default function fromJSON(data, config, options = {}) {
         value: new List(map(values, 'value')),
         valueSrc: new List(map(values, () => 'value')),
         operatorOptions,
-        valueType: new List(map(values, 'type'))
+        valueType: new List(map(values, 'type')),
+        options: _options,
       }),
       path
     });

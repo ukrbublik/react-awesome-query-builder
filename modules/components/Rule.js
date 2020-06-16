@@ -138,6 +138,8 @@ class Rule extends Component {
                                     config={this.props.config}
                                     selectedField={this.props.selectedField}
                                     setField={this.props.setField}
+                                    options={this.props.options}
+                                    setOptions={this.props.setOptions}
                                     renderAsDropdown={this.props.config.settings.renderFieldAndOpAsDropdown}
                                     renderFieldAsLabel={this.props.config.settings.renderFieldAsLabel}
                                     customProps={
