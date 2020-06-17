@@ -1,4 +1,7 @@
 # Changelog
+- 2.1.2
+  - Added `maxNumberOfRules`
+  - Enabled ESLint for examples with TS
 - 2.1.1
   - Fixed export of `not_like` op to JsonLogic
 - 2.1.0
