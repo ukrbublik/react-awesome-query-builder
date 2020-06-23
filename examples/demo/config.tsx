@@ -7,6 +7,8 @@ import {
   DateTimeFieldSettings,
 } from "react-awesome-query-builder";
 import moment from "moment";
+//import en_US from 'antd/lib/locale-provider/en_US';
+//import ru_RU from 'antd/lib/locale-provider/ru_RU';
 
 // @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
@@ -145,8 +147,6 @@ export default (skin) => {
     locale: {
       short: "ru",
       full: "ru-RU",
-      //import en_US from 'antd/lib/locale-provider/en_US';
-      //import ru_RU from 'antd/lib/locale-provider/ru_RU';
       //antd: ru_RU,
     },
     valueLabel: "Value",
@@ -196,8 +196,8 @@ export default (skin) => {
     // canRegroup: true,
     // showNot: true,
     // showLabels: true,
-    maxNesting: 3,
-    canLeaveEmptyGroup: true, //after deletion
+    maxNesting: 5,
+    canLeaveEmptyGroup: true,
     showErrorMessage: true,
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
