@@ -6,7 +6,7 @@
     ],
     "plugins": [
         ["transform-decorators-legacy"],
-        ["import", { libraryName: "antd", style: "css" }],
+        ["import", { libraryName: "antd", style: true }],
         ["transform-es2015-modules-commonjs", {
             "allowTopLevelThis": true,
             "loose": true
