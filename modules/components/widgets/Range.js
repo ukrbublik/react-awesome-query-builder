@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Slider, InputNumber, Col, Row } from 'antd';
-import 'antd/lib/date-picker/style';
 import { getFieldConfig } from '../../utils/configUtils';
 import shallowCompare from 'react-addons-shallow-compare';
 
@@ -39,7 +38,7 @@ export default class RangeWidget extends Component {
       value[1] = valueFrom;
     this.props.setValue(value);
   }
-  
+
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
     value = [...value];

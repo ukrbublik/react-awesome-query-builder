@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { InputNumber, Col } from 'antd';
-import 'antd/lib/date-picker/style';
 import {getFieldConfig} from '../../utils/configUtils';
 import shallowCompare from 'react-addons-shallow-compare';
 
