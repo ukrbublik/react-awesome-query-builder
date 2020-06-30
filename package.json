@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "dependencies": {
+    "antd": "^4.3.5",
     "classnames": "^2.2.6",
     "clone": "^2.1.1",
     "immutable": "^3.7.6",
@@ -55,7 +56,6 @@
     "react-redux": "^5.0.0",
     "react-transition-group": "^1.2.1",
     "redux": "^3.7.2",
-    "antd": "^4.3.5",
     "@ant-design/icons": "^4.0.0"
   },
   "devDependencies": {
