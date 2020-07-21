@@ -252,6 +252,7 @@ Pull Requests are always welcomed :)
 
 ## Contributors
 
+
 ### Code Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
@@ -279,6 +280,12 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/react-awesome-query-builder/organization/7/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/7/avatar.svg"></a>
 <a href="https://opencollective.com/react-awesome-query-builder/organization/8/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/react-awesome-query-builder/organization/9/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/9/avatar.svg"></a>
+
+
+react-awesome-query-builder is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
+
+<!--<a href="https://tracking.gitads.io/?repo=react-awesome-query-builder"> <img src="https://images.gitads.io/react-awesome-query-builder" alt="GitAds"/> </a>-->
+
 
 ## License
 MIT. See also `LICENSE.txt`
