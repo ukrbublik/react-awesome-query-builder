@@ -78,6 +78,7 @@ export const fixPathsInTree = (tree) => {
   let newTree = tree;
 
   function _processNode (item, path, lev) {
+    if (!item) return;
     const _id = item.get("id");
     const itemPath = path.push(item.get("id"));
     const currItemPath = item.get("path");
@@ -103,19 +104,21 @@ export const fixEmptyGroupsInTree = (tree) => {
   let newTree = tree;
 
   function _processNode (item, path, lev) {
+    if (!item) return false;
     const id = item.get("id");
     const itemPath = path.push(item.get("id"));
 
     const children = item.get("children1");
     if (children) {
-      children.map((child, _childId) => {
-        _processNode(child, itemPath, lev + 1);
-      });
-      if (children.size == 0) {
+      const allChildrenGone = children.map((child, _childId) => {
+        return _processNode(child, itemPath, lev + 1);
+      }).reduce((curr, v) => (curr && v), true);
+      if ((children.size == 0 || allChildrenGone) && lev > 0) {
         newTree = newTree.deleteIn(expandTreePath(itemPath));
-        return;
+        return true;
       }
     }
+    return false;
   }
 
   _processNode(tree, new Immutable.List(), 0);

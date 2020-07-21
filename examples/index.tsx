@@ -1,11 +1,11 @@
-import { hot } from 'react-hot-loader/root';
-import { AppContainer } from 'react-hot-loader';
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
-import Demo from './demo/demo';
+import { hot } from "react-hot-loader/root";
+import { AppContainer } from "react-hot-loader";
+import React, {Component} from "react";
+import ReactDOM from "react-dom";
+import Demo from "./demo/demo";
 
-import '../css/antd.less';
-import '../css/styles.scss';
+import "../css/antd.less";
+import "../css/styles.scss";
 //import '../css/compact_styles.scss'; //optional
 
 /*
@@ -21,10 +21,10 @@ import '../css/denormalize.scss';
 */
 
 const HotDemo = hot(Demo);
-const rootElement = window.document.getElementById('root');
+const rootElement = window.document.getElementById("root");
 
 ReactDOM.render((
-    <AppContainer>
-        <HotDemo />
-    </AppContainer>
+  <AppContainer>
+    <HotDemo />
+  </AppContainer>
 ), rootElement);

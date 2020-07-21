@@ -6,9 +6,15 @@
         "jest": true,
         "node": true
     },
+    "ignorePatterns": [
+        "**/node_modules/*",
+        "bundle.js",
+        "webpack.config.js"
+    ],
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/eslint-recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -24,14 +30,15 @@
     },
     "plugins": [
         "react",
-        "babel"
+        "babel",
+        "@typescript-eslint"
     ],
     "settings": {
         "react": {
             "version": "detect"
         }
     },
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "rules": {
         "indent": [
             "error",

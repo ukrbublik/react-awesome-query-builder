@@ -7,6 +7,8 @@ import {ElementType, ReactElement, Factory} from 'react';
 // common
 /////////////////
 
+type AnyObject = object;
+
 type MongoValue = any;
 
 type JsonLogicResult = {
@@ -16,9 +18,9 @@ type JsonLogicResult = {
 };
 type JsonLogicTree = Object;
 type JsonLogicValue = any;
-type JsonLogicField = { "var": String };
+type JsonLogicField = { "var": string };
 
-type RuleValue = Boolean | Number | String | Date | Array<String> | any;
+type RuleValue = boolean | number | string | Date | Array<string> | any;
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
@@ -35,36 +37,36 @@ type ValueSource = "value" | "field" | "func" | "const";
 
 type JsonGroup = {
   type: "group",
-  id?: String,
+  id?: string,
   children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup},
   properties?: {
-    conjunction: String,
-    not?: Boolean,
+    conjunction: string,
+    not?: boolean,
   }
 };
 type JsonRuleGroup = {
   type: "rule_group",
-  id?: String,
+  id?: string,
   children1?: {[id: string]: JsonRuleGroup|JsonRule},
   properties?: {
-    field: String | Empty,
+    field: string | Empty,
   }
 };
 type JsonRule = {
   type: "rule",
   properties: {
-    field: String | Empty,
-    operator: String | Empty,
+    field: string | Empty,
+    operator: string | Empty,
     value: Array<RuleValue>,
     valueSrc: Array<ValueSource>,
-    valueType: Array<String>,
-    valueError?: Array<String>,
-    operatorOptions?: {}
+    valueType: Array<string>,
+    valueError?: Array<string>,
+    operatorOptions?: AnyObject
   }
 };
 export type JsonTree = JsonGroup;
 
-export type ImmutableTree = ImmutableMap<String, String|Object>;
+export type ImmutableTree = ImmutableMap<string, string|Object>;
 
 
 ////////////////
@@ -75,8 +77,8 @@ export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object;
-  queryString(tree: ImmutableTree, config: Config, isForDisplay?: Boolean): String;
-  sqlFormat(tree: ImmutableTree, config: Config): String;
+  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string;
+  sqlFormat(tree: ImmutableTree, config: Config): string;
   mongodbFormat(tree: ImmutableTree, config: Config): Object;
   // load, save
   getTree(tree: ImmutableTree): JsonTree;
@@ -86,7 +88,7 @@ export interface Utils {
   // import
   loadFromJsonLogic(logicTree: JsonLogicTree, config: Config): ImmutableTree;
   // other
-  uuid(): String;
+  uuid(): string;
 };
 
 export interface BuilderProps {
@@ -126,26 +128,26 @@ export interface Config {
 // Widgets, WidgetProps
 /////////////////
 
-type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: Boolean, op: String, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator, rightFieldDef?: Field) => String;
-type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: String, opDef: Operator) => MongoValue;
-type ValidateValue =       (val: RuleValue, fieldDef: Field) => boolean | string | null;
+type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
+type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
 
 interface BaseWidgetProps {
   value: RuleValue,
   setValue(val: RuleValue): void,
-  placeholder: String,
-  field: String,
+  placeholder: string,
+  field: string,
   operator: string,
   fieldDefinition: Field,
   config: Config,
-  delta?: Number,
-  customProps?: {},
-  readonly?: Boolean,
+  delta?: number,
+  customProps?: AnyObject,
+  readonly?: boolean,
 };
 interface RangeWidgetProps extends BaseWidgetProps {
-  placeholders: Array<String>,
-  textSeparators: Array<String>,
+  placeholders: Array<string>,
+  textSeparators: Array<string>,
 };
 export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
 
@@ -158,13 +160,13 @@ export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 
 export interface BaseWidget {
-  customProps?: {},
-  type: String,
-  jsType?: String,
+  customProps?: AnyObject,
+  type: string,
+  jsType?: string,
   factory: Factory<WidgetProps>,
   valueSrc?: ValueSource,
-  valuePlaceholder?: String,
-  valueLabel?: String,
+  valuePlaceholder?: string,
+  valueLabel?: string,
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
@@ -172,14 +174,14 @@ export interface BaseWidget {
   validateValue?: ValidateValue,
 };
 export interface RangeableWidget extends BaseWidget {
-  singleWidget?: String,
-  valueLabels?: Array<String | {label: String, placeholder: String}>,
+  singleWidget?: string,
+  valueLabels?: Array<string | {label: string, placeholder: string}>,
 };
 export interface FieldWidget {
-  customProps?: {},
+  customProps?: AnyObject,
   valueSrc: "field",
-  valuePlaceholder?: String,
-  valueLabel?: String,
+  valuePlaceholder?: string,
+  valueLabel?: string,
   formatValue: FormatValue, // with rightFieldDef
   sqlFormatValue: SqlFormatValue, // with rightFieldDef
   //obsolete:
@@ -201,35 +203,35 @@ export type Widgets = TypedMap<Widget>;
 // Conjunctions
 /////////////////
 
-type FormatConj = (children: ImmutableList<String>, conj: String, not: Boolean, isForDisplay?: Boolean) => String;
-type SqlFormatConj = (children: ImmutableList<String>, conj: String, not: Boolean) => String;
+type FormatConj = (children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
+type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
 
 export interface Conjunction {
-  label: String,
+  label: string,
   formatConj: FormatConj,
   sqlFormatConj: SqlFormatConj,
-  mongoConj: String,
-  reversedConj?: String,
+  mongoConj: string,
+  reversedConj?: string,
 };
 export type Conjunctions = TypedMap<Conjunction>;
 
 export interface ConjunctionOption {
-  id: String,
-  key: String,
-  label: String,
-  checked: Boolean,
+  id: string,
+  key: string,
+  label: string,
+  checked: boolean,
 };
 
 export interface ConjsProps {
-  path: String, 
-  readonly?: Boolean,
-  disabled?: Boolean,
-  selectedConjunction?: String,
-  setConjunction(conj: String): void,
+  path: string, 
+  readonly?: boolean,
+  disabled?: boolean,
+  selectedConjunction?: string,
+  setConjunction(conj: string): void,
   conjunctionOptions?: Array<ConjunctionOption>,
   config?: Config,
-  not: Boolean,
-  setNot(not: Boolean): void,
+  not: boolean,
+  setNot(not: boolean): void,
 }
 
 
@@ -240,7 +242,7 @@ export interface ConjsProps {
 export interface ButtonProps {
   type: "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup", 
   onClick(): void, 
-  label: String,
+  label: string,
   config?: Config,
 };
 
@@ -255,7 +257,7 @@ export interface ProviderProps {
 };
 
 export type ValueSourceItem = {
-  label: String, 
+  label: string, 
 };
 type ValueSourcesItems = TypedKeyMap<ValueSource, ValueSourceItem>;
 
@@ -263,45 +265,45 @@ export interface ValueSourcesProps {
   config?: Config,
   valueSources: ValueSourcesItems, 
   valueSrc?: ValueSource, 
-  setValueSrc(valueSrc: String): void, 
-  readonly?: Boolean,
-  title: String,
+  setValueSrc(valueSrc: string): void, 
+  readonly?: boolean,
+  title: string,
 };
 
 export interface ConfirmModalProps {
   onOk(): void, 
-  okText: String, 
-  cancelText?: String, 
-  title: String,
+  okText: string, 
+  cancelText?: string, 
+  title: string,
 };
 
 export interface RuleErrorProps {
-  error: String,
+  error: string,
 };
 
 /////////////////
 // Operators
 /////////////////
 
-type FormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}, isForDisplay?: Boolean) => String;
-type MongoFormatOperator = (field: string, op: String, vals: MongoValue | Array<MongoValue>, useExpr?: Boolean, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => Object;
-type SqlFormatOperator = (field: String, op: String, vals: String | Array<String>, valueSrc?: ValueSource, valueType?: String, opDef?: Operator, operatorOptions?: {}) => String;
-type JsonLogicFormatOperator = (field: JsonLogicField, op: String, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: {}) => JsonLogicTree;
+type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean) => string;
+type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => Object;
+type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => string;
+type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject) => JsonLogicTree;
 
 interface ProximityConfig {
-  optionLabel: String,
-  optionTextBefore: String,
-  optionPlaceholder: String,
-  minProximity: Number,
-  maxProximity: Number,
+  optionLabel: string,
+  optionTextBefore: string,
+  optionPlaceholder: string,
+  minProximity: number,
+  maxProximity: number,
   defaults: {
-      proximity: Number,
+      proximity: number,
   },
-  customProps?: {},
+  customProps?: AnyObject,
 };
 export interface ProximityProps extends ProximityConfig {
-  options: ImmutableMap<String, any>,
-  setOption: (key: String, value: any) => void,
+  options: ImmutableMap<string, any>,
+  setOption: (key: string, value: any) => void,
   config: Config,
 };
 export interface ProximityOptions extends ProximityConfig {
@@ -309,16 +311,16 @@ export interface ProximityOptions extends ProximityConfig {
 };
 
 interface BaseOperator {
-  label: String,
-  reversedOp: String,
-  cardinality?: Number,
+  label: string,
+  reversedOp: string,
+  cardinality?: number,
   formatOp?: FormatOperator,
-  labelForFormat?: String,
+  labelForFormat?: string,
   mongoFormatOp?: MongoFormatOperator,
-  sqlOp?: String,
+  sqlOp?: string,
   sqlFormatOp?: SqlFormatOperator,
-  jsonLogic?: String | JsonLogicFormatOperator,
-  _jsonLogicIsRevArgs?: Boolean,
+  jsonLogic?: string | JsonLogicFormatOperator,
+  _jsonLogicIsRevArgs?: boolean,
   valueSources?: Array<ValueSource>,
 };
 interface UnaryOperator extends BaseOperator {
@@ -329,9 +331,9 @@ interface BinaryOperator extends BaseOperator {
 };
 interface Operator2 extends BaseOperator {
   //cardinality: 2
-  textSeparators: Array<String>,
-  valueLabels: Array<String | {label: String, placeholder: String}>,
-  isSpecialRange?: Boolean,
+  textSeparators: Array<string>,
+  valueLabels: Array<string | {label: string, placeholder: string}>,
+  isSpecialRange?: boolean,
 };
 interface OperatorProximity extends Operator2 {
   options: ProximityOptions,
@@ -348,12 +350,12 @@ export type Operators = TypedMap<Operator>;
 interface WidgetConfigForType {
   widgetProps?: Optional<Widget>,
   opProps?: Optional<Operator>,
-  operators?: Array<String>,
+  operators?: Array<string>,
 };
 
 interface Type {
   valueSources?: Array<ValueSource>,
-  defaultOperator?: String,
+  defaultOperator?: string,
   widgets: TypedMap<WidgetConfigForType>,
 };
 export type Types = TypedMap<Type>;
@@ -363,79 +365,79 @@ export type Types = TypedMap<Type>;
 // Fields
 /////////////////
 
-type FieldType = String | "!struct" | "!group";
+type FieldType = string | "!struct" | "!group";
 
 interface ListItem {
   value: any,
-  title?: String,
+  title?: string,
 };
 interface TreeItem extends ListItem {
   children?: Array<TreeItem>,
   parent?: any,
-  disabled?: Boolean,
-  selectable?: Boolean,
-  disableCheckbox?: Boolean,
-  checkable?: Boolean,
+  disabled?: boolean,
+  selectable?: boolean,
+  disableCheckbox?: boolean,
+  checkable?: boolean,
 };
 type TreeData = Array<TreeItem>;
-type ListValues = TypedMap<String> | TypedKeyMap<String | number, String> | Array<ListItem> | Array<String | number>;
+type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
-interface BasicFieldSettings {
+export interface BasicFieldSettings {
   validateValue?: ValidateValue,
 }
-interface NumberFieldSettings extends BasicFieldSettings {
+export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
   max?: number,
   step?: number,
-  marks?: {[mark: number]: ReactElement | String}
+  marks?: {[mark: number]: ReactElement | string}
 };
-interface DateTimeFieldSettings extends BasicFieldSettings {
-  timeFormat?: String,
-  dateFormat?: String,
-  valueFormat?: String,
-  use12Hours?: Boolean,
+export interface DateTimeFieldSettings extends BasicFieldSettings {
+  timeFormat?: string,
+  dateFormat?: string,
+  valueFormat?: string,
+  use12Hours?: boolean,
 };
-interface SelectFieldSettings extends BasicFieldSettings {
+export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
-  allowCustomValues?: Boolean,
+  allowCustomValues?: boolean,
 }
-interface TreeSelectFieldSettings extends BasicFieldSettings {
+export interface TreeSelectFieldSettings extends BasicFieldSettings {
   listValues?: TreeData,
-  treeExpandAll?: Boolean,
-  treeSelectOnlyLeafs?:  Boolean,
+  treeExpandAll?: boolean,
+  treeSelectOnlyLeafs?:  boolean,
 }
-interface BooleanFieldSettings extends BasicFieldSettings {
-  labelYes?: ReactElement | String,
-  labelNo?: ReactElement | String,
+export interface BooleanFieldSettings extends BasicFieldSettings {
+  labelYes?: ReactElement | string,
+  labelNo?: ReactElement | string,
 };
 export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
-  label?: String,
-  tooltip?: String,
+  label?: string,
+  tooltip?: string,
 };
 interface ValueField extends BaseField {
-  type: String,
-  preferWidgets?: Array<String>,
+  type: string,
+  preferWidgets?: Array<string>,
   valueSources?: Array<ValueSource>,
-  funcs?: Array<String>,
-  tableName?: String,
+  funcs?: Array<string>,
+  tableName?: string,
   fieldSettings?: FieldSettings,
   defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,
   mainWidgetProps?: Optional<Widget>,
-  hideForSelect?: Boolean,
-  hideForCompare?: Boolean,
+  hideForSelect?: boolean,
+  hideForCompare?: boolean,
   //obsolete - moved to FieldSettings
   listValues?: ListValues,
-  allowCustomValues?: Boolean,
+  allowCustomValues?: boolean,
 };
 interface SimpleField extends ValueField {
-  label2?: String,
-  operators?: Array<String>,
-  defaultOperator?: String,
-  excludeOperators?: Array<String>,
+  label2?: string,
+  operators?: Array<string>,
+  defaultOperator?: string,
+  excludeOperators?: Array<string>,
 };
 interface FieldStruct extends BaseField {
   type: "!struct",
@@ -457,30 +459,30 @@ export type Fields = TypedMap<FieldOrGroup>;
 
 export type FieldItem = {
   items?: FieldItems, 
-  key: String, 
-  path?: String, 
-  label: String, 
-  fullLabel?: String, 
-  altLabel?: String, 
-  tooltip?: String,
-  disabled?: Boolean,
+  key: string, 
+  path?: string, 
+  label: string, 
+  fullLabel?: string, 
+  altLabel?: string, 
+  tooltip?: string,
+  disabled?: boolean,
 };
 type FieldItems = TypedMap<FieldItem>;
 
 export interface FieldProps {
   items: FieldItems,
-  setField(path: String): void,
-  selectedKey: String | Empty,
-  selectedKeys?: Array<String> | Empty,
-  selectedPath?: Array<String> | Empty,
-  selectedLabel?: String | Empty,
-  selectedAltLabel?: String | Empty,
-  selectedFullLabel?: String | Empty,
+  setField(path: string): void,
+  selectedKey: string | Empty,
+  selectedKeys?: Array<string> | Empty,
+  selectedPath?: Array<string> | Empty,
+  selectedLabel?: string | Empty,
+  selectedAltLabel?: string | Empty,
+  selectedFullLabel?: string | Empty,
   config?: Config,
-  customProps?: {},
-  placeholder?: String,
-  selectedOpts?: {tooltip?: String},
-  readonly?: Boolean,
+  customProps?: AnyObject,
+  placeholder?: string,
+  selectedOpts?: {tooltip?: string},
+  readonly?: boolean,
 }
 
 
@@ -490,43 +492,43 @@ export interface FieldProps {
 
 type ConfirmFunc = (opts: ConfirmModalProps) => void;
 
-type ValueSourcesInfo = {[vs in ValueSource]?: {label: String, widget?: String}};
+type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
-type FormatReverse = (q: String, op: String, reversedOp: String, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: Boolean) => String;
-type FormatField = (field: String, parts: Array<String>, label2: String, fieldDefinition: Field, config: Config, isForDisplay: Boolean) => String;
-type CanCompareFieldWithField = (leftField: String, leftFieldConfig: Field, rightField: String, rightFieldConfig: Field, op: String) => Boolean;
+type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
+type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
+type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
 
 export interface LocaleSettings {
   locale?: {
-    short: String,
-    full: String,
+    short: string,
+    full: string,
     antd?: Object,
   },
-  valueLabel?: String,
-  valuePlaceholder?: String,
-  fieldLabel?: String,
-  operatorLabel?: String,
-  fieldPlaceholder?: String,
-  funcPlaceholder?: String,
-  funcLabel?: String,
-  operatorPlaceholder?: String,
-  deleteLabel?: String,
-  addGroupLabel?: String,
-  addRuleLabel?: String,
-  delGroupLabel?: String,
-  notLabel?: String,
-  valueSourcesPopupTitle?: String,
+  valueLabel?: string,
+  valuePlaceholder?: string,
+  fieldLabel?: string,
+  operatorLabel?: string,
+  fieldPlaceholder?: string,
+  funcPlaceholder?: string,
+  funcLabel?: string,
+  operatorPlaceholder?: string,
+  deleteLabel?: string,
+  addGroupLabel?: string,
+  addRuleLabel?: string,
+  delGroupLabel?: string,
+  notLabel?: string,
+  valueSourcesPopupTitle?: string,
   removeRuleConfirmOptions?: {
-      title?: String,
-      okText?: String,
-      okType?: String,
+      title?: string,
+      okText?: string,
+      okType?: string,
   },
   removeGroupConfirmOptions?: {
-    title?: String,
-    okText?: String,
-    okType?: String,
+    title?: string,
+    okText?: string,
+    okType?: string,
   },
 };
 
@@ -543,10 +545,10 @@ export interface RenderSettings {
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
-  showLabels?: Boolean,
-  hideConjForOne?: Boolean,
-  maxLabelsLength?: Number,
-  customFieldSelectProps?: {},
+  showLabels?: boolean,
+  hideConjForOne?: boolean,
+  maxLabelsLength?: number,
+  customFieldSelectProps?: AnyObject,
   renderBeforeWidget?: Factory<FieldProps>;
   renderAfterWidget?: Factory<FieldProps>;
   renderBeforeActions?: Factory<FieldProps>;
@@ -557,27 +559,27 @@ export interface RenderSettings {
 export interface BehaviourSettings {
   valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField,
-  canReorder?: Boolean,
-  canRegroup?: Boolean,
-  showNot?: Boolean,
-  maxNesting?: Number,
+  canReorder?: boolean,
+  canRegroup?: boolean,
+  showNot?: boolean,
+  maxNesting?: number,
   setOpOnChangeField: Array<ChangeFieldStrategy>,
-  clearValueOnChangeField?: Boolean,
-  clearValueOnChangeOp?: Boolean,
-  canLeaveEmptyGroup?: Boolean,
-  immutableGroupsMode?: Boolean,
-  immutableFieldsMode?: Boolean,
-  immutableOpsMode?: Boolean,
-  immutableValuesMode?: Boolean,
-  maxNumberOfRules?: Number
-  showErrorMessage?: Boolean
-  canShortMongoQuery?: Boolean,
-  convertableWidgets?: TypedMap<Array<String>>,
+  clearValueOnChangeField?: boolean,
+  clearValueOnChangeOp?: boolean,
+  canLeaveEmptyGroup?: boolean,
+  immutableGroupsMode?: boolean,
+  immutableFieldsMode?: boolean,
+  immutableOpsMode?: boolean,
+  immutableValuesMode?: boolean,
+  maxNumberOfRules?: Number,
+  showErrorMessage?: boolean,
+  canShortMongoQuery?: boolean,
+  convertableWidgets?: TypedMap<Array<string>>,
 };
 
 export interface OtherSettings {
-  fieldSeparator?: String,
-  fieldSeparatorDisplay?: String,
+  fieldSeparator?: string,
+  fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse,
   formatField?: FormatField,
 };
@@ -589,34 +591,34 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & Oth
 // Funcs
 /////////////////
 
-type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => String;
-type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: Boolean) => String;
+type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
+type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
 type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
 
 interface FuncGroup {
   type?: "!struct",
-  label?: String,
+  label?: string,
   subfields: TypedMap<Func>,
 }
 
 export interface Func {
-  returnType: String,
+  returnType: string,
   args: TypedMap<FuncArg>,
-  label?: String,
-  sqlFunc?: String,
-  mongoFunc?: String,
-  mongoArgsAsObject?: Boolean,
-  jsonLogic?: String | JsonLogicFormatFunc,
-  jsonLogicIsMethod?: Boolean,
+  label?: string,
+  sqlFunc?: string,
+  mongoFunc?: string,
+  mongoArgsAsObject?: boolean,
+  jsonLogic?: string | JsonLogicFormatFunc,
+  jsonLogicIsMethod?: boolean,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,
-  renderBrackets?: Array<ReactElement | String>,
-  renderSeps?: Array<ReactElement | String>,
+  renderBrackets?: Array<ReactElement | string>,
+  renderSeps?: Array<ReactElement | string>,
 };
 export interface FuncArg extends ValueField {
-  isOptional?: Boolean,
+  isOptional?: boolean,
 };
 export type Funcs = TypedMap<Func | FuncGroup>;
 

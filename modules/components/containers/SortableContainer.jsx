@@ -516,7 +516,7 @@ export default (Builder, CanMoveFn = null) => {
       const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
         || toII.parentType == "rule_group";
 
-      if (maxNesting && (newLev + 1) >= maxNesting)
+      if (maxNesting && (newLev + 1) > maxNesting)
         return false;
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange))

@@ -13,9 +13,9 @@ export default class TreeSelectWidget extends PureComponent {
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
     readonly: PropTypes.bool,
+    treeMultiple: PropTypes.bool,
     // from fieldSettings:
     listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
-    treeMultiple: PropTypes.bool,
   };
 
   constructor(props) {

@@ -39,7 +39,7 @@ export default class Proximity extends PureComponent {
     const defaultProximity = defaults ? defaults.proximity : undefined;
     const {showLabels} = settings;
     const selectedProximity = options.get("proximity", defaultProximity);
-    const listValues = range(minProximity, maxProximity + 1).map((item) => ({title: item, value: item}));
+    const proxValues = range(minProximity, maxProximity + 1).map((item) => ({title: item, value: item}));
     const Select = widgets.select.factory;
 
     return (
@@ -56,7 +56,7 @@ export default class Proximity extends PureComponent {
           <Select
             config={config}
             value={selectedProximity}
-            listValues={listValues}
+            listValues={proxValues}
             setValue={this.handleChange}
             readonly={readonly}
             placeholder={optionPlaceholder}

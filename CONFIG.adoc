@@ -27,7 +27,7 @@ Usually it's enough to just reuse link:#basic-config[basic config], provide your
 Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).
 
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
-They have common param `isForDisplay` - false by default, true will be used for `QbUtils.queryString(immutableTree, config, true)` (see 3rd param true). +
+They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `sqlFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
@@ -39,9 +39,29 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 
 == Basic config
 
+Use `BasicConfig` for simple vanilla UI or `AntdConfig` for more advanced UI with AntDesign widgets.
 [source,javascript]
 ----
 import {BasicConfig} from 'react-awesome-query-builder';
+import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
+const InitialConfig = BasicConfig; // or AntdConfig
+
+const myConfig = {
+  ...InitialConfig, // reuse basic config
+
+  fields: {
+    stock: {
+        label: 'In stock',
+        type: 'boolean',
+    },
+    // ... my other fields
+  }
+};
+----
+
+What is in basic config?
+[source,javascript]
+----
 const {
     conjunctions: {
         AND, 
@@ -72,11 +92,11 @@ const {
       text,
       number,
       slider,
-      rangeslider,
+      rangeslider, // missing in `BasicConfig`
       select,
       multiselect,
-      treeselect,
-      treemultiselect,
+      treeselect, // missing in `BasicConfig`
+      treemultiselect, // missing in `BasicConfig`
       date,
       time,
       datetime,
@@ -97,19 +117,7 @@ const {
       boolean,
     },
     settings
-} = BasicConfig;
-
-const myConfig = {
-  ...BasicConfig, // reuse basic config
-
-  fields: {
-    stock: {
-        label: 'In stock',
-        type: 'boolean',
-    },
-    // ... my other fields
-  }
-};
+} = AntdConfig;
 ----
 
 
@@ -121,6 +129,7 @@ const myConfig = {
 [[configfields]]
 === config.fields
 
+Example:
 [source,javascript]
 ----
 {
@@ -166,20 +175,20 @@ const myConfig = {
   Just `name` can be confusing, so can be overriden by setting `label2` to something like `User name`. +
   As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
-|listValues |+ for (multi)select, tree (multi)select | |List of values for Select widget. +
+|fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
+  Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
+  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
+|fieldSettings.listValues |+ for (multi)select, tree (multi)select | |List of values for (multi)select widget. +
   Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
    (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
   Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
-|allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
-|treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
-|treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
-|defaultValue | | |Default value
-|fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
-  Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
-  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
 |fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
   `(mixed val, Object fieldSettings) => boolean \| string \| null`
+|fieldSettings.allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
+|fieldSettings.treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
+|fieldSettings.treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
+|defaultValue | | |Default value
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
@@ -198,6 +207,7 @@ const myConfig = {
 [[configsettings]]
 === config.settings
 
+Example:
 [source,javascript]
 ----
 import en_US from 'antd/lib/locale-provider/en_US';
@@ -253,23 +263,23 @@ Behaviour settings:
 |valueSourcesInfo |`{value: {}}` |By default fields can be compared with values. +
   If you want to enable comparing with another fields, add `field` like in example above. +
   If you want to enable comparing with result of function, add `func` like in example above.
+|showErrorMessage |false |Show error message in QueryBuilder if validateValue() in field config returns false
 |canReorder |true |Activate reordering support for rules and groups of rules?
 |canRegroup |true |Allow move rules (or groups) in/out groups during reorder? +
   False - allow "safe" reorder, means only reorder at same level
 |showNot |true |Show `NOT` together with `AND`/`OR`?
+|maxNumberOfRules | |Maximum number of rules which can be added to the query builder
 |maxNesting | |Max nesting for rule groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
+|canLeaveEmptyGroup |true |Leave empty group after deletion or add 1 clean rule immediately?
 |immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change
 |immutableFieldsMode |false |Not allow to change fields
 |immutableOpsMode |false |Not allow to change operators
 |immutableValuesMode |false |Not allow to change values
-|showErrorMessage |false |Show error message in QueryBuilder if validateValue() in field config returns false
-|setOpOnChangeField |`['keep', 'default']` |Strategies for selecting operator for new field (used by order until success): +
-  `default` (default if present), `keep` (keep prev from last field), `first`, `none`
 |clearValueOnChangeField |false |Clear value on field change? false - if prev & next fields have same type (widget), keep
 |clearValueOnChangeOp |false |Clear value on operator change?
-|canLeaveEmptyGroup |false |Leave empty group after deletion or add 1 clean rule immediately?
-|maxNumberOfRules |100 |Maximum number of rules which can be added to the query builder
+|setOpOnChangeField |`['keep', 'default']` |Strategies for selecting operator for new field (used by order until success): +
+  `default` (default if present), `keep` (keep prev from last field), `first`, `none`
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
@@ -509,7 +519,7 @@ const {
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
 |use12Hours | |`false` |Option for `<TimeWidget>`
 |dateFormat | |`YYYY-MM-DD` |Option for `<DateWidget>`, `<DateTimeWidget>` to display date in widget. Example: `YYYY-MM-DD`
-|valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to format value to be passed in `formatValue()`. Example: `YYYY-MM-DD HH:mm`
+|valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to prepare string representation of value to be stored. Example: `YYYY-MM-DD HH:mm`
 |labelYes, labelNo | | |Option for `<BooleanWidget>`
 |customProps | | |You can pass any props directly to widget with `customProps`. +
   For example enable search for https://ant.design/components/select/[`<Select>`] widget: `customProps: {showSearch: true}`

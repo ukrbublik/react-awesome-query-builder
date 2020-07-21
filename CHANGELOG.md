@@ -1,4 +1,8 @@
 # Changelog
+- 2.1.2
+  - Added config `maxNumberOfRules`
+  - Bugfix: respect `maxNesting` and `canLeaveEmptyGroup` settings during drag-n-drop
+  - Enabled ESLint for examples with TS
 - 2.1.1
   - Fixed export of `not_like` op to JsonLogic
 - 2.1.0

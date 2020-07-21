@@ -122,31 +122,37 @@ export const with_select = (BasicConfig) => ({
     color: {
       label: "Color",
       type: "select",
-      listValues: [
-        { value: "yellow", title: "Yellow" },
-        { value: "green", title: "Green" },
-        { value: "orange", title: "Orange" },
-      ],
+      fieldSettings: {
+        listValues: [
+          { value: "yellow", title: "Yellow" },
+          { value: "green", title: "Green" },
+          { value: "orange", title: "Orange" },
+        ],
+      }
     },
     // old format of listValues
     color2: {
       label: "Color2",
       type: "select",
-      listValues: {
-        yellow: "Yellow",
-        green: "Green",
-        orange: "Orange",
-      },
+      fieldSettings: {
+        listValues: {
+          yellow: "Yellow",
+          green: "Green",
+          orange: "Orange",
+        },
+      }
     },
     multicolor: {
       label: "Colors",
       type: "multiselect",
-      listValues: {
-        yellow: "Yellow",
-        green: "Green",
-        orange: "Orange"
-      },
-      allowCustomValues: false
+      fieldSettings: {
+        listValues: {
+          yellow: "Yellow",
+          green: "Green",
+          orange: "Orange"
+        },
+        allowCustomValues: false
+      }
     },
   
   },
@@ -264,21 +270,25 @@ export const with_all_types = (BasicConfig) => ({
     color: {
       label: "Color",
       type: "select",
-      listValues: [
-        { value: "yellow", title: "Yellow" },
-        { value: "green", title: "Green" },
-        { value: "orange", title: "Orange" },
-      ],
+      fieldSettings: {
+        listValues: [
+          { value: "yellow", title: "Yellow" },
+          { value: "green", title: "Green" },
+          { value: "orange", title: "Orange" },
+        ],
+      }
     },
     multicolor: {
       label: "Colors",
       type: "multiselect",
-      listValues: {
-        yellow: "Yellow",
-        green: "Green",
-        orange: "Orange"
-      },
-      allowCustomValues: false
+      fieldSettings: {
+        listValues: {
+          yellow: "Yellow",
+          green: "Green",
+          orange: "Orange"
+        },
+        allowCustomValues: false
+      }
     },
     selecttree: {
       label: "Color (tree)",
