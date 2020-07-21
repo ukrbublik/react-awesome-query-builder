@@ -7,6 +7,8 @@ import {ElementType, ReactElement, Factory} from 'react';
 // common
 /////////////////
 
+type AnyObject = object;
+
 type MongoValue = any;
 
 type JsonLogicResult = {
@@ -59,7 +61,7 @@ type JsonRule = {
     valueSrc: Array<ValueSource>,
     valueType: Array<string>,
     valueError?: Array<string>,
-    operatorOptions?: {}
+    operatorOptions?: AnyObject
   }
 };
 export type JsonTree = JsonGroup;
@@ -140,7 +142,7 @@ interface BaseWidgetProps {
   fieldDefinition: Field,
   config: Config,
   delta?: number,
-  customProps?: {},
+  customProps?: AnyObject,
   readonly?: boolean,
 };
 interface RangeWidgetProps extends BaseWidgetProps {
@@ -158,7 +160,7 @@ export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 
 export interface BaseWidget {
-  customProps?: {},
+  customProps?: AnyObject,
   type: string,
   jsType?: string,
   factory: Factory<WidgetProps>,
@@ -176,7 +178,7 @@ export interface RangeableWidget extends BaseWidget {
   valueLabels?: Array<string | {label: string, placeholder: string}>,
 };
 export interface FieldWidget {
-  customProps?: {},
+  customProps?: AnyObject,
   valueSrc: "field",
   valuePlaceholder?: string,
   valueLabel?: string,
@@ -283,10 +285,10 @@ export interface RuleErrorProps {
 // Operators
 /////////////////
 
-type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: {}, isForDisplay?: boolean) => string;
-type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: {}) => Object;
-type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: {}) => string;
-type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: {}) => JsonLogicTree;
+type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean) => string;
+type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => Object;
+type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => string;
+type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject) => JsonLogicTree;
 
 interface ProximityConfig {
   optionLabel: string,
@@ -297,7 +299,7 @@ interface ProximityConfig {
   defaults: {
       proximity: number,
   },
-  customProps?: {},
+  customProps?: AnyObject,
 };
 export interface ProximityProps extends ProximityConfig {
   options: ImmutableMap<string, any>,
@@ -477,7 +479,7 @@ export interface FieldProps {
   selectedAltLabel?: string | Empty,
   selectedFullLabel?: string | Empty,
   config?: Config,
-  customProps?: {},
+  customProps?: AnyObject,
   placeholder?: string,
   selectedOpts?: {tooltip?: string},
   readonly?: boolean,
@@ -546,7 +548,7 @@ export interface RenderSettings {
   showLabels?: boolean,
   hideConjForOne?: boolean,
   maxLabelsLength?: number,
-  customFieldSelectProps?: {},
+  customFieldSelectProps?: AnyObject,
   renderBeforeWidget?: Factory<FieldProps>;
   renderAfterWidget?: Factory<FieldProps>;
   renderBeforeActions?: Factory<FieldProps>;
