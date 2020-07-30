@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.3
+  - Fixed issue #255 with reordering
 - 2.1.2
   - Added config `maxNumberOfRules`
   - Bugfix: respect `maxNesting` and `canLeaveEmptyGroup` settings during drag-n-drop
