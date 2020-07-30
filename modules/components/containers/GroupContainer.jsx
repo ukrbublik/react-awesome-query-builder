@@ -23,6 +23,7 @@ export default (Group) => {
       parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
+      isDraggingTempo: PropTypes.bool,
     };
 
     constructor(props) {
@@ -30,6 +31,7 @@ export default (Group) => {
       useOnPropsChanged(this);
 
       this.conjunctionOptions = this._getConjunctionOptions(props);
+      this.dummyFn.isDummyFn = true;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -108,6 +110,7 @@ export default (Group) => {
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const currentNesting = this.props.path.size;
       const maxNesting = this.props.config.settings.maxNesting;
+      const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
 
       // Don't allow nesting further than the maximum configured depth and don't
       // allow removal of the root group.
@@ -123,7 +126,7 @@ export default (Group) => {
             isDraggingMe ? <Group
               key={"dragging"}
               id={this.props.id}
-              isDraggingMe={isDraggingMe}
+              isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
               isRoot={isRoot}
@@ -151,18 +154,19 @@ export default (Group) => {
               key={this.props.id}
               id={this.props.id}
               isDraggingMe={isDraggingMe}
+              isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
               isRoot={isRoot}
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
               selectedConjunction={this.props.conjunction}
-              setConjunction={this.setConjunction}
-              setNot={this.setNot}
-              removeSelf={this.removeSelf}
-              addGroup={this.addGroup}
-              addRule={this.addRule}
-              setField={this.setField}
+              setConjunction={isInDraggingTempo ? this.dummyFn : this.setConjunction}
+              setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
+              removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
+              addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
+              addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
+              setField={isInDraggingTempo ? this.dummyFn : this.setField}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}

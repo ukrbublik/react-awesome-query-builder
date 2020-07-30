@@ -24,10 +24,13 @@ export default (Rule) => {
       parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
+      isDraggingTempo: PropTypes.bool,
     };
 
     constructor(props) {
       super(props);
+      
+      this.dummyFn.isDummyFn = true;
     }
 
     dummyFn = () => {}
@@ -87,6 +90,7 @@ export default (Rule) => {
       const fieldConfig = getFieldConfig(this.props.field, this.props.config);
       const {showErrorMessage} = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
+      const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
 
       const valueError = this.props.valueError;
       const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
@@ -101,13 +105,15 @@ export default (Rule) => {
             isDraggingMe ? <Rule
               key={"dragging"}
               id={this.props.id}
-              isDraggingMe={isDraggingMe}
+              isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
               setField={this.dummyFn}
               setOperator={this.dummyFn}
               setOperatorOption={this.dummyFn}
               removeSelf={this.dummyFn}
+              setValue={this.dummyFn}
+              setValueSrc={this.dummyFn}
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
@@ -124,13 +130,14 @@ export default (Rule) => {
               key={this.props.id}
               id={this.props.id}
               isDraggingMe={isDraggingMe}
+              isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
-              removeSelf={this.removeSelf}
-              setField={this.setField}
-              setOperator={this.setOperator}
-              setOperatorOption={this.setOperatorOption}
-              setValue={this.setValue}
-              setValueSrc={this.setValueSrc}
+              removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
+              setField={isInDraggingTempo ? this.dummyFn : this.setField}
+              setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
+              setOperatorOption={isInDraggingTempo ? this.dummyFn : this.setOperatorOption}
+              setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
+              setValueSrc={isInDraggingTempo ? this.dummyFn : this.setValueSrc}
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
