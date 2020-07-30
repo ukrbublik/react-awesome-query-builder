@@ -15,6 +15,7 @@ const typeMap = {
       totalRulesCnt={props.totalRulesCnt}
       config={props.config}
       onDragStart={props.onDragStart}
+      isDraggingTempo={props.isDraggingTempo}
       parentField={props.parentField}
     />
   ),
@@ -29,6 +30,7 @@ const typeMap = {
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
+      isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={null}
     />
@@ -44,6 +46,7 @@ const typeMap = {
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
+      isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
     />
@@ -64,6 +67,7 @@ class Item extends PureComponent {
     reordableNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
     parentField: PropTypes.string, //from RuleGroup
+    isDraggingTempo: PropTypes.bool,
   };
 
   render() {

@@ -34,11 +34,8 @@ export default (className) => (GroupOrRule) => {
         ...otherProps
       } = this.props;
 
-      if (!isDraggingMe && isDraggingTempo)
-        return null;
-
       let styles = {};
-      if (isDraggingTempo) {
+      if (isDraggingMe && isDraggingTempo) {
         styles = {
           top: dragging.y,
           left: dragging.x,

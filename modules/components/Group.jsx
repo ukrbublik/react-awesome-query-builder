@@ -211,6 +211,7 @@ export class Group extends PureComponent {
         reordableNodesCnt={this.reordableNodesCnt()}
         totalRulesCnt={this.props.totalRulesCnt}
         onDragStart={onDragStart}
+        isDraggingTempo={this.props.isDraggingTempo}
       />
     );
   }
