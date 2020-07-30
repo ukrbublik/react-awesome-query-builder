@@ -24,10 +24,13 @@ export default (Rule) => {
       parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
+      isDraggingTempo: PropTypes.bool,
     };
 
     constructor(props) {
       super(props);
+      
+      this.dummyFn.isDummyFn = true;
     }
 
     dummyFn = () => {}
