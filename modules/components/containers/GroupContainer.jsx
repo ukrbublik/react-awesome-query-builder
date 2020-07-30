@@ -153,7 +153,7 @@ export default (Group) => {
             <Group
               key={this.props.id}
               id={this.props.id}
-              isDraggingMe={false}
+              isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
               isRoot={isRoot}

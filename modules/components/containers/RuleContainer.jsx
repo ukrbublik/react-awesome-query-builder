@@ -129,7 +129,7 @@ export default (Rule) => {
             <Rule
               key={this.props.id}
               id={this.props.id}
-              isDraggingMe={false}
+              isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
