@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "reactjs",
@@ -38,6 +38,7 @@
     "url": "https://github.com/ukrbublik/react-awesome-query-builder/issues"
   },
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
+  "funding": "https://opencollective.com/react-awesome-query-builder",
   "dependencies": {
     "classnames": "^2.2.5",
     "clone": "^2.1.1",
