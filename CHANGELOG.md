@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.6
+  - Temporary disable AntDesign 4.5.0+ because of "Invalid hook call" problem
 - 2.1.4
   - Fixed issue #249 with importing rules with group fields from JsonLogic format
 - 2.1.3
