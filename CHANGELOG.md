@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.4
+  - Fixed issue #249 with importing rules with group fields from JsonLogic format
 - 2.1.3
   - Fixed issue #255 with reordering
 - 2.1.2
