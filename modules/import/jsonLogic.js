@@ -7,6 +7,14 @@ import moment from "moment";
 
 // http://jsonlogic.com/
 
+// helpers
+Array.prototype.uniq = function() {
+  return Array.from(new Set(this));
+};
+Array.prototype.to_object = function() {
+  return this.reduce((acc, [f, fc]) => ({...acc, [f] : fc}), {});
+};
+
 //meta is mutable
 export const loadFromJsonLogic = (logicTree, config) => {
   let meta = {
@@ -232,31 +240,72 @@ const convertConj = (op, vals, conv, config, not, meta) => {
   const {fieldSeparator} = config.settings;
   if (conjKey) {
     let type = "group";
-    let children = vals
+    const children = vals
       .map(v => convertFromLogic(v, conv, config, "rule", meta, false))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
-    let complexFields = Object.entries(children)
+    const complexFields = Object.entries(children)
       .filter(([_k, v]) => v.properties !== undefined && v.properties.field !== undefined && v.properties.field.indexOf(fieldSeparator) != -1)
       .map(([_k, v]) => (v.properties.field.split(fieldSeparator)));
-    let userGroupFields = complexFields
-      .map(parts => parts.splice(0, parts.length - 1).join(fieldSeparator))
+    const complexFieldsParents = complexFields
+      .map(parts => parts.slice(0, parts.length - 1).join(fieldSeparator));
+    const complexFieldsConfigs = complexFieldsParents
+      .uniq()
       .map(f => [f, getFieldConfig(f, config)])
-      .filter(([f, fc]) => fc && fc.type == "!group")
-      .map(([f, fc]) => f);
-    let usedGroup = userGroupFields.length > 0 ? userGroupFields[0] : null;
+      .to_object();
+    const complexFieldsInGroup = complexFieldsParents
+      .filter((f) => complexFieldsConfigs[f].type == "!group");
+    const usedGroups = complexFieldsInGroup.uniq();
+    
+    let children1 = children;
     let properties = {
       conjunction: conjKey,
       not: not
     };
-    if (usedGroup) {
-      type = "rule_group";
-      properties.field = usedGroup;
+
+    // every field should be in single group or neither
+    const isOk = usedGroups.length == 0 || usedGroups.length == 1 && complexFieldsInGroup.length == Object.keys(children).length;
+    const usedGroup = usedGroups.length > 0 ? usedGroups[0] : null;
+    if (isOk) {
+      if (usedGroup) {
+        type = "rule_group";
+        properties.field = usedGroup;
+      }
+    } else {
+      // if not ok, we should split children by groups
+      children1 = {};
+      let groupToId = {};
+      Object.entries(children).map(([k, v]) => {
+        const groupFields = usedGroups.filter((f) => v.properties.field.indexOf(f) == 0);
+        const groupField = groupFields.length > 0 ? groupFields[0] : null;
+        if (!groupField) {
+          // not in group (can be simple field or in struct)
+          children1[k] = v;
+        } else {
+          let groupId = groupToId[groupField];
+          if (!groupId) {
+            groupId = uuid();
+            groupToId[groupField] = groupId;
+            children1[groupId] = {
+              type: "rule_group",
+              id: groupId,
+              children1: {},
+              properties: {
+                conjunction: conjKey,
+                not: false,
+                field: groupField,
+              }
+            };
+          }
+          children1[groupId].children1[k] = v;
+        }
+      });
     }
+
     return {
       type: type,
       id: uuid(),
-      children1: children,
+      children1: children1,
       properties: properties
     };
   }
