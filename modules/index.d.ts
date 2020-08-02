@@ -1,6 +1,7 @@
+/* eslint-disable no-extra-semi */
 
-import {List as ImmutableList, Map as ImmutableMap} from 'immutable';
-import {ElementType, ReactElement, Factory} from 'react';
+import {List as ImmutableList, Map as ImmutableMap} from "immutable";
+import {ElementType, ReactElement, Factory} from "react";
 
 
 ////////////////
@@ -228,7 +229,7 @@ export interface ConjsProps {
   disabled?: boolean,
   selectedConjunction?: string,
   setConjunction(conj: string): void,
-  conjunctionOptions?: Array<ConjunctionOption>,
+  conjunctionOptions?: TypedKeyMap<string, ConjunctionOption>,
   config?: Config,
   not: boolean,
   setNot(not: boolean): void,
