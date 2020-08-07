@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.8
+  - Fixed issue #263
 - 2.1.7
   - Fixed TS def for conjunctionOptions (#247)
 - 2.1.6
