@@ -56,8 +56,8 @@ import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import 'react-awesome-query-builder/css/antd.less'; // or import "antd/dist/antd.css";
-import 'react-awesome-query-builder/css/styles.scss';
-import 'react-awesome-query-builder/css/compact_styles.scss'; //optional, for more compact styles
+import 'react-awesome-query-builder/css/styles.css';
+import 'react-awesome-query-builder/css/compact_styles.css'; //optional, for more compact styles
 const InitialConfig = AntdConfig; // or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
