@@ -15,6 +15,8 @@ export const extendConfig = (config) => {
     return config;
     
   config.settings = merge({}, defaultSettings, config.settings);
+  config._fieldsCntByType = {};
+  config._funcsCntByType = {};
 
   _extendTypesConfig(config.types, config);
 
@@ -73,7 +75,6 @@ function _extendTypeConfig(type, typeConfig, config) {
 }
 
 function _extendFieldsConfig(subconfig, config) {
-  config._fieldsCntByType = {};
   for (let field in subconfig) {
     _extendFieldConfig(subconfig[field], config);
     if (subconfig[field].subfields) {
@@ -83,7 +84,6 @@ function _extendFieldsConfig(subconfig, config) {
 }
 
 function _extendFuncArgsConfig(subconfig, config) {
-  config._funcsCntByType = {};
   if (!subconfig) return;
   for (let funcKey in subconfig) {
     const funcDef = subconfig[funcKey];
