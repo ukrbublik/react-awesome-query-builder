@@ -76,6 +76,8 @@ const {
         greater_or_equal,
         like,
         not_like,
+        starts_with,
+        ends_with,
         between,
         not_between,
         is_empty,
