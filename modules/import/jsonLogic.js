@@ -8,12 +8,18 @@ import moment from "moment";
 // http://jsonlogic.com/
 
 // helpers
-Array.prototype.uniq = function() {
-  return Array.from(new Set(this));
-};
-Array.prototype.to_object = function() {
-  return this.reduce((acc, [f, fc]) => ({...acc, [f] : fc}), {});
-};
+Object.defineProperty(Array.prototype, "uniq", {
+  enumerable: false,
+  value: function () {
+    return Array.from(new Set(this));
+  }
+});
+Object.defineProperty(Array.prototype, "to_object", {
+  enumerable: false,
+  value: function () {
+    return this.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
+  }
+});
 
 //meta is mutable
 export const loadFromJsonLogic = (logicTree, config) => {
