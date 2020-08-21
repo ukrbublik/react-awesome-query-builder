@@ -389,7 +389,7 @@ export interface BasicFieldSettings {
 export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
   max?: number,
-  step?: number,
+  step?: number | "any",
   marks?: {[mark: number]: ReactElement | string}
 };
 export interface DateTimeFieldSettings extends BasicFieldSettings {
