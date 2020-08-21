@@ -7,7 +7,7 @@ export default (props) => {
     if (val === "" || val === null)
       val = undefined;
     else
-      val = Number.isInteger(step) ? parseInt(val, 10) : parseFloat(val);
+      val = parseInt(val);
     setValue(val);
   };
   return (
