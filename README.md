@@ -39,12 +39,12 @@ Using awesome [Ant Design](https://ant.design/) v4 for widgets
 
 
 ## Getting started
-Install: `npm i react-awesome-query-builder`  (`antd`, `typescript` are optional)  
+Install: `npm i react-awesome-query-builder`  (packages `antd`, `typescript` are optional)  
 
 See [basic usage](#usage) and [API](#api) below.  
 
 Demo apps:
-- [`npm run`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`npm start`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
 - [`npm run sandbox_ts`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
 - [`npm run sandbox_js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 

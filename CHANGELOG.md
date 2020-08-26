@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.12
+  - Added sandbox with vanilla widgets and without TS
 - 2.1.11
   - Minor fix for some/not JsonLogic operators can be potentially used for array types
 - 2.1.10
