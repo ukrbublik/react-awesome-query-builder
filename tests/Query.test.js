@@ -326,21 +326,26 @@ describe("query with !struct", () => {
       "logic": {
         "and": [
           {
-            "and": [
+            "some": [
+              [{ "var": "results" }],
               {
-                "==": [
+                "and": [
                   {
-                    "var": "results.slider"
+                    "==": [
+                      {
+                        "var": "slider"
+                      },
+                      22
+                    ]
                   },
-                  22
-                ]
-              },
-              {
-                "==": [
                   {
-                    "var": "results.stock"
-                  },
-                  true
+                    "==": [
+                      {
+                        "var": "stock"
+                      },
+                      true
+                    ]
+                  }
                 ]
               }
             ]
