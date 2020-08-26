@@ -8,6 +8,7 @@ Uses complex config to demonstrate anvanced usage.
 
 ### Run
 ```sh
+cd examples
 npm i
 npm start
 ```

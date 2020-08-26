@@ -10,7 +10,7 @@ Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
 
 Using awesome [Ant Design](https://ant.design/) v4 for widgets
 
-[Demo](https://ukrbublik.github.io/react-awesome-query-builder)
+[Demo page](https://ukrbublik.github.io/react-awesome-query-builder)
 
 
 ### Features
@@ -42,10 +42,10 @@ Install: `npm i react-awesome-query-builder`  (`antd`, `typescript` are optional
 
 See [basic usage](#usage) and [API](#api) below.  
 
-Demos:
-- [`examples`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`sandbox`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- [`sandbox_simple`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+Demo apps:
+- [`npm run`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`npm run sandbox_ts`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- [`npm run sandbox_js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 
 
 ## v2 Migration

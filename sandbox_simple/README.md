@@ -13,6 +13,7 @@ Or create own temaplte on [codesandbox.io](https://codesandbox.io/) by importing
 
 ### Run locally
 ```sh
+cd sandbox_simple
 npm i
 npm start
 ```
