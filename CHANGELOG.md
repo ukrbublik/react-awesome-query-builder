@@ -1,4 +1,9 @@
 # Changelog
+- 2.1.11
+  - Minor fix for some/not JsonLogic operators can be potentially used for array types
+- 2.1.10
+  - Fixed issues #249, #246 regarding export/import from jsonLogic and groups
+  - Fixed issue #272 with float numbers for vanilla widgets
 - 2.1.8
   - Fixed issue #263
 - 2.1.7

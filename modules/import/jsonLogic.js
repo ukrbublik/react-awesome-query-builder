@@ -81,7 +81,7 @@ const buildConv = (config) => {
   };
 };
 
-const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget) => {
+const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null) => {
   let op, vals;
   if (isLogic(logic)) {
     op = Object.keys(logic)[0];
@@ -96,14 +96,14 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isLogic(vals[0]) && Object.keys(vals[0])[0] == "var");
   const isRev = op == "!" && !isNotOp;
   if (isRev) {
-    ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget);
+    ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
   } else if(expectedType == "val") {
-    ret = convertField(op, vals, conv, config, not, meta) 
-      || convertFunc(op, vals, conv, config, not, fieldConfig, meta) 
+    ret = convertField(op, vals, conv, config, not, meta, parentField) 
+      || convertFunc(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertVal(logic, fieldConfig, widget, config, meta);
   } else if(expectedType == "rule") {
-    ret = convertConj(op, vals, conv, config, not, meta) 
-    || convertOp(op, vals, conv, config, not, meta);
+    ret = convertConj(op, vals, conv, config, not, meta, parentField) 
+    || convertOp(op, vals, conv, config, not, meta, parentField);
   }
 
   let afterErrorsCnt = meta.errors.length;
@@ -167,9 +167,12 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   };
 };
 
-const convertField = (op, vals, conv, config, not, meta) => {
+const convertField = (op, vals, conv, config, not, meta, parentField = null) => {
+  const {fieldSeparator} = config.settings;
   if (op == "var") {
-    const field = vals[0];
+    let field = vals[0];
+    if (parentField)
+      field = [parentField, field].join(fieldSeparator);
     const fieldConfig = getFieldConfig(field, config);
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);
@@ -186,7 +189,7 @@ const convertField = (op, vals, conv, config, not, meta) => {
   return undefined;
 };
 
-const convertFunc = (op, vals, conv, config, not, fieldConfig, meta) => {
+const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField = null) => {
   if (!op) return undefined;
   let func, argsArr;
   const jsonLogicIsMethod = (op == "method");
@@ -217,7 +220,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta) => {
     let args = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
       const argConfig = funcConfig.args[argKey];
-      let argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig);
+      let argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
       if (argVal === undefined) {
         argVal = argConfig.defaultValue;
         if (argVal === undefined) {
@@ -241,13 +244,13 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta) => {
   return undefined;
 };
 
-const convertConj = (op, vals, conv, config, not, meta) => {
+const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   const conjKey = conv.conjunctions[op];
   const {fieldSeparator} = config.settings;
   if (conjKey) {
     let type = "group";
     const children = vals
-      .map(v => convertFromLogic(v, conv, config, "rule", meta, false))
+      .map(v => convertFromLogic(v, conv, config, "rule", meta, false, null, null, parentField))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
     const complexFields = Object.entries(children)
@@ -319,6 +322,19 @@ const convertConj = (op, vals, conv, config, not, meta) => {
   return undefined;
 };
 
+const wrapInDefaultConjRuleGroup = (rule, parentField, config) => {
+  return {
+    type: "rule_group",
+    id: uuid(),
+    children1: { [rule.id]: rule },
+    properties: {
+      conjunction: defaultConjunction(config),
+      not: false,
+      field: parentField,
+    }
+  };
+};
+
 const wrapInDefaultConj = (rule, config) => {
   return {
     type: "group",
@@ -331,8 +347,9 @@ const wrapInDefaultConj = (rule, config) => {
   };
 };
 
-const convertOp = (op, vals, conv, config, not, meta) => {
+const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   if (!op) return undefined;
+  const {fieldSeparator} = config.settings;
   const arity = vals.length;
   const cardinality = arity - 1;
   if (op == "all") {
@@ -361,7 +378,9 @@ const convertOp = (op, vals, conv, config, not, meta) => {
       } else {
         [jlField, ...args] = vals;
       }
-      const {"var": field} = jlField;
+      let {"var": field} = jlField;
+      if (parentField)
+        field = [parentField, field].join(fieldSeparator);
       if (!field) {
         errors.push(`Unknown field ${JSON.stringify(jlField)}`);
         return;
@@ -393,6 +412,28 @@ const convertOp = (op, vals, conv, config, not, meta) => {
   _check(false);
   _check(true);
 
+  // special case for `rule_group` (issue #246)
+  if (["some", "none"].includes(op) && arity == 2) {
+    if (vals[0].length == 1 && vals[0][0].var !== undefined && Object.keys(vals[1]).length == 1) {
+      const {"var": field} = vals[0][0];
+      const sub = vals[1];
+      const newOp = Object.keys(sub)[0];
+      const newVals = sub[newOp];
+      const newNot = !!(not ^ (newOp == "none"));
+      const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
+      const groupFieldConfig = getFieldConfig(groupField, config);
+      if (groupFieldConfig && groupFieldConfig.type == "!group") {
+        let res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
+        if (!res) {
+          // need to be wrapped in `rule_group`
+          const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
+          res = wrapInDefaultConjRuleGroup(rule, groupField, config);
+        }
+        return res;
+      }
+    }
+  }
+
   if (!oks.length) {
     meta.errors.push(errors.join("; ") || `Unknown op ${op}/${arity}`);
     return undefined;
@@ -413,7 +454,7 @@ const convertOp = (op, vals, conv, config, not, meta) => {
   const widget = getWidgetForFieldOp(config, field, opKey);
 
   const convertedArgs = args
-    .map(v => convertFromLogic(v, conv, config, "val", meta, false, fieldConfig, widget));
+    .map(v => convertFromLogic(v, conv, config, "val", meta, false, fieldConfig, widget, parentField));
   if (convertedArgs.filter(v => v === undefined).length) {
     //meta.errors.push(`Undefined arg for field ${field} and op ${opKey}`);
     return undefined;

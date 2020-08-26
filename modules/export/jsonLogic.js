@@ -46,7 +46,7 @@ export const jsonLogicFormat = (item, config) => {
 };
 
 //meta is mutable
-const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField = null) => {
   if (currentValue === undefined)
     return undefined;
   const {fieldSeparator} = config.settings;
@@ -74,7 +74,7 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-      const formattedArgVal = jsonLogicFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+      const formattedArgVal = jsonLogicFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField);
       if (argValue != undefined && formattedArgVal === undefined) {
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
         return undefined;
@@ -126,19 +126,16 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
 };
 
 //meta is mutable
-const jsonLogicFormatItem = (item, config, meta, isRoot) => {
+const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => {
   if (!item) return undefined;
+  const {fieldSeparator} = config.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const children = item.get("children1");
+  const field = properties.get("field");
 
   if ((type === "group" || type === "rule_group") && children && children.size) {
-    const list = children
-      .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false))
-      .filter((currentChild) => typeof currentChild !== "undefined");
-    if (!list.size)
-      return undefined;
-
+    const isRuleGroup = (type === "rule_group" && !isRoot);
     let conjunction = properties.get("conjunction");
     if (!conjunction)
       conjunction = defaultConjunction(config);
@@ -149,14 +146,41 @@ const jsonLogicFormatItem = (item, config, meta, isRoot) => {
       return undefined;
     }
 
+    const groupField = isRuleGroup ? (parentField ? [parentField, field] : [field]).join(fieldSeparator) : parentField;
+    const list = children
+      .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, groupField))
+      .filter((currentChild) => typeof currentChild !== "undefined");
+    if (!list.size)
+      return undefined;
+
     let resultQuery = {};
     if (list.size == 1 && !isRoot)
       resultQuery = list.first();
     else
       resultQuery[conj] = list.toList().toJS();
-    if (not) {
-      resultQuery = { "!": resultQuery };
+    
+    // revert
+    if (not && !isRuleGroup) {
+      if (Object.keys(resultQuery).length == 1 && Object.keys(resultQuery)[0] == "some") {
+        // if `rule_group` is wrapped in group with `not` - just swap `some` to `none` for simplicity
+        resultQuery["none"] = resultQuery["some"];
+        delete(resultQuery["some"]);
+      } else {
+        resultQuery = { "!": resultQuery };
+      }
     }
+
+    // rule_group (issue #246)
+    if (isRuleGroup) {
+      const op = not ? "none" : "some";
+      resultQuery = {
+        [op]: [
+          [{var: field}],
+          resultQuery
+        ]
+      };
+    }
+
     return resultQuery;
   } else if (type === "rule") {
     let operator = properties.get("operator");
@@ -200,7 +224,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot) => {
       currentValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-      const fv = jsonLogicFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+      const fv = jsonLogicFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
       if (fv !== undefined) {
         valueSrcs.push(valueSrc);
         valueTypes.push(valueType);
@@ -216,6 +240,9 @@ const jsonLogicFormatItem = (item, config, meta, isRoot) => {
 
     // format field
     let fieldName = field;
+    if (parentField) {
+      fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
+    }
     const formattedField = { "var": fieldName };
     if (meta.usedFields.indexOf(fieldName) == -1)
       meta.usedFields.push(fieldName);
@@ -258,3 +285,10 @@ const jsonLogicFormatItem = (item, config, meta, isRoot) => {
   return undefined;
 };
 
+// helpers
+const cutBeginOfString = (str, begin) => {
+  if (begin && str.slice(0, begin.length) == begin) {
+    str = str.slice(begin.length);
+  }
+  return str;
+};
