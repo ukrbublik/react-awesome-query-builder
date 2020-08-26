@@ -322,6 +322,19 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   return undefined;
 };
 
+const wrapInDefaultConjRuleGroup = (rule, parentField, config) => {
+  return {
+    type: "rule_group",
+    id: uuid(),
+    children1: { [rule.id]: rule },
+    properties: {
+      conjunction: defaultConjunction(config),
+      not: false,
+      field: parentField,
+    }
+  };
+};
+
 const wrapInDefaultConj = (rule, config) => {
   return {
     type: "group",
@@ -401,15 +414,20 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   if (!oks.length && ["some", "none"].includes(op) && arity == 2) {
     if (vals[0].length == 1 && vals[0][0].var !== undefined) {
-      not = op == "none";
+      not = !!(not ^ (op == "none"));
       const {"var": field} = vals[0][0];
       const subParentField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
       const sub = vals[1];
       if (Object.keys(sub).length == 1) {
         op = Object.keys(sub)[0];
         vals = sub[op];
-        return convertConj(op, vals, conv, config, not, meta, subParentField) 
-          || convertOp(op, vals, conv, config, not, meta, subParentField);
+        let res = convertConj(op, vals, conv, config, not, meta, subParentField);
+        if (!res) {
+          // need to be wrapped in `rule_group`
+          const rule = convertOp(op, vals, conv, config, not, meta, subParentField);
+          res = wrapInDefaultConjRuleGroup(rule, subParentField, config);
+        }
+        return res;
       }
     }
   }

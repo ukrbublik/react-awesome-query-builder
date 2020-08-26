@@ -158,10 +158,19 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       resultQuery = list.first();
     else
       resultQuery[conj] = list.toList().toJS();
+    
+    // revert
     if (not && !isRuleGroup) {
-      resultQuery = { "!": resultQuery };
+      if (Object.keys(resultQuery).length == 1 && Object.keys(resultQuery)[0] == "some") {
+        // if `rule_group` is wrapped in group with `not` - just swap `some` to `none` for simplicity
+        resultQuery["none"] = resultQuery["some"];
+        delete(resultQuery["some"]);
+      } else {
+        resultQuery = { "!": resultQuery };
+      }
     }
 
+    // rule_group (issue #246)
     if (isRuleGroup) {
       const op = not ? "none" : "some";
       resultQuery = {
