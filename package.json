@@ -21,6 +21,8 @@
     "build-global": "NODE_ENV=production COMPRESS=1 ANALYZE=0 webpack modules/index.js",
     "build-examples": "./scripts/build-examples.sh",
     "examples": "cd examples && npm i && npm start",
+    "sandbox_ts": "cd sandbox && npm i && npm start",
+    "sandbox_js": "cd sandbox_simple && npm i && npm start",
     "start": "npm run examples",
     "test": "karma start karma.conf.js",
     "lint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --fix ./modules/ ./sandbox/ ./examples/ ./tests/",
