@@ -22,7 +22,7 @@
     "@types/react-dom": "^16.9.7",
     "antd": ">=4.0.0 <4.5.0",
     "react": "^16.4.1",
-    "react-awesome-query-builder": "^2.1.10",
+    "react-awesome-query-builder": "^2.1.11",
     "react-dom": "^16.4.1",
     "react-scripts": "3.0.1",
     "typescript": "^3.8.3"

@@ -146,9 +146,9 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       return undefined;
     }
 
-    const subParentField = isRuleGroup ? (parentField ? [parentField, field] : [field]).join(fieldSeparator) : parentField;
+    const groupField = isRuleGroup ? (parentField ? [parentField, field] : [field]).join(fieldSeparator) : parentField;
     const list = children
-      .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, subParentField))
+      .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, groupField))
       .filter((currentChild) => typeof currentChild !== "undefined");
     if (!list.size)
       return undefined;
