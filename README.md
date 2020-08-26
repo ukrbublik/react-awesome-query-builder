@@ -34,13 +34,18 @@ Using awesome [Ant Design](https://ant.design/) v4 for widgets
   (But using custom widgets of another framework is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
-- TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo))
+- TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples))
 
 
 ## Getting started
-Install: `npm i react-awesome-query-builder`  
+Install: `npm i react-awesome-query-builder`  (`antd`, `typescript` are optional)  
+
 See [basic usage](#usage) and [API](#api) below.  
-Also see [`examples/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo) or [`sandbox/src/demo`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox/src/demo) for more advanced usage and configuration.
+
+Demos:
+- [`examples`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`sandbox`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- [`sandbox_simple`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 
 
 ## v2 Migration
@@ -240,7 +245,7 @@ To build the component locally, clone this repo then run:
 Then open localhost:3001 in a browser.
 
 Scripts:
-- `npm test` - Run tests with Karma and update coverage. Recommended before commits.
+- `npm test` - Run tests with Karma and update coverage. Recommended before commits. Requires Node.js v10+
 - `npm run lint` - Run ESLint. Recommended before commits.
 - `npm run lint-fix` - Run ESLint with `--fix` option. Recommended before commits.
 - `npm run build-examples` - Build examples with webpack. Output path: `examples`
