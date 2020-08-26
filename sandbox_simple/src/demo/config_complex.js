@@ -1,10 +1,6 @@
 import React from "react";
 import merge from "lodash/merge";
-import {
-  BasicConfig,
-} from "react-awesome-query-builder";
-import en_US from "antd/lib/locale-provider/en_US";
-import ru_RU from "antd/lib/locale-provider/ru_RU";
+import { BasicConfig } from "react-awesome-query-builder";
 const InitialConfig = BasicConfig;
 
 
@@ -335,7 +331,6 @@ const localeSettings = {
   locale: {
     short: "ru",
     full: "ru-RU",
-    antd: ru_RU,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
