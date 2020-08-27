@@ -19,8 +19,8 @@ const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? l
 const initTree = checkTree(loadTree(initValue), loadedConfig);
 
 // -OR- alternativaly get init value in JsonLogic format:
-//const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
-//const initTree: ImmutableTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
+//const initLogic = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
+//const initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
 
 
 export default class DemoQueryBuilder extends Component {
