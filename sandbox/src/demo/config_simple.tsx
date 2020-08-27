@@ -1,3 +1,4 @@
+/*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import React from "react";
 import merge from "lodash/merge";
 import {
@@ -45,7 +46,7 @@ const fields: Fields = {
         excludeOperators: ["proximity"],
         fieldSettings: {
           validateValue: (val, fieldSettings) => {
-            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+            return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
           },
         },
         mainWidgetProps: {

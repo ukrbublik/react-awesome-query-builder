@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import React, {Component} from "react";
 import {
   Query, Builder, Utils,
@@ -116,7 +117,7 @@ export default class DemoQueryBuilder extends Component {
           </div>
           <hr/>
           <div>
-            <a href="http://jsonlogic.com/play.html" target="_blank" rel="noreferrer">jsonLogicFormat</a>: 
+            <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
             { errors.length > 0 
               && <pre style={preErrorStyle}>
                 {stringify(errors, undefined, 2)}
