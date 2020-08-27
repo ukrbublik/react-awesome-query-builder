@@ -23,7 +23,7 @@
     "examples": "cd examples && npm i && npm start",
     "sandbox_ts": "cd sandbox && npm i && npm start",
     "sandbox_js": "cd sandbox_simple && npm i && npm start",
-    "start": "npm run examples",
+    "start": "npm i && npm run examples",
     "test": "karma start karma.conf.js",
     "lint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --fix ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
     "lint": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/"
@@ -43,6 +43,10 @@
   },
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "funding": "https://opencollective.com/react-awesome-query-builder",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
   "dependencies": {
     "classnames": "^2.2.5",
     "clone": "^2.1.1",
