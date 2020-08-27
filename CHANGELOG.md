@@ -1,4 +1,10 @@
 # Changelog
+- 2.1.13
+  - Require Node v10+ (for karma)
+  - Fixed "SyntaxError Unexpected token '<'" in sandboxes
+  - Fixed requirement of sass in sandboxes
+  - Fixed eslint warnings in sandboxes
+  - Improved Travis config: fixed ENOSPC, removed excess testing during install
 - 2.1.12
   - Added sandbox with vanilla widgets and without TS
 - 2.1.11
