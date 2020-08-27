@@ -33,7 +33,7 @@ const fields = {
         excludeOperators: ["proximity"],
         fieldSettings: {
           validateValue: (val, fieldSettings) => {
-            return (val.length < 10 && (val == "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+            return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
           },
         },
         mainWidgetProps: {

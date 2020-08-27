@@ -163,7 +163,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
           </div>
           <hr/>
           <div>
-            <a href="http://jsonlogic.com/play.html" target="_blank" rel="noreferrer">jsonLogicFormat</a>: 
+            <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
             { errors.length > 0 
               && <pre style={preErrorStyle}>
                 {stringify(errors, undefined, 2)}

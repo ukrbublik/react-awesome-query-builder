@@ -20,7 +20,8 @@
     "react": "^16.4.1",
     "react-awesome-query-builder": "^2.1.12",
     "react-dom": "^16.4.1",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "lodash": "^4.6"
   },
   "browserslist": {
     "production": [
