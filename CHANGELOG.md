@@ -1,5 +1,5 @@
 # Changelog
-- 2.1.13
+- 2.1.14
   - Require Node v10+ (for karma)
   - Fixed "SyntaxError Unexpected token '<'" in sandboxes
   - Fixed requirement of sass in sandboxes
