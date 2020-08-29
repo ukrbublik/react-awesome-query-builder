@@ -16,10 +16,10 @@ type JsonLogicResult = {
   logic?: JsonLogicTree,
   data?: Object,
   errors?: Array<string>
-};
+}
 type JsonLogicTree = Object;
 type JsonLogicValue = any;
-type JsonLogicField = { "var": string };
+type JsonLogicField = { "var": string }
 
 type RuleValue = boolean | number | string | Date | Array<string> | any;
 
@@ -28,9 +28,10 @@ type Optional<T> = {
 }
 type TypedMap<T> = {
   [key: string]: T;
-};
-type TypedKeyMap<K, T> = {
-  [key: K]: T;
+}
+type TypedKeyMap<K extends string|number, T> = {
+  [key: string]: T;
+  [key: number]: T;
 };
 type Empty = null | undefined;
 
@@ -44,7 +45,7 @@ type JsonGroup = {
     conjunction: string,
     not?: boolean,
   }
-};
+}
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
@@ -52,7 +53,7 @@ type JsonRuleGroup = {
   properties?: {
     field: string | Empty,
   }
-};
+}
 type JsonRule = {
   type: "rule",
   properties: {
@@ -64,7 +65,7 @@ type JsonRule = {
     valueError?: Array<string>,
     operatorOptions?: AnyObject
   }
-};
+}
 export type JsonTree = JsonGroup;
 
 export type ImmutableTree = ImmutableMap<string, string|Object>;
@@ -90,13 +91,13 @@ export interface Utils {
   loadFromJsonLogic(logicTree: JsonLogicTree, config: Config): ImmutableTree;
   // other
   uuid(): string;
-};
+}
 
 export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
   actions: {[key: string]: Function},
-};
+}
 
 export interface QueryProps {
   conjunctions: Conjunctions;
@@ -109,7 +110,7 @@ export interface QueryProps {
   value: ImmutableTree;
   onChange(immutableTree: ImmutableTree, config: Config): void;
   renderBuilder(props: BuilderProps): ReactElement;
-};
+}
 
 export type Builder = ElementType<BuilderProps>;
 export type Query = ElementType<QueryProps>;
@@ -122,7 +123,7 @@ export interface Config {
   settings: Settings,
   fields: Fields,
   funcs?: Funcs,
-};
+}
 
 
 /////////////////
@@ -145,11 +146,11 @@ interface BaseWidgetProps {
   delta?: number,
   customProps?: AnyObject,
   readonly?: boolean,
-};
+}
 interface RangeWidgetProps extends BaseWidgetProps {
   placeholders: Array<string>,
   textSeparators: Array<string>,
-};
+}
 export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
 
 export type TextWidgetProps = BaseWidgetProps & BasicFieldSettings;
@@ -173,11 +174,11 @@ export interface BaseWidget {
   mongoFormatValue?: MongoFormatValue,
   //obsolete:
   validateValue?: ValidateValue,
-};
+}
 export interface RangeableWidget extends BaseWidget {
   singleWidget?: string,
   valueLabels?: Array<string | {label: string, placeholder: string}>,
-};
+}
 export interface FieldWidget {
   customProps?: AnyObject,
   valueSrc: "field",
@@ -187,7 +188,7 @@ export interface FieldWidget {
   sqlFormatValue: SqlFormatValue, // with rightFieldDef
   //obsolete:
   validateValue?: ValidateValue,
-};
+}
 
 export type TextWidget = BaseWidget & BasicFieldSettings;
 export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
@@ -213,7 +214,7 @@ export interface Conjunction {
   sqlFormatConj: SqlFormatConj,
   mongoConj: string,
   reversedConj?: string,
-};
+}
 export type Conjunctions = TypedMap<Conjunction>;
 
 export interface ConjunctionOption {
@@ -221,7 +222,7 @@ export interface ConjunctionOption {
   key: string,
   label: string,
   checked: boolean,
-};
+}
 
 export interface ConjsProps {
   path: string, 
@@ -245,21 +246,21 @@ export interface ButtonProps {
   onClick(): void, 
   label: string,
   config?: Config,
-};
+}
 
 export interface ButtonGroupProps {
   children: ReactElement,
   config?: Config,
-};
+}
 
 export interface ProviderProps {
   children: ReactElement,
   config?: Config,
-};
+}
 
 export type ValueSourceItem = {
   label: string, 
-};
+}
 type ValueSourcesItems = TypedKeyMap<ValueSource, ValueSourceItem>;
 
 export interface ValueSourcesProps {
@@ -269,18 +270,18 @@ export interface ValueSourcesProps {
   setValueSrc(valueSrc: string): void, 
   readonly?: boolean,
   title: string,
-};
+}
 
 export interface ConfirmModalProps {
   onOk(): void, 
   okText: string, 
   cancelText?: string, 
   title: string,
-};
+}
 
 export interface RuleErrorProps {
   error: string,
-};
+}
 
 /////////////////
 // Operators
@@ -301,15 +302,15 @@ interface ProximityConfig {
       proximity: number,
   },
   customProps?: AnyObject,
-};
+}
 export interface ProximityProps extends ProximityConfig {
   options: ImmutableMap<string, any>,
   setOption: (key: string, value: any) => void,
   config: Config,
-};
+}
 export interface ProximityOptions extends ProximityConfig {
   factory: Factory<ProximityProps>,
-};
+}
 
 interface BaseOperator {
   label: string,
@@ -323,22 +324,22 @@ interface BaseOperator {
   jsonLogic?: string | JsonLogicFormatOperator,
   _jsonLogicIsRevArgs?: boolean,
   valueSources?: Array<ValueSource>,
-};
+}
 interface UnaryOperator extends BaseOperator {
   //cardinality: 0,
-};
+}
 interface BinaryOperator extends BaseOperator {
   //cardinality: 1,
-};
+}
 interface Operator2 extends BaseOperator {
   //cardinality: 2
   textSeparators: Array<string>,
   valueLabels: Array<string | {label: string, placeholder: string}>,
   isSpecialRange?: boolean,
-};
+}
 interface OperatorProximity extends Operator2 {
   options: ProximityOptions,
-};
+}
 export type Operator = UnaryOperator | BinaryOperator | Operator2 | OperatorProximity;
 export type Operators = TypedMap<Operator>;
 
@@ -352,13 +353,13 @@ interface WidgetConfigForType {
   widgetProps?: Optional<Widget>,
   opProps?: Optional<Operator>,
   operators?: Array<string>,
-};
+}
 
 interface Type {
   valueSources?: Array<ValueSource>,
   defaultOperator?: string,
   widgets: TypedMap<WidgetConfigForType>,
-};
+}
 export type Types = TypedMap<Type>;
 
 
@@ -371,7 +372,7 @@ type FieldType = string | "!struct" | "!group";
 interface ListItem {
   value: any,
   title?: string,
-};
+}
 interface TreeItem extends ListItem {
   children?: Array<TreeItem>,
   parent?: any,
@@ -379,7 +380,7 @@ interface TreeItem extends ListItem {
   selectable?: boolean,
   disableCheckbox?: boolean,
   checkable?: boolean,
-};
+}
 type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
@@ -391,13 +392,13 @@ export interface NumberFieldSettings extends BasicFieldSettings {
   max?: number,
   step?: number,
   marks?: {[mark: number]: ReactElement | string}
-};
+}
 export interface DateTimeFieldSettings extends BasicFieldSettings {
   timeFormat?: string,
   dateFormat?: string,
   valueFormat?: string,
   use12Hours?: boolean,
-};
+}
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
@@ -410,14 +411,14 @@ export interface TreeSelectFieldSettings extends BasicFieldSettings {
 export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
-};
+}
 export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
   label?: string,
   tooltip?: string,
-};
+}
 interface ValueField extends BaseField {
   type: string,
   preferWidgets?: Array<string>,
@@ -433,21 +434,21 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: ListValues,
   allowCustomValues?: boolean,
-};
+}
 interface SimpleField extends ValueField {
   label2?: string,
   operators?: Array<string>,
   defaultOperator?: string,
   excludeOperators?: Array<string>,
-};
+}
 interface FieldStruct extends BaseField {
   type: "!struct",
   subfields: Fields,
-};
+}
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
-};
+}
 
 export type Field = SimpleField;
 type FieldOrGroup = FieldStruct | FieldGroup | Field;
@@ -467,7 +468,7 @@ export type FieldItem = {
   altLabel?: string, 
   tooltip?: string,
   disabled?: boolean,
-};
+}
 type FieldItems = TypedMap<FieldItem>;
 
 export interface FieldProps {
@@ -491,9 +492,7 @@ export interface FieldProps {
 // Settings
 /////////////////
 
-type ConfirmFunc = (opts: ConfirmModalProps) => void;
-
-type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}};
+type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}}
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
@@ -531,7 +530,7 @@ export interface LocaleSettings {
     okText?: string,
     okType?: string,
   },
-};
+}
 
 export interface RenderSettings {
   renderField?: Factory<FieldProps>;
@@ -555,7 +554,7 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>;
   renderAfterActions?: Factory<FieldProps>;
   renderRuleError?: Factory<RuleErrorProps>;
-};
+}
 
 export interface BehaviourSettings {
   valueSourcesInfo?: ValueSourcesInfo,
@@ -576,14 +575,14 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
-};
+}
 
 export interface OtherSettings {
   fieldSeparator?: string,
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse,
   formatField?: FormatField,
-};
+}
 
 export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & OtherSettings;
 
@@ -617,10 +616,10 @@ export interface Func {
   mongoFormatFunc?: MongoFormatFunc,
   renderBrackets?: Array<ReactElement | string>,
   renderSeps?: Array<ReactElement | string>,
-};
+}
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
-};
+}
 export type Funcs = TypedMap<Func | FuncGroup>;
 
 
@@ -685,7 +684,7 @@ export interface BasicConfig extends Config {
     boolean: Type,
   },
   settings: Settings,
-};
+}
 
 
 /////////////////
@@ -746,7 +745,7 @@ export interface AntdWidgets {
 interface ReadyWidgets extends VanillaWidgets {
   ValueFieldWidget: ElementType<WidgetProps>,
   FuncWidget: ElementType<WidgetProps>,
-};
+}
 
 
 /////////////////
