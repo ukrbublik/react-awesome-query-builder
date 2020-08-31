@@ -35,13 +35,13 @@ type TypedMap<T> = {
 type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
-};
+}
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
-};
+}
 
 type JsonGroup = {
   type: "group",
