@@ -29,6 +29,9 @@ type Optional<T> = {
 type TypedMap<T> = {
   [key: string]: T;
 }
+
+// You can not use a union for types on a key, but can define overloaded accessors of different types.
+// Key can be a string OR number
 type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
@@ -36,6 +39,9 @@ type TypedKeyMap<K extends string|number, T> = {
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
+type TypedValueSourceMap<T> = {
+  [key in ValueSource]: T;
+};
 
 type JsonGroup = {
   type: "group",
@@ -230,7 +236,7 @@ export interface ConjsProps {
   disabled?: boolean,
   selectedConjunction?: string,
   setConjunction(conj: string): void,
-  conjunctionOptions?: TypedKeyMap<string, ConjunctionOption>,
+  conjunctionOptions?: TypedMap<ConjunctionOption>,
   config?: Config,
   not: boolean,
   setNot(not: boolean): void,
@@ -261,7 +267,7 @@ export interface ProviderProps {
 export type ValueSourceItem = {
   label: string, 
 }
-type ValueSourcesItems = TypedKeyMap<ValueSource, ValueSourceItem>;
+type ValueSourcesItems = TypedValueSourceMap<ValueSourceItem>;
 
 export interface ValueSourcesProps {
   config?: Config,
