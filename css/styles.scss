@@ -471,7 +471,6 @@ div.tooltip-inner {
   }
   .group--header:hover .group--header,
   .group--header:not(:hover),
-  .rule_group:hover .rule_group,
   .rule_group:not(:hover) {
     #{$what} {
       opacity: 0;
@@ -485,7 +484,6 @@ div.tooltip-inner {
   }
   .group--header:hover .group--header,
   .group--header:not(:hover),
-  .rule_group:hover .rule_group,
   .rule_group:not(:hover) {
     #{$inactive} {
       width: 0;
