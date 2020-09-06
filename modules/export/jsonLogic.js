@@ -146,7 +146,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       return undefined;
     }
 
-    const groupField = isRuleGroup ? (parentField ? [parentField, field] : [field]).join(fieldSeparator) : parentField;
+    const groupField = isRuleGroup ? field : parentField;
     const list = children
       .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, groupField))
       .filter((currentChild) => typeof currentChild !== "undefined");
@@ -173,9 +173,13 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
     // rule_group (issue #246)
     if (isRuleGroup) {
       const op = not ? "none" : "some";
+      let fieldName = field;
+      if (parentField) {
+        fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
+      }
       resultQuery = {
         [op]: [
-          [{var: field}],
+          [{var: fieldName}],
           resultQuery
         ]
       };
@@ -244,8 +248,8 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
     }
     const formattedField = { "var": fieldName };
-    if (meta.usedFields.indexOf(fieldName) == -1)
-      meta.usedFields.push(fieldName);
+    if (meta.usedFields.indexOf(field) == -1)
+      meta.usedFields.push(field);
 
     // format logic
     let formatteOp = operator;
