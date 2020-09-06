@@ -314,9 +314,9 @@ describe("query with !struct and !group", () => {
 //////////////////////////////////////////////////////////////////////////////////////////
 // query with nested !group
 
-describe("query nested !group", () => {
+describe("query with nested !group", () => {
 
-  describe("export", () => {
+  describe("with one group rule", () => {
     export_checks(configs.with_nested_group, inits.with_nested_group, "JsonLogic", {
       "query": "(results.score > 15 && results.user.name == \"denis\")",
       "queryHuman": "(Results.score > 15 AND Results.user.name == \"denis\")",
@@ -363,8 +363,89 @@ describe("query nested !group", () => {
     });
   });
 
+  describe("with two separate group rules", () => {
+    export_checks(configs.with_nested_group, inits.two_rules_with_nested_group, "JsonLogic", {
+      "query": "(results.score == 11 && results.user.name == \"aaa\")",
+      "queryHuman": "(Results.score == 11 AND Results.user.name == \"aaa\")",
+      "sql": "(results.score = 11 AND results.user.name = 'aaa')",
+      "mongo": {
+        "$and": [
+          {
+            "results": {
+              "$elemMatch": {
+                "score": 11
+              }
+            }
+          }, {
+            "results": {
+              "$elemMatch": {
+                "user": {
+                  "$elemMatch": {
+                    "name": "aaa"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "==": [  { "var": "score" },  11  ] }
+            ]
+          },
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "some": [
+                [ { "var": "user" } ], {
+                  "==": [ { "var": "name" },  "aaa" ]
+                }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
 });
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// query with !struct inside !group
+
+describe("query with !struct inside !group", () => {
+
+  describe("export", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group, "JsonLogic", {
+      "query": "results.user.name == \"ddd\"",
+      "queryHuman": "Results.user.name == \"ddd\"",
+      "sql": "results.user.name = 'ddd'",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "ddd"
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "==": [  { "var": "user.name" },  "ddd"  ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+});
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // query with field compare

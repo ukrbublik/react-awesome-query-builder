@@ -246,6 +246,29 @@ export const with_nested_group = (BasicConfig) => ({
     },
   }
 });
+  
+export const with_struct_inside_group = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      subfields: {
+        score: {
+          type: "number",
+        },
+        user: {
+          type: "!struct",
+          subfields: {
+            name: {
+              type: "text",
+            }
+          }
+        }
+      }
+    },
+  }
+});
 
 export const with_all_types = (BasicConfig) => ({
   ...BasicConfig,

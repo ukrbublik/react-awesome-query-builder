@@ -114,6 +114,38 @@ export const with_nested_group = {
   ]
 };
 
+export const two_rules_with_nested_group = {
+  "and": [
+    {
+      "some": [
+        [ { "var": "results" } ],
+        { "==": [  { "var": "score" },  11  ] }
+      ]
+    },
+    {
+      "some": [
+        [ { "var": "results" } ],
+        { "some": [
+          [ { "var": "user" } ], {
+            "==": [ { "var": "name" },  "aaa" ]
+          }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group = {
+  "and": [
+    {
+      "some": [
+        [ { "var": "results" } ],
+        { "==": [  { "var": "user.name" },  "ddd"  ] }
+      ]
+    }
+  ]
+};
+
 export const with_number_field_compare = {
   "and": [
     { "==": [ { "var": "num" }, { "var": "num2" } ] }
