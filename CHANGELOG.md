@@ -1,4 +1,8 @@
 # Changelog
+- 2.1.16
+  - Fixed issues with export to Mongo and JsonLogic of queries with nested groups (#279, #279)
+- 2.1.15
+  - Fixed issue #276 with TS definitions
 - 2.1.14
   - Require Node v10+ (for karma)
   - Fixed "SyntaxError Unexpected token '<'" in sandboxes
@@ -60,7 +64,7 @@
   - Removed coupling with AntDesign. Now it should be possible to use another UI framework.
   - Added vanilla widgets. Added switcher between `antd` and `vanilla` in demo.
 - 1.3.7
-  - Fixed [issue](https://github.com/ukrbublik/react-awesome-query-builder/issues/168) with dot in field name
+  - Fixed issue #168 with dot in field name
 - 1.3.6
   - Added config options to disable inputs: `immutableFieldsMode`, `immutableOpsMode`, `immutableValuesMode` 
 - 1.3.5

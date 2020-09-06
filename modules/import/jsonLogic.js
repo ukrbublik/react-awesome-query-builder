@@ -28,7 +28,7 @@ export const loadFromJsonLogic = (logicTree, config) => {
   };
   const extendedConfig = extendConfig(config);
   const conv = buildConv(extendedConfig);
-  let jsTree = convertFromLogic(logicTree, conv, extendedConfig, "rule", meta);
+  let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
   if (jsTree && jsTree.type != "group") {
     jsTree = wrapInDefaultConj(jsTree, extendedConfig);
   }

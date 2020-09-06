@@ -121,6 +121,12 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
   const children = item.get("children1");
   const {fieldSeparator, canShortMongoQuery} = config.settings;
 
+  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
+  const parentPath = parents
+    .filter(it => it.get("type") == "rule_group")
+    .map(it => it.get("properties").get("field"))
+    .slice(-1).pop();
+
   if ((type === "group" || type === "rule_group") && children && children.size) {
     const not = _not ? !(properties.get("not")) : (properties.get("not"));
     const list = children
@@ -181,7 +187,17 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
         resultQuery = { [mongoConj] : rules };
     }
     if (field) {
-      resultQuery = { [field]: {"$elemMatch": resultQuery} };
+      //format field
+      let fieldName = field;
+      if (hasParentRuleGroup) {
+        if (parentPath && fieldName.indexOf(parentPath+".") == 0) {
+          fieldName = fieldName.slice((parentPath+".").length);
+        } else {
+          meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
+        }
+      }
+      
+      resultQuery = { [fieldName]: {"$elemMatch": resultQuery} };
     }
     return resultQuery;
   } else if (type === "rule") {
@@ -204,21 +220,16 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
     }
 
-    const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
-    const parentPath = parents
-      .filter(it => it.get("type") == "rule_group")
-      .map(it => it.get("properties").get("field"))
-      .join(fieldSeparator);
-
     //format field
     let fieldName = field;
     if (hasParentRuleGroup) {
-      if (parentPath.length > 0 && fieldName.indexOf(parentPath+".") == 0) {
+      if (parentPath && fieldName.indexOf(parentPath+".") == 0) {
         fieldName = fieldName.slice((parentPath+".").length);
       } else {
-        meta.errors.push(`Can't cut group from field ${fieldName}`);
+        meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
       }
     }
+    
     // if (fieldDefinition.tableName) {
     //   let fieldParts = Array.isArray(field) ? [...field] : field.split(fieldSeparator);
     //   fieldParts[0] = fieldDefinition.tableName;

@@ -26,8 +26,7 @@ export const tree_with_number = {
 export const with_number = {
   "and": [{
     "==": [
-      { "var": "num" },
-      2
+      { "var": "num" },  2
     ]
   }]
 };
@@ -35,13 +34,11 @@ export const with_number = {
 export const with_number_and_string = {
   "or": [{
     "<": [
-      { "var": "num" },
-      2
+      { "var": "num" },  2
     ]
   }, {
     "==": [
-      { "var": "login" },
-      "ukrbublik"
+      { "var": "login" },  "ukrbublik"
     ]
   }]
 };
@@ -49,14 +46,10 @@ export const with_number_and_string = {
 export const with_not_number_and_string = {
   "!": {
     "or": [{
-      "<": [
-        { "var": "num" },
-        2
-      ]
+      "<": [ { "var": "num" }, 2 ]
     }, {
       "==": [
-        { "var": "login" },
-        "ukrbublik"
+        { "var": "login" },  "ukrbublik"
       ]
     }]
   }
@@ -96,6 +89,60 @@ export const with_struct_and_group = {
     },
     { "==": [ { "var": "user.firstName" }, "abc" ] },
     { "!!": { "var": "user.login" } }
+  ]
+};
+  
+export const with_nested_group = {
+  "and": [
+    { "some": [
+      [
+        { "var": "results" }
+      ], {
+        "and": [
+          {
+            ">": [  { "var": "score" },  15  ]
+          }, {
+            "some": [
+              [ { "var": "user" } ], {
+                "==": [  { "var": "name" },  "denis"  ]
+              }
+            ]
+          }
+        ]
+      }
+    ] }
+  ]
+};
+
+export const two_rules_with_nested_group = {
+  "and": [
+    {
+      "some": [
+        [ { "var": "results" } ],
+        { "==": [  { "var": "score" },  11  ] }
+      ]
+    },
+    {
+      "some": [
+        [ { "var": "results" } ],
+        { "some": [
+          [ { "var": "user" } ], {
+            "==": [ { "var": "name" },  "aaa" ]
+          }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group = {
+  "and": [
+    {
+      "some": [
+        [ { "var": "results" } ],
+        { "==": [  { "var": "user.name" },  "ddd"  ] }
+      ]
+    }
   ]
 };
 
@@ -165,94 +212,37 @@ export const with_treeselect = {
 export const with_ops = {
   "and": [
     {
-      "!=": [
-        {
-          "var": "num"
-        },
-        2
-      ]
-    },
-    {
+      "!=": [ { "var": "num" },  2 ]
+    }, {
+      "in": [ "abc",  { "var": "str" } ]
+    }, {
+      "!": {
+        "in": [ "xyz", { "var": "str" } ]
+      }
+    }, {
+      "<=": [  1,  { "var": "num" },  2  ]
+    }, {
+      "!": {
+        "<=": [  3,  { "var": "num" },  4  ]
+      }
+    }, {
+      "!": { "var": "num" }
+    }, {
       "in": [
-        "abc",
-        {
-          "var": "str"
-        }
+        { "var": "color" },
+        [ "yellow" ]
       ]
-    },
-    {
+    }, {
       "!": {
         "in": [
-          "xyz",
-          {
-            "var": "str"
-          }
+          { "var": "color" },  [ "green" ]
         ]
       }
-    },
-    {
-      "<=": [
-        1,
-        {
-          "var": "num"
-        },
-        2
-      ]
-    },
-    {
-      "!": {
-        "<=": [
-          3,
-          {
-            "var": "num"
-          },
-          4
-        ]
-      }
-    },
-    {
-      "!": {
-        "var": "num"
-      }
-    },
-    {
-      "in": [
-        {
-          "var": "color"
-        },
-        [
-          "yellow"
-        ]
-      ]
-    },
-    {
-      "!": {
-        "in": [
-          {
-            "var": "color"
-          },
-          [
-            "green"
-          ]
-        ]
-      }
-    },
-    {
+    }, {
       "!": {
         "all": [
-          {
-            "var": "multicolor"
-          },
-          {
-            "in": [
-              {
-                "var": ""
-              },
-              [
-                "yellow"
-              ]
-            ]
-          }
+          { "var": "multicolor" },
+          { "in": [ { "var": "" },  [ "yellow" ] ] }
         ]
       }
     }
@@ -340,17 +330,11 @@ export const with_func_tolower_from_field = {
   "and": [
     {
       "==": [
-        {
-          "var": "str"
-        },
-        {
-          "method": [
-            {
-              "var": "str2"
-            },
-            "toLowerCase"
-          ]
-        }
+        { "var": "str" },
+        { "method": [
+          { "var": "str2" },
+          "toLowerCase"
+        ] }
       ]
     }
   ]

@@ -191,8 +191,7 @@ describe("query with subquery and datetime types", () => {
         "$or": [
           {
             "datetime": "2020-05-18 21:50:01"
-          },
-          {
+          }, {
             "date": "2020-05-18",
             "time": "00:50:00"
           }
@@ -201,30 +200,13 @@ describe("query with subquery and datetime types", () => {
       "logic": {
         "or": [
           {
-            "==": [
-              {
-                "var": "datetime"
-              },
-              "2020-05-18T21:50:01.000Z"
-            ]
-          },
-          {
+            "==": [ { "var": "datetime" },  "2020-05-18T21:50:01.000Z" ]
+          }, {
             "and": [
               {
-                "==": [
-                  {
-                    "var": "date"
-                  },
-                  "2020-05-18T00:00:00.000Z"
-                ]
-              },
-              {
-                "==": [
-                  {
-                    "var": "time"
-                  },
-                  3000
-                ]
+                "==": [ { "var": "date" },  "2020-05-18T00:00:00.000Z" ]
+              }, {
+                "==": [ { "var": "time" },  3000 ]
               }
             ]
           }
@@ -254,37 +236,18 @@ describe("query with select", () => {
       "sql": "(color = 'yellow' AND multicolor = 'yellow,green')",
       "mongo": {
         "color": "yellow",
-        "multicolor": [
-          "yellow",
-          "green"
-        ]
+        "multicolor": [ "yellow", "green" ]
       },
       "logic": {
         "and": [
           {
-            "==": [
-              {
-                "var": "color"
-              },
-              "yellow"
-            ]
-          },
-          {
+            "==": [ { "var": "color" },  "yellow" ]
+          }, {
             "all": [
-              {
-                "var": "multicolor"
-              },
-              {
-                "in": [
-                  {
-                    "var": ""
-                  },
-                  [
-                    "yellow",
-                    "green"
-                  ]
-                ]
-              }
+              { "var": "multicolor" },
+              { "in": [
+                { "var": "" },  [ "yellow", "green" ]
+              ] }
             ]
           }
         ]
@@ -296,7 +259,7 @@ describe("query with select", () => {
 //////////////////////////////////////////////////////////////////////////////////////////
 // query with !struct and !group
 
-describe("query with !struct", () => {
+describe("query with !struct and !group", () => {
 
   describe("import", () => {
     it("should work with value of JsonLogic format", () => {
@@ -328,40 +291,18 @@ describe("query with !struct", () => {
           {
             "some": [
               [{ "var": "results" }],
-              {
-                "and": [
-                  {
-                    "==": [
-                      {
-                        "var": "slider"
-                      },
-                      22
-                    ]
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": "stock"
-                      },
-                      true
-                    ]
-                  }
-                ]
-              }
+              { "and": [
+                {
+                  "==": [ { "var": "slider" },  22 ]
+                }, {
+                  "==": [ { "var": "stock" },  true ]
+                }
+              ] }
             ]
-          },
-          {
-            "==": [
-              {
-                "var": "user.firstName"
-              },
-              "abc"
-            ]
-          },
-          {
-            "!!": {
-              "var": "user.login"
-            }
+          }, {
+            "==": [ { "var": "user.firstName" },  "abc" ]
+          }, {
+            "!!": { "var": "user.login" }
           }
         ]
       }
@@ -370,6 +311,141 @@ describe("query with !struct", () => {
 
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// query with nested !group
+
+describe("query with nested !group", () => {
+
+  describe("with one group rule", () => {
+    export_checks(configs.with_nested_group, inits.with_nested_group, "JsonLogic", {
+      "query": "(results.score > 15 && results.user.name == \"denis\")",
+      "queryHuman": "(Results.score > 15 AND Results.user.name == \"denis\")",
+      "sql": "(results.score > 15 AND results.user.name = 'denis')",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "score": {
+              "$gt": 15
+            },
+            "user": {
+              "$elemMatch": {
+                "name": "denis"
+              }
+            }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [
+                { "var": "results" }
+              ], {
+                "and": [
+                  {
+                    ">": [  { "var": "score" },  15  ]
+                  }, {
+                    "some": [
+                      [
+                        { "var": "user" }
+                      ], {
+                        "==": [  { "var": "name" },  "denis"  ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with two separate group rules", () => {
+    export_checks(configs.with_nested_group, inits.two_rules_with_nested_group, "JsonLogic", {
+      "query": "(results.score == 11 && results.user.name == \"aaa\")",
+      "queryHuman": "(Results.score == 11 AND Results.user.name == \"aaa\")",
+      "sql": "(results.score = 11 AND results.user.name = 'aaa')",
+      "mongo": {
+        "$and": [
+          {
+            "results": {
+              "$elemMatch": {
+                "score": 11
+              }
+            }
+          }, {
+            "results": {
+              "$elemMatch": {
+                "user": {
+                  "$elemMatch": {
+                    "name": "aaa"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "==": [  { "var": "score" },  11  ] }
+            ]
+          },
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "some": [
+                [ { "var": "user" } ], {
+                  "==": [ { "var": "name" },  "aaa" ]
+                }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+});
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// query with !struct inside !group
+
+describe("query with !struct inside !group", () => {
+
+  describe("export", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group, "JsonLogic", {
+      "query": "results.user.name == \"ddd\"",
+      "queryHuman": "Results.user.name == \"ddd\"",
+      "sql": "results.user.name = 'ddd'",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "ddd"
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "==": [  { "var": "user.name" },  "ddd"  ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+});
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // query with field compare
@@ -391,22 +467,14 @@ describe("query with field compare", () => {
       "sql": "num = num2",
       "mongo": {
         "$expr": {
-          "$eq": [
-            "$num",
-            "$num2"
-          ]
+          "$eq": [ "$num", "$num2" ]
         }
       },
       "logic": {
         "and": [
           {
             "==": [
-              {
-                "var": "num"
-              },
-              {
-                "var": "num2"
-              }
+              { "var": "num" },  { "var": "num2" }
             ]
           }
         ]
@@ -439,16 +507,9 @@ describe("query with func", () => {
         "and": [
           {
             "==": [
+              { "var": "str" },
               {
-                "var": "str"
-              },
-              {
-                "method": [
-                  {
-                    "var": "str2"
-                  },
-                  "toLowerCase"
-                ]
+                "method": [ { "var": "str2" },  "toLowerCase" ]
               }
             ]
           }
@@ -485,17 +546,9 @@ describe("query with func", () => {
           "$expr": {
             "$eq": [
               "$num",
-              {
-                "$sum": [
-                  {
-                    "$multiply": [
-                      1,
-                      4
-                    ]
-                  },
-                  0
-                ]
-              }
+              { "$sum": [
+                { "$multiply": [ 1, 4 ] },  0
+              ] }
             ]
           }
         },
@@ -503,20 +556,8 @@ describe("query with func", () => {
           "and": [
             {
               "==": [
-                {
-                  "var": "num"
-                },
-                {
-                  "+": [
-                    {
-                      "*": [
-                        1,
-                        4
-                      ]
-                    },
-                    0
-                  ]
-                }
+                { "var": "num" },
+                { "+": [ { "*": [ 1, 4 ] }, 0 ] }
               ]
             }
           ]
@@ -554,110 +595,47 @@ describe("query with ops", () => {
           }
         },
         "color": {
-          "$in": [
-            "yellow"
-          ],
-          "$nin": [
-            "green"
-          ]
+          "$in": [ "yellow" ],
+          "$nin": [ "green" ]
         },
         "multicolor": {
-          "$ne": [
-            "yellow"
-          ]
+          "$ne": [ "yellow" ]
         }
       },
       "logic": {
         "and": [
           {
-            "!=": [
-              {
-                "var": "num"
-              },
-              2
-            ]
-          },
-          {
-            "in": [
-              "abc",
-              {
-                "var": "str"
-              }
-            ]
-          },
-          {
+            "!=": [ { "var": "num" },  2 ]
+          }, {
+            "in": [ "abc",  { "var": "str" } ]
+          }, {
             "!": {
               "in": [
                 "xyz",
-                {
-                  "var": "str"
-                }
+                { "var": "str" }
               ]
             }
-          },
-          {
-            "<=": [
-              1,
-              {
-                "var": "num"
-              },
-              2
-            ]
-          },
-          {
-            "!": {
-              "<=": [
-                3,
-                {
-                  "var": "num"
-                },
-                4
-              ]
-            }
-          },
-          {
-            "!": {
-              "var": "num"
-            }
-          },
-          {
+          }, {
+            "<=": [  1,  { "var": "num" },  2  ]
+          }, {
+            "!": {  "<=": [ 3,  { "var": "num" },  4 ]  }
+          }, {
+            "!": { "var": "num" }
+          }, {
             "in": [
-              {
-                "var": "color"
-              },
-              [
-                "yellow"
-              ]
+              { "var": "color" },  [ "yellow" ]
             ]
-          },
-          {
+          }, {
             "!": {
               "in": [
-                {
-                  "var": "color"
-                },
-                [
-                  "green"
-                ]
+                { "var": "color" },  [ "green" ]
               ]
             }
-          },
-          {
+          }, {
             "!": {
               "all": [
-                {
-                  "var": "multicolor"
-                },
-                {
-                  "in": [
-                    {
-                      "var": ""
-                    },
-                    [
-                      "yellow"
-                    ]
-                  ]
-                }
+                { "var": "multicolor" },
+                { "in": [ { "var": "" },  [ "yellow" ] ] }
               ]
             }
           }
