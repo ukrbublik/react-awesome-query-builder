@@ -259,7 +259,7 @@ describe("query with select", () => {
 //////////////////////////////////////////////////////////////////////////////////////////
 // query with !struct and !group
 
-describe("query with !struct", () => {
+describe("query with !struct and !group", () => {
 
   describe("import", () => {
     it("should work with value of JsonLogic format", () => {
@@ -303,6 +303,60 @@ describe("query with !struct", () => {
             "==": [ { "var": "user.firstName" },  "abc" ]
           }, {
             "!!": { "var": "user.login" }
+          }
+        ]
+      }
+    });
+  });
+
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// query with nested !group
+
+describe("query nested !group", () => {
+
+  describe("export", () => {
+    export_checks(configs.with_nested_group, inits.with_nested_group, "JsonLogic", {
+      "query": "(results.score > 15 && results.user.name == \"denis\")",
+      "queryHuman": "(Results.score > 15 AND Results.user.name == \"denis\")",
+      "sql": "(results.score > 15 AND results.user.name = 'denis')",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "score": {
+              "$gt": 15
+            },
+            "user": {
+              "$elemMatch": {
+                "name": "denis"
+              }
+            }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [
+                { "var": "results" }
+              ], {
+                "and": [
+                  {
+                    ">": [  { "var": "score" },  15  ]
+                  }, {
+                    "some": [
+                      [
+                        { "var": "user" }
+                      ], {
+                        "==": [  { "var": "name" },  "denis"  ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         ]
       }

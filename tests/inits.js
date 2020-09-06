@@ -91,6 +91,28 @@ export const with_struct_and_group = {
     { "!!": { "var": "user.login" } }
   ]
 };
+  
+export const with_nested_group = {
+    "and": [
+      { "some": [
+        [
+          { "var": "results" }
+        ], {
+          "and": [
+            {
+              ">": [  { "var": "score" },  15  ]
+            }, {
+              "some": [
+                [ { "var": "user" } ], {
+                  "==": [  { "var": "name" },  "denis"  ]
+                }
+              ]
+            }
+          ]
+        }
+      ] }
+    ]
+};
 
 export const with_number_field_compare = {
   "and": [
