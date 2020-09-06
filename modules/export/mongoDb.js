@@ -216,7 +216,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       if (parentPath.length > 0 && fieldName.indexOf(parentPath+".") == 0) {
         fieldName = fieldName.slice((parentPath+".").length);
       } else {
-        meta.errors.push(`Can't cut group from field ${fieldName}`);
+        meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
       }
     }
     // if (fieldDefinition.tableName) {
