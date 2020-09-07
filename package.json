@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "2.1.17",
+  "version": "2.1.18",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "query-builder",
@@ -38,15 +38,11 @@
     "lint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --fix ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
     "lint": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/"
   },
-  "readme": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "contributors": [
-    "Sebastian Siemssen <fubhy@fubhy.com> (https://github.com/fubhy)"
-  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ukrbublik/react-awesome-query-builder/issues"
