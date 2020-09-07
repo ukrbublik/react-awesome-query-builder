@@ -187,4 +187,10 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("should not render not with showNot=false", () => {
+    with_qb(configs.with_settings_not_show_not, inits.with_numbers_and_group, "JsonLogic", (qb) => {
+      expect(qb.find(".group--conjunctions input[type='checkbox']")).to.have.length(0);
+    });
+  });
+
 });

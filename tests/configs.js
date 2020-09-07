@@ -547,4 +547,13 @@ export const with_settings_confirm = (BasicConfig) => ({
   }
 });
 
-//todo: showNot
+export const with_settings_not_show_not = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  conjunctions: {
+    AND: BasicConfig.conjunctions.AND,
+  },
+  settings: {
+    ...BasicConfig.settings,
+    showNot: false
+  }
+});
