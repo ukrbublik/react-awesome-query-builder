@@ -27,8 +27,8 @@ describe("change props", () => {
   });
 
   describe("load tree with another config", () => {
-    with_qb(configs.simple_with_number, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {export_checks}) => {
-      export_checks({
+    with_qb(configs.simple_with_number, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {expect_checks}) => {
+      expect_checks({
         logic: inits.with_number
       });
     });
