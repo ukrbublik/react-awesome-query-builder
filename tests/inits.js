@@ -30,6 +30,20 @@ export const with_number = {
     ]
   }]
 };
+
+export const with_undefined_as_number = {
+  "and": [{
+    "==": [
+      { "var": "num" },  undefined
+    ]
+  }]
+};
+
+export const with_number_not_in_group = {
+  "==": [
+    { "var": "num" },  2
+  ]
+};
   
 export const with_number_and_string = {
   "or": [{
@@ -89,6 +103,13 @@ export const with_struct_and_group = {
     },
     { "==": [ { "var": "user.firstName" }, "abc" ] },
     { "!!": { "var": "user.login" } }
+  ]
+};
+  
+export const with_struct_and_group_mixed_obsolete = {
+  "and": [
+    { "==": [ { "var": "results.slider" }, 22 ] },
+    { "==": [ { "var": "user.firstName" }, "abc" ] },
   ]
 };
   

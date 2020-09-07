@@ -53,6 +53,34 @@ describe("query with !struct and !group", () => {
     });
   });
 
+  describe("should handle if !group isnot wrapped in #some", () => {
+    export_checks(configs.with_struct_and_group, inits.with_struct_and_group_mixed_obsolete, "JsonLogic", {
+      "query": "(results.slider == 22 && user.firstName == \"abc\")",
+      "queryHuman": "(Results.Slider == 22 AND Username == \"abc\")",
+      "sql": "(results.slider = 22 AND user.firstName = 'abc')",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "slider": 22
+          }
+        },
+        "user.firstName": "abc"
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              [ { "var": "results" } ],
+              { "==": [ { "var": "slider" }, 22 ] }
+            ]
+          }, {
+            "==": [ { "var": "user.firstName" }, "abc" ]
+          }
+        ]
+      }
+    });
+  });
+
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
