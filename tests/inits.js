@@ -194,6 +194,18 @@ export const with_select = {
   "and": [{  "==": [ { "var": "color" }, "red" ]  }]
 };
 
+export const with_bool = {
+  "and": [{  "==": [ { "var": "stock" }, true ]  }]
+};
+
+export const with_slider = {
+  "and": [{  "==": [ { "var": "slider" }, 32 ]  }]
+};
+
+export const with_time = {
+  "and": [{  "==": [ { "var": "time" }, 60*60*2+60*20 ]  }]
+};
+
 export const with_multiselect = {
   "and": [
     {

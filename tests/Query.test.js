@@ -976,7 +976,39 @@ describe("widgets", () => {
     });
   });
 
-  //todo: time, slider, bool
+  it("change bool value", () => {
+    with_qb(configs.with_all_types, inits.with_bool, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find(".rule .rule--value .widget--widget input[value=false]")
+        .simulate("change", { target: { value: "false" } });
+      expect_jlogic([null, {
+        "and": [{  "==": [ { "var": "stock" }, false ]  }]
+      }]);
+    });
+  });
+
+  it("change slider value", () => {
+    with_qb(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find(".rule .rule--value .widget--widget input[type='range']")
+        .simulate("change", { target: { value: 42 } });
+      expect_jlogic([null, {
+        "and": [{  "==": [ { "var": "slider" }, 42 ]  }]
+      }]);
+    });
+  });
+
+  it("change time value", () => {
+    with_qb(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      qb
+        .find(".rule .rule--value .widget--widget input[type='time']")
+        .simulate("change", { target: { value: '10:30' } });
+      expect_jlogic([null, {
+        "and": [{  "==": [ { "var": "time" }, 60*60*10+60*30 ]  }]
+      }]);
+    });
+  });
+
 });
 
 
