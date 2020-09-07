@@ -61,7 +61,7 @@
     "classnames": "^2.2.5",
     "clone": "^2.1.1",
     "immutable": "^3.7.6",
-    "lodash": "^4.6",
+    "lodash": "^4.17.20",
     "moment": "^2.24.0",
     "prop-types": "^15.6.0",
     "react-redux": "^7.2.1",
