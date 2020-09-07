@@ -103,7 +103,7 @@ describe("vanilla widgets interactions", () => {
     with_qb(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input[type='time']")
-        .simulate("change", { target: { value: '10:30' } });
+        .simulate("change", { target: { value: "10:30" } });
       expect_jlogic([null, {
         "and": [{  "==": [ { "var": "time" }, 60*60*10+60*30 ]  }]
       }]);

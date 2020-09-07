@@ -80,16 +80,11 @@ const render_builder = (props) => (
 export const empty_value = {id: uuid(), type: "group"};
 
 export const do_export_checks = (config, tree, expects, inside_it = false) => {
-  let origIt = it;
-  if (inside_it) {
-    it = (name, func) => {
-      func();
-    };
-  }
+  const doIt = inside_it ? ((name, func) => { func(); }) : it;
 
   if (expects) {
     if (expects["query"] !== undefined) {
-      it("should work to query string", () => {
+      doIt("should work to query string", () => {
         const res = queryString(tree, config);
         expect(res).to.equal(expects["query"]);
         const res2 = queryString(tree, config, true);
@@ -98,21 +93,21 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
     }
   
     if (expects["sql"] !== undefined) {
-      it("should work to SQL", () => {
+      doIt("should work to SQL", () => {
         const res = sqlFormat(tree, config);
         expect(res).to.equal(expects["sql"]);
       });
     }
     
     if (expects["mongo"] !== undefined) {
-      it("should work to MongoDb", () => {
+      doIt("should work to MongoDb", () => {
         const res = mongodbFormat(tree, config);
         expect(res).to.eql(expects["mongo"]);
       });
     }
   
     if (expects["logic"] !== undefined) {
-      it("should work to JsonLogic", () => {
+      doIt("should work to JsonLogic", () => {
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
         expect(safe_logic).to.eql(expects["logic"]);
@@ -121,7 +116,7 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
       });
     }
   
-    it("should work to QueryBuilder", () => {
+    doIt("should work to QueryBuilder", () => {
       const res = queryBuilderFormat(tree, config);
     });
   } else {
@@ -134,10 +129,6 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
       logic: logic,
     };
     console.log(stringify(correct, undefined, 2));
-  }
-    
-  if (inside_it) {
-    it = origIt;
   }
 };
   
