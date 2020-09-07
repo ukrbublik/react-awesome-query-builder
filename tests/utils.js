@@ -56,8 +56,8 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
     expect_queries: (queries) => {
       expect_queries_before_and_after(config, value, onChange, queries);
     },
-    export_checks: (expects) => {
-      do_export_checks(config, tree, expects);
+    expect_checks: (expects) => {
+      do_export_checks(config, tree, expects, true);
     },
     config: config,
   };
@@ -79,7 +79,14 @@ const render_builder = (props) => (
   
 export const empty_value = {id: uuid(), type: "group"};
 
-export const do_export_checks = (config, tree, expects) => {
+export const do_export_checks = (config, tree, expects, inside_it = false) => {
+  let origIt = it;
+  if (inside_it) {
+    it = (name, func) => {
+      func();
+    };
+  }
+
   if (expects) {
     if (expects["query"] !== undefined) {
       it("should work to query string", () => {
@@ -129,6 +136,9 @@ export const do_export_checks = (config, tree, expects) => {
     console.log(stringify(correct, undefined, 2));
   }
     
+  if (inside_it) {
+    it = origIt;
+  }
 };
   
 export const export_checks = (config_fn, value, valueFormat, expects) => {
@@ -137,6 +147,14 @@ export const export_checks = (config_fn, value, valueFormat, expects) => {
   const tree = checkTree(loadFn(value, config), config);
 
   do_export_checks(config, tree, expects);
+};
+  
+export const export_checks_in_it = (config_fn, value, valueFormat, expects) => {
+  const config = config_fn(BasicConfig);
+  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
+  const tree = checkTree(loadFn(value, config), config);
+
+  do_export_checks(config, tree, expects, true);
 };
   
 const createBubbledEvent = (type, props = {}) => {

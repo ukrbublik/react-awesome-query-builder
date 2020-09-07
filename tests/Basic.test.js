@@ -43,7 +43,7 @@ describe("basic query", () => {
       });
     });
 
-    it("should work with simple value in JsonLogic format not in group", () => {
+    describe("should work with simple value in JsonLogic format not in group", () => {
       export_checks(configs.simple_with_number, inits.with_number_not_in_group, "JsonLogic", {
         query: "num == 2",
         queryHuman: "Number == 2",
@@ -57,19 +57,19 @@ describe("basic query", () => {
       });
     });
 
-    it("should handle undefined value in JsonLogic format", () => {
+    describe("should handle undefined value in JsonLogic format", () => {
       export_checks(configs.simple_with_number, inits.with_undefined_as_number, "JsonLogic", {});
     });
 
-    it("should handle unexpected json logic value in JsonLogic format", () => {
+    describe("should handle unexpected json logic value in JsonLogic format", () => {
       export_checks(configs.simple_with_number, inits.with_jl_value, "JsonLogic", {});
     });
 
-    it("should handle unknown field", () => {
+    describe("should handle unknown field", () => {
       export_checks(configs.simple_with_number, inits.with_nested, "JsonLogic", {});
     });
 
-    it("should handle unknown type", () => {
+    describe("should handle unknown type", () => {
       export_checks(configs.with_wrong_type, inits.with_number, "JsonLogic", {});
     });
 

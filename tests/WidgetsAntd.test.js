@@ -84,7 +84,21 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change treeselect value", () => {
-    with_qb_ant(configs.with_all_types, inits.with_treeselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    with_qb_ant(configs.with_all_types, inits.with_treeselect, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      expect_checks({
+        "query": "selecttree == \"2\"",
+        "queryHuman": "Color (tree) == \"Red\"",
+        "sql": "selecttree = '2'",
+        "mongo": {
+          "selecttree": "2"
+        },
+        "logic": {
+          "and": [
+            { "==": [ { "var": "selecttree" }, "2" ] }
+          ]
+        }
+      });
+      
       qb
         .find("TreeSelectWidget")
         .instance()
@@ -96,7 +110,24 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change multitreeselect value", () => {
-    with_qb_ant(configs.with_all_types, inits.with_multiselecttree, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    with_qb_ant(configs.with_all_types, inits.with_multiselecttree, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      expect_checks({
+        "query": "multiselecttree == [\"2\", \"5\"]",
+        "queryHuman": "Colors (tree) == [\"Red\", \"Green\"]",
+        "sql": "multiselecttree = '2,5'",
+        "mongo": {
+          "multiselecttree": [ "2", "5" ]
+        },
+        "logic": {
+          "and": [
+            { "all": [
+              { "var": "multiselecttree" },
+              { "in": [ { "var": "" }, [ "2", "5" ] ] }
+            ] }
+          ]
+        }
+      });
+
       qb
         .find("TreeSelectWidget")
         .instance()
@@ -162,5 +193,33 @@ describe("antdesign widgets interactions", () => {
     });
   });
 
-  //todo: range
+  it("change range slider value", () => {
+    with_qb_ant(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      expect_checks({
+        "query": "slider >= 18 && slider <= 42",
+        "queryHuman": "Slider >= 18 AND Slider <= 42",
+        "sql": "slider BETWEEN 18 AND 42",
+        "mongo": {
+          "slider": {
+            "$gte": 18,
+            "$lte": 42
+          }
+        },
+        "logic": {
+          "and": [
+            { "<=": [ 18, { "var": "slider" }, 42 ] }
+          ]
+        }
+      });
+
+      qb
+        .find("RangeWidget")
+        .instance()
+        .handleChange([19, 42]);
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 19, { "var": "slider" }, 42 ] }] }
+      ]);
+    });
+  });
+
 });

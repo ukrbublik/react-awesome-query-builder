@@ -31,6 +31,16 @@ export const with_number = {
   }]
 };
 
+export const with_range_slider = {
+  "and": [{
+    "<=": [
+      18, 
+      { "var": "slider" },
+      42
+    ]
+  }]
+};
+
 export const with_undefined_as_number = {
   "and": [{
     "==": [

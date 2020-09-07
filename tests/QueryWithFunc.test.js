@@ -1,6 +1,6 @@
 import * as configs from "./configs";
 import * as inits from "./inits";
-import { with_qb, export_checks } from "./utils";
+import { with_qb, with_qb_ant, export_checks, export_checks_in_it } from "./utils";
 
 
 describe("query with func", () => {
@@ -35,6 +35,12 @@ describe("query with func", () => {
     });
   });
 
+  it("should render func with antd", () => {
+    with_qb_ant(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      expect(qb.find("FuncWidget")).to.have.length(1);
+    });
+  });
+
   it("set function for number", () => {
     with_qb(configs.with_funcs, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
@@ -55,7 +61,8 @@ describe("query with func", () => {
         ] }] }
       ], 2);
       const updatedTree = onChange.getCall(2).args[0];
-      export_checks(configs.with_funcs, updatedTree, "default", {
+
+      export_checks_in_it(configs.with_funcs, updatedTree, "default", {
         "query": "num == (1 * 4 + 0)",
         "queryHuman": "Number == (1 * 4 + 0)",
         "sql": "num = (1 * 4 + 0)",
