@@ -532,6 +532,15 @@ export const with_prox = (BasicConfig) => ({
   },
 });
 
+export const with_wrong_type = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      type: "not-a-text",
+    },
+  },
+});
+
 export const with_settings_confirm = (BasicConfig) => ({
   ...simple_with_number(BasicConfig),
   settings: {

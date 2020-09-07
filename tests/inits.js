@@ -438,3 +438,9 @@ export const with_prox = {
     not: false
   }
 };
+
+export const with_jl_value = {
+  "==": [
+    { "var": "num" },  { "+": [1, 2] }
+  ]
+};
