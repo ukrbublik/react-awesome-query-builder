@@ -3,7 +3,7 @@ import * as inits from "./inits";
 import { with_qb, with_qb_skins } from "./utils";
 
 
-describe("widgets", () => {
+describe("vanilla widgets interactions", () => {
   it("change number value", () => {
     with_qb_skins(configs.with_all_types, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb

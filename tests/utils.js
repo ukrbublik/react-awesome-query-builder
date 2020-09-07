@@ -59,6 +59,7 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
     export_checks: (expects) => {
       do_export_checks(config, tree, expects);
     },
+    config: config,
   };
   
   checks(qb, onChange, tasks);

@@ -163,4 +163,28 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("remove group with 2 rules with confirm", () => {
+    with_qb(configs.with_settings_confirm, inits.with_number_and_group, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
+      const renderConfirm = config.settings.renderConfirm;
+      qb
+        .find(".group--children .group .group--header .group--actions button")
+        .at(2)
+        .simulate("click");
+      expect(renderConfirm.callCount).to.equal(1);
+      renderConfirm.resetHistory();
+    });
+  });
+
+  it("remove group with 1 rule with confirm", () => {
+    with_qb(configs.with_settings_confirm, inits.with_number_and_group_1, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
+      const renderConfirm = config.settings.renderConfirm;
+      qb
+        .find(".group--children .group .group--header .group--actions button")
+        .at(2)
+        .simulate("click");
+      expect(renderConfirm.callCount).to.equal(1);
+      renderConfirm.resetHistory();
+    });
+  });
+
 });

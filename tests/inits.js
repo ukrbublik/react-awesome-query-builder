@@ -287,6 +287,17 @@ export const with_number_and_group_3 = {
   ]
 };
 
+export const with_number_and_group_1 = {
+  "or": [
+    { "==": [ { "var": "num" }, 1 ] },
+    { "and": [
+      {
+        "==": [ { "var": "num" }, 2 ]
+      }
+    ]}
+  ]
+};
+
 export const with_number_and_group = {
   "or": [
     { "==": [ { "var": "num" }, 1 ] },

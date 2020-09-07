@@ -1,4 +1,5 @@
 import React from "react";
+import sinon from "sinon";
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 const {
@@ -522,4 +523,28 @@ export const with_prox = (BasicConfig) => ({
     },
   },
 });
-  
+
+export const with_settings_confirm = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    removeRuleConfirmOptions: {
+      title: "Are you sure delete this rule?",
+      okText: "Yes",
+      okType: "danger",
+    },
+    removeGroupConfirmOptions: {
+      title: "Are you sure delete this group?",
+      okText: "Yes",
+      okType: "danger",
+    },
+    renderConfirm: sinon.spy(),
+    /*({onOk, okText, cancelText, title}) => {
+      if (confirm(title)) {
+        onOk();
+      }
+    }*/
+  }
+});
+
+//todo: showNot
