@@ -193,4 +193,12 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("should handle maxNumberOfRules=3", () => {
+    with_qb(configs.with_settings_max_number_of_rules_3, inits.with_number_and_group, "JsonLogic", (qb) => {
+      // if max exceeded --> (3) Add group | Add group, Delete group
+      // else -->            (5) Add rule, Add group | Add rule, Add group, Delete group
+      expect(qb.find(".group--actions button")).to.have.length(3);
+    });
+  });
+
 });

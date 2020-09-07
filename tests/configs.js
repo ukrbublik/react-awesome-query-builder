@@ -557,3 +557,12 @@ export const with_settings_not_show_not = (BasicConfig) => ({
     showNot: false
   }
 });
+
+export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    maxNumberOfRules: 3
+  }
+});
+
