@@ -78,6 +78,10 @@ describe("drag-n-drop", () => {
     do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
       sinon.assert.notCalled(onChange);
     });
+    
+    do_test(configs.simple_with_number_max_nesting_1, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
+      sinon.assert.notCalled(onChange);
+    });
   });
 
   it("should move rule out of group", () => {

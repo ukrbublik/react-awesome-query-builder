@@ -386,6 +386,14 @@ export const simple_with_number_without_regroup = (BasicConfig) => ({
   }
 });
 
+export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    maxNesting: 1,
+  }
+});
+
 export const with_all_types__show_error = (BasicConfig) => ({
   ...with_all_types(BasicConfig),
   settings: {
