@@ -3,13 +3,17 @@
   "version": "2.1.16",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
-    "reactjs",
-    "react-component",
-    "react-components",
     "query-builder",
+    "query",
+    "builder",
+    "query builder",
+    "react-query-builder",
     "react",
+    "react-component",
     "antd",
-    "antdesign"
+    "antdesign",
+    "ant-design",
+    "configurable"
   ],
   "main": "lib",
   "types": "modules/index.d.ts",
