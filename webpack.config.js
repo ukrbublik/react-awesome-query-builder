@@ -2,7 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 var plugins = [
     new webpack.optimize.OccurrenceOrderPlugin(),
@@ -25,7 +25,9 @@ if (process.env.COMPRESS == "1") {
         ...plugins,
         new CompressionPlugin()
     ];
-    optimization.minimizer = [new UglifyJsPlugin()];
+    optimization.minimizer = [
+        //new UglifyJsPlugin()
+    ];
 }
 
 module.exports = {
