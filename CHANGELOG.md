@@ -1,4 +1,6 @@
 # Changelog
+- 2.1.17
+  - Dropped support of loading query in obsolete Immutable string format used in versions 0.* (issue #254)
 - 2.1.16
   - Fixed issues with export to Mongo and JsonLogic of queries with nested groups (#279, #279)
 - 2.1.15

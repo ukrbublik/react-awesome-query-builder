@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "2.1.16",
+  "version": "2.1.17",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "query-builder",
@@ -61,9 +61,7 @@
     "prop-types": "^15.6.0",
     "react-redux": "^5.0.0",
     "redux": "^3.5.0",
-    "sqlstring": "^2.3.1",
-    "transit-immutable-js": "^0.7.0",
-    "transit-js": "^0.8.846"
+    "sqlstring": "^2.3.1"
   },
   "peerDependencies": {
     "antd": ">=4.0.0 <4.5.0",
