@@ -46,8 +46,6 @@ module.exports = {
             "redux": "Redux",
             "immutable": "Immutable",
             "moment": 'moment',
-            "transit-js": "Transit",
-            "transit-immutable-js": "TransitImmutable",
             "sqlstring": "sqlstring",
             "classnames": "classnames",
         },

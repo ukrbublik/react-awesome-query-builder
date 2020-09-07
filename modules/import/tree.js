@@ -1,5 +1,4 @@
 import Immutable, { fromJS, Map } from "immutable";
-const transit = require("transit-immutable-js");
 import {validateTree} from "../utils/validation";
 import {extendConfig} from "../utils/configUtils";
 import {getTreeBadFields} from "../utils/treeUtils";
@@ -21,7 +20,7 @@ export const loadTree = (serTree) => {
   } else if (typeof serTree == "string" && serTree.startsWith('["~#iM"')) {
     //tip: old versions of RAQB were saving tree with `transit.toJSON()`
     // https://github.com/ukrbublik/react-awesome-query-builder/issues/69
-    return transit.fromJSON(serTree);
+    throw "You are trying to load query in obsolete serialization format (Immutable string) which is not supported in versions starting from 2.1.17";
   } else if (typeof serTree == "string") {
     return _fromJS(JSON.parse(serTree));
   } else throw "Can't load tree!";
