@@ -56,9 +56,10 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
     expect_queries: (queries) => {
       expect_queries_before_and_after(config, value, onChange, queries);
     },
-    export_checks: (expects) => {
-      do_export_checks(config, tree, expects);
+    expect_checks: (expects) => {
+      do_export_checks(config, tree, expects, true);
     },
+    config: config,
   };
   
   checks(qb, onChange, tasks);
@@ -78,10 +79,12 @@ const render_builder = (props) => (
   
 export const empty_value = {id: uuid(), type: "group"};
 
-export const do_export_checks = (config, tree, expects) => {
+export const do_export_checks = (config, tree, expects, inside_it = false) => {
+  const doIt = inside_it ? ((name, func) => { func(); }) : it;
+
   if (expects) {
     if (expects["query"] !== undefined) {
-      it("should work to query string", () => {
+      doIt("should work to query string", () => {
         const res = queryString(tree, config);
         expect(res).to.equal(expects["query"]);
         const res2 = queryString(tree, config, true);
@@ -90,21 +93,21 @@ export const do_export_checks = (config, tree, expects) => {
     }
   
     if (expects["sql"] !== undefined) {
-      it("should work to SQL", () => {
+      doIt("should work to SQL", () => {
         const res = sqlFormat(tree, config);
         expect(res).to.equal(expects["sql"]);
       });
     }
     
     if (expects["mongo"] !== undefined) {
-      it("should work to MongoDb", () => {
+      doIt("should work to MongoDb", () => {
         const res = mongodbFormat(tree, config);
         expect(res).to.eql(expects["mongo"]);
       });
     }
   
     if (expects["logic"] !== undefined) {
-      it("should work to JsonLogic", () => {
+      doIt("should work to JsonLogic", () => {
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
         expect(safe_logic).to.eql(expects["logic"]);
@@ -113,7 +116,7 @@ export const do_export_checks = (config, tree, expects) => {
       });
     }
   
-    it("should work to QueryBuilder", () => {
+    doIt("should work to QueryBuilder", () => {
       const res = queryBuilderFormat(tree, config);
     });
   } else {
@@ -127,7 +130,6 @@ export const do_export_checks = (config, tree, expects) => {
     };
     console.log(stringify(correct, undefined, 2));
   }
-    
 };
   
 export const export_checks = (config_fn, value, valueFormat, expects) => {
@@ -136,6 +138,14 @@ export const export_checks = (config_fn, value, valueFormat, expects) => {
   const tree = checkTree(loadFn(value, config), config);
 
   do_export_checks(config, tree, expects);
+};
+  
+export const export_checks_in_it = (config_fn, value, valueFormat, expects) => {
+  const config = config_fn(BasicConfig);
+  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
+  const tree = checkTree(loadFn(value, config), config);
+
+  do_export_checks(config, tree, expects, true);
 };
   
 const createBubbledEvent = (type, props = {}) => {

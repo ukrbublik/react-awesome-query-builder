@@ -1,4 +1,5 @@
 import React from "react";
+import sinon from "sinon";
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 const {
@@ -385,6 +386,14 @@ export const simple_with_number_without_regroup = (BasicConfig) => ({
   }
 });
 
+export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    maxNesting: 1,
+  }
+});
+
 export const with_all_types__show_error = (BasicConfig) => ({
   ...with_all_types(BasicConfig),
   settings: {
@@ -522,4 +531,55 @@ export const with_prox = (BasicConfig) => ({
     },
   },
 });
-  
+
+export const with_wrong_type = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      type: "not-a-text",
+    },
+  },
+});
+
+export const with_settings_confirm = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    removeRuleConfirmOptions: {
+      title: "Are you sure delete this rule?",
+      okText: "Yes",
+      okType: "danger",
+    },
+    removeGroupConfirmOptions: {
+      title: "Are you sure delete this group?",
+      okText: "Yes",
+      okType: "danger",
+    },
+    renderConfirm: sinon.spy(),
+    /*({onOk, okText, cancelText, title}) => {
+      if (confirm(title)) {
+        onOk();
+      }
+    }*/
+  }
+});
+
+export const with_settings_not_show_not = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  conjunctions: {
+    AND: BasicConfig.conjunctions.AND,
+  },
+  settings: {
+    ...BasicConfig.settings,
+    showNot: false
+  }
+});
+
+export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
+  ...simple_with_number(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    maxNumberOfRules: 3
+  }
+});
+

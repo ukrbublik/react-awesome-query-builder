@@ -30,6 +30,30 @@ export const with_number = {
     ]
   }]
 };
+
+export const with_range_slider = {
+  "and": [{
+    "<=": [
+      18, 
+      { "var": "slider" },
+      42
+    ]
+  }]
+};
+
+export const with_undefined_as_number = {
+  "and": [{
+    "==": [
+      { "var": "num" },  undefined
+    ]
+  }]
+};
+
+export const with_number_not_in_group = {
+  "==": [
+    { "var": "num" },  2
+  ]
+};
   
 export const with_number_and_string = {
   "or": [{
@@ -89,6 +113,13 @@ export const with_struct_and_group = {
     },
     { "==": [ { "var": "user.firstName" }, "abc" ] },
     { "!!": { "var": "user.login" } }
+  ]
+};
+  
+export const with_struct_and_group_mixed_obsolete = {
+  "and": [
+    { "==": [ { "var": "results.slider" }, 22 ] },
+    { "==": [ { "var": "user.firstName" }, "abc" ] },
   ]
 };
   
@@ -194,6 +225,18 @@ export const with_select = {
   "and": [{  "==": [ { "var": "color" }, "red" ]  }]
 };
 
+export const with_bool = {
+  "and": [{  "==": [ { "var": "stock" }, true ]  }]
+};
+
+export const with_slider = {
+  "and": [{  "==": [ { "var": "slider" }, 32 ]  }]
+};
+
+export const with_time = {
+  "and": [{  "==": [ { "var": "time" }, 60*60*2+60*20 ]  }]
+};
+
 export const with_multiselect = {
   "and": [
     {
@@ -275,6 +318,17 @@ export const with_number_and_group_3 = {
   ]
 };
 
+export const with_number_and_group_1 = {
+  "or": [
+    { "==": [ { "var": "num" }, 1 ] },
+    { "and": [
+      {
+        "==": [ { "var": "num" }, 2 ]
+      }
+    ]}
+  ]
+};
+
 export const with_number_and_group = {
   "or": [
     { "==": [ { "var": "num" }, 1 ] },
@@ -340,6 +394,37 @@ export const with_func_tolower_from_field = {
   ]
 };
 
+export const with_func_linear_regression = {
+  type: "group",
+  id: uuid(),
+  children1: {
+    [uuid()]: {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "equal",
+        value: [
+          {
+            func: "LINEAR_REGRESSION",
+            args: {
+              coef: { value: 2 },
+              bias: { value: 0 },
+              val: { value: 3 }
+            }
+          }
+        ],
+        valueSrc: [ "func" ],
+        valueType: [ "number" ],
+        valueError: [ null ]
+      }
+    },
+  },
+  properties: {
+    conjunction: "AND",
+    not: false
+  }
+};
+
 export const with_prox = {
   type: "group",
   id: uuid(),
@@ -362,4 +447,10 @@ export const with_prox = {
     conjunction: "AND",
     not: false
   }
+};
+
+export const with_jl_value = {
+  "==": [
+    { "var": "num" },  { "+": [1, 2] }
+  ]
 };
