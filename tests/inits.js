@@ -363,6 +363,37 @@ export const with_func_tolower_from_field = {
   ]
 };
 
+export const with_func_linear_regression = {
+  type: "group",
+  id: uuid(),
+  children1: {
+    [uuid()]: {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "equal",
+        value: [
+          {
+            func: "LINEAR_REGRESSION",
+            args: {
+              coef: { value: 2 },
+              bias: { value: 0 },
+              val: { value: 3 }
+            }
+          }
+        ],
+        valueSrc: [ "func" ],
+        valueType: [ "number" ],
+        valueError: [ null ]
+      }
+    },
+  },
+  properties: {
+    conjunction: "AND",
+    not: false
+  }
+};
+
 export const with_prox = {
   type: "group",
   id: uuid(),

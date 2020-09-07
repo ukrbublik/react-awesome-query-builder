@@ -5,7 +5,7 @@ import { with_qb, export_checks } from "./utils";
 
 describe("query with func", () => {
 
-  describe("loads tree with func from JsonLogic", () => {
+  describe("loads tree with func LOWER from JsonLogic", () => {
     export_checks(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", {
       "query": "str == LOWER(str2)",
       "queryHuman": "String == Lowercase(String: String2)",
@@ -80,6 +80,34 @@ describe("query with func", () => {
           ]
         }
       });
+    });
+  });
+
+  describe("loads tree with func LINEAR_REGRESSION", () => {
+    export_checks(configs.with_funcs, inits.with_func_linear_regression, "default", {
+      "query": "num == (2 * 3 + 0)",
+      "queryHuman": "Number == (2 * 3 + 0)",
+      "sql": "num = (2 * 3 + 0)",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            "$num",
+            { "$sum": [
+              { "$multiply": [ 2, 3 ] },  0
+            ] }
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              { "var": "num" },
+              { "+": [ { "*": [ 2, 3 ] }, 0 ] }
+            ]
+          }
+        ]
+      }
     });
   });
 
