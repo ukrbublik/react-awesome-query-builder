@@ -150,7 +150,7 @@ export default class QueryContainer extends Component {
           this.state.store.dispatch(
             actions.tree.setTree(nextProps, validatedTree)
           );
-        })
+        });
       }
     }
 
