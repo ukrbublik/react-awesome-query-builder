@@ -127,16 +127,10 @@ export default class QueryContainer extends Component {
     }
 
     shouldComponentUpdate = liteShouldComponentUpdate(this, {
-      value: (nextValue, prevValue, state) => {
-        const storeValue = state.store.getState().tree;
-        return !immutableEqual(storeValue, nextValue) && !immutableEqual(prevValue, nextValue);
-      }
+      value: (nextValue, prevValue, state) => { return false; }
     });
 
     onPropsChanged(nextProps) {
-      if (this.props.dontDispatchOnNewProps)
-        return;
-        
       // compare configs
       const oldConfig = pick(this.props, configKeys);
       let nextConfig = pick(nextProps, configKeys);
@@ -145,16 +139,18 @@ export default class QueryContainer extends Component {
         nextConfig = extendConfig(nextConfig);
         this.setState({config: nextConfig});
       }
-        
+      
       // compare trees
       const storeValue = this.state.store.getState().tree;
       const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
       if (isTreeChanged) {
         const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
         const validatedTree = validateAndFixTree(nextTree, null, nextConfig, oldConfig);
-        this.state.store.dispatch(
-          actions.tree.setTree(nextProps, validatedTree)
-        );
+        queueMicrotask(() => {
+          this.state.store.dispatch(
+            actions.tree.setTree(nextProps, validatedTree)
+          );
+        });
       }
     }
 
