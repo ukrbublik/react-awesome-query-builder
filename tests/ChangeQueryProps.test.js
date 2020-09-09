@@ -6,15 +6,12 @@ import { with_qb, load_tree } from "./utils";
 
 describe("change props", () => {
   it("change tree via props triggers onChange", () => {
-    with_qb(configs.simple_with_2_numbers, inits.with_num_and_num2, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb.setProps({
+    with_qb(configs.simple_with_2_numbers, inits.with_num_and_num2, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+      await qb.setProps({
         value: load_tree("JsonLogic", inits.with_number, configs.simple_with_2_numbers(BasicConfig))
       });
-      return new Promise((resolve) => {
-        expect_jlogic([null, inits.with_number]);
-        expect(onChange.getCall(1)).to.equal(null);
-        resolve();
-      });
+      expect_jlogic([null, inits.with_number]);
+      expect(onChange.getCall(1)).to.equal(null);
     });
   });
 

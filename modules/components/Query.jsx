@@ -146,11 +146,11 @@ export default class QueryContainer extends Component {
       if (isTreeChanged) {
         const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
         const validatedTree = validateAndFixTree(nextTree, null, nextConfig, oldConfig);
-        queueMicrotask(() => {
+        return Promise.resolve().then(() => {
           this.state.store.dispatch(
             actions.tree.setTree(nextProps, validatedTree)
           );
-        });
+        })
       }
     }
 
