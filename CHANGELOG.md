@@ -1,4 +1,7 @@
 # Changelog
+- 2.1.19
+  - Fixed issue #252 ("Cannot update a component from inside the function body of a different component")
+  - Issue #190: Fixed TS def for getTree/2 - added 2nd param light?
 - 2.1.17
   - Dropped support of loading query in obsolete Immutable string format used in versions 0.* (issue #254)
 - 2.1.16

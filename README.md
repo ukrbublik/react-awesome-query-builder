@@ -192,9 +192,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
 ### `Utils`
 - Save, load:
-  #### getTree (immutableValue) -> Object
+  #### getTree (immutableValue, light = true) -> Object
   Convert query value from internal Immutable format to JS format. 
-  You can use it to save value on backend in `onChange` callback of `<Query>`.
+  You can use it to save value on backend in `onChange` callback of `<Query>`.  
+  Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
   #### loadTree (jsValue, config) -> Immutable
   Convert query value from JS format to internal Immutable format. 
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
@@ -205,7 +206,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   #### isValidTree (immutableValue) -> Boolean
   If `showErrorMessage` in config.settings is true, use this method to check is query has bad values.
 - Export:
-  #### queryString (immutableValue, config, isForDisplay) -> String
+  #### queryString (immutableValue, config, isForDisplay = false) -> String
   Convert query value to custom string representation. `isForDisplay` = true can be used to make string more "human readable".
   #### mongodbFormat (immutableValue, config) -> Object
   Convert query value to MongoDb query object.
