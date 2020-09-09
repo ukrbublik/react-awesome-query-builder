@@ -1,28 +1,29 @@
 import Immutable, { fromJS, Map } from "immutable";
 import {validateTree} from "../utils/validation";
 import {extendConfig} from "../utils/configUtils";
-import {getTreeBadFields} from "../utils/treeUtils";
+import {getTreeBadFields, getLightTree} from "../utils/treeUtils";
+import {isJsonLogic} from "../utils/stuff";
 
 export const getTree = (immutableTree, light = true) => {
   if (!immutableTree) return undefined;
   let tree = immutableTree;
   tree = tree.toJS();
   if (light)
-    tree = _lightTree(tree);
+    tree = getLightTree(tree);
   return tree;
 };
 
 export const loadTree = (serTree) => {
-  if (Map.isMap(serTree)) {
+  if (isImmutableTree(serTree)) {
     return serTree;
-  } else if (typeof serTree == "object") {
-    return _fromJS(serTree);
+  } else if (isTree(serTree)) {
+    return jsTreeToImmutable(serTree);
   } else if (typeof serTree == "string" && serTree.startsWith('["~#iM"')) {
     //tip: old versions of RAQB were saving tree with `transit.toJSON()`
     // https://github.com/ukrbublik/react-awesome-query-builder/issues/69
     throw "You are trying to load query in obsolete serialization format (Immutable string) which is not supported in versions starting from 2.1.17";
   } else if (typeof serTree == "string") {
-    return _fromJS(JSON.parse(serTree));
+    return jsTreeToImmutable(JSON.parse(serTree));
   } else throw "Can't load tree!";
 };
 
@@ -36,7 +37,17 @@ export const isValidTree = (tree) => {
   return getTreeBadFields(tree).length == 0;
 };
 
-function _fromJS(tree) {
+export const isImmutableTree = (tree) => {
+  return Map.isMap(tree);
+};
+
+export const isTree = (tree) => {
+  return typeof tree == "object" && tree.type == "group";
+};
+
+export {isJsonLogic};
+
+function jsTreeToImmutable(tree) {
   return fromJS(tree, function (key, value) {
     let outValue;
     if (key == "value" && value.get(0) && value.get(0).toJS !== undefined) {
@@ -53,32 +64,3 @@ function _fromJS(tree) {
   });
 }
 
-
-// Remove fields that can be calced: "id", "path"
-// Remove empty fields: "operatorOptions"
-function _lightTree (tree) {
-  let newTree = tree;
-
-  function _processNode (item, itemId) {
-    if (item.path)
-      delete item.path;
-    if (itemId)
-      delete item.id;
-    let properties = item.properties;
-    if (properties) {
-      if (properties.operatorOptions == null)
-        delete properties.operatorOptions;
-    }
-
-    const children = item.children1;
-    if (children) {
-      for (let id in children) {
-        _processNode(children[id], id);
-      }
-    }
-  }
-
-  _processNode(tree, null);
-
-  return newTree;
-}

@@ -4,6 +4,7 @@ import {getFieldConfig, extendConfig, getWidgetForFieldOp} from "../utils/config
 import {loadTree} from "./tree";
 import {defaultConjunction} from "../utils/defaultUtils";
 import moment from "moment";
+import {isJsonLogic} from "../utils/stuff";
 
 // http://jsonlogic.com/
 
@@ -83,7 +84,7 @@ const buildConv = (config) => {
 
 const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null) => {
   let op, vals;
-  if (isLogic(logic)) {
+  if (isJsonLogic(logic)) {
     op = Object.keys(logic)[0];
     vals = logic[op];
     if (!Array.isArray(vals))
@@ -93,7 +94,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
-  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isLogic(vals[0]) && Object.keys(vals[0])[0] == "var");
+  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && Object.keys(vals[0])[0] == "var");
   const isRev = op == "!" && !isNotOp;
   if (isRev) {
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
@@ -123,7 +124,7 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
     return undefined;
   }
 
-  if (isLogic(val)) {
+  if (isJsonLogic(val)) {
     meta.errors.push(`Unexpected logic in value: ${JSON.stringify(val)}`);
     return undefined;
   }
@@ -473,9 +474,3 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   };
 };
 
-const isLogic = (logic) => (
-  typeof logic === "object" // An object
-  && logic !== null // but not null
-  && !Array.isArray(logic) // and not an array
-  && Object.keys(logic).length === 1 // with exactly one key
-);

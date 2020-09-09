@@ -9,14 +9,22 @@ import {
 } from "react-awesome-query-builder";
 const {
   uuid, 
-  checkTree, loadTree, loadFromJsonLogic, 
+  checkTree, loadTree, loadFromJsonLogic, isJsonLogic,
   queryString, sqlFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
 
-export const load_tree = (valueFormat, value, config) => {
+
+export const load_tree = (value, config, valueFormat = null) => {
+  if (!valueFormat) {
+    if (isJsonLogic(value))
+      valueFormat = "JsonLogic";
+    else
+      valueFormat = "default";
+  }
   const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
-  return checkTree(loadFn(value, config), config);
+  const tree = loadFn(value, config);
+  return checkTree(tree, config);
 };
 
 export  const with_qb = (config_fn, value, valueFormat, checks) => {
@@ -35,7 +43,7 @@ export  const with_qb_skins = (config_fn, value, valueFormat, checks) => {
 const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
   const config = config_fn(BasicConfig);
   const onChange = sinon.spy();
-  const tree = load_tree(valueFormat, value, config);
+  const tree = load_tree(value, config, valueFormat);
   let qb;
   
   act(() => {
@@ -78,6 +86,8 @@ const render_builder = (props) => (
 );
   
 export const empty_value = {id: uuid(), type: "group"};
+
+// ----------- export checks
 
 export const do_export_checks = (config, tree, expects, inside_it = false) => {
   const doIt = inside_it ? ((name, func) => { func(); }) : it;
@@ -131,22 +141,46 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
     console.log(stringify(correct, undefined, 2));
   }
 };
-  
+
 export const export_checks = (config_fn, value, valueFormat, expects) => {
   const config = config_fn(BasicConfig);
-  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
-  const tree = checkTree(loadFn(value, config), config);
-
+  const tree = load_tree(value, config, valueFormat);
   do_export_checks(config, tree, expects);
 };
-  
+
 export const export_checks_in_it = (config_fn, value, valueFormat, expects) => {
   const config = config_fn(BasicConfig);
-  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
-  const tree = checkTree(loadFn(value, config), config);
-
+  const tree = load_tree(value, config, valueFormat);
   do_export_checks(config, tree, expects, true);
 };
+
+export const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
+  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
+  const initTreeString = queryString(load_tree(init_value_jl, config), config);
+  if (queries[0] !== null) {
+    expect(initTreeString).to.equal(queries[0]);
+  }
+  
+  const call = onChange.getCall(0);
+  if (!call) throw new Error("onChange was not called");
+  const changedTreeString = queryString(call.args[0], config);
+  expect(changedTreeString).to.equal(queries[1]);
+};
+
+export  const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
+  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
+  const {logic: initTreeJl} = jsonLogicFormat(load_tree(init_value_jl, config), config);
+  if (jlogics[0] !== null) {
+    expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));
+  }
+  
+  const call = onChange.getCall(changeIndex);
+  if (!call) throw new Error("onChange was not called");
+  const {logic: changedTreeJl} = jsonLogicFormat(call.args[0], config);
+  expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
+};
+
+// ----------- d-n-d
   
 const createBubbledEvent = (type, props = {}) => {
   const event = new Event(type, { bubbles: true });
@@ -189,28 +223,3 @@ export const simulate_drag_n_drop = (sourceRule, targetRule, coords) => {
     createBubbledEvent("mouseup", { ...mousePos })
   );
 };
-  
-export const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
-  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
-  const initTreeString = queryString(loadFromJsonLogic(init_value_jl, config), config);
-  expect(initTreeString).to.equal(queries[0]);
-  
-  const changedTreeString = queryString(onChange.getCall(0).args[0], config);
-  expect(changedTreeString).to.equal(queries[1]);
-};
-  
-export  const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
-  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
-  const {logic: initTreeJl} = jsonLogicFormat(loadFromJsonLogic(init_value_jl, config), config);
-  if (jlogics[0]) {
-    expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));
-    //expect(initTreeJl).to.eql(jlogics[0]);
-  }
-  
-  const call = onChange.getCall(changeIndex);
-  if (!call) throw new Error("onChange was not called");
-  const {logic: changedTreeJl} = jsonLogicFormat(call.args[0], config);
-  expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
-  //expect(changedTreeJl).to.eql(jlogics[1]);
-};
-
