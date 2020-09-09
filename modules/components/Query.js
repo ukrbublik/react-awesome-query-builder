@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { ConfigProvider } from 'antd';
 import createTreeStore from '../stores/tree';
 import {createStore} from 'redux';
 import {Provider, Connector, connect} from 'react-redux';
@@ -148,19 +149,21 @@ export default class Query extends Component {
     }
 
     render() {
-        const {conjunctions, fields, types, operators, widgets, settings, get_children, onChange, value, tree, children, ...props} = this.props;
+        const {conjunctions, fields, types, operators, widgets, settings, get_children, onChange, value, tree, children, prefixCls, ...props} = this.props;
         let config = {conjunctions, fields, types, operators, widgets, settings};
         config = extendConfig(config);
 
         return (
-          <Provider store={this.state.store}>
-              <QueryContainer
-                store={this.state.store}
-                get_children={get_children}
-                config={config}
-                onChange={onChange}
-              />
-          </Provider>
+          <ConfigProvider prefixCls={prefixCls}>
+            <Provider store={this.state.store}>
+                <QueryContainer
+                  store={this.state.store}
+                  get_children={get_children}
+                  config={config}
+                  onChange={onChange}
+                />
+            </Provider>
+          </ConfigProvider>
         )
     }
 }
