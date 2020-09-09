@@ -89,7 +89,7 @@ export interface Utils {
   sqlFormat(tree: ImmutableTree, config: Config): string;
   mongodbFormat(tree: ImmutableTree, config: Config): Object;
   // load, save
-  getTree(tree: ImmutableTree): JsonTree;
+  getTree(tree: ImmutableTree, light?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   isValidTree(tree: ImmutableTree): boolean;
