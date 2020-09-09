@@ -10,8 +10,11 @@ describe("change props", () => {
       qb.setProps({
         value: load_tree("JsonLogic", inits.with_number, configs.simple_with_2_numbers(BasicConfig))
       });
-      expect_jlogic([null, inits.with_number]);
-      expect(onChange.getCall(1)).to.equal(null);
+      return new Promise((resolve) => {
+        expect_jlogic([null, inits.with_number]);
+        expect(onChange.getCall(1)).to.equal(null);
+        resolve();
+      });
     });
   });
 
