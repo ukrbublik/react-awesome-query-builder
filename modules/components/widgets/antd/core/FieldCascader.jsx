@@ -29,6 +29,13 @@ export default class FieldCascader extends PureComponent {
     this.props.setField([...parentPath, ...keys]);
   }
 
+  filterOption = (inputValue, path) => {
+    const keysForFilter = ["label", "key", "altLabel"];
+    return path.some(option => (
+      keysForFilter.map(k => option[k]).join("\0").toLowerCase().indexOf(inputValue.toLowerCase()) > -1
+    ));
+  }
+
   render() {
     const {
       config, customProps, items, placeholder,
@@ -36,12 +43,8 @@ export default class FieldCascader extends PureComponent {
     } = this.props;
     let customProps2 = {...customProps};
     if (customProps2.showSearch) {
-      const keysForFilter = ["label", "key", "altLabel"];
       customProps2.showSearch = {
-        filter: (inputValue, path) => 
-          path.some(option => (
-            keysForFilter.map(k => option[k]).join("\0").toLowerCase().indexOf(inputValue.toLowerCase()) > -1
-          ))
+        filter: this.filterOption
       };
     }
 

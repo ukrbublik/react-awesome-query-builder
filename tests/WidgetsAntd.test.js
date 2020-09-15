@@ -279,4 +279,54 @@ describe("antdesign widgets interactions", () => {
 
   });
 
+  //////////////////////////////////////////////////////////////////////////////////////////
+
+  describe("antdesign core widgets", () => {
+
+    it("change field via cascader", () => {
+      with_qb_ant(configs.with_cascader, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldCascader").instance();
+
+        w.onChange(["user", "login"]);
+
+        // search
+        expect(w.filterOption("re", [{label: "Red"}])).to.equal(true);
+        expect(w.filterOption("wh", [{label: "Red"}])).to.equal(false);
+      });
+    });
+
+    it("change field via select", () => {
+      with_qb_ant(configs.with_struct, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldSelect").first().instance();
+
+        w.onChange("user.login");
+
+        // search
+        expect(w.filterOption("re", {title: "Red"})).to.equal(true);
+        expect(w.filterOption("wh", {title: "Red"})).to.equal(false);
+      });
+    });
+
+    it("change field via dropdown", () => {
+      with_qb_ant(configs.with_dropdown, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldDropdown").first().instance();
+
+        w.onChange({key: "user.login"});
+      });
+    });
+
+    it("change field via tree select", () => {
+      with_qb_ant(configs.with_tree_select, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldTreeSelect").first().instance();
+
+        w.onChange("user.login");
+
+        // search
+        expect(w.filterTreeNode("re", {title: "Red"})).to.equal(true);
+        expect(w.filterTreeNode("wh", {title: "Red"})).to.equal(false);
+      });
+    });
+
+  });
+
 });

@@ -478,6 +478,7 @@ export const with_struct = (BasicConfig) => ({
       subfields: {
         login: {
           type: "text",
+          label2: "User's login",
         },
         info: {
           type: "!struct",
