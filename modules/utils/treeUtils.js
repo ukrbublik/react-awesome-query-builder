@@ -306,4 +306,4 @@ export const getLightTree = (tree) => {
   _processNode(tree, null);
 
   return newTree;
-}
+};
