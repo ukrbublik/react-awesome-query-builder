@@ -236,4 +236,32 @@ describe("antdesign widgets interactions", () => {
     });
   });
 
+  //////////////////////////////////////////////////////////////////////////////////////////
+  
+  describe("antdesign widgets", () => {
+
+    it("load date range", () => {
+      with_qb_ant(configs.with_all_types, inits.with_range_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+        expect_checks({
+          "query": "date >= \"2020-05-10\" && date <= \"2020-05-15\"",
+          "queryHuman": "Date >= \"10.05.2020\" AND Date <= \"15.05.2020\"",
+          "sql": "date BETWEEN '2020-05-10' AND '2020-05-15'",
+          "mongo": {
+            "date": { "$gte": "2020-05-10", "$lte": "2020-05-15" }
+          },
+          "logic": {
+            "and": [ { "<=": [ "2020-05-10T00:00:00.000Z", { "var": "date" }, "2020-05-15T00:00:00.000Z" ] } ]
+          }
+        });
+      });
+    });
+  
+    it("load bad date range", () => {
+      with_qb_ant(configs.with_all_types, inits.with_range_bad_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+        expect_checks({});
+      });
+    });
+
+  });
+
 });

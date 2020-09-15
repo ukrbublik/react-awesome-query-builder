@@ -147,9 +147,14 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
 
   // "2020-01-08T22:00:00.000Z" -> Date object
   if (fieldConfig && ["date", "datetime"].includes(fieldConfig.type) && val && !(val instanceof Date)) {
-    const dateVal = new Date(val);
-    if (dateVal instanceof Date && dateVal.toISOString() === val) {
-      val = dateVal;
+    try {
+      const dateVal = new Date(val);
+      if (dateVal instanceof Date && dateVal.toISOString() === val) {
+        val = dateVal;
+      }
+    } catch(e) {
+      meta.errors.push(`Can't convert value ${val} as Date`);
+      val = undefined;
     }
   }
 
