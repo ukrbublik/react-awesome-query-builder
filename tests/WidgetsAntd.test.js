@@ -54,22 +54,24 @@ describe("antdesign widgets interactions", () => {
 
   it("change select value", () => {
     with_qb_ant(configs.with_all_types, inits.with_select, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb
-        .find("SelectWidget")
-        .instance()
-        .handleChange("green");
+      const w = qb.find("SelectWidget").instance();
+
+      w.handleChange("green");
       expect_jlogic([null,
         { "and": [{  "==": [ { "var": "color" }, "green" ]  }] }
       ]);
+
+      // search
+      expect(w.filterOption("re", {value: "Red"})).to.equal(true);
+      expect(w.filterOption("wh", {value: "Red"})).to.equal(false);
     });
   });
 
   it("change multiselect value", () => {
     with_qb_ant(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb
-        .find("MultiSelectWidget")
-        .instance()
-        .handleChange(["orange"]);
+      const w = qb.find("MultiSelectWidget").instance();
+      
+      w.handleChange(["orange"]);
       expect_jlogic([null, {
         "and": [
           {
@@ -80,6 +82,13 @@ describe("antdesign widgets interactions", () => {
           }
         ]
       }]);
+
+      w.handleChange([]); //not allow []
+      expect_jlogic([null, undefined], 1);
+
+      // search
+      expect(w.filterOption("re", {value: "Red"})).to.equal(true);
+      expect(w.filterOption("wh", {value: "Red"})).to.equal(false);
     });
   });
 
@@ -99,13 +108,13 @@ describe("antdesign widgets interactions", () => {
         }
       });
       
-      qb
-        .find("TreeSelectWidget")
-        .instance()
-        .handleChange("5");
+      const w = qb.find("TreeSelectWidget").instance();
+      
+      w.handleChange("5");
       expect_jlogic([null,
         { "and": [{  "==": [ { "var": "selecttree" }, "5" ]  }] }
       ]);
+
     });
   });
 
@@ -128,20 +137,24 @@ describe("antdesign widgets interactions", () => {
         }
       });
 
-      qb
-        .find("TreeSelectWidget")
-        .instance()
-        .handleChange(["3"]);
+      const w = qb.find("TreeSelectWidget").instance();
+
+      w.handleChange(["3"]);
       expect_jlogic([null, {
         "and": [
-          {
-            "all": [
-              { "var": "multiselecttree" },
-              { "in": [ { "var": "" }, [ "3" ] ] }
-            ]
-          }
+          { "all": [
+            { "var": "multiselecttree" },
+            { "in": [ { "var": "" }, [ "3" ] ] }
+          ] }
         ]
       }]);
+
+      w.handleChange([]); //not allow []
+      expect_jlogic([null, undefined], 1);
+
+      // search
+      expect(w.filterTreeNode("re", {title: "Red"})).to.equal(true);
+      expect(w.filterTreeNode("wh", {title: "Red"})).to.equal(false);
     });
   });
 
@@ -171,13 +184,15 @@ describe("antdesign widgets interactions", () => {
 
   it("change slider value", () => {
     with_qb_ant(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb
-        .find("SliderWidget")
-        .instance()
-        .handleChange(12);
+      const w = qb.find("SliderWidget").instance();
+
+      w.handleChange(12);
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "slider" }, 12 ] }] }
       ]);
+
+      w.handleChange("");
+      expect_jlogic([null, undefined], 1);
     });
   });
 

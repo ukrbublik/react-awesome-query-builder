@@ -372,7 +372,10 @@ export const with_all_types = (BasicConfig) => ({
               ] }
             ] }
           ] }
-        ]
+        ],
+        customProps: {
+          treeCheckStrictly: true
+        }
       }
     },
   },
