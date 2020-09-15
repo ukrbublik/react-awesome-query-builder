@@ -212,13 +212,27 @@ describe("antdesign widgets interactions", () => {
         }
       });
 
-      qb
-        .find("RangeWidget")
-        .instance()
-        .handleChange([19, 42]);
+      const w = qb.find("RangeWidget").instance();
+      
+      w.handleChange([19, 42]);
       expect_jlogic([null,
         { "and": [{ "<=": [ 19, { "var": "slider" }, 42 ] }] }
-      ]);
+      ], 0);
+
+      w.handleChangeFrom(20);
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 20, { "var": "slider" }, 42 ] }] }
+      ], 1);
+
+      w.handleChangeTo(40);
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 20, { "var": "slider" }, 40 ] }] }
+      ], 2);
+
+      w.handleChangeFrom(null);
+      w.handleChangeTo(null);
+      expect_jlogic([null, undefined], 3);
+
     });
   });
 
