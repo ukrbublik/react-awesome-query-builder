@@ -54,22 +54,24 @@ describe("antdesign widgets interactions", () => {
 
   it("change select value", () => {
     with_qb_ant(configs.with_all_types, inits.with_select, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb
-        .find("SelectWidget")
-        .instance()
-        .handleChange("green");
+      const w = qb.find("SelectWidget").instance();
+
+      w.handleChange("green");
       expect_jlogic([null,
         { "and": [{  "==": [ { "var": "color" }, "green" ]  }] }
       ]);
+
+      // search
+      expect(w.filterOption("re", {value: "Red"})).to.equal(true);
+      expect(w.filterOption("wh", {value: "Red"})).to.equal(false);
     });
   });
 
   it("change multiselect value", () => {
     with_qb_ant(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb
-        .find("MultiSelectWidget")
-        .instance()
-        .handleChange(["orange"]);
+      const w = qb.find("MultiSelectWidget").instance();
+      
+      w.handleChange(["orange"]);
       expect_jlogic([null, {
         "and": [
           {
@@ -80,6 +82,13 @@ describe("antdesign widgets interactions", () => {
           }
         ]
       }]);
+
+      w.handleChange([]); //not allow []
+      expect_jlogic([null, undefined], 1);
+
+      // search
+      expect(w.filterOption("re", {value: "Red"})).to.equal(true);
+      expect(w.filterOption("wh", {value: "Red"})).to.equal(false);
     });
   });
 
@@ -99,13 +108,13 @@ describe("antdesign widgets interactions", () => {
         }
       });
       
-      qb
-        .find("TreeSelectWidget")
-        .instance()
-        .handleChange("5");
+      const w = qb.find("TreeSelectWidget").instance();
+      
+      w.handleChange("5");
       expect_jlogic([null,
         { "and": [{  "==": [ { "var": "selecttree" }, "5" ]  }] }
       ]);
+
     });
   });
 
@@ -128,20 +137,24 @@ describe("antdesign widgets interactions", () => {
         }
       });
 
-      qb
-        .find("TreeSelectWidget")
-        .instance()
-        .handleChange(["3"]);
+      const w = qb.find("TreeSelectWidget").instance();
+
+      w.handleChange(["3"]);
       expect_jlogic([null, {
         "and": [
-          {
-            "all": [
-              { "var": "multiselecttree" },
-              { "in": [ { "var": "" }, [ "3" ] ] }
-            ]
-          }
+          { "all": [
+            { "var": "multiselecttree" },
+            { "in": [ { "var": "" }, [ "3" ] ] }
+          ] }
         ]
       }]);
+
+      w.handleChange([]); //not allow []
+      expect_jlogic([null, undefined], 1);
+
+      // search
+      expect(w.filterTreeNode("re", {title: "Red"})).to.equal(true);
+      expect(w.filterTreeNode("wh", {title: "Red"})).to.equal(false);
     });
   });
 
@@ -171,13 +184,15 @@ describe("antdesign widgets interactions", () => {
 
   it("change slider value", () => {
     with_qb_ant(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
-      qb
-        .find("SliderWidget")
-        .instance()
-        .handleChange(12);
+      const w = qb.find("SliderWidget").instance();
+
+      w.handleChange(12);
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "slider" }, 12 ] }] }
       ]);
+
+      w.handleChange("");
+      expect_jlogic([null, undefined], 1);
     });
   });
 
@@ -212,14 +227,106 @@ describe("antdesign widgets interactions", () => {
         }
       });
 
-      qb
-        .find("RangeWidget")
-        .instance()
-        .handleChange([19, 42]);
+      const w = qb.find("RangeWidget").instance();
+      
+      w.handleChange([19, 42]);
       expect_jlogic([null,
         { "and": [{ "<=": [ 19, { "var": "slider" }, 42 ] }] }
-      ]);
+      ], 0);
+
+      w.handleChangeFrom(20);
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 20, { "var": "slider" }, 42 ] }] }
+      ], 1);
+
+      w.handleChangeTo(40);
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 20, { "var": "slider" }, 40 ] }] }
+      ], 2);
+
+      w.handleChangeFrom(null);
+      w.handleChangeTo(null);
+      expect_jlogic([null, undefined], 3);
+
     });
+  });
+
+  //////////////////////////////////////////////////////////////////////////////////////////
+  
+  describe("antdesign widgets", () => {
+
+    it("load date range", () => {
+      with_qb_ant(configs.with_all_types, inits.with_range_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+        expect_checks({
+          "query": "date >= \"2020-05-10\" && date <= \"2020-05-15\"",
+          "queryHuman": "Date >= \"10.05.2020\" AND Date <= \"15.05.2020\"",
+          "sql": "date BETWEEN '2020-05-10' AND '2020-05-15'",
+          "mongo": {
+            "date": { "$gte": "2020-05-10", "$lte": "2020-05-15" }
+          },
+          "logic": {
+            "and": [ { "<=": [ "2020-05-10T00:00:00.000Z", { "var": "date" }, "2020-05-15T00:00:00.000Z" ] } ]
+          }
+        });
+      });
+    });
+  
+    it("load bad date range", () => {
+      with_qb_ant(configs.with_all_types, inits.with_range_bad_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+        expect_checks({});
+      });
+    });
+
+  });
+
+  //////////////////////////////////////////////////////////////////////////////////////////
+
+  describe("antdesign core widgets", () => {
+
+    it("change field via cascader", () => {
+      with_qb_ant(configs.with_cascader, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldCascader").instance();
+
+        w.onChange(["user", "login"]);
+
+        // search
+        expect(w.filterOption("re", [{label: "Red"}])).to.equal(true);
+        expect(w.filterOption("wh", [{label: "Red"}])).to.equal(false);
+      });
+    });
+
+    it("change field via select", () => {
+      with_qb_ant(configs.with_struct, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldSelect").first().instance();
+
+        w.onChange("user.login");
+
+        // search
+        expect(w.filterOption("re", {title: "Red"})).to.equal(true);
+        expect(w.filterOption("wh", {title: "Red"})).to.equal(false);
+      });
+    });
+
+    it("change field via dropdown", () => {
+      with_qb_ant(configs.with_dropdown, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldDropdown").first().instance();
+
+        w.onChange({key: "user.login"});
+      });
+    });
+
+    it("change field via tree select", () => {
+      with_qb_ant(configs.with_tree_select, inits.with_nested, "JsonLogic", (qb) => {
+        const w = qb.find("FieldTreeSelect").first().instance();
+
+        w.onChange("user.login");
+
+        // search
+        expect(w.filterTreeNode("re", {title: "Red"})).to.equal(true);
+        expect(w.filterTreeNode("wh", {title: "Red"})).to.equal(false);
+      });
+    });
+
   });
 
 });

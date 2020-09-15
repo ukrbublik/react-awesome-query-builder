@@ -277,3 +277,33 @@ export const getTreeBadFields = (tree) => {
     
   return Array.from(new Set(badFields));
 };
+
+
+// Remove fields that can be calced: "id", "path"
+// Remove empty fields: "operatorOptions"
+export const getLightTree = (tree) => {
+  let newTree = tree;
+
+  function _processNode (item, itemId) {
+    if (item.path)
+      delete item.path;
+    if (itemId)
+      delete item.id;
+    let properties = item.properties;
+    if (properties) {
+      if (properties.operatorOptions == null)
+        delete properties.operatorOptions;
+    }
+
+    const children = item.children1;
+    if (children) {
+      for (let id in children) {
+        _processNode(children[id], id);
+      }
+    }
+  }
+
+  _processNode(tree, null);
+
+  return newTree;
+};

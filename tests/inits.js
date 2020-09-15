@@ -41,6 +41,26 @@ export const with_range_slider = {
   }]
 };
 
+export const with_range_dates = {
+  "and": [{
+    "<=": [
+      "2020-05-10T21:00:00.000Z", 
+      { "var": "date" },
+      "2020-05-15T21:00:00.000Z"
+    ]
+  }]
+};
+
+export const with_range_bad_dates = {
+  "and": [{
+    "<=": [
+      "2020-05-10TTTT", 
+      { "var": "date" },
+      "2020-05-15T21:00:00.000Z"
+    ]
+  }]
+};
+
 export const with_undefined_as_number = {
   "and": [{
     "==": [

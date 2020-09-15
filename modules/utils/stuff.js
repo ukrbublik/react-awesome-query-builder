@@ -354,3 +354,10 @@ export const removePrefixPath = (selectedPath, parentPath) => {
   }
   return isPrefix ? selectedPath.slice(parentPath.length) : selectedPath;
 };
+
+export const isJsonLogic = (logic) => (
+  typeof logic === "object" // An object
+  && logic !== null // but not null
+  && !Array.isArray(logic) // and not an array
+  && Object.keys(logic).length === 1 // with exactly one key
+);
