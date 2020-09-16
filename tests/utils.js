@@ -112,7 +112,7 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
         const res = mongodbFormat(tree, config);
-        expect(res).to.eql(expects["mongo"]);
+        expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["mongo"]));
       });
     }
   
@@ -120,7 +120,7 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
       doIt("should work to JsonLogic", () => {
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
-        expect(safe_logic).to.eql(expects["logic"]);
+        expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expects["logic"]));
         if (expects["logic"])
           expect(errors).to.eql([]);
       });
