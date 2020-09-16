@@ -146,15 +146,14 @@ export const with_struct_and_group_mixed_obsolete = {
 export const with_nested_group = {
   "and": [
     { "some": [
-      [
-        { "var": "results" }
-      ], {
+      { "var": "results" },
+      {
         "and": [
           {
             ">": [  { "var": "score" },  15  ]
           }, {
             "some": [
-              [ { "var": "user" } ], {
+              { "var": "user" }, {
                 "==": [  { "var": "name" },  "denis"  ]
               }
             ]
@@ -169,15 +168,15 @@ export const two_rules_with_nested_group = {
   "and": [
     {
       "some": [
-        [ { "var": "results" } ],
+        { "var": "results" },
         { "==": [  { "var": "score" },  11  ] }
       ]
     },
     {
       "some": [
-        [ { "var": "results" } ],
+        { "var": "results" },
         { "some": [
-          [ { "var": "user" } ], {
+          { "var": "user" }, {
             "==": [ { "var": "name" },  "aaa" ]
           }
         ] }
@@ -190,7 +189,7 @@ export const with_struct_inside_group = {
   "and": [
     {
       "some": [
-        [ { "var": "results" } ],
+        { "var": "results" },
         { "==": [  { "var": "user.name" },  "ddd"  ] }
       ]
     }
