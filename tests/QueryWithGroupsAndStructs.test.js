@@ -102,17 +102,15 @@ describe("query with nested !group", () => {
         "and": [
           {
             "some": [
-              [
-                { "var": "results" }
-              ], {
+              { "var": "results" },
+              {
                 "and": [
                   {
                     ">": [  { "var": "score" },  15  ]
                   }, {
                     "some": [
-                      [
-                        { "var": "user" }
-                      ], {
+                      { "var": "user" },
+                      {
                         "==": [  { "var": "name" },  "denis"  ]
                       }
                     ]
@@ -156,15 +154,16 @@ describe("query with nested !group", () => {
         "and": [
           {
             "some": [
-              [ { "var": "results" } ],
+              { "var": "results" },
               { "==": [  { "var": "score" },  11  ] }
             ]
           },
           {
             "some": [
-              [ { "var": "results" } ],
+              { "var": "results" },
               { "some": [
-                [ { "var": "user" } ], {
+                { "var": "user" }, 
+                {
                   "==": [ { "var": "name" },  "aaa" ]
                 }
               ] }
@@ -197,7 +196,7 @@ describe("query with !struct inside !group", () => {
         "and": [
           {
             "some": [
-              [ { "var": "results" } ],
+              { "var": "results" },
               { "==": [  { "var": "user.name" },  "ddd"  ] }
             ]
           }

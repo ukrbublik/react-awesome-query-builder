@@ -345,6 +345,7 @@ const topLevelFieldsFilter = (fields) => {
 };
 
 const wrapInDefaultConjRuleGroup = (rule, parentField, config) => {
+  if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
@@ -436,8 +437,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   // special case for `rule_group` (issue #246)
   if (["some", "none"].includes(op) && arity == 2) {
-    if (vals[0].length == 1 && vals[0][0].var !== undefined && Object.keys(vals[1]).length == 1) {
-      const {"var": field} = vals[0][0];
+    if (vals[0].var !== undefined && Object.keys(vals[1]).length == 1) {
+      const {"var": field} = vals[0];
       const sub = vals[1];
       const newOp = Object.keys(sub)[0];
       const newVals = sub[newOp];

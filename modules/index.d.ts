@@ -581,6 +581,7 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
+  useSomeForGroups?: boolean,
 }
 
 export interface OtherSettings {

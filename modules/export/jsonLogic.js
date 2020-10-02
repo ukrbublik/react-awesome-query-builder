@@ -179,7 +179,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       }
       resultQuery = {
         [op]: [
-          [{var: fieldName}],
+          {var: fieldName},
           resultQuery
         ]
       };
