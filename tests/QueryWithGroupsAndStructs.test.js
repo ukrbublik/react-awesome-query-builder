@@ -101,14 +101,14 @@ describe("query with nested !group", () => {
       "logic": {
         "and": [
           {
-            "some": [
+            "all": [
               { "var": "results" },
               {
                 "and": [
                   {
                     ">": [  { "var": "score" },  15  ]
                   }, {
-                    "some": [
+                    "all": [
                       { "var": "user" },
                       {
                         "==": [  { "var": "name" },  "denis"  ]

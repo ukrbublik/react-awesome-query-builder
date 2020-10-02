@@ -250,8 +250,9 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
   return undefined;
 };
 
-const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
+const convertConj = (op, vals, conv, config, not, meta, parentField = null, groupOp = null) => {
   const conjKey = conv.conjunctions[op];
+  const groupConj = groupOp ? conv.conjunctions[groupOp] : null;
   const {fieldSeparator} = config.settings;
   if (conjKey) {
     let type = "group";
@@ -274,7 +275,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     const usedTopGroups = topLevelFieldsFilter(usedGroups);
     
     let properties = {
-      conjunction: conjKey,
+      conjunction: groupConj || conjKey,
       not: not
     };
 
@@ -306,7 +307,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
                 id: groupId,
                 children1: {},
                 properties: {
-                  conjunction: conjKey,
+                  conjunction: groupConj,
                   not: false,
                   field: ff,
                 }
@@ -344,14 +345,14 @@ const topLevelFieldsFilter = (fields) => {
   return arr;
 };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, config) => {
+const wrapInDefaultConjRuleGroup = (rule, parentField, config, conj) => {
   if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: defaultConjunction(config),
+      conjunction: conj || defaultConjunction(config),
       not: false,
       field: parentField,
     }
@@ -449,11 +450,15 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
         const groupFieldConfig = getFieldConfig(groupField, config);
         if (groupFieldConfig && groupFieldConfig.type == "!group") {
-          let res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
-          if (!res) {
+          const groupOp = op == "some" ? "or" : "and";
+          const groupConj = conv.conjunctions[groupOp];
+          let res;
+          if (conv.conjunctions[newOp] !== undefined) {
+            res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField, groupOp);
+          } else {
             // need to be wrapped in `rule_group`
             const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
-            res = wrapInDefaultConjRuleGroup(rule, groupField, config);
+            res = wrapInDefaultConjRuleGroup(rule, groupField, config, groupConj);
           }
           return res;
         }

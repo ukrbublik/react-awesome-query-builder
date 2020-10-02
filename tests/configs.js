@@ -67,6 +67,10 @@ export const simple_with_numbers_and_str = (BasicConfig) => ({
       excludeOperators: ["equal"],
     },
   },
+  settings: {
+    ...BasicConfig.settings,
+    defaultGroupConjunction: "AND",
+  }
 });
   
 export const with_number_and_string = (BasicConfig) => ({
@@ -253,7 +257,6 @@ export const with_nested_group = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     useGroupsAsArrays: true,
-    jsonLogicOpForGroups: "some",
   }
 });
   
@@ -281,7 +284,6 @@ export const with_struct_inside_group = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     useGroupsAsArrays: true,
-    jsonLogicOpForGroups: "some",
   }
 });
 
