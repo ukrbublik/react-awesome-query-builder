@@ -376,13 +376,15 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   const arity = vals.length;
   const cardinality = arity - 1;
   if (op == "all") {
-    // special case
+    // special case for "all-in"
     const op2 = Object.keys(vals[1])[0];
-    vals = [
-      vals[0],
-      vals[1][op2][1]
-    ];
-    op = op + "-" + op2; // example: "all-in"
+    if (op2 == "in") {
+      vals = [
+        vals[0],
+        vals[1][op2][1]
+      ];
+      op = op + "-" + op2; // "all-in"
+    }
   }
   const opk = op + "/" + cardinality;
 
