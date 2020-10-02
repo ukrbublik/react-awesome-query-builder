@@ -245,6 +245,9 @@ export const with_nested_group = (BasicConfig) => ({
         }
       }
     },
+  },
+  settings: {
+    useSomeForGroups: true
   }
 });
   
@@ -268,6 +271,9 @@ export const with_struct_inside_group = (BasicConfig) => ({
         }
       }
     },
+  },
+  settings: {
+    useSomeForGroups: true
   }
 });
 

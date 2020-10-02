@@ -33,16 +33,11 @@ describe("query with !struct and !group", () => {
       "logic": {
         "and": [
           {
-            "some": [
-              [{ "var": "results" }],
-              { "and": [
-                {
-                  "==": [ { "var": "slider" },  22 ]
-                }, {
-                  "==": [ { "var": "stock" },  true ]
-                }
-              ] }
-            ]
+            "and": [{
+              "==": [ { "var": "results.slider" },  22 ]
+            }, {
+              "==": [ { "var": "results.stock" },  true ]
+            }]
           }, {
             "==": [ { "var": "user.firstName" },  "abc" ]
           }, {
@@ -69,10 +64,7 @@ describe("query with !struct and !group", () => {
       "logic": {
         "and": [
           {
-            "some": [
-              [ { "var": "results" } ],
-              { "==": [ { "var": "slider" }, 22 ] }
-            ]
+            "==": [ { "var": "results.slider" }, 22 ]
           }, {
             "==": [ { "var": "user.firstName" }, "abc" ]
           }
