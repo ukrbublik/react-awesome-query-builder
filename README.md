@@ -291,7 +291,6 @@ Support this project with your organization. Your logo will show up here with a 
 
 react-awesome-query-builder is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
 
-<!--<a href="https://tracking.gitads.io/?repo=react-awesome-query-builder"> <img src="https://images.gitads.io/react-awesome-query-builder" alt="GitAds"/> </a>-->
 
 
 ## License
