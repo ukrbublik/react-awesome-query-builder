@@ -70,5 +70,5 @@ export const settings = {
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
-  useSomeForGroups: true,
+  groupsAreArrays: true,
 };

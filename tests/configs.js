@@ -225,7 +225,7 @@ export const with_struct_and_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useSomeForGroups: false
+    groupsAreArrays: false
   }
 });
   
@@ -252,7 +252,7 @@ export const with_nested_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useSomeForGroups: true
+    groupsAreArrays: true
   }
 });
   
@@ -279,7 +279,7 @@ export const with_struct_inside_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useSomeForGroups: true
+    groupsAreArrays: true
   }
 });
 
