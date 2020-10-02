@@ -285,7 +285,7 @@ Behaviour settings:
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
-|useGroupsAsArrays |true |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
+|useGroupsAsArrays |false |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
 |defaultGroupConjunction |`"OR"` |For use with `useGroupsAsArrays` (`OR` will translate to JsonLogic's `some`, `AND` - to `all`)
 |===
 
