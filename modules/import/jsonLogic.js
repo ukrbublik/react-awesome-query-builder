@@ -436,23 +436,25 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   _check(true);
 
   // special case for `rule_group` (issue #246)
-  if (["some", "none"].includes(op) && arity == 2) {
+  if (["some", "all", "none"].includes(op) && arity == 2) {
     if (vals[0].var !== undefined && Object.keys(vals[1]).length == 1) {
       const {"var": field} = vals[0];
       const sub = vals[1];
       const newOp = Object.keys(sub)[0];
-      const newVals = sub[newOp];
-      const newNot = !!(not ^ (newOp == "none"));
-      const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
-      const groupFieldConfig = getFieldConfig(groupField, config);
-      if (groupFieldConfig && groupFieldConfig.type == "!group") {
-        let res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
-        if (!res) {
-          // need to be wrapped in `rule_group`
-          const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
-          res = wrapInDefaultConjRuleGroup(rule, groupField, config);
+      if (!(newOp == "in" && op == "all")) { // don't confuse with "all-in" for multiselect
+        const newVals = sub[newOp];
+        const newNot = !!(not ^ (newOp == "none"));
+        const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
+        const groupFieldConfig = getFieldConfig(groupField, config);
+        if (groupFieldConfig && groupFieldConfig.type == "!group") {
+          let res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
+          if (!res) {
+            // need to be wrapped in `rule_group`
+            const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
+            res = wrapInDefaultConjRuleGroup(rule, groupField, config);
+          }
+          return res;
         }
-        return res;
       }
     }
   }

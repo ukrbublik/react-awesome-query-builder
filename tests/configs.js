@@ -225,7 +225,7 @@ export const with_struct_and_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    groupsAreArrays: false
+    useGroupsAsArrays: false,
   }
 });
   
@@ -252,7 +252,8 @@ export const with_nested_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    groupsAreArrays: true
+    useGroupsAsArrays: true,
+    jsonLogicOpForGroups: "some",
   }
 });
   
@@ -279,7 +280,8 @@ export const with_struct_inside_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    groupsAreArrays: true
+    useGroupsAsArrays: true,
+    jsonLogicOpForGroups: "some",
   }
 });
 

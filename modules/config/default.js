@@ -70,5 +70,6 @@ export const settings = {
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
-  groupsAreArrays: true,
+  useGroupsAsArrays: true,
+  jsonLogicOpForGroups: "some", // or "all"
 };
