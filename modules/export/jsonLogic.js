@@ -128,7 +128,7 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
 //meta is mutable
 const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => {
   if (!item) return undefined;
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator, useSomeForGroups} = config.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const children = item.get("children1");
@@ -146,7 +146,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       return undefined;
     }
 
-    const groupField = isRuleGroup ? field : parentField;
+    const groupField = isRuleGroup && useSomeForGroups ? field : parentField;
     const list = children
       .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, groupField))
       .filter((currentChild) => typeof currentChild !== "undefined");
@@ -171,7 +171,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
     }
 
     // rule_group (issue #246)
-    if (isRuleGroup) {
+    if (isRuleGroup && useSomeForGroups) {
       const op = not ? "none" : "some";
       let fieldName = field;
       if (parentField) {

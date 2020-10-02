@@ -271,51 +271,53 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     const complexFieldsInGroup = complexFieldsParents
       .filter((f) => complexFieldsConfigs[f].type == "!group");
     const usedGroups = complexFieldsInGroup.uniq();
+    const usedTopGroups = topLevelFieldsFilter(usedGroups);
     
-    let children1 = children;
     let properties = {
       conjunction: conjKey,
       not: not
     };
 
     // every field should be in single group or neither
-    const isOk = usedGroups.length == 0 || usedGroups.length == 1 && complexFieldsInGroup.length == Object.keys(children).length;
-    const usedGroup = usedGroups.length > 0 ? usedGroups[0] : null;
-    if (isOk) {
-      if (usedGroup) {
-        type = "rule_group";
-        properties.field = usedGroup;
-      }
-    } else {
-      // if not ok, we should split children by groups
-      children1 = {};
-      let groupToId = {};
-      Object.entries(children).map(([k, v]) => {
-        const groupFields = usedGroups.filter((f) => v.properties.field.indexOf(f) == 0);
-        const groupField = groupFields.length > 0 ? groupFields[0] : null;
-        if (!groupField) {
-          // not in group (can be simple field or in struct)
-          children1[k] = v;
-        } else {
-          let groupId = groupToId[groupField];
-          if (!groupId) {
-            groupId = uuid();
-            groupToId[groupField] = groupId;
-            children1[groupId] = {
-              type: "rule_group",
-              id: groupId,
-              children1: {},
-              properties: {
-                conjunction: conjKey,
-                not: false,
-                field: groupField,
-              }
-            };
+    const needSplit = !(usedTopGroups.length == 1 && complexFieldsInGroup.length == Object.keys(children).length);
+    let children1 = {};
+    let groupToId = {};
+    Object.entries(children).map(([k, v]) => {
+      const groupFields = usedGroups.filter((f) => v.properties.field.indexOf(f) == 0);
+      const groupField = groupFields.length > 0 ? groupFields[0] : null;
+      if (!groupField) {
+        // not in group (can be simple field or in struct)
+        children1[k] = v;
+      } else {
+        let ch = children1;
+        groupField.split(fieldSeparator).map((f, i, a) => {
+          const p = a.slice(0, i);
+          const ff = [...p, f].join(fieldSeparator);
+          if (!needSplit && i == 0) {
+            type = "rule_group";
+            properties.field = ff;
+          } else {
+            let groupId = groupToId[ff];
+            if (!groupId) {
+              groupId = uuid();
+              groupToId[ff] = groupId;
+              ch[groupId] = {
+                type: "rule_group",
+                id: groupId,
+                children1: {},
+                properties: {
+                  conjunction: conjKey,
+                  not: false,
+                  field: ff,
+                }
+              };
+            }
+            ch = ch[groupId].children1;
           }
-          children1[groupId].children1[k] = v;
-        }
-      });
-    }
+        });
+        ch[k] = v;
+      }
+    });
 
     return {
       type: type,
@@ -326,6 +328,20 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   }
 
   return undefined;
+};
+
+const topLevelFieldsFilter = (fields) => {
+  let arr = [...fields].sort((a, b) => (a.length - b.length));
+  for (let i = 0 ; i < arr.length ; i++) {
+    for (let j = i + 1 ; j < arr.length ; j++) {
+      if (arr[j].indexOf(arr[i]) == 0) {
+        // arr[j] is inside arr[i] (eg. "a.b" inside "a")
+        arr.splice(j, 1);
+        j--;
+      }
+    }
+  }
+  return arr;
 };
 
 const wrapInDefaultConjRuleGroup = (rule, parentField, config) => {
