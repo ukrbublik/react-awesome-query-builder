@@ -174,6 +174,83 @@ describe("query with nested !group", () => {
     });
   });
 
+  describe("with two nested groups", () => {
+    export_checks(configs.with_nested_group, inits.with_two_groups_1, "JsonLogic", {
+      "query": "((results.user.name == \"ddd\" && results.score == 2) && group2.inside == 33 && results.score == 2)",
+      "queryHuman": "((Results.user.name == \"ddd\" AND Results.score == 2) AND Group2.inside == 33 AND Results.score == 2)",
+      "sql": "((results.user.name = 'ddd' AND results.score = 2) AND group2.inside = 33 AND results.score = 2)",
+      "mongo": {
+        "$and": [
+          {
+            "results": {
+              "$elemMatch": {
+                "user": {
+                  "$elemMatch": {
+                    "name": "ddd"
+                  }
+                },
+                "score": 2
+              }
+            }
+          },
+          {
+            "group2": {
+              "$elemMatch": {
+                "inside": 33
+              }
+            }
+          },
+          {
+            "results": {
+              "$elemMatch": {
+                "score": 2
+              }
+            }
+          }
+        ]
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              {
+                "and": [
+                  {
+                    "some": [
+                      { "var": "user" },
+                      {
+                        "==": [ { "var": "name" },  "ddd" ]
+                      }
+                    ]
+                  },
+                  {
+                    "==": [ { "var": "score" },  2 ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "some": [
+              { "var": "group2" },
+              {
+                "==": [ { "var": "inside" },  33 ]
+              }
+            ]
+          },
+          {
+            "some": [
+              { "var": "results" },
+              {
+                "==": [ { "var": "score" },  2 ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////

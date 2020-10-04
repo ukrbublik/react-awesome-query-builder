@@ -198,6 +198,30 @@ export const with_struct_inside_group = {
   ]
 };
 
+export const with_two_groups_1 = {
+  "and": [
+    {
+      "and": [
+        {
+          "==": [ { "var": "results.user.name" },  "ddd" ]
+        }, 
+        {
+          "==": [ { "var": "results.score" },  2 ]
+        },
+      ]
+    },
+    {
+      "==": [ { "var": "group2.inside" },  33 ]
+    },
+    {
+      "==": [ { "var": "results.score" },  2 ]
+    },
+    {
+      "==": [ { "var": "num" },  -1 ]
+    }
+  ]
+};
+
 export const with_number_field_compare = {
   "and": [
     { "==": [ { "var": "num" }, { "var": "num2" } ] }
