@@ -2,7 +2,7 @@ import uuid from "../utils/uuid";
 import {defaultValue} from "../utils/stuff";
 import {getFieldConfig, extendConfig, getWidgetForFieldOp} from "../utils/configUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction} from "../utils/defaultUtils";
+import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
 import moment from "moment";
 import {isJsonLogic} from "../utils/stuff";
 
@@ -358,7 +358,7 @@ const wrapInDefaultConjRuleGroup = (rule, parentField, config, conj) => {
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: conj || defaultConjunction(config),
+      conjunction: conj || defaultGroupConjunction(config),
       not: false,
       field: parentField,
     }
