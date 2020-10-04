@@ -1,6 +1,6 @@
 # Changelog
 - 2.2.0
-  - Fixed issues #246 and #176 related to wrong export and import from JsonLogic for multi-nested group fields
+  - Fixed issues #246 and #176 related to wrong export and import from JsonLogic for multi-nested group fields  
     Now `!group` fields are treated as arrays (added setting `useGroupsAsArrays` = true)
 - 2.1.19
   - Fixed issue #252 ("Cannot update a component from inside the function body of a different component")
