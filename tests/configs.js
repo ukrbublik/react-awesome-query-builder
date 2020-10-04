@@ -222,6 +222,10 @@ export const with_struct_and_group = (BasicConfig) => ({
         },
       }
     },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    useGroupsAsArrays: false,
   }
 });
   
@@ -245,6 +249,19 @@ export const with_nested_group = (BasicConfig) => ({
         }
       }
     },
+    group2: {
+      label: "Group2",
+      type: "!group",
+      subfields: {
+        inside: {
+          type: "number",
+        },
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    useGroupsAsArrays: true,
   }
 });
   
@@ -268,6 +285,10 @@ export const with_struct_inside_group = (BasicConfig) => ({
         }
       }
     },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    useGroupsAsArrays: true,
   }
 });
 

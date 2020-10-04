@@ -2,7 +2,7 @@ import uuid from "../utils/uuid";
 import {defaultValue} from "../utils/stuff";
 import {getFieldConfig, extendConfig, getWidgetForFieldOp} from "../utils/configUtils";
 import {loadTree} from "./tree";
-import {defaultConjunction} from "../utils/defaultUtils";
+import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
 import moment from "moment";
 import {isJsonLogic} from "../utils/stuff";
 
@@ -268,58 +268,70 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
       .uniq()
       .map(f => [f, getFieldConfig(f, config)])
       .to_object();
-    const complexFieldsInGroup = complexFieldsParents
+    const complexFieldsInRuleGroup = complexFieldsParents
       .filter((f) => complexFieldsConfigs[f].type == "!group");
-    const usedGroups = complexFieldsInGroup.uniq();
+    const usedRuleGroups = complexFieldsInRuleGroup.uniq();
+    const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
-    let children1 = children;
     let properties = {
       conjunction: conjKey,
       not: not
     };
+    const id = uuid();
 
-    // every field should be in single group or neither
-    const isOk = usedGroups.length == 0 || usedGroups.length == 1 && complexFieldsInGroup.length == Object.keys(children).length;
-    const usedGroup = usedGroups.length > 0 ? usedGroups[0] : null;
-    if (isOk) {
-      if (usedGroup) {
-        type = "rule_group";
-        properties.field = usedGroup;
-      }
-    } else {
-      // if not ok, we should split children by groups
-      children1 = {};
-      let groupToId = {};
-      Object.entries(children).map(([k, v]) => {
-        const groupFields = usedGroups.filter((f) => v.properties.field.indexOf(f) == 0);
-        const groupField = groupFields.length > 0 ? groupFields[0] : null;
+    let children1 = {};
+    // TIP: `needSplit` will be true if using useGroupsAsArrays=false and there are fields of different groups on one level
+    //      (like "a.b" and "x.z" -> need to split them with hierarchy)
+    // TIP: Even if fields are of same root parent (like "a.b", "a.c.d"), still we may need to create hierarchy of `rule_group`s
+    const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
+    let groupToId = {};
+    Object.entries(children).map(([k, v]) => {
+      if (v.type == "group" || v.type == "rule_group") {
+        // put as-is
+        children1[k] = v;
+      } else {
+        const groupFields = usedRuleGroups.filter((f) => v.properties.field.indexOf(f) == 0);
+        const groupField = groupFields.length > 0 ? groupFields.sort((a, b) => (b.length - a.length))[0] : null;
         if (!groupField) {
-          // not in group (can be simple field or in struct)
+          // not in rule_group (can be simple field or in struct) - put as-is
           children1[k] = v;
         } else {
-          let groupId = groupToId[groupField];
-          if (!groupId) {
-            groupId = uuid();
-            groupToId[groupField] = groupId;
-            children1[groupId] = {
-              type: "rule_group",
-              id: groupId,
-              children1: {},
-              properties: {
-                conjunction: conjKey,
-                not: false,
-                field: groupField,
+          // wrap field in rule_group (with creating hierarchy if need)
+          let ch = children1;
+          groupField.split(fieldSeparator).map((f, i, a) => {
+            const p = a.slice(0, i);
+            const ff = [...p, f].join(fieldSeparator);
+            if (!needSplit && i == 0) {
+              type = "rule_group";
+              properties.field = ff;
+              groupToId[ff] = id;
+            } else {
+              let groupId = groupToId[ff];
+              if (!groupId) {
+                groupId = uuid();
+                groupToId[ff] = groupId;
+                ch[groupId] = {
+                  type: "rule_group",
+                  id: groupId,
+                  children1: {},
+                  properties: {
+                    conjunction: conjKey,
+                    not: false,
+                    field: ff,
+                  }
+                };
               }
-            };
-          }
-          children1[groupId].children1[k] = v;
+              ch = ch[groupId].children1;
+            }
+          });
+          ch[k] = v;
         }
-      });
-    }
+      }
+    });
 
     return {
       type: type,
-      id: uuid(),
+      id: id,
       children1: children1,
       properties: properties
     };
@@ -328,13 +340,28 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   return undefined;
 };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, config) => {
+const topLevelFieldsFilter = (fields) => {
+  let arr = [...fields].sort((a, b) => (a.length - b.length));
+  for (let i = 0 ; i < arr.length ; i++) {
+    for (let j = i + 1 ; j < arr.length ; j++) {
+      if (arr[j].indexOf(arr[i]) == 0) {
+        // arr[j] is inside arr[i] (eg. "a.b" inside "a")
+        arr.splice(j, 1);
+        j--;
+      }
+    }
+  }
+  return arr;
+};
+
+const wrapInDefaultConjRuleGroup = (rule, parentField, config, conj) => {
+  if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: defaultConjunction(config),
+      conjunction: conj || defaultGroupConjunction(config),
       not: false,
       field: parentField,
     }
@@ -359,13 +386,15 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   const arity = vals.length;
   const cardinality = arity - 1;
   if (op == "all") {
-    // special case
+    // special case for "all-in"
     const op2 = Object.keys(vals[1])[0];
-    vals = [
-      vals[0],
-      vals[1][op2][1]
-    ];
-    op = op + "-" + op2; // example: "all-in"
+    if (op2 == "in") {
+      vals = [
+        vals[0],
+        vals[1][op2][1]
+      ];
+      op = op + "-" + op2; // "all-in"
+    }
   }
   const opk = op + "/" + cardinality;
 
@@ -419,23 +448,27 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   _check(true);
 
   // special case for `rule_group` (issue #246)
-  if (["some", "none"].includes(op) && arity == 2) {
-    if (vals[0].length == 1 && vals[0][0].var !== undefined && Object.keys(vals[1]).length == 1) {
-      const {"var": field} = vals[0][0];
+  if (["some", "all", "none"].includes(op) && arity == 2) {
+    if (vals[0].var !== undefined && Object.keys(vals[1]).length == 1) {
+      const {"var": field} = vals[0];
       const sub = vals[1];
       const newOp = Object.keys(sub)[0];
-      const newVals = sub[newOp];
-      const newNot = !!(not ^ (newOp == "none"));
-      const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
-      const groupFieldConfig = getFieldConfig(groupField, config);
-      if (groupFieldConfig && groupFieldConfig.type == "!group") {
-        let res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
-        if (!res) {
-          // need to be wrapped in `rule_group`
-          const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
-          res = wrapInDefaultConjRuleGroup(rule, groupField, config);
+      if (!(newOp == "in" && op == "all")) { // don't confuse with "all-in" for multiselect
+        const newVals = sub[newOp];
+        const newNot = !!(not ^ (newOp == "none"));
+        const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
+        const groupFieldConfig = getFieldConfig(groupField, config);
+        if (groupFieldConfig && groupFieldConfig.type == "!group") {
+          let res;
+          if (conv.conjunctions[newOp] !== undefined) {
+            res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
+          } else {
+            // need to be wrapped in `rule_group`
+            const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
+            res = wrapInDefaultConjRuleGroup(rule, groupField, config, conv.conjunctions["and"]);
+          }
+          return res;
         }
-        return res;
       }
     }
   }

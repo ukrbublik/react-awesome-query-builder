@@ -21,19 +21,27 @@ export const jsonLogicFormat = (item, config) => {
     
   // build empty data
   const {errors, usedFields} = meta;
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator, useGroupsAsArrays} = config.settings;
   let data = {};
   for (let ff of usedFields) {
+    const def = getFieldConfig(ff, config) || {};
     const parts = ff.split(fieldSeparator);
     let tmp = data;
     for (let i = 0 ; i < parts.length ; i++) {
       const p = parts[i];
+      const pdef = getFieldConfig(parts.slice(0, i+1), config) || {};
       if (i != parts.length - 1) {
-        if (!tmp[p])
-          tmp[p] = {};
-        tmp = tmp[p];
+        if (pdef.type == "!group" && useGroupsAsArrays) {
+          if (!tmp[p])
+            tmp[p] = [{}];
+          tmp = tmp[p][0];
+        } else {
+          if (!tmp[p])
+            tmp[p] = {};
+          tmp = tmp[p];
+        }
       } else {
-        tmp[p] = null;
+        tmp[p] = null; // can use def.type for sample values
       }
     }
   }
@@ -128,7 +136,7 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
 //meta is mutable
 const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => {
   if (!item) return undefined;
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator, useGroupsAsArrays} = config.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const children = item.get("children1");
@@ -146,7 +154,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       return undefined;
     }
 
-    const groupField = isRuleGroup ? field : parentField;
+    const groupField = isRuleGroup && useGroupsAsArrays ? field : parentField;
     const list = children
       .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, groupField))
       .filter((currentChild) => typeof currentChild !== "undefined");
@@ -161,17 +169,18 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
     
     // revert
     if (not && !isRuleGroup) {
-      if (Object.keys(resultQuery).length == 1 && Object.keys(resultQuery)[0] == "some") {
+      if (Object.keys(resultQuery).length == 1 && ["all", "some"].includes(Object.keys(resultQuery)[0])) {
         // if `rule_group` is wrapped in group with `not` - just swap `some` to `none` for simplicity
-        resultQuery["none"] = resultQuery["some"];
-        delete(resultQuery["some"]);
+        const gop = Object.keys(resultQuery)[0];
+        resultQuery["none"] = resultQuery[gop];
+        delete(resultQuery[gop]);
       } else {
         resultQuery = { "!": resultQuery };
       }
     }
 
     // rule_group (issue #246)
-    if (isRuleGroup) {
+    if (isRuleGroup && useGroupsAsArrays) {
       const op = not ? "none" : "some";
       let fieldName = field;
       if (parentField) {
@@ -179,7 +188,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       }
       resultQuery = {
         [op]: [
-          [{var: fieldName}],
+          {var: fieldName},
           resultQuery
         ]
       };

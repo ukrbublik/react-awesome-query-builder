@@ -146,15 +146,15 @@ export const with_struct_and_group_mixed_obsolete = {
 export const with_nested_group = {
   "and": [
     { "some": [
-      [
-        { "var": "results" }
-      ], {
+      { "var": "results" },
+      {
         "and": [
           {
             ">": [  { "var": "score" },  15  ]
           }, {
             "some": [
-              [ { "var": "user" } ], {
+              { "var": "user" },
+              {
                 "==": [  { "var": "name" },  "denis"  ]
               }
             ]
@@ -169,15 +169,16 @@ export const two_rules_with_nested_group = {
   "and": [
     {
       "some": [
-        [ { "var": "results" } ],
+        { "var": "results" },
         { "==": [  { "var": "score" },  11  ] }
       ]
     },
     {
       "some": [
-        [ { "var": "results" } ],
+        { "var": "results" },
         { "some": [
-          [ { "var": "user" } ], {
+          { "var": "user" }, 
+          {
             "==": [ { "var": "name" },  "aaa" ]
           }
         ] }
@@ -190,9 +191,33 @@ export const with_struct_inside_group = {
   "and": [
     {
       "some": [
-        [ { "var": "results" } ],
+        { "var": "results" },
         { "==": [  { "var": "user.name" },  "ddd"  ] }
       ]
+    }
+  ]
+};
+
+export const with_two_groups_1 = {
+  "and": [
+    {
+      "and": [
+        {
+          "==": [ { "var": "results.user.name" },  "ddd" ]
+        }, 
+        {
+          "==": [ { "var": "results.score" },  2 ]
+        },
+      ]
+    },
+    {
+      "==": [ { "var": "group2.inside" },  33 ]
+    },
+    {
+      "==": [ { "var": "results.score" },  2 ]
+    },
+    {
+      "==": [ { "var": "num" },  -1 ]
     }
   ]
 };
