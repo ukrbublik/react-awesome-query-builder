@@ -269,60 +269,67 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, grou
       .uniq()
       .map(f => [f, getFieldConfig(f, config)])
       .to_object();
-    const complexFieldsInGroup = complexFieldsParents
+    const complexFieldsInRuleGroup = complexFieldsParents
       .filter((f) => complexFieldsConfigs[f].type == "!group");
-    const usedGroups = complexFieldsInGroup.uniq();
-    const usedTopGroups = topLevelFieldsFilter(usedGroups);
+    const usedRuleGroups = complexFieldsInRuleGroup.uniq();
+    const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
     let properties = {
       conjunction: groupConj || conjKey,
       not: not
     };
+    const id = uuid();
 
-    // every field should be in single group or neither
-    const needSplit = !(usedTopGroups.length == 1 && complexFieldsInGroup.length == Object.keys(children).length);
     let children1 = {};
+    const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
     let groupToId = {};
     Object.entries(children).map(([k, v]) => {
-      const groupFields = usedGroups.filter((f) => v.properties.field.indexOf(f) == 0);
-      const groupField = groupFields.length > 0 ? groupFields[0] : null;
-      if (!groupField) {
-        // not in group (can be simple field or in struct)
+      if (v.type == "group" || v.type == "rule_group") {
+        // put as-is
         children1[k] = v;
       } else {
-        let ch = children1;
-        groupField.split(fieldSeparator).map((f, i, a) => {
-          const p = a.slice(0, i);
-          const ff = [...p, f].join(fieldSeparator);
-          if (!needSplit && i == 0) {
-            type = "rule_group";
-            properties.field = ff;
-          } else {
-            let groupId = groupToId[ff];
-            if (!groupId) {
-              groupId = uuid();
-              groupToId[ff] = groupId;
-              ch[groupId] = {
-                type: "rule_group",
-                id: groupId,
-                children1: {},
-                properties: {
-                  conjunction: groupConj,
-                  not: false,
-                  field: ff,
-                }
-              };
+        const groupFields = usedRuleGroups.filter((f) => v.properties.field.indexOf(f) == 0);
+        const groupField = groupFields.length > 0 ? groupFields.sort((a, b) => (b.length - a.length))[0] : null;
+        if (!groupField) {
+          // not in rule_group (can be simple field or in struct) - put as-is
+          children1[k] = v;
+        } else {
+          // wrap field in rule_group
+          let ch = children1;
+          groupField.split(fieldSeparator).map((f, i, a) => {
+            const p = a.slice(0, i);
+            const ff = [...p, f].join(fieldSeparator);
+            if (!needSplit && i == 0) {
+              type = "rule_group";
+              properties.field = ff;
+              groupToId[ff] = id;
+            } else {
+              let groupId = groupToId[ff];
+              if (!groupId) {
+                groupId = uuid();
+                groupToId[ff] = groupId;
+                ch[groupId] = {
+                  type: "rule_group",
+                  id: groupId,
+                  children1: {},
+                  properties: {
+                    conjunction: groupConj,
+                    not: false,
+                    field: ff,
+                  }
+                };
+              }
+              ch = ch[groupId].children1;
             }
-            ch = ch[groupId].children1;
-          }
-        });
-        ch[k] = v;
+          });
+          ch[k] = v;
+        }
       }
     });
 
     return {
       type: type,
-      id: uuid(),
+      id: id,
       children1: children1,
       properties: properties
     };
@@ -450,7 +457,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
         const groupFieldConfig = getFieldConfig(groupField, config);
         if (groupFieldConfig && groupFieldConfig.type == "!group") {
-          const groupOp = op == "some" ? "or" : "and";
+          const groupOp = "and";
           const groupConj = conv.conjunctions[groupOp];
           let res;
           if (conv.conjunctions[newOp] !== undefined) {

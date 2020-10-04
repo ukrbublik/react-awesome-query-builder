@@ -181,7 +181,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
 
     // rule_group (issue #246)
     if (isRuleGroup && useGroupsAsArrays) {
-      const op = not ? "none" : (conj == "and" ? "all" : "some");
+      const op = not ? "none" : "some";
       let fieldName = field;
       if (parentField) {
         fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);

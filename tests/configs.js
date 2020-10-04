@@ -67,10 +67,6 @@ export const simple_with_numbers_and_str = (BasicConfig) => ({
       excludeOperators: ["equal"],
     },
   },
-  settings: {
-    ...BasicConfig.settings,
-    defaultGroupConjunction: "AND",
-  }
 });
   
 export const with_number_and_string = (BasicConfig) => ({
@@ -251,6 +247,15 @@ export const with_nested_group = (BasicConfig) => ({
             }
           }
         }
+      }
+    },
+    group2: {
+      label: "Group2",
+      type: "!group",
+      subfields: {
+        inside: {
+          type: "number",
+        },
       }
     },
   },

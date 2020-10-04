@@ -145,14 +145,14 @@ export const with_struct_and_group_mixed_obsolete = {
   
 export const with_nested_group = {
   "and": [
-    { "all": [
+    { "some": [
       { "var": "results" },
       {
         "and": [
           {
             ">": [  { "var": "score" },  15  ]
           }, {
-            "all": [
+            "some": [
               { "var": "user" },
               {
                 "==": [  { "var": "name" },  "denis"  ]

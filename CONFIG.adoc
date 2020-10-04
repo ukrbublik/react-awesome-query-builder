@@ -168,7 +168,8 @@ Example:
 |===
 |key |required |default |meaning
 |type |+ | |One of types described in link:#configtypes[config.types] or `!struct`/`!group` for complex field +
- (`!group` can be used with https://docs.mongodb.com/manual/reference/operator/query/elemMatch/[elemMatch] in MongoDb)
+ (use `!struct` for objects, `!group` for arrays) +
+ (for export of `!group` operator https://docs.mongodb.com/manual/reference/operator/query/elemMatch/[elemMatch] will be used in MongoDb, http://jsonlogic.com/operations.html#all-none-and-some[some] in JsonLogic)
 |subfields |+ for `!struct`/`!group` type | |Config for subfields of complex field (multiple nesting is supported)
 |label |+ | |Label to be displayed in field list +
   (If not specified, fields's key will be used instead)
@@ -285,8 +286,7 @@ Behaviour settings:
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
-|useGroupsAsArrays |false |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
-|defaultGroupConjunction |`"OR"` |For use with `useGroupsAsArrays` (`OR` will translate to JsonLogic's `some`, `AND` - to `all`)
+|useGroupsAsArrays |true |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
 |===
 
 Render settings:
