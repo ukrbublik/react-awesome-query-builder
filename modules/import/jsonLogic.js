@@ -280,6 +280,9 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     const id = uuid();
 
     let children1 = {};
+    // TIP: `needSplit` will be true if using useGroupsAsArrays=false and there are fields of different groups on one level
+    //      (like "a.b" and "x.z" -> need to split them with hierarchy)
+    // TIP: Even if fields are of same root parent (like "a.b", "a.c.d"), still we may need to create hierarchy of `rule_group`s
     const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
     let groupToId = {};
     Object.entries(children).map(([k, v]) => {
@@ -293,7 +296,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
           // not in rule_group (can be simple field or in struct) - put as-is
           children1[k] = v;
         } else {
-          // wrap field in rule_group
+          // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
           groupField.split(fieldSeparator).map((f, i, a) => {
             const p = a.slice(0, i);
