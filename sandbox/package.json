@@ -24,7 +24,7 @@
     "antd": ">=4.0.0 <4.5.0",
     "lodash": "^4.6",
     "react": "^16.4.1",
-    "react-awesome-query-builder": "^2.1.16",
+    "react-awesome-query-builder": "^2.2.0",
     "react-dom": "^16.4.1",
     "react-scripts": "^3.4.3",
     "typescript": "3.4.5"
