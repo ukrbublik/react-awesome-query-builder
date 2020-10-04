@@ -250,9 +250,8 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
   return undefined;
 };
 
-const convertConj = (op, vals, conv, config, not, meta, parentField = null, groupOp = null) => {
+const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   const conjKey = conv.conjunctions[op];
-  const groupConj = groupOp ? conv.conjunctions[groupOp] : null;
   const {fieldSeparator} = config.settings;
   if (conjKey) {
     let type = "group";
@@ -275,7 +274,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, grou
     const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
     let properties = {
-      conjunction: groupConj || conjKey,
+      conjunction: conjKey,
       not: not
     };
     const id = uuid();
@@ -313,7 +312,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, grou
                   id: groupId,
                   children1: {},
                   properties: {
-                    conjunction: groupConj,
+                    conjunction: conjKey,
                     not: false,
                     field: ff,
                   }
@@ -457,15 +456,13 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
         const groupFieldConfig = getFieldConfig(groupField, config);
         if (groupFieldConfig && groupFieldConfig.type == "!group") {
-          const groupOp = "and";
-          const groupConj = conv.conjunctions[groupOp];
           let res;
           if (conv.conjunctions[newOp] !== undefined) {
-            res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField, groupOp);
+            res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
           } else {
             // need to be wrapped in `rule_group`
             const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
-            res = wrapInDefaultConjRuleGroup(rule, groupField, config, groupConj);
+            res = wrapInDefaultConjRuleGroup(rule, groupField, config, conv.conjunctions["and"]);
           }
           return res;
         }
