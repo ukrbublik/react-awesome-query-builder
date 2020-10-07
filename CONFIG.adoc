@@ -213,7 +213,8 @@ Example:
 Example:
 [source,javascript]
 ----
-import en_US from 'antd/lib/locale-provider/en_US';
+import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import { ruRU } from '@material-ui/core/locale';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import {Widgets} from 'react-awesome-query-builder';
 const { VanillaFieldSelect } = Widgets;
@@ -237,9 +238,9 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
     }
   },
   locale: {
-      short: 'ru',
-      full: 'ru-RU',
+      moment: 'ru',
       antd: ru_RU,
+      material: ruRU,
   },
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
@@ -320,7 +321,9 @@ Other settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|locale |en |Locale used for AntDesign widgets
+|locale.moment |en |Locale used for moment
+|locale.antd |en |Locale used for AntDesign widgets
+|locale.material |en |Locale used for materialUI widgets
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +

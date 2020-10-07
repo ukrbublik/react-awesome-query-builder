@@ -344,8 +344,7 @@ const types: Types = {
 
 const localeSettings: LocaleSettings = {
   locale: {
-    short: "ru",
-    full: "ru-RU",
+    moment: "ru",
     antd: ru_RU,
   },
   valueLabel: "Value",

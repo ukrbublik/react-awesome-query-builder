@@ -13,8 +13,9 @@ const {
   Button,
   ButtonGroup,
   Conjs,
-  Provider,
   ValueSources,
+
+  Provider,
   confirm,
 } = AntdWidgets;
 const {
@@ -47,14 +48,13 @@ const settings = {
   renderConjs: (props) => <Conjs {...props} />,
   renderButton: (props) => <Button {...props} />,
   renderButtonGroup: (props) => <ButtonGroup {...props} />,
-  renderProvider: (props) => <Provider {...props} />,
   renderValueSources: (props) => <ValueSources {...props} />,
+  renderProvider: (props) => <Provider {...props} />,
   renderConfirm: confirm,
 
   // localization
   locale: {
-    short: "en",
-    full: "en-US",
+    moment: "en",
     antd: en_US,
   },
 };

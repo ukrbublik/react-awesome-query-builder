@@ -529,7 +529,7 @@ export default (Builder, CanMoveFn = null) => {
     }
 
     move (fromII, toII, placement, toParentII) {
-      if (isDev())  console.log("move", fromII, toII, placement, toParentII);
+      //if (isDev())  console.log("move", fromII, toII, placement, toParentII);
       this.props.actions.moveItem(fromII.path, toII.path, placement);
     }
 

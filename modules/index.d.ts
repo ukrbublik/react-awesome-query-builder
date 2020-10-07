@@ -508,9 +508,9 @@ type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, righ
 
 export interface LocaleSettings {
   locale?: {
-    short: string,
-    full: string,
+    moment?: string,
     antd?: Object,
+    material?: Object,
   },
   valueLabel?: string,
   valuePlaceholder?: string,
@@ -752,6 +752,15 @@ export interface AntdWidgets {
 interface ReadyWidgets extends VanillaWidgets {
   ValueFieldWidget: ElementType<WidgetProps>,
   FuncWidget: ElementType<WidgetProps>,
+}
+
+export interface MaterialWidgets {
+  // material core widgets
+  //......
+
+  // material value widgets
+  MaterialTextWidget: ElementType<TextWidgetProps>,
+  //......
 }
 
 

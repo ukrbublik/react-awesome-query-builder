@@ -14,7 +14,7 @@ const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlForma
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
-const initialSkin = "antd";
+const initialSkin = "material"; // "antd";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
@@ -67,6 +67,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         <select value={this.state.skin} onChange={this.changeSkin}>
           <option key="vanilla">vanilla</option>
           <option key="antd">antd</option>
+          <option key="material">material</option>
         </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>

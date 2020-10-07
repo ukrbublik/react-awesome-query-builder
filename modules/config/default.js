@@ -51,8 +51,7 @@ export const settings = {
 
   // localization
   locale: {
-    short: "en",
-    full: "en-US",
+    moment: "en",
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",

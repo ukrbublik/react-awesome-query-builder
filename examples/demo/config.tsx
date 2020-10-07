@@ -20,9 +20,17 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
+// @ts-ignore
+import MaterialConfig from "react-awesome-query-builder/config/material";
+
+const skinToConfig = {
+  vanilla: BasicConfig,
+  antd: AntdConfig,
+  material: MaterialConfig,
+};
 
 export default (skin) => {
-  const InitialConfig = skin == "vanilla" ? BasicConfig : AntdConfig;
+  const InitialConfig = skinToConfig[skin];
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
@@ -145,8 +153,7 @@ export default (skin) => {
 
   const localeSettings: LocaleSettings = {
     locale: {
-      short: "ru",
-      full: "ru-RU",
+      moment: "ru",
       //antd: ru_RU,
     },
     valueLabel: "Value",
