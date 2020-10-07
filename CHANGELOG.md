@@ -1,4 +1,6 @@
 # Changelog
+- 2.2.1
+  - Fix issue #300: If using query builder inside a form element, buttons try to submit the form
 - 2.2.0
   - Fixed issues #246 and #176 related to wrong export and import from JsonLogic for multi-nested group fields  
     Now `!group` fields are treated as arrays (added setting `useGroupsAsArrays` = true)
