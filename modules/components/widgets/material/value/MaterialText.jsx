@@ -1,5 +1,6 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
+import FormControl from '@material-ui/core/FormControl';
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder} = props;
@@ -10,13 +11,17 @@ export default (props) => {
     setValue(val);
   };
   return (
-    <TextField 
-      value={value || ""}
-      label={placeholder}
-      InputProps={{
-        readOnly: readonly,
-      }}
-      onChange={onChange}
-    />
+    <FormControl>
+      <TextField 
+        value={value || ""}
+        placeholder={placeholder}
+        margin={"none"}
+        InputProps={{
+          readOnly: readonly,
+        }}
+        disabled={readonly}
+        onChange={onChange}
+      />
+    </FormControl>
   );
 };

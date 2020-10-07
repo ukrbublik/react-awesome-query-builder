@@ -7,8 +7,8 @@ import {
   DateTimeFieldSettings,
 } from "react-awesome-query-builder";
 import moment from "moment";
-//import en_US from 'antd/lib/locale-provider/en_US';
-//import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import { ruRU } from '@material-ui/core/locale';
 
 // @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
@@ -154,7 +154,8 @@ export default (skin) => {
   const localeSettings: LocaleSettings = {
     locale: {
       moment: "ru",
-      //antd: ru_RU,
+      antd: ru_RU,
+      material: ruRU,
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",
@@ -202,10 +203,11 @@ export default (skin) => {
     // canReorder: true,
     // canRegroup: true,
     // showNot: true,
-    // showLabels: true,
+    showLabels: false,
     maxNesting: 5,
     canLeaveEmptyGroup: true,
     showErrorMessage: true,
+    setOpOnChangeField: ['none'],
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,

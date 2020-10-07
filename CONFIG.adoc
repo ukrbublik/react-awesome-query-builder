@@ -290,6 +290,18 @@ Behaviour settings:
 |useGroupsAsArrays |true |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
 |===
 
+TIP: For fully read-only mode use these settings:
+[source,javascript]
+----
+immutableGroupsMode: true,
+immutableFieldsMode: true,
+immutableOpsMode: true,
+immutableValuesMode: true,
+canReorder: false,
+canRegroup: false,
+----
+
+
 Render settings:
 
 [cols="1m,1,3a",options="header",]

@@ -1,21 +1,31 @@
 import React from "react";
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
 
-export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) => {
+export default ({config, valueSources, valueSrc, title, setValueSrc, readonly, placeholder}) => {
   const renderOptions = (valueSources) => (
     valueSources.map(([srcKey, info]) => (
-      <option key={srcKey} value={srcKey}>{info.label}</option>
+      <MenuItem key={srcKey} value={srcKey}>{info.label}</MenuItem>
     ))
   );
 
-  const onChange = e => setValueSrc(e.target.value);
+  const onChange = e => {
+    if (e.target.value === undefined)
+      return;
+    setValueSrc(e.target.value);
+  }
   
   return (
-    <select 
-      onChange={onChange}
-      value={valueSrc}
-      disabled={readonly}
-    >
-      {renderOptions(valueSources)}
-    </select>
+    <FormControl>
+      <Select 
+        label={title}
+        onChange={onChange}
+        value={valueSrc}
+        disabled={readonly}
+      >
+        {renderOptions(valueSources)}
+      </Select>
+    </FormControl>
   );
 };

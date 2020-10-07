@@ -1,29 +1,49 @@
 import React from "react";
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import FormControl from '@material-ui/core/FormControl';
 
-export default ({items, setField, selectedKey, readonly}) => {
-  const renderOptions = (fields) => (
+export default ({items, setField, selectedKey, readonly, placeholder}) => {
+  const renderOptions = (fields, level = 0) => (
     Object.keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
       const {items, path, label, disabled} = field;
+      const prefix = "\u00A0\u00A0".repeat(level);
       if (items) {
-        return <optgroup disabled={disabled} key={path} label={label}>{renderOptions(items)}</optgroup>;
+        return [
+          <ListSubheader disabled={disabled} key={path} disableSticky={true}>{label}</ListSubheader>,
+          renderOptions(items, level+1),
+        ];
       } else {
-        return <option disabled={disabled} key={path} value={path}>{label}</option>;
+        return <MenuItem disabled={disabled} key={path} value={path}>
+          {prefix && <span>{prefix}</span>}
+          {label}
+        </MenuItem>;
       }
     })
   );
 
-  const onChange = e => setField(e.target.value);
+  const onChange = e => {
+    if (e.target.value === undefined)
+      return;
+    setField(e.target.value);
+  }
   
   const hasValue = selectedKey != null;
   return (
-    <select 
-      onChange={onChange}
-      value={hasValue ? selectedKey : ""}
-      disabled={readonly}
-    >
-      {!hasValue && <option disabled value={""}></option>}
-      {renderOptions(items)}
-    </select>
+    <FormControl>
+      <Select
+        autoWidth
+        displayEmpty
+        label={placeholder}
+        onChange={onChange}
+        value={hasValue ? selectedKey : ""}
+        disabled={readonly}
+      >
+        {!hasValue && <MenuItem disabled value={""}>{placeholder}</MenuItem>}
+        {renderOptions(items)}
+      </Select>
+    </FormControl>
   );
 };
