@@ -5,19 +5,10 @@ import { DatePicker } from "@material-ui/pickers";
 
 export default (props) => {
   
-  const {value, setValue, valueFormat, readonly, customProps, dateFormat, placeholder} = props;
-
-  const isValidSingleValue = (value) => {
-    return !value || value && value.isValid();
-  };
-
-  const formatSingleValue = (value) => {
-    return value && value.isValid() ? value.format(valueFormat) : undefined;
-  };
+  const {value, setValue, readonly, customProps, dateFormat, placeholder} = props;
 
   const handleChange = (value) => {
-    if (isValidSingleValue(value))
-      setValue(formatSingleValue(value));
+      setValue(value);
   };
 
   return (
