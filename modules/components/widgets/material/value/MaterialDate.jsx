@@ -5,17 +5,20 @@ import { DatePicker } from "@material-ui/pickers";
 
 export default (props) => {
   
-  const {value, setValue, readonly, customProps, dateFormat, placeholder} = props;
+  const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder} = props;
+
+  const formatSingleValue = (value) => {
+    return value && value.isValid() ? value.format(valueFormat) : undefined;
+  };
 
   const handleChange = (value) => {
-      setValue(value);
+      setValue(formatSingleValue(value));
   };
 
   return (
     <MuiPickersUtilsProvider utils={MomentUtils}>
       <DatePicker
         readOnly={readonly}
-        key="widget-date"
         placeholder={placeholder}
         format={dateFormat}
         value={value || null}
