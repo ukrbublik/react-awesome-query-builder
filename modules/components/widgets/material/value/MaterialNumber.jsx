@@ -1,16 +1,37 @@
 import React from "react";
+import TextField from "@material-ui/core/TextField";
+import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {value, setValue, config, readonly, min, max, step, placeholder} = props;
+  const {value, setValue, config, readonly, min, max, step, placeholder, customProps} = props;
+  
   const onChange = e => {
     let val = e.target.value;
     if (val === "" || val === null)
       val = undefined;
     else
-      val =  Number.isInteger(step) ? parseInt(val) : parseFloat(val);
+      val = Number.isInteger(step) ? parseInt(val) : parseFloat(val);
     setValue(val);
   };
+  
   return (
-    <input type="number"  value={value} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <FormControl>
+      <TextField 
+        type="number"
+        value={value}
+        placeholder={!readonly ? placeholder : ""}
+        InputProps={{
+          readOnly: readonly,
+        }}
+        inputProps={{
+          min: min,
+          max: max,
+          step: step,
+        }}
+        disabled={readonly}
+        onChange={onChange}
+        {...customProps}
+      />
+    </FormControl>
   );
 };
