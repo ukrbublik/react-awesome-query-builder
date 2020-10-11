@@ -1,8 +1,8 @@
 import React from "react";
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import FormControl from '@material-ui/core/FormControl';
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import FormControl from "@material-ui/core/FormControl";
 
 export default ({items, setField, selectedKey, readonly, placeholder}) => {
   const renderOptions = (fields, level = 0) => (
@@ -28,7 +28,7 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
     if (e.target.value === undefined)
       return;
     setField(e.target.value);
-  }
+  };
   
   const hasValue = selectedKey != null;
   return (

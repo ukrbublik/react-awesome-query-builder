@@ -1,7 +1,7 @@
 import React from "react";
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
 
 export default ({config, valueSources, valueSrc, title, setValueSrc, readonly, placeholder}) => {
   const renderOptions = (valueSources) => (
@@ -14,7 +14,7 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly, p
     if (e.target.value === undefined)
       return;
     setValueSrc(e.target.value);
-  }
+  };
   
   return (
     <FormControl>

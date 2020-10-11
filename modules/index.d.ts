@@ -404,6 +404,7 @@ export interface DateTimeFieldSettings extends BasicFieldSettings {
   dateFormat?: string,
   valueFormat?: string,
   use12Hours?: boolean,
+  useKeyboard?: boolean,
 }
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,

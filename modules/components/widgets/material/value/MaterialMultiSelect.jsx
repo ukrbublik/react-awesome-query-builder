@@ -1,35 +1,54 @@
 import React from "react";
 import {mapListValues} from "../../../../utils/stuff";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import Checkbox from "@material-ui/core/Checkbox";
+import ListItemText from "@material-ui/core/ListItemText";
 
-export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
-  const renderOptions = () => 
+export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
+  const renderOptions = (selectedValues) => 
     mapListValues(listValues, ({title, value}) => {
-      return <option key={value} value={value}>{title}</option>;
+      return (
+        <MenuItem key={value} value={value}>
+          <Checkbox checked={selectedValues.indexOf(value) > -1} />
+          <ListItemText primary={title} />
+        </MenuItem>
+      );
     });
 
-  const getMultiSelectValues = (multiselect) => {
-    let values = [];
-    const options = multiselect.options;
-    for (let i = 0 ; i < options.length ; i++) {
-      const opt = options[i];
-      if (opt.selected) {
-        values.push(opt.value);
-      }
-    }
-    if (!values.length)
-      values = undefined; //not allow []
-    return values;
+  const renderValue = (selectedValues) => {
+    if (!readonly && !selectedValues.length)
+      return placeholder;
+    const selectedTitles = mapListValues(listValues, ({title, value}) => (
+      selectedValues.indexOf(value) > -1 ? title : null
+    )).filter(v => v !== null);
+    return selectedTitles.join(", ");
   };
 
-  const onChange = e => setValue(getMultiSelectValues(e.target));
-  
+  const hasValue = value != null && value.length > 0;
+
+  const onChange = e => {
+    if (e.target.value === undefined)
+      return;
+    setValue(e.target.value);
+  };
+
   return (
-    <select multiple
-      onChange={onChange}
-      value={value}
-      disabled={readonly}
-    >
-      {renderOptions()}
-    </select>
+    <FormControl>
+      <Select multiple
+        autoWidth
+        displayEmpty
+        label={!readonly ? placeholder : ""}
+        onChange={onChange}
+        value={hasValue ? value : []}
+        disabled={readonly}
+        readOnly={readonly}
+        renderValue={renderValue}
+        {...customProps}
+      >
+        {renderOptions(hasValue ? value : [])}
+      </Select>
+    </FormControl>
   );
 };
