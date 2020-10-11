@@ -1,22 +1,30 @@
 import React from "react";
-import uuid from "../../../../utils/uuid";
+import Switch from "@material-ui/core/Switch";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 export default (props) => {
-  const {value, setValue, config, labelYes, labelNo, readonly} = props;
-  const onCheckboxChange = e => setValue(e.target.checked);
-  const onRadioChange = e => setValue(e.target.value == "true");
-  const id = uuid(), id2 = uuid();
+  const { customProps, value, setValue, labelYes, labelNo, readonly } = props;
 
-  // return <>
-  //     <input key={id}  type="checkbox" id={id} checked={!!value} disabled={readonly} onChange={onCheckboxChange} />
-  //     <label style={{display: "inline"}} key={id+"label"}  htmlFor={id}>{value ? labelYes : labelNo}</label>
-  // </>;
+  const onChange = () => {
+    setValue(!value);
+  };
 
-  return <>
-    <input key={id}  type="radio" id={id} value={true} checked={!!value} disabled={readonly} onChange={onRadioChange} />
-    <label style={{display: "inline"}} key={id+"label"}  htmlFor={id}>{labelYes}</label>
-    <input key={id2}  type="radio" id={id2} value={false} checked={!value} disabled={readonly} onChange={onRadioChange} />
-    <label style={{display: "inline"}} key={id2+"label"}  htmlFor={id2}>{labelNo}</label>
-  </>;
+  const label = value ? labelYes || null : labelNo || null;
 
+  return (
+    <FormControl>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={value || null}
+            onChange={onChange}
+            disabled={readonly}
+            {...customProps}
+          />
+        }
+        label={label}
+      />
+    </FormControl>
+  );
 };
