@@ -20,7 +20,7 @@ export default (props) => {
   };
 
   const handleInputBlur = () => {
-    // TIP: Fix if used typed value out of range in input
+    // TIP: Fix if typed value out of range in input
     if (value < min) {
       setValue(min);
     } else if (value > max) {
