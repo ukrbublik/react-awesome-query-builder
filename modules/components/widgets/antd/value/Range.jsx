@@ -53,7 +53,7 @@ export default class RangeWidget extends PureComponent {
 
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
-    if (valueFrom == "" || valueFrom == null)
+    if (valueFrom === "" || valueFrom == null)
       valueFrom = undefined; //value[0];
     value = [...value];
     value[0] = valueFrom;
@@ -64,7 +64,7 @@ export default class RangeWidget extends PureComponent {
   
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
-    if (valueTo == "" || valueTo == null)
+    if (valueTo === "" || valueTo == null)
       valueTo = undefined; //value[1];
     value = [...value];
     value[1] = valueTo;

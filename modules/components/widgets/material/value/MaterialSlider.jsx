@@ -6,9 +6,6 @@ import FormControl from "@material-ui/core/FormControl";
 export default (props) => {
   const {placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
 
-  // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
-  const muiMarks = marks ? Object.keys(marks).map(v => ({value: v, label: marks[v]})) : false;
-
   const handleSliderChange = (_e, newValue) => {
     setValue(newValue);
   };
@@ -23,6 +20,7 @@ export default (props) => {
   };
 
   const handleInputBlur = () => {
+    // TIP: Fix if used typed value out of range in input
     if (value < min) {
       setValue(min);
     } else if (value > max) {
@@ -30,15 +28,24 @@ export default (props) => {
     }
   };
 
-  const {width, ...rest} =  customProps;
+
+  const {width, ...rest} =  customProps || {};
   const customInputProps = rest.input || {};
   const customSliderProps = rest.slider || rest;
-  const sliderValue = typeof value === 'number' ? value : min;
+  
+  // TIP: Can't pass undefined to MUI, cause it means uncontrolled component use.
+  //      For empty value input needs "", slider needs null or 0
+  const inputValue = typeof value === 'number' ? value : "";
+  const sliderValue = typeof value === 'number' ? value : null;
+
+  // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
+  const muiMarks = marks ? Object.keys(marks).map(v => ({value: v, label: marks[v]})) : false;
+
 
   const InputCmp = (
     <TextField 
       type="number"
-      value={value}
+      value={inputValue}
       placeholder={placeholder}
       InputProps={{
         readOnly: readonly,
@@ -64,12 +71,16 @@ export default (props) => {
       max={max}
       step={step}
       marks={muiMarks}
+      valueLabelDisplay="auto"
       {...customSliderProps}
     />
   );
 
   const stylesWrapper = {
     display: "inline-flex", 
+  };
+
+  const stylesInputWrapper = {
     marginLeft: "5px",
   };
 
@@ -83,7 +94,9 @@ export default (props) => {
   return (
     <FormControl>
       <div style={stylesWrapper}>
-        {InputCmp}
+        <div style={stylesInputWrapper}>
+          {InputCmp}
+        </div>
         <div style={stylesSliderWrapper}>
           {SliderCmp}
         </div>
