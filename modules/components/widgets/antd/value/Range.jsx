@@ -78,7 +78,9 @@ export default class RangeWidget extends PureComponent {
   render() {
     const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
     const {renderSize} = config.settings;
-    const _customProps = customProps || {};
+    const {width, ...rest} = customProps || {};
+    const customInputProps = rest.input || {};
+    const customSliderProps = rest.slider || rest;
     const _value = value != undefined ? value : undefined;
     const [valueFrom, valueTo] = _value || [null, null];
 
@@ -95,7 +97,7 @@ export default class RangeWidget extends PureComponent {
             step={step}
             placeholder={placeholders[0]}
             onChange={this.handleChangeFrom}
-            {...customProps}
+            {...customInputProps}
           />
         </Col>
         <Col style={{float: "left", marginRight: "5px", lineHeight: "20px"}}>
@@ -112,10 +114,10 @@ export default class RangeWidget extends PureComponent {
             step={step}
             placeholder={placeholders[1]}
             onChange={this.handleChangeTo}
-            {...customProps}
+            {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: _customProps.width || "300px"}}>
+        <Col style={{float: "left", width: width || "300px"}}>
           <Slider
             disabled={readonly}
             value={_value}
@@ -127,7 +129,7 @@ export default class RangeWidget extends PureComponent {
             included={false}
             range={true}
             onChange={this.handleChange}
-            {...customProps}
+            {...customSliderProps}
           />
         </Col>
         <Col style={{clear: "both"}} />
