@@ -127,22 +127,6 @@ const types = {
       }
     },
   },
-  date: {
-    ...BasicConfig.types.date,
-    widgets: {
-      date: {
-        ...BasicConfig.types.date.widgets.date,
-        opProps: {
-          between: {
-            isSpecialRange: true,
-          },
-          not_between: {
-            isSpecialRange: true,
-          }
-        },
-      }
-    },
-  },
 };
 
 export default {
