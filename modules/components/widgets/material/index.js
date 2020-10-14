@@ -1,6 +1,9 @@
 import React from "react";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import MomentUtils from "@date-io/moment";
+
 
 // value widgets
 import MaterialTextWidget from "./value/MaterialText";
@@ -24,17 +27,24 @@ import MaterialConjs from "./core/MaterialConjs";
 import MaterialValueSources from "./core/MaterialValueSources";
 import MaterialConfirm from "./core/MaterialConfirm";
 
-const MaterialProvider = ({config, children}) => 
-  <ThemeProvider 
-    theme={createMuiTheme({
-      ...config.settings.theme,
-    }, config.settings.locale.material)}
-  >
-    <ConfirmProvider>
-      {children}
-    </ConfirmProvider>
-  </ThemeProvider>
-;
+// provider
+const MaterialProvider = ({config, children}) => {
+  const settingsTheme = config.settings.theme || {};
+  const settingsMaterialTheme = settingsTheme.material || {};
+  const locale = config.settings.locale.material;
+  const theme = createMuiTheme(settingsMaterialTheme, locale);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <MuiPickersUtilsProvider utils={MomentUtils}>
+        <ConfirmProvider>
+          {children}
+        </ConfirmProvider>
+      </MuiPickersUtilsProvider>
+    </ThemeProvider>
+  );
+};
+
 
 export default {
   MaterialTextWidget,
