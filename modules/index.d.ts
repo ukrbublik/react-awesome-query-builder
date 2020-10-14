@@ -540,15 +540,16 @@ export interface LocaleSettings {
 }
 
 export interface RenderSettings {
-  renderField?: Factory<FieldProps>;
-  renderOperator?: Factory<FieldProps>;
-  renderFunc?: Factory<FieldProps>;
-  renderConjs?: Factory<ConjsProps>;
-  renderButton?: Factory<ButtonProps>;
-  renderButtonGroup?: Factory<ButtonGroupProps>;
-  renderProvider?: Factory<ProviderProps>;
-  renderValueSources?: Factory<ValueSourcesProps>;
-  renderConfirm?: ConfirmFunc;
+  renderField?: Factory<FieldProps>,
+  renderOperator?: Factory<FieldProps>,
+  renderFunc?: Factory<FieldProps>,
+  renderConjs?: Factory<ConjsProps>,
+  renderButton?: Factory<ButtonProps>,
+  renderButtonGroup?: Factory<ButtonGroupProps>,
+  renderProvider?: Factory<ProviderProps>,
+  renderValueSources?: Factory<ValueSourcesProps>,
+  renderConfirm?: ConfirmFunc,
+  useConfirm?: () => Function,
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
@@ -556,11 +557,11 @@ export interface RenderSettings {
   hideConjForOne?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: Factory<FieldProps>;
-  renderAfterWidget?: Factory<FieldProps>;
-  renderBeforeActions?: Factory<FieldProps>;
-  renderAfterActions?: Factory<FieldProps>;
-  renderRuleError?: Factory<RuleErrorProps>;
+  renderBeforeWidget?: Factory<FieldProps>,
+  renderAfterWidget?: Factory<FieldProps>,
+  renderBeforeActions?: Factory<FieldProps>,
+  renderAfterActions?: Factory<FieldProps>,
+  renderRuleError?: Factory<RuleErrorProps>,
 }
 
 export interface BehaviourSettings {

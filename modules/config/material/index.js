@@ -23,6 +23,7 @@ const {
 
   MaterialProvider,
   MaterialConfirm,
+  MaterialUseConfirm,
 } = MaterialWidgets;
 
 
@@ -38,6 +39,7 @@ const settings = {
   renderValueSources: (props) => <MaterialValueSources {...props} />,
   renderProvider: (props) => <MaterialProvider {...props} />,
   renderConfirm: MaterialConfirm,
+  useConfirm: MaterialUseConfirm,
 };
 
 

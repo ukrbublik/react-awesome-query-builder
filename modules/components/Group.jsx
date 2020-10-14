@@ -16,6 +16,15 @@ const DragIcon = () => (
   </svg>
 );
 
+const ConfirmFn = (Cmp) => (
+  props => {
+    const {useConfirm} = props.config.settings;
+    const confirmFn = useConfirm ? useConfirm() : null;
+    return <Cmp {...props} confirmFn={confirmFn} />;
+  }
+);
+
+
 export class Group extends PureComponent {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
@@ -53,6 +62,7 @@ export class Group extends PureComponent {
   }
 
   removeSelf() {
+    const {confirmFn} = this.props;
     const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = this.props.config.settings;
     const doRemove = () => {
       this.props.removeSelf();
@@ -60,7 +70,8 @@ export class Group extends PureComponent {
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
       renderConfirm({...confirmOptions,
         onOk: doRemove,
-        onCancel: null
+        onCancel: null,
+        confirmFn: confirmFn
       });
     } else {
       doRemove();
@@ -277,4 +288,4 @@ export class Group extends PureComponent {
   }
 }
 
-export default GroupContainer(Draggable("group")(Group));
+export default GroupContainer(Draggable("group")(ConfirmFn(Group)));

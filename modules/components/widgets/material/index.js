@@ -1,6 +1,6 @@
 import React from "react";
-
-export {default as MaterialTextWidget} from "./value/MaterialText";
+import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
 
 // value widgets
 import MaterialTextWidget from "./value/MaterialText";
@@ -24,13 +24,16 @@ import MaterialConjs from "./core/MaterialConjs";
 import MaterialValueSources from "./core/MaterialValueSources";
 import MaterialConfirm from "./core/MaterialConfirm";
 
-import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 const MaterialProvider = ({config, children}) => 
   <ThemeProvider 
     theme={createMuiTheme({
       ...config.settings.theme,
     }, config.settings.locale.material)}
-  >{children}</ThemeProvider>
+  >
+    <ConfirmProvider>
+      {children}
+    </ConfirmProvider>
+  </ThemeProvider>
 ;
 
 export default {
@@ -52,6 +55,7 @@ export default {
   MaterialConjs,
   MaterialValueSources,
   MaterialConfirm,
+  MaterialUseConfirm: useConfirm,
 
   MaterialProvider,
 };
