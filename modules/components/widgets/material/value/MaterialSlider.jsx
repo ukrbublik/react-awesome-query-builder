@@ -6,6 +6,8 @@ import FormControl from "@material-ui/core/FormControl";
 export default (props) => {
   const {placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
 
+  const muiMarks = Object.keys(marks).map(mark => ({value: mark, label: marks[mark].props.children}));
+
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -22,9 +24,11 @@ export default (props) => {
     }
   };
 
+  const {width, ...rest} =  customProps;
+
   return (
     <FormControl >
-    <div style={{display: "inline-flex"}}>
+    <div style={{display: "inline-flex", marginLeft: "5px"}}>
     <TextField 
         type="number"
         value={value}
@@ -40,10 +44,9 @@ export default (props) => {
         disabled={readonly}
         onChange={handleInputChange}
         onBlur={handleBlur}
-        fullWidth
-        {...customProps}
+        {...rest}
       />
-    <div style={{marginLeft: "11px", width: customProps.width || "300px"}}>
+    <div style={{marginLeft: "5px", paddingLeft:"12px", width: width || "300px"}}>
     <Slider 
             value={typeof value === 'number' ? value : 0}
             onChange={handleSliderChange}
@@ -51,8 +54,8 @@ export default (props) => {
   min={min}
   max={max}
   step={step}
-  // marks={marks}
-  {...customProps}
+  marks={muiMarks}
+  {...rest}
   />
   </div>
   </div>
