@@ -10,9 +10,10 @@ export default (props) => {
       val = Number(val);
     setValue(val);
   };
+  const numberValue = value == undefined ? "" : value;
   return [
-    <input key={"number"} type="number"  value={value} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <input key={"number"} type="number"  value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
     ,
-    <input key={"range"} type="range"  value={value} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <input key={"range"} type="range"  value={numberValue} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
   ];
 };
