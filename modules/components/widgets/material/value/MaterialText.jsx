@@ -12,10 +12,12 @@ export default (props) => {
     setValue(val);
   };
 
+  const textValue = value || "";
+
   return (
     <FormControl>
       <TextField 
-        value={value || ""}
+        value={textValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={{
           readOnly: readonly,

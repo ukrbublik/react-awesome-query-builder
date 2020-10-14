@@ -10,15 +10,17 @@ export default (props) => {
     if (val === "" || val === null)
       val = undefined;
     else
-      val = Number.isInteger(step) ? parseInt(val) : parseFloat(val);
+      val = Number(val);
     setValue(val);
   };
+
+  const numberValue = value == undefined ? "" : value;
   
   return (
     <FormControl>
       <TextField 
         type="number"
-        value={value}
+        value={numberValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={{
           readOnly: readonly,
