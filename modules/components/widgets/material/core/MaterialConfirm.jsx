@@ -5,6 +5,6 @@ export default ({onOk, okText, cancelText, title, confirmFn}) => {
     confirmationText: okText || "Ok",
     cancellationText: cancelText || "Cancel",
   })
-  .then(onOk)
-  .catch(() => {});
+    .then(onOk)
+    .catch(() => {});
 };

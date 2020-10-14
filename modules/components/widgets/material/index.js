@@ -1,6 +1,6 @@
 import React from "react";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import { ConfirmProvider, useConfirm } from 'material-ui-confirm';
+import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 

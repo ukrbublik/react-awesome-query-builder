@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Slider from '@material-ui/core/Slider';
+import Slider from "@material-ui/core/Slider";
 import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 
