@@ -1,6 +1,7 @@
 import MaterialWidgets from "../../components/widgets/material";
 import BasicConfig from "../basic";
 import React from "react";
+import {SqlString} from "../../utils/sql";
 
 const {
   MaterialBooleanWidget,
@@ -12,6 +13,7 @@ const {
   MaterialSelectWidget,
   MaterialNumberWidget,
   MaterialSliderWidget,
+  MaterialRangeWidget,
 
   MaterialFieldSelect,
   MaterialConjs,
@@ -77,11 +79,54 @@ const widgets = {
     ...BasicConfig.widgets.datetime,
     factory: (props) => <MaterialDateTimeWidget {...props} />,
   },
+
+  rangeslider: {
+    type: "number",
+    jsType: "number",
+    valueSrc: "value",
+    factory: (props) => <MaterialRangeWidget {...props} />,
+    valueLabel: "Range",
+    valuePlaceholder: "Select range",
+    valueLabels: [
+      { label: "Number from", placeholder: "Enter number from" },
+      { label: "Number to", placeholder: "Enter number to" },
+    ],
+    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+      return isForDisplay ? val : JSON.stringify(val);
+    },
+    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      return SqlString.escape(val);
+    },
+    singleWidget: "slider",
+    toJS: (val, fieldSettings) => (val),
+  },
 };
 
 
 const types = {
   ...BasicConfig.types,
+  number: {
+    ...BasicConfig.types.number,
+    widgets: {
+      ...BasicConfig.types.number.widgets,
+      rangeslider: {
+        opProps: {
+          between: {
+            isSpecialRange: true,
+          },
+          not_between: {
+            isSpecialRange: true,
+          }
+        },
+        operators: [
+          "between",
+          "not_between",
+          "is_empty",
+          "is_not_empty",
+        ],
+      }
+    },
+  },
 };
 
 export default {

@@ -62,7 +62,9 @@ export default class SliderWidget extends PureComponent {
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
     const {renderSize, showErrorMessage} = config.settings;
-    const _customProps = customProps || {};
+    const {width, ...rest} = customProps || {};
+    const customInputProps = rest.input || {};
+    const customSliderProps = rest.slider || rest;
 
     const canUseInternal = showErrorMessage ? true : !valueError;
     let _value = __isInternal && canUseInternal ? this.state.internalValue : value;
@@ -82,10 +84,10 @@ export default class SliderWidget extends PureComponent {
             step={step}
             placeholder={placeholder}
             onChange={this.handleChange}
-            {...customProps}
+            {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: _customProps.width || "300px"}}>
+        <Col style={{float: "left", width: width || "300px"}}>
           <Slider
             disabled={readonly}
             value={sliderValue}
@@ -96,7 +98,7 @@ export default class SliderWidget extends PureComponent {
             step={step}
             marks={marks}
             onChange={this.handleChange}
-            {...customProps}
+            {...customSliderProps}
           />
         </Col>
         <Col style={{clear: "both"}} />
