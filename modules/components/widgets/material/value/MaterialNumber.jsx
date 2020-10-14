@@ -13,12 +13,14 @@ export default (props) => {
       val = Number(val);
     setValue(val);
   };
+
+  const numberValue = value == undefined ? "" : value;
   
   return (
     <FormControl>
       <TextField 
         type="number"
-        value={value}
+        value={numberValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={{
           readOnly: readonly,

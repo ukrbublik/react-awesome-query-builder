@@ -8,7 +8,8 @@ export default (props) => {
       val = undefined; // don't allow empty value
     setValue(val);
   };
+  const textValue = value || "";
   return (
-    <input type="text"  value={value || ""} placeholder={placeholder}  disabled={readonly} onChange={onChange} />
+    <input type="text"  value={textValue} placeholder={placeholder}  disabled={readonly} onChange={onChange} />
   );
 };
