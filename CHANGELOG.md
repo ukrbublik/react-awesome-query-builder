@@ -1,4 +1,6 @@
 # Changelog
+- 2.2.2
+  - Fix issue #306: Wrong import from JsonLogic and export to MongoDb for negated single-item group
 - 2.2.1
   - Fix issue #300: If using query builder inside a form element, buttons try to submit the form
 - 2.2.0
