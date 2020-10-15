@@ -141,6 +141,9 @@ export default (props) => {
 
   const stylesSepWrapper = {
     marginLeft: "5px",
+    paddingTop: "6px",
+    paddingBottom: "7px",
+    verticalAlign: "bottom"
   };
 
   const stylesSliderWrapper = {

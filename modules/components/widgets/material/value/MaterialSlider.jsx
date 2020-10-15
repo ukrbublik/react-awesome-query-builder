@@ -78,7 +78,6 @@ export default (props) => {
 
   const stylesWrapper = {
     display: "inline-flex", 
-    alignItems: "center"
   };
 
   const stylesInputWrapper = {

@@ -38,7 +38,7 @@ const MaterialProvider = ({config, children}) => {
     <ThemeProvider theme={theme}>
       <MuiPickersUtilsProvider utils={MomentUtils}>
         <ConfirmProvider>
-          {children}
+          <div className="mui">{children}</div>
         </ConfirmProvider>
       </MuiPickersUtilsProvider>
     </ThemeProvider>

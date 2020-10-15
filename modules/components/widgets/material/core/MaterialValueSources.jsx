@@ -49,7 +49,7 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
 
   return (
     <div>
-      <IconButton onClick={toggleOpenClose}>
+      <IconButton size="small" onClick={toggleOpenClose}>
         <ExpandMoreSharpIcon />
       </IconButton>
     

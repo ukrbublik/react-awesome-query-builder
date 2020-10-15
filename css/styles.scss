@@ -349,14 +349,10 @@ ul.ant-select-selection__rendered {
 .rule--field, .group--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
 .widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep,
 .rule--before-widget, .rule--after-widget {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
 }
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
-}
-.widget--sep {
-  align-items: center;
 }
 .widget--valuesrc {
   margin-right: -8px;
@@ -366,6 +362,27 @@ ul.ant-select-selection__rendered {
 }
 .operator--options--sep {
   margin-right: 10px;
+}
+
+.mui .widget--sep {
+  padding: 6px 0 7px 0;
+}
+.mui .widget--sep, .mui .widget--valuesrc {
+ vertical-align: bottom;
+}
+.mui .rule--widget.rule--widget--SLIDER .widget--sep, .mui .rule--widget.rule--widget--RANGESLIDER .widget--sep{
+  padding-bottom: 14px;
+}
+.mui .rule--widget.rule--widget--SLIDER .widget--valuesrc, .mui .rule--widget.rule--widget--RANGESLIDER .widget--valuesrc {
+  padding-bottom: 6px;
+} 
+.mui .rule--widget.rule--widget--SLIDER .widget--sep
+.mui .rule--widget.rule--widget--RANGESLIDER .widget--sep, .mui .rule--widget.rule--widget--SLIDER .widget--valuesrc, .mui .rule--widget.rule--widget--RANGESLIDER .widget--valuesrc {
+   vertical-align: bottom;
+}
+.mui .rule--widget.rule--widget--SLIDER .widget--widget span,
+.mui .rule--widget.rule--widget--RANGESLIDER .widget--widget span {
+  vertical-align: bottom;
 }
 
 div.tooltip-inner {
@@ -442,13 +459,11 @@ div.tooltip-inner {
 .rule--func--wrapper, .rule--func, .rule--func--args, .rule--func--arg, .rule--func--arg-value, 
 .rule--func--bracket-before, .rule--func--bracket-after, .rule--func--arg-sep,
 .rule--func--arg-label, .rule--func--arg-label-sep {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
 }
 .rule--func--bracket-before, .rule--func--bracket-after {
   margin-left: 3px;
   margin-right: 3px;
-  align-items: center;
 }
 .rule--func--bracket-before {
   margin-left: 5px;
