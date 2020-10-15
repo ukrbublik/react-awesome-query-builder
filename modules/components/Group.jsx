@@ -249,6 +249,8 @@ export class Group extends PureComponent {
     const showConjs = conjunctionCount > 1 || showNot;
     if (!showConjs)
       return null;
+    if (!children1.size)
+      return null;
 
     const renderProps = {
       disabled: children1.size < 2,
