@@ -368,14 +368,14 @@ const wrapInDefaultConjRuleGroup = (rule, parentField, config, conj) => {
   };
 };
 
-const wrapInDefaultConj = (rule, config) => {
+const wrapInDefaultConj = (rule, config, not = false) => {
   return {
     type: "group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
       conjunction: defaultConjunction(config),
-      not: false
+      not: not
     }
   };
 };
@@ -485,10 +485,6 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     opKey = opConfig.reversedOp;
     opConfig = config.operators[opKey];
   }
-  if (not) {
-    meta.errors.push(`No rev op for ${opKey}`);
-    return undefined;
-  }
 
   const widget = getWidgetForFieldOp(config, field, opKey);
 
@@ -499,7 +495,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     return undefined;
   }
 
-  return {
+  const rule = {
     type: "rule",
     id: uuid(),
     properties: {
@@ -510,5 +506,12 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       valueType: convertedArgs.map(v => v.valueType),
     }
   };
+
+  if (not) {
+    //meta.errors.push(`No rev op for ${opKey}`);
+    return wrapInDefaultConj(rule, config, not);
+  } else {
+    return rule;
+  }
 };
 
