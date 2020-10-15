@@ -156,7 +156,7 @@ export default (props) => {
         <div style={stylesInputWrapper}>
           {FromInputCmp}
         </div>
-        <div class={"widget--sep"} style={stylesSepWrapper}>
+        <div className={"widget--sep"} style={stylesSepWrapper}>
           <span>{ textSeparators[1] }</span>
         </div>
         <div style={stylesInputWrapper}>
