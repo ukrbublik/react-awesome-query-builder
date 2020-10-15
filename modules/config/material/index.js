@@ -1,7 +1,7 @@
 import MaterialWidgets from "../../components/widgets/material";
 import BasicConfig from "../basic";
 import React from "react";
-import { SqlString } from "../../utils/sql";
+import {SqlString} from "../../utils/sql";
 
 const {
   MaterialBooleanWidget,
@@ -26,6 +26,7 @@ const {
   MaterialUseConfirm,
 } = MaterialWidgets;
 
+
 const settings = {
   ...BasicConfig.settings,
 
@@ -40,6 +41,7 @@ const settings = {
   renderConfirm: MaterialConfirm,
   useConfirm: MaterialUseConfirm,
 };
+
 
 const widgets = {
   ...BasicConfig.widgets,
@@ -98,9 +100,10 @@ const widgets = {
       return SqlString.escape(val);
     },
     singleWidget: "slider",
-    toJS: (val, fieldSettings) => val,
+    toJS: (val, fieldSettings) => (val),
   },
 };
+
 
 const types = {
   ...BasicConfig.types,
@@ -115,10 +118,15 @@ const types = {
           },
           not_between: {
             isSpecialRange: true,
-          },
+          }
         },
-        operators: ["between", "not_between", "is_empty", "is_not_empty"],
-      },
+        operators: [
+          "between",
+          "not_between",
+          "is_empty",
+          "is_not_empty",
+        ],
+      }
     },
   },
 };
