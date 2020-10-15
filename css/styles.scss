@@ -1,4 +1,4 @@
-@mixin flex {
+@mixin flex{
   display: flex;
   align-items: center;
 }
@@ -27,22 +27,22 @@
   @include clearfix;
 }
 
-%flex {
+%flex{
   @include flex;
 }
 
 .query-builder {
   overflow: hidden;
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     box-sizing: border-box;
   }
 }
 
+
 /******************************************************************************/
 /** COMMON ********************************************************************/
 /******************************************************************************/
+
 
 body.qb-dragging {
   .ant-tooltip {
@@ -51,7 +51,7 @@ body.qb-dragging {
 }
 
 .query-builder {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.25;
   margin: 1rem;
@@ -67,7 +67,7 @@ body.qb-dragging {
 
 .group {
   background: rgba(250, 240, 210, 0.5);
-  border: 1px solid #dcc896;
+  border: 1px solid #DCC896;
 }
 
 .rule {
@@ -111,7 +111,7 @@ body.qb-dragging {
 }
 
 .qb-placeholder {
-  border: 1px dashed gray;
+    border: 1px dashed gray;
 }
 
 /* slider */
@@ -147,7 +147,7 @@ ul.ant-select-selection__rendered {
 /** GROUP *********************************************************************/
 /******************************************************************************/
 .group--header,
-.group--footer {
+.group--footer{
   @extend %flex;
 }
 
@@ -156,81 +156,78 @@ ul.ant-select-selection__rendered {
 
   & > .group-or-rule-container > .group-or-rule {
     &:before {
-      top: -4px;
-      border-width: 0 0 2px 2px;
+        top: -4px;
+        border-width: 0 0 2px 2px;
     }
 
-    &::after {
-      top: 50%;
-      border-width: 0 0 0 2px;
+     &::after {
+        top: 50%;
+        border-width: 0 0 0 2px;
     }
 
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      left: -14px;
-      width: 14px;
-      height: calc(50% + 8px);
-      border-color: #ccc;
-      border-style: solid;
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        left: -14px;
+        width: 14px;
+        height: calc(50% + 8px);
+        border-color: #CCC;
+        border-style: solid;    
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
     }
   }
+
 
   &.hide--conjs > .group-or-rule-container:first-child > .group-or-rule {
-    &::before {
-      display: none;
-    }
-    &::after {
-      border-radius: 4px 0 0 0;
-      border-width: 2px 0 0 2px;
-    }
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: 4px 0 0 0;
+        border-width: 2px 0 0 2px;
+      }
   }
 
-  &.rule_group--children
-    > .group-or-rule-container:first-child
-    > .group-or-rule {
-    &::before {
-      display: none;
-    }
-    &::after {
-      border-radius: 4px 0 0 0;
-      border-width: 2px 0 0 2px;
-    }
+  &.rule_group--children > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: 4px 0 0 0;
+        border-width: 2px 0 0 2px;
+      }
   }
   & > .group-or-rule-container:first-child > .group-or-rule {
-    &::before {
-      top: -12px;
-      height: calc(50% + 14px);
-    }
+      &::before {
+        top: -12px;
+        height: calc(50% + 14px);
+      }
   }
   & > .group-or-rule-container:last-child > .group-or-rule {
-    &::before {
-      border-radius: 0 0 0 4px;
-    }
-    &::after {
-      display: none;
-    }
+      &::before {
+        border-radius: 0 0 0 4px;
+      }
+      &::after {
+        display: none;
+      }
   }
+
 }
 
 .group--children.hide--line {
-  & > .group-or-rule-container > .group-or-rule {
-    &::before,
-    &::after {
-      border-color: rgba(128, 128, 128, 0.1);
+    & > .group-or-rule-container > .group-or-rule {
+        &::before, &::after {
+            border-color: rgba(128, 128, 128, 0.1);
+        }
     }
-  }
 }
 
 .qb-draggable {
-  &::before,
-  &::after {
-    display: none;
-  }
+    &::before, &::after {
+        display: none;
+    }
 }
 
 .qb-drag-handler {
@@ -249,7 +246,7 @@ ul.ant-select-selection__rendered {
 }
 
 .group--conjunctions.hide--conj {
-  opacity: 0.3;
+    opacity: 0.3;
 }
 
 .group--actions {
@@ -257,11 +254,11 @@ ul.ant-select-selection__rendered {
   flex: 1;
   display: flex;
   &--tl,
-  &--bl {
+  &--bl{
     justify-content: flex-start;
   }
 
-  &--tl {
+  &--tl{
     margin-left: 20px;
   }
 
@@ -271,7 +268,7 @@ ul.ant-select-selection__rendered {
   }
 
   &--tr,
-  &--br {
+  &--br{
     justify-content: flex-end;
   }
 
@@ -279,6 +276,7 @@ ul.ant-select-selection__rendered {
     margin-top: -1px;
   }
 }
+
 
 /******************************************************************************/
 /** RULE_GROUP *********************************************************************/
@@ -316,11 +314,10 @@ ul.ant-select-selection__rendered {
     }
 
     & > .group-or-rule-container > .group-or-rule {
-      &::before,
-      &::after {
-        left: -10px;
-        width: 10px;
-        height: calc(50% + 8px);
+      &::before, &::after {
+          left: -10px;
+          width: 10px;
+          height: calc(50% + 8px);
       }
     }
   }
@@ -349,32 +346,18 @@ ul.ant-select-selection__rendered {
   margin-right: 8px;
 }
 
-.rule--field,
-.group--field,
-.rule--operator,
-.rule--value,
-.rule--operator-options,
-.rule--widget,
-.widget--widget,
-.widget--valuesrc,
-.widget--sep,
-.operator--options--sep,
-.rule--before-widget,
-.rule--after-widget {
+.rule--field, .group--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
+.widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep,
+.rule--before-widget, .rule--after-widget {
   display: inline-flex;
   align-items: center;
 }
-.rule--operator,
-.widget--widget,
-.widget--valuesrc,
-.widget--sep {
+.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
 }
-
 .widget--sep {
   align-items: center;
 }
-
 .widget--valuesrc {
   margin-right: -8px;
 }
@@ -389,10 +372,7 @@ div.tooltip-inner {
   max-width: 500px;
 }
 
-.rule--field,
-.group--field,
-.rule--operator,
-.widget--widget {
+.rule--field, .group--field, .rule--operator, .widget--widget {
   label {
     display: block;
     font-weight: bold;
@@ -459,21 +439,13 @@ div.tooltip-inner {
 /** FUNC **********************************************************************/
 /******************************************************************************/
 
-.rule--func--wrapper,
-.rule--func,
-.rule--func--args,
-.rule--func--arg,
-.rule--func--arg-value,
-.rule--func--bracket-before,
-.rule--func--bracket-after,
-.rule--func--arg-sep,
-.rule--func--arg-label,
-.rule--func--arg-label-sep {
+.rule--func--wrapper, .rule--func, .rule--func--args, .rule--func--arg, .rule--func--arg-value, 
+.rule--func--bracket-before, .rule--func--bracket-after, .rule--func--arg-sep,
+.rule--func--arg-label, .rule--func--arg-label-sep {
   display: inline-flex;
   align-items: center;
 }
-.rule--func--bracket-before,
-.rule--func--bracket-after {
+.rule--func--bracket-before, .rule--func--bracket-after {
   margin-left: 3px;
   margin-right: 3px;
   align-items: center;
@@ -493,9 +465,11 @@ div.tooltip-inner {
   margin-right: 6px;
 }
 
+
 /******************************************************************************/
 /** Minimalism ****************************************************************/
 /******************************************************************************/
+
 
 @mixin visible_only_for_hovered_group($what) {
   #{$what} {
@@ -558,6 +532,8 @@ $inactive_conjs: ".group--conjunctions .ant-btn:not(.ant-btn-primary)";
 $active_conjs: ".group--conjunctions .ant-btn.ant-btn-primary";
 $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 
+
+
 .qb-lite {
   @include visible_only_for_hovered_group($group_actions);
   @include display_only_for_hovered_group($inactive_conjs, $active_conjs);
@@ -569,9 +545,12 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
   }
 }
 
+
+
 /******************************************************************************/
 /** Vertical padding ****************************************************************/
 /******************************************************************************/
+
 
 .group--header,
 .group--footer {
