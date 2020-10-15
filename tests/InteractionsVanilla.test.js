@@ -128,12 +128,15 @@ describe("interactions on vanilla", () => {
   });
 
   it("change conjunction from AND to OR", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    with_qb(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find('.group--conjunctions input[type="radio"][value="OR"]')
         .simulate("change", { target: { value: "OR" } });
       expect_jlogic([null,
-        { "or": [{ "==": [ { "var": "num" }, 2 ] }] }
+        { "or": [
+          { "==": [ { "var": "num" }, 2 ] },
+          { "==": [ { "var": "num" }, 3 ] }
+        ] }
       ]);
     });
   });
