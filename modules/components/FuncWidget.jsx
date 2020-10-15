@@ -69,7 +69,7 @@ export default class FuncWidget extends PureComponent {
     };
     const {showLabels, funcLabel} = config.settings;
     const widgetLabel = showLabels
-      ? <label>{funcLabel}</label>
+      ? <label className="rule--label">{funcLabel}</label>
       : null;
 
     return (

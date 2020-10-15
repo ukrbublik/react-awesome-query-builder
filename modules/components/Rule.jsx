@@ -246,7 +246,7 @@ export class FieldWrapper extends PureComponent {
     return (
       <Col className={classname}>
         { config.settings.showLabels
-                    && <label>{config.settings.fieldLabel}</label>
+                    && <label className="rule--label">{config.settings.fieldLabel}</label>
         }
         <Field
           config={config}
@@ -271,7 +271,7 @@ class OperatorWrapper extends PureComponent {
     const operator = showOperator
             && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
               { config.settings.showLabels
-                    && <label>{config.settings.operatorLabel}</label>
+                    && <label className="rule--label">{config.settings.operatorLabel}</label>
               }
               <Operator
                 key="operator"
@@ -286,7 +286,7 @@ class OperatorWrapper extends PureComponent {
             && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
               <div className="rule--operator">
                 {config.settings.showLabels
-                  ? <label>&nbsp;</label>
+                  ? <label className="rule--label">&nbsp;</label>
                   : null}
                 <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
               </div>

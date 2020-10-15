@@ -347,17 +347,32 @@ ul.ant-select-selection__rendered {
   margin-right: 8px;
 }
 
-.rule--field, .group--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, 
-.widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep,
-.rule--before-widget, .rule--after-widget {
-  display: inline-flex;
-  align-items: center;
+$rule_items: ".rule--field", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
+ ".widget--widget", ".widget--valuesrc", ".widget--sep", ".operator--options--sep",
+ ".rule--before-widget", ".rule--after-widget";
+ 
+$seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep";
+
+#{$rule_items} {
+  display: inline-block;
 }
+
+.mui {
+  #{$seps} {
+    vertical-align: bottom;
+    align-self: flex-end;
+    margin-bottom: 8px;
+  }
+  .rule--operator-options {
+    vertical-align: bottom;
+  }
+  .widget--valuesrc {
+    vertical-align: bottom;
+  }
+}
+
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
-}
-.widget--sep {
-  align-items: center;
 }
 .widget--valuesrc {
   margin-right: -8px;
@@ -440,16 +455,17 @@ div.tooltip-inner {
 /** FUNC **********************************************************************/
 /******************************************************************************/
 
-.rule--func--wrapper, .rule--func, .rule--func--args, .rule--func--arg, .rule--func--arg-value, 
-.rule--func--bracket-before, .rule--func--bracket-after, .rule--func--arg-sep,
-.rule--func--arg-label, .rule--func--arg-label-sep {
-  display: inline-flex;
-  align-items: center;
+$rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".rule--func--arg", ".rule--func--arg-value", 
+ ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep",
+ ".rule--func--arg-label", ".rule--func--arg-label-sep";
+
+#{$rule_func_items} {
+  display: inline-block;
 }
+
 .rule--func--bracket-before, .rule--func--bracket-after {
   margin-left: 3px;
   margin-right: 3px;
-  align-items: center;
 }
 .rule--func--bracket-before {
   margin-left: 5px;
