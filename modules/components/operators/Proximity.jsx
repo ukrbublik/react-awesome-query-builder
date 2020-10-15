@@ -46,7 +46,7 @@ export default class Proximity extends PureComponent {
       <div className="operator--PROXIMITY">
         <div className="operator--options">
           { showLabels
-            && <label>{optionLabel}</label>
+            && <label className="rule--label">{optionLabel}</label>
           }
           { !showLabels && optionTextBefore
             && <div className="operator--options--sep">
