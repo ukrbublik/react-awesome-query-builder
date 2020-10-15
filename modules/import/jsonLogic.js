@@ -509,7 +509,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   if (not) {
     //meta.errors.push(`No rev op for ${opKey}`);
-    return wrapInDefaultConj(rule, config, not)
+    return wrapInDefaultConj(rule, config, not);
   } else {
     return rule;
   }
