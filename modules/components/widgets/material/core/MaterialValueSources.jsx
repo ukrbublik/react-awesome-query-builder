@@ -1,31 +1,82 @@
 import React from "react";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import IconButton from "@material-ui/core/IconButton";
+import ExpandMoreSharpIcon from "@material-ui/icons/ExpandMoreSharp";
+import Popover from "@material-ui/core/Popover";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+import { makeStyles } from "@material-ui/core/styles";
 
-export default ({config, valueSources, valueSrc, title, setValueSrc, readonly, placeholder}) => {
-  const renderOptions = (valueSources) => (
-    valueSources.map(([srcKey, info]) => (
-      <MenuItem key={srcKey} value={srcKey}>{info.label}</MenuItem>
-    ))
-  );
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    padding: theme.spacing(1),
+  },
+}));
 
-  const onChange = e => {
+export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const classes = useStyles();
+
+
+  const handleOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const toggleOpenClose = (event) => {
+    anchorEl ? handleClose() : handleOpen(event);
+  };
+
+  const handleChange = e => {
     if (e.target.value === undefined)
       return;
     setValueSrc(e.target.value);
+    handleClose();
   };
-  
+
+  const renderOptions = (valueSources) => (
+    valueSources.map(([srcKey, info]) => (
+      <FormControlLabel key={srcKey} value={srcKey} checked={valueSrc == srcKey} control={<Radio />} label={info.label} />
+    ))
+  );
+
+  const open = Boolean(anchorEl);
+
   return (
-    <FormControl>
-      <Select 
-        label={title}
-        onChange={onChange}
-        value={valueSrc}
-        disabled={readonly}
+    <div>
+      <IconButton size="small" onClick={toggleOpenClose}>
+        <ExpandMoreSharpIcon />
+      </IconButton>
+    
+      <Popover    
+        open={open}
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+        onClose={handleClose}
+        classes={{
+          paper: classes.paper,
+        }}
+        disablePortal
       >
-        {renderOptions(valueSources)}
-      </Select>
-    </FormControl>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">{title}</FormLabel>
+          <RadioGroup aria-label="gender" name="gender1" value={valueSrc} onChange={handleChange}>
+            {renderOptions(valueSources)}
+          </RadioGroup>
+        </FormControl>
+      </Popover>
+    </div>
   );
 };

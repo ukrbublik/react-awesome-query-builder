@@ -78,6 +78,7 @@ export default (props) => {
 
   const stylesWrapper = {
     display: "inline-flex", 
+    alignItems: "center"
   };
 
   const stylesInputWrapper = {
@@ -87,7 +88,7 @@ export default (props) => {
   const stylesSliderWrapper = {
     marginLeft: "5px", 
     paddingLeft: "12px", 
-    marginBottom: muiMarks && "-10px", 
+    marginBottom: muiMarks && "-16px", 
     width: width || "300px",
   };
 
