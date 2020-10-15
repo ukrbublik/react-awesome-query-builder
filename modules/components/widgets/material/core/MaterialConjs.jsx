@@ -6,11 +6,16 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Button from "@material-ui/core/Button";
 
 export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config}) => {
+  //TIP: disabled=true if only 1 rule; readonly=true if immutable mode
+  const conjsCount = Object.keys(conjunctionOptions).length;
+  const lessThenTwo = disabled;
 
   const renderOptions = () => 
     Object.keys(conjunctionOptions).map(key => {
       const {id, name, label, checked} = conjunctionOptions[key];
       let postfix = setConjunction.isDummyFn ? "__dummy" : "";
+      if (readonly && !checked)
+        return null;
       return (
         <Button 
           key={id+postfix} 
@@ -18,7 +23,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
           color={checked ? "primary" : "default"} 
           value={key} 
           onClick={onClick.bind(null, key)} 
-          disabled={disabled}
+          disabled={readonly}
         >
           {label}
         </Button>
@@ -26,13 +31,15 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
     });
   
   const renderNot = () => {
+    if (readonly && !not)
+      return null;
     return (
       <Button 
         key={id}
         id={id + "__not"}
         color={not ? "secondary" : "default"} 
         onClick={onNotClick.bind(null, !not)} 
-        disabled={disabled}
+        disabled={readonly}
       >
         {config.settings.notLabel || "NOT"}
       </Button>
@@ -48,10 +55,10 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
         disableElevation 
         variant="contained" 
         size="small" 
-        disabled={disabled}
+        disabled={readonly}
       >
         {config.settings.showNot && renderNot()}
-        {renderOptions()}
+        {conjsCount > 1 && !lessThenTwo && renderOptions()}
       </ButtonGroup>
     </FormControl>
   );
