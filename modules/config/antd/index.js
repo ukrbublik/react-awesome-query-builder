@@ -54,7 +54,7 @@ const settings = {
 
   // localization
   locale: {
-    moment: "en",
+    ...BasicConfig.settings.locale,
     antd: en_US,
   },
 };

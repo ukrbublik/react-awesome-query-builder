@@ -1,5 +1,5 @@
 import React from "react";
-import Slider from '@material-ui/core/Slider';
+import Slider from "@material-ui/core/Slider";
 import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 
@@ -35,8 +35,8 @@ export default (props) => {
   
   // TIP: Can't pass undefined to MUI, cause it means uncontrolled component use.
   //      For empty value input needs "", slider needs null or 0
-  const inputValue = typeof value === 'number' ? value : "";
-  const sliderValue = typeof value === 'number' ? value : null;
+  const inputValue = typeof value === "number" ? value : "";
+  const sliderValue = typeof value === "number" ? value : null;
 
   // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
   const muiMarks = marks ? Object.keys(marks).map(v => ({value: v, label: marks[v]})) : false;

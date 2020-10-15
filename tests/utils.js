@@ -13,6 +13,7 @@ const {
   queryString, sqlFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
+import MaterialConfig from "react-awesome-query-builder/config/material";
 
 
 export const load_tree = (value, config, valueFormat = null) => {
@@ -38,6 +39,7 @@ export  const with_qb_ant = (config_fn, value, valueFormat, checks) => {
 export  const with_qb_skins = (config_fn, value, valueFormat, checks) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
   do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
+  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks);
 };
   
 const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {

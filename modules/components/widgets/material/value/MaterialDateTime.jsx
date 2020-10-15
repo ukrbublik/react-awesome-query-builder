@@ -1,6 +1,4 @@
 import React from "react";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
 import { DateTimePicker, KeyboardDateTimePicker } from "@material-ui/pickers";
 import FormControl from "@material-ui/core/FormControl";
 
@@ -20,18 +18,16 @@ export default (props) => {
   
   return (
     <FormControl>
-      <MuiPickersUtilsProvider utils={MomentUtils}>
-        <Picker
-          readOnly={readonly}
-          disabled={readonly}
-          ampm={!!use12Hours}
-          placeholder={!readonly ? placeholder : ""}
-          format={dateTimeFormat}
-          value={value || null}
-          onChange={handleChange}
-          {...customProps}
-        />
-      </MuiPickersUtilsProvider>
+      <Picker
+        readOnly={readonly}
+        disabled={readonly}
+        ampm={!!use12Hours}
+        placeholder={!readonly ? placeholder : ""}
+        format={dateTimeFormat}
+        value={value || null}
+        onChange={handleChange}
+        {...customProps}
+      />
     </FormControl>
   );
 };

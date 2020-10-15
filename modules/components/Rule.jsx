@@ -18,8 +18,17 @@ const DragIcon = () => (
   </svg>
 );
 
+const ConfirmFn = (Cmp) => (
+  props => {
+    const {useConfirm} = props.config.settings;
+    const confirmFn = useConfirm ? useConfirm() : null;
+    return <Cmp {...props} confirmFn={confirmFn} />;
+  }
+);
+
 @RuleContainer
 @Draggable("rule")
+@ConfirmFn
 class Rule extends PureComponent {
     static propTypes = {
       selectedField: PropTypes.string,
@@ -85,6 +94,7 @@ class Rule extends PureComponent {
     }
 
     removeSelf = () => {
+      const {confirmFn} = this.props;
       const {renderConfirm, removeRuleConfirmOptions: confirmOptions} = this.props.config.settings;
       const doRemove = () => {
         this.props.removeSelf();
@@ -92,7 +102,8 @@ class Rule extends PureComponent {
       if (confirmOptions && !this.isEmptyCurrentRule()) {
         renderConfirm({...confirmOptions,
           onOk: doRemove,
-          onCancel: null
+          onCancel: null,
+          confirmFn: confirmFn
         });
       } else {
         doRemove();
