@@ -146,7 +146,7 @@ export default (props) => {
   const stylesSliderWrapper = {
     marginLeft: "5px", 
     paddingLeft: "12px", 
-    marginBottom: muiMarks && "-10px", 
+    marginBottom: muiMarks && "-16px", 
     width: width || "300px",
   };
 
@@ -156,7 +156,7 @@ export default (props) => {
         <div style={stylesInputWrapper}>
           {FromInputCmp}
         </div>
-        <div style={stylesSepWrapper}>
+        <div class={"widget--sep"} style={stylesSepWrapper}>
           <span>{ textSeparators[1] }</span>
         </div>
         <div style={stylesInputWrapper}>
