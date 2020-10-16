@@ -16,7 +16,7 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import MaterialConfig from "react-awesome-query-builder/config/material";
+import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
 
 
