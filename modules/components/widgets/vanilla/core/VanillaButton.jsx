@@ -7,5 +7,5 @@ export default ({type, label, onClick, config}) => {
     "delRule": "x",
   };
   const btnLabel = typeToLabel[type] || label;
-  return <button onClick={onClick}>{btnLabel}</button>;
+  return <button onClick={onClick} type="button">{btnLabel}</button>;
 };

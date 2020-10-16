@@ -215,9 +215,11 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
     const cardinality = defaultValue(operatorDefinition.cardinality, 1);
 
-    if (_not) {
+    let not = _not;
+    if (not && reversedOp) {
       [operator, reversedOp] = [reversedOp, operator];
       [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
+      not = false;
     }
 
     //format field
@@ -278,6 +280,9 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     let ruleQuery = fn(...args);
     if (ruleQuery && useExpr) {
       ruleQuery = { "$expr": ruleQuery };
+    }
+    if (not) {
+      ruleQuery = { "$not": ruleQuery };
     }
     return ruleQuery;
   }
