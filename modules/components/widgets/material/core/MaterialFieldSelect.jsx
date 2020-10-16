@@ -29,6 +29,18 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
       return;
     setField(e.target.value);
   };
+
+  const renderValue = (selectedValue) => {
+    if (!readonly && !selectedValue)
+      return placeholder;
+    const findLabel = (fields) => {
+      return fields.map(field => {
+        if(!field.items) return field.path === selectedValue ? field.label : null;
+        return findLabel(field.items);
+      });
+    };
+    return findLabel(items).filter(v => v !== null).pop();
+  };
   
   const hasValue = selectedKey != null;
   return (
@@ -40,8 +52,8 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
         onChange={onChange}
         value={hasValue ? selectedKey : ""}
         disabled={readonly}
+        renderValue={renderValue}
       >
-        {!hasValue && <MenuItem disabled value={""}>{placeholder}</MenuItem>}
         {renderOptions(items)}
       </Select>
     </FormControl>
