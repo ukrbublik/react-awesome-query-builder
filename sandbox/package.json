@@ -28,7 +28,7 @@
     "material-ui-confirm": "^2.1.1",
     "lodash": "^4.6",
     "react": "^16.4.1",
-    "react-awesome-query-builder": "^2.2.2",
+    "react-awesome-query-builder": "^3.0.0",
     "react-dom": "^16.4.1",
     "react-scripts": "^3.4.3",
     "typescript": "3.4.5"
