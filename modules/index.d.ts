@@ -758,11 +758,26 @@ interface ReadyWidgets extends VanillaWidgets {
 
 export interface MaterialWidgets {
   // material core widgets
-  //......
+  MaterialFieldSelect: ElementType<FieldProps>,
+  MaterialConjs: ElementType<ConjsProps>,
+  MaterialButton: ElementType<ButtonProps>,
+  MaterialButtonGroup: ElementType<ButtonGroupProps>,
+  MaterialProvider: ElementType<ProviderProps>,
+  MaterialValueSources: ElementType<ValueSourcesProps>,
+  MaterialConfirm: ConfirmFunc,
+  MaterialUseConfirm: () => Function,
 
-  // material value widgets
+  // material core widgets
+  MaterialBooleanWidget: ElementType<BooleanWidgetProps>,
   MaterialTextWidget: ElementType<TextWidgetProps>,
-  //......
+  MaterialDateWidget: ElementType<DateTimeWidgetProps>,
+  MaterialTimeWidget: ElementType<DateTimeWidgetProps>,
+  MaterialDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  MaterialMultiSelectWidget: ElementType<SelectWidgetProps>,
+  MaterialSelectWidget: ElementType<SelectWidgetProps>,
+  MaterialNumberWidget: ElementType<NumberWidgetProps>,
+  MaterialSliderWidget: ElementType<NumberWidgetProps>,
+  MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
 }
 
 
