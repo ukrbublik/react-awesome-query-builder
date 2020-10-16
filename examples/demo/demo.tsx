@@ -14,7 +14,7 @@ const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlForma
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
-const initialSkin = "material"; // "antd";
+const initialSkin = "antd";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
