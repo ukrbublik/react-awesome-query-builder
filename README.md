@@ -34,7 +34,7 @@ Now [Material-UI](https://material-ui.com/) is also supported!
   - function (arguments also can be values/fields/funcs)
 - Reordering (drag-n-drop) support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/) as UI framework with rich features.  
-  Now [Material-UI](https://material-ui.com/) is also supported!
+  Now [Material-UI](https://material-ui.com/) is also supported!  
   (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
