@@ -41,7 +41,13 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
 
   const renderOptions = (valueSources) => (
     valueSources.map(([srcKey, info]) => (
-      <FormControlLabel key={srcKey} value={srcKey} checked={valueSrc == srcKey} control={<Radio />} label={info.label} />
+      <FormControlLabel 
+        key={srcKey} 
+        value={srcKey} 
+        checked={valueSrc == srcKey || !valueSrc && srcKey == "value"} 
+        control={<Radio />} 
+        label={info.label}
+      />
     ))
   );
 
@@ -72,7 +78,7 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
       >
         <FormControl component="fieldset">
           <FormLabel component="legend">{title}</FormLabel>
-          <RadioGroup aria-label="gender" name="gender1" value={valueSrc} onChange={handleChange}>
+          <RadioGroup value={valueSrc || "value"} onChange={handleChange}>
             {renderOptions(valueSources)}
           </RadioGroup>
         </FormControl>
