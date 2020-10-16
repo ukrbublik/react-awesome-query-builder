@@ -7,10 +7,11 @@ export default (props) => {
     if (val === "" || val === null)
       val = undefined;
     else
-      val =  Number.isInteger(step) ? parseInt(val) : parseFloat(val);
+      val = Number(val);
     setValue(val);
   };
+  const numberValue = value == undefined ? "" : value;
   return (
-    <input type="number"  value={value} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <input type="number"  value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
   );
 };

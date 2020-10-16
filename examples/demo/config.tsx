@@ -7,8 +7,8 @@ import {
   DateTimeFieldSettings,
 } from "react-awesome-query-builder";
 import moment from "moment";
-//import en_US from 'antd/lib/locale-provider/en_US';
-//import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import ru_RU from "antd/lib/locale-provider/ru_RU";
+import { ruRU } from "@material-ui/core/locale";
 
 // @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
@@ -20,9 +20,17 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
+// @ts-ignore
+import MaterialConfig from "react-awesome-query-builder/config/material";
+
+const skinToConfig = {
+  vanilla: BasicConfig,
+  antd: AntdConfig,
+  material: MaterialConfig,
+};
 
 export default (skin) => {
-  const InitialConfig = skin == "vanilla" ? BasicConfig : AntdConfig;
+  const InitialConfig = skinToConfig[skin];
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
@@ -145,9 +153,9 @@ export default (skin) => {
 
   const localeSettings: LocaleSettings = {
     locale: {
-      short: "ru",
-      full: "ru-RU",
-      //antd: ru_RU,
+      moment: "ru",
+      antd: ru_RU,
+      material: ruRU,
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",

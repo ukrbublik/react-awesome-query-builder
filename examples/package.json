@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder-demo-local",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Local hot-reloadable demo for react-awesome-query-builder",
   "main": "index.tsx",
   "scripts": {
@@ -9,6 +9,10 @@
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/pickers": "^3.2.10",
+    "material-ui-confirm": "^2.1.1",
     "antd": ">=4.0.0 <4.5.0",
     "react-awesome-query-builder": "file:..",
     "webpack": "^4.44.2",

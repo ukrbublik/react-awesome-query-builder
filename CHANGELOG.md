@@ -1,4 +1,6 @@
 # Changelog
+- 3.0.0
+  - Added [Material-UI](https://material-ui.com) widgets
 - 2.2.2
   - Fix issue #306: Wrong import from JsonLogic and export to MongoDb for negated single-item group
 - 2.2.1

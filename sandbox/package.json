@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder-demo",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Demo for react-awesome-query-builder",
   "main": "src/index.jsx",
   "readme": "README.md",
@@ -22,9 +22,13 @@
     "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.7",
     "antd": ">=4.0.0 <4.5.0",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/pickers": "^3.2.10",
+    "material-ui-confirm": "^2.1.1",
     "lodash": "^4.6",
     "react": "^16.4.1",
-    "react-awesome-query-builder": "^2.2.2",
+    "react-awesome-query-builder": "^3.0.0",
     "react-dom": "^16.4.1",
     "react-scripts": "^3.4.3",
     "typescript": "3.4.5"

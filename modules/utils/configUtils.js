@@ -24,7 +24,7 @@ export const extendConfig = (config) => {
 
   _extendFuncArgsConfig(config.funcs, config);
     
-  moment.locale(config.settings.locale.short);
+  moment.locale(config.settings.locale.moment);
 
   Object.defineProperty(config, "__extended", {
     enumerable: false,

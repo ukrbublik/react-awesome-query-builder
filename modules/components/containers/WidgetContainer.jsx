@@ -180,13 +180,13 @@ export default (Widget) => {
                 //}
 
                 const sepLabel = settings.showLabels
-                  ? <label>&nbsp;</label>
+                  ? <label className="rule--label">&nbsp;</label>
                   : null;
                 const sourceLabel = settings.showLabels
-                  ? <label>&nbsp;</label>
+                  ? <label className="rule--label">&nbsp;</label>
                   : null;
                 const widgetLabel = settings.showLabels
-                  ? <label>{valueLabel.label}</label>
+                  ? <label className="rule--label">{valueLabel.label}</label>
                   : null;
 
                 const sep = sepText

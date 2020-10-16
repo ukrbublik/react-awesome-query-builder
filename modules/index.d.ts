@@ -404,6 +404,7 @@ export interface DateTimeFieldSettings extends BasicFieldSettings {
   dateFormat?: string,
   valueFormat?: string,
   use12Hours?: boolean,
+  useKeyboard?: boolean,
 }
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
@@ -508,9 +509,9 @@ type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, righ
 
 export interface LocaleSettings {
   locale?: {
-    short: string,
-    full: string,
+    moment?: string,
     antd?: Object,
+    material?: Object,
   },
   valueLabel?: string,
   valuePlaceholder?: string,
@@ -539,15 +540,16 @@ export interface LocaleSettings {
 }
 
 export interface RenderSettings {
-  renderField?: Factory<FieldProps>;
-  renderOperator?: Factory<FieldProps>;
-  renderFunc?: Factory<FieldProps>;
-  renderConjs?: Factory<ConjsProps>;
-  renderButton?: Factory<ButtonProps>;
-  renderButtonGroup?: Factory<ButtonGroupProps>;
-  renderProvider?: Factory<ProviderProps>;
-  renderValueSources?: Factory<ValueSourcesProps>;
-  renderConfirm?: ConfirmFunc;
+  renderField?: Factory<FieldProps>,
+  renderOperator?: Factory<FieldProps>,
+  renderFunc?: Factory<FieldProps>,
+  renderConjs?: Factory<ConjsProps>,
+  renderButton?: Factory<ButtonProps>,
+  renderButtonGroup?: Factory<ButtonGroupProps>,
+  renderProvider?: Factory<ProviderProps>,
+  renderValueSources?: Factory<ValueSourcesProps>,
+  renderConfirm?: ConfirmFunc,
+  useConfirm?: () => Function,
   renderSize?: AntdSize,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
@@ -555,11 +557,11 @@ export interface RenderSettings {
   hideConjForOne?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: Factory<FieldProps>;
-  renderAfterWidget?: Factory<FieldProps>;
-  renderBeforeActions?: Factory<FieldProps>;
-  renderAfterActions?: Factory<FieldProps>;
-  renderRuleError?: Factory<RuleErrorProps>;
+  renderBeforeWidget?: Factory<FieldProps>,
+  renderAfterWidget?: Factory<FieldProps>,
+  renderBeforeActions?: Factory<FieldProps>,
+  renderAfterActions?: Factory<FieldProps>,
+  renderRuleError?: Factory<RuleErrorProps>,
 }
 
 export interface BehaviourSettings {
@@ -752,6 +754,30 @@ export interface AntdWidgets {
 interface ReadyWidgets extends VanillaWidgets {
   ValueFieldWidget: ElementType<WidgetProps>,
   FuncWidget: ElementType<WidgetProps>,
+}
+
+export interface MaterialWidgets {
+  // material core widgets
+  MaterialFieldSelect: ElementType<FieldProps>,
+  MaterialConjs: ElementType<ConjsProps>,
+  MaterialButton: ElementType<ButtonProps>,
+  MaterialButtonGroup: ElementType<ButtonGroupProps>,
+  MaterialProvider: ElementType<ProviderProps>,
+  MaterialValueSources: ElementType<ValueSourcesProps>,
+  MaterialConfirm: ConfirmFunc,
+  MaterialUseConfirm: () => Function,
+
+  // material core widgets
+  MaterialBooleanWidget: ElementType<BooleanWidgetProps>,
+  MaterialTextWidget: ElementType<TextWidgetProps>,
+  MaterialDateWidget: ElementType<DateTimeWidgetProps>,
+  MaterialTimeWidget: ElementType<DateTimeWidgetProps>,
+  MaterialDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  MaterialMultiSelectWidget: ElementType<SelectWidgetProps>,
+  MaterialSelectWidget: ElementType<SelectWidgetProps>,
+  MaterialNumberWidget: ElementType<NumberWidgetProps>,
+  MaterialSliderWidget: ElementType<NumberWidgetProps>,
+  MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
 }
 
 

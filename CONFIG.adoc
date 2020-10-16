@@ -39,12 +39,15 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 
 == Basic config
 
-Use `BasicConfig` for simple vanilla UI or `AntdConfig` for more advanced UI with AntDesign widgets.
+- Use `BasicConfig` for simple vanilla UI
+- Use `AntdConfig` for more advanced UI with https://ant.design/[AntDesign] widgets
+- Use `MaterialConfig` for https://material-ui.com/[Material-UI] widgets
 [source,javascript]
 ----
 import {BasicConfig} from 'react-awesome-query-builder';
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-const InitialConfig = BasicConfig; // or AntdConfig
+import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
+const InitialConfig = BasicConfig; // or AntdConfig or MaterialConfig
 
 const myConfig = {
   ...InitialConfig, // reuse basic config
@@ -97,8 +100,8 @@ const {
       rangeslider, // missing in `BasicConfig`
       select,
       multiselect,
-      treeselect, // missing in `BasicConfig`
-      treemultiselect, // missing in `BasicConfig`
+      treeselect, // missing in `BasicConfig` and in `MaterialConfig`
+      treemultiselect, // missing in `BasicConfig` and in `MaterialConfig`
       date,
       time,
       datetime,
@@ -180,7 +183,7 @@ Example:
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
-  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`.
+  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`.
 |fieldSettings.listValues |+ for (multi)select, tree (multi)select | |List of values for (multi)select widget. +
   Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
    (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
@@ -213,10 +216,10 @@ Example:
 Example:
 [source,javascript]
 ----
-import en_US from 'antd/lib/locale-provider/en_US';
+import ru_RU from 'antd/lib/locale-provider/ru_RU';
+import { ruRU } from '@material-ui/core/locale';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import {Widgets} from 'react-awesome-query-builder';
-const { VanillaFieldSelect } = Widgets;
 const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
 
@@ -237,9 +240,9 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
     }
   },
   locale: {
-      short: 'ru',
-      full: 'ru-RU',
+      moment: 'ru',
       antd: ru_RU,
+      material: ruRU,
   },
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
@@ -289,6 +292,18 @@ Behaviour settings:
 |useGroupsAsArrays |true |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
 |===
 
+TIP: For fully read-only mode use these settings:
+[source,javascript]
+----
+immutableGroupsMode: true,
+immutableFieldsMode: true,
+immutableOpsMode: true,
+immutableValuesMode: true,
+canReorder: false,
+canRegroup: false,
+----
+
+
 Render settings:
 
 [cols="1m,1,3a",options="header",]
@@ -296,12 +311,12 @@ Render settings:
 |key |default |meaning
 |renderSize |`small` |Size of AntDesign components - `small` or `large`
 |renderField |`(props) => <FieldSelect {...props} />` |Render fields list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `FieldTreeSelect`, `VanillaFieldSelect` (see `AntdWidgets` and `Widgets` above)
+  Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `FieldTreeSelect`
 |renderOperator |`(props) => <FieldSelect {...props} />` |Render operators list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+  Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
-|renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
+  Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
+|renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
 |hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
@@ -320,7 +335,10 @@ Other settings:
 [cols="1m,1,3a",options="header",]
 |===
 |key |default |meaning
-|locale |en |Locale used for AntDesign widgets
+|locale.moment |"en" |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
+|locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
+|locale.material |`enUS` |Locale object used for https://material-ui.com/ru/guides/localization/[MaterialUI] widgets
+|theme.material |{} |Options for https://material-ui.com/ru/customization/theming/[createMuiTheme]
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +
@@ -472,6 +490,7 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 ----
 import {Widgets} from 'react-awesome-query-builder';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
+import MaterialWidgets from 'react-awesome-query-builder/lib/components/widgets/material';
 const {
     TextWidget,
     NumberWidget,
@@ -482,6 +501,11 @@ const {
     VanillaNumberWidget,
     ...
 } = Widgets;
+const {
+    MaterialTextWidget,
+    MaterialNumberWidget,
+    ...
+} = MaterialWidgets;
 ----
 
 [source,javascript]
@@ -522,6 +546,7 @@ const {
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
 |use12Hours | |`false` |Option for `<TimeWidget>`
+|useKeyboard | |`true` |Option for Material-UI date/time pickers, `false` disables input with keyboard, only picker use is allowed
 |dateFormat | |`YYYY-MM-DD` |Option for `<DateWidget>`, `<DateTimeWidget>` to display date in widget. Example: `YYYY-MM-DD`
 |valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to prepare string representation of value to be stored. Example: `YYYY-MM-DD HH:mm`
 |labelYes, labelNo | | |Option for `<BooleanWidget>`

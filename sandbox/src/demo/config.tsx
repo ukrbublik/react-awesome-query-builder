@@ -6,8 +6,8 @@ import {
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
 } from "react-awesome-query-builder";
-import en_US from "antd/lib/locale-provider/en_US";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
+import { ruRU } from "@material-ui/core/locale";
 import AntdConfig from "react-awesome-query-builder/lib/config/antd";
 import AntdWidgets from "react-awesome-query-builder/lib/components/widgets/antd";
 const {
@@ -16,7 +16,8 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-const InitialConfig = AntdConfig; // or BasicConfig for vanilla design instead of antd
+import MaterialConfig from "react-awesome-query-builder/config/material";
+const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
 
 
 
@@ -344,9 +345,9 @@ const types: Types = {
 
 const localeSettings: LocaleSettings = {
   locale: {
-    short: "ru",
-    full: "ru-RU",
+    moment: "ru",
     antd: ru_RU,
+    material: ruRU,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",

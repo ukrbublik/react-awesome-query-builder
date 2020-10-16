@@ -1,5 +1,5 @@
 # react-awesome-query-builder
-[![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder) [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder) [![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
+[![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder) [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder) [![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design) [![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=Material%20UI)](https://material-ui.com) [![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
 [![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/) [![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx) [![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple?file=/src/demo/config_simple.js)
 
 
@@ -10,6 +10,8 @@ User-friendly React component to build queries.
 Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
 
 Using awesome [Ant Design](https://ant.design/) v4 for widgets
+
+Now [Material-UI](https://material-ui.com/) is also supported!
 
 [Demo page](https://ukrbublik.github.io/react-awesome-query-builder)
 
@@ -32,14 +34,31 @@ Using awesome [Ant Design](https://ant.design/) v4 for widgets
   - function (arguments also can be values/fields/funcs)
 - Reordering (drag-n-drop) support for rules and groups of rules
 - Using awesome [Ant Design](https://ant.design/) as UI framework with rich features.  
-  (But using custom widgets of another framework is possible, see below)
+  Now [Material-UI](https://material-ui.com/) is also supported!  
+  (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
 - TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples))
 
 
 ## Getting started
-Install: `npm i react-awesome-query-builder`  (packages `antd`, `typescript` are optional)  
+Install: 
+```
+npm i react-awesome-query-builder
+```
+
+For AntDesign widgets only:
+```
+npm i antd
+```
+
+For Material-UI widgets only:
+```
+npm i @material-ui/core
+npm i @material-ui/icons
+npm i @material-ui/pickers
+npm i material-ui-confirm
+```
 
 See [basic usage](#usage) and [API](#api) below.  
 
@@ -53,18 +72,24 @@ Demo apps:
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
 Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
 Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
-Support of other UI frameworks (like Bootstrap, Material UI) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
+Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
 
 
 ## Usage
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
+
+// For AntDesign widgets only:
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import 'react-awesome-query-builder/css/antd.less'; // or import "antd/dist/antd.css";
+// For Material-UI widgets only:
+import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
+// Choose your skin (ant/material/vanilla):
+const InitialConfig = AntdConfig; // or MaterialConfig or BasicConfig
+
 import 'react-awesome-query-builder/lib/css/styles.css';
 import 'react-awesome-query-builder/lib/css/compact_styles.css'; //optional, for more compact styles
-const InitialConfig = AntdConfig; // or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
 const config = {
@@ -230,14 +255,15 @@ See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/
 
 
 ## Other UI frameworks
-Currently there are 2 collections of widgets:
+Currently there are 3 collections of widgets:
 - [antdesign widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/antd)
+- [material widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/material)
 - [vanilla widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/vanilla)
 
 Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
 You can use vanilla widgets as skeleton.  
 Then to enable new widgets you need to create config overrides like this:
-[antdesign config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd/index.js)
+[material config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/material/index.js)
 
 
 ## Development

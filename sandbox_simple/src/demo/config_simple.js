@@ -262,8 +262,7 @@ const types = {
 
 const localeSettings = {
   locale: {
-    short: "ru",
-    full: "ru-RU",
+    moment: "ru",
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
