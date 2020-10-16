@@ -39,12 +39,15 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 
 == Basic config
 
-Use `BasicConfig` for simple vanilla UI or `AntdConfig` for more advanced UI with AntDesign widgets.
+- Use `BasicConfig` for simple vanilla UI
+- Use `AntdConfig` for more advanced UI with https://ant.design/[AntDesign] widgets
+- Use `MaterialConfig` for https://material-ui.com/[Material-UI] widgets
 [source,javascript]
 ----
 import {BasicConfig} from 'react-awesome-query-builder';
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-const InitialConfig = BasicConfig; // or AntdConfig
+import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
+const InitialConfig = BasicConfig; // or AntdConfig or MaterialConfig
 
 const myConfig = {
   ...InitialConfig, // reuse basic config
@@ -97,8 +100,8 @@ const {
       rangeslider, // missing in `BasicConfig`
       select,
       multiselect,
-      treeselect, // missing in `BasicConfig`
-      treemultiselect, // missing in `BasicConfig`
+      treeselect, // missing in `BasicConfig` and in `MaterialConfig`
+      treemultiselect, // missing in `BasicConfig` and in `MaterialConfig`
       date,
       time,
       datetime,
@@ -217,7 +220,6 @@ import ru_RU from 'antd/lib/locale-provider/ru_RU';
 import { ruRU } from '@material-ui/core/locale';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import {Widgets} from 'react-awesome-query-builder';
-const { VanillaFieldSelect } = Widgets;
 const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
 
@@ -309,11 +311,11 @@ Render settings:
 |key |default |meaning
 |renderSize |`small` |Size of AntDesign components - `small` or `large`
 |renderField |`(props) => <FieldSelect {...props} />` |Render fields list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `FieldTreeSelect`, `VanillaFieldSelect` (see `AntdWidgets` and `Widgets` above)
+  Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`, `FieldCascader`, `FieldTreeSelect`
 |renderOperator |`(props) => <FieldSelect {...props} />` |Render operators list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+  Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
-  Available widgets: `FieldSelect`, `FieldDropdown`, `VanillaFieldSelect`
+  Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
 |hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
@@ -488,6 +490,7 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 ----
 import {Widgets} from 'react-awesome-query-builder';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
+import MaterialWidgets from 'react-awesome-query-builder/lib/components/widgets/material';
 const {
     TextWidget,
     NumberWidget,
@@ -498,6 +501,11 @@ const {
     VanillaNumberWidget,
     ...
 } = Widgets;
+const {
+    MaterialTextWidget,
+    MaterialNumberWidget,
+    ...
+} = MaterialWidgets;
 ----
 
 [source,javascript]
