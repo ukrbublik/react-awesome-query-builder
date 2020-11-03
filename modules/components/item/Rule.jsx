@@ -41,6 +41,7 @@ class Rule extends PureComponent {
     constructor(props) {
       super(props);
       useOnPropsChanged(this);
+      this.removeSelf = this.removeSelf.bind(this);
 
       this.onPropsChanged(props);
     }
