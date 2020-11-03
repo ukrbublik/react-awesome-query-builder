@@ -41,6 +41,7 @@ export class BasicGroup extends PureComponent {
     super(props);
 
     this.removeSelf = this.removeSelf.bind(this);
+    this.renderItem = this.renderItem.bind(this);
   }
 
   isGroupTopPosition() {
@@ -184,7 +185,7 @@ export class BasicGroup extends PureComponent {
 
   renderChildren() {
     const {children1} = this.props;
-    return children1 ? children1.map(this.renderItem.bind(this)).toList() : null;
+    return children1 ? children1.map(this.renderItem).toList() : null;
   }
 
   renderItem(item) {
