@@ -4,7 +4,7 @@ import FuncSelect from "./FuncSelect";
 import {
   getFuncConfig
 } from "../utils/configUtils";
-import WidgetWrapper from "./WidgetWrapper";
+import Widget from "./Widget";
 import {Col} from "./utils";
 import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
 import {useOnPropsChanged} from "../utils/stuff";
@@ -125,7 +125,7 @@ export default class FuncWidget extends PureComponent {
       argDefinition,
       readonly,
     };
-    //tip: value & valueSrc will be converted to Immutable.List at WidgetContainer
+    //tip: value & valueSrc will be converted to Immutable.List at <Widget>
 
     return (
       <Col className="rule--func--arg-value">
@@ -215,7 +215,7 @@ class ArgWidget extends PureComponent {
 
   render() {
     return (
-      <WidgetWrapper
+      <Widget
         {...this.props} 
         setValue={this.setValue} 
         setValueSrc={this.setValueSrc} 

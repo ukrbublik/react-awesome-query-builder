@@ -4,7 +4,7 @@ import RuleContainer from "./containers/RuleContainer";
 import Draggable from "./containers/Draggable";
 import OperatorWrapper from "./OperatorWrapper";
 import FieldWrapper from "./FieldWrapper";
-import WidgetWrapper from "./WidgetWrapper";
+import Widget from "./Widget";
 import OperatorOptions from "./OperatorOptions";
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import {useOnPropsChanged} from "../utils/stuff";
@@ -145,7 +145,7 @@ class Rule extends PureComponent {
       const { immutableValuesMode } = config.settings;
       if (!showWidget) return null;
 
-      const widget = <WidgetWrapper
+      const widget = <Widget
         key="values"
         field={this.props.selectedField}
         operator={this.props.selectedOperator}
