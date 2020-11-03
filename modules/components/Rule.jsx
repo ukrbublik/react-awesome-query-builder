@@ -1,30 +1,15 @@
-import React, { Component, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import RuleContainer from "./containers/RuleContainer";
 import Draggable from "./containers/Draggable";
-import Field from "./Field";
-import Operator from "./Operator";
-import Widget from "./Widget";
+import OperatorWrapper from "./OperatorWrapper";
+import FieldWrapper from "./FieldWrapper";
+import WidgetWrapper from "./WidgetWrapper";
 import OperatorOptions from "./OperatorOptions";
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
 import {useOnPropsChanged} from "../utils/stuff";
+import {Col, DragIcon, dummyFn, ConfirmFn} from "./utils";
 
-const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
-const dummyFn = () => {};
-const DragIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray" width="18px" height="18px">
-    <path d="M0 0h24v24H0V0z" fill="none"/>
-    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-  </svg>
-);
-
-const ConfirmFn = (Cmp) => (
-  props => {
-    const {useConfirm} = props.config.settings;
-    const confirmFn = useConfirm ? useConfirm() : null;
-    return <Cmp {...props} confirmFn={confirmFn} />;
-  }
-);
 
 @RuleContainer
 @Draggable("rule")
@@ -93,7 +78,7 @@ class Rule extends PureComponent {
       };
     }
 
-    removeSelf = () => {
+    removeSelf() {
       const {confirmFn} = this.props;
       const {renderConfirm, removeRuleConfirmOptions: confirmOptions} = this.props.config.settings;
       const doRemove = () => {
@@ -110,7 +95,7 @@ class Rule extends PureComponent {
       }
     }
 
-    isEmptyCurrentRule = () => {
+    isEmptyCurrentRule() {
       return !(
         this.props.selectedField !== null
             && this.props.selectedOperator !== null
@@ -118,113 +103,161 @@ class Rule extends PureComponent {
       );
     }
 
-    render () {
-      const {config, valueError} = this.props;
+    renderField() {
+      const {config} = this.props;
+      const { immutableFieldsMode } = config.settings;
+
+      return <FieldWrapper
+        key="field"
+        classname={"rule--field"}
+        config={config}
+        selectedField={this.props.selectedField}
+        setField={!immutableFieldsMode ? this.props.setField : dummyFn}
+        parentField={this.props.parentField}
+        readonly={immutableFieldsMode}
+      />;
+    }
+
+    renderOperator () {
+      const {config} = this.props;
       const {
-        selectedFieldPartsLabels, selectedFieldWidgetConfig,
-        showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
+        selectedFieldPartsLabels, selectedFieldWidgetConfig, showOperator, showOperatorLabel
       } = this.meta;
+      const { immutableOpsMode } = config.settings;
+
+      return <OperatorWrapper
+        key="operator"
+        config={config}
+        selectedField={this.props.selectedField}
+        selectedOperator={this.props.selectedOperator}
+        setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
+        selectedFieldPartsLabels={selectedFieldPartsLabels}
+        showOperator={showOperator}
+        showOperatorLabel={showOperatorLabel}
+        selectedFieldWidgetConfig={selectedFieldWidgetConfig}
+        readonly={immutableOpsMode}
+      />;
+    }
+
+    renderWidget() {
+      const {config, valueError} = this.props;
+      const { showWidget } = this.meta;
+      const { immutableValuesMode } = config.settings;
+      if (!showWidget) return null;
+
+      const widget = <WidgetWrapper
+        key="values"
+        field={this.props.selectedField}
+        operator={this.props.selectedOperator}
+        value={this.props.value}
+        valueSrc={this.props.valueSrc}
+        valueError={valueError}
+        config={config}
+        setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
+        setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
+        readonly={immutableValuesMode}
+      />;
+
+      return (
+        <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
+          {widget}
+        </Col>
+      );
+    }
+
+    renderOperatorOptions() {
+      const {config} = this.props;
+      const { showOperatorOptions } = this.meta;
+      const { immutableOpsMode, immutableValuesMode } = config.settings;
+      if (!showOperatorOptions) return null;
+
+      const opOpts = <OperatorOptions
+        key="operatorOptions"
+        selectedField={this.props.selectedField}
+        selectedOperator={this.props.selectedOperator}
+        operatorOptions={this.props.operatorOptions}
+        setOperatorOption={!immutableOpsMode ? this.props.setOperatorOption : dummyFn}
+        config={config}
+        readonly={immutableValuesMode}
+      />;
+
+      return (
+        <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
+          {opOpts}
+        </Col>
+      );
+    }
+
+    renderBeforeWidget() {
+      const {config} = this.props;
+      const { renderBeforeWidget } = config.settings;
+      return renderBeforeWidget 
+        && <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
+          {typeof renderBeforeWidget === "function" ? renderBeforeWidget(this.props) : renderBeforeWidget}
+        </Col>;
+    }
+
+    renderAfterWidget() {
+      const {config} = this.props;
+      const { renderAfterWidget } = config.settings;
+      return renderAfterWidget 
+        && <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
+          {typeof renderAfterWidget === "function" ? renderAfterWidget(this.props) : renderAfterWidget}
+        </Col>;
+    }
+
+    renderError() {
+      const {config, valueError} = this.props;
+      const { renderRuleError, showErrorMessage } = config.settings;
+      const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+      return showErrorMessage && oneValueError 
+        && <div className="rule--error">
+          {renderRuleError ? renderRuleError({error: oneValueError}) : oneValueError}
+        </div>;
+    }
+
+    renderDrag() {
+      const { showDragIcon } = this.meta;
+
+      return showDragIcon
+        && <span
+          key="rule-drag-icon"
+          className={"qb-drag-handler rule--drag-handler"}
+          onMouseDown={this.props.handleDraggerMouseDown}
+        ><DragIcon /> </span>;
+    }
+
+    renderDel() {
+      const {config} = this.props;
       const {
-        deleteLabel, renderBeforeWidget, renderAfterWidget, renderSize, 
-        immutableGroupsMode, immutableFieldsMode, immutableOpsMode, immutableValuesMode,
-        renderRuleError, showErrorMessage,
+        deleteLabel, renderSize, 
+        immutableGroupsMode, 
         renderButton: Btn
       } = config.settings;
 
-      const field 
-            = <FieldWrapper
-              key="field"
-              classname={"rule--field"}
-              config={config}
-              selectedField={this.props.selectedField}
-              setField={!immutableOpsMode ? this.props.setField : dummyFn}
-              parentField={this.props.parentField}
-              readonly={immutableFieldsMode}
-            />;
-      const operator 
-            = <OperatorWrapper
-              key="operator"
-              config={config}
-              selectedField={this.props.selectedField}
-              selectedOperator={this.props.selectedOperator}
-              setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
-              selectedFieldPartsLabels={selectedFieldPartsLabels}
-              showOperator={showOperator}
-              showOperatorLabel={showOperatorLabel}
-              selectedFieldWidgetConfig={selectedFieldWidgetConfig}
-              readonly={immutableOpsMode}
-            />;
-
-      const widget = showWidget
-            && <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
-              <Widget
-                key="values"
-                field={this.props.selectedField}
-                operator={this.props.selectedOperator}
-                value={this.props.value}
-                valueSrc={this.props.valueSrc}
-                valueError={valueError}
-                config={config}
-                setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
-                setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
-                readonly={immutableValuesMode}
-              />
-            </Col>;
-      const operatorOptions = showOperatorOptions
-            && <Col key={"op-options-for-"+this.props.selectedOperator} className="rule--operator-options">
-              <OperatorOptions
-                key="operatorOptions"
-                selectedField={this.props.selectedField}
-                selectedOperator={this.props.selectedOperator}
-                operatorOptions={this.props.operatorOptions}
-                setOperatorOption={!immutableOpsMode ? this.props.setOperatorOption : dummyFn}
-                config={config}
-                readonly={immutableValuesMode}
-              />
-            </Col>;
-
-      const beforeWidget = renderBeforeWidget 
-            && <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
-              {typeof renderBeforeWidget === "function" ? renderBeforeWidget(this.props) : renderBeforeWidget}
-            </Col>;
-
-      const afterWidget = renderAfterWidget 
-            && <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
-              {typeof renderAfterWidget === "function" ? renderAfterWidget(this.props) : renderAfterWidget}
-            </Col>;
-        
-      const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
-      const error = showErrorMessage && oneValueError 
-            && <div className="rule--error">
-              {renderRuleError ? renderRuleError({error: oneValueError}) : oneValueError}
-            </div>;
-
-      const parts = [
-        field,
-        operator,
-        beforeWidget,
-        widget,
-        afterWidget,
-        operatorOptions,
-      ];
-
-      const drag = showDragIcon
-            && <span
-              key="rule-drag-icon"
-              className={"qb-drag-handler rule--drag-handler"}
-              onMouseDown={this.props.handleDraggerMouseDown}
-            ><DragIcon /> </span>
-        ;
-
-      const del = (
+      return (
         <div key="rule-header" className="rule--header">
           {!immutableGroupsMode && <Btn 
             type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
           />}
         </div>
       );
+    }
 
+    render () {
+      const parts = [
+        this.renderField(),
+        this.renderOperator(),
+        this.renderBeforeWidget(),
+        this.renderWidget(),
+        this.renderAfterWidget(),
+        this.renderOperatorOptions(),
+      ];
       const body = <div key="rule-body" className="rule--body">{parts}</div>;
+
+      const error = this.renderError();
+      const drag = this.renderDrag();
+      const del = this.renderDel();
 
       return (
         <>
@@ -239,63 +272,5 @@ class Rule extends PureComponent {
 
 }
 
-
-export class FieldWrapper extends PureComponent {
-  render() {
-    const {config, selectedField, setField, parentField, classname, readonly} = this.props;
-    return (
-      <Col className={classname}>
-        { config.settings.showLabels
-                    && <label className="rule--label">{config.settings.fieldLabel}</label>
-        }
-        <Field
-          config={config}
-          selectedField={selectedField}
-          parentField={parentField}
-          setField={setField}
-          customProps={config.settings.customFieldSelectProps}
-          readonly={readonly}
-        />
-      </Col>
-    );
-  }
-}
-
-
-class OperatorWrapper extends PureComponent {
-  render() {
-    const {
-      config, selectedField, selectedOperator, setOperator, 
-      selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly
-    } = this.props;
-    const operator = showOperator
-            && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
-              { config.settings.showLabels
-                    && <label className="rule--label">{config.settings.operatorLabel}</label>
-              }
-              <Operator
-                key="operator"
-                config={config}
-                selectedField={selectedField}
-                selectedOperator={selectedOperator}
-                setOperator={setOperator}
-                readonly={readonly}
-              />
-            </Col>;
-    const hiddenOperator = showOperatorLabel
-            && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
-              <div className="rule--operator">
-                {config.settings.showLabels
-                  ? <label className="rule--label">&nbsp;</label>
-                  : null}
-                <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
-              </div>
-            </Col>;
-    return [
-      operator,
-      hiddenOperator
-    ];
-  }
-}
 
 export default Rule;

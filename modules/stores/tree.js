@@ -237,6 +237,7 @@ const setField = (state, path, newField, config) => {
   const wasRuleGroup = currentType == "rule_group";
   const newFieldConfig = getFieldConfig(newField, config);
   const isRuleGroup = newFieldConfig.type == "!group";
+  const isRuleGroupExt = isRuleGroup && newFieldConfig.ext;
 
   if (!isRuleGroup && !newFieldConfig.operators) {
     console.warn(`Type ${newFieldConfig.type} is not supported`);
@@ -253,6 +254,7 @@ const setField = (state, path, newField, config) => {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
     let groupProperties = defaultGroupProperties(config).merge({
       field: newField,
+      ext: isRuleGroupExt,
     });
     state = state.setIn(expandTreePath(path, "properties"), groupProperties);
     state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());

@@ -1,10 +1,10 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import WidgetContainer from "./containers/WidgetContainer";
-const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
+import {Col} from "./utils";
 
 @WidgetContainer
-export default class Widget extends PureComponent {
+export default class WidgetWrapper extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     name: PropTypes.string.isRequired,

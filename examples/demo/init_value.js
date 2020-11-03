@@ -27,43 +27,12 @@ export default
         ]
       }
     },
-    "98a8a9ba-0123-4456-b89a-b16e721c8cd0": {
-      "type": "rule",
-      "properties": {
-        "field": "stock",
-        "operator": "equal",
-        "value": [
-          false
-        ],
-        "valueSrc": [
-          "value"
-        ],
-        "valueType": [
-          "boolean"
-        ]
-      }
-    },
-    "aabbab8a-cdef-4012-b456-716e85c65e9c": {
-      "type": "rule",
-      "properties": {
-        "field": "slider",
-        "operator": "equal",
-        "value": [
-          35
-        ],
-        "valueSrc": [
-          "value"
-        ],
-        "valueType": [
-          "number"
-        ]
-      }
-    },
     "aaab8999-cdef-4012-b456-71702cd50090": {
       "type": "rule_group",
       "properties": {
         "conjunction": "AND",
-        "field": "results"
+        "field": "results",
+        "ext": true
       },
       "children1": {
         "99b8a8a8-89ab-4cde-b012-31702cd5078b": {

@@ -55,9 +55,10 @@ type JsonGroup = {
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRuleGroup|JsonRule},
+  children1?: {[id: string]: JsonRule},
   properties?: {
     field: string | Empty,
+    ext?: boolean,
   }
 }
 type JsonRule = {
@@ -456,9 +457,16 @@ interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
 }
+interface FieldGroupExt extends BaseField {
+  type: "!group",
+  subfields: Fields,
+  ext: true,
+  operators?: Array<string>,
+  //group_operators?: Array<string>,
+}
 
 export type Field = SimpleField;
-type FieldOrGroup = FieldStruct | FieldGroup | Field;
+type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
 

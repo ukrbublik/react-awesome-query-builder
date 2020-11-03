@@ -254,6 +254,8 @@ export default (skin) => {
     results: {
       label: "Results",
       type: "!group",
+      ext: true,
+      //group_operators: ["some", "all", "none"],
       subfields: {
         product: {
           type: "select",

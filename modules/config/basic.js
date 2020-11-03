@@ -834,6 +834,17 @@ const types = {
       }
     },
   },
+  "!group": {
+    widgets: {
+      field: {
+        operators: [
+          "equal",
+          "not_equal",
+          //todo: other operators as for number
+        ],
+      }
+    }
+  }
 };
 
 //----------------------------  settings

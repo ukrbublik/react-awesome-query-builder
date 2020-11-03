@@ -4,10 +4,10 @@ import FuncSelect from "./FuncSelect";
 import {
   getFuncConfig
 } from "../utils/configUtils";
-import Widget from "./Widget";
+import WidgetWrapper from "./WidgetWrapper";
+import {Col} from "./utils";
 import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
 import {useOnPropsChanged} from "../utils/stuff";
-const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
 
 
 export default class FuncWidget extends PureComponent {
@@ -215,7 +215,7 @@ class ArgWidget extends PureComponent {
 
   render() {
     return (
-      <Widget
+      <WidgetWrapper
         {...this.props} 
         setValue={this.setValue} 
         setValueSrc={this.setValueSrc} 

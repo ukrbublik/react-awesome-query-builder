@@ -5,14 +5,15 @@ import Draggable from "./containers/Draggable";
 import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "./FieldWrapper";
+import OperatorWrapper from "./OperatorWrapper";
 import {useOnPropsChanged} from "../utils/stuff";
 import {ConfirmFn} from "./utils";
 
 
 @GroupContainer
-@Draggable("group rule_group")
+@Draggable("group rule_group_ext")
 @ConfirmFn
-class RuleGroup extends BasicGroup {
+class RuleGroupExt extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
@@ -29,26 +30,49 @@ class RuleGroup extends BasicGroup {
   onPropsChanged(nextProps) {
   }
 
-  childrenClassName = () => "rule_group--children";
+  childrenClassName = () => "rule_group_ext--children";
   
-  renderHeaderWrapper = () => null;
   renderFooterWrapper = () => null;
-  renderConjs = () => null;
   canAddGroup = () => false;
   canAddRule = () => true;
-  canDeleteGroup = () => false;
+  canDeleteGroup = () => true;
 
   reordableNodesCnt() {
     const {children1} = this.props;
     return children1.size;
   }
 
+  renderHeaderWrapper() {
+    return (
+      <div key="group-header" className="group--header">
+        {this.renderHeader()}
+        {this.renderField()}
+        {this.renderOperator()}
+        {this.renderActions()}
+      </div>
+    );
+  }
+
+  renderConjs() {
+    return (
+      <div className={"group--actions"}>
+        {super.renderConjs()}
+      </div>
+    );
+  }
+
+  renderHeader() {
+    return (
+      <div className={"group--conjunctions"}>
+        {this.renderDrag()}
+      </div>
+    );
+  }
+
   renderChildrenWrapper() {
     return (
       <>
-        {this.renderDrag()}
-        {this.renderField()}
-        {this.renderActions()}
+        {this.renderConjs()}
         {super.renderChildrenWrapper()}
       </>
     );
@@ -63,6 +87,26 @@ class RuleGroup extends BasicGroup {
       selectedField={this.props.selectedField}
       setField={this.props.setField}
       parentField={this.props.parentField}
+      readonly={immutableFieldsMode}
+    />;
+  }
+
+  renderOperator() {
+    const { immutableFieldsMode } = this.props.config.settings;
+    const showOperator = true, showOperatorLabel = false; //
+    const selectedFieldWidgetConfig = {}; //
+    return <OperatorWrapper
+      key="operator"
+      classname={"group--operator"}
+      config={this.props.config}
+      selectedField={this.props.selectedField}
+      selectedOperator={this.props.selectedOperator} //
+      setField={this.props.setField}
+      setOperator={this.props.setOperator} //
+      selectedFieldPartsLabels={["group"]}
+      showOperator={showOperator}
+      showOperatorLabel={showOperatorLabel}
+      selectedFieldWidgetConfig={selectedFieldWidgetConfig}
       readonly={immutableFieldsMode}
     />;
   }
@@ -87,4 +131,4 @@ class RuleGroup extends BasicGroup {
 }
 
 
-export default RuleGroup;
+export default RuleGroupExt;

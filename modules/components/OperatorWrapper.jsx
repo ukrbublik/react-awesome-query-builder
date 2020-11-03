@@ -1,0 +1,40 @@
+import React, { PureComponent } from "react";
+import Operator from "./Operator";
+import {Col} from "./utils";
+
+
+export default class OperatorWrapper extends PureComponent {
+  render() {
+    const {
+      config, selectedField, selectedOperator, setOperator, 
+      selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly
+    } = this.props;
+    const operator = showOperator
+            && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+              { config.settings.showLabels
+                    && <label className="rule--label">{config.settings.operatorLabel}</label>
+              }
+              <Operator
+                key="operator"
+                config={config}
+                selectedField={selectedField}
+                selectedOperator={selectedOperator}
+                setOperator={setOperator}
+                readonly={readonly}
+              />
+            </Col>;
+    const hiddenOperator = showOperatorLabel
+            && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+              <div className="rule--operator">
+                {config.settings.showLabels
+                  ? <label className="rule--label">&nbsp;</label>
+                  : null}
+                <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
+              </div>
+            </Col>;
+    return [
+      operator,
+      hiddenOperator
+    ];
+  }
+}
