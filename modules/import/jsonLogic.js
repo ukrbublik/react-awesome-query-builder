@@ -9,18 +9,9 @@ import {isJsonLogic} from "../utils/stuff";
 // http://jsonlogic.com/
 
 // helpers
-Object.defineProperty(Array.prototype, "uniq", {
-  enumerable: false,
-  value: function () {
-    return Array.from(new Set(this));
-  }
-});
-Object.defineProperty(Array.prototype, "to_object", {
-  enumerable: false,
-  value: function () {
-    return this.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
-  }
-});
+const arrayUniq = (arr) => Array.from(new Set(arr));
+const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
+
 
 //meta is mutable
 export const loadFromJsonLogic = (logicTree, config) => {
@@ -264,13 +255,12 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
       .map(([_k, v]) => (v.properties.field.split(fieldSeparator)));
     const complexFieldsParents = complexFields
       .map(parts => parts.slice(0, parts.length - 1).join(fieldSeparator));
-    const complexFieldsConfigs = complexFieldsParents
-      .uniq()
-      .map(f => [f, getFieldConfig(f, config)])
-      .to_object();
+    const complexFieldsConfigs = arrayToObject(
+      arrayUniq(complexFieldsParents).map(f => [f, getFieldConfig(f, config)])
+    );
     const complexFieldsInRuleGroup = complexFieldsParents
       .filter((f) => complexFieldsConfigs[f].type == "!group");
-    const usedRuleGroups = complexFieldsInRuleGroup.uniq();
+    const usedRuleGroups = arrayUniq(complexFieldsInRuleGroup);
     const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
     let properties = {
