@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Immutable, {Map} from "immutable";
-import Item from "../components/Item";
+import Item from "./item/Item";
 import SortableContainer from "./containers/SortableContainer";
 import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../utils/treeUtils";
 import uuid from "../utils/uuid";

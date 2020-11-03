@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {truncateString, useOnPropsChanged} from "../utils/stuff";
+import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../../utils/configUtils";
+import {truncateString, useOnPropsChanged} from "../../utils/stuff";
 import last from "lodash/last";
 import keys from "lodash/keys";
 

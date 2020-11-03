@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 import FuncSelect from "./FuncSelect";
 import {
   getFuncConfig
-} from "../utils/configUtils";
+} from "../../utils/configUtils";
 import Widget from "./Widget";
-import {Col} from "./utils";
-import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
-import {useOnPropsChanged} from "../utils/stuff";
+import {Col} from "../utils";
+import {setFunc, setArgValue, setArgValueSrc} from "../../utils/funcUtils";
+import {useOnPropsChanged} from "../../utils/stuff";
 
 
 export default class FuncWidget extends PureComponent {

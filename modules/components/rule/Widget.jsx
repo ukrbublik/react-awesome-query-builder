@@ -4,12 +4,12 @@ import range from "lodash/range";
 import {
   getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
   getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
-} from "../utils/configUtils";
-import {defaultValue, useOnPropsChanged} from "../utils/stuff";
+} from "../../utils/configUtils";
+import {defaultValue, useOnPropsChanged} from "../../utils/stuff";
 import pick from "lodash/pick";
 import Immutable from "immutable";
 import WidgetFactory from "./WidgetFactory";
-import {Col} from "./utils";
+import {Col} from "../utils";
 
 const funcArgDummyOpDef = {cardinality: 1};
 

@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import Operator from "./Operator";
-import {Col} from "./utils";
+import {Col} from "../utils";
 
 
 export default class OperatorWrapper extends PureComponent {

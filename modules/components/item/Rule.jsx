@@ -1,14 +1,14 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import RuleContainer from "./containers/RuleContainer";
-import Draggable from "./containers/Draggable";
-import OperatorWrapper from "./OperatorWrapper";
-import FieldWrapper from "./FieldWrapper";
-import Widget from "./Widget";
-import OperatorOptions from "./OperatorOptions";
-import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../utils/configUtils";
-import {useOnPropsChanged} from "../utils/stuff";
-import {Col, DragIcon, dummyFn, ConfirmFn} from "./utils";
+import RuleContainer from "../containers/RuleContainer";
+import Draggable from "../containers/Draggable";
+import OperatorWrapper from "../rule/OperatorWrapper";
+import FieldWrapper from "../rule/FieldWrapper";
+import Widget from "../rule/Widget";
+import OperatorOptions from "../rule/OperatorOptions";
+import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
+import {useOnPropsChanged} from "../../utils/stuff";
+import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
 
 
 @RuleContainer

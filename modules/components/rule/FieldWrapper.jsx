@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import Field from "./Field";
-import {Col} from "./utils";
+import {Col} from "../utils";
 
 
 export default class FieldWrapper extends PureComponent {

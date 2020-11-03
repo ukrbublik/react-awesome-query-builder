@@ -1,10 +1,10 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
+import {getFieldConfig, getOperatorConfig} from "../../utils/configUtils";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
-import {useOnPropsChanged} from "../utils/stuff";
+import {useOnPropsChanged} from "../../utils/stuff";
 
 
 export default class Operator extends PureComponent {
