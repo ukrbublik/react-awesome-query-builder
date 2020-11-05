@@ -234,10 +234,39 @@ const setField = (state, path, newField, config) => {
     newField = newField.join(fieldSeparator);
 
   const currentType = state.getIn(expandTreePath(path, "type"));
+  const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
   const newFieldConfig = getFieldConfig(newField, config);
   const isRuleGroup = newFieldConfig.type == "!group";
   const isRuleGroupExt = isRuleGroup && newFieldConfig.ext;
+  const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
+  
+  const currentOperator = currentProperties.get("operator");
+  const currentOperatorOptions = currentProperties.get("operatorOptions");
+  const _currentField = currentProperties.get("field");
+  const _currentValue = currentProperties.get("value");
+  const _currentValueSrc = currentProperties.get("valueSrc", new Immutable.List());
+  const _currentValueType = currentProperties.get("valueType", new Immutable.List());
+
+  // If the newly selected field supports the same operator the rule currently
+  // uses, keep it selected.
+  const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
+  let newOperator = null;
+  const availOps = getOperatorsForField(config, newField);
+  if (availOps && availOps.length == 1)
+    newOperator = availOps[0];
+  else if (availOps && availOps.length > 1) {
+    for (let strategy of setOpOnChangeField || []) {
+      if (strategy == "keep" && !isChangeToAnotherType)
+        newOperator = lastOp;
+      else if (strategy == "default")
+        newOperator = defaultOperator(config, newField, false);
+      else if (strategy == "first")
+        newOperator = getFirstOperator(config, newField);
+      if (newOperator) //found op for strategy
+        break;
+    }
+  }
 
   if (!isRuleGroup && !newFieldConfig.operators) {
     console.warn(`Type ${newFieldConfig.type} is not supported`);
@@ -252,46 +281,34 @@ const setField = (state, path, newField, config) => {
 
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
+    const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
+      config, config, currentProperties, newField, newOperator, "field", true
+    );
     let groupProperties = defaultGroupProperties(config).merge({
       field: newField,
       ext: isRuleGroupExt,
     });
-    state = state.setIn(expandTreePath(path, "properties"), groupProperties);
+    if (isRuleGroupExt) {
+      groupProperties = groupProperties.merge({
+        operator: newOperator,
+        value: newValue,
+        valueSrc: newValueSrc,
+        valueType: newValueType,
+      });
+    }
     state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
-    state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
+    state = state.setIn(expandTreePath(path, "properties"), groupProperties);
+    if (newFieldConfig.initialEmptyWhere && operatorCardinality == 1) { // just `COUNT(grp) > 1` without `HAVING ..`
+      // no childeren
+    } else {
+      state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
+    }
     state = fixPathsInTree(state);
 
     return state;
   }
 
   return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
-    const currentOperator = current.get("operator");
-    const currentOperatorOptions = current.get("operatorOptions");
-    const _currentField = current.get("field");
-    const _currentValue = current.get("value");
-    const _currentValueSrc = current.get("valueSrc", new Immutable.List());
-    const _currentValueType = current.get("valueType", new Immutable.List());
-
-    // If the newly selected field supports the same operator the rule currently
-    // uses, keep it selected.
-    const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
-    let newOperator = null;
-    const availOps = getOperatorsForField(config, newField);
-    if (availOps && availOps.length == 1)
-      newOperator = availOps[0];
-    else if (availOps && availOps.length > 1) {
-      for (let strategy of setOpOnChangeField || []) {
-        if (strategy == "keep")
-          newOperator = lastOp;
-        else if (strategy == "default")
-          newOperator = defaultOperator(config, newField, false);
-        else if (strategy == "first")
-          newOperator = getFirstOperator(config, newField);
-        if (newOperator) //found op for strategy
-          break;
-      }
-    }
-
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
       config, config, current, newField, newOperator, "field", true
     );

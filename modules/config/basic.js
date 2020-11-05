@@ -433,6 +433,18 @@ const operators = {
       },
     }
   },
+  some: {
+    label: "Some",
+    cardinality: 0,
+  },
+  all: {
+    label: "All",
+    cardinality: 0,
+  },
+  none: {
+    label: "None",
+    cardinality: 0,
+  }
 };
 
 
@@ -835,13 +847,55 @@ const types = {
     },
   },
   "!group": {
+    defaultOperator: "some",
+    mainWidget: "number",
     widgets: {
-      field: {
+      number: {
+        widgetProps: {
+          min: 0
+        },
         operators: [
+          // w/o operand
+          "some",
+          "all",
+          "none",
+
+          // w/ operand - count
           "equal",
           "not_equal",
-          //todo: other operators as for number
+          "less",
+          "less_or_equal",
+          "greater",
+          "greater_or_equal",
+          "between",
+          "not_between",
         ],
+        opProps: {
+          equal: {
+            label: "Count =="
+          },
+          not_equal: {
+            label: "Count !="
+          },
+          less: {
+            label: "Count <"
+          },
+          less_or_equal: {
+            label: "Count <="
+          },
+          greater: {
+            label: "Count >"
+          },
+          greater_or_equal: {
+            label: "Count >="
+          },
+          between: {
+            label: "Count between"
+          },
+          not_between: {
+            label: "Count not between"
+          }
+        }
       }
     }
   }

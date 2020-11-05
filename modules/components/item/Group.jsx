@@ -99,10 +99,15 @@ export class BasicGroup extends PureComponent {
     </>;
   }
 
+  showNot() {
+    const {config} = this.props;
+    return config.settings.showNot;
+  }
+
   renderChildrenWrapper() {
     const {conjunctionOptions, children1, config} = this.props;
     const conjunctionCount = Object.keys(conjunctionOptions).length;
-    const showConjs = conjunctionCount > 1 || config.settings.showNot;
+    const showConjs = conjunctionCount > 1 || this.showNot();
 
     return children1 && (
       <div key="group-children" className={classNames(
@@ -238,12 +243,19 @@ export class BasicGroup extends PureComponent {
     return drag;
   }
 
+  conjunctionOptions() {
+    const { conjunctionOptions } = this.props;
+    return conjunctionOptions;
+  }
+
   renderConjs() {
     const {
       config, children1, id,
-      selectedConjunction, setConjunction, conjunctionOptions, not, setNot
+      selectedConjunction, setConjunction, not, setNot
     } = this.props;
-    const {immutableGroupsMode, renderConjs: Conjs, showNot} = config.settings;
+    const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
+    const showNot = this.showNot();
+    const conjunctionOptions = this.conjunctionOptions();
     const conjunctionCount = Object.keys(conjunctionOptions).length;
     const showConjs = conjunctionCount > 1 || showNot;
     if (!showConjs)
@@ -261,6 +273,8 @@ export class BasicGroup extends PureComponent {
       not: not || false,
       id: id,
       setNot: immutableGroupsMode ? dummyFn : setNot,
+      notLabel: notLabel,
+      showNot: showNot,
     };
     return <Conjs {...renderProps} />;
   }

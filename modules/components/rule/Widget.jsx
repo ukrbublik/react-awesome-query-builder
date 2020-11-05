@@ -30,6 +30,8 @@ export default class Widget extends PureComponent {
     fieldFunc: PropTypes.string,
     fieldArg: PropTypes.string,
     leftField: PropTypes.string,
+    // for RuleGroupExt
+    isForRuleGruop: PropTypes.bool,
   };
 
   constructor(props) {
@@ -72,11 +74,11 @@ export default class Widget extends PureComponent {
     this.props.setValueSrc(delta, srcKey);
   }
 
-  getMeta({config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, isFuncArg, leftField}) {
+  getMeta({config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, isForRuleGruop, isFuncArg, leftField}) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     let _valueSrcs = valueSrcs;
     let _values = values;
-    if (isFuncArg) {
+    if (isFuncArg || isForRuleGruop) {
       _valueSrcs = Immutable.List([valueSrcs]);
       _values = Immutable.List([values]);
     }

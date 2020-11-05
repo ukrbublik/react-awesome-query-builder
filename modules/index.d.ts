@@ -241,6 +241,8 @@ export interface ConjsProps {
   config?: Config,
   not: boolean,
   setNot(not: boolean): void,
+  showNot?: boolean,
+  notLabel?: string,
 }
 
 
@@ -462,7 +464,9 @@ interface FieldGroupExt extends BaseField {
   subfields: Fields,
   ext: true,
   operators?: Array<string>,
-  //group_operators?: Array<string>,
+  initialEmptyWhere?: boolean,
+  showNot?: boolean,
+  conjunctions?: Array<string>,
 }
 
 export type Field = SimpleField;

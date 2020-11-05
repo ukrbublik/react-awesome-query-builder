@@ -377,7 +377,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const currentFieldConfig = getFieldConfig(currentField, oldConfig);
   const newFieldConfig = getFieldConfig(newField, config);
 
-  let canReuseValue = currentField && currentOperator && newOperator 
+  let canReuseValue = currentField && currentOperator && newOperator && currentValue != undefined
     && (!changedField 
       || changedField == "field" && !clearValueOnChangeField 
       || changedField == "operator" && !clearValueOnChangeOp)
@@ -403,7 +403,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 
   const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
   const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
-
+  
   let valueFixes = {};
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
   if (canReuseValue) {
@@ -483,9 +483,11 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         vt = currentValueType.get(i);
     } else if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
       vt = firstWidgetConfig.type;
+    } else if (operatorCardinality == 1 && newFieldConfig && newFieldConfig.type !== undefined) {
+      vt = newFieldConfig.type == "!group" ? "number" : newFieldConfig.type;
     }
     return vt;
   }));
 
-  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError};
+  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError, operatorCardinality};
 };

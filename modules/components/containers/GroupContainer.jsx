@@ -111,6 +111,10 @@ export default (Group) => {
       this.props.actions.setOperator(this.props.path, operator);
     }
 
+    setValue = (delta, value, type) => {
+      this.props.actions.setValue(this.props.path, delta, value, type);
+    }
+
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const currentNesting = this.props.path.size;
@@ -146,6 +150,8 @@ export default (Group) => {
               addRule={this.dummyFn}
               setField={this.dummyFn}
               setOperator={this.dummyFn}
+              setValue={this.dummyFn}
+              value={this.props.value || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
@@ -154,6 +160,7 @@ export default (Group) => {
               totalRulesCnt={this.props.totalRulesCnt}
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
+              selectedOperator={this.props.operator || null}
             /> : null
             ,
             <Group
@@ -174,6 +181,8 @@ export default (Group) => {
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
+              setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
+              value={this.props.value || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
@@ -182,6 +191,7 @@ export default (Group) => {
               totalRulesCnt={this.props.totalRulesCnt}
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
+              selectedOperator={this.props.operator || null}
             />
           ]}
         </div>

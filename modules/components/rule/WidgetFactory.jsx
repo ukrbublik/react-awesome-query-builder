@@ -18,8 +18,7 @@ export default ({
     
   let value = isSpecialRange 
     ? [immValue.get(0), immValue.get(1)] 
-    : immValue.get(delta)
-    ;
+    : (immValue ? immValue.get(delta) : undefined);
   const valueError = immValueError && (isSpecialRange 
     ? [immValueError.get(0), immValueError.get(1)]
     : immValueError.get(delta)

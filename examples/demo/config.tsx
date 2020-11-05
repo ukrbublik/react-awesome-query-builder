@@ -251,11 +251,46 @@ export default (skin) => {
         }
       }
     },
+    results2: {
+      label: "Results2",
+      type: "!group",
+      ext: true,
+      subfields: {
+        product: {
+          type: "select",
+          fieldSettings: {
+            listValues: ["abc", "def", "xyz"],
+          },
+          valueSources: ["value"],
+        },
+      }
+    },
     results: {
       label: "Results",
       type: "!group",
+      
       ext: true,
-      //group_operators: ["some", "all", "none"],
+      initialEmptyWhere: true, // for count only
+      showNot: false,
+      defaultOperator: "some",
+      operators: [
+        // w/ operand - count
+        "equal",
+        "not_equal",
+        // "less",
+        // "less_or_equal",
+        // "greater",
+        // "greater_or_equal",
+        // "between",
+        // "not_between",
+
+        // w/o operand
+        "some",
+        "all",
+        "none",
+      ],
+      conjunctions: ["AND"],
+
       subfields: {
         product: {
           type: "select",

@@ -7,7 +7,9 @@ import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import OperatorWrapper from "../rule/OperatorWrapper";
 import {useOnPropsChanged} from "../../utils/stuff";
-import {ConfirmFn} from "../utils";
+import {Col, dummyFn, ConfirmFn} from "../utils";
+import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
+import Widget from "../rule/Widget";
 
 
 @GroupContainer
@@ -17,8 +19,10 @@ class RuleGroupExt extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
+    selectedOperator: PropTypes.string,
     parentField: PropTypes.string,
     setField: PropTypes.func,
+    setOperator: PropTypes.func,
   };
 
   constructor(props) {
@@ -48,6 +52,7 @@ class RuleGroupExt extends BasicGroup {
         {this.renderHeader()}
         {this.renderField()}
         {this.renderOperator()}
+        {this.renderWidget()}
         {this.renderActions()}
       </div>
     );
@@ -78,6 +83,26 @@ class RuleGroupExt extends BasicGroup {
     );
   }
 
+  showNot() {
+    const {config, selectedField, selectedOperator} = this.props;
+    const selectedFieldConfig = getFieldConfig(selectedField, config) || {};
+    return selectedFieldConfig.showNot != undefined ? selectedFieldConfig.showNot : config.settings.showNot;
+  }
+
+  conjunctionOptions() {
+    const {config, selectedField, selectedOperator} = this.props;
+    const selectedFieldConfig = getFieldConfig(selectedField, config) || {};
+    let conjunctionOptions = super.conjunctionOptions();
+    if (selectedFieldConfig.conjunctions) {
+      let filtered = {};
+      for (let k of selectedFieldConfig.conjunctions) {
+        filtered[k] = conjunctionOptions[k];
+      }
+      conjunctionOptions = filtered;
+    }
+    return conjunctionOptions;
+  }
+
   renderField() {
     const { immutableFieldsMode } = this.props.config.settings;
     return <FieldWrapper
@@ -92,23 +117,55 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderOperator() {
-    const { immutableFieldsMode } = this.props.config.settings;
-    const showOperator = true, showOperatorLabel = false; //
-    const selectedFieldWidgetConfig = {}; //
+    const {config, selectedField, selectedOperator, setField, setOperator} = this.props;
+    const { immutableFieldsMode } = config.settings;
+    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
+    const hideOperator = selectedFieldWidgetConfig.hideOperator;
+    const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
+    const showOperator = selectedField && !hideOperator;
+
     return <OperatorWrapper
       key="operator"
       classname={"group--operator"}
-      config={this.props.config}
-      selectedField={this.props.selectedField}
-      selectedOperator={this.props.selectedOperator} //
-      setField={this.props.setField}
-      setOperator={this.props.setOperator} //
+      config={config}
+      selectedField={selectedField}
+      selectedOperator={selectedOperator}
+      setField={setField}
+      setOperator={setOperator}
       selectedFieldPartsLabels={["group"]}
       showOperator={showOperator}
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}
       readonly={immutableFieldsMode}
     />;
+  }
+
+  renderWidget() {
+    const {config, selectedField, selectedOperator} = this.props;
+    const { immutableValuesMode } = config.settings;
+    const isFieldAndOpSelected = selectedField && selectedOperator;
+    const showWidget = isFieldAndOpSelected;
+    if (!showWidget) return null;
+
+    const widget = <Widget
+      key="values"
+      isForRuleGruop={true}
+      field={this.props.selectedField}
+      operator={this.props.selectedOperator}
+      value={this.props.value}
+      valueSrc={"value"}
+      valueError={null}
+      config={config}
+      setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
+      setValueSrc={dummyFn}
+      readonly={immutableValuesMode}
+    />;
+
+    return (
+      <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
+        {widget}
+      </Col>
+    );
   }
 
   renderActions() {
