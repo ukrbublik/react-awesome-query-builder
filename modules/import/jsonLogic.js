@@ -344,14 +344,14 @@ const topLevelFieldsFilter = (fields) => {
   return arr;
 };
 
-const wrapInDefaultConjRuleGroup = (rule, parentField, config, conj) => {
+const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
   if (!rule) return undefined;
   return {
     type: "rule_group",
     id: uuid(),
     children1: { [rule.id]: rule },
     properties: {
-      conjunction: conj || defaultGroupConjunction(config),
+      conjunction: conj || defaultGroupConjunction(config, parentFieldConfig),
       not: false,
       field: parentField,
     }
@@ -455,7 +455,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
           } else {
             // need to be wrapped in `rule_group`
             const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
-            res = wrapInDefaultConjRuleGroup(rule, groupField, config, conv.conjunctions["and"]);
+            res = wrapInDefaultConjRuleGroup(rule, groupField, groupFieldConfig, config, conv.conjunctions["and"]);
           }
           return res;
         }

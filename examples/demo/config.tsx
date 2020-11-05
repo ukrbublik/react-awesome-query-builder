@@ -289,7 +289,7 @@ export default (skin) => {
         "all",
         "none",
       ],
-      conjunctions: ["AND"],
+      conjunctions: ["AND", "OR"],
 
       subfields: {
         product: {

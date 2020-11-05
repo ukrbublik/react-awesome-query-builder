@@ -26,48 +26,6 @@ export default
           "text"
         ]
       }
-    },
-    "aaab8999-cdef-4012-b456-71702cd50090": {
-      "type": "rule_group",
-      "properties": {
-        "conjunction": "AND",
-        "field": "results",
-        "ext": true
-      },
-      "children1": {
-        "99b8a8a8-89ab-4cde-b012-31702cd5078b": {
-          "type": "rule",
-          "properties": {
-            "field": "results.product",
-            "operator": "select_equals",
-            "value": [
-              "abc"
-            ],
-            "valueSrc": [
-              "value"
-            ],
-            "valueType": [
-              "select"
-            ]
-          }
-        },
-        "88b9bb89-4567-489a-bcde-f1702cd53266": {
-          "type": "rule",
-          "properties": {
-            "field": "results.score",
-            "operator": "greater",
-            "value": [
-              8
-            ],
-            "valueSrc": [
-              "value"
-            ],
-            "valueType": [
-              "number"
-            ]
-          }
-        }
-      }
     }
   },
   "properties": {

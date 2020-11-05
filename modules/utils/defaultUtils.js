@@ -69,14 +69,18 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
 
 //------------
 
-export const defaultGroupConjunction = (config) =>
-  config.settings.defaultGroupConjunction || config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
+export const defaultGroupConjunction = (config, fieldConfig = null) => {
+  const conjs = fieldConfig && fieldConfig.conjunctions || Object.keys(config.conjunctions);
+  if (conjs.length == 1)
+    return conjs[0];
+  return config.settings.defaultGroupConjunction || config.settings.defaultConjunction || conjs[0];
+}
 
 export const defaultConjunction = (config) =>
   config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
 
-export const defaultGroupProperties = (config) => new Immutable.Map({
-  conjunction: defaultGroupConjunction(config)
+export const defaultGroupProperties = (config, fieldConfig = null) => new Immutable.Map({
+  conjunction: defaultGroupConjunction(config, fieldConfig)
 });
 
 

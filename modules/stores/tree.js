@@ -74,14 +74,26 @@ const removeRule = (state, path, config) => {
 
   const parentPath = path.pop();
   const parent = state.getIn(expandTreePath(parentPath));
+
   const parentField = parent.getIn(["properties", "field"]);
+  const parentOperator = parent.getIn(["properties", "operator"]);
+  const parentValue = parent.getIn(["properties", "value", 0]);
+  const parentFieldConfig = parentField ? getFieldConfig(parentField, config) : null;
+  const parentOperatorConfig = parentOperator ? getOperatorConfig(config, parentOperator, parentField) : null;
+  const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0 && parentValue != undefined;
+  
   const isParentRuleGroup = parent.get("type") == "rule_group";
   const isEmptyGroup = !hasChildren(state, parentPath);
   const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup ? true : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
+  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup ? 
+    hasGroupCountRule && parentFieldConfig.initialEmptyWhere : 
+    config.settings.canLeaveEmptyGroup && !isEmptyRoot);
+    
   if (isEmptyGroup) {
     if (isParentRuleGroup) {
-      state = state.deleteIn(expandTreePath(parentPath));
+      if (!canLeaveEmpty) {
+        state = state.deleteIn(expandTreePath(parentPath));
+      }
     } else if (isEmptyRoot) {
       state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField), config);
     } else if (!canLeaveEmpty) {
@@ -284,7 +296,7 @@ const setField = (state, path, newField, config) => {
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
       config, config, currentProperties, newField, newOperator, "field", true
     );
-    let groupProperties = defaultGroupProperties(config).merge({
+    let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
       ext: isRuleGroupExt,
     });
