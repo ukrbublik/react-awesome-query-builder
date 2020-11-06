@@ -5,7 +5,6 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 
 export default ({type, label, onClick, config}) => {
-  console.log(1, type, label)
   const typeToOnlyIcon = {
     "delGroup": <DeleteIcon />,
     "delRuleGroup": <DeleteIcon />,

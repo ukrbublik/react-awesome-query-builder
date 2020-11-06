@@ -280,7 +280,22 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
         };
       } else {
         // there is rule for count
-        resultQuery = formatLogic(config, properties, fieldName, formattedValue, groupOperator);
+        const filter = !list.size ? 
+          fieldName : 
+          {
+            "filter": [
+              {var: fieldName},
+              resultQuery
+            ]
+          };
+        const count = {
+          "reduce": [
+            filter,
+            { "+": [1, { var: "accumulator" }] },
+            0
+          ]
+        };
+        resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator);
       }
     }
 
