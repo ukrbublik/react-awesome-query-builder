@@ -462,7 +462,7 @@ interface FieldGroup extends BaseField {
 interface FieldGroupExt extends BaseField {
   type: "!group",
   subfields: Fields,
-  ext: true,
+  ext: boolean,
   operators?: Array<string>,
   initialEmptyWhere?: boolean,
   showNot?: boolean,

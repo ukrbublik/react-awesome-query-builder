@@ -53,6 +53,7 @@ export const jsonLogicFormat = (item, config) => {
   };
 };
 
+
 //meta is mutable
 const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField = null) => {
   if (currentValue === undefined)
@@ -133,6 +134,82 @@ const jsonLogicFormatValue = (meta, config, currentValue, valueSrc, valueType, f
   return ret;
 };
 
+
+const formarValue = (config, properties, meta, operator, parentField) => {
+  const field = properties.get("field");
+  const fieldDefinition = getFieldConfig(field, config) || {};
+  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+
+  let value = properties.get("value");
+  if (value == undefined)
+    return undefined;
+  let valueSrcs = [];
+  let valueTypes = [];
+  let _usedFields = meta.usedFields;
+  value = value.map((currentValue, ind) => {
+    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
+    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
+    currentValue = completeValue(currentValue, valueSrc, config);
+    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+    const fv = jsonLogicFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
+    if (fv !== undefined) {
+      valueSrcs.push(valueSrc);
+      valueTypes.push(valueType);
+    }
+    return fv;
+  });
+  const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
+  if (value.size < cardinality || hasUndefinedValues) {
+    meta.usedFields = _usedFields; // restore
+    return undefined;
+  }
+  return cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
+};
+
+
+const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, isRev = false) => {
+  const field = properties.get("field");
+  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
+  let formatteOp = operator;
+  if (typeof operatorDefinition.jsonLogic == "string")
+    formatteOp = operatorDefinition.jsonLogic;
+  let fn = typeof operatorDefinition.jsonLogic == "function" ? operatorDefinition.jsonLogic : null;
+  if (!fn) {
+    const rangeOps = ["<", "<=", ">", ">="];
+    fn = (field, op, val, opDef, opOpts) => {
+      if (cardinality == 0)
+        return { [formatteOp]: formattedField };
+      else if (cardinality == 1 && isReverseArgs)
+        return { [formatteOp]: [formattedValue, formattedField] };
+      else if (cardinality == 1)
+        return { [formatteOp]: [formattedField, formattedValue] };
+      else if (cardinality == 2 && rangeOps.includes(formatteOp))
+        return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
+      else
+        return { [formatteOp]: [formattedField, ...formattedValue] };
+    };
+  }
+  const args = [
+    formattedField,
+    operator,
+    formattedValue,
+    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    operatorOptions,
+  ];
+  let ruleQuery = fn(...args);
+
+  if (isRev) {
+    ruleQuery = { "!": ruleQuery };
+  }
+
+  return ruleQuery;
+};
+
+
 //meta is mutable
 const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => {
   if (!item) return undefined;
@@ -155,11 +232,24 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
     }
 
     const groupField = isRuleGroup && useGroupsAsArrays ? field : parentField;
+    const ext = properties.get("ext");
+    const groupOperator = properties.get("operator");
+    const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || {};
+    const groupValue = properties.get("value");
+    const formattedValue = formarValue(config, properties, meta, groupOperator, parentField);
+
     const list = children
       .map((currentChild) => jsonLogicFormatItem(currentChild, config, meta, false, groupField))
       .filter((currentChild) => typeof currentChild !== "undefined");
-    if (!list.size)
-      return undefined;
+    
+    if (isRuleGroup && useGroupsAsArrays && groupOperatorDefinition.cardinality != 0) {
+      // "count" rule can have no "having" children, but should have number value
+      if (formattedValue == undefined)
+        return undefined;
+    } else {
+      if (!list.size)
+        return undefined;
+    }
 
     let resultQuery = {};
     if (list.size == 1 && !isRoot)
@@ -168,30 +258,30 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       resultQuery[conj] = list.toList().toJS();
     
     // revert
-    if (not && !isRuleGroup) {
-      if (Object.keys(resultQuery).length == 1 && ["all", "some"].includes(Object.keys(resultQuery)[0])) {
-        // if `rule_group` is wrapped in group with `not` - just swap `some` to `none` for simplicity
-        const gop = Object.keys(resultQuery)[0];
-        resultQuery["none"] = resultQuery[gop];
-        delete(resultQuery[gop]);
-      } else {
-        resultQuery = { "!": resultQuery };
-      }
+    if (not) {
+      resultQuery = { "!": resultQuery };
     }
 
     // rule_group (issue #246)
     if (isRuleGroup && useGroupsAsArrays) {
-      const op = not ? "none" : "some";
       let fieldName = field;
       if (parentField) {
         fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
       }
-      resultQuery = {
-        [op]: [
-          {var: fieldName},
-          resultQuery
-        ]
-      };
+
+      if (!groupOperator || groupOperatorDefinition.cardinality == 0) {
+        // all / some / none
+        const op = groupOperator || "some";
+        resultQuery = {
+          [op]: [
+            {var: fieldName},
+            resultQuery
+          ]
+        };
+      } else {
+        // there is rule for count
+        resultQuery = formatLogic(config, properties, fieldName, formattedValue, groupOperator);
+      }
     }
 
     return resultQuery;
@@ -202,7 +292,6 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
     if (operatorOptions && !Object.keys(operatorOptions).length)
       operatorOptions = null;
     let field = properties.get("field");
-    let value = properties.get("value");
 
     if (field == null || operator == null)
       return undefined;
@@ -216,40 +305,20 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
 
     // check op
     let isRev = false;
+    if (!operatorDefinition.jsonLogic && !revOperatorDefinition.jsonLogic) {
+      meta.errors.push(`Operator ${operator} is not supported`);
+      return undefined;
+    }
     if (!operatorDefinition.jsonLogic && revOperatorDefinition.jsonLogic) {
       isRev = true;
       [operator, reversedOp] = [reversedOp, operator];
       [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
     }
-    if (!operatorDefinition.jsonLogic) {
-      meta.errors.push(`Operator ${operator} is not supported`);
-      return undefined;
-    }
 
     // format value
-    const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
-    let valueSrcs = [];
-    let valueTypes = [];
-    let _usedFields = meta.usedFields;
-    value = value.map((currentValue, ind) => {
-      const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
-      const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
-      currentValue = completeValue(currentValue, valueSrc, config);
-      const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-      const fv = jsonLogicFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
-      if (fv !== undefined) {
-        valueSrcs.push(valueSrc);
-        valueTypes.push(valueType);
-      }
-      return fv;
-    });
-    const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
-    if (value.size < cardinality || hasUndefinedValues) {
-      meta.usedFields = _usedFields; // restore
+    const formattedValue = formarValue(config, properties, meta, operator, parentField);
+    if (formattedValue === undefined)
       return undefined;
-    }
-    const formattedValue = cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
 
     // format field
     let fieldName = field;
@@ -261,42 +330,11 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       meta.usedFields.push(field);
 
     // format logic
-    let formatteOp = operator;
-    if (typeof operatorDefinition.jsonLogic == "string")
-      formatteOp = operatorDefinition.jsonLogic;
-    let fn = typeof operatorDefinition.jsonLogic == "function" ? operatorDefinition.jsonLogic : null;
-    if (!fn) {
-      const rangeOps = ["<", "<=", ">", ">="];
-      fn = (field, op, val, opDef, opOpts) => {
-        if (cardinality == 0)
-          return { [formatteOp]: formattedField };
-        else if (cardinality == 1 && isReverseArgs)
-          return { [formatteOp]: [formattedValue, formattedField] };
-        else if (cardinality == 1)
-          return { [formatteOp]: [formattedField, formattedValue] };
-        else if (cardinality == 2 && rangeOps.includes(formatteOp))
-          return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
-        else
-          return { [formatteOp]: [formattedField, ...formattedValue] };
-      };
-    }
-    const args = [
-      formattedField,
-      operator,
-      formattedValue,
-      omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
-      operatorOptions,
-    ];
-    let ruleQuery = fn(...args);
-
-    if (isRev) {
-      ruleQuery = { "!": ruleQuery };
-    }
-
-    return ruleQuery;
+    return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, isRev);
   }
   return undefined;
 };
+
 
 // helpers
 const cutBeginOfString = (str, begin) => {

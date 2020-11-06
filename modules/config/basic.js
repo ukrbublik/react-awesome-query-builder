@@ -867,8 +867,8 @@ const types = {
           "less_or_equal",
           "greater",
           "greater_or_equal",
-          "between",
-          "not_between",
+          // "between",
+          // "not_between",
         ],
         opProps: {
           equal: {

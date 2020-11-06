@@ -277,12 +277,12 @@ export default (skin) => {
         // w/ operand - count
         "equal",
         "not_equal",
-        // "less",
-        // "less_or_equal",
-        // "greater",
-        // "greater_or_equal",
-        // "between",
-        // "not_between",
+        "less",
+        "less_or_equal",
+        "greater",
+        "greater_or_equal",
+        "between",
+        "not_between",
 
         // w/o operand
         "some",
