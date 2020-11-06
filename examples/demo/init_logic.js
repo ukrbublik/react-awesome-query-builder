@@ -2,34 +2,36 @@ export default
 {
   "and": [
     {
-      "==": [
+      ">": [
         {
-          "var": "user.login"
-        },
-        {
-          "method": [
+          "reduce": [
             {
-              "var": "user.firstName"
+              "filter": [
+                {
+                  "var": "results"
+                },
+                {
+                  "==": [
+                    {
+                      "var": "product"
+                    },
+                    "abc"
+                  ]
+                }
+              ]
             },
-            "toLowerCase"
+            {
+              "+": [
+                1,
+                {
+                  "var": "accumulator"
+                }
+              ]
+            },
+            0
           ]
-        }
-      ]
-    },
-    {
-      "==": [
-        {
-          "var": "stock"
         },
-        false
-      ]
-    },
-    {
-      "==": [
-        {
-          "var": "slider"
-        },
-        35
+        2
       ]
     }
   ]

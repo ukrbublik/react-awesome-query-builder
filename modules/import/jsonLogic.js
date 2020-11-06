@@ -404,8 +404,15 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         [jlField, ...args] = vals;
       }
       let {"var": field} = jlField;
+      let {"reduce": reduce} = jlField;
       if (parentField)
         field = [parentField, field].join(fieldSeparator);
+      if (reduce) {
+        let [filter, acc, init] = reduce;
+        if (init == 0 && acc["+"] && acc["+"][0] == 1 && acc["+"][1] && acc["+"][1]["var"] == "accumulator") {
+          
+        }
+      }
       if (!field) {
         errors.push(`Unknown field ${JSON.stringify(jlField)}`);
         return;

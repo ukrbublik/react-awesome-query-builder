@@ -21,7 +21,7 @@ let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree;
 initTree = checkTree(loadTree(initValue), loadedConfig);
-//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 const updateEvent = new CustomEvent("update", { detail: {
   config: loadedConfig,
