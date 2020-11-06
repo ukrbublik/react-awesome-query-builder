@@ -249,7 +249,6 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
   renderFunc: (props) => <FieldDropdown {...props} />,
   canReorder: true,
   canRegroup: true,
-  hideConjForOne: true,
   maxNesting: 10,
   showLabels: false,
   showNot: true,
@@ -318,7 +317,6 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
-|hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
 |customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
@@ -369,6 +367,7 @@ Localization:
 |delGroupLabel |`null`
 |addGroupLabel |Add group
 |addRuleLabel |Add rule
+|addSubRuleLabel |Add sub rule
 |notLabel |Not
 |valueSourcesPopupTitle |Select value source
 |removeRuleConfirmOptions |If you want to ask confirmation of removing non-empty rule/group, add these options. +

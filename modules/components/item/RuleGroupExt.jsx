@@ -3,13 +3,14 @@ import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
-import {RuleGroupActions} from "./RuleGroupActions";
+import {RuleGroupExtActions} from "./RuleGroupExtActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import OperatorWrapper from "../rule/OperatorWrapper";
 import {useOnPropsChanged} from "../../utils/stuff";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
 import Widget from "../rule/Widget";
+const classNames = require("classnames");
 
 
 @GroupContainer
@@ -41,27 +42,16 @@ class RuleGroupExt extends BasicGroup {
   canAddRule = () => true;
   canDeleteGroup = () => true;
 
-  reordableNodesCnt() {
-    const {children1} = this.props;
-    return children1.size;
-  }
-
   renderHeaderWrapper() {
     return (
-      <div key="group-header" className="group--header">
+      <div key="group-header" className={classNames(
+        "group--header", 
+        this.showDragIcon() ? "with--drag" : "hide--drag",
+        this.showConjs() && !this.isOneChild() ? "with--conjs" : "hide--conjs"
+      )}>
         {this.renderHeader()}
-        {this.renderField()}
-        {this.renderOperator()}
-        {this.renderWidget()}
+        {this.renderGroupField()}
         {this.renderActions()}
-      </div>
-    );
-  }
-
-  renderConjs() {
-    return (
-      <div className={"group--actions"}>
-        {super.renderConjs()}
       </div>
     );
   }
@@ -69,17 +59,19 @@ class RuleGroupExt extends BasicGroup {
   renderHeader() {
     return (
       <div className={"group--conjunctions"}>
+        {this.renderConjs()}
         {this.renderDrag()}
       </div>
     );
   }
 
-  renderChildrenWrapper() {
+  renderGroupField() {
     return (
-      <>
-        {this.renderConjs()}
-        {super.renderChildrenWrapper()}
-      </>
+      <div className={"group--field--count--rule"}>
+        {this.renderField()}
+        {this.renderOperator()}
+        {this.renderWidget()}
+      </div>
     );
   }
 
@@ -107,7 +99,7 @@ class RuleGroupExt extends BasicGroup {
     const { immutableFieldsMode } = this.props.config.settings;
     return <FieldWrapper
       key="field"
-      classname={"group--field"}
+      classname={"rule--field"}
       config={this.props.config}
       selectedField={this.props.selectedField}
       setField={this.props.setField}
@@ -171,13 +163,18 @@ class RuleGroupExt extends BasicGroup {
   renderActions() {
     const {config, addRule} = this.props;
 
-    return <RuleGroupActions
+    return <RuleGroupExtActions
       config={config}
       addRule={addRule}
       canAddRule={this.canAddRule()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
     />;
+  }
+
+  reordableNodesCnt() {
+    const {children1} = this.props;
+    return children1.size;
   }
 
   extraPropsForItem(_item) {

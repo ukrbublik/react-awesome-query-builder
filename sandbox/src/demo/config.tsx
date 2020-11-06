@@ -358,6 +358,7 @@ const localeSettings: LocaleSettings = {
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",
+  addSubRuleLabel: "Add sub rule",
   delGroupLabel: null,
   notLabel: "Not",
   valueSourcesPopupTitle: "Select value source",

@@ -5,10 +5,13 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 
 export default ({type, label, onClick, config}) => {
+  console.log(1, type, label)
   const typeToOnlyIcon = {
     "delGroup": <DeleteIcon />,
+    "delRuleGroup": <DeleteIcon />,
     "delRule": <DeleteIcon />,
     "addRuleGroup": <AddIcon />,
+    "addRuleGroupExt": <AddIcon />,
   };
   const typeToIcon = {
     "addRule": <AddIcon />,
@@ -18,6 +21,7 @@ export default ({type, label, onClick, config}) => {
     "addRule": "default",
     "addGroup": "primary",
     "delGroup": "secondary",
+    "delRuleGroup": "secondary",
     "delRule": "secondary",
   };
   if (typeToOnlyIcon[type])

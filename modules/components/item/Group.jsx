@@ -104,17 +104,27 @@ export class BasicGroup extends PureComponent {
     return config.settings.showNot;
   }
 
-  renderChildrenWrapper() {
+  // show conjs for 2+ children?
+  showConjs() {
     const {conjunctionOptions, children1, config} = this.props;
     const conjunctionCount = Object.keys(conjunctionOptions).length;
-    const showConjs = conjunctionCount > 1 || this.showNot();
+    return conjunctionCount > 1 || this.showNot();
+  }
+
+  isOneChild() {
+    const {children1} = this.props;
+    return children1.size < 2;
+  }
+
+  renderChildrenWrapper() {
+    const {children1} = this.props;
 
     return children1 && (
       <div key="group-children" className={classNames(
         "group--children",
-        !showConjs ? "hide--conjs" : "",
-        children1.size < 2 && config.settings.hideConjForOne ? "hide--line" : "",
-        children1.size < 2 ? "one--child" : "",
+        !this.showConjs() ? "hide--conjs" : "",
+        this.isOneChild() ? "hide--line" : "",
+        this.isOneChild() ? "one--child" : "",
         this.childrenClassName()
       )}>{this.renderChildren()}</div>
     );
@@ -228,13 +238,14 @@ export class BasicGroup extends PureComponent {
     return this.props.reordableNodesCnt;
   }
 
+  showDragIcon() {
+    const { config, isRoot, reordableNodesCnt } = this.props;
+    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
+  }
+
   renderDrag() {
-    const {
-      config, isRoot, reordableNodesCnt,
-      handleDraggerMouseDown
-    } = this.props;
-    const showDragIcon = config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
-    const drag = showDragIcon
+    const { handleDraggerMouseDown } = this.props;
+    const drag = this.showDragIcon()
       && <span
         key="group-drag-icon"
         className={"qb-drag-handler group--drag-handler"}
@@ -254,17 +265,14 @@ export class BasicGroup extends PureComponent {
       selectedConjunction, setConjunction, not, setNot
     } = this.props;
     const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
-    const showNot = this.showNot();
     const conjunctionOptions = this.conjunctionOptions();
-    const conjunctionCount = Object.keys(conjunctionOptions).length;
-    const showConjs = conjunctionCount > 1 || showNot;
-    if (!showConjs)
+    if (!this.showConjs())
       return null;
     if (!children1.size)
       return null;
 
     const renderProps = {
-      disabled: children1.size < 2,
+      disabled: this.isOneChild(),
       readonly: immutableGroupsMode,
       selectedConjunction: selectedConjunction,
       setConjunction: immutableGroupsMode ? dummyFn : setConjunction,
@@ -274,17 +282,14 @@ export class BasicGroup extends PureComponent {
       id: id,
       setNot: immutableGroupsMode ? dummyFn : setNot,
       notLabel: notLabel,
-      showNot: showNot,
+      showNot: this.showNot(),
     };
     return <Conjs {...renderProps} />;
   }
 
   renderHeader() {
     return (
-      <div className={classNames(
-        "group--conjunctions",
-        // children1.size < 2 && config.settings.hideConjForOne ? 'hide--conj' : ''
-      )}>
+      <div className={"group--conjunctions"}>
         {this.renderConjs()}
         {this.renderDrag()}
       </div>

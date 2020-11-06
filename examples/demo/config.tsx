@@ -168,6 +168,7 @@ export default (skin) => {
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
+    addSubRuleLabel: "Add sub rule",
     delGroupLabel: null,
     notLabel: "Not",
     valueSourcesPopupTitle: "Select value source",
@@ -254,7 +255,6 @@ export default (skin) => {
     results2: {
       label: "Results2",
       type: "!group",
-      ext: true,
       subfields: {
         product: {
           type: "select",

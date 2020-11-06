@@ -8,6 +8,7 @@ export default ({type, onClick, label, config: {settings}}) => {
     "addGroup": <PlusCircleOutlined />,
     "delRule": <DeleteFilled />, //?
     "delGroup": <DeleteFilled />,
+    "delRuleGroup": <DeleteFilled />,
 
     "addRuleGroup": <PlusOutlined />,
     "delRuleGroup": <DeleteFilled />,
@@ -18,6 +19,7 @@ export default ({type, onClick, label, config: {settings}}) => {
     "addGroup": "action action--ADD-GROUP",
     "delRule": "action action--DELETE", //?
     "delGroup": "action action--DELETE",
+    "delRuleGroup": "action action--DELETE",
 
     "addRuleGroup": <PlusOutlined />,
     "delRuleGroup": <DeleteFilled />,
@@ -26,6 +28,7 @@ export default ({type, onClick, label, config: {settings}}) => {
   const typeToType = {
     "delRule": "danger",
     "delGroup": "danger",
+    "delRuleGroup": "danger",
     "delRuleGroup": "danger",
   };
 
