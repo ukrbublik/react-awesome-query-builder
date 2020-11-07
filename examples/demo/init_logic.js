@@ -7,19 +7,7 @@ export default
           {
             "reduce": [
               {
-                "filter": [
-                  {
-                    "varValues": "results"
-                  },
-                  {
-                    "==": [
-                      {
-                        "var": "product"
-                      },
-                      "def"
-                    ]
-                  }
-                ]
+                "varValues": "results"
               },
               {
                 "+": [
@@ -48,6 +36,66 @@ export default
               "abc"
             ]
           }
+        ]
+      },
+      {
+        "some": [
+          {
+            "varValues": "results"
+          },
+          {
+            "or": [
+              {
+                "==": [
+                  {
+                    "var": "product"
+                  },
+                  "def"
+                ]
+              },
+              {
+                "==": [
+                  {
+                    "var": "score"
+                  },
+                  2
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "<=": [
+          {
+            "reduce": [
+              {
+                "filter": [
+                  {
+                    "varValues": "results"
+                  },
+                  {
+                    "==": [
+                      {
+                        "var": "product"
+                      },
+                      "abc"
+                    ]
+                  }
+                ]
+              },
+              {
+                "+": [
+                  1,
+                  {
+                    "var": "accumulator"
+                  }
+                ]
+              },
+              0
+            ]
+          },
+          5
         ]
       }
     ]

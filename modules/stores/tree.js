@@ -80,7 +80,7 @@ const removeRule = (state, path, config) => {
   const parentValue = parent.getIn(["properties", "value", 0]);
   const parentFieldConfig = parentField ? getFieldConfig(parentField, config) : null;
   const parentOperatorConfig = parentOperator ? getOperatorConfig(config, parentOperator, parentField) : null;
-  const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0 && parentValue != undefined;
+  const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0; // && parentValue != undefined;
   
   const isParentRuleGroup = parent.get("type") == "rule_group";
   const isEmptyGroup = !hasChildren(state, parentPath);
@@ -347,7 +347,17 @@ const setField = (state, path, newField, config) => {
  */
 const setOperator = (state, path, newOperator, config) => {
   const {showErrorMessage} = config.settings;
-  return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
+
+  const properties = state.getIn(expandTreePath(path, "properties"));
+  const children = state.getIn(expandTreePath(path, "children1"));
+  const currentField = properties.get("field");
+  const fieldConfig = getFieldConfig(currentField, config);
+  const isRuleGroup = fieldConfig.type == "!group";
+  const isRuleGroupExt = isRuleGroup && fieldConfig.ext;
+  const operatorConfig = getOperatorConfig(config, newOperator, currentField);
+  const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
+
+  state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
     const currentField = current.get("field");
     const currentOperatorOptions = current.get("operatorOptions");
     const _currentValue = current.get("value", new Immutable.List());
@@ -370,6 +380,14 @@ const setOperator = (state, path, newOperator, config) => {
       .set("valueSrc", newValueSrc)
       .set("valueType", newValueType);
   }));
+
+  if (isRuleGroup) {
+    if (operatorCardinality == 0 && children.size == 0) {
+      state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, currentField), config);
+    }
+  }
+
+  return state;
 };
 
 /**

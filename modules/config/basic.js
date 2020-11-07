@@ -852,9 +852,6 @@ const types = {
   "!group": {
     defaultOperator: "some",
     mainWidget: "number",
-    jsonLogic: {
-      var: "varValues",
-    },
     widgets: {
       number: {
         widgetProps: {
@@ -873,8 +870,8 @@ const types = {
           "less_or_equal",
           "greater",
           "greater_or_equal",
-          // "between",
-          // "not_between",
+          "between",
+          "not_between",
         ],
         opProps: {
           equal: {

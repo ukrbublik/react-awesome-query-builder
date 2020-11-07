@@ -135,7 +135,10 @@ export class BasicGroup extends PureComponent {
   renderHeaderWrapper() {
     const isGroupTopPosition = this.isGroupTopPosition();
     return (
-      <div key="group-header" className="group--header">
+      <div key="group-header" className={classNames(
+        "group--header",
+        this.isOneChild() ? "one--child" : "",
+      )}>
         {this.renderHeader()}
         {isGroupTopPosition && this.renderBeforeActions()}
         {isGroupTopPosition && this.renderActions()}

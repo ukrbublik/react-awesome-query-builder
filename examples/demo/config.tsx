@@ -130,6 +130,11 @@ export default (skin) => {
   const types: Types = {
     ...InitialConfig.types,
     // examples of  overriding
+    "!group": merge(InitialConfig.types["!group"], {
+      jsonLogic: {
+        var: "varValues",
+      },
+    }),
     boolean: merge(InitialConfig.types.boolean, {
       widgets: {
         boolean: {
@@ -271,7 +276,7 @@ export default (skin) => {
       
       ext: true,
       initialEmptyWhere: true, // for count only
-      showNot: false,
+      showNot: true,
       defaultOperator: "some",
       operators: [
         // w/ operand - count
