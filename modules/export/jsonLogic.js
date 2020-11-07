@@ -11,6 +11,7 @@ import pick from "lodash/pick";
 
 // http://jsonlogic.com/
 
+//meta is mutable
 export const jsonLogicFormat = (item, config) => {
   let meta = {
     usedFields: [],
@@ -259,15 +260,16 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const groupField = isRuleGroup && useGroupsAsArrays ? field : parentField;
   const ext = properties.get("ext");
   const groupOperator = properties.get("operator");
-  const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || {};
+  const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
   const groupValue = properties.get("value");
   const formattedValue = formatItemValue(config, properties, meta, groupOperator, parentField);
+  const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDefinition.cardinality == 0);
 
   const list = children
     .map((currentChild) => formatItem(currentChild, config, meta, false, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
   
-  if (isRuleGroup && useGroupsAsArrays && groupOperatorDefinition.cardinality != 0) {
+  if (isRuleGroup && useGroupsAsArrays && !isGroup0) {
     // "count" rule can have no "having" children, but should have number value
     if (formattedValue == undefined)
       return undefined;
@@ -289,7 +291,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
 
   // rule_group (issue #246)
   if (isRuleGroup && useGroupsAsArrays) {
-    if (!groupOperator || groupOperatorDefinition.cardinality == 0) {
+    if (isGroup0) {
       // all / some / none
       const op = groupOperator || "some";
       resultQuery = {
@@ -319,7 +321,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
       resultQuery = formatLogic(config, properties, count, formattedValue, groupOperator);
     }
   }
-
+  
   return resultQuery;
 };
 

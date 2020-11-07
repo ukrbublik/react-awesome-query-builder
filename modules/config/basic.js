@@ -436,14 +436,17 @@ const operators = {
   some: {
     label: "Some",
     cardinality: 0,
+    jsonLogic: "some",
   },
   all: {
     label: "All",
     cardinality: 0,
+    jsonLogic: "all",
   },
   none: {
     label: "None",
     cardinality: 0,
+    jsonLogic: "none",
   }
 };
 
