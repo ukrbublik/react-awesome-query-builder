@@ -36,8 +36,8 @@ export default class Operator extends PureComponent {
 
   getMeta({config, selectedField, selectedOperator}) {
     const fieldConfig = getFieldConfig(selectedField, config);
-    const operatorOptions = 
-      mapValues(
+    const operatorOptions 
+      = mapValues(
         pickBy(
           config.operators, 
           (item, key) => fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1

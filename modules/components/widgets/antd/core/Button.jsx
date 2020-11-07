@@ -11,7 +11,6 @@ export default ({type, onClick, label, config: {settings}}) => {
     "delRuleGroup": <DeleteFilled />,
 
     "addRuleGroup": <PlusOutlined />,
-    "delRuleGroup": <DeleteFilled />,
   };
 
   const typeToClass = {
@@ -22,13 +21,11 @@ export default ({type, onClick, label, config: {settings}}) => {
     "delRuleGroup": "action action--DELETE",
 
     "addRuleGroup": <PlusOutlined />,
-    "delRuleGroup": <DeleteFilled />,
   };
 
   const typeToType = {
     "delRule": "danger",
     "delGroup": "danger",
-    "delRuleGroup": "danger",
     "delRuleGroup": "danger",
   };
 

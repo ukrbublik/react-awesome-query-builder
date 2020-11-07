@@ -74,7 +74,7 @@ export const defaultGroupConjunction = (config, fieldConfig = null) => {
   if (conjs.length == 1)
     return conjs[0];
   return config.settings.defaultGroupConjunction || config.settings.defaultConjunction || conjs[0];
-}
+};
 
 export const defaultConjunction = (config) =>
   config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];

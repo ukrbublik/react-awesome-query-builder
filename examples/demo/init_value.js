@@ -69,4 +69,4 @@ export default
     "conjunction": "AND",
     "not": false
   }
-}
+};

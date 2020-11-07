@@ -266,4 +266,4 @@ export default class Widget extends PureComponent {
     );
   }
 
-};
+}

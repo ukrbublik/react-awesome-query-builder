@@ -302,10 +302,9 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
       };
     } else {
       // there is rule for count
-      const filter = !list.size ? 
-        formatField(meta, config, field, parentField)
-        :
-        {
+      const filter = !list.size 
+        ? formatField(meta, config, field, parentField)
+        : {
           "filter": [
             formatField(meta, config, field, parentField),
             resultQuery
