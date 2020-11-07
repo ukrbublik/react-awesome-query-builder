@@ -250,7 +250,7 @@ const setField = (state, path, newField, config) => {
   const wasRuleGroup = currentType == "rule_group";
   const newFieldConfig = getFieldConfig(newField, config);
   const isRuleGroup = newFieldConfig.type == "!group";
-  const isRuleGroupExt = isRuleGroup && newFieldConfig.ext;
+  const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
   const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
   
   const currentOperator = currentProperties.get("operator");
@@ -298,7 +298,7 @@ const setField = (state, path, newField, config) => {
     );
     let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
-      ext: isRuleGroupExt,
+      mode: newFieldConfig.mode,
     });
     if (isRuleGroupExt) {
       groupProperties = groupProperties.merge({
@@ -353,7 +353,6 @@ const setOperator = (state, path, newOperator, config) => {
   const currentField = properties.get("field");
   const fieldConfig = getFieldConfig(currentField, config);
   const isRuleGroup = fieldConfig.type == "!group";
-  const isRuleGroupExt = isRuleGroup && fieldConfig.ext;
   const operatorConfig = getOperatorConfig(config, newOperator, currentField);
   const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
 

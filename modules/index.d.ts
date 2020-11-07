@@ -39,6 +39,7 @@ type TypedKeyMap<K extends string|number, T> = {
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
+type RuleGroupModes = "struct" | "some" | "array";
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
@@ -46,7 +47,7 @@ type TypedValueSourceMap<T> = {
 type JsonGroup = {
   type: "group",
   id?: string,
-  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup},
+  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup|JsonRuleGroupExt},
   properties?: {
     conjunction: string,
     not?: boolean,
@@ -58,7 +59,21 @@ type JsonRuleGroup = {
   children1?: {[id: string]: JsonRule},
   properties?: {
     field: string | Empty,
-    ext?: boolean,
+    mode?: RuleGroupModes,
+  }
+}
+type JsonRuleGroupExt = {
+  type: "rule_group",
+  id?: string,
+  children1?: {[id: string]: JsonRule},
+  properties?: {
+    field: string | Empty,
+    mode: RuleGroupModes,
+    operator: string | Empty,
+    value: Array<RuleValue>,
+    valueSrc: Array<ValueSource>,
+    valueType: Array<string>,
+    valueError?: Array<string>,
   }
 }
 type JsonRule = {
@@ -458,12 +473,14 @@ interface FieldStruct extends BaseField {
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
+  mode: RuleGroupModes,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
   subfields: Fields,
-  ext: boolean,
+  mode: "array",
   operators?: Array<string>,
+  defaultOperator?: string,
   initialEmptyWhere?: boolean,
   showNot?: boolean,
   conjunctions?: Array<string>,
@@ -595,7 +612,6 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
-  useGroupsAsArrays?: boolean,
 }
 
 export interface OtherSettings {

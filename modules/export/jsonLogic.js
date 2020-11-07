@@ -22,7 +22,7 @@ export const jsonLogicFormat = (item, config) => {
     
   // build empty data
   const {errors, usedFields} = meta;
-  const {fieldSeparator, useGroupsAsArrays} = config.settings;
+  const {fieldSeparator} = config.settings;
   let data = {};
   for (let ff of usedFields) {
     const def = getFieldConfig(ff, config) || {};
@@ -32,7 +32,7 @@ export const jsonLogicFormat = (item, config) => {
       const p = parts[i];
       const pdef = getFieldConfig(parts.slice(0, i+1), config) || {};
       if (i != parts.length - 1) {
-        if (pdef.type == "!group" && useGroupsAsArrays) {
+        if (pdef.type == "!group" && pdef.mode != "struct") {
           if (!tmp[p])
             tmp[p] = [{}];
           tmp = tmp[p][0];
@@ -239,9 +239,9 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
 
 
 const formatGroup = (item, config, meta, isRoot, parentField = null) => {
-  const {useGroupsAsArrays} = config.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
+  const mode = properties.get("mode");
   const children = item.get("children1");
   const field = properties.get("field");
   if (!children) return undefined;
@@ -257,8 +257,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   }
 
   const isRuleGroup = (type === "rule_group" && !isRoot);
-  const groupField = isRuleGroup && useGroupsAsArrays ? field : parentField;
-  const ext = properties.get("ext");
+  const groupField = isRuleGroup && mode != "struct" ? field : parentField;
   const groupOperator = properties.get("operator");
   const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
   const groupValue = properties.get("value");
@@ -269,7 +268,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
     .map((currentChild) => formatItem(currentChild, config, meta, false, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
   
-  if (isRuleGroup && useGroupsAsArrays && !isGroup0) {
+  if (isRuleGroup && mode != "struct" && !isGroup0) {
     // "count" rule can have no "having" children, but should have number value
     if (formattedValue == undefined)
       return undefined;
@@ -290,7 +289,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   }
 
   // rule_group (issue #246)
-  if (isRuleGroup && useGroupsAsArrays) {
+  if (isRuleGroup && mode != "struct") {
     if (isGroup0) {
       // all / some / none
       const op = groupOperator || "some";

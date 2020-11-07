@@ -279,7 +279,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     const id = uuid();
 
     let children1 = {};
-    // TIP: `needSplit` will be true if using useGroupsAsArrays=false and there are fields of different groups on one level
+    // TIP: `needSplit` will be true if using mode=struct and there are fields of different groups on one level
     //      (like "a.b" and "x.z" -> need to split them with hierarchy)
     // TIP: Even if fields are of same root parent (like "a.b", "a.c.d"), still we may need to create hierarchy of `rule_group`s
     const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
@@ -547,11 +547,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
     }
     Object.assign(res.properties, {
-      ext: fieldConfig.ext || false,
+      mode: fieldConfig.mode,
       not: not,
       operator: opKey,
     });
-    if (fieldConfig.ext) {
+    if (fieldConfig.mode == "array") {
       Object.assign(res.properties, {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
@@ -566,12 +566,12 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       properties: {
         conjunction: defaultGroupConjunction(config),
         not: not,
-        ext: fieldConfig.ext || false,
+        mode: fieldConfig.mode,
         field: field,
         operator: opKey,
       }
     };
-    if (fieldConfig.ext) {
+    if (fieldConfig.mode == "array") {
       Object.assign(res.properties, {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),

@@ -132,7 +132,7 @@ export default (skin) => {
     // examples of  overriding
     "!group": merge(InitialConfig.types["!group"], {
       jsonLogic: {
-        var: "varValues",
+        //var: "varValues",
       },
     }),
     boolean: merge(InitialConfig.types.boolean, {
@@ -257,8 +257,8 @@ export default (skin) => {
         }
       }
     },
-    results2: {
-      label: "Results2",
+    results: {
+      label: "Results",
       type: "!group",
       subfields: {
         product: {
@@ -268,16 +268,26 @@ export default (skin) => {
           },
           valueSources: ["value"],
         },
+        gr: {
+          type: "!group",
+          subfields: {
+            subproduct: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["abc", "def", "xyz"],
+              },
+              valueSources: ["value"],
+            },
+          },
+        }
       }
     },
-    results: {
-      label: "Results",
+    cars: {
+      label: "Cars",
       type: "!group",
-      
-      ext: true,
-      initialEmptyWhere: true, // for count only
+      mode: "array",
+      conjunctions: ["AND", "OR"],
       showNot: true,
-      defaultOperator: "some",
       operators: [
         // w/ operand - count
         "equal",
@@ -294,21 +304,22 @@ export default (skin) => {
         "all",
         "none",
       ],
-      conjunctions: ["AND", "OR"],
+      defaultOperator: "some",
+      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
 
       subfields: {
-        product: {
+        vendor: {
           type: "select",
           fieldSettings: {
-            listValues: ["abc", "def", "xyz"],
+            listValues: ["Ford", "Toyota", "Tesla"],
           },
           valueSources: ["value"],
         },
-        score: {
+        year: {
           type: "number",
           fieldSettings: {
-            min: 0,
-            max: 100,
+            min: 1990,
+            max: 2020,
           },
           valueSources: ["value"],
         }

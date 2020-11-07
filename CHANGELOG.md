@@ -1,4 +1,10 @@
 # Changelog
+- 4.0.0
+  - Removed `useGroupsAsArrays`. 
+    Instead added for type `!group` property `mode` with values: 
+      `some` (default, corresponding useGroupsAsArrays = true), 
+      `array` (new), 
+      `struct` (obsolete, corresponding useGroupsAsArrays = false).
 - 3.0.0
   - Added [Material-UI](https://material-ui.com) widgets
 - 2.2.2

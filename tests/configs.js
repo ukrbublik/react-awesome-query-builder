@@ -187,6 +187,7 @@ export const with_struct_and_group = (BasicConfig) => ({
     results: {
       label: "Results",
       type: "!group",
+      mode: "struct",
       subfields: {
         slider: {
           label: "Slider",
@@ -225,7 +226,6 @@ export const with_struct_and_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useGroupsAsArrays: false,
   }
 });
   
@@ -235,12 +235,14 @@ export const with_nested_group = (BasicConfig) => ({
     results: {
       label: "Results",
       type: "!group",
+      mode: "some",
       subfields: {
         score: {
           type: "number",
         },
         user: {
           type: "!group",
+          mode: "some",
           subfields: {
             name: {
               type: "text",
@@ -252,6 +254,7 @@ export const with_nested_group = (BasicConfig) => ({
     group2: {
       label: "Group2",
       type: "!group",
+      mode: "some",
       subfields: {
         inside: {
           type: "number",
@@ -261,7 +264,6 @@ export const with_nested_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useGroupsAsArrays: true,
   }
 });
   
@@ -271,6 +273,7 @@ export const with_struct_inside_group = (BasicConfig) => ({
     results: {
       label: "Results",
       type: "!group",
+      mode: "some",
       subfields: {
         score: {
           type: "number",
@@ -288,7 +291,6 @@ export const with_struct_inside_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useGroupsAsArrays: true,
   }
 });
 

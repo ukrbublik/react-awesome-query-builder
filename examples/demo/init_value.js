@@ -6,7 +6,7 @@ export default
     "998a98b9-89ab-4cde-b012-31759ffa5c5b": {
       "type": "rule_group",
       "properties": {
-        "ext": true,
+        "mode": "array",
         "operator": "not_equal",
         "valueType": [
           "number"
