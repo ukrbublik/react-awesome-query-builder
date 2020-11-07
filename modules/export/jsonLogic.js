@@ -55,7 +55,6 @@ export const jsonLogicFormat = (item, config) => {
 };
 
 
-//meta is mutable
 const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
@@ -106,18 +105,28 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
 };
 
 
-//meta is mutable
+const groupVar = (config) => {
+  const {types} = config;
+  const groupSettings = types["!group"] || {};
+  const groupJL = groupSettings.jsonLogic || {};
+  return groupJL.var || "var";
+};
+
+
 const formatField = (meta, config, field, parentField = null) => {
   const {fieldSeparator} = config.settings;
+
   let ret;
   if (field) {
     if (Array.isArray(field))
       field = field.join(fieldSeparator);
+    const fieldDef = getFieldConfig(field, config) || {};
     let fieldName = field;
     if (parentField) {
       fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
     }
-    ret = { "var": fieldName };
+    let varName = fieldDef.type == "!group" ? groupVar(config) : "var";
+    ret = { [varName] : fieldName };
     if (meta.usedFields.indexOf(field) == -1)
       meta.usedFields.push(field);
   }
@@ -125,7 +134,6 @@ const formatField = (meta, config, field, parentField = null) => {
 };
 
 
-//meta is mutable
 const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField = null) => {
   if (currentValue === undefined)
     return undefined;
@@ -229,7 +237,6 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
 };
 
 
-//meta is mutable
 const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const {useGroupsAsArrays} = config.settings;
   const type = item.get("type");
@@ -317,7 +324,6 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
 };
 
 
-//meta is mutable
 const formatRule = (item, config, meta, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
@@ -360,7 +366,6 @@ const formatRule = (item, config, meta, parentField = null) => {
 };
 
 
-//meta is mutable
 const formatItem = (item, config, meta, isRoot, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");

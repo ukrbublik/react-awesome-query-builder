@@ -667,7 +667,7 @@ const widgets = {
     customProps: {
       //showSearch: true
     }
-  },
+  }
 };
 
 //----------------------------  types
@@ -849,6 +849,9 @@ const types = {
   "!group": {
     defaultOperator: "some",
     mainWidget: "number",
+    jsonLogic: {
+      var: "varValues",
+    },
     widgets: {
       number: {
         widgetProps: {

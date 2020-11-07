@@ -30,6 +30,7 @@ export const loadFromJsonLogic = (logicTree, config) => {
   return immTree;
 };
 
+
 const buildConv = (config) => {
   let operators = {};
   for (let opKey in config.operators) {
@@ -70,8 +71,10 @@ const buildConv = (config) => {
     operators,
     conjunctions,
     funcs,
+    groupVar: groupVar(config),
   };
 };
+
 
 const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null) => {
   let op, vals;
@@ -85,7 +88,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
-  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && Object.keys(vals[0])[0] == "var");
+  const isNotOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && ["var", conv.groupVar].includes(Object.keys(vals[0])[0]));
   const isRev = op == "!" && !isNotOp;
   if (isRev) {
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
@@ -105,6 +108,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
 
   return ret;
 };
+
 
 const convertVal = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined) return undefined;
@@ -164,9 +168,10 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   };
 };
 
+
 const convertField = (op, vals, conv, config, not, meta, parentField = null) => {
   const {fieldSeparator} = config.settings;
-  if (op == "var") {
+  if (op == "var" || op == conv.groupVar) {
     let field = vals[0];
     if (parentField)
       field = [parentField, field].join(fieldSeparator);
@@ -185,6 +190,7 @@ const convertField = (op, vals, conv, config, not, meta, parentField = null) => 
 
   return undefined;
 };
+
 
 const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField = null) => {
   if (!op) return undefined;
@@ -240,6 +246,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
 
   return undefined;
 };
+
 
 const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   const conjKey = conv.conjunctions[op];
@@ -330,6 +337,14 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   return undefined;
 };
 
+
+const groupVar = (config) => {
+  const {types} = config;
+  const groupSettings = types["!group"] || {};
+  const groupJL = groupSettings.jsonLogic || {};
+  return groupJL.var || "var";
+};
+
 const topLevelFieldsFilter = (fields) => {
   let arr = [...fields].sort((a, b) => (a.length - b.length));
   for (let i = 0 ; i < arr.length ; i++) {
@@ -370,6 +385,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
   };
 };
 
+
 const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   if (!op) return undefined;
   const {fieldSeparator} = config.settings;
@@ -403,14 +419,14 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       } else {
         [jlField, ...args] = vals;
       }
-      let {"var": field} = jlField;
+      let {"var": field} = jlField; //todo
       let {"reduce": reduce} = jlField;
       if (parentField)
         field = [parentField, field].join(fieldSeparator);
       if (reduce) {
         let [filter, acc, init] = reduce;
         if (init == 0 && acc["+"] && acc["+"][0] == 1 && acc["+"][1] && acc["+"][1]["var"] == "accumulator") {
-          
+          //todo
         }
       }
       if (!field) {
@@ -447,23 +463,27 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   // special case for `rule_group` (issue #246)
   if (["some", "all", "none"].includes(op) && arity == 2) {
     if (vals[0].var !== undefined && Object.keys(vals[1]).length == 1) {
-      const {"var": field} = vals[0];
+      const {"var": field} = vals[0]; //todo
       const sub = vals[1];
-      const newOp = Object.keys(sub)[0];
-      if (!(newOp == "in" && op == "all")) { // don't confuse with "all-in" for multiselect
-        const newVals = sub[newOp];
-        const newNot = !!(not ^ (newOp == "none"));
+      const conj = Object.keys(sub)[0];
+      if (!(conj == "in" && op == "all")) { // don't confuse with "all-in" for multiselect
+        const newVals = sub[conj];
+        const newNot = not;
         const groupField = (parentField ? [parentField, field] : [field]).join(fieldSeparator);
         const groupFieldConfig = getFieldConfig(groupField, config);
         if (groupFieldConfig && groupFieldConfig.type == "!group") {
           let res;
-          if (conv.conjunctions[newOp] !== undefined) {
-            res = convertConj(newOp, newVals, conv, config, newNot, meta, groupField);
+          if (conv.conjunctions[conj] !== undefined) {
+            res = convertConj(conj, newVals, conv, config, newNot, meta, groupField);
           } else {
             // need to be wrapped in `rule_group`
-            const rule = convertOp(newOp, newVals, conv, config, newNot, meta, groupField);
+            const rule = convertOp(conj, newVals, conv, config, newNot, meta, groupField);
             res = wrapInDefaultConjRuleGroup(rule, groupField, groupFieldConfig, config, conv.conjunctions["and"]);
           }
+          Object.assign(res.properties, {
+            ext: groupFieldConfig.ext || false,
+            operator: op,
+          });
           return res;
         }
       }
