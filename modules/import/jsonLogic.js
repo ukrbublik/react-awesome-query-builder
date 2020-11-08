@@ -300,9 +300,11 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
           groupField.split(fieldSeparator).map((f, i, a) => {
             const p = a.slice(0, i);
             const ff = [...p, f].join(fieldSeparator);
+            const ffConfig = getFieldConfig(ff, config) || {};
             if (!needSplit && i == 0) {
               type = "rule_group";
               properties.field = ff;
+              properties.mode = ffConfig.mode;
               groupToId[ff] = id;
             } else {
               let groupId = groupToId[ff];
@@ -317,6 +319,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
                     conjunction: conjKey,
                     not: false,
                     field: ff,
+                    mode: ffConfig.mode,
                   }
                 };
               }
