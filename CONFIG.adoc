@@ -371,6 +371,7 @@ Localization:
 |addGroupLabel |Add group
 |addRuleLabel |Add rule
 |addSubRuleLabel |Add sub rule
+|addSubRuleLabel |Add sub rule
 |notLabel |Not
 |valueSourcesPopupTitle |Select value source
 |removeRuleConfirmOptions |If you want to ask confirmation of removing non-empty rule/group, add these options. +

@@ -268,17 +268,13 @@ export default (skin) => {
           },
           valueSources: ["value"],
         },
-        gr: {
-          type: "!group",
-          subfields: {
-            subproduct: {
-              type: "select",
-              fieldSettings: {
-                listValues: ["abc", "def", "xyz"],
-              },
-              valueSources: ["value"],
-            },
+        score: {
+          type: "number",
+          fieldSettings: {
+            min: 0,
+            max: 100,
           },
+          valueSources: ["value"],
         }
       }
     },
