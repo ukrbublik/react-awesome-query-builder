@@ -450,6 +450,7 @@ interface ValueField extends BaseField {
   valueSources?: Array<ValueSource>,
   funcs?: Array<string>,
   tableName?: string,
+  jsonLogicVar?: string,
   fieldSettings?: FieldSettings,
   defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,

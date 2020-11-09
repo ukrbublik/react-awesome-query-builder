@@ -32,6 +32,7 @@ export default class Widget extends PureComponent {
     leftField: PropTypes.string,
     // for RuleGroupExt
     isForRuleGruop: PropTypes.bool,
+    parentField: PropTypes.string,
   };
 
   constructor(props) {
@@ -158,7 +159,7 @@ export default class Widget extends PureComponent {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly} = props;
+    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField} = props;
     const {settings} = config;
     const { widgets, _values, _field } = meta;
     const value = isFuncArg ? _values : values;
@@ -182,6 +183,7 @@ export default class Widget extends PureComponent {
           {...pick(widgets[delta], ["widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler"])}
           config={config}
           field={field}
+          parentField={parentField}
           operator={operator}
           readonly={readonly}
         />

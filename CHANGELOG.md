@@ -5,6 +5,7 @@
       `some` (default, corresponding useGroupsAsArrays = true), 
       `array` (new), 
       `struct` (obsolete, corresponding useGroupsAsArrays = false).
+  - Removed obsolete `hideConjForOne`
 - 3.0.0
   - Added [Material-UI](https://material-ui.com) widgets
 - 2.2.2

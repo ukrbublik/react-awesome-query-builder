@@ -71,7 +71,7 @@ const buildConv = (config) => {
     operators,
     conjunctions,
     funcs,
-    groupVar: groupVar(config),
+    varKeys: ["var", config.settings.jsonLogic.groupVar, config.settings.jsonLogic.altVar],
   };
 };
 
@@ -88,7 +88,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
-  const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && ["var", conv.groupVar].includes(Object.keys(vals[0])[0]));
+  const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
   const isRev = op == "!" && !isEmptyOp;
   if (isRev) {
     // reverse with not
@@ -173,7 +173,7 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
 
 const convertField = (op, vals, conv, config, not, meta, parentField = null) => {
   const {fieldSeparator} = config.settings;
-  if (["var", conv.groupVar].includes(op) && typeof vals[0] == "string") {
+  if (conv.varKeys.includes(op) && typeof vals[0] == "string") {
     let field = vals[0];
     if (parentField)
       field = [parentField, field].join(fieldSeparator);
@@ -343,13 +343,6 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
 };
 
 
-const groupVar = (config) => {
-  const {types} = config;
-  const groupSettings = types["!group"] || {};
-  const groupJL = groupSettings.jsonLogic || {};
-  return groupJL.var || "var";
-};
-
 const topLevelFieldsFilter = (fields) => {
   let arr = [...fields].sort((a, b) => (a.length - b.length));
   for (let i = 0 ; i < arr.length ; i++) {
@@ -434,7 +427,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
     let v = Object.values(jlField)[0];
     
     let field, having, isGroup;
-    if (["var", conv.groupVar].includes(k) && typeof v == "string") {
+    if (conv.varKeys.includes(k) && typeof v == "string") {
       field = v;
     }
     if (isGroup0) {
@@ -453,13 +446,13 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
           if (isJsonLogic(group)) {
             k = Object.keys(group)[0];
             v = Object.values(group)[0];
-            if (["var", conv.groupVar].includes(k) && typeof v == "string") {
+            if (conv.varKeys.includes(k) && typeof v == "string") {
               field = v;
               having = filter;
               isGroup = true;
             }
           }
-        } else if (["var", conv.groupVar].includes(k) && typeof v == "string") {
+        } else if (conv.varKeys.includes(k) && typeof v == "string") {
           field = v;
           isGroup = true;
         }

@@ -9,6 +9,19 @@ import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 
+const formatFieldName = (field, config) => {
+  const fieldDefinition = getFieldConfig(field, config) || {};
+  const {fieldSeparator} = config.settings;
+  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  if (fieldDefinition.tableName) {
+      const fieldPartsCopy = [...fieldParts];
+      fieldPartsCopy[0] = fieldDefinition.tableName;
+      fieldName = fieldPartsCopy.join(fieldSeparator);
+  }
+  return fieldName;
+};
+
 const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay) => {
   if (currentValue === undefined)
     return undefined;
@@ -26,7 +39,7 @@ const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefin
       const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
       const fieldLabel2 = rightFieldDefinition.label2 || fieldFullLabel;
       const formatField = config.settings.formatField || defaultSettings.formatField;
-      const rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
+      const rightFieldName = formatFieldName(rightField, config);
       formattedField = formatField(rightFieldName, fieldParts, fieldLabel2, rightFieldDefinition, config, isForDisplay);
     }
     ret = formattedField;

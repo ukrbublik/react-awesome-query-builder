@@ -69,5 +69,10 @@ export const settings = {
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
-  defaultGroupConjunction: "AND"
+
+  defaultGroupConjunction: "AND",
+  jsonLogic: {
+    groupVar: "var",
+    altVar: "var",
+  }
 };

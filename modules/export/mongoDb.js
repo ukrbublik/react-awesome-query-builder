@@ -24,8 +24,29 @@ export const mongodbFormat = (tree, config) => {
 
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
+const formatFieldName = (field, config, meta, parentPath) => {
+  const fieldDefinition = getFieldConfig(field, config) || {};
+  const {fieldSeparator} = config.settings;
+  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  // if (fieldDefinition.tableName) {
+  //     const fieldPartsCopy = [...fieldParts];
+  //     fieldPartsCopy[0] = fieldDefinition.tableName;
+  //     fieldName = fieldPartsCopy.join(fieldSeparator);
+  // }
+
+  if (parentPath) {
+    if (fieldName.indexOf(parentPath+".") == 0) {
+      fieldName = fieldName.slice((parentPath+".").length);
+    } else {
+      meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
+    }
+  }
+  return fieldName;
+};
+
 //meta is mutable
-const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, parentPath, operator, operatorDefinition) => {
   if (currentValue === undefined)
     return [undefined, false];
   const {fieldSeparator} = config.settings;
@@ -41,12 +62,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
       const fieldPartsLabels = getFieldPathLabels(rightField, config);
       const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
       const formatField = config.settings.formatField || defaultSettings.formatField;
-      let rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
-      // if (rightFieldDefinition.tableName) {
-      //     const fieldPartsCopy = [...fieldParts];
-      //     fieldPartsCopy[0] = rightFieldDefinition.tableName;
-      //     rightFieldName = fieldPartsCopy.join(fieldSeparator);
-      // }
+      const rightFieldName = formatFieldName(rightField, config, meta, parentPath);
       const formattedField = formatField(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
       ret = "$" + formattedField;
       useExpr = true;
@@ -67,7 +83,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-      const [formattedArgVal, _argUseExpr] = mongoFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+      const [formattedArgVal, _argUseExpr] = mongoFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, parentPath, argConfig, null, null);
       if (argValue != undefined && formattedArgVal === undefined) {
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
         return [undefined, false];
@@ -188,15 +204,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     }
     if (field) {
       //format field
-      let fieldName = field;
-      if (hasParentRuleGroup) {
-        if (parentPath && fieldName.indexOf(parentPath+".") == 0) {
-          fieldName = fieldName.slice((parentPath+".").length);
-        } else {
-          meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
-        }
-      }
-      
+      let fieldName = formatFieldName(field, config, meta, hasParentRuleGroup && parentPath);      
       resultQuery = { [fieldName]: {"$elemMatch": resultQuery} };
     }
     return resultQuery;
@@ -248,7 +256,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       currentValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-      const [fv, _useExpr] = mongoFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+      const [fv, _useExpr] = mongoFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, hasParentRuleGroup && parentPath, operator, operatorDefinition);
       if (fv !== undefined) {
         useExpr = useExpr || _useExpr;
         valueSrcs.push(valueSrc);

@@ -149,6 +149,7 @@ class Rule extends PureComponent {
       const widget = <Widget
         key="values"
         field={this.props.selectedField}
+        parentField={this.props.parentField}
         operator={this.props.selectedOperator}
         value={this.props.value}
         valueSrc={this.props.valueSrc}

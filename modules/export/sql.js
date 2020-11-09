@@ -23,6 +23,19 @@ export const sqlFormat = (tree, config) => {
   return res;
 };
 
+const formatFieldName = (field, config) => {
+  const fieldDefinition = getFieldConfig(field, config) || {};
+  const {fieldSeparator} = config.settings;
+  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  if (fieldDefinition.tableName) {
+      const fieldPartsCopy = [...fieldParts];
+      fieldPartsCopy[0] = fieldDefinition.tableName;
+      fieldName = fieldPartsCopy.join(fieldSeparator);
+  }
+  return fieldName;
+};
+
 //meta is mutable
 const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
   if (currentValue === undefined)
@@ -40,12 +53,7 @@ const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWi
       const fieldPartsLabels = getFieldPathLabels(rightField, config);
       const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
       const formatField = config.settings.formatField || defaultSettings.formatField;
-      let rightFieldName = Array.isArray(rightField) ? rightField.join(fieldSeparator) : rightField;
-      if (rightFieldDefinition.tableName) {
-        const fieldPartsCopy = [...fieldParts];
-        fieldPartsCopy[0] = rightFieldDefinition.tableName;
-        rightFieldName = fieldPartsCopy.join(fieldSeparator);
-      }
+      const rightFieldName = formatFieldName(rightField, config);
       formattedField = formatField(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config);
     }
     ret = formattedField;
@@ -194,13 +202,8 @@ const sqlFormatItem = (item, config, meta) => {
     }
         
     //format field
-    let fieldName = field;
+    let fieldName = formatFieldName(field, config);
     const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-    if (fieldDefinition.tableName) {
-      const fieldPartsCopy = [...fieldParts];
-      fieldPartsCopy[0] = fieldDefinition.tableName;
-      fieldName = fieldPartsCopy.join(fieldSeparator);
-    }
     const _fieldKeys = getFieldPath(field, config);
     const fieldPartsLabels = getFieldPathLabels(field, config);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparator) : null;

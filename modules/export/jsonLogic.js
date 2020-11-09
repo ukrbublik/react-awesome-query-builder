@@ -106,16 +106,8 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
 };
 
 
-const groupVar = (config) => {
-  const {types} = config;
-  const groupSettings = types["!group"] || {};
-  const groupJL = groupSettings.jsonLogic || {};
-  return groupJL.var || "var";
-};
-
-
 const formatField = (meta, config, field, parentField = null) => {
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator, jsonLogic} = config.settings;
 
   let ret;
   if (field) {
@@ -126,7 +118,7 @@ const formatField = (meta, config, field, parentField = null) => {
     if (parentField) {
       fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
     }
-    let varName = fieldDef.type == "!group" ? groupVar(config) : "var";
+    let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVar : "var");
     ret = { [varName] : fieldName };
     if (meta.usedFields.indexOf(field) == -1)
       meta.usedFields.push(field);
@@ -140,7 +132,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     return undefined;
   let ret;
   if (valueSrc == "field") {
-    ret = formatField(meta, config, currentValue, null);
+    ret = formatField(meta, config, currentValue, parentField);
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
   } else if (typeof fieldWidgetDefinition.jsonLogic === "function") {

@@ -130,11 +130,6 @@ export default (skin) => {
   const types: Types = {
     ...InitialConfig.types,
     // examples of  overriding
-    "!group": merge(InitialConfig.types["!group"], {
-      jsonLogic: {
-        //var: "varValues",
-      },
-    }),
     boolean: merge(InitialConfig.types.boolean, {
       widgets: {
         boolean: {
@@ -217,6 +212,11 @@ export default (skin) => {
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
     // maxNumberOfRules: 10 // number of rules can be added to the query builder
+    //todo
+    jsonLogic: {
+      groupVar: "varValues",
+      altVar: "shortcut",
+    }
   };
 
   //////////////////////////////////////////////////////////////////////
@@ -275,6 +275,15 @@ export default (skin) => {
             max: 100,
           },
           valueSources: ["value"],
+        },
+         //todo
+        score2: {
+          type: "number",
+          fieldSettings: {
+            min: 0,
+            max: 100,
+          },
+          valueSources: ["value", "field"],
         }
       }
     },
@@ -501,6 +510,7 @@ export default (skin) => {
       label: "In stock",
       type: "boolean",
       defaultValue: true,
+      jsonLogicVar: "shortcut", //todo
       mainWidgetProps: {
         labelYes: "+",
         labelNo: "-"

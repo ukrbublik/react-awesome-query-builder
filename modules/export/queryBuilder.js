@@ -53,6 +53,19 @@ export const queryBuilderFormat = (item, config) => {
   return {..._queryBuilderFormat(item, config, meta), ...meta};
 };
 
+const formatFieldName = (field, config) => {
+  const fieldDefinition = getFieldConfig(field, config) || {};
+  const {fieldSeparator} = config.settings;
+  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  if (fieldDefinition.tableName) {
+      const fieldPartsCopy = [...fieldParts];
+      fieldPartsCopy[0] = fieldDefinition.tableName;
+      fieldName = fieldPartsCopy.join(fieldSeparator);
+  }
+  return fieldName;
+};
+
 //meta is mutable
 const _queryBuilderFormat = (item, config, meta) => {
   if (!item) return undefined;
@@ -98,13 +111,7 @@ const _queryBuilderFormat = (item, config, meta) => {
     const cardinality = defaultValue(operatorDefinition.cardinality, 1);
     const typeConfig = config.types[fieldDefinition.type] || {};
 
-    //format field
-    let fieldName = field;
-    if (fieldDefinition.tableName) {
-      let fieldParts = Array.isArray(field) ? [...field] : field.split(fieldSeparator);
-      fieldParts[0] = fieldDefinition.tableName;
-      fieldName = fieldParts.join(fieldSeparator);
-    }
+    let fieldName = formatFieldName(field, config);
 
     if (value.size < cardinality)
       return undefined;
