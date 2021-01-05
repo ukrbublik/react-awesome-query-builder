@@ -148,5 +148,8 @@
     "webpack-bundle-analyzer": "^3.9.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.11.0"
-  }
+  },
+  "precommit": [
+    "build-global"
+  ]
 }
