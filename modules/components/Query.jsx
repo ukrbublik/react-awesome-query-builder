@@ -1,6 +1,7 @@
 import React, { Component, PureComponent } from "react";
 import PropTypes from "prop-types";
 import createTreeStore from "../stores/tree";
+import context from "../stores/context";
 import {createStore} from "redux";
 import {Provider, Connector, connect} from "react-redux";
 import * as actions from "../actions";
@@ -90,6 +91,11 @@ const ConnectedQuery = connect(
       __isInternalValueChange: state.__isInternalValueChange,
     };
   },
+  null,
+  null,
+  {
+    context
+  }
 )(Query);
 ConnectedQuery.displayName = "ConnectedQuery";
 
@@ -162,7 +168,7 @@ export default class QueryContainer extends Component {
 
       return (
         <QueryWrapper config={config}>
-          <Provider store={store}>
+          <Provider store={store} context={context}>
             <ConnectedQuery
               store={store}
               config={config}

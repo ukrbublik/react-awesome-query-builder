@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import context from "../../stores/context";
 import {getFieldConfig} from "../../utils/configUtils";
 import {pureShouldComponentUpdate} from "../../utils/renderUtils";
 import {connect} from "react-redux";
@@ -162,6 +163,11 @@ export default (Rule) => {
       return {
         dragging: state.dragging,
       };
+    },
+    null,
+    null,
+    {
+      context
     }
   )(RuleContainer);
   ConnectedRuleContainer.displayName = "ConnectedRuleContainer";

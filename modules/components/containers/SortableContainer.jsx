@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {connect} from "react-redux";
+import context from "../../stores/context";
 import {getFlatTree} from "../../utils/treeUtils";
 import * as constants from "../../constants";
 import clone from "clone";
@@ -553,6 +554,10 @@ export default (Builder, CanMoveFn = null) => {
       setDragStart: actions.drag.setDragStart,
       setDragProgress: actions.drag.setDragProgress,
       setDragEnd: actions.drag.setDragEnd,
+    },
+    null,
+    {
+      context
     }
   )(SortableContainer);
   ConnectedSortableContainer.displayName = "ConnectedSortableContainer";
