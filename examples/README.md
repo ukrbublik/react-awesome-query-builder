@@ -10,7 +10,7 @@ Uses complex config to demonstrate anvanced usage.
 ```sh
 cd examples
 npm i
-npm start
+npm run start
 ```
 And open localhost:3001 in a browser.  
 Feel free to play with code in `demo` dir.  
