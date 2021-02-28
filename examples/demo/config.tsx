@@ -276,7 +276,7 @@ export default (skin) => {
           },
           valueSources: ["value"],
         },
-         //todo: delete
+        //todo: delete
         score2: {
           type: "number",
           fieldSettings: {

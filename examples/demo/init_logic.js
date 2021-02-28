@@ -107,4 +107,4 @@ export default
       ]
     }
   ]
-}
+};
