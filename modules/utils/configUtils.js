@@ -117,6 +117,7 @@ function _extendFuncArgsConfig(subconfig, config) {
 }
 
 function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
+  //todo: set missing fieldName ?
   let operators = null, defaultOperator = null;
   const typeConfig = config.types[fieldConfig.type];
   const excludeOperators = fieldConfig.excludeOperators || [];

@@ -25,19 +25,27 @@ export const mongodbFormat = (tree, config) => {
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 const formatFieldName = (field, config, meta, parentPath) => {
-  const fieldDefinition = getFieldConfig(field, config) || {};
+  const fieldDef = getFieldConfig(field, config) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  // if (fieldDefinition.tableName) {
+  // if (fieldDef.tableName) { // legacy
   //     const fieldPartsCopy = [...fieldParts];
-  //     fieldPartsCopy[0] = fieldDefinition.tableName;
+  //     fieldPartsCopy[0] = fieldDef.tableName;
   //     fieldName = fieldPartsCopy.join(fieldSeparator);
   // }
+  if (fieldDef.fieldName) {
+    fieldName = fieldDef.fieldName;
+  }
 
   if (parentPath) {
-    if (fieldName.indexOf(parentPath+".") == 0) {
-      fieldName = fieldName.slice((parentPath+".").length);
+    const parentFieldDef = getFieldConfig(parentPath, config) || {};
+    let parentFieldName = parentPath;
+    if (parentFieldDef.fieldName) {
+      parentFieldName = parentFieldDef.fieldName;
+    }
+    if (fieldName.indexOf(parentFieldName+".") == 0) {
+      fieldName = fieldName.slice((parentFieldName+".").length);
     } else {
       meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
     }

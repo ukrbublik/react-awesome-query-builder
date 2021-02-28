@@ -243,7 +243,7 @@ export default (skin) => {
         },
         login: {
           type: "text",
-          tableName: "t1", // PR #18, PR #20
+          tableName: "t1", // legacy: PR #18, PR #20
           excludeOperators: ["proximity"],
           fieldSettings: {
             validateValue: (val, fieldSettings) => {
@@ -259,6 +259,7 @@ export default (skin) => {
     },
     results: {
       label: "Results",
+      fieldName: "state.input.results", //todo: temp
       type: "!group",
       subfields: {
         product: {
@@ -270,6 +271,7 @@ export default (skin) => {
         },
         score: {
           type: "number",
+          //todo: should be extended auto
           fieldSettings: {
             min: 0,
             max: 100,
@@ -279,6 +281,7 @@ export default (skin) => {
         //todo: delete
         score2: {
           type: "number",
+          fieldName: "state.input.results.score2", //todo: temp
           fieldSettings: {
             min: 0,
             max: 100,

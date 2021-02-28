@@ -14,11 +14,12 @@ const formatFieldName = (field, config) => {
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  if (fieldDefinition.tableName) {
+  if (fieldDefinition.tableName) { // legacy
     const fieldPartsCopy = [...fieldParts];
     fieldPartsCopy[0] = fieldDefinition.tableName;
     fieldName = fieldPartsCopy.join(fieldSeparator);
   }
+  //todo: cut group, use fieldName config
   return fieldName;
 };
 

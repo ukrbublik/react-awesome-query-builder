@@ -177,7 +177,7 @@ const convertField = (op, vals, conv, config, not, meta, parentField = null) => 
     let field = vals[0];
     if (parentField)
       field = [parentField, field].join(fieldSeparator);
-    const fieldConfig = getFieldConfig(field, config);
+    const fieldConfig = getFieldConfig(field, config); //todo: use fieldName config for reverse find (introduce cache?)
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);
       return undefined;

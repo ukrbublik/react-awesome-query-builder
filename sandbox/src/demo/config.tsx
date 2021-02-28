@@ -45,7 +45,7 @@ const fields: Fields = {
       },
       login: {
         type: "text",
-        tableName: "t1", // PR #18, PR #20
+        tableName: "t1", // legacy: PR #18, PR #20
         excludeOperators: ["proximity"],
         fieldSettings: {
           validateValue: (val, fieldSettings) => {

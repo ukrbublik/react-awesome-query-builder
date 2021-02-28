@@ -449,7 +449,8 @@ interface ValueField extends BaseField {
   preferWidgets?: Array<string>,
   valueSources?: Array<ValueSource>,
   funcs?: Array<string>,
-  tableName?: string,
+  tableName?: string, // legacy: PR #18, PR #20
+  fieldName?: string,
   jsonLogicVar?: string,
   fieldSettings?: FieldSettings,
   defaultValue?: RuleValue,

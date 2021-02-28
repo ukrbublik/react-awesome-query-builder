@@ -115,8 +115,20 @@ const formatField = (meta, config, field, parentField = null) => {
       field = field.join(fieldSeparator);
     const fieldDef = getFieldConfig(field, config) || {};
     let fieldName = field;
+    if (fieldDef.fieldName) {
+      fieldName = fieldDef.fieldName;
+    }
     if (parentField) {
-      fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
+      const parentFieldDef = getFieldConfig(parentField, config) || {};
+      let parentFieldName = parentField;
+      if (parentFieldDef.fieldName) {
+        parentFieldName = parentFieldDef.fieldName;
+      }
+      if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
+        fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
+      } else {
+        meta.errors.push(`Can't cut group ${parentField} from field ${fieldName}`);
+      }
     }
     let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVarKey : "var");
     ret = { [varName] : fieldName };
@@ -370,10 +382,3 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
 };
 
 
-// helpers
-const cutBeginOfString = (str, begin) => {
-  if (begin && str.slice(0, begin.length) == begin) {
-    str = str.slice(begin.length);
-  }
-  return str;
-};
