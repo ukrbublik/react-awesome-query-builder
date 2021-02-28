@@ -232,21 +232,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       not = false;
     }
 
-    //format field
-    let fieldName = field;
-    if (hasParentRuleGroup) {
-      if (parentPath && fieldName.indexOf(parentPath+".") == 0) {
-        fieldName = fieldName.slice((parentPath+".").length);
-      } else {
-        meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
-      }
-    }
-    
-    // if (fieldDefinition.tableName) {
-    //   let fieldParts = Array.isArray(field) ? [...field] : field.split(fieldSeparator);
-    //   fieldParts[0] = fieldDefinition.tableName;
-    //   fieldName = fieldParts.join(fieldSeparator);
-    // }
+    const fieldName = formatFieldName(field, config, meta, hasParentRuleGroup && parentPath);
 
     //format value
     let valueSrcs = [];

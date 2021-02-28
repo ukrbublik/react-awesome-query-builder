@@ -110,8 +110,7 @@ const _queryBuilderFormat = (item, config, meta) => {
     const fieldType = fieldDefinition.type || "undefined";
     const cardinality = defaultValue(operatorDefinition.cardinality, 1);
     const typeConfig = config.types[fieldDefinition.type] || {};
-
-    let fieldName = formatFieldName(field, config);
+    const fieldName = formatFieldName(field, config);
 
     if (value.size < cardinality)
       return undefined;

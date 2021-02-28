@@ -173,13 +173,8 @@ export const queryString = (item, config, isForDisplay = false) => {
       return undefined;
         
     //format field
-    let fieldName = field;
+    const fieldName = formatFieldName(field, config);
     const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-    if (fieldDefinition.tableName) {
-      const fieldPartsCopy = [...fieldParts];
-      fieldPartsCopy[0] = fieldDefinition.tableName;
-      fieldName = fieldPartsCopy.join(fieldSeparator);
-    }
     const _fieldKeys = getFieldPath(field, config);
     const fieldPartsLabels = getFieldPathLabels(field, config);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(config.settings.fieldSeparatorDisplay) : null;
