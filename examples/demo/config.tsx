@@ -212,10 +212,10 @@ export default (skin) => {
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
     // maxNumberOfRules: 10 // number of rules can be added to the query builder
-    //todo
+    // todo: just for demo, delete later
     jsonLogic: {
-      groupVar: "varValues",
-      altVar: "shortcut",
+      groupVarKey: "varValues",
+      altVarKey: "shortcut",
     }
   };
 
@@ -276,7 +276,7 @@ export default (skin) => {
           },
           valueSources: ["value"],
         },
-         //todo
+         //todo: delete
         score2: {
           type: "number",
           fieldSettings: {
@@ -510,7 +510,7 @@ export default (skin) => {
       label: "In stock",
       type: "boolean",
       defaultValue: true,
-      jsonLogicVar: "shortcut", //todo
+      jsonLogicVar: "shortcut", //todo: just for demo, delete later
       mainWidgetProps: {
         labelYes: "+",
         labelNo: "-"

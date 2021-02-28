@@ -83,7 +83,9 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-      const [formattedArgVal, _argUseExpr] = mongoFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, parentPath, argConfig, null, null);
+      const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
+      const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
+      const [formattedArgVal, _argUseExpr] = mongoFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, argConfig, null, null);
       if (argValue != undefined && formattedArgVal === undefined) {
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
         return [undefined, false];

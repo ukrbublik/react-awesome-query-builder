@@ -118,7 +118,7 @@ const formatField = (meta, config, field, parentField = null) => {
     if (parentField) {
       fieldName = cutBeginOfString(fieldName, parentField + fieldSeparator);
     }
-    let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVar : "var");
+    let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVarKey : "var");
     ret = { [varName] : fieldName };
     if (meta.usedFields.indexOf(field) == -1)
       meta.usedFields.push(field);

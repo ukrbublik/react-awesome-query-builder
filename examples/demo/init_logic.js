@@ -19,7 +19,7 @@ export default
     {
       "==": [
         {
-          "var": "stock"
+          "shortcut": "stock"
         },
         false
       ]
@@ -35,16 +35,18 @@ export default
     {
       "some": [
         {
-          "var": "results"
+          "varValues": "results"
         },
         {
           "and": [
             {
               "==": [
                 {
-                  "var": "product"
+                  "var": "score2"
                 },
-                "abc"
+                {
+                  "var": "score"
+                }
               ]
             },
             {
@@ -66,7 +68,7 @@ export default
             {
               "filter": [
                 {
-                  "var": "cars"
+                  "varValues": "cars"
                 },
                 {
                   "and": [
@@ -106,4 +108,3 @@ export default
     }
   ]
 }
-;

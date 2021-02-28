@@ -71,7 +71,7 @@ const buildConv = (config) => {
     operators,
     conjunctions,
     funcs,
-    varKeys: ["var", config.settings.jsonLogic.groupVar, config.settings.jsonLogic.altVar],
+    varKeys: ["var", config.settings.jsonLogic.groupVarKey, config.settings.jsonLogic.altVarKey],
   };
 };
 

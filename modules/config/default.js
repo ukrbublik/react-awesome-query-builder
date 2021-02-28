@@ -72,7 +72,7 @@ export const settings = {
 
   defaultGroupConjunction: "AND",
   jsonLogic: {
-    groupVar: "var",
-    altVar: "var",
+    groupVarKey: "var",
+    altVarKey: "var",
   }
 };
