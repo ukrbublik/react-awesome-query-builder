@@ -16,7 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "strictNullChecks": false,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
