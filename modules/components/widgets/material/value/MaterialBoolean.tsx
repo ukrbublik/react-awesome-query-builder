@@ -10,12 +10,14 @@ export default (props) => {
   const onChange = () => {
     setValue(!value);
   };
-  
+
   return (
     <FormControl>
       <Typography component="div">
         <Grid component="label" container alignItems="center" spacing={0}>
-          <Grid item component="span">{labelNo}</Grid>
+          <Grid item component="span">
+            {labelNo}
+          </Grid>
           <Grid item component="span">
             <Switch
               checked={!!value}
@@ -24,7 +26,9 @@ export default (props) => {
               {...customProps}
             />
           </Grid>
-          <Grid item component="span">{labelYes}</Grid>
+          <Grid item component="span">
+            {labelYes}
+          </Grid>
         </Grid>
       </Typography>
     </FormControl>

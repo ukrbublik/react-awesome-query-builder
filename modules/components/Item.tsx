@@ -21,13 +21,13 @@ const typeMap = {
     />
   ),
   group: (props) => (
-    <Group 
+    <Group
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
+      // tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -37,13 +37,13 @@ const typeMap = {
     />
   ),
   rule_group: (props) => (
-    <RuleGroup 
+    <RuleGroup
       {...props.properties.toObject()}
       id={props.id}
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
+      // tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -51,23 +51,22 @@ const typeMap = {
       children1={props.children1}
       parentField={props.parentField}
     />
-  )
+  ),
 };
-
 
 class Item extends PureComponent {
   static propTypes = {
-    //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
+    // tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
-    path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-    properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
-    children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
+    path: PropTypes.any.isRequired, // instanceOf(Immutable.List)
+    properties: PropTypes.any.isRequired, // instanceOf(Immutable.Map)
+    children1: PropTypes.any, // instanceOf(Immutable.OrderedMap)
     actions: PropTypes.object.isRequired,
     reordableNodesCnt: PropTypes.number,
     onDragStart: PropTypes.func,
-    parentField: PropTypes.string, //from RuleGroup
+    parentField: PropTypes.string, // from RuleGroup
     isDraggingTempo: PropTypes.bool,
   };
 

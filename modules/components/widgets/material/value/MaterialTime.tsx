@@ -4,11 +4,20 @@ import moment from "moment";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps, useKeyboard} = props;
+  const {
+    value,
+    setValue,
+    use12Hours,
+    readonly,
+    placeholder,
+    timeFormat,
+    valueFormat,
+    customProps,
+    useKeyboard,
+  } = props;
 
-  const formatSingleValue = (value) => {
-    return value && value.isValid() ? value.format(valueFormat) : undefined;
-  };
+  const formatSingleValue = (value) =>
+    value && value.isValid() ? value.format(valueFormat) : undefined;
 
   const handleChange = (value) => {
     setValue(formatSingleValue(value));
@@ -28,7 +37,9 @@ export default (props) => {
         format={timeFormat}
         value={timeValue || null}
         onChange={handleChange}
-        views={hasSeconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
+        views={
+          hasSeconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]
+        }
         {...customProps}
       />
     </FormControl>

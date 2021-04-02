@@ -13,7 +13,9 @@ export default class OperatorOptions extends PureComponent {
 
   render() {
     return (
-      <div className={`rule--operator rule--operator--${this.props.name.toUpperCase()}`}>
+      <div
+        className={`rule--operator rule--operator--${this.props.name.toUpperCase()}`}
+      >
         {this.props.children}
       </div>
     );

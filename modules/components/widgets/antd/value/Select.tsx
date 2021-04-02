@@ -1,16 +1,22 @@
 // @ts-nocheck
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
 import { Select } from "antd";
-const Option = Select.Option;
+import {
+  useOnPropsChanged,
+  mapListValues,
+  calcTextWidth,
+  SELECT_WIDTH_OFFSET_RIGHT,
+} from "../../../../utils/stuff";
+
+const { Option } = Select;
 
 export default class SelectWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
     field: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), //key in listValues
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // key in listValues
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
     readonly: PropTypes.bool,
@@ -24,42 +30,46 @@ export default class SelectWidget extends PureComponent {
     this.onPropsChanged(props);
   }
 
-  onPropsChanged (props) {
-    const {listValues} = props;
+  onPropsChanged(props) {
+    const { listValues } = props;
 
     let optionsMaxWidth = 0;
-    mapListValues(listValues, ({title, value}) => {
+    mapListValues(listValues, ({ title, value }) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title, null));
     });
     this.optionsMaxWidth = optionsMaxWidth;
 
-    this.options = mapListValues(listValues, ({title, value}) => {
-      return (<Option key={value+""} value={value+""}>{title}</Option>);
-    });
+    this.options = mapListValues(listValues, ({ title, value }) => (
+      <Option key={`${value}`} value={`${value}`}>
+        {title}
+      </Option>
+    ));
   }
 
   handleChange = (val) => {
     this.props.setValue(val);
-  }
+  };
 
   filterOption = (input, option) => {
     const dataForFilter = option.children || option.value;
     return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  }
+  };
 
   render() {
-    const {config, placeholder, customProps, value, readonly} = this.props;
-    const {renderSize} = config.settings;
+    const { config, placeholder, customProps, value, readonly } = this.props;
+    const { renderSize } = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const width = value ? dropdownWidth : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const _value = value != undefined ? value+"" : undefined;
+    const width = value
+      ? dropdownWidth
+      : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const _value = value != undefined ? `${value}` : undefined;
 
     return (
       <Select
         disabled={readonly}
         style={{ width }}
-        key={"widget-select"}
+        key="widget-select"
         dropdownMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
@@ -67,7 +77,8 @@ export default class SelectWidget extends PureComponent {
         onChange={this.handleChange}
         filterOption={this.filterOption}
         {...customProps}
-      >{this.options}
+      >
+        {this.options}
       </Select>
     );
   }

@@ -1,35 +1,39 @@
 import React from "react";
 import { Button } from "antd";
-import { PlusOutlined, PlusCircleOutlined, DeleteFilled } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  PlusCircleOutlined,
+  DeleteFilled,
+} from "@ant-design/icons";
 
-export default ({type, onClick, label, config: {settings}}) => {
+export default ({ type, onClick, label, config: { settings } }) => {
   const typeToIcon = {
-    "addRule": <PlusOutlined />,
-    "addGroup": <PlusCircleOutlined />,
-    "delRule": <DeleteFilled />, //?
-    "delGroup": <DeleteFilled />,
+    addRule: <PlusOutlined />,
+    addGroup: <PlusCircleOutlined />,
+    delRule: <DeleteFilled />, // ?
+    delGroup: <DeleteFilled />,
 
-    "addRuleGroup": <PlusOutlined />,
-    "delRuleGroup": <DeleteFilled />,
+    addRuleGroup: <PlusOutlined />,
+    delRuleGroup: <DeleteFilled />,
   };
 
   const typeToClass = {
-    "addRule": "action action--ADD-RULE",
-    "addGroup": "action action--ADD-GROUP",
-    "delRule": "action action--DELETE", //?
-    "delGroup": "action action--DELETE",
+    addRule: "action action--ADD-RULE",
+    addGroup: "action action--ADD-GROUP",
+    delRule: "action action--DELETE", // ?
+    delGroup: "action action--DELETE",
 
-    "addRuleGroup": <PlusOutlined />,
-    "delRuleGroup": <DeleteFilled />,
+    addRuleGroup: <PlusOutlined />,
+    delRuleGroup: <DeleteFilled />,
   };
 
   const typeToType = {
-    "delRule": "danger",
-    "delGroup": "danger",
-    "delRuleGroup": "danger",
+    delRule: "danger",
+    delGroup: "danger",
+    delRuleGroup: "danger",
   };
 
-  const {renderSize} = settings;
+  const { renderSize } = settings;
 
   const btnLabel = type == "addRuleGroup" ? "" : label;
 
@@ -41,6 +45,8 @@ export default ({type, onClick, label, config: {settings}}) => {
       className={typeToClass[type]}
       onClick={onClick}
       size={renderSize}
-    >{btnLabel}</Button>
+    >
+      {btnLabel}
+    </Button>
   );
 };

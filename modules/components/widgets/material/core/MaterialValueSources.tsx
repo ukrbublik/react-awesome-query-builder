@@ -15,10 +15,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
+export default ({ valueSources, valueSrc, title, setValueSrc, readonly }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const classes = useStyles();
-
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -32,24 +31,22 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
     anchorEl ? handleClose() : handleOpen(event);
   };
 
-  const handleChange = e => {
-    if (e.target.value === undefined)
-      return;
+  const handleChange = (e) => {
+    if (e.target.value === undefined) return;
     setValueSrc(e.target.value);
     handleClose();
   };
 
-  const renderOptions = (valueSources) => (
+  const renderOptions = (valueSources) =>
     valueSources.map(([srcKey, info]) => (
-      <FormControlLabel 
-        key={srcKey} 
-        value={srcKey} 
-        checked={valueSrc == srcKey || !valueSrc && srcKey == "value"} 
-        control={<Radio />} 
+      <FormControlLabel
+        key={srcKey}
+        value={srcKey}
+        checked={valueSrc == srcKey || (!valueSrc && srcKey == "value")}
+        control={<Radio />}
         label={info.label}
       />
-    ))
-  );
+    ));
 
   const open = Boolean(anchorEl);
 
@@ -58,8 +55,8 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
       <IconButton size="small" onClick={toggleOpenClose}>
         <ExpandMoreSharpIcon />
       </IconButton>
-    
-      <Popover    
+
+      <Popover
         open={open}
         anchorEl={anchorEl}
         anchorOrigin={{

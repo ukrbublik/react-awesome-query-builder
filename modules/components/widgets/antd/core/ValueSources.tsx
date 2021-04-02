@@ -1,18 +1,19 @@
 // @ts-nocheck
 import React, { PureComponent } from "react";
 import { Popover, Radio } from "antd";
+import { EllipsisOutlined } from "@ant-design/icons";
+
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
-import { EllipsisOutlined } from "@ant-design/icons";
 
 export default class ValueSources extends PureComponent {
   onChange = (e) => {
-    const {setValueSrc} = this.props;
+    const { setValueSrc } = this.props;
     setValueSrc(e.target.value);
   };
 
   render() {
-    const {config, valueSources, valueSrc, readonly, title} = this.props;
+    const { config, valueSources, valueSrc, readonly, title } = this.props;
 
     const content = (
       <RadioGroup
@@ -22,10 +23,9 @@ export default class ValueSources extends PureComponent {
         disabled={readonly}
       >
         {valueSources.map(([srcKey, info]) => (
-          <RadioButton
-            key={srcKey}
-            value={srcKey}
-          >{info.label}</RadioButton>
+          <RadioButton key={srcKey} value={srcKey}>
+            {info.label}
+          </RadioButton>
         ))}
       </RadioGroup>
     );

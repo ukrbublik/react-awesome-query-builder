@@ -1,15 +1,21 @@
 // @ts-nocheck
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {
-  getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getFuncPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
-} from "../utils/configUtils";
-import {truncateString, useOnPropsChanged} from "../utils/stuff";
 import last from "lodash/last";
 import keys from "lodash/keys";
 import clone from "clone";
+import { truncateString, useOnPropsChanged } from "../utils/stuff";
+import {
+  getFieldConfig,
+  getFuncConfig,
+  getFieldPath,
+  getFieldPathLabels,
+  getFuncPathLabels,
+  getValueSourcesForFieldOp,
+  getWidgetForFieldOp,
+} from "../utils/configUtils";
 
-//tip: this.props.value - right value, this.props.field - left value
+// tip: this.props.value - right value, this.props.field - left value
 
 export default class FuncSelect extends PureComponent {
   static propTypes = {
@@ -25,7 +31,7 @@ export default class FuncSelect extends PureComponent {
   constructor(props) {
     super(props);
     useOnPropsChanged(this);
-      
+
     this.onPropsChanged(props);
   }
 
@@ -33,8 +39,14 @@ export default class FuncSelect extends PureComponent {
     const prevProps = this.props;
     const keysForItems = ["config", "field", "operator"];
     const keysForMeta = ["config", "field", "value"];
-    const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
-    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateItems
+      = !this.items
+      || keysForItems.map((k) => nextProps[k] !== prevProps[k]).filter((ch) => ch)
+        .length > 0;
+    const needUpdateMeta
+      = !this.meta
+      || keysForMeta.map((k) => nextProps[k] !== prevProps[k]).filter((ch) => ch)
+        .length > 0;
 
     if (needUpdateItems) {
       this.items = this.getItems(nextProps);
@@ -44,50 +56,70 @@ export default class FuncSelect extends PureComponent {
     }
   }
 
-  getItems({config, field, operator}) {
-    const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField);
+  getItems({ config, field, operator }) {
+    const { canUseFuncForField } = config.settings;
+    const filteredFuncs = this.filterFuncs(
+      config,
+      config.funcs,
+      field,
+      operator,
+      canUseFuncForField
+    );
     const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
 
-  getMeta({config, field, value}) {
-    const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
+  getMeta({ config, field, value }) {
+    const { funcPlaceholder, fieldSeparatorDisplay } = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
 
     const leftFieldConfig = getFieldConfig(field, config);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    const leftFieldWidgetFieldProps
+      = (leftFieldWidgetField && leftFieldWidgetField.widgetProps) || {};
     const placeholder = !isFuncSelected ? funcPlaceholder : null;
 
-    const currFunc = isFuncSelected ? getFuncConfig(selectedFuncKey, config) : null;
+    const currFunc = isFuncSelected
+      ? getFuncConfig(selectedFuncKey, config)
+      : null;
     const selectedOpts = currFunc || {};
 
     const selectedKeys = getFieldPath(selectedFuncKey, config);
     const selectedPath = getFieldPath(selectedFuncKey, config, true);
     const selectedLabel = this.getFuncLabel(currFunc, selectedFuncKey, config);
     const partsLabels = getFuncPathLabels(selectedFuncKey, config);
-    let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
-    if (selectedFullLabel == selectedLabel)
-      selectedFullLabel = null;
-    
+    let selectedFullLabel = partsLabels
+      ? partsLabels.join(fieldSeparatorDisplay)
+      : null;
+    if (selectedFullLabel == selectedLabel) selectedFullLabel = null;
+
     return {
       placeholder,
-      selectedKey: selectedFuncKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedFullLabel,
+      selectedKey: selectedFuncKey,
+      selectedKeys,
+      selectedPath,
+      selectedLabel,
+      selectedOpts,
+      selectedFullLabel,
     };
   }
 
   filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField) {
     funcs = clone(funcs);
-    const fieldSeparator = config.settings.fieldSeparator;
+    const { fieldSeparator } = config.settings;
     const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
     let expectedType;
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
+    const widget = getWidgetForFieldOp(
+      config,
+      leftFieldFullkey,
+      operator,
+      "value"
+    );
     if (widget) {
       const widgetConfig = config.widgets[widget];
       const widgetType = widgetConfig.type;
-      //expectedType = leftFieldConfig.type;
+      // expectedType = leftFieldConfig.type;
       expectedType = widgetType;
     } else {
       expectedType = leftFieldConfig.type;
@@ -95,21 +127,28 @@ export default class FuncSelect extends PureComponent {
 
     function _filter(list, path) {
       for (const funcKey in list) {
-        const subfields = list[funcKey].subfields;
-        const subpath = (path ? path : []).concat(funcKey);
+        const { subfields } = list[funcKey];
+        const subpath = (path || []).concat(funcKey);
         const funcFullkey = subpath.join(fieldSeparator);
         const funcConfig = getFuncConfig(funcFullkey, config);
         if (funcConfig.type == "!struct") {
-          if(_filter(subfields, subpath) == 0)
-            delete list[funcKey];
+          if (_filter(subfields, subpath) == 0) delete list[funcKey];
         } else {
           let canUse = funcConfig.returnType == expectedType;
           if (leftFieldConfig.funcs)
             canUse = canUse && leftFieldConfig.funcs.includes(funcFullkey);
-          if (canUseFuncForField)
-            canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
-          if (!canUse)
-            delete list[funcKey];
+          if (canUseFuncForField) {
+            canUse
+              = canUse
+              && canUseFuncForField(
+                leftFieldFullkey,
+                leftFieldConfig,
+                funcFullkey,
+                funcConfig,
+                operator
+              );
+          }
+          if (!canUse) delete list[funcKey];
         }
       }
       return keys(list).length;
@@ -121,65 +160,63 @@ export default class FuncSelect extends PureComponent {
   }
 
   buildOptions(config, funcs, path = null, optGroupLabel = null) {
-    if (!funcs)
-      return null;
-    const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+    if (!funcs) return null;
+    const { fieldSeparator, fieldSeparatorDisplay } = config.settings;
     const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
 
-    return keys(funcs).map(funcKey => {
+    return keys(funcs).map((funcKey) => {
       const func = funcs[funcKey];
       const label = this.getFuncLabel(func, funcKey, config);
       const partsLabels = getFuncPathLabels(funcKey, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
-      if (fullLabel == label)
-        fullLabel = null;
-      const tooltip = func.tooltip;
-      const subpath = (path ? path : []).concat(funcKey);
+      if (fullLabel == label) fullLabel = null;
+      const { tooltip } = func;
+      const subpath = (path || []).concat(funcKey);
 
       if (func.type == "!struct") {
         return {
           key: funcKey,
-          path: prefix+funcKey,
+          path: prefix + funcKey,
           label,
           fullLabel,
           tooltip,
-          items: this.buildOptions(config, func.subfields, subpath, label)
-        };
-      } else {
-        return {
-          key: funcKey,
-          path: prefix+funcKey,
-          label,
-          fullLabel,
-          tooltip,
-          grouplabel: optGroupLabel
+          items: this.buildOptions(config, func.subfields, subpath, label),
         };
       }
+      return {
+        key: funcKey,
+        path: prefix + funcKey,
+        label,
+        fullLabel,
+        tooltip,
+        grouplabel: optGroupLabel,
+      };
     });
   }
 
   getFuncLabel(funcOpts, funcKey, config) {
     if (!funcKey) return null;
-    const fieldSeparator = config.settings.fieldSeparator;
-    const maxLabelsLength = config.settings.maxLabelsLength;
-    const funcParts = Array.isArray(funcKey) ? funcKey : funcKey.split(fieldSeparator);
+    const { fieldSeparator } = config.settings;
+    const { maxLabelsLength } = config.settings;
+    const funcParts = Array.isArray(funcKey)
+      ? funcKey
+      : funcKey.split(fieldSeparator);
     let label = funcOpts.label || last(funcParts);
     label = truncateString(label, maxLabelsLength);
     return label;
   }
 
   render() {
-    const {config, customProps, setValue, readonly} = this.props;
-    const {renderFunc} = config.settings;
+    const { config, customProps, setValue, readonly } = this.props;
+    const { renderFunc } = config.settings;
     const renderProps = {
       config,
       customProps,
       readonly,
       setField: setValue,
       items: this.items,
-      ...this.meta
+      ...this.meta,
     };
     return renderFunc(renderProps);
   }
-
 }

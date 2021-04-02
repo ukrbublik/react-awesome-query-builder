@@ -1,4 +1,4 @@
-import * as constants from "../constants";
+import * as constants from '../constants';
 
 /**
  * @param {object} config
@@ -9,7 +9,7 @@ export const setField = (config, path, field) => ({
   type: constants.SET_FIELD,
   path: path,
   field: field,
-  config: config
+  config: config,
 });
 
 /**
@@ -21,7 +21,7 @@ export const setOperator = (config, path, operator) => ({
   type: constants.SET_OPERATOR,
   path: path,
   operator: operator,
-  config: config
+  config: config,
 });
 
 /**
@@ -32,14 +32,21 @@ export const setOperator = (config, path, operator) => ({
  * @param {string} valueType
  * @param {boolean} __isInternal
  */
-export const setValue = (config, path, delta, value, valueType, __isInternal) => ({
+export const setValue = (
+  config,
+  path,
+  delta,
+  value,
+  valueType,
+  __isInternal
+) => ({
   type: constants.SET_VALUE,
   path: path,
   delta: delta,
   value: value,
   valueType: valueType,
   config: config,
-  __isInternal: __isInternal
+  __isInternal: __isInternal,
 });
 
 /**
@@ -53,7 +60,7 @@ export const setValueSrc = (config, path, delta, srcKey) => ({
   path: path,
   delta: delta,
   srcKey: srcKey,
-  config: config
+  config: config,
 });
 
 /**
@@ -67,5 +74,5 @@ export const setOperatorOption = (config, path, name, value) => ({
   path: path,
   name: name,
   value: value,
-  config: config
+  config: config,
 });

@@ -1,6 +1,7 @@
 import React from "react";
 
 // value widgets
+import { ConfigProvider } from "antd";
 import DateWidget from "./value/Date";
 import DateTimeWidget from "./value/DateTime";
 import TimeWidget from "./value/Time";
@@ -26,8 +27,11 @@ import Conjs from "./core/Conjs";
 import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
-import { ConfigProvider } from "antd";
-const Provider = ({config, children}) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+const Provider = ({ config, children }) => (
+  <ConfigProvider locale={config.settings.locale.antd}>
+    {children}
+  </ConfigProvider>
+);
 
 export default {
   DateWidget,

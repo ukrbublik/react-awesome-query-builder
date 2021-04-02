@@ -3,11 +3,19 @@ import { KeyboardDatePicker, DatePicker } from "@material-ui/pickers";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder, useKeyboard} = props;
+  const {
+    value,
+    setValue,
+    readonly,
+    customProps,
+    dateFormat,
+    valueFormat,
+    placeholder,
+    useKeyboard,
+  } = props;
 
-  const formatSingleValue = (value) => {
-    return value && value.isValid() ? value.format(valueFormat) : undefined;
-  };
+  const formatSingleValue = (value) =>
+    value && value.isValid() ? value.format(valueFormat) : undefined;
 
   const handleChange = (value) => {
     setValue(formatSingleValue(value));

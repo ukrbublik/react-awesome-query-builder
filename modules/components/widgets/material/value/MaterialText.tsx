@@ -3,12 +3,11 @@ import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {value, setValue, config, readonly, placeholder, customProps} = props;
+  const { value, setValue, config, readonly, placeholder, customProps } = props;
 
-  const onChange = e => {
+  const onChange = (e) => {
     let val = e.target.value;
-    if (val === "")
-      val = undefined; // don't allow empty value
+    if (val === "") val = undefined; // don't allow empty value
     setValue(val);
   };
 
@@ -16,7 +15,7 @@ export default (props) => {
 
   return (
     <FormControl>
-      <TextField 
+      <TextField
         value={textValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={{

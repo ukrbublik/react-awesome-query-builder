@@ -1,27 +1,35 @@
-/*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
+/* eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}] */
 import React from "react";
 import merge from "lodash/merge";
 import {
   BasicConfig,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
+  Operators,
+  Widgets,
+  Fields,
+  Config,
+  Types,
+  Conjunctions,
+  Settings,
+  LocaleSettings,
+  OperatorProximity,
+  Funcs,
 } from "react-awesome-query-builder";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import AntdConfig from "react-awesome-query-builder/lib/config/antd";
 import AntdWidgets from "react-awesome-query-builder/lib/components/widgets/antd";
+import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
 
-
-
-//////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////
 
 const fields: Fields = {
   user: {
@@ -30,13 +38,11 @@ const fields: Fields = {
     type: "!struct",
     subfields: {
       firstName: {
-        label2: "Username", //only for menu's toggler
+        label2: "Username", // only for menu's toggler
         type: "text",
         excludeOperators: ["proximity"],
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
-            return (val.length < 10);
-          },
+          validateValue: (val, fieldSettings) => val.length < 10,
         },
         mainWidgetProps: {
           valueLabel: "Name",
@@ -48,16 +54,16 @@ const fields: Fields = {
         tableName: "t1", // PR #18, PR #20
         excludeOperators: ["proximity"],
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
-            return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-          },
+          validateValue: (val, fieldSettings) =>
+            val.length < 10
+            && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null),
         },
         mainWidgetProps: {
           valueLabel: "Login",
           valuePlaceholder: "Enter login",
         },
-      }
-    }
+      },
+    },
   },
   prox1: {
     label: "prox",
@@ -71,7 +77,7 @@ const fields: Fields = {
     preferWidgets: ["number"],
     fieldSettings: {
       min: -1,
-      max: 5
+      max: 5,
     },
     funcs: ["LINEAR_REGRESSION"],
   },
@@ -86,16 +92,16 @@ const fields: Fields = {
       step: 1,
       marks: {
         0: <strong>0%</strong>,
-        100: <strong>100%</strong>
+        100: <strong>100%</strong>,
       },
     },
-    //overrides
+    // overrides
     widgets: {
       slider: {
         widgetProps: {
           valuePlaceholder: "..Slider",
-        }
-      }
+        },
+      },
     },
   },
   date: {
@@ -113,12 +119,12 @@ const fields: Fields = {
   datetime: {
     label: "DateTime",
     type: "datetime",
-    valueSources: ["value"]
+    valueSources: ["value"],
   },
   datetime2: {
     label: "DateTime2",
     type: "datetime",
-    valueSources: ["field"]
+    valueSources: ["field"],
   },
   color: {
     label: "Color",
@@ -135,9 +141,9 @@ const fields: Fields = {
       listValues: [
         { value: "yellow", title: "Yellow" },
         { value: "green", title: "Green" },
-        { value: "orange", title: "Orange" }
+        { value: "orange", title: "Orange" },
       ],
-    }
+    },
   },
   color2: {
     label: "Color2",
@@ -147,9 +153,9 @@ const fields: Fields = {
         yellow: "Yellow",
         green: "Green",
         orange: "Orange",
-        purple: "Purple"
+        purple: "Purple",
       },
-    }
+    },
   },
   multicolor: {
     label: "Colors",
@@ -158,10 +164,10 @@ const fields: Fields = {
       listValues: {
         yellow: "Yellow",
         green: "Green",
-        orange: "Orange"
+        orange: "Orange",
       },
-      allowCustomValues: true
-    }
+      allowCustomValues: true,
+    },
   },
   selecttree: {
     label: "Color (tree)",
@@ -171,11 +177,11 @@ const fields: Fields = {
       // * deep format (will be auto converted to flat format):
       // listValues: [
       //     { value: "1", title: "Warm colors", children: [
-      //         { value: "2", title: "Red" }, 
+      //         { value: "2", title: "Red" },
       //         { value: "3", title: "Orange" }
       //     ] },
       //     { value: "4", title: "Cool colors", children: [
-      //         { value: "5", title: "Green" }, 
+      //         { value: "5", title: "Green" },
       //         { value: "6", title: "Blue", children: [
       //             { value: "7", title: "Sub blue", children: [
       //                 { value: "8", title: "Sub sub blue and a long text" }
@@ -194,7 +200,7 @@ const fields: Fields = {
         { value: "7", title: "Sub blue", parent: "6" },
         { value: "8", title: "Sub sub blue and a long text", parent: "7" },
       ],
-    }
+    },
   },
   multiselecttree: {
     label: "Colors (tree)",
@@ -202,20 +208,36 @@ const fields: Fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
-      ]
-    }
+        {
+          value: "1",
+          title: "Warm colors",
+          children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" },
+          ],
+        },
+        {
+          value: "4",
+          title: "Cool colors",
+          children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6",
+              title: "Blue",
+              children: [
+                {
+                  value: "7",
+                  title: "Sub blue",
+                  children: [
+                    { value: "8", title: "Sub sub blue and a long text" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   },
   stock: {
     label: "In stock",
@@ -223,19 +245,17 @@ const fields: Fields = {
     defaultValue: true,
     mainWidgetProps: {
       labelYes: "+",
-      labelNo: "-"
-    }
+      labelNo: "-",
+    },
   },
 };
 
-
-//////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////
 
 const conjunctions: Conjunctions = {
   AND: InitialConfig.conjunctions.AND,
   OR: InitialConfig.conjunctions.OR,
 };
-
 
 const proximity: OperatorProximity = {
   ...InitialConfig.operators.proximity,
@@ -244,8 +264,8 @@ const proximity: OperatorProximity = {
     { label: "Word 2", placeholder: "Enter second word" },
   ],
   textSeparators: [
-    //'Word 1',
-    //'Word 2'
+    // 'Word 1',
+    // 'Word 2'
   ],
   options: {
     ...InitialConfig.operators.proximity.options,
@@ -255,10 +275,10 @@ const proximity: OperatorProximity = {
     minProximity: 2,
     maxProximity: 10,
     defaults: {
-      proximity: 2
+      proximity: 2,
     },
-    customProps: {}
-  }
+    customProps: {},
+  },
 };
 
 const operators: Operators = {
@@ -266,14 +286,8 @@ const operators: Operators = {
   // examples of  overriding
   between: {
     ...InitialConfig.operators.between,
-    valueLabels: [
-      "Value from",
-      "Value to"
-    ],
-    textSeparators: [
-      "from",
-      "to"
-    ],
+    valueLabels: ["Value from", "Value to"],
+    textSeparators: ["from", "to"],
   },
   proximity,
 };
@@ -287,14 +301,14 @@ const widgets: Widgets = {
   slider: {
     ...InitialConfig.widgets.slider,
     customProps: {
-      width: "300px"
-    }
+      width: "300px",
+    },
   },
   rangeslider: {
     ...InitialConfig.widgets.rangeslider,
     customProps: {
-      width: "300px"
-    }
+      width: "300px",
+    },
   },
   date: {
     ...InitialConfig.widgets.date,
@@ -315,17 +329,16 @@ const widgets: Widgets = {
   func: {
     ...InitialConfig.widgets.func,
     customProps: {
-      showSearch: true
-    }
+      showSearch: true,
+    },
   },
   treeselect: {
     ...InitialConfig.widgets.treeselect,
     customProps: {
-      showSearch: true
-    }
+      showSearch: true,
+    },
   },
 };
-
 
 const types: Types = {
   ...InitialConfig.types,
@@ -336,12 +349,11 @@ const types: Types = {
         widgetProps: {
           hideOperator: true,
           operatorInlineLabel: "is",
-        }
+        },
       },
     },
   }),
 };
-
 
 const localeSettings: LocaleSettings = {
   locale: {
@@ -379,7 +391,7 @@ const settings: Settings = {
 
   valueSourcesInfo: {
     value: {
-      label: "Value"
+      label: "Value",
     },
     field: {
       label: "Field",
@@ -388,26 +400,25 @@ const settings: Settings = {
     func: {
       label: "Function",
       widget: "func",
-    }
+    },
   },
   // canReorder: false,
   // canRegroup: false,
   // showNot: false,
   // showLabels: true,
   maxNesting: 3,
-  canLeaveEmptyGroup: true, //after deletion
-    
+  canLeaveEmptyGroup: true, // after deletion
+
   // renderField: (props) => <FieldCascader {...props} />,
   // renderOperator: (props) => <FieldDropdown {...props} />,
   // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
-
 const funcs: Funcs = {
   LOWER: {
     label: "Lowercase",
     mongoFunc: "$toLower",
-    jsonLogic: ({str}) => ({ "method": [ str, "toLowerCase" ] }),
+    jsonLogic: ({ str }) => ({ method: [str, "toLowerCase"] }),
     returnType: "text",
     args: {
       str: {
@@ -415,15 +426,17 @@ const funcs: Funcs = {
         type: "text",
         valueSources: ["value", "field"],
       },
-    }
+    },
   },
   LINEAR_REGRESSION: {
     label: "Linear regression",
     returnType: "number",
-    formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
-    sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
-    mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
-    jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
+    formatFunc: ({ coef, bias, val }, _) => `(${coef} * ${val} + ${bias})`,
+    sqlFormatFunc: ({ coef, bias, val }) => `(${coef} * ${val} + ${bias})`,
+    mongoFormatFunc: ({ coef, bias, val }) => ({
+      $sum: [{ $multiply: [coef, val] }, bias],
+    }),
+    jsonLogic: ({ coef, bias, val }) => ({ "+": [{ "*": [coef, val] }, bias] }),
     renderBrackets: ["", ""],
     renderSeps: [" * ", " + "],
     args: {
@@ -443,11 +456,10 @@ const funcs: Funcs = {
         type: "number",
         defaultValue: 0,
         valueSources: ["value"],
-      }
-    }
+      },
+    },
   },
 };
-
 
 const config: Config = {
   conjunctions,
@@ -456,8 +468,7 @@ const config: Config = {
   types,
   settings,
   fields,
-  funcs
+  funcs,
 };
 
 export default config;
-

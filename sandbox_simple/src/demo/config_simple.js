@@ -1,10 +1,10 @@
 import React from "react";
 import merge from "lodash/merge";
 import { BasicConfig } from "react-awesome-query-builder";
+
 const InitialConfig = BasicConfig;
 
-
-//////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////
 
 const fields = {
   user: {
@@ -13,7 +13,7 @@ const fields = {
     type: "!struct",
     subfields: {
       firstName: {
-        label2: "Username", //only for menu's toggler
+        label2: "Username", // only for menu's toggler
         type: "text",
         excludeOperators: ["proximity"],
         mainWidgetProps: {
@@ -21,25 +21,23 @@ const fields = {
           valuePlaceholder: "Enter name",
         },
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
-            return (val.length < 10);
-          },
+          validateValue: (val, fieldSettings) => val.length < 10,
         },
       },
       login: {
         type: "text",
         excludeOperators: ["proximity"],
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
-            return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-          },
+          validateValue: (val, fieldSettings) =>
+            val.length < 10
+            && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null),
         },
         mainWidgetProps: {
           valueLabel: "Login",
           valuePlaceholder: "Enter login",
         },
-      }
-    }
+      },
+    },
   },
   num: {
     label: "Number",
@@ -47,7 +45,7 @@ const fields = {
     preferWidgets: ["number"],
     fieldSettings: {
       min: -1,
-      max: 5
+      max: 5,
     },
   },
   slider: {
@@ -61,16 +59,16 @@ const fields = {
       step: 1,
       marks: {
         0: <strong>0%</strong>,
-        100: <strong>100%</strong>
+        100: <strong>100%</strong>,
       },
     },
-    //overrides
+    // overrides
     widgets: {
       slider: {
         widgetProps: {
           valuePlaceholder: "..Slider",
-        }
-      }
+        },
+      },
     },
   },
   date: {
@@ -88,12 +86,12 @@ const fields = {
   datetime: {
     label: "DateTime",
     type: "datetime",
-    valueSources: ["value"]
+    valueSources: ["value"],
   },
   datetime2: {
     label: "DateTime2",
     type: "datetime",
-    valueSources: ["field"]
+    valueSources: ["field"],
   },
   color: {
     label: "Color",
@@ -103,9 +101,9 @@ const fields = {
       listValues: [
         { value: "yellow", title: "Yellow" },
         { value: "green", title: "Green" },
-        { value: "orange", title: "Orange" }
+        { value: "orange", title: "Orange" },
       ],
-    }
+    },
   },
   color2: {
     label: "Color2",
@@ -115,9 +113,9 @@ const fields = {
         yellow: "Yellow",
         green: "Green",
         orange: "Orange",
-        purple: "Purple"
+        purple: "Purple",
       },
-    }
+    },
   },
   multicolor: {
     label: "Colors",
@@ -126,9 +124,9 @@ const fields = {
       listValues: {
         yellow: "Yellow",
         green: "Green",
-        orange: "Orange"
+        orange: "Orange",
       },
-      allowCustomValues: true
+      allowCustomValues: true,
     },
   },
   selecttree: {
@@ -137,20 +135,36 @@ const fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
+        {
+          value: "1",
+          title: "Warm colors",
+          children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" },
+          ],
+        },
+        {
+          value: "4",
+          title: "Cool colors",
+          children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6",
+              title: "Blue",
+              children: [
+                {
+                  value: "7",
+                  title: "Sub blue",
+                  children: [
+                    { value: "8", title: "Sub sub blue and a long text" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
-    }
+    },
   },
   multiselecttree: {
     label: "Colors (tree)",
@@ -158,20 +172,36 @@ const fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
-      ]
-    }
+        {
+          value: "1",
+          title: "Warm colors",
+          children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" },
+          ],
+        },
+        {
+          value: "4",
+          title: "Cool colors",
+          children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6",
+              title: "Blue",
+              children: [
+                {
+                  value: "7",
+                  title: "Sub blue",
+                  children: [
+                    { value: "8", title: "Sub sub blue and a long text" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   },
   stock: {
     label: "In stock",
@@ -179,13 +209,12 @@ const fields = {
     defaultValue: true,
     mainWidgetProps: {
       labelYes: "+",
-      labelNo: "-"
-    }
+      labelNo: "-",
+    },
   },
 };
 
-
-//////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////
 
 const conjunctions = {
   AND: InitialConfig.conjunctions.AND,
@@ -197,10 +226,7 @@ const operators = {
   // examples of  overriding
   between: {
     ...InitialConfig.operators.between,
-    textSeparators: [
-      "from",
-      "to"
-    ],
+    textSeparators: ["from", "to"],
   },
 };
 
@@ -210,14 +236,14 @@ const widgets = {
   slider: {
     ...InitialConfig.widgets.slider,
     customProps: {
-      width: "300px"
-    }
+      width: "300px",
+    },
   },
   rangeslider: {
     ...InitialConfig.widgets.rangeslider,
     customProps: {
-      width: "300px"
-    }
+      width: "300px",
+    },
   },
   date: {
     ...InitialConfig.widgets.date,
@@ -238,11 +264,10 @@ const widgets = {
   treeselect: {
     ...InitialConfig.widgets.treeselect,
     customProps: {
-      showSearch: true
-    }
+      showSearch: true,
+    },
   },
 };
-
 
 const types = {
   ...InitialConfig.types,
@@ -253,12 +278,11 @@ const types = {
         widgetProps: {
           hideOperator: true,
           operatorInlineLabel: "is",
-        }
+        },
       },
     },
   }),
 };
-
 
 const localeSettings = {
   locale: {
@@ -294,7 +318,7 @@ const settings = {
 
   valueSourcesInfo: {
     value: {
-      label: "Value"
+      label: "Value",
     },
     field: {
       label: "Field",
@@ -303,23 +327,21 @@ const settings = {
     func: {
       label: "Function",
       widget: "func",
-    }
+    },
   },
   // canReorder: false,
   // canRegroup: false,
   // showNot: false,
   // showLabels: true,
   maxNesting: 3,
-  canLeaveEmptyGroup: true, //after deletion
-    
+  canLeaveEmptyGroup: true, // after deletion
+
   // renderField: (props) => <FieldCascader {...props} />,
   // renderOperator: (props) => <FieldDropdown {...props} />,
   // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 const funcs = {};
-
-
 
 const config = {
   conjunctions,
@@ -328,8 +350,7 @@ const config = {
   types,
   settings,
   fields,
-  funcs
+  funcs,
 };
 
 export default config;
-

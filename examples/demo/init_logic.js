@@ -1,36 +1,35 @@
-export default 
-{
-  "and": [
+export default {
+  and: [
     {
       "==": [
         {
-          "var": "user.login"
+          var: "user.login",
         },
         {
-          "method": [
+          method: [
             {
-              "var": "user.firstName"
+              var: "user.firstName",
             },
-            "toLowerCase"
-          ]
-        }
-      ]
+            "toLowerCase",
+          ],
+        },
+      ],
     },
     {
       "==": [
         {
-          "var": "stock"
+          var: "stock",
         },
-        false
-      ]
+        false,
+      ],
     },
     {
       "==": [
         {
-          "var": "slider"
+          var: "slider",
         },
-        35
-      ]
-    }
-  ]
+        35,
+      ],
+    },
+  ],
 };

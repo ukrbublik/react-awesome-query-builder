@@ -4,7 +4,17 @@ import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
+  const {
+    placeholder,
+    customProps,
+    value,
+    setValue,
+    min,
+    max,
+    step,
+    marks,
+    readonly,
+  } = props;
 
   const handleSliderChange = (_e, newValue) => {
     setValue(newValue);
@@ -12,10 +22,8 @@ export default (props) => {
 
   const handleInputChange = (e) => {
     let val = e.target.value;
-    if (val === "" || val === null)
-      val = undefined;
-    else
-      val = Number(val);
+    if (val === "" || val === null) val = undefined;
+    else val = Number(val);
     setValue(val);
   };
 
@@ -28,22 +36,22 @@ export default (props) => {
     }
   };
 
-
-  const {width, ...rest} =  customProps || {};
+  const { width, ...rest } = customProps || {};
   const customInputProps = rest.input || {};
   const customSliderProps = rest.slider || rest;
-  
+
   // TIP: Can't pass undefined to MUI, cause it means uncontrolled component use.
   //      For empty value input needs "", slider needs null or 0
   const inputValue = typeof value === "number" ? value : "";
   const sliderValue = typeof value === "number" ? value : null;
 
   // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
-  const muiMarks = marks ? Object.keys(marks).map(v => ({value: v, label: marks[v]})) : false;
-
+  const muiMarks = marks
+    ? Object.keys(marks).map((v) => ({ value: v, label: marks[v] }))
+    : false;
 
   const InputCmp = (
-    <TextField 
+    <TextField
       type="number"
       value={inputValue}
       placeholder={placeholder}
@@ -51,9 +59,9 @@ export default (props) => {
         readOnly: readonly,
       }}
       inputProps={{
-        min: min,
-        max: max,
-        step: step,
+        min,
+        max,
+        step,
       }}
       disabled={readonly}
       onChange={handleInputChange}
@@ -63,7 +71,7 @@ export default (props) => {
   );
 
   const SliderCmp = (
-    <Slider 
+    <Slider
       value={sliderValue}
       onChange={handleSliderChange}
       disabled={readonly}
@@ -77,8 +85,8 @@ export default (props) => {
   );
 
   const stylesWrapper = {
-    display: "inline-flex", 
-    alignItems: "center"
+    display: "inline-flex",
+    alignItems: "center",
   };
 
   const stylesInputWrapper = {
@@ -86,21 +94,17 @@ export default (props) => {
   };
 
   const stylesSliderWrapper = {
-    marginLeft: "5px", 
-    paddingLeft: "12px", 
-    marginBottom: muiMarks && "-16px", 
+    marginLeft: "5px",
+    paddingLeft: "12px",
+    marginBottom: muiMarks && "-16px",
     width: width || "300px",
   };
 
   return (
     <FormControl>
       <div style={stylesWrapper}>
-        <div style={stylesInputWrapper}>
-          {InputCmp}
-        </div>
-        <div style={stylesSliderWrapper}>
-          {SliderCmp}
-        </div>
+        <div style={stylesInputWrapper}>{InputCmp}</div>
+        <div style={stylesSliderWrapper}>{SliderCmp}</div>
       </div>
     </FormControl>
   );

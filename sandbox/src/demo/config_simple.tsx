@@ -1,26 +1,34 @@
-/*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
+/* eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}] */
 import React from "react";
 import merge from "lodash/merge";
 import {
   BasicConfig,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, Funcs,
+  Operators,
+  Widgets,
+  Fields,
+  Config,
+  Types,
+  Conjunctions,
+  Settings,
+  LocaleSettings,
+  Funcs,
 } from "react-awesome-query-builder";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import AntdConfig from "react-awesome-query-builder/lib/config/antd";
 import AntdWidgets from "react-awesome-query-builder/lib/components/widgets/antd";
+import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
 
-
-//////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////
 
 const fields: Fields = {
   user: {
@@ -29,7 +37,7 @@ const fields: Fields = {
     type: "!struct",
     subfields: {
       firstName: {
-        label2: "Username", //only for menu's toggler
+        label2: "Username", // only for menu's toggler
         type: "text",
         excludeOperators: ["proximity"],
         mainWidgetProps: {
@@ -37,25 +45,23 @@ const fields: Fields = {
           valuePlaceholder: "Enter name",
         },
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
-            return (val.length < 10);
-          },
+          validateValue: (val, fieldSettings) => val.length < 10,
         },
       },
       login: {
         type: "text",
         excludeOperators: ["proximity"],
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
-            return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-          },
+          validateValue: (val, fieldSettings) =>
+            val.length < 10
+            && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null),
         },
         mainWidgetProps: {
           valueLabel: "Login",
           valuePlaceholder: "Enter login",
         },
-      }
-    }
+      },
+    },
   },
   num: {
     label: "Number",
@@ -63,7 +69,7 @@ const fields: Fields = {
     preferWidgets: ["number"],
     fieldSettings: {
       min: -1,
-      max: 5
+      max: 5,
     },
   },
   slider: {
@@ -77,16 +83,16 @@ const fields: Fields = {
       step: 1,
       marks: {
         0: <strong>0%</strong>,
-        100: <strong>100%</strong>
+        100: <strong>100%</strong>,
       },
     },
-    //overrides
+    // overrides
     widgets: {
       slider: {
         widgetProps: {
           valuePlaceholder: "..Slider",
-        }
-      }
+        },
+      },
     },
   },
   date: {
@@ -104,12 +110,12 @@ const fields: Fields = {
   datetime: {
     label: "DateTime",
     type: "datetime",
-    valueSources: ["value"]
+    valueSources: ["value"],
   },
   datetime2: {
     label: "DateTime2",
     type: "datetime",
-    valueSources: ["field"]
+    valueSources: ["field"],
   },
   color: {
     label: "Color",
@@ -119,9 +125,9 @@ const fields: Fields = {
       listValues: [
         { value: "yellow", title: "Yellow" },
         { value: "green", title: "Green" },
-        { value: "orange", title: "Orange" }
+        { value: "orange", title: "Orange" },
       ],
-    }
+    },
   },
   color2: {
     label: "Color2",
@@ -131,9 +137,9 @@ const fields: Fields = {
         yellow: "Yellow",
         green: "Green",
         orange: "Orange",
-        purple: "Purple"
+        purple: "Purple",
       },
-    }
+    },
   },
   multicolor: {
     label: "Colors",
@@ -142,9 +148,9 @@ const fields: Fields = {
       listValues: {
         yellow: "Yellow",
         green: "Green",
-        orange: "Orange"
+        orange: "Orange",
       },
-      allowCustomValues: true
+      allowCustomValues: true,
     },
   },
   selecttree: {
@@ -153,20 +159,36 @@ const fields: Fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
+        {
+          value: "1",
+          title: "Warm colors",
+          children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" },
+          ],
+        },
+        {
+          value: "4",
+          title: "Cool colors",
+          children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6",
+              title: "Blue",
+              children: [
+                {
+                  value: "7",
+                  title: "Sub blue",
+                  children: [
+                    { value: "8", title: "Sub sub blue and a long text" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
-    }
+    },
   },
   multiselecttree: {
     label: "Colors (tree)",
@@ -174,20 +196,36 @@ const fields: Fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
-      ]
-    }
+        {
+          value: "1",
+          title: "Warm colors",
+          children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" },
+          ],
+        },
+        {
+          value: "4",
+          title: "Cool colors",
+          children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6",
+              title: "Blue",
+              children: [
+                {
+                  value: "7",
+                  title: "Sub blue",
+                  children: [
+                    { value: "8", title: "Sub sub blue and a long text" },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   },
   stock: {
     label: "In stock",
@@ -195,13 +233,12 @@ const fields: Fields = {
     defaultValue: true,
     mainWidgetProps: {
       labelYes: "+",
-      labelNo: "-"
-    }
+      labelNo: "-",
+    },
   },
 };
 
-
-//////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////
 
 const conjunctions: Conjunctions = {
   AND: InitialConfig.conjunctions.AND,
@@ -213,10 +250,7 @@ const operators: Operators = {
   // examples of  overriding
   between: {
     ...InitialConfig.operators.between,
-    textSeparators: [
-      "from",
-      "to"
-    ],
+    textSeparators: ["from", "to"],
   },
 };
 
@@ -226,14 +260,14 @@ const widgets: Widgets = {
   slider: {
     ...InitialConfig.widgets.slider,
     customProps: {
-      width: "300px"
-    }
+      width: "300px",
+    },
   },
   rangeslider: {
     ...InitialConfig.widgets.rangeslider,
     customProps: {
-      width: "300px"
-    }
+      width: "300px",
+    },
   },
   date: {
     ...InitialConfig.widgets.date,
@@ -254,11 +288,10 @@ const widgets: Widgets = {
   treeselect: {
     ...InitialConfig.widgets.treeselect,
     customProps: {
-      showSearch: true
-    }
+      showSearch: true,
+    },
   },
 };
-
 
 const types: Types = {
   ...InitialConfig.types,
@@ -269,12 +302,11 @@ const types: Types = {
         widgetProps: {
           hideOperator: true,
           operatorInlineLabel: "is",
-        }
+        },
       },
     },
   }),
 };
-
 
 const localeSettings: LocaleSettings = {
   locale: {
@@ -312,7 +344,7 @@ const settings: Settings = {
 
   valueSourcesInfo: {
     value: {
-      label: "Value"
+      label: "Value",
     },
     field: {
       label: "Field",
@@ -321,23 +353,21 @@ const settings: Settings = {
     func: {
       label: "Function",
       widget: "func",
-    }
+    },
   },
   // canReorder: false,
   // canRegroup: false,
   // showNot: false,
   // showLabels: true,
   maxNesting: 3,
-  canLeaveEmptyGroup: true, //after deletion
-    
+  canLeaveEmptyGroup: true, // after deletion
+
   // renderField: (props) => <FieldCascader {...props} />,
   // renderOperator: (props) => <FieldDropdown {...props} />,
   // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 const funcs: Funcs = {};
-
-
 
 const config: Config = {
   conjunctions,
@@ -346,8 +376,7 @@ const config: Config = {
   types,
   settings,
   fields,
-  funcs
+  funcs,
 };
 
 export default config;
-

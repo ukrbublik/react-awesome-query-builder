@@ -7,7 +7,7 @@ export default class Proximity extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     setOption: PropTypes.func.isRequired,
-    options: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
+    options: PropTypes.any.isRequired, // instanceOf(Immutable.Map)
     minProximity: PropTypes.number,
     maxProximity: PropTypes.number,
     optionPlaceholder: PropTypes.string,
@@ -15,7 +15,7 @@ export default class Proximity extends PureComponent {
     optionLabel: PropTypes.string,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
-    //children
+    // children
   };
 
   static defaultProps = {
@@ -29,31 +29,40 @@ export default class Proximity extends PureComponent {
 
   handleChange = (value) => {
     this.props.setOption("proximity", parseInt(value));
-  }
+  };
 
   render() {
     const {
-      defaults, options, config, optionLabel, optionPlaceholder, customProps, 
-      minProximity, maxProximity, optionTextBefore, readonly
+      defaults,
+      options,
+      config,
+      optionLabel,
+      optionPlaceholder,
+      customProps,
+      minProximity,
+      maxProximity,
+      optionTextBefore,
+      readonly,
     } = this.props;
-    const {settings, widgets} = config;
+    const { settings, widgets } = config;
     const defaultProximity = defaults ? defaults.proximity : undefined;
-    const {showLabels} = settings;
+    const { showLabels } = settings;
     const selectedProximity = options.get("proximity", defaultProximity);
-    const proxValues = range(minProximity, maxProximity + 1).map((item) => ({title: item, value: item}));
+    const proxValues = range(minProximity, maxProximity + 1).map((item) => ({
+      title: item,
+      value: item,
+    }));
     const Select = widgets.select.factory;
 
     return (
       <div className="operator--PROXIMITY">
         <div className="operator--options">
-          { showLabels
-            && <label className="rule--label">{optionLabel}</label>
-          }
-          { !showLabels && optionTextBefore
-            && <div className="operator--options--sep">
+          {showLabels && <label className="rule--label">{optionLabel}</label>}
+          {!showLabels && optionTextBefore && (
+            <div className="operator--options--sep">
               <span>{optionTextBefore}</span>
             </div>
-          }
+          )}
           <Select
             config={config}
             value={selectedProximity}

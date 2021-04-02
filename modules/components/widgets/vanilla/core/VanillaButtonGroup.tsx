@@ -1,5 +1,3 @@
 import React from "react";
 
-export default ({children, config}) => {
-  return <>{children}</>;
-};
+export default ({ children, config }) => <>{children}</>;

@@ -3,7 +3,9 @@ html {
 }
 
 body {
-  font-family: sans-serif, "Helvetica Neue For Number", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: sans-serif, 'Helvetica Neue For Number', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: small;
   line-height: normal;
   color: rgba(30, 30, 30, 1);
@@ -21,23 +23,25 @@ body {
   box-sizing: content-box;
 }
 
-
 select {
   -webkit-appearance: menulist;
 }
 select[multiple] {
   -webkit-appearance: listbox;
 }
-button, input[type="button"], input[type="reset"], input[type="submit"] {
+button,
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
   -webkit-appearance: button;
 }
-input[type="text"] {
+input[type='text'] {
   -webkit-appearance: textfield;
 }
-input[type="checkbox"] {
+input[type='checkbox'] {
   -webkit-appearance: checkbox;
 }
-input[type="radio"] {
+input[type='radio'] {
   -webkit-appearance: radio;
 }
 textarea {

@@ -2,12 +2,8 @@ import React from "react";
 import sinon from "sinon";
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
-const {
-  FieldDropdown,
-  FieldCascader,
-  FieldTreeSelect,
-} = AntdWidgets;
 
+const { FieldDropdown, FieldCascader, FieldTreeSelect } = AntdWidgets;
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -18,7 +14,7 @@ export const simple_with_number = (BasicConfig) => ({
       preferWidgets: ["number"],
       fieldSettings: {
         min: -1,
-        max: 5
+        max: 5,
       },
     },
   },
@@ -49,7 +45,7 @@ export const simple_with_numbers_and_str = (BasicConfig) => ({
       preferWidgets: ["number"],
       fieldSettings: {
         min: -1,
-        max: 5
+        max: 5,
       },
     },
     num2: {
@@ -68,7 +64,7 @@ export const simple_with_numbers_and_str = (BasicConfig) => ({
     },
   },
 });
-  
+
 export const with_number_and_string = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -78,25 +74,25 @@ export const with_number_and_string = (BasicConfig) => ({
       preferWidgets: ["number"],
       fieldSettings: {
         min: -1,
-        max: 5
+        max: 5,
       },
     },
     login: {
       type: "text",
       excludeOperators: ["proximity"],
       fieldSettings: {
-        validateValue: (val, fieldSettings) => {
-          return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-        },
+        validateValue: (val, fieldSettings) =>
+          val.length < 10
+          && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null),
       },
       mainWidgetProps: {
         valueLabel: "Login",
         valuePlaceholder: "Enter login",
       },
-    }
+    },
   },
 });
-  
+
 export const with_date_and_time = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -114,8 +110,7 @@ export const with_date_and_time = (BasicConfig) => ({
     },
   },
 });
-  
-  
+
 export const with_select = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -129,7 +124,7 @@ export const with_select = (BasicConfig) => ({
           { value: "green", title: "Green" },
           { value: "orange", title: "Orange" },
         ],
-      }
+      },
     },
     // old format of listValues
     color2: {
@@ -141,7 +136,7 @@ export const with_select = (BasicConfig) => ({
           green: "Green",
           orange: "Orange",
         },
-      }
+      },
     },
     multicolor: {
       label: "Colors",
@@ -150,15 +145,14 @@ export const with_select = (BasicConfig) => ({
         listValues: {
           yellow: "Yellow",
           green: "Green",
-          orange: "Orange"
+          orange: "Orange",
         },
-        allowCustomValues: false
-      }
+        allowCustomValues: false,
+      },
     },
-  
   },
 });
-  
+
 export const with_struct_and_group = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -168,7 +162,7 @@ export const with_struct_and_group = (BasicConfig) => ({
       type: "!struct",
       subfields: {
         firstName: {
-          label2: "Username", //only for menu's toggler
+          label2: "Username", // only for menu's toggler
           type: "text",
           mainWidgetProps: {
             valueLabel: "Name",
@@ -182,7 +176,7 @@ export const with_struct_and_group = (BasicConfig) => ({
             valuePlaceholder: "Enter login",
           },
         },
-      }
+      },
     },
     results: {
       label: "Results",
@@ -199,16 +193,16 @@ export const with_struct_and_group = (BasicConfig) => ({
             step: 1,
             marks: {
               0: <strong>0%</strong>,
-              100: <strong>100%</strong>
+              100: <strong>100%</strong>,
             },
           },
-          //overrides
+          // overrides
           widgets: {
             slider: {
               widgetProps: {
                 valuePlaceholder: "..Slider",
-              }
-            }
+              },
+            },
           },
         },
         stock: {
@@ -217,18 +211,18 @@ export const with_struct_and_group = (BasicConfig) => ({
           defaultValue: true,
           mainWidgetProps: {
             labelYes: "+",
-            labelNo: "-"
-          }
+            labelNo: "-",
+          },
         },
-      }
+      },
     },
   },
   settings: {
     ...BasicConfig.settings,
     useGroupsAsArrays: false,
-  }
+  },
 });
-  
+
 export const with_nested_group = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -244,10 +238,10 @@ export const with_nested_group = (BasicConfig) => ({
           subfields: {
             name: {
               type: "text",
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     },
     group2: {
       label: "Group2",
@@ -256,15 +250,15 @@ export const with_nested_group = (BasicConfig) => ({
         inside: {
           type: "number",
         },
-      }
+      },
     },
   },
   settings: {
     ...BasicConfig.settings,
     useGroupsAsArrays: true,
-  }
+  },
 });
-  
+
 export const with_struct_inside_group = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -280,16 +274,16 @@ export const with_struct_inside_group = (BasicConfig) => ({
           subfields: {
             name: {
               type: "text",
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     },
   },
   settings: {
     ...BasicConfig.settings,
     useGroupsAsArrays: true,
-  }
+  },
 });
 
 export const with_all_types = (BasicConfig) => ({
@@ -344,7 +338,7 @@ export const with_all_types = (BasicConfig) => ({
           { value: "green", title: "Green" },
           { value: "orange", title: "Orange" },
         ],
-      }
+      },
     },
     multicolor: {
       label: "Colors",
@@ -353,10 +347,10 @@ export const with_all_types = (BasicConfig) => ({
         listValues: {
           yellow: "Yellow",
           green: "Green",
-          orange: "Orange"
+          orange: "Orange",
         },
-        allowCustomValues: false
-      }
+        allowCustomValues: false,
+      },
     },
     selecttree: {
       label: "Color (tree)",
@@ -373,7 +367,7 @@ export const with_all_types = (BasicConfig) => ({
           { value: "7", title: "Sub blue", parent: "6" },
           { value: "8", title: "Sub sub blue and a long text", parent: "7" },
         ],
-      }
+      },
     },
     multiselecttree: {
       label: "Colors (tree)",
@@ -381,23 +375,39 @@ export const with_all_types = (BasicConfig) => ({
       fieldSettings: {
         treeExpandAll: true,
         listValues: [
-          { value: "1", title: "Warm colors", children: [
-            { value: "2", title: "Red" },
-            { value: "3", title: "Orange" }
-          ] },
-          { value: "4", title: "Cool colors", children: [
-            { value: "5", title: "Green" },
-            { value: "6", title: "Blue", children: [
-              { value: "7", title: "Sub blue", children: [
-                { value: "8", title: "Sub sub blue and a long text" }
-              ] }
-            ] }
-          ] }
+          {
+            value: "1",
+            title: "Warm colors",
+            children: [
+              { value: "2", title: "Red" },
+              { value: "3", title: "Orange" },
+            ],
+          },
+          {
+            value: "4",
+            title: "Cool colors",
+            children: [
+              { value: "5", title: "Green" },
+              {
+                value: "6",
+                title: "Blue",
+                children: [
+                  {
+                    value: "7",
+                    title: "Sub blue",
+                    children: [
+                      { value: "8", title: "Sub sub blue and a long text" },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
         ],
         customProps: {
-          treeCheckStrictly: true
-        }
-      }
+          treeCheckStrictly: true,
+        },
+      },
     },
   },
 });
@@ -407,7 +417,7 @@ export const simple_with_number_without_regroup = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     canRegroup: false,
-  }
+  },
 });
 
 export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
@@ -415,7 +425,7 @@ export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     maxNesting: 1,
-  }
+  },
 });
 
 export const with_all_types__show_error = (BasicConfig) => ({
@@ -423,7 +433,7 @@ export const with_all_types__show_error = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     showErrorMessage: true,
-  }
+  },
 });
 
 export const with_funcs = (BasicConfig) => ({
@@ -441,15 +451,19 @@ export const with_funcs = (BasicConfig) => ({
           type: "text",
           valueSources: ["value", "field"],
         },
-      }
+      },
     },
     LINEAR_REGRESSION: {
       label: "Linear regression",
       returnType: "number",
-      formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
-      sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
-      mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
-      jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
+      formatFunc: ({ coef, bias, val }, _) => `(${coef} * ${val} + ${bias})`,
+      sqlFormatFunc: ({ coef, bias, val }) => `(${coef} * ${val} + ${bias})`,
+      mongoFormatFunc: ({ coef, bias, val }) => ({
+        $sum: [{ $multiply: [coef, val] }, bias],
+      }),
+      jsonLogic: ({ coef, bias, val }) => ({
+        "+": [{ "*": [coef, val] }, bias],
+      }),
       renderBrackets: ["", ""],
       renderSeps: [" * ", " + "],
       args: {
@@ -469,8 +483,8 @@ export const with_funcs = (BasicConfig) => ({
           type: "number",
           defaultValue: 0,
           valueSources: ["value"],
-        }
-      }
+        },
+      },
     },
   },
   fields: {
@@ -486,7 +500,7 @@ export const with_funcs = (BasicConfig) => ({
       label: "String2",
       type: "text",
     },
-  }
+  },
 });
 
 export const with_struct = (BasicConfig) => ({
@@ -507,14 +521,14 @@ export const with_struct = (BasicConfig) => ({
             firstName: {
               type: "text",
             },
-          }
-        }
-      }
+          },
+        },
+      },
     },
   },
 });
 
-export  const with_cascader = (AntdConfig) => {
+export const with_cascader = (AntdConfig) => {
   const config = with_struct(AntdConfig);
   return {
     ...config,
@@ -525,7 +539,7 @@ export  const with_cascader = (AntdConfig) => {
   };
 };
 
-export  const with_tree_select = (AntdConfig) => {
+export const with_tree_select = (AntdConfig) => {
   const config = with_struct(AntdConfig);
   return {
     ...config,
@@ -536,7 +550,7 @@ export  const with_tree_select = (AntdConfig) => {
   };
 };
 
-export  const with_dropdown = (AntdConfig) => {
+export const with_dropdown = (AntdConfig) => {
   const config = with_struct(AntdConfig);
   return {
     ...config,
@@ -581,12 +595,12 @@ export const with_settings_confirm = (BasicConfig) => ({
       okType: "danger",
     },
     renderConfirm: sinon.spy(),
-    /*({onOk, okText, cancelText, title}) => {
+    /* ({onOk, okText, cancelText, title}) => {
       if (confirm(title)) {
         onOk();
       }
-    }*/
-  }
+    } */
+  },
 });
 
 export const with_settings_not_show_not = (BasicConfig) => ({
@@ -596,15 +610,14 @@ export const with_settings_not_show_not = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    showNot: false
-  }
+    showNot: false,
+  },
 });
 
 export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
   ...simple_with_number(BasicConfig),
   settings: {
     ...BasicConfig.settings,
-    maxNumberOfRules: 3
-  }
+    maxNumberOfRules: 3,
+  },
 });
-

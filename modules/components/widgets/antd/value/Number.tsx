@@ -20,10 +20,9 @@ export default class NumberWidget extends PureComponent {
   };
 
   handleChange = (val) => {
-    if (val === "" || val === null)
-      val = undefined;
+    if (val === "" || val === null) val = undefined;
     this.props.setValue(val);
-  }
+  };
 
   static defaultProps = {
     min: undefined,
@@ -32,8 +31,17 @@ export default class NumberWidget extends PureComponent {
   };
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step, readonly} = this.props;
-    const {renderSize} = config.settings;
+    const {
+      config,
+      placeholder,
+      customProps,
+      value,
+      min,
+      max,
+      step,
+      readonly,
+    } = this.props;
+    const { renderSize } = config.settings;
     const _value = value != undefined ? value : undefined;
 
     return (

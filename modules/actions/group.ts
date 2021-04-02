@@ -1,4 +1,4 @@
-import * as constants from "../constants";
+import * as constants from '../constants';
 
 /**
  * @param {object} config
@@ -8,7 +8,7 @@ import * as constants from "../constants";
 export const setConjunction = (config, path, conjunction) => ({
   type: constants.SET_CONJUNCTION,
   path: path,
-  conjunction: conjunction
+  conjunction: conjunction,
 });
 
 /**
@@ -19,5 +19,5 @@ export const setConjunction = (config, path, conjunction) => ({
 export const setNot = (config, path, not) => ({
   type: constants.SET_NOT,
   path: path,
-  not: not
+  not: not,
 });

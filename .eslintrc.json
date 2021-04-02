@@ -1,98 +1,132 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true,
-        "mocha": true,
-        "jest": true,
-        "node": true
+  "env": {
+    "browser": true,
+    "es6": true,
+    "mocha": true,
+    "jest": true,
+    "node": true
+  },
+  "ignorePatterns": ["**/node_modules/*", "bundle.js", "webpack.config.js"],
+  "extends": [
+    "airbnb-typescript",
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "ecmaFeatures": {
+      "legacyDecorators": true,
+      "jsx": true
     },
-    "ignorePatterns": [
-        "**/node_modules/*",
-        "bundle.js",
-        "webpack.config.js"
-    ],
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/eslint-recommended"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parserOptions": {
-        "ecmaVersion": 11,
-        "ecmaFeatures": {
-            "legacyDecorators": true,
-            "jsx": true
-        },
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "babel",
-        "@typescript-eslint"
-    ],
-    "settings": {
-        "react": {
-            "version": "detect"
-        }
-    },
-    "parser": "@typescript-eslint/parser",
-    "rules": {
-        "indent": [
-            "error",
-            2,
-            {
-            }
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "operator-linebreak": [
-            "warn",
-            "before"
-        ],
-        "quotes": [
-            "warn",
-            "double",
-            {
-                "avoidEscape": true
-            }
-        ],
-        "semi": [
-            "error",
-            "always"
-        ],
-        "no-tabs": [
-            "error",
-            {
-                "allowIndentationTabs": false
-            }
-        ],
-        "no-unused-vars": [
-            "off", 
-            {
-                "todo": "set to warn",
-                "args": "all", 
-                "argsIgnorePattern": "^_", 
-                "ignoreRestSiblings": true, 
-                "caughtErrors": "none", 
-                "varsIgnorePattern": "^_"
-            }
-        ],
-        "react/display-name": [
-            "off"
-        ],
-        "global-require": [
-            "off"
-        ],
-        "react/prop-types": [
-            "off",
-            {
-                "todo": "set to warn"
-            }
-        ]
+    "sourceType": "module"
+  },
+  "plugins": ["prettier", "react", "babel", "@typescript-eslint"],
+  "settings": {
+    "react": {
+      "version": "detect"
     }
+  },
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    "indent": ["error", 2, {}],
+    "linebreak-style": ["error", "unix"],
+    "operator-linebreak": ["warn", "before"],
+    "quotes": [
+      "warn",
+      "double",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "semi": ["error", "always"],
+    "no-tabs": [
+      "error",
+      {
+        "allowIndentationTabs": false
+      }
+    ],
+    "no-unused-vars": [
+      "off",
+      {
+        "todo": "set to warn",
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": true,
+        "caughtErrors": "none",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "react/display-name": ["off"],
+    "global-require": ["off"],
+    "react/prop-types": [
+      "off",
+      {
+        "todo": "set to warn"
+      }
+    ],
+    "@typescript-eslint/dot-notation": "off",
+    "@typescript-eslint/no-implied-eval": "off",
+    "@typescript-eslint/no-throw-literal": "off",
+    "@typescript-eslint/return-await": "off",
+    "@typescript-eslint/quotes": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-loop-func": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "prettier/prettier": "off",
+    "react/sort-comp": "off",
+    "react/forbid-prop-types": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-filename-extension": "off",
+    "react/button-has-type": "off",
+    "react/state-in-constructor": "off",
+    "react/jsx-no-comment-textnodes": "off",
+    "react/destructuring-assignment": "off",
+    "react/jsx-no-duplicate-props": "off",
+    "react/require-default-props": "off",
+    "react/static-property-placement": "off",
+    "react/jsx-no-bind": "off",
+    "react/no-unused-prop-types": "off",
+    "react/no-array-index-key": "off",
+    "react/no-access-state-in-setstate": "off",
+    "no-param-reassign": "off",
+    "import/no-unresolved": "off",
+    "eqeqeq": "off",
+    "no-console": "off",
+    "no-nested-ternary": "off",
+    "no-useless-concat": "off",
+    "no-underscore-dangle": "off",
+    "jsx-a11y/control-has-associated-label": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "array-callback-return": "off",
+    "no-plusplus": "off",
+    "no-alert": "off",
+    "no-restricted-globals": "off",
+    "radix": "off",
+    "import/prefer-default-export": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-cycle": "off",
+    "import/no-named-as-default": "off",
+    "class-methods-use-this": "off",
+    "max-classes-per-file": "off",
+    "consistent-return": "off",
+    "prefer-destructuring": "off",
+    "guard-for-in": "off",
+    "no-restricted-syntax": "off"
+  }
 }

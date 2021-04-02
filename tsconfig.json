@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2017"
-    ],
+    "lib": ["dom", "dom.iterable", "es2019"],
     "esModuleInterop": true,
     "moduleResolution": "node",
     "sourceMap": true,

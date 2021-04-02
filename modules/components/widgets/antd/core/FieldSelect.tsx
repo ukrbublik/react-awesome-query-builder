@@ -1,11 +1,15 @@
 // @ts-nocheck
 import React, { PureComponent } from "react";
 import { Tooltip, Select } from "antd";
-import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/stuff";
 import PropTypes from "prop-types";
-const { Option, OptGroup } = Select;
 import keys from "lodash/keys";
+import {
+  BUILT_IN_PLACEMENTS,
+  SELECT_WIDTH_OFFSET_RIGHT,
+  calcTextWidth,
+} from "../../../../utils/stuff";
 
+const { Option, OptGroup } = Select;
 
 export default class FieldSelect extends PureComponent {
   static propTypes = {
@@ -21,39 +25,53 @@ export default class FieldSelect extends PureComponent {
     selectedFullLabel: PropTypes.string,
     selectedOpts: PropTypes.object,
     readonly: PropTypes.bool,
-    //actions
+    // actions
     setField: PropTypes.func.isRequired,
   };
 
   onChange = (key) => {
     this.props.setField(key);
-  }
+  };
 
   filterOption = (input, option) => {
     const dataForFilter = option;
     const keysForFilter = ["title", "value", "grouplabel", "label"];
     const valueForFilter = keysForFilter
-      .map(k => (typeof dataForFilter[k] == "string" ? dataForFilter[k] : ""))
+      .map((k) =>
+        typeof dataForFilter[k] === "string" ? dataForFilter[k] : ""
+      )
       .join("\0");
     return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  }
+  };
 
   render() {
     const {
-      config, customProps, items, placeholder,
-      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
+      config,
+      customProps,
+      items,
+      placeholder,
+      selectedKey,
+      selectedLabel,
+      selectedOpts,
+      selectedAltLabel,
+      selectedFullLabel,
+      readonly,
     } = this.props;
-    const {showSearch} = customProps || {};
+    const { showSearch } = customProps || {};
 
     const selectText = selectedLabel || placeholder;
     const selectWidth = calcTextWidth(selectText);
     const isFieldSelected = !!selectedKey;
-    const dropdownPlacement = config.settings.dropdownPlacement;
-    const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
-    const width = isFieldSelected && !showSearch ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const { dropdownPlacement } = config.settings;
+    const dropdownAlign = dropdownPlacement
+      ? BUILT_IN_PLACEMENTS[dropdownPlacement]
+      : undefined;
+    const width
+      = isFieldSelected && !showSearch
+        ? null
+        : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
     let tooltipText = selectedAltLabel || selectedFullLabel;
-    if (tooltipText == selectedLabel)
-      tooltipText = null;
+    if (tooltipText == selectedLabel) tooltipText = null;
 
     const fieldSelectItems = this.renderSelectItems(items);
 
@@ -69,7 +87,9 @@ export default class FieldSelect extends PureComponent {
         filterOption={this.filterOption}
         disabled={readonly}
         {...customProps}
-      >{fieldSelectItems}</Select>
+      >
+        {fieldSelectItems}
+      </Select>
     );
 
     if (tooltipText && !selectedOpts.tooltip) {
@@ -80,20 +100,33 @@ export default class FieldSelect extends PureComponent {
   }
 
   renderSelectItems(fields) {
-    return keys(fields).map(fieldKey => {
+    return keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
-      const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel} = field;
+      const {
+        items,
+        key,
+        path,
+        label,
+        fullLabel,
+        altLabel,
+        tooltip,
+        grouplabel,
+      } = field;
       const _path = path || key;
       if (items) {
-        return <OptGroup
-          key={_path}
-          label={label}
-        >
-          {this.renderSelectItems(items)}
-        </OptGroup>;
-      } else {
-        const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
-        return <Option
+        return (
+          <OptGroup key={_path} label={label}>
+            {this.renderSelectItems(items)}
+          </OptGroup>
+        );
+      }
+      const option = tooltip ? (
+        <Tooltip title={tooltip}>{label}</Tooltip>
+      ) : (
+        label
+      );
+      return (
+        <Option
           key={_path}
           value={_path}
           title={altLabel}
@@ -101,9 +134,8 @@ export default class FieldSelect extends PureComponent {
           label={label}
         >
           {option}
-        </Option>;
-      }
+        </Option>
+      );
     });
   }
-
 }

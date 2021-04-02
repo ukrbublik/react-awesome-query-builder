@@ -1,5 +1,6 @@
-import * as Widgets from "../components/widgets";
 import React from "react";
+import * as Widgets from "../components/widgets";
+
 const {
   VanillaFieldSelect,
   VanillaConjs,
@@ -11,11 +12,16 @@ const {
 } = Widgets;
 
 export const settings = {
-  formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
-    if (isForDisplay)
-      return label2;
-    else
-      return field;
+  formatField: (
+    field,
+    parts,
+    label2,
+    fieldDefinition,
+    config,
+    isForDisplay
+  ) => {
+    if (isForDisplay) return label2;
+    return field;
   },
 
   renderField: (props) => <VanillaFieldSelect {...props} />,
@@ -44,9 +50,9 @@ export const settings = {
   setOpOnChangeField: ["keep", "default"], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
 
   convertableWidgets: {
-    "number": ["slider", "rangeslider"],
-    "slider": ["number", "rangeslider"],
-    "rangeslider": ["number", "slider"],
+    number: ["slider", "rangeslider"],
+    slider: ["number", "rangeslider"],
+    rangeslider: ["number", "slider"],
   },
 
   // localization
@@ -70,5 +76,5 @@ export const settings = {
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
   useGroupsAsArrays: true,
-  defaultGroupConjunction: "AND"
+  defaultGroupConjunction: "AND",
 };

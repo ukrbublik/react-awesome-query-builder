@@ -1,9 +1,10 @@
-import uuid from "../utils/uuid";
-import {defaultRuleProperties, defaultGroupProperties} from "../utils/defaultUtils";
-import * as constants from "../constants";
-import Immutable from "immutable";
-
-
+import uuid from '../utils/uuid';
+import {
+  defaultRuleProperties,
+  defaultGroupProperties,
+} from '../utils/defaultUtils';
+import * as constants from '../constants';
+import Immutable from 'immutable';
 
 /**
  * @param {object} config
@@ -11,7 +12,7 @@ import Immutable from "immutable";
  */
 export const setTree = (config, tree) => ({
   type: constants.SET_TREE,
-  tree: tree
+  tree: tree,
 });
 
 /**
@@ -24,7 +25,7 @@ export const addRule = (config, path, properties) => ({
   path: path,
   id: uuid(),
   properties: defaultRuleProperties(config).merge(properties || {}),
-  config: config
+  config: config,
 });
 
 /**
@@ -34,7 +35,7 @@ export const addRule = (config, path, properties) => ({
 export const removeRule = (config, path) => ({
   type: constants.REMOVE_RULE,
   path: path,
-  config: config
+  config: config,
 });
 
 /**
@@ -46,7 +47,7 @@ export const addGroup = (config, path, properties) => ({
   type: constants.ADD_NEW_GROUP,
   path: path,
   properties: defaultGroupProperties(config).merge(properties || {}),
-  config: config
+  config: config,
 });
 
 /**
@@ -56,7 +57,7 @@ export const addGroup = (config, path, properties) => ({
 export const removeGroup = (config, path) => ({
   type: constants.REMOVE_GROUP,
   path: path,
-  config: config
+  config: config,
 });
 
 /**

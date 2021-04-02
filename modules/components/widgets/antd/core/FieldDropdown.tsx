@@ -3,10 +3,10 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import keys from "lodash/keys";
 import { Menu, Dropdown, Tooltip, Button } from "antd";
-const SubMenu = Menu.SubMenu;
-const MenuItem = Menu.Item;
 import { DownOutlined } from "@ant-design/icons";
 
+const { SubMenu } = Menu;
+const MenuItem = Menu.Item;
 
 export default class FieldDropdown extends PureComponent {
   static propTypes = {
@@ -22,55 +22,52 @@ export default class FieldDropdown extends PureComponent {
     selectedFullLabel: PropTypes.string,
     selectedOpts: PropTypes.object,
     readonly: PropTypes.bool,
-    //actions
+    // actions
     setField: PropTypes.func.isRequired,
   };
 
-  onChange = ({key, keyPath}) => {
+  onChange = ({ key, keyPath }) => {
     this.props.setField(key);
-  }
+  };
 
   renderMenuItems(fields) {
-    return keys(fields).map(fieldKey => {
+    return keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
-      const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
+      const { items, key, path, label, fullLabel, altLabel, tooltip } = field;
       const _path = path || key;
-      const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
+      const option = tooltip ? (
+        <Tooltip title={tooltip}>{label}</Tooltip>
+      ) : (
+        label
+      );
 
       if (items) {
-        return <SubMenu
-          key={_path}
-          title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
-        >
-          {this.renderMenuItems(items)}
-        </SubMenu>;
-      } else {
-        return <MenuItem
-          key={_path}
-        >
-          {option}
-        </MenuItem>;
+        return (
+          <SubMenu
+            key={_path}
+            title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
+          >
+            {this.renderMenuItems(items)}
+          </SubMenu>
+        );
       }
+      return <MenuItem key={_path}>{option}</MenuItem>;
     });
   }
 
   renderMenuToggler(togglerLabel, tooltipText, config, readonly) {
-    let toggler
-          = <Button
-            size={config.settings.renderSize}
-            disabled={readonly}
-          >
-            {togglerLabel} <DownOutlined />
-          </Button>;
+    let toggler = (
+      <Button size={config.settings.renderSize} disabled={readonly}>
+        {togglerLabel} <DownOutlined />
+      </Button>
+    );
 
     if (tooltipText) {
-      toggler 
-              = <Tooltip
-          placement="top"
-          title={tooltipText}
-        >
+      toggler = (
+        <Tooltip placement="top" title={tooltipText}>
           {toggler}
-        </Tooltip>;
+        </Tooltip>
+      );
     }
 
     return toggler;
@@ -78,27 +75,43 @@ export default class FieldDropdown extends PureComponent {
 
   render() {
     const {
-      config, customProps, items, placeholder,
-      selectedKeys, selectedLabel, selectedOpts, readonly, selectedAltLabel, selectedFullLabel,
+      config,
+      customProps,
+      items,
+      placeholder,
+      selectedKeys,
+      selectedLabel,
+      selectedOpts,
+      readonly,
+      selectedAltLabel,
+      selectedFullLabel,
     } = this.props;
 
     const fieldMenuItems = this.renderMenuItems(items);
 
     const fieldMenu = (
       <Menu
-        //size={config.settings.renderSize}
+        // size={config.settings.renderSize}
         selectedKeys={selectedKeys}
         onClick={this.onChange}
         {...customProps}
-      >{fieldMenuItems}</Menu>
+      >
+        {fieldMenuItems}
+      </Menu>
     );
     const togglerLabel = selectedAltLabel || selectedLabel || placeholder;
     let tooltipText = selectedFullLabel;
-    if (tooltipText == selectedLabel)
-      tooltipText = null;
-    const fieldToggler = this.renderMenuToggler(togglerLabel, tooltipText, config, readonly);
+    if (tooltipText == selectedLabel) tooltipText = null;
+    const fieldToggler = this.renderMenuToggler(
+      togglerLabel,
+      tooltipText,
+      config,
+      readonly
+    );
 
-    return readonly ? fieldToggler : (
+    return readonly ? (
+      fieldToggler
+    ) : (
       <Dropdown
         overlay={fieldMenu}
         trigger={["click"]}

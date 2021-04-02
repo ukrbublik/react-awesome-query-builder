@@ -6,7 +6,8 @@
   @include force_nomargin;
 }
 
-.group, .rule {
+.group,
+.rule {
 }
 
 .rule {
@@ -25,19 +26,19 @@
   padding-left: 10px !important;
 
   & > .group-or-rule-container > .group-or-rule {
-    &::before, &::after {
-        left: -7px;
-        width: 7px;
+    &::before,
+    &::after {
+      left: -7px;
+      width: 7px;
     }
   }
-  
+
   & > .group-or-rule-container:first-child > .group-or-rule {
-      &::before {
-        top: -7px;
-      }
+    &::before {
+      top: -7px;
+    }
   }
 }
-
 
 .group--conjunctions {
   @extend %force_nomargin;
@@ -61,7 +62,10 @@
   }
 }
 
-.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
+.rule--operator,
+.widget--widget,
+.widget--valuesrc,
+.widget--sep {
   margin-left: 5px;
 }
 
@@ -76,9 +80,10 @@
     }
 
     & > .group-or-rule-container > .group-or-rule {
-      &::before, &::after {
-          left: -7px;
-          width: 7px;
+      &::before,
+      &::after {
+        left: -7px;
+        width: 7px;
       }
     }
   }

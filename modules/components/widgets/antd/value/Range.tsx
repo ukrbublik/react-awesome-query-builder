@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
 
 export default class RangeWidget extends PureComponent {
-
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
@@ -30,8 +29,7 @@ export default class RangeWidget extends PureComponent {
     marks: undefined,
   };
 
-  state = {
-  }
+  state = {};
 
   constructor(props) {
     super(props);
@@ -50,44 +48,53 @@ export default class RangeWidget extends PureComponent {
 
   handleChange = (value) => {
     this.props.setValue(value);
-  }
+  };
 
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
-    if (valueFrom === "" || valueFrom == null)
-      valueFrom = undefined; //value[0];
+    if (valueFrom === "" || valueFrom == null) valueFrom = undefined; // value[0];
     value = [...value];
     value[0] = valueFrom;
     // if (value[1] == undefined)
     //   value[1] = valueFrom;
     this.props.setValue(value);
-  }
-  
+  };
+
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
-    if (valueTo === "" || valueTo == null)
-      valueTo = undefined; //value[1];
+    if (valueTo === "" || valueTo == null) valueTo = undefined; // value[1];
     value = [...value];
     value[1] = valueTo;
     // if (value[0] == undefined)
     //   value[0] = valueTo;
     this.props.setValue(value);
-  }
+  };
 
-  tipFormatter = (val) => (val != undefined ? val.toString() : "")
+  tipFormatter = (val) => (val != undefined ? val.toString() : "");
 
   render() {
-    const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
-    const {renderSize} = config.settings;
-    const {width, ...rest} = customProps || {};
+    const {
+      config,
+      placeholders,
+      customProps,
+      value,
+      min,
+      max,
+      step,
+      marks,
+      textSeparators,
+      readonly,
+    } = this.props;
+    const { renderSize } = config.settings;
+    const { width, ...rest } = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
     const _value = value != undefined ? value : undefined;
     const [valueFrom, valueTo] = _value || [null, null];
 
     return (
-      <Col style={{display: "inline-flex"}}>
-        <Col style={{float: "left", marginRight: "5px"}}>
+      <Col style={{ display: "inline-flex" }}>
+        <Col style={{ float: "left", marginRight: "5px" }}>
           <InputNumber
             disabled={readonly}
             size={renderSize}
@@ -101,10 +108,10 @@ export default class RangeWidget extends PureComponent {
             {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", marginRight: "5px", lineHeight: "20px"}}>
-          <span>{ textSeparators[1] }</span>
+        <Col style={{ float: "left", marginRight: "5px", lineHeight: "20px" }}>
+          <span>{textSeparators[1]}</span>
         </Col>
-        <Col style={{float: "left", marginRight: "5px"}}>
+        <Col style={{ float: "left", marginRight: "5px" }}>
           <InputNumber
             disabled={readonly}
             size={renderSize}
@@ -118,7 +125,7 @@ export default class RangeWidget extends PureComponent {
             {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: width || "300px"}}>
+        <Col style={{ float: "left", width: width || "300px" }}>
           <Slider
             disabled={readonly}
             value={_value}
@@ -128,12 +135,12 @@ export default class RangeWidget extends PureComponent {
             step={step}
             marks={marks}
             included={false}
-            range={true}
+            range
             onChange={this.handleChange}
             {...customSliderProps}
           />
         </Col>
-        <Col style={{clear: "both"}} />
+        <Col style={{ clear: "both" }} />
       </Col>
     );
   }

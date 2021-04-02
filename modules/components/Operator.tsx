@@ -1,12 +1,11 @@
 // @ts-nocheck
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
-import {useOnPropsChanged} from "../utils/stuff";
-
+import { getFieldConfig, getOperatorConfig } from "../utils/configUtils";
+import { useOnPropsChanged } from "../utils/stuff";
 
 export default class Operator extends PureComponent {
   static propTypes = {
@@ -14,7 +13,7 @@ export default class Operator extends PureComponent {
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string,
     readonly: PropTypes.bool,
-    //actions
+    // actions
     setOperator: PropTypes.func.isRequired,
   };
 
@@ -28,19 +27,29 @@ export default class Operator extends PureComponent {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForMeta = ["config", "selectedField", "selectedOperator"];
-    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateMeta
+      = !this.meta
+      || keysForMeta.map((k) => nextProps[k] !== prevProps[k]).filter((ch) => ch)
+        .length > 0;
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
     }
   }
 
-  getMeta({config, selectedField, selectedOperator}) {
+  getMeta({ config, selectedField, selectedOperator }) {
     const fieldConfig = getFieldConfig(selectedField, config);
-    const operatorOptions = mapValues(pickBy(config.operators, (item, key) =>
-      fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
-    ), (_opts, op) => getOperatorConfig(config, op, selectedField));
-      
+    const operatorOptions = mapValues(
+      pickBy(
+        config.operators,
+        (item, key) =>
+          fieldConfig
+          && fieldConfig.operators
+          && fieldConfig.operators.indexOf(key) !== -1
+      ),
+      (_opts, op) => getOperatorConfig(config, op, selectedField)
+    );
+
     const items = this.buildOptions(config, operatorOptions);
 
     const isOpSelected = !!selectedOperator;
@@ -53,18 +62,22 @@ export default class Operator extends PureComponent {
     const selectedLabel = selectedOpts.label;
 
     return {
-      placeholder, items,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts
+      placeholder,
+      items,
+      selectedKey,
+      selectedKeys,
+      selectedPath,
+      selectedLabel,
+      selectedOpts,
     };
   }
 
   buildOptions(config, fields) {
-    if (!fields)
-      return null;
+    if (!fields) return null;
 
-    return keys(fields).map(fieldKey => {
+    return keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
-      const label = field.label;
+      const { label } = field;
       return {
         key: fieldKey,
         path: fieldKey,
@@ -74,17 +87,15 @@ export default class Operator extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setOperator, readonly} = this.props;
-    const {renderOperator} = config.settings;
+    const { config, customProps, setOperator, readonly } = this.props;
+    const { renderOperator } = config.settings;
     const renderProps = {
-      config, 
-      customProps, 
+      config,
+      customProps,
       readonly,
       setField: setOperator,
-      ...this.meta
+      ...this.meta,
     };
     return renderOperator(renderProps);
   }
-
-
 }
