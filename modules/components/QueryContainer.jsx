@@ -5,9 +5,9 @@ import {createStore} from "redux";
 import {connect, Provider} from "react-redux";
 import * as actions from "../actions";
 import {extendConfig} from "../utils/configUtils";
-import {shallowEqual, immutableEqual, useOnPropsChanged} from "../utils/stuff";
+import {shallowEqual, immutableEqual} from "../utils/stuff";
 import {defaultRoot} from "../utils/defaultUtils";
-import {liteShouldComponentUpdate} from "../utils/renderUtils";
+import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import pick from "lodash/pick";
 import Query, {validateAndFixTree} from "./Query";
 

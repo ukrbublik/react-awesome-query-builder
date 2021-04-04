@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Select } from "antd";
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
+import {mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
+import {useOnPropsChanged} from "../../../../utils/reactUtils";
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends PureComponent {

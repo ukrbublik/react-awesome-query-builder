@@ -36,3 +36,20 @@ export const pureShouldComponentUpdate = (self) => function(nextProps, nextState
     || !shallowEqual(self.state, nextState)
   );
 };
+
+const canUseUnsafe = () => {
+  const v = React.version.split(".").map(parseInt.bind(null, 10));
+  return v[0] >= 16 && v[1] >= 3;
+};
+
+export const useOnPropsChanged = (obj) => {
+  if (canUseUnsafe) {
+    obj.UNSAFE_componentWillReceiveProps = (nextProps) => {
+      obj.onPropsChanged(nextProps);
+    };
+  } else {
+    obj.componentWillReceiveProps = (nextProps) => {
+      obj.onPropsChanged(nextProps);
+    };
+  }
+};

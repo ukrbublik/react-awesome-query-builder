@@ -184,24 +184,6 @@ export const escapeRegExp = (string) => {
 };
 
 
-const canUseUnsafe = () => {
-  const v = React.version.split(".").map(parseInt.bind(null, 10));
-  return v[0] >= 16 && v[1] >= 3;
-};
-
-export const useOnPropsChanged = (obj) => {
-  if (canUseUnsafe) {
-    obj.UNSAFE_componentWillReceiveProps = (nextProps) => {
-      obj.onPropsChanged(nextProps);
-    };
-  } else {
-    obj.componentWillReceiveProps = (nextProps) => {
-      obj.onPropsChanged(nextProps);
-    };
-  }
-};
-
-
 const isObject = (v) => (typeof v == "object" && v !== null);
 const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
 

@@ -6,7 +6,7 @@ import {BasicGroup} from "./Group";
 import {RuleGroupExtActions} from "./RuleGroupExtActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import OperatorWrapper from "../rule/OperatorWrapper";
-import {useOnPropsChanged} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
 import Widget from "../rule/Widget";

@@ -5,7 +5,7 @@ import Item from "./item/Item";
 import SortableContainer from "./containers/SortableContainer";
 import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../utils/treeUtils";
 import uuid from "../utils/uuid";
-import {pureShouldComponentUpdate} from "../utils/renderUtils";
+import {pureShouldComponentUpdate} from "../utils/reactUtils";
 
 
 @SortableContainer

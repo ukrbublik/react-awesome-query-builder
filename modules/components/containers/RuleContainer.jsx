@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {getFieldConfig} from "../../utils/configUtils";
-import {pureShouldComponentUpdate} from "../../utils/renderUtils";
+import {pureShouldComponentUpdate} from "../../utils/reactUtils";
 import {connect} from "react-redux";
 const classNames = require("classnames");
 

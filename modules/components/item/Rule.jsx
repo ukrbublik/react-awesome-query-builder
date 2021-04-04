@@ -7,7 +7,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
-import {useOnPropsChanged} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
 
 

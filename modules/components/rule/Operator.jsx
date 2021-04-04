@@ -4,7 +4,7 @@ import {getFieldConfig, getOperatorConfig} from "../../utils/configUtils";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
-import {useOnPropsChanged} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 
 
 export default class Operator extends PureComponent {

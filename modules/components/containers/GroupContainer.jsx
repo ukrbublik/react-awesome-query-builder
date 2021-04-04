@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import mapValues from "lodash/mapValues";
-import {pureShouldComponentUpdate} from "../../utils/renderUtils";
+import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
 import {connect} from "react-redux";
-import {useOnPropsChanged} from "../../utils/stuff";
 
 
 export default (Group) => {

@@ -5,7 +5,7 @@ import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
-import {useOnPropsChanged} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import {ConfirmFn} from "../utils";
 
 

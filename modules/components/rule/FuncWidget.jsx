@@ -7,7 +7,7 @@ import {
 import Widget from "./Widget";
 import {Col} from "../utils";
 import {setFunc, setArgValue, setArgValueSrc} from "../../utils/funcUtils";
-import {useOnPropsChanged} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 
 
 export default class FuncWidget extends PureComponent {

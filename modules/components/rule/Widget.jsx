@@ -5,7 +5,8 @@ import {
   getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
   getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
 } from "../../utils/configUtils";
-import {defaultValue, useOnPropsChanged} from "../../utils/stuff";
+import {defaultValue} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
 import Immutable from "immutable";
 import WidgetFactory from "./WidgetFactory";

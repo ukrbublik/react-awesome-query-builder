@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 import {
   getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getFuncPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
 } from "../../utils/configUtils";
-import {truncateString, useOnPropsChanged} from "../../utils/stuff";
+import {truncateString} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 import clone from "clone";
