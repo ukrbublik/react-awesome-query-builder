@@ -1,10 +1,9 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
 } from "./configUtils";
-import {getOperatorsForField, getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
 import {defaultValue, deepEqual, getItemInListValues} from "../utils/stuff";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
-import {getNewValueForFieldOp} from "../utils/ruleUtils";
 import omit from "lodash/omit";
 
 

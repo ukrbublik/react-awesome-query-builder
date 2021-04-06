@@ -19,6 +19,7 @@ export const extendConfig = (config) => {
 
   _extendTypesConfig(config.types, config);
 
+  config.__fieldNames = {};
   _extendFieldsConfig(config.fields, config);
 
   _extendFuncArgsConfig(config.funcs, config);
@@ -73,11 +74,11 @@ function _extendTypeConfig(type, typeConfig, config) {
     typeConfig.defaultOperator = defaultOperator;
 }
 
-function _extendFieldsConfig(subconfig, config) {
+function _extendFieldsConfig(subconfig, config, path = []) {
   for (let field in subconfig) {
-    _extendFieldConfig(subconfig[field], config);
+    _extendFieldConfig(subconfig[field], config, [...path, field]);
     if (subconfig[field].subfields) {
-      _extendFieldsConfig(subconfig[field].subfields, config);
+      _extendFieldsConfig(subconfig[field].subfields, config, [...path, field]);
     }
   }
 }
@@ -92,7 +93,7 @@ function _extendFuncArgsConfig(subconfig, config) {
       config._funcsCntByType[funcDef.returnType]++;
     }
     for (let argKey in funcDef.args) {
-      _extendFieldConfig(funcDef.args[argKey], config, true);
+      _extendFieldConfig(funcDef.args[argKey], config, null, true);
     }
 
     // isOptional can be only in the end
@@ -115,7 +116,7 @@ function _extendFuncArgsConfig(subconfig, config) {
   }
 }
 
-function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
+function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
   //todo: set missing fieldName ?
   let operators = null, defaultOperator = null;
   const typeConfig = config.types[fieldConfig.type];
@@ -180,12 +181,17 @@ function _extendFieldConfig(fieldConfig, config, isFuncArg = false) {
       fieldConfig.fieldSettings.listValues = normalizeListValues(fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings);
     }
   }
+
+  if (path && fieldConfig.fieldName) {
+    config.__fieldNames[fieldConfig.fieldName] = path;
+  }
 }
 
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
   const fieldSeparator = config.settings.fieldSeparator;
+  //field = normalizeField(config, field);
   const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
   const targetFields = config[fieldsKey];
   if (!targetFields)
@@ -212,6 +218,14 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
   return fieldConfig;
 };
 
+export const normalizeField = (config, field) => {
+  const fieldSeparator = config.settings.fieldSeparator;
+  const fieldStr = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  if (config.__fieldNames[fieldStr]) {
+    return config.__fieldNames[fieldStr].join(fieldSeparator);
+  }
+  return fieldStr;
+};
 
 export const getFuncConfig = (config, func) => {
   if (!func)

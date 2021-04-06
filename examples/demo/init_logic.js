@@ -35,7 +35,7 @@ export default
     {
       "some": [
         {
-          "varValues": "results"
+          "varValues": "state.input.results"
         },
         {
           "and": [

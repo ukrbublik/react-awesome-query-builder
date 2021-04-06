@@ -1,6 +1,6 @@
 import uuid from "../utils/uuid";
 import {defaultValue} from "../utils/stuff";
-import {getFieldConfig, extendConfig} from "../utils/configUtils";
+import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
@@ -178,7 +178,8 @@ const convertField = (op, vals, conv, config, not, meta, parentField = null) => 
     let field = vals[0];
     if (parentField)
       field = [parentField, field].join(fieldSeparator);
-    const fieldConfig = getFieldConfig(config, field); //todo: use fieldName config for reverse find (introduce cache?)
+    field = normalizeField(config, field);
+    const fieldConfig = getFieldConfig(config, field);
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);
       return undefined;
@@ -300,7 +301,8 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
           let ch = children1;
           groupField.split(fieldSeparator).map((f, i, a) => {
             const p = a.slice(0, i);
-            const ff = [...p, f].join(fieldSeparator);
+            let ff = [...p, f].join(fieldSeparator);
+            ff = normalizeField(config, ff);
             const ffConfig = getFieldConfig(config, ff) || {};
             if (!needSplit && i == 0) {
               type = "rule_group";
@@ -466,6 +468,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
     }
     if (parentField)
       field = [parentField, field].join(fieldSeparator);
+    field = normalizeField(config, field);
 
     const fieldConfig = getFieldConfig(config, field);
     if (!fieldConfig) {

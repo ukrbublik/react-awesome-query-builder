@@ -1,8 +1,7 @@
 import {defaultValue} from "../utils/stuff";
-import {
-  getFieldConfig, getOperatorConfig
-} from "../utils/configUtils";
+import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
+import {formatFieldName} from "../utils/ruleUtils";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 
@@ -50,20 +49,6 @@ export const queryBuilderFormat = (item, config) => {
     usedFields: []
   };
   return {..._queryBuilderFormat(item, config, meta), ...meta};
-};
-
-const formatFieldName = (field, config) => {
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const {fieldSeparator} = config.settings;
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  if (fieldDefinition.tableName) { // legacy
-    const fieldPartsCopy = [...fieldParts];
-    fieldPartsCopy[0] = fieldDefinition.tableName;
-    fieldName = fieldPartsCopy.join(fieldSeparator);
-  }
-  //todo: cut group, use fieldName config
-  return fieldName;
 };
 
 //meta is mutable

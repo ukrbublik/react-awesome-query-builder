@@ -47,7 +47,7 @@ const formatFieldName = (field, config, meta, parentPath) => {
     if (fieldName.indexOf(parentFieldName+".") == 0) {
       fieldName = fieldName.slice((parentFieldName+".").length);
     } else {
-      meta.errors.push(`Can't cut group ${parentPath} from field ${fieldName}`);
+      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
     }
   }
   return fieldName;

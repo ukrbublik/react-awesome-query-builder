@@ -127,7 +127,7 @@ const formatField = (meta, config, field, parentField = null) => {
       if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
         fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
       } else {
-        meta.errors.push(`Can't cut group ${parentField} from field ${fieldName}`);
+        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
       }
     }
     let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVarKey : "var");

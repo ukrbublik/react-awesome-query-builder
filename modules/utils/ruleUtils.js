@@ -324,3 +324,20 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
     widget = widgets[0];
   return widget;
 };
+
+export const formatFieldName = (field, config) => {
+  const fieldDef = getFieldConfig(config, field) || {};
+  const {fieldSeparator} = config.settings;
+  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  if (fieldDef.tableName) { // legacy
+    const fieldPartsCopy = [...fieldParts];
+    fieldPartsCopy[0] = fieldDef.tableName;
+    fieldName = fieldPartsCopy.join(fieldSeparator);
+  }
+  if (fieldDef.fieldName) {
+    fieldName = fieldDef.fieldName;
+  }
+  return fieldName;
+};
+

@@ -212,7 +212,7 @@ export default (skin) => {
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
     // maxNumberOfRules: 10 // number of rules can be added to the query builder
-    // todo: just for demo, delete later
+    //todo: just for demo, delete later
     jsonLogic: {
       groupVarKey: "varValues",
       altVarKey: "shortcut",
@@ -271,6 +271,7 @@ export default (skin) => {
         },
         score: {
           type: "number",
+          fieldName: "state.input.results.score", //todo: temp
           //todo: should be extended auto
           fieldSettings: {
             min: 0,

@@ -1,3 +1,4 @@
+import React from "react";
 import mapValues from "lodash/mapValues";
 import {shallowEqual} from "./stuff";
 

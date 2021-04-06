@@ -1,7 +1,9 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
-import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} from "../utils/ruleUtils";
+import {
+  getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName
+} from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {defaultValue} from "../utils/stuff";
@@ -22,20 +24,6 @@ export const sqlFormat = (tree, config) => {
   if (meta.errors.length)
     console.warn("Errors while exporting to SQL:", meta.errors);
   return res;
-};
-
-const formatFieldName = (field, config) => {
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const {fieldSeparator} = config.settings;
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  if (fieldDefinition.tableName) { // legacy
-    const fieldPartsCopy = [...fieldParts];
-    fieldPartsCopy[0] = fieldDefinition.tableName;
-    fieldName = fieldPartsCopy.join(fieldSeparator);
-  }
-  //todo: cut group, use fieldName config
-  return fieldName;
 };
 
 //meta is mutable
