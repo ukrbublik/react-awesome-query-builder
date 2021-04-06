@@ -87,7 +87,7 @@ export default (Rule) => {
 
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const fieldConfig = getFieldConfig(this.props.field, this.props.config);
+      const fieldConfig = getFieldConfig(this.props.config, this.props.field);
       const {showErrorMessage} = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;

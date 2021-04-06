@@ -1,4 +1,3 @@
-"use strict";
 import {defaultValue} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig
@@ -54,7 +53,7 @@ export const queryBuilderFormat = (item, config) => {
 };
 
 const formatFieldName = (field, config) => {
-  const fieldDefinition = getFieldConfig(field, config) || {};
+  const fieldDefinition = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
@@ -106,7 +105,7 @@ const _queryBuilderFormat = (item, config, meta) => {
     if (field == null || operator == null || hasUndefinedValues)
       return undefined;
 
-    const fieldDefinition = getFieldConfig(field, config) || {};
+    const fieldDefinition = getFieldConfig(config, field) || {};
     const operatorDefinition = getOperatorConfig(config, operator, field) || {};
     const fieldType = fieldDefinition.type || "undefined";
     const cardinality = defaultValue(operatorDefinition.cardinality, 1);

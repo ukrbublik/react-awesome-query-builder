@@ -1,10 +1,12 @@
-import React, { Component, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import range from "lodash/range";
 import {
-  getFieldConfig, getValueLabel, getOperatorConfig, getValueSourcesForFieldOp,
-  getWidgetForFieldOp, getFieldWidgetConfig, getWidgetsForFieldOp
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig
 } from "../../utils/configUtils";
+import {
+  getValueSourcesForFieldOp, getWidgetsForFieldOp, getWidgetForFieldOp, getValueLabel
+} from "../../utils/ruleUtils";
 import {defaultValue} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
@@ -85,7 +87,7 @@ export default class Widget extends PureComponent {
       _values = Immutable.List([values]);
     }
 
-    const fieldDefinition = getFieldConfig(field, config);
+    const fieldDefinition = getFieldConfig(config, field);
     const defaultWidget = getWidgetForFieldOp(config, field, operator);
     const _widgets = getWidgetsForFieldOp(config, field, operator);
     const operatorDefinition = isFuncArg ? funcArgDummyOpDef : getOperatorConfig(config, operator, field);

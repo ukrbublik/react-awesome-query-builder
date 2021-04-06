@@ -78,13 +78,13 @@ class RuleGroupExt extends BasicGroup {
 
   showNot() {
     const {config, selectedField, selectedOperator} = this.props;
-    const selectedFieldConfig = getFieldConfig(selectedField, config) || {};
+    const selectedFieldConfig = getFieldConfig(config, selectedField) || {};
     return selectedFieldConfig.showNot != undefined ? selectedFieldConfig.showNot : config.settings.showNot;
   }
 
   conjunctionOptions() {
     const {config, selectedField, selectedOperator} = this.props;
-    const selectedFieldConfig = getFieldConfig(selectedField, config) || {};
+    const selectedFieldConfig = getFieldConfig(config, selectedField) || {};
     let conjunctionOptions = super.conjunctionOptions();
     if (selectedFieldConfig.conjunctions) {
       let filtered = {};

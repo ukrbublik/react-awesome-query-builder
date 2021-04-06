@@ -1,7 +1,7 @@
 import Immutable from "immutable";
 import uuid from "./uuid";
-import {getFieldConfig, getFirstField, getFirstOperator, getOperatorConfig} from "./configUtils";
-import {getNewValueForFieldOp} from "../utils/validation";
+import {getFieldConfig, getOperatorConfig} from "./configUtils";
+import {getNewValueForFieldOp, getFirstField, getFirstOperator} from "../utils/ruleUtils";
 
 
 export const defaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
@@ -11,7 +11,7 @@ export const defaultField = (config, canGetFirst = true, parentRuleGroupPath = n
 };
 
 export const defaultOperator = (config, field, canGetFirst = true) => {
-  let fieldConfig = getFieldConfig(field, config);
+  let fieldConfig = getFieldConfig(config, field);
   let fieldOperators = fieldConfig && fieldConfig.operators || [];
   let fieldDefaultOperator = fieldConfig && fieldConfig.defaultOperator;
   if (!fieldOperators.includes(fieldDefaultOperator))
@@ -67,7 +67,6 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
   return current; 
 };
 
-//------------
 
 export const defaultGroupConjunction = (config, fieldConfig = null) => {
   const conjs = fieldConfig && fieldConfig.conjunctions || Object.keys(config.conjunctions);
@@ -84,9 +83,8 @@ export const defaultGroupProperties = (config, fieldConfig = null) => new Immuta
 });
 
 
-//------------
 
-export const getChild = (id, config) => ({
+export const defaultRule = (id, config) => ({
   [id]: new Immutable.Map({
     type: "rule",
     id: id,
@@ -102,8 +100,7 @@ export const defaultRoot = (config) => {
   return new Immutable.Map({
     type: "group",
     id: uuid(),
-    children1: new Immutable.OrderedMap({ ...getChild(uuid(), config) }),
+    children1: new Immutable.OrderedMap({ ...defaultRule(uuid(), config) }),
     properties: defaultGroupProperties(config)
   });
 };
-

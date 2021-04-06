@@ -1,6 +1,7 @@
 import {
-  getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
+import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {defaultValue} from "../utils/stuff";
@@ -24,7 +25,7 @@ export const sqlFormat = (tree, config) => {
 };
 
 const formatFieldName = (field, config) => {
-  const fieldDefinition = getFieldConfig(field, config) || {};
+  const fieldDefinition = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
@@ -48,7 +49,7 @@ const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWi
     const rightField = currentValue;
     let formattedField = null;
     if (rightField) {
-      const rightFieldDefinition = getFieldConfig(rightField, config) || {};
+      const rightFieldDefinition = getFieldConfig(config, rightField) || {};
       const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
       const _fieldKeys = getFieldPath(rightField, config);
       const fieldPartsLabels = getFieldPathLabels(rightField, config);
@@ -61,12 +62,12 @@ const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWi
   } else if (valueSrc == "func") {
     const funcKey = currentValue.get("func");
     const args = currentValue.get("args");
-    const funcConfig = getFuncConfig(funcKey, config);
+    const funcConfig = getFuncConfig(config, funcKey);
     const funcName = funcConfig.sqlFunc || funcKey;
     const formattedArgs = {};
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
-      const fieldDef = getFieldConfig(argConfig, config);
+      const fieldDef = getFieldConfig(config, argConfig);
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -102,7 +103,7 @@ const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWi
         args.push(operatorDefinition);
       }
       if (valueSrc == "field") {
-        const valFieldDefinition = getFieldConfig(currentValue, config) || {}; 
+        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
         args.push(valFieldDefinition);
       }
       ret = fn(...args);
@@ -141,7 +142,7 @@ const sqlFormatItem = (item, config, meta) => {
     if (field == null || operator == null)
       return undefined;
 
-    const fieldDefinition = getFieldConfig(field, config) || {};
+    const fieldDefinition = getFieldConfig(config, field) || {};
     const operatorDefinition = getOperatorConfig(config, operator, field) || {};
     const reversedOp = operatorDefinition.reversedOp;
     const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};

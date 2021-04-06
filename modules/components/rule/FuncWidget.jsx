@@ -40,7 +40,7 @@ export default class FuncWidget extends PureComponent {
 
   getMeta({config, field, operator, value}) {
     const funcKey = value ? value.get("func") : null;
-    const funcDefinition = funcKey ? getFuncConfig(funcKey, config) : null;
+    const funcDefinition = funcKey ? getFuncConfig(config, funcKey) : null;
 
     return {
       funcDefinition, funcKey

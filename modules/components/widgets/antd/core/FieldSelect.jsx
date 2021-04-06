@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { Tooltip, Select } from "antd";
-import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/stuff";
+import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/domUtils";
 import PropTypes from "prop-types";
 const { Option, OptGroup } = Select;
 import keys from "lodash/keys";

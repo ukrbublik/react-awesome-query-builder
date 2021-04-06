@@ -1,8 +1,8 @@
-"use strict";
 import {defaultValue} from "../utils/stuff";
 import {
-  getFieldConfig, getWidgetForFieldOp, getOperatorConfig, getFieldWidgetConfig, getFieldPath, getFieldPathLabels, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
+import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
 import omit from "lodash/omit";
@@ -25,7 +25,7 @@ export const mongodbFormat = (tree, config) => {
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 const formatFieldName = (field, config, meta, parentPath) => {
-  const fieldDef = getFieldConfig(field, config) || {};
+  const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
@@ -39,7 +39,7 @@ const formatFieldName = (field, config, meta, parentPath) => {
   }
 
   if (parentPath) {
-    const parentFieldDef = getFieldConfig(parentPath, config) || {};
+    const parentFieldDef = getFieldConfig(config, parentPath) || {};
     let parentFieldName = parentPath;
     if (parentFieldDef.fieldName) {
       parentFieldName = parentFieldDef.fieldName;
@@ -64,7 +64,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
     //format field
     const rightField = currentValue;
     if (rightField) {
-      const rightFieldDefinition = getFieldConfig(rightField, config) || {};
+      const rightFieldDefinition = getFieldConfig(config, rightField) || {};
       const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
       const _fieldKeys = getFieldPath(rightField, config);
       const fieldPartsLabels = getFieldPathLabels(rightField, config);
@@ -79,7 +79,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
     useExpr = true;
     const funcKey = currentValue.get("func");
     const args = currentValue.get("args");
-    const funcConfig = getFuncConfig(funcKey, config);
+    const funcConfig = getFuncConfig(config, funcKey);
     const funcName = funcConfig.mongoFunc || funcKey;
     const mongoArgsAsObject = funcConfig.mongoArgsAsObject;
     const formattedArgs = {};
@@ -87,7 +87,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
     let lastArg = undefined;
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
-      const fieldDef = getFieldConfig(argConfig, config);
+      const fieldDef = getFieldConfig(config, argConfig);
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -227,7 +227,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     if (field == null || operator == null)
       return undefined;
 
-    const fieldDefinition = getFieldConfig(field, config) || {};
+    const fieldDefinition = getFieldConfig(config, field) || {};
     let operatorDefinition = getOperatorConfig(config, operator, field) || {};
     let reversedOp = operatorDefinition.reversedOp;
     let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};

@@ -2,8 +2,8 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import * as actions from "../actions";
 import {fixPathsInTree} from "../utils/treeUtils";
-import {bindActionCreators, immutableEqual} from "../utils/stuff";
-import {useOnPropsChanged} from "../utils/reactUtils";
+import {immutableEqual} from "../utils/stuff";
+import {useOnPropsChanged, bindActionCreators} from "../utils/reactUtils";
 import {validateTree} from "../utils/validation";
 
 

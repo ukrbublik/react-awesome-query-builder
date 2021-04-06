@@ -1,8 +1,9 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
+import {getFieldConfig, getFuncConfig} from "../../utils/configUtils";
 import {
-  getFieldConfig, getFuncConfig, getFieldPath, getFieldPathLabels, getFuncPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
-} from "../../utils/configUtils";
+  getFieldPath, getFuncPathLabels, getFieldPathLabels, getValueSourcesForFieldOp, getWidgetForFieldOp
+} from "../../utils/ruleUtils";
 import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
@@ -56,12 +57,12 @@ export default class FuncSelect extends PureComponent {
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(field, config);
+    const leftFieldConfig = getFieldConfig(config, field);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     const placeholder = !isFuncSelected ? funcPlaceholder : null;
 
-    const currFunc = isFuncSelected ? getFuncConfig(selectedFuncKey, config) : null;
+    const currFunc = isFuncSelected ? getFuncConfig(config, selectedFuncKey) : null;
     const selectedOpts = currFunc || {};
 
     const selectedKeys = getFieldPath(selectedFuncKey, config);
@@ -81,7 +82,7 @@ export default class FuncSelect extends PureComponent {
   filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     let expectedType;
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     if (widget) {
@@ -98,7 +99,7 @@ export default class FuncSelect extends PureComponent {
         let subfields = list[funcKey].subfields;
         let subpath = (path ? path : []).concat(funcKey);
         let funcFullkey = subpath.join(fieldSeparator);
-        let funcConfig = getFuncConfig(funcFullkey, config);
+        let funcConfig = getFuncConfig(config, funcFullkey);
         if (funcConfig.type == "!struct") {
           if(_filter(subfields, subpath) == 0)
             delete list[funcKey];

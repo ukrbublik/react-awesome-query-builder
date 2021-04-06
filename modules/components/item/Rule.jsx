@@ -6,7 +6,8 @@ import OperatorWrapper from "../rule/OperatorWrapper";
 import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
-import {getFieldConfig, getFieldPathLabels, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
+import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
+import {getFieldPathLabels} from "../../utils/ruleUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
 
@@ -58,7 +59,7 @@ class Rule extends PureComponent {
 
     getMeta({selectedField, selectedOperator, config, reordableNodesCnt}) {
       const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
-      const selectedFieldConfig = getFieldConfig(selectedField, config);
+      const selectedFieldConfig = getFieldConfig(config, selectedField);
       const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
       const isFieldAndOpSelected = selectedField && selectedOperator && !isSelectedGroup;
       const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField);

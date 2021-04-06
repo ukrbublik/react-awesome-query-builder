@@ -1,3 +1,4 @@
+import mapValues from "lodash/mapValues";
 import {shallowEqual} from "./stuff";
 
 export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState) => {
@@ -53,3 +54,8 @@ export const useOnPropsChanged = (obj) => {
     };
   }
 };
+
+export const bindActionCreators = (actionCreators, config, dispatch) =>
+  mapValues(actionCreators, (actionCreator) =>
+    (...args) => dispatch(actionCreator(config, ...args))
+  );

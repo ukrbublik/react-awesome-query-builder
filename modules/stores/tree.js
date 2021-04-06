@@ -5,16 +5,20 @@ import {
   getTotalRulesCountInTree, fixEmptyGroupsInTree
 } from "../utils/treeUtils";
 import {
-  defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot
+  defaultRuleProperties, defaultGroupProperties, defaultOperator, 
+  defaultOperatorOptions, defaultRoot
 } from "../utils/defaultUtils";
 import * as constants from "../constants";
 import uuid from "../utils/uuid";
 import {
-  getFirstOperator, getFuncConfig, getFieldConfig, getOperatorsForField, getWidgetForFieldOp,
-  getFieldWidgetConfig, getOperatorConfig
+  getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig
 } from "../utils/configUtils";
+import {
+  getOperatorsForField, getFirstOperator, getWidgetForFieldOp
+} from "../utils/ruleUtils";
 import {deepEqual, defaultValue} from "../utils/stuff";
-import {validateValue, getNewValueForFieldOp} from "../utils/validation";
+import {validateValue} from "../utils/validation";
+import {getNewValueForFieldOp} from "../utils/ruleUtils";
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
 
@@ -78,7 +82,7 @@ const removeRule = (state, path, config) => {
   const parentField = parent.getIn(["properties", "field"]);
   const parentOperator = parent.getIn(["properties", "operator"]);
   const parentValue = parent.getIn(["properties", "value", 0]);
-  const parentFieldConfig = parentField ? getFieldConfig(parentField, config) : null;
+  const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
   const parentOperatorConfig = parentOperator ? getOperatorConfig(config, parentOperator, parentField) : null;
   const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0; // && parentValue != undefined;
   
@@ -248,7 +252,7 @@ const setField = (state, path, newField, config) => {
   const currentType = state.getIn(expandTreePath(path, "type"));
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
-  const newFieldConfig = getFieldConfig(newField, config);
+  const newFieldConfig = getFieldConfig(config, newField);
   const isRuleGroup = newFieldConfig.type == "!group";
   const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
   const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
@@ -351,7 +355,7 @@ const setOperator = (state, path, newOperator, config) => {
   const properties = state.getIn(expandTreePath(path, "properties"));
   const children = state.getIn(expandTreePath(path, "children1"));
   const currentField = properties.get("field");
-  const fieldConfig = getFieldConfig(currentField, config);
+  const fieldConfig = getFieldConfig(config, currentField);
   const isRuleGroup = fieldConfig.type == "!group";
   const operatorConfig = getOperatorConfig(config, newOperator, currentField);
   const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
@@ -523,14 +527,14 @@ const calculateValueType = (value, valueSrc, config) => {
   let calculatedValueType = null;
   if (value) {
     if (valueSrc === "field") {
-      const fieldConfig = getFieldConfig(value, config);
+      const fieldConfig = getFieldConfig(config, value);
       if (fieldConfig) {
         calculatedValueType = fieldConfig.type;
       }
     } else if (valueSrc === "func") {
       const funcKey = value.get("func");
       if (funcKey) {
-        const funcConfig = getFuncConfig(funcKey, config);
+        const funcConfig = getFuncConfig(config, funcKey);
         if (funcConfig) {
           calculatedValueType = funcConfig.returnType;
         }
