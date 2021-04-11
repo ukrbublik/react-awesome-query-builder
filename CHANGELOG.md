@@ -1,11 +1,17 @@
 # Changelog
 - 4.0.0
-  - Removed `useGroupsAsArrays`. 
-    Instead added for type `!group` property `mode` with values: 
+  - Removed setting `useGroupsAsArrays`. 
+    Instead added field config `mode` for type `!group` with values: 
       `some` (default, corresponding useGroupsAsArrays = true), 
-      `array` (new), 
+      `array` (new, user can choose one of group operators), 
       `struct` (obsolete, corresponding useGroupsAsArrays = false).
-  - Removed obsolete `hideConjForOne`
+  - For type=`!group` and mode=`array`:
+    - new field configs are available: `conjunctions`, `showNot`, `operators`, `defaultOperator`, `initialEmptyWhere`
+    - you can use group operators `some`, `none`, `all` or operators with 1 integer opearnd (for count): `equal`, `not_equal`, `less`, `between`, ..
+    - localization setting `addSubRuleLabel`
+  - Removed obsolete setting `hideConjForOne`
+  - Added field config `fieldName` to override field key for import/export
+  - Added field config `jsonLogicVar` and settings `jsonLogic.groupVarKey`, `jsonLogic.altVarKey` to override JsonLogic var key if need
 - 3.0.0
   - Added [Material-UI](https://material-ui.com) widgets
 - 2.2.2
