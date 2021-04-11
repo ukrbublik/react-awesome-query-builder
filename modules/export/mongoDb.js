@@ -25,6 +25,7 @@ export const mongodbFormat = (tree, config) => {
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 const formatFieldName = (field, config, meta, parentPath) => {
+  if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -140,7 +141,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
 };
 
 //meta is mutable
-const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
+const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = undefined, __value = undefined) => {
   if (!item) return undefined;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
@@ -154,14 +155,20 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     .slice(-1).pop();
 
   if ((type === "group" || type === "rule_group") && children && children.size) {
+    const groupField = type === "rule_group" ? properties.get("field") : null;
+    const groupFieldName = formatFieldName(groupField, config, meta, hasParentRuleGroup && parentPath);
+    const groupFieldDef = getFieldConfig(config, groupField) || {};
+
+    const useExpr = groupFieldDef.mode == "array";
     const not = _not ? !(properties.get("not")) : (properties.get("not"));
     const list = children
-      .map((currentChild) => mongodbFormatItem([...parents, item], currentChild, config, meta, not))
+      .map((currentChild) => mongodbFormatItem(
+        [...parents, item], currentChild, config, meta, not, useExpr ? (f => `$$el.${f}`) : undefined)
+      )
       .filter((currentChild) => typeof currentChild !== "undefined");
     if (!list.size)
       return undefined;
 
-    let field = type === "rule_group" ? properties.get("field") : null;
     let conjunction = properties.get("conjunction");
     if (!conjunction)
       conjunction = defaultConjunction(config);
@@ -212,10 +219,26 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       if (!resultQuery) // can't be shorten
         resultQuery = { [mongoConj] : rules };
     }
-    if (field) {
-      //format field
-      let fieldName = formatFieldName(field, config, meta, hasParentRuleGroup && parentPath);      
-      resultQuery = { [fieldName]: {"$elemMatch": resultQuery} };
+
+    if (groupField) {
+      if (groupFieldDef.mode == "array") {
+        const filterQuery = {
+          "$size": {
+            "$filter": {
+              input: "$" + groupFieldName,
+              as: "el",
+              cond: resultQuery
+            }
+          }
+        };
+        const totalQuery = {
+          "$size": groupFieldName
+        };
+        resultQuery = mongodbFormatItem(parents, item.set("type", "rule"), config, meta, false, (_f => filterQuery), totalQuery);
+        resultQuery = { "$expr": resultQuery };
+      } else {
+        resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
+      }
     }
     return resultQuery;
   } else if (type === "rule") {
@@ -224,7 +247,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     let field = properties.get("field");
     let value = properties.get("value");
 
-    if (field == null || operator == null)
+    if (field == null || operator == null || value === undefined)
       return undefined;
 
     const fieldDefinition = getFieldConfig(config, field) || {};
@@ -245,21 +268,22 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
     //format value
     let valueSrcs = [];
     let valueTypes = [];
-    let useExpr = false;
+    let useExpr = !!__field;
     value = value.map((currentValue, ind) => {
       const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
       const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
       currentValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-      const [fv, _useExpr] = mongoFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, hasParentRuleGroup && parentPath, operator, operatorDefinition);
+      const [fv, fvUseExpr] = mongoFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, hasParentRuleGroup && parentPath, operator, operatorDefinition);
       if (fv !== undefined) {
-        useExpr = useExpr || _useExpr;
+        useExpr = useExpr || fvUseExpr;
         valueSrcs.push(valueSrc);
         valueTypes.push(valueType);
       }
       return fv;
     });
+    let wrapExpr = useExpr && !__field;
     const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
     if (value.size < cardinality || hasUndefinedValues)
       return undefined;
@@ -272,9 +296,9 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       return undefined;
     }
     const args = [
-      fieldName,
+      __field ? __field(fieldName) : fieldName,
       operator,
-      formattedValue,
+      __value !== undefined && formattedValue == null ? __value : formattedValue,
       useExpr,
       (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
       (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
@@ -282,7 +306,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false) => {
       operatorOptions,
     ];
     let ruleQuery = fn(...args);
-    if (ruleQuery && useExpr) {
+    if (ruleQuery && wrapExpr) {
       ruleQuery = { "$expr": ruleQuery };
     }
     if (not) {

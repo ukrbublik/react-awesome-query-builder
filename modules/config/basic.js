@@ -64,38 +64,40 @@ const conjunctions = {
 
 // helpers for mongo format
 const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
+  const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   const mv = mc(value);
   if (mv === undefined)
     return undefined;
   if (not) {
     return !useExpr
       ? { [field]: { "$not": { [mop]: mv } } } 
-      : { "$not": { [mop]: ["$"+field, mv] } };
+      : { "$not": { [mop]: [$field, mv] } };
   } else {
     if (!useExpr && mop == "$eq")
       return { [field]: mv }; // short form
     return !useExpr
       ? { [field]: { [mop]: mv } } 
-      : { [mop]: ["$"+field, mv] };
+      : { [mop]: [$field, mv] };
   }
 };
 
 const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
+  const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   if (not) {
     return !useExpr
       ? { [field]: { "$not": { [mops[0]]: values[0], [mops[1]]: values[1] } } } 
       : {"$not":
                 {"$and": [
-                  { [mops[0]]: [ "$"+field, values[0] ] },
-                  { [mops[1]]: [ "$"+field, values[1] ] },
+                  { [mops[0]]: [ $field, values[0] ] },
+                  { [mops[1]]: [ $field, values[1] ] },
                 ]}
       };
   } else {
     return !useExpr
       ? { [field]: { [mops[0]]: values[0], [mops[1]]: values[1] } } 
       : {"$and": [
-        { [mops[0]]: [ "$"+field, values[0] ] },
-        { [mops[1]]: [ "$"+field, values[1] ] },
+        { [mops[0]]: [ $field, values[0] ] },
+        { [mops[1]]: [ $field, values[1] ] },
       ]};
   }
 };
@@ -437,16 +439,19 @@ const operators = {
     label: "Some",
     cardinality: 0,
     jsonLogic: "some",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => 0, false),
   },
   all: {
     label: "All",
     cardinality: 0,
     jsonLogic: "all",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
   },
   none: {
     label: "None",
     cardinality: 0,
     jsonLogic: "none",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => 0, false),
   }
 };
 
