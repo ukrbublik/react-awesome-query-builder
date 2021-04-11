@@ -42,11 +42,9 @@ export default
             {
               "==": [
                 {
-                  "var": "score2"
+                  "var": "product"
                 },
-                {
-                  "var": "score"
-                }
+                "abc"
               ]
             },
             {

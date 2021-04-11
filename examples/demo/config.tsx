@@ -276,15 +276,6 @@ export default (skin) => {
             max: 100,
           },
           valueSources: ["value"],
-        },
-        //todo: delete
-        score2: {
-          type: "number",
-          fieldSettings: {
-            min: 0,
-            max: 100,
-          },
-          valueSources: ["value", "field"],
         }
       }
     },
