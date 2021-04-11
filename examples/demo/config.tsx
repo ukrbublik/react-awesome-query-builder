@@ -271,8 +271,6 @@ export default (skin) => {
         },
         score: {
           type: "number",
-          fieldName: "state.input.results.score", //todo: temp
-          //todo: should be extended auto
           fieldSettings: {
             min: 0,
             max: 100,
@@ -282,7 +280,6 @@ export default (skin) => {
         //todo: delete
         score2: {
           type: "number",
-          fieldName: "state.input.results.score2", //todo: temp
           fieldSettings: {
             min: 0,
             max: 100,

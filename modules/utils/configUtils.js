@@ -117,7 +117,6 @@ function _extendFuncArgsConfig(subconfig, config) {
 }
 
 function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
-  //todo: set missing fieldName ?
   let operators = null, defaultOperator = null;
   const typeConfig = config.types[fieldConfig.type];
   const excludeOperators = fieldConfig.excludeOperators || [];
@@ -182,6 +181,11 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     }
   }
 
+  const computedFieldName = computeFieldName(config, path);
+  if (computedFieldName) {
+    fieldConfig.fieldName = computedFieldName;
+  }
+
   if (path && fieldConfig.fieldName) {
     config.__fieldNames[fieldConfig.fieldName] = path;
   }
@@ -216,6 +220,21 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
   }
 
   return fieldConfig;
+};
+
+const computeFieldName = (config, path) => {
+  if (!path)
+    return null;
+  const fieldSeparator = config.settings.fieldSeparator;
+  let l = [...path], r = [], f, fConfig;
+  while ((f = l.pop()) !== undefined && l.length > 0) {
+    r.unshift(f);
+    fConfig = getFieldRawConfig(config, l);
+    if (fConfig.fieldName) {
+      return [fConfig.fieldName, ...r].join(fieldSeparator);
+    }
+  }
+  return null;
 };
 
 export const normalizeField = (config, field) => {
