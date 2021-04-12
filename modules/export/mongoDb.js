@@ -158,8 +158,9 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapEx
     const groupField = type === "rule_group" ? properties.get("field") : null;
     const groupFieldName = formatFieldName(groupField, config, meta, hasParentRuleGroup && parentPath);
     const groupFieldDef = getFieldConfig(config, groupField) || {};
+    const mode = groupFieldDef.mode; //properties.get("mode");
 
-    const useExpr = groupFieldDef.mode == "array";
+    const useExpr = mode == "array";
     const not = _not ? !(properties.get("not")) : (properties.get("not"));
     const list = children
       .map((currentChild) => mongodbFormatItem(
@@ -221,7 +222,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapEx
     }
 
     if (groupField) {
-      if (groupFieldDef.mode == "array") {
+      if (mode == "array") {
         const filterQuery = {
           "$size": {
             "$filter": {

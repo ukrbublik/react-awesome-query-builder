@@ -110,6 +110,12 @@ const sqlFormatItem = (item, config, meta) => {
   const children = item.get("children1");
 
   if ((type === "group" || type === "rule_group") && children && children.size) {
+    const groupField = type === "rule_group" ? properties.get("field") : null;
+    const groupFieldDef = getFieldConfig(config, groupField) || {};
+    if (groupFieldDef.mode == "array") {
+      meta.errors.push(`Aggregation is not supported for ${groupField}`);
+    }
+
     const not = properties.get("not");
     const list = children
       .map((currentChild) => sqlFormatItem(currentChild, config, meta))
