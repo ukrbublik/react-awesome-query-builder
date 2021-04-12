@@ -141,7 +141,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
 };
 
 //meta is mutable
-const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = undefined, __value = undefined) => {
+const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
   if (!item) return undefined;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
@@ -163,7 +163,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = 
     const not = _not ? !(properties.get("not")) : (properties.get("not"));
     const list = children
       .map((currentChild) => mongodbFormatItem(
-        [...parents, item], currentChild, config, meta, not, useExpr ? (f => `$$el.${f}`) : undefined)
+        [...parents, item], currentChild, config, meta, not, false, useExpr ? (f => `$$el.${f}`) : undefined)
       )
       .filter((currentChild) => typeof currentChild !== "undefined");
     if (!list.size)
@@ -234,7 +234,9 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = 
         const totalQuery = {
           "$size": groupFieldName
         };
-        resultQuery = mongodbFormatItem(parents, item.set("type", "rule"), config, meta, false, (_f => filterQuery), totalQuery);
+        resultQuery = mongodbFormatItem(
+          parents, item.set("type", "rule"), config, meta, false, false, (_f => filterQuery), totalQuery
+        );
         resultQuery = { "$expr": resultQuery };
       } else {
         resultQuery = { [groupFieldName]: {"$elemMatch": resultQuery} };
@@ -268,7 +270,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = 
     //format value
     let valueSrcs = [];
     let valueTypes = [];
-    let useExpr = !!__field;
+    let useExpr = false;
     value = value.map((currentValue, ind) => {
       const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
       const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
@@ -283,7 +285,9 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = 
       }
       return fv;
     });
-    let wrapExpr = useExpr && !__field;
+    if (!!_fieldName)
+      useExpr = true;
+    const wrapExpr = useExpr && _canWrapExpr;
     const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
     if (value.size < cardinality || hasUndefinedValues)
       return undefined;
@@ -296,9 +300,9 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, __field = 
       return undefined;
     }
     const args = [
-      __field ? __field(fieldName) : fieldName,
+      _fieldName ? _fieldName(fieldName) : fieldName,
       operator,
-      __value !== undefined && formattedValue == null ? __value : formattedValue,
+      _value !== undefined && formattedValue == null ? _value : formattedValue,
       useExpr,
       (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
       (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
