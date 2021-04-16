@@ -13,6 +13,7 @@ import {queryString} from "../utils/queryString";
 import {defaultRoot} from "../utils/defaultUtils";
 import Immutable from 'immutable';
 
+const __LIB__ = {}
 
 class ConnectedQuery extends Component {
     static propTypes = {
@@ -42,7 +43,8 @@ class ConnectedQuery extends Component {
 
     _updateActions (props) {
       const {config, dispatch} = props;
-      this.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
+      __LIB__.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
+      this.actions = __LIB__.actions;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -127,6 +129,8 @@ export default class Query extends Component {
             )
         };
     }
+
+    lib = __LIB__
 
     // handle case when value property changes
     componentWillReceiveProps(nextProps) {
