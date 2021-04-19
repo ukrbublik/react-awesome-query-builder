@@ -27,13 +27,11 @@ class ConnectedQuery extends Component {
 
         this._updateActions(props);
         this.validatedTree = this.validateTree(props, props.config, props.tree);
-        this.lib.tree = this.validatedTree
+        props.setLib({ tree: this.validatedTree })
         if (props.tree !== this.validatedTree) {
             props.onChange && props.onChange(this.validatedTree);
         }
     }
-
-    lib = {}
 
     validateTree (props, oldConfig, oldTree) {
         let tree = validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
@@ -43,8 +41,8 @@ class ConnectedQuery extends Component {
 
     _updateActions (props) {
       const {config, dispatch} = props;
-      this.lib.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
-      this.actions = this.lib.actions;
+      this.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
+      props.setLib({ actions: this.actions })
     }
 
     componentWillReceiveProps(nextProps) {
@@ -60,7 +58,7 @@ class ConnectedQuery extends Component {
         }
 
         this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
-        this.lib.tree = this.validatedTree
+        props.setLib({tree: this.validatedTree})
         let validatedTreeChanged = oldValidatedTree !== this.validatedTree 
             && JSON.stringify(oldValidatedTree) != JSON.stringify(this.validatedTree);
         if (validatedTreeChanged) {
@@ -131,6 +129,12 @@ export default class Query extends Component {
         };
     }
 
+    lib = {}
+
+    setLib (v) {
+      Object.assign(this.lib, v)
+    }
+
     // handle case when value property changes
     componentWillReceiveProps(nextProps) {
         if (this.props.dontDispatchOnNewProps)
@@ -164,6 +168,7 @@ export default class Query extends Component {
                   get_children={get_children}
                   config={config}
                   onChange={onChange}
+                  setLib={this.setLib.bind(this)}
                 />
             </Provider>
           </ConfigProvider>
