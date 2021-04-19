@@ -13,8 +13,6 @@ import {queryString} from "../utils/queryString";
 import {defaultRoot} from "../utils/defaultUtils";
 import Immutable from 'immutable';
 
-const __LIB__ = {}
-
 class ConnectedQuery extends Component {
     static propTypes = {
         config: PropTypes.object.isRequired,
@@ -28,9 +26,10 @@ class ConnectedQuery extends Component {
         super(props);
 
         this._updateActions(props);
+        this.lib = {}
 
         this.validatedTree = this.validateTree(props, props.config, props.tree);
-        __LIB__.tree = this.validatedTree
+        this.lib.tree = this.validatedTree
         if (props.tree !== this.validatedTree) {
             props.onChange && props.onChange(this.validatedTree);
         }
@@ -44,8 +43,8 @@ class ConnectedQuery extends Component {
 
     _updateActions (props) {
       const {config, dispatch} = props;
-      __LIB__.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
-      this.actions = __LIB__.actions;
+      this.lib.actions = bindActionCreators({...actions.tree, ...actions.group, ...actions.rule}, config, dispatch);
+      this.actions = this.lib.actions;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -61,7 +60,7 @@ class ConnectedQuery extends Component {
         }
 
         this.validatedTree = this.validateTree(nextProps, oldConfig, oldTree);
-        __LIB__.tree = this.validatedTree
+        this.lib.tree = this.validatedTree
         let validatedTreeChanged = oldValidatedTree !== this.validatedTree 
             && JSON.stringify(oldValidatedTree) != JSON.stringify(this.validatedTree);
         if (validatedTreeChanged) {
@@ -131,8 +130,6 @@ export default class Query extends Component {
             )
         };
     }
-
-    lib = __LIB__
 
     // handle case when value property changes
     componentWillReceiveProps(nextProps) {
