@@ -26,14 +26,14 @@ class ConnectedQuery extends Component {
         super(props);
 
         this._updateActions(props);
-        this.lib = {}
-
         this.validatedTree = this.validateTree(props, props.config, props.tree);
         this.lib.tree = this.validatedTree
         if (props.tree !== this.validatedTree) {
             props.onChange && props.onChange(this.validatedTree);
         }
     }
+
+    lib = {}
 
     validateTree (props, oldConfig, oldTree) {
         let tree = validateTree(props.tree, oldTree, props.config, oldConfig, true, true);
