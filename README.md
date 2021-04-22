@@ -239,7 +239,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Convert query value to SQL where string.
   #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}
   Convert query value to [JsonLogic](http://jsonlogic.com) format. 
-  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
+  If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with either the threshold value used in the rules, or `null` as a fallback ("template" data).
 - Import:
   #### loadFromJsonLogic (jsonLogicObject, config) -> Immutable
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 

@@ -14,16 +14,18 @@ import pick from "lodash/pick";
 export const jsonLogicFormat = (item, config) => {
   let meta = {
     usedFields: [],
+    usedValues: {},
     errors: []
   };
-    
+  
   const logic = jsonLogicFormatItem(item, config, meta, true);
-    
+  
   // build empty data
-  const {errors, usedFields} = meta;
+  const {errors, usedFields, usedValues} = meta;
   const {fieldSeparator, useGroupsAsArrays} = config.settings;
   let data = {};
   for (let ff of usedFields) {
+    const value = usedValues ? usedValues[ff] : undefined;
     const def = getFieldConfig(ff, config) || {};
     const parts = ff.split(fieldSeparator);
     let tmp = data;
@@ -41,7 +43,7 @@ export const jsonLogicFormat = (item, config) => {
           tmp = tmp[p];
         }
       } else {
-        tmp[p] = null; // can use def.type for sample values
+        tmp[p] = value ?? null; // can use def.type for sample values
       }
     }
   }
@@ -235,6 +237,8 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
       const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
       currentValue = completeValue(currentValue, valueSrc, config);
+      if (!meta.usedValues[field] && typeof currentValue !== 'object')
+        meta.usedValues[field] = currentValue;
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
       const fv = jsonLogicFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
