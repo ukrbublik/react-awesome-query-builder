@@ -237,7 +237,7 @@ const jsonLogicFormatItem = (item, config, meta, isRoot, parentField = null) => 
       const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
       const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
       currentValue = completeValue(currentValue, valueSrc, config);
-      if (!meta.usedValues[field] && typeof currentValue !== 'object')
+      if (!meta.usedValues[field] && typeof currentValue !== "object")
         meta.usedValues[field] = currentValue;
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
