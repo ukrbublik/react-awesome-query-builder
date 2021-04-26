@@ -1,6 +1,6 @@
 {
   "name": "@sebranly/react-awesome-query-builder",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "query-builder",
@@ -52,7 +52,9 @@
     "url": "https://github.com/ukrbublik/react-awesome-query-builder/issues"
   },
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
-  "funding": "https://opencollective.com/react-awesome-query-builder",
+  "funding": {
+    "url": "https://opencollective.com/react-awesome-query-builder"
+  },
   "engines": {
     "node": ">=10.14",
     "npm": ">=6"
