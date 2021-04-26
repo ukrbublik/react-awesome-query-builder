@@ -1,5 +1,5 @@
 {
-  "name": "react-awesome-query-builder",
+  "name": "@sebranly/react-awesome-query-builder",
   "version": "4.0.0",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
@@ -28,7 +28,7 @@
   "main": "lib",
   "types": "modules/index.d.ts",
   "scripts": {
-    "prepublish": "npm run build-npm",
+    "prepare": "npm run build-npm",
     "for-npm": "./scripts/for-npm.sh",
     "for-gpr": "./scripts/for-gpr.sh",
     "build-npm": "./scripts/build-npm.sh",
