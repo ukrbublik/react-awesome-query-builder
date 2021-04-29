@@ -952,6 +952,19 @@ export default {
     canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
       // for type == 'select'/'multiselect' you can check listValues
       return true
-    }
+    },
+    fieldFactory: {
+      type: 'group', props: {
+        treeData: [
+          { id: 'apple', pId: 'fruit', value: 'apple', title: 'apple' },
+          { id: 'peach', pId: 'fruit', value: 'peach', title: 'peach' },
+          { id: 'banana', pId: 'fruit', value: 'banana', title: 'banana' },
+          { id: 'lsp', pId: 'man', value: 'lsp', title: 'lsp' },
+          { id: 'xz', pId: 'man', value: 'xz', title: 'xz' },
+          { id: 'man', pId: 0, value: 'man', title: 'man' },
+          { id: 'fruit', pId: 0, value: 'fruit', title: 'fruit' }
+        ],
+      }
+    },
   }
 }

@@ -9,8 +9,9 @@ const { Option, OptGroup } = Select;
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
 const DropdownButton = Dropdown.Button;
-import { map, last, keys, toString, isFunction } from 'lodash';
+import { map, last, keys, toString, isFunction, isObject } from 'lodash';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
+import MixSelect from './fields/MixSelect';
 
 
 export default class Field extends Component {
@@ -198,6 +199,13 @@ export default class Field extends Component {
     };
     if (isFunction(fieldFactory)) {
       return fieldFactory(selectProps, this.props);
+    }
+    if (isObject(fieldFactory)) {
+      return <MixSelect
+        config={fieldFactory}
+        selectProps={selectProps}
+        fieldProps={this.props}
+      />;
     }
     return <Select {...selectProps} />;
   }
