@@ -440,6 +440,10 @@ const operators = {
     cardinality: 0,
     jsonLogic: "some",
     mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => 0, false),
+    formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      console.log({ field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay })
+      return `${field}`;
+    },
   },
   all: {
     label: "All",

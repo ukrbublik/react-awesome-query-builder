@@ -192,18 +192,20 @@ export const getFieldPath = (field, config, onlyKeys = false) => {
       .map((parts) => parts.join(fieldSeparator));
 };
 
-export const getFuncPathLabels = (field, config) => {
-  return getFieldPathLabels(field, config, "funcs", "subfields");
+export const getFuncPathLabels = (field, config, parentField = null) => {
+  return getFieldPathLabels(field, config, parentField, "funcs", "subfields");
 };
 
-export const getFieldPathLabels = (field, config, fieldsKey = "fields", subfieldsKey = "subfields") => {
+export const getFieldPathLabels = (field, config, parentField = null, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
   const fieldSeparator = config.settings.fieldSeparator;
   const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
   return parts
+    .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
-    .map((parts) => parts.join(fieldSeparator))
+    .map((parts) => [...parentParts, ...parts].join(fieldSeparator))
     .map(part => {
       const cnf = getFieldRawConfig(config, part, fieldsKey, subfieldsKey);
       return cnf && cnf.label || cnf && last(part.split(fieldSeparator));
@@ -325,7 +327,7 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
   return widget;
 };
 
-export const formatFieldName = (field, config) => {
+export const formatFieldName = (field, config, parentField = null) => {
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -337,6 +339,18 @@ export const formatFieldName = (field, config) => {
   }
   if (fieldDef.fieldName) {
     fieldName = fieldDef.fieldName;
+  }
+  if (parentField) {
+    const parentFieldDef = getFieldConfig(config, parentField) || {};
+    let parentFieldName = parentField;
+    if (parentFieldDef.fieldName) {
+      parentFieldName = parentFieldDef.fieldName;
+    }
+    if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
+      fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
+    } else {
+      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+    }
   }
   return fieldName;
 };
