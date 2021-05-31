@@ -11,8 +11,8 @@ import pick from "lodash/pick";
 
 // http://jsonlogic.com/
 
-//meta is mutable
 export const jsonLogicFormat = (item, config) => {
+  //meta is mutable
   let meta = {
     usedFields: [],
     errors: []
@@ -241,7 +241,6 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
   return ruleQuery;
 };
 
-
 const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
@@ -380,5 +379,3 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   }
   return undefined;
 };
-
-

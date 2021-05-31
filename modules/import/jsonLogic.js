@@ -14,8 +14,8 @@ const arrayUniq = (arr) => Array.from(new Set(arr));
 const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
 
 
-//meta is mutable
 export const loadFromJsonLogic = (logicTree, config) => {
+  //meta is mutable
   let meta = {
     errors: []
   };

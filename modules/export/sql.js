@@ -15,6 +15,7 @@ import {SqlString} from "../utils/sql";
 
 
 export const sqlFormat = (tree, config) => {
+  //meta is mutable
   let meta = {
     errors: []
   };
@@ -26,7 +27,6 @@ export const sqlFormat = (tree, config) => {
   return res;
 };
 
-//meta is mutable
 const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
   if (currentValue === undefined)
     return undefined;
@@ -102,7 +102,6 @@ const sqlFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWi
   return ret;
 };
 
-//meta is mutable
 const sqlFormatItem = (item, config, meta) => {
   if (!item) return undefined;
   const type = item.get("type");
