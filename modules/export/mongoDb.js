@@ -160,11 +160,10 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapEx
     const groupFieldDef = getFieldConfig(config, groupField) || {};
     const mode = groupFieldDef.mode; //properties.get("mode");
 
-    const useExpr = mode == "array";
     const not = _not ? !(properties.get("not")) : (properties.get("not"));
     const list = children
       .map((currentChild) => mongodbFormatItem(
-        [...parents, item], currentChild, config, meta, not, false, useExpr ? (f => `$$el.${f}`) : undefined)
+        [...parents, item], currentChild, config, meta, not, true, mode == "array" ? (f => `$$el.${f}`) : undefined)
       )
       .filter((currentChild) => typeof currentChild !== "undefined");
     if (!list.size)
@@ -311,7 +310,7 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapEx
       operatorOptions,
     ];
     let ruleQuery = fn(...args);
-    if (ruleQuery && wrapExpr) {
+    if (wrapExpr) {
       ruleQuery = { "$expr": ruleQuery };
     }
     if (not) {

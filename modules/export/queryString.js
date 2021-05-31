@@ -12,7 +12,8 @@ import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 
-const formatField = (config, field, isForDisplay, parentField = null) => {
+
+const formatField = (config, field, isForDisplay, parentField = null, cutParentField = false) => {
   const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
   let ret = null;
   if (field) {
@@ -23,7 +24,7 @@ const formatField = (config, field, isForDisplay, parentField = null) => {
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
     const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
-    const fieldName = formatFieldName(field, config);
+    const fieldName = formatFieldName(field, config, cutParentField ? parentField : null);
     ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
   }
   return ret;
@@ -66,7 +67,42 @@ const formatFunc = (config, funcValue, isForDisplay, parentField = null) => {
   return ret;
 };
 
-const formatRule = (properties, config, isForDisplay = false, parentField = null) => {
+const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay, parentField = null) => {
+  if (currentValue === undefined)
+    return undefined;
+  let ret;
+  if (valueSrc == "field") {
+    ret = formatField(config, currentValue, isForDisplay, parentField);
+  } else if (valueSrc == "func") {
+    ret = formatFunc(config, currentValue, isForDisplay, parentField);
+  } else {
+    if (typeof fieldWidgetDefinition.formatValue === "function") {
+      const fn = fieldWidgetDefinition.formatValue;
+      const args = [
+        currentValue,
+        pick(fieldDefinition, ["fieldSettings", "listValues"]),
+        //useful options: valueFormat for date/time
+        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+        isForDisplay
+      ];
+      if (operator) {
+        args.push(operator);
+        args.push(operatorDefinition);
+      }
+      if (valueSrc == "field") {
+        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
+        args.push(valFieldDefinition);
+      }
+      ret = fn(...args);
+    } else {
+      ret = currentValue;
+    }
+  }
+  return ret;
+};
+
+const formatRule = (item, config, isForDisplay = false, parentField = null) => {
+  const properties = item.get("properties") || new Map();
   let field = properties.get("field");
   const operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
@@ -140,64 +176,37 @@ const formatRule = (properties, config, isForDisplay = false, parentField = null
   return ret;
 };
 
-const formatValue = (config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, isForDisplay, parentField = null) => {
-  if (currentValue === undefined)
+const formatGroup = (item, config, isForDisplay = false, parentField = null) => {
+  const type = item.get("type");
+  const properties = item.get("properties") || new Map();
+  const children = item.get("children1");
+
+  const groupField = type === "rule_group" ? properties.get("field") : null;
+  const groupFieldDef = getFieldConfig(config, groupField) || {};
+  const not = properties.get("not");
+  const list = children
+    .map((currentChild) => queryString(currentChild, config, isForDisplay, groupField))
+    .filter((currentChild) => typeof currentChild !== "undefined");
+  if (!list.size)
     return undefined;
-  let ret;
-  if (valueSrc == "field") {
-    ret = formatField(config, currentValue, isForDisplay, parentField);
-  } else if (valueSrc == "func") {
-    ret = formatFunc(config, currentValue, isForDisplay, parentField);
-  } else {
-    if (typeof fieldWidgetDefinition.formatValue === "function") {
-      const fn = fieldWidgetDefinition.formatValue;
-      const args = [
-        currentValue,
-        pick(fieldDefinition, ["fieldSettings", "listValues"]),
-        //useful options: valueFormat for date/time
-        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
-        isForDisplay
-      ];
-      if (operator) {
-        args.push(operator);
-        args.push(operatorDefinition);
-      }
-      if (valueSrc == "field") {
-        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
-        args.push(valFieldDefinition);
-      }
-      ret = fn(...args);
-    } else {
-      ret = currentValue;
-    }
-  }
-  return ret;
+
+  let conjunction = properties.get("conjunction");
+  if (!conjunction)
+    conjunction = defaultConjunction(config);
+  const conjunctionDefinition = config.conjunctions[conjunction];
+
+  return conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
 };
 
 export const queryString = (item, config, isForDisplay = false, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
-  const properties = item.get("properties") || new Map();
   const children = item.get("children1");
 
   if ((type === "group" || type === "rule_group") && children && children.size) {
-    const groupField = type === "rule_group" ? properties.get("field") : null;
-    const groupFieldDef = getFieldConfig(config, groupField) || {};
-    const not = properties.get("not");
-    const list = children
-      .map((currentChild) => queryString(currentChild, config, isForDisplay, groupField))
-      .filter((currentChild) => typeof currentChild !== "undefined");
-    if (!list.size)
-      return undefined;
-
-    let conjunction = properties.get("conjunction");
-    if (!conjunction)
-      conjunction = defaultConjunction(config);
-    const conjunctionDefinition = config.conjunctions[conjunction];
-
-    return conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
+    return formatGroup(item, config, isForDisplay, parentField);
   } else if (type === "rule") {
-    return formatRule(properties, config, isForDisplay, parentField);
+    return formatRule(item, config, isForDisplay, parentField);
   }
 
   return undefined;
