@@ -45,13 +45,34 @@ import {Map} from "immutable";
  }
  */
 
+
 export const queryBuilderFormat = (item, config) => {
   //meta is mutable
   let meta = {
     usedFields: []
   };
-  return {..._queryBuilderFormat(item, config, meta), ...meta};
+
+  return {
+    ...formatItem(item, config, meta), 
+    ...meta
+  };
 };
+
+
+const formatItem = (item, config, meta) => {
+  if (!item) return undefined;
+
+  const type = item.get("type");
+  const children = item.get("children1");
+
+  if ((type === "group" || type === "rule_group") && children && children.size) {
+    return formatGroup(item, config, meta);
+  } else if (type === "rule") {
+    return formatRule(item, config, meta);
+  }
+  return undefined;
+};
+
 
 const formatGroup = (item, config, meta) => {
   const properties = item.get("properties") || new Map();
@@ -59,7 +80,7 @@ const formatGroup = (item, config, meta) => {
   const id = item.get("id");
 
   const list = children
-    .map((currentChild) => _queryBuilderFormat(currentChild, config, meta))
+    .map((currentChild) => formatItem(currentChild, config, meta))
     .filter((currentChild) => typeof currentChild !== "undefined");
   if (!list.size)
     return undefined;
@@ -76,6 +97,7 @@ const formatGroup = (item, config, meta) => {
   resultQuery["not"] = not;
   return resultQuery;
 };
+
 
 const formatRule = (item, config, meta) => {
   const properties = item.get("properties") || new Map();
@@ -97,7 +119,7 @@ const formatRule = (item, config, meta) => {
   const fieldType = fieldDefinition.type || "undefined";
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   const typeConfig = config.types[fieldDefinition.type] || {};
-  const fieldName = formatFieldName(field, config);
+  const fieldName = formatFieldName(field, config, meta);
 
   if (value.size < cardinality)
     return undefined;
@@ -136,18 +158,3 @@ const formatRule = (item, config, meta) => {
   ruleQuery.values = values;
   return ruleQuery;
 };
-
-const _queryBuilderFormat = (item, config, meta) => {
-  if (!item) return undefined;
-
-  const type = item.get("type");
-  const children = item.get("children1");
-
-  if ((type === "group" || type === "rule_group") && children && children.size) {
-    return formatGroup(item, config, meta);
-  } else if (type === "rule") {
-    return formatRule(item, config, meta);
-  }
-  return undefined;
-};
-

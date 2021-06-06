@@ -10,6 +10,11 @@ import pick from "lodash/pick";
 import {Map} from "immutable";
 import {settings as defaultSettings} from "../config/default";
 
+
+// helpers
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
+
 export const mongodbFormat = (tree, config) => {
   //meta is mutable
   let meta = {
@@ -23,8 +28,6 @@ export const mongodbFormat = (tree, config) => {
   return res;
 };
 
-// helpers
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
   if (!item) return undefined;
@@ -71,6 +74,7 @@ const formatFieldName = (field, config, meta, parentPath) => {
   return fieldName;
 };
 
+
 const formatRightField = (meta, config, rightField, parentPath) => {
   const {fieldSeparator} = config.settings;
   let ret;
@@ -89,6 +93,7 @@ const formatRightField = (meta, config, rightField, parentPath) => {
   return [ret, useExpr];
 };
 
+
 const formatFunc = (meta, config, currentValue, parentPath) => {
   const useExpr = true;
   let ret;
@@ -98,7 +103,8 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   const funcConfig = getFuncConfig(config, funcKey);
   const funcName = funcConfig.mongoFunc || funcKey;
   const mongoArgsAsObject = funcConfig.mongoArgsAsObject;
-  const formattedArgs = {};
+
+  let formattedArgs = {};
   let argsCnt = 0;
   let lastArg = undefined;
   for (const argKey in funcConfig.args) {
@@ -120,6 +126,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
       lastArg = formattedArgVal;
     }
   }
+
   if (typeof funcConfig.mongoFormatFunc === "function") {
     const fn = funcConfig.mongoFormatFunc;
     const args = [
@@ -137,6 +144,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
 
   return [ret, useExpr];
 };
+
 
 const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, parentPath, operator, operatorDefinition) => {
   if (currentValue === undefined)
@@ -170,6 +178,7 @@ const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, field
 
   return [ret, useExpr];
 };
+
 
 const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
   const properties = item.get("properties") || new Map();
@@ -221,7 +230,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     }
     return fv;
   });
-  if (!!_fieldName)
+  if (_fieldName)
     useExpr = true;
   const wrapExpr = useExpr && _canWrapExpr;
   const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
@@ -254,6 +263,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   }
   return ruleQuery;
 };
+
 
 const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
   const type = item.get("type");
@@ -356,4 +366,3 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   }
   return resultQuery;
 };
-

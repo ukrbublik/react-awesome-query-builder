@@ -11,15 +11,16 @@ import pick from "lodash/pick";
 
 // http://jsonlogic.com/
 
+
 export const jsonLogicFormat = (item, config) => {
   //meta is mutable
   let meta = {
     usedFields: [],
     errors: []
   };
-    
+  
   const logic = formatItem(item, config, meta, true);
-    
+  
   // build empty data
   const {errors, usedFields} = meta;
   const {fieldSeparator} = config.settings;
@@ -56,190 +57,17 @@ export const jsonLogicFormat = (item, config) => {
 };
 
 
-const formatFunc = (meta, config, currentValue, parentField = null) => {
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
-  const funcConfig = getFuncConfig(config, funcKey);
-  if (!funcConfig.jsonLogic) {
-    meta.errors.push(`Func ${funcKey} is not supported`);
-    return undefined;
+const formatItem = (item, config, meta, isRoot, parentField = null) => {
+  if (!item) return undefined;
+  const type = item.get("type");
+  if (type === "group" || type === "rule_group") {
+    return formatGroup(item, config, meta, isRoot, parentField);
+  } else if (type === "rule") {
+    return formatRule(item, config, meta, parentField);
   }
-  const formattedArgs = {};
-  for (const argKey in funcConfig.args) {
-    const argConfig = funcConfig.args[argKey];
-    const fieldDef = getFieldConfig(config, argConfig);
-    const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
-    const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-    const formattedArgVal = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField);
-    if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
-      return undefined;
-    }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
-    }
-  }
-  const formattedArgsArr = Object.values(formattedArgs);
-  let ret;
-  if (typeof funcConfig.jsonLogic === "function") {
-    const fn = funcConfig.jsonLogic;
-    const args = [
-      formattedArgs,
-    ];
-    ret = fn(...args);
-  } else {
-    const funcName = funcConfig.jsonLogic || funcKey;
-    const isMethod = !!funcConfig.jsonLogicIsMethod;
-    if (isMethod) {
-      const [obj, ...params] = formattedArgsArr;
-      if (params.length) {
-        ret = { "method": [ obj, funcName, params ] };
-      } else {
-        ret = { "method": [ obj, funcName ] };
-      }
-    } else {
-      ret = { [funcName]: formattedArgsArr };
-    }
-  }
-  return ret;
+  return undefined;
 };
 
-
-const formatField = (meta, config, field, parentField = null) => {
-  const {fieldSeparator, jsonLogic} = config.settings;
-
-  let ret;
-  if (field) {
-    if (Array.isArray(field))
-      field = field.join(fieldSeparator);
-    const fieldDef = getFieldConfig(config, field) || {};
-    let fieldName = field;
-    if (fieldDef.fieldName) {
-      fieldName = fieldDef.fieldName;
-    }
-    if (parentField) {
-      const parentFieldDef = getFieldConfig(config, parentField) || {};
-      let parentFieldName = parentField;
-      if (parentFieldDef.fieldName) {
-        parentFieldName = parentFieldDef.fieldName;
-      }
-      if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
-        fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
-      } else {
-        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-      }
-    }
-    let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVarKey : "var");
-    ret = { [varName] : fieldName };
-    if (meta.usedFields.indexOf(field) == -1)
-      meta.usedFields.push(field);
-  }
-  return ret;
-};
-
-
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField = null) => {
-  if (currentValue === undefined)
-    return undefined;
-  let ret;
-  if (valueSrc == "field") {
-    ret = formatField(meta, config, currentValue, parentField);
-  } else if (valueSrc == "func") {
-    ret = formatFunc(meta, config, currentValue, parentField);
-  } else if (typeof fieldWidgetDefinition.jsonLogic === "function") {
-    const fn = fieldWidgetDefinition.jsonLogic;
-    const args = [
-      currentValue,
-      pick(fieldDefinition, ["fieldSettings", "listValues"]),
-      //useful options: valueFormat for date/time
-      omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
-    ];
-    if (operator) {
-      args.push(operator);
-      args.push(operatorDefinition);
-    }
-    ret = fn(...args);
-  } else {
-    ret = currentValue;
-  }
-  return ret;
-};
-
-
-const formatItemValue = (config, properties, meta, operator, parentField) => {
-  const field = properties.get("field");
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-
-  let value = properties.get("value");
-  if (value == undefined)
-    return undefined;
-  let valueSrcs = [];
-  let valueTypes = [];
-  let _usedFields = meta.usedFields;
-  value = value.map((currentValue, ind) => {
-    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
-    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
-    currentValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    const fv = formatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
-    if (fv !== undefined) {
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
-  const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
-  if (value.size < cardinality || hasUndefinedValues) {
-    meta.usedFields = _usedFields; // restore
-    return undefined;
-  }
-  return cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
-};
-
-
-const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, isRev = false) => {
-  const field = properties.get("field");
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
-  let formatteOp = operator;
-  if (typeof operatorDefinition.jsonLogic == "string")
-    formatteOp = operatorDefinition.jsonLogic;
-  let fn = typeof operatorDefinition.jsonLogic == "function" ? operatorDefinition.jsonLogic : null;
-  if (!fn) {
-    const rangeOps = ["<", "<=", ">", ">="];
-    fn = (field, op, val, opDef, opOpts) => {
-      if (cardinality == 0)
-        return { [formatteOp]: formattedField };
-      else if (cardinality == 1 && isReverseArgs)
-        return { [formatteOp]: [formattedValue, formattedField] };
-      else if (cardinality == 1)
-        return { [formatteOp]: [formattedField, formattedValue] };
-      else if (cardinality == 2 && rangeOps.includes(formatteOp))
-        return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
-      else
-        return { [formatteOp]: [formattedField, ...formattedValue] };
-    };
-  }
-  const args = [
-    formattedField,
-    operator,
-    formattedValue,
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
-    operatorOptions,
-  ];
-  let ruleQuery = fn(...args);
-
-  if (isRev) {
-    ruleQuery = { "!": ruleQuery };
-  }
-
-  return ruleQuery;
-};
 
 const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const type = item.get("type");
@@ -369,13 +197,189 @@ const formatRule = (item, config, meta, parentField = null) => {
 };
 
 
-const formatItem = (item, config, meta, isRoot, parentField = null) => {
-  if (!item) return undefined;
-  const type = item.get("type");
-  if (type === "group" || type === "rule_group") {
-    return formatGroup(item, config, meta, isRoot, parentField);
-  } else if (type === "rule") {
-    return formatRule(item, config, meta, parentField);
+const formatItemValue = (config, properties, meta, operator, parentField) => {
+  const field = properties.get("field");
+  const fieldDefinition = getFieldConfig(config, field) || {};
+  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+
+  let value = properties.get("value");
+  if (value == undefined)
+    return undefined;
+  let valueSrcs = [];
+  let valueTypes = [];
+  let _usedFields = meta.usedFields;
+  const fvalue = value.map((currentValue, ind) => {
+    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
+    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
+    currentValue = completeValue(currentValue, valueSrc, config);
+    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+    const fv = formatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
+    if (fv !== undefined) {
+      valueSrcs.push(valueSrc);
+      valueTypes.push(valueType);
+    }
+    return fv;
+  });
+  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+  if (fvalue.size < cardinality || hasUndefinedValues) {
+    meta.usedFields = _usedFields; // restore
+    return undefined;
   }
-  return undefined;
+  return cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
+};
+
+
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField = null) => {
+  if (currentValue === undefined)
+    return undefined;
+  let ret;
+  if (valueSrc == "field") {
+    ret = formatField(meta, config, currentValue, parentField);
+  } else if (valueSrc == "func") {
+    ret = formatFunc(meta, config, currentValue, parentField);
+  } else if (typeof fieldWidgetDefinition.jsonLogic === "function") {
+    const fn = fieldWidgetDefinition.jsonLogic;
+    const args = [
+      currentValue,
+      pick(fieldDefinition, ["fieldSettings", "listValues"]),
+      //useful options: valueFormat for date/time
+      omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+    ];
+    if (operator) {
+      args.push(operator);
+      args.push(operatorDefinition);
+    }
+    ret = fn(...args);
+  } else {
+    ret = currentValue;
+  }
+  return ret;
+};
+
+
+const formatFunc = (meta, config, currentValue, parentField = null) => {
+  const funcKey = currentValue.get("func");
+  const args = currentValue.get("args");
+  const funcConfig = getFuncConfig(config, funcKey);
+  if (!funcConfig.jsonLogic) {
+    meta.errors.push(`Func ${funcKey} is not supported`);
+    return undefined;
+  }
+
+  let formattedArgs = {};
+  for (const argKey in funcConfig.args) {
+    const argConfig = funcConfig.args[argKey];
+    const fieldDef = getFieldConfig(config, argConfig);
+    const argVal = args ? args.get(argKey) : undefined;
+    const argValue = argVal ? argVal.get("value") : undefined;
+    const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const formattedArgVal = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField);
+    if (argValue != undefined && formattedArgVal === undefined) {
+      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      return undefined;
+    }
+    if (formattedArgVal !== undefined) { // skip optional in the end
+      formattedArgs[argKey] = formattedArgVal;
+    }
+  }
+  const formattedArgsArr = Object.values(formattedArgs);
+
+  let ret;
+  if (typeof funcConfig.jsonLogic === "function") {
+    const fn = funcConfig.jsonLogic;
+    const args = [
+      formattedArgs,
+    ];
+    ret = fn(...args);
+  } else {
+    const funcName = funcConfig.jsonLogic || funcKey;
+    const isMethod = !!funcConfig.jsonLogicIsMethod;
+    if (isMethod) {
+      const [obj, ...params] = formattedArgsArr;
+      if (params.length) {
+        ret = { "method": [ obj, funcName, params ] };
+      } else {
+        ret = { "method": [ obj, funcName ] };
+      }
+    } else {
+      ret = { [funcName]: formattedArgsArr };
+    }
+  }
+  return ret;
+};
+
+
+const formatField = (meta, config, field, parentField = null) => {
+  const {fieldSeparator, jsonLogic} = config.settings;
+
+  let ret;
+  if (field) {
+    if (Array.isArray(field))
+      field = field.join(fieldSeparator);
+    const fieldDef = getFieldConfig(config, field) || {};
+    let fieldName = field;
+    if (fieldDef.fieldName) {
+      fieldName = fieldDef.fieldName;
+    }
+    if (parentField) {
+      const parentFieldDef = getFieldConfig(config, parentField) || {};
+      let parentFieldName = parentField;
+      if (parentFieldDef.fieldName) {
+        parentFieldName = parentFieldDef.fieldName;
+      }
+      if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
+        fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
+      } else {
+        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      }
+    }
+    let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVarKey : "var");
+    ret = { [varName] : fieldName };
+    if (meta.usedFields.indexOf(field) == -1)
+      meta.usedFields.push(field);
+  }
+  return ret;
+};
+
+
+const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, isRev = false) => {
+  const field = properties.get("field");
+  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
+  let formatteOp = operator;
+  if (typeof operatorDefinition.jsonLogic == "string")
+    formatteOp = operatorDefinition.jsonLogic;
+  let fn = typeof operatorDefinition.jsonLogic == "function" ? operatorDefinition.jsonLogic : null;
+  if (!fn) {
+    const rangeOps = ["<", "<=", ">", ">="];
+    fn = (field, op, val, opDef, opOpts) => {
+      if (cardinality == 0)
+        return { [formatteOp]: formattedField };
+      else if (cardinality == 1 && isReverseArgs)
+        return { [formatteOp]: [formattedValue, formattedField] };
+      else if (cardinality == 1)
+        return { [formatteOp]: [formattedField, formattedValue] };
+      else if (cardinality == 2 && rangeOps.includes(formatteOp))
+        return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
+      else
+        return { [formatteOp]: [formattedField, ...formattedValue] };
+    };
+  }
+  const args = [
+    formattedField,
+    operator,
+    formattedValue,
+    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    operatorOptions,
+  ];
+  let ruleQuery = fn(...args);
+
+  if (isRev) {
+    ruleQuery = { "!": ruleQuery };
+  }
+
+  return ruleQuery;
 };

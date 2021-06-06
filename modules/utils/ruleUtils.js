@@ -327,7 +327,7 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
   return widget;
 };
 
-export const formatFieldName = (field, config, parentField = null) => {
+export const formatFieldName = (field, config, meta, parentField = null) => {
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
