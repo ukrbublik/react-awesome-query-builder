@@ -21,7 +21,7 @@ export const mongodbFormat = (tree, config) => {
     errors: []
   };
 
-  const res = mongodbFormatItem([], tree, config, meta);
+  const res = formatItem([], tree, config, meta);
 
   if (meta.errors.length)
     console.warn("Errors while exporting to MongoDb:", meta.errors);
@@ -29,7 +29,7 @@ export const mongodbFormat = (tree, config) => {
 };
 
 
-const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
   if (!item) return undefined;
 
   const type = item.get("type");
@@ -41,227 +41,6 @@ const mongodbFormatItem = (parents, item, config, meta, _not = false, _canWrapEx
     return formatRule(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
   }
   return undefined;
-};
-
-
-const formatFieldName = (field, config, meta, parentPath) => {
-  if (!field) return;
-  const fieldDef = getFieldConfig(config, field) || {};
-  const {fieldSeparator} = config.settings;
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  // if (fieldDef.tableName) { // legacy
-  //     const fieldPartsCopy = [...fieldParts];
-  //     fieldPartsCopy[0] = fieldDef.tableName;
-  //     fieldName = fieldPartsCopy.join(fieldSeparator);
-  // }
-  if (fieldDef.fieldName) {
-    fieldName = fieldDef.fieldName;
-  }
-
-  if (parentPath) {
-    const parentFieldDef = getFieldConfig(config, parentPath) || {};
-    let parentFieldName = parentPath;
-    if (parentFieldDef.fieldName) {
-      parentFieldName = parentFieldDef.fieldName;
-    }
-    if (fieldName.indexOf(parentFieldName+".") == 0) {
-      fieldName = fieldName.slice((parentFieldName+".").length);
-    } else {
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-    }
-  }
-  return fieldName;
-};
-
-
-const formatRightField = (meta, config, rightField, parentPath) => {
-  const {fieldSeparator} = config.settings;
-  let ret;
-  const useExpr = true;
-
-  const rightFieldDefinition = getFieldConfig(config, rightField) || {};
-  const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
-  const _fieldKeys = getFieldPath(rightField, config);
-  const fieldPartsLabels = getFieldPathLabels(rightField, config);
-  const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
-  const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
-  const rightFieldName = formatFieldName(rightField, config, meta, parentPath);
-  const formattedField = formatFieldFn(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
-  ret = "$" + formattedField;
-
-  return [ret, useExpr];
-};
-
-
-const formatFunc = (meta, config, currentValue, parentPath) => {
-  const useExpr = true;
-  let ret;
-
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
-  const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.mongoFunc || funcKey;
-  const mongoArgsAsObject = funcConfig.mongoArgsAsObject;
-
-  let formattedArgs = {};
-  let argsCnt = 0;
-  let lastArg = undefined;
-  for (const argKey in funcConfig.args) {
-    const argConfig = funcConfig.args[argKey];
-    const fieldDef = getFieldConfig(config, argConfig);
-    const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
-    const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-    const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
-    const [formattedArgVal, _argUseExpr] = mongoFormatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, argConfig, null, null);
-    if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
-      return [undefined, false];
-    }
-    argsCnt++;
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
-      lastArg = formattedArgVal;
-    }
-  }
-
-  if (typeof funcConfig.mongoFormatFunc === "function") {
-    const fn = funcConfig.mongoFormatFunc;
-    const args = [
-      formattedArgs,
-    ];
-    ret = fn(...args);
-  } else {
-    if (mongoArgsAsObject)
-      ret = { [funcName]: formattedArgs };
-    else if (argsCnt == 1 && lastArg !== undefined)
-      ret = { [funcName]: lastArg };
-    else
-      ret = { [funcName]: Object.values(formattedArgs) };
-  }
-
-  return [ret, useExpr];
-};
-
-
-const mongoFormatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, parentPath, operator, operatorDefinition) => {
-  if (currentValue === undefined)
-    return [undefined, false];
-  
-  let ret;
-  let useExpr = false;
-
-  if (valueSrc == "field") {
-    [ret, useExpr] = formatRightField(meta, config, currentValue, parentPath);
-  } else if (valueSrc == "func") {
-    [ret, useExpr] = formatFunc(meta, config, currentValue, parentPath);
-  } else {
-    if (typeof fieldWidgetDefinition.mongoFormatValue === "function") {
-      const fn = fieldWidgetDefinition.mongoFormatValue;
-      const args = [
-        currentValue,
-        pick(fieldDefinition, ["fieldSettings", "listValues"]),
-        //useful options: valueFormat for date/time
-        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
-      ];
-      if (operator) {
-        args.push(operator);
-        args.push(operatorDefinition);
-      }
-      ret = fn(...args);
-    } else {
-      ret = currentValue;
-    }
-  }
-
-  return [ret, useExpr];
-};
-
-
-const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
-  const properties = item.get("properties") || new Map();
-
-  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
-  const parentPath = parents
-    .filter(it => it.get("type") == "rule_group")
-    .map(it => it.get("properties").get("field"))
-    .slice(-1).pop();
-
-  let operator = properties.get("operator");
-  const operatorOptions = properties.get("operatorOptions");
-  let field = properties.get("field");
-  let value = properties.get("value");
-
-  if (field == null || operator == null || value === undefined)
-    return undefined;
-
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  let operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  let reversedOp = operatorDefinition.reversedOp;
-  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-
-  let not = _not;
-  if (not && reversedOp) {
-    [operator, reversedOp] = [reversedOp, operator];
-    [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
-    not = false;
-  }
-
-  const fieldName = formatFieldName(field, config, meta, hasParentRuleGroup && parentPath);
-
-  //format value
-  let valueSrcs = [];
-  let valueTypes = [];
-  let useExpr = false;
-  value = value.map((currentValue, ind) => {
-    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
-    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
-    currentValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    const [fv, fvUseExpr] = mongoFormatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, hasParentRuleGroup && parentPath, operator, operatorDefinition);
-    if (fv !== undefined) {
-      useExpr = useExpr || fvUseExpr;
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
-  if (_fieldName)
-    useExpr = true;
-  const wrapExpr = useExpr && _canWrapExpr;
-  const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
-  if (value.size < cardinality || hasUndefinedValues)
-    return undefined;
-  const formattedValue = cardinality > 1 ? value.toArray() : (cardinality == 1 ? value.first() : null);
-      
-  //build rule
-  const fn = operatorDefinition.mongoFormatOp;
-  if (!fn) {
-    meta.errors.push(`Operator ${operator} is not supported`);
-    return undefined;
-  }
-  const args = [
-    _fieldName ? _fieldName(fieldName) : fieldName,
-    operator,
-    _value !== undefined && formattedValue == null ? _value : formattedValue,
-    useExpr,
-    (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
-    (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
-    operatorOptions,
-  ];
-  let ruleQuery = fn(...args);
-  if (wrapExpr) {
-    ruleQuery = { "$expr": ruleQuery };
-  }
-  if (not) {
-    ruleQuery = { "$not": ruleQuery };
-  }
-  return ruleQuery;
 };
 
 
@@ -284,7 +63,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children
-    .map((currentChild) => mongodbFormatItem(
+    .map((currentChild) => formatItem(
       [...parents, item], currentChild, config, meta, not, true, mode == "array" ? (f => `$$el.${f}`) : undefined)
     )
     .filter((currentChild) => typeof currentChild !== "undefined");
@@ -356,7 +135,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       const totalQuery = {
         "$size": groupFieldName
       };
-      resultQuery = mongodbFormatItem(
+      resultQuery = formatItem(
         parents, item.set("type", "rule"), config, meta, false, false, (_f => filterQuery), totalQuery
       );
       resultQuery = { "$expr": resultQuery };
@@ -366,3 +145,234 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   }
   return resultQuery;
 };
+
+
+const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+  const properties = item.get("properties") || new Map();
+
+  const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
+  const parentPath = parents
+    .filter(it => it.get("type") == "rule_group")
+    .map(it => it.get("properties").get("field"))
+    .slice(-1).pop();
+  const realParentPath = hasParentRuleGroup && parentPath;
+
+  let operator = properties.get("operator");
+  const operatorOptions = properties.get("operatorOptions");
+  let field = properties.get("field");
+  const iValue = properties.get("value");
+  const iValueSrc = properties.get("valueSrc");
+  const iValueType = properties.get("valueType");
+
+  if (field == null || operator == null || value === undefined)
+    return undefined;
+
+  const fieldDef = getFieldConfig(config, field) || {};
+  let operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  let reversedOp = operatorDefinition.reversedOp;
+  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+
+  let not = _not;
+  if (not && reversedOp) {
+    [operator, reversedOp] = [reversedOp, operator];
+    [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
+    not = false;
+  }
+
+  const fieldName = formatFieldName(field, config, meta, realParentPath);
+
+  //format value
+  let valueSrcs = [];
+  let valueTypes = [];
+  let useExpr = false;
+  const fvalue = iValue.map((currentValue, ind) => {
+    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+    const valueType = iValueType ? iValueType.get(ind) : null;
+    const cValue = completeValue(currentValue, valueSrc, config);
+    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+    const [fv, fvUseExpr] = formatValue(
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition
+    );
+    if (fv !== undefined) {
+      useExpr = useExpr || fvUseExpr;
+      valueSrcs.push(valueSrc);
+      valueTypes.push(valueType);
+    }
+    return fv;
+  });
+  if (_fieldName)
+    useExpr = true;
+  const wrapExpr = useExpr && _canWrapExpr;
+  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+  if (fvalue.size < cardinality || hasUndefinedValues)
+    return undefined;
+  const formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
+  
+  //build rule
+  const fn = operatorDefinition.mongoFormatOp;
+  if (!fn) {
+    meta.errors.push(`Operator ${operator} is not supported`);
+    return undefined;
+  }
+  const args = [
+    _fieldName ? _fieldName(fieldName) : fieldName,
+    operator,
+    _value !== undefined && formattedValue == null ? _value : formattedValue,
+    useExpr,
+    (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
+    (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
+    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    operatorOptions,
+  ];
+  let ruleQuery = fn(...args);
+  if (wrapExpr) {
+    ruleQuery = { "$expr": ruleQuery };
+  }
+  if (not) {
+    ruleQuery = { "$not": ruleQuery };
+  }
+  return ruleQuery;
+};
+
+
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, parentPath, operator, operatorDefinition) => {
+  if (currentValue === undefined)
+    return [undefined, false];
+  
+  let ret;
+  let useExpr = false;
+
+  if (valueSrc == "field") {
+    [ret, useExpr] = formatRightField(meta, config, currentValue, parentPath);
+  } else if (valueSrc == "func") {
+    [ret, useExpr] = formatFunc(meta, config, currentValue, parentPath);
+  } else {
+    if (typeof fieldWidgetDefinition.mongoFormatValue === "function") {
+      const fn = fieldWidgetDefinition.mongoFormatValue;
+      const args = [
+        currentValue,
+        pick(fieldDefinition, ["fieldSettings", "listValues"]),
+        //useful options: valueFormat for date/time
+        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+      ];
+      if (operator) {
+        args.push(operator);
+        args.push(operatorDefinition);
+      }
+      ret = fn(...args);
+    } else {
+      ret = currentValue;
+    }
+  }
+
+  return [ret, useExpr];
+};
+
+
+
+const formatFieldName = (field, config, meta, parentPath) => {
+  if (!field) return;
+  const fieldDef = getFieldConfig(config, field) || {};
+  const {fieldSeparator} = config.settings;
+  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
+  // if (fieldDef.tableName) { // legacy
+  //     const fieldPartsCopy = [...fieldParts];
+  //     fieldPartsCopy[0] = fieldDef.tableName;
+  //     fieldName = fieldPartsCopy.join(fieldSeparator);
+  // }
+  if (fieldDef.fieldName) {
+    fieldName = fieldDef.fieldName;
+  }
+
+  if (parentPath) {
+    const parentFieldDef = getFieldConfig(config, parentPath) || {};
+    let parentFieldName = parentPath;
+    if (parentFieldDef.fieldName) {
+      parentFieldName = parentFieldDef.fieldName;
+    }
+    if (fieldName.indexOf(parentFieldName+".") == 0) {
+      fieldName = fieldName.slice((parentFieldName+".").length);
+    } else {
+      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+    }
+  }
+  return fieldName;
+};
+
+
+const formatRightField = (meta, config, rightField, parentPath) => {
+  const {fieldSeparator} = config.settings;
+  let ret;
+  const useExpr = true;
+
+  if (rightField) {
+    const rightFieldDefinition = getFieldConfig(config, rightField) || {};
+    const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
+    const _fieldKeys = getFieldPath(rightField, config);
+    const fieldPartsLabels = getFieldPathLabels(rightField, config);
+    const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
+    const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
+    const rightFieldName = formatFieldName(rightField, config, meta, parentPath);
+    const formattedField = formatFieldFn(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
+    ret = "$" + formattedField;
+  }
+
+  return [ret, useExpr];
+};
+
+
+const formatFunc = (meta, config, currentValue, parentPath) => {
+  const useExpr = true;
+  let ret;
+
+  const funcKey = currentValue.get("func");
+  const args = currentValue.get("args");
+  const funcConfig = getFuncConfig(config, funcKey);
+  const funcName = funcConfig.mongoFunc || funcKey;
+  const mongoArgsAsObject = funcConfig.mongoArgsAsObject;
+
+  let formattedArgs = {};
+  let argsCnt = 0;
+  let lastArg = undefined;
+  for (const argKey in funcConfig.args) {
+    const argConfig = funcConfig.args[argKey];
+    const fieldDef = getFieldConfig(config, argConfig);
+    const argVal = args ? args.get(argKey) : undefined;
+    const argValue = argVal ? argVal.get("value") : undefined;
+    const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
+    const [formattedArgVal, _argUseExpr] = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, argConfig, null, null);
+    if (argValue != undefined && formattedArgVal === undefined) {
+      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      return [undefined, false];
+    }
+    argsCnt++;
+    if (formattedArgVal !== undefined) { // skip optional in the end
+      formattedArgs[argKey] = formattedArgVal;
+      lastArg = formattedArgVal;
+    }
+  }
+
+  if (typeof funcConfig.mongoFormatFunc === "function") {
+    const fn = funcConfig.mongoFormatFunc;
+    const args = [
+      formattedArgs,
+    ];
+    ret = fn(...args);
+  } else {
+    if (mongoArgsAsObject)
+      ret = { [funcName]: formattedArgs };
+    else if (argsCnt == 1 && lastArg !== undefined)
+      ret = { [funcName]: lastArg };
+    else
+      ret = { [funcName]: Object.values(formattedArgs) };
+  }
+
+  return [ret, useExpr];
+};
+
+

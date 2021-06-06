@@ -75,6 +75,9 @@ const formatRule = (item, config, meta) => {
   let field = properties.get("field");
   const operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
+  const iValueSrc = properties.get("valueSrc");
+  const iValueType = properties.get("valueType");
+  const iValue = properties.get("value");
   if (field == null || operator == null)
     return undefined;
 
@@ -88,9 +91,9 @@ const formatRule = (item, config, meta) => {
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  let value = properties.get("value").map((currentValue, ind) => {
-    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
-    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
+  const fvalue = iValue.map((currentValue, ind) => {
+    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+    const valueType = iValueType ? iValueType.get(ind) : null;
     currentValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
@@ -101,10 +104,10 @@ const formatRule = (item, config, meta) => {
     }
     return fv;
   });
-  const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
-  if (hasUndefinedValues || value.size < cardinality)
+  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+  if (hasUndefinedValues || fvalue.size < cardinality)
     return undefined;
-  const formattedValue = (cardinality == 1 ? value.first() : value);
+  const formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
 
   //find fn to format expr
   let isRev = false;
@@ -116,21 +119,21 @@ const formatRule = (item, config, meta) => {
     }
   }
   if (!fn) {
-    const _operator = operatorDefinition.sqlOp || operator;
+    const sqlOp = operatorDefinition.sqlOp || operator;
     if (cardinality == 0) {
       fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-        return `${field} ${_operator}`;
+        return `${field} ${sqlOp}`;
       };
     } else if (cardinality == 1) {
       fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions) => {
-        return `${field} ${_operator} ${value}`;
+        return `${field} ${sqlOp} ${value}`;
       };
     } else if (cardinality == 2) {
       // between
       fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
         const valFrom = values.first();
         const valTo = values.get(1);
-        return `${field} ${_operator} ${valFrom} AND ${valTo}`;
+        return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
       };
     }
   }
@@ -156,6 +159,40 @@ const formatRule = (item, config, meta) => {
   let ret = fn(...args);
   if (isRev) {
     ret = config.settings.sqlFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+  }
+  return ret;
+};
+
+
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+  if (currentValue === undefined)
+    return undefined;
+  let ret;
+  if (valueSrc == "field") {
+    ret = formatField(meta, config, currentValue);
+  } else if (valueSrc == "func") {
+    ret = formatFunc(meta, config, currentValue);
+  } else {
+    if (typeof fieldWidgetDefinition.sqlFormatValue === "function") {
+      const fn = fieldWidgetDefinition.sqlFormatValue;
+      const args = [
+        currentValue,
+        pick(fieldDefinition, ["fieldSettings", "listValues"]),
+        //useful options: valueFormat for date/time
+        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+      ];
+      if (operator) {
+        args.push(operator);
+        args.push(operatorDefinition);
+      }
+      if (valueSrc == "field") {
+        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
+        args.push(valFieldDefinition);
+      }
+      ret = fn(...args);
+    } else {
+      ret = SqlString.escape(currentValue);
+    }
   }
   return ret;
 };
@@ -210,40 +247,6 @@ const formatFunc = (meta, config, currentValue) => {
       .map(([k, v]) => v)
       .join(", ");
     ret = `${funcName}(${argsStr})`;
-  }
-  return ret;
-};
-
-
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
-  if (currentValue === undefined)
-    return undefined;
-  let ret;
-  if (valueSrc == "field") {
-    ret = formatField(meta, config, currentValue);
-  } else if (valueSrc == "func") {
-    ret = formatFunc(meta, config, currentValue);
-  } else {
-    if (typeof fieldWidgetDefinition.sqlFormatValue === "function") {
-      const fn = fieldWidgetDefinition.sqlFormatValue;
-      const args = [
-        currentValue,
-        pick(fieldDefinition, ["fieldSettings", "listValues"]),
-        //useful options: valueFormat for date/time
-        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
-      ];
-      if (operator) {
-        args.push(operator);
-        args.push(operatorDefinition);
-      }
-      if (valueSrc == "field") {
-        const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
-        args.push(valFieldDefinition);
-      }
-      ret = fn(...args);
-    } else {
-      ret = SqlString.escape(currentValue);
-    }
   }
   return ret;
 };

@@ -90,11 +90,12 @@ const formatGroup = (item, config, meta) => {
     conjunction = defaultConjunction(config);
   const not = properties.get("not");
 
-  let resultQuery = {};
-  resultQuery["id"] = id;
-  resultQuery["rules"] = list.toList();
-  resultQuery["condition"] = conjunction.toUpperCase();
-  resultQuery["not"] = not;
+  const resultQuery = {
+    id,
+    rules: list.toList(),
+    condition: conjunction.toUpperCase(),
+    not,
+  };
   return resultQuery;
 };
 

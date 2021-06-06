@@ -70,6 +70,8 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   let field = properties.get("field");
   const operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
+  const iValueSrc = properties.get("valueSrc");
+  const iValueType = properties.get("valueType");
   if (field == null || operator == null)
     return undefined;
 
@@ -83,8 +85,8 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   let valueSrcs = [];
   let valueTypes = [];
   let value = properties.get("value").map((currentValue, ind) => {
-    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
-    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
+    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+    const valueType = iValueType ? iValueType.get(ind) : null;
     currentValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
@@ -110,9 +112,9 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     }
   }
   if (!fn && cardinality == 1) {
-    let _operator = operatorDefinition.labelForFormat || operator;
+    let foperator = operatorDefinition.labelForFormat || operator;
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return `${field} ${_operator} ${values}`;
+      return `${field} ${foperator} ${values}`;
     };
   }
   if (!fn)

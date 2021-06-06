@@ -199,19 +199,21 @@ const formatRule = (item, config, meta, parentField = null) => {
 
 const formatItemValue = (config, properties, meta, operator, parentField) => {
   const field = properties.get("field");
+  const iValueSrc = properties.get("valueSrc");
+  const iValueType = properties.get("valueType");
   const fieldDefinition = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
 
-  let value = properties.get("value");
-  if (value == undefined)
+  const iValue = properties.get("value");
+  if (iValue == undefined)
     return undefined;
   let valueSrcs = [];
   let valueTypes = [];
-  let _usedFields = meta.usedFields;
-  const fvalue = value.map((currentValue, ind) => {
-    const valueSrc = properties.get("valueSrc") ? properties.get("valueSrc").get(ind) : null;
-    const valueType = properties.get("valueType") ? properties.get("valueType").get(ind) : null;
+  let oldUsedFields = meta.usedFields;
+  const fvalue = iValue.map((currentValue, ind) => {
+    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+    const valueType = iValueType ? iValueType.get(ind) : null;
     currentValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
@@ -224,7 +226,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
   });
   const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
   if (fvalue.size < cardinality || hasUndefinedValues) {
-    meta.usedFields = _usedFields; // restore
+    meta.usedFields = oldUsedFields; // restore
     return undefined;
   }
   return cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
