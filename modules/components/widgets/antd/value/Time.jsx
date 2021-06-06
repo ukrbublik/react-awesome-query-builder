@@ -36,13 +36,13 @@ export default class TimeWidget extends PureComponent {
     };
 
 
-    handleChange = (_value) => {
+    handleChange = (aValue) => {
       const {setValue, valueFormat, timeFormat} = this.props;
-      if (_value && _value.isValid() && timeFormat == "HH:mm") {
-        _value.set({second:0, millisecond:0});
+      if (aValue && aValue.isValid() && timeFormat == "HH:mm") {
+        aValue.set({second:0, millisecond:0});
       }
-      const value = _value && _value.isValid() ? _value.format(valueFormat) : undefined;
-      if (value || _value === null)
+      const value = aValue && aValue.isValid() ? aValue.format(valueFormat) : undefined;
+      if (value || aValue === null)
         setValue(value);
     }
 

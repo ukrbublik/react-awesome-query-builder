@@ -51,12 +51,12 @@ export default class FieldTreeSelect extends PureComponent {
       const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
       if (fn)
         fn(field);
-      const _path = path || key;
+      const pathKey = path || key;
       const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
 
       if (items) {
         return {
-          value: _path,
+          value: pathKey,
           title: option,
           children: this.getTreeData(items, fn),
           selectable: false,
@@ -66,7 +66,7 @@ export default class FieldTreeSelect extends PureComponent {
         };
       } else {
         return {
-          value: _path,
+          value: pathKey,
           title: option,
           altLabel: altLabel,
           fullLabel: fullLabel,

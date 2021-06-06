@@ -82,10 +82,10 @@ export default class FieldSelect extends PureComponent {
     return keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
       const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel} = field;
-      const _path = path || key;
+      const pathKey = path || key;
       if (items) {
         return <OptGroup
-          key={_path}
+          key={pathKey}
           label={label}
         >
           {this.renderSelectItems(items)}
@@ -93,8 +93,8 @@ export default class FieldSelect extends PureComponent {
       } else {
         const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
         return <Option
-          key={_path}
-          value={_path}
+          key={pathKey}
+          value={pathKey}
           title={altLabel}
           grouplabel={grouplabel}
           label={label}

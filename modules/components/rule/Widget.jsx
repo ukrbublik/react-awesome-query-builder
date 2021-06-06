@@ -80,11 +80,11 @@ export default class Widget extends PureComponent {
 
   getMeta({config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, isForRuleGruop, isFuncArg, leftField}) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
-    let _valueSrcs = valueSrcs;
-    let _values = values;
+    let iValueSrcs = valueSrcs;
+    let iValues = values;
     if (isFuncArg || isForRuleGruop) {
-      _valueSrcs = Immutable.List([valueSrcs]);
-      _values = Immutable.List([values]);
+      iValueSrcs = Immutable.List([valueSrcs]);
+      iValues = Immutable.List([values]);
     }
 
     const fieldDefinition = getFieldConfig(config, field);
@@ -95,7 +95,7 @@ export default class Widget extends PureComponent {
       return null;
     }
     const isSpecialRange = operatorDefinition.isSpecialRange;
-    const isSpecialRangeForSrcField = isSpecialRange && (_valueSrcs.get(0) == "field" || _valueSrcs.get(1) == "field");
+    const isSpecialRangeForSrcField = isSpecialRange && (iValueSrcs.get(0) == "field" || iValueSrcs.get(1) == "field");
     const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
     const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition.cardinality, 1);
     if (cardinality === 0) {
@@ -105,7 +105,7 @@ export default class Widget extends PureComponent {
     const valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition, isFuncArg ? leftField : null);
 
     const widgets = range(0, cardinality).map(delta => {
-      const valueSrc = _valueSrcs.get(delta) || null;
+      const valueSrc = iValueSrcs.get(delta) || null;
       let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       let widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
       if (isSpecialRangeForSrcField) {
@@ -156,17 +156,17 @@ export default class Widget extends PureComponent {
       cardinality,
       valueSources,
       widgets,
-      _values, //correct for isFuncArg
-      _field: field, //correct for isFuncArg
+      iValues, //correct for isFuncArg
+      aField: field, //correct for isFuncArg
     };
   }
 
   renderWidget = (delta, meta, props) => {
     const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField} = props;
     const {settings} = config;
-    const { widgets, _values, _field } = meta;
-    const value = isFuncArg ? _values : values;
-    const field = isFuncArg ? leftField : _field;
+    const { widgets, iValues, aField } = meta;
+    const value = isFuncArg ? iValues : values;
+    const field = isFuncArg ? leftField : aField;
     const {valueSrc, valueLabel} = widgets[delta];
 
     const widgetLabel = settings.showLabels

@@ -56,8 +56,8 @@ export default class MultiSelectWidget extends PureComponent {
     const {config, placeholder, allowCustomValues, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
-    const _value = value && value.length ? value : undefined;
-    const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const aValue = value && value.length ? value : undefined;
+    const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
     
     return (
@@ -75,7 +75,7 @@ export default class MultiSelectWidget extends PureComponent {
         dropdownMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
-        value={_value}
+        value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
         {...customProps}
