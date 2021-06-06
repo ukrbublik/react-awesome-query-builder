@@ -80,7 +80,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
-  let conj = conjunction.toLowerCase();
+  const conj = conjunction.toLowerCase();
   const not = properties.get("not");
   if (conj != "and" && conj != "or") {
     meta.errors.push(`Conjunction ${conj} is not supported`);

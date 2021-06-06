@@ -72,7 +72,7 @@ const formatGroup = (item, config, meta) => {
 
 const formatRule = (item, config, meta) => {
   const properties = item.get("properties") || new Map();
-  let field = properties.get("field");
+  const field = properties.get("field");
   const operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
   const iValueSrc = properties.get("valueSrc");
@@ -86,7 +86,6 @@ const formatRule = (item, config, meta) => {
   const reversedOp = operatorDefinition.reversedOp;
   const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  const {fieldSeparator} = config.settings;
 
   //format value
   let valueSrcs = [];
@@ -196,7 +195,6 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   }
   return ret;
 };
-
 
 const formatField = (meta, config, field) => {
   const {fieldSeparator} = config.settings;

@@ -55,9 +55,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
     .filter(it => it.get("type") == "rule_group")
     .map(it => it.get("properties").get("field"))
     .slice(-1).pop();
+  const realParentPath = hasParentRuleGroup && parentPath;
 
   const groupField = type === "rule_group" ? properties.get("field") : null;
-  const groupFieldName = formatFieldName(groupField, config, meta, hasParentRuleGroup && parentPath);
+  const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
 
@@ -159,12 +160,12 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
 
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
-  let field = properties.get("field");
+  const field = properties.get("field");
   const iValue = properties.get("value");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
 
-  if (field == null || operator == null || value === undefined)
+  if (field == null || operator == null || iValue === undefined)
     return undefined;
 
   const fieldDef = getFieldConfig(config, field) || {};
@@ -302,7 +303,6 @@ const formatFieldName = (field, config, meta, parentPath) => {
   return fieldName;
 };
 
-
 const formatRightField = (meta, config, rightField, parentPath) => {
   const {fieldSeparator} = config.settings;
   let ret;
@@ -345,7 +345,9 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
     const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
-    const [formattedArgVal, _argUseExpr] = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, argConfig, null, null);
+    const [formattedArgVal, _argUseExpr] = formatValue(
+      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, argConfig, null, null
+    );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return [undefined, false];

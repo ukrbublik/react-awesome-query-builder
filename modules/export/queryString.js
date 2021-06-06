@@ -67,9 +67,10 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
 
 const formatRule = (item, config, meta, isForDisplay = false, parentField = null) => {
   const properties = item.get("properties") || new Map();
-  let field = properties.get("field");
+  const field = properties.get("field");
   const operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
+  const iValue = properties.get("value");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
   if (field == null || operator == null)
@@ -84,7 +85,7 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  let value = properties.get("value").map((currentValue, ind) => {
+  const fvalue = iValue.map((currentValue, ind) => {
     const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
     const valueType = iValueType ? iValueType.get(ind) : null;
     currentValue = completeValue(currentValue, valueSrc, config);
@@ -97,10 +98,10 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     }
     return fv;
   });
-  const hasUndefinedValues = value.filter(v => v === undefined).size > 0;
-  if (hasUndefinedValues || value.size < cardinality)
+  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+  if (hasUndefinedValues || fvalue.size < cardinality)
     return undefined;
-  const formattedValue = (cardinality == 1 ? value.first() : value);
+  const formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
 
   //find fn to format expr
   let isRev = false;
@@ -111,11 +112,24 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
       isRev = true;
     }
   }
-  if (!fn && cardinality == 1) {
-    let foperator = operatorDefinition.labelForFormat || operator;
-    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return `${field} ${foperator} ${values}`;
-    };
+  if (!fn) {
+    const fop = operatorDefinition.labelForFormat || operator;
+    if (cardinality == 0) {
+      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+        return `${field} ${fop}`;
+      };
+    } else if (cardinality == 1) {
+      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+        return `${field} ${fop} ${values}`;
+      };
+    } else if (cardinality == 2) {
+      // between
+      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+        const valFrom = values.first();
+        const valTo = values.get(1);
+        return `${field} ${fop} ${valFrom} AND ${valTo}`;
+      };
+    }
   }
   if (!fn)
     return undefined;
