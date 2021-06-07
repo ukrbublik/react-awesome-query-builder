@@ -33,19 +33,19 @@ export default class FieldDropdown extends PureComponent {
     return keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
       const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
-      const _path = path || key;
+      const pathKey = path || key;
       const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
 
       if (items) {
         return <SubMenu
-          key={_path}
+          key={pathKey}
           title={<span>{option} &nbsp;&nbsp;&nbsp;&nbsp;</span>}
         >
           {this.renderMenuItems(items)}
         </SubMenu>;
       } else {
         return <MenuItem
-          key={_path}
+          key={pathKey}
         >
           {option}
         </MenuItem>;

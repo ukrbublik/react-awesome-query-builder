@@ -1,6 +1,8 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
+import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/domUtils";
+import {mapListValues} from "../../../../utils/stuff";
+import {useOnPropsChanged} from "../../../../utils/reactUtils";
 import { Select } from "antd";
 const Option = Select.Option;
 
@@ -52,7 +54,7 @@ export default class SelectWidget extends PureComponent {
     const placeholderWidth = calcTextWidth(placeholder);
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const width = value ? dropdownWidth : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const _value = value != undefined ? value+"" : undefined;
+    const aValue = value != undefined ? value+"" : undefined;
 
     return (
       <Select
@@ -62,7 +64,7 @@ export default class SelectWidget extends PureComponent {
         dropdownMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
-        value={_value}
+        value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
         {...customProps}

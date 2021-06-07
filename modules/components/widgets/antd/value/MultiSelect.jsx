@@ -1,7 +1,9 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Select } from "antd";
-import {useOnPropsChanged, mapListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/stuff";
+import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/domUtils";
+import {mapListValues} from "../../../../utils/stuff";
+import {useOnPropsChanged} from "../../../../utils/reactUtils";
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends PureComponent {
@@ -54,8 +56,8 @@ export default class MultiSelectWidget extends PureComponent {
     const {config, placeholder, allowCustomValues, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
-    const _value = value && value.length ? value : undefined;
-    const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const aValue = value && value.length ? value : undefined;
+    const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
     
     return (
@@ -73,7 +75,7 @@ export default class MultiSelectWidget extends PureComponent {
         dropdownMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
-        value={_value}
+        value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
         {...customProps}

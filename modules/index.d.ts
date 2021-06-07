@@ -39,6 +39,7 @@ type TypedKeyMap<K extends string|number, T> = {
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
+type RuleGroupModes = "struct" | "some" | "array";
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
@@ -46,7 +47,7 @@ type TypedValueSourceMap<T> = {
 type JsonGroup = {
   type: "group",
   id?: string,
-  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup},
+  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup|JsonRuleGroupExt},
   properties?: {
     conjunction: string,
     not?: boolean,
@@ -55,9 +56,24 @@ type JsonGroup = {
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRuleGroup|JsonRule},
+  children1?: {[id: string]: JsonRule},
   properties?: {
     field: string | Empty,
+    mode?: RuleGroupModes,
+  }
+}
+type JsonRuleGroupExt = {
+  type: "rule_group",
+  id?: string,
+  children1?: {[id: string]: JsonRule},
+  properties?: {
+    field: string | Empty,
+    mode: RuleGroupModes,
+    operator: string | Empty,
+    value: Array<RuleValue>,
+    valueSrc: Array<ValueSource>,
+    valueType: Array<string>,
+    valueError?: Array<string>,
   }
 }
 type JsonRule = {
@@ -240,6 +256,8 @@ export interface ConjsProps {
   config?: Config,
   not: boolean,
   setNot(not: boolean): void,
+  showNot?: boolean,
+  notLabel?: string,
 }
 
 
@@ -431,7 +449,9 @@ interface ValueField extends BaseField {
   preferWidgets?: Array<string>,
   valueSources?: Array<ValueSource>,
   funcs?: Array<string>,
-  tableName?: string,
+  tableName?: string, // legacy: PR #18, PR #20
+  fieldName?: string,
+  jsonLogicVar?: string,
   fieldSettings?: FieldSettings,
   defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,
@@ -455,10 +475,21 @@ interface FieldStruct extends BaseField {
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
+  mode: RuleGroupModes,
+}
+interface FieldGroupExt extends BaseField {
+  type: "!group",
+  subfields: Fields,
+  mode: "array",
+  operators?: Array<string>,
+  defaultOperator?: string,
+  initialEmptyWhere?: boolean,
+  showNot?: boolean,
+  conjunctions?: Array<string>,
 }
 
 export type Field = SimpleField;
-type FieldOrGroup = FieldStruct | FieldGroup | Field;
+type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
 
@@ -504,8 +535,10 @@ type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "botto
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
+type SqlFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
 type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
+type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | Array<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {
@@ -524,6 +557,7 @@ export interface LocaleSettings {
   deleteLabel?: string,
   addGroupLabel?: string,
   addRuleLabel?: string,
+  addSubRuleLabel?: string,
   delGroupLabel?: string,
   notLabel?: string,
   valueSourcesPopupTitle?: string,
@@ -554,7 +588,6 @@ export interface RenderSettings {
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
   showLabels?: boolean,
-  hideConjForOne?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
   renderBeforeWidget?: Factory<FieldProps>,
@@ -583,14 +616,15 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
-  useGroupsAsArrays?: boolean,
 }
 
 export interface OtherSettings {
   fieldSeparator?: string,
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse,
+  sqlFormatReverse?: SqlFormatReverse,
   formatField?: FormatField,
+  formarAggr?: FormatAggr,
 }
 
 export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & OtherSettings;

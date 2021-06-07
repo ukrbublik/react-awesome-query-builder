@@ -171,8 +171,11 @@ Example:
 |===
 |key |required |default |meaning
 |type |+ | |One of types described in link:#configtypes[config.types] or `!struct`/`!group` for complex field +
- (use `!struct` for objects, `!group` for arrays) +
- (for export of `!group` operator https://docs.mongodb.com/manual/reference/operator/query/elemMatch/[elemMatch] will be used in MongoDb, http://jsonlogic.com/operations.html#all-none-and-some[some] in JsonLogic)
+  (use `!struct` for objects, `!group` for arrays)
+|mode | | |For `!group` type, values are: `some`/`array` +
+  `some` is light mode (default), at least one subrule should match +
+   (for export https://docs.mongodb.com/manual/reference/operator/query/elemMatch/[elemMatch] will be used in MongoDb, http://jsonlogic.com/operations.html#all-none-and-some[some] in JsonLogic) +
+   `array` is extended mode, user can choose one of group operators (`some`/`all`/`none`/`count >/</==/...`)
 |subfields |+ for `!struct`/`!group` type | |Config for subfields of complex field (multiple nesting is supported)
 |label |+ | |Label to be displayed in field list +
   (If not specified, fields's key will be used instead)
@@ -204,6 +207,7 @@ Example:
 |funcs | | |If comparing with funcs is enabled for this field (`valueSources` contains `'func'`), you can also limit list of funcs to be compared (by default will be available all funcs from link:#configfuncs[config.funcs] with `returnType` matching field's `type`)
 |hideForSelect | |false |If true, field will appear only at right side (when you compare field with another field)
 |hideForCompare | |false |If true, field will appear only at left side
+|conjunctions, showNot | | | For type=`!group` with mode=`array`. Example: `conjunctions: ['AND'], showNot: false`
 |===
 
 
@@ -249,7 +253,6 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
   renderFunc: (props) => <FieldDropdown {...props} />,
   canReorder: true,
   canRegroup: true,
-  hideConjForOne: true,
   maxNesting: 10,
   showLabels: false,
   showNot: true,
@@ -289,7 +292,6 @@ Behaviour settings:
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
-|useGroupsAsArrays |true |See https://github.com/ukrbublik/react-awesome-query-builder/issues/246[issue]
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -318,7 +320,6 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
-|hideConjForOne |true |Don't show conjunctions switcher for only 1 rule?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
 |customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
@@ -348,6 +349,12 @@ Other settings:
   `parts` - list of fields's keys for struct field +
   `label2` - field's `label2` OR parts joined by `fieldSeparatorDisplay` +
   Default impl will just return `field` (or `label2` for `isForDisplay==true`)
+|formatAggr | |Function for formatting query string, used to format aggregation rule (like `SOME OF Cars HAVE Year > 2010`) +
+  `(string whereStr, string aggrField, string operator, mixed value, string valueSrc, string valueType, Object operatorDefinition, Object operatorOptions, bool isForDisplay, Object aggrFieldDef) => string` +
+  `whereStr` - formatted string representing condition for items (eg. `Year > 2010` in example) +
+  `aggrField` - aggregation field (eg. `Cars` in example) +
+  `operator` - can be `some`/`all`/`none` (with cardinality 0) or `equal`/`less`/`between`/.. (applied to count of items) +
+  `value` - for operators with cardinality 1/2 it is value for comparing with count of items
 |fieldSeparator |`.` |Separator for struct fields.
 |fieldSeparatorDisplay |`.` |Separator for struct fields in UI.
 |===
@@ -369,6 +376,7 @@ Localization:
 |delGroupLabel |`null`
 |addGroupLabel |Add group
 |addRuleLabel |Add rule
+|addSubRuleLabel |Add sub rule
 |notLabel |Not
 |valueSourcesPopupTitle |Select value source
 |removeRuleConfirmOptions |If you want to ask confirmation of removing non-empty rule/group, add these options. +

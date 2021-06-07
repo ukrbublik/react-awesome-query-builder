@@ -35,7 +35,6 @@ export const settings = {
   fieldSeparatorDisplay: ".",
   renderSize: "small",
   maxLabelsLength: 100,
-  hideConjForOne: true,
   canReorder: true,
   canRegroup: true,
   showNot: true,
@@ -64,11 +63,16 @@ export const settings = {
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",
+  addSubRuleLabel: "Add sub rule",
   delGroupLabel: "",
   notLabel: "Not",
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
-  useGroupsAsArrays: true,
-  defaultGroupConjunction: "AND"
+
+  defaultGroupConjunction: "AND",
+  jsonLogic: {
+    groupVarKey: "var",
+    altVarKey: "var",
+  }
 };

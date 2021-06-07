@@ -1,9 +1,9 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {
-  getFieldConfig, getFieldPath, getFieldPathLabels, getWidgetForFieldOp
-} from "../utils/configUtils";
-import {truncateString, useOnPropsChanged} from "../utils/stuff";
+import {getFieldConfig} from "../../utils/configUtils";
+import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} from "../../utils/ruleUtils";
+import {truncateString} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 import clone from "clone";
@@ -19,6 +19,7 @@ export default class ValueField extends PureComponent {
     operator: PropTypes.string,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
+    parentField: PropTypes.string,
   };
 
   constructor(props) {
@@ -31,7 +32,7 @@ export default class ValueField extends PureComponent {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
-    const keysForMeta = ["config", "field", "operator", "value"];
+    const keysForMeta = ["config", "field", "operator", "value", "parentField"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -43,24 +44,30 @@ export default class ValueField extends PureComponent {
     }
   }
 
-  getItems({config, field, operator}) {
+  getItems({config, field, operator, parentField}) {
     const {canCompareFieldWithField} = config.settings;
-    const filteredFields = this.filterFields(config, config.fields, field, operator, canCompareFieldWithField);
-    const items = this.buildOptions(config, filteredFields);
+
+    const fieldSeparator = config.settings.fieldSeparator;
+    const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
+    const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+    const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
+
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField);
+    const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
 
-  getMeta({config, field, operator, value, placeholder: customPlaceholder, isFuncArg}) {
+  getMeta({config, field, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(field, config);
+    const leftFieldConfig = getFieldConfig(config, field);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     const placeholder = isFieldSelected ? null 
       : (isFuncArg && customPlaceholder || leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder);
-    const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
+    const currField = isFieldSelected ? getFieldConfig(config, selectedKey) : null;
     const selectedOpts = currField || {};
 
     const selectedKeys = getFieldPath(selectedKey, config);
@@ -68,7 +75,7 @@ export default class ValueField extends PureComponent {
     const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
     const partsLabels = getFieldPathLabels(selectedKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
-    if (selectedFullLabel == selectedLabel)
+    if (selectedFullLabel == selectedLabel || parentField)
       selectedFullLabel = null;
     const selectedAltLabel = selectedOpts.label2;
 
@@ -78,10 +85,10 @@ export default class ValueField extends PureComponent {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, operator, canCompareFieldWithField) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(leftFieldFullkey, config);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     let expectedType;
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     if (widget) {
@@ -98,7 +105,7 @@ export default class ValueField extends PureComponent {
         let subfields = list[rightFieldKey].subfields;
         let subpath = (path ? path : []).concat(rightFieldKey);
         let rightFieldFullkey = subpath.join(fieldSeparator);
-        let rightFieldConfig = getFieldConfig(rightFieldFullkey, config);
+        let rightFieldConfig = getFieldConfig(config, rightFieldFullkey);
         if (!rightFieldConfig) {
           delete list[rightFieldKey];
         } else if (rightFieldConfig.type == "!struct" || rightFieldConfig.type == "!group") {
@@ -116,12 +123,12 @@ export default class ValueField extends PureComponent {
       return keys(list).length;
     }
 
-    _filter(fields, []);
+    _filter(fields, parentFieldPath || []);
 
     return fields;
   }
 
-  buildOptions(config, fields, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, path = null, optGroupLabel = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
@@ -132,7 +139,7 @@ export default class ValueField extends PureComponent {
       const label = this.getFieldLabel(field, fieldKey, config);
       const partsLabels = getFieldPathLabels(fieldKey, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
-      if (fullLabel == label)
+      if (fullLabel == label || parentFieldPath)
         fullLabel = null;
       const altLabel = field.label2;
       const tooltip = field.tooltip;
@@ -149,7 +156,7 @@ export default class ValueField extends PureComponent {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(config, field.subfields, subpath, label)
+          items: this.buildOptions(parentFieldPath, config, field.subfields, subpath, label)
         };
       } else {
         return {
