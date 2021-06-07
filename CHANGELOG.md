@@ -1,4 +1,6 @@
 # Changelog
+- 4.0.2
+  - Fixed MaterialConfig import for TS projects (issue #368)
 - 4.0.1
   - Added custom context to isolate Query Builder store (PR #350)
   - Added support for React 17 as a peer dependency
