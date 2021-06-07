@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import mapValues from "lodash/mapValues";
+import context from "../../stores/context";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
 import {connect} from "react-redux";
 
@@ -204,6 +205,11 @@ export default (Group) => {
       return {
         dragging: state.dragging,
       };
+    },
+    null,
+    null,
+    {
+      context
     }
   )(GroupContainer);
   ConnectedGroupContainer.displayName = "ConnectedGroupContainer";
