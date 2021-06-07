@@ -610,3 +610,59 @@ export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
   }
 });
 
+
+export const with_group_array = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    str: {
+      label: "String",
+      type: "text",
+    },
+    cars: {
+      label: "Cars",
+      type: "!group",
+      mode: "array",
+      conjunctions: ["AND", "OR"],
+      showNot: true,
+      operators: [
+        // w/ operand - count
+        "equal",
+        "not_equal",
+        "less",
+        "less_or_equal",
+        "greater",
+        "greater_or_equal",
+        "between",
+        "not_between",
+
+        // w/o operand
+        "some",
+        "all",
+        "none",
+      ],
+      defaultOperator: "some",
+      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
+
+      subfields: {
+        vendor: {
+          type: "select",
+          fieldSettings: {
+            listValues: ["Ford", "Toyota", "Tesla"],
+          },
+          valueSources: ["value"],
+        },
+        year: {
+          type: "number",
+          fieldSettings: {
+            min: 1990,
+            max: 2020,
+          },
+          valueSources: ["value"],
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});

@@ -115,7 +115,7 @@ export const with_select_and_multiselect = {
   "and": [{
     "==": [ { "var": "color" }, "yellow" ]
   }, {
-    "all": [ 
+    "all": [
       { "var": "multicolor" },
       { "in": [ { "var": "" }, [ "yellow", "green" ] ] }
     ]
@@ -499,3 +499,26 @@ export const with_jl_value = {
     { "var": "num" },  { "+": [1, 2] }
   ]
 };
+
+export const with_group_array = {
+  "and": [
+    { ">": [
+      { "reduce": [
+        { "filter": [
+          { "var": "cars" },
+          { "and": [
+              {
+                "==": [ { "var": "vendor" }, "Toyota" ]
+              }, {
+                ">=": [ { "var": "year" }, 2010 ]
+              }
+          ] }
+        ] },
+        { "+": [ 1, { "var": "accumulator" } ] },
+        0
+      ] },
+      2
+    ] }
+  ]
+};
+
