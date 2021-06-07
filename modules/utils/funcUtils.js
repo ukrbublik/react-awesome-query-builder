@@ -26,7 +26,7 @@ export const completeFuncValue = (value, config) => {
     if (!value)
       return undefined;
     const funcKey = value.get("func");
-    const funcConfig = funcKey && getFuncConfig(funcKey, config);
+    const funcConfig = funcKey && getFuncConfig(config, funcKey);
     if (!funcConfig)
       return undefined;
     let complValue = value;
@@ -81,7 +81,7 @@ const getUsedFieldsInFuncValue = (value, config) => {
       if (arg.get("valueSrc") == "field") {
         const rightField = arg.get("value");
         if (rightField) {
-          const rightFieldDefinition = config ? getFieldConfig(rightField, config) : undefined;
+          const rightFieldDefinition = config ? getFieldConfig(config, rightField) : undefined;
           if (config && !rightFieldDefinition)
             badFields.push(rightField);
           else
@@ -116,7 +116,7 @@ export const setFunc = (value, funcKey, config) => {
   value = value.set("args", new Immutable.Map());
 
   // defaults
-  const funcConfig = funcKey && getFuncConfig(funcKey, config);
+  const funcConfig = funcKey && getFuncConfig(config, funcKey);
   if (funcConfig) {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];

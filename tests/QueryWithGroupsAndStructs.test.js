@@ -283,3 +283,101 @@ describe("query with !struct inside !group", () => {
   });
 
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe("query with !group mode array", () => {
+
+  describe("export", () => {
+    export_checks(configs.with_group_array, inits.with_group_array, "JsonLogic", {
+      "query": "COUNT OF cars WHERE (vendor == \"Toyota\" && year >= 2010) > 2",
+      "queryHuman": "COUNT OF Cars WHERE (vendor == \"Toyota\" AND year >= 2010) > 2",
+      "sql": "(cars.vendor = 'Toyota' AND cars.year >= 2010)",
+      "mongo": {
+        "$expr": {
+          "$gt": [
+            {
+              "$size": {
+                "$filter": {
+                  "input": "$cars",
+                  "as": "el",
+                  "cond": {
+                    "$and": [
+                      {
+                        "$expr": {
+                          "$eq": [
+                            "$$el.vendor",
+                            "Toyota"
+                          ]
+                        }
+                      },
+                      {
+                        "$expr": {
+                          "$gte": [
+                            "$$el.year",
+                            2010
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            2
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            ">": [
+              {
+                "reduce": [
+                  {
+                    "filter": [
+                      {
+                        "var": "cars"
+                      },
+                      {
+                        "and": [
+                          {
+                            "==": [
+                              {
+                                "var": "vendor"
+                              },
+                              "Toyota"
+                            ]
+                          },
+                          {
+                            ">=": [
+                              {
+                                "var": "year"
+                              },
+                              2010
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "+": [
+                      1,
+                      {
+                        "var": "accumulator"
+                      }
+                    ]
+                  },
+                  0
+                ]
+              },
+              2
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+});

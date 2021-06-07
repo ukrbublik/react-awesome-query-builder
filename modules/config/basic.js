@@ -64,38 +64,40 @@ const conjunctions = {
 
 // helpers for mongo format
 const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
+  const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   const mv = mc(value);
   if (mv === undefined)
     return undefined;
   if (not) {
     return !useExpr
       ? { [field]: { "$not": { [mop]: mv } } } 
-      : { "$not": { [mop]: ["$"+field, mv] } };
+      : { "$not": { [mop]: [$field, mv] } };
   } else {
     if (!useExpr && mop == "$eq")
       return { [field]: mv }; // short form
     return !useExpr
       ? { [field]: { [mop]: mv } } 
-      : { [mop]: ["$"+field, mv] };
+      : { [mop]: [$field, mv] };
   }
 };
 
 const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
+  const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   if (not) {
     return !useExpr
       ? { [field]: { "$not": { [mops[0]]: values[0], [mops[1]]: values[1] } } } 
       : {"$not":
                 {"$and": [
-                  { [mops[0]]: [ "$"+field, values[0] ] },
-                  { [mops[1]]: [ "$"+field, values[1] ] },
+                  { [mops[0]]: [ $field, values[0] ] },
+                  { [mops[1]]: [ $field, values[1] ] },
                 ]}
       };
   } else {
     return !useExpr
       ? { [field]: { [mops[0]]: values[0], [mops[1]]: values[1] } } 
       : {"$and": [
-        { [mops[0]]: [ "$"+field, values[0] ] },
-        { [mops[1]]: [ "$"+field, values[1] ] },
+        { [mops[0]]: [ $field, values[0] ] },
+        { [mops[1]]: [ $field, values[1] ] },
       ]};
   }
 };
@@ -226,7 +228,7 @@ const operators = {
       let valFrom = values.first();
       let valTo = values.get(1);
       if (isForDisplay)
-        return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+        return `${field} BETWEEN ${valFrom} AND ${valTo}`;
       else
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
@@ -414,10 +416,10 @@ const operators = {
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
       const val1 = values.first();
       const val2 = values.get(1);
-      const _val1 = SqlString.trim(val1);
-      const _val2 = SqlString.trim(val2);
+      const aVal1 = SqlString.trim(val1);
+      const aVal2 = SqlString.trim(val2);
       const prox = operatorOptions.get("proximity");
-      return `CONTAINS(${field}, 'NEAR((${_val1}, ${_val2}), ${prox})')`;
+      return `CONTAINS(${field}, 'NEAR((${aVal1}, ${aVal2}), ${prox})')`;
     },
     mongoFormatOp: undefined, // not supported
     jsonLogic: undefined, // not supported
@@ -433,6 +435,27 @@ const operators = {
       },
     }
   },
+  some: {
+    label: "Some",
+    labelForFormat: "SOME",
+    cardinality: 0,
+    jsonLogic: "some",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => 0, false),
+  },
+  all: {
+    label: "All",
+    labelForFormat: "ALL",
+    cardinality: 0,
+    jsonLogic: "all",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
+  },
+  none: {
+    label: "None",
+    labelForFormat: "NONE",
+    cardinality: 0,
+    jsonLogic: "none",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => 0, false),
+  }
 };
 
 
@@ -655,7 +678,7 @@ const widgets = {
     customProps: {
       //showSearch: true
     }
-  },
+  }
 };
 
 //----------------------------  types
@@ -834,6 +857,59 @@ const types = {
       }
     },
   },
+  "!group": {
+    defaultOperator: "some",
+    mainWidget: "number",
+    widgets: {
+      number: {
+        widgetProps: {
+          min: 0
+        },
+        operators: [
+          // w/o operand
+          "some",
+          "all",
+          "none",
+
+          // w/ operand - count
+          "equal",
+          "not_equal",
+          "less",
+          "less_or_equal",
+          "greater",
+          "greater_or_equal",
+          "between",
+          "not_between",
+        ],
+        opProps: {
+          equal: {
+            label: "Count =="
+          },
+          not_equal: {
+            label: "Count !="
+          },
+          less: {
+            label: "Count <"
+          },
+          less_or_equal: {
+            label: "Count <="
+          },
+          greater: {
+            label: "Count >"
+          },
+          greater_or_equal: {
+            label: "Count >="
+          },
+          between: {
+            label: "Count between"
+          },
+          not_between: {
+            label: "Count not between"
+          }
+        }
+      }
+    }
+  }
 };
 
 //----------------------------  settings
@@ -857,6 +933,18 @@ const settings = {
       return "NOT(" + q + ")";
     else
       return "!(" + q + ")";
+  },
+  formatAggr: (whereStr, aggrField, operator, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay, aggrFieldDef) => {
+    const {labelForFormat, cardinality} = opDef;
+    if (cardinality == 0) {
+      return `${labelForFormat} OF ${aggrField} HAVE ${whereStr}`;
+    } else if (cardinality == undefined || cardinality == 1) {
+      return `COUNT OF ${aggrField} WHERE ${whereStr} ${labelForFormat} ${value}`;
+    } else if (cardinality == 2) {
+      let valFrom = value.first();
+      let valTo = value.get(1);
+      return `COUNT OF ${aggrField} WHERE ${whereStr} ${labelForFormat} ${valFrom} AND ${valTo}`;
+    }
   },
   canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
     //for type == 'select'/'multiselect' you can check listValues

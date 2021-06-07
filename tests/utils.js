@@ -31,9 +31,13 @@ export const load_tree = (value, config, valueFormat = null) => {
 export  const with_qb = (config_fn, value, valueFormat, checks) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
 };
-  
+
 export  const with_qb_ant = (config_fn, value, valueFormat, checks) => {
   do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
+};
+
+export  const with_qb_material = (config_fn, value, valueFormat, checks) => {
+  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks);
 };
   
 export  const with_qb_skins = (config_fn, value, valueFormat, checks) => {
@@ -46,8 +50,8 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
   const config = config_fn(BasicConfig);
   const onChange = sinon.spy();
   const tree = load_tree(value, config, valueFormat);
+
   let qb;
-  
   act(() => {
     qb = mount(
       <Query
@@ -67,15 +71,15 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
       expect_queries_before_and_after(config, value, onChange, queries);
     },
     expect_checks: (expects) => {
-      do_export_checks(config, tree, expects, true);
+      do_export_checks(config, tree, expects, false, true);
     },
     config: config,
   };
   
   checks(qb, onChange, tasks);
-    
+  
   qb.unmount();
-    
+  
   onChange.resetHistory();
 };
   
@@ -91,10 +95,23 @@ export const empty_value = {id: uuid(), type: "group"};
 
 // ----------- export checks
 
-export const do_export_checks = (config, tree, expects, inside_it = false) => {
+const do_export_checks = (config, tree, expects, with_render = false, inside_it = false) => {
   const doIt = inside_it ? ((name, func) => { func(); }) : it;
 
   if (expects) {
+    let qb;
+    if (with_render) {
+      act(() => {
+        qb = mount(
+          <Query
+            {...config}
+            value={tree}
+            renderBuilder={render_builder}
+          />
+        );
+      });
+    }
+
     if (expects["query"] !== undefined) {
       doIt("should work to query string", () => {
         const res = queryString(tree, config);
@@ -131,6 +148,10 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
     doIt("should work to QueryBuilder", () => {
       const res = queryBuilderFormat(tree, config);
     });
+
+    if (qb) {
+      qb.unmount();
+    }
   } else {
     const {logic, data, errors} = jsonLogicFormat(tree, config);
     const correct = {
@@ -147,16 +168,16 @@ export const do_export_checks = (config, tree, expects, inside_it = false) => {
 export const export_checks = (config_fn, value, valueFormat, expects) => {
   const config = config_fn(BasicConfig);
   const tree = load_tree(value, config, valueFormat);
-  do_export_checks(config, tree, expects);
+  do_export_checks(config, tree, expects, true);
 };
 
 export const export_checks_in_it = (config_fn, value, valueFormat, expects) => {
   const config = config_fn(BasicConfig);
   const tree = load_tree(value, config, valueFormat);
-  do_export_checks(config, tree, expects, true);
+  do_export_checks(config, tree, expects, true, true);
 };
 
-export const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
+const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
   const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
   const initTreeString = queryString(load_tree(init_value_jl, config), config);
   if (queries[0] !== null) {
@@ -169,7 +190,7 @@ export const expect_queries_before_and_after = (config_fn, init_value_jl, onChan
   expect(changedTreeString).to.equal(queries[1]);
 };
 
-export  const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
+const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
   const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
   const {logic: initTreeJl} = jsonLogicFormat(load_tree(init_value_jl, config), config);
   if (jlogics[0] !== null) {

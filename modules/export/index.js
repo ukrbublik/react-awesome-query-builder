@@ -1,4 +1,3 @@
-"use strict";
 export {queryBuilderFormat} from "./queryBuilder";
 export {jsonLogicFormat} from "./jsonLogic";
 export {mongodbFormat} from "./mongoDb";
