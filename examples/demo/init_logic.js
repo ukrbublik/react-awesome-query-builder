@@ -19,7 +19,7 @@ export default
     {
       "==": [
         {
-          "shortcut": "stock"
+          "var": "stock"
         },
         false
       ]
@@ -35,7 +35,7 @@ export default
     {
       "some": [
         {
-          "varValues": "state.input.results"
+          "var": "results"
         },
         {
           "and": [
@@ -66,7 +66,7 @@ export default
             {
               "filter": [
                 {
-                  "varValues": "cars"
+                  "var": "cars"
                 },
                 {
                   "and": [

@@ -10,8 +10,8 @@
     - you can use group operators `some`, `none`, `all` or operators with 1 integer opearnd (for count): `equal`, `not_equal`, `less`, `between`, ..
     - localization setting `addSubRuleLabel`
   - Removed obsolete setting `hideConjForOne`
-  - Added field config `fieldName` to override field key for import/export
-  - Added field config `jsonLogicVar` and settings `jsonLogic.groupVarKey`, `jsonLogic.altVarKey` to override JsonLogic var key if need
+  - (rare) Added field config `fieldName` to override field key for import/export
+  - (rare) Added field config `jsonLogicVar` and settings `jsonLogic.groupVarKey`, `jsonLogic.altVarKey` to override JsonLogic var key if need
 - 3.0.0
   - Added [Material-UI](https://material-ui.com) widgets
 - 2.2.2

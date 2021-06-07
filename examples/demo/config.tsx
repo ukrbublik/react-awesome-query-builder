@@ -212,11 +212,6 @@ export default (skin) => {
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
     // maxNumberOfRules: 10 // number of rules can be added to the query builder
-    //todo: just for demo, delete later
-    jsonLogic: {
-      groupVarKey: "varValues",
-      altVarKey: "shortcut",
-    }
   };
 
   //////////////////////////////////////////////////////////////////////
@@ -259,7 +254,6 @@ export default (skin) => {
     },
     results: {
       label: "Results",
-      fieldName: "state.input.results", //todo: temp
       type: "!group",
       subfields: {
         product: {
@@ -502,7 +496,6 @@ export default (skin) => {
       label: "In stock",
       type: "boolean",
       defaultValue: true,
-      jsonLogicVar: "shortcut", //todo: just for demo, delete later
       mainWidgetProps: {
         labelYes: "+",
         labelNo: "-"

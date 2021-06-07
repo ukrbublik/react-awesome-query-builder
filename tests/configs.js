@@ -666,3 +666,44 @@ export const with_group_array = (BasicConfig) => ({
     ...BasicConfig.settings,
   }
 });
+
+// rare
+export const with_fieldName = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      fieldName: "state.input.num",
+      label: "Number",
+      type: "number",
+    },
+  },
+});
+
+// rare
+export const with_groupVarKey = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        score: {
+          type: "number",
+        },
+      }
+    },
+    stock: {
+      label: "In stock",
+      type: "boolean",
+      jsonLogicVar: "shortcut",
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    jsonLogic: {
+      groupVarKey: "varValues",
+      altVarKey: "shortcut",
+    }
+  }
+});

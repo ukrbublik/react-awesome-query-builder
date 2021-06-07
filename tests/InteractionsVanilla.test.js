@@ -140,7 +140,6 @@ describe("interactions on vanilla", () => {
       const childKeys = Object.keys(changedTree.children1); 
       expect(childKeys.length).to.equal(1);
       const child = changedTree.children1[childKeys[0]];
-      console.log( child.properties );
       expect(child.properties.field).to.equal("cars");
       expect(child.properties.operator).to.equal("some");
       expect(child.properties.conjunction).to.equal("AND");

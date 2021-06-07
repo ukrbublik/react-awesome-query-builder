@@ -522,3 +522,25 @@ export const with_group_array = {
   ]
 };
 
+// rare
+export const with_fieldName = {
+  "and": [{
+    "==": [
+      { "var": "state.input.num" },  2
+    ]
+  }]
+};
+
+// rare
+export const with_groupVarKey = {
+  "and": [
+    {
+      "==": [ { "shortcut": "stock" }, true ]
+    }, {
+      "some": [
+        { "varValues": "results" },
+        { ">": [ { "var": "score" }, 8 ] }
+      ]
+    }
+  ]
+};
