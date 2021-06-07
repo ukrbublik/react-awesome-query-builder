@@ -1,4 +1,7 @@
 # Changelog
+- 4.0.1
+  - Added custom context to isolate Query Builder store (PR #350)
+  - Added support for React 17 as a peer dependency
 - 4.0.0
   - Removed setting `useGroupsAsArrays`. 
     Instead added field config `mode` for type `!group` with values: 
