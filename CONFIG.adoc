@@ -349,6 +349,12 @@ Other settings:
   `parts` - list of fields's keys for struct field +
   `label2` - field's `label2` OR parts joined by `fieldSeparatorDisplay` +
   Default impl will just return `field` (or `label2` for `isForDisplay==true`)
+|formatAggr | |Function for formatting query string, used to format aggregation rule (like `SOME OF Cars HAVE Year > 2010`) +
+  `(string whereStr, string aggrField, string operator, mixed value, string valueSrc, string valueType, Object operatorDefinition, Object operatorOptions, bool isForDisplay, Object aggrFieldDef) => string` +
+  `whereStr` - formatted string representing condition for items (eg. `Year > 2010` in example) +
+  `aggrField` - aggregation field (eg. `Cars` in example) +
+  `operator` - can be `some`/`all`/`none` (with cardinality 0) or `equal`/`less`/`between`/.. (applied to count of items) +
+  `value` - for operators with cardinality 1/2 it is value for comparing with count of items
 |fieldSeparator |`.` |Separator for struct fields.
 |fieldSeparatorDisplay |`.` |Separator for struct fields in UI.
 |===
