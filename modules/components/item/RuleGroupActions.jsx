@@ -19,7 +19,7 @@ export class RuleGroupActions extends PureComponent {
     return (
       <div className={"group--actions"}>
         {addRuleBtn}
-        {/*delGroupBtn*/}
+        {delGroupBtn}
       </div>
     );
   }

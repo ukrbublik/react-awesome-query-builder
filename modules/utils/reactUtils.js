@@ -1,3 +1,5 @@
+import React from "react";
+import mapValues from "lodash/mapValues";
 import {shallowEqual} from "./stuff";
 
 export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState) => {
@@ -36,3 +38,25 @@ export const pureShouldComponentUpdate = (self) => function(nextProps, nextState
     || !shallowEqual(self.state, nextState)
   );
 };
+
+const canUseUnsafe = () => {
+  const v = React.version.split(".").map(parseInt.bind(null, 10));
+  return v[0] >= 16 && v[1] >= 3;
+};
+
+export const useOnPropsChanged = (obj) => {
+  if (canUseUnsafe) {
+    obj.UNSAFE_componentWillReceiveProps = (nextProps) => {
+      obj.onPropsChanged(nextProps);
+    };
+  } else {
+    obj.componentWillReceiveProps = (nextProps) => {
+      obj.onPropsChanged(nextProps);
+    };
+  }
+};
+
+export const bindActionCreators = (actionCreators, config, dispatch) =>
+  mapValues(actionCreators, (actionCreator) =>
+    (...args) => dispatch(actionCreator(config, ...args))
+  );

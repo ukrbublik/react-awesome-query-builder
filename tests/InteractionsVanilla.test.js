@@ -116,6 +116,37 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("change field from group_ext to simple", () => {
+    with_qb(configs.with_group_array, inits.with_group_array, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".rule_group_ext .group--field--count--rule .rule--field select")
+        .simulate("change", { target: { value: "str" } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal("str");
+      expect(child.properties.operator).to.equal("equal");
+      expect(child.properties.value).to.eql([undefined]);
+    });
+  });
+
+  it("change field from simple to group_ext", () => {
+    with_qb(configs.with_group_array, inits.with_text, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".rule .rule--field select")
+        .simulate("change", { target: { value: "cars" } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal("cars");
+      expect(child.properties.operator).to.equal("some");
+      expect(child.properties.conjunction).to.equal("AND");
+      expect(child.properties.value).to.eql([]);
+    });
+  });
+
   it("set not", () => {
     with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
@@ -184,6 +215,20 @@ describe("interactions on vanilla", () => {
       qb
         .find(".group--children .group .group--header .group--actions button")
         .at(2)
+        .simulate("click");
+      expect(renderConfirm.callCount).to.equal(1);
+      renderConfirm.resetHistory();
+    });
+  });
+
+  it("remove rule with confirm", () => {
+    with_qb(configs.with_settings_confirm, inits.with_2_numbers, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
+      const renderConfirm = config.settings.renderConfirm;
+      qb
+        .find(".group--children .rule-container")
+        .first()
+        .find(".rule .rule--header button")
+        .at(0)
         .simulate("click");
       expect(renderConfirm.callCount).to.equal(1);
       renderConfirm.resetHistory();

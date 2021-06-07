@@ -1,10 +1,10 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
+import {getFieldConfig, getOperatorConfig} from "../../utils/configUtils";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
-import {useOnPropsChanged} from "../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 
 
 export default class Operator extends PureComponent {
@@ -35,12 +35,17 @@ export default class Operator extends PureComponent {
   }
 
   getMeta({config, selectedField, selectedOperator}) {
-    const fieldConfig = getFieldConfig(selectedField, config);
-    const operatorOptions = mapValues(pickBy(config.operators, (item, key) =>
-      fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
-    ), (_opts, op) => getOperatorConfig(config, op, selectedField));
+    const fieldConfig = getFieldConfig(config, selectedField);
+    const operatorOptions 
+      = mapValues(
+        pickBy(
+          config.operators, 
+          (item, key) => fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
+        ), 
+        (_opts, op) => getOperatorConfig(config, op, selectedField)
+      );
       
-    const items = this.buildOptions(config, operatorOptions);
+    const items = this.buildOptions(config, operatorOptions, fieldConfig.operators);
 
     const isOpSelected = !!selectedOperator;
     const currOp = isOpSelected ? operatorOptions[selectedOperator] : null;
@@ -50,18 +55,18 @@ export default class Operator extends PureComponent {
     const selectedKeys = isOpSelected ? [selectedKey] : null;
     const selectedPath = selectedKeys;
     const selectedLabel = selectedOpts.label;
-
+    
     return {
       placeholder, items,
       selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts
     };
   }
 
-  buildOptions(config, fields) {
+  buildOptions(config, fields, ops) {
     if (!fields)
       return null;
 
-    return keys(fields).map(fieldKey => {
+    return keys(fields).sort((a, b) => (ops.indexOf(a) - ops.indexOf(b))).map(fieldKey => {
       const field = fields[fieldKey];
       const label = field.label;
       return {

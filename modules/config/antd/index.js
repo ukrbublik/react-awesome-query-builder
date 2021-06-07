@@ -186,9 +186,11 @@ const types = {
         opProps: {
           between: {
             isSpecialRange: true,
+            textSeparators: [null, null],
           },
           not_between: {
             isSpecialRange: true,
+            textSeparators: [null, null],
           }
         },
       }

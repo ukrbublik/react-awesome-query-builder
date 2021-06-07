@@ -1,18 +1,20 @@
 import React from "react";
 import PropTypes from "prop-types";
-import GroupContainer from "./containers/GroupContainer";
-import Draggable from "./containers/Draggable";
-import {Group} from "./Group";
+import GroupContainer from "../containers/GroupContainer";
+import Draggable from "../containers/Draggable";
+import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
-import {FieldWrapper} from "./Rule";
-import {useOnPropsChanged} from "../utils/stuff";
+import FieldWrapper from "../rule/FieldWrapper";
+import {useOnPropsChanged} from "../../utils/reactUtils";
+import {ConfirmFn} from "../utils";
 
 
 @GroupContainer
 @Draggable("group rule_group")
-class RuleGroup extends Group {
+@ConfirmFn
+class RuleGroup extends BasicGroup {
   static propTypes = {
-    ...Group.propTypes,
+    ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
     parentField: PropTypes.string,
     setField: PropTypes.func,

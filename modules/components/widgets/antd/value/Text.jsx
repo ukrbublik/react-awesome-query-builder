@@ -22,7 +22,7 @@ export default class TextWidget extends PureComponent {
   render() {
     const {config, placeholder, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
-    const _value = value != undefined ? value : null;
+    const aValue = value != undefined ? value : null;
 
     return (
       <Col>
@@ -31,7 +31,7 @@ export default class TextWidget extends PureComponent {
           key="widget-text"
           size={renderSize}
           type={"text"}
-          value={_value}
+          value={aValue}
           placeholder={placeholder}
           onChange={this.handleChange}
           {...customProps}
