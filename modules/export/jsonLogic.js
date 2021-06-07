@@ -204,20 +204,22 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
   const fieldDefinition = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-
   const iValue = properties.get("value");
   if (iValue == undefined)
     return undefined;
+  
   let valueSrcs = [];
   let valueTypes = [];
   let oldUsedFields = meta.usedFields;
   const fvalue = iValue.map((currentValue, ind) => {
     const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
     const valueType = iValueType ? iValueType.get(ind) : null;
-    currentValue = completeValue(currentValue, valueSrc, config);
+    const cValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    const fv = formatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+    const fv = formatValue(
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField
+    );
     if (fv !== undefined) {
       valueSrcs.push(valueSrc);
       valueTypes.push(valueType);
@@ -233,7 +235,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
 };
 
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, parentField = null) => {
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField = null) => {
   if (currentValue === undefined)
     return undefined;
   let ret;
@@ -241,17 +243,17 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     ret = formatField(meta, config, currentValue, parentField);
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
-  } else if (typeof fieldWidgetDefinition.jsonLogic === "function") {
-    const fn = fieldWidgetDefinition.jsonLogic;
+  } else if (typeof fieldWidgetDef.jsonLogic === "function") {
+    const fn = fieldWidgetDef.jsonLogic;
     const args = [
       currentValue,
-      pick(fieldDefinition, ["fieldSettings", "listValues"]),
+      pick(fieldDef, ["fieldSettings", "listValues"]),
       //useful options: valueFormat for date/time
-      omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+      omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
     ];
     if (operator) {
       args.push(operator);
-      args.push(operatorDefinition);
+      args.push(operatorDef);
     }
     ret = fn(...args);
   } else {
@@ -277,7 +279,9 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-    const formattedArgVal = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField);
+    const formattedArgVal = formatValue(
+      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField
+    );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;

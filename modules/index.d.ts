@@ -535,8 +535,10 @@ type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "botto
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
+type SqlFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
 type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
+type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | Array<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {
@@ -620,7 +622,9 @@ export interface OtherSettings {
   fieldSeparator?: string,
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse,
+  sqlFormatReverse?: SqlFormatReverse,
   formatField?: FormatField,
+  formarAggr?: FormatAggr,
 }
 
 export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & OtherSettings;

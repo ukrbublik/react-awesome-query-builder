@@ -93,10 +93,12 @@ const formatRule = (item, config, meta) => {
   const fvalue = iValue.map((currentValue, ind) => {
     const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
     const valueType = iValueType ? iValueType.get(ind) : null;
-    currentValue = completeValue(currentValue, valueSrc, config);
+    const cValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    let fv = formatValue(meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition);
+    let fv = formatValue(
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition
+    );
     if (fv !== undefined) {
       valueSrcs.push(valueSrc);
       valueTypes.push(valueType);
@@ -163,7 +165,7 @@ const formatRule = (item, config, meta) => {
 };
 
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition) => {
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef) => {
   if (currentValue === undefined)
     return undefined;
   let ret;
@@ -172,17 +174,17 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue);
   } else {
-    if (typeof fieldWidgetDefinition.sqlFormatValue === "function") {
-      const fn = fieldWidgetDefinition.sqlFormatValue;
+    if (typeof fieldWidgetDef.sqlFormatValue === "function") {
+      const fn = fieldWidgetDef.sqlFormatValue;
       const args = [
         currentValue,
-        pick(fieldDefinition, ["fieldSettings", "listValues"]),
+        pick(fieldDef, ["fieldSettings", "listValues"]),
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
       ];
       if (operator) {
         args.push(operator);
-        args.push(operatorDefinition);
+        args.push(operatorDef);
       }
       if (valueSrc == "field") {
         const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 

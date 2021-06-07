@@ -238,7 +238,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
 };
 
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, parentPath, operator, operatorDefinition) => {
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, parentPath, operator, operatorDef) => {
   if (currentValue === undefined)
     return [undefined, false];
   
@@ -250,17 +250,17 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc == "func") {
     [ret, useExpr] = formatFunc(meta, config, currentValue, parentPath);
   } else {
-    if (typeof fieldWidgetDefinition.mongoFormatValue === "function") {
-      const fn = fieldWidgetDefinition.mongoFormatValue;
+    if (typeof fieldWidgetDef.mongoFormatValue === "function") {
+      const fn = fieldWidgetDef.mongoFormatValue;
       const args = [
         currentValue,
-        pick(fieldDefinition, ["fieldSettings", "listValues"]),
+        pick(fieldDef, ["fieldSettings", "listValues"]),
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDefinition, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
       ];
       if (operator) {
         args.push(operator);
-        args.push(operatorDefinition);
+        args.push(operatorDef);
       }
       ret = fn(...args);
     } else {

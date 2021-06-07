@@ -228,7 +228,7 @@ const operators = {
       let valFrom = values.first();
       let valTo = values.get(1);
       if (isForDisplay)
-        return `${field} >= ${valFrom} AND ${field} <= ${valTo}`;
+        return `${field} BETWEEN ${valFrom} AND ${valTo}`;
       else
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
@@ -437,22 +437,21 @@ const operators = {
   },
   some: {
     label: "Some",
+    labelForFormat: "SOME",
     cardinality: 0,
     jsonLogic: "some",
     mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => 0, false),
-    formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      console.log({ field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay });
-      return `${field}`;
-    },
   },
   all: {
     label: "All",
+    labelForFormat: "ALL",
     cardinality: 0,
     jsonLogic: "all",
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
   },
   none: {
     label: "None",
+    labelForFormat: "NONE",
     cardinality: 0,
     jsonLogic: "none",
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => 0, false),
@@ -934,6 +933,18 @@ const settings = {
       return "NOT(" + q + ")";
     else
       return "!(" + q + ")";
+  },
+  formatAggr: (whereStr, aggrField, operator, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay, aggrFieldDef) => {
+    const {labelForFormat, cardinality} = opDef;
+    if (cardinality == 0) {
+      return `${labelForFormat} OF ${aggrField} HAVE ${whereStr}`;
+    } else if (cardinality == undefined || cardinality == 1) {
+      return `COUNT OF ${aggrField} WHERE ${whereStr} ${labelForFormat} ${value}`;
+    } else if (cardinality == 2) {
+      let valFrom = value.first();
+      let valTo = value.get(1);
+      return `COUNT OF ${aggrField} WHERE ${whereStr} ${labelForFormat} ${valFrom} AND ${valTo}`;
+    }
   },
   canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
     //for type == 'select'/'multiselect' you can check listValues
