@@ -134,13 +134,13 @@ describe("interactions on vanilla", () => {
   it("change field from simple to group_ext", () => {
     with_qb(configs.with_group_array, inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
-      .find(".rule .rule--field select")
+        .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });
       const changedTree = getTree(onChange.getCall(0).args[0]);
       const childKeys = Object.keys(changedTree.children1); 
       expect(childKeys.length).to.equal(1);
       const child = changedTree.children1[childKeys[0]];
-      console.log( child.properties )
+      console.log( child.properties );
       expect(child.properties.field).to.equal("cars");
       expect(child.properties.operator).to.equal("some");
       expect(child.properties.conjunction).to.equal("AND");

@@ -507,11 +507,11 @@ export const with_group_array = {
         { "filter": [
           { "var": "cars" },
           { "and": [
-              {
-                "==": [ { "var": "vendor" }, "Toyota" ]
-              }, {
-                ">=": [ { "var": "year" }, 2010 ]
-              }
+            {
+              "==": [ { "var": "vendor" }, "Toyota" ]
+            }, {
+              ">=": [ { "var": "year" }, 2010 ]
+            }
           ] }
         ] },
         { "+": [ 1, { "var": "accumulator" } ] },
