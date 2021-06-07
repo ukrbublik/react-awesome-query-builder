@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
-import {useOnPropsChanged} from "../../../../utils/stuff";
+import {useOnPropsChanged} from "../../../../utils/reactUtils";
 const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends PureComponent {
@@ -67,10 +67,10 @@ export default class SliderWidget extends PureComponent {
     const customSliderProps = rest.slider || rest;
 
     const canUseInternal = showErrorMessage ? true : !valueError;
-    let _value = __isInternal && canUseInternal ? this.state.internalValue : value;
-    if (_value == undefined)
-      _value = null;
-    const sliderValue = _value == null && min ? min : _value;
+    let aValue = __isInternal && canUseInternal ? this.state.internalValue : value;
+    if (aValue == undefined)
+      aValue = null;
+    const sliderValue = aValue == null && min ? min : aValue;
       
     return (
       <Col style={{display: "inline-flex"}}>
@@ -78,7 +78,7 @@ export default class SliderWidget extends PureComponent {
           <InputNumber
             disabled={readonly}
             size={renderSize}
-            value={_value}
+            value={aValue}
             min={min}
             max={max}
             step={step}

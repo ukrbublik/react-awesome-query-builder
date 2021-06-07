@@ -24,6 +24,9 @@ export default
         ],
         "valueType": [
           "text"
+        ],
+        "valueError": [
+          null
         ]
       }
     },
@@ -40,6 +43,9 @@ export default
         ],
         "valueType": [
           "boolean"
+        ],
+        "valueError": [
+          null
         ]
       }
     },
@@ -56,6 +62,9 @@ export default
         ],
         "valueType": [
           "number"
+        ],
+        "valueError": [
+          null
         ]
       }
     },
@@ -79,6 +88,9 @@ export default
             ],
             "valueType": [
               "select"
+            ],
+            "valueError": [
+              null
             ]
           }
         },
@@ -92,6 +104,70 @@ export default
             ],
             "valueSrc": [
               "value"
+            ],
+            "valueType": [
+              "number"
+            ],
+            "valueError": [
+              null
+            ]
+          }
+        }
+      }
+    },
+    "a99a9b9b-cdef-4012-b456-7175a7d54553": {
+      "type": "rule_group",
+      "properties": {
+        "mode": "array",
+        "operator": "greater",
+        "valueType": [
+          "number"
+        ],
+        "value": [
+          2
+        ],
+        "valueSrc": [
+          "value"
+        ],
+        "conjunction": "AND",
+        "valueError": [
+          null
+        ],
+        "field": "cars"
+      },
+      "children1": {
+        "99a9a9a8-89ab-4cde-b012-3175a7d55374": {
+          "type": "rule",
+          "properties": {
+            "field": "cars.vendor",
+            "operator": "select_equals",
+            "value": [
+              "Toyota"
+            ],
+            "valueSrc": [
+              "value"
+            ],
+            "valueError": [
+              null
+            ],
+            "valueType": [
+              "select"
+            ]
+          }
+        },
+        "988bbbab-4567-489a-bcde-f175a7d58793": {
+          "type": "rule",
+          "properties": {
+            "field": "cars.year",
+            "operator": "greater_or_equal",
+            "value": [
+              2010
+            ],
+            "valueSrc": [
+              "value"
+            ],
+            "valueError": [
+              null
             ],
             "valueType": [
               "number"

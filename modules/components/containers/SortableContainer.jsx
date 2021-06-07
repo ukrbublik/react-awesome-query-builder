@@ -5,8 +5,7 @@ import * as constants from "../../constants";
 import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
-import {pureShouldComponentUpdate} from "../../utils/renderUtils";
-import {useOnPropsChanged} from "../../utils/stuff";
+import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
 const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
 
 

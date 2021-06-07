@@ -115,7 +115,7 @@ export const with_select_and_multiselect = {
   "and": [{
     "==": [ { "var": "color" }, "yellow" ]
   }, {
-    "all": [ 
+    "all": [
       { "var": "multicolor" },
       { "in": [ { "var": "" }, [ "yellow", "green" ] ] }
     ]
@@ -497,5 +497,50 @@ export const with_prox = {
 export const with_jl_value = {
   "==": [
     { "var": "num" },  { "+": [1, 2] }
+  ]
+};
+
+export const with_group_array = {
+  "and": [
+    { ">": [
+      { "reduce": [
+        { "filter": [
+          { "var": "cars" },
+          { "and": [
+            {
+              "==": [ { "var": "vendor" }, "Toyota" ]
+            }, {
+              ">=": [ { "var": "year" }, 2010 ]
+            }
+          ] }
+        ] },
+        { "+": [ 1, { "var": "accumulator" } ] },
+        0
+      ] },
+      2
+    ] }
+  ]
+};
+
+// rare
+export const with_fieldName = {
+  "and": [{
+    "==": [
+      { "var": "state.input.num" },  2
+    ]
+  }]
+};
+
+// rare
+export const with_groupVarKey = {
+  "and": [
+    {
+      "==": [ { "shortcut": "stock" }, true ]
+    }, {
+      "some": [
+        { "varValues": "results" },
+        { ">": [ { "var": "score" }, 8 ] }
+      ]
+    }
   ]
 };

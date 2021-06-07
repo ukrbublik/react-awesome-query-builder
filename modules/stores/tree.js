@@ -5,16 +5,20 @@ import {
   getTotalRulesCountInTree, fixEmptyGroupsInTree
 } from "../utils/treeUtils";
 import {
-  defaultRuleProperties, defaultGroupProperties, defaultOperator, defaultOperatorOptions, defaultRoot
+  defaultRuleProperties, defaultGroupProperties, defaultOperator, 
+  defaultOperatorOptions, defaultRoot
 } from "../utils/defaultUtils";
 import * as constants from "../constants";
 import uuid from "../utils/uuid";
 import {
-  getFirstOperator, getFuncConfig, getFieldConfig, getOperatorsForField, getWidgetForFieldOp,
-  getFieldWidgetConfig, getOperatorConfig
+  getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig
 } from "../utils/configUtils";
+import {
+  getOperatorsForField, getFirstOperator, getWidgetForFieldOp
+} from "../utils/ruleUtils";
 import {deepEqual, defaultValue} from "../utils/stuff";
-import {validateValue, getNewValueForFieldOp} from "../utils/validation";
+import {validateValue} from "../utils/validation";
+import {getNewValueForFieldOp} from "../utils/ruleUtils";
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
 
@@ -74,14 +78,26 @@ const removeRule = (state, path, config) => {
 
   const parentPath = path.pop();
   const parent = state.getIn(expandTreePath(parentPath));
+
   const parentField = parent.getIn(["properties", "field"]);
+  const parentOperator = parent.getIn(["properties", "operator"]);
+  const parentValue = parent.getIn(["properties", "value", 0]);
+  const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+  const parentOperatorConfig = parentOperator ? getOperatorConfig(config, parentOperator, parentField) : null;
+  const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0; // && parentValue != undefined;
+  
   const isParentRuleGroup = parent.get("type") == "rule_group";
   const isEmptyGroup = !hasChildren(state, parentPath);
   const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup ? true : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
+  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup 
+    ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere 
+    : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
+    
   if (isEmptyGroup) {
     if (isParentRuleGroup) {
-      state = state.deleteIn(expandTreePath(parentPath));
+      if (!canLeaveEmpty) {
+        state = state.deleteIn(expandTreePath(parentPath));
+      }
     } else if (isEmptyRoot) {
       state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField), config);
     } else if (!canLeaveEmpty) {
@@ -234,9 +250,39 @@ const setField = (state, path, newField, config) => {
     newField = newField.join(fieldSeparator);
 
   const currentType = state.getIn(expandTreePath(path, "type"));
+  const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
-  const newFieldConfig = getFieldConfig(newField, config);
+  const newFieldConfig = getFieldConfig(config, newField);
   const isRuleGroup = newFieldConfig.type == "!group";
+  const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
+  const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
+  
+  const currentOperator = currentProperties.get("operator");
+  const currentOperatorOptions = currentProperties.get("operatorOptions");
+  const _currentField = currentProperties.get("field");
+  const _currentValue = currentProperties.get("value");
+  const _currentValueSrc = currentProperties.get("valueSrc", new Immutable.List());
+  const _currentValueType = currentProperties.get("valueType", new Immutable.List());
+
+  // If the newly selected field supports the same operator the rule currently
+  // uses, keep it selected.
+  const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
+  let newOperator = null;
+  const availOps = getOperatorsForField(config, newField);
+  if (availOps && availOps.length == 1)
+    newOperator = availOps[0];
+  else if (availOps && availOps.length > 1) {
+    for (let strategy of setOpOnChangeField || []) {
+      if (strategy == "keep" && !isChangeToAnotherType)
+        newOperator = lastOp;
+      else if (strategy == "default")
+        newOperator = defaultOperator(config, newField, false);
+      else if (strategy == "first")
+        newOperator = getFirstOperator(config, newField);
+      if (newOperator) //found op for strategy
+        break;
+    }
+  }
 
   if (!isRuleGroup && !newFieldConfig.operators) {
     console.warn(`Type ${newFieldConfig.type} is not supported`);
@@ -251,45 +297,34 @@ const setField = (state, path, newField, config) => {
 
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
-    let groupProperties = defaultGroupProperties(config).merge({
+    const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
+      config, config, currentProperties, newField, newOperator, "field", true
+    );
+    let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
+      mode: newFieldConfig.mode,
     });
-    state = state.setIn(expandTreePath(path, "properties"), groupProperties);
+    if (isRuleGroupExt) {
+      groupProperties = groupProperties.merge({
+        operator: newOperator,
+        value: newValue,
+        valueSrc: newValueSrc,
+        valueType: newValueType,
+      });
+    }
     state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
-    state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
+    state = state.setIn(expandTreePath(path, "properties"), groupProperties);
+    if (newFieldConfig.initialEmptyWhere && operatorCardinality == 1) { // just `COUNT(grp) > 1` without `HAVING ..`
+      // no childeren
+    } else {
+      state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
+    }
     state = fixPathsInTree(state);
 
     return state;
   }
 
   return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
-    const currentOperator = current.get("operator");
-    const currentOperatorOptions = current.get("operatorOptions");
-    const _currentField = current.get("field");
-    const _currentValue = current.get("value");
-    const _currentValueSrc = current.get("valueSrc", new Immutable.List());
-    const _currentValueType = current.get("valueType", new Immutable.List());
-
-    // If the newly selected field supports the same operator the rule currently
-    // uses, keep it selected.
-    const lastOp = newFieldConfig && newFieldConfig.operators.indexOf(currentOperator) !== -1 ? currentOperator : null;
-    let newOperator = null;
-    const availOps = getOperatorsForField(config, newField);
-    if (availOps && availOps.length == 1)
-      newOperator = availOps[0];
-    else if (availOps && availOps.length > 1) {
-      for (let strategy of setOpOnChangeField || []) {
-        if (strategy == "keep")
-          newOperator = lastOp;
-        else if (strategy == "default")
-          newOperator = defaultOperator(config, newField, false);
-        else if (strategy == "first")
-          newOperator = getFirstOperator(config, newField);
-        if (newOperator) //found op for strategy
-          break;
-      }
-    }
-
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
       config, config, current, newField, newOperator, "field", true
     );
@@ -316,7 +351,16 @@ const setField = (state, path, newField, config) => {
  */
 const setOperator = (state, path, newOperator, config) => {
   const {showErrorMessage} = config.settings;
-  return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
+
+  const properties = state.getIn(expandTreePath(path, "properties"));
+  const children = state.getIn(expandTreePath(path, "children1"));
+  const currentField = properties.get("field");
+  const fieldConfig = getFieldConfig(config, currentField);
+  const isRuleGroup = fieldConfig.type == "!group";
+  const operatorConfig = getOperatorConfig(config, newOperator, currentField);
+  const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
+
+  state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
     const currentField = current.get("field");
     const currentOperatorOptions = current.get("operatorOptions");
     const _currentValue = current.get("value", new Immutable.List());
@@ -339,6 +383,14 @@ const setOperator = (state, path, newOperator, config) => {
       .set("valueSrc", newValueSrc)
       .set("valueType", newValueType);
   }));
+
+  if (isRuleGroup) {
+    if (operatorCardinality == 0 && children.size == 0) {
+      state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, currentField), config);
+    }
+  }
+
+  return state;
 };
 
 /**
@@ -475,14 +527,14 @@ const calculateValueType = (value, valueSrc, config) => {
   let calculatedValueType = null;
   if (value) {
     if (valueSrc === "field") {
-      const fieldConfig = getFieldConfig(value, config);
+      const fieldConfig = getFieldConfig(config, value);
       if (fieldConfig) {
         calculatedValueType = fieldConfig.type;
       }
     } else if (valueSrc === "func") {
       const funcKey = value.get("func");
       if (funcKey) {
-        const funcConfig = getFuncConfig(funcKey, config);
+        const funcConfig = getFuncConfig(config, funcKey);
         if (funcConfig) {
           calculatedValueType = funcConfig.returnType;
         }

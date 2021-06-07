@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 import FuncSelect from "./FuncSelect";
 import {
   getFuncConfig
-} from "../utils/configUtils";
+} from "../../utils/configUtils";
 import Widget from "./Widget";
-import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
-import {useOnPropsChanged} from "../utils/stuff";
-const Col = ({children, ...props}) => (<div {...props}>{children}</div>);
+import {Col} from "../utils";
+import {setFunc, setArgValue, setArgValueSrc} from "../../utils/funcUtils";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 
 
 export default class FuncWidget extends PureComponent {
@@ -40,7 +40,7 @@ export default class FuncWidget extends PureComponent {
 
   getMeta({config, field, operator, value}) {
     const funcKey = value ? value.get("func") : null;
-    const funcDefinition = funcKey ? getFuncConfig(funcKey, config) : null;
+    const funcDefinition = funcKey ? getFuncConfig(config, funcKey) : null;
 
     return {
       funcDefinition, funcKey
@@ -125,7 +125,7 @@ export default class FuncWidget extends PureComponent {
       argDefinition,
       readonly,
     };
-    //tip: value & valueSrc will be converted to Immutable.List at WidgetContainer
+    //tip: value & valueSrc will be converted to Immutable.List at <Widget>
 
     return (
       <Col className="rule--func--arg-value">

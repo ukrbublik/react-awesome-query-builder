@@ -3,6 +3,13 @@ import PropTypes from "prop-types";
 import Rule from "./Rule";
 import Group from "./Group";
 import RuleGroup from "./RuleGroup";
+import RuleGroupExt from "./RuleGroupExt";
+
+const types = [
+  "rule",
+  "group",
+  "rule_group"
+];
 
 const typeMap = {
   rule: (props) => (
@@ -50,7 +57,23 @@ const typeMap = {
       children1={props.children1}
       parentField={props.parentField}
     />
-  )
+  ),
+  rule_group_ext: (props) => (
+    <RuleGroupExt 
+      {...props.properties.toObject()}
+      id={props.id}
+      path={props.path}
+      actions={props.actions}
+      config={props.config}
+      //tree={props.tree}
+      reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
+      onDragStart={props.onDragStart}
+      isDraggingTempo={props.isDraggingTempo}
+      children1={props.children1}
+      parentField={props.parentField}
+    />
+  ),
 };
 
 
@@ -59,7 +82,7 @@ class Item extends PureComponent {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
-    type: PropTypes.oneOf(Object.keys(typeMap)).isRequired,
+    type: PropTypes.oneOf(types).isRequired,
     path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
     properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
@@ -72,7 +95,9 @@ class Item extends PureComponent {
 
   render() {
     const { type, ...props } = this.props;
-    const Cmp = typeMap[type];
+    const mode = props.properties.get("mode");
+    const postfix = mode == "array" ? "_ext" : "";
+    const Cmp = typeMap[type + postfix];
     if (!Cmp) return null;
     return Cmp(props);
   }
