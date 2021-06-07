@@ -81,8 +81,8 @@ export default class RangeWidget extends PureComponent {
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
-    const _value = value != undefined ? value : undefined;
-    const [valueFrom, valueTo] = _value || [null, null];
+    const aValue = value != undefined ? value : undefined;
+    const [valueFrom, valueTo] = aValue || [null, null];
 
     return (
       <Col style={{display: "inline-flex"}}>
@@ -120,7 +120,7 @@ export default class RangeWidget extends PureComponent {
         <Col style={{float: "left", width: width || "300px"}}>
           <Slider
             disabled={readonly}
-            value={_value}
+            value={aValue}
             tipFormatter={this.tipFormatter}
             min={min}
             max={max}

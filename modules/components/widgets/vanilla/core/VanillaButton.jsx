@@ -3,7 +3,9 @@ import React from "react";
 export default ({type, label, onClick, config}) => {
   const typeToLabel = {
     "addRuleGroup": "+",
+    "addRuleGroupExt": "+",
     "delGroup": "x",
+    "delRuleGroup": "x",
     "delRule": "x",
   };
   const btnLabel = typeToLabel[type] || label;

@@ -1,7 +1,9 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { TreeSelect } from "antd";
-import { useOnPropsChanged, defaultTreeDataMap, mapListValues, getTitleInListValues, calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../../utils/stuff";
+import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../../utils/domUtils";
+import { defaultTreeDataMap, mapListValues, getTitleInListValues } from "../../../../utils/stuff";
+import { useOnPropsChanged } from "../../../../utils/reactUtils";
 
 export default class TreeSelectWidget extends PureComponent {
   static propTypes = {
@@ -75,13 +77,13 @@ export default class TreeSelectWidget extends PureComponent {
     const treeCheckStrictly = customProps.treeCheckStrictly || false;
     const { renderSize } = config.settings;
     const placeholderWidth = calcTextWidth(placeholder) + 6;
-    let _value = value != undefined ? value : undefined;
-    if (treeCheckStrictly && _value !== undefined) {
+    let aValue = value != undefined ? value : undefined;
+    if (treeCheckStrictly && aValue !== undefined) {
       if (treeMultiple) {
-        _value = _value.map(v => ({value: v, label: getTitleInListValues(listValues, v)}));
+        aValue = aValue.map(v => ({value: v, label: getTitleInListValues(listValues, v)}));
       }
     }
-    const width = _value ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownMinWidth = 100;
     const dropdownMaxWidth = 800;
     const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
@@ -107,7 +109,7 @@ export default class TreeSelectWidget extends PureComponent {
         treeData={listValues}
         treeDataSimpleMode={defaultTreeDataMap}
         filterTreeNode={this.filterTreeNode}
-        value={_value}
+        value={aValue}
         onChange={this.handleChange}
         treeDefaultExpandAll={treeExpandAll}
         {...customProps}

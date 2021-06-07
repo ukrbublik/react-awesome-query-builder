@@ -1,7 +1,9 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import {getFieldConfig, getFieldPath, getFieldPathLabels} from "../utils/configUtils";
-import {truncateString, useOnPropsChanged} from "../utils/stuff";
+import {getFieldConfig} from "../../utils/configUtils";
+import {getFieldPath, getFieldPathLabels} from "../../utils/ruleUtils";
+import {truncateString} from "../../utils/stuff";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 
@@ -39,7 +41,7 @@ export default class Field extends PureComponent {
       const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
       const isFieldSelected = !!selectedField;
       const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
-      const currField = isFieldSelected ? getFieldConfig(selectedKey, config) : null;
+      const currField = isFieldSelected ? getFieldConfig(config, selectedKey) : null;
       const selectedOpts = currField || {};
 
       const selectedKeys = getFieldPath(selectedKey, config);
@@ -52,7 +54,7 @@ export default class Field extends PureComponent {
       const selectedAltLabel = selectedOpts.label2;
 
       const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
-      const parentFieldConfig = parentField ? getFieldConfig(parentField, config) : null;
+      const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
       const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
       const items = this.buildOptions(parentFieldPath, config, sourceFields, parentFieldPath);
 

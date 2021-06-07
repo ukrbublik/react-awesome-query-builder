@@ -187,6 +187,7 @@ export const with_struct_and_group = (BasicConfig) => ({
     results: {
       label: "Results",
       type: "!group",
+      mode: "struct",
       subfields: {
         slider: {
           label: "Slider",
@@ -225,7 +226,6 @@ export const with_struct_and_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useGroupsAsArrays: false,
   }
 });
   
@@ -235,12 +235,14 @@ export const with_nested_group = (BasicConfig) => ({
     results: {
       label: "Results",
       type: "!group",
+      mode: "some",
       subfields: {
         score: {
           type: "number",
         },
         user: {
           type: "!group",
+          mode: "some",
           subfields: {
             name: {
               type: "text",
@@ -252,6 +254,7 @@ export const with_nested_group = (BasicConfig) => ({
     group2: {
       label: "Group2",
       type: "!group",
+      mode: "some",
       subfields: {
         inside: {
           type: "number",
@@ -261,7 +264,6 @@ export const with_nested_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useGroupsAsArrays: true,
   }
 });
   
@@ -271,6 +273,7 @@ export const with_struct_inside_group = (BasicConfig) => ({
     results: {
       label: "Results",
       type: "!group",
+      mode: "some",
       subfields: {
         score: {
           type: "number",
@@ -288,7 +291,6 @@ export const with_struct_inside_group = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
-    useGroupsAsArrays: true,
   }
 });
 
@@ -608,3 +610,100 @@ export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
   }
 });
 
+
+export const with_group_array = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    str: {
+      label: "String",
+      type: "text",
+    },
+    cars: {
+      label: "Cars",
+      type: "!group",
+      mode: "array",
+      conjunctions: ["AND", "OR"],
+      showNot: true,
+      operators: [
+        // w/ operand - count
+        "equal",
+        "not_equal",
+        "less",
+        "less_or_equal",
+        "greater",
+        "greater_or_equal",
+        "between",
+        "not_between",
+
+        // w/o operand
+        "some",
+        "all",
+        "none",
+      ],
+      defaultOperator: "some",
+      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
+
+      subfields: {
+        vendor: {
+          type: "select",
+          fieldSettings: {
+            listValues: ["Ford", "Toyota", "Tesla"],
+          },
+          valueSources: ["value"],
+        },
+        year: {
+          type: "number",
+          fieldSettings: {
+            min: 1990,
+            max: 2020,
+          },
+          valueSources: ["value"],
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+// rare
+export const with_fieldName = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      fieldName: "state.input.num",
+      label: "Number",
+      type: "number",
+    },
+  },
+});
+
+// rare
+export const with_groupVarKey = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        score: {
+          type: "number",
+        },
+      }
+    },
+    stock: {
+      label: "In stock",
+      type: "boolean",
+      jsonLogicVar: "shortcut",
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    jsonLogic: {
+      groupVarKey: "varValues",
+      altVarKey: "shortcut",
+    }
+  }
+});

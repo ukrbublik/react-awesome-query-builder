@@ -1,6 +1,6 @@
 import React from "react";
 
-export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config}) => {
+export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config, showNot, notLabel}) => {
   const conjsCount = Object.keys(conjunctionOptions).length;
   const lessThenTwo = disabled;
 
@@ -19,7 +19,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
     return [
       <input key={id}  type="checkbox" id={id + "__not"} checked={not} disabled={readonly} onChange={onNotChange} />
       ,
-      <label key={id+"label"}  htmlFor={id + "__not"}>{config.settings.notLabel || "NOT"}</label>
+      <label key={id+"label"}  htmlFor={id + "__not"}>{notLabel || "NOT"}</label>
     ];
   };
 
@@ -28,7 +28,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
   const onNotChange = e => setNot(e.target.checked);
 
   return [
-    config.settings.showNot && renderNot(),
+    showNot && renderNot(),
     conjsCount > 1 && !lessThenTwo && renderOptions()
   ];
   

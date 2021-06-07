@@ -239,6 +239,8 @@ ul.ant-select-selection__rendered {
 
 .group--drag-handler {
   margin-right: 8px;
+  position: relative;
+  top: 3px;
 }
 .group--conjunctions {
   .group--drag-handler {
@@ -321,6 +323,16 @@ ul.ant-select-selection__rendered {
           height: calc(50% + 8px);
       }
     }
+  }
+}
+
+/******************************************************************************/
+/** RULE_GROUP_EXT *********************************************************************/
+/******************************************************************************/
+
+.group--header.hide--drag.with--conjs {
+  & > .group--field--count--rule {
+    margin-left: 20px;
   }
 }
 
@@ -545,7 +557,7 @@ $rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".
 }
 
 $group_actions: ".group--drag-handler", ".group--actions";
-$inactive_conjs: ".group--conjunctions .ant-btn:not(.ant-btn-primary)";
+$inactive_conjs: ".group--conjunctions .ant-btn:not(.ant-btn-primary)", ".rule_group_ext--drag-handler";
 $active_conjs: ".group--conjunctions .ant-btn.ant-btn-primary";
 $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 
@@ -573,7 +585,7 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 .group--footer {
   padding: {
     left: 10px;
-    right: 5px;
+    right: 10px;
   }
   margin: {
     top: 10px;

@@ -1,31 +1,17 @@
 import React, { Component, PureComponent } from "react";
 import PropTypes from "prop-types";
 import startsWith from "lodash/startsWith";
-import GroupContainer from "./containers/GroupContainer";
-import Draggable from "./containers/Draggable";
+import GroupContainer from "../containers/GroupContainer";
+import Draggable from "../containers/Draggable";
 const classNames = require("classnames");
 import Item from "./Item";
 import {GroupActions} from "./GroupActions";
+import {ConfirmFn, DragIcon, dummyFn} from "../utils";
 
 const defaultPosition = "topRight";
-const dummyFn = () => {};
-const DragIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray" width="18px" height="18px">
-    <path d="M0 0h24v24H0V0z" fill="none"/>
-    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-  </svg>
-);
-
-const ConfirmFn = (Cmp) => (
-  props => {
-    const {useConfirm} = props.config.settings;
-    const confirmFn = useConfirm ? useConfirm() : null;
-    return <Cmp {...props} confirmFn={confirmFn} />;
-  }
-);
 
 
-export class Group extends PureComponent {
+export class BasicGroup extends PureComponent {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     reordableNodesCnt: PropTypes.number,
@@ -55,6 +41,7 @@ export class Group extends PureComponent {
     super(props);
 
     this.removeSelf = this.removeSelf.bind(this);
+    this.renderItem = this.renderItem.bind(this);
   }
 
   isGroupTopPosition() {
@@ -85,7 +72,8 @@ export class Group extends PureComponent {
   }
 
   isEmpty(item) {
-    return (item.get("type") == "group" || item.get("type") == "rule_group") ? this.isEmptyGroup(item) : this.isEmptyRule(item);
+    const isGroup = (item.get("type") == "group" || item.get("type") == "rule_group");
+    return isGroup ? this.isEmptyGroup(item) : this.isEmptyRule(item);
   }
 
   isEmptyGroup(group) {
@@ -111,17 +99,32 @@ export class Group extends PureComponent {
     </>;
   }
 
-  renderChildrenWrapper() {
+  showNot() {
+    const {config} = this.props;
+    return config.settings.showNot;
+  }
+
+  // show conjs for 2+ children?
+  showConjs() {
     const {conjunctionOptions, children1, config} = this.props;
     const conjunctionCount = Object.keys(conjunctionOptions).length;
-    const showConjs = conjunctionCount > 1 || config.settings.showNot;
+    return conjunctionCount > 1 || this.showNot();
+  }
+
+  isOneChild() {
+    const {children1} = this.props;
+    return children1.size < 2;
+  }
+
+  renderChildrenWrapper() {
+    const {children1} = this.props;
 
     return children1 && (
       <div key="group-children" className={classNames(
         "group--children",
-        !showConjs ? "hide--conjs" : "",
-        children1.size < 2 && config.settings.hideConjForOne ? "hide--line" : "",
-        children1.size < 2 ? "one--child" : "",
+        !this.showConjs() ? "hide--conjs" : "",
+        this.isOneChild() ? "hide--line" : "",
+        this.isOneChild() ? "one--child" : "",
         this.childrenClassName()
       )}>{this.renderChildren()}</div>
     );
@@ -132,7 +135,10 @@ export class Group extends PureComponent {
   renderHeaderWrapper() {
     const isGroupTopPosition = this.isGroupTopPosition();
     return (
-      <div key="group-header" className="group--header">
+      <div key="group-header" className={classNames(
+        "group--header",
+        this.isOneChild() ? "one--child" : "",
+      )}>
         {this.renderHeader()}
         {isGroupTopPosition && this.renderBeforeActions()}
         {isGroupTopPosition && this.renderActions()}
@@ -197,7 +203,7 @@ export class Group extends PureComponent {
 
   renderChildren() {
     const {children1} = this.props;
-    return children1 ? children1.map(this.renderItem.bind(this)).toList() : null;
+    return children1 ? children1.map(this.renderItem).toList() : null;
   }
 
   renderItem(item) {
@@ -235,13 +241,14 @@ export class Group extends PureComponent {
     return this.props.reordableNodesCnt;
   }
 
+  showDragIcon() {
+    const { config, isRoot, reordableNodesCnt } = this.props;
+    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
+  }
+
   renderDrag() {
-    const {
-      config, isRoot, reordableNodesCnt,
-      handleDraggerMouseDown
-    } = this.props;
-    const showDragIcon = config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
-    const drag = showDragIcon
+    const { handleDraggerMouseDown } = this.props;
+    const drag = this.showDragIcon()
       && <span
         key="group-drag-icon"
         className={"qb-drag-handler group--drag-handler"}
@@ -250,21 +257,25 @@ export class Group extends PureComponent {
     return drag;
   }
 
+  conjunctionOptions() {
+    const { conjunctionOptions } = this.props;
+    return conjunctionOptions;
+  }
+
   renderConjs() {
     const {
       config, children1, id,
-      selectedConjunction, setConjunction, conjunctionOptions, not, setNot
+      selectedConjunction, setConjunction, not, setNot
     } = this.props;
-    const {immutableGroupsMode, renderConjs: Conjs, showNot} = config.settings;
-    const conjunctionCount = Object.keys(conjunctionOptions).length;
-    const showConjs = conjunctionCount > 1 || showNot;
-    if (!showConjs)
+    const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
+    const conjunctionOptions = this.conjunctionOptions();
+    if (!this.showConjs())
       return null;
     if (!children1.size)
       return null;
 
     const renderProps = {
-      disabled: children1.size < 2,
+      disabled: this.isOneChild(),
       readonly: immutableGroupsMode,
       selectedConjunction: selectedConjunction,
       setConjunction: immutableGroupsMode ? dummyFn : setConjunction,
@@ -273,16 +284,15 @@ export class Group extends PureComponent {
       not: not || false,
       id: id,
       setNot: immutableGroupsMode ? dummyFn : setNot,
+      notLabel: notLabel,
+      showNot: this.showNot(),
     };
     return <Conjs {...renderProps} />;
   }
 
   renderHeader() {
     return (
-      <div className={classNames(
-        "group--conjunctions",
-        // children1.size < 2 && config.settings.hideConjForOne ? 'hide--conj' : ''
-      )}>
+      <div className={"group--conjunctions"}>
         {this.renderConjs()}
         {this.renderDrag()}
       </div>
@@ -290,4 +300,4 @@ export class Group extends PureComponent {
   }
 }
 
-export default GroupContainer(Draggable("group")(ConfirmFn(Group)));
+export default GroupContainer(Draggable("group")(ConfirmFn(BasicGroup)));

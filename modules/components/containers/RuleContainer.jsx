@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {getFieldConfig} from "../../utils/configUtils";
-import {pureShouldComponentUpdate} from "../../utils/renderUtils";
+import {pureShouldComponentUpdate} from "../../utils/reactUtils";
 import {connect} from "react-redux";
 const classNames = require("classnames");
 
@@ -87,7 +87,7 @@ export default (Rule) => {
 
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const fieldConfig = getFieldConfig(this.props.field, this.props.config);
+      const fieldConfig = getFieldConfig(this.props.config, this.props.field);
       const {showErrorMessage} = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;

@@ -1,4 +1,4 @@
-export { default as Query } from "./components/Query";
+export { default as Query } from "./components/QueryContainer";
 export { default as Builder } from "./components/Builder";
 
 import * as Export from "./export";

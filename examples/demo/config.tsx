@@ -168,6 +168,7 @@ export default (skin) => {
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
+    addSubRuleLabel: "Add sub rule",
     delGroupLabel: null,
     notLabel: "Not",
     valueSourcesPopupTitle: "Select value source",
@@ -237,7 +238,7 @@ export default (skin) => {
         },
         login: {
           type: "text",
-          tableName: "t1", // PR #18, PR #20
+          tableName: "t1", // legacy: PR #18, PR #20
           excludeOperators: ["proximity"],
           fieldSettings: {
             validateValue: (val, fieldSettings) => {
@@ -267,6 +268,49 @@ export default (skin) => {
           fieldSettings: {
             min: 0,
             max: 100,
+          },
+          valueSources: ["value"],
+        }
+      }
+    },
+    cars: {
+      label: "Cars",
+      type: "!group",
+      mode: "array",
+      conjunctions: ["AND", "OR"],
+      showNot: true,
+      operators: [
+        // w/ operand - count
+        "equal",
+        "not_equal",
+        "less",
+        "less_or_equal",
+        "greater",
+        "greater_or_equal",
+        "between",
+        "not_between",
+
+        // w/o operand
+        "some",
+        "all",
+        "none",
+      ],
+      defaultOperator: "some",
+      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
+
+      subfields: {
+        vendor: {
+          type: "select",
+          fieldSettings: {
+            listValues: ["Ford", "Toyota", "Tesla"],
+          },
+          valueSources: ["value"],
+        },
+        year: {
+          type: "number",
+          fieldSettings: {
+            min: 1990,
+            max: 2020,
           },
           valueSources: ["value"],
         }

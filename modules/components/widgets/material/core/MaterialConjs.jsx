@@ -5,7 +5,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Button from "@material-ui/core/Button";
 
-export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config}) => {
+export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config, showNot, notLabel}) => {
   //TIP: disabled=true if only 1 rule; readonly=true if immutable mode
   const conjsCount = Object.keys(conjunctionOptions).length;
   const lessThenTwo = disabled;
@@ -41,7 +41,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
         onClick={onNotClick.bind(null, !not)} 
         disabled={readonly}
       >
-        {config.settings.notLabel || "NOT"}
+        {notLabel || "NOT"}
       </Button>
     );
   };
@@ -57,7 +57,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
         size="small" 
         disabled={readonly}
       >
-        {config.settings.showNot && renderNot()}
+        {showNot && renderNot()}
         {conjsCount > 1 && !lessThenTwo && renderOptions()}
       </ButtonGroup>
     </FormControl>
