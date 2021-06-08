@@ -1,6 +1,7 @@
 # Changelog
 - 4.0.3
   - Fixed issue #386 with import select field from JsonLogic (reason: bug with func/field widget in getWidgetForFieldOp)
+  - Fixed issue #387 with subgroups in Material UI 
 - 4.0.2
   - Fixed MaterialConfig import for TS projects (issue #368)
 - 4.0.1
