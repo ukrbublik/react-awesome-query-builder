@@ -302,10 +302,10 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
     if (w == fieldConfig.mainWidget) {
       wg += 100;
     }
-    if (w == 'field') {
+    if (w == "field") {
       wg -= 1;
     }
-    if (w == 'func') {
+    if (w == "func") {
       wg += 2;
     }
     return wg;
@@ -341,7 +341,7 @@ export const getValueSourcesForFieldOp = (config, field, operator, fieldDefiniti
 
 export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
   const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
-  console.log( 3, widgets )
+  console.log( 3, widgets );
   let widget = null;
   if (widgets.length)
     widget = widgets[0];
