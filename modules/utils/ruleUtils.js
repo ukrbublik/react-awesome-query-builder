@@ -266,6 +266,14 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       const widgetConfig = fieldConfig.widgets[widget];
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
+      if (widget == "field" && config._fieldsCntByType) {
+        if (!config._fieldsCntByType[fieldConfig.type])
+          canAdd = false;
+      }
+      if (widget == "func" && config._funcsCntByType) {
+        if (!config._funcsCntByType[fieldConfig.type])
+          canAdd = false;
+      }
       if (!widgetConfig.operators)
         canAdd = canAdd && (valueSrc != "value" || isFuncArg); //if can't check operators, don't add
       if (widgetConfig.operators && operator)
@@ -284,14 +292,25 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       }
     }
   }
-  widgets.sort((w1, w2) => {
-    let w1Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w1) != -1 : w1 == fieldConfig.mainWidget;
-    let _w2Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w2) != -1 : w2 == fieldConfig.mainWidget;
-    if (w1 != w2) {
-      return w1Main ? -1 : +1;
+
+  const widgetWeight = (w) => {
+    let wg = 0;
+    if (fieldConfig.preferWidgets) {
+      if (fieldConfig.preferWidgets.includes(w))
+        wg += (10 - fieldConfig.preferWidgets.indexOf(w));
+    } else if (w == fieldConfig.mainWidget) {
+      wg += 100;
     }
-    return 0;
-  });
+    if (w == "field") {
+      wg -= 1;
+    }
+    if (w == "func") {
+      wg -= 2;
+    }
+    return wg;
+  };
+
+  widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
     
   return {widgets, valueSrcs};
 }
