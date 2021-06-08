@@ -85,11 +85,12 @@ import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import 'react-awesome-query-builder/css/antd.less'; // or import "antd/dist/antd.css";
 // For Material-UI widgets only:
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
-// Choose your skin (ant/material/vanilla):
-const InitialConfig = AntdConfig; // or MaterialConfig or BasicConfig
 
 import 'react-awesome-query-builder/lib/css/styles.css';
 import 'react-awesome-query-builder/lib/css/compact_styles.css'; //optional, for more compact styles
+
+// Choose your skin (ant/material/vanilla):
+const InitialConfig = AntdConfig; // or MaterialConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
 const config = {
