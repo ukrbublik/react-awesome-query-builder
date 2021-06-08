@@ -341,7 +341,6 @@ export const getValueSourcesForFieldOp = (config, field, operator, fieldDefiniti
 
 export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
   const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
-  console.log( 3, widgets );
   let widget = null;
   if (widgets.length)
     widget = widgets[0];
