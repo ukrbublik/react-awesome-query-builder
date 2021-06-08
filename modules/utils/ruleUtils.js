@@ -267,12 +267,12 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
       if (widget == "field" && config._fieldsCntByType) {
-       if (!config._fieldsCntByType[fieldConfig.type])
-         canAdd = false;
+        if (!config._fieldsCntByType[fieldConfig.type])
+          canAdd = false;
       }
       if (widget == "func" && config._funcsCntByType) {
-       if (!config._funcsCntByType[fieldConfig.type])
-         canAdd = false;
+        if (!config._funcsCntByType[fieldConfig.type])
+          canAdd = false;
       }
       if (!widgetConfig.operators)
         canAdd = canAdd && (valueSrc != "value" || isFuncArg); //if can't check operators, don't add
