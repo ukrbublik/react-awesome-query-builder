@@ -266,13 +266,13 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       const widgetConfig = fieldConfig.widgets[widget];
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
-      if (widget == "field") {
-        if (!config._fieldsCntByType[widgetConfig.type])
-          canAdd = false;
+      if (widget == "field" && config._fieldsCntByType) {
+       if (!config._fieldsCntByType[fieldConfig.type])
+         canAdd = false;
       }
-      if (widget == "func") {
-        if (!config._funcsCntByType[widgetConfig.type])
-          canAdd = false;
+      if (widget == "func" && config._funcsCntByType) {
+       if (!config._funcsCntByType[fieldConfig.type])
+         canAdd = false;
       }
       if (!widgetConfig.operators)
         canAdd = canAdd && (valueSrc != "value" || isFuncArg); //if can't check operators, don't add
@@ -297,16 +297,15 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
     let wg = 0;
     if (fieldConfig.preferWidgets) {
       if (fieldConfig.preferWidgets.includes(w))
-        wg += 10 - fieldConfig.preferWidgets.indexOf(w);
-    }
-    if (w == fieldConfig.mainWidget) {
+        wg += (10 - fieldConfig.preferWidgets.indexOf(w));
+    } else if (w == fieldConfig.mainWidget) {
       wg += 100;
     }
     if (w == "field") {
       wg -= 1;
     }
     if (w == "func") {
-      wg += 2;
+      wg -= 2;
     }
     return wg;
   };
