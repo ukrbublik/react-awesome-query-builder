@@ -39,7 +39,13 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
         return findLabel(field.items);
       });
     };
-    return findLabel(items).filter(v => v !== null).pop();
+    return findLabel(items).filter((v) => {
+      if (Array.isArray(v)) {
+        return v.some((value) => value !== null);
+      } else {
+        return v !== null;
+      }
+    }).pop();
   };
   
   const hasValue = selectedKey != null;
