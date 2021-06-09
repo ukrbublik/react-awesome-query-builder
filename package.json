@@ -54,7 +54,7 @@
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "funding": "https://opencollective.com/react-awesome-query-builder",
   "engines": {
-    "node": ">=10.14",
+    "node": ">=12.13",
     "npm": ">=6"
   },
   "dependencies": {
