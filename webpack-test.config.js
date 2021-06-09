@@ -7,7 +7,7 @@ module.exports = {
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
-          NODE_ENV: JSON.stringify('test'),
+          NODE_ENV: JSON.stringify('development'),
           CI: JSON.stringify(process.env.CI),
         },
       }),
@@ -63,10 +63,6 @@ module.exports = {
             }
         ],
     },
-    node: {
-      // Some tests import fs
-      fs: 'empty',
-    },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         modules: [
@@ -76,6 +72,10 @@ module.exports = {
         alias: {
             'ReactAwesomeQueryBuilder': __dirname + '/modules',
             'react-awesome-query-builder': __dirname + '/modules',
+        },
+        fallback: {
+          fs: false,
+          util: false
         }
     },
 };

@@ -2,10 +2,8 @@ var webpack = require('webpack');
 var path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
-//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 var plugins = [
-    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     }),
@@ -25,9 +23,7 @@ if (process.env.COMPRESS == "1") {
         ...plugins,
         new CompressionPlugin()
     ];
-    optimization.minimizer = [
-        //new UglifyJsPlugin()
-    ];
+    optimization.minimize = true;
 }
 
 module.exports = {
@@ -48,8 +44,8 @@ module.exports = {
             "redux": "Redux",
             "immutable": "Immutable",
             "moment": 'moment',
-            "sqlstring": "sqlstring",
-            "classnames": "classnames",
+            // "sqlstring": "sqlstring",
+            // "classnames": "classnames",
         },
         /^lodash\/.+$/,
     ],
@@ -103,9 +99,9 @@ module.exports = {
         alias: {
             'ReactAwesomeQueryBuilder': __dirname + '/modules/',
             'immutable': 'immutable'
+        },
+        fallback: {
+            Buffer: false,
         }
-    },
-    node: {
-        Buffer: false
     }
 };
