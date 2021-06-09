@@ -81,6 +81,7 @@ module.exports = {
                         plugins: [
                             ["@babel/plugin-proposal-decorators", { "legacy": true }],
                             ["@babel/plugin-proposal-class-properties", { "loose": true }],
+                            ["@babel/plugin-proposal-private-methods", { "loose": true }],
                             "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
                             "react-hot-loader/babel",
                             ["import", {
@@ -115,7 +116,9 @@ module.exports = {
                 }, {
                     loader: "less-loader",
                     options: {
-                        javascriptEnabled: true
+                        lessOptions: {
+                            javascriptEnabled: true
+                        }
                     }
                 }]
             },
