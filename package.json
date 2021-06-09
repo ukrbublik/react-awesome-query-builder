@@ -110,7 +110,7 @@
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
     "codecov": "^3.7.0",
-    "compression-webpack-plugin": "^8.0.0",
+    "compression-webpack-plugin": "^7.1.2",
     "css-loader": "^4.3.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
