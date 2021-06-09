@@ -69,26 +69,28 @@ module.exports = {
             // },
             {
                 test: /\.[jt]sx?$/,
-                loaders: 'babel-loader',
-                options: {
-                    presets: [
-                        '@babel/preset-env', 
-                        '@babel/preset-react',
-                        '@babel/preset-typescript', // or can use 'ts-loader' instead
-                    ],
-                    plugins: [
-                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                        ["@babel/plugin-proposal-class-properties", { "loose": true }],
-                        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
-                        "react-hot-loader/babel",
-                        ["import", {
-                            "libraryName": "antd",
-                            "style": false,
-                            "libraryDirectory": "es"
-                        }],
-                    ]
-                },
-                exclude: /node_modules/
+                exclude: /node_modules/,
+                use: [{
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            '@babel/preset-env', 
+                            '@babel/preset-react',
+                            '@babel/preset-typescript', // or can use 'ts-loader' instead
+                        ],
+                        plugins: [
+                            ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                            ["@babel/plugin-proposal-class-properties", { "loose": true }],
+                            "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
+                            "react-hot-loader/babel",
+                            ["import", {
+                                "libraryName": "antd",
+                                "style": false,
+                                "libraryDirectory": "es"
+                            }],
+                        ]
+                    },
+                }]
             },
             {
                 test: /\.css$/,
@@ -119,7 +121,11 @@ module.exports = {
             },
             {
                 test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader?limit=10000&minetype=application/font-woff"
+                loader: "url-loader",
+                options: {
+                    limit: 10000,
+                    minetype: 'application/font-woff'
+                }
             },
             {
                 test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
