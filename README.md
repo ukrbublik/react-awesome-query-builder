@@ -187,7 +187,7 @@ class DemoQueryBuilder extends Component {
 }
 ```
 
-The same example in Typescript with function component ([Codesandbox](https://codesandbox.io/s/relaxed-sun-erhnu?file=/src/demo/demo.tsx)):
+The same example in TypeScript with function component ([Codesandbox](https://codesandbox.io/s/relaxed-sun-erhnu?file=/src/demo/demo.tsx)):
 ```typescript
 import React, { useState } from "react";
 import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
