@@ -19,7 +19,8 @@
         "plugins": [
           ["istanbul", {
             "exclude": [
-              "tests/**/*.test.js"
+              // exclude from karma reporter
+              "tests/**/*"
             ]
           }]
         ]
