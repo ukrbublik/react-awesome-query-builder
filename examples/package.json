@@ -4,8 +4,8 @@
   "description": "Local hot-reloadable demo for react-awesome-query-builder",
   "main": "index.tsx",
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack serve --config webpack.config.js --hot --color",
-    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js"
+    "start": "cross-env NODE_ENV=development webpack serve",
+    "build": "cross-env NODE_ENV=production webpack"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
@@ -14,14 +14,14 @@
     "@material-ui/pickers": "^3.2.10",
     "antd": "^4.16.2",
     "material-ui-confirm": "^2.1.1",
-    "react-awesome-query-builder": "file:..",
+    "react-awesome-query-builder": "file:.."
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
     "react-hot-loader": "^4.8.8",
     "webpack": "^5.38.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2"
-  },
-  "devDependencies": {
-    "cross-env": "^7.0.2"
   }
 }

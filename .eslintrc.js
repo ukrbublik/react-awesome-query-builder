@@ -7,6 +7,7 @@ module.exports = {
         "node": true
     },
     "ignorePatterns": [
+        "**/ts_out/*",
         "**/node_modules/*",
         "bundle.js",
         "webpack.config.js"

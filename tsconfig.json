@@ -1,25 +1,28 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
+    "module": "esnext",
+    "jsx": "preserve",
     "lib": [
       "dom",
-      "dom.iterable",
-      "es2017"
+      "dom.iterable"
     ],
+    "experimentalDecorators": true,
+    "allowJs": true,
+    "outDir": "ts_out",
+    "noEmit": true,
+
+    "strict": true,
+    "alwaysStrict": true,
+
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "sourceMap": true,
-    "allowJs": true,
-    "outDir": "./ts_out",
-    "skipLibCheck": true,
-    "jsx": "react",
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "strictNullChecks": false,
-    "noImplicitAny": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false
+
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
-  "include": ["modules"],
-  "exclude": ["node_modules"]
+  "include": [
+    "modules/**/*"
+  ]
 }

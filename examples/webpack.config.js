@@ -59,6 +59,7 @@ module.exports = {
         ],
         alias: {
             [lib_name]: MODULES,
+            [lib_name + '/config/antd']: MODULES + 'config/antd/index.d.ts',
             'react-dom': '@hot-loader/react-dom',
             // take antd from this node_modules
             'antd': ANTD,
