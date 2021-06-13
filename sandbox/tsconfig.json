@@ -20,7 +20,13 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
 
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
   },
   "include": [
     "src/**/*"
