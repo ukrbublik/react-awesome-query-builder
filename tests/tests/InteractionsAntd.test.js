@@ -1,6 +1,6 @@
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb_ant } from "./utils";
+import * as configs from "../configs";
+import * as inits from "../inits";
+import { with_qb_ant } from "../utils";
 
 
 describe("interactions on antd", () => {

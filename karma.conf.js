@@ -35,7 +35,7 @@ module.exports = function(config) {
       'karma.tests.js': ['webpack', 'sourcemap'],
       'modules/**/*': ['coverage']
     },
-    webpack: require('./webpack-test.config'),
+    webpack: require('./webpack.test.config'),
     webpackMiddleware: {
       stats: 'errors-only'
     },

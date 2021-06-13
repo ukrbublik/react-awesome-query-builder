@@ -20,7 +20,6 @@ import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
 
 
-
 //////////////////////////////////////////////////////////////////////
 
 const fields: Fields = {

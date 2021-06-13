@@ -1,5 +1,9 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
+
+const MODULES = path.resolve(__dirname, 'modules/');
+const LibName = 'ReactAwesomeQueryBuilder';
+const lib_name = 'react-awesome-query-builder';
 
 module.exports = {
     mode: "development",
@@ -19,7 +23,7 @@ module.exports = {
                 use: [{
                     loader: 'ts-loader',
                     options: {
-                        cacheDirectory: true,
+                        experimentalFileCaching: true,
                     },
                 }],
                 exclude: /node_modules/,
@@ -68,12 +72,11 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         modules: [
-            'node_modules',
-            __dirname + '/node_modules',
+            'node_modules'
         ],
         alias: {
-            'ReactAwesomeQueryBuilder': __dirname + '/modules',
-            'react-awesome-query-builder': __dirname + '/modules',
+            [LibName]: MODULES,
+            [lib_name]: MODULES,
         },
         fallback: {
           fs: false,

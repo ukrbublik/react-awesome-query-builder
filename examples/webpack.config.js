@@ -1,32 +1,35 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+const PORT = 3001;
+const lib_name = 'react-awesome-query-builder';
+const isAnalyze = process.env.ANALYZE == "1";
 const isProd = (process.env.NODE_ENV != "development");
-
 const EXAMPLES = __dirname;
-const NODE_MODULES = path.resolve(EXAMPLES, '../node_modules');
-const MODULES = path.resolve(EXAMPLES, '../modules');
-const ANTD = path.resolve(EXAMPLES, 'node_modules/antd');
-const ANTDESIGN = path.resolve(EXAMPLES, 'node_modules/@ant-design');
+const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
+const MODULES = path.resolve(EXAMPLES, '../modules/');
+// take antd from this node_modules
+const ANTD = path.resolve(EXAMPLES, 'node_modules/antd/');
+const ANTDESIGN = path.resolve(EXAMPLES, 'node_modules/@ant-design/');
 
-var plugins = [];
+let plugins = [
+    new webpack.DefinePlugin({
+        'process.env': {
+            NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
+        }
+    }),
+];
 if (isProd) {
     plugins = [
+        ...plugins,
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
-        //new BundleAnalyzerPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify(process.env.NODE_ENV || "production"),
-            }
-        }),
     ];
-} else {
+}
+if (isAnalyze) {
     plugins = [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
-            }
-        }),
+        ...plugins,
+        new BundleAnalyzerPlugin()
     ];
 }
 
@@ -35,7 +38,7 @@ module.exports = {
     mode: process.env.NODE_ENV || "development",
     devtool: isProd ? 'source-map' : 'source-map',
     devServer: {
-        port: 3001,
+        port: PORT,
         inline: true,
         historyApiFallback: true,
         hot: true,
@@ -50,12 +53,14 @@ module.exports = {
     },
     resolve: {
         modules: [
+            // combine with parent node_modules
             'node_modules',
-            NODE_MODULES,
+            RAQB_NODE_MODULES,
         ],
         alias: {
-            'react-awesome-query-builder': MODULES,
+            [lib_name]: MODULES,
             'react-dom': '@hot-loader/react-dom',
+            // take antd from this node_modules
             'antd': ANTD,
             '@ant-design': ANTDESIGN,
         },

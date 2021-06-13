@@ -1,8 +1,8 @@
 import { Utils } from "react-awesome-query-builder";
 const { isValidTree } = Utils;
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb } from "./utils";
+import * as configs from "../configs";
+import * as inits from "../inits";
+import { with_qb } from "../utils";
 
 
 describe("validation", () => {

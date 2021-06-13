@@ -10,9 +10,7 @@ import moment from "moment";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 
-// @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
-// @ts-ignore
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 const {
   FieldSelect,
@@ -20,16 +18,15 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-// @ts-ignore
 import MaterialConfig from "react-awesome-query-builder/config/material";
 
-const skinToConfig = {
+const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
   antd: AntdConfig,
   material: MaterialConfig,
 };
 
-export default (skin) => {
+export default (skin: string) => {
   const InitialConfig = skinToConfig[skin] as BasicConfig;
 
   const conjunctions: Conjunctions = {

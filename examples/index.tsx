@@ -8,8 +8,6 @@ import "../css/antd.less";
 import "../css/styles.scss";
 //import '../css/compact_styles.scss'; //optional
 
-
-
 const HotDemo = hot(Demo);
 const rootElement = window.document.getElementById("root");
 

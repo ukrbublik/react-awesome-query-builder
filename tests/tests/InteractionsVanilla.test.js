@@ -1,8 +1,8 @@
 import { Utils } from "react-awesome-query-builder";
 const { getTree } = Utils;
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb } from "./utils";
+import * as configs from "../configs";
+import * as inits from "../inits";
+import { with_qb } from "../utils";
 
 
 describe("interactions on vanilla", () => {

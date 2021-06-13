@@ -1,6 +1,8 @@
 /examples/bundle.js
 /examples/bundle.js.map
 /examples/bundle.js.LICENSE.txt
+/examples/dist/
+/sandbox/dist/
 /build/
 /coverage/
 node_modules/

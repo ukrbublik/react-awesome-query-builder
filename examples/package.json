@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve --config webpack.config.js --hot --color",
-    "build": "NODE_ENV=production webpack --config webpack.config.js"
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
@@ -15,6 +15,7 @@
     "antd": "^4.16.2",
     "material-ui-confirm": "^2.1.1",
     "react-awesome-query-builder": "file:..",
+    "react-hot-loader": "^4.8.8",
     "webpack": "^5.38.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.2",

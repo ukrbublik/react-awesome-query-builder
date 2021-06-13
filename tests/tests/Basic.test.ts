@@ -1,8 +1,10 @@
 import { Query, Builder, BasicConfig } from "react-awesome-query-builder";
 import AntdConfig from "react-awesome-query-builder/config/antd";
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb, empty_value, export_checks } from "./utils";
+import * as configs from "../configs";
+import * as inits from "../inits";
+import { with_qb, empty_value, export_checks } from "../utils";
+import { expect } from "chai";
+import { ReactWrapper } from "enzyme";
 // warning: don't put `export_checks` inside `it`
 
 
@@ -20,25 +22,25 @@ describe("basic query", () => {
 
   describe("import", () => {
     it("should work with empty value", () => {
-      with_qb(configs.simple_with_number, empty_value, "default", (qb) => {
+      with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
     it("should work with empty JsonLogic tree", () => {
-      with_qb(configs.simple_with_number, undefined, "JsonLogic", (qb) => {
+      with_qb(configs.simple_with_number, undefined, "JsonLogic", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
     it("should work with simple value", () => {
-      with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb) => {
+      with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
     it("should work with simple value in JsonLogic format", () => {
-      with_qb(configs.simple_with_number, inits.with_number, "JsonLogic", (qb) => {
+      with_qb(configs.simple_with_number, inits.with_number, "JsonLogic", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });

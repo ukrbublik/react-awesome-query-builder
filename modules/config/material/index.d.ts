@@ -1,3 +1,3 @@
 import {BasicConfig} from "../..";
-const MaterialConfig: BasicConfig;
+declare const MaterialConfig: BasicConfig;
 export default MaterialConfig;

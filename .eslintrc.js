@@ -1,4 +1,4 @@
-{
+module.exports = {
     "env": {
         "browser": true,
         "es6": true,
@@ -13,6 +13,8 @@
     ],
     "extends": [
         "eslint:recommended",
+        "plugin:import/recommended",
+        "plugin:import/typescript",
         "plugin:react/recommended",
         "plugin:@typescript-eslint/eslint-recommended"
     ],
@@ -31,12 +33,33 @@
     "plugins": [
         "react",
         "babel",
+        "import",
         "@typescript-eslint"
     ],
     "settings": {
         "react": {
             "version": "detect"
-        }
+        },
+        "import/resolver": {
+            "webpack": {
+                "config": "./webpack.config.js"
+            }
+        },
+        "import/extensions": [
+            ".js",
+            ".jsx",
+            ".ts",
+            ".tsx"
+        ],
+        "import/parsers": {
+            "@typescript-eslint/parser": [
+                ".ts", 
+                ".tsx"
+            ]
+        },
+        "import/core-modules": [
+            "react-awesome-query-builder/lib/css/styles.css"
+        ]
     },
     "parser": "@typescript-eslint/parser",
     "rules": {
@@ -72,9 +95,9 @@
             }
         ],
         "no-unused-vars": [
+            //todo: set to warn
             "off", 
             {
-                "todo": "set to warn",
                 "args": "all", 
                 "argsIgnorePattern": "^_", 
                 "ignoreRestSiblings": true, 
@@ -89,9 +112,9 @@
             "off"
         ],
         "react/prop-types": [
+            //todo: set to warn
             "off",
             {
-                "todo": "set to warn"
             }
         ]
     }

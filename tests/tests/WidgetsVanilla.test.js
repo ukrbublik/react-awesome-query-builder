@@ -1,6 +1,6 @@
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb, with_qb_skins } from "./utils";
+import * as configs from "../configs";
+import * as inits from "../inits";
+import { with_qb, with_qb_skins } from "../utils";
 
 
 describe("vanilla widgets interactions", () => {
