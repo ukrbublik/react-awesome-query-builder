@@ -9,9 +9,6 @@ const isProd = (process.env.NODE_ENV != "development");
 const EXAMPLES = __dirname;
 const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
 const MODULES = path.resolve(EXAMPLES, '../modules/');
-// take antd from this node_modules
-const ANTD = path.resolve(EXAMPLES, 'node_modules/antd/');
-const ANTDESIGN = path.resolve(EXAMPLES, 'node_modules/@ant-design/');
 
 let plugins = [
     new webpack.DefinePlugin({
@@ -59,11 +56,7 @@ module.exports = {
         ],
         alias: {
             [lib_name]: MODULES,
-            [lib_name + '/config/antd']: MODULES + 'config/antd/index.d.ts',
             'react-dom': '@hot-loader/react-dom',
-            // take antd from this node_modules
-            'antd': ANTD,
-            '@ant-design': ANTDESIGN,
         },
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },

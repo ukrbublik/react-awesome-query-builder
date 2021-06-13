@@ -3,6 +3,8 @@
 /examples/bundle.js.LICENSE.txt
 /build/
 /coverage/
+/sandbox/build/
+/sandbox_simple/build/
 ts_out/
 node_modules/
 package-lock.json

@@ -9,11 +9,6 @@
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/pickers": "^3.2.10",
-    "antd": "^4.16.2",
-    "material-ui-confirm": "^2.1.1",
     "react-awesome-query-builder": "file:.."
   },
   "devDependencies": {
