@@ -8,6 +8,7 @@ module.exports = {
     },
     "ignorePatterns": [
         "**/ts_out/*",
+        "**/build/*",
         "**/node_modules/*",
         "bundle.js",
         "webpack.config.js"
