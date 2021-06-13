@@ -39,8 +39,8 @@
     "sandbox_js": "cd sandbox_simple && npm i && npm start",
     "start": "npm i && npm run examples",
     "test": "karma start karma.conf.js",
-    "lint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --fix ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
-    "lint": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/"
+    "lint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
+    "lint": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/"
   },
   "repository": {
     "type": "git",
