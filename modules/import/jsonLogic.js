@@ -1,11 +1,10 @@
 import uuid from "../utils/uuid";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, isJsonLogic} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
 import moment from "moment";
-import {isJsonLogic} from "../utils/stuff";
 
 // http://jsonlogic.com/
 
