@@ -49,10 +49,14 @@
     "tsc-tests": "tsc -p ./tests --noEmit",
     "tsc": "npm run tsc-lib && npm run tsc-examples && npm run tsc-sandbox && npm run tsc-tests",
     "eslint-fix": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
-    "eslint": "./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
+    "eslint": "    ./node_modules/.bin/eslint --ext .jsx --ext .js --ext .tsx --ext .ts       ./modules/ ./sandbox/ ./sandbox_simple/ ./examples/ ./tests/",
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "npm run eslint-fix",
-    "smoke": "npm run lint && npm run test && npm run build-all"
+    "clean": "./scripts/clean.sh",
+    "install-all": "npm i  &&  npm i -C examples  &&  npm i -C sandbox  &&  npm i -C sandbox_simple",
+    "reinstall": "npm run clean && npm run install-all",
+    "smoke": "npm run lint && npm run test && npm run build-all",
+    "resmoke": "npm run reinstall && npm run smoke"
   },
   "repository": {
     "type": "git",
