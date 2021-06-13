@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 const classNames = require("classnames");
 
 
-export default (className) => (GroupOrRule) => {
-  return class Draggable extends PureComponent {
+export default (className) => (GroupOrRule) =>
+  class Draggable extends PureComponent {
     static propTypes = {
       isDraggingTempo: PropTypes.bool,
       isDraggingMe: PropTypes.bool,
@@ -66,4 +66,3 @@ export default (className) => (GroupOrRule) => {
     }
 
   };
-};

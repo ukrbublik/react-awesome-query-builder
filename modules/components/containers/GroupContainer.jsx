@@ -6,7 +6,7 @@ import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUti
 import {connect} from "react-redux";
 
 
-export default (Group) => {
+const createGroupContainer = (Group) => 
   class GroupContainer extends Component {
     static propTypes = {
       //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
@@ -198,8 +198,10 @@ export default (Group) => {
       );
     }
 
-  }
+  };
 
+
+export default (Group) => {
   const ConnectedGroupContainer = connect(
     (state) => {
       return {
@@ -211,7 +213,7 @@ export default (Group) => {
     {
       context
     }
-  )(GroupContainer);
+  )(createGroupContainer(Group));
   ConnectedGroupContainer.displayName = "ConnectedGroupContainer";
 
   return ConnectedGroupContainer;

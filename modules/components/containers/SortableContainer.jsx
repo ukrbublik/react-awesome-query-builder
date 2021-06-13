@@ -10,9 +10,8 @@ import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUti
 const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
 
 
-export default (Builder, CanMoveFn = null) => {
+const createSortableContainer = (Builder, CanMoveFn = null) => 
   class SortableContainer extends Component {
-
     static propTypes = {
       tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
       actions: PropTypes.object.isRequired, // {moveItem: Function, ..}
@@ -33,7 +32,7 @@ export default (Builder, CanMoveFn = null) => {
     shouldComponentUpdate(nextProps, nextState) {
       let prevProps = this.props;
       let prevState = this.state;
-  
+
       let should = pureShouldComponentUpdate(this)(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
@@ -545,9 +544,10 @@ export default (Builder, CanMoveFn = null) => {
         onDragStart={this.onDragStart}
       />;
     }
+  };
 
-  }
 
+export default (Builder, CanMoveFn = null) => {
   const ConnectedSortableContainer = connect(
     (state) => {
       return {
@@ -564,10 +564,9 @@ export default (Builder, CanMoveFn = null) => {
     {
       context
     }
-  )(SortableContainer);
+  )(createSortableContainer(Builder, CanMoveFn));
   ConnectedSortableContainer.displayName = "ConnectedSortableContainer";
 
   return ConnectedSortableContainer;
-
 };
 
