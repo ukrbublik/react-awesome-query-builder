@@ -3,6 +3,12 @@ var path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const isProd = (process.env.NODE_ENV != "development");
 
+const EXAMPLES = __dirname;
+const NODE_MODULES = path.resolve(EXAMPLES, '../node_modules');
+const MODULES = path.resolve(EXAMPLES, '../modules');
+const ANTD = path.resolve(EXAMPLES, 'node_modules/antd');
+const ANTDESIGN = path.resolve(EXAMPLES, 'node_modules/@ant-design');
+
 var plugins = [];
 if (isProd) {
     plugins = [
@@ -39,19 +45,19 @@ module.exports = {
         './index',
     ],
     output: {
-        path: __dirname,
+        path: EXAMPLES,
         filename: 'bundle.js'
     },
     resolve: {
         modules: [
             'node_modules',
-            path.resolve(__dirname, '../node_modules'),
+            NODE_MODULES,
         ],
         alias: {
-            'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
+            'react-awesome-query-builder': MODULES,
             'react-dom': '@hot-loader/react-dom',
-            'antd': path.resolve(__dirname, 'node_modules/antd'),
-            '@ant-design': path.resolve(__dirname, 'node_modules/@ant-design'),
+            'antd': ANTD,
+            '@ant-design': ANTDESIGN,
         },
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
