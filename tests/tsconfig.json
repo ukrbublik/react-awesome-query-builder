@@ -22,9 +22,7 @@
       "react-awesome-query-builder/*": ["modules/*"]
     },
 
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noImplicitReturns": true
   },
   "include": [
     "**/*"

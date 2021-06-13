@@ -18,9 +18,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
 
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noImplicitReturns": true
   },
   "include": [
     "modules/**/*"
