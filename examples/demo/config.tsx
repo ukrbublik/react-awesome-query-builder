@@ -30,7 +30,7 @@ const skinToConfig = {
 };
 
 export default (skin) => {
-  const InitialConfig = skinToConfig[skin];
+  const InitialConfig = skinToConfig[skin] as BasicConfig;
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
