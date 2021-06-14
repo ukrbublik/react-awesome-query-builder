@@ -24,12 +24,18 @@ let initTree: ImmutableTree;
 initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 // Trick to hot-load new config when you edit `config.tsx`
-const updateEvent = new CustomEvent("update", { detail: {
+const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
   config: loadedConfig,
   _initTree: initTree,
   _initValue: initValue,
 } });
 window.dispatchEvent(updateEvent);
+
+interface CustomEventDetail {
+  config: Config;
+  _initTree: ImmutableTree;
+  _initValue: JsonTree;
+}
 
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
@@ -79,7 +85,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     )
 
     onConfigChanged = (e: Event) => {
-      const {detail: {config, _initTree, _initValue}} = e as CustomEvent;
+      const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
       console.log("Updating config...");
       this.setState({
         config,

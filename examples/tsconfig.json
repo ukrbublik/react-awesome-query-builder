@@ -27,6 +27,7 @@
     "noImplicitReturns": true
   },
   "include": [
-    "demo/**/*"
+    "demo/**/*",
+    "index.tsx"
   ]
 }

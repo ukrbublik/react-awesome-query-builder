@@ -124,13 +124,39 @@ module.exports = {
     },
     "overrides": [
       {
+        "files": ["modules/**/*.ts", "modules/**/*.tsx"],
+        "parserOptions": {
+        "project": 'tsconfig.json',
+        },
+      },
+      {
+        "files": ["examples/**/*.ts", "examples/**/*.tsx"],
+        "parserOptions": {
+          "project": 'examples/tsconfig.json',
+        },
+      },
+      {
+        "files": ["sandbox/**/*.ts", "sandbox/**/*.tsx"],
+        "parserOptions": {
+          "project": 'sandbox/tsconfig.json',
+        },
+      },
+      {
+        "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+        "parserOptions": {
+          "project": 'tests/tsconfig.json',
+        },
+      },
+      {
         "files": ["**/*.ts", "**/*.tsx"],
         "extends": [
             "eslint:recommended",
             "plugin:import/recommended",
             "plugin:import/typescript",
             "plugin:react/recommended",
-            "plugin:@typescript-eslint/recommended"
+            "plugin:@typescript-eslint/eslint-recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking"
         ],
         "rules": {
             //todo
@@ -138,7 +164,9 @@ module.exports = {
             "@typescript-eslint/ban-types": 0,
             "@typescript-eslint/explicit-module-boundary-types": 0,
             "@typescript-eslint/no-explicit-any": 0,
-            "@typescript-eslint/no-empty-interface": 0
+            "@typescript-eslint/no-empty-interface": 0,
+            "@typescript-eslint/unbound-method": 0,
+            "@typescript-eslint/prefer-regexp-exec": 0
         }
       },
     ],

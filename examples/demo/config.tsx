@@ -224,7 +224,7 @@ export default (skin: string) => {
           type: "text",
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val, fieldSettings) => {
+            validateValue: (val: string, fieldSettings) => {
               return (val.length < 10);
             },
           },
@@ -238,7 +238,7 @@ export default (skin: string) => {
           tableName: "t1", // legacy: PR #18, PR #20
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val, fieldSettings) => {
+            validateValue: (val: string, fieldSettings) => {
               return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
             },
           },
