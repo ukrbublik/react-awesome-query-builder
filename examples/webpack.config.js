@@ -1,10 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const PORT = 3001;
 const lib_name = 'react-awesome-query-builder';
-const isAnalyze = process.env.ANALYZE == "1";
 const isProd = (process.env.NODE_ENV != "development");
 const EXAMPLES = __dirname;
 const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
@@ -21,12 +19,6 @@ if (isProd) {
     plugins = [
         ...plugins,
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
-    ];
-}
-if (isAnalyze) {
-    plugins = [
-        ...plugins,
-        new BundleAnalyzerPlugin()
     ];
 }
 

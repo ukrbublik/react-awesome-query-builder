@@ -92,9 +92,7 @@
     "antd": "^4.16.2",
     "material-ui-confirm": "^2.1.1",
     "react": "^0.14.6 || ^15.0.0 || ^16.0.0 || ^17.0.1",
-    "react-dom": "^0.14.6 || ^15.0.0 || ^16.0.0 || ^17.0.1",
-    "react-redux": "^4.0.6 || ^5.0.0 || ^6.0.0 || ^7.0.0",
-    "redux": "^3.5.0 || ^4.0.0"
+    "react-dom": "^0.14.6 || ^15.0.0 || ^16.0.0 || ^17.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -107,7 +105,6 @@
     "@babel/preset-env": "^7.7.4",
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-typescript": "^7.7.4",
-    "@hot-loader/react-dom": "^16.4.1",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
@@ -165,8 +162,6 @@
     "typescript": "^4.3.2",
     "url-loader": "^3.0.0",
     "webpack": "^5.38.1",
-    "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.9.0"
+    "webpack-cli": "^4.7.2"
   }
 }
