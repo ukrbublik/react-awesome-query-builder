@@ -10,5 +10,4 @@ before_install:
 install:
   - npm run install-all
   - npm run lint
-  - npm run test
   - npm run build-all
