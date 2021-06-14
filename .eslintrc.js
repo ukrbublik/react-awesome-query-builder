@@ -18,7 +18,7 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
         "plugin:react/recommended",
-        "plugin:@typescript-eslint/eslint-recommended"
+        "plugin:@typescript-eslint/eslint-recommended",
     ],
     "globals": {
         "Atomics": "readonly",
@@ -115,9 +115,31 @@ module.exports = {
         ],
         "react/prop-types": [
             //todo: set to warn
-            "off",
-            {
-            }
+            "off", {}
+        ],
+        "prefer-const": [
+            //todo: set to warn
+            "off", {}
         ]
-    }
+    },
+    "overrides": [
+      {
+        "files": ["**/*.ts", "**/*.tsx"],
+        "extends": [
+            "eslint:recommended",
+            "plugin:import/recommended",
+            "plugin:import/typescript",
+            "plugin:react/recommended",
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "rules": {
+            //todo
+            "@typescript-eslint/no-unused-vars": 0,
+            "@typescript-eslint/ban-types": 0,
+            "@typescript-eslint/explicit-module-boundary-types": 0,
+            "@typescript-eslint/no-explicit-any": 0,
+            "@typescript-eslint/no-empty-interface": 0
+        }
+      },
+    ],
 }
