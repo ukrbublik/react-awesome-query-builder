@@ -1,11 +1,10 @@
 const webpack = require('webpack');
 const path = require('path');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
 
+const MODE = process.env.NODE_ENV || "development";
 const BUILD = path.resolve(__dirname, 'build/');
 const MODULES = path.resolve(__dirname, 'modules/');
-const isAnalyze = process.env.ANALYZE == "1";
 const isCompress = process.env.COMPRESS == "1";
 const LibName = 'ReactAwesomeQueryBuilder';
 const lib_name = 'react-awesome-query-builder';
@@ -13,19 +12,13 @@ const lib_name = 'react-awesome-query-builder';
 let plugins = [
     new webpack.DefinePlugin({
         'process.env': {
-            NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+            NODE_ENV: JSON.stringify(MODE),
         }
     }),
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
 ];
 let optimization = {};
 
-if (isAnalyze) {
-    plugins = [
-        ...plugins,
-        new BundleAnalyzerPlugin()
-    ];
-}
 if (isCompress) {
     plugins = [
         ...plugins,
@@ -37,7 +30,7 @@ if (isCompress) {
 module.exports = {
     plugins,
     optimization,
-    mode:  process.env.NODE_ENV || "development",
+    mode: MODE,
     entry: [
         './modules/index.js',
     ],

@@ -5,7 +5,8 @@
   "main": "index.tsx",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=production webpack",
+    "analyze": "cross-env NODE_ENV=production ANALYZE=1 webpack"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
@@ -17,7 +18,6 @@
     "webpack": "^5.38.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2",
-    "@hot-loader/react-dom": "^16.4.1"
+    "webpack-dev-server": "^3.11.2"
   }
 }

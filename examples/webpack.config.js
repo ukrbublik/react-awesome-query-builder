@@ -1,9 +1,13 @@
 const webpack = require('webpack');
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const MODE = process.env.NODE_ENV || "development";
 const PORT = 3001;
 const lib_name = 'react-awesome-query-builder';
-const isProd = (process.env.NODE_ENV != "development");
+const isProd = (MODE != "development");
+const isDev = (MODE == "development");
+const isAnalyze = process.env.ANALYZE == "1";
 const EXAMPLES = __dirname;
 const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
 const MODULES = path.resolve(EXAMPLES, '../modules/');
@@ -11,20 +15,56 @@ const MODULES = path.resolve(EXAMPLES, '../modules/');
 let plugins = [
     new webpack.DefinePlugin({
         'process.env': {
-            NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
+            NODE_ENV: JSON.stringify(MODE),
         }
     }),
 ];
+let aliases = {
+    [lib_name]: MODULES
+};
+
 if (isProd) {
     plugins = [
         ...plugins,
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
     ];
 }
+if (isAnalyze) {
+    plugins = [
+        ...plugins,
+        new BundleAnalyzerPlugin()
+    ];
+}
+if (isDev) {
+    aliases = {
+        ...aliases,
+        'react-dom': '@hot-loader/react-dom',
+    };
+}
+
+const babel_options = {
+    presets: [
+        '@babel/preset-env', 
+        '@babel/preset-react',
+        '@babel/preset-typescript', // or can use 'ts-loader' instead
+    ],
+    plugins: [
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }],
+        ["@babel/plugin-proposal-private-methods", { "loose": true }],
+        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
+        "react-hot-loader/babel",
+        ["import", {
+            "libraryName": "antd",
+            "style": false,
+            "libraryDirectory": "es"
+        }],
+    ]
+};
 
 module.exports = {
     plugins,
-    mode: process.env.NODE_ENV || "development",
+    mode: MODE,
     devtool: isProd ? 'source-map' : 'source-map',
     devServer: {
         port: PORT,
@@ -46,10 +86,7 @@ module.exports = {
             'node_modules',
             RAQB_NODE_MODULES,
         ],
-        alias: {
-            [lib_name]: MODULES,
-            'react-dom': '@hot-loader/react-dom',
-        },
+        alias: aliases,
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
     module: {
@@ -69,25 +106,7 @@ module.exports = {
                 exclude: /node_modules/,
                 use: [{
                     loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            '@babel/preset-env', 
-                            '@babel/preset-react',
-                            '@babel/preset-typescript', // or can use 'ts-loader' instead
-                        ],
-                        plugins: [
-                            ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                            ["@babel/plugin-proposal-class-properties", { "loose": true }],
-                            ["@babel/plugin-proposal-private-methods", { "loose": true }],
-                            "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
-                            "react-hot-loader/babel",
-                            ["import", {
-                                "libraryName": "antd",
-                                "style": false,
-                                "libraryDirectory": "es"
-                            }],
-                        ]
-                    },
+                    options: babel_options,
                 }]
             },
             {

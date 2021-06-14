@@ -32,7 +32,9 @@
     "for-npm": "./scripts/for-npm.sh",
     "for-gpr": "./scripts/for-gpr.sh",
     "build-npm": "./scripts/build-npm.sh",
-    "build-global": "NODE_ENV=production COMPRESS=1 ANALYZE=0 webpack",
+    "check-hot": "node ./scripts/check-hot.js",
+    "build-global": "NODE_ENV=production COMPRESS=1 webpack",
+    "build": "npm run build-npm && npm run build-global",
     "build-examples": "cd examples && npm run build",
     "build-sandbox-ts": "cd sandbox && npm run build",
     "build-sandbox-js": "cd sandbox_simple && npm run build",
@@ -55,7 +57,7 @@
     "clean": "./scripts/clean.sh",
     "install-all": "npm i  &&  npm i -C examples  &&  npm i -C sandbox  &&  npm i -C sandbox_simple",
     "reinstall": "npm run clean && npm run install-all",
-    "smoke": "npm run lint && npm run test && npm run build-all",
+    "smoke": "npm run lint && npm run test && npm run build-all && npm run check-hot",
     "resmoke": "npm run reinstall && npm run smoke"
   },
   "repository": {
@@ -162,6 +164,7 @@
     "typescript": "^4.3.2",
     "url-loader": "^3.0.0",
     "webpack": "^5.38.1",
-    "webpack-cli": "^4.7.2"
+    "webpack-cli": "^4.7.2",
+    "@hot-loader/react-dom": "^16.4.1"
   }
 }
