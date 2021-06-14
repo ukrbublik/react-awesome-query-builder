@@ -1,8 +1,8 @@
 import { Query, Builder, BasicConfig } from "react-awesome-query-builder";
 import AntdConfig from "react-awesome-query-builder/config/antd";
-import * as configs from "../configs";
-import * as inits from "../inits";
-import { with_qb, empty_value, export_checks } from "../utils";
+import * as configs from "../support/configs";
+import * as inits from "../support/inits";
+import { with_qb, empty_value, export_checks } from "../support/utils";
 import { expect } from "chai";
 import { ReactWrapper } from "enzyme";
 // warning: don't put `export_checks` inside `it`

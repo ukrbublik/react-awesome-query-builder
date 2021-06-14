@@ -68,7 +68,7 @@ module.exports = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.jsx?$/,
+                test: /\.[jt]sx?$/,
                 loader: 'babel-loader',
                 exclude: /node_modules/
             },

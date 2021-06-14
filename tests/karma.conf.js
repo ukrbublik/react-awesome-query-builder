@@ -33,9 +33,9 @@ module.exports = function(config) {
     exclude: [],
     preprocessors: {
       'karma.tests.js': ['webpack', 'sourcemap'],
-      'modules/**/*': ['coverage']
+      '../modules/**/*': ['coverage']
     },
-    webpack: require('./webpack.test.config'),
+    webpack: require('./webpack.config'),
     webpackMiddleware: {
       stats: 'errors-only'
     },
@@ -43,7 +43,7 @@ module.exports = function(config) {
     reporters: ['progress', 'coverage'],
 
     coverageReporter: {
-      dir: 'coverage',
+      dir: '../coverage',
       reporters: [
           { type: 'html', subdir: 'html' },
           { type: 'text-summary' },

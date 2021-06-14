@@ -42,7 +42,7 @@
     "sandbox-js": "cd sandbox_simple && npm i && npm start",
     "sandbox": "npm run sandbox-ts",
     "start": "npm i && npm run examples",
-    "test": "karma start karma.conf.js",
+    "test": "karma start ./tests/karma.conf.js",
     "tsc-lib": "tsc -p . --noEmit",
     "tsc-examples": "tsc -p ./examples --noEmit",
     "tsc-sandbox": "tsc -p ./sandbox --noEmit",

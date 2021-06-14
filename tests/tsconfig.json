@@ -25,6 +25,7 @@
     "noImplicitReturns": true
   },
   "include": [
-    "**/*"
+    "specs/**/*",
+    "support/**/*"
   ]
 }

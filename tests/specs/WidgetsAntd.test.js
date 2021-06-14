@@ -1,7 +1,7 @@
 import moment from "moment";
-import * as configs from "../configs";
-import * as inits from "../inits";
-import { with_qb_ant } from "../utils";
+import * as configs from "../support/configs";
+import * as inits from "../support/inits";
+import { with_qb_ant } from "../support/utils";
 
 
 describe("antdesign widgets render", () => {

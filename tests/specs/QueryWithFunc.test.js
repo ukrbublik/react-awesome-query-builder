@@ -1,6 +1,6 @@
-import * as configs from "../configs";
-import * as inits from "../inits";
-import { with_qb, with_qb_ant, export_checks, export_checks_in_it } from "../utils";
+import * as configs from "../support/configs";
+import * as inits from "../support/inits";
+import { with_qb, with_qb_ant, export_checks, export_checks_in_it } from "../support/utils";
 
 
 describe("query with func", () => {
