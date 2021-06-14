@@ -1,6 +1,7 @@
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const COMPILE_TIMEOUT = 30*1000; // 30 s
 const EXIT_TIMEOUT = 1*1000; // 1 s
+const WEBPACK_PORT = 3001;
 
 let prcOutBuf = Buffer.alloc(0);
 let prcErrBuf = Buffer.alloc(0);
@@ -23,11 +24,16 @@ prc.on('exit', (code) => {
   end(`webpack exited with code ${code}`);
 });
 
+// Remove ANSI color from webpack output
 const cleanStr = (str) => {
-  return str.replace(
-    /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, 
-    ''
-  );
+  //https://github.com/chalk/ansi-regex/blob/main/index.js
+  const pattern = [
+		'[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)',
+		'(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'
+	].join('|');
+  const regex = new RegExp(pattern, 'g');
+  
+  return str.replace(regex, '');
 };
 
 const startTimerCompile = () => {
@@ -45,16 +51,29 @@ const stopTimerCompile = () => {
 const end = (err) => {
   stopTimerCompile();
 
+  // Kill `npm run examples`
   prc.kill();
 
-  const prcOut = prcOutBuf.toString();
-  const prcErr = prcErrBuf.toString();
+  // Kill webpack
+  try {
+    const webpack_pid = parseInt(execSync(`lsof -t -i tcp:${WEBPACK_PORT}`, {
+      encoding: 'utf8'
+    }));
+    process.kill(webpack_pid);
+  } catch(e) {
+    console.error('Failed to kill webpack!', e);
+  }
+
+  // Print webpack out
+  const prcOut = cleanStr(prcOutBuf.toString());
+  const prcErr = cleanStr(prcErrBuf.toString());
   console.log('------------------ [ webpack out ]');
   console.log(prcOut);
   console.log('------------------ [ webpack err ]');
   console.log(prcErr);
   console.log('------------------');
 
+  // Return 0 or 1
   if (err) {
     console.log(err);
     process.exit(1);
@@ -74,6 +93,7 @@ const check = () => {
       end(`webpack failed to compile`);
     }, EXIT_TIMEOUT);
   }
+
   if (prcOutClean.indexOf('｢wdm｣: Compiled successfully.') != -1) {
     isCompiled = true;
     stopTimerCompile();
