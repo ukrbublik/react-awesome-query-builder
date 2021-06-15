@@ -139,6 +139,10 @@ export default (Builder, CanMoveFn = null) => {
       }
     }
 
+    _getEventTarget = (e, dragStart) => {
+      return e && e.__mocked_window || document.body || window;
+    }
+
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest(".query-builder");
       document.body.classList.add("qb-dragging");
@@ -183,7 +187,8 @@ export default (Builder, CanMoveFn = null) => {
         clientY: e.clientY,
       };
 
-      const target = e.__mocked_window || window;
+      const target = this._getEventTarget(e, dragStart);
+      this.eventTarget = target;
       target.addEventListener("mousemove", this.onDrag);
       target.addEventListener("mouseup", this.onDragEnd);
 
@@ -263,10 +268,11 @@ export default (Builder, CanMoveFn = null) => {
       document.body.classList.remove("qb-dragging");
       this._cacheEls = {};
 
-      window.removeEventListener("mousemove", this.onDrag);
-      window.removeEventListener("mouseup", this.onDragEnd);
+      const target = this.eventTarget || this._getEventTarget();
+      target.removeEventListener("mousemove", this.onDrag);
+      target.removeEventListener("mouseup", this.onDragEnd);
     }
-
+    
 
     handleDrag (dragInfo, e, canMoveFn) {
       const canMoveBeforeAfterGroup = true;

@@ -1,5 +1,6 @@
 # Changelog
 - 4.0.4
+  - Fixed issue #349 with drag-n-drop and office-ui-fabric-react
   - Fixed issue #413 with func arg with 1 value source which is not value
 - 4.0.3
   - Fixed issue #386 with import select field from JsonLogic (reason: bug with func/field widget in getWidgetForFieldOp)
