@@ -1,5 +1,5 @@
 # Changelog
-- 4.0.5
+- 4.1.0
   - Fixed lint errors in code
   - Reorganized files in `tests`
   - Updated packages
@@ -9,7 +9,7 @@
   - Added new scripts: `install-all`, `clean`, `reinstall`, `build-all`, `check-hot`, `tsc`, `eslint`, `smoke`, `resmoke`.
     Renamed `sandbox_ts` to `sandbox-ts`, `sandbox_js` to `sandbox-js`.
   - Fixed problems with VSCode's TSLint plugin
-  - Moved from deprecated `prepublish` to `prepare` in package.json
+  - Moved from deprecated `prepublish` to `prepare` in `package.json`
 - 4.0.4
   - Fixed issue #349 with drag-n-drop and office-ui-fabric-react
   - Fixed issue #413 with func arg with 1 value source which is not value
