@@ -15,12 +15,11 @@
     "strict": true,
     "alwaysStrict": true,
     "strictNullChecks": false,
+    "noImplicitReturns": true,
 
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
-
-    "noImplicitReturns": true,
 
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,

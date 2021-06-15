@@ -15,6 +15,7 @@
     "strict": true,
     "alwaysStrict": true,
     "strictNullChecks": false,
+    "noImplicitReturns": true,
 
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -22,9 +23,7 @@
     "paths": {
       "react-awesome-query-builder": ["modules"],
       "react-awesome-query-builder/*": ["modules/*"],
-    },
-
-    "noImplicitReturns": true
+    }
   },
   "include": [
     "demo/**/*",

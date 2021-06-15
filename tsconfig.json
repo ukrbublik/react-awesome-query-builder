@@ -14,11 +14,10 @@
 
     "strict": true,
     "alwaysStrict": true,
+    "noImplicitReturns": true,
 
     "esModuleInterop": true,
-    "moduleResolution": "node",
-
-    "noImplicitReturns": true
+    "moduleResolution": "node"
   },
   "include": [
     "modules/**/*"
