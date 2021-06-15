@@ -408,11 +408,14 @@ To build the component locally, clone this repo then run:
 Then open localhost:3001 in a browser.
 
 Scripts:
-- `npm test` - Run tests with Karma and update coverage. Recommended before commits. Requires Node.js v10+
-- `npm run lint` - Run ESLint. Recommended before commits.
-- `npm run lint-fix` - Run ESLint with `--fix` option. Recommended before commits.
-- `npm run build-examples` - Build examples with webpack. Output path: `examples`
-- `npm run build-npm` - Build npm module that can be published. Output path: `lib`
+- `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
+- `npm run lint` - Run ESLint and TSC
+- `npm run lint-fix` - Run ESLint with `--fix` option
+- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
+- `npm run install-all` - Install npm packages in root, examples, sandboxes
+- `npm run smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
+- `npm run build` - Build npm module to `lib`, build minified production package to `build`
+- `npm run build-examples` - Build demo with webpack to `examples`. Then you can open `examples/index.html`
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)
