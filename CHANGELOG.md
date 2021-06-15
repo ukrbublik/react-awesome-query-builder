@@ -1,4 +1,6 @@
 # Changelog
+- 4.0.4
+  - Fixed issue #349 with drag-n-drop and office-ui-fabric-react
 - 4.0.3
   - Fixed issue #386 with import select field from JsonLogic (reason: bug with func/field widget in getWidgetForFieldOp)
   - Fixed issue #387 with subgroups in Material UI 
