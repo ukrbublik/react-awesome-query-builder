@@ -52,11 +52,19 @@ export default class FuncWidget extends PureComponent {
   };
 
   setArgValue = (argKey, argVal) => {
-    this.props.setValue( setArgValue(this.props.value, argKey, argVal) );
+    const {funcDefinition} = this.meta;
+    const {args} = funcDefinition;
+    const argDefinition = args[argKey];
+
+    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition) );
   };
 
   setArgValueSrc = (argKey, argValSrc) => {
-    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc) );
+    const {funcDefinition} = this.meta;
+    const {args} = funcDefinition;
+    const argDefinition = args[argKey];
+
+    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition) );
   };
 
   renderFuncSelect = () => {
@@ -108,7 +116,8 @@ export default class FuncWidget extends PureComponent {
     const {config, field, operator, value, readonly} = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
-    const argValSrc = arg ? (arg.get("valueSrc") || "value") : undefined;
+    const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
+    const argValSrc = arg ? (arg.get("valueSrc") || defaultValueSource || "value") : defaultValueSource;
 
     const widgetProps = {
       config, 
