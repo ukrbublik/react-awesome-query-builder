@@ -1,4 +1,7 @@
 # Changelog
+- 4.0.5
+  - Updated packages with security vulnerabilities
+  - Minimum supported NodeJs is 12.13
 - 4.0.4
   - Fixed issue #349 with drag-n-drop and office-ui-fabric-react
   - Fixed issue #413 with func arg with 1 value source which is not value
