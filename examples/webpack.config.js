@@ -106,7 +106,10 @@ module.exports = {
                 exclude: /node_modules/,
                 use: [{
                     loader: 'babel-loader',
-                    options: babel_options,
+                    options: {
+                        ...babel_options,
+                        cacheDirectory: true
+                    }
                 }]
             },
             {

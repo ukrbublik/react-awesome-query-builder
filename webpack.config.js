@@ -63,6 +63,9 @@ module.exports = {
             {
                 test: /\.[jt]sx?$/,
                 loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true
+                },
                 exclude: /node_modules/
             },
             {
