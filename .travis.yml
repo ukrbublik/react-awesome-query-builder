@@ -11,5 +11,4 @@ install:
   - npm run install-all
   - npm run lint
   - npm run build-all
-  - npm run build-all
   - npm run check-hot
