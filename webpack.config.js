@@ -61,7 +61,7 @@ module.exports = {
                 exclude: /node_modules/,
             },
             {
-                test: /\.[jt]sx?$/,
+                test: /\.jsx?$/,
                 loader: 'babel-loader',
                 options: {
                     cacheDirectory: true
