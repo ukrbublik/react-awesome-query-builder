@@ -21,7 +21,7 @@
     "@types/node": "^13.13.21",
     "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.7",
-    "antd": "^4.16.2",
+    "antd": ">=4.0.0 <4.5.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/pickers": "^3.2.10",
@@ -30,8 +30,7 @@
     "react": "^16.4.1",
     "react-awesome-query-builder": "^4.0.3",
     "react-dom": "^16.4.1",
-    "react-scripts": "^3.4.3",
-    "typescript": "4.3.2"
+    "react-scripts": "^3.4.3"
   },
   "browserslist": {
     "production": [
