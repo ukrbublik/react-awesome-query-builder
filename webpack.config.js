@@ -1,11 +1,13 @@
 const webpack = require('webpack');
 const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const MODE = process.env.NODE_ENV || "development";
 const BUILD = path.resolve(__dirname, 'build/');
 const MODULES = path.resolve(__dirname, 'modules/');
 const isCompress = process.env.COMPRESS == "1";
+const isAnalyze = process.env.ANALYZE == "1";
 const LibName = 'ReactAwesomeQueryBuilder';
 const lib_name = 'react-awesome-query-builder';
 
@@ -26,6 +28,12 @@ if (isCompress) {
     ];
     optimization.minimize = true;
 }
+if (isAnalyze) {
+    plugins = [
+        ...plugins,
+        new BundleAnalyzerPlugin()
+    ];
+}
 
 module.exports = {
     plugins,
@@ -36,7 +44,7 @@ module.exports = {
     ],
     output: {
         library: LibName,
-        libraryTarget: 'umd',
+        libraryTarget: isAnalyze ? undefined : 'umd',
         path: BUILD,
         filename: LibName + (isCompress ? '.min' : '') + '.js',
     },
