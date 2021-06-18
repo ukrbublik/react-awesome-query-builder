@@ -1,3 +1,3 @@
 import {MaterialWidgets} from "../../..";
-const MaterialWidgets: MaterialWidgets;
+declare const MaterialWidgets: MaterialWidgets;
 export default MaterialWidgets;

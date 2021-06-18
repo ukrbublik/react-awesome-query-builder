@@ -1,44 +1,56 @@
-var webpack = require('webpack');
-var path = require('path');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const webpack = require('webpack');
+const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
-//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
-var plugins = [
-    new webpack.optimize.OccurrenceOrderPlugin(),
+const MODE = process.env.NODE_ENV || "development";
+const BUILD = path.resolve(__dirname, 'build/');
+const MODULES = path.resolve(__dirname, 'modules/');
+const isCompress = process.env.COMPRESS == "1";
+const isAnalyze = process.env.ANALYZE == "1";
+const LibName = 'ReactAwesomeQueryBuilder';
+const lib_name = 'react-awesome-query-builder';
+
+let plugins = [
     new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        'process.env': {
+            NODE_ENV: JSON.stringify(MODE),
+        }
     }),
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
+    new MomentLocalesPlugin({
+        localesToKeep: ['es-us', 'ru'],
+    }),
 ];
-var optimization = {};
+let optimization = {};
 
-if (process.env.ANALYZE == "1") {
+if (isCompress) {
+    plugins = [
+        ...plugins,
+        new CompressionPlugin()
+    ];
+    optimization.minimize = true;
+}
+if (isAnalyze) {
     plugins = [
         ...plugins,
         new BundleAnalyzerPlugin()
     ];
 }
 
-if (process.env.COMPRESS == "1") {
-    plugins = [
-        ...plugins,
-        new CompressionPlugin()
-    ];
-    optimization.minimizer = [
-        //new UglifyJsPlugin()
-    ];
-}
-
 module.exports = {
     plugins,
     optimization,
-    mode:  process.env.NODE_ENV || "development",
+    mode: MODE,
+    entry: [
+        './modules/index.js',
+    ],
     output: {
-        library: 'ReactAwesomeQueryBuilder',
-        libraryTarget: 'umd',
-        path: path.resolve(__dirname, 'build'),
-        filename: 'ReactAwesomeQueryBuilder' + (process.env.COMPRESS ? '.min' : '') + '.js',
+        library: LibName,
+        libraryTarget: isAnalyze ? undefined : 'umd',
+        path: BUILD,
+        filename: LibName + (isCompress ? '.min' : '') + '.js',
     },
     externals: [
         {
@@ -48,8 +60,8 @@ module.exports = {
             "redux": "Redux",
             "immutable": "Immutable",
             "moment": 'moment',
-            "sqlstring": "sqlstring",
-            "classnames": "classnames",
+            // "sqlstring": "sqlstring",
+            // "classnames": "classnames",
         },
         /^lodash\/.+$/,
     ],
@@ -63,6 +75,9 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 loader: 'babel-loader',
+                options: {
+                    cacheDirectory: true
+                },
                 exclude: /node_modules/
             },
             {
@@ -88,7 +103,9 @@ module.exports = {
                 }, {
                     loader: "less-loader",
                     options: {
-                        javascriptEnabled: true
+                        lessOptions: {
+                            javascriptEnabled: true
+                        }
                     }
                 }]
             }
@@ -97,15 +114,14 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         modules: [
-            'node_modules',
-            __dirname + '/node_modules',
+            'node_modules'
         ],
         alias: {
-            'ReactAwesomeQueryBuilder': __dirname + '/modules/',
-            'immutable': 'immutable'
+            [LibName]: MODULES,
+            [lib_name]: MODULES
+        },
+        fallback: {
+            Buffer: false,
         }
-    },
-    node: {
-        Buffer: false
     }
 };

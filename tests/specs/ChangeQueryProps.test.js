@@ -1,7 +1,7 @@
 import { BasicConfig } from "react-awesome-query-builder";
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb, load_tree } from "./utils";
+import * as configs from "../support/configs";
+import * as inits from "../support/inits";
+import { with_qb, load_tree } from "../support/utils";
 
 
 describe("change props", () => {

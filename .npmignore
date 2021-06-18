@@ -1,7 +1,9 @@
-/examples/bundle.js
-/examples/bundle.js.map
+/examples/bundle.*
 /build/
 /coverage/
+/sandbox/build/
+/sandbox_simple/build/
+ts_out/
 node_modules/
 package-lock.json
 npm-debug.log

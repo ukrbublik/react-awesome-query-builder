@@ -10,15 +10,14 @@ import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import AntdConfig from "react-awesome-query-builder/lib/config/antd";
 import AntdWidgets from "react-awesome-query-builder/lib/components/widgets/antd";
+import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
-
 
 
 //////////////////////////////////////////////////////////////////////
@@ -34,7 +33,7 @@ const fields: Fields = {
         type: "text",
         excludeOperators: ["proximity"],
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
+          validateValue: (val: string, fieldSettings) => {
             return (val.length < 10);
           },
         },
@@ -48,7 +47,7 @@ const fields: Fields = {
         tableName: "t1", // legacy: PR #18, PR #20
         excludeOperators: ["proximity"],
         fieldSettings: {
-          validateValue: (val, fieldSettings) => {
+          validateValue: (val: string, fieldSettings) => {
             return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
           },
         },

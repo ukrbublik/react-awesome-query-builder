@@ -64,8 +64,8 @@ See [basic usage](#usage) and [API](#api) below.
 
 Demo apps:
 - [`npm start`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`npm run sandbox_ts`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- [`npm run sandbox_js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+- [`npm run sandbox-ts`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- [`npm run sandbox-js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 
 
 ## v2 Migration
@@ -83,7 +83,7 @@ import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query
 
 // For AntDesign widgets only:
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import 'react-awesome-query-builder/css/antd.less'; // or import "antd/dist/antd.css";
+import 'antd/dist/antd.css'; // or import "react-awesome-query-builder/css/antd.less";
 // For Material-UI widgets only:
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
 
@@ -408,11 +408,14 @@ To build the component locally, clone this repo then run:
 Then open localhost:3001 in a browser.
 
 Scripts:
-- `npm test` - Run tests with Karma and update coverage. Recommended before commits. Requires Node.js v10+
-- `npm run lint` - Run ESLint. Recommended before commits.
-- `npm run lint-fix` - Run ESLint with `--fix` option. Recommended before commits.
-- `npm run build-examples` - Build examples with webpack. Output path: `examples`
-- `npm run build-npm` - Build npm module that can be published. Output path: `lib`
+- `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
+- `npm run lint` - Run ESLint and TSC
+- `npm run lint-fix` - Run ESLint with `--fix` option
+- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
+- `npm run install-all` - Install npm packages in root, examples, sandboxes
+- `npm run smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
+- `npm run build` - Build npm module to `lib`, build minified production package to `build`
+- `npm run build-examples` - Build demo with webpack to `examples`. Then you can open `examples/index.html`
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)

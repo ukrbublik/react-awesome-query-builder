@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 10
+  - 12
 sudo: required
 dist: trusty
 before_install:
@@ -8,6 +8,7 @@ before_install:
   # https://stackoverflow.com/questions/22475849/node-js-error-enospc#32600959
   - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 install:
-  - npm install
+  - npm run install-all
   - npm run lint
-  - npm run build-examples
+  - npm run build-all
+  - npm run check-hot

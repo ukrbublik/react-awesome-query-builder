@@ -14,11 +14,11 @@ import {
   getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig
 } from "../utils/configUtils";
 import {
-  getOperatorsForField, getFirstOperator, getWidgetForFieldOp
+  getOperatorsForField, getFirstOperator, getWidgetForFieldOp,
+  getNewValueForFieldOp
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue} from "../utils/stuff";
 import {validateValue} from "../utils/validation";
-import {getNewValueForFieldOp} from "../utils/ruleUtils";
 
 const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
 

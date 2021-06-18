@@ -7,7 +7,7 @@ import {connect} from "react-redux";
 const classNames = require("classnames");
 
 
-export default (Rule) => {
+const createRuleContainer = (Rule) => 
   class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
@@ -155,9 +155,10 @@ export default (Rule) => {
       );
     }
 
-  }
+  };
 
 
+export default (Rule) => {
   const ConnectedRuleContainer = connect(
     (state) => {
       return {
@@ -169,7 +170,7 @@ export default (Rule) => {
     {
       context
     }
-  )(RuleContainer);
+  )(createRuleContainer(Rule));
   ConnectedRuleContainer.displayName = "ConnectedRuleContainer";
 
   return ConnectedRuleContainer;

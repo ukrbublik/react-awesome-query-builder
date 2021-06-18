@@ -10,9 +10,7 @@ import moment from "moment";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 
-// @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
-// @ts-ignore
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 const {
   FieldSelect,
@@ -20,17 +18,16 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-// @ts-ignore
 import MaterialConfig from "react-awesome-query-builder/config/material";
 
-const skinToConfig = {
+const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
   antd: AntdConfig,
   material: MaterialConfig,
 };
 
-export default (skin) => {
-  const InitialConfig = skinToConfig[skin];
+export default (skin: string) => {
+  const InitialConfig = skinToConfig[skin] as BasicConfig;
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
@@ -227,7 +224,7 @@ export default (skin) => {
           type: "text",
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val, fieldSettings) => {
+            validateValue: (val: string, fieldSettings) => {
               return (val.length < 10);
             },
           },
@@ -241,7 +238,7 @@ export default (skin) => {
           tableName: "t1", // legacy: PR #18, PR #20
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val, fieldSettings) => {
+            validateValue: (val: string, fieldSettings) => {
               return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
             },
           },

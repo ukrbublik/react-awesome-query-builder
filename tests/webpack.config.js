@@ -1,5 +1,9 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
+
+const MODULES = path.resolve(__dirname, '../modules/');
+const LibName = 'ReactAwesomeQueryBuilder';
+const lib_name = 'react-awesome-query-builder';
 
 module.exports = {
     mode: "development",
@@ -7,7 +11,7 @@ module.exports = {
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
-          NODE_ENV: JSON.stringify('test'),
+          NODE_ENV: JSON.stringify('development'),
           CI: JSON.stringify(process.env.CI),
         },
       }),
@@ -17,10 +21,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: [{
-                    loader: 'ts-loader',
-                    options: {
-                        cacheDirectory: true,
-                    },
+                    loader: 'ts-loader'
                 }],
                 exclude: /node_modules/,
             },
@@ -29,7 +30,7 @@ module.exports = {
                 use: [{
                     loader: 'babel-loader',
                     options: {
-                        cacheDirectory: true,
+                        cacheDirectory: true
                     },
                 }],
                 exclude: /node_modules/
@@ -57,25 +58,26 @@ module.exports = {
                 }, {
                     loader: "less-loader",
                     options: {
-                        javascriptEnabled: true
+                        lessOptions: {
+                            javascriptEnabled: true
+                        }
                     }
                 }]
             }
         ],
     },
-    node: {
-      // Some tests import fs
-      fs: 'empty',
-    },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         modules: [
-            'node_modules',
-            __dirname + '/node_modules',
+            'node_modules'
         ],
         alias: {
-            'ReactAwesomeQueryBuilder': __dirname + '/modules',
-            'react-awesome-query-builder': __dirname + '/modules',
+            [LibName]: MODULES,
+            [lib_name]: MODULES,
+        },
+        fallback: {
+          fs: false,
+          util: false
         }
     },
 };

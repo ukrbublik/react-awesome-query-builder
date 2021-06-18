@@ -1,6 +1,6 @@
-import * as configs from "./configs";
-import * as inits from "./inits";
-import { with_qb_skins, export_checks } from "./utils";
+import * as configs from "../support/configs";
+import * as inits from "../support/inits";
+import { with_qb_skins, export_checks } from "../support/utils";
 
 
 describe("query with !struct and !group", () => {

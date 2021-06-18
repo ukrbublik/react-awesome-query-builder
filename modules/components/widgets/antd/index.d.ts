@@ -1,3 +1,3 @@
 import {AntdWidgets} from "../../..";
-const AntdWidgets: AntdWidgets;
+declare const AntdWidgets: AntdWidgets;
 export default AntdWidgets;
