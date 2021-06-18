@@ -5,7 +5,7 @@
   "main": "index.tsx",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve",
-    "build": "cross-env NODE_ENV=production webpack",
+    "build": "cross-env NODE_ENV=production CSS=0 webpack",
     "analyze": "cross-env NODE_ENV=production ANALYZE=1 webpack"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",

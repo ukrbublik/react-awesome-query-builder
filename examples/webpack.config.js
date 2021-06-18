@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const MODE = process.env.NODE_ENV || "development";
 const PORT = 3001;
@@ -8,9 +10,11 @@ const lib_name = 'react-awesome-query-builder';
 const isProd = (MODE != "development");
 const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
+const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
 const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
 const MODULES = path.resolve(EXAMPLES, '../modules/');
+const DIST = path.resolve(EXAMPLES, '.');
 
 let plugins = [
     new webpack.DefinePlugin({
@@ -22,11 +26,28 @@ let plugins = [
 let aliases = {
     [lib_name]: MODULES
 };
+let style_loaders = [{
+    loader: "style-loader"
+}];
 
 if (isProd) {
     plugins = [
         ...plugins,
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
+        new MomentLocalesPlugin({
+            localesToKeep: ['es-us', 'ru'],
+        }),
+    ];
+}
+if (isSeparateCss) {
+    plugins = [
+        ...plugins,
+        new MiniCssExtractPlugin({
+            filename: path.resolve(DIST, 'bundle.css')
+        }),
+    ];
+    style_loaders = [
+        MiniCssExtractPlugin.loader
     ];
 }
 if (isAnalyze) {
@@ -77,7 +98,7 @@ module.exports = {
         './index',
     ],
     output: {
-        path: EXAMPLES,
+        path: DIST,
         filename: 'bundle.js'
     },
     resolve: {
@@ -114,13 +135,11 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ["style-loader", "css-loader"]
+                use: [...style_loaders, "css-loader"]
             },
             {
                 test: /\.scss$/,
-                use: [{
-                    loader: "style-loader"
-                }, {
+                use: [...style_loaders, {
                     loader: "css-loader"
                 }, {
                     loader: "sass-loader"
@@ -128,9 +147,7 @@ module.exports = {
             },
             {
                 test: /\.less$/,
-                use: [{
-                    loader: "style-loader"
-                }, {
+                use: [...style_loaders, {
                     loader: "css-loader"
                 }, {
                     loader: "less-loader",

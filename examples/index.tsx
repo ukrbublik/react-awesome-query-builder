@@ -4,7 +4,7 @@ import React, {Component} from "react";
 import ReactDOM from "react-dom";
 import Demo from "./demo/demo";
 
-import "antd/dist/antd.css"; // or import "../css/antd.less";
+import "../css/antd.less"; // or import "antd/dist/antd.css";
 import "../css/styles.scss";
 //import '../css/compact_styles.scss'; //optional
 

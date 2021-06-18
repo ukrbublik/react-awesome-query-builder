@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 
 const MODE = process.env.NODE_ENV || "development";
 const BUILD = path.resolve(__dirname, 'build/');
@@ -18,6 +19,9 @@ let plugins = [
         }
     }),
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
+    new MomentLocalesPlugin({
+        localesToKeep: ['es-us', 'ru'],
+    }),
 ];
 let optimization = {};
 
