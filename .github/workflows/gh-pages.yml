@@ -15,7 +15,7 @@ jobs:
         ref: master
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '12.x'
     - run: npm install
     - name: Build examples
       run: npm run build-examples
