@@ -83,7 +83,7 @@ import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query
 
 // For AntDesign widgets only:
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import 'react-awesome-query-builder/css/antd.less'; // or import "antd/dist/antd.css";
+import 'antd/dist/antd.css'; // or import "react-awesome-query-builder/css/antd.less";
 // For Material-UI widgets only:
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
 
