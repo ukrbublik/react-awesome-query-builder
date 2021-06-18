@@ -15,13 +15,11 @@
     "eject": "SKIP_PREFLIGHT_CHECK=true react-scripts eject"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "homepage": "https://ukrbublik.github.io/react-awesome-query-builder/",
   "dependencies": {
-    "lodash": "^4.6",
-    "react": "^16.4.1",
+    "react-scripts": "^3.4.3",
     "react-awesome-query-builder": "^4.0.3",
-    "react-dom": "^16.4.1",
-    "react-scripts": "^3.4.3"
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "browserslist": {
     "production": [

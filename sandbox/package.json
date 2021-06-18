@@ -15,22 +15,19 @@
     "eject": "SKIP_PREFLIGHT_CHECK=true react-scripts eject"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "homepage": "https://ukrbublik.github.io/react-awesome-query-builder/",
   "dependencies": {
-    "@types/lodash": "^4.14.161",
-    "@types/node": "^13.13.21",
-    "@types/react": "^16.9.49",
-    "@types/react-dom": "^16.9.7",
-    "antd": ">=4.0.0 <4.5.0",
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/pickers": "^3.2.10",
-    "material-ui-confirm": "^2.1.1",
-    "lodash": "^4.6",
-    "react": "^16.4.1",
+    "react-scripts": "^3.4.3",
     "react-awesome-query-builder": "^4.0.3",
-    "react-dom": "^16.4.1",
-    "react-scripts": "^3.4.3"
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "antd": ">=4.0.0 <4.5.0",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/pickers": "^3.3.10",
+    "material-ui-confirm": "^2.1.2",
+    "@types/lodash": "^4.14.170",
+    "@types/react": "^16.14.0",
+    "@types/react-dom": "^17.0.8"
   },
   "browserslist": {
     "production": [
