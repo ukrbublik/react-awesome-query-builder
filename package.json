@@ -83,7 +83,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "prop-types": "^15.7.2",
-    "react-redux": "~7.2.4",
+    "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "sqlstring": "^2.3.2"
   },
