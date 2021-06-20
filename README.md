@@ -60,7 +60,7 @@ npm i @material-ui/pickers
 npm i material-ui-confirm
 ```
 
-See [basic usage](#usage) and [API](#api) below.  
+See [basic usage](#usage), [API](#api), [config](#config-format) below.  
 
 Demo apps:
 - [`npm start`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
@@ -68,15 +68,10 @@ Demo apps:
 - [`npm run sandbox-js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 
 
-## v2 Migration
-From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
-Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
-Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
-Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
-
 
 ## Usage
-Minimal Javascript example with class component:
+
+#### Minimal Javascript example with class component
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
@@ -187,7 +182,8 @@ class DemoQueryBuilder extends Component {
 }
 ```
 
-The same example in TypeScript with function component ([Codesandbox](https://codesandbox.io/s/relaxed-sun-erhnu?file=/src/demo/demo.tsx)):
+#### Minimal TypeScript example with function component
+([Codesandbox](https://codesandbox.io/s/relaxed-sun-erhnu?file=/src/demo/demo.tsx))
 ```typescript
 import React, { useState } from "react";
 import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
@@ -321,6 +317,7 @@ export const Demo: React.FC = () => {
 ```
 
 
+
 ## API
 
 ### `<Query />`
@@ -380,34 +377,62 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
 
 
+### Config format
+This library uses configarion driven aprroach. 
+Config defines what value types, operators are supported, how they are rendered, imported, exported. 
+At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
+See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) documentation.
 
-## Config format
-See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
 
 
-## Changelog
+## Versions
+
+Versions 2.x, 3.x, 4.x are backward-compatible. 
+Version 3 introduced support of Material-UI. 
+Version 4 introduced extended support of groups. 
+
+### Supported versions
+| Version | Supported          |
+| ------- | ------------------ |
+| 4.x     | :white_check_mark: |
+| 3.x     | :white_check_mark: |
+| 2.x     | :warning:          |
+| 1.x     | :x:                |
+| 0.x     | :x:                |
+
+### Changelog
 See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CHANGELOG.md)
 
+### Migration to v2
+From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
+Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
+Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
+Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
 
-## Other UI frameworks
-Currently there are 3 collections of widgets:
-- [antdesign widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/antd)
-- [material widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/material)
-- [vanilla widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/vanilla)
-
-Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
-You can use vanilla widgets as skeleton.  
-Then to enable new widgets you need to create config overrides like this:
-[material config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/material/index.js)
 
 
 ## Development
-To build the component locally, clone this repo then run:  
-`npm install`  
-`npm start`  
-Then open localhost:3001 in a browser.
+Clone this repo and run `npm start`. 
+Open `http://localhost:3001/` in a browser. 
+You will see demo app with hot reload of demo code and local library code. 
 
-Scripts:
+### Directory structure
+- `modules` - Main source code of library
+  - `components` - Core React components
+    - `widgets` - Components to render list of fields, operators, values of different types. Built with UI frameworks
+  - `config` - Basic config lives here. See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) docs.
+  - `export` - Code for export to JsonLogic, MongoDb, SQL, plain string
+  - `import` - Code for import from JsonLogic
+  - `actions` - Redux actions
+  - `stores/tree.js` - Redux store
+  - `index.d.ts` - TS definitions
+- `css` - Styles for query builder
+- `examples` - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- `sandbox` - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- `sandbox_simple` - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+- `tests` - All tests are here. Uses Karma, Mocha, Chai, Enzyme
+
+### Scripts
 - `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
 - `npm run lint` - Run ESLint and TSC
 - `npm run lint-fix` - Run ESLint with `--fix` option
@@ -420,9 +445,20 @@ Scripts:
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)
 
+### Other UI frameworks
+Currently there are 3 collections of widgets:
+- [antdesign widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/antd)
+- [material widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/material)
+- [vanilla widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/vanilla)
+
+Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
+You can use vanilla widgets as skeleton.  
+Then to enable new widgets you need to create config overrides like this:
+[material config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/material/index.js)
+
+
 
 ## Contributors
-
 
 ### Code Contributors
 
