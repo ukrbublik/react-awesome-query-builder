@@ -60,7 +60,8 @@ npm i @material-ui/pickers
 npm i material-ui-confirm
 ```
 
-See [basic usage](#usage), [API](#api), [config](#config-format) below.  
+See [basic usage](#usage) for minimum code example. 
+See [API](#api) and [config](#config-format) for documentation. 
 
 Demo apps:
 - [`npm start`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
@@ -381,7 +382,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 This library uses configarion driven aprroach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
 At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
-See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) documentation.
+See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) for full documentation.
 
 
 
