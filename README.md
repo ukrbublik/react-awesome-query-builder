@@ -388,7 +388,7 @@ See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/mas
 
 ## Versions
 
-Versions 2.x, 3.x, 4.x are backward-compatible. 
+Versions 4.x are backward-compatible with 2.x and 3.x. 
 
 Version 3 introduced support of Material-UI. 
 
