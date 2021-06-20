@@ -1,7 +1,8 @@
 import sinon from "sinon";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb, simulate_drag_n_drop } from "../support/utils";
+import { with_qb } from "../support/utils";
+import { simulate_drag_n_drop } from "../support/dnd";
 
 
 describe("drag-n-drop", () => {
