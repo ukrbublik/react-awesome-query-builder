@@ -406,7 +406,7 @@ Version 4 introduced extended support of groups.
 ### Changelog
 See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CHANGELOG.md)
 
-### Migration to v2
+### Migration from v1 to v2
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
 Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
 Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
