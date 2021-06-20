@@ -1,11 +1,13 @@
-import React from "react";
-import { mount, shallow } from "enzyme";
+import React, { ReactElement } from "react";
+import { mount, shallow, ReactWrapper } from "enzyme";
 import { act } from "react-dom/test-utils";
 import sinon from "sinon";
+import { expect } from "chai";
 const stringify = JSON.stringify;
 
 import {
-  Query, Builder, Utils, BasicConfig,
+  Query, Builder, Utils, BasicConfig, 
+  JsonLogicTree, JsonTree, Config, ImmutableTree, BuilderProps
 } from "react-awesome-query-builder";
 const {
   uuid, 
@@ -15,8 +17,28 @@ const {
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import MaterialConfig from "react-awesome-query-builder/config/material";
 
+type TreeValueFormat = "JsonLogic" | "default" | null;
+type TreeValue = JsonLogicTree | JsonTree | undefined;
+type ConfigFn = (_: Config) => Config;
+type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => void;
+interface ExtectedExports {
+  query?: string;
+  queryHuman?: string;
+  sql?: string;
+  mongo?: Object;
+  logic?: JsonLogicTree;
+}
+interface Tasks {
+  expect_jlogic: (jlogics: Array<null | JsonLogicTree>, changeIndex?: number) => void;
+  expect_queries: (queries: Array<string>) => void;
+  expect_checks: (expects: ExtectedExports) => void;
+  config: Config;
+}
 
-export const load_tree = (value, config, valueFormat = null) => {
+const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
+
+
+export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {
   if (!valueFormat) {
     if (isJsonLogic(value))
       valueFormat = "JsonLogic";
@@ -28,30 +50,43 @@ export const load_tree = (value, config, valueFormat = null) => {
   return checkTree(tree, config);
 };
 
-export  const with_qb = (config_fn, value, valueFormat, checks) => {
+export  const with_qb = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
 };
 
-export  const with_qb_ant = (config_fn, value, valueFormat, checks) => {
+export  const with_qb_ant = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
   do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
 };
 
-export  const with_qb_material = (config_fn, value, valueFormat, checks) => {
+export  const with_qb_material = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
   do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks);
 };
   
-export  const with_qb_skins = (config_fn, value, valueFormat, checks) => {
+export  const with_qb_skins = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
   do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
   do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks);
 };
   
-const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
+const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
   const config = config_fn(BasicConfig);
   const onChange = sinon.spy();
   const tree = load_tree(value, config, valueFormat);
 
-  let qb;
+  const tasks: Tasks = {
+    expect_jlogic: (jlogics, changeIndex = 0) => {
+      expect_jlogic_before_and_after(config, tree, onChange, jlogics, changeIndex);
+    },
+    expect_queries: (queries) => {
+      expect_queries_before_and_after(config, tree, onChange, queries);
+    },
+    expect_checks: (expects) => {
+      do_export_checks(config, tree, expects, false, true);
+    },
+    config: config,
+  };
+
+  let qb: ReactWrapper;
   act(() => {
     qb = mount(
       <Query
@@ -60,30 +95,19 @@ const do_with_qb = (BasicConfig, config_fn, value, valueFormat, checks) => {
         renderBuilder={render_builder}
         onChange={onChange}
       />
-    );
+    ) as ReactWrapper;
   });
 
-  const tasks = {
-    expect_jlogic: (jlogics, changeIndex = 0) => {
-      expect_jlogic_before_and_after(config, value, onChange, jlogics, changeIndex);
-    },
-    expect_queries: (queries) => {
-      expect_queries_before_and_after(config, value, onChange, queries);
-    },
-    expect_checks: (expects) => {
-      do_export_checks(config, tree, expects, false, true);
-    },
-    config: config,
-  };
-  
+  // @ts-ignore
   checks(qb, onChange, tasks);
-  
+
+  // @ts-ignore
   qb.unmount();
   
   onChange.resetHistory();
 };
   
-const render_builder = (props) => (
+const render_builder = (props: BuilderProps) => (
   <div className="query-builder-container" style={{padding: "10px"}}>
     <div className="query-builder qb-lite">
       <Builder {...props} />
@@ -95,23 +119,10 @@ export const empty_value = {id: uuid(), type: "group"};
 
 // ----------- export checks
 
-const do_export_checks = (config, tree, expects, with_render = false, inside_it = false) => {
-  const doIt = inside_it ? ((name, func) => { func(); }) : it;
+const do_export_checks = (config: Config, tree: ImmutableTree, expects: ExtectedExports, with_render = false, inside_it = false) => {
+  const doIt = inside_it ? ((name: string, func: Function) => { func(); }) : it;
 
   if (expects) {
-    let qb;
-    if (with_render) {
-      act(() => {
-        qb = mount(
-          <Query
-            {...config}
-            value={tree}
-            renderBuilder={render_builder}
-          />
-        );
-      });
-    }
-
     if (expects["query"] !== undefined) {
       doIt("should work to query string", () => {
         const res = queryString(tree, config);
@@ -138,7 +149,7 @@ const do_export_checks = (config, tree, expects, with_render = false, inside_it 
     if (expects["logic"] !== undefined) {
       doIt("should work to JsonLogic", () => {
         const {logic, data, errors} = jsonLogicFormat(tree, config);
-        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
+        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
         expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expects["logic"]));
         if (expects["logic"])
           expect(errors).to.eql([]);
@@ -149,8 +160,19 @@ const do_export_checks = (config, tree, expects, with_render = false, inside_it 
       const res = queryBuilderFormat(tree, config);
     });
 
-    if (qb) {
-      qb.unmount();
+    if (with_render) {
+      act(() => {
+        const qb = mount(
+          <Query
+            {...config}
+            value={tree}
+            renderBuilder={render_builder}
+            onChange={emptyOnChange}
+          />
+        );
+  
+        qb.unmount();
+      });
     }
   } else {
     const {logic, data, errors} = jsonLogicFormat(tree, config);
@@ -165,21 +187,20 @@ const do_export_checks = (config, tree, expects, with_render = false, inside_it 
   }
 };
 
-export const export_checks = (config_fn, value, valueFormat, expects) => {
+export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
   const config = config_fn(BasicConfig);
   const tree = load_tree(value, config, valueFormat);
   do_export_checks(config, tree, expects, true);
 };
 
-export const export_checks_in_it = (config_fn, value, valueFormat, expects) => {
+export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
   const config = config_fn(BasicConfig);
   const tree = load_tree(value, config, valueFormat);
   do_export_checks(config, tree, expects, true, true);
 };
 
-const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, queries) => {
-  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
-  const initTreeString = queryString(load_tree(init_value_jl, config), config);
+const expect_queries_before_and_after = (config: Config, tree: ImmutableTree, onChange: sinon.SinonSpy, queries: Array<string>) => {
+  const initTreeString = queryString(tree, config);
   if (queries[0] !== null) {
     expect(initTreeString).to.equal(queries[0]);
   }
@@ -190,9 +211,8 @@ const expect_queries_before_and_after = (config_fn, init_value_jl, onChange, que
   expect(changedTreeString).to.equal(queries[1]);
 };
 
-const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlogics, changeIndex = 0) => {
-  const config = typeof config_fn == "function" ? config_fn(BasicConfig) : config_fn;
-  const {logic: initTreeJl} = jsonLogicFormat(load_tree(init_value_jl, config), config);
+const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onChange: sinon.SinonSpy, jlogics: Array<null | JsonLogicTree>, changeIndex = 0) => {
+  const {logic: initTreeJl} = jsonLogicFormat(tree, config);
   if (jlogics[0] !== null) {
     expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));
   }
@@ -201,48 +221,4 @@ const expect_jlogic_before_and_after = (config_fn, init_value_jl, onChange, jlog
   if (!call) throw new Error("onChange was not called");
   const {logic: changedTreeJl} = jsonLogicFormat(call.args[0], config);
   expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
-};
-
-// ----------- d-n-d
-  
-const createBubbledEvent = (type, props = {}) => {
-  const event = new Event(type, { bubbles: true });
-  Object.assign(event, props);
-  return event;
-};
-  
-export const simulate_drag_n_drop = (sourceRule, targetRule, coords) => {
-  const {
-    mousePos,
-    startMousePos,
-    dragRect,
-    plhRect,
-    treeRect,
-    hovRect,
-  } = coords;
-  const dragHandler = sourceRule.find(".qb-drag-handler").at(0);
-  
-  dragHandler.simulate(
-    "mousedown", 
-    createBubbledEvent("mousedown", {
-      ...startMousePos, 
-      __mocked_window: dragHandler.instance(), 
-    })
-  );
-  const targetContainer = targetRule.closest(".group-or-rule-container");
-  targetContainer.instance().getBoundingClientRect = () => hovRect;
-  dragHandler.instance().dispatchEvent(
-    createBubbledEvent("mousemove", {
-      ...mousePos,
-      __mock_dom: ({treeEl, dragEl, plhEl}) => {
-        treeEl.getBoundingClientRect = () => treeRect;
-        dragEl.getBoundingClientRect = () => dragRect;
-        plhEl.getBoundingClientRect = () => plhRect;
-      },
-      __mocked_hov_container: targetContainer.instance(),
-    })
-  );
-  dragHandler.instance().dispatchEvent(
-    createBubbledEvent("mouseup", { ...mousePos })
-  );
 };
