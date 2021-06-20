@@ -5,6 +5,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Checkbox from "@material-ui/core/Checkbox";
 import ListItemText from "@material-ui/core/ListItemText";
+import omit from "lodash/omit";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
   const renderOptions = (selectedValues) => 
@@ -45,7 +46,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
         disabled={readonly}
         readOnly={readonly}
         renderValue={renderValue}
-        {...customProps}
+        {...omit(customProps, ["showSearch"])}
       >
         {renderOptions(hasValue ? value : [])}
       </Select>

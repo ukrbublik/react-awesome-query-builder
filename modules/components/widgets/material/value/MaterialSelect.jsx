@@ -3,6 +3,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {mapListValues} from "../../../../utils/stuff";
 import FormControl from "@material-ui/core/FormControl";
+import omit from "lodash/omit";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
   const renderOptions = () => 
@@ -35,7 +36,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
         disabled={readonly}
         readOnly={readonly}
         renderValue={renderValue}
-        {...customProps}
+        {...omit(customProps, ["showSearch"])}
       >
         {renderOptions()}
       </Select>

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { expect } from "chai";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
@@ -54,5 +55,19 @@ describe("material-ui widgets interactions", () => {
       ]);
     });
   });
+
+  it("change time value", () => {
+    with_qb_material(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      const {onChange: onChangeDate} = qb
+        .find("KeyboardDateInput")
+        .props();
+      // @ts-ignore  
+      onChangeDate(moment("0001-01-01 10:30"));
+      expect_jlogic([null,
+        { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
+      ]);
+    });
+  });
+
 
 });
