@@ -61,6 +61,7 @@ npm i material-ui-confirm
 ```
 
 See [basic usage](#usage) for minimum code example. 
+
 See [API](#api) and [config](#config-format) for documentation. 
 
 Demo apps:
