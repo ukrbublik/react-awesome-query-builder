@@ -1,8 +1,7 @@
 import React, { ReactElement } from "react";
-import { mount, shallow } from "enzyme";
+import { mount, shallow, ReactWrapper } from "enzyme";
 import { act } from "react-dom/test-utils";
 import sinon from "sinon";
-import { ReactWrapper } from "enzyme";
 import { expect } from "chai";
 const stringify = JSON.stringify;
 
@@ -22,20 +21,21 @@ type TreeValueFormat = "JsonLogic" | "default" | null;
 type TreeValue = JsonLogicTree | JsonTree | undefined;
 type ConfigFn = (_: Config) => Config;
 type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => void;
-type OnChangeFn = (immutableTree: ImmutableTree, config: Config) => void;
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
   sql?: string;
   mongo?: Object;
   logic?: JsonLogicTree;
-};
+}
 interface Tasks {
   expect_jlogic: (jlogics: Array<null | JsonLogicTree>, changeIndex?: number) => void;
   expect_queries: (queries: Array<string>) => void;
   expect_checks: (expects: ExtectedExports) => void;
   config: Config;
-};
+}
+
+const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {
@@ -73,24 +73,6 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
   const onChange = sinon.spy();
   const tree = load_tree(value, config, valueFormat);
 
-  let qb: ReactWrapper;
-  act(() => {
-    qb = mount(
-      <Query
-        {...config}
-        value={tree}
-        renderBuilder={render_builder}
-        onChange={onChange}
-      />
-    );
-
-    checks(qb, onChange, tasks);
-    
-    qb.unmount();
-    
-    onChange.resetHistory();
-  });
-
   const tasks: Tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
       expect_jlogic_before_and_after(config, tree, onChange, jlogics, changeIndex);
@@ -103,6 +85,26 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
     },
     config: config,
   };
+
+  let qb: ReactWrapper;
+  act(() => {
+    qb = mount(
+      <Query
+        {...config}
+        value={tree}
+        renderBuilder={render_builder}
+        onChange={onChange}
+      />
+    ) as ReactWrapper;
+  });
+
+  // @ts-ignore
+  checks(qb, onChange, tasks);
+
+  // @ts-ignore
+  qb.unmount();
+  
+  onChange.resetHistory();
 };
   
 const render_builder = (props: BuilderProps) => (
@@ -147,7 +149,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
     if (expects["logic"] !== undefined) {
       doIt("should work to JsonLogic", () => {
         const {logic, data, errors} = jsonLogicFormat(tree, config);
-        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) : undefined;
+        const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
         expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expects["logic"]));
         if (expects["logic"])
           expect(errors).to.eql([]);
@@ -165,7 +167,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
             {...config}
             value={tree}
             renderBuilder={render_builder}
-            onChange={() => {}}
+            onChange={emptyOnChange}
           />
         );
   

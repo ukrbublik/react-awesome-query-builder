@@ -166,7 +166,8 @@ module.exports = {
             "@typescript-eslint/no-explicit-any": 0,
             "@typescript-eslint/no-empty-interface": 0,
             "@typescript-eslint/unbound-method": 0,
-            "@typescript-eslint/prefer-regexp-exec": 0
+            "@typescript-eslint/prefer-regexp-exec": 0,
+            "@typescript-eslint/no-empty-function": 0
         }
       },
     ],
