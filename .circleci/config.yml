@@ -1,11 +1,8 @@
 version: 2.1
-orbs:
-  node: circleci/node@4.5
 jobs:
   test:
-    executor:
-      name: node/default
-      tag: '12.19'
+    docker:
+      - image: circleci/node:latest-browsers
     steps:
       - checkout
       # - restore_cache:
