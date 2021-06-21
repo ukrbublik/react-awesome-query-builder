@@ -14,7 +14,7 @@ const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
 const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
 const MODULES = path.resolve(EXAMPLES, '../modules/');
-const DIST = path.resolve(EXAMPLES, '.');
+const DIST = path.resolve(EXAMPLES, './build');
 
 let plugins = [
     new webpack.DefinePlugin({

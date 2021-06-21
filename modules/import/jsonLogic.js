@@ -563,7 +563,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       id: uuid(),
       children1: {},
       properties: {
-        conjunction: defaultGroupConjunction(config),
+        conjunction: defaultGroupConjunction(config, fieldConfig),
         not: not,
         mode: fieldConfig.mode,
         field: field,

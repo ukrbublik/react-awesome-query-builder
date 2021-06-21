@@ -3,12 +3,13 @@ rm -rf ./node_modules
 rm -rf ./build
 rm -rf ./lib
 rm -rf ./coverage
+rm -rf ./junit
 rm -rf ./ts_out
 rm -rf ./tests/ts_out
 
 rm -rf ./examples/package-lock.json
 rm -rf ./examples/node_modules
-rm -f  ./examples/bundle.*
+rm -rf ./examples/build/bundle.*
 rm -rf ./examples/ts_out
 
 rm -rf ./sandbox/package-lock.json

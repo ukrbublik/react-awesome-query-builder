@@ -8,6 +8,6 @@ export default ({type, label, onClick, config}) => {
     "delRuleGroup": "x",
     "delRule": "x",
   };
-  const btnLabel = typeToLabel[type] || label;
+  const btnLabel = label || typeToLabel[type];
   return <button onClick={onClick} type="button">{btnLabel}</button>;
 };

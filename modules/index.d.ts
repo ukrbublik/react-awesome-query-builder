@@ -547,6 +547,9 @@ export interface LocaleSettings {
     antd?: Object,
     material?: Object,
   },
+  theme?: {
+    material?: Object,
+  },
   valueLabel?: string,
   valuePlaceholder?: string,
   fieldLabel?: string,
