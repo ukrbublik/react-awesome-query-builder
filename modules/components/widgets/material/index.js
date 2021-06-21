@@ -30,19 +30,27 @@ import MaterialConfirm from "./core/MaterialConfirm";
 // provider
 const MaterialProvider = ({config, children}) => {
   const settingsTheme = config.settings.theme || {};
-  const settingsMaterialTheme = settingsTheme.material || {};
-  const locale = config.settings.locale.material;
-  const theme = createMuiTheme(settingsMaterialTheme, locale);
+  const settingsLocale = config.settings.locale || {};
+  const themeConfig = settingsTheme.material;
+  const locale = settingsLocale.material;
+  const useTheme = themeConfig || locale;
+  const theme = useTheme ? createMuiTheme(themeConfig, locale) : null;
 
-  return (
-    <ThemeProvider theme={theme}>
-      <MuiPickersUtilsProvider utils={MomentUtils}>
-        <ConfirmProvider>
-          <div className="mui">{children}</div>
-        </ConfirmProvider>
-      </MuiPickersUtilsProvider>
-    </ThemeProvider>
+  const base = (<div className="mui">{children}</div>);
+  const withProviders = (
+    <MuiPickersUtilsProvider utils={MomentUtils}>
+      <ConfirmProvider>
+        {base}
+      </ConfirmProvider>
+    </MuiPickersUtilsProvider>
   );
+  const withTheme = theme ? (
+    <ThemeProvider theme={theme}>
+      {withProviders}
+    </ThemeProvider>
+  ) : withProviders;
+
+  return withTheme;
 };
 
 
