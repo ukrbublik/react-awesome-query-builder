@@ -441,7 +441,7 @@ You will see demo app with hot reload of demo code and local library code.
 - `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
 - `npm run smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
 - `npm run build` - Build npm module to `lib`, build minified production package to `build`
-- `npm run build-examples` - Build demo with webpack to `examples`. Then you can open `examples/index.html`
+- `npm run build-examples` - Build demo with webpack to `examples/build`
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)
