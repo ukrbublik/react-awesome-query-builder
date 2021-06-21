@@ -435,10 +435,10 @@ You will see demo app with hot reload of demo code and local library code.
 
 ### Scripts
 - `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
-- `npm run lint` - Run ESLint and TSC
-- `npm run lint-fix` - Run ESLint with `--fix` option
-- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
 - `npm run install-all` - Install npm packages in root, examples, sandboxes
+- `npm run lint` - Run ESLint and TSC (in root, tests, examples, sandboxes)
+- `npm run lint-fix` - Run ESLint with `--fix` option (in root, tests, examples, sandboxes)
+- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
 - `npm run smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
 - `npm run build` - Build npm module to `lib`, build minified production package to `build`
 - `npm run build-examples` - Build demo with webpack to `examples`. Then you can open `examples/index.html`
