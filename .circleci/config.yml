@@ -6,23 +6,23 @@ jobs:
       - image: cimg/node:12.19
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
-            - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}
+      # - restore_cache:
+      #     keys:
+      #       - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
+      #       - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}
       - run:
           name: Install
           command: npm run install-all
-      - save_cache:
-          key: node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
-          paths:
-            - node_modules
-            - examples/node_modules
-            - sandbox/node_modules
-            - sandbox_simple/node_modules
-      - run:
-          name: Lint
-          command: npm run lint
+      # - save_cache:
+      #     key: node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
+      #     paths:
+      #       - node_modules
+      #       - examples/node_modules
+      #       - sandbox/node_modules
+      #       - sandbox_simple/node_modules
+      # - run:
+      #     name: Lint
+      #     command: npm run lint
       - run:
           name: Test
           command: npm run test
