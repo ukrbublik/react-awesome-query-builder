@@ -3,9 +3,11 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: cimg/node:14
+      - image: cimg/node:12.19
     steps:
       - checkout
+      - run: node --version
+      - run: npm --version
       - restore_cache:
           keys:
             - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
