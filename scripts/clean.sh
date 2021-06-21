@@ -3,6 +3,7 @@ rm -rf ./node_modules
 rm -rf ./build
 rm -rf ./lib
 rm -rf ./coverage
+rm -rf ./junit
 rm -rf ./ts_out
 rm -rf ./tests/ts_out
 

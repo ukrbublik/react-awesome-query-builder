@@ -7,6 +7,8 @@ if (puppeteer.executablePath().indexOf("/home/ukrbublik/") == 0) {
 process.env.TZ = "Etc/UTC";
 process.env.BABEL_ENV = "test"; // Set the proper environment for babel
 
+const isCI = !!process.env.CI;
+
 module.exports = function(config) {
   config.set({
     basePath: "",
@@ -19,6 +21,7 @@ module.exports = function(config) {
       "karma-sourcemap-loader",
       "karma-webpack",
       "karma-mocha-reporter",
+      "karma-junit-reporter",
       "karma-coverage",
     ],
 
@@ -40,14 +43,20 @@ module.exports = function(config) {
       stats: "errors-only"
     },
 
-    reporters: ["progress", "coverage"],
+    reporters: isCI ? ["progress", "junit", "coverage"] : ["progress", "coverage"],
+
+    junitReporter: {
+      outputDir: "../junit",
+      outputFile: "test-results.xml",
+      useBrowserName: false
+    },
 
     coverageReporter: {
       dir: "../coverage",
       reporters: [
         { type: "html", subdir: "html" },
         { type: "text-summary" },
-        { type: "lcov" }
+        { type: "lcovonly", subdir: "lcov" }
       ],
       includeAllSources: true,
       instrumenterOptions: {
