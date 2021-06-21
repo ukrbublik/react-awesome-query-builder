@@ -1,9 +1,11 @@
 version: 2.1
-
+orbs:
+  node: circleci/node@x.y
 jobs:
   test:
-    docker:
-      - image: cimg/node:12.19
+    executor:
+      name: node/default
+      tag: '12.19'
     steps:
       - checkout
       # - restore_cache:
