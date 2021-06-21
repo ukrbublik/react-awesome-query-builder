@@ -1,6 +1,7 @@
-/examples/bundle.*
+/examples/build/bundle.*
 /build/
 /coverage/
+/junit/
 /sandbox/build/
 /sandbox_simple/build/
 ts_out/
