@@ -4,6 +4,7 @@ import mapValues from "lodash/mapValues";
 import context from "../../stores/context";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
 import {connect} from "react-redux";
+import {defaultGroupConjunction} from "../../utils/defaultUtils";
 
 
 const createGroupContainer = (Group) => 
@@ -19,7 +20,7 @@ const createGroupContainer = (Group) =>
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
       onDragStart: PropTypes.func,
       reordableNodesCnt: PropTypes.number,
-      selectedField: PropTypes.string, // for RuleGroup
+      field: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
@@ -30,6 +31,7 @@ const createGroupContainer = (Group) =>
       super(props);
       useOnPropsChanged(this);
 
+      this.selectedConjunction = this._selectedConjunction(props);
       this.conjunctionOptions = this._getConjunctionOptions(props);
       this.dummyFn.isDummyFn = true;
     }
@@ -65,6 +67,7 @@ const createGroupContainer = (Group) =>
       const oldConfig = this.props.config;
       const oldConjunction = this.props.conjunction;
       if (oldConfig != config || oldConjunction != conjunction) {
+        this.selectedConjunction = this._selectedConjunction(props);
         this.conjunctionOptions = this._getConjunctionOptions(nextProps);
       }
     }
@@ -75,8 +78,13 @@ const createGroupContainer = (Group) =>
         name: `conjunction[${props.id}]`,
         key: index,
         label: item.label,
-        checked: index === props.conjunction,
+        checked: index === this._selectedConjunction(props),
       }));
+    }
+
+    _selectedConjunction = (props) => {
+      props = props || this.props;
+      return props.conjunction || defaultGroupConjunction(props.config, props.field);
     }
 
     setConjunction = (conj = null) => {
@@ -142,7 +150,7 @@ const createGroupContainer = (Group) =>
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
-              selectedConjunction={this.props.conjunction}
+              selectedConjunction={this.selectedConjunction}
               setConjunction={this.dummyFn}
               setNot={this.dummyFn}
               removeSelf={this.dummyFn}
@@ -173,7 +181,7 @@ const createGroupContainer = (Group) =>
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
-              selectedConjunction={this.props.conjunction}
+              selectedConjunction={this.selectedConjunction}
               setConjunction={isInDraggingTempo ? this.dummyFn : this.setConjunction}
               setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
