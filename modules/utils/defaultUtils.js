@@ -69,6 +69,7 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
 
 
 export const defaultGroupConjunction = (config, fieldConfig = null) => {
+  fieldConfig = getFieldConfig(config, fieldConfig); // if `fieldConfig` is field name, not config
   const conjs = fieldConfig && fieldConfig.conjunctions || Object.keys(config.conjunctions);
   if (conjs.length == 1)
     return conjs[0];
