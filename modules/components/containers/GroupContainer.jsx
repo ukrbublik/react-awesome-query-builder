@@ -67,7 +67,7 @@ const createGroupContainer = (Group) =>
       const oldConfig = this.props.config;
       const oldConjunction = this.props.conjunction;
       if (oldConfig != config || oldConjunction != conjunction) {
-        this.selectedConjunction = this._selectedConjunction(props);
+        this.selectedConjunction = this._selectedConjunction(nextProps);
         this.conjunctionOptions = this._getConjunctionOptions(nextProps);
       }
     }
