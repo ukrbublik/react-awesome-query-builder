@@ -9,6 +9,17 @@ before_install:
   - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 install:
   - npm run install-all
+cache:
+  directories:
+    - node_modules
+    - examples/node_modules
+    - sandbox/node_modules
+    - sandbox_simple/node_modules
+script:
   - npm run lint
+  - npm run test
   - npm run build-all
   - npm run check-hot
+branches:
+  only: 
+    - master
