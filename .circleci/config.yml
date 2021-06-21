@@ -14,9 +14,9 @@ jobs:
       #     keys:
       #       - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #       - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}
-      # - run:
-      #     name: Install
-      #     command: npm run install-all
+      - run:
+          name: Install
+          command: npm run install-all
       # - save_cache:
       #     key: node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #     paths:
@@ -24,12 +24,12 @@ jobs:
       #       - examples/node_modules
       #       - sandbox/node_modules
       #       - sandbox_simple/node_modules
-      # - run:
-      #     name: Lint
-      #     command: npm run lint
-      # - run:
-      #     name: Test
-      #     command: npm run test
+      - run:
+          name: Lint
+          command: npm run lint
+      - run:
+          name: Test
+          command: npm run test
       # - store_test_results:
       #     path: ./junit
       # - store_artifacts:
