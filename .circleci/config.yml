@@ -1,17 +1,22 @@
 version: 2.1
+orbs:
+  browser-tools: circleci/browser-tools@1.1.3
 jobs:
   test:
     docker:
-      - image: circleci/node:latest-browsers
+      - image: cimg/node:12.22-browsers
     steps:
+      - browser-tools/install-browser-tools
       - checkout
+      - run: node --version
+      - run: google-chrome --version
       # - restore_cache:
       #     keys:
       #       - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #       - node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}
-      - run:
-          name: Install
-          command: npm run install-all
+      # - run:
+      #     name: Install
+      #     command: npm run install-all
       # - save_cache:
       #     key: node-deps-v1-{{ arch }}-{{ .Branch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #     paths:
@@ -22,25 +27,25 @@ jobs:
       # - run:
       #     name: Lint
       #     command: npm run lint
-      - run:
-          name: Test
-          command: npm run test
-      - store_test_results:
-          path: ./junit
-      - store_artifacts:
-          path: ./junit
-      - store_artifacts:
-          path: ./coverage/lconv
-      - store_artifacts:
-          path: ./coverage/html
-      - run:
-          name: Build
-          command: npm run build-all
-      - run:
-          name: Hot
-          command: npm run check-hot
+      # - run:
+      #     name: Test
+      #     command: npm run test
+      # - store_test_results:
+      #     path: ./junit
+      # - store_artifacts:
+      #     path: ./junit
+      # - store_artifacts:
+      #     path: ./coverage/lconv
+      # - store_artifacts:
+      #     path: ./coverage/html
+      # - run:
+      #     name: Build
+      #     command: npm run build-all
+      # - run:
+      #     name: Hot
+      #     command: npm run check-hot
 
 workflows:
-  build-and-test:
+  smoke:
     jobs:
       - test
