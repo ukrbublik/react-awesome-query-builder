@@ -10,16 +10,14 @@ before_install:
 install:
   - npm run install-all
 cache:
-  directories:
-    - node_modules
-    - examples/node_modules
-    - sandbox/node_modules
-    - sandbox_simple/node_modules
+  npm: false
+  # directories:
+  #   - node_modules
+  #   - examples/node_modules
+  #   - sandbox/node_modules
+  #   - sandbox_simple/node_modules
 script:
-  - npm run lint
-  - npm run test
-  - npm run build-all
-  - npm run check-hot
+  - npm run smoke
 branches:
   only: 
     - master
