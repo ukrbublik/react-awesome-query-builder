@@ -9,25 +9,27 @@ jobs:
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - run:
+          name: Check install
           command: |
             google-chrome --version
             chromedriver --version
-          name: Check install
+            node --version
+            npm --version
       - checkout
-      - restore_cache:
-          keys:
-            - node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
-            - node-deps-v1-{{ arch }}-{{checksum "package.json"}}
+      # - restore_cache:
+      #     keys:
+      #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
+      #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}
       - run:
           name: Install
           command: npm run install-all
-      - save_cache:
-          key: node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
-          paths:
-            - node_modules
-            - examples/node_modules
-            - sandbox/node_modules
-            - sandbox_simple/node_modules
+      # - save_cache:
+      #     key: node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
+      #     paths:
+      #       - node_modules
+      #       - examples/node_modules
+      #       - sandbox/node_modules
+      #       - sandbox_simple/node_modules
       - run:
           name: Lint
           command: npm run lint
