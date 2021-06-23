@@ -307,3 +307,7 @@ export const getLightTree = (tree) => {
 
   return newTree;
 };
+
+export const isEmptyTree = (tree) => (!tree.get("children1") || tree.get("children1").size == 0);
+
+export const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;

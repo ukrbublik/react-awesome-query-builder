@@ -2,7 +2,7 @@
 import Immutable from "immutable";
 import {
   expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
-  getTotalRulesCountInTree, fixEmptyGroupsInTree
+  getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, defaultOperator, 
@@ -19,8 +19,6 @@ import {
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue} from "../utils/stuff";
 import {validateValue} from "../utils/validation";
-
-const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
 
 
 /**
@@ -56,14 +54,17 @@ const addNewGroup = (state, path, properties, config) => {
 const removeGroup = (state, path, config) => {
   state = removeItem(state, path);
 
+  const {canLeaveEmptyGroup} = config.settings;
   const parentPath = path.slice(0, -1);
   const isEmptyGroup = !hasChildren(state, parentPath);
-  const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
-  const canLeaveEmpty = isEmptyGroup && config.settings.canLeaveEmptyGroup && !isEmptyRoot;
-  if (isEmptyRoot) {
-    state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config), config);
-  } else if (!canLeaveEmpty) {
+  if (isEmptyGroup && !canLeaveEmptyGroup) {
+    // check ancestors for emptiness (and delete 'em if empty)
     state = fixEmptyGroupsInTree(state);
+
+    if (isEmptyTree(state)) {
+      // if whole query is empty, add one empty rule to root
+      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+    }
   }
   state = fixPathsInTree(state);
   return state;
@@ -88,20 +89,22 @@ const removeRule = (state, path, config) => {
   
   const isParentRuleGroup = parent.get("type") == "rule_group";
   const isEmptyGroup = !hasChildren(state, parentPath);
-  const isEmptyRoot = isEmptyGroup && parentPath.size == 1;
   const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup 
     ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere 
-    : config.settings.canLeaveEmptyGroup && !isEmptyRoot);
-    
-  if (isEmptyGroup) {
+    : config.settings.canLeaveEmptyGroup);
+  
+  if (isEmptyGroup && !canLeaveEmpty) {
     if (isParentRuleGroup) {
-      if (!canLeaveEmpty) {
-        state = state.deleteIn(expandTreePath(parentPath));
-      }
-    } else if (isEmptyRoot) {
-      state = addItem(state, parentPath, "rule", uuid(), defaultRuleProperties(config, parentField), config);
-    } else if (!canLeaveEmpty) {
-      state = fixEmptyGroupsInTree(state);
+      // deleted last rule from rule_group, so delete whole rule_group
+      state = state.deleteIn(expandTreePath(parentPath));
+    }
+
+    // check ancestors for emptiness (and delete 'em if empty)
+    state = fixEmptyGroupsInTree(state);
+
+    if (isEmptyTree(state)) {
+      // if whole query is empty, add one empty rule to root
+      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
   }
   state = fixPathsInTree(state);
