@@ -1,4 +1,10 @@
 # Changelog
+- 4.1.1
+  - Fix warning about showSearch in MUI theme
+  - Fix incorrect override of vanilla button label (issue #347)
+  - Fix display default conj (issue #426)
+  - Don't wrap in MUI ThemeProvider if no theme or locale provided (issue #325)
+  - Fix canLeaveEmptyGroup logic (issue #378)
 - 4.1.0
   - Fixed lint errors in code
   - Reorganized files in `tests`
