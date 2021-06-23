@@ -521,7 +521,6 @@ export default (skin: string) => {
           type: "date",
           defaultValue: "NOW",
           valueSources: ["const"],
-          showPrefix: false,
         },
         op: {
           type: "select",
