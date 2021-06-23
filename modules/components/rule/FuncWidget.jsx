@@ -89,21 +89,23 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgLabel = (argKey, argDefinition) => {
+    const {valueSources, type, showPrefix, label} = argDefinition;
     const {config} = this.props;
-    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == "const";
-    const forceShow = !config.settings.showLabels && (argDefinition.type == "boolean" || isConst);
+    const isConst = valueSources && valueSources.length == 1 && valueSources[0] == "const";
+    const forceShow = !config.settings.showLabels && (type == "boolean" || isConst) && showPrefix !== false;
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label">
-        {argDefinition.label || argKey}
+        {label || argKey}
       </Col>
     );
   };
 
   renderArgLabelSep = (argKey, argDefinition) => {
+    const {valueSources, type, showPrefix} = argDefinition;
     const {config} = this.props;
-    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == "const";
-    const forceShow = !config.settings.showLabels && (argDefinition.type == "boolean" || isConst);
+    const isConst = valueSources && valueSources.length == 1 && valueSources[0] == "const";
+    const forceShow = !config.settings.showLabels && (type == "boolean" || isConst) && showPrefix !== false;
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label-sep">

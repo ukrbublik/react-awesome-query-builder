@@ -677,6 +677,7 @@ export interface Func {
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
+  showPrefix?: boolean,
 }
 export type Funcs = TypedMap<Func | FuncGroup>;
 

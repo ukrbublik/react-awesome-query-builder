@@ -374,7 +374,7 @@ export default (skin: string) => {
     date: {
       label: "Date",
       type: "date",
-      valueSources: ["value"],
+      //valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
         validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
@@ -511,6 +511,61 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const funcs: Funcs = {
+    RELATIVE_DATE: {
+      label: "Relative",
+      returnType: "date",
+      renderBrackets: ["", ""],
+      renderSeps: ["", "", ""],
+      args: {
+        now: {
+          type: "date",
+          defaultValue: "NOW",
+          valueSources: ["const"],
+          showPrefix: false,
+        },
+        op: {
+          type: "select",
+          defaultValue: "plus",
+          valueSources: ["value"],
+          mainWidgetProps: {
+            customProps: {
+              showSearch: false
+            }
+          },
+          fieldSettings: {
+            listValues: {
+              plus: "+",
+              minus: "-",
+            },
+          }
+        },
+        val: {
+          label: "Value",
+          type: "number",
+          defaultValue: 1,
+          valueSources: ["value"],
+        },
+        dim: {
+          label: "Dimention",
+          type: "select",
+          defaultValue: "day",
+          valueSources: ["value"],
+          mainWidgetProps: {
+            customProps: {
+              showSearch: false
+            }
+          },
+          fieldSettings: {
+            listValues: {
+              day: "day",
+              week: "week",
+              month: "month",
+              year: "year",
+            },
+          }
+        },
+      }
+    },
     LOWER: {
       label: "Lowercase",
       mongoFunc: "$toLower",

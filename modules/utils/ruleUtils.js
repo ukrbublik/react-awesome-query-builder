@@ -278,7 +278,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
         canAdd = canAdd && (valueSrc != "value" || isFuncArg); //if can't check operators, don't add
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
-      if (valueSrc && valueSrc != widgetValueSrc)
+      if (valueSrc && valueSrc != widgetValueSrc && valueSrc != "const")
         canAdd = false;
       if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc != "value"))
         canAdd = false;

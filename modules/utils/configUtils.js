@@ -315,7 +315,7 @@ export const getOperatorConfig = (config, operator, field = null) => {
 };
 
 export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
-  if (!field || !(operator || widget))
+  if (!field || !(operator || widget) && valueSrc != "const")
     return null;
   const fieldConfig = getFieldConfig(config, field);
   if (!widget)
