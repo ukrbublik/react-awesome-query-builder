@@ -48,7 +48,7 @@ export default class FieldTreeSelect extends PureComponent {
   getTreeData(fields, fn = null) {
     return keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
-      const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
       if (fn)
         fn(field);
       const pathKey = path || key;
@@ -63,6 +63,7 @@ export default class FieldTreeSelect extends PureComponent {
           altLabel: altLabel,
           fullLabel: fullLabel,
           label: label,
+          disabled: disabled,
         };
       } else {
         return {
@@ -71,6 +72,7 @@ export default class FieldTreeSelect extends PureComponent {
           altLabel: altLabel,
           fullLabel: fullLabel,
           label: label,
+          disabled: disabled,
         };
       }
     });
