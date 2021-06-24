@@ -602,6 +602,8 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>,
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
+  defaultSliderWidth?: string,
+  defaultTextWidth?: string,
 }
 
 export interface BehaviourSettings {
