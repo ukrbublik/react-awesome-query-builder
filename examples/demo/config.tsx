@@ -182,7 +182,6 @@ export default (skin: string) => {
     ...InitialConfig.settings,
     ...localeSettings,
 
-    defaultTextWidth: "200px",
     defaultSliderWidth: "200px",
 
     valueSourcesInfo: {

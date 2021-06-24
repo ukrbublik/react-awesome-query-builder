@@ -331,7 +331,6 @@ Render settings:
 |renderBeforeActions| | 
 |renderAfterActions| | 
 |defaultSliderWidth|"200px" |Width for slider 
-|defaultTextWidth|"200px" |Width for text input 
 |===
 
 Other settings:
