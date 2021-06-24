@@ -176,7 +176,7 @@ interface RangeWidgetProps extends BaseWidgetProps {
 }
 export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
 
-export type TextWidgetProps = BaseWidgetProps & BasicFieldSettings;
+export type TextWidgetProps = BaseWidgetProps & TextFieldSettings;
 export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
 export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
 export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
@@ -213,7 +213,7 @@ export interface FieldWidget {
   validateValue?: ValidateValue,
 }
 
-export type TextWidget = BaseWidget & BasicFieldSettings;
+export type TextWidget = BaseWidget & TextFieldSettings;
 export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
 export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
@@ -412,6 +412,9 @@ type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Arra
 export interface BasicFieldSettings {
   validateValue?: ValidateValue,
 }
+export interface TextFieldSettings extends BasicFieldSettings {
+  maxLength?: number
+}
 export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
   max?: number,
@@ -438,7 +441,7 @@ export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
 }
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | TextFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,

@@ -186,7 +186,8 @@ Example:
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
-  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`.
+  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`. +
+  Available settings for text widget: `maxLength`.
 |fieldSettings.listValues |+ for (multi)select, tree (multi)select | |List of values for (multi)select widget. +
   Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
    (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
@@ -552,6 +553,7 @@ const {
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
+|maxLength | | |Option for `<TextWidget>`, `<TextAreaWidget>`
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
 |use12Hours | |`false` |Option for `<TimeWidget>`
 |useKeyboard | |`true` |Option for Material-UI date/time pickers, `false` disables input with keyboard, only picker use is allowed
