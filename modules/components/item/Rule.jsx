@@ -10,6 +10,7 @@ import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../../uti
 import {getFieldPathLabels} from "../../utils/ruleUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
+const classNames = require("classnames");
 
 
 @RuleContainer
@@ -248,6 +249,7 @@ class Rule extends PureComponent {
     }
 
     render () {
+      const { showOperatorOptions } = this.meta;
       const parts = [
         this.renderField(),
         this.renderOperator(),
@@ -256,7 +258,7 @@ class Rule extends PureComponent {
         this.renderAfterWidget(),
         this.renderOperatorOptions(),
       ];
-      const body = <div key="rule-body" className="rule--body">{parts}</div>;
+      const body = <div key="rule-body" className={classNames("rule--body", showOperatorOptions && "with--op--options")}>{parts}</div>;
 
       const error = this.renderError();
       const drag = this.renderDrag();

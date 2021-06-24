@@ -613,16 +613,17 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 /******************************************************************************/
 /** Flex for full-width widget ************************************************/
 /******************************************************************************/
-.rule--body {
+.rule--body:not(.with--op--options) {
   display: flex;
+  align-items: center;
   .rule--value {
     flex: 1;
   }
-}
-.rule--value > .rule--widget {
-  display: flex;
-  .widget--widget {
-    flex: 1;
+  .rule--value > .rule--widget {
+    display: flex;
+    .widget--widget {
+      flex: 1;
+    }
   }
 }
 .widget--valuesrc .anticon {
