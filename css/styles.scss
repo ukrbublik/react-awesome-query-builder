@@ -626,6 +626,10 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
       flex: 1;
     }
   }
+  .rule--value > .rule--widget > .widget--valuesrc {
+    display: flex;
+    align-items: center;
+  }
 }
 
 .rule--value > .rule--widget > .widget--valuesrc {
