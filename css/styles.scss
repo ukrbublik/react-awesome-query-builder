@@ -611,9 +611,10 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 
 
 /******************************************************************************/
-/** Flex for full-width widget ************************************************/
+/** Shrink textarea ***********************************************************/
 /******************************************************************************/
-.rule--body:not(.with--op--options) {
+
+.rule--body.can--shrink--value {
   display: flex;
   align-items: center;
   .rule--value {
@@ -626,9 +627,12 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
     }
   }
 }
-.widget--valuesrc .anticon {
-  height: 100%;
-  svg {
+
+.rule--value > .rule--widget > .widget--valuesrc {
+  .anticon {
     height: 100%;
+    svg {
+      height: 100%;
+    }
   }
 }

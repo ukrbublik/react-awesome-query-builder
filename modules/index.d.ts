@@ -192,6 +192,7 @@ export interface BaseWidget {
   valueSrc?: ValueSource,
   valuePlaceholder?: string,
   valueLabel?: string,
+  fullWidth?: boolean,
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
