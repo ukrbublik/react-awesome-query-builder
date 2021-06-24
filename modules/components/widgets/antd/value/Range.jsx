@@ -77,7 +77,7 @@ export default class RangeWidget extends PureComponent {
 
   render() {
     const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;
-    const {renderSize} = config.settings;
+    const {renderSize, defaultSliderWidth} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
@@ -117,7 +117,7 @@ export default class RangeWidget extends PureComponent {
             {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: width || "300px"}}>
+        <Col style={{float: "left", width: width || defaultSliderWidth}}>
           <Slider
             disabled={readonly}
             value={aValue}

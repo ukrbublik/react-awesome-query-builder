@@ -79,19 +79,16 @@ export default (skin: string) => {
     ...InitialConfig.widgets,
     // examples of  overriding
     text: {
-      ...InitialConfig.widgets.text,
+      ...InitialConfig.widgets.text
+    },
+    textarea: {
+      ...InitialConfig.widgets.textarea
     },
     slider: {
-      ...InitialConfig.widgets.slider,
-      customProps: {
-        width: "300px"
-      }
+      ...InitialConfig.widgets.slider
     },
     rangeslider: {
-      ...InitialConfig.widgets.rangeslider,
-      customProps: {
-        width: "300px"
-      },
+      ...InitialConfig.widgets.rangeslider
     },
     date: {
       ...InitialConfig.widgets.date,
@@ -184,6 +181,9 @@ export default (skin: string) => {
   const settings: Settings = {
     ...InitialConfig.settings,
     ...localeSettings,
+
+    defaultTextWidth: "200px",
+    defaultSliderWidth: "200px",
 
     valueSourcesInfo: {
       value: {

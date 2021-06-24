@@ -968,6 +968,9 @@ const settings = {
   customFieldSelectProps: {
     showSearch: true
   },
+
+  defaultSliderWidth: "200px",
+  defaultTextWidth: "200px"
 };
 
 //----------------------------
