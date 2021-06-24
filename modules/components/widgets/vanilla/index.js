@@ -3,6 +3,7 @@ import React from "react";
 // value widgets
 export {default as VanillaBooleanWidget} from "./value/VanillaBoolean";
 export {default as VanillaTextWidget} from "./value/VanillaText";
+export {default as VanillaTextAreaWidget} from "./value/VanillaTextArea";
 export {default as VanillaDateWidget} from "./value/VanillaDate";
 export {default as VanillaTimeWidget} from "./value/VanillaTime";
 export {default as VanillaDateTimeWidget} from "./value/VanillaDateTime";

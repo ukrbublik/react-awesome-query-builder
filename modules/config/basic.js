@@ -10,6 +10,7 @@ const {
   //vanilla
   VanillaBooleanWidget,
   VanillaTextWidget,
+  VanillaTextAreaWidget,
   VanillaDateWidget,
   VanillaTimeWidget,
   VanillaDateTimeWidget,
@@ -481,6 +482,26 @@ const widgets = {
     },
     toJS: (val, fieldSettings) => (val),
   },
+  textarea: {
+    type: "text",
+    jsType: "string",
+    valueSrc: "value",
+    valueLabel: "Text",
+    valuePlaceholder: "Enter text",
+    factory: (props) => <VanillaTextAreaWidget {...props} />,
+    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
+      return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
+    },
+    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
+        return SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+      } else {
+        return SqlString.escape(val);
+      }
+    },
+    toJS: (val, fieldSettings) => (val),
+    fullWidth: true,
+  },
   number: {
     type: "number",
     jsType: "number",
@@ -686,6 +707,7 @@ const widgets = {
 const types = {
   text: {
     defaultOperator: "equal",
+    mainWidget: "text",
     widgets: {
       text: {
         operators: [
@@ -698,6 +720,20 @@ const types = {
           "starts_with",
           "ends_with",
           "proximity"
+        ],
+        widgetProps: {},
+        opProps: {},
+      },
+      textarea: {
+        operators: [
+          "equal",
+          "not_equal",
+          "is_empty",
+          "is_not_empty",
+          "like",
+          "not_like",
+          "starts_with",
+          "ends_with"
         ],
         widgetProps: {},
         opProps: {},
@@ -968,6 +1004,8 @@ const settings = {
   customFieldSelectProps: {
     showSearch: true
   },
+
+  defaultSliderWidth: "200px"
 };
 
 //----------------------------

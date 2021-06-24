@@ -81,7 +81,7 @@ export default class FieldSelect extends PureComponent {
   renderSelectItems(fields) {
     return keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
-      const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled} = field;
       const pathKey = path || key;
       if (items) {
         return <OptGroup
@@ -98,6 +98,7 @@ export default class FieldSelect extends PureComponent {
           title={altLabel}
           grouplabel={grouplabel}
           label={label}
+          disabled={disabled}
         >
           {option}
         </Option>;

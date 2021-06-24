@@ -20,6 +20,7 @@ const {
 } = AntdWidgets;
 const {
   TextWidget,
+  TextAreaWidget,
   NumberWidget,
   SliderWidget,
   RangeWidget,
@@ -65,6 +66,10 @@ const widgets = {
   text: {
     ...BasicConfig.widgets.text,
     factory: (props) => <TextWidget {...props} />,
+  },
+  textarea: {
+    ...BasicConfig.widgets.textarea,
+    factory: (props) => <TextAreaWidget {...props} />,
   },
   number: {
     ...BasicConfig.widgets.number,

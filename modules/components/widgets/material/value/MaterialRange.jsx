@@ -4,7 +4,8 @@ import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {placeholders, customProps, value, setValue, min, max, step, marks, readonly, textSeparators} = props;
+  const {config, placeholders, customProps, value, setValue, min, max, step, marks, readonly, textSeparators} = props;
+  const {defaultSliderWidth} = config.settings;
 
   useEffect(() => {
     const [valueFrom, valueTo] = props.value || [undefined, undefined];
@@ -143,7 +144,7 @@ export default (props) => {
     marginLeft: "5px", 
     paddingLeft: "12px", 
     marginBottom: muiMarks && "-16px", 
-    width: width || "300px",
+    width: width || defaultSliderWidth,
   };
 
   return (

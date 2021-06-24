@@ -176,7 +176,7 @@ interface RangeWidgetProps extends BaseWidgetProps {
 }
 export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
 
-export type TextWidgetProps = BaseWidgetProps & BasicFieldSettings;
+export type TextWidgetProps = BaseWidgetProps & TextFieldSettings;
 export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
 export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
 export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
@@ -192,6 +192,7 @@ export interface BaseWidget {
   valueSrc?: ValueSource,
   valuePlaceholder?: string,
   valueLabel?: string,
+  fullWidth?: boolean,
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
@@ -213,7 +214,7 @@ export interface FieldWidget {
   validateValue?: ValidateValue,
 }
 
-export type TextWidget = BaseWidget & BasicFieldSettings;
+export type TextWidget = BaseWidget & TextFieldSettings;
 export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
 export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
@@ -412,6 +413,10 @@ type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Arra
 export interface BasicFieldSettings {
   validateValue?: ValidateValue,
 }
+export interface TextFieldSettings extends BasicFieldSettings {
+  maxLength?: number,
+  maxRows?: number,
+}
 export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
   max?: number,
@@ -438,7 +443,7 @@ export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
 }
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | TextFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
@@ -599,6 +604,7 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>,
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
+  defaultSliderWidth?: string,
 }
 
 export interface BehaviourSettings {
@@ -704,6 +710,7 @@ export interface BasicConfig extends Config {
   },
   widgets: {
     text: TextWidget,
+    textarea: TextWidget,
     number: NumberWidget,
     slider: NumberWidget,
     rangeslider: NumberWidget,
@@ -753,6 +760,7 @@ interface VanillaWidgets {
   // vanilla core widgets
   VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
   VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaTextAreaWidget: ElementType<TextWidgetProps>,
   VanillaDateWidget: ElementType<DateTimeWidgetProps>,
   VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
   VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
@@ -777,6 +785,7 @@ export interface AntdWidgets {
 
   // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
+  TextAreaWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,
   RangeWidget: ElementType<RangeSliderWidgetProps>,
@@ -808,6 +817,7 @@ export interface MaterialWidgets {
   // material core widgets
   MaterialBooleanWidget: ElementType<BooleanWidgetProps>,
   MaterialTextWidget: ElementType<TextWidgetProps>,
+  MaterialTextAreaWidget: ElementType<TextWidgetProps>,
   MaterialDateWidget: ElementType<DateTimeWidgetProps>,
   MaterialTimeWidget: ElementType<DateTimeWidgetProps>,
   MaterialDateTimeWidget: ElementType<DateTimeWidgetProps>,

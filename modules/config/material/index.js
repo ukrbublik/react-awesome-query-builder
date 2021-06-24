@@ -6,6 +6,7 @@ import {SqlString} from "../../utils/sql";
 const {
   MaterialBooleanWidget,
   MaterialTextWidget,
+  MaterialTextAreaWidget,
   MaterialDateWidget,
   MaterialTimeWidget,
   MaterialDateTimeWidget,
@@ -48,6 +49,10 @@ const widgets = {
   text: {
     ...BasicConfig.widgets.text,
     factory: (props) => <MaterialTextWidget {...props} />,
+  },
+  textarea: {
+    ...BasicConfig.widgets.textarea,
+    factory: (props) => <MaterialTextAreaWidget {...props} />,
   },
   number: {
     ...BasicConfig.widgets.number,

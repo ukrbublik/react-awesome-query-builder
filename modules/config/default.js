@@ -46,6 +46,8 @@ export const settings = {
     "number": ["slider", "rangeslider"],
     "slider": ["number", "rangeslider"],
     "rangeslider": ["number", "slider"],
+    "text": ["textarea"],
+    "textarea": ["text"]
   },
 
   // localization

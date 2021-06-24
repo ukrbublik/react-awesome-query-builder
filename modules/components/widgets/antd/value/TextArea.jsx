@@ -1,8 +1,10 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Input, Col } from "antd";
+const { TextArea } = Input;
+const defaultMaxRows = 5;
 
-export default class TextWidget extends PureComponent {
+export default class TextAreaWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
@@ -12,6 +14,7 @@ export default class TextWidget extends PureComponent {
     readonly: PropTypes.bool,
     customProps: PropTypes.object,
     maxLength: PropTypes.number,
+    maxRows: PropTypes.number,
   };
 
   handleChange = (ev) => {
@@ -21,20 +24,20 @@ export default class TextWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value, readonly, maxLength} = this.props;
+    const {config, placeholder, customProps, value, readonly, maxLength, maxRows, fullWidth} = this.props;
     const {renderSize} = config.settings;
     const aValue = value != undefined ? value : null;
 
     return (
       <Col>
-        <Input
+        <TextArea
+          autoSize={{minRows: 1, maxRows: maxRows || defaultMaxRows}}
+          maxLength={maxLength}
           disabled={readonly}
-          key="widget-text"
+          key="widget-textarea"
           size={renderSize}
-          type={"text"}
           value={aValue}
           placeholder={placeholder}
-          maxLength={maxLength}
           onChange={this.handleChange}
           {...customProps}
         />

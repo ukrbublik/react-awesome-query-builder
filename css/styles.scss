@@ -351,6 +351,7 @@ ul.ant-select-selection__rendered {
   margin-left: auto;
   display: flex;
   align-items: center;
+  padding-left: 10px;
 }
 
 .rule--drag-handler {
@@ -606,4 +607,36 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 .group--children {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+
+/******************************************************************************/
+/** Shrink textarea ***********************************************************/
+/******************************************************************************/
+
+.rule--body.can--shrink--value {
+  display: flex;
+  align-items: center;
+  .rule--value {
+    flex: 1;
+  }
+  .rule--value > .rule--widget {
+    display: flex;
+    .widget--widget {
+      flex: 1;
+    }
+  }
+  .rule--value > .rule--widget > .widget--valuesrc {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.rule--value > .rule--widget > .widget--valuesrc {
+  .anticon {
+    height: 100%;
+    svg {
+      height: 100%;
+    }
+  }
 }

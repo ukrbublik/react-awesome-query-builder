@@ -79,19 +79,17 @@ export default (skin: string) => {
     ...InitialConfig.widgets,
     // examples of  overriding
     text: {
-      ...InitialConfig.widgets.text,
+      ...InitialConfig.widgets.text
+    },
+    textarea: {
+      ...InitialConfig.widgets.textarea,
+      maxRows: 3
     },
     slider: {
-      ...InitialConfig.widgets.slider,
-      customProps: {
-        width: "300px"
-      }
+      ...InitialConfig.widgets.slider
     },
     rangeslider: {
-      ...InitialConfig.widgets.rangeslider,
-      customProps: {
-        width: "300px"
-      },
+      ...InitialConfig.widgets.rangeslider
     },
     date: {
       ...InitialConfig.widgets.date,
@@ -185,6 +183,8 @@ export default (skin: string) => {
     ...InitialConfig.settings,
     ...localeSettings,
 
+    defaultSliderWidth: "200px",
+
     valueSourcesInfo: {
       value: {
         label: "Value"
@@ -247,6 +247,14 @@ export default (skin: string) => {
             valuePlaceholder: "Enter login",
           },
         }
+      }
+    },
+    bio: {
+      label: "Bio",
+      type: "text",
+      preferWidgets: ["textarea"],
+      fieldSettings: {
+        maxLength: 1000,
       }
     },
     results: {

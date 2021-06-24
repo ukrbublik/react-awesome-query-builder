@@ -61,7 +61,7 @@ export default class SliderWidget extends PureComponent {
 
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
-    const {renderSize, showErrorMessage} = config.settings;
+    const {renderSize, showErrorMessage, defaultSliderWidth} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
@@ -87,7 +87,7 @@ export default class SliderWidget extends PureComponent {
             {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: width || "300px"}}>
+        <Col style={{float: "left", width: width || defaultSliderWidth}}>
           <Slider
             disabled={readonly}
             value={sliderValue}
