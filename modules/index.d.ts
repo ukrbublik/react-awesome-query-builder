@@ -414,7 +414,8 @@ export interface BasicFieldSettings {
   validateValue?: ValidateValue,
 }
 export interface TextFieldSettings extends BasicFieldSettings {
-  maxLength?: number
+  maxLength?: number,
+  maxRows?: number,
 }
 export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
@@ -709,6 +710,7 @@ export interface BasicConfig extends Config {
   },
   widgets: {
     text: TextWidget,
+    textarea: TextWidget,
     number: NumberWidget,
     slider: NumberWidget,
     rangeslider: NumberWidget,
@@ -758,6 +760,7 @@ interface VanillaWidgets {
   // vanilla core widgets
   VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
   VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaTextAreaWidget: ElementType<TextWidgetProps>,
   VanillaDateWidget: ElementType<DateTimeWidgetProps>,
   VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
   VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
@@ -782,6 +785,7 @@ export interface AntdWidgets {
 
   // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
+  TextAreaWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,
   RangeWidget: ElementType<RangeSliderWidgetProps>,
@@ -813,6 +817,7 @@ export interface MaterialWidgets {
   // material core widgets
   MaterialBooleanWidget: ElementType<BooleanWidgetProps>,
   MaterialTextWidget: ElementType<TextWidgetProps>,
+  MaterialTextAreaWidget: ElementType<TextWidgetProps>,
   MaterialDateWidget: ElementType<DateTimeWidgetProps>,
   MaterialTimeWidget: ElementType<DateTimeWidgetProps>,
   MaterialDateTimeWidget: ElementType<DateTimeWidgetProps>,

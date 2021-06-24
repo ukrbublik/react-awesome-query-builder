@@ -7,6 +7,7 @@ import MomentUtils from "@date-io/moment";
 
 // value widgets
 import MaterialTextWidget from "./value/MaterialText";
+import MaterialTextAreaWidget from "./value/MaterialTextArea";
 import MaterialDateWidget from "./value/MaterialDate";
 import MaterialDateTimeWidget from "./value/MaterialDateTime";
 import MaterialTimeWidget from "./value/MaterialTime";
@@ -56,6 +57,7 @@ const MaterialProvider = ({config, children}) => {
 
 export default {
   MaterialTextWidget,
+  MaterialTextAreaWidget,
   MaterialDateWidget,
   MaterialDateTimeWidget,
   MaterialTimeWidget,

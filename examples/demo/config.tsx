@@ -82,7 +82,8 @@ export default (skin: string) => {
       ...InitialConfig.widgets.text
     },
     textarea: {
-      ...InitialConfig.widgets.textarea
+      ...InitialConfig.widgets.textarea,
+      maxRows: 3
     },
     slider: {
       ...InitialConfig.widgets.slider
@@ -246,6 +247,14 @@ export default (skin: string) => {
             valuePlaceholder: "Enter login",
           },
         }
+      }
+    },
+    bio: {
+      label: "Bio",
+      type: "text",
+      preferWidgets: ["textarea"],
+      fieldSettings: {
+        maxLength: 1000,
       }
     },
     results: {
