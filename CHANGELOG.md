@@ -1,4 +1,6 @@
 # Changelog
+- 4.2.0
+  - Added `textarea` widget
 - 4.1.1
   - Fix warning about showSearch in MUI theme
   - Fix incorrect override of vanilla button label (issue #347)
