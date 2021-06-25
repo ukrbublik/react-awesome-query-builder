@@ -515,8 +515,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   let {field, fieldConfig, opKey, args, having} = parseRes;
 
   let opConfig = config.operators[opKey];
-  const canRev = !(fieldConfig.type == "!group" && having) && opConfig.reversedOp;
-  if (not && canRev) {
+  const canRev = !(fieldConfig.type == "!group");
+  if (not && canRev && opConfig.reversedOp) {
     not = false;
     opKey = opConfig.reversedOp;
     opConfig = config.operators[opKey];
