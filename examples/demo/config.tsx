@@ -510,12 +510,33 @@ export default (skin: string) => {
 
   //////////////////////////////////////////////////////////////////////
 
+  //todo: add jsonlogic extension for now, date_add, toLowerCase
+
   const funcs: Funcs = {
     RELATIVE_DATE: {
       label: "Relative",
       returnType: "date",
       renderBrackets: ["", ""],
       renderSeps: ["", "", ""],
+      jsonLogic: ({_now, op, val, dim}) => ({
+        "date_add": [
+          {"now": []},
+          val * (op == "minus" ? -1 : +1),
+          dim
+        ]
+      }),
+      /* eslint-disable */
+      jsonLogicImport: (v: any) => {
+        const now = "NOW";
+        const val = Math.abs(v["date_add"][1]);
+        const op = v["date_add"][1] >= 0 ? "plus" : "minus";
+        const dim = v["date_add"][2];
+        return [now, op, val, dim];
+      },
+      // MySQL
+      sqlFormatFunc: ({_now, op, val, dim}) => `DATE_ADD(${"NOW()"}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, '')})`,
+      /* eslint-enable */
+      mongoFormatFunc: null, // not supported
       args: {
         now: {
           type: "date",
@@ -541,6 +562,9 @@ export default (skin: string) => {
         val: {
           label: "Value",
           type: "number",
+          fieldSettings: {
+            min: 0,
+          },
           defaultValue: 1,
           valueSources: ["value"],
         },

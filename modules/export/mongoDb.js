@@ -365,6 +365,9 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
       formattedArgs,
     ];
     ret = fn(...args);
+  } else if (funcConfig.mongoFormatFunc === null) {
+    meta.errors.push(`Functon ${funcName} is not supported`);
+    return [undefined, false];
   } else {
     if (mongoArgsAsObject)
       ret = { [funcName]: formattedArgs };
