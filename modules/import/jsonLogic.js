@@ -59,8 +59,13 @@ const buildConv = (config) => {
   let funcs = {};
   for (let funcKey in config.funcs) {
     const funcConfig = config.funcs[funcKey];
-    if (typeof funcConfig.jsonLogic == "string") {
-      const fk = (funcConfig.jsonLogicIsMethod ? "#" : "") + funcConfig.jsonLogic;
+    let fk;
+    if (funcConfig.jsonLogicIsMethod) {
+      fk = "#" + funcConfig.jsonLogic;
+    } else if (typeof funcConfig.jsonLogic == "string") {
+      fk = funcConfig.jsonLogic;
+    }
+    if (fk) {
       if (!funcs[fk])
         funcs[fk] = [];
       funcs[fk].push(funcKey);
@@ -197,7 +202,7 @@ const convertField = (op, vals, conv, config, not, meta, parentField = null) => 
 
 const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField = null) => {
   if (!op) return undefined;
-  let func, argsArr;
+  let func, argsArr, funcKey;
   const jsonLogicIsMethod = (op == "method");
   if (jsonLogicIsMethod) {
     let obj, opts;
@@ -207,20 +212,34 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
     func = op;
     argsArr = vals;
   }
-  const fk = (jsonLogicIsMethod ? "#" : "") + func;
 
-  let funcKeys = conv.funcs[fk];
-  if (funcKeys) {
-    let funcKey = funcKeys[0];
-    if (funcKeys.length > 1 && fieldConfig) {
-      funcKeys = funcKeys
-        .filter(k => (config.funcs[k].returnType == fieldConfig.type));
-      if (funcKeys.length == 0) {
-        meta.errors.push(`No funcs returning type ${fieldConfig.type}`);
-        return undefined;
+  const fk = (jsonLogicIsMethod ? "#" : "") + func;
+  const funcKeys = (conv.funcs[fk] || []).filter(k => 
+    (fieldConfig ? config.funcs[k].returnType == fieldConfig.type : true)
+  );
+  if (funcKeys.length) {
+    funcKey = funcKeys[0];
+  } else {
+    const v = {[op]: vals};
+    for (const [f, fc] of Object.entries(config.funcs || {})) {
+      if (fc.jsonLogicImport && fc.returnType == fieldConfig.type) {
+        let parsed;
+        try {
+          parsed = fc.jsonLogicImport(v);
+        } catch(_e) {
+          // given expression `v` can't be parsed into function
+        }
+        if (parsed) {
+          funcKey = f;
+          argsArr = parsed;
+        }
       }
-      funcKey = funcKeys[0];
     }
+  }
+  if (!funcKey)
+    return undefined;
+
+  if (funcKey) {
     const funcConfig = config.funcs[funcKey];
     const argKeys = Object.keys(funcConfig.args);
     let args = argsArr.reduce((acc, val, ind) => {
@@ -515,8 +534,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   let {field, fieldConfig, opKey, args, having} = parseRes;
 
   let opConfig = config.operators[opKey];
-  const canRev = !(fieldConfig.type == "!group" && having) && opConfig.reversedOp;
-  if (not && canRev) {
+  const canRev = !(fieldConfig.type == "!group");
+  if (not && canRev && opConfig.reversedOp) {
     not = false;
     opKey = opConfig.reversedOp;
     opConfig = config.operators[opKey];

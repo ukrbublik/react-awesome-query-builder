@@ -515,7 +515,7 @@ export default (skin: string) => {
       label: "Lowercase",
       mongoFunc: "$toLower",
       jsonLogic: "toLowerCase",
-      jsonLogicIsMethod: true,
+      //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
       returnType: "text",
       args: {
         str: {
@@ -532,6 +532,14 @@ export default (skin: string) => {
       sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
       mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
       jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
+      /* eslint-disable */
+      jsonLogicImport: (v: any) => {
+        const coef = v["+"][0]["*"][0];
+        const val = v["+"][0]["*"][1];
+        const bias = v["+"][1];
+        return [coef, val, bias];
+      },
+      /* eslint-enable */
       renderBrackets: ["", ""],
       renderSeps: [" * ", " + "],
       args: {

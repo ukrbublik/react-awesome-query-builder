@@ -430,9 +430,8 @@ export const with_func_tolower_from_field = {
     {
       "==": [
         { "var": "str" },
-        { "method": [
-          { "var": "str2" },
-          "toLowerCase"
+        { "toLowerCase": [
+          { "var": "str2" }
         ] }
       ]
     }

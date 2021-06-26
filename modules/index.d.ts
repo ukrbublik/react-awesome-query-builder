@@ -648,6 +648,7 @@ type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
 type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
 type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
+type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 
 interface FuncGroup {
   type?: "!struct",
@@ -663,7 +664,11 @@ export interface Func {
   mongoFunc?: string,
   mongoArgsAsObject?: boolean,
   jsonLogic?: string | JsonLogicFormatFunc,
+  // Deprecated!
+  // Calling methods on objects was remvoed in JsonLogic 2.x
+  // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean,
+  jsonLogicImport?: JsonLogicImportFunc,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,

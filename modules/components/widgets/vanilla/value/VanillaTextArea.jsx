@@ -17,7 +17,7 @@ export default (props) => {
       onChange={onChange}
       maxLength={maxLength}
       style={{
-        width: fullWidth ? '100%' : undefined
+        width: fullWidth ? "100%" : undefined
       }}
     />
   );

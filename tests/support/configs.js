@@ -435,7 +435,6 @@ export const with_funcs = (BasicConfig) => ({
       label: "Lowercase",
       mongoFunc: "$toLower",
       jsonLogic: "toLowerCase",
-      jsonLogicIsMethod: true,
       returnType: "text",
       args: {
         str: {

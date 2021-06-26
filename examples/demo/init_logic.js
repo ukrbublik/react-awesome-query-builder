@@ -7,11 +7,10 @@ export default
           "var": "user.login"
         },
         {
-          "method": [
+          "toLowerCase": [
             {
               "var": "user.firstName"
-            },
-            "toLowerCase"
+            }
           ]
         }
       ]
