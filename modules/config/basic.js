@@ -481,6 +481,7 @@ const widgets = {
       }
     },
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   textarea: {
     type: "text",
@@ -500,6 +501,7 @@ const widgets = {
       }
     },
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
     fullWidth: true,
   },
   number: {
@@ -520,6 +522,7 @@ const widgets = {
       return SqlString.escape(val);
     },
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   slider: {
     type: "number",
@@ -535,6 +538,7 @@ const widgets = {
       return SqlString.escape(val);
     },
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   select: {
     type: "select",
@@ -551,6 +555,7 @@ const widgets = {
       return SqlString.escape(val);
     },
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   multiselect: {
     type: "multiselect",
@@ -567,6 +572,7 @@ const widgets = {
       return vals.map(v => SqlString.escape(v));
     },
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   date: {
     type: "date",
@@ -595,6 +601,10 @@ const widgets = {
       const dateVal = moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
+    mongoFormatValue: (val, fieldDef, wgtDef) => {
+      const dateVal = moment(val, wgtDef.valueFormat);
+      return dateVal.isValid() ? dateVal.toDate() : undefined;
+    }
   },
   time: {
     type: "time",
@@ -629,6 +639,11 @@ const widgets = {
       const dateVal = moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second") : undefined;
     },
+    mongoFormatValue: (val, fieldDef, wgtDef) => {
+      // return seconds of day
+      const dateVal = moment(val, wgtDef.valueFormat);
+      return dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second");
+    },
   },
   datetime: {
     type: "datetime",
@@ -659,6 +674,10 @@ const widgets = {
       const dateVal = moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
+    mongoFormatValue: (val, fieldDef, wgtDef) => {
+      const dateVal = moment(val, wgtDef.valueFormat);
+      return dateVal.isValid() ? dateVal.toDate() : undefined;
+    }
   },
   boolean: {
     type: "boolean",
@@ -675,6 +694,7 @@ const widgets = {
     },
     defaultValue: false,
     toJS: (val, fieldSettings) => (val),
+    mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
   field: {
     valueSrc: "field",
