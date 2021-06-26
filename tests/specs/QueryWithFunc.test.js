@@ -26,7 +26,7 @@ describe("query with func", () => {
             "==": [
               { "var": "str" },
               {
-                "method": [ { "var": "str2" },  "toLowerCase" ]
+                "toLowerCase": [ { "var": "str2" } ]
               }
             ]
           }

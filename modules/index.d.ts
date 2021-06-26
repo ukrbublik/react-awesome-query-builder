@@ -664,6 +664,9 @@ export interface Func {
   mongoFunc?: string,
   mongoArgsAsObject?: boolean,
   jsonLogic?: string | JsonLogicFormatFunc,
+  // Deprecated!
+  // Calling methods on objects was remvoed in JsonLogic 2.x
+  // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean,
   jsonLogicImport?: JsonLogicImportFunc,
   formatFunc?: FormatFunc,

@@ -515,7 +515,7 @@ export default (skin: string) => {
       label: "Lowercase",
       mongoFunc: "$toLower",
       jsonLogic: "toLowerCase",
-      jsonLogicIsMethod: true,
+      //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
       returnType: "text",
       args: {
         str: {

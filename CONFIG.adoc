@@ -662,6 +662,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
 |mongoFormatFunc |- for MongoDB format | |Can be used instead of `mongoFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression object.
 |jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (function name) or function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression for JsonLogic.
+|jsonLogicImport | | |Function to convert given JsonLogic expression to array of arguments of current function. If given expression can't be parsed into current function, throw an error.
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]

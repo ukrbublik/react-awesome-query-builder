@@ -221,7 +221,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
     funcKey = funcKeys[0];
   } else {
     const v = {[op]: vals};
-    for (const [f, fc] of Object.entries(config.funcs)) {
+    for (const [f, fc] of Object.entries(config.funcs || {})) {
       if (fc.jsonLogicImport && fc.returnType == fieldConfig.type) {
         let parsed;
         try {
