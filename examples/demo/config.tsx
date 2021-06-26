@@ -532,6 +532,12 @@ export default (skin: string) => {
       sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
       mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
       jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
+      jsonLogicImport: (v) => {
+        const coef = v["+"][0]["*"][0];
+        const val = v["+"][0]["*"][1];
+        const bias = v["+"][1];
+        return [coef, val, bias];
+      },
       renderBrackets: ["", ""],
       renderSeps: [" * ", " + "],
       args: {

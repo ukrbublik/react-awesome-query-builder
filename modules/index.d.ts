@@ -648,6 +648,7 @@ type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
 type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
 type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
+type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 
 interface FuncGroup {
   type?: "!struct",
@@ -664,6 +665,7 @@ export interface Func {
   mongoArgsAsObject?: boolean,
   jsonLogic?: string | JsonLogicFormatFunc,
   jsonLogicIsMethod?: boolean,
+  jsonLogicImport?: JsonLogicImportFunc,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,
