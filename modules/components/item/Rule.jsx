@@ -251,7 +251,7 @@ class Rule extends PureComponent {
     render () {
       const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
       const { valueSrc, value } = this.props;
-      const canShrinkValue = valueSrc.first() == 'value' && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
+      const canShrinkValue = valueSrc.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
       
       const parts = [
         this.renderField(),

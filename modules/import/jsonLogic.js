@@ -226,7 +226,9 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
         let parsed;
         try {
           parsed = fc.jsonLogicImport(v);
-        } catch(_e) {}
+        } catch(_e) {
+          // given expression `v` can't be parsed into function
+        }
         if (parsed) {
           funcKey = f;
           argsArr = parsed;
