@@ -134,12 +134,15 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
 
     if (!fieldConfig.widgets)
       fieldConfig.widgets = {};
+    if (isFuncArg)
+      fieldConfig._isFuncArg = true;
     fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
     fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
     for (let widget in typeConfig.widgets) {
       let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
       const typeWidgetConfig = typeConfig.widgets[widget] || {};
       if (!isFuncArg) {
+        //todo: why I've excluded isFuncArg ?
         const shouldIncludeOperators = fieldConfig.preferWidgets && (widget == "field" || fieldConfig.preferWidgets.includes(widget)) || excludeOperators.length > 0;
         if (fieldWidgetConfig.operators) {
           if (!operators)
@@ -315,7 +318,9 @@ export const getOperatorConfig = (config, operator, field = null) => {
 };
 
 export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
-  if (!field || !(operator || widget) && valueSrc != "const")
+  if (!field)
+    return null;
+  if (!(operator || widget) && valueSrc != "const")
     return null;
   const fieldConfig = getFieldConfig(config, field);
   if (!widget)

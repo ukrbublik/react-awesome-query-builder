@@ -214,7 +214,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
 };
 
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
-  const isFuncArg = typeof field == "object" && field.arg;
+  const isFuncArg = typeof field == "object" && !!field.func && !!field.arg;
   const {showLabels} = config.settings;
   const fieldConfig = getFieldConfig(config, field);
   const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
@@ -258,11 +258,12 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
-  const isFuncArg = typeof field == "object" && !!field.type;
+  const isFuncArg = typeof field == "object" && (!!field.func && !!field.arg || field._isFuncArg);
   const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
+  
   if (fieldConfig && fieldConfig.widgets) {
-    for (let widget in fieldConfig.widgets) {
+    for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
@@ -274,8 +275,10 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
         if (!config._funcsCntByType[fieldConfig.type])
           canAdd = false;
       }
-      if (!widgetConfig.operators)
-        canAdd = canAdd && (valueSrc != "value" || isFuncArg); //if can't check operators, don't add
+      // If can't check operators, don't add
+      // Func args don't have operators
+      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg)
+        canAdd = false;
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
       if (valueSrc && valueSrc != widgetValueSrc && valueSrc != "const")

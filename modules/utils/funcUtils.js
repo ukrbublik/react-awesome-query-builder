@@ -50,7 +50,7 @@ export const completeFuncValue = (value, config) => {
           return undefined;
         }
       } else if (argConfig.defaultValue !== undefined) {
-        complValue = complValue.setIn(["args", argKey, "value"], argConfig.defaultValue);
+        complValue = complValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
         complValue = complValue.setIn(["args", argKey, "valueSrc"], "value");
       } else if (argConfig.isOptional) {
         // optional
@@ -121,12 +121,25 @@ export const setFunc = (value, funcKey, config) => {
   if (funcConfig) {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
+      const argDefaultValueSrc = argConfig.valueSources.length ? argConfig.valueSources[0] : undefined;
+      if (argDefaultValueSrc) {
+        value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
+      }
       if (argConfig.defaultValue !== undefined) {
-        value = value.setIn(["args", argKey, "value"], argConfig.defaultValue);
+        value = value.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
       }
     }
   }
 
+  return value;
+};
+
+const getDefaultArgValue = ({defaultValue: value}) => {
+  if (typeof value == "object" && !Immutable.Map.isMap(value) && value.func) {
+    return Immutable.fromJS(value, function (k, v) {
+      return Immutable.Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
+    });
+  }
   return value;
 };
 
