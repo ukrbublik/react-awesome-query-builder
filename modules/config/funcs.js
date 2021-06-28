@@ -1,4 +1,4 @@
-
+import moment from "moment";
 
 const NOW = {
   label: "Now",
@@ -38,7 +38,7 @@ const RELATIVE_DATETIME = {
   },
   // MySQL
   //todo: other SQL dialects?
-  sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, '')})`,
+  sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
   mongoFormatFunc: null, //todo: support?
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
