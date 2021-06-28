@@ -262,7 +262,7 @@ describe("antdesign widgets interactions", () => {
           "queryHuman": "Date BETWEEN \"10.05.2020\" AND \"15.05.2020\"",
           "sql": "date BETWEEN '2020-05-10' AND '2020-05-15'",
           "mongo": {
-            "date": { "$gte": "2020-05-10", "$lte": "2020-05-15" }
+            "date": { "$gte": "2020-05-10T00:00:00.000Z", "$lte": "2020-05-15T00:00:00.000Z" }
           },
           "logic": {
             "and": [ { "<=": [ "2020-05-10T00:00:00.000Z", { "var": "date" }, "2020-05-15T00:00:00.000Z" ] } ]

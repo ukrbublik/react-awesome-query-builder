@@ -21,10 +21,10 @@ describe("query with subquery and datetime types", () => {
       "mongo": {
         "$or": [
           {
-            "datetime": "2020-05-18 21:50:01"
+            "datetime": "2020-05-18T21:50:01.000Z"
           }, {
-            "date": "2020-05-18",
-            "time": "00:50:00"
+            "date": "2020-05-18T00:00:00.000Z",
+            "time": 3000
           }
         ]
       },
