@@ -1,35 +1,55 @@
 
-  //todo: add jsonlogic extension for now, date_add, toLowerCase
-  
-const RELATIVE_DATE = {
+
+const NOW = {
+  label: "Now",
+  returnType: "datetime",
+  jsonLogic: "now",
+  //todo: document option `jsonLogicCustomOps`
+  //todo: add util to return all used custom ops to be added by user with `jsonLogic.add_operation`
+  jsonLogicCustomOps: {
+    now: () => new Date(),
+  },
+  sqlFormatFunc: () => "NOW()",
+  mongoFormatFunc: () => new Date(),
+  formatFunc: () => "NOW",
+};
+
+const RELATIVE_DATETIME = {
   label: "Relative",
-  returnType: "date",
+  returnType: "datetime",
   renderBrackets: ["", ""],
   renderSeps: ["", "", ""],
-  jsonLogic: ({_now, op, val, dim}) => ({
+  jsonLogic: ({date, op, val, dim}) => ({
     "date_add": [
-      {"now": []},
+      date,
       val * (op == "minus" ? -1 : +1),
       dim
     ]
   }),
   jsonLogicImport: (v) => {
-    const now = "NOW";
+    const date = v["date_add"][0];
     const val = Math.abs(v["date_add"][1]);
     const op = v["date_add"][1] >= 0 ? "plus" : "minus";
     const dim = v["date_add"][2];
-    return [now, op, val, dim];
+    return [date, op, val, dim];
+  },
+  jsonLogicCustomOps: {
+    date_add: (date, val, dim) => moment(date).add(val, dim).toDate()
   },
   // MySQL
-  sqlFormatFunc: ({_now, op, val, dim}) => `DATE_ADD(${"NOW()"}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, '')})`,
-  mongoFormatFunc: null, // not supported
+  //todo: other SQL dialects?
+  sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, '')})`,
+  mongoFormatFunc: null, //todo: support?
+  formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
-    now: {
-      type: "date",
-      defaultValue: "NOW",
-      valueSources: ["const"],
+    date: {
+      label: "Date",
+      type: "datetime",
+      defaultValue: {func: "NOW", args: []},
+      valueSources: ["func", "field"],
     },
     op: {
+      label: "Op",
       type: "select",
       defaultValue: "plus",
       valueSources: ["value"],
@@ -51,11 +71,11 @@ const RELATIVE_DATE = {
       fieldSettings: {
         min: 0,
       },
-      defaultValue: 1,
+      defaultValue: 0,
       valueSources: ["value"],
     },
     dim: {
-      label: "Dimention",
+      label: "Dimension",
       type: "select",
       defaultValue: "day",
       valueSources: ["value"],
@@ -81,6 +101,27 @@ const LOWER = {
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
+  jsonLogicCustomOps: {
+    toLowerCase: (str) => str.toLowerCase(),
+  },
+  returnType: "text",
+  args: {
+    str: {
+      label: "String",
+      type: "text",
+      valueSources: ["value", "field"],
+    },
+  }
+};
+
+const UPPER = {
+  label: "Uppercase",
+  mongoFunc: "$toUpper",
+  jsonLogic: "toUpperCase",
+  //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
+  jsonLogicCustomOps: {
+    toUpperCase: (str) => str.toUpperCase(),
+  },
   returnType: "text",
   args: {
     str: {
@@ -98,14 +139,12 @@ const LINEAR_REGRESSION = {
   sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
-  /* eslint-disable */
   jsonLogicImport: (v) => {
     const coef = v["+"][0]["*"][0];
     const val = v["+"][0]["*"][1];
     const bias = v["+"][1];
     return [coef, val, bias];
   },
-  /* eslint-enable */
   renderBrackets: ["", ""],
   renderSeps: [" * ", " + "],
   args: {
@@ -118,7 +157,7 @@ const LINEAR_REGRESSION = {
     val: {
       label: "Value",
       type: "number",
-      valueSources: ["value"],
+      valueSources: ["field", "value"],
     },
     bias: {
       label: "Bias",
@@ -130,7 +169,9 @@ const LINEAR_REGRESSION = {
 };
 
 export {
-  RELATIVE_DATE,
-  LINEAR_REGRESSION,
   LOWER,
+  UPPER,
+  NOW,
+  RELATIVE_DATETIME,
+  LINEAR_REGRESSION,
 };

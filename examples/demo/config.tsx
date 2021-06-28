@@ -374,7 +374,7 @@ export default (skin: string) => {
     date: {
       label: "Date",
       type: "date",
-      //valueSources: ["value"],
+      valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
         validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
@@ -393,7 +393,7 @@ export default (skin: string) => {
     datetime: {
       label: "DateTime",
       type: "datetime",
-      valueSources: ["value"]
+      valueSources: ["value", "func"]
     },
     datetime2: {
       label: "DateTime2",

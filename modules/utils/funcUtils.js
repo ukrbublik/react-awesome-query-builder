@@ -2,6 +2,8 @@
 import {getFieldConfig, getFuncConfig} from "../utils/configUtils";
 import Immutable from "immutable";
 
+// helpers
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 /**
  * @param {*} value
@@ -33,8 +35,9 @@ export const completeFuncValue = (value, config) => {
     let tmpHasOptional = false;
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
+      const {valueSources, isOptional, defaultValue} = argConfig;
       const args = complValue.get("args");
-      const argDefaultValueSrc = argConfig.valueSources.length == 1 ? argConfig.valueSources[0] : undefined;
+      const argDefaultValueSrc = valueSources.length == 1 ? valueSources[0] : undefined;
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = (argVal ? argVal.get("valueSrc") : undefined) || argDefaultValueSrc;
@@ -49,10 +52,10 @@ export const completeFuncValue = (value, config) => {
           // has gap
           return undefined;
         }
-      } else if (argConfig.defaultValue !== undefined) {
+      } else if (defaultValue !== undefined && !isObject(defaultValue)) {
         complValue = complValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
         complValue = complValue.setIn(["args", argKey, "valueSrc"], "value");
-      } else if (argConfig.isOptional) {
+      } else if (isOptional) {
         // optional
         tmpHasOptional = true;
       } else {
@@ -121,12 +124,15 @@ export const setFunc = (value, funcKey, config) => {
   if (funcConfig) {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
-      const argDefaultValueSrc = argConfig.valueSources.length ? argConfig.valueSources[0] : undefined;
+      const {valueSources, defaultValue} = argConfig;
+      const firstValueSrc = valueSources.length ? valueSources[0] : undefined;
+      const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
+      const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
+      if (defaultValue !== undefined) {
+        value = value.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
+      }
       if (argDefaultValueSrc) {
         value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
-      }
-      if (argConfig.defaultValue !== undefined) {
-        value = value.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
       }
     }
   }
@@ -135,7 +141,7 @@ export const setFunc = (value, funcKey, config) => {
 };
 
 const getDefaultArgValue = ({defaultValue: value}) => {
-  if (typeof value == "object" && !Immutable.Map.isMap(value) && value.func) {
+  if (isObject(value) && !Immutable.Map.isMap(value) && value.func) {
     return Immutable.fromJS(value, function (k, v) {
       return Immutable.Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
     });
