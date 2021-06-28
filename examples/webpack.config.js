@@ -22,6 +22,10 @@ let plugins = [
             NODE_ENV: JSON.stringify(MODE),
         }
     }),
+    new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer'],
+    }),
 ];
 let aliases = {
     [lib_name]: MODULES

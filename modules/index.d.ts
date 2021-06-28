@@ -677,6 +677,7 @@ export interface Func {
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
+  showPrefix?: boolean,
 }
 export type Funcs = TypedMap<Func | FuncGroup>;
 
@@ -840,4 +841,5 @@ export const Utils: Utils;
 export const Query: Query;
 export const Builder: Builder;
 export const BasicConfig: BasicConfig;
+export const BasicFuncs: Funcs;
 export const Widgets: ReadyWidgets;

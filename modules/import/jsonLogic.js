@@ -241,7 +241,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
 
   if (funcKey) {
     const funcConfig = config.funcs[funcKey];
-    const argKeys = Object.keys(funcConfig.args);
+    const argKeys = Object.keys(funcConfig.args || {});
     let args = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
       const argConfig = funcConfig.args[argKey];

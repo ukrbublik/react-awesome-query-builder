@@ -1,4 +1,10 @@
 # Changelog
+- 4.3.0
+  - Improved function support
+  - Functions used in examples now moved to `BasicFuncs` (exported with lib)
+  - Added funcs `RELATIVE_DATETIME`, `NOW`, `UPPER`
+  - Added option `showPrefix` for func args (false by default)
+  - Added missing `mongoFormatValue` for all types in basic config (now dates are exported as `Date` objects)
 - 4.2.0
   - Added `textarea` widget
 - 4.1.1

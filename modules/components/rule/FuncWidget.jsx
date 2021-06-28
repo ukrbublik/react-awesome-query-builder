@@ -14,11 +14,12 @@ export default class FuncWidget extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
-    operator: PropTypes.string.isRequired,
+    operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
     setValue: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
+    parentFuncs: PropTypes.array,
   };
 
   constructor(props) {
@@ -68,12 +69,12 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderFuncSelect = () => {
-    const {config, field, operator, customProps, value, readonly} = this.props;
+    const {config, field, operator, customProps, value, readonly, parentFuncs} = this.props;
     const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
-      config, field, operator, customProps, readonly,
+      config, field, operator, customProps, readonly, parentFuncs,
     };
     const {showLabels, funcLabel} = config.settings;
     const widgetLabel = showLabels
@@ -89,21 +90,23 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgLabel = (argKey, argDefinition) => {
+    const {valueSources, type, showPrefix, label} = argDefinition;
     const {config} = this.props;
-    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == "const";
-    const forceShow = !config.settings.showLabels && (argDefinition.type == "boolean" || isConst);
+    const isConst = valueSources && valueSources.length == 1 && valueSources[0] == "const";
+    const forceShow = !config.settings.showLabels && (type == "boolean" || isConst) && showPrefix;
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label">
-        {argDefinition.label || argKey}
+        {label || argKey}
       </Col>
     );
   };
 
   renderArgLabelSep = (argKey, argDefinition) => {
+    const {valueSources, type, showPrefix} = argDefinition;
     const {config} = this.props;
-    const isConst = argDefinition.valueSources && argDefinition.valueSources.length == 1 && argDefinition.valueSources[0] == "const";
-    const forceShow = !config.settings.showLabels && (argDefinition.type == "boolean" || isConst);
+    const isConst = valueSources && valueSources.length == 1 && valueSources[0] == "const";
+    const forceShow = !config.settings.showLabels && (type == "boolean" || isConst) && showPrefix;
     if (!forceShow) return null;
     return (
       <Col className="rule--func--arg-label-sep">
@@ -113,7 +116,7 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, operator, value, readonly} = this.props;
+    const {config, field, operator, value, readonly, parentFuncs} = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
@@ -133,6 +136,7 @@ export default class FuncWidget extends PureComponent {
       argKey,
       argDefinition,
       readonly,
+      parentFuncs,
     };
     //tip: value & valueSrc will be converted to Immutable.List at <Widget>
 
@@ -210,6 +214,7 @@ class ArgWidget extends PureComponent {
     setValue: PropTypes.func.isRequired,
     setValueSrc: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
+    parentFuncs: PropTypes.array,
   };
 
   setValue = (_delta, value, _widgetType) => {
@@ -223,12 +228,14 @@ class ArgWidget extends PureComponent {
   }
 
   render() {
+    const {funcKey, parentFuncs} = this.props;
     return (
       <Widget
         {...this.props} 
         setValue={this.setValue} 
         setValueSrc={this.setValueSrc} 
         isFuncArg={true}
+        parentFuncs={[...(parentFuncs || []), funcKey]}
       />
     );
   }

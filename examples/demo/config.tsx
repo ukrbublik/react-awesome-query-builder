@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import merge from "lodash/merge";
 import {
-  BasicConfig,
+  BasicConfig, BasicFuncs,
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs, 
   DateTimeFieldSettings,
@@ -393,7 +393,7 @@ export default (skin: string) => {
     datetime: {
       label: "DateTime",
       type: "datetime",
-      valueSources: ["value"]
+      valueSources: ["value", "func"]
     },
     datetime2: {
       label: "DateTime2",
@@ -511,59 +511,8 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const funcs: Funcs = {
-    LOWER: {
-      label: "Lowercase",
-      mongoFunc: "$toLower",
-      jsonLogic: "toLowerCase",
-      //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
-      returnType: "text",
-      args: {
-        str: {
-          label: "String",
-          type: "text",
-          valueSources: ["value", "field"],
-        },
-      }
-    },
-    LINEAR_REGRESSION: {
-      label: "Linear regression",
-      returnType: "number",
-      formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
-      sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
-      mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
-      jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
-      /* eslint-disable */
-      jsonLogicImport: (v: any) => {
-        const coef = v["+"][0]["*"][0];
-        const val = v["+"][0]["*"][1];
-        const bias = v["+"][1];
-        return [coef, val, bias];
-      },
-      /* eslint-enable */
-      renderBrackets: ["", ""],
-      renderSeps: [" * ", " + "],
-      args: {
-        coef: {
-          label: "Coef",
-          type: "number",
-          defaultValue: 1,
-          valueSources: ["value"],
-        },
-        val: {
-          label: "Value",
-          type: "number",
-          valueSources: ["value"],
-        },
-        bias: {
-          label: "Bias",
-          type: "number",
-          defaultValue: 0,
-          valueSources: ["value"],
-        }
-      }
-    },
+    ...BasicFuncs
   };
-
 
 
   const config: Config = {
