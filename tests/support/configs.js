@@ -430,6 +430,7 @@ export const with_all_types__show_error = (BasicConfig) => ({
 
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
+  //todo: use BasicFuncs
   funcs: {
     LOWER: {
       label: "Lowercase",
