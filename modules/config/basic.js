@@ -864,7 +864,9 @@ const types = {
       select: {
         operators: [
           "select_equals",
-          "select_not_equals"
+          "select_not_equals",
+          "is_empty",
+          "is_not_empty",
         ],
         widgetProps: {
           customProps: {
@@ -875,7 +877,9 @@ const types = {
       multiselect: {
         operators: [
           "select_any_in",
-          "select_not_any_in"
+          "select_not_any_in",
+          "is_empty",
+          "is_not_empty",
         ],
       },
     },
@@ -887,6 +891,8 @@ const types = {
         operators: [
           "multiselect_equals",
           "multiselect_not_equals",
+          "is_empty",
+          "is_not_empty",
         ]
       }
     },
