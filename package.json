@@ -1,5 +1,5 @@
 {
-  "name": "react-awesome-query-builder",
+  "name": "@sailthru/react-awesome-query-builder",
   "version": "4.3.0",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
