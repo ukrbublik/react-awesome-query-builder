@@ -160,7 +160,7 @@ type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boo
 
 interface BaseWidgetProps {
   value: RuleValue,
-  setValue(val: RuleValue): void,
+  setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
   operator: string,

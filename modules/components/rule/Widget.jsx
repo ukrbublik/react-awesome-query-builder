@@ -64,15 +64,15 @@ export default class Widget extends PureComponent {
     }
   }
 
-  _setValue = (isSpecialRange, delta, widgetType, value, __isInternal) => {
+  _setValue = (isSpecialRange, delta, widgetType, value, asyncListValues, __isInternal) => {
     if (isSpecialRange && Array.isArray(value)) {
       const oldRange = [this.props.value.get(0), this.props.value.get(1)];
       if (oldRange[0] != value[0])
-        this.props.setValue(0, value[0], widgetType, __isInternal);
+        this.props.setValue(0, value[0], widgetType, asyncListValues, __isInternal);
       if (oldRange[1] != value[1])
-        this.props.setValue(1, value[1], widgetType, __isInternal);
+        this.props.setValue(1, value[1], widgetType, asyncListValues, __isInternal);
     } else {
-      this.props.setValue(delta, value, widgetType, __isInternal);
+      this.props.setValue(delta, value, widgetType, asyncListValues, __isInternal);
     }
   }
 

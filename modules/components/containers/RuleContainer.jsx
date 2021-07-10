@@ -52,8 +52,8 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setOperatorOption(this.props.path, name, value);
     }
 
-    setValue = (delta, value, type, __isInternal) => {
-      this.props.actions.setValue(this.props.path, delta, value, type, __isInternal);
+    setValue = (delta, value, type, asyncListValues, __isInternal) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, __isInternal);
     }
 
     setValueSrc = (delta, srcKey) => {

@@ -402,9 +402,10 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {integer} delta
  * @param {*} value
  * @param {string} valueType
+ * @param {*} asyncListValues
  * @param {boolean} __isInternal
  */
-const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
+const setValue = (state, path, delta, value, valueType, config, asyncListValues, __isInternal) => {
   const {fieldSeparator, showErrorMessage} = config.settings;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
   if (valueSrc === "field" && Array.isArray(value))
@@ -416,7 +417,9 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
   const isEndValue = false;
   const canFix = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-  const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+  const [validateError, fixedValue] = validateValue(
+    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
+  );
     
   const isValid = !validateError;
   if (isValid && fixedValue !== value) {
@@ -605,7 +608,7 @@ export default (config) => {
 
     case constants.SET_VALUE: {
       let set = {};
-      const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.__isInternal);
+      const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.asyncListValues, action.__isInternal);
       if (tree.__isInternalValueChange)
         set.__isInternalValueChange = true;
       return Object.assign({}, state, {...unset, ...set}, {tree});

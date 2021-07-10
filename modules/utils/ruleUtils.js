@@ -72,7 +72,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const isEndValue = !canFix;
-      const [validateError, fixedValue] = validateValue(config, newField, newField, newOperator, v, vType, vSrc, canFix, isEndValue);
+      const asyncListValues = undefined;
+      const [validateError, fixedValue] = validateValue(
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
+      );
       const isValid = !validateError;
       if (!isValid && showErrorMessage && changedField != "field") {
         // allow bad value
