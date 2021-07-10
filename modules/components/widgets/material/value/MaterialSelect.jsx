@@ -20,8 +20,15 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
   const renderValue = (selectedValue) => {
     if (!readonly && !selectedValue)
       return placeholder;
-    return mapListValues(listValues, ({title, value}) => (value === selectedValue ? title : null)).filter(v => v !== null).shift();
+    return getListValueTitle(selectedValue);
   };
+
+  const getListValueTitle = (selectedValue) => 
+    mapListValues(listValues, ({title, value}) => 
+      (value === selectedValue ? title : null)
+    )
+    .filter(v => v !== null)
+    .shift();
   
   const hasValue = value != null;
 

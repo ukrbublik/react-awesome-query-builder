@@ -156,15 +156,19 @@ export const getValueInListValues = (listValues, value) => {
   return it !== undefined ? it.value : undefined;
 };
 
-export const mapListValues = (listValues, fun) => {
+export const mapListValues = (listValues, mapFn) => {
   let ret = [];
   if (Array.isArray(listValues)) {
     for (let v of listValues) {
-      ret.push(fun(listValue(v)));
+      const lv = mapFn(listValue(v));
+      if (lv != null)
+        ret.push(lv);
     }
   } else {
     for (let value in listValues) {
-      ret.push(fun(listValue(value, listValues[value])));
+      const lv = mapFn(listValue(value, listValues[value]));
+      if (lv != null)
+        ret.push(lv);
     }
   }
   return ret;
