@@ -251,10 +251,11 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
   }
 
   if (fieldSettings) {
-    if (fieldSettings.listValues && !fieldSettings.allowCustomValues) {
+    const listValues = asyncListValues || fieldSettings.listValues;
+    if (listValues && !fieldSettings.allowCustomValues) {
       if (value instanceof Array) {
         for (let i = 0 ; i < value.length ; i++) {
-          const vv = getItemInListValues(fieldSettings.listValues, value[i]);
+          const vv = getItemInListValues(listValues, value[i]);
           if (vv == undefined) {
             return [`Value ${value[i]} is not in list of values`, value];
           } else {
@@ -262,7 +263,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
           }
         }
       } else {
-        const vv = getItemInListValues(fieldSettings.listValues, value);
+        const vv = getItemInListValues(listValues, value);
         if (vv == undefined) {
           return [`Value ${value} is not in list of values`, value];
         } else {

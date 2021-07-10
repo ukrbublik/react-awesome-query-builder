@@ -23,6 +23,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
   const currentValueType = current.get("valueType", new Immutable.List());
+  const currentAsyncListValues = current.get("asyncListValues");
 
   //const isValidatingTree = (changedField === null);
   const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
@@ -72,7 +73,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const isEndValue = !canFix;
-      const asyncListValues = undefined;
+      const asyncListValues = currentAsyncListValues;
       const [validateError, fixedValue] = validateValue(
         config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
       );

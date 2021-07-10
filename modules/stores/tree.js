@@ -343,7 +343,8 @@ const setField = (state, path, newField, config) => {
       .set("operatorOptions", newOperatorOptions)
       .set("value", newValue)
       .set("valueSrc", newValueSrc)
-      .set("valueType", newValueType);
+      .set("valueType", newValueType)
+      .delete("asyncListValues");
   }));
 };
 
@@ -378,6 +379,11 @@ const setOperator = (state, path, newOperator, config) => {
         .set("valueError", newValueError);
     }
     const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
+
+    if (!canReuseValue) {
+      current = current
+        .delete("asyncListValues");
+    }
 
     return current
       .set("operator", newOperator)
@@ -449,11 +455,15 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const isLastEmpty = lastValue == undefined;
   const isLastError = !!lastError;
   if (isValid || showErrorMessage) {
+    state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
     // set only good value
     if (typeof value === "undefined") {
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
       state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
     } else {
+      if (asyncListValues) {
+        state = state.setIn(expandTreePath(path, "properties", "asyncListValues"), asyncListValues);
+      }
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), value);
       state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), calculatedValueType);
       state.__isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
@@ -481,6 +491,7 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
 
   state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
   state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
+  state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
 
   if (showErrorMessage) {
     // clear value error
