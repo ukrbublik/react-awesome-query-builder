@@ -3,23 +3,36 @@ import TextField from '@material-ui/core/TextField';
 import {mapListValues, listValuesToArray} from "../../../../utils/stuff";
 import FormControl from "@material-ui/core/FormControl";
 import omit from "lodash/omit";
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 
-//todo: load more
+
+//.... work with server
+//todo: load more ....
+//todo: throttle, cancel last fetch
+//todo: initial values can be undefined until search
+
+//todo: value as obj ???    is re-render that bad ?
 //todo: after F5
 //todo: humanStringFormat
-//todo: initial values can be undefined until search
-//todo: multi
 
+//todo: showSearch should use Autocomplete implicitly for end user
 //release: doc async, fetch
 
-// todo: groupBy for field, test readonly
+//todo: multi
+//todo: groupBy
+//todo: i18n load more
 
+const defaultFilterOptions = createFilterOptions();
 
-export default ({asyncListValues: selectedAsyncListValues, listValues: staticListValues, value: selectedValue, setValue, allowCustomValues, readonly, placeholder, customProps, config}) => {
+export default ({
+  asyncListValues: selectedAsyncListValues, listValues: staticListValues, allowCustomValues,
+  value: selectedValue, setValue, placeholder, customProps, readonly, config
+}) => {
   const async = true;
+  const useLoadMore = true;
+  const useSearch = true;
 
   // utils
   const mergeListValues = (values, selectedValues) => {
@@ -57,20 +70,27 @@ export default ({asyncListValues: selectedAsyncListValues, listValues: staticLis
       {title: 'A', value: 'a'},
       {title: 'AAA', value: 'aaa'},
       {title: 'B', value: 'b'},
-      {title: 'C', value: 'c'}
+      {title: 'C', value: 'c'},
+      {title: 'D', value: 'd'},
+      {title: 'E', value: 'e'},
+      {title: 'F', value: 'f'},
     ]
     .filter(({title}) => filter == null ? true : title.indexOf(filter) != -1);
   };
+
+  const loadMoreTitle = `Load more...`;
 
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
-  const listValues = async ? mergeListValues(asyncListValues, selectedAsyncListValues) : staticListValues;
+  const listValues = async ? 
+    (!allowCustomValues ? mergeListValues(asyncListValues, selectedAsyncListValues) : asyncListValues) :
+    staticListValues;
   const isLoading = open && loading;
   const isInitialLoading = open && listValues === undefined;
+  const canLoadMore = !isLoading && !isInitialLoading && listValues && listValues.length > 0;
 
-  //todo: [p3] cancel last fetch
   const loadListValues = async (fetchFn) => {
     setLoading(true);
     const list = await fetchFn();
@@ -120,15 +140,41 @@ export default ({asyncListValues: selectedAsyncListValues, listValues: staticLis
   const onOpen = () => setOpen(true);
   const onClose = () => setOpen(false);
 
-  const onChange = (_e, option) => {
-    setValue(option == null ? undefined : option.value, [option]);
+  const onChange = async (_e, option) => {
+    if (option && option.specialValue) {
+      await loadListValues(() => fetchListValues(inputValue, true));
+    } else {
+      setValue(option == null ? undefined : option.value, [option]);
+    }
   };
 
   const onInputChange = async (e, newInputValue) => {
     let val = newInputValue;
+
+    if (val === loadMoreTitle) {
+      return;
+    }
+
     setInputValue(val);
 
-    await loadListValues(() => fetchListValues(val));
+    if (allowCustomValues) {
+      setValue(val, [val]);
+    }
+
+    if (useSearch) {
+      await loadListValues(() => fetchListValues(val));
+    }
+  };
+
+  const filterOptions = (options, params) => {
+    const filtered = defaultFilterOptions(options, params);
+    if (useLoadMore && canLoadMore) {
+      filtered.push({
+        specialValue: 'LOAD_MORE',
+        title: loadMoreTitle,
+      });
+    }
+    return filtered;
   };
 
   // render
@@ -165,14 +211,27 @@ export default ({asyncListValues: selectedAsyncListValues, listValues: staticLis
     if (valueOrOption == null)
       return null;
     const option = valueOrOption.value != undefined ? valueOrOption : listValueToOption(getListValue(valueOrOption));
+    if (!option && valueOrOption.specialValue) {
+      // special last 'Load more...' item
+      return valueOrOption.title;
+    }
+    if (!option && allowCustomValues) {
+      // there is just string value, it's not item from list
+      return valueOrOption;
+    }
+    if (!option) {
+      // weird
+      return valueOrOption;
+    }
     return option.title;
-  }
+  };
 
   return (
     <FormControl>
       <Autocomplete
         //autoWidth
         //displayEmpty
+        freeSolo={allowCustomValues}
         loading={isInitialLoading}
         style={{ width: width || defaultSliderWidth }}
         open={open}
@@ -189,6 +248,7 @@ export default ({asyncListValues: selectedAsyncListValues, listValues: staticLis
         options={options}
         getOptionLabel={getOptionLabel}
         renderInput={renderInput}
+        filterOptions={filterOptions}
         {...customAutocompleteProps}
       ></Autocomplete>
     </FormControl>
