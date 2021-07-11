@@ -25,6 +25,7 @@ export default class Widget extends PureComponent {
     field: PropTypes.string,
     operator: PropTypes.string,
     readonly: PropTypes.bool,
+    asyncListValues: PropTypes.array,
     //actions
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
@@ -49,7 +50,9 @@ export default class Widget extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["config", "field", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg"];
+    const keysForMeta = [
+      "config", "field", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues"
+    ];
     const needUpdateMeta = !this.meta 
           || keysForMeta
             .map(k => (
@@ -80,7 +83,10 @@ export default class Widget extends PureComponent {
     this.props.setValueSrc(delta, srcKey);
   }
 
-  getMeta({config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, isForRuleGruop, isFuncArg, leftField}) {
+  getMeta({
+    config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, 
+    isForRuleGruop, isFuncArg, leftField, asyncListValues
+  }) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     let iValueSrcs = valueSrcs;
     let iValues = values;
@@ -160,6 +166,7 @@ export default class Widget extends PureComponent {
       widgets,
       iValues, //correct for isFuncArg
       aField: field, //correct for isFuncArg
+      asyncListValues,
     };
   }
 
@@ -184,7 +191,7 @@ export default class Widget extends PureComponent {
           value={value}
           valueError={valueError}
           isFuncArg={isFuncArg}
-          {...pick(meta, ["isSpecialRange", "fieldDefinition"])}
+          {...pick(meta, ["isSpecialRange", "fieldDefinition", "asyncListValues"])}
           {...pick(widgets[delta], ["widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler"])}
           config={config}
           field={field}

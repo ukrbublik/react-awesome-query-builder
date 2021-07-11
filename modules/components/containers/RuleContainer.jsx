@@ -19,6 +19,7 @@ const createRuleContainer = (Rule) =>
       onDragStart: PropTypes.func,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
+      asyncListValues: PropTypes.array,
       valueError: PropTypes.any,
       operatorOptions: PropTypes.object,
       reordableNodesCnt: PropTypes.number,
@@ -125,6 +126,7 @@ const createRuleContainer = (Rule) =>
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
+              asyncListValues={this.props.asyncListValues}
             /> : null
             ,
             <Rule
@@ -149,6 +151,7 @@ const createRuleContainer = (Rule) =>
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
+              asyncListValues={this.props.asyncListValues}
             />
           ]}
         </div>
