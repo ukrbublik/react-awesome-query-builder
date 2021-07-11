@@ -832,6 +832,7 @@ export interface MaterialWidgets {
   MaterialNumberWidget: ElementType<NumberWidgetProps>,
   MaterialSliderWidget: ElementType<NumberWidgetProps>,
   MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
+  MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
 
 

@@ -15,6 +15,7 @@ const {
   MaterialNumberWidget,
   MaterialSliderWidget,
   MaterialRangeWidget,
+  MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
   MaterialConjs,
@@ -64,7 +65,8 @@ const widgets = {
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => <MaterialSelectWidget {...props} />,
+    // factory: (props) => <MaterialSelectWidget {...props} />,
+    factory: (props) => <MaterialAutocompleteWidget {...props} />,
   },
   slider: {
     ...BasicConfig.widgets.slider,

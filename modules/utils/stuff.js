@@ -122,7 +122,7 @@ const isObject = (v) => (typeof v == "object" && v !== null);
 const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
 
 // convert {<value>: <title>, ..} or [value, ..] to normal [{value, title}, ..]
-const listValuesToArray = (listValuesObj) => {
+export const listValuesToArray = (listValuesObj) => {
   if (!isObject(listValuesObj))
     return listValuesObj;
   if (Array.isArray(listValuesObj))
