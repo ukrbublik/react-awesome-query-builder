@@ -281,3 +281,9 @@ export const isJsonLogic = (logic) => (
   && !Array.isArray(logic) // and not an array
   && Object.keys(logic).length === 1 // with exactly one key
 );
+
+export function sleep(delay) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
+};
