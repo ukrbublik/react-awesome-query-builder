@@ -131,6 +131,21 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("change field from group_ext to simple with custom operator", () => {
+    with_qb(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".rule_group_ext .group--field--count--rule .rule--field select")
+        .simulate("change", { target: { value: "str" } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal("str");
+      expect(child.properties.operator).to.equal("equal");
+      expect(child.properties.value).to.eql([undefined]);
+    });
+  });
+
   it("change field from simple to group_ext", () => {
     with_qb(configs.with_group_array, inits.with_text, "JsonLogic", (qb, onChange) => {
       qb

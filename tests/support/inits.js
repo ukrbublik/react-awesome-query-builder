@@ -521,6 +521,21 @@ export const with_group_array = {
   ]
 };
 
+export const with_group_array_custom_operator = {
+  "and": [
+    { "custom_group_operator": [
+      { "var": "cars" },
+      { "and": [
+        {
+          "==": [ { "var": "vendor" }, "Toyota" ]
+        }, {
+          ">=": [ { "var": "year" }, 2010 ]
+        }
+      ] }
+    ] }
+  ]
+};
+
 // rare
 export const with_fieldName = {
   "and": [{

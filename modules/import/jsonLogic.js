@@ -418,10 +418,10 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
 };
 
 const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArgs) => {
-  // some/all/none is used for group count (cardinality = 0 is exception)
+  // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" for multiselect
   const isAllInForMultiselect = op == "all" && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
-  const isGroup0 = !isAllInForMultiselect && ["some", "all", "none"].includes(op);
+  const isGroup0 = !isAllInForMultiselect && config.settings.groupOperators.includes(op);
   const cardinality = isGroup0 ? 0 : arity - 1;
 
   const opk = op + "/" + cardinality;

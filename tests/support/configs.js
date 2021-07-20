@@ -641,7 +641,7 @@ export const with_group_array = (BasicConfig) => ({
         "none",
       ],
       defaultOperator: "some",
-      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
+      initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
       subfields: {
         vendor: {
@@ -664,6 +664,59 @@ export const with_group_array = (BasicConfig) => ({
   },
   settings: {
     ...BasicConfig.settings,
+  }
+});
+
+export const with_group_array_custom_operator = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    str: {
+      label: "String",
+      type: "text",
+    },
+    cars: {
+      label: "Cars",
+      type: "!group",
+      mode: "array",
+      conjunctions: ["AND", "OR"],
+      showNot: true,
+      operators: [
+        "custom_group_operator"
+      ],
+      defaultOperator: "some",
+      initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
+
+      subfields: {
+        vendor: {
+          type: "select",
+          fieldSettings: {
+            listValues: ["Ford", "Toyota", "Tesla"],
+          },
+          valueSources: ["value"],
+        },
+        year: {
+          type: "number",
+          fieldSettings: {
+            min: 1990,
+            max: 2020,
+          },
+          valueSources: ["value"],
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    groupOperators: [...BasicConfig.settings.groupOperators, "custom_group_operator"]
+  },
+  operators: {
+    ...BasicConfig.operators,
+    custom_group_operator: {
+      label: "custom_group_operator",
+      labelForFormat: "custom_group_operator",
+      cardinality: 0,
+      jsonLogic: "custom_group_operator",
+    },
   }
 });
 
