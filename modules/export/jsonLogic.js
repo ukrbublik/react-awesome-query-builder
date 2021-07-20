@@ -122,7 +122,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   // rule_group (issue #246)
   if (isRuleGroup && mode != "struct") {
     if (isGroup0) {
-      // all / some / none
+      // config.settings.groupOperators
       const op = groupOperator || "some";
       resultQuery = {
         [op]: [

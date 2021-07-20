@@ -301,7 +301,7 @@ export default (skin: string) => {
         "none",
       ],
       defaultOperator: "some",
-      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
+      initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
       subfields: {
         vendor: {
