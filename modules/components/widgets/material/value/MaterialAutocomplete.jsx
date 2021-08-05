@@ -9,7 +9,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 //.... work with server
-//  throttle, cancel last fetch
+//  throttle
 //  initial values can be undefined until search  --  forceSearch
 
 //  value as obj ???    is re-render that bad ?
@@ -64,6 +64,7 @@ const getListValue = (selectedValue, listValues) =>
   .filter(v => v !== null)
   .shift();
 
+let asyncFectchCnt = 0;
 
 
 export default ({
@@ -100,7 +101,7 @@ export default ({
   // state
   const [open, setOpen] = React.useState(false);
   const [asyncFetchMeta, setAsyncFetchMeta] = React.useState(undefined);
-  const [loading, setLoading] = React.useState(false);
+  const [loadingCnt, setLoadingCnt] = React.useState(0);
   const [inputValue, setInputValue] = React.useState('');
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
 
@@ -109,7 +110,7 @@ export default ({
   const listValues = asyncFetch ? 
     (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
     staticListValues;
-  const isLoading = open && loading;
+  const isLoading = open && loadingCnt > 0;
   const isInitialLoading = open && asyncFetch && listValues === undefined;
   const canLoadMore = !isLoading && !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
   const options = mapListValues(listValues, listValueToOption);
@@ -127,7 +128,12 @@ export default ({
     const offset = isLoadMore && asyncListValues ? asyncListValues.length : 0;
     const meta = isLoadMore && asyncFetchMeta;
 
+    const newAsyncFetchCnt = ++asyncFectchCnt;
     const res = await asyncFetch(filter, offset, meta);
+    if (asyncFectchCnt > newAsyncFetchCnt) {
+      // cancelled
+      return null;
+    }
 
     const {values, hasMore, meta: newMeta} = res && res.values ? res : {values: res};
     const nValues = listValuesToArray(values);
@@ -157,13 +163,13 @@ export default ({
   };
 
   const loadListValues = async (filter = null, isLoadMore = false) => {
-    setLoading(true);
+    setLoadingCnt(x => (x + 1));
     const list = await fetchListValues(filter, isLoadMore);
     if (list != null) {
       // tip: null can be used for reject (eg, if user don't want to filter by input)
       setAsyncListValues(list);
     }
-    setLoading(false);
+    setLoadingCnt(x => (x - 1));
   };
 
   // Initial loading
