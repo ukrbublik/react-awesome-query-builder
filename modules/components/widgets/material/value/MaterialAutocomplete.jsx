@@ -5,13 +5,12 @@ import FormControl from "@material-ui/core/FormControl";
 import omit from "lodash/omit";
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { nextTick } from "process";
 
 
 
 //.... work with server
 //  throttle, cancel last fetch
-//  initial values can be undefined until search
+//  initial values can be undefined until search  --  forceSearch
 
 //  value as obj ???    is re-render that bad ?
 //  after F5
@@ -48,7 +47,7 @@ const simulateAsyncFetch = (all, pageSize = 0, delay = 1000) => async (search, o
 const mergeListValues = (values, newValues, toStart = false) => {
   if (!newValues)
     return values;
-  const old = values ? listValuesToArray(values) : [];
+  const old = values || [];
   const newFiltered = newValues.filter(v => old.find(av => av.value == v.value) == undefined);
   const merged = toStart ? [...newFiltered, ...old] : [...old, ...newFiltered];
   return merged;
@@ -96,6 +95,7 @@ export default ({
   const asyncFetch = simulateAsyncFetch(demoAll, 3);
   const useLoadMore = true;
   const useSearch = true;
+  const forceSearch = true;
 
   // state
   const [open, setOpen] = React.useState(false);
@@ -105,11 +105,12 @@ export default ({
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
 
   // compute
+  const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
   const listValues = asyncFetch ? 
-    (!allowCustomValues ? mergeListValues(asyncListValues, selectedAsyncListValues, true) : asyncListValues) :
+    (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
     staticListValues;
   const isLoading = open && loading;
-  const isInitialLoading = open && listValues === undefined;
+  const isInitialLoading = open && asyncFetch && listValues === undefined;
   const canLoadMore = !isLoading && !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
@@ -118,7 +119,7 @@ export default ({
   
   // fetch
   const fetchListValues = async (filter = null, isLoadMore = false) => {
-    // clear last meta
+    // clear obsolete meta
     if (!isLoadMore && asyncFetchMeta) {
       setAsyncFetchMeta(undefined);
     }
@@ -129,13 +130,17 @@ export default ({
     const res = await asyncFetch(filter, offset, meta);
 
     const {values, hasMore, meta: newMeta} = res && res.values ? res : {values: res};
+    const nValues = listValuesToArray(values);
     let assumeHasMore;
     let newValues;
     if (isLoadMore) {
-      newValues = mergeListValues(asyncListValues, values, false);
+      newValues = mergeListValues(asyncListValues, nValues, false);
       assumeHasMore = newValues.length > asyncListValues.length;
     } else {
-      newValues = values;
+      newValues = nValues;
+      if (useLoadMore) {
+        assumeHasMore = newValues.length > 0;
+      }
     }
     
     // save new meta
@@ -151,9 +156,9 @@ export default ({
     return newValues;
   };
 
-  const loadListValues = async (fetchFn) => {
+  const loadListValues = async (filter = null, isLoadMore = false) => {
     setLoading(true);
-    const list = await fetchFn();
+    const list = await fetchListValues(filter, isLoadMore);
     if (list != null) {
       // tip: null can be used for reject (eg, if user don't want to filter by input)
       setAsyncListValues(list);
@@ -171,7 +176,7 @@ export default ({
     (async () => {
       if (active && !loading) {
         loading = true;
-        await loadListValues(() => fetchListValues());
+        await loadListValues();
         loading = false;
       }
     })();
@@ -181,7 +186,7 @@ export default ({
     };
   }, [isInitialLoading]);
 
-  // on
+  // Event handlers
   let isSelectedLoadMore;
   const onOpen = () => setOpen(true);
   const onClose = (_e) => {
@@ -193,9 +198,9 @@ export default ({
   }
 
   const onChange = async (_e, option) => {
-    if (option && option.specialValue) {
+    if (option && option.specialValue == 'LOAD_MORE') {
       isSelectedLoadMore = true;
-      await loadListValues(() => fetchListValues(inputValue, true), true);
+      await loadListValues(inputValue, true);
     } else {
       setValue(option == null ? undefined : option.value, [option]);
     }
@@ -215,22 +220,11 @@ export default ({
     }
 
     if (useSearch) {
-      await loadListValues(() => fetchListValues(val));
+      await loadListValues(val);
     }
   };
 
-  const filterOptions = (options, params) => {
-    const filtered = defaultFilterOptions(options, params);
-    if (useLoadMore && canLoadMore) {
-      filtered.push({
-        specialValue: 'LOAD_MORE',
-        title: loadMoreTitle,
-      });
-    }
-    return filtered;
-  };
-
-  // render
+  // Render
   const renderInput = (params) => {
     return (
       <TextField 
@@ -251,6 +245,16 @@ export default ({
         {...customInputProps}
       />
     );
+  };
+  const filterOptions = (options, params) => {
+    const filtered = defaultFilterOptions(options, params);
+    if (useLoadMore && canLoadMore) {
+      filtered.push({
+        specialValue: 'LOAD_MORE',
+        title: loadMoreTitle,
+      });
+    }
+    return filtered;
   };
 
   const getOptionSelected = (option, valueOrOption) => {

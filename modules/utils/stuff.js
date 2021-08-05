@@ -118,7 +118,7 @@ export const escapeRegExp = (string) => {
 };
 
 
-const isObject = (v) => (typeof v == "object" && v !== null);
+const isObject = (v) => (typeof v == "object" && v !== null); // object or array
 const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
 
 // convert {<value>: <title>, ..} or [value, ..] to normal [{value, title}, ..]
