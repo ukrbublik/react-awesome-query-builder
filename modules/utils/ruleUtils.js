@@ -6,6 +6,13 @@ import Immutable from "immutable";
 import {validateValue} from "../utils/validation";
 import last from "lodash/last";
 
+const selectTypes = [
+  "select",
+  "multiselect",
+  "treeselect",
+  "treemultiselect",
+];
+
 /**
  * @param {object} config
  * @param {object} oldConfig
@@ -40,6 +47,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       || changedField == "field" && !clearValueOnChangeField 
       || changedField == "operator" && !clearValueOnChangeOp)
     && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
+  if (canReuseValue && selectTypes.includes(currentFieldConfig.type) && changedField == "field") {
+    // different fields of select types has different listValues
+    canReuseValue = false;
+  }
 
   // compare old & new widgets
   for (let i = 0 ; i < operatorCardinality ; i++) {

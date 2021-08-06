@@ -9,37 +9,9 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 
-//  value as obj ???    is re-render that bad ?
-//  after F5
-//  humanStringFormat
-
-//  showSearch should use Autocomplete implicitly for end user
-//release: doc async, fetch
-
-//  multi
-//  groupBy
-//  i18n load more
-
 const defaultFilterOptions = createFilterOptions();
 
-const simulateAsyncFetch = (all, pageSize = 0, delay = 1000) => async (search, offset, _meta) => {
-  const filtered = listValuesToArray(all)
-    .filter(({title}) => search == null ? true : title.indexOf(search) != -1);
-  const pages = pageSize ? Math.ceil(filtered.length / pageSize) : 0;
-  const currentOffset = offset || 0;
-  const currentPage = pageSize ? Math.ceil(currentOffset / pageSize) : null;
-  const values = pageSize ? filtered.slice(currentOffset, currentOffset + pageSize) : filtered;
-  const newOffset = pageSize ? currentOffset + values.length : null;
-  const hasMore = pageSize ? (newOffset < filtered.length) : false;
-  // console.debug('simulateAsyncFetch', {
-  //   search, offset, values, hasMore, filtered
-  // });
-  await sleep(delay);
-  return {
-    values,
-    hasMore
-  };
-};
+
 
 const mergeListValues = (values, newValues, toStart = false) => {
   if (!newValues)
@@ -63,27 +35,12 @@ const getListValue = (selectedValue, listValues) =>
 
 
 export default ({
+  asyncFetch,
   asyncListValues: selectedAsyncListValues, 
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder, customProps, readonly, config
 }) => {
   //todo: configurable
-  const demoAll = [
-    {title: 'A', value: 'a'},
-    {title: 'AA', value: 'aa'},
-    {title: 'AAA1', value: 'aaa1'},
-    {title: 'AAA2', value: 'aaa2'},
-    {title: 'B', value: 'b'},
-    {title: 'C', value: 'c'},
-    {title: 'D', value: 'd'},
-    {title: 'E', value: 'e'},
-    {title: 'F', value: 'f'},
-    {title: 'G', value: 'g'},
-    {title: 'H', value: 'h'},
-    {title: 'I', value: 'i'},
-    {title: 'J', value: 'j'},
-  ];
-  const asyncFetch = simulateAsyncFetch(demoAll, 3);
   const useLoadMore = true;
   const useSearch = true;
   const forceSearch = false;

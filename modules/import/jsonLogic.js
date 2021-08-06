@@ -168,10 +168,14 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
     }
   }
 
+  let asyncListValues;
+  console.log( val, fieldConfig )
+
   return {
     valueSrc: "value",
     value: val,
-    valueType: widgetConfig.type
+    valueType: widgetConfig.type,
+    asyncListValues
   };
 };
 
@@ -597,6 +601,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       });
     }
   } else {
+    const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
+    const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
     res = {
       type: "rule",
       id: uuid(),
@@ -606,6 +612,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
+        asyncListValues,
       }
     };
   }

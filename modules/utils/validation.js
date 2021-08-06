@@ -232,6 +232,27 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
   return [validError, validError ? value : fixedValue];
 };
 
+const validateValueInList = (value, listValues) => {
+  if (value instanceof Array) {
+    for (let i = 0 ; i < value.length ; i++) {
+      const vv = getItemInListValues(listValues, value[i]);
+      if (vv == undefined) {
+        return [`Value ${value[i]} is not in list of values`, value];
+      } else {
+        value[i] = vv.value;
+      }
+    }
+  } else {
+    const vv = getItemInListValues(listValues, value);
+    if (vv == undefined) {
+      return [`Value ${value} is not in list of values`, value];
+    } else {
+      value = vv.value;
+    }
+  }
+  return [null, value];
+};
+
 /**
 * 
 */
@@ -253,23 +274,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
   if (fieldSettings) {
     const listValues = asyncListValues || fieldSettings.listValues;
     if (listValues && !fieldSettings.allowCustomValues) {
-      if (value instanceof Array) {
-        for (let i = 0 ; i < value.length ; i++) {
-          const vv = getItemInListValues(listValues, value[i]);
-          if (vv == undefined) {
-            return [`Value ${value[i]} is not in list of values`, value];
-          } else {
-            value[i] = vv.value;
-          }
-        }
-      } else {
-        const vv = getItemInListValues(listValues, value);
-        if (vv == undefined) {
-          return [`Value ${value} is not in list of values`, value];
-        } else {
-          value = vv.value;
-        }
-      }
+      return validateValueInList(value, listValues);
     }
     if (fieldSettings.min != null && value < fieldSettings.min) {
       return [`Value ${value} < min ${fieldSettings.min}`, value];

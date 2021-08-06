@@ -114,6 +114,7 @@ export interface Utils {
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
+  simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
 }
 
 export interface BuilderProps {
@@ -410,6 +411,14 @@ interface TreeItem extends ListItem {
 type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
+type AsyncFetchListValues = ListValues;
+interface AsyncFetchListValuesResult {
+  values: AsyncFetchListValues,
+  hasMore?: boolean,
+}
+type AsyncFetchListValuesFn = (search: string | null, offset: number) => AsyncFetchListValuesResult;
+
+
 export interface BasicFieldSettings {
   validateValue?: ValidateValue,
 }
@@ -433,11 +442,13 @@ export interface DateTimeFieldSettings extends BasicFieldSettings {
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
+  asyncFetch?: AsyncFetchListValuesFn,
+  //......
 }
 export interface TreeSelectFieldSettings extends BasicFieldSettings {
   listValues?: TreeData,
   treeExpandAll?: boolean,
-  treeSelectOnlyLeafs?:  boolean,
+  treeSelectOnlyLeafs?: boolean,
 }
 export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,

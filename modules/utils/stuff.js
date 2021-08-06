@@ -147,11 +147,15 @@ export const getItemInListValues = (listValues, value) => {
 };
 
 export const getTitleInListValues = (listValues, value) => {
+  if (listValues == undefined)
+    return value;
   const it = getItemInListValues(listValues, value);
   return it !== undefined ? it.title : undefined;
 };
 
 export const getValueInListValues = (listValues, value) => {
+  if (listValues == undefined)
+    return value;
   const it = getItemInListValues(listValues, value);
   return it !== undefined ? it.value : undefined;
 };
