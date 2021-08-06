@@ -169,7 +169,10 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   }
 
   let asyncListValues;
-  console.log( val, fieldConfig )
+  if (val && fieldConfig.fieldSettings && fieldConfig.fieldSettings.asyncFetch) {
+    const vals = Array.isArray(val) ? val : [val];
+    asyncListValues = vals;
+  }
 
   return {
     valueSrc: "value",
