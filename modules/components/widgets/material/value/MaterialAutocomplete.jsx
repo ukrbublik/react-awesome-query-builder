@@ -10,7 +10,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 //.... work with server
-//  throttle
 //  initial values can be undefined until search  --  forceSearch
 
 //  value as obj ???    is re-render that bad ?
