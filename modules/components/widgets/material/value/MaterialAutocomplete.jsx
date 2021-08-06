@@ -9,8 +9,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 
-//.... work with server
-//  initial values can be undefined until search  --  forceSearch
+////   ? loading more
 
 //  value as obj ???    is re-render that bad ?
 //  after F5
@@ -70,14 +69,6 @@ export default ({
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder, customProps, readonly, config
 }) => {
-  // setings
-  const {defaultSliderWidth} = config.settings;
-  const {width, ...rest} = customProps || {};
-  const customInputProps = rest.input || {};
-  const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
-  const loadMoreTitle = `Load more...`;
-  const fetchonInputDebounce = 0;
-
   //todo: configurable
   const demoAll = [
     {title: 'A', value: 'a'},
@@ -97,7 +88,16 @@ export default ({
   const asyncFetch = simulateAsyncFetch(demoAll, 3);
   const useLoadMore = true;
   const useSearch = true;
-  const forceSearch = true;
+  const forceSearch = false;
+
+  // setings
+  const {defaultSliderWidth} = config.settings;
+  const {width, ...rest} = customProps || {};
+  const customInputProps = rest.input || {};
+  const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
+  const loadMoreTitle = `Load more...`;
+  const aPlacaholder = forceSearch ? 'Type to search' : placeholder;
+  const fetchonInputDebounce = 0;
 
   // state
   const [open, setOpen] = React.useState(false);
@@ -107,9 +107,9 @@ export default ({
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
 
   // ref
-  let asyncFectchCnt = React.useRef(0);
+  const asyncFectchCnt = React.useRef(0);
   const componentIsMounted = React.useRef(true);
-  let isSelectedLoadMore = React.useRef(false);
+  const isSelectedLoadMore = React.useRef(false);
 
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
@@ -117,7 +117,7 @@ export default ({
     (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
     staticListValues;
   const isLoading = loadingCnt > 0;
-  const isInitialLoading = open && asyncFetch && listValues === undefined;
+  const isInitialLoading = open && asyncFetch && listValues === undefined && !forceSearch;
   const canLoadMore = !isLoading && !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
@@ -218,7 +218,8 @@ export default ({
   };
 
   const onInputChange = async (e, newInputValue) => {
-    let val = newInputValue;
+    const val = newInputValue;
+    //const isTypeToSearch = e.type == 'change';
 
     if (val === loadMoreTitle) {
       return;
@@ -230,7 +231,8 @@ export default ({
       setValue(val, [val]);
     }
 
-    if (useSearch) {
+    const canSearchAsync = useSearch && (forceSearch ? !!val : true);
+    if (canSearchAsync) {
       await loadListValuesDebounced(val);
     }
   };
@@ -251,7 +253,7 @@ export default ({
           ),
         }}
         disabled={readonly}
-        placeholder={!readonly ? placeholder : ""}
+        placeholder={!readonly ? aPlacaholder : ""}
         //onChange={onInputChange}
         {...customInputProps}
       />
@@ -307,7 +309,7 @@ export default ({
         onClose={onClose}
         inputValue={inputValue}
         onInputChange={onInputChange}
-        label={!readonly ? placeholder : ""}
+        label={!readonly ? aPlacaholder : ""}
         onChange={onChange}
         value={hasValue ? selectedValue : null} // should be simple value to prevent re-render!
         getOptionSelected={getOptionSelected}
