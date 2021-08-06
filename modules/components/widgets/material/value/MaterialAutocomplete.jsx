@@ -3,6 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import {mapListValues, listValuesToArray, sleep} from "../../../../utils/stuff";
 import FormControl from "@material-ui/core/FormControl";
 import omit from "lodash/omit";
+import debounce from "lodash/debounce";
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -64,8 +65,6 @@ const getListValue = (selectedValue, listValues) =>
   .filter(v => v !== null)
   .shift();
 
-let asyncFectchCnt = 0;
-
 
 export default ({
   asyncListValues: selectedAsyncListValues, 
@@ -78,11 +77,14 @@ export default ({
   const customInputProps = rest.input || {};
   const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
   const loadMoreTitle = `Load more...`;
+  const fetchonInputDebounce = 0;
 
   //todo: configurable
   const demoAll = [
     {title: 'A', value: 'a'},
-    {title: 'AAA', value: 'aaa'},
+    {title: 'AA', value: 'aa'},
+    {title: 'AAA1', value: 'aaa1'},
+    {title: 'AAA2', value: 'aaa2'},
     {title: 'B', value: 'b'},
     {title: 'C', value: 'c'},
     {title: 'D', value: 'd'},
@@ -105,12 +107,17 @@ export default ({
   const [inputValue, setInputValue] = React.useState('');
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
 
+  // ref
+  let asyncFectchCnt = React.useRef(0);
+  const componentIsMounted = React.useRef(true);
+  let isSelectedLoadMore = React.useRef(false);
+
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
   const listValues = asyncFetch ? 
     (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
     staticListValues;
-  const isLoading = open && loadingCnt > 0;
+  const isLoading = loadingCnt > 0;
   const isInitialLoading = open && asyncFetch && listValues === undefined;
   const canLoadMore = !isLoading && !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
   const options = mapListValues(listValues, listValueToOption);
@@ -128,10 +135,10 @@ export default ({
     const offset = isLoadMore && asyncListValues ? asyncListValues.length : 0;
     const meta = isLoadMore && asyncFetchMeta;
 
-    const newAsyncFetchCnt = ++asyncFectchCnt;
+    const newAsyncFetchCnt = ++asyncFectchCnt.current;
     const res = await asyncFetch(filter, offset, meta);
-    if (asyncFectchCnt > newAsyncFetchCnt) {
-      // cancelled
+    const isFetchCancelled = asyncFectchCnt.current != newAsyncFetchCnt;
+    if (isFetchCancelled || !componentIsMounted.current) {
       return null;
     }
 
@@ -165,39 +172,38 @@ export default ({
   const loadListValues = async (filter = null, isLoadMore = false) => {
     setLoadingCnt(x => (x + 1));
     const list = await fetchListValues(filter, isLoadMore);
+    if (!componentIsMounted.current) {
+      return;
+    }
     if (list != null) {
       // tip: null can be used for reject (eg, if user don't want to filter by input)
       setAsyncListValues(list);
     }
     setLoadingCnt(x => (x - 1));
   };
+  const loadListValuesDebounced = React.useCallback(debounce(loadListValues, fetchonInputDebounce), []);
+
+  // Unmount
+  React.useEffect(() => {
+    return () => {
+      componentIsMounted.current = false;
+    };
+  }, []);
 
   // Initial loading
   React.useEffect(() => {
-    let active = true, loading = false;
-    
-    if (!isInitialLoading)
-      return undefined;
-
-    (async () => {
-      if (active && !loading) {
-        loading = true;
+    if (isInitialLoading && loadingCnt == 0) {
+      (async () => {
         await loadListValues();
-        loading = false;
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
+      })();
+    }
   }, [isInitialLoading]);
 
   // Event handlers
-  let isSelectedLoadMore;
   const onOpen = () => setOpen(true);
   const onClose = (_e) => {
-    if (isSelectedLoadMore) {
-      isSelectedLoadMore = false;
+    if (isSelectedLoadMore.current) {
+      isSelectedLoadMore.current = false;
     } else {
       setOpen(false);
     }
@@ -205,7 +211,7 @@ export default ({
 
   const onChange = async (_e, option) => {
     if (option && option.specialValue == 'LOAD_MORE') {
-      isSelectedLoadMore = true;
+      isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
     } else {
       setValue(option == null ? undefined : option.value, [option]);
@@ -226,7 +232,7 @@ export default ({
     }
 
     if (useSearch) {
-      await loadListValues(val);
+      await loadListValuesDebounced(val);
     }
   };
 
