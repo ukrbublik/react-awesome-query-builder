@@ -9,8 +9,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 
-////   ? loading more
-
 //  value as obj ???    is re-render that bad ?
 //  after F5
 //  humanStringFormat
@@ -96,6 +94,7 @@ export default ({
   const customInputProps = rest.input || {};
   const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
   const loadMoreTitle = `Load more...`;
+  const loadingMoreTitle = `Loading more...`;
   const aPlacaholder = forceSearch ? 'Type to search' : placeholder;
   const fetchonInputDebounce = 0;
 
@@ -103,6 +102,7 @@ export default ({
   const [open, setOpen] = React.useState(false);
   const [asyncFetchMeta, setAsyncFetchMeta] = React.useState(undefined);
   const [loadingCnt, setLoadingCnt] = React.useState(0);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
 
@@ -118,7 +118,8 @@ export default ({
     staticListValues;
   const isLoading = loadingCnt > 0;
   const isInitialLoading = open && asyncFetch && listValues === undefined && !forceSearch;
-  const canLoadMore = !isLoading && !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
+  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
+  const canShowLoadMore = !isLoading && canLoadMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
   //const selectedListValue = hasValue ? getListValue(selectedValue, listValues) : null;
@@ -170,6 +171,7 @@ export default ({
 
   const loadListValues = async (filter = null, isLoadMore = false) => {
     setLoadingCnt(x => (x + 1));
+    setIsLoadingMore(isLoadMore);
     const list = await fetchListValues(filter, isLoadMore);
     if (!componentIsMounted.current) {
       return;
@@ -179,6 +181,7 @@ export default ({
       setAsyncListValues(list);
     }
     setLoadingCnt(x => (x - 1));
+    setIsLoadingMore(false);
   };
   const loadListValuesDebounced = React.useCallback(debounce(loadListValues, fetchonInputDebounce), []);
 
@@ -212,6 +215,8 @@ export default ({
     if (option && option.specialValue == 'LOAD_MORE') {
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
+    } else if (option && option.specialValue == 'LOADING_MORE') {
+      isSelectedLoadMore.current = true;
     } else {
       setValue(option == null ? undefined : option.value, [option]);
     }
@@ -221,7 +226,7 @@ export default ({
     const val = newInputValue;
     //const isTypeToSearch = e.type == 'change';
 
-    if (val === loadMoreTitle) {
+    if (val === loadMoreTitle || val == loadingMoreTitle) {
       return;
     }
 
@@ -261,11 +266,19 @@ export default ({
   };
   const filterOptions = (options, params) => {
     const filtered = defaultFilterOptions(options, params);
-    if (useLoadMore && canLoadMore) {
-      filtered.push({
-        specialValue: 'LOAD_MORE',
-        title: loadMoreTitle,
-      });
+    if (useLoadMore) {
+      if (canShowLoadMore) {
+        filtered.push({
+          specialValue: 'LOAD_MORE',
+          title: loadMoreTitle,
+        });
+      } else if (isLoadingMore) {
+        filtered.push({
+          specialValue: 'LOADING_MORE',
+          title: loadingMoreTitle,
+          disabled: true
+        });
+      }
     }
     return filtered;
   };
@@ -275,6 +288,10 @@ export default ({
       return null;
     const selectedValue = valueOrOption.value != undefined ? valueOrOption.value : valueOrOption;
     return option.value === selectedValue;
+  };
+
+  const getOptionDisabled = (valueOrOption) => {
+    return valueOrOption && valueOrOption.disabled;
   };
 
   const getOptionLabel = (valueOrOption) => {
@@ -317,6 +334,7 @@ export default ({
         readOnly={readonly}
         options={options}
         getOptionLabel={getOptionLabel}
+        getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
         filterOptions={filterOptions}
         {...customAutocompleteProps}
