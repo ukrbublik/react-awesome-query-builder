@@ -34,14 +34,11 @@ const useListValuesAutocomplete = ({
   const listValues = asyncFetch ? 
     (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
     staticListValues;
-  const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
+  //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
   const canInitialLoad = open && asyncFetch &&
     asyncListValues === undefined && 
-    // if got dirty value (not {value, title}) from F5, trigger fetch to fix
-    // todo: this should not work for multiselect
-    // if forceAsyncSearch, don't trigger fetch until user input
-    (!forceAsyncSearch || inputValue || isDirtyInitialListValues);
+    (forceAsyncSearch ? inputValue : true);
   const isInitialLoading = canInitialLoad && isLoading;
   const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 && 
     asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || '') === inputValue;
