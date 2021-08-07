@@ -1,4 +1,4 @@
-import {listValuesToArray, sleep} from "./stuff";
+import {listValuesToArray, sleep, mapListValues} from "./stuff";
 
 export const simulateAsyncFetch = (all, pageSize = 0, delay = 1000) => async (search, offset, _meta) => {
   const filtered = listValuesToArray(all)
@@ -18,3 +18,23 @@ export const simulateAsyncFetch = (all, pageSize = 0, delay = 1000) => async (se
     hasMore
   };
 };
+
+export const mergeListValues = (values, newValues, toStart = false) => {
+  if (!newValues)
+    return values;
+  const old = values || [];
+  const newFiltered = newValues.filter(v => old.find(av => av.value == v.value) == undefined);
+  const merged = toStart ? [...newFiltered, ...old] : [...old, ...newFiltered];
+  return merged;
+};
+
+export const listValueToOption = (lv) => {
+  if (lv == null) return null;
+  const {title, value} = lv;
+  return {title, value};
+};
+
+export const getListValue = (selectedValue, listValues) => 
+  mapListValues(listValues, (lv) => (lv.value === selectedValue ? lv : null))
+  .filter(v => v !== null)
+  .shift();

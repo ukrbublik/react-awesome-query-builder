@@ -443,7 +443,9 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
   asyncFetch?: AsyncFetchListValuesFn,
-  //......
+  useLoadMore?: boolean,
+  useAsyncSearch?: boolean,
+  forceAsyncSearch?: boolean,
 }
 export interface TreeSelectFieldSettings extends BasicFieldSettings {
   listValues?: TreeData,

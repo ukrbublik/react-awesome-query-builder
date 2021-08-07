@@ -1,6 +1,7 @@
 import React from "react";
 import TextField from '@material-ui/core/TextField';
-import {mapListValues, listValuesToArray, sleep} from "../../../../utils/stuff";
+import {mapListValues, listValuesToArray} from "../../../../utils/stuff";
+import {mergeListValues, listValueToOption, getListValue} from "../../../../utils/autocomplete";
 import FormControl from "@material-ui/core/FormControl";
 import omit from "lodash/omit";
 import debounce from "lodash/debounce";
@@ -13,38 +14,14 @@ const defaultFilterOptions = createFilterOptions();
 
 
 
-const mergeListValues = (values, newValues, toStart = false) => {
-  if (!newValues)
-    return values;
-  const old = values || [];
-  const newFiltered = newValues.filter(v => old.find(av => av.value == v.value) == undefined);
-  const merged = toStart ? [...newFiltered, ...old] : [...old, ...newFiltered];
-  return merged;
-};
-
-const listValueToOption = (lv) => {
-  if (lv == null) return null;
-  const {title, value} = lv;
-  return {title, value};
-};
-
-const getListValue = (selectedValue, listValues) => 
-  mapListValues(listValues, (lv) => (lv.value === selectedValue ? lv : null))
-  .filter(v => v !== null)
-  .shift();
 
 
 export default ({
-  asyncFetch,
+  asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
   asyncListValues: selectedAsyncListValues, 
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder, customProps, readonly, config
 }) => {
-  //todo: configurable
-  const useLoadMore = true;
-  const useSearch = true;
-  const forceSearch = false;
-
   // setings
   const {defaultSliderWidth} = config.settings;
   const {width, ...rest} = customProps || {};
@@ -52,7 +29,7 @@ export default ({
   const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
   const loadMoreTitle = `Load more...`;
   const loadingMoreTitle = `Loading more...`;
-  const aPlacaholder = forceSearch ? 'Type to search' : placeholder;
+  const aPlacaholder = forceAsyncSearch ? 'Type to search' : placeholder;
   const fetchonInputDebounce = 0;
 
   // state
@@ -73,8 +50,12 @@ export default ({
   const listValues = asyncFetch ? 
     (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
     staticListValues;
+  const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
-  const isInitialLoading = open && asyncFetch && listValues === undefined && !forceSearch;
+  const isInitialLoading = open && asyncFetch && (
+    listValues === undefined && !forceAsyncSearch || 
+    useAsyncSearch && isDirtyInitialListValues
+  );
   const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 && asyncFetchMeta && asyncFetchMeta.hasMore;
   const canShowLoadMore = !isLoading && canLoadMore;
   const options = mapListValues(listValues, listValueToOption);
@@ -152,6 +133,7 @@ export default ({
   // Initial loading
   React.useEffect(() => {
     if (isInitialLoading && loadingCnt == 0) {
+      console.log(6)
       (async () => {
         await loadListValues();
       })();
@@ -193,7 +175,7 @@ export default ({
       setValue(val, [val]);
     }
 
-    const canSearchAsync = useSearch && (forceSearch ? !!val : true);
+    const canSearchAsync = useAsyncSearch && (forceAsyncSearch ? !!val : true);
     if (canSearchAsync) {
       await loadListValuesDebounced(val);
     }

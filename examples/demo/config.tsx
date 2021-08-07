@@ -521,6 +521,9 @@ export default (skin: string) => {
       valueSources: ["value"],
       fieldSettings: {
         asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false
       },
     },
     stock: {
