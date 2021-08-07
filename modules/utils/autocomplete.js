@@ -1,6 +1,7 @@
 import {listValuesToArray, sleep, mapListValues} from "./stuff";
 
-export const simulateAsyncFetch = (all, pageSize = 0, delay = 1000) => async (search, offset, _meta) => {
+export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (search, offset, meta) => {
+  const pageSize = meta.pageSize != undefined ? meta.pageSize : cPageSize;
   const filtered = listValuesToArray(all)
     .filter(({title}) => search == null ? true : title.toUpperCase().indexOf(search.toUpperCase()) != -1);
   const pages = pageSize ? Math.ceil(filtered.length / pageSize) : 0;

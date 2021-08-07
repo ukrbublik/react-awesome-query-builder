@@ -523,7 +523,8 @@ export default (skin: string) => {
         asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
         useLoadMore: true,
-        forceAsyncSearch: false
+        forceAsyncSearch: false,
+        allowCustomValues: false
       },
     },
     stock: {

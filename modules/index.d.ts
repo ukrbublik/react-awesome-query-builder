@@ -416,7 +416,7 @@ interface AsyncFetchListValuesResult {
   values: AsyncFetchListValues,
   hasMore?: boolean,
 }
-type AsyncFetchListValuesFn = (search: string | null, offset: number) => AsyncFetchListValuesResult;
+type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
 
 
 export interface BasicFieldSettings {
