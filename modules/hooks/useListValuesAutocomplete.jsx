@@ -28,7 +28,7 @@ const useListValuesAutocomplete = ({
   const asyncFectchCnt = React.useRef(0);
   const componentIsMounted = React.useRef(true);
   const isSelectedLoadMore = React.useRef(false);
-
+  
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
   const listValues = asyncFetch ? 
@@ -36,13 +36,12 @@ const useListValuesAutocomplete = ({
     staticListValues;
   const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
-  const canInitialLoad = open && asyncFetch && (
-    // if forceAsyncSearch, wait for input
-    listValues === undefined && !forceAsyncSearch || 
-    // if got just value (not {value, title}) from F5, trigger fetch
+  const canInitialLoad = open && asyncFetch &&
+    asyncListValues === undefined && 
+    // if got dirty value (not {value, title}) from F5, trigger fetch to fix
     // todo: this should not work for multiselect
-    isDirtyInitialListValues
-  );
+    // if forceAsyncSearch, don't trigger fetch until user input
+    (!forceAsyncSearch || inputValue || isDirtyInitialListValues);
   const isInitialLoading = canInitialLoad && isLoading;
   const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 && 
     asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || '') === inputValue;
