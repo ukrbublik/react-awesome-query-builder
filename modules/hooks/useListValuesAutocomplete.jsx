@@ -149,7 +149,7 @@ const useListValuesAutocomplete = ({
     }
   };
 
-  const onInputChange = async (e, newInputValue) => {
+  const onInputChange = async (_e, newInputValue) => {
     const val = newInputValue;
     //const isTypeToSearch = e.type == 'change';
 
@@ -223,29 +223,31 @@ const useListValuesAutocomplete = ({
   };
 
   return {
+    options,
+    listValues,
+    hasValue,
+    
     open,
     onOpen,
     onClose,
     onChange,
-    onInputChange,
     inputValue,
+    onInputChange,
+    
     canShowLoadMore,
-    options,
-    hasValue,
     isInitialLoading,
     isLoading,
     isLoadingMore,
-    listValues,
-    loadMoreTitle,
-    loadingMoreTitle,
-    aPlaceholder,
+    
     extendOptions,
     getOptionSelected,
     getOptionDisabled,
     getOptionLabel,
+
     // unused
     selectedListValue,
     selectedOption,
+    aPlaceholder,
   };
 };
 
