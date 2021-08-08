@@ -205,6 +205,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   const iValue = properties.get("value");
+  const asyncListValues = properties.get("asyncListValues");
   if (iValue == undefined)
     return undefined;
   
@@ -218,7 +219,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
     const fv = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField, asyncListValues
     );
     if (fv !== undefined) {
       valueSrcs.push(valueSrc);
@@ -235,7 +236,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
 };
 
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField = null) => {
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField = null, asyncListValues) => {
   if (currentValue === undefined)
     return undefined;
   let ret;
@@ -247,7 +248,10 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     const fn = fieldWidgetDef.jsonLogic;
     const args = [
       currentValue,
-      pick(fieldDef, ["fieldSettings", "listValues"]),
+      {
+        ...pick(fieldDef, ["fieldSettings", "listValues"]),
+        asyncListValues
+      },
       //useful options: valueFormat for date/time
       omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
     ];

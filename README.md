@@ -55,6 +55,7 @@ npm i antd
 For Material-UI widgets only:
 ```
 npm i @material-ui/core
+npm i @material-ui/lab
 npm i @material-ui/icons
 npm i @material-ui/pickers
 npm i material-ui-confirm

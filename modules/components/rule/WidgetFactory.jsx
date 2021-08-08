@@ -3,7 +3,7 @@ import {getTitleInListValues} from "../../utils/stuff";
 
 export default ({
   delta, isFuncArg, valueSrc,
-  value: immValue, valueError: immValueError,
+  value: immValue, valueError: immValueError, asyncListValues,
   isSpecialRange, fieldDefinition,
   widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
   config, field, operator, readonly, parentField, parentFuncs,
@@ -44,6 +44,7 @@ export default ({
     textSeparators: textSeparators,
     setValue: setValueHandler,
     readonly: readonly,
+    asyncListValues: asyncListValues,
   });
     
   if (widget == "field") {

@@ -17,6 +17,7 @@ import MaterialSliderWidget from "./value/MaterialSlider";
 import MaterialRangeWidget from "./value/MaterialRange";
 import MaterialBooleanWidget from "./value/MaterialBoolean";
 import MaterialMultiSelectWidget from "./value/MaterialMultiSelect";
+import MaterialAutocompleteWidget from "./value/MaterialAutocomplete";
 
 // field select widgets
 import MaterialFieldSelect from "./core/MaterialFieldSelect";
@@ -67,6 +68,7 @@ export default {
   MaterialRangeWidget,
   MaterialBooleanWidget,
   MaterialMultiSelectWidget,
+  MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
 

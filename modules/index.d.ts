@@ -114,6 +114,7 @@ export interface Utils {
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
+  simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
 }
 
 export interface BuilderProps {
@@ -160,7 +161,7 @@ type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boo
 
 interface BaseWidgetProps {
   value: RuleValue,
-  setValue(val: RuleValue): void,
+  setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
   operator: string,
@@ -410,6 +411,14 @@ interface TreeItem extends ListItem {
 type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
+type AsyncFetchListValues = ListValues;
+interface AsyncFetchListValuesResult {
+  values: AsyncFetchListValues,
+  hasMore?: boolean,
+}
+type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
+
+
 export interface BasicFieldSettings {
   validateValue?: ValidateValue,
 }
@@ -433,11 +442,16 @@ export interface DateTimeFieldSettings extends BasicFieldSettings {
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
+  showSearch?: boolean,
+  asyncFetch?: AsyncFetchListValuesFn,
+  useLoadMore?: boolean,
+  useAsyncSearch?: boolean,
+  forceAsyncSearch?: boolean,
 }
 export interface TreeSelectFieldSettings extends BasicFieldSettings {
   listValues?: TreeData,
   treeExpandAll?: boolean,
-  treeSelectOnlyLeafs?:  boolean,
+  treeSelectOnlyLeafs?: boolean,
 }
 export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
@@ -832,6 +846,7 @@ export interface MaterialWidgets {
   MaterialNumberWidget: ElementType<NumberWidgetProps>,
   MaterialSliderWidget: ElementType<NumberWidgetProps>,
   MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
+  MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
 
 

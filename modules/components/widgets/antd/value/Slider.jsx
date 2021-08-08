@@ -47,7 +47,7 @@ export default class SliderWidget extends PureComponent {
       val = undefined;
     if (__isInternal)
       this.setState({internalValue: val});
-    this.props.setValue(val, __isInternal);
+    this.props.setValue(val, undefined, __isInternal);
   }
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
