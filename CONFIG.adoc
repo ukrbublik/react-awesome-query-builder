@@ -301,6 +301,7 @@ Behaviour settings:
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
+|groupOperators |`['all', 'some', 'none']` |Operators usable in `!group` fields with `array` mode
 |===
 
 TIP: For fully read-only mode use these settings:

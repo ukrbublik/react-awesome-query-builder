@@ -11,6 +11,30 @@ describe("query with !struct and !group", () => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
+    it("should handle custom operator in !group arrays", () => {
+      with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+        expect_checks({
+          "logic": {
+            "and": [
+              {
+                "custom_group_operator": [
+                  {"var": "cars"},
+                  {
+                    "and": [
+                      {
+                        "==": [{"var": "vendor"}, "Toyota"]
+                      }, {
+                        ">=": [{"var": "year"}, 2010]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+      });
+    });
   });
 
   describe("export", () => {
