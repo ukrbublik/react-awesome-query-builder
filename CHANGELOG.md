@@ -1,6 +1,8 @@
 # Changelog
+- 4.4.1
+  - feat: possibility to add custom operators for groups (PR #462)
 - 4.4.0
-  - Added support of server-side load of values for `select` (MaterialUI only)
+  - Added support of server-side load of values for `select` (MaterialUI only) (PR #471)
 - 4.3.0
   - Improved function support
   - Functions used in examples now moved to `BasicFuncs` (exported with lib)
