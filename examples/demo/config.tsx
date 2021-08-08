@@ -423,6 +423,7 @@ export default (skin: string) => {
       type: "select",
       valueSources: ["value"],
       fieldSettings: {
+        showSearch: true,
         // * old format:
         // listValues: {
         //     yellow: 'Yellow',

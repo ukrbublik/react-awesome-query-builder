@@ -66,7 +66,7 @@ const widgets = {
   select: {
     ...BasicConfig.widgets.select,
     factory: (props) => {
-      return props.asyncFetch ? 
+      return (props.asyncFetch || props.showSearch) ? 
         <MaterialAutocompleteWidget {...props} /> : 
         <MaterialSelectWidget {...props} />;
     },

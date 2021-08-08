@@ -442,6 +442,7 @@ export interface DateTimeFieldSettings extends BasicFieldSettings {
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
+  showSearch?: boolean,
   asyncFetch?: AsyncFetchListValuesFn,
   useLoadMore?: boolean,
   useAsyncSearch?: boolean,
