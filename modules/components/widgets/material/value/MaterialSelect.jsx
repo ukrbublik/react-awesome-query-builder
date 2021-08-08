@@ -27,8 +27,8 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
     mapListValues(listValues, ({title, value}) => 
       (value === selectedValue ? title : null)
     )
-    .filter(v => v !== null)
-    .shift();
+      .filter(v => v !== null)
+      .shift();
   
   const hasValue = value != null;
 

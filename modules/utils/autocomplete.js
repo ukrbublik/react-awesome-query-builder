@@ -10,7 +10,7 @@ export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (s
   const values = pageSize ? filtered.slice(currentOffset, currentOffset + pageSize) : filtered;
   const newOffset = pageSize ? currentOffset + values.length : null;
   const hasMore = pageSize ? (newOffset < filtered.length) : false;
-  console.debug('simulateAsyncFetch', {
+  console.debug("simulateAsyncFetch", {
     search, offset, values, hasMore, filtered
   });
   await sleep(delay);
@@ -37,5 +37,5 @@ export const listValueToOption = (lv) => {
 
 export const getListValue = (selectedValue, listValues) => 
   mapListValues(listValues, (lv) => (lv.value === selectedValue ? lv : null))
-  .filter(v => v !== null)
-  .shift();
+    .filter(v => v !== null)
+    .shift();

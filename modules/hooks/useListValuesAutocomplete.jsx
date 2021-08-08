@@ -12,16 +12,16 @@ const useListValuesAutocomplete = ({
 }, {
   debounceTimeout
 }) => {
-  const loadMoreTitle = `Load more...`;
-  const loadingMoreTitle = `Loading more...`;
-  const aPlaceholder = forceAsyncSearch ? 'Type to search' : placeholder;
+  const loadMoreTitle = "Load more...";
+  const loadingMoreTitle = "Loading more...";
+  const aPlaceholder = forceAsyncSearch ? "Type to search" : placeholder;
 
   // state
   const [open, setOpen] = React.useState(false);
   const [asyncFetchMeta, setAsyncFetchMeta] = React.useState(undefined);
   const [loadingCnt, setLoadingCnt] = React.useState(0);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState('');
+  const [inputValue, setInputValue] = React.useState("");
   const [asyncListValues, setAsyncListValues] = React.useState(undefined);
 
   // ref
@@ -31,17 +31,17 @@ const useListValuesAutocomplete = ({
   
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
-  const listValues = asyncFetch ? 
-    (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues) :
-    staticListValues;
+  const listValues = asyncFetch 
+    ? (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
+    : staticListValues;
   //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
-  const canInitialLoad = open && asyncFetch &&
-    asyncListValues === undefined && 
-    (forceAsyncSearch ? inputValue : true);
+  const canInitialLoad = open && asyncFetch
+    && asyncListValues === undefined 
+    && (forceAsyncSearch ? inputValue : true);
   const isInitialLoading = canInitialLoad && isLoading;
-  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 && 
-    asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || '') === inputValue;
+  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 
+    && asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || "") === inputValue;
   const canShowLoadMore = !isLoading && canLoadMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
@@ -128,7 +128,7 @@ const useListValuesAutocomplete = ({
   // Event handlers
   const onOpen = () => {
     setOpen(true);
-  }
+  };
 
   const onClose = (_e) => {
     if (isSelectedLoadMore.current) {
@@ -136,13 +136,13 @@ const useListValuesAutocomplete = ({
     } else {
       setOpen(false);
     }
-  }
+  };
 
   const onChange = async (_e, option) => {
-    if (option && option.specialValue == 'LOAD_MORE') {
+    if (option && option.specialValue == "LOAD_MORE") {
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
-    } else if (option && option.specialValue == 'LOADING_MORE') {
+    } else if (option && option.specialValue == "LOADING_MORE") {
       isSelectedLoadMore.current = true;
     } else {
       setValue(option == null ? undefined : option.value, [option]);
@@ -177,12 +177,12 @@ const useListValuesAutocomplete = ({
     if (useLoadMore) {
       if (canShowLoadMore) {
         filtered.push({
-          specialValue: 'LOAD_MORE',
+          specialValue: "LOAD_MORE",
           title: loadMoreTitle,
         });
       } else if (isLoadingMore) {
         filtered.push({
-          specialValue: 'LOADING_MORE',
+          specialValue: "LOADING_MORE",
           title: loadingMoreTitle,
           disabled: true
         });
@@ -205,8 +205,8 @@ const useListValuesAutocomplete = ({
   const getOptionLabel = (valueOrOption) => {
     if (valueOrOption == null)
       return null;
-    const option = valueOrOption.value != undefined ? valueOrOption : 
-      listValueToOption(getListValue(valueOrOption, listValues));
+    const option = valueOrOption.value != undefined ? valueOrOption 
+      : listValueToOption(getListValue(valueOrOption, listValues));
     if (!option && valueOrOption.specialValue) {
       // special last 'Load more...' item
       return valueOrOption.title;
