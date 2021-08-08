@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import merge from "lodash/merge";
 import {
-  BasicConfig, BasicFuncs,
+  BasicConfig, BasicFuncs, Utils,
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs, 
   DateTimeFieldSettings,
@@ -12,13 +12,14 @@ import { ruRU } from "@material-ui/core/locale";
 
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
+import MaterialConfig from "react-awesome-query-builder/config/material";
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import MaterialConfig from "react-awesome-query-builder/config/material";
+const {simulateAsyncFetch} = Utils;
 
 const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
@@ -28,6 +29,23 @@ const skinToConfig: Record<string, Config> = {
 
 export default (skin: string) => {
   const InitialConfig = skinToConfig[skin] as BasicConfig;
+
+  const demoListValues = [
+    {title: "A", value: "a"},
+    {title: "AA", value: "aa"},
+    {title: "AAA1", value: "aaa1"},
+    {title: "AAA2", value: "aaa2"},
+    {title: "B", value: "b"},
+    {title: "C", value: "c"},
+    {title: "D", value: "d"},
+    {title: "E", value: "e"},
+    {title: "F", value: "f"},
+    {title: "G", value: "g"},
+    {title: "H", value: "h"},
+    {title: "I", value: "i"},
+    {title: "J", value: "j"},
+  ];
+  const simulatedAsyncFetch = simulateAsyncFetch(demoListValues, 3);
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
@@ -405,6 +423,7 @@ export default (skin: string) => {
       type: "select",
       valueSources: ["value"],
       fieldSettings: {
+        showSearch: true,
         // * old format:
         // listValues: {
         //     yellow: 'Yellow',
@@ -496,6 +515,18 @@ export default (skin: string) => {
           ] }
         ]
       }
+    },
+    autocomplete: {
+      label: "Autocomplete",
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
     },
     stock: {
       label: "In stock",

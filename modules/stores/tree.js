@@ -343,7 +343,8 @@ const setField = (state, path, newField, config) => {
       .set("operatorOptions", newOperatorOptions)
       .set("value", newValue)
       .set("valueSrc", newValueSrc)
-      .set("valueType", newValueType);
+      .set("valueType", newValueType)
+      .delete("asyncListValues");
   }));
 };
 
@@ -379,6 +380,11 @@ const setOperator = (state, path, newOperator, config) => {
     }
     const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
 
+    if (!canReuseValue) {
+      current = current
+        .delete("asyncListValues");
+    }
+
     return current
       .set("operator", newOperator)
       .set("operatorOptions", newOperatorOptions)
@@ -402,9 +408,10 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {integer} delta
  * @param {*} value
  * @param {string} valueType
+ * @param {*} asyncListValues
  * @param {boolean} __isInternal
  */
-const setValue = (state, path, delta, value, valueType, config, __isInternal) => {
+const setValue = (state, path, delta, value, valueType, config, asyncListValues, __isInternal) => {
   const {fieldSeparator, showErrorMessage} = config.settings;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
   if (valueSrc === "field" && Array.isArray(value))
@@ -416,7 +423,9 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
   const isEndValue = false;
   const canFix = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-  const [validateError, fixedValue] = validateValue(config, field, field, operator, value, calculatedValueType, valueSrc, canFix, isEndValue);
+  const [validateError, fixedValue] = validateValue(
+    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
+  );
     
   const isValid = !validateError;
   if (isValid && fixedValue !== value) {
@@ -446,11 +455,15 @@ const setValue = (state, path, delta, value, valueType, config, __isInternal) =>
   const isLastEmpty = lastValue == undefined;
   const isLastError = !!lastError;
   if (isValid || showErrorMessage) {
+    state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
     // set only good value
     if (typeof value === "undefined") {
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
       state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
     } else {
+      if (asyncListValues) {
+        state = state.setIn(expandTreePath(path, "properties", "asyncListValues"), asyncListValues);
+      }
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), value);
       state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), calculatedValueType);
       state.__isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
@@ -478,6 +491,7 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
 
   state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
   state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
+  state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
 
   if (showErrorMessage) {
     // clear value error
@@ -605,7 +619,7 @@ export default (config) => {
 
     case constants.SET_VALUE: {
       let set = {};
-      const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.__isInternal);
+      const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.asyncListValues, action.__isInternal);
       if (tree.__isInternalValueChange)
         set.__isInternalValueChange = true;
       return Object.assign({}, state, {...unset, ...set}, {tree});

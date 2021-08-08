@@ -96,6 +96,7 @@ const formatItemValue = (config, properties, meta, _operator, isForDisplay, pare
   const operatorDef = getOperatorConfig(config, operator, field) || {};
   const cardinality = defaultValue(operatorDef.cardinality, 1);
   const iValue = properties.get("value");
+  const asyncListValues = properties.get("asyncListValues");
 
   let valueSrcs = [];
   let valueTypes = [];
@@ -109,7 +110,7 @@ const formatItemValue = (config, properties, meta, _operator, isForDisplay, pare
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
       let fv = formatValue(
-        config, meta, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, isForDisplay, parentField
+        config, meta, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, isForDisplay, parentField, asyncListValues
       );
       if (fv !== undefined) {
         valueSrcs.push(valueSrc);
@@ -219,7 +220,7 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
 };
 
 
-const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, opDef, isForDisplay, parentField = null) => {
+const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, opDef, isForDisplay, parentField = null, asyncListValues) => {
   if (value === undefined)
     return undefined;
   let ret;
@@ -232,7 +233,10 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
       const fn = fieldWidgetDef.formatValue;
       const args = [
         value,
-        pick(fieldDef, ["fieldSettings", "listValues"]),
+        {
+          ...pick(fieldDef, ["fieldSettings", "listValues"]),
+          asyncListValues
+        },
         //useful options: valueFormat for date/time
         omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
         isForDisplay
@@ -286,8 +290,9 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
-      config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField
+      config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues
     );
     const argName = isForDisplay && argConfig.label || argKey;
     if (formattedArgVal !== undefined) { // skip optional in the end

@@ -30,14 +30,16 @@ export const setOperator = (config, path, operator) => ({
  * @param {integer} delta
  * @param {*} value
  * @param {string} valueType
+ * @param {*} asyncListValues
  * @param {boolean} __isInternal
  */
-export const setValue = (config, path, delta, value, valueType, __isInternal) => ({
+export const setValue = (config, path, delta, value, valueType, asyncListValues, __isInternal) => ({
   type: constants.SET_VALUE,
   path: path,
   delta: delta,
   value: value,
   valueType: valueType,
+  asyncListValues: asyncListValues,
   config: config,
   __isInternal: __isInternal
 });

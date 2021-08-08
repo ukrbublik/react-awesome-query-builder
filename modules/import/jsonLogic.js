@@ -168,10 +168,17 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
     }
   }
 
+  let asyncListValues;
+  if (val && fieldConfig.fieldSettings && fieldConfig.fieldSettings.asyncFetch) {
+    const vals = Array.isArray(val) ? val : [val];
+    asyncListValues = vals;
+  }
+
   return {
     valueSrc: "value",
     value: val,
-    valueType: widgetConfig.type
+    valueType: widgetConfig.type,
+    asyncListValues
   };
 };
 
@@ -597,6 +604,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       });
     }
   } else {
+    const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
+    const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
     res = {
       type: "rule",
       id: uuid(),
@@ -606,6 +615,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
+        asyncListValues,
       }
     };
   }

@@ -186,17 +186,17 @@ function validateRule (item, path, itemId, meta, c) {
  * @param {bool} isRawValue false is used only internally from validateFuncValue
  * @return {array} [validError, fixedValue] - if validError === null and canFix == true, fixedValue can differ from value if was fixed
  */
-export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, canFix = false, isEndValue = false, isRawValue = true) => {
+export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false, isRawValue = true) => {
   let validError = null;
   let fixedValue = value;
 
   if (value != null) {
     if (valueSrc == "field") {
-      [validError, fixedValue] = validateFieldValue(leftField, field, value, valueSrc, valueType, config, operator, isEndValue, canFix);
+      [validError, fixedValue] = validateFieldValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "func") {
-      [validError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, config, operator, isEndValue, canFix);
+      [validError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "value" || !valueSrc) {
-      [validError, fixedValue] = validateNormalValue(leftField, field, value, valueSrc, valueType, config, operator, isEndValue, canFix);
+      [validError, fixedValue] = validateNormalValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     }
 
     if (!validError) {
@@ -232,10 +232,31 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
   return [validError, validError ? value : fixedValue];
 };
 
+const validateValueInList = (value, listValues) => {
+  if (value instanceof Array) {
+    for (let i = 0 ; i < value.length ; i++) {
+      const vv = getItemInListValues(listValues, value[i]);
+      if (vv == undefined) {
+        return [`Value ${value[i]} is not in list of values`, value];
+      } else {
+        value[i] = vv.value;
+      }
+    }
+  } else {
+    const vv = getItemInListValues(listValues, value);
+    if (vv == undefined) {
+      return [`Value ${value} is not in list of values`, value];
+    } else {
+      value = vv.value;
+    }
+  }
+  return [null, value];
+};
+
 /**
 * 
 */
-const validateNormalValue = (leftField, field, value, valueSrc, valueType, config, operator = null, isEndValue = false, canFix = false) => {
+const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   let fixedValue = value;
   const fieldConfig = getFieldConfig(config, field);
   const w = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -251,24 +272,9 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, confi
   }
 
   if (fieldSettings) {
-    if (fieldSettings.listValues && !fieldSettings.allowCustomValues) {
-      if (value instanceof Array) {
-        for (let i = 0 ; i < value.length ; i++) {
-          const vv = getItemInListValues(fieldSettings.listValues, value[i]);
-          if (vv == undefined) {
-            return [`Value ${value[i]} is not in list of values`, value];
-          } else {
-            value[i] = vv.value;
-          }
-        }
-      } else {
-        const vv = getItemInListValues(fieldSettings.listValues, value);
-        if (vv == undefined) {
-          return [`Value ${value} is not in list of values`, value];
-        } else {
-          value = vv.value;
-        }
-      }
+    const listValues = asyncListValues || fieldSettings.listValues;
+    if (listValues && !fieldSettings.allowCustomValues) {
+      return validateValueInList(value, listValues);
     }
     if (fieldSettings.min != null && value < fieldSettings.min) {
       return [`Value ${value} < min ${fieldSettings.min}`, value];
@@ -285,7 +291,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, confi
 /**
 * 
 */
-const validateFieldValue = (leftField, field, value, _valueSrc, valueType, config, operator = null, isEndValue = false, canFix = false) => {
+const validateFieldValue = (leftField, field, value, _valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   const {fieldSeparator} = config.settings;
   const leftFieldStr = Array.isArray(leftField) ? leftField.join(fieldSeparator) : leftField;
   const rightFieldStr = Array.isArray(value) ? value.join(fieldSeparator) : value;
@@ -302,7 +308,7 @@ const validateFieldValue = (leftField, field, value, _valueSrc, valueType, confi
 /**
 * 
 */
-const validateFuncValue = (leftField, field, value, _valueSrc, valueType, config, operator = null, isEndValue = false, canFix = false) => {
+const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   let fixedValue = value;
 
   if (value) {
@@ -321,7 +327,7 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, config
           const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
           if (argValue !== undefined) {
             const [argValidError, fixedArgVal] = validateValue(
-              config, leftField, fieldDef, operator, argValue, argConfig.type, argValueSrc, canFix, isEndValue, false
+              config, leftField, fieldDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, false
             );
             if (argValidError !== null) {
               if (canFix) {
