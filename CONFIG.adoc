@@ -199,6 +199,12 @@ Example:
 |fieldSettings.allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
 |fieldSettings.treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
 |fieldSettings.treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
+|fieldSettings.asyncFetch |- for `select` widget| |Async function to load list of options for `select` from server. +
+  Function format: `async (string search, int offset) => { values: Array, hasMore: boolean }` +
+  `values` - list of `{title: string, value: mixed}` +
+  For server-side select `listValues` will not be used. See also `useLoadMore`, `useAsyncSearch`.
+|fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
+|fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
 |defaultValue | | |Default value
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +

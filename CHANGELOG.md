@@ -1,4 +1,6 @@
 # Changelog
+- 4.4.0
+  - Added support of server-side load of values for `select` (MaterialUI only)
 - 4.3.0
   - Improved function support
   - Functions used in examples now moved to `BasicFuncs` (exported with lib)
