@@ -24,6 +24,7 @@ class Rule extends PureComponent {
       config: PropTypes.object.isRequired,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
+      asyncListValues: PropTypes.array,
       isDraggingMe: PropTypes.bool,
       isDraggingTempo: PropTypes.bool,
       parentField: PropTypes.string, //from RuleGroup
@@ -155,6 +156,7 @@ class Rule extends PureComponent {
         operator={this.props.selectedOperator}
         value={this.props.value}
         valueSrc={this.props.valueSrc}
+        asyncListValues={this.props.asyncListValues}
         valueError={valueError}
         config={config}
         setValue={!immutableValuesMode ? this.props.setValue : dummyFn}

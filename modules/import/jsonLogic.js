@@ -168,10 +168,17 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
     }
   }
 
+  let asyncListValues;
+  if (val && fieldConfig.fieldSettings && fieldConfig.fieldSettings.asyncFetch) {
+    const vals = Array.isArray(val) ? val : [val];
+    asyncListValues = vals;
+  }
+
   return {
     valueSrc: "value",
     value: val,
-    valueType: widgetConfig.type
+    valueType: widgetConfig.type,
+    asyncListValues
   };
 };
 
@@ -418,10 +425,10 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
 };
 
 const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArgs) => {
-  // some/all/none is used for group count (cardinality = 0 is exception)
+  // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" for multiselect
   const isAllInForMultiselect = op == "all" && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
-  const isGroup0 = !isAllInForMultiselect && ["some", "all", "none"].includes(op);
+  const isGroup0 = !isAllInForMultiselect && config.settings.groupOperators.includes(op);
   const cardinality = isGroup0 ? 0 : arity - 1;
 
   const opk = op + "/" + cardinality;
@@ -597,6 +604,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       });
     }
   } else {
+    const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
+    const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
     res = {
       type: "rule",
       id: uuid(),
@@ -606,6 +615,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
+        asyncListValues,
       }
     };
   }
