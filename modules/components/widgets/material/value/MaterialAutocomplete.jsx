@@ -8,10 +8,11 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
 const defaultFilterOptions = createFilterOptions();
+const emptyArray = [];
 
 export default (props) => {
   const {
-    allowCustomValues,
+    allowCustomValues, multiple,
     value: selectedValue, customProps, readonly, config
   } = props;
   const hasValue = selectedValue != null;
@@ -33,7 +34,8 @@ export default (props) => {
     getOptionDisabled,
     getOptionLabel,
   } = useListValuesAutocomplete(props, {
-    debounceTimeout: 100
+    debounceTimeout: 100,
+    multiple
   });
 
   // setings
@@ -71,9 +73,13 @@ export default (props) => {
     );
   };
 
+  // should be simple value to prevent re-render!s
+  const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
+
   return (
     <FormControl>
       <Autocomplete
+        multiple={multiple}
         fullWidth
         style={{ width: width || defaultSliderWidth }}
         freeSolo={allowCustomValues}
@@ -85,7 +91,7 @@ export default (props) => {
         onInputChange={onInputChange}
         label={!readonly ? aPlaceholder : ""}
         onChange={onChange}
-        value={hasValue ? selectedValue : null} // should be simple value to prevent re-render!
+        value={value}
         getOptionSelected={getOptionSelected}
         disabled={readonly}
         readOnly={readonly}

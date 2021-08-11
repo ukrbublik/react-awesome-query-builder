@@ -454,6 +454,7 @@ export default (skin: string) => {
       label: "Colors",
       type: "multiselect",
       fieldSettings: {
+        showSearch: true,
         listValues: {
           yellow: "Yellow",
           green: "Green",
