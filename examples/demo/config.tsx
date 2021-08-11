@@ -137,7 +137,7 @@ export default (skin: string) => {
     multiselect: {
       ...InitialConfig.widgets.multiselect,
       customProps: {
-        showCheckboxes: true,
+        //showCheckboxes: false,
         width: "200px",
         input: {
           width: "100px"
