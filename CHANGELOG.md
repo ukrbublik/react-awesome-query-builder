@@ -1,4 +1,6 @@
 # Changelog
+- 4.4.2
+  - Added support of autocomplete for multiselect widget in MUI (PR #475)
 - 4.4.1
   - feat: possibility to add custom operators for groups (PR #462)
 - 4.4.0

@@ -4,17 +4,24 @@ import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Chip from "@material-ui/core/Chip";
+import Checkbox from "@material-ui/core/Checkbox";
+import { makeStyles } from "@material-ui/core/styles";
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
+const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const defaultFilterOptions = createFilterOptions();
+const emptyArray = [];
 
 export default (props) => {
   const {
-    allowCustomValues,
+    allowCustomValues, multiple,
     value: selectedValue, customProps, readonly, config
   } = props;
-  const hasValue = selectedValue != null;
 
   // hook
   const {
@@ -33,22 +40,58 @@ export default (props) => {
     getOptionDisabled,
     getOptionLabel,
   } = useListValuesAutocomplete(props, {
-    debounceTimeout: 100
+    debounceTimeout: 100,
+    multiple
   });
 
   // setings
-  const {defaultSliderWidth} = config.settings;
-  const {width, ...rest} = customProps || {};
-  const customInputProps = rest.input || {};
-  const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
+  const {defaultSelectWidth, defaultSearchWidth} = config.settings;
+  const {width, showCheckboxes, ...rest} = customProps || {};
+  let customInputProps = rest.input || {};
+  const inputWidth = customInputProps.width || defaultSearchWidth;
+  customInputProps = omit(customInputProps, ["width"]);
+  const customAutocompleteProps = omit(rest, ["showSearch", "showCheckboxes"]);
 
+  const fullWidth = true;
+  const minWidth = width || defaultSelectWidth;
+  const style = {
+    width: (multiple ? undefined : minWidth),
+    minWidth: minWidth
+  };
+  const placeholder = !readonly ? aPlaceholder : "";
+  const hasValue = selectedValue != null;
+  // should be simple value to prevent re-render!s
+  const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
+  
   const filterOptions = (options, params) => {
     const filtered = defaultFilterOptions(options, params);
     const extended = extendOptions(filtered, params);
     return extended;
   };
 
-  // Render
+  // styles
+  const useStyles = makeStyles((theme) => ({
+    // fix too small width
+    input: {
+      minWidth: inputWidth + " !important",
+    }
+  }));
+
+  const useStylesChip = makeStyles((theme) => ({
+    // fix height
+    root: {
+      height: "auto"
+    },
+    label: {
+      marginTop: "3px",
+      marginBottom: "3px",
+    }
+  }));
+
+  const classesChip = useStylesChip();
+  const classes = useStyles();
+
+  // render
   const renderInput = (params) => {
     return (
       <TextField 
@@ -64,18 +107,46 @@ export default (props) => {
           ),
         }}
         disabled={readonly}
-        placeholder={!readonly ? aPlaceholder : ""}
+        placeholder={placeholder}
         //onChange={onInputChange}
         {...customInputProps}
       />
     );
   };
 
+  const renderTags = (value, getTagProps) => value.map((option, index) => {
+    return <Chip
+      key={index}
+      classes={classesChip}
+      label={getOptionLabel(option)}
+      {...getTagProps({ index })}
+    />;
+  });
+
+  const renderOption = (option, { selected }) => {
+    if (multiple && showCheckboxes != false) {
+      return <React.Fragment>
+        <Checkbox
+          icon={nonCheckedIcon}
+          checkedIcon={checkedIcon}
+          style={{ marginRight: 8 }}
+          checked={selected}
+        />
+        {option.title}
+      </React.Fragment>;
+    } else {
+      return <React.Fragment>{option.title}</React.Fragment>;
+    }
+  };
+
   return (
-    <FormControl>
+    <FormControl fullWidth={fullWidth}>
       <Autocomplete
-        fullWidth
-        style={{ width: width || defaultSliderWidth }}
+        disableCloseOnSelect={multiple}
+        fullWidth={fullWidth}
+        multiple={multiple}
+        style={style}
+        classes={classes}
         freeSolo={allowCustomValues}
         loading={isInitialLoading}
         open={open}
@@ -83,9 +154,9 @@ export default (props) => {
         onClose={onClose}
         inputValue={inputValue}
         onInputChange={onInputChange}
-        label={!readonly ? aPlaceholder : ""}
+        label={placeholder}
         onChange={onChange}
-        value={hasValue ? selectedValue : null} // should be simple value to prevent re-render!
+        value={value}
         getOptionSelected={getOptionSelected}
         disabled={readonly}
         readOnly={readonly}
@@ -93,6 +164,8 @@ export default (props) => {
         getOptionLabel={getOptionLabel}
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
+        renderTags={renderTags}
+        renderOption={renderOption}
         filterOptions={filterOptions}
         {...customAutocompleteProps}
       ></Autocomplete>
