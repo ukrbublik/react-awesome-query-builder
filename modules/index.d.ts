@@ -443,6 +443,7 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
   showSearch?: boolean,
+  showCheckboxes?: boolean,
   asyncFetch?: AsyncFetchListValuesFn,
   useLoadMore?: boolean,
   useAsyncSearch?: boolean,

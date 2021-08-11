@@ -5,10 +5,15 @@ import FormControl from "@material-ui/core/FormControl";
 import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Chip from "@material-ui/core/Chip";
+import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from "@material-ui/core/styles";
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
+const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
@@ -41,11 +46,11 @@ export default (props) => {
 
   // setings
   const {defaultSelectWidth, defaultSearchWidth} = config.settings;
-  const {width, ...rest} = customProps || {};
+  const {width, showCheckboxes, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
   const inputWidth = customInputProps.width || defaultSearchWidth;
   customInputProps = omit(customInputProps, ["width"]);
-  const customAutocompleteProps = omit(rest, ["showSearch"]);
+  const customAutocompleteProps = omit(rest, ["showSearch", "showCheckboxes"]);
 
   const fullWidth = true;
   const minWidth = width || defaultSelectWidth;
@@ -118,9 +123,26 @@ export default (props) => {
     />;
   });
 
+  const renderOption = (option, { selected }) => {
+    if (multiple && showCheckboxes != false) {
+      return <React.Fragment>
+        <Checkbox
+          icon={nonCheckedIcon}
+          checkedIcon={checkedIcon}
+          style={{ marginRight: 8 }}
+          checked={selected}
+        />
+        {option.title}
+      </React.Fragment>
+    } else {
+      return <React.Fragment>{option.title}</React.Fragment>;
+    }
+  };
+
   return (
     <FormControl fullWidth={fullWidth}>
       <Autocomplete
+        disableCloseOnSelect={multiple}
         fullWidth={fullWidth}
         multiple={multiple}
         style={style}
@@ -143,6 +165,7 @@ export default (props) => {
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
         renderTags={renderTags}
+        renderOption={renderOption}
         filterOptions={filterOptions}
         {...customAutocompleteProps}
       ></Autocomplete>

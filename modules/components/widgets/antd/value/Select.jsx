@@ -4,6 +4,7 @@ import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/domUti
 import {mapListValues} from "../../../../utils/stuff";
 import {useOnPropsChanged} from "../../../../utils/reactUtils";
 import { Select } from "antd";
+import omit from "lodash/omit";
 const Option = Select.Option;
 
 export default class SelectWidget extends PureComponent {
@@ -55,6 +56,7 @@ export default class SelectWidget extends PureComponent {
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const width = value ? dropdownWidth : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const aValue = value != undefined ? value+"" : undefined;
+    const customSelectProps = omit(customProps, [""]);
 
     return (
       <Select
@@ -67,7 +69,7 @@ export default class SelectWidget extends PureComponent {
         value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
-        {...customProps}
+        {...customSelectProps}
       >{this.options}
       </Select>
     );
