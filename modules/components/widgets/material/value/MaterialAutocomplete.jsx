@@ -4,8 +4,8 @@ import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Chip from '@material-ui/core/Chip';
-import { makeStyles } from '@material-ui/core/styles';
+import Chip from "@material-ui/core/Chip";
+import { makeStyles } from "@material-ui/core/styles";
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
@@ -75,11 +75,11 @@ export default (props) => {
   const useStylesChip = makeStyles((theme) => ({
     // fix height
     root: {
-      height: 'auto'
+      height: "auto"
     },
     label: {
-      marginTop: '3px',
-      marginBottom: '3px',
+      marginTop: "3px",
+      marginBottom: "3px",
     }
   }));
 
@@ -111,10 +111,11 @@ export default (props) => {
 
   const renderTags = (value, getTagProps) => value.map((option, index) => {
     return <Chip
+      key={index}
       classes={classesChip}
       label={getOptionLabel(option)}
       {...getTagProps({ index })}
-    />
+    />;
   });
 
   return (
