@@ -5,10 +5,10 @@ import FormControl from "@material-ui/core/FormControl";
 import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Chip from "@material-ui/core/Chip";
-import Checkbox from '@material-ui/core/Checkbox';
+import Checkbox from "@material-ui/core/Checkbox";
 import { makeStyles } from "@material-ui/core/styles";
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
@@ -133,7 +133,7 @@ export default (props) => {
           checked={selected}
         />
         {option.title}
-      </React.Fragment>
+      </React.Fragment>;
     } else {
       return <React.Fragment>{option.title}</React.Fragment>;
     }
