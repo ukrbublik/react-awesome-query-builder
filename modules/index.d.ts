@@ -619,6 +619,9 @@ export interface RenderSettings {
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
   defaultSliderWidth?: string,
+  defaultSelectWidth?: string,
+  defaultSearchWidth?: string,
+  defaultMaxRows?: number,
 }
 
 export interface BehaviourSettings {

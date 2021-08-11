@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Input, Col } from "antd";
 const { TextArea } = Input;
-const defaultMaxRows = 5;
 
 export default class TextAreaWidget extends PureComponent {
   static propTypes = {
@@ -25,7 +24,7 @@ export default class TextAreaWidget extends PureComponent {
 
   render() {
     const {config, placeholder, customProps, value, readonly, maxLength, maxRows, fullWidth} = this.props;
-    const {renderSize} = config.settings;
+    const {renderSize, defaultMaxRows} = config.settings;
     const aValue = value != undefined ? value : null;
 
     return (

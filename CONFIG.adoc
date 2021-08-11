@@ -335,11 +335,14 @@ Render settings:
 |customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
  `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
-|renderBeforeWidget| | 
-|renderAfterWidget| | 
-|renderBeforeActions| | 
-|renderAfterActions| | 
-|defaultSliderWidth|"200px" |Width for slider 
+|renderBeforeWidget | | 
+|renderAfterWidget | | 
+|renderBeforeActions | | 
+|renderAfterActions | | 
+|defaultSliderWidth |`200px` |Width for slider
+|defaultSelectWidth |`200px` |Width for select
+|defaultSearchWidth |`100px` |Width for search in autocomplete
+|defaultMaxRows |5 | Max rows for textarea
 |===
 
 Other settings:

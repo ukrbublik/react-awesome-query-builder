@@ -4,6 +4,8 @@ import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
 import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Chip from '@material-ui/core/Chip';
+import { makeStyles } from '@material-ui/core/styles';
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
@@ -15,7 +17,6 @@ export default (props) => {
     allowCustomValues, multiple,
     value: selectedValue, customProps, readonly, config
   } = props;
-  const hasValue = selectedValue != null;
 
   // hook
   const {
@@ -39,18 +40,53 @@ export default (props) => {
   });
 
   // setings
-  const {defaultSliderWidth} = config.settings;
+  const {defaultSelectWidth, defaultSearchWidth} = config.settings;
   const {width, ...rest} = customProps || {};
-  const customInputProps = rest.input || {};
-  const customAutocompleteProps = omit(rest.autocomplete || rest, ["showSearch"]);
+  let customInputProps = rest.input || {};
+  const inputWidth = customInputProps.width || defaultSearchWidth;
+  customInputProps = omit(customInputProps, ["width"]);
+  const customAutocompleteProps = omit(rest, ["showSearch"]);
 
+  const fullWidth = true;
+  const minWidth = width || defaultSelectWidth;
+  const style = {
+    width: (multiple ? undefined : minWidth),
+    minWidth: minWidth
+  };
+  const placeholder = !readonly ? aPlaceholder : "";
+  const hasValue = selectedValue != null;
+  // should be simple value to prevent re-render!s
+  const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
+  
   const filterOptions = (options, params) => {
     const filtered = defaultFilterOptions(options, params);
     const extended = extendOptions(filtered, params);
     return extended;
   };
 
-  // Render
+  // styles
+  const useStyles = makeStyles((theme) => ({
+    // fix too small width
+    input: {
+      minWidth: inputWidth + " !important",
+    }
+  }));
+
+  const useStylesChip = makeStyles((theme) => ({
+    // fix height
+    root: {
+      height: 'auto'
+    },
+    label: {
+      marginTop: '3px',
+      marginBottom: '3px',
+    }
+  }));
+
+  const classesChip = useStylesChip();
+  const classes = useStyles();
+
+  // render
   const renderInput = (params) => {
     return (
       <TextField 
@@ -66,22 +102,28 @@ export default (props) => {
           ),
         }}
         disabled={readonly}
-        placeholder={!readonly ? aPlaceholder : ""}
+        placeholder={placeholder}
         //onChange={onInputChange}
         {...customInputProps}
       />
     );
   };
 
-  // should be simple value to prevent re-render!s
-  const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
+  const renderTags = (value, getTagProps) => value.map((option, index) => {
+    return <Chip
+      classes={classesChip}
+      label={getOptionLabel(option)}
+      {...getTagProps({ index })}
+    />
+  });
 
   return (
-    <FormControl>
+    <FormControl fullWidth={fullWidth}>
       <Autocomplete
+        fullWidth={fullWidth}
         multiple={multiple}
-        fullWidth
-        style={{ width: width || defaultSliderWidth }}
+        style={style}
+        classes={classes}
         freeSolo={allowCustomValues}
         loading={isInitialLoading}
         open={open}
@@ -89,7 +131,7 @@ export default (props) => {
         onClose={onClose}
         inputValue={inputValue}
         onInputChange={onInputChange}
-        label={!readonly ? aPlaceholder : ""}
+        label={placeholder}
         onChange={onChange}
         value={value}
         getOptionSelected={getOptionSelected}
@@ -99,6 +141,7 @@ export default (props) => {
         getOptionLabel={getOptionLabel}
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
+        renderTags={renderTags}
         filterOptions={filterOptions}
         {...customAutocompleteProps}
       ></Autocomplete>
