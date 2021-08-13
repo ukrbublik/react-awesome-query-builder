@@ -1084,7 +1084,10 @@ const settings = {
     showSearch: true
   },
 
-  defaultSliderWidth: "200px"
+  defaultSliderWidth: "200px",
+  defaultSelectWidth: "200px",
+  defaultSearchWidth: "100px",
+  defaultMaxRows: 5,
 };
 
 //----------------------------

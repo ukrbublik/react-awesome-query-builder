@@ -444,6 +444,7 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
   showSearch?: boolean,
+  showCheckboxes?: boolean,
   asyncFetch?: AsyncFetchListValuesFn,
   useLoadMore?: boolean,
   useAsyncSearch?: boolean,
@@ -620,6 +621,9 @@ export interface RenderSettings {
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
   defaultSliderWidth?: string,
+  defaultSelectWidth?: string,
+  defaultSearchWidth?: string,
+  defaultMaxRows?: number,
 }
 
 export interface BehaviourSettings {

@@ -4,6 +4,7 @@ import { Select } from "antd";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../../../utils/domUtils";
 import {mapListValues} from "../../../../utils/stuff";
 import {useOnPropsChanged} from "../../../../utils/reactUtils";
+import omit from "lodash/omit";
 const Option = Select.Option;
 
 export default class MultiSelectWidget extends PureComponent {
@@ -59,6 +60,7 @@ export default class MultiSelectWidget extends PureComponent {
     const aValue = value && value.length ? value : undefined;
     const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
     const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const customSelectProps = omit(customProps, ["showCheckboxes"]);
     
     return (
       <Select
@@ -78,7 +80,7 @@ export default class MultiSelectWidget extends PureComponent {
         value={aValue}
         onChange={this.handleChange}
         filterOption={this.filterOption}
-        {...customProps}
+        {...customSelectProps}
       >{this.options}
       </Select>
     );

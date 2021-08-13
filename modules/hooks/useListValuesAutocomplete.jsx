@@ -10,7 +10,8 @@ const useListValuesAutocomplete = ({
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder
 }, {
-  debounceTimeout
+  debounceTimeout,
+  multiple
 }) => {
   const loadMoreTitle = "Load more...";
   const loadingMoreTitle = "Loading more...";
@@ -45,8 +46,8 @@ const useListValuesAutocomplete = ({
   const canShowLoadMore = !isLoading && canLoadMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
-  const selectedListValue = hasValue ? getListValue(selectedValue, listValues) : null;
-  const selectedOption = listValueToOption(selectedListValue);
+  // const selectedListValue = hasValue ? getListValue(selectedValue, listValues) : null;
+  // const selectedOption = listValueToOption(selectedListValue);
   
   // fetch
   const fetchListValues = async (filter = null, isLoadMore = false) => {
@@ -145,7 +146,18 @@ const useListValuesAutocomplete = ({
     } else if (option && option.specialValue == "LOADING_MORE") {
       isSelectedLoadMore.current = true;
     } else {
-      setValue(option == null ? undefined : option.value, [option]);
+      if (multiple) {
+        let newSelectedListValues = option.map( o => 
+          o.value != null ? o : getListValue(o, listValues)
+        );
+        let newSelectedValues = newSelectedListValues.map(o => o.value);
+        if (!newSelectedValues.length)
+          newSelectedValues = undefined; //not allow []
+        setValue(newSelectedValues, newSelectedListValues);
+      } else {
+        const v = option == null ? undefined : option.value;
+        setValue(v, [option]);
+      }
     }
   };
 
@@ -153,14 +165,18 @@ const useListValuesAutocomplete = ({
     const val = newInputValue;
     //const isTypeToSearch = e.type == 'change';
 
-    if (val === loadMoreTitle || val == loadingMoreTitle) {
+    if (val === loadMoreTitle || val === loadingMoreTitle) {
       return;
     }
 
     setInputValue(val);
 
     if (allowCustomValues) {
-      setValue(val, [val]);
+      if (multiple) {
+        //todo
+      } else {
+        setValue(val, [val]);
+      }
     }
 
     const canSearchAsync = useAsyncSearch && (forceAsyncSearch ? !!val : true);
@@ -238,15 +254,15 @@ const useListValuesAutocomplete = ({
     isInitialLoading,
     isLoading,
     isLoadingMore,
-    
+
     extendOptions,
     getOptionSelected,
     getOptionDisabled,
     getOptionLabel,
 
     // unused
-    selectedListValue,
-    selectedOption,
+    //selectedListValue,
+    //selectedOption,
     aPlaceholder,
   };
 };

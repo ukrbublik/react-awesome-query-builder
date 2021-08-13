@@ -131,6 +131,19 @@ export default (skin: string) => {
         showSearch: true
       }
     },
+    select: {
+      ...InitialConfig.widgets.select,
+    },
+    multiselect: {
+      ...InitialConfig.widgets.multiselect,
+      customProps: {
+        //showCheckboxes: false,
+        width: "200px",
+        input: {
+          width: "100px"
+        }
+      }
+    },
     treeselect: {
       ...InitialConfig.widgets.treeselect,
       customProps: {
@@ -202,6 +215,9 @@ export default (skin: string) => {
     ...localeSettings,
 
     defaultSliderWidth: "200px",
+    defaultSelectWidth: "200px",
+    defaultSearchWidth: "100px",
+    defaultMaxRows: 5,
 
     valueSourcesInfo: {
       value: {
@@ -454,6 +470,7 @@ export default (skin: string) => {
       label: "Colors",
       type: "multiselect",
       fieldSettings: {
+        showSearch: true,
         listValues: {
           yellow: "Yellow",
           green: "Green",

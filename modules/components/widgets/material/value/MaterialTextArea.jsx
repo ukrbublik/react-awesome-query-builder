@@ -1,10 +1,10 @@
 import React from "react";
 import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
-const defaultMaxRows = 5;
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, maxRows, fullWidth} = props;
+  const {defaultMaxRows} = config.settings;
 
   const onChange = e => {
     let val = e.target.value;
