@@ -168,7 +168,12 @@ module.exports = {
             "@typescript-eslint/unbound-method": 0,
             "@typescript-eslint/prefer-regexp-exec": 0,
             "@typescript-eslint/no-empty-function": 0,
-            "@typescript-eslint/ban-ts-comment": 0
+            "@typescript-eslint/ban-ts-comment": 0,
+            "@typescript-eslint/no-unsafe-member-access": 0,
+            "@typescript-eslint/no-unsafe-assignment": 0,
+            "@typescript-eslint/no-unsafe-call": 0,
+            "@typescript-eslint/restrict-template-expressions": 0
+
         }
       },
     ],

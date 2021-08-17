@@ -32,6 +32,24 @@ describe("query with conjunction", () => {
           }
         ]
       },
+      elasticSearch: {
+        "bool": {
+          "should": [
+            {
+              "range": {
+                "num": {
+                  "lt": "2"
+                }
+              }
+            },
+            {
+              "term": {
+                "login": "ukrbublik"
+              }
+            }
+          ] 
+        }
+      },
     });
   });
 
@@ -55,6 +73,24 @@ describe("query with conjunction", () => {
               "<": [ {"var": "num"}, 2 ]
             }, {
               "==": [ {"var": "login"}, "ukrbublik" ]
+            }
+          ]
+        }
+      },
+      "elasticSearch": {
+        "bool": {
+          "should": [
+            {
+              "range": {
+                "num": {
+                  "lt": "2"
+                }
+              }
+            },
+            {
+              "term": {
+                "login": "ukrbublik"
+              }
             }
           ]
         }

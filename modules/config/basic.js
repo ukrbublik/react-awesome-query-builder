@@ -266,9 +266,9 @@ const operators = {
       }
       return null;
     },
-    elasticSearchOccurrence: 'must',
+    elasticSearchOccurrence: "must",
     elasticSearchQueryType: function elasticSearchQueryType(type) {
-      return type === 'time' ? 'filter' : 'range';
+      return type === "time" ? "filter" : "range";
     }
   },
   not_between: {
@@ -292,8 +292,8 @@ const operators = {
       }
       return null;
     },
-    elasticSearchOccurrence: 'must_not',
-    elasticSearchQueryType: 'range'
+    elasticSearchOccurrence: "must_not",
+    elasticSearchQueryType: "range"
   },
   is_empty: {
     label: "Is empty",

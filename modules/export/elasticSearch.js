@@ -27,7 +27,7 @@ function buildEsGeoPoint(geoPointString) {
     return null;
   }
 
-  var coordsNumberArray = geoPointString.split(',').map(Number);
+  var coordsNumberArray = geoPointString.split(",").map(Number);
   return {
     top_left: {
       lat: coordsNumberArray[0],
@@ -63,38 +63,38 @@ function buildEsRangeParameters(value, operator) {
   var dateTime = value[0]; // -- TODO: Rethink about this part, what if someone adds a new type of opperator
 
   switch (operator) {
-    case 'on_date':
-    case 'not_on_date':
-    case 'equal':
-    case 'select_equals':
-    case 'not_equal':
-      return {
-        gte: "".concat(dateTime, "||/d"),
-        lte: "".concat(dateTime, "||+1d")
-      };
+  case "on_date":
+  case "not_on_date":
+  case "equal":
+  case "select_equals":
+  case "not_equal":
+    return {
+      gte: "".concat(dateTime, "||/d"),
+      lte: "".concat(dateTime, "||+1d")
+    };
 
-    case 'less_or_equal':
-      return {
-        lte: "".concat(dateTime)
-      };
+  case "less_or_equal":
+    return {
+      lte: "".concat(dateTime)
+    };
 
-    case 'greater_or_equal':
-      return {
-        gte: "".concat(dateTime)
-      };
+  case "greater_or_equal":
+    return {
+      gte: "".concat(dateTime)
+    };
 
-    case 'less':
-      return {
-        lt: "".concat(dateTime)
-      };
+  case "less":
+    return {
+      lt: "".concat(dateTime)
+    };
 
-    case 'greater':
-      return {
-        gte: "".concat(dateTime)
-      };
+  case "greater":
+    return {
+      gte: "".concat(dateTime)
+    };
 
-    default:
-      return undefined;
+  default:
+    return undefined;
   }
 }
 /**
@@ -123,20 +123,20 @@ function buildEsWildcardParameters(value) {
 
 function determineOccurrence(combinator) {
   switch (combinator) {
-    case 'AND':
-      return 'must';
+  case "AND":
+    return "must";
     // -- AND
 
-    case 'OR':
-      return 'should';
+  case "OR":
+    return "should";
     // -- OR
 
-    case 'NOT':
-      return 'must_not';
+  case "NOT":
+    return "must_not";
     // -- NOT AND
 
-    default:
-      return undefined;
+  default:
+    return undefined;
   }
 }
 /**
@@ -151,23 +151,23 @@ function determineOccurrence(combinator) {
 
 
 function determineQueryField(fieldDataType, fullFieldName, queryType) {
-  if (fieldDataType === 'boolean') {
+  if (fieldDataType === "boolean") {
     return fullFieldName;
   }
 
   switch (queryType) {
-    case 'term':
-    case 'wildcard':
-      return "".concat(fullFieldName, ".keyword");
+  case "term":
+  case "wildcard":
+    return "".concat(fullFieldName, ".keyword");
 
-    case 'geo_bounding_box':
-    case 'range':
-    case 'match':
-      return fullFieldName;
+  case "geo_bounding_box":
+  case "range":
+  case "match":
+    return fullFieldName;
 
-    default:
-      console.error("Can't determine query field for query type ".concat(queryType));
-      return null;
+  default:
+    console.error("Can't determine query field for query type ".concat(queryType));
+    return null;
   }
 }
 
@@ -183,37 +183,37 @@ function determineField(fieldName, config) {
 
 function buildParameters(queryType, value, operator, fieldName, config) {
   switch (queryType) {
-    case 'filter':
-      return {
-        script: config.operators[operator].elasticSearchScript(fieldName, value)
-      };
+  case "filter":
+    return {
+      script: config.operators[operator].elasticSearchScript(fieldName, value)
+    };
 
-    case 'exists':
-      return {
-        field: fieldName
-      };
+  case "exists":
+    return {
+      field: fieldName
+    };
 
-    case 'match':
-      var textField = determineField(fieldName, config);
-      return _defineProperty({}, textField, value[0]);
+  case "match":
+    var textField = determineField(fieldName, config);
+    return _defineProperty({}, textField, value[0]);
 
-    case 'term':
-      return _defineProperty({}, fieldName, value[0]);
+  case "term":
+    return _defineProperty({}, fieldName, value[0]);
 
-    case 'geo_bounding_box':
-      return _defineProperty({}, fieldName, buildEsGeoPoint(value[0]));
+  case "geo_bounding_box":
+    return _defineProperty({}, fieldName, buildEsGeoPoint(value[0]));
 
-    case 'range':
-      return _defineProperty({}, fieldName, buildEsRangeParameters(value, operator));
+  case "range":
+    return _defineProperty({}, fieldName, buildEsRangeParameters(value, operator));
 
-    case 'wildcard':
-      return _defineProperty({}, fieldName, buildEsWildcardParameters(value[0]));
+  case "wildcard":
+    return _defineProperty({}, fieldName, buildEsWildcardParameters(value[0]));
 
-    case 'regexp':
-      return _defineProperty({}, fieldName, buildRegexpParameters(value[0]));
+  case "regexp":
+    return _defineProperty({}, fieldName, buildRegexpParameters(value[0]));
 
-    default:
-      return undefined;
+  default:
+    return undefined;
   }
 }
 /**
@@ -237,7 +237,7 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
 
   var queryType;
 
-  if (typeof config.operators[operator].elasticSearchQueryType === 'function') {
+  if (typeof config.operators[operator].elasticSearchQueryType === "function") {
     queryType = config.operators[operator].elasticSearchQueryType(widget);
   } else {
     queryType = config.operators[operator].elasticSearchQueryType;
@@ -248,13 +248,13 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
 
   var parameters;
 
-  if (typeof config.widgets[widget].elasticSearchFormatValue === 'function') {
+  if (typeof config.widgets[widget].elasticSearchFormatValue === "function") {
     parameters = config.widgets[widget].elasticSearchFormatValue(queryType, value, operator, fieldName, config);
   } else {
     parameters = buildParameters(queryType, value, operator, fieldName, config);
   }
 
-  if (occurrence === 'must') {
+  if (occurrence === "must") {
     return _defineProperty({}, queryType, _objectSpread({}, parameters));
   }
 
@@ -293,20 +293,20 @@ function buildEsGroup(children, conjunction, recursiveFxn, config) {
 function elasticSearchFormat(tree, config) {
   // -- format the es dsl here
   if (!tree) return undefined;
-  var type = tree.get('type');
+  var type = tree.get("type");
   var tk_dbug = tree.toJS();
-  var properties = tree.get('properties');
+  var properties = tree.get("properties");
   var tk_properties = properties.toJS();
 
-  if (type === 'rule' && properties.get('field')) {
+  if (type === "rule" && properties.get("field")) {
     // -- field is null when a new blank rule is added
-    var operator = properties.get('operator');
-    var field = properties.get('field');
-    var value = properties.get('value').toJS();
-    var valueType = properties.get('valueType').get(0);
-    var valueSrc = properties.get('valueSrc').get(0);
+    var operator = properties.get("operator");
+    var field = properties.get("field");
+    var value = properties.get("value").toJS();
+    var valueType = properties.get("valueType").get(0);
+    var valueSrc = properties.get("valueSrc").get(0);
 
-    if (valueSrc === 'func') {
+    if (valueSrc === "func") {
       // -- elastic search doesn't support functions (that is post processing)
       return;
     }
@@ -321,10 +321,10 @@ function elasticSearchFormat(tree, config) {
     }
   }
 
-  if (type === 'group' || type === 'rule_group') {
+  if (type === "group" || type === "rule_group") {
     var thing = tree.toJS();
-    var conjunction = tree.get('properties').get('conjunction');
-    var children = tree.get('children1');
+    var conjunction = tree.get("properties").get("conjunction");
+    var children = tree.get("children1");
     return buildEsGroup(children, conjunction, elasticSearchFormat, config);
   }
 }

@@ -11,7 +11,7 @@ import {
 } from "react-awesome-query-builder";
 const {
   uuid, 
-  checkTree, loadTree, loadFromJsonLogic, isJsonLogic,
+  checkTree, loadTree, loadFromJsonLogic, isJsonLogic, elasticSearchFormat,
   queryString, sqlFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
@@ -26,6 +26,7 @@ interface ExtectedExports {
   queryHuman?: string;
   sql?: string;
   mongo?: Object;
+  elasticSearch?: Object;
   logic?: JsonLogicTree;
 }
 interface Tasks {
@@ -143,6 +144,13 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
       doIt("should work to MongoDb", () => {
         const res = mongodbFormat(tree, config);
         expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["mongo"]));
+      });
+    }
+
+    if (expects["elasticSearch"] !== undefined) {
+      doIt("should work with elasticSearch", () => {
+        const res = elasticSearchFormat(tree, config);
+        expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["elasticSearch"]));
       });
     }
   
