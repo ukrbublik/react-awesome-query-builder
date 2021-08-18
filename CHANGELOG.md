@@ -1,6 +1,7 @@
 # Changelog
 - latest
   - babel: use "@babel/plugin-transform-runtime" to avoid globally defined regenerator runtime (PR #480)
+  - Fixed issue with default import/export in Vite build (PR #481)
 - 4.4.2
   - Added support of autocomplete for multiselect widget in MUI (PR #475)
 - 4.4.1
