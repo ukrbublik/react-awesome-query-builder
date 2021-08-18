@@ -44,21 +44,17 @@ Now [Material-UI](https://material-ui.com/) is also supported!
 ## Getting started
 Install: 
 ```
-npm i react-awesome-query-builder
+npm i react-awesome-query-builder --save
 ```
 
 For AntDesign widgets only:
 ```
-npm i antd
+npm i antd --save
 ```
 
 For Material-UI widgets only:
 ```
-npm i @material-ui/core
-npm i @material-ui/lab
-npm i @material-ui/icons
-npm i @material-ui/pickers
-npm i material-ui-confirm
+npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm --save
 ```
 
 See [basic usage](#usage) for minimum code example. 
