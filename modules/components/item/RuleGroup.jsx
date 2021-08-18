@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
-import BasicGroup from "./BasicGroup";
+import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import {useOnPropsChanged} from "../../utils/reactUtils";
