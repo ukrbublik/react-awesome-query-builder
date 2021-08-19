@@ -12,7 +12,8 @@ module.exports = {
         "**/dist/*",
         "**/node_modules/*",
         "bundle.js",
-        "webpack.config.js"
+        "webpack.config.js",
+        "vite.config.ts"
     ],
     "extends": [
         "eslint:recommended",
