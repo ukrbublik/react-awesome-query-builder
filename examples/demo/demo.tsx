@@ -6,11 +6,8 @@ import {
 } from "react-awesome-query-builder";
 import throttle from "lodash/throttle";
 import loadConfig from "./config";
-
-
-import loadedConfig from "../data/config_with_nested_properties";
-import loadedInitValue from "../data/tree.js";
-import loadedInitLogic from "../data/jsonLogicReimported";
+import loadedInitValue from "./init_value";
+import loadedInitLogic from "./init_logic";
 
 const stringify = JSON.stringify;
 const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
@@ -19,12 +16,12 @@ const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "
 
 const initialSkin = "antd";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
-
+const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
-initTree = checkTree(loadTree(initValue), loadedConfig);
-//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+//initTree = checkTree(loadTree(initValue), loadedConfig);
+initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 // Trick to hot-load new config when you edit `config.tsx`
 const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
@@ -80,7 +77,6 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
-        <button onClick={this.reparseJsonLogic}>reparse</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
@@ -119,15 +115,6 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         tree: loadTree(emptyInitValue), 
       });
     };
-
-    reparseJsonLogic = () => {
-      const res = jsonLogicFormat(this.state.tree, this.state.config);
-      const {logic} = res;
-      const imTreeFromJsonLogic = loadFromJsonLogic(logic, this.state.config);
-      this.setState({
-        tree: imTreeFromJsonLogic
-      });
-    }
 
     renderBuilder = (props: BuilderProps) => (
       <div className="query-builder-container" style={{padding: "10px"}}>
