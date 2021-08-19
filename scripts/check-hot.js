@@ -1,5 +1,5 @@
 const { spawn, execSync } = require('child_process');
-const COMPILE_TIMEOUT = 30*1000; // 30 s
+const COMPILE_TIMEOUT = 50*1000; // 50 s
 const EXIT_TIMEOUT = 1*1000; // 1 s
 const WEBPACK_PORT = 3001;
 

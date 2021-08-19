@@ -3,6 +3,7 @@
 /coverage/
 /junit/
 /sandbox/build/
+/sandbox/dist/
 /sandbox_simple/build/
 ts_out/
 node_modules/
@@ -14,4 +15,6 @@ npm-debug.log
 .git
 .github
 .vscode
+.circleci
+.travis.yml
 *.log

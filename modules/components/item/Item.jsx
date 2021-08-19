@@ -103,4 +103,4 @@ class Item extends PureComponent {
   }
 }
 
-export default Item;
+export { Item };
