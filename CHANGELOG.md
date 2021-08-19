@@ -1,4 +1,6 @@
 # Changelog
+- latest
+  - babel: use "@babel/plugin-transform-runtime" to avoid globally defined regenerator runtime (PR #480)
 - 4.4.2
   - Added support of autocomplete for multiselect widget in MUI (PR #475)
 - 4.4.1
