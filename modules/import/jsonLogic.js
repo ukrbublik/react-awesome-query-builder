@@ -539,9 +539,22 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
   let {field, fieldConfig, opKey, args, having} = parseRes;
-
   let opConfig = config.operators[opKey];
-  const canRev = !(fieldConfig.type == "!group");
+
+  // Group component in array mode can show NOT checkbox, so do nothing in this case
+  // Otherwise try to revert
+  const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
+  let canRev = true;
+  if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
+    canRev = false;
+
+  // Fix "some ! in"
+  if (fieldConfig.type == "!group" && having && Object.keys(having)[0] == "!") {
+    not = !not;
+    having = having["!"];
+  }
+
+  // Use reversed op
   if (not && canRev && opConfig.reversedOp) {
     not = false;
     opKey = opConfig.reversedOp;
@@ -573,7 +586,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     }
     Object.assign(res.properties, {
       mode: fieldConfig.mode,
-      not: not,
+      not: (canRev ? false : not),
       operator: opKey,
     });
     if (fieldConfig.mode == "array") {
@@ -590,7 +603,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       children1: {},
       properties: {
         conjunction: defaultGroupConjunction(config, fieldConfig),
-        not: not,
+        not: (canRev ? false : not),
         mode: fieldConfig.mode,
         field: field,
         operator: opKey,
