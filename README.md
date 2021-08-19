@@ -431,8 +431,8 @@ You will see demo app with hot reload of demo code and local library code.
 - `tests` - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts
-- `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
 - `npm run install-all` - Install npm packages in root, examples, sandboxes
+- `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
 - `npm run lint` - Run ESLint and TSC (in root, tests, examples, sandboxes)
 - `npm run lint-fix` - Run ESLint with `--fix` option (in root, tests, examples, sandboxes)
 - `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
