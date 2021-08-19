@@ -77,6 +77,7 @@ const babel_options = {
         ["@babel/plugin-proposal-decorators", { "legacy": true }],
         ["@babel/plugin-proposal-class-properties", { "loose": true }],
         ["@babel/plugin-proposal-private-methods", { "loose": true }],
+        ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
         "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
         "react-hot-loader/babel",
         ["import", {
