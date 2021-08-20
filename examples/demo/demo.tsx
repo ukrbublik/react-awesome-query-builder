@@ -16,7 +16,7 @@ const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mo
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
-const initialSkin = window._initialSkin || "antd";
+const initialSkin = window._initialSkin || "fluent";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
@@ -79,6 +79,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
             <option key="vanilla">vanilla</option>
             <option key="antd">antd</option>
             <option key="material">material</option>
+            <option key="fluent">fluent</option>
           </select>
           <button onClick={this.resetValue}>reset</button>
           <button onClick={this.clearValue}>clear</button>
