@@ -2,7 +2,10 @@ import React, { PureComponent } from "react";
 
 export class RuleGroupActions extends PureComponent {
   render() {
-    const {config, addRule, canAddRule, canDeleteGroup, removeSelf} = this.props;
+    const {
+      config, 
+      addRule, canAddRule, canDeleteGroup, removeSelf, setLock
+    } = this.props;
     const {
       immutableGroupsMode, addRuleLabel, delGroupLabel,
       renderButton: Btn

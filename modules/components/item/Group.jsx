@@ -35,6 +35,7 @@ export class BasicGroup extends PureComponent {
     removeSelf: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
+    setLock: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
   };
 
@@ -42,11 +43,16 @@ export class BasicGroup extends PureComponent {
     super(props);
 
     this.removeSelf = this.removeSelf.bind(this);
+    this.setLock = this.setLock.bind(this);
     this.renderItem = this.renderItem.bind(this);
   }
 
   isGroupTopPosition() {
     return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, "top");
+  }
+
+  setLock(lock) {
+    this.props.setLock(lock);
   }
 
   removeSelf() {
@@ -186,6 +192,7 @@ export class BasicGroup extends PureComponent {
       canAddRule={this.canAddRule()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
+      setLock={this.setLock}
     />;
   }
 

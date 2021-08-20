@@ -31,12 +31,14 @@ class Rule extends PureComponent {
       isDraggingTempo: PropTypes.bool,
       parentField: PropTypes.string, //from RuleGroup
       valueError: PropTypes.any,
+      isLocked: PropTypes.bool,
       //path: PropTypes.instanceOf(Immutable.List),
       //actions
       handleDraggerMouseDown: PropTypes.func,
       setField: PropTypes.func,
       setOperator: PropTypes.func,
       setOperatorOption: PropTypes.func,
+      setLock: PropTypes.func,
       removeSelf: PropTypes.func,
       setValue: PropTypes.func,
       setValueSrc: PropTypes.func,
@@ -47,6 +49,7 @@ class Rule extends PureComponent {
       super(props);
       useOnPropsChanged(this);
       this.removeSelf = this.removeSelf.bind(this);
+      this.setLock = this.setLock.bind(this);
 
       this.onPropsChanged(props);
     }
@@ -81,6 +84,10 @@ class Rule extends PureComponent {
         selectedFieldPartsLabels, selectedFieldWidgetConfig,
         showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
       };
+    }
+
+    setLock(lock) {
+      this.props.setLock(lock);
     }
 
     removeSelf() {
@@ -243,15 +250,32 @@ class Rule extends PureComponent {
     renderDel() {
       const {config} = this.props;
       const {
-        deleteLabel, renderSize, 
+        deleteLabel, 
         immutableGroupsMode, 
         renderButton: Btn
       } = config.settings;
 
       return (
-        <div key="rule-header" className="rule--header">
+        <div key="rule-del" className="rule--header">
           {!immutableGroupsMode && <Btn 
             type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
+          />}
+        </div>
+      );
+    }
+
+    renderLock() {
+      const {config, isLocked, id} = this.props;
+      const {
+        lockLabel, 
+        showLock,
+        renderCheckbox: Checkbox
+      } = config.settings;
+      
+      return showLock && (
+        <div key="rule-lock" className="rule--header">
+          {<Checkbox 
+            id={id} value={isLocked} setValue={this.setLock} label={lockLabel} config={config}
           />}
         </div>
       );
@@ -274,6 +298,7 @@ class Rule extends PureComponent {
 
       const error = this.renderError();
       const drag = this.renderDrag();
+      const lock = this.renderLock();
       const del = this.renderDel();
       
       return (
@@ -282,6 +307,7 @@ class Rule extends PureComponent {
           <div className="rule--body--wrapper">
             {body}{error}
           </div>
+          {lock}
           {del}
         </>
       );

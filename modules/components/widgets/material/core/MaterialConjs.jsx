@@ -15,7 +15,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
   const renderOptions = () => 
     Object.keys(conjunctionOptions).map(key => {
       const {id, name, label, checked} = conjunctionOptions[key];
-      let postfix = setConjunction.isDummyFn ? "__dummy" : "";
+      const postfix = setConjunction.isDummyFn ? "__dummy" : "";
       if ((readonly || disabled) && !checked)
         return null;
       return (

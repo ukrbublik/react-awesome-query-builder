@@ -22,3 +22,14 @@ export const setNot = (config, path, not) => ({
   path: toImmutableList(path),
   not: not
 });
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {bool} lock
+ */
+export const setLock = (config, path, lock) => ({
+  type: constants.SET_LOCK,
+  path: path,
+  lock: lock
+});

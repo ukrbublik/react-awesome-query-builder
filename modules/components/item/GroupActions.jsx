@@ -13,7 +13,11 @@ const defaultPosition = "topRight";
 
 export class GroupActions extends PureComponent {
   render() {
-    const {config, addRule, addGroup, canAddGroup, canAddRule, canDeleteGroup, removeSelf} = this.props;
+    const {
+      config, 
+      addRule, addGroup, removeSelf, setLock,
+      canAddGroup, canAddRule, canDeleteGroup
+    } = this.props;
     const {
       immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
       renderButton: Btn, renderButtonGroup: BtnGrp

@@ -8,6 +8,7 @@ const {
   VanillaProvider,
   VanillaValueSources,
   vanillaConfirm,
+  VanillaCheckbox,
 } = Widgets;
 
 export const settings = {
@@ -22,6 +23,7 @@ export const settings = {
   renderOperator: (props) => <VanillaFieldSelect {...props} />,
   renderFunc: (props) => <VanillaFieldSelect {...props} />,
   renderConjs: (props) => <VanillaConjs {...props} />,
+  renderCheckbox: (props) => <VanillaCheckbox {...props} />,
   renderButton: (props) => <VanillaButton {...props} />,
   renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
   renderProvider: (props) => <VanillaProvider {...props} />,
@@ -37,6 +39,7 @@ export const settings = {
   maxLabelsLength: 100,
   canReorder: true,
   canRegroup: true,
+  showLock: false,
   showNot: true,
   canLeaveEmptyGroup: true,
   shouldCreateEmptyGroup: false,
@@ -66,6 +69,7 @@ export const settings = {
   fieldPlaceholder: "Select field",
   funcPlaceholder: "Select function",
   operatorPlaceholder: "Select operator",
+  lockLabel: "Lock",
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",

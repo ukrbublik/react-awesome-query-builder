@@ -176,6 +176,7 @@ class RuleGroupExt extends BasicGroup {
       canAddRule={this.canAddRule()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
+      setLock={this.setLock}
     />;
   }
 

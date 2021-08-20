@@ -96,6 +96,10 @@ const createGroupContainer = (Group) =>
       this.props.actions.setNot(this.props.path, not);
     }
 
+    setLock = (lock = null) => {
+      this.props.actions.setLock(this.props.path, lock);
+    }
+
     dummyFn = () => {}
 
     removeSelf = () => {
@@ -154,6 +158,7 @@ const createGroupContainer = (Group) =>
               selectedConjunction={this.selectedConjunction}
               setConjunction={this.dummyFn}
               setNot={this.dummyFn}
+              setLock={this.dummyFn}
               removeSelf={this.dummyFn}
               addGroup={this.dummyFn}
               addRule={this.dummyFn}
@@ -186,6 +191,7 @@ const createGroupContainer = (Group) =>
               selectedConjunction={this.selectedConjunction}
               setConjunction={isInDraggingTempo ? this.dummyFn : this.setConjunction}
               setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
+              setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
