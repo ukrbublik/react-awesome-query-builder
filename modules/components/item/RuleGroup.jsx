@@ -70,7 +70,7 @@ class RuleGroup extends BasicGroup {
   }
 
   renderActions() {
-    const {config, addRule} = this.props;
+    const {config, addRule, isLocked, id} = this.props;
 
     return <RuleGroupActions
       config={config}
@@ -79,6 +79,8 @@ class RuleGroup extends BasicGroup {
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
       setLock={this.setLock}
+      isLocked={isLocked}
+      id={id}
     />;
   }
 

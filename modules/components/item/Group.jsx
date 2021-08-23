@@ -27,6 +27,7 @@ export class BasicGroup extends PureComponent {
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     isDraggingMe: PropTypes.bool,
     isDraggingTempo: PropTypes.bool,
+    isLocked: PropTypes.bool,
     //actions
     handleDraggerMouseDown: PropTypes.func,
     onDragStart: PropTypes.func,
@@ -182,7 +183,7 @@ export class BasicGroup extends PureComponent {
   }
 
   renderActions() {
-    const {config, addRule, addGroup} = this.props;
+    const {config, addRule, addGroup, isLocked, id} = this.props;
 
     return <GroupActions
       config={config}
@@ -193,6 +194,8 @@ export class BasicGroup extends PureComponent {
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
       setLock={this.setLock}
+      isLocked={isLocked}
+      id={id}
     />;
   }
 

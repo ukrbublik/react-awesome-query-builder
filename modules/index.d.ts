@@ -57,28 +57,33 @@ type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
 
-interface RuleProperties {
+interface BasicItemProperties {
+  isLocked?: boolean,
+}
+
+interface RuleProperties extends BasicItemProperties {
   field: string | Empty,
   operator: string | Empty,
   value: Array<RuleValue>,
   valueSrc?: Array<ValueSource>,
   valueType?: Array<string>,
   valueError?: Array<string>,
-  operatorOptions?: AnyObject
+  operatorOptions?: AnyObject,
 }
 
 interface RuleGroupExtProperties extends RuleProperties {
   mode: RuleGroupMode,
 }
 
-interface RuleGroupProperties {
+interface RuleGroupProperties extends BasicItemProperties {
   field: string | Empty,
   mode?: RuleGroupMode,
 }
 
-interface GroupProperties {
+interface GroupProperties extends BasicItemProperties {
   conjunction: string,
   not?: boolean,
+  isLocked?: boolean,
 }
 
 type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
@@ -191,6 +196,7 @@ interface BaseAction {
 
   conjunction?: string,
   not?: boolean,
+  lock?: boolean,
   field?: string,
   operator?: string,
   delta?: number, // for SET_VALUE
@@ -219,6 +225,7 @@ export interface Actions {
   addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
   removeGroup(path: IdPath): undefined;
   setNot(path: IdPath, not: boolean): undefined;
+  setLock(path: IdPath, lock: boolean): undefined;
   setConjunction(path: IdPath, conjunction: string): undefined;
   setField(path: IdPath, field: string): undefined;
   setOperator(path: IdPath, operator: string): undefined;
