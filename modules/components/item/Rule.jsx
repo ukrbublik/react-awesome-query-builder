@@ -7,7 +7,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
-import {getFieldPathLabels} from "../../utils/ruleUtils";
+import {getFieldPathLabels, getValueSourcesForFieldOp} from "../../utils/ruleUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
 const classNames = require("classnames");
