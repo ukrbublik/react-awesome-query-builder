@@ -21,13 +21,14 @@ export default class TextWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value, readonly, maxLength} = this.props;
-    const {renderSize} = config.settings;
+    const { config, placeholder, customProps, value, readonly, maxLength } = this.props;
+    const { renderSize } = config.settings;
     const aValue = value != undefined ? value : null;
 
     return (
       <Col>
         <Input
+          className="form-control form-control-sm"
           disabled={readonly}
           key="widget-text"
           size={renderSize}

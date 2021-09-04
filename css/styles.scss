@@ -52,10 +52,10 @@ body.qb-dragging {
 
 .query-builder {
   @extend %noselect;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.25;
-  margin: 1rem;
+  font-family: 'Poppins', Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.56;
+  // margin: 1rem;
 }
 
 .query-builder.qb-dragging {
@@ -67,8 +67,8 @@ body.qb-dragging {
 }
 
 .group {
-  background: rgba(250, 240, 210, 0.5);
-  border: 1px solid #DCC896;
+  background:white;
+  border: 1px solid rgba(112, 112, 112, 0.19);
 }
 
 .rule {
@@ -78,7 +78,7 @@ body.qb-dragging {
 }
 
 .rule-with-error .rule {
-  border: 1px solid #e0a1a1;
+  border: 1px solid var(--danger);
 }
 
 .rule--body--wrapper {
@@ -88,19 +88,19 @@ body.qb-dragging {
 }
 
 .rule--error {
-  color: red;
+  color: var(--danger);
   margin-bottom: -5px;
   margin-top: 5px;
 }
 
 .group-or-rule {
-  border-radius: 5px;
+  border-radius: 4px;
   position: relative;
 }
 
 .rule_group {
-  background: rgba(255, 252, 242, 0.5);
-  border: 1px solid #f9f1dd;
+  background: white;
+  border: 1px solid rgba(112, 112, 112, 0.19);
 }
 
 .qb-draggable {
@@ -430,7 +430,7 @@ div.tooltip-inner {
 
   &[data-state="active"] {
     label {
-      background-color: #3276b1;
+      background-color: var(--primary);
       border-color: #285e8e;
     }
   }
