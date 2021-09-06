@@ -95,7 +95,7 @@
     "@material-ui/icons": "^4.0.0",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.2.10",
-    "@shoutout-labs/shoutout-themes-enterprise": "^2.0.17",
+    "@shoutout-labs/shoutout-themes-enterprise": "^2.0.22",
     "antd": "^4.0.0",
     "material-ui-confirm": "^2.0.1",
     "react": "^16.8.4 || ^17.0.1",

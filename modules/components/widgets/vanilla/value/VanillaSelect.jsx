@@ -1,5 +1,5 @@
 import React from "react";
-import { mapListValues } from "../../../../utils/stuff";
+// import { mapListValues } from "../../../../utils/stuff";
 import { Form } from '@shoutout-labs/shoutout-themes-enterprise';
 export default ({ listValues, value, setValue, allowCustomValues, readonly }) => {
   // const renderOptions = () => 
@@ -15,7 +15,7 @@ export default ({ listValues, value, setValue, allowCustomValues, readonly }) =>
   //   return [];
   // }, [value, listValues])
 
-  console.debug(value, listValues)
+  // console.debug(value, listValues)
   return (
     <Form.Select
       id="select-typeahead"
