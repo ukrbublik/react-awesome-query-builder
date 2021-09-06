@@ -1,5 +1,5 @@
 {
-  "name": "react-awesome-query-builder-shoutout",
+  "name": "@shoutout-labs/react-awesome-query-builder-shoutout",
   "version": "5.0.0",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
