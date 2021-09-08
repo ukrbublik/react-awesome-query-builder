@@ -6,28 +6,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 12
 
-      - run: 'rm .npmrc'
-        shell: bash
+  #     - run: 'rm .npmrc'
+  #       shell: bash
         
-      - run: 'echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc'
-        shell: bash
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_PKG_TOKEN }}
-      - run: 'echo "@shoutout-labs:registry=https://npm.pkg.github.com/shoutout-labs" >> .npmrc'
-        shell: bash
+  #     - run: 'echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc'
+  #       shell: bash
+  #       env:
+  #         NPM_TOKEN: ${{ secrets.NPM_PKG_TOKEN }}
+  #     - run: 'echo "@shoutout-labs:registry=https://npm.pkg.github.com/shoutout-labs" >> .npmrc'
+  #       shell: bash
 
-      - run: npm i
-      - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - run: npm run lint-lite
-      - run: npm test
+  #     - run: npm i
+  #     - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+  #     - run: npm run lint-lite
+  #     - run: npm test
 
   publish-npm:
     needs: test
