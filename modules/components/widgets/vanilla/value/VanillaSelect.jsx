@@ -1,6 +1,6 @@
 import React from "react";
 // import { mapListValues } from "../../../../utils/stuff";
-import { Form } from '@shoutout-labs/shoutout-themes-enterprise';
+import { Form } from "@shoutout-labs/shoutout-themes-enterprise";
 export default ({ listValues, value, setValue, allowCustomValues, readonly }) => {
   // const renderOptions = () => 
   //   mapListValues(listValues, ({title, value}) => {
