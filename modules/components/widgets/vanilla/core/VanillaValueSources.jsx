@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Form } from '@shoutout-labs/shoutout-themes-enterprise';
-import "./VanilaValueSources.scss";
+
 export default ({ config, valueSources, valueSrc, title, setValueSrc, readonly }) => {
   // const renderOptions = (valueSources) => (
   //   valueSources.map(([srcKey, info]) => (
