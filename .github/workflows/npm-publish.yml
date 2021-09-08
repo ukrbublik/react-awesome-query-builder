@@ -13,6 +13,17 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
+
+      - run: 'rm .npmrc'
+        shell: bash
+        
+      - run: 'echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc'
+        shell: bash
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_PKG_TOKEN }}
+      - run: 'echo "@shoutout-labs:registry=https://npm.pkg.github.com/shoutout-labs" >> .npmrc'
+        shell: bash
+
       - run: npm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - run: npm run lint-lite
@@ -27,6 +38,17 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com
+
+      - run: 'rm .npmrc'
+        shell: bash
+        
+      - run: 'echo "//npm.pkg.github.com/:_authToken=$NPM_TOKEN" >> .npmrc'
+        shell: bash
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_PKG_TOKEN }}
+      - run: 'echo "@shoutout-labs:registry=https://npm.pkg.github.com/shoutout-labs" >> .npmrc'
+        shell: bash
+        
       - run: npm i
       - run: npm publish
         env:
