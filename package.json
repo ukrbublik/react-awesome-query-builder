@@ -1,6 +1,6 @@
 {
-  "name": "react-awesome-query-builder-shoutout",
-  "version": "5.0.0",
+  "name": "@shoutout-labs/react-awesome-query-builder-shoutout",
+  "version": "5.0.6",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "query-builder",
@@ -65,7 +65,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
+    "url": "ssh://git@github.com/shoutout-labs/react-awesome-query-builder.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
@@ -95,10 +98,10 @@
     "@material-ui/icons": "^4.0.0",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.2.10",
-    "@shoutout-labs/shoutout-themes-enterprise": "^2.0.22",
+    "@shoutout-labs/shoutout-themes-enterprise": "^2.0.24",
     "antd": "^4.0.0",
     "material-ui-confirm": "^2.0.1",
-    "react": "^16.8.4 || ^17.0.1",
+    "react": "^16.x || ^17.x",
     "react-awesome-query-builder": "^4.4.3",
     "react-dom": "^16.8.4 || ^17.0.1"
   },
