@@ -598,6 +598,8 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
   margin-top: 10px;
   margin-bottom: 10px;
   padding-right: 10px;
+  margin-right: 20px;
+  border: 1px solid rgba(112, 112, 112, 0.19);
   &:first-child {
     margin-top: 0px !important;
   }
