@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { Form } from '@shoutout-labs/shoutout-themes-enterprise';
+import { Form } from "@shoutout-labs/shoutout-themes-enterprise";
 
 export default ({ items, setField, selectedKey, readonly, ...rest }) => {
 

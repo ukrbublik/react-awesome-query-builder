@@ -1,5 +1,5 @@
 import React from "react";
-import { Form } from '@shoutout-labs/shoutout-themes-enterprise';
+import { Form } from "@shoutout-labs/shoutout-themes-enterprise";
 export default (props) => {
   const { value, setValue, config, readonly, min, max, step, placeholder } = props;
   const onChange = e => {
