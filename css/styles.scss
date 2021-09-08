@@ -154,7 +154,7 @@ ul.ant-select-selection__rendered {
 }
 
 .group--children {
-  padding-left: 24px;
+  padding-left: 20px;
 
   & > .group-or-rule-container > .group-or-rule {
     &:before {
@@ -586,10 +586,10 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 
 .group--header,
 .group--footer {
-  padding: {
-    left: 10px;
-    right: 10px;
-  }
+  // padding: {
+  //   left: 10px;
+  //   right: 10px;
+  // }
   margin: {
     top: 10px;
     bottom: 10px;

@@ -14,5 +14,5 @@ export default ({ type, label, onClick, config }) => {
   if (type === "delRule"||type==="delGroup") {
     return <Button onClick={onClick} type="button" variant="outline-danger" size="sm">{btnLabel}</Button>;
   }
-  return <Button onClick={onClick} type="button" variant="outline-primary" size="sm" className="mr-2">{btnLabel}</Button>;
+  return <Button onClick={onClick} type="button" variant="outline-primary" size="sm" className="ml-2">{btnLabel}</Button>;
 };
