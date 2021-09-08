@@ -68,13 +68,14 @@ body.qb-dragging {
 
 .group {
   background:white;
-  border: 1px solid rgba(112, 112, 112, 0.19);
+  // border: 1px solid rgba(112, 112, 112, 0.19);
 }
 
 .rule {
   background-color: white;
-  border: 1px solid transparent;
+  border: 1px solid rgba(112, 112, 112, 0.19);
   padding: 10px;
+  margin-top: 10px;
 }
 
 .rule-with-error .rule {
@@ -595,11 +596,12 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
   }
 }
 .group-or-rule-container {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-right: 10px;
-  margin-right: 20px;
-  border: 1px solid rgba(112, 112, 112, 0.19);
+  // margin-top: 10px;
+  // margin-bottom: 10px;
+  // padding-right: 10px;
+  margin:0;
+  padding: 0;
+  border: none;
   &:first-child {
     margin-top: 0px !important;
   }
