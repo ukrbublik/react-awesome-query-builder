@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 // import { mapListValues } from "../../../../utils/stuff";
 import { Form } from "@shoutout-labs/shoutout-themes-enterprise";
 export default ({ listValues, value, setValue, allowCustomValues, readonly }) => {
@@ -7,7 +7,17 @@ export default ({ listValues, value, setValue, allowCustomValues, readonly }) =>
   //     return <option key={value} value={value}>{title}</option>;
   //   });
 
-  const onChange = e => setValue(e[0] ? e[0] : "");
+  const onChange = useCallback(e => {
+    setValue(e[0] ? e[0].value : "")
+  },
+    [setValue]);
+
+  const selectedValue = useMemo(() => {
+    if (value) {
+      return [listValues.find((item) => item.value === value)];
+    }
+    return [];
+  }, [value, listValues])
   // const selectedValue = (() => {
   //   if (value) {
   //     return [listValues.find((item) => item === value)];
@@ -16,11 +26,14 @@ export default ({ listValues, value, setValue, allowCustomValues, readonly }) =>
   // }, [value, listValues])
 
   // console.debug(value, listValues)
+
+  console.debug(listValues, value);
   return (
     <Form.Select
+      labelKey="title"
       id="select-typeahead"
       onChange={onChange}
-      selected={value ? [value] : []}
+      selected={selectedValue}
       disabled={readonly}
       options={listValues}
       size="sm"
