@@ -18,16 +18,7 @@ export default ({ listValues, value, setValue, allowCustomValues, readonly }) =>
     }
     return [];
   }, [value, listValues])
-  // const selectedValue = (() => {
-  //   if (value) {
-  //     return [listValues.find((item) => item === value)];
-  //   }
-  //   return [];
-  // }, [value, listValues])
-
-  // console.debug(value, listValues)
-
-  console.debug(listValues, value);
+ 
   return (
     <Form.Select
       labelKey="title"
