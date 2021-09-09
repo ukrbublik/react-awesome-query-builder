@@ -1,6 +1,6 @@
 import React from "react";
-
-export default ({type, label, onClick, config}) => {
+import { Button } from "@shoutout-labs/shoutout-themes-enterprise";
+export default ({ type, label, onClick, config }) => {
   const typeToLabel = {
     "addRuleGroup": "+",
     "addRuleGroupExt": "+",
@@ -9,5 +9,10 @@ export default ({type, label, onClick, config}) => {
     "delRule": "x",
   };
   const btnLabel = label || typeToLabel[type];
-  return <button onClick={onClick} type="button" className="btn btn-sm btn-outline-primary mr-2">{btnLabel}</button>;
+
+
+  if (type === "delRule"||type==="delGroup") {
+    return <Button onClick={onClick} type="button" variant="outline-danger" size="sm">{btnLabel}</Button>;
+  }
+  return <Button onClick={onClick} type="button" variant="outline-primary" size="sm" className="ml-2">{btnLabel}</Button>;
 };

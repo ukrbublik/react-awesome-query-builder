@@ -32,7 +32,7 @@
 }
 
 .query-builder {
-  overflow: hidden;
+  // overflow: hidden;
   *, *::before, *::after {
     box-sizing: border-box;
   }
@@ -68,13 +68,14 @@ body.qb-dragging {
 
 .group {
   background:white;
-  border: 1px solid rgba(112, 112, 112, 0.19);
+  // border: 1px solid rgba(112, 112, 112, 0.19);
 }
 
 .rule {
   background-color: white;
-  border: 1px solid transparent;
+  border: 1px solid rgba(112, 112, 112, 0.19);
   padding: 10px;
+  margin-top: 10px;
 }
 
 .rule-with-error .rule {
@@ -153,7 +154,7 @@ ul.ant-select-selection__rendered {
 }
 
 .group--children {
-  padding-left: 24px;
+  padding-left: 20px;
 
   & > .group-or-rule-container > .group-or-rule {
     &:before {
@@ -585,19 +586,22 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
 
 .group--header,
 .group--footer {
-  padding: {
-    left: 10px;
-    right: 10px;
-  }
+  // padding: {
+  //   left: 10px;
+  //   right: 10px;
+  // }
   margin: {
     top: 10px;
     bottom: 10px;
   }
 }
 .group-or-rule-container {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-right: 10px;
+  // margin-top: 10px;
+  // margin-bottom: 10px;
+  // padding-right: 10px;
+  margin:0;
+  padding: 0;
+  border: none;
   &:first-child {
     margin-top: 0px !important;
   }
