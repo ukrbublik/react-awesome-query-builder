@@ -248,313 +248,108 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const fields: Fields = {
-    user: {
-      label: "User",
-      tooltip: "Group of fields",
-      type: "!struct",
-      subfields: {
-        firstName: {
-          label2: "Username", //only for menu's toggler
-          type: "text",
-          excludeOperators: ["proximity"],
-          fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
-              return (val.length < 10);
-            },
-          },
-          mainWidgetProps: {
-            valueLabel: "Name",
-            valuePlaceholder: "Enter name",
-          },
-        },
-        login: {
-          type: "text",
-          tableName: "t1", // legacy: PR #18, PR #20
-          excludeOperators: ["proximity"],
-          fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
-              return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-            },
-          },
-          mainWidgetProps: {
-            valueLabel: "Login",
-            valuePlaceholder: "Enter login",
-          },
-        }
+    "_created_on": {
+      "label": "Created On",
+      "type": "date"
+    },
+    "_last_seen_on": {
+      "label": "Last Seen On",
+      "type": "date"
+    },
+    "address": {
+      "label": "Address",
+      "type": "text",
+      "valueSources":["value"]
+    },
+    "birth_date": {
+      "label": "Birth Date",
+      "type": "date"
+    },
+    "birth_day_of_month": {
+      "label": "Birth Day Of Month",
+      "type": "text"
+    },
+    "birth_month": {
+      "label": "Birth Month",
+      "type": "text"
+    },
+    "company": {
+      "label": "Company",
+      "type": "text"
+    },
+    "country": {
+      "label": "Country",
+      "type": "text"
+    },
+    "country_code": {
+      "label": "Country Code",
+      "type": "text"
+    },
+    "email": {
+      "label": "Email",
+      "type": "text"
+    },
+    "gender": {
+      "label": "Gender",
+      "type": "text"
+    },
+    "location": {
+      "label": "Location",
+      "type": "text"
+    },
+    "loyalty_id": {
+      "label": "Loyalty Id",
+      "type": "text"
+    },
+    "mobile_number": {
+      "label": "Mobile Number",
+      "type": "text"
+    },
+    "name": {
+      "label": "Name",
+      "type": "text"
+    },
+    "points": {
+      "label": "Points",
+      "type": "number"
+    },
+    "purchases_count": {
+      "label": "Purchases Count",
+      "type": "number"
+    },
+    "purchases_value": {
+      "label": "Purchases Value",
+      "type": "number"
+    },
+    "region_id": {
+      "label": "Region Id",
+      "type": "text"
+    },
+    "register_on": {
+      "label": "Register On",
+      "type": "date"
+    },
+    "source": {
+      "label": "Source",
+      "type": "text"
+    },
+    "tags": {
+      "label": "Tags",
+      "type": "select",
+      "fieldSettings": {
+        "listValues": [{
+          "title": "Loyalty User",
+          "value": "loyalty_user"
+        }],
+        "showSearch": true
       }
     },
-    bio: {
-      label: "Bio",
-      type: "text",
-      preferWidgets: ["textarea"],
-      fieldSettings: {
-        maxLength: 1000,
-      }
-    },
-    results: {
-      label: "Results",
-      type: "!group",
-      subfields: {
-        product: {
-          type: "select",
-          fieldSettings: {
-            listValues: ["abc", "def", "xyz"],
-          },
-          valueSources: ["value"],
-        },
-        score: {
-          type: "number",
-          fieldSettings: {
-            min: 0,
-            max: 100,
-          },
-          valueSources: ["value"],
-        }
-      }
-    },
-    cars: {
-      label: "Cars",
-      type: "!group",
-      mode: "array",
-      conjunctions: ["AND", "OR"],
-      showNot: true,
-      operators: [
-        // w/ operand - count
-        "equal",
-        "not_equal",
-        "less",
-        "less_or_equal",
-        "greater",
-        "greater_or_equal",
-        "between",
-        "not_between",
-
-        // w/o operand
-        "some",
-        "all",
-        "none",
-      ],
-      defaultOperator: "some",
-      initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
-
-      subfields: {
-        vendor: {
-          type: "select",
-          fieldSettings: {
-            listValues: ["Ford", "Toyota", "Tesla"],
-          },
-          valueSources: ["value"],
-        },
-        year: {
-          type: "number",
-          fieldSettings: {
-            min: 1990,
-            max: 2020,
-          },
-          valueSources: ["value"],
-        }
-      }
-    },
-    prox1: {
-      label: "prox",
-      tooltip: "Proximity search",
-      type: "text",
-      operators: ["proximity"],
-    },
-    num: {
-      label: "Number",
-      type: "number",
-      preferWidgets: ["number"],
-      fieldSettings: {
-        min: -1,
-        max: 5
-      },
-      funcs: ["LINEAR_REGRESSION"],
-    },
-    slider: {
-      label: "Slider",
-      type: "number",
-      preferWidgets: ["slider", "rangeslider"],
-      valueSources: ["value", "field"],
-      fieldSettings: {
-        min: 0,
-        max: 100,
-        step: 1,
-        marks: {
-          0: <strong>0%</strong>,
-          100: <strong>100%</strong>
-        },
-        validateValue: (val, fieldSettings) => {
-          return (val < 50 ? null : "Invalid slider value, see validateValue()");
-        },
-      },
-      //overrides
-      widgets: {
-        slider: {
-          widgetProps: {
-            valuePlaceholder: "..Slider",
-          }
-        },
-        rangeslider: {
-          widgetProps: {
-            valueLabels: [
-              { label: "Number from", placeholder: "from" },
-              { label: "Number to", placeholder: "to" },
-            ],
-          }
-        },
-      },
-    },
-    date: {
-      label: "Date",
-      type: "date",
-      valueSources: ["value"],
-      fieldSettings: {
-        dateFormat: "DD-MM-YYYY",
-        validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
-          // example of date validation
-          const dateVal = moment(val, fieldSettings.valueFormat);
-          return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
-        },
-      },
-    },
-    time: {
-      label: "Time",
-      type: "time",
-      valueSources: ["value"],
-      defaultOperator: "between",
-    },
-    datetime: {
-      label: "DateTime",
-      type: "datetime",
-      valueSources: ["value", "func"]
-    },
-    datetime2: {
-      label: "DateTime2",
-      type: "datetime",
-      valueSources: ["field"]
-    },
-    color: {
-      label: "Color",
-      type: "select",
-      valueSources: ["value"],
-      fieldSettings: {
-        showSearch: true,
-        // * old format:
-        // listValues: {
-        //     yellow: 'Yellow',
-        //     green: 'Green',
-        //     orange: 'Orange'
-        // },
-        // * new format:
-        listValues: [
-          { value: "yellow", title: "Yellow" },
-          { value: "green", title: "Green" },
-          { value: "orange", title: "Orange" }
-        ],
-      },
-    },
-    color2: {
-      label: "Color2",
-      type: "select",
-      fieldSettings: {
-        listValues: {
-          yellow: "Yellow",
-          green: "Green",
-          orange: "Orange",
-          purple: "Purple"
-        },
-      }
-    },
-    multicolor: {
-      label: "Colors",
-      type: "multiselect",
-      fieldSettings: {
-        showSearch: true,
-        listValues: {
-          yellow: "Yellow",
-          green: "Green",
-          orange: "Orange"
-        },
-        allowCustomValues: true,
-      }
-    },
-    selecttree: {
-      label: "Color (tree)",
-      type: "treeselect",
-      fieldSettings: {
-        treeExpandAll: true,
-        // * deep format (will be auto converted to flat format):
-        // listValues: [
-        //     { value: "1", title: "Warm colors", children: [
-        //         { value: "2", title: "Red" },
-        //         { value: "3", title: "Orange" }
-        //     ] },
-        //     { value: "4", title: "Cool colors", children: [
-        //         { value: "5", title: "Green" },
-        //         { value: "6", title: "Blue", children: [
-        //             { value: "7", title: "Sub blue", children: [
-        //                 { value: "8", title: "Sub sub blue and a long text" }
-        //             ] }
-        //         ] }
-        //     ] }
-        // ],
-        // * flat format:
-        listValues: [
-          { value: "1", title: "Warm colors" },
-          { value: "2", title: "Red", parent: "1" },
-          { value: "3", title: "Orange", parent: "1" },
-          { value: "4", title: "Cool colors" },
-          { value: "5", title: "Green", parent: "4" },
-          { value: "6", title: "Blue", parent: "4" },
-          { value: "7", title: "Sub blue", parent: "6" },
-          { value: "8", title: "Sub sub blue and a long text", parent: "7" },
-        ],
-      }
-    },
-    multiselecttree: {
-      label: "Colors (tree)",
-      type: "treemultiselect",
-      fieldSettings: {
-        treeExpandAll: true,
-        listValues: [
-          { value: "1", title: "Warm colors", children: [
-            { value: "2", title: "Red" },
-            { value: "3", title: "Orange" }
-          ] },
-          { value: "4", title: "Cool colors", children: [
-            { value: "5", title: "Green" },
-            { value: "6", title: "Blue", children: [
-              { value: "7", title: "Sub blue", children: [
-                { value: "8", title: "Sub sub blue and a long text" }
-              ] }
-            ] }
-          ] }
-        ]
-      }
-    },
-    autocomplete: {
-      label: "Autocomplete",
-      type: "select",
-      valueSources: ["value"],
-      fieldSettings: {
-        asyncFetch: simulatedAsyncFetch,
-        useAsyncSearch: true,
-        useLoadMore: true,
-        forceAsyncSearch: false,
-        allowCustomValues: false
-      },
-    },
-    stock: {
-      label: "In stock",
-      type: "boolean",
-      defaultValue: true,
-      mainWidgetProps: {
-        labelYes: "+",
-        labelNo: "-"
-      }
-    },
-  };
+    "tier_points": {
+      "label": "Tier Points",
+      "type": "number"
+    }
+  }
+ 
 
   //////////////////////////////////////////////////////////////////////
 

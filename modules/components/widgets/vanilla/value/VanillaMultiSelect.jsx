@@ -1,35 +1,34 @@
-import React from "react";
-import {mapListValues} from "../../../../utils/stuff";
+import React, { useMemo, useCallback } from "react";
+// import { mapListValues } from "../../../../utils/stuff";
+import { Form } from "@shoutout-labs/shoutout-themes-enterprise";
 
-export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
-  const renderOptions = () => 
-    mapListValues(listValues, ({title, value}) => {
-      return <option key={value} value={value}>{title}</option>;
-    });
+export default ({ listValues, value, setValue, allowCustomValues, readonly }) => {
 
-  const getMultiSelectValues = (multiselect) => {
-    let values = [];
-    const options = multiselect.options;
-    for (let i = 0 ; i < options.length ; i++) {
-      const opt = options[i];
-      if (opt.selected) {
-        values.push(opt.value);
-      }
+  const onChange = useCallback(e => {
+    setValue(e.length > 0 ? e.map((item) => item.value) : undefined);
+  },
+    [setValue]);
+
+  const selectedValues = useMemo(() => {
+    if (value) {
+      return listValues.filter((item) => value.indexOf(item.value) > -1);
     }
-    if (!values.length)
-      values = undefined; //not allow []
-    return values;
-  };
+    return [];
+  }, [value, listValues])
 
-  const onChange = e => setValue(getMultiSelectValues(e.target));
-  
   return (
-    <select multiple
+    <Form.Select
+      labelKey="title"
+      id="select-typeahead-multi"
       onChange={onChange}
-      value={value}
+      selected={selectedValues}
       disabled={readonly}
-    >
-      {renderOptions()}
-    </select>
-  );
+      options={listValues}
+      size="sm"
+      placeholder="Select"
+      multiple={true}
+      clearButton={true}
+    />
+  )
+
 };
