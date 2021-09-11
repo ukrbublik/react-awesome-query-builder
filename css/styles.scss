@@ -388,9 +388,9 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
 }
-.widget--valuesrc {
-  margin-right: -8px;
-}
+// .widget--valuesrc {
+//   margin-right: -8px;
+// }
 .widget--valuesrc span i {
   transform: rotate(90deg);
 }

@@ -1,17 +1,24 @@
 import React from "react";
 import moment from "moment";
-
+import { FormDate } from "@shoutout-labs/shoutout-themes-enterprise";
 export default (props) => {
-  const {value, setValue, config, valueFormat, readonly} = props;
+  const { value, setValue, config, valueFormat, readonly } = props;
 
-  const onChange = e => {
-    let value = e.target.value;
-    if (value == "")
-      value = undefined;
-    setValue(value);
+  const onChange = (date) => {
+    if (date) {
+      setValue(moment(date).format(valueFormat));
+    } else {
+      setValue(undefined);
+    }
   };
-  
+
   return (
-    <input type="date"  value={value || ""}  disabled={readonly} onChange={onChange} />
+    <FormDate
+      date={value ? moment(value).toDate() : undefined}
+      disabled={readonly}
+      onChange={onChange}
+      dateDisplayFormat={valueFormat}
+      size="sm"
+    />
   );
 };
