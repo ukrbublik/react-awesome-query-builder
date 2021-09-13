@@ -13,3 +13,4 @@ npm-debug.log
 .idea
 .eslintcache
 .DS_Store
+.vscode/*
