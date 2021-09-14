@@ -44,21 +44,17 @@ Now [Material-UI](https://material-ui.com/) is also supported!
 ## Getting started
 Install: 
 ```
-npm i react-awesome-query-builder
+npm i react-awesome-query-builder --save
 ```
 
 For AntDesign widgets only:
 ```
-npm i antd
+npm i antd --save
 ```
 
 For Material-UI widgets only:
 ```
-npm i @material-ui/core
-npm i @material-ui/lab
-npm i @material-ui/icons
-npm i @material-ui/pickers
-npm i material-ui-confirm
+npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm --save
 ```
 
 See [basic usage](#usage) for minimum code example. 
@@ -437,8 +433,8 @@ You will see demo app with hot reload of demo code and local library code.
 - `tests` - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts
+- `npm run install-all` - Install npm packages in root, examples, sandboxes. **Required for other scripts!**
 - `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
-- `npm run install-all` - Install npm packages in root, examples, sandboxes
 - `npm run lint` - Run ESLint and TSC (in root, tests, examples, sandboxes)
 - `npm run lint-fix` - Run ESLint with `--fix` option (in root, tests, examples, sandboxes)
 - `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)

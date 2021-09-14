@@ -14,6 +14,7 @@ rm -rf ./examples/ts_out
 
 rm -rf ./sandbox/package-lock.json
 rm -rf ./sandbox/node_modules
+rm -rf ./sandbox/dist
 rm -rf ./sandbox/ts_out
 rm -rf ./sandbox/build
 

@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
 import { mount, shallow, ReactWrapper } from "enzyme";
 import { act } from "react-dom/test-utils";
-import sinon from "sinon";
+import sinon, {spy} from "sinon";
 import { expect } from "chai";
 const stringify = JSON.stringify;
 
@@ -71,7 +71,7 @@ export  const with_qb_skins = (config_fn: ConfigFn, value: TreeValue, valueForma
   
 const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
   const config = config_fn(BasicConfig);
-  const onChange = sinon.spy();
+  const onChange = spy();
   const tree = load_tree(value, config, valueFormat);
 
   const tasks: Tasks = {

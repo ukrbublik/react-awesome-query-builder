@@ -4,7 +4,7 @@ import startsWith from "lodash/startsWith";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 const classNames = require("classnames");
-import Item from "./Item";
+import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
 import {ConfirmFn, DragIcon, dummyFn} from "../utils";
 
