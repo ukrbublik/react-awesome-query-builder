@@ -2,13 +2,6 @@
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 
 
-// helpers
-function flatten(arr) {
-  return arr.reduce((flat, toFlatten) =>
-    flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), 
-  []);
-}
-
 /**
  * Converts a string representation of top_left and bottom_right cords to
  * a ES geo_point required for query
@@ -101,7 +94,7 @@ function buildEsRangeParameters(value, operator) {
  */
 function buildEsWildcardParameters(value) {
   return {
-    value: "*".concat(value, "*")
+    value: "*" + value + "*"
   };
 }
 
@@ -114,6 +107,7 @@ function buildEsWildcardParameters(value) {
  * @private
  */
 function determineOccurrence(combinator) {
+  //todo: move into config, like mongoConj
   switch (combinator) {
   case "AND":
     return "must";
@@ -274,12 +268,13 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
  * @returns {object} - The ES group
  */
 function buildEsGroup(children, conjunction, recursiveFxn, config) {
-  const realChildren = children.valueSeq().toArray();
+  const childrenArray = children.valueSeq().toArray();
   const occurrence = determineOccurrence(conjunction);
-  const result = realChildren.map((c) => recursiveFxn(c, config));
+  const result = childrenArray.map((c) => recursiveFxn(c, config));
+  const resultFlat = result.flat(Infinity);
   return {
     bool: {
-      [occurrence]: flatten(result)
+      [occurrence]: resultFlat
     }
   };
 }
