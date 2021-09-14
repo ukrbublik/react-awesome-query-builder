@@ -1,11 +1,13 @@
 
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+// helpers
+function flatten(arr) {
+  return arr.reduce((flat, toFlatten) =>
+    flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten), 
+  []);
+}
 
 /**
  * Converts a string representation of top_left and bottom_right cords to
@@ -20,7 +22,7 @@ function buildEsGeoPoint(geoPointString) {
     return null;
   }
 
-  var coordsNumberArray = geoPointString.split(",").map(Number);
+  const coordsNumberArray = geoPointString.split(",").map(Number);
   return {
     top_left: {
       lat: coordsNumberArray[0],
@@ -32,6 +34,7 @@ function buildEsGeoPoint(geoPointString) {
     }
   };
 }
+
 /**
  * Converts a dateTime string from the query builder to a ES range formatted object
  *
@@ -41,8 +44,6 @@ function buildEsGeoPoint(geoPointString) {
  *
  * @private
  */
-
-
 function buildEsRangeParameters(value, operator) {
   // -- if value is greater than 1 then we assume this is a between operator : BUG this is wrong, a selectable list can have multiple values
   if (value.length > 1) {
@@ -52,11 +53,11 @@ function buildEsRangeParameters(value, operator) {
     };
   } // -- if value is only one we assume this is a date time query for a specific day
 
+  const dateTime = value[0]; //TODO: Rethink about this part, what if someone adds a new type of opperator
 
-  var dateTime = value[0]; //TODO: Rethink about this part, what if someone adds a new type of opperator
-
+  //todo: move this logic into config
   switch (operator) {
-  case "on_date":
+  case "on_date": //todo: not used
   case "not_on_date":
   case "equal":
   case "select_equals":
@@ -90,6 +91,7 @@ function buildEsRangeParameters(value, operator) {
     return undefined;
   }
 }
+
 /**
  * Builds the DSL parameters for a Wildcard query
  *
@@ -97,13 +99,12 @@ function buildEsRangeParameters(value, operator) {
  * @returns {{value: string}} - The value = value parameter surrounded with * on each end
  * @private
  */
-
-
 function buildEsWildcardParameters(value) {
   return {
     value: "*".concat(value, "*")
   };
 }
+
 /**
  * Takes the match type string from awesome query builder like 'greater_or_equal' and
  * returns the ES occurrence required for bool queries
@@ -112,8 +113,6 @@ function buildEsWildcardParameters(value) {
  * @returns {string} - ES occurrence type. See constants.js
  * @private
  */
-
-
 function determineOccurrence(combinator) {
   switch (combinator) {
   case "AND":
@@ -132,6 +131,7 @@ function determineOccurrence(combinator) {
     return undefined;
   }
 }
+
 /**
  * Determines what field to query off of given the operator type
  *
@@ -141,8 +141,7 @@ function determineOccurrence(combinator) {
  * @returns {string|*} - will be either the fullFieldName or fullFieldName.keyword
  * @private
  */
-
-
+//todo: not used
 function determineQueryField(fieldDataType, fullFieldName, queryType) {
   if (fieldDataType === "boolean") {
     return fullFieldName;
@@ -171,12 +170,14 @@ function buildRegexpParameters(value) {
 }
 
 function determineField(fieldName, config) {
+  //todo: ElasticSearchTextField - not used
   return config.fields[fieldName].ElasticSearchTextField || fieldName;
 }
 
 function buildParameters(queryType, value, operator, fieldName, config) {
   switch (queryType) {
   case "filter":
+    //todo: elasticSearchScript - not used
     return {
       script: config.operators[operator].elasticSearchScript(fieldName, value)
     };
@@ -185,13 +186,13 @@ function buildParameters(queryType, value, operator, fieldName, config) {
     return { field: fieldName };
 
   case "match":
-    var textField = determineField(fieldName, config);
+    const textField = determineField(fieldName, config);
     return { [textField]: value[0] };
 
   case "term":
     return { [fieldName]: value[0] };
 
-  //todo: not used so far
+  //todo: not used
   // need to add geo type into RAQB or remove this code
   case "geo_bounding_box":
     return { [fieldName]: buildEsGeoPoint(value[0]) };
@@ -219,30 +220,31 @@ function buildParameters(queryType, value, operator, fieldName, config) {
  * @returns {object} - The ES rule
  * @private
  */
-
-
 function buildEsRule(fieldName, value, operator, config, valueSrc) {
+  const opConfig = config.operators[operator];
+  const { elasticSearchQueryType } = opConfig;
   // handle if value 0 has multiple values like a select in a array
-  var widget = getWidgetForFieldOp(config, fieldName, operator, valueSrc);
-  var occurrence = config.operators[operator].elasticSearchOccurrence;
+  const widget = getWidgetForFieldOp(config, fieldName, operator, valueSrc);
+  const widgetConfig = config.widgets[widget];
+  const { elasticSearchFormatValue } = widgetConfig;
+  //todo: remove elasticSearchOccurrence, add isNotOp for operators
+  const occurrence = opConfig.elasticSearchOccurrence;
   /** In most cases the queryType will be static however in some casese (like between) the query type will change
    * based on the data type. i.e. a between time will be different than between number, date, letters etc... */
 
-  var queryType;
-
-  if (typeof config.operators[operator].elasticSearchQueryType === "function") {
-    queryType = config.operators[operator].elasticSearchQueryType(widget);
+  let queryType;
+  if (typeof elasticSearchQueryType === "function") {
+    queryType = elasticSearchQueryType(widget);
   } else {
-    queryType = config.operators[operator].elasticSearchQueryType;
+    queryType = elasticSearchQueryType;
   }
   /** If a widget has a rule on how to format that data then use that otherwise use default way of determineing search parameters
    * */
 
 
-  var parameters;
-
-  if (typeof config.widgets[widget].elasticSearchFormatValue === "function") {
-    parameters = config.widgets[widget].elasticSearchFormatValue(queryType, value, operator, fieldName, config);
+  let parameters;
+  if (typeof elasticSearchFormatValue === "function") {
+    parameters = elasticSearchFormatValue(queryType, value, operator, fieldName, config);
   } else {
     parameters = buildParameters(queryType, value, operator, fieldName, config);
   }
@@ -262,11 +264,6 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
   };
 }
 
-function flatten(arr) {
-  return arr.reduce(function (flat, toFlatten) {
-    return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-  }, []);
-}
 /**
  * Handles the building of the group portion of the DSL
  *
@@ -276,34 +273,30 @@ function flatten(arr) {
  * @private
  * @returns {object} - The ES group
  */
-
-
 function buildEsGroup(children, conjunction, recursiveFxn, config) {
-  var realChildren = children.valueSeq().toArray();
-  var occurrence = determineOccurrence(conjunction);
-  var result = realChildren.map(function (c) {
-    return recursiveFxn(c, config);
-  });
+  const realChildren = children.valueSeq().toArray();
+  const occurrence = determineOccurrence(conjunction);
+  const result = realChildren.map((c) => recursiveFxn(c, config));
   return {
-    bool: _defineProperty({}, occurrence, flatten(result))
+    bool: {
+      [occurrence]: flatten(result)
+    }
   };
 }
 
 export function elasticSearchFormat(tree, config) {
   // -- format the es dsl here
   if (!tree) return undefined;
-  var type = tree.get("type");
-  var tk_dbug = tree.toJS();
-  var properties = tree.get("properties");
-  var tk_properties = properties.toJS();
+  const type = tree.get("type");
+  const properties = tree.get("properties");
 
   if (type === "rule" && properties.get("field")) {
     // -- field is null when a new blank rule is added
-    var operator = properties.get("operator");
-    var field = properties.get("field");
-    var value = properties.get("value").toJS();
-    var valueType = properties.get("valueType").get(0);
-    var valueSrc = properties.get("valueSrc").get(0);
+    const operator = properties.get("operator");
+    const field = properties.get("field");
+    const value = properties.get("value").toJS();
+    const _valueType = properties.get("valueType").get(0);
+    const valueSrc = properties.get("valueSrc").get(0);
 
     if (valueSrc === "func") {
       // -- elastic search doesn't support functions (that is post processing)
@@ -312,18 +305,17 @@ export function elasticSearchFormat(tree, config) {
 
     if (value && Array.isArray(value[0])) {
       //TODO : Handle case where the value has multiple values such as in the case of a list
-      return value[0].map(function (val) {
-        return buildEsRule(field, [val], operator, config, valueSrc);
-      });
+      return value[0].map((val) => 
+         buildEsRule(field, [val], operator, config, valueSrc)
+      );
     } else {
       return buildEsRule(field, value, operator, config, valueSrc);
     }
   }
 
   if (type === "group" || type === "rule_group") {
-    var thing = tree.toJS();
-    var conjunction = tree.get("properties").get("conjunction");
-    var children = tree.get("children1");
+    const conjunction = tree.get("properties").get("conjunction");
+    const children = tree.get("children1");
     return buildEsGroup(children, conjunction, elasticSearchFormat, config);
   }
 }
