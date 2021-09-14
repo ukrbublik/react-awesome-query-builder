@@ -1,12 +1,5 @@
-"use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.elasticSearchFormat = elasticSearchFormat;
-
-var _configUtils = require("../utils/configUtils");
-var _ruleUtils = require("../utils/ruleUtils");
+import {getWidgetForFieldOp} from "../utils/ruleUtils";
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -60,7 +53,7 @@ function buildEsRangeParameters(value, operator) {
   } // -- if value is only one we assume this is a date time query for a specific day
 
 
-  var dateTime = value[0]; // -- TODO: Rethink about this part, what if someone adds a new type of opperator
+  var dateTime = value[0]; //TODO: Rethink about this part, what if someone adds a new type of opperator
 
   switch (operator) {
   case "on_date":
@@ -189,28 +182,28 @@ function buildParameters(queryType, value, operator, fieldName, config) {
     };
 
   case "exists":
-    return {
-      field: fieldName
-    };
+    return { field: fieldName };
 
   case "match":
     var textField = determineField(fieldName, config);
-    return _defineProperty({}, textField, value[0]);
+    return { [textField]: value[0] };
 
   case "term":
-    return _defineProperty({}, fieldName, value[0]);
+    return { [fieldName]: value[0] };
 
+  //todo: not used so far
+  // need to add geo type into RAQB or remove this code
   case "geo_bounding_box":
-    return _defineProperty({}, fieldName, buildEsGeoPoint(value[0]));
+    return { [fieldName]: buildEsGeoPoint(value[0]) };
 
   case "range":
-    return _defineProperty({}, fieldName, buildEsRangeParameters(value, operator));
+    return { [fieldName]: buildEsRangeParameters(value, operator) };
 
   case "wildcard":
-    return _defineProperty({}, fieldName, buildEsWildcardParameters(value[0]));
+    return { [fieldName]: buildEsWildcardParameters(value[0]) };
 
   case "regexp":
-    return _defineProperty({}, fieldName, buildRegexpParameters(value[0]));
+    return { [fieldName]: buildRegexpParameters(value[0]) };
 
   default:
     return undefined;
@@ -230,7 +223,7 @@ function buildParameters(queryType, value, operator, fieldName, config) {
 
 function buildEsRule(fieldName, value, operator, config, valueSrc) {
   // handle if value 0 has multiple values like a select in a array
-  var widget = (0, _ruleUtils.getWidgetForFieldOp)(config, fieldName, operator, valueSrc);
+  var widget = getWidgetForFieldOp(config, fieldName, operator, valueSrc);
   var occurrence = config.operators[operator].elasticSearchOccurrence;
   /** In most cases the queryType will be static however in some casese (like between) the query type will change
    * based on the data type. i.e. a between time will be different than between number, date, letters etc... */
@@ -255,11 +248,17 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
   }
 
   if (occurrence === "must") {
-    return _defineProperty({}, queryType, _objectSpread({}, parameters));
+    return {
+      [queryType]: {...parameters}
+    };
   }
 
   return {
-    bool: _defineProperty({}, occurrence, _defineProperty({}, queryType, _objectSpread({}, parameters)))
+    bool: {
+      [occurrence]: {
+        [queryType]: {...parameters}
+      }
+    }
   };
 }
 
@@ -290,7 +289,7 @@ function buildEsGroup(children, conjunction, recursiveFxn, config) {
   };
 }
 
-function elasticSearchFormat(tree, config) {
+export function elasticSearchFormat(tree, config) {
   // -- format the es dsl here
   if (!tree) return undefined;
   var type = tree.get("type");
@@ -312,7 +311,7 @@ function elasticSearchFormat(tree, config) {
     }
 
     if (value && Array.isArray(value[0])) {
-      // -- TODO : Handle case where the value has multiple values such as in the case of a list
+      //TODO : Handle case where the value has multiple values such as in the case of a list
       return value[0].map(function (val) {
         return buildEsRule(field, [val], operator, config, valueSrc);
       });
