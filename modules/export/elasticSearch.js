@@ -169,6 +169,7 @@ function determineField(fieldName, config) {
 }
 
 function buildParameters(queryType, value, operator, fieldName, config) {
+  const textField = determineField(fieldName, config);
   switch (queryType) {
   case "filter":
     //todo: elasticSearchScript - not used
@@ -180,7 +181,6 @@ function buildParameters(queryType, value, operator, fieldName, config) {
     return { field: fieldName };
 
   case "match":
-    const textField = determineField(fieldName, config);
     return { [textField]: value[0] };
 
   case "term":
@@ -314,7 +314,7 @@ export function elasticSearchFormat(tree, config) {
     if (value && Array.isArray(value[0])) {
       //TODO : Handle case where the value has multiple values such as in the case of a list
       return value[0].map((val) => 
-         buildEsRule(field, [val], operator, config, valueSrc)
+        buildEsRule(field, [val], operator, config, valueSrc)
       );
     } else {
       return buildEsRule(field, value, operator, config, valueSrc);
