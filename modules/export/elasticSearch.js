@@ -215,47 +215,60 @@ function buildParameters(queryType, value, operator, fieldName, config) {
  * @private
  */
 function buildEsRule(fieldName, value, operator, config, valueSrc) {
-  const opConfig = config.operators[operator];
-  const { elasticSearchQueryType } = opConfig;
+  let op = operator;
+  let opConfig = config.operators[op];
+  let { elasticSearchQueryType } = opConfig;
+
+  // not
+  let not = false;
+  if (!elasticSearchQueryType && opConfig.reversedOp) {
+    not = true;
+    op = opConfig.reversedOp;
+    opConfig = config.operators[op];
+    ({ elasticSearchQueryType } = opConfig);
+  }
+  
   // handle if value 0 has multiple values like a select in a array
-  const widget = getWidgetForFieldOp(config, fieldName, operator, valueSrc);
+  const widget = getWidgetForFieldOp(config, fieldName, op, valueSrc);
   const widgetConfig = config.widgets[widget];
   const { elasticSearchFormatValue } = widgetConfig;
-  //todo: remove elasticSearchOccurrence, add isNotOp for operators
-  const occurrence = opConfig.elasticSearchOccurrence;
+
   /** In most cases the queryType will be static however in some casese (like between) the query type will change
    * based on the data type. i.e. a between time will be different than between number, date, letters etc... */
-
   let queryType;
   if (typeof elasticSearchQueryType === "function") {
     queryType = elasticSearchQueryType(widget);
   } else {
     queryType = elasticSearchQueryType;
   }
-  /** If a widget has a rule on how to format that data then use that otherwise use default way of determineing search parameters
-   * */
 
-
-  let parameters;
-  if (typeof elasticSearchFormatValue === "function") {
-    parameters = elasticSearchFormatValue(queryType, value, operator, fieldName, config);
-  } else {
-    parameters = buildParameters(queryType, value, operator, fieldName, config);
+  if (!queryType) {
+    // Not supported
+    return undefined;
   }
 
-  if (occurrence === "must") {
+  /** If a widget has a rule on how to format that data then use that otherwise use default way of determineing search parameters
+   * */
+  let parameters;
+  if (typeof elasticSearchFormatValue === "function") {
+    parameters = elasticSearchFormatValue(queryType, value, op, fieldName, config);
+  } else {
+    parameters = buildParameters(queryType, value, op, fieldName, config);
+  }
+
+  if (not) {
+    return {
+      bool: {
+        must_not: {
+          [queryType]: {...parameters}
+        }
+      }
+    };
+  } else {
     return {
       [queryType]: {...parameters}
     };
   }
-
-  return {
-    bool: {
-      [occurrence]: {
-        [queryType]: {...parameters}
-      }
-    }
-  };
 }
 
 /**

@@ -12,6 +12,8 @@ type AnyObject = object;
 
 type MongoValue = any;
 
+type ElasticSearchQueryType = string;
+
 type JsonLogicResult = {
   logic?: JsonLogicTree,
   data?: Object,
@@ -159,6 +161,7 @@ type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isF
 type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
+type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 interface BaseWidgetProps {
   value: RuleValue,
@@ -198,6 +201,7 @@ export interface BaseWidget {
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
+  elasticSearchFormatValue?: ElasticSearchFormatValue,
   //obsolete:
   validateValue?: ValidateValue,
 }
@@ -319,6 +323,7 @@ type FormatOperator = (field: string, op: string, vals: string | Array<string>, 
 type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => Object;
 type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject) => JsonLogicTree;
+type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
   optionLabel: string,
@@ -343,6 +348,7 @@ export interface ProximityOptions extends ProximityConfig {
 interface BaseOperator {
   label: string,
   reversedOp: string,
+  isNotOp?: boolean,
   cardinality?: number,
   formatOp?: FormatOperator,
   labelForFormat?: string,
@@ -351,6 +357,7 @@ interface BaseOperator {
   sqlFormatOp?: SqlFormatOperator,
   jsonLogic?: string | JsonLogicFormatOperator,
   _jsonLogicIsRevArgs?: boolean,
+  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType,
   valueSources?: Array<ValueSource>,
 }
 interface UnaryOperator extends BaseOperator {

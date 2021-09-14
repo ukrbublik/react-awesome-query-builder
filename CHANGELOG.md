@@ -1,4 +1,6 @@
 # Changelog
+- 4.5.0
+  - Added basic support of export to ElasticSearch (PR #469)
 - 4.4.2
   - Added support of autocomplete for multiselect widget in MUI (PR #475)
 - 4.4.1
