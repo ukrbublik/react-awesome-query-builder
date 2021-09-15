@@ -118,8 +118,10 @@ const operators = {
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     jsonLogic: "==",
+    elasticSearchQueryType: "term",
   },
   not_equal: {
+    isNotOp: true,
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>",
@@ -140,6 +142,7 @@ const operators = {
     reversedOp: "greater_or_equal",
     mongoFormatOp: mongoFormatOp1.bind(null, "$lt", v => v, false),
     jsonLogic: "<",
+    elasticSearchQueryType: "range",
   },
   less_or_equal: {
     label: "<=",
@@ -148,6 +151,7 @@ const operators = {
     reversedOp: "greater",
     mongoFormatOp: mongoFormatOp1.bind(null, "$lte", v => v, false),
     jsonLogic: "<=",
+    elasticSearchQueryType: "range",
   },
   greater: {
     label: ">",
@@ -156,6 +160,7 @@ const operators = {
     reversedOp: "less_or_equal",
     mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => v, false),
     jsonLogic: ">",
+    elasticSearchQueryType: "range",
   },
   greater_or_equal: {
     label: ">=",
@@ -164,6 +169,7 @@ const operators = {
     reversedOp: "less",
     mongoFormatOp: mongoFormatOp1.bind(null, "$gte", v => v, false),
     jsonLogic: ">=",
+    elasticSearchQueryType: "range",
   },
   like: {
     label: "Like",
@@ -180,8 +186,10 @@ const operators = {
     jsonLogic: "in",
     _jsonLogicIsRevArgs: true,
     valueSources: ["value"],
+    elasticSearchQueryType: "regexp",
   },
   not_like: {
+    isNotOp: true,
     label: "Not like",
     reversedOp: "like",
     labelForFormat: "Not Like",
@@ -250,8 +258,12 @@ const operators = {
       }
       return null;
     },
+    elasticSearchQueryType: function elasticSearchQueryType(type) {
+      return type === "time" ? "filter" : "range";
+    },
   },
   not_between: {
+    isNotOp: true,
     label: "Not between",
     labelForFormat: "NOT BETWEEN",
     sqlOp: "NOT BETWEEN",
@@ -286,6 +298,7 @@ const operators = {
     jsonLogic: "!",
   },
   is_not_empty: {
+    isNotOp: true,
     label: "Is not empty",
     labelForFormat: "IS NOT EMPTY",
     sqlOp: "IS NOT EMPTY",
@@ -296,6 +309,7 @@ const operators = {
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
     jsonLogic: "!!",
+    elasticSearchQueryType: "exists",
   },
   select_equals: {
     label: "==",
@@ -307,8 +321,10 @@ const operators = {
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     reversedOp: "select_not_equals",
     jsonLogic: "==",
+    elasticSearchQueryType: "term",
   },
   select_not_equals: {
+    isNotOp: true,
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>", // enum/set
@@ -335,8 +351,10 @@ const operators = {
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
     reversedOp: "select_not_any_in",
     jsonLogic: "in",
+    elasticSearchQueryType: "term",
   },
   select_not_any_in: {
+    isNotOp: true,
     label: "Not in",
     labelForFormat: "NOT IN",
     sqlOp: "NOT IN",
@@ -376,8 +394,10 @@ const operators = {
       // it's not "equals", but "includes" operator - just for example
       "all": [ field, {"in": [{"var": ""}, vals]} ]
     }),
+    elasticSearchQueryType: "term",
   },
   multiselect_not_equals: {
+    isNotOp: true,
     label: "Not equals",
     labelForFormat: "!=",
     sqlOp: "<>",
@@ -434,7 +454,7 @@ const operators = {
       defaults: {
         proximity: 2
       },
-    }
+    },
   },
   some: {
     label: "Some",
@@ -643,6 +663,19 @@ const widgets = {
       // return seconds of day
       const dateVal = moment(val, wgtDef.valueFormat);
       return dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second");
+    },
+    elasticSearchFormatValue: function elasticSearchFormatValue(queryType, value, operator, fieldName) {
+      return {
+        script: {
+          script: {
+            source: "doc[".concat(fieldName, "][0].getHour() >== params.min && doc[").concat(fieldName, "][0].getHour() <== params.max"),
+            params: {
+              min: value[0],
+              max: value[1]
+            }
+          }
+        }
+      };
     },
   },
   datetime: {

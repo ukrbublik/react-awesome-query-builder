@@ -36,7 +36,7 @@ Now [Material-UI](https://material-ui.com/) is also supported!
 - Using awesome [Ant Design](https://ant.design/) as UI framework with rich features.  
   Now [Material-UI](https://material-ui.com/) is also supported!  
   (Using another UI framework and custom widgets is possible, see below)
-- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com) or your custom format
+- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
 - TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples))
 
@@ -368,6 +368,8 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Convert query value to MongoDb query object.
   #### sqlFormat (immutableValue, config) -> String
   Convert query value to SQL where string.
+  #### elasticSearchFormat (immutableValue, config) -> Object
+  Convert query value to ElasticSearch query object.
   #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}
   Convert query value to [JsonLogic](http://jsonlogic.com) format. 
   If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
@@ -419,7 +421,7 @@ You will see demo app with hot reload of demo code and local library code.
   - `components` - Core React components
     - `widgets` - Components to render list of fields, operators, values of different types. Built with UI frameworks
   - `config` - Basic config lives here. See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) docs.
-  - `export` - Code for export to JsonLogic, MongoDb, SQL, plain string
+  - `export` - Code for export to JsonLogic, MongoDb, SQL, ElasticSearch, plain string
   - `import` - Code for import from JsonLogic
   - `actions` - Redux actions
   - `stores/tree.js` - Redux store

@@ -171,6 +171,7 @@ module.exports = {
             "@typescript-eslint/prefer-regexp-exec": 0,
             "@typescript-eslint/no-empty-function": 0,
             "@typescript-eslint/ban-ts-comment": 0
+
         }
       },
     ],

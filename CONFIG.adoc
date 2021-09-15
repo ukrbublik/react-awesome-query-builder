@@ -464,7 +464,8 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |===
 |key |required |default |meaning
 |label |+ | |Label to be displayed in operators select component
-|reversedOp |+ | |Opposite operator.
+|reversedOp |+ | |Opposite operator
+|isNotOp | |false |Eg. true for operator "!=", false for operator "=="
 |cardinality | |1 |Number of right operands (1 for binary, 2 for `between`)
 |formatOp |+ | |Function for formatting query string, used to join operands into rule. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, bool isForDisplay) => string` +
@@ -482,6 +483,8 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `(object field, string op, mixed value, Object opDef, Object operatorOptions) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `field` - already formatted `{"var": <some field>}`
+|elasticSearchQueryType |+ for ElasticSearch format | |String (eg. `term`) -or- function `(string valueType) => string` +
+  One of https://www.elastic.co/guide/en/elasticsearch/reference/6.8/term-level-queries.html[types of term-level queries]
 |valueLabels |+ for `cardinality==2` | |Labels to be displayed on top of 2 values widgets if `config.settings.showLabels` is true +
   Example: `['Value from', {label: 'Value to', placeholder: 'Enter value to'}]`
 |textSeparators |+ for `cardinality==2` | |Labels to be displayed before each 2 values widgets +
@@ -564,6 +567,8 @@ const {
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
 |jsonLogic |- for http://jsonlogic.com[JsonLogic] |v => v |Function for formatting widget's value for JsonLogic. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
+|elasticSearchFormatValue |- for ElasticSearch format |`v => v` |Function for formatting widget's value for ES query. +
+  `(string esQueryType, mixed val, string op, string field, Object config) => Object`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
 |maxLength | | |Option for `<TextWidget>`, `<TextAreaWidget>`
