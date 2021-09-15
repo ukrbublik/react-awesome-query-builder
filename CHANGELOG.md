@@ -2,6 +2,7 @@
 - 4.5.0
   - Added basic support of export to ElasticSearch (PR #469)
   - Export all helper funcs from configUtils (PR #493)
+  - Fixed bug with zero value in MaterialSelect (PR #392)
 - 4.4.3
   - babel: use "@babel/plugin-transform-runtime" to avoid globally defined regenerator runtime (PR #480)
   - Fix export of not in some!group into JsonLogic (issue #476) (PR #484)
