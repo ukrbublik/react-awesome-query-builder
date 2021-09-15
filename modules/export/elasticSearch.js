@@ -165,7 +165,8 @@ function buildRegexpParameters(value) {
 
 function determineField(fieldName, config) {
   //todo: ElasticSearchTextField - not used
-  return config.fields[fieldName].ElasticSearchTextField || fieldName;
+  //return config.fields[fieldName].ElasticSearchTextField || fieldName;
+  return fieldName;
 }
 
 function buildParameters(queryType, value, operator, fieldName, config) {
