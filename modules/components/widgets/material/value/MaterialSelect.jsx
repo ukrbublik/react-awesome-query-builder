@@ -3,6 +3,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import {mapListValues} from "../../../../utils/stuff";
 import FormControl from "@material-ui/core/FormControl";
+import omit from "lodash/omit";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
   const renderOptions = () =>
@@ -16,13 +17,20 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
     setValue(e.target.value);
   };
 
-  const hasValue = value != null;
-
   const renderValue = (selectedValue) => {
-    if (!readonly && !hasValue)
+    if (!readonly && selectedValue == null)
       return placeholder;
-    return mapListValues(listValues, ({title, value}) => (value === selectedValue ? title : null)).filter(v => v !== null).shift();
+    return getListValueTitle(selectedValue);
   };
+
+  const getListValueTitle = (selectedValue) => 
+    mapListValues(listValues, ({title, value}) => 
+      (value === selectedValue ? title : null)
+    )
+      .filter(v => v !== null)
+      .shift();
+  
+  const hasValue = value != null;
 
   return (
     <FormControl>
@@ -35,7 +43,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
         disabled={readonly}
         readOnly={readonly}
         renderValue={renderValue}
-        {...customProps}
+        {...omit(customProps, ["showSearch", "input"])}
       >
         {renderOptions()}
       </Select>

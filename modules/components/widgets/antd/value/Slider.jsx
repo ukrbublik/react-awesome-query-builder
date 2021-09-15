@@ -47,7 +47,7 @@ export default class SliderWidget extends PureComponent {
       val = undefined;
     if (__isInternal)
       this.setState({internalValue: val});
-    this.props.setValue(val, __isInternal);
+    this.props.setValue(val, undefined, __isInternal);
   }
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
@@ -61,7 +61,7 @@ export default class SliderWidget extends PureComponent {
 
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
-    const {renderSize, showErrorMessage} = config.settings;
+    const {renderSize, showErrorMessage, defaultSliderWidth} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
@@ -87,7 +87,7 @@ export default class SliderWidget extends PureComponent {
             {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: width || "300px"}}>
+        <Col style={{float: "left", width: width || defaultSliderWidth}}>
           <Slider
             disabled={readonly}
             value={sliderValue}

@@ -6,6 +6,7 @@ import {SqlString} from "../../utils/sql";
 const {
   MaterialBooleanWidget,
   MaterialTextWidget,
+  MaterialTextAreaWidget,
   MaterialDateWidget,
   MaterialTimeWidget,
   MaterialDateTimeWidget,
@@ -14,6 +15,7 @@ const {
   MaterialNumberWidget,
   MaterialSliderWidget,
   MaterialRangeWidget,
+  MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
   MaterialConjs,
@@ -49,17 +51,29 @@ const widgets = {
     ...BasicConfig.widgets.text,
     factory: (props) => <MaterialTextWidget {...props} />,
   },
+  textarea: {
+    ...BasicConfig.widgets.textarea,
+    factory: (props) => <MaterialTextAreaWidget {...props} />,
+  },
   number: {
     ...BasicConfig.widgets.number,
     factory: (props) => <MaterialNumberWidget {...props} />,
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props) => <MaterialMultiSelectWidget {...props} />,
+    factory: (props) => {
+      return (props.asyncFetch || props.showSearch) 
+        ? <MaterialAutocompleteWidget multiple {...props} /> 
+        : <MaterialMultiSelectWidget {...props} />;
+    },
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => <MaterialSelectWidget {...props} />,
+    factory: (props) => {
+      return (props.asyncFetch || props.showSearch) 
+        ? <MaterialAutocompleteWidget {...props} /> 
+        : <MaterialSelectWidget {...props} />;
+    },
   },
   slider: {
     ...BasicConfig.widgets.slider,

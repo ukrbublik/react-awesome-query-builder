@@ -16,11 +16,12 @@ export default class FuncSelect extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
-    operator: PropTypes.string.isRequired,
+    operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.string,
     setValue: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
+    parentFuncs: PropTypes.array,
   };
 
   constructor(props) {
@@ -37,17 +38,17 @@ export default class FuncSelect extends PureComponent {
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
-    if (needUpdateItems) {
-      this.items = this.getItems(nextProps);
-    }
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
     }
+    if (needUpdateItems) {
+      this.items = this.getItems(nextProps);
+    }
   }
 
-  getItems({config, field, operator}) {
+  getItems({config, field, operator, parentFuncs}) {
     const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField);
+    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField, parentFuncs);
     const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
@@ -79,7 +80,7 @@ export default class FuncSelect extends PureComponent {
     };
   }
 
-  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField) {
+  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField, parentFuncs) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
@@ -109,6 +110,9 @@ export default class FuncSelect extends PureComponent {
             canUse = canUse && leftFieldConfig.funcs.includes(funcFullkey);
           if (canUseFuncForField)
             canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
+          // don't use func in func (can be configurable, but usually users don't need this)
+          if (parentFuncs && parentFuncs.includes(funcFullkey))
+            canUse = false;
           if (!canUse)
             delete list[funcKey];
         }

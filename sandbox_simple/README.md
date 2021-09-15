@@ -17,5 +17,5 @@ cd sandbox_simple
 npm i
 npm start
 ```
-Will open localhost:3000 in a browser.  
+Will open `http://localhost:3000` in a browser.  
 Feel free to play with code in `src/demo` dir.  

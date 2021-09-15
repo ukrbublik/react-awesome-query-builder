@@ -16,6 +16,16 @@ Or create own temaplte on [codesandbox.io](https://codesandbox.io/) by importing
 cd sandbox
 npm i
 npm start
+# npm run build
 ```
-Will open localhost:3000 in a browser.  
+Will open `http://localhost:3000` in a browser.  
 Feel free to play with code in `src/demo` dir.  
+
+
+### Run with Vite
+```sh
+cd sandbox
+npm i
+npm run dev
+# npm run build-vite && npm run serve
+```

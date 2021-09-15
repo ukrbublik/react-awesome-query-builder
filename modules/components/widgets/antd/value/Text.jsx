@@ -11,6 +11,7 @@ export default class TextWidget extends PureComponent {
     field: PropTypes.string.isRequired,
     readonly: PropTypes.bool,
     customProps: PropTypes.object,
+    maxLength: PropTypes.number,
   };
 
   handleChange = (ev) => {
@@ -20,7 +21,7 @@ export default class TextWidget extends PureComponent {
   }
 
   render() {
-    const {config, placeholder, customProps, value, readonly} = this.props;
+    const {config, placeholder, customProps, value, readonly, maxLength} = this.props;
     const {renderSize} = config.settings;
     const aValue = value != undefined ? value : null;
 
@@ -33,6 +34,7 @@ export default class TextWidget extends PureComponent {
           type={"text"}
           value={aValue}
           placeholder={placeholder}
+          maxLength={maxLength}
           onChange={this.handleChange}
           {...customProps}
         />

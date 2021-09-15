@@ -5,19 +5,24 @@
         "@babel/preset-react"
     ],
     "plugins": [
-        ["@babel/plugin-proposal-decorators", {
-            "legacy": true
-        }],
-        ["@babel/plugin-proposal-class-properties", {
-            "loose": true
-        }]
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }],
+        ["@babel/plugin-proposal-private-methods", { "loose": true }],
+        ["@babel/plugin-transform-runtime", { "loose": true }],
+        ["@babel/plugin-proposal-private-property-in-object", { "loose": true }]
     ],
     "env": {
+      "production": {
+        "compact": true,
+        "comments": false,
+        "minified": true
+      },
       "test": {
         "plugins": [
           ["istanbul", {
             "exclude": [
-              "tests/**/*.test.js"
+              // exclude from karma reporter
+              "tests/**/*"
             ]
           }]
         ]

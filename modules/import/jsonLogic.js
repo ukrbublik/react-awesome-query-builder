@@ -1,11 +1,10 @@
 import uuid from "../utils/uuid";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, isJsonLogic} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
 import moment from "moment";
-import {isJsonLogic} from "../utils/stuff";
 
 // http://jsonlogic.com/
 
@@ -60,8 +59,13 @@ const buildConv = (config) => {
   let funcs = {};
   for (let funcKey in config.funcs) {
     const funcConfig = config.funcs[funcKey];
-    if (typeof funcConfig.jsonLogic == "string") {
-      const fk = (funcConfig.jsonLogicIsMethod ? "#" : "") + funcConfig.jsonLogic;
+    let fk;
+    if (funcConfig.jsonLogicIsMethod) {
+      fk = "#" + funcConfig.jsonLogic;
+    } else if (typeof funcConfig.jsonLogic == "string") {
+      fk = funcConfig.jsonLogic;
+    }
+    if (fk) {
       if (!funcs[fk])
         funcs[fk] = [];
       funcs[fk].push(funcKey);
@@ -164,10 +168,17 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
     }
   }
 
+  let asyncListValues;
+  if (val && fieldConfig.fieldSettings && fieldConfig.fieldSettings.asyncFetch) {
+    const vals = Array.isArray(val) ? val : [val];
+    asyncListValues = vals;
+  }
+
   return {
     valueSrc: "value",
     value: val,
-    valueType: widgetConfig.type
+    valueType: widgetConfig.type,
+    asyncListValues
   };
 };
 
@@ -198,7 +209,7 @@ const convertField = (op, vals, conv, config, not, meta, parentField = null) => 
 
 const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField = null) => {
   if (!op) return undefined;
-  let func, argsArr;
+  let func, argsArr, funcKey;
   const jsonLogicIsMethod = (op == "method");
   if (jsonLogicIsMethod) {
     let obj, opts;
@@ -208,22 +219,36 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
     func = op;
     argsArr = vals;
   }
-  const fk = (jsonLogicIsMethod ? "#" : "") + func;
 
-  let funcKeys = conv.funcs[fk];
-  if (funcKeys) {
-    let funcKey = funcKeys[0];
-    if (funcKeys.length > 1 && fieldConfig) {
-      funcKeys = funcKeys
-        .filter(k => (config.funcs[k].returnType == fieldConfig.type));
-      if (funcKeys.length == 0) {
-        meta.errors.push(`No funcs returning type ${fieldConfig.type}`);
-        return undefined;
+  const fk = (jsonLogicIsMethod ? "#" : "") + func;
+  const funcKeys = (conv.funcs[fk] || []).filter(k => 
+    (fieldConfig ? config.funcs[k].returnType == fieldConfig.type : true)
+  );
+  if (funcKeys.length) {
+    funcKey = funcKeys[0];
+  } else {
+    const v = {[op]: vals};
+    for (const [f, fc] of Object.entries(config.funcs || {})) {
+      if (fc.jsonLogicImport && fc.returnType == fieldConfig.type) {
+        let parsed;
+        try {
+          parsed = fc.jsonLogicImport(v);
+        } catch(_e) {
+          // given expression `v` can't be parsed into function
+        }
+        if (parsed) {
+          funcKey = f;
+          argsArr = parsed;
+        }
       }
-      funcKey = funcKeys[0];
     }
+  }
+  if (!funcKey)
+    return undefined;
+
+  if (funcKey) {
     const funcConfig = config.funcs[funcKey];
-    const argKeys = Object.keys(funcConfig.args);
+    const argKeys = Object.keys(funcConfig.args || {});
     let args = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
       const argConfig = funcConfig.args[argKey];
@@ -400,10 +425,10 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
 };
 
 const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArgs) => {
-  // some/all/none is used for group count (cardinality = 0 is exception)
+  // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" for multiselect
   const isAllInForMultiselect = op == "all" && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
-  const isGroup0 = !isAllInForMultiselect && ["some", "all", "none"].includes(op);
+  const isGroup0 = !isAllInForMultiselect && config.settings.groupOperators.includes(op);
   const cardinality = isGroup0 ? 0 : arity - 1;
 
   const opk = op + "/" + cardinality;
@@ -514,10 +539,23 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
   let {field, fieldConfig, opKey, args, having} = parseRes;
-
   let opConfig = config.operators[opKey];
-  const canRev = !(fieldConfig.type == "!group" && having) && opConfig.reversedOp;
-  if (not && canRev) {
+
+  // Group component in array mode can show NOT checkbox, so do nothing in this case
+  // Otherwise try to revert
+  const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
+  let canRev = true;
+  if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
+    canRev = false;
+
+  // Fix "some ! in"
+  if (fieldConfig.type == "!group" && having && Object.keys(having)[0] == "!") {
+    not = !not;
+    having = having["!"];
+  }
+
+  // Use reversed op
+  if (not && canRev && opConfig.reversedOp) {
     not = false;
     opKey = opConfig.reversedOp;
     opConfig = config.operators[opKey];
@@ -548,7 +586,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     }
     Object.assign(res.properties, {
       mode: fieldConfig.mode,
-      not: not,
+      not: (canRev ? false : not),
       operator: opKey,
     });
     if (fieldConfig.mode == "array") {
@@ -564,8 +602,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       id: uuid(),
       children1: {},
       properties: {
-        conjunction: defaultGroupConjunction(config),
-        not: not,
+        conjunction: defaultGroupConjunction(config, fieldConfig),
+        not: (canRev ? false : not),
         mode: fieldConfig.mode,
         field: field,
         operator: opKey,
@@ -579,6 +617,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       });
     }
   } else {
+    const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
+    const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
     res = {
       type: "rule",
       id: uuid(),
@@ -588,6 +628,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
+        asyncListValues,
       }
     };
   }

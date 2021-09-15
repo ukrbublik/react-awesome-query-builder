@@ -164,6 +164,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   const iValue = properties.get("value");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
+  const asyncListValues = properties.get("asyncListValues");
 
   if (field == null || operator == null || iValue === undefined)
     return undefined;
@@ -194,7 +195,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
     const [fv, fvUseExpr] = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
     );
     if (fv !== undefined) {
       useExpr = useExpr || fvUseExpr;
@@ -238,7 +239,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
 };
 
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, parentPath, operator, operatorDef) => {
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, parentPath, operator, operatorDef, asyncListValues) => {
   if (currentValue === undefined)
     return [undefined, false];
   
@@ -254,9 +255,12 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
       const fn = fieldWidgetDef.mongoFormatValue;
       const args = [
         currentValue,
-        pick(fieldDef, ["fieldSettings", "listValues"]),
+        {
+          ...pick(fieldDef, ["fieldSettings", "listValues"]),
+          asyncListValues
+        },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
       ];
       if (operator) {
         args.push(operator);
@@ -343,10 +347,11 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
     const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
     const [formattedArgVal, _argUseExpr] = formatValue(
-      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, argConfig, null, null
+      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
@@ -365,6 +370,9 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
       formattedArgs,
     ];
     ret = fn(...args);
+  } else if (funcConfig.mongoFormatFunc === null) {
+    meta.errors.push(`Functon ${funcName} is not supported`);
+    return [undefined, false];
   } else {
     if (mongoArgsAsObject)
       ret = { [funcName]: formattedArgs };

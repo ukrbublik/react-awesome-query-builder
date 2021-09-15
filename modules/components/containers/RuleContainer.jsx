@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import context from "../../stores/context";
 import {getFieldConfig} from "../../utils/configUtils";
 import {pureShouldComponentUpdate} from "../../utils/reactUtils";
 import {connect} from "react-redux";
 const classNames = require("classnames");
 
 
-export default (Rule) => {
+const createRuleContainer = (Rule) => 
   class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
@@ -18,6 +19,7 @@ export default (Rule) => {
       onDragStart: PropTypes.func,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
+      asyncListValues: PropTypes.array,
       valueError: PropTypes.any,
       operatorOptions: PropTypes.object,
       reordableNodesCnt: PropTypes.number,
@@ -51,8 +53,8 @@ export default (Rule) => {
       this.props.actions.setOperatorOption(this.props.path, name, value);
     }
 
-    setValue = (delta, value, type, __isInternal) => {
-      this.props.actions.setValue(this.props.path, delta, value, type, __isInternal);
+    setValue = (delta, value, type, asyncListValues, __isInternal) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, __isInternal);
     }
 
     setValueSrc = (delta, srcKey) => {
@@ -124,6 +126,7 @@ export default (Rule) => {
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
+              asyncListValues={this.props.asyncListValues}
             /> : null
             ,
             <Rule
@@ -148,22 +151,29 @@ export default (Rule) => {
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
+              asyncListValues={this.props.asyncListValues}
             />
           ]}
         </div>
       );
     }
 
-  }
+  };
 
 
+export default (Rule) => {
   const ConnectedRuleContainer = connect(
     (state) => {
       return {
         dragging: state.dragging,
       };
+    },
+    null,
+    null,
+    {
+      context
     }
-  )(RuleContainer);
+  )(createRuleContainer(Rule));
   ConnectedRuleContainer.displayName = "ConnectedRuleContainer";
 
   return ConnectedRuleContainer;

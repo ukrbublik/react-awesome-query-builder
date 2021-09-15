@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import merge from "lodash/merge";
 import {
-  BasicConfig,
+  BasicConfig, BasicFuncs, Utils,
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs, 
   DateTimeFieldSettings,
@@ -10,27 +10,42 @@ import moment from "moment";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 
-// @ts-ignore
 import AntdConfig from "react-awesome-query-builder/config/antd";
-// @ts-ignore
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
+import MaterialConfig from "react-awesome-query-builder/config/material";
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-// @ts-ignore
-import MaterialConfig from "react-awesome-query-builder/config/material";
+const {simulateAsyncFetch} = Utils;
 
-const skinToConfig = {
+const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
   antd: AntdConfig,
   material: MaterialConfig,
 };
 
-export default (skin) => {
-  const InitialConfig = skinToConfig[skin];
+export default (skin: string) => {
+  const InitialConfig = skinToConfig[skin] as BasicConfig;
+
+  const demoListValues = [
+    {title: "A", value: "a"},
+    {title: "AA", value: "aa"},
+    {title: "AAA1", value: "aaa1"},
+    {title: "AAA2", value: "aaa2"},
+    {title: "B", value: "b"},
+    {title: "C", value: "c"},
+    {title: "D", value: "d"},
+    {title: "E", value: "e"},
+    {title: "F", value: "f"},
+    {title: "G", value: "g"},
+    {title: "H", value: "h"},
+    {title: "I", value: "i"},
+    {title: "J", value: "j"},
+  ];
+  const simulatedAsyncFetch = simulateAsyncFetch(demoListValues, 3);
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
@@ -82,19 +97,17 @@ export default (skin) => {
     ...InitialConfig.widgets,
     // examples of  overriding
     text: {
-      ...InitialConfig.widgets.text,
+      ...InitialConfig.widgets.text
+    },
+    textarea: {
+      ...InitialConfig.widgets.textarea,
+      maxRows: 3
     },
     slider: {
-      ...InitialConfig.widgets.slider,
-      customProps: {
-        width: "300px"
-      }
+      ...InitialConfig.widgets.slider
     },
     rangeslider: {
-      ...InitialConfig.widgets.rangeslider,
-      customProps: {
-        width: "300px"
-      },
+      ...InitialConfig.widgets.rangeslider
     },
     date: {
       ...InitialConfig.widgets.date,
@@ -116,6 +129,19 @@ export default (skin) => {
       ...InitialConfig.widgets.func,
       customProps: {
         showSearch: true
+      }
+    },
+    select: {
+      ...InitialConfig.widgets.select,
+    },
+    multiselect: {
+      ...InitialConfig.widgets.multiselect,
+      customProps: {
+        //showCheckboxes: false,
+        width: "200px",
+        input: {
+          width: "100px"
+        }
       }
     },
     treeselect: {
@@ -188,6 +214,11 @@ export default (skin) => {
     ...InitialConfig.settings,
     ...localeSettings,
 
+    defaultSliderWidth: "200px",
+    defaultSelectWidth: "200px",
+    defaultSearchWidth: "100px",
+    defaultMaxRows: 5,
+
     valueSourcesInfo: {
       value: {
         label: "Value"
@@ -227,7 +258,7 @@ export default (skin) => {
           type: "text",
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val, fieldSettings) => {
+            validateValue: (val: string, fieldSettings) => {
               return (val.length < 10);
             },
           },
@@ -241,7 +272,7 @@ export default (skin) => {
           tableName: "t1", // legacy: PR #18, PR #20
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val, fieldSettings) => {
+            validateValue: (val: string, fieldSettings) => {
               return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
             },
           },
@@ -250,6 +281,14 @@ export default (skin) => {
             valuePlaceholder: "Enter login",
           },
         }
+      }
+    },
+    bio: {
+      label: "Bio",
+      type: "text",
+      preferWidgets: ["textarea"],
+      fieldSettings: {
+        maxLength: 1000,
       }
     },
     results: {
@@ -296,7 +335,7 @@ export default (skin) => {
         "none",
       ],
       defaultOperator: "some",
-      initialEmptyWhere: true, // if default operator is not some/all/none, true - to set no children, false - to add 1 empty
+      initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
       subfields: {
         vendor: {
@@ -388,7 +427,7 @@ export default (skin) => {
     datetime: {
       label: "DateTime",
       type: "datetime",
-      valueSources: ["value"]
+      valueSources: ["value", "func"]
     },
     datetime2: {
       label: "DateTime2",
@@ -400,6 +439,7 @@ export default (skin) => {
       type: "select",
       valueSources: ["value"],
       fieldSettings: {
+        showSearch: true,
         // * old format:
         // listValues: {
         //     yellow: 'Yellow',
@@ -430,6 +470,7 @@ export default (skin) => {
       label: "Colors",
       type: "multiselect",
       fieldSettings: {
+        showSearch: true,
         listValues: {
           yellow: "Yellow",
           green: "Green",
@@ -492,6 +533,18 @@ export default (skin) => {
         ]
       }
     },
+    autocomplete: {
+      label: "Autocomplete",
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
+    },
     stock: {
       label: "In stock",
       type: "boolean",
@@ -506,51 +559,8 @@ export default (skin) => {
   //////////////////////////////////////////////////////////////////////
 
   const funcs: Funcs = {
-    LOWER: {
-      label: "Lowercase",
-      mongoFunc: "$toLower",
-      jsonLogic: "toLowerCase",
-      jsonLogicIsMethod: true,
-      returnType: "text",
-      args: {
-        str: {
-          label: "String",
-          type: "text",
-          valueSources: ["value", "field"],
-        },
-      }
-    },
-    LINEAR_REGRESSION: {
-      label: "Linear regression",
-      returnType: "number",
-      formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
-      sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
-      mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
-      jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
-      renderBrackets: ["", ""],
-      renderSeps: [" * ", " + "],
-      args: {
-        coef: {
-          label: "Coef",
-          type: "number",
-          defaultValue: 1,
-          valueSources: ["value"],
-        },
-        val: {
-          label: "Value",
-          type: "number",
-          valueSources: ["value"],
-        },
-        bias: {
-          label: "Bias",
-          type: "number",
-          defaultValue: 0,
-          valueSources: ["value"],
-        }
-      }
-    },
+    ...BasicFuncs
   };
-
 
 
   const config: Config = {

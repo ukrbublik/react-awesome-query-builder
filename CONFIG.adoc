@@ -95,6 +95,7 @@ const {
     },
     widgets: {
       text,
+      textarea,
       number,
       slider,
       rangeslider, // missing in `BasicConfig`
@@ -186,7 +187,8 @@ Example:
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
-  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`.
+  Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`. +
+  Available settings for text widget: `maxLength`, `maxRows`.
 |fieldSettings.listValues |+ for (multi)select, tree (multi)select | |List of values for (multi)select widget. +
   Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
    (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
@@ -195,8 +197,15 @@ Example:
 |fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
   `(mixed val, Object fieldSettings) => boolean \| string \| null`
 |fieldSettings.allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
+|fieldSettings.showSearch |- for (multi)select, tree (multi)select|false |Show search (autocomplete)?
 |fieldSettings.treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
 |fieldSettings.treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
+|fieldSettings.asyncFetch |- for `select` widget| |Async function to load list of options for `select` from server. +
+  Function format: `async (string search, int offset) => { values: Array, hasMore: boolean }` +
+  `values` - list of `{title: string, value: mixed}` +
+  For server-side select `listValues` will not be used. See also `useLoadMore`, `useAsyncSearch`.
+|fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
+|fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
 |defaultValue | | |Default value
 |preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
@@ -292,6 +301,7 @@ Behaviour settings:
 |canCompareFieldWithField | |For `<ValueFieldWidget>` - Function for building right list of fields to compare field with field +
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
+|groupOperators |`['all', 'some', 'none']` |Operators usable in `!group` fields with `array` mode
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -322,13 +332,17 @@ Render settings:
 |showLabels |false |Show labels above all fields?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
-|customFieldSelectProps |`{}` |You can pass props to `Select` field widget. Example: `{showSearch: true}`
+|customFieldSelectProps |`{}` |You can pass props to `FieldSelect` widget. Example: `{showSearch: true}`
 |groupActionsPosition |`topRight` |You can change the position of the group actions to the following: +
  `topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight`
-|renderBeforeWidget| | 
-|renderAfterWidget| | 
-|renderBeforeActions| | 
-|renderAfterActions| | 
+|renderBeforeWidget | | 
+|renderAfterWidget | | 
+|renderBeforeActions | | 
+|renderAfterActions | | 
+|defaultSliderWidth |`200px` |Width for slider
+|defaultSelectWidth |`200px` |Width for select
+|defaultSearchWidth |`100px` |Width for search in autocomplete
+|defaultMaxRows |5 | Max rows for textarea
 |===
 
 Other settings:
@@ -450,7 +464,8 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |===
 |key |required |default |meaning
 |label |+ | |Label to be displayed in operators select component
-|reversedOp |+ | |Opposite operator.
+|reversedOp |+ | |Opposite operator
+|isNotOp | |false |Eg. true for operator "!=", false for operator "=="
 |cardinality | |1 |Number of right operands (1 for binary, 2 for `between`)
 |formatOp |+ | |Function for formatting query string, used to join operands into rule. +
   `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, bool isForDisplay) => string` +
@@ -468,6 +483,8 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `(object field, string op, mixed value, Object opDef, Object operatorOptions) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `field` - already formatted `{"var": <some field>}`
+|elasticSearchQueryType |+ for ElasticSearch format | |String (eg. `term`) -or- function `(string valueType) => string` +
+  One of https://www.elastic.co/guide/en/elasticsearch/reference/6.8/term-level-queries.html[types of term-level queries]
 |valueLabels |+ for `cardinality==2` | |Labels to be displayed on top of 2 values widgets if `config.settings.showLabels` is true +
   Example: `['Value from', {label: 'Value to', placeholder: 'Enter value to'}]`
 |textSeparators |+ for `cardinality==2` | |Labels to be displayed before each 2 values widgets +
@@ -550,8 +567,12 @@ const {
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
 |jsonLogic |- for http://jsonlogic.com[JsonLogic] |v => v |Function for formatting widget's value for JsonLogic. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
+|elasticSearchFormatValue |- for ElasticSearch format |`v => v` |Function for formatting widget's value for ES query. +
+  `(string esQueryType, mixed val, string op, string field, Object config) => Object`
 |valueLabel | |`config.settings.valueLabel` |Common option, text to be placed on top of widget if `config.settings.showLabels` is true
 |valuePlaceholder | |`config.settings.valuePlaceholder` |Common option, placeholder text to be shown in widget for empty value
+|maxLength | | |Option for `<TextWidget>`, `<TextAreaWidget>`
+|maxRows | | |Option for `<TextAreaWidget>`
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
 |use12Hours | |`false` |Option for `<TimeWidget>`
 |useKeyboard | |`true` |Option for Material-UI date/time pickers, `false` disables input with keyboard, only picker use is allowed
@@ -609,7 +630,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] - it has 3 widhets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
@@ -657,6 +678,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array
 |mongoFormatFunc |- for MongoDB format | |Can be used instead of `mongoFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression object.
 |jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (function name) or function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression for JsonLogic.
+|jsonLogicImport | | |Function to convert given JsonLogic expression to array of arguments of current function. If given expression can't be parsed into current function, throw an error.
 |args.* | | |Arguments of function. Config is almost same as for simple link:#configfields[fields]
 |args.<arg>.label | |arg's key |Label to be displayed in arg's label or placeholder (if `config.settings.showLabels` is false)
 |args.<arg>.type |+ | |One of types described in link:#configtypes[config.types]

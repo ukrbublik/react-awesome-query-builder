@@ -32,7 +32,7 @@ export default class FieldDropdown extends PureComponent {
   renderMenuItems(fields) {
     return keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
-      const {items, key, path, label, fullLabel, altLabel, tooltip} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
       const pathKey = path || key;
       const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
 
@@ -46,6 +46,7 @@ export default class FieldDropdown extends PureComponent {
       } else {
         return <MenuItem
           key={pathKey}
+          disabled={disabled}
         >
           {option}
         </MenuItem>;

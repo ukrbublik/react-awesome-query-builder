@@ -12,6 +12,8 @@ type AnyObject = object;
 
 type MongoValue = any;
 
+type ElasticSearchQueryType = string;
+
 type JsonLogicResult = {
   logic?: JsonLogicTree,
   data?: Object,
@@ -104,15 +106,18 @@ export interface Utils {
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string;
   sqlFormat(tree: ImmutableTree, config: Config): string;
   mongodbFormat(tree: ImmutableTree, config: Config): Object;
+  elasticSearchFormat(tree: ImmutableTree, config: Config): Object;
   // load, save
   getTree(tree: ImmutableTree, light?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   isValidTree(tree: ImmutableTree): boolean;
   // import
-  loadFromJsonLogic(logicTree: JsonLogicTree, config: Config): ImmutableTree;
+  loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree;
+  isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
+  simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
 }
 
 export interface BuilderProps {
@@ -156,10 +161,11 @@ type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isF
 type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
+type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 interface BaseWidgetProps {
   value: RuleValue,
-  setValue(val: RuleValue): void,
+  setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
   operator: string,
@@ -175,7 +181,7 @@ interface RangeWidgetProps extends BaseWidgetProps {
 }
 export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
 
-export type TextWidgetProps = BaseWidgetProps & BasicFieldSettings;
+export type TextWidgetProps = BaseWidgetProps & TextFieldSettings;
 export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
 export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
 export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
@@ -191,9 +197,11 @@ export interface BaseWidget {
   valueSrc?: ValueSource,
   valuePlaceholder?: string,
   valueLabel?: string,
+  fullWidth?: boolean,
   formatValue: FormatValue,
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
+  elasticSearchFormatValue?: ElasticSearchFormatValue,
   //obsolete:
   validateValue?: ValidateValue,
 }
@@ -212,7 +220,7 @@ export interface FieldWidget {
   validateValue?: ValidateValue,
 }
 
-export type TextWidget = BaseWidget & BasicFieldSettings;
+export type TextWidget = BaseWidget & TextFieldSettings;
 export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
 export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
@@ -315,6 +323,7 @@ type FormatOperator = (field: string, op: string, vals: string | Array<string>, 
 type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => Object;
 type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject) => JsonLogicTree;
+type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
   optionLabel: string,
@@ -339,6 +348,7 @@ export interface ProximityOptions extends ProximityConfig {
 interface BaseOperator {
   label: string,
   reversedOp: string,
+  isNotOp?: boolean,
   cardinality?: number,
   formatOp?: FormatOperator,
   labelForFormat?: string,
@@ -347,6 +357,7 @@ interface BaseOperator {
   sqlFormatOp?: SqlFormatOperator,
   jsonLogic?: string | JsonLogicFormatOperator,
   _jsonLogicIsRevArgs?: boolean,
+  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType,
   valueSources?: Array<ValueSource>,
 }
 interface UnaryOperator extends BaseOperator {
@@ -408,8 +419,20 @@ interface TreeItem extends ListItem {
 type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
+type AsyncFetchListValues = ListValues;
+interface AsyncFetchListValuesResult {
+  values: AsyncFetchListValues,
+  hasMore?: boolean,
+}
+type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
+
+
 export interface BasicFieldSettings {
   validateValue?: ValidateValue,
+}
+export interface TextFieldSettings extends BasicFieldSettings {
+  maxLength?: number,
+  maxRows?: number,
 }
 export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
@@ -427,17 +450,23 @@ export interface DateTimeFieldSettings extends BasicFieldSettings {
 export interface SelectFieldSettings extends BasicFieldSettings {
   listValues?: ListValues,
   allowCustomValues?: boolean,
+  showSearch?: boolean,
+  showCheckboxes?: boolean,
+  asyncFetch?: AsyncFetchListValuesFn,
+  useLoadMore?: boolean,
+  useAsyncSearch?: boolean,
+  forceAsyncSearch?: boolean,
 }
 export interface TreeSelectFieldSettings extends BasicFieldSettings {
   listValues?: TreeData,
   treeExpandAll?: boolean,
-  treeSelectOnlyLeafs?:  boolean,
+  treeSelectOnlyLeafs?: boolean,
 }
 export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
 }
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | BasicFieldSettings;
+export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | TextFieldSettings | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
@@ -546,6 +575,9 @@ export interface LocaleSettings {
     antd?: Object,
     material?: Object,
   },
+  theme?: {
+    material?: Object,
+  },
   valueLabel?: string,
   valuePlaceholder?: string,
   fieldLabel?: string,
@@ -595,6 +627,10 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>,
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
+  defaultSliderWidth?: string,
+  defaultSelectWidth?: string,
+  defaultSearchWidth?: string,
+  defaultMaxRows?: number,
 }
 
 export interface BehaviourSettings {
@@ -638,6 +674,7 @@ type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
 type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
 type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
+type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 
 interface FuncGroup {
   type?: "!struct",
@@ -653,7 +690,11 @@ export interface Func {
   mongoFunc?: string,
   mongoArgsAsObject?: boolean,
   jsonLogic?: string | JsonLogicFormatFunc,
+  // Deprecated!
+  // Calling methods on objects was remvoed in JsonLogic 2.x
+  // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean,
+  jsonLogicImport?: JsonLogicImportFunc,
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,
@@ -662,6 +703,7 @@ export interface Func {
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
+  showPrefix?: boolean,
 }
 export type Funcs = TypedMap<Func | FuncGroup>;
 
@@ -700,6 +742,7 @@ export interface BasicConfig extends Config {
   },
   widgets: {
     text: TextWidget,
+    textarea: TextWidget,
     number: NumberWidget,
     slider: NumberWidget,
     rangeslider: NumberWidget,
@@ -749,6 +792,7 @@ interface VanillaWidgets {
   // vanilla core widgets
   VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
   VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaTextAreaWidget: ElementType<TextWidgetProps>,
   VanillaDateWidget: ElementType<DateTimeWidgetProps>,
   VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
   VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
@@ -773,6 +817,7 @@ export interface AntdWidgets {
 
   // antd value widgets
   TextWidget: ElementType<TextWidgetProps>,
+  TextAreaWidget: ElementType<TextWidgetProps>,
   NumberWidget: ElementType<NumberWidgetProps>,
   SliderWidget: ElementType<NumberWidgetProps>,
   RangeWidget: ElementType<RangeSliderWidgetProps>,
@@ -804,6 +849,7 @@ export interface MaterialWidgets {
   // material core widgets
   MaterialBooleanWidget: ElementType<BooleanWidgetProps>,
   MaterialTextWidget: ElementType<TextWidgetProps>,
+  MaterialTextAreaWidget: ElementType<TextWidgetProps>,
   MaterialDateWidget: ElementType<DateTimeWidgetProps>,
   MaterialTimeWidget: ElementType<DateTimeWidgetProps>,
   MaterialDateTimeWidget: ElementType<DateTimeWidgetProps>,
@@ -812,6 +858,7 @@ export interface MaterialWidgets {
   MaterialNumberWidget: ElementType<NumberWidgetProps>,
   MaterialSliderWidget: ElementType<NumberWidgetProps>,
   MaterialRangeWidget: ElementType<RangeSliderWidgetProps>,
+  MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
 
 
@@ -821,4 +868,5 @@ export const Utils: Utils;
 export const Query: Query;
 export const Builder: Builder;
 export const BasicConfig: BasicConfig;
+export const BasicFuncs: Funcs;
 export const Widgets: ReadyWidgets;

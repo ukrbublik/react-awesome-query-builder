@@ -180,7 +180,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         currentValue,
         pick(fieldDef, ["fieldSettings", "listValues"]),
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
       ];
       if (operator) {
         args.push(operator);

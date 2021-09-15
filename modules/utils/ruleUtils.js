@@ -6,6 +6,13 @@ import Immutable from "immutable";
 import {validateValue} from "../utils/validation";
 import last from "lodash/last";
 
+const selectTypes = [
+  "select",
+  "multiselect",
+  "treeselect",
+  "treemultiselect",
+];
+
 /**
  * @param {object} config
  * @param {object} oldConfig
@@ -23,6 +30,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
   const currentValueType = current.get("valueType", new Immutable.List());
+  const currentAsyncListValues = current.get("asyncListValues");
 
   //const isValidatingTree = (changedField === null);
   const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
@@ -39,6 +47,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       || changedField == "field" && !clearValueOnChangeField 
       || changedField == "operator" && !clearValueOnChangeOp)
     && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
+  if (canReuseValue && selectTypes.includes(currentFieldConfig.type) && changedField == "field") {
+    // different fields of select types has different listValues
+    canReuseValue = false;
+  }
 
   // compare old & new widgets
   for (let i = 0 ; i < operatorCardinality ; i++) {
@@ -72,7 +84,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const isEndValue = !canFix;
-      const [validateError, fixedValue] = validateValue(config, newField, newField, newOperator, v, vType, vSrc, canFix, isEndValue);
+      const asyncListValues = currentAsyncListValues;
+      const [validateError, fixedValue] = validateValue(
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
+      );
       const isValid = !validateError;
       if (!isValid && showErrorMessage && changedField != "field") {
         // allow bad value
@@ -214,7 +229,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
 };
 
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
-  const isFuncArg = typeof field == "object" && field.arg;
+  const isFuncArg = typeof field == "object" && !!field.func && !!field.arg;
   const {showLabels} = config.settings;
   const fieldConfig = getFieldConfig(config, field);
   const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
@@ -258,19 +273,30 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
-  const isFuncArg = typeof field == "object" && !!field.type;
+  const isFuncArg = typeof field == "object" && (!!field.func && !!field.arg || field._isFuncArg);
   const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
+  
   if (fieldConfig && fieldConfig.widgets) {
-    for (let widget in fieldConfig.widgets) {
+    for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
-      if (!widgetConfig.operators)
-        canAdd = canAdd && (valueSrc != "value" || isFuncArg); //if can't check operators, don't add
+      if (widget == "field" && config._fieldsCntByType) {
+        if (!config._fieldsCntByType[fieldConfig.type])
+          canAdd = false;
+      }
+      if (widget == "func" && config._funcsCntByType) {
+        if (!config._funcsCntByType[fieldConfig.type])
+          canAdd = false;
+      }
+      // If can't check operators, don't add
+      // Func args don't have operators
+      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg)
+        canAdd = false;
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
-      if (valueSrc && valueSrc != widgetValueSrc)
+      if (valueSrc && valueSrc != widgetValueSrc && valueSrc != "const")
         canAdd = false;
       if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc != "value"))
         canAdd = false;
@@ -284,14 +310,25 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       }
     }
   }
-  widgets.sort((w1, w2) => {
-    let w1Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w1) != -1 : w1 == fieldConfig.mainWidget;
-    let _w2Main = fieldConfig.preferWidgets ? fieldConfig.preferWidgets.indexOf(w2) != -1 : w2 == fieldConfig.mainWidget;
-    if (w1 != w2) {
-      return w1Main ? -1 : +1;
+
+  const widgetWeight = (w) => {
+    let wg = 0;
+    if (fieldConfig.preferWidgets) {
+      if (fieldConfig.preferWidgets.includes(w))
+        wg += (10 - fieldConfig.preferWidgets.indexOf(w));
+    } else if (w == fieldConfig.mainWidget) {
+      wg += 100;
     }
-    return 0;
-  });
+    if (w == "field") {
+      wg -= 1;
+    }
+    if (w == "func") {
+      wg -= 2;
+    }
+    return wg;
+  };
+
+  widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
     
   return {widgets, valueSrcs};
 }

@@ -15,7 +15,7 @@ jobs:
         ref: master
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '12.x'
     - run: npm install
     - name: Build examples
       run: npm run build-examples
@@ -24,7 +24,7 @@ jobs:
         rm -rf /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder/gh-pages
-        cp ./examples/bundle.js ./examples/bundle.js.map /tmp/react-awesome-query-builder/gh-pages
+        cp ./examples/build/bundle.* /tmp/react-awesome-query-builder/gh-pages/
     - uses: actions/checkout@v1
       with:
         ref: gh-pages
@@ -33,8 +33,7 @@ jobs:
         cp -R /tmp/react-awesome-query-builder/gh-pages/* .
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add ./bundle.js
-        git add ./bundle.js.map
+        git add ./bundle.*
         git commit -m "update to ${GITHUB_SHA}"
     - name: Push changes
       uses: ad-m/github-push-action@master

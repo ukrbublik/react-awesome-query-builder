@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {connect} from "react-redux";
 import {getFlatTree} from "../../utils/treeUtils";
+import context from "../../stores/context";
 import * as constants from "../../constants";
 import clone from "clone";
 import PropTypes from "prop-types";
@@ -9,9 +10,8 @@ import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUti
 const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
 
 
-export default (Builder, CanMoveFn = null) => {
+const createSortableContainer = (Builder, CanMoveFn = null) => 
   class SortableContainer extends Component {
-
     static propTypes = {
       tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
       actions: PropTypes.object.isRequired, // {moveItem: Function, ..}
@@ -32,7 +32,7 @@ export default (Builder, CanMoveFn = null) => {
     shouldComponentUpdate(nextProps, nextState) {
       let prevProps = this.props;
       let prevState = this.state;
-  
+
       let should = pureShouldComponentUpdate(this)(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
@@ -138,6 +138,10 @@ export default (Builder, CanMoveFn = null) => {
       }
     }
 
+    _getEventTarget = (e, dragStart) => {
+      return e && e.__mocked_window || document.body || window;
+    }
+
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest(".query-builder");
       document.body.classList.add("qb-dragging");
@@ -182,7 +186,8 @@ export default (Builder, CanMoveFn = null) => {
         clientY: e.clientY,
       };
 
-      const target = e.__mocked_window || window;
+      const target = this._getEventTarget(e, dragStart);
+      this.eventTarget = target;
       target.addEventListener("mousemove", this.onDrag);
       target.addEventListener("mouseup", this.onDragEnd);
 
@@ -262,10 +267,11 @@ export default (Builder, CanMoveFn = null) => {
       document.body.classList.remove("qb-dragging");
       this._cacheEls = {};
 
-      window.removeEventListener("mousemove", this.onDrag);
-      window.removeEventListener("mouseup", this.onDragEnd);
+      const target = this.eventTarget || this._getEventTarget();
+      target.removeEventListener("mousemove", this.onDrag);
+      target.removeEventListener("mouseup", this.onDragEnd);
     }
-
+    
 
     handleDrag (dragInfo, e, canMoveFn) {
       const canMoveBeforeAfterGroup = true;
@@ -538,9 +544,10 @@ export default (Builder, CanMoveFn = null) => {
         onDragStart={this.onDragStart}
       />;
     }
+  };
 
-  }
 
+export default (Builder, CanMoveFn = null) => {
   const ConnectedSortableContainer = connect(
     (state) => {
       return {
@@ -552,11 +559,14 @@ export default (Builder, CanMoveFn = null) => {
       setDragStart: actions.drag.setDragStart,
       setDragProgress: actions.drag.setDragProgress,
       setDragEnd: actions.drag.setDragEnd,
+    },
+    null,
+    {
+      context
     }
-  )(SortableContainer);
+  )(createSortableContainer(Builder, CanMoveFn));
   ConnectedSortableContainer.displayName = "ConnectedSortableContainer";
 
   return ConnectedSortableContainer;
-
 };
 

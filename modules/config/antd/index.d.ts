@@ -1,3 +1,3 @@
-import {BasicConfig} from '../..';
-const AntdConfig: BasicConfig;
+import {BasicConfig} from "../..";
+declare const AntdConfig: BasicConfig;
 export default AntdConfig;

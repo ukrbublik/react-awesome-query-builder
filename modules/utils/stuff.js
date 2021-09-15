@@ -118,11 +118,11 @@ export const escapeRegExp = (string) => {
 };
 
 
-const isObject = (v) => (typeof v == "object" && v !== null);
+const isObject = (v) => (typeof v == "object" && v !== null); // object or array
 const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
 
 // convert {<value>: <title>, ..} or [value, ..] to normal [{value, title}, ..]
-const listValuesToArray = (listValuesObj) => {
+export const listValuesToArray = (listValuesObj) => {
   if (!isObject(listValuesObj))
     return listValuesObj;
   if (Array.isArray(listValuesObj))
@@ -147,24 +147,32 @@ export const getItemInListValues = (listValues, value) => {
 };
 
 export const getTitleInListValues = (listValues, value) => {
+  if (listValues == undefined)
+    return value;
   const it = getItemInListValues(listValues, value);
   return it !== undefined ? it.title : undefined;
 };
 
 export const getValueInListValues = (listValues, value) => {
+  if (listValues == undefined)
+    return value;
   const it = getItemInListValues(listValues, value);
   return it !== undefined ? it.value : undefined;
 };
 
-export const mapListValues = (listValues, fun) => {
+export const mapListValues = (listValues, mapFn) => {
   let ret = [];
   if (Array.isArray(listValues)) {
     for (let v of listValues) {
-      ret.push(fun(listValue(v)));
+      const lv = mapFn(listValue(v));
+      if (lv != null)
+        ret.push(lv);
     }
   } else {
     for (let value in listValues) {
-      ret.push(fun(listValue(value, listValues[value])));
+      const lv = mapFn(listValue(value, listValues[value]));
+      if (lv != null)
+        ret.push(lv);
     }
   }
   return ret;
@@ -277,3 +285,9 @@ export const isJsonLogic = (logic) => (
   && !Array.isArray(logic) // and not an array
   && Object.keys(logic).length === 1 // with exactly one key
 );
+
+export function sleep(delay) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
+}

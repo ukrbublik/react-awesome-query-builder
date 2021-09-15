@@ -1,4 +1,53 @@
 # Changelog
+- 4.5.0
+  - Added basic support of export to ElasticSearch (PR #469)
+  - Export all helper funcs from configUtils (PR #493)
+- 4.4.3
+  - babel: use "@babel/plugin-transform-runtime" to avoid globally defined regenerator runtime (PR #480)
+  - Fix export of not in some!group into JsonLogic (issue #476) (PR #484)
+  - Fixed issue with default import/export in Vite build (PR #481)
+- 4.4.2
+  - Added support of autocomplete for multiselect widget in MUI (PR #475)
+- 4.4.1
+  - feat: possibility to add custom operators for groups (PR #462)
+- 4.4.0
+  - Added support of server-side load of values for `select` (MaterialUI only) (PR #471)
+- 4.3.0
+  - Improved function support
+  - Functions used in examples now moved to `BasicFuncs` (exported with lib)
+  - Added funcs `RELATIVE_DATETIME`, `NOW`, `UPPER`
+  - Added option `showPrefix` for func args (false by default)
+  - Added missing `mongoFormatValue` for all types in basic config (now dates are exported as `Date` objects)
+- 4.2.0
+  - Added `textarea` widget
+- 4.1.1
+  - Fix warning about showSearch in MUI theme
+  - Fix incorrect override of vanilla button label (issue #347)
+  - Fix display default conj (issue #426)
+  - Don't wrap in MUI ThemeProvider if no theme or locale provided (issue #325)
+  - Fix canLeaveEmptyGroup logic (issue #378)
+- 4.1.0
+  - Fixed lint errors in code
+  - Reorganized files in `tests`
+  - Updated packages
+  - Now minimum supported NodeJs is 12.13
+  - Added TSC linting
+  - Now ESLint checks types in TS files
+  - Added new scripts: `install-all`, `clean`, `reinstall`, `build-all`, `check-hot`, `tsc`, `eslint`, `smoke`, `resmoke`.
+    Renamed `sandbox_ts` to `sandbox-ts`, `sandbox_js` to `sandbox-js`.
+  - Fixed problems with VSCode's TSLint plugin
+  - Moved from deprecated `prepublish` to `prepare` in `package.json`
+- 4.0.4
+  - Fixed issue #349 with drag-n-drop and office-ui-fabric-react
+  - Fixed issue #413 with func arg with 1 value source which is not value
+- 4.0.3
+  - Fixed issue #386 with import select field from JsonLogic (reason: bug with func/field widget in getWidgetForFieldOp)
+  - Fixed issue #387 with subgroups in Material UI 
+- 4.0.2
+  - Fixed MaterialConfig import for TS projects (issue #368)
+- 4.0.1
+  - Added custom context to isolate Query Builder store (PR #350)
+  - Added support for React 17 as a peer dependency
 - 4.0.0
   - Removed setting `useGroupsAsArrays`. 
     Instead added field config `mode` for type `!group` with values: 

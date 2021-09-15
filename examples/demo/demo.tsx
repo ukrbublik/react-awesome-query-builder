@@ -10,7 +10,7 @@ import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
+const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -19,17 +19,23 @@ const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
-let initTree;
+let initTree: ImmutableTree;
 //initTree = checkTree(loadTree(initValue), loadedConfig);
 initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
-const updateEvent = new CustomEvent("update", { detail: {
+// Trick to hot-load new config when you edit `config.tsx`
+const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
   config: loadedConfig,
   _initTree: initTree,
   _initValue: initValue,
 } });
 window.dispatchEvent(updateEvent);
 
+interface CustomEventDetail {
+  config: Config;
+  _initTree: ImmutableTree;
+  _initValue: JsonTree;
+}
 
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
@@ -78,7 +84,9 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       </div>
     )
 
-    onConfigChanged = ({detail: {config, _initTree, _initValue}}: CustomEvent) => {
+    onConfigChanged = (e: Event) => {
+      const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
+      console.log("Updating config...");
       this.setState({
         config,
       });
@@ -92,7 +100,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       });
     };
 
-    changeSkin = (e) => {
+    changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const skin = e.target.value;
       const config = loadConfig(e.target.value);
       this.setState({
@@ -153,6 +161,13 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
           sqlFormat: 
             <pre style={preStyle}>
               {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            </pre>
+          </div>
+          <hr/>
+          <div>
+          elasticSearchFormat: 
+            <pre style={preStyle}>
+              {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
             </pre>
           </div>
           <hr/>

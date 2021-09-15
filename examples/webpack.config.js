@@ -1,35 +1,99 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const isProd = (process.env.NODE_ENV != "development");
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-var plugins = [];
+const MODE = process.env.NODE_ENV || "development";
+const PORT = 3001;
+const lib_name = 'react-awesome-query-builder';
+const isProd = (MODE != "development");
+const isDev = (MODE == "development");
+const isAnalyze = process.env.ANALYZE == "1";
+const isSeparateCss = process.env.CSS == "1";
+const EXAMPLES = __dirname;
+const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
+const MODULES = path.resolve(EXAMPLES, '../modules/');
+const DIST = path.resolve(EXAMPLES, './build');
+
+let plugins = [
+    new webpack.DefinePlugin({
+        'process.env': {
+            NODE_ENV: JSON.stringify(MODE),
+        }
+    }),
+    new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer'],
+    }),
+];
+let aliases = {
+    [lib_name]: MODULES
+};
+let style_loaders = [{
+    loader: "style-loader"
+}];
+
 if (isProd) {
     plugins = [
+        ...plugins,
         new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en|ru|es-us/),
-        //new BundleAnalyzerPlugin(),
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify(process.env.NODE_ENV || "production"),
-            }
-        }),
-    ];
-} else {
-    plugins = [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify(process.env.NODE_ENV || "development"),
-            }
+        new MomentLocalesPlugin({
+            localesToKeep: ['es-us', 'ru'],
         }),
     ];
 }
+if (isSeparateCss) {
+    plugins = [
+        ...plugins,
+        new MiniCssExtractPlugin({
+            filename: path.resolve(DIST, 'bundle.css')
+        }),
+    ];
+    style_loaders = [
+        MiniCssExtractPlugin.loader
+    ];
+}
+if (isAnalyze) {
+    plugins = [
+        ...plugins,
+        new BundleAnalyzerPlugin()
+    ];
+}
+if (isDev) {
+    aliases = {
+        ...aliases,
+        'react-dom': '@hot-loader/react-dom',
+    };
+}
+
+const babel_options = {
+    presets: [
+        '@babel/preset-env', 
+        '@babel/preset-react',
+        '@babel/preset-typescript', // or can use 'ts-loader' instead
+    ],
+    plugins: [
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }],
+        ["@babel/plugin-proposal-private-methods", { "loose": true }],
+        ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
+        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
+        "react-hot-loader/babel",
+        ["import", {
+            "libraryName": "antd",
+            "style": false,
+            "libraryDirectory": "es"
+        }],
+    ]
+};
 
 module.exports = {
     plugins,
-    mode: process.env.NODE_ENV || "development",
+    mode: MODE,
     devtool: isProd ? 'source-map' : 'source-map',
     devServer: {
-        port: 3001,
+        port: PORT,
         inline: true,
         historyApiFallback: true,
         hot: true,
@@ -39,20 +103,16 @@ module.exports = {
         './index',
     ],
     output: {
-        path: __dirname,
+        path: DIST,
         filename: 'bundle.js'
     },
     resolve: {
         modules: [
+            // combine with parent node_modules
             'node_modules',
-            path.resolve(__dirname, '../node_modules'),
+            RAQB_NODE_MODULES,
         ],
-        alias: {
-            'react-awesome-query-builder': path.resolve(__dirname, '../modules'),
-            'react-dom': '@hot-loader/react-dom',
-            'antd': path.resolve(__dirname, 'node_modules/antd'),
-            '@ant-design': path.resolve(__dirname, 'node_modules/@ant-design'),
-        },
+        alias: aliases,
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
     module: {
@@ -69,36 +129,22 @@ module.exports = {
             // },
             {
                 test: /\.[jt]sx?$/,
-                loaders: 'babel-loader',
-                options: {
-                    presets: [
-                        '@babel/preset-env', 
-                        '@babel/preset-react',
-                        '@babel/preset-typescript', // or can use 'ts-loader' instead
-                    ],
-                    plugins: [
-                        ["@babel/plugin-proposal-decorators", { "legacy": true }],
-                        ["@babel/plugin-proposal-class-properties", { "loose": true }],
-                        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
-                        "react-hot-loader/babel",
-                        ["import", {
-                            "libraryName": "antd",
-                            "style": false,
-                            "libraryDirectory": "es"
-                        }],
-                    ]
-                },
-                exclude: /node_modules/
+                exclude: /node_modules/,
+                use: [{
+                    loader: 'babel-loader',
+                    options: {
+                        ...babel_options,
+                        cacheDirectory: true
+                    }
+                }]
             },
             {
                 test: /\.css$/,
-                use: ["style-loader", "css-loader"]
+                use: [...style_loaders, "css-loader"]
             },
             {
                 test: /\.scss$/,
-                use: [{
-                    loader: "style-loader"
-                }, {
+                use: [...style_loaders, {
                     loader: "css-loader"
                 }, {
                     loader: "sass-loader"
@@ -106,20 +152,24 @@ module.exports = {
             },
             {
                 test: /\.less$/,
-                use: [{
-                    loader: "style-loader"
-                }, {
+                use: [...style_loaders, {
                     loader: "css-loader"
                 }, {
                     loader: "less-loader",
                     options: {
-                        javascriptEnabled: true
+                        lessOptions: {
+                            javascriptEnabled: true
+                        }
                     }
                 }]
             },
             {
                 test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader?limit=10000&minetype=application/font-woff"
+                loader: "url-loader",
+                options: {
+                    limit: 10000,
+                    minetype: 'application/font-woff'
+                }
             },
             {
                 test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,

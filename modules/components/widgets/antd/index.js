@@ -6,6 +6,7 @@ import DateTimeWidget from "./value/DateTime";
 import TimeWidget from "./value/Time";
 import SelectWidget from "./value/Select";
 import TextWidget from "./value/Text";
+import TextAreaWidget from "./value/TextArea";
 import NumberWidget from "./value/Number";
 import SliderWidget from "./value/Slider";
 import RangeWidget from "./value/Range";
@@ -35,6 +36,7 @@ export default {
   TimeWidget,
   SelectWidget,
   TextWidget,
+  TextAreaWidget,
   NumberWidget,
   SliderWidget,
   RangeWidget,

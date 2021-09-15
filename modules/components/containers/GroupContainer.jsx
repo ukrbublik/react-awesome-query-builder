@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import mapValues from "lodash/mapValues";
+import context from "../../stores/context";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
 import {connect} from "react-redux";
+import {defaultGroupConjunction} from "../../utils/defaultUtils";
 
 
-export default (Group) => {
+const createGroupContainer = (Group) => 
   class GroupContainer extends Component {
     static propTypes = {
       //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
@@ -18,7 +20,7 @@ export default (Group) => {
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
       onDragStart: PropTypes.func,
       reordableNodesCnt: PropTypes.number,
-      selectedField: PropTypes.string, // for RuleGroup
+      field: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
@@ -29,6 +31,7 @@ export default (Group) => {
       super(props);
       useOnPropsChanged(this);
 
+      this.selectedConjunction = this._selectedConjunction(props);
       this.conjunctionOptions = this._getConjunctionOptions(props);
       this.dummyFn.isDummyFn = true;
     }
@@ -64,6 +67,7 @@ export default (Group) => {
       const oldConfig = this.props.config;
       const oldConjunction = this.props.conjunction;
       if (oldConfig != config || oldConjunction != conjunction) {
+        this.selectedConjunction = this._selectedConjunction(nextProps);
         this.conjunctionOptions = this._getConjunctionOptions(nextProps);
       }
     }
@@ -74,8 +78,13 @@ export default (Group) => {
         name: `conjunction[${props.id}]`,
         key: index,
         label: item.label,
-        checked: index === props.conjunction,
+        checked: index === this._selectedConjunction(props),
       }));
+    }
+
+    _selectedConjunction = (props) => {
+      props = props || this.props;
+      return props.conjunction || defaultGroupConjunction(props.config, props.field);
     }
 
     setConjunction = (conj = null) => {
@@ -141,7 +150,7 @@ export default (Group) => {
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
-              selectedConjunction={this.props.conjunction}
+              selectedConjunction={this.selectedConjunction}
               setConjunction={this.dummyFn}
               setNot={this.dummyFn}
               removeSelf={this.dummyFn}
@@ -172,7 +181,7 @@ export default (Group) => {
               allowFurtherNesting={allowFurtherNesting}
               conjunctionOptions={this.conjunctionOptions}
               not={this.props.not}
-              selectedConjunction={this.props.conjunction}
+              selectedConjunction={this.selectedConjunction}
               setConjunction={isInDraggingTempo ? this.dummyFn : this.setConjunction}
               setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
@@ -197,15 +206,22 @@ export default (Group) => {
       );
     }
 
-  }
+  };
 
+
+export default (Group) => {
   const ConnectedGroupContainer = connect(
     (state) => {
       return {
         dragging: state.dragging,
       };
+    },
+    null,
+    null,
+    {
+      context
     }
-  )(GroupContainer);
+  )(createGroupContainer(Group));
   ConnectedGroupContainer.displayName = "ConnectedGroupContainer";
 
   return ConnectedGroupContainer;
