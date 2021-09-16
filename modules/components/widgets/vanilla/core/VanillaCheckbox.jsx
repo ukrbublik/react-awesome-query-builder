@@ -1,10 +1,11 @@
 import React from "react";
 
-export default ({value, setValue, label, id, config}) => {
+export default ({value, setValue, label, id, config, type}) => {
   const onChange = e => setValue(e.target.checked);
+  const postfix = type;
   return [
-    <input key={id}  type="checkbox" id={id + "__lock"} checked={!!value} onChange={onChange} />
+    <input key={id+postfix}  type="checkbox" id={id+postfix} checked={!!value} onChange={onChange} />
     ,
-    <label key={id+"label"}  htmlFor={id + "__lock"}>{label || "Lock"}</label>
+    <label key={id+postfix+"label"}  htmlFor={id+postfix}>{label}</label>
   ];
 };

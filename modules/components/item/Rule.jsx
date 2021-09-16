@@ -274,7 +274,7 @@ class Rule extends PureComponent {
       return showLock && (
         <div key="rule-lock" className="rule--header">
           {<Checkbox 
-            id={id} value={isLocked} setValue={this.setLock} label={lockLabel} config={config}
+            type="lock" id={id} value={isLocked} setValue={this.setLock} label={lockLabel} config={config}
           />}
         </div>
       );

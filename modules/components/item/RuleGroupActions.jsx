@@ -14,7 +14,7 @@ export class RuleGroupActions extends PureComponent {
     } = config.settings;
 
     const setLockSwitch = showLock && <Checkbox 
-      id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
+      type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn 
