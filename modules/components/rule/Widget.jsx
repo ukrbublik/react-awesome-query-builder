@@ -26,6 +26,7 @@ export default class Widget extends PureComponent {
     operator: PropTypes.string,
     readonly: PropTypes.bool,
     asyncListValues: PropTypes.array,
+    id: PropTypes.string,
     //actions
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
@@ -171,13 +172,13 @@ export default class Widget extends PureComponent {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs} = props;
+    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id} = props;
     const {settings} = config;
     const { widgets, iValues, aField } = meta;
     const value = isFuncArg ? iValues : values;
     const field = isFuncArg ? leftField : aField;
     const {valueSrc, valueLabel} = widgets[delta];
-
+ 
     const widgetLabel = settings.showLabels
       ? <label className="rule--label">{valueLabel.label}</label>
       : null;
@@ -186,6 +187,7 @@ export default class Widget extends PureComponent {
       <div key={"widget-"+field+"-"+delta} className="widget--widget">
         {valueSrc == "func" ? null : widgetLabel}
         <WidgetFactory
+          id={id}
           valueSrc={valueSrc}
           delta={delta}
           value={value}

@@ -78,10 +78,10 @@ export default class Operator extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setOperator, readonly} = this.props;
+    const {config, customProps, setOperator, readonly,id} = this.props;
     const {renderOperator} = config.settings;
     const renderProps = {
-    id: this.props.id,
+      id,
       config, 
       customProps, 
       readonly,

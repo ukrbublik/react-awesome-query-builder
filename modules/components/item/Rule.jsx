@@ -119,6 +119,7 @@ class Rule extends PureComponent {
         setField={!immutableFieldsMode ? this.props.setField : dummyFn}
         parentField={this.props.parentField}
         readonly={immutableFieldsMode}
+        id={this.props.id}
       />;
     }
 
@@ -163,6 +164,7 @@ class Rule extends PureComponent {
         setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
         setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
         readonly={immutableValuesMode}
+        id={this.props.id}
       />;
 
       return (
