@@ -140,6 +140,7 @@ class Rule extends PureComponent {
         showOperatorLabel={showOperatorLabel}
         selectedFieldWidgetConfig={selectedFieldWidgetConfig}
         readonly={immutableOpsMode}
+        id={this.props.id}
       />;
     }
 

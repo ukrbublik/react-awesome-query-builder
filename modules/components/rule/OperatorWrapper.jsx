@@ -21,6 +21,7 @@ export default class OperatorWrapper extends PureComponent {
                 selectedOperator={selectedOperator}
                 setOperator={setOperator}
                 readonly={readonly}
+                id={this.props.id}
               />
             </Col>;
     const hiddenOperator = showOperatorLabel
