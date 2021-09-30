@@ -6,9 +6,9 @@ import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import Checkbox from "@mui/material/Checkbox";
-import { makeStyles } from "@mui/material/styles";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import styled from "@emotion/styled";
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
@@ -70,26 +70,37 @@ export default (props) => {
   };
 
   // styles
-  const useStyles = makeStyles((theme) => ({
-    // fix too small width
-    input: {
-      minWidth: inputWidth + " !important",
+  // const useStyles = makeStyles((theme) => ({
+  //   input: {
+  //     minWidth: inputWidth + " !important",
+  //   }
+  // }));
+  const StyledAutocomplete = styled(Autocomplete)`
+    & .MuiAutocomplete-input {
+      min-width: ${inputWidth}px !important;
     }
-  }));
+  `;
 
-  const useStylesChip = makeStyles((theme) => ({
-    // fix height
-    root: {
-      height: "auto"
-    },
-    label: {
-      marginTop: "3px",
-      marginBottom: "3px",
+  const StyledChip = styled(Chip)`
+    & .MuiChip-root {
+      height: auto;
     }
-  }));
+    & .MuiChip-label {
+      margin-top: 3px;
+      margin-bottom: 3px;
+    }
+  `;
 
-  const classesChip = useStylesChip();
-  const classes = useStyles();
+  // const useStylesChip = makeStyles((theme) => ({
+  //
+  //   root: {
+  //     height: "auto"
+  //   },
+  //   label: {
+  //     marginTop: "3px",
+  //     marginBottom: "3px",
+  //   }
+  // }));
 
   // render
   const renderInput = (params) => {
@@ -115,9 +126,8 @@ export default (props) => {
   };
 
   const renderTags = (value, getTagProps) => value.map((option, index) => {
-    return <Chip
+    return <StyledChip
       key={index}
-      classes={classesChip}
       label={getOptionLabel(option)}
       {...getTagProps({ index })}
     />;
@@ -141,12 +151,11 @@ export default (props) => {
 
   return (
     <FormControl fullWidth={fullWidth}>
-      <Autocomplete
+      <StyledAutocomplete
         disableCloseOnSelect={multiple}
         fullWidth={fullWidth}
         multiple={multiple}
         style={style}
-        classes={classes}
         freeSolo={allowCustomValues}
         loading={isInitialLoading}
         open={open}
@@ -168,7 +177,7 @@ export default (props) => {
         renderOption={renderOption}
         filterOptions={filterOptions}
         {...customAutocompleteProps}
-      ></Autocomplete>
+      ></StyledAutocomplete>
     </FormControl>
   );
 };

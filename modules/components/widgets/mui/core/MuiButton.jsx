@@ -17,7 +17,7 @@ export default ({type, label, onClick, config}) => {
     "addGroup": <AddIcon />,
   };
   const typeToColor = {
-    "addRule": "default",
+    "addRule": "neutral",
     "addGroup": "primary",
     "delGroup": "secondary",
     "delRuleGroup": "secondary",

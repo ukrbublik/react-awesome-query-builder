@@ -9,10 +9,12 @@ import {
 import moment from "moment";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
+import { ruRU as muiRuRU } from "@mui/material/locale";
 
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 import MaterialConfig from "react-awesome-query-builder/config/material";
+import MuiConfig from "react-awesome-query-builder/config/mui";
 const {
   FieldSelect,
   FieldDropdown,
@@ -25,6 +27,7 @@ const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
   antd: AntdConfig,
   material: MaterialConfig,
+  mui: MuiConfig
 };
 
 export default (skin: string) => {
@@ -182,6 +185,7 @@ export default (skin: string) => {
       moment: "ru",
       antd: ru_RU,
       material: ruRU,
+      mui: muiRuRU
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",

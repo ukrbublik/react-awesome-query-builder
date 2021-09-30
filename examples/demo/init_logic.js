@@ -4,28 +4,6 @@ export default
     {
       "==": [
         {
-          "var": "user.login"
-        },
-        {
-          "toLowerCase": [
-            {
-              "var": "user.firstName"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "==": [
-        {
-          "var": "stock"
-        },
-        false
-      ]
-    },
-    {
-      "==": [
-        {
           "var": "slider"
         },
         35

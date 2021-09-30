@@ -7,18 +7,9 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { makeStyles } from "@mui/material/styles";
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(1),
-  },
-}));
 
 export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const classes = useStyles();
-
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -71,8 +62,8 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
           horizontal: "left",
         }}
         onClose={handleClose}
-        classes={{
-          paper: classes.paper,
+        sx={{
+          padding: theme => theme.spacing(1)
         }}
         disablePortal
       >

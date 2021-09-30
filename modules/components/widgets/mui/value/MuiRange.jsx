@@ -62,7 +62,11 @@ export default (props) => {
   const customSliderProps = rest.slider || rest;
 
   // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
-  const muiMarks = marks ? Object.keys(marks).map(v => ({value: v, label: marks[v]})) : false;
+  const muiMarks = marks ? Object.keys(marks).map(v => ({
+    value: Number(v),
+    label: typeof marks[v] === "object" || typeof marks[v] === "undefined" ? marks[v] : <p>{marks[v]}</p>
+  })) : false;
+
 
   // TIP: Can't pass undefined to MUI, cause it means uncontrolled component use.
   //      For empty value input needs "", slider needs null or 0, but null will cause problems with range mode

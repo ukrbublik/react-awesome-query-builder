@@ -35,8 +35,14 @@ const MuiProvider = ({config, children}) => {
   const settingsLocale = config.settings.locale || {};
   const themeConfig = settingsTheme.mui;
   const locale = settingsLocale.mui;
-  const useTheme = themeConfig || locale;
-  const theme = useTheme ? createTheme(themeConfig, locale) : null;
+  const theme = createTheme(themeConfig, locale, { 
+    palette: {
+      neutral: {
+        main: "#64748B",
+        contrastText: "#fff"
+      },
+    }
+  });
 
   const base = (<div className="mui">{children}</div>);
   const withProviders = (

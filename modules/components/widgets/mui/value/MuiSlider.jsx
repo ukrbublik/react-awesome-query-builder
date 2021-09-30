@@ -40,8 +40,10 @@ export default (props) => {
   const sliderValue = typeof value === "number" ? value : null;
 
   // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
-  const muiMarks = marks ? Object.keys(marks).map(v => ({value: v, label: marks[v]})) : false;
-
+  const muiMarks = marks ? Object.keys(marks).map(v => ({
+    value: Number(v),
+    label: typeof marks[v] === "object" || typeof marks[v] === "undefined" ? marks[v] : <p>{marks[v]}</p>
+  })) : false;
 
   const InputCmp = (
     <TextField 
