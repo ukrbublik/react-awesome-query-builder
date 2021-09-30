@@ -60,12 +60,12 @@ if (isAnalyze) {
         new BundleAnalyzerPlugin()
     ];
 }
-if (isDev) {
-    aliases = {
-        ...aliases,
-        'react-dom': '@hot-loader/react-dom',
-    };
-}
+// if (isDev) {
+//     aliases = {
+//         ...aliases,
+//         'react-dom': '@hot-loader/react-dom',
+//     };
+// }
 
 const babel_options = {
     presets: [
