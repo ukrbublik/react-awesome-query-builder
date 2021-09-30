@@ -98,6 +98,7 @@ export default (props) => {
       disabled={readonly}
       onChange={handleInputChangeFrom}
       onBlur={handleInputBlur}
+      size="small"
       {...customInputProps}
     />
   );
@@ -118,6 +119,7 @@ export default (props) => {
       disabled={readonly}
       onChange={handleInputChangeTo}
       onBlur={handleInputBlur}
+      size="small"
       {...customInputProps}
     />
   );
@@ -132,6 +134,7 @@ export default (props) => {
       step={step}
       marks={muiMarks}
       valueLabelDisplay="auto"
+      size="small"
       {...customSliderProps}
     />
   );

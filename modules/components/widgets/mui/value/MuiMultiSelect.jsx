@@ -46,6 +46,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
         disabled={readonly}
         readOnly={readonly}
         renderValue={renderValue}
+        size="small"
         {...omit(customProps, ["showSearch", "input", "showCheckboxes"])}
       >
         {renderOptions(hasValue ? value : [])}

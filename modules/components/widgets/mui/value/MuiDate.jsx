@@ -1,6 +1,7 @@
 import React from "react";
 import DatePicker from "@mui/lab/DatePicker";
 import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
 
 export default (props) => {
   const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder} = props;
@@ -18,10 +19,11 @@ export default (props) => {
       <DatePicker
         readOnly={readonly}
         disabled={readonly}
-        placeholder={!readonly ? placeholder : ""}
-        format={dateFormat}
+        toolbarPlaceholder={!readonly ? placeholder : ""}
+        inputFormat={dateFormat}
         value={value || null}
         onChange={handleChange}
+        renderInput={(props) => <TextField size="small" {...props} />}
         {...customProps}
       />
     </FormControl>

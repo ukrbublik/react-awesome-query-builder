@@ -31,6 +31,7 @@ export default (props) => {
         }}
         disabled={readonly}
         onChange={onChange}
+        size="small"
         {...customProps}
       />
     </FormControl>

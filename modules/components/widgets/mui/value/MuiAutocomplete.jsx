@@ -17,6 +17,27 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
+const StyledAutocomplete = styled(Autocomplete)`
+& .MuiAutocomplete-input {
+  min-width: ${props => props.inputWidth || "0px"} !important;
+}
+`;
+
+const StyledChip = styled(Chip)`
+& .MuiChip-root {
+  height: auto;
+}
+& .MuiChip-label {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+`;
+
+const StyledCircularProgress = styled(CircularProgress)`
+right: 35px;
+position: absolute;
+`;
+
 export default (props) => {
   const {
     allowCustomValues, multiple,
@@ -69,39 +90,6 @@ export default (props) => {
     return extended;
   };
 
-  // styles
-  // const useStyles = makeStyles((theme) => ({
-  //   input: {
-  //     minWidth: inputWidth + " !important",
-  //   }
-  // }));
-  const StyledAutocomplete = styled(Autocomplete)`
-    & .MuiAutocomplete-input {
-      min-width: ${inputWidth}px !important;
-    }
-  `;
-
-  const StyledChip = styled(Chip)`
-    & .MuiChip-root {
-      height: auto;
-    }
-    & .MuiChip-label {
-      margin-top: 3px;
-      margin-bottom: 3px;
-    }
-  `;
-
-  // const useStylesChip = makeStyles((theme) => ({
-  //
-  //   root: {
-  //     height: "auto"
-  //   },
-  //   label: {
-  //     marginTop: "3px",
-  //     marginBottom: "3px",
-  //   }
-  // }));
-
   // render
   const renderInput = (params) => {
     return (
@@ -112,7 +100,7 @@ export default (props) => {
           readOnly: readonly,
           endAdornment: (
             <React.Fragment>
-              {isLoading ? <CircularProgress color="inherit" size={20} /> : null}
+              {isLoading ? <StyledCircularProgress color="inherit" size={20}  /> : null}
               {params.InputProps.endAdornment}
             </React.Fragment>
           ),
@@ -176,6 +164,8 @@ export default (props) => {
         renderTags={renderTags}
         renderOption={renderOption}
         filterOptions={filterOptions}
+        size="small"
+        inputWidth={inputWidth}
         {...customAutocompleteProps}
       ></StyledAutocomplete>
     </FormControl>

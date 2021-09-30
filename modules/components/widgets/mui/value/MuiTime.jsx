@@ -2,6 +2,7 @@ import React from "react";
 import TimePicker from "@mui/lab/TimePicker";
 import moment from "moment";
 import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
 
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps} = props;
@@ -23,11 +24,12 @@ export default (props) => {
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}
-        placeholder={!readonly ? placeholder : ""}
-        format={timeFormat}
+        toolbarPlaceholder={!readonly ? placeholder : ""}
+        inputFormat={timeFormat}
         value={timeValue || null}
         onChange={handleChange}
         views={hasSeconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
+        renderInput={(params) => <TextField size="small" {...params} />}
         {...customProps}
       />
     </FormControl>

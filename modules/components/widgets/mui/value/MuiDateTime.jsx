@@ -1,6 +1,7 @@
 import React from "react";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
 
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, dateFormat, timeFormat, valueFormat, customProps} = props;
@@ -21,10 +22,11 @@ export default (props) => {
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}
-        placeholder={!readonly ? placeholder : ""}
-        format={dateTimeFormat}
+        toolbarPlaceholder={!readonly ? placeholder : ""}
+        inputFormat={dateTimeFormat}
         value={value || null}
         onChange={handleChange}
+        renderInput={(props) => <TextField size="small" {...props} />}
         {...customProps}
       />
     </FormControl>

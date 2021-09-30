@@ -37,12 +37,13 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
       <Select
         autoWidth
         displayEmpty
-        label={!readonly ? placeholder : ""}
+        placeholder={!readonly ? placeholder : ""}
         onChange={onChange}
         value={hasValue ? value : ""}
         disabled={readonly}
         readOnly={readonly}
         renderValue={renderValue}
+        size="small"
         {...omit(customProps, ["showSearch", "input"])}
       >
         {renderOptions()}
