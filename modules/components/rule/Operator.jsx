@@ -58,7 +58,7 @@ export default class Operator extends PureComponent {
     
     return {
       placeholder, items,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts
+      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts,fieldConfig
     };
   }
 
@@ -78,9 +78,10 @@ export default class Operator extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setOperator, readonly} = this.props;
+    const {config, customProps, setOperator, readonly,id} = this.props;
     const {renderOperator} = config.settings;
     const renderProps = {
+      id,
       config, 
       customProps, 
       readonly,
