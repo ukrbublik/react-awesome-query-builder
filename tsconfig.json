@@ -17,7 +17,8 @@
     "noImplicitReturns": true,
 
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true // Necessary to ignore duplicate identifier of 'DateType' in @date-io/moment and @mui/lab/node_modules/@date-io/moment
   },
   "include": [
     "modules/**/*"

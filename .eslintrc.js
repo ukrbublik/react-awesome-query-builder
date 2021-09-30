@@ -32,9 +32,7 @@ module.exports = {
             "legacyDecorators": true,
             "jsx": true
         },
-        "sourceType": "module",
-        "project": ["./tsconfig.json", "./sandbox/tsconfig.json"],
-        "tsconfigRootDir": __dirname
+        "sourceType": "module"
     },
     "plugins": [
         "react",
