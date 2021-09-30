@@ -115,6 +115,10 @@ body.qb-dragging {
     border: 1px dashed gray;
 }
 
+.locked {
+  border: 1px dashed red;
+}
+
 /* slider */
 .ant-tooltip-inner {
   min-height: 18px;

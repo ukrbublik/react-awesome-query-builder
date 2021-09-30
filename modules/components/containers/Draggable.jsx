@@ -27,12 +27,15 @@ export default (className) => (GroupOrRule) =>
     }
 
     render () {
-      let {
+      const {
         isDraggingTempo,
         isDraggingMe,
         dragging,
         ...otherProps
       } = this.props;
+      const {
+        isLocked,
+      } = otherProps;
 
       let styles = {};
       if (isDraggingMe && isDraggingTempo) {
@@ -46,6 +49,7 @@ export default (className) => (GroupOrRule) =>
       const cn = classNames(className, "group-or-rule",
         isDraggingMe && isDraggingTempo ? "qb-draggable" : null,
         isDraggingMe && !isDraggingTempo ? "qb-placeholder" : null,
+        isLocked ? "locked" : null
       );
 
       return (
