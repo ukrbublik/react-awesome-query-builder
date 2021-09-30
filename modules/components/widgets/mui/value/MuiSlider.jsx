@@ -1,7 +1,7 @@
 import React from "react";
-import Slider from "@material-ui/core/Slider";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
+import Slider from "@mui/material/Slider";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
 
 export default (props) => {
   const {config, placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;

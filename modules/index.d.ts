@@ -574,9 +574,11 @@ export interface LocaleSettings {
     moment?: string,
     antd?: Object,
     material?: Object,
+    mui?: Object,
   },
   theme?: {
     material?: Object,
+    mui?: Object,
   },
   valueLabel?: string,
   valuePlaceholder?: string,
@@ -861,6 +863,32 @@ export interface MaterialWidgets {
   MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
 
+
+export interface MuiWidgets {
+  // material core widgets
+  MuiFieldSelect: ElementType<FieldProps>,
+  MuiConjs: ElementType<ConjsProps>,
+  MuiButton: ElementType<ButtonProps>,
+  MuiButtonGroup: ElementType<ButtonGroupProps>,
+  MuiProvider: ElementType<ProviderProps>,
+  MuiValueSources: ElementType<ValueSourcesProps>,
+  MuiConfirm: ConfirmFunc,
+  MuiUseConfirm: () => Function,
+
+  // material core widgets
+  MuiBooleanWidget: ElementType<BooleanWidgetProps>,
+  MuiTextWidget: ElementType<TextWidgetProps>,
+  MuiTextAreaWidget: ElementType<TextWidgetProps>,
+  MuiDateWidget: ElementType<DateTimeWidgetProps>,
+  MuiTimeWidget: ElementType<DateTimeWidgetProps>,
+  MuiDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  MuiMultiSelectWidget: ElementType<SelectWidgetProps>,
+  MuiSelectWidget: ElementType<SelectWidgetProps>,
+  MuiNumberWidget: ElementType<NumberWidgetProps>,
+  MuiSliderWidget: ElementType<NumberWidgetProps>,
+  MuiRangeWidget: ElementType<RangeSliderWidgetProps>,
+  MuiAutocompleteWidget: ElementType<SelectWidgetProps>,
+}
 
 /////////////////
 

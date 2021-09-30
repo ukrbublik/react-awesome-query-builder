@@ -1,8 +1,8 @@
 import React from "react";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import {mapListValues} from "../../../../utils/stuff";
-import FormControl from "@material-ui/core/FormControl";
+import FormControl from "@mui/material/FormControl";
 import omit from "lodash/omit";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {

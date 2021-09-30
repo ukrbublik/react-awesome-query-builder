@@ -1,9 +1,9 @@
 import React from "react";
-import { KeyboardDatePicker, DatePicker } from "@material-ui/pickers";
-import FormControl from "@material-ui/core/FormControl";
+import DateTimePicker from "@mui/lab/DateTimePicker";
+import FormControl from "@mui/material/FormControl";
 
 export default (props) => {
-  const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder, useKeyboard} = props;
+  const {value, setValue, use12Hours, readonly, placeholder, dateFormat, timeFormat, valueFormat, customProps} = props;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -13,15 +13,16 @@ export default (props) => {
     setValue(formatSingleValue(value));
   };
 
-  const Picker = useKeyboard ? KeyboardDatePicker : DatePicker;
-
+  const dateTimeFormat = dateFormat + " " + timeFormat;
+  
   return (
     <FormControl>
-      <Picker
+      <DateTimePicker
         readOnly={readonly}
         disabled={readonly}
+        ampm={!!use12Hours}
         placeholder={!readonly ? placeholder : ""}
-        format={dateFormat}
+        format={dateTimeFormat}
         value={value || null}
         onChange={handleChange}
         {...customProps}

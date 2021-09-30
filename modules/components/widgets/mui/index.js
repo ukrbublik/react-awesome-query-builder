@@ -6,35 +6,35 @@ import AdapterMoment from "@mui/lab/AdapterMoment"; // TODO: set moment to dayjs
 
 
 // value widgets
-import MaterialTextWidget from "./value/MaterialText";
-import MaterialTextAreaWidget from "./value/MaterialTextArea";
-import MaterialDateWidget from "./value/MaterialDate";
-import MaterialDateTimeWidget from "./value/MaterialDateTime";
-import MaterialTimeWidget from "./value/MaterialTime";
-import MaterialSelectWidget from "./value/MaterialSelect";
-import MaterialNumberWidget from "./value/MaterialNumber";
-import MaterialSliderWidget from "./value/MaterialSlider";
-import MaterialRangeWidget from "./value/MaterialRange";
-import MaterialBooleanWidget from "./value/MaterialBoolean";
-import MaterialMultiSelectWidget from "./value/MaterialMultiSelect";
-import MaterialAutocompleteWidget from "./value/MaterialAutocomplete";
+import MuiTextWidget from "./value/MuiText";
+import MuiTextAreaWidget from "./value/MuiTextArea";
+import MuiDateWidget from "./value/MuiDate";
+import MuiDateTimeWidget from "./value/MuiDateTime";
+import MuiTimeWidget from "./value/MuiTime";
+import MuiSelectWidget from "./value/MuiSelect";
+import MuiNumberWidget from "./value/MuiNumber";
+import MuiSliderWidget from "./value/MuiSlider";
+import MuiRangeWidget from "./value/MuiRange";
+import MuiBooleanWidget from "./value/MuiBoolean";
+import MuiMultiSelectWidget from "./value/MuiMultiSelect";
+import MuiAutocompleteWidget from "./value/MuiAutocomplete";
 
 // field select widgets
-import MaterialFieldSelect from "./core/MaterialFieldSelect";
+import MuiFieldSelect from "./core/MuiFieldSelect";
 
 // core components
-import MaterialButton from "./core/MaterialButton";
-import MaterialButtonGroup from "./core/MaterialButtonGroup";
-import MaterialConjs from "./core/MaterialConjs";
-import MaterialValueSources from "./core/MaterialValueSources";
-import MaterialConfirm from "./core/MaterialConfirm";
+import MuiButton from "./core/MuiButton";
+import MuiButtonGroup from "./core/MuiButtonGroup";
+import MuiConjs from "./core/MuiConjs";
+import MuiValueSources from "./core/MuiValueSources";
+import MuiConfirm from "./core/MuiConfirm";
 
 // provider
-const MaterialProvider = ({config, children}) => {
+const MuiProvider = ({config, children}) => {
   const settingsTheme = config.settings.theme || {};
   const settingsLocale = config.settings.locale || {};
-  const themeConfig = settingsTheme.material;
-  const locale = settingsLocale.material;
+  const themeConfig = settingsTheme.mui;
+  const locale = settingsLocale.mui;
   const useTheme = themeConfig || locale;
   const theme = useTheme ? createTheme(themeConfig, locale) : null;
 
@@ -57,27 +57,27 @@ const MaterialProvider = ({config, children}) => {
 
 
 export default {
-  MaterialTextWidget,
-  MaterialTextAreaWidget,
-  MaterialDateWidget,
-  MaterialDateTimeWidget,
-  MaterialTimeWidget,
-  MaterialSelectWidget,
-  MaterialNumberWidget,
-  MaterialSliderWidget,
-  MaterialRangeWidget,
-  MaterialBooleanWidget,
-  MaterialMultiSelectWidget,
-  MaterialAutocompleteWidget,
+  MuiTextWidget,
+  MuiTextAreaWidget,
+  MuiDateWidget,
+  MuiDateTimeWidget,
+  MuiTimeWidget,
+  MuiSelectWidget,
+  MuiNumberWidget,
+  MuiSliderWidget,
+  MuiRangeWidget,
+  MuiBooleanWidget,
+  MuiMultiSelectWidget,
+  MuiAutocompleteWidget,
 
-  MaterialFieldSelect,
+  MuiFieldSelect,
 
-  MaterialButton,
-  MaterialButtonGroup,
-  MaterialConjs,
-  MaterialValueSources,
-  MaterialConfirm,
-  MaterialUseConfirm: useConfirm,
+  MuiButton,
+  MuiButtonGroup,
+  MuiConjs,
+  MuiValueSources,
+  MuiConfirm,
+  MuiUseConfirm: useConfirm,
 
-  MaterialProvider,
+  MuiProvider,
 };

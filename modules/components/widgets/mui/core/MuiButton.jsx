@@ -1,8 +1,8 @@
 import React from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 
 export default ({type, label, onClick, config}) => {
   const typeToOnlyIcon = {
