@@ -120,6 +120,7 @@ class Rule extends PureComponent {
         parentField={this.props.parentField}
         readonly={immutableFieldsMode}
         id={this.props.id}
+        groupId={this.props.groupId}
       />;
     }
 
