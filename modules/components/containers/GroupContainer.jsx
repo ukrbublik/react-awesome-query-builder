@@ -133,7 +133,7 @@ const createGroupContainer = (Group) =>
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
       const isRoot = currentNesting == 1;
-      const groupId = isRoot ? null: this.props.groupId;
+      const groupId = isRoot ? this.props.id : this.props.groupId;
       return (
         <div
           className={"group-or-rule-container group-container"}
