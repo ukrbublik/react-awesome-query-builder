@@ -10,6 +10,8 @@ import keys from "lodash/keys";
 
 export default class Field extends PureComponent {
     static propTypes = {
+      id: PropTypes.string,
+      groupId: PropTypes.string,
       config: PropTypes.object.isRequired,
       selectedField: PropTypes.string,
       parentField: PropTypes.string,

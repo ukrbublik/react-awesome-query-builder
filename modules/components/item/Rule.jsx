@@ -143,6 +143,7 @@ class Rule extends PureComponent {
         selectedFieldWidgetConfig={selectedFieldWidgetConfig}
         readonly={immutableOpsMode}
         id={this.props.id}
+        groupId={this.props.groupId}
       />;
     }
 
@@ -166,6 +167,7 @@ class Rule extends PureComponent {
         setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
         readonly={immutableValuesMode}
         id={this.props.id}
+        groupId={this.props.groupId}
       />;
 
       return (
