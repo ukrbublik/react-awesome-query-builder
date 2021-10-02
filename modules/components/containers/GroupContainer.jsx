@@ -133,7 +133,7 @@ const createGroupContainer = (Group) =>
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
       const isRoot = currentNesting == 1;
-
+      const groupId = isRoot ? null: this.props.groupId;
       return (
         <div
           className={"group-or-rule-container group-container"}
@@ -143,6 +143,7 @@ const createGroupContainer = (Group) =>
             isDraggingMe ? <Group
               key={"dragging"}
               id={this.props.id}
+              groupId={groupId}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
@@ -174,6 +175,7 @@ const createGroupContainer = (Group) =>
             <Group
               key={this.props.id}
               id={this.props.id}
+              groupId={groupId}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
