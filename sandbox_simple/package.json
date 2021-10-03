@@ -2,7 +2,7 @@
   "name": "react-awesome-query-builder-demo-simple",
   "version": "0.5.0",
   "description": "Simple demo for react-awesome-query-builder",
-  "main": "src/index.js",
+  "main": "./src/index.js",
   "readme": "README.md",
   "repository": {
     "type": "git",
@@ -17,9 +17,9 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
     "react-scripts": "^4.0.3",
-    "react-awesome-query-builder": "^4.1.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-awesome-query-builder": "file:..",
+    "react": "file:../node_modules/react",
+    "react-dom": "file:../node_modules/react-dom"
   },
   "browserslist": {
     "production": [
