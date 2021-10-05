@@ -217,7 +217,7 @@ export class BasicGroup extends PureComponent {
         {...this.extraPropsForItem(item)}
         key={item.get("id")}
         id={item.get("id")}
-        groupId={props.groupId}
+        groupId={props.id}
         //path={props.path.push(item.get('id'))}
         path={item.get("path")}
         type={type}

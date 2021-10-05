@@ -31,6 +31,7 @@ const typeMap = {
     <Group 
       {...props.properties.toObject()}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
