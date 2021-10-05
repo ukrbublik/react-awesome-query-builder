@@ -60,7 +60,7 @@ export default class Operator extends PureComponent {
     
     return {
       placeholder, items,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts,fieldConfig
+      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, fieldConfig
     };
   }
 
