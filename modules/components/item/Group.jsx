@@ -22,6 +22,7 @@ export class BasicGroup extends PureComponent {
     selectedConjunction: PropTypes.string,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
+    groupId: PropTypes.string,
     path: PropTypes.any, //instanceOf(Immutable.List)
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     isDraggingMe: PropTypes.bool,

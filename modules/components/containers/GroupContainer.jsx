@@ -15,6 +15,7 @@ const createGroupContainer = (Group) =>
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       not: PropTypes.bool,
       conjunction: PropTypes.string,
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)

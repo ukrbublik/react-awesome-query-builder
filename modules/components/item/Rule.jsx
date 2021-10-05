@@ -18,6 +18,8 @@ const classNames = require("classnames");
 @ConfirmFn
 class Rule extends PureComponent {
     static propTypes = {
+      id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       selectedField: PropTypes.string,
       selectedOperator: PropTypes.string,
       operatorOptions: PropTypes.object,

@@ -11,6 +11,7 @@ const createRuleContainer = (Rule) =>
   class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       config: PropTypes.object.isRequired,
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       operator: PropTypes.string,
