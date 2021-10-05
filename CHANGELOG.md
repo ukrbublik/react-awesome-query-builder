@@ -1,11 +1,12 @@
 # Changelog
 
 - 4.5.3
-  - Added groupIds (id of the parent Item - Group, RuleGroup, RuleGroup etc) to field's, operartor's and widget's props
+  - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroup etc) to field's, operartor's and widget's props (PR #510)
+  - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
 - 4.5.2
-  - Added ruleId to field's, operartor's and widget's props. Added config of the selected field to the operatorProps (issue #502)
+  - Added rule `id` to field's, operartor's and widget's props. Added config of the selected field to the operator props as `fieldConfig` (issue #502) (PR #503)
 - 4.5.1
-  - Exported config util functions
+  - Fixed export of field name to ES (broken demo app)
 - 4.5.0
   - Added basic support of export to ElasticSearch (PR #469)
   - Export all helper funcs from configUtils (PR #493)
