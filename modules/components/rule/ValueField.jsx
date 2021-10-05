@@ -12,6 +12,8 @@ import clone from "clone";
 
 export default class ValueField extends PureComponent {
   static propTypes = {
+    id: PropTypes.string,
+    groupId: PropTypes.string,
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
@@ -183,7 +185,7 @@ export default class ValueField extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setValue, readonly} = this.props;
+    const {config, customProps, setValue, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
       config,
@@ -191,6 +193,8 @@ export default class ValueField extends PureComponent {
       setField: setValue,
       readonly,
       items: this.items,
+      id,
+      groupId,
       ...this.meta
     };
     return renderField(renderProps);
