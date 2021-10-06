@@ -64,6 +64,8 @@ class RuleGroup extends BasicGroup {
       setField={this.props.setField}
       parentField={this.props.parentField}
       readonly={immutableFieldsMode}
+      id={this.props.id}
+      groupId={this.props.groupId}
     />;
   }
 

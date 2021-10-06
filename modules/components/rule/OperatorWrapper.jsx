@@ -7,7 +7,7 @@ export default class OperatorWrapper extends PureComponent {
   render() {
     const {
       config, selectedField, selectedOperator, setOperator, 
-      selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly,id
+      selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly, id, groupId
     } = this.props;
     const operator = showOperator
             && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
@@ -22,6 +22,7 @@ export default class OperatorWrapper extends PureComponent {
                 setOperator={setOperator}
                 readonly={readonly}
                 id={id}
+                groupId={groupId}
               />
             </Col>;
     const hiddenOperator = showOperatorLabel

@@ -106,6 +106,8 @@ class RuleGroupExt extends BasicGroup {
       setField={this.props.setField}
       parentField={this.props.parentField}
       readonly={immutableFieldsMode}
+      id={this.props.id}
+      groupId={this.props.groupId}
     />;
   }
 
@@ -130,6 +132,8 @@ class RuleGroupExt extends BasicGroup {
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}
       readonly={immutableFieldsMode}
+      id={this.props.id}
+      groupId={this.props.groupId}
     />;
   }
 
@@ -152,6 +156,8 @@ class RuleGroupExt extends BasicGroup {
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={dummyFn}
       readonly={immutableValuesMode}
+      id={this.props.id}
+      groupId={this.props.groupId}
     />;
 
     return (

@@ -18,6 +18,8 @@ const classNames = require("classnames");
 @ConfirmFn
 class Rule extends PureComponent {
     static propTypes = {
+      id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       selectedField: PropTypes.string,
       selectedOperator: PropTypes.string,
       operatorOptions: PropTypes.object,
@@ -120,6 +122,7 @@ class Rule extends PureComponent {
         parentField={this.props.parentField}
         readonly={immutableFieldsMode}
         id={this.props.id}
+        groupId={this.props.groupId}
       />;
     }
 
@@ -142,6 +145,7 @@ class Rule extends PureComponent {
         selectedFieldWidgetConfig={selectedFieldWidgetConfig}
         readonly={immutableOpsMode}
         id={this.props.id}
+        groupId={this.props.groupId}
       />;
     }
 
@@ -165,6 +169,7 @@ class Rule extends PureComponent {
         setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
         readonly={immutableValuesMode}
         id={this.props.id}
+        groupId={this.props.groupId}
       />;
 
       return (

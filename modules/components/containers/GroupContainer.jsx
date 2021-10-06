@@ -15,6 +15,7 @@ const createGroupContainer = (Group) =>
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       not: PropTypes.bool,
       conjunction: PropTypes.string,
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
@@ -133,7 +134,6 @@ const createGroupContainer = (Group) =>
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
       const isRoot = currentNesting == 1;
-
       return (
         <div
           className={"group-or-rule-container group-container"}
@@ -143,6 +143,7 @@ const createGroupContainer = (Group) =>
             isDraggingMe ? <Group
               key={"dragging"}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
@@ -174,6 +175,7 @@ const createGroupContainer = (Group) =>
             <Group
               key={this.props.id}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}

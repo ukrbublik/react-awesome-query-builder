@@ -10,6 +10,8 @@ import keys from "lodash/keys";
 
 export default class Field extends PureComponent {
     static propTypes = {
+      id: PropTypes.string,
+      groupId: PropTypes.string,
       config: PropTypes.object.isRequired,
       selectedField: PropTypes.string,
       parentField: PropTypes.string,
@@ -122,10 +124,11 @@ export default class Field extends PureComponent {
     }
 
     render() {
-      const {config, customProps, setField, readonly,id} = this.props;
+      const {config, customProps, setField, readonly, id, groupId} = this.props;
       const {renderField} = config.settings;
       const renderProps = {
         id,
+        groupId,
         config, 
         customProps, 
         readonly,

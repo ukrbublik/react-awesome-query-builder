@@ -11,6 +11,7 @@ const createRuleContainer = (Rule) =>
   class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       config: PropTypes.object.isRequired,
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       operator: PropTypes.string,
@@ -107,6 +108,7 @@ const createRuleContainer = (Rule) =>
             isDraggingMe ? <Rule
               key={"dragging"}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
@@ -132,6 +134,7 @@ const createRuleContainer = (Rule) =>
             <Rule
               key={this.props.id}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}

@@ -1,4 +1,12 @@
 # Changelog
+
+- 4.5.3
+  - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroupExt etc) to field's, operartor's and widget's props (PR #510)
+  - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
+- 4.5.2
+  - Added rule `id` to field's, operartor's and widget's props. Added config of the selected field to the operator props as `fieldConfig` (issue #502) (PR #503)
+- 4.5.1
+  - Fixed export of field name to ES (broken demo app)
 - 4.5.0
   - Added basic support of export to ElasticSearch (PR #469)
   - Export all helper funcs from configUtils (PR #493)
@@ -43,18 +51,18 @@
   - Fixed issue #413 with func arg with 1 value source which is not value
 - 4.0.3
   - Fixed issue #386 with import select field from JsonLogic (reason: bug with func/field widget in getWidgetForFieldOp)
-  - Fixed issue #387 with subgroups in Material UI 
+  - Fixed issue #387 with subgroups in Material UI
 - 4.0.2
   - Fixed MaterialConfig import for TS projects (issue #368)
 - 4.0.1
   - Added custom context to isolate Query Builder store (PR #350)
   - Added support for React 17 as a peer dependency
 - 4.0.0
-  - Removed setting `useGroupsAsArrays`. 
-    Instead added field config `mode` for type `!group` with values: 
-      `some` (default, corresponding useGroupsAsArrays = true), 
-      `array` (new, user can choose one of group operators), 
-      `struct` (obsolete, corresponding useGroupsAsArrays = false).
+  - Removed setting `useGroupsAsArrays`.
+    Instead added field config `mode` for type `!group` with values:
+    `some` (default, corresponding useGroupsAsArrays = true),
+    `array` (new, user can choose one of group operators),
+    `struct` (obsolete, corresponding useGroupsAsArrays = false).
   - For type=`!group` and mode=`array`:
     - new field configs are available: `conjunctions`, `showNot`, `operators`, `defaultOperator`, `initialEmptyWhere`
     - you can use group operators `some`, `none`, `all` or operators with 1 integer opearnd (for count): `equal`, `not_equal`, `less`, `between`, ..
@@ -75,7 +83,7 @@
   - Fixed issue #252 ("Cannot update a component from inside the function body of a different component")
   - Issue #190: Fixed TS def for getTree/2 - added 2nd param light?
 - 2.1.17
-  - Dropped support of loading query in obsolete Immutable string format used in versions 0.* (issue #254)
+  - Dropped support of loading query in obsolete Immutable string format used in versions 0.\* (issue #254)
 - 2.1.16
   - Fixed issues with export to Mongo and JsonLogic of queries with nested groups (#279, #279)
 - 2.1.15
@@ -143,7 +151,7 @@
 - 1.3.7
   - Fixed issue #168 with dot in field name
 - 1.3.6
-  - Added config options to disable inputs: `immutableFieldsMode`, `immutableOpsMode`, `immutableValuesMode` 
+  - Added config options to disable inputs: `immutableFieldsMode`, `immutableOpsMode`, `immutableValuesMode`
 - 1.3.5
   - Issue #158
 - 1.3.3
@@ -156,7 +164,7 @@
   - Added support of `!group`
 - 1.2.0
   - Added `treeselect` and `treemultiselect` types
-  - Changed format of `listValues` from `{<value>: <title>}` to `[{value, title}]` (old is supported). 
+  - Changed format of `listValues` from `{<value>: <title>}` to `[{value, title}]` (old is supported).
     Tree select also use `listValues`, format is compatible with simple select - `[{value, title, parent}]`
 - 1.1.3
   - Fixed console warnings
@@ -207,7 +215,7 @@
   - added: `allowCustomValues` (issue #88)
   - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField` (issue #109)
   - added `renderOperator` (issue #89)
-  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported) (issue #61)
+  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree` (old format is supported) (issue #61)
   - added: `canRegroup`
   - rename: `readonlyMode` -> `immutableGroupsMode`
   - rename: `get_children` -> `renderBuilder`

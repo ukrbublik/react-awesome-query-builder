@@ -16,6 +16,7 @@ const typeMap = {
     <Rule
       {...props.properties.toObject()}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       reordableNodesCnt={props.reordableNodesCnt}
@@ -30,6 +31,7 @@ const typeMap = {
     <Group 
       {...props.properties.toObject()}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
@@ -46,6 +48,7 @@ const typeMap = {
     <RuleGroup 
       {...props.properties.toObject()}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
@@ -62,6 +65,7 @@ const typeMap = {
     <RuleGroupExt 
       {...props.properties.toObject()}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
@@ -82,6 +86,7 @@ class Item extends PureComponent {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
+    groupId: PropTypes.string,
     type: PropTypes.oneOf(types).isRequired,
     path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
     properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
