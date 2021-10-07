@@ -30,7 +30,7 @@ export default class Builder extends Component {
       }
       if (!chs.length)
         should = false;
-        //optimize render
+      //optimize render
       if (chs.length == 1 && chs[0] == "tree" && nextProps.__isInternalValueChange)
         should = false;
     }

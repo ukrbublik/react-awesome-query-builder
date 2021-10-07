@@ -123,7 +123,7 @@ export interface Utils {
 export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
-  actions: {[key: string]: Function},
+  actions: TypedMap<Function>,
 }
 
 export interface QueryProps {
@@ -135,7 +135,7 @@ export interface QueryProps {
   fields: Fields;
   funcs?: Funcs;
   value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config): void;
+  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
   renderBuilder(props: BuilderProps): ReactElement;
 }
 
@@ -150,6 +150,30 @@ export interface Config {
   settings: Settings,
   fields: Fields,
   funcs?: Funcs,
+}
+
+type Placement = "after" | "before" | "append" | "prepend";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+export interface ActionMeta {
+  type: ActionType,
+
+  id?: string, // for ADD_RULE, ADD_GROUP - id of new item
+  path?: Array<string>, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
+  affectedField?: string, // gets field name from `path` (or `field` for first SET_FIELD)
+
+  conjunction?: string,
+  not?: boolean,
+  field?: string,
+  operator?: string,
+  delta?: number, // for SET_VALUE
+  value?: RuleValue,
+  valueType?: string,
+  srcKey?: ValueSource,
+  name?: string, // for SET_OPERATOR_OPTION
+  fromPath?: Array<string>, // for MOVE_ITEM
+  toPath?: Array<string>, // for MOVE_ITEM
+  placement?: Placement, // for MOVE_ITEM
+  properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
 }
 
 
@@ -255,7 +279,7 @@ export interface ConjunctionOption {
 }
 
 export interface ConjsProps {
-  path: string, 
+  id: string, 
   readonly?: boolean,
   disabled?: boolean,
   selectedConjunction?: string,
@@ -529,7 +553,7 @@ export type Fields = TypedMap<FieldOrGroup>;
 export type FieldItem = {
   items?: FieldItems, 
   key: string, 
-  path?: string, 
+  path?: string, // field path with separator
   label: string, 
   fullLabel?: string, 
   altLabel?: string, 
@@ -540,7 +564,7 @@ type FieldItems = TypedMap<FieldItem>;
 
 export interface FieldProps {
   items: FieldItems,
-  setField(path: string): void,
+  setField(fieldPath: string): void,
   selectedKey: string | Empty,
   selectedKeys?: Array<string> | Empty,
   selectedPath?: Array<string> | Empty,
@@ -670,10 +694,10 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & Oth
 // Funcs
 /////////////////
 
-type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
-type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
-type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
-type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
+type SqlFormatFunc = (formattedArgs: TypedMap<string>) => string;
+type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
+type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
+type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 
 interface FuncGroup {

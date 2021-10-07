@@ -43,8 +43,9 @@ export const removeRule = (config, path) => ({
  * @param {Immutable.Map} properties
  */
 export const addGroup = (config, path, properties) => ({
-  type: constants.ADD_NEW_GROUP,
+  type: constants.ADD_GROUP,
   path: path,
+  id: uuid(),
   properties: defaultGroupProperties(config).merge(properties || {}),
   config: config
 });

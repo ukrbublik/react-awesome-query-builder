@@ -2,12 +2,13 @@ import React, {Component} from "react";
 import {
   Query, Builder, Utils, 
   //types:
-  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree
+  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree, ActionMeta
 } from "react-awesome-query-builder";
 import throttle from "lodash/throttle";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
+import Immutable from "immutable";
 
 const stringify = JSON.stringify;
 const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
@@ -46,6 +47,7 @@ interface DemoQueryBuilderState {
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
     private config: Config;
+    private _actions: { [key: string]: Function };
 
     componentDidMount() {
       window.addEventListener("update", this.onConfigChanged);
@@ -77,12 +79,19 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
+        <button onClick={this.addRule}>add rule</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
         </div>
       </div>
     )
+
+    addRule = () => {
+      this._actions.addRule(
+        Immutable.List([ this.state.tree.get('id') ])
+      );
+    }
 
     onConfigChanged = (e: Event) => {
       const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
@@ -116,15 +125,18 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       });
     };
 
-    renderBuilder = (props: BuilderProps) => (
-      <div className="query-builder-container" style={{padding: "10px"}}>
-        <div className="query-builder qb-lite">
-          <Builder {...props} />
+    renderBuilder = (props: BuilderProps) => {
+      this._actions = props.actions;
+      return (
+        <div className="query-builder-container" style={{padding: "10px"}}>
+          <div className="query-builder qb-lite">
+            <Builder {...props} />
+          </div>
         </div>
-      </div>
-    )
+      );
+    }
     
-    onChange = (immutableTree: ImmutableTree, config: Config) => {
+    onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();

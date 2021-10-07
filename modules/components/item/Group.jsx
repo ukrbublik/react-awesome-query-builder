@@ -269,6 +269,7 @@ export class BasicGroup extends PureComponent {
       config, children1, id,
       selectedConjunction, setConjunction, not, setNot
     } = this.props;
+
     const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
     if (!this.showConjs())

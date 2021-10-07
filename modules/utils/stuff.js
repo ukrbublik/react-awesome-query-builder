@@ -290,4 +290,8 @@ export function sleep(delay) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
   });
-}
+};
+
+export function applyToJS(v) {
+  return (typeof v == 'object' && v !== null && typeof v.toJS == 'function' ? v.toJS() : v);
+};
