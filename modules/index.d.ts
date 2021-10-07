@@ -118,6 +118,14 @@ export interface Utils {
   // other
   uuid(): string;
   simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
+  // config utils
+  ConfigUtils: {
+    getFieldConfig(config: Config, field: string): Field | null;
+    getFuncConfig(config: Config, func: string): Func | null;
+    getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
+    getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
+    getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  }
 }
 
 export interface BuilderProps {
@@ -151,6 +159,10 @@ export interface Config {
   fields: Fields,
   funcs?: Funcs,
 }
+
+/////////////////
+// Actions
+/////////////////
 
 type Placement = "after" | "before" | "append" | "prepend";
 type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
@@ -192,12 +204,15 @@ interface BaseWidgetProps {
   setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
+  parentField?: string,
   operator: string,
   fieldDefinition: Field,
   config: Config,
   delta?: number,
   customProps?: AnyObject,
   readonly?: boolean,
+  id?: string, // id of rule
+  groupId?: string, // id of parent group
 }
 interface RangeWidgetProps extends BaseWidgetProps {
   placeholders: Array<string>,
@@ -576,8 +591,9 @@ export interface FieldProps {
   placeholder?: string,
   selectedOpts?: {tooltip?: string},
   readonly?: boolean,
+  id?: string, // id of rule
+  groupId?: string, // id of parent group
 }
-
 
 /////////////////
 // Settings
