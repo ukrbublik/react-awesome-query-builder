@@ -216,8 +216,12 @@ function buildParameters(queryType, value, operator, fieldName, config) {
  * @private
  */
 function buildEsRule(fieldName, value, operator, config, valueSrc) {
+  if (!fieldName || !operator || value == undefined)
+    return undefined; // rule is not fully entered
   let op = operator;
   let opConfig = config.operators[op];
+  if (!opConfig)
+    return undefined; // unknown operator
   let { elasticSearchQueryType } = opConfig;
 
   // not
@@ -308,8 +312,8 @@ export function elasticSearchFormat(tree, config) {
     const operator = properties.get("operator");
     const field = properties.get("field");
     const value = properties.get("value").toJS();
-    const _valueType = properties.get("valueType").get(0);
-    const valueSrc = properties.get("valueSrc").get(0);
+    const _valueType = properties.get("valueType")?.get(0);
+    const valueSrc = properties.get("valueSrc")?.get(0);
 
     if (valueSrc === "func") {
       // -- elastic search doesn't support functions (that is post processing)

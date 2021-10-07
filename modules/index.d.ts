@@ -45,50 +45,56 @@ type RuleGroupModes = "struct" | "some" | "array";
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
+type ItemType = "group" | "rule_group" | "rule";
+type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
 
+interface RuleProperties {
+  field: string | Empty,
+  operator: string | Empty,
+  value: Array<RuleValue>,
+  valueSrc?: Array<ValueSource>,
+  valueType?: Array<string>,
+  valueError?: Array<string>,
+  operatorOptions?: AnyObject
+}
+
+interface RuleGroupExtProperties extends RuleProperties {
+  mode: RuleGroupModes,
+}
+
+interface RuleGroupProperties {
+  field: string | Empty,
+  mode?: RuleGroupModes,
+}
+
+interface GroupProperties {
+  conjunction: string,
+  not?: boolean,
+}
+
+type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
+type JsonItem = JsonGroup|JsonAnyRule;
 type JsonGroup = {
   type: "group",
   id?: string,
-  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup|JsonRuleGroupExt},
-  properties?: {
-    conjunction: string,
-    not?: boolean,
-  }
+  children1?: {[id: string]: JsonItem} | [JsonItem],
+  properties?: GroupProperties
 }
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule},
-  properties?: {
-    field: string | Empty,
-    mode?: RuleGroupModes,
-  }
+  children1?: {[id: string]: JsonRule} | [JsonRule],
+  properties?: RuleGroupProperties
 }
 type JsonRuleGroupExt = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule},
-  properties?: {
-    field: string | Empty,
-    mode: RuleGroupModes,
-    operator: string | Empty,
-    value: Array<RuleValue>,
-    valueSrc: Array<ValueSource>,
-    valueType: Array<string>,
-    valueError?: Array<string>,
-  }
+  children1?: {[id: string]: JsonRule} | [JsonRule],
+  properties?: RuleGroupExtProperties
 }
 type JsonRule = {
   type: "rule",
-  properties: {
-    field: string | Empty,
-    operator: string | Empty,
-    value: Array<RuleValue>,
-    valueSrc: Array<ValueSource>,
-    valueType: Array<string>,
-    valueError?: Array<string>,
-    operatorOptions?: AnyObject
-  }
+  properties: RuleProperties,
 }
 export type JsonTree = JsonGroup;
 
@@ -131,7 +137,7 @@ export interface Utils {
 export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
-  actions: TypedMap<Function>,
+  actions: Actions,
 }
 
 export interface QueryProps {
@@ -186,6 +192,12 @@ export interface ActionMeta {
   toPath?: Array<string>, // for MOVE_ITEM
   placement?: Placement, // for MOVE_ITEM
   properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
+}
+
+export interface Actions {
+  addRule(path: Array<string>, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
+  addGroup(path: Array<string>, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
+  //todo
 }
 
 

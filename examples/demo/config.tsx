@@ -349,7 +349,7 @@ export default (skin: string) => {
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }

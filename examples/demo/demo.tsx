@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {
   Query, Builder, Utils, 
   //types:
-  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree, ActionMeta
+  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree, ActionMeta, Actions
 } from "react-awesome-query-builder";
 import throttle from "lodash/throttle";
 import loadConfig from "./config";
@@ -47,7 +47,7 @@ interface DemoQueryBuilderState {
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
     private config: Config;
-    private _actions: { [key: string]: Function };
+    private _actions: Actions;
 
     componentDidMount() {
       window.addEventListener("update", this.onConfigChanged);
@@ -79,7 +79,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
-        <button onClick={this.addRule}>add rule</button>
+        <button onClick={this.runActions}>beta: actions</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
@@ -87,9 +87,60 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       </div>
     )
 
-    addRule = () => {
+    runActions = () => {
+      // Demonstrates how actions can be called programmatically
+      
       this._actions.addRule(
-        Immutable.List([ this.state.tree.get('id') ])
+        [ this.state.tree.get('id') as string ],
+        {
+          field: "cars",
+          mode: "array",
+          operator: "all",
+        },
+        "rule_group",
+        [
+          {
+            type: "rule",
+            properties: {
+              field: "cars.year",
+              operator: "equal",
+              value: [2021]
+            }
+          }
+        ]
+      );
+
+      this._actions.addGroup(
+        [ this.state.tree.get('id') as string ],
+        {
+          conjunction: "AND"
+        },
+        [
+          {
+            type: "rule",
+            properties: {
+              field: "slider",
+              operator: "equal",
+              value: [50]
+            }
+          },
+          {
+            type: "group",
+            properties: {
+              conjunction: "AND"
+            },
+            children1: [
+              {
+                type: "rule",
+                properties: {
+                  field: "slider",
+                  operator: "less",
+                  value: [20]
+                }
+              },
+            ]
+          }
+        ]
       );
     }
 

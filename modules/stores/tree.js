@@ -6,7 +6,7 @@ import {
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, defaultOperator, 
-  defaultOperatorOptions, defaultRoot
+  defaultOperatorOptions, defaultRoot, defaultItemProperties
 } from "../utils/defaultUtils";
 import * as constants from "../constants";
 import uuid from "../utils/uuid";
@@ -27,20 +27,23 @@ import mapValues from "lodash/mapValues";
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, groupUuid, properties, config) => {
+const addNewGroup = (state, path, groupUuid, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
   const {maxNumberOfRules} = config.settings;
   const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
-  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
+  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
 
-  const groupPath = path.push(groupUuid);
-  // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
-  state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
+  if (!children) {
+    const groupPath = path.push(groupUuid);
+    // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
+    state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
-  if (canAddNewRule) {
-    state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+    if (canAddNewRule) {
+      state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+    }
   }
+
   state = fixPathsInTree(state);
   
   return state;
@@ -127,6 +130,27 @@ const setNot = (state, path, not) =>
 const setConjunction = (state, path, conjunction) =>
   state.setIn(expandTreePath(path, "properties", "conjunction"), conjunction);
 
+// convert children deeply from JS to Immutable
+const _addChildren1 = (config, item, children) => {
+  if (children && Array.isArray(children)) {
+    item.children1 = new Immutable.OrderedMap(
+      children.reduce((map, it) => {
+        const id1 = uuid();
+        const it1 = {
+          ...it,
+          properties: defaultItemProperties(config, it).merge(it.properties || {}),
+          id: id1
+        };
+        _addChildren1(config, it1, it1.children1);
+        return {
+          ...map,
+          [id1]: new Immutable.Map(it1)
+        };
+      }, {})
+    );
+  }
+};
+
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
@@ -135,14 +159,17 @@ const setConjunction = (state, path, conjunction) =>
  * @param {Immutable.OrderedMap} properties
  * @param {object} config
  */
-const addItem = (state, path, type, id, properties, config) => {
+const addItem = (state, path, type, id, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
   const {maxNumberOfRules} = config.settings;
   const canAddNewRule = !(type == "rule" && maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
+  const item = {type, id, properties};
+  _addChildren1(config, item, children);
+
   if (canAddNewRule) {
     state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
-      [id]: new Immutable.Map({type, id, properties})
+      [id]: new Immutable.Map(item)
     }));
   }
   state = fixPathsInTree(state);
@@ -620,7 +647,7 @@ export default (config) => {
     }
 
     case constants.ADD_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, action.id, action.properties, action.config);
+      set.tree = addNewGroup(state.tree, action.path, action.id, action.properties, action.config,  action.children);
       break;
     }
 
@@ -630,7 +657,7 @@ export default (config) => {
     }
 
     case constants.ADD_RULE: {
-      set.tree = addItem(state.tree, action.path, "rule", action.id, action.properties, action.config);
+      set.tree = addItem(state.tree, action.path, action.ruleType, action.id, action.properties, action.config, action.children);
       break;
     }
 
