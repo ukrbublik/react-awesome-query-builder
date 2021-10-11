@@ -119,7 +119,7 @@ export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object;
-  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string;
+  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string;
   mongodbFormat(tree: ImmutableTree, config: Config): Object;
   elasticSearchFormat(tree: ImmutableTree, config: Config): Object;
