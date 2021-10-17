@@ -89,7 +89,17 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
     runActions = () => {
       // Demonstrates how actions can be called programmatically
-      
+
+      const firstPath = [
+        this.state.tree.get('id'), 
+        this.state.tree.get('children1').first().get('id')
+      ];
+
+      this._actions.setField(firstPath, 'num');
+      this._actions.setOperator(firstPath, 'between');
+      this._actions.setValue(firstPath, 0, 2, 'number');
+      this._actions.setValue(firstPath, 1, 4, 'number');
+
       this._actions.addRule(
         [ this.state.tree.get('id') as string ],
         {

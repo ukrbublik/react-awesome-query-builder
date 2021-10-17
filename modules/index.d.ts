@@ -98,7 +98,7 @@ type JsonRule = {
 }
 export type JsonTree = JsonGroup;
 
-export type ImmutableTree = ImmutableMap<string, string|Object>;
+export type ImmutableTree = ImmutableMap<string, any>;
 
 
 ////////////////
@@ -138,6 +138,7 @@ export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
   actions: Actions,
+  dispatch: Dispatch,
 }
 
 export interface QueryProps {
@@ -172,12 +173,11 @@ export interface Config {
 
 type Placement = "after" | "before" | "append" | "prepend";
 type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
-export interface ActionMeta {
+interface BaseAction {
   type: ActionType,
 
   id?: string, // for ADD_RULE, ADD_GROUP - id of new item
-  path?: Array<string>, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
-  affectedField?: string, // gets field name from `path` (or `field` for first SET_FIELD)
+  path?: Array<string> | ImmutableList<string>, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
 
   conjunction?: string,
   not?: boolean,
@@ -193,10 +193,21 @@ export interface ActionMeta {
   placement?: Placement, // for MOVE_ITEM
   properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
 }
+export interface InputAction extends BaseAction {
+  config: Config,
+}
+export interface ActionMeta extends BaseAction {
+  affectedField?: string, // gets field name from `path` (or `field` for first SET_FIELD)
+}
+
+export type Dispatch = (action: InputAction) => void;
 
 export interface Actions {
   addRule(path: Array<string>, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
   addGroup(path: Array<string>, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
+  setField(path: Array<string>, field: string): undefined;
+  setOperator(path: Array<string>, operator: string): undefined;
+  setValue(path: Array<string>, delta: number, value: RuleValue, valueType: string): undefined;
   //todo
 }
 
