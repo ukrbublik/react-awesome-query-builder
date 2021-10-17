@@ -41,7 +41,7 @@ type TypedKeyMap<K extends string|number, T> = {
 type Empty = null | undefined;
 
 type ValueSource = "value" | "field" | "func" | "const";
-type RuleGroupModes = "struct" | "some" | "array";
+type RuleGroupMode = "struct" | "some" | "array";
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
@@ -59,12 +59,12 @@ interface RuleProperties {
 }
 
 interface RuleGroupExtProperties extends RuleProperties {
-  mode: RuleGroupModes,
+  mode: RuleGroupMode,
 }
 
 interface RuleGroupProperties {
   field: string | Empty,
-  mode?: RuleGroupModes,
+  mode?: RuleGroupMode,
 }
 
 interface GroupProperties {
@@ -555,7 +555,7 @@ interface FieldStruct extends BaseField {
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
-  mode: RuleGroupModes,
+  mode: RuleGroupMode,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
