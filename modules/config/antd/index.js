@@ -179,6 +179,8 @@ const types = {
           "not_between",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       }
     },
