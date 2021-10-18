@@ -164,6 +164,11 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         this.state.tree.get('children1')?.last()?.get('id')
       ];
 
+      // Move first item
+      if (!isEmpty) {
+        this._actions.moveItem(firstPath, lastPath, 'before');
+      }
+
       // Remove last rule
       if (!isEmpty) {
         this._actions.removeRule(lastPath);
