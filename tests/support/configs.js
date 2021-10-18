@@ -428,6 +428,14 @@ export const with_all_types__show_error = (BasicConfig) => ({
   }
 });
 
+export const dont_leave_empty_group = (BasicConfig) => ({
+  ...simple_with_numbers_and_str(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    canLeaveEmptyGroup: false,
+  }
+});
+
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   //todo: use BasicFuncs

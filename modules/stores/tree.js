@@ -39,6 +39,7 @@ const addNewGroup = (state, path, groupUuid, properties, config, children = null
     // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
+    // Add one empty rule into new group
     if (canAddNewRule) {
       state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
     }

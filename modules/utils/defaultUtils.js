@@ -35,7 +35,7 @@ export const defaultOperatorOptions = (config, operator, field) => {
 };
 
 export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null) => {
-  let field, operator;
+  let field = null, operator = null;
   const {setDefaultFieldAndOp, showErrorMessage} = config.settings;
   if (item) {
     field = item?.properties?.field;
