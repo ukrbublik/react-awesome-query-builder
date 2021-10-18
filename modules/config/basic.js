@@ -111,10 +111,11 @@ const operators = {
     sqlOp: "=",
     reversedOp: "not_equal",
     formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
+      const opStr = isForDisplay ? "=" : opDef.label;
       if (valueTypes == "boolean" && isForDisplay)
         return value == "No" ? `NOT ${field}` : `${field}`;
       else
-        return `${field} ${opDef.label} ${value}`;
+        return `${field} ${opStr} ${value}`;
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     jsonLogic: "==",
@@ -316,7 +317,8 @@ const operators = {
     labelForFormat: "==",
     sqlOp: "=", // enum/set
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return `${field} == ${value}`;
+      const opStr = isForDisplay ? "=" : "==";
+      return `${field} ${opStr} ${value}`;
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     reversedOp: "select_not_equals",
@@ -375,10 +377,11 @@ const operators = {
     labelForFormat: "==",
     sqlOp: "=",
     formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      const opStr = isForDisplay ? "=" : "==";
       if (valueSrc == "value")
-        return `${field} == [${values.join(", ")}]`;
+        return `${field} ${opStr} [${values.join(", ")}]`;
       else
-        return `${field} == ${values}`;
+        return `${field} ${opStr} ${values}`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
       if (valueSrc == "value")
