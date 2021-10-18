@@ -1,9 +1,10 @@
 # Changelog
 
-- 4.5.3
+- 4.6.0
   - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroupExt etc) to field's, operartor's and widget's props (PR #510)
   - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
-  - Added 3rd param `actionMeta` to `onChange()` (PR #445) (issue ##351)
+  - Added 3rd param `actionMeta` to `onChange()` to get info about action (PR #445) (issue #351)
+  - Added demo of using actions programmatically (see `run actions` in demo app) (PR #445)
 - 4.5.2
   - Added rule `id` to field's, operartor's and widget's props. Added config of the selected field to the operator props as `fieldConfig` (issue #502) (PR #503)
 - 4.5.1
