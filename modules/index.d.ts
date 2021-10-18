@@ -676,14 +676,16 @@ export interface LocaleSettings {
   notLabel?: string,
   valueSourcesPopupTitle?: string,
   removeRuleConfirmOptions?: {
-      title?: string,
-      okText?: string,
-      okType?: string,
+    title?: string,
+    okText?: string,
+    okType?: string,
+    cancelText?: string,
   },
   removeGroupConfirmOptions?: {
     title?: string,
     okText?: string,
     okType?: string,
+    cancelText?: string,
   },
 }
 

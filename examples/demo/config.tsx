@@ -202,11 +202,13 @@ export default (skin: string) => {
       title: "Are you sure delete this rule?",
       okText: "Yes",
       okType: "danger",
+      cancelText: "Cancel"
     },
     removeGroupConfirmOptions: {
       title: "Are you sure delete this group?",
       okText: "Yes",
       okType: "danger",
+      cancelText: "Cancel"
     },
   };
 
