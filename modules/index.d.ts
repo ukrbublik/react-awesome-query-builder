@@ -1,6 +1,6 @@
 /* eslint-disable no-extra-semi */
 
-import {List as ImmutableList, Map as ImmutableMap} from "immutable";
+import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 
 
@@ -108,7 +108,7 @@ type JsonRule = {
 }
 export type JsonTree = JsonGroup;
 
-export type ImmutableTree = ImmutableMap<string, any>;
+export type ImmutableTree = ImmutableOMap<string, any>;
 
 
 ////////////////

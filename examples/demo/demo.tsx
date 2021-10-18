@@ -44,6 +44,8 @@ interface DemoQueryBuilderState {
   skin: String,
 }
 
+type ImmOMap = Immutable.OrderedMap<string, any>;
+
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
     private config: Config;
@@ -157,11 +159,11 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       const isEmptyTree = !this.state.tree.get("children1");
       const firstPath = [
         this.state.tree.get("id"), 
-        this.state.tree.get("children1")?.first()?.get("id")
+        ((this.state.tree.get("children1") as ImmOMap)?.first() as ImmOMap)?.get("id")
       ];
       const lastPath = [
         this.state.tree.get("id"), 
-        this.state.tree.get("children1")?.last()?.get("id")
+        ((this.state.tree.get("children1") as ImmOMap)?.last() as ImmOMap)?.get("id")
       ];
 
       // Change root group to NOT OR
