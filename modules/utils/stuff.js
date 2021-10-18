@@ -150,14 +150,14 @@ export const getTitleInListValues = (listValues, value) => {
   if (listValues == undefined)
     return value;
   const it = getItemInListValues(listValues, value);
-  return it !== undefined ? it.title : undefined;
+  return it !== undefined ? it.title : value;
 };
 
 export const getValueInListValues = (listValues, value) => {
   if (listValues == undefined)
     return value;
   const it = getItemInListValues(listValues, value);
-  return it !== undefined ? it.value : undefined;
+  return it !== undefined ? it.value : value;
 };
 
 export const mapListValues = (listValues, mapFn) => {
