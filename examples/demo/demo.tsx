@@ -153,24 +153,24 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
     // Demonstrates how actions can be called programmatically
     runActions = () => {
-      const rootPath = [ this.state.tree.get('id') as string ];
-      const isEmptyTree = !this.state.tree.get('children1');
+      const rootPath = [ this.state.tree.get("id") as string ];
+      const isEmptyTree = !this.state.tree.get("children1");
       const firstPath = [
-        this.state.tree.get('id'), 
-        this.state.tree.get('children1')?.first()?.get('id')
+        this.state.tree.get("id"), 
+        this.state.tree.get("children1")?.first()?.get("id")
       ];
       const lastPath = [
-        this.state.tree.get('id'), 
-        this.state.tree.get('children1')?.last()?.get('id')
+        this.state.tree.get("id"), 
+        this.state.tree.get("children1")?.last()?.get("id")
       ];
 
       // Change root group to NOT OR
       this._actions.setNot(rootPath, true);
-      this._actions.setConjunction(rootPath, 'OR');
+      this._actions.setConjunction(rootPath, "OR");
 
       // Move first item
       if (!isEmptyTree) {
-        this._actions.moveItem(firstPath, lastPath, 'before');
+        this._actions.moveItem(firstPath, lastPath, "before");
       }
 
       // Remove last rule
@@ -180,11 +180,11 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
       // Change first rule to `num between 2 and 4`
       if (!isEmptyTree) {
-        this._actions.setField(firstPath, 'num');
-        this._actions.setOperator(firstPath, 'between');
-        this._actions.setValueSrc(firstPath, 0, 'value');
-        this._actions.setValue(firstPath, 0, 2, 'number');
-        this._actions.setValue(firstPath, 1, 4, 'number');
+        this._actions.setField(firstPath, "num");
+        this._actions.setOperator(firstPath, "between");
+        this._actions.setValueSrc(firstPath, 0, "value");
+        this._actions.setValue(firstPath, 0, 2, "number");
+        this._actions.setValue(firstPath, 1, 4, "number");
       }
 
       // Add rule `login == "denis"`

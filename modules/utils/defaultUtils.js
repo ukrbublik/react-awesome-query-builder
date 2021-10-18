@@ -87,9 +87,9 @@ export const defaultGroupProperties = (config, fieldConfig = null) => new Immuta
 });
 
 export const defaultItemProperties = (config, item) => {
-  return item && item.type == "group" ? 
-    defaultGroupProperties(config, item?.properties?.field) : 
-    defaultRuleProperties(config, null, item);
+  return item && item.type == "group" 
+    ? defaultGroupProperties(config, item?.properties?.field) 
+    : defaultRuleProperties(config, null, item);
 };
 
 export const defaultRule = (id, config) => ({

@@ -611,7 +611,7 @@ const emptyDrag = {
 
 const getActionMeta = (action, state) => {
   const actionKeysToOmit = [
-    'config', 'asyncListValues', '__isInternal'
+    "config", "asyncListValues", "__isInternal"
   ];
   const actionTypesToIgnore = [
     constants.SET_TREE,
@@ -623,7 +623,7 @@ const getActionMeta = (action, state) => {
   let affectedField = action.path && getField(state.tree, action.path) || action.field;
   if (affectedField)
     meta.affectedField = affectedField;
-  if (actionTypesToIgnore.includes(action.type) || action.type.indexOf('@@redux') == 0)
+  if (actionTypesToIgnore.includes(action.type) || action.type.indexOf("@@redux") == 0)
     meta = null;
   return meta;
 };

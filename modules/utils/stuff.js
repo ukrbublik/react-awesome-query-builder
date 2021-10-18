@@ -290,7 +290,7 @@ export function sleep(delay) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
   });
-};
+}
 
 export const isImmutable = (v) => {
   return typeof v === "object" && v !== null && typeof v.toJS === "function";
@@ -298,8 +298,8 @@ export const isImmutable = (v) => {
 
 export function applyToJS(v) {
   return (isImmutable(v) ? v.toJS() : v);
-};
+}
 
 export function toImmutableList(v) {
   return (isImmutable(v) ? v : new Immutable.List(v));
-};
+}
