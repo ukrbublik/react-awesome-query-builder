@@ -79,117 +79,14 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
-        <button onClick={this.runActions}>beta: actions</button>
+        <button onClick={this.runActions}>run actions</button>
+        <button onClick={this.validate}>validate</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
         </div>
       </div>
     )
-
-    // Demonstrates how actions can be called programmatically
-    runActions = () => {
-      const rootPath = [ this.state.tree.get('id') as string ];
-      const isEmpty = !this.state.tree.get('children1');
-      const firstPath = [
-        this.state.tree.get('id'), 
-        this.state.tree.get('children1')?.first()?.get('id')
-      ];
-      const lastPath = [
-        this.state.tree.get('id'), 
-        this.state.tree.get('children1')?.last()?.get('id')
-      ];
-
-      // Remove last rule
-      if (!isEmpty) {
-        this._actions.removeRule(lastPath);
-      }
-
-      // Change first rule to `num between 2 and 4`
-      if (!isEmpty) {
-        this._actions.setField(firstPath, 'num');
-        this._actions.setOperator(firstPath, 'between');
-        this._actions.setValueSrc(firstPath, 0, 'value');
-        this._actions.setValue(firstPath, 0, 2, 'number');
-        this._actions.setValue(firstPath, 1, 4, 'number');
-      }
-
-      // Add rule `login == "denis"`
-      this._actions.addRule(
-        rootPath,
-        {
-          field: "user.login",
-          operator: "equal",
-          value: ["denis"]
-        },
-      );
-
-      // Add rule `login == firstName`
-      this._actions.addRule(
-        rootPath,
-        {
-          field: "user.login",
-          operator: "equal",
-          value: ["user.firstName"],
-          valueSrc: ["field"]
-        },
-      );
-
-      // Add rule-group `cars` with `year == 2021`
-      this._actions.addRule(
-        rootPath,
-        {
-          field: "cars",
-          mode: "array",
-          operator: "all",
-        },
-        "rule_group",
-        [
-          {
-            type: "rule",
-            properties: {
-              field: "cars.year",
-              operator: "equal",
-              value: [2021]
-            }
-          }
-        ]
-      );
-
-      // Add group with `slider == 50` and subgroup `slider < 20`
-      this._actions.addGroup(
-        rootPath,
-        {
-          conjunction: "AND"
-        },
-        [
-          {
-            type: "rule",
-            properties: {
-              field: "slider",
-              operator: "equal",
-              value: [50]
-            }
-          },
-          {
-            type: "group",
-            properties: {
-              conjunction: "AND"
-            },
-            children1: [
-              {
-                type: "rule",
-                properties: {
-                  field: "slider",
-                  operator: "less",
-                  value: [20]
-                }
-              },
-            ]
-          }
-        ]
-      );
-    }
 
     onConfigChanged = (e: Event) => {
       const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
@@ -206,6 +103,12 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         tree: initTree, 
       });
     };
+
+    validate = () => {
+      this.setState({
+        tree: checkTree(this.state.tree, this.state.config)
+      });
+    }
 
     changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const skin = e.target.value;
@@ -247,6 +150,112 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     updateResult = throttle(() => {
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
+
+    // Demonstrates how actions can be called programmatically
+    runActions = () => {
+      const rootPath = [ this.state.tree.get('id') as string ];
+      const isEmpty = !this.state.tree.get('children1');
+      const firstPath = [
+        this.state.tree.get('id'), 
+        this.state.tree.get('children1')?.first()?.get('id')
+      ];
+      const lastPath = [
+        this.state.tree.get('id'), 
+        this.state.tree.get('children1')?.last()?.get('id')
+      ];
+
+      // Remove last rule
+      if (!isEmpty) {
+        this._actions.removeRule(lastPath);
+      }
+
+      // Change first rule to `num between 2 and 4`
+      if (!isEmpty) {
+        this._actions.setField(firstPath, 'num');
+        this._actions.setOperator(firstPath, 'between');
+        this._actions.setValueSrc(firstPath, 0, 'value');
+        this._actions.setValue(firstPath, 0, 2, 'number');
+        this._actions.setValue(firstPath, 1, 4, 'number');
+      }
+
+      // Add rule `login == "denis"`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "user.login",
+          operator: "equal",
+          value: ["denis"],
+          valueSrc: ["value"],
+          valueType: ["text"]
+        },
+      );
+
+      // Add rule `login == firstName`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "user.login",
+          operator: "equal",
+          value: ["user.firstName"],
+          valueSrc: ["field"]
+        },
+      );
+
+      // Add rule-group `cars` with `year == 2021`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "cars",
+          mode: "array",
+          operator: "all",
+        },
+        "rule_group",
+        [
+          {
+            type: "rule",
+            properties: {
+              field: "cars.year",
+              operator: "equal",
+              value: [2021]
+            }
+          }
+        ]
+      );
+
+      // Add group with `slider == 40` and subgroup `slider < 20`
+      this._actions.addGroup(
+        rootPath,
+        {
+          conjunction: "AND"
+        },
+        [
+          {
+            type: "rule",
+            properties: {
+              field: "slider",
+              operator: "equal",
+              value: [40]
+            }
+          },
+          {
+            type: "group",
+            properties: {
+              conjunction: "AND"
+            },
+            children1: [
+              {
+                type: "rule",
+                properties: {
+                  field: "slider",
+                  operator: "less",
+                  value: [20]
+                }
+              },
+            ]
+          }
+        ]
+      );
+    }
 
     renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
       const isValid = isValidTree(immutableTree);
