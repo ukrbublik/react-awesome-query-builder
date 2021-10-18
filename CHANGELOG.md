@@ -10,6 +10,7 @@
   - Breaking changes for format with `isForDisplay=true` - don't wrap strings with `"`, replace `==` with `=` (PR #518)
   - Fixed type definition for export utils - can return undefined (PR #516)
   - Fixed use of `hideOperator` (PR #523) (issue #292)
+  - Documented `cancelText` (PR #524) (issue #520)
 - 4.5.2
   - Added rule `id` to field's, operartor's and widget's props. Added config of the selected field to the operator props as `fieldConfig` (issue #502) (PR #503)
 - 4.5.1

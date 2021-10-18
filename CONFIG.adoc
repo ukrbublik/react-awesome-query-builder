@@ -399,9 +399,11 @@ Localization:
 |removeRuleConfirmOptions.title |Are you sure delete this rule?
 |removeRuleConfirmOptions.okText |Yes
 |removeRuleConfirmOptions.okType |`danger`
+|removeRuleConfirmOptions.cancelText |Cancel
 |removeGroupConfirmOptions.title |Are you sure delete this group?
 |removeGroupConfirmOptions.okText |Yes
 |removeGroupConfirmOptions.okType |`danger`
+|removeGroupConfirmOptions.cancelText |Cancel
 |===
 
 
