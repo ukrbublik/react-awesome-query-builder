@@ -50,7 +50,7 @@ describe("interactions on vanilla", () => {
     });
   });
 
-  it("click on add group will add new group with one empty rule if canLeaveEmptyGroup=false", () => {
+  it("click on add group will add new group with one empty rule if shouldCreateEmptyGroup=false", () => {
     with_qb(configs.dont_leave_empty_group, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")

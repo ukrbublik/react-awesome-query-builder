@@ -29,7 +29,7 @@ import mapValues from "lodash/mapValues";
  */
 const addNewGroup = (state, path, groupUuid, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
-  const {maxNumberOfRules} = config.settings;
+  const {maxNumberOfRules, shouldCreateEmptyGroup} = config.settings;
   const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
   state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
@@ -40,7 +40,7 @@ const addNewGroup = (state, path, groupUuid, properties, config, children = null
     state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
     // Add one empty rule into new group
-    if (canAddNewRule) {
+    if (canAddNewRule && !shouldCreateEmptyGroup) {
       state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
     }
   }
@@ -60,8 +60,8 @@ const removeGroup = (state, path, config) => {
 
   const {canLeaveEmptyGroup} = config.settings;
   const parentPath = path.slice(0, -1);
-  const isEmptyGroup = !hasChildren(state, parentPath);
-  if (isEmptyGroup && !canLeaveEmptyGroup) {
+  const isEmptyParentGroup = !hasChildren(state, parentPath);
+  if (isEmptyParentGroup && !canLeaveEmptyGroup) {
     // check ancestors for emptiness (and delete 'em if empty)
     state = fixEmptyGroupsInTree(state);
 
@@ -92,12 +92,12 @@ const removeRule = (state, path, config) => {
   const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0; // && parentValue != undefined;
   
   const isParentRuleGroup = parent.get("type") == "rule_group";
-  const isEmptyGroup = !hasChildren(state, parentPath);
-  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup 
+  const isEmptyParentGroup = !hasChildren(state, parentPath);
+  const canLeaveEmpty = isEmptyParentGroup && (isParentRuleGroup 
     ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere 
     : config.settings.canLeaveEmptyGroup);
   
-  if (isEmptyGroup && !canLeaveEmpty) {
+  if (isEmptyParentGroup && !canLeaveEmpty) {
     if (isParentRuleGroup) {
       // deleted last rule from rule_group, so delete whole rule_group
       state = state.deleteIn(expandTreePath(parentPath));

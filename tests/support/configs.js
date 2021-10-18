@@ -433,6 +433,7 @@ export const dont_leave_empty_group = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     canLeaveEmptyGroup: false,
+    shouldCreateEmptyGroup: false
   }
 });
 
