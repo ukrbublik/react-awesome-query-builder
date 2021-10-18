@@ -238,6 +238,7 @@ export default (skin: string) => {
     // showLabels: true,
     maxNesting: 5,
     canLeaveEmptyGroup: true,
+    shouldCreateEmptyGroup: false,
     showErrorMessage: true,
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,

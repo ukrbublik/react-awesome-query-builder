@@ -289,7 +289,7 @@ Behaviour settings:
 |maxNumberOfRules | |Maximum number of rules which can be added to the query builder
 |maxNesting | |Max nesting for rule groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
-|canLeaveEmptyGroup |true |Leave empty group after deletion or add 1 clean rule immediately?
+|canLeaveEmptyGroup |true |True - leave empty group after deletion of rules, false - automatically remove empty groups + add 1 empty rule to empty root
 |shouldCreateEmptyGroup |false |False - automatically add 1 empty rule into new group
 |immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change
 |immutableFieldsMode |false |Not allow to change fields
