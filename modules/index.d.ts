@@ -118,11 +118,11 @@ export type ImmutableTree = ImmutableOMap<string, any>;
 export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
-  queryBuilderFormat(tree: ImmutableTree, config: Config): Object;
+  queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
-  sqlFormat(tree: ImmutableTree, config: Config): string;
-  mongodbFormat(tree: ImmutableTree, config: Config): Object;
-  elasticSearchFormat(tree: ImmutableTree, config: Config): Object;
+  sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
+  mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
   // load, save
   getTree(tree: ImmutableTree, light?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
