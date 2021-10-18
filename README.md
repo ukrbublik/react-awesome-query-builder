@@ -323,7 +323,7 @@ export const Demo: React.FC = () => {
 Props:
 - `{...config}` - destructured query [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
-- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change).
+- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/modules/index.d.ts)).
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
