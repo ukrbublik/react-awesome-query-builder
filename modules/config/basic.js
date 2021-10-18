@@ -1030,7 +1030,7 @@ const settings = {
   formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
     if (q == undefined) return undefined;
     if (isForDisplay)
-      return "NOT(" + q + ")";
+      return "NOT (" + q + ")";
     else
       return "!(" + q + ")";
   },
