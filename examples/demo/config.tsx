@@ -238,6 +238,7 @@ export default (skin: string) => {
     // showLabels: true,
     maxNesting: 5,
     canLeaveEmptyGroup: true,
+    shouldCreateEmptyGroup: false,
     showErrorMessage: true,
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
@@ -349,7 +350,7 @@ export default (skin: string) => {
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }

@@ -428,6 +428,15 @@ export const with_all_types__show_error = (BasicConfig) => ({
   }
 });
 
+export const dont_leave_empty_group = (BasicConfig) => ({
+  ...simple_with_numbers_and_str(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    canLeaveEmptyGroup: false,
+    shouldCreateEmptyGroup: false
+  }
+});
+
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   //todo: use BasicFuncs
@@ -655,7 +664,7 @@ export const with_group_array = (BasicConfig) => ({
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }
@@ -698,7 +707,7 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }

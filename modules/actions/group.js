@@ -1,4 +1,5 @@
 import * as constants from "../constants";
+import {toImmutableList} from "../utils/stuff";
 
 /**
  * @param {object} config
@@ -7,7 +8,7 @@ import * as constants from "../constants";
  */
 export const setConjunction = (config, path, conjunction) => ({
   type: constants.SET_CONJUNCTION,
-  path: path,
+  path: toImmutableList(path),
   conjunction: conjunction
 });
 
@@ -18,6 +19,6 @@ export const setConjunction = (config, path, conjunction) => ({
  */
 export const setNot = (config, path, not) => ({
   type: constants.SET_NOT,
-  path: path,
+  path: toImmutableList(path),
   not: not
 });

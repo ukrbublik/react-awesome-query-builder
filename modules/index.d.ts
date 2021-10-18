@@ -1,6 +1,6 @@
 /* eslint-disable no-extra-semi */
 
-import {List as ImmutableList, Map as ImmutableMap} from "immutable";
+import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 
 
@@ -9,25 +9,14 @@ import {ElementType, ReactElement, Factory} from "react";
 /////////////////
 
 type AnyObject = object;
+type Empty = null | undefined;
 
-type MongoValue = any;
-
-type ElasticSearchQueryType = string;
-
-type JsonLogicResult = {
-  logic?: JsonLogicTree,
-  data?: Object,
-  errors?: Array<string>
-}
-type JsonLogicTree = Object;
-type JsonLogicValue = any;
-type JsonLogicField = { "var": string }
-
-type RuleValue = boolean | number | string | Date | Array<string> | any;
+type IdPath = Array<string> | ImmutableList<string>;
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
 }
+
 type TypedMap<T> = {
   [key: string]: T;
 }
@@ -38,61 +27,88 @@ type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
 }
-type Empty = null | undefined;
+
+// for export/import
+
+type MongoValue = any;
+type ElasticSearchQueryType = string;
+
+type JsonLogicResult = {
+  logic?: JsonLogicTree,
+  data?: Object,
+  errors?: Array<string>
+}
+type JsonLogicTree = Object;
+type JsonLogicValue = any;
+type JsonLogicField = { "var": string };
+
+////////////////
+// query value
+/////////////////
+
+type RuleValue = boolean | number | string | Date | Array<string> | any;
 
 type ValueSource = "value" | "field" | "func" | "const";
-type RuleGroupModes = "struct" | "some" | "array";
+type RuleGroupMode = "struct" | "some" | "array";
+type ItemType = "group" | "rule_group" | "rule";
+type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
+
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
 
+interface RuleProperties {
+  field: string | Empty,
+  operator: string | Empty,
+  value: Array<RuleValue>,
+  valueSrc?: Array<ValueSource>,
+  valueType?: Array<string>,
+  valueError?: Array<string>,
+  operatorOptions?: AnyObject
+}
+
+interface RuleGroupExtProperties extends RuleProperties {
+  mode: RuleGroupMode,
+}
+
+interface RuleGroupProperties {
+  field: string | Empty,
+  mode?: RuleGroupMode,
+}
+
+interface GroupProperties {
+  conjunction: string,
+  not?: boolean,
+}
+
+type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
+type JsonItem = JsonGroup|JsonAnyRule;
 type JsonGroup = {
   type: "group",
   id?: string,
-  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup|JsonRuleGroupExt},
-  properties?: {
-    conjunction: string,
-    not?: boolean,
-  }
+  // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
+  children1?: {[id: string]: JsonItem} | [JsonItem],
+  properties?: GroupProperties
 }
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule},
-  properties?: {
-    field: string | Empty,
-    mode?: RuleGroupModes,
-  }
+  children1?: {[id: string]: JsonRule} | [JsonRule],
+  properties?: RuleGroupProperties
 }
 type JsonRuleGroupExt = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule},
-  properties?: {
-    field: string | Empty,
-    mode: RuleGroupModes,
-    operator: string | Empty,
-    value: Array<RuleValue>,
-    valueSrc: Array<ValueSource>,
-    valueType: Array<string>,
-    valueError?: Array<string>,
-  }
+  children1?: {[id: string]: JsonRule} | [JsonRule],
+  properties?: RuleGroupExtProperties
 }
 type JsonRule = {
   type: "rule",
-  properties: {
-    field: string | Empty,
-    operator: string | Empty,
-    value: Array<RuleValue>,
-    valueSrc: Array<ValueSource>,
-    valueType: Array<string>,
-    valueError?: Array<string>,
-    operatorOptions?: AnyObject
-  }
+  properties: RuleProperties,
 }
 export type JsonTree = JsonGroup;
 
-export type ImmutableTree = ImmutableMap<string, string|Object>;
+export type ImmutableTree = ImmutableOMap<string, any>;
 
 
 ////////////////
@@ -118,12 +134,21 @@ export interface Utils {
   // other
   uuid(): string;
   simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
+  // config utils
+  ConfigUtils: {
+    getFieldConfig(config: Config, field: string): Field | null;
+    getFuncConfig(config: Config, func: string): Func | null;
+    getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
+    getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
+    getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  }
 }
 
 export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
-  actions: {[key: string]: Function},
+  actions: Actions,
+  dispatch: Dispatch,
 }
 
 export interface QueryProps {
@@ -135,7 +160,7 @@ export interface QueryProps {
   fields: Fields;
   funcs?: Funcs;
   value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config): void;
+  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
   renderBuilder(props: BuilderProps): ReactElement;
 }
 
@@ -150,6 +175,58 @@ export interface Config {
   settings: Settings,
   fields: Fields,
   funcs?: Funcs,
+}
+
+/////////////////
+// Actions
+/////////////////
+
+type Placement = "after" | "before" | "append" | "prepend";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+interface BaseAction {
+  type: ActionType,
+
+  id?: string, // for ADD_RULE, ADD_GROUP - id of new item
+  path?: IdPath, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
+
+  conjunction?: string,
+  not?: boolean,
+  field?: string,
+  operator?: string,
+  delta?: number, // for SET_VALUE
+  value?: RuleValue,
+  valueType?: string,
+  srcKey?: ValueSource,
+  name?: string, // for SET_OPERATOR_OPTION
+  fromPath?: IdPath, // for MOVE_ITEM
+  toPath?: IdPath, // for MOVE_ITEM
+  placement?: Placement, // for MOVE_ITEM
+  properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
+}
+export interface InputAction extends BaseAction {
+  config: Config,
+}
+export interface ActionMeta extends BaseAction {
+  affectedField?: string, // gets field name from `path` (or `field` for first SET_FIELD)
+}
+
+export type Dispatch = (action: InputAction) => void;
+
+export interface Actions {
+  // tip: children will be converted to immutable ordered map in `_addChildren1`
+  addRule(path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
+  removeRule(path: IdPath): undefined;
+  addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
+  removeGroup(path: IdPath): undefined;
+  setNot(path: IdPath, not: boolean): undefined;
+  setConjunction(path: IdPath, conjunction: string): undefined;
+  setField(path: IdPath, field: string): undefined;
+  setOperator(path: IdPath, operator: string): undefined;
+  setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
+  setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
+  setOperatorOption(path: IdPath, name: string, value: RuleValue): undefined;
+  moveItem(fromPath: IdPath, toPath: IdPath, placement: Placement): undefined;
+  setTree(tree: ImmutableTree): undefined;
 }
 
 
@@ -168,12 +245,15 @@ interface BaseWidgetProps {
   setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
+  parentField?: string,
   operator: string,
   fieldDefinition: Field,
   config: Config,
   delta?: number,
   customProps?: AnyObject,
   readonly?: boolean,
+  id?: string, // id of rule
+  groupId?: string, // id of parent group
 }
 interface RangeWidgetProps extends BaseWidgetProps {
   placeholders: Array<string>,
@@ -255,7 +335,7 @@ export interface ConjunctionOption {
 }
 
 export interface ConjsProps {
-  path: string, 
+  id: string, 
   readonly?: boolean,
   disabled?: boolean,
   selectedConjunction?: string,
@@ -504,7 +584,7 @@ interface FieldStruct extends BaseField {
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
-  mode: RuleGroupModes,
+  mode: RuleGroupMode,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
@@ -529,7 +609,7 @@ export type Fields = TypedMap<FieldOrGroup>;
 export type FieldItem = {
   items?: FieldItems, 
   key: string, 
-  path?: string, 
+  path?: string, // field path with separator
   label: string, 
   fullLabel?: string, 
   altLabel?: string, 
@@ -540,7 +620,7 @@ type FieldItems = TypedMap<FieldItem>;
 
 export interface FieldProps {
   items: FieldItems,
-  setField(path: string): void,
+  setField(fieldPath: string): void,
   selectedKey: string | Empty,
   selectedKeys?: Array<string> | Empty,
   selectedPath?: Array<string> | Empty,
@@ -552,8 +632,9 @@ export interface FieldProps {
   placeholder?: string,
   selectedOpts?: {tooltip?: string},
   readonly?: boolean,
+  id?: string, // id of rule
+  groupId?: string, // id of parent group
 }
-
 
 /////////////////
 // Settings
@@ -644,6 +725,7 @@ export interface BehaviourSettings {
   clearValueOnChangeField?: boolean,
   clearValueOnChangeOp?: boolean,
   canLeaveEmptyGroup?: boolean,
+  shouldCreateEmptyGroup?: boolean,
   immutableGroupsMode?: boolean,
   immutableFieldsMode?: boolean,
   immutableOpsMode?: boolean,
@@ -670,10 +752,10 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & Oth
 // Funcs
 /////////////////
 
-type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
-type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
-type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
-type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
+type SqlFormatFunc = (formattedArgs: TypedMap<string>) => string;
+type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
+type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
+type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 
 interface FuncGroup {

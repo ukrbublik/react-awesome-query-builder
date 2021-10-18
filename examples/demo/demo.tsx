@@ -2,12 +2,13 @@ import React, {Component} from "react";
 import {
   Query, Builder, Utils, 
   //types:
-  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree
+  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree, ActionMeta, Actions
 } from "react-awesome-query-builder";
 import throttle from "lodash/throttle";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
+import Immutable from "immutable";
 
 const stringify = JSON.stringify;
 const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
@@ -43,9 +44,12 @@ interface DemoQueryBuilderState {
   skin: String,
 }
 
+type ImmOMap = Immutable.OrderedMap<string, any>;
+
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
     private config: Config;
+    private _actions: Actions;
 
     componentDidMount() {
       window.addEventListener("update", this.onConfigChanged);
@@ -77,6 +81,8 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         </select>
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
+        <button onClick={this.runActions}>run actions</button>
+        <button onClick={this.validate}>validate</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
@@ -100,6 +106,12 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       });
     };
 
+    validate = () => {
+      this.setState({
+        tree: checkTree(this.state.tree, this.state.config)
+      });
+    }
+
     changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const skin = e.target.value;
       const config = loadConfig(e.target.value);
@@ -116,15 +128,20 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       });
     };
 
-    renderBuilder = (props: BuilderProps) => (
-      <div className="query-builder-container" style={{padding: "10px"}}>
-        <div className="query-builder qb-lite">
-          <Builder {...props} />
+    renderBuilder = (props: BuilderProps) => {
+      this._actions = props.actions;
+      return (
+        <div className="query-builder-container" style={{padding: "10px"}}>
+          <div className="query-builder qb-lite">
+            <Builder {...props} />
+          </div>
         </div>
-      </div>
-    )
+      );
+    }
     
-    onChange = (immutableTree: ImmutableTree, config: Config) => {
+    onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
+      if (actionMeta)
+        console.info(actionMeta);
       this.immutableTree = immutableTree;
       this.config = config;
       this.updateResult();
@@ -135,6 +152,121 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     updateResult = throttle(() => {
       this.setState({tree: this.immutableTree, config: this.config});
     }, 100)
+
+    // Demonstrates how actions can be called programmatically
+    runActions = () => {
+      const rootPath = [ this.state.tree.get("id") as string ];
+      const isEmptyTree = !this.state.tree.get("children1");
+      const firstPath = [
+        this.state.tree.get("id"), 
+        ((this.state.tree.get("children1") as ImmOMap)?.first() as ImmOMap)?.get("id")
+      ];
+      const lastPath = [
+        this.state.tree.get("id"), 
+        ((this.state.tree.get("children1") as ImmOMap)?.last() as ImmOMap)?.get("id")
+      ];
+
+      // Change root group to NOT OR
+      this._actions.setNot(rootPath, true);
+      this._actions.setConjunction(rootPath, "OR");
+
+      // Move first item
+      if (!isEmptyTree) {
+        this._actions.moveItem(firstPath, lastPath, "before");
+      }
+
+      // Remove last rule
+      if (!isEmptyTree) {
+        this._actions.removeRule(lastPath);
+      }
+
+      // Change first rule to `num between 2 and 4`
+      if (!isEmptyTree) {
+        this._actions.setField(firstPath, "num");
+        this._actions.setOperator(firstPath, "between");
+        this._actions.setValueSrc(firstPath, 0, "value");
+        this._actions.setValue(firstPath, 0, 2, "number");
+        this._actions.setValue(firstPath, 1, 4, "number");
+      }
+
+      // Add rule `login == "denis"`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "user.login",
+          operator: "equal",
+          value: ["denis"],
+          valueSrc: ["value"],
+          valueType: ["text"]
+        },
+      );
+
+      // Add rule `login == firstName`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "user.login",
+          operator: "equal",
+          value: ["user.firstName"],
+          valueSrc: ["field"]
+        },
+      );
+
+      // Add rule-group `cars` with `year == 2021`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "cars",
+          mode: "array",
+          operator: "all",
+        },
+        "rule_group",
+        [
+          {
+            type: "rule",
+            properties: {
+              field: "cars.year",
+              operator: "equal",
+              value: [2021]
+            }
+          }
+        ]
+      );
+
+      // Add group with `slider == 40` and subgroup `slider < 20`
+      this._actions.addGroup(
+        rootPath,
+        {
+          conjunction: "AND"
+        },
+        [
+          {
+            type: "rule",
+            properties: {
+              field: "slider",
+              operator: "equal",
+              value: [40]
+            }
+          },
+          {
+            type: "group",
+            properties: {
+              conjunction: "AND"
+            },
+            children1: [
+              {
+                type: "rule",
+                properties: {
+                  field: "slider",
+                  operator: "less",
+                  value: [20]
+                }
+              },
+            ]
+          }
+        ]
+      );
+    }
 
     renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
       const isValid = isValidTree(immutableTree);

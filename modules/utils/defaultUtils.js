@@ -34,10 +34,13 @@ export const defaultOperatorOptions = (config, operator, field) => {
   ) : null;
 };
 
-export const defaultRuleProperties = (config, parentRuleGroupPath = null) => {
+export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null) => {
   let field = null, operator = null;
   const {setDefaultFieldAndOp, showErrorMessage} = config.settings;
-  if (setDefaultFieldAndOp) {
+  if (item) {
+    field = item?.properties?.field;
+    operator = item?.properties?.operator;
+  } else if (setDefaultFieldAndOp) {
     field = defaultField(config, true, parentRuleGroupPath);
     operator = defaultOperator(config, field);
   }
@@ -83,7 +86,11 @@ export const defaultGroupProperties = (config, fieldConfig = null) => new Immuta
   conjunction: defaultGroupConjunction(config, fieldConfig)
 });
 
-
+export const defaultItemProperties = (config, item) => {
+  return item && item.type == "group" 
+    ? defaultGroupProperties(config, item?.properties?.field) 
+    : defaultRuleProperties(config, null, item);
+};
 
 export const defaultRule = (id, config) => ({
   [id]: new Immutable.Map({
