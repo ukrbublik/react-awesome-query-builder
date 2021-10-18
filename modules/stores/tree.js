@@ -142,6 +142,7 @@ const _addChildren1 = (config, item, children) => {
           id: id1
         };
         _addChildren1(config, it1, it1.children1);
+        //todo: guarantee order
         return {
           ...map,
           [id1]: new Immutable.Map(it1)

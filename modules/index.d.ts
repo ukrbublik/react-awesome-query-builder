@@ -86,6 +86,7 @@ type JsonItem = JsonGroup|JsonAnyRule;
 type JsonGroup = {
   type: "group",
   id?: string,
+  // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
   children1?: {[id: string]: JsonItem} | [JsonItem],
   properties?: GroupProperties
 }
@@ -212,6 +213,7 @@ export interface ActionMeta extends BaseAction {
 export type Dispatch = (action: InputAction) => void;
 
 export interface Actions {
+  // tip: children will be converted to immutable ordered map in `_addChildren1`
   addRule(path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
   removeRule(path: IdPath): undefined;
   addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
