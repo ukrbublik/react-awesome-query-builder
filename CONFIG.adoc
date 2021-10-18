@@ -582,6 +582,7 @@ const {
 |labelYes, labelNo | | |Option for `<BooleanWidget>`
 |customProps | | |You can pass any props directly to widget with `customProps`. +
   For example enable search for https://ant.design/components/select/[`<Select>`] widget: `customProps: {showSearch: true}`
+|hideOperator | | |Hide operator?
 |===
 
 NOTE: There is special `field` widget, rendered by `<ValueFieldWidget>`. +

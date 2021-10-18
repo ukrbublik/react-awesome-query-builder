@@ -282,6 +282,7 @@ export interface BaseWidget {
   sqlFormatValue: SqlFormatValue,
   mongoFormatValue?: MongoFormatValue,
   elasticSearchFormatValue?: ElasticSearchFormatValue,
+  hideOperator?: boolean,
   //obsolete:
   validateValue?: ValidateValue,
 }
