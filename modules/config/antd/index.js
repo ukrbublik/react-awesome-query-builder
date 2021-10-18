@@ -4,6 +4,7 @@ import BasicConfig from "../basic";
 import {getTitleInListValues} from "../../utils/stuff";
 import {SqlString} from "../../utils/sql";
 import React from "react";
+import {stringifyForDisplay} from "../basic";
 
 const {
   FieldSelect,
@@ -116,7 +117,7 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? val : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -133,7 +134,7 @@ const widgets = {
     valuePlaceholder: "Select value",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -149,7 +150,7 @@ const widgets = {
     valuePlaceholder: "Select values",
     formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
       let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
+      return isForDisplay ? valsLabels.map(stringifyForDisplay) : vals.map(JSON.stringify);
     },
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
       return vals.map(v => SqlString.escape(v));

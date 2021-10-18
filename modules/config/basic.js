@@ -64,7 +64,7 @@ const conjunctions = {
 //----------------------------  operators
 
 // helpers for mongo format
-const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
+export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   const mv = mc(value);
   if (mv === undefined)
@@ -82,7 +82,7 @@ const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
   }
 };
 
-const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
+export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   if (not) {
     return !useExpr
@@ -482,6 +482,8 @@ const operators = {
 
 //----------------------------  widgets
 
+export const stringifyForDisplay = (v) => (v === null ? "NULL" : v.toString());
+
 const widgets = {
   text: {
     type: "text",
@@ -491,7 +493,7 @@ const widgets = {
     valuePlaceholder: "Enter string",
     factory: (props) => <VanillaTextWidget {...props} />,
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
@@ -511,7 +513,7 @@ const widgets = {
     valuePlaceholder: "Enter text",
     factory: (props) => <VanillaTextAreaWidget {...props} />,
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? '"' + val + '"' : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
@@ -536,7 +538,7 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? val : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -552,7 +554,7 @@ const widgets = {
     valueLabel: "Number",
     valuePlaceholder: "Enter number or move slider",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? val : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -569,7 +571,7 @@ const widgets = {
     valuePlaceholder: "Select value",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -586,7 +588,7 @@ const widgets = {
     valuePlaceholder: "Select values",
     formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
       let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
+      return isForDisplay ? valsLabels.map(stringifyForDisplay) : vals.map(JSON.stringify);
     },
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
       return vals.map(v => SqlString.escape(v));
@@ -610,7 +612,7 @@ const widgets = {
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       const dateVal = moment(val, wgtDef.valueFormat);
-      return isForDisplay ? '"' + dateVal.format(wgtDef.dateFormat) + '"' : JSON.stringify(val);
+      return isForDisplay ? dateVal.format(wgtDef.dateFormat) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       const dateVal = moment(val, wgtDef.valueFormat);
@@ -643,7 +645,7 @@ const widgets = {
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       const dateVal = moment(val, wgtDef.valueFormat);
-      return isForDisplay ? '"' + dateVal.format(wgtDef.timeFormat) + '"' : JSON.stringify(val);
+      return isForDisplay ? dateVal.format(wgtDef.timeFormat) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       const dateVal = moment(val, wgtDef.valueFormat);
@@ -696,7 +698,7 @@ const widgets = {
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       const dateVal = moment(val, wgtDef.valueFormat);
-      return isForDisplay ? '"' + dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) + '"' : JSON.stringify(val);
+      return isForDisplay ? dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       const dateVal = moment(val, wgtDef.valueFormat);
