@@ -8,7 +8,7 @@ describe("query with func", () => {
   describe("loads tree with func LOWER from JsonLogic", () => {
     export_checks(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", {
       "query": "str == LOWER(str2)",
-      "queryHuman": "String == Lowercase(String: String2)",
+      "queryHuman": "String = Lowercase(String: String2)",
       "sql": "str = LOWER(str2)",
       "mongo": {
         "$expr": {
@@ -64,7 +64,7 @@ describe("query with func", () => {
 
       export_checks_in_it(configs.with_funcs, updatedTree, "default", {
         "query": "num == (1 * 4 + 0)",
-        "queryHuman": "Number == (1 * 4 + 0)",
+        "queryHuman": "Number = (1 * 4 + 0)",
         "sql": "num = (1 * 4 + 0)",
         "mongo": {
           "$expr": {
@@ -93,7 +93,7 @@ describe("query with func", () => {
   describe("loads tree with func LINEAR_REGRESSION", () => {
     export_checks(configs.with_funcs, inits.with_func_linear_regression, "default", {
       "query": "num == (2 * 3 + 0)",
-      "queryHuman": "Number == (2 * 3 + 0)",
+      "queryHuman": "Number = (2 * 3 + 0)",
       "sql": "num = (2 * 3 + 0)",
       "mongo": {
         "$expr": {

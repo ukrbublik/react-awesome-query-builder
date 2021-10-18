@@ -16,7 +16,7 @@ describe("query with field compare", () => {
   describe("export", () => {
     export_checks(configs.simple_with_2_numbers, inits.with_number_field_compare, "JsonLogic", {
       "query": "num == num2",
-      "queryHuman": "Number == Number2",
+      "queryHuman": "Number = Number2",
       "sql": "num = num2",
       "mongo": {
         "$expr": {

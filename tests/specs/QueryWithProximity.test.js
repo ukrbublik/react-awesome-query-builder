@@ -8,7 +8,7 @@ describe("proximity", () => {
   describe("export", () => {
     export_checks(configs.with_prox, inits.with_prox, "default", {
       "query": "str \"a\" NEAR/3 \"b\"",
-      "queryHuman": "String \"a\" NEAR/3 \"b\"",
+      "queryHuman": "String a NEAR/3 b",
       "sql": "CONTAINS(str, 'NEAR((a, b), 3)')"
     });
   });

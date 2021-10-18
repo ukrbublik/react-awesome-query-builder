@@ -541,7 +541,7 @@ const {
     type: 'text',
     valueSrc: 'value',
     factory: (props) => <TextWidget {...props} />,
-    formatValue: (val, _fieldDef, _wgtDef, isForDisplay) => (isForDisplay ? '"' + val + '"' : JSON.stringify(val)),
+    formatValue: (val, _fieldDef, _wgtDef, isForDisplay) => (isForDisplay ? val.toString() : JSON.stringify(val)),
     mongoFormatValue: (val, _fieldDef, _wgtDef) => (val),
     // Options:
     valueLabel: "Text",
