@@ -87,21 +87,57 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       </div>
     )
 
+    // Demonstrates how actions can be called programmatically
     runActions = () => {
-      // Demonstrates how actions can be called programmatically
-
+      const rootPath = [ this.state.tree.get('id') as string ];
+      const isEmpty = !this.state.tree.get('children1');
       const firstPath = [
         this.state.tree.get('id'), 
-        this.state.tree.get('children1').first().get('id')
+        this.state.tree.get('children1')?.first()?.get('id')
+      ];
+      const lastPath = [
+        this.state.tree.get('id'), 
+        this.state.tree.get('children1')?.last()?.get('id')
       ];
 
-      this._actions.setField(firstPath, 'num');
-      this._actions.setOperator(firstPath, 'between');
-      this._actions.setValue(firstPath, 0, 2, 'number');
-      this._actions.setValue(firstPath, 1, 4, 'number');
+      // Remove last rule
+      if (!isEmpty) {
+        this._actions.removeRule(lastPath);
+      }
 
+      // Change first rule to `num between 2 and 4`
+      if (!isEmpty) {
+        this._actions.setField(firstPath, 'num');
+        this._actions.setOperator(firstPath, 'between');
+        this._actions.setValueSrc(firstPath, 0, 'value');
+        this._actions.setValue(firstPath, 0, 2, 'number');
+        this._actions.setValue(firstPath, 1, 4, 'number');
+      }
+
+      // Add rule `login == "denis"`
       this._actions.addRule(
-        [ this.state.tree.get('id') as string ],
+        rootPath,
+        {
+          field: "user.login",
+          operator: "equal",
+          value: ["denis"]
+        },
+      );
+
+      // Add rule `login == firstName`
+      this._actions.addRule(
+        rootPath,
+        {
+          field: "user.login",
+          operator: "equal",
+          value: ["user.firstName"],
+          valueSrc: ["field"]
+        },
+      );
+
+      // Add rule-group `cars` with `year == 2021`
+      this._actions.addRule(
+        rootPath,
         {
           field: "cars",
           mode: "array",
@@ -120,8 +156,9 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         ]
       );
 
+      // Add group with `slider == 50` and subgroup `slider < 20`
       this._actions.addGroup(
-        [ this.state.tree.get('id') as string ],
+        rootPath,
         {
           conjunction: "AND"
         },

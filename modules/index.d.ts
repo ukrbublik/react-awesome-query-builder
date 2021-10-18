@@ -9,25 +9,14 @@ import {ElementType, ReactElement, Factory} from "react";
 /////////////////
 
 type AnyObject = object;
+type Empty = null | undefined;
 
-type MongoValue = any;
-
-type ElasticSearchQueryType = string;
-
-type JsonLogicResult = {
-  logic?: JsonLogicTree,
-  data?: Object,
-  errors?: Array<string>
-}
-type JsonLogicTree = Object;
-type JsonLogicValue = any;
-type JsonLogicField = { "var": string }
-
-type RuleValue = boolean | number | string | Date | Array<string> | any;
+type IdPath = Array<string> | ImmutableList<string>;
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
 }
+
 type TypedMap<T> = {
   [key: string]: T;
 }
@@ -38,15 +27,35 @@ type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
 }
-type Empty = null | undefined;
+
+// for export/import
+
+type MongoValue = any;
+type ElasticSearchQueryType = string;
+
+type JsonLogicResult = {
+  logic?: JsonLogicTree,
+  data?: Object,
+  errors?: Array<string>
+}
+type JsonLogicTree = Object;
+type JsonLogicValue = any;
+type JsonLogicField = { "var": string };
+
+////////////////
+// query value
+/////////////////
+
+type RuleValue = boolean | number | string | Date | Array<string> | any;
 
 type ValueSource = "value" | "field" | "func" | "const";
 type RuleGroupMode = "struct" | "some" | "array";
+type ItemType = "group" | "rule_group" | "rule";
+type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
+
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
-type ItemType = "group" | "rule_group" | "rule";
-type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
 
 interface RuleProperties {
   field: string | Empty,
@@ -177,7 +186,7 @@ interface BaseAction {
   type: ActionType,
 
   id?: string, // for ADD_RULE, ADD_GROUP - id of new item
-  path?: Array<string> | ImmutableList<string>, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
+  path?: IdPath, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
 
   conjunction?: string,
   not?: boolean,
@@ -188,8 +197,8 @@ interface BaseAction {
   valueType?: string,
   srcKey?: ValueSource,
   name?: string, // for SET_OPERATOR_OPTION
-  fromPath?: Array<string>, // for MOVE_ITEM
-  toPath?: Array<string>, // for MOVE_ITEM
+  fromPath?: IdPath, // for MOVE_ITEM
+  toPath?: IdPath, // for MOVE_ITEM
   placement?: Placement, // for MOVE_ITEM
   properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
 }
@@ -203,12 +212,17 @@ export interface ActionMeta extends BaseAction {
 export type Dispatch = (action: InputAction) => void;
 
 export interface Actions {
-  addRule(path: Array<string>, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
-  addGroup(path: Array<string>, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
-  setField(path: Array<string>, field: string): undefined;
-  setOperator(path: Array<string>, operator: string): undefined;
-  setValue(path: Array<string>, delta: number, value: RuleValue, valueType: string): undefined;
-  //todo
+  addRule(path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
+  removeRule(path: IdPath): undefined;
+  addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
+  removeGroup(path: IdPath): undefined;
+  setField(path: IdPath, field: string): undefined;
+  setOperator(path: IdPath, operator: string): undefined;
+  setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
+  setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
+  setOperatorOption(path: IdPath, name: string, value: RuleValue): undefined;
+  moveItem(fromPath: IdPath, toPath: IdPath, placement: Placement): undefined;
+  setTree(tree: ImmutableTree): undefined;
 }
 
 

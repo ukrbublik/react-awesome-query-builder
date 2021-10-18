@@ -354,7 +354,6 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 } else if (dragDirs.vrt < 0) { //up
                   if (hovII.lev >= itemInfo.lev) {
                     //take whole group
-                    //todo: 5 is magic for now (bottom margin), configure it!
                     const isClimbToHover = ((hovRect.bottom - dragRect.top) >= 2);
                     if (isClimbToHover && hovII.top < dragInfo.itemInfo.top) {
                       trgII = hovII;
