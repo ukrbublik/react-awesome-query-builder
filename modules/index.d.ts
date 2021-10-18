@@ -216,6 +216,8 @@ export interface Actions {
   removeRule(path: IdPath): undefined;
   addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
   removeGroup(path: IdPath): undefined;
+  setNot(path: IdPath, not: boolean): undefined;
+  setConjunction(path: IdPath, conjunction: string): undefined;
   setField(path: IdPath, field: string): undefined;
   setOperator(path: IdPath, operator: string): undefined;
   setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;

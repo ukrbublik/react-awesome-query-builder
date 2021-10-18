@@ -154,7 +154,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     // Demonstrates how actions can be called programmatically
     runActions = () => {
       const rootPath = [ this.state.tree.get('id') as string ];
-      const isEmpty = !this.state.tree.get('children1');
+      const isEmptyTree = !this.state.tree.get('children1');
       const firstPath = [
         this.state.tree.get('id'), 
         this.state.tree.get('children1')?.first()?.get('id')
@@ -164,18 +164,22 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         this.state.tree.get('children1')?.last()?.get('id')
       ];
 
+      // Change root group to NOT OR
+      this._actions.setNot(rootPath, true);
+      this._actions.setConjunction(rootPath, 'OR');
+
       // Move first item
-      if (!isEmpty) {
+      if (!isEmptyTree) {
         this._actions.moveItem(firstPath, lastPath, 'before');
       }
 
       // Remove last rule
-      if (!isEmpty) {
+      if (!isEmptyTree) {
         this._actions.removeRule(lastPath);
       }
 
       // Change first rule to `num between 2 and 4`
-      if (!isEmpty) {
+      if (!isEmptyTree) {
         this._actions.setField(firstPath, 'num');
         this._actions.setOperator(firstPath, 'between');
         this._actions.setValueSrc(firstPath, 0, 'value');
