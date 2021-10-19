@@ -294,6 +294,43 @@ export const with_struct_inside_group = (BasicConfig) => ({
   }
 });
 
+export const with_group_inside_struct = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            vendor: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Ford", "Toyota", "Tesla"],
+              },
+              valueSources: ["value"],
+            },
+            year: {
+              type: "number",
+              fieldSettings: {
+                min: 1990,
+                max: 2021,
+              },
+              valueSources: ["value"],
+            }
+          }
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
 export const with_all_types = (BasicConfig) => ({
   ...BasicConfig,
   fields: {

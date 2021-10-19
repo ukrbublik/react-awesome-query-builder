@@ -405,3 +405,38 @@ describe("query with !group mode array", () => {
   });
 
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe("query with !group inside !struct", () => {
+
+  describe("export", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct, "JsonLogic", {
+      "sql": "(vehicles.cars.vendor = 'Toyota' AND vehicles.cars.year = 2006)",
+      "mongo": {
+        "vehicles.cars": {
+          "$elemMatch": {
+            "vendor": "Toyota",
+            "year": 2006
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              {
+                "and": [
+                  { "==": [  { "var": "vendor" }, "Toyota"  ] },
+                  { "==": [  { "var": "year" }, 2006  ] }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+});

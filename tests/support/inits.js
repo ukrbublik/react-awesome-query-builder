@@ -221,6 +221,20 @@ export const with_two_groups_1 = {
     }
   ]
 };
+  
+export const with_group_inside_struct = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        { "and": [
+          { "==": [ { "var": "vendor" }, "Toyota" ] },
+          { "==": [ { "var": "year" }, 2006 ] }
+        ] }
+      ]
+    }
+  ]
+};
 
 export const with_number_field_compare = {
   "and": [
