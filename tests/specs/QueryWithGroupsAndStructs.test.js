@@ -281,7 +281,7 @@ describe("query with nested !group", () => {
 
 describe("query with !struct inside !group", () => {
 
-  describe("export", () => {
+  describe("with 1 struct, 1 subfield", () => {
     export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group, "JsonLogic", {
       "query": "results.user.name == \"ddd\"",
       "queryHuman": "Results.user.name = ddd",
@@ -299,6 +299,80 @@ describe("query with !struct inside !group", () => {
             "some": [
               { "var": "results" },
               { "==": [  { "var": "user.name" },  "ddd"  ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 1 struct, 2 subfields", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_2, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.user.age >= 18 && results.score == 5)",
+      "queryHuman": "(Results.user.name = denis AND Results.user.age >= 18 AND Results.score = 5)",
+      "sql": "(results.user.name = 'denis' AND results.user.age >= 18 AND results.score = 5)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "user.age": { "$gte": 18 },
+            "score": 5
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { ">=": [  { "var": "user.age" },  18  ] },
+                { "==": [  { "var": "score" },  5  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 2 structs", () => {
+    // todo
+  });
+
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe("query with !group inside !struct", () => {
+
+  describe("with 1 group, 1 subfield", () => {
+    // todo
+  });
+
+  describe("with 1 group, 2 subfields", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct, "JsonLogic", {
+      "sql": "(vehicles.cars.vendor = 'Toyota' AND vehicles.cars.year = 2006)",
+      "mongo": {
+        "vehicles.cars": {
+          "$elemMatch": {
+            "vendor": "Toyota",
+            "year": 2006
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              {
+                "and": [
+                  { "==": [  { "var": "vendor" }, "Toyota"  ] },
+                  { "==": [  { "var": "year" }, 2006  ] }
+                ]
+              }
             ]
           }
         ]
@@ -397,41 +471,6 @@ describe("query with !group mode array", () => {
                 ]
               },
               2
-            ]
-          }
-        ]
-      }
-    });
-  });
-
-});
-
-//////////////////////////////////////////////////////////////////////////////////////////
-
-describe("query with !group inside !struct", () => {
-
-  describe("export", () => {
-    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct, "JsonLogic", {
-      "sql": "(vehicles.cars.vendor = 'Toyota' AND vehicles.cars.year = 2006)",
-      "mongo": {
-        "vehicles.cars": {
-          "$elemMatch": {
-            "vendor": "Toyota",
-            "year": 2006
-          }
-        }
-      },
-      "logic": {
-        "and": [
-          {
-            "some": [
-              { "var": "vehicles.cars" },
-              {
-                "and": [
-                  { "==": [  { "var": "vendor" }, "Toyota"  ] },
-                  { "==": [  { "var": "year" }, 2006  ] }
-                ]
-              }
             ]
           }
         ]

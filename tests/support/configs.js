@@ -283,6 +283,9 @@ export const with_struct_inside_group = (BasicConfig) => ({
           subfields: {
             name: {
               type: "text",
+            },
+            age: {
+              type: "number",
             }
           }
         }
