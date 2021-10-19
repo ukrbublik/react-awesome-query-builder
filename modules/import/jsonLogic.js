@@ -324,34 +324,47 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
+          const groupFieldConfig = getFieldConfig(config, groupField);
+          console.log('>>>>> child', { groupField, needSplit, groupFieldConfig})
           groupField.split(fieldSeparator).map((f, i, a) => {
             const p = a.slice(0, i);
             let ff = [...p, f].join(fieldSeparator);
             ff = normalizeField(config, ff);
             const ffConfig = getFieldConfig(config, ff) || {};
             if (!needSplit && i == 0) {
+              console.log('i==0 -> set to out', {field: ff})
               type = "rule_group";
               properties.field = ff;
               properties.mode = ffConfig.mode;
               groupToId[ff] = id;
+              if (ffConfig.type == '!struct') {
+                properties.field = groupField;
+              }
             } else {
               let groupId = groupToId[ff];
-              if (!groupId) {
-                groupId = uuid();
-                groupToId[ff] = groupId;
-                ch[groupId] = {
-                  type: "rule_group",
-                  id: groupId,
-                  children1: {},
-                  properties: {
-                    conjunction: conjKey,
-                    not: false,
-                    field: ff,
-                    mode: ffConfig.mode,
-                  }
-                };
+              if (ff == groupField && properties.field == groupField) {
+                console.log('*****', ff)
+                groupId = id;
+              } else {
+                console.log('i==', i, {field: ff, has: !!groupId})
+                if (!groupId) {
+                  groupId = uuid();
+                  groupToId[ff] = groupId;
+                  console.log('+ rule_group', {field: ff})
+                  ch[groupId] = {
+                    type: "rule_group",
+                    id: groupId,
+                    children1: {},
+                    properties: {
+                      conjunction: conjKey,
+                      not: false,
+                      field: ff,
+                      mode: ffConfig.mode,
+                    }
+                  };
+                }
+                ch = ch[groupId].children1;
               }
-              ch = ch[groupId].children1;
             }
           });
           ch[k] = v;
@@ -576,13 +589,19 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     const conj = Object.keys(having)[0];
     const havingVals = having[conj];
     const _not = false;
+    console.log('>>  having', {
+      field, havingVals, conj, conv_c: conv.conjunctions
+    })
 
     if (conv.conjunctions[conj] !== undefined) {
       res = convertConj(conj, havingVals, conv, config, _not, meta, field);
+      console.log('>> 3', res)
     } else {
       // need to be wrapped in `rule_group`
       const rule = convertOp(conj, havingVals, conv, config, _not, meta, field);
+      console.log('>> 1', rule)
       res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
+      console.log('>> 2', res)
     }
     Object.assign(res.properties, {
       mode: fieldConfig.mode,
@@ -597,6 +616,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       });
     }
   } else if (fieldConfig.type == "!group" && !having) {
+    console.log('>> not having', field)
     res = {
       type: "rule_group",
       id: uuid(),
