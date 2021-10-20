@@ -198,7 +198,7 @@ describe("query with nested !group", () => {
     });
   });
 
-  describe("with two nested groups", () => {
+  describe("with two nested groups - import with old format, export to new format", () => {
     export_checks(configs.with_nested_group, inits.with_two_groups_1, "JsonLogic", {
       "query": "((results.user.name == \"ddd\" && results.score == 2) && group2.inside == 33 && results.score == 2)",
       "queryHuman": "((Results.user.name = ddd AND Results.score = 2) AND Group2.inside = 33 AND Results.score = 2)",
@@ -243,9 +243,7 @@ describe("query with nested !group", () => {
                   {
                     "some": [
                       { "var": "user" },
-                      {
-                        "==": [ { "var": "name" },  "ddd" ]
-                      }
+                      { "==": [ { "var": "name" },  "ddd" ] }
                     ]
                   },
                   {
@@ -258,17 +256,13 @@ describe("query with nested !group", () => {
           {
             "some": [
               { "var": "group2" },
-              {
-                "==": [ { "var": "inside" },  33 ]
-              }
+              { "==": [ { "var": "inside" },  33 ] }
             ]
           },
           {
             "some": [
               { "var": "results" },
-              {
-                "==": [ { "var": "score" },  2 ]
-              }
+              { "==": [ { "var": "score" },  2 ] }
             ]
           }
         ]

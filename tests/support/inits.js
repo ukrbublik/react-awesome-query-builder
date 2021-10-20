@@ -154,9 +154,7 @@ export const with_nested_group = {
           }, {
             "some": [
               { "var": "user" },
-              {
-                "==": [  { "var": "name" },  "denis"  ]
-              }
+              { "==": [  { "var": "name" },  "denis"  ] }
             ]
           }
         ]
@@ -178,9 +176,7 @@ export const two_rules_with_nested_group = {
         { "var": "results" },
         { "some": [
           { "var": "user" }, 
-          {
-            "==": [ { "var": "name" },  "aaa" ]
-          }
+          { "==": [ { "var": "name" },  "aaa" ] }
         ] }
       ]
     }
