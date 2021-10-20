@@ -307,7 +307,7 @@ describe("query with !struct inside !group", () => {
   });
 
   describe("with 1 struct, 1 subfield and 1 simple field", () => {
-    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1, "JsonLogic", {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1s, "JsonLogic", {
       "query": "(results.user.age >= 18 && results.score == 5)",
       "queryHuman": "(Results.user.age >= 18 AND Results.score = 5)",
       "sql": "(results.user.age >= 18 AND results.score = 5)",
@@ -364,8 +364,97 @@ describe("query with !struct inside !group", () => {
     });
   });
 
-  describe("with 2 structs", () => {
-    // todo
+  describe("with 2 structs, 1 subfield per each", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.quiz.name == \"ethics\")",
+      "queryHuman": "(Results.user.name = denis AND Results.quiz.name = ethics)",
+      "sql": "(results.user.name = 'denis' AND results.quiz.name = 'ethics')",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "quiz.name": "ethics"
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { "==": [  { "var": "quiz.name" },  "ethics"  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 2 structs, 2 subfields per each", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_2_2, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.quiz.name == \"ethics\" && results.user.age >= 18 && results.quiz.max_score > 70)",
+      "queryHuman": "(Results.user.name = denis AND Results.quiz.name = ethics AND Results.user.age >= 18 AND Results.quiz.max_score > 70)",
+      "sql": "(results.user.name = 'denis' AND results.quiz.name = 'ethics' AND results.user.age >= 18 AND results.quiz.max_score > 70)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "quiz.name": "ethics",
+            "user.age": { "$gte": 18 },
+            "quiz.max_score": { "$gt": 70 }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { "==": [  { "var": "quiz.name" },  "ethics"  ] },
+                { ">=": [  { "var": "user.age" },  18  ] },
+                { ">": [  { "var": "quiz.max_score" },  70  ] },
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 2 structs, 1 subfield per each and 1 simple field", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1_1s, "JsonLogic", {
+      "query": "(results.user.age >= 18 && results.quiz.max_score > 70 && results.score < 70)",
+      "queryHuman": "(Results.user.age >= 18 AND Results.quiz.max_score > 70 AND Results.score < 70)",
+      "sql": "(results.user.age >= 18 AND results.quiz.max_score > 70 AND results.score < 70)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.age": { "$gte": 18 },
+            "quiz.max_score": { "$gt": 70 },
+            "score": { "$lt": 70 }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { ">=": [  { "var": "user.age" },  18  ] },
+                { ">": [  { "var": "quiz.max_score" },  70  ] },
+                { "<": [  { "var": "score" },  70  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
   });
 
 });

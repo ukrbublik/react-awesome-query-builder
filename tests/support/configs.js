@@ -288,6 +288,17 @@ export const with_struct_inside_group = (BasicConfig) => ({
               type: "number",
             }
           }
+        },
+        quiz: {
+          type: "!struct",
+          subfields: {
+            name: {
+              type: "text",
+            },
+            max_score: {
+              type: "number",
+            }
+          }
         }
       }
     },

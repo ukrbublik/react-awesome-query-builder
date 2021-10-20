@@ -198,7 +198,7 @@ export const with_struct_inside_group = {
   ]
 };
 
-export const with_struct_inside_group_1_1 = {
+export const with_struct_inside_group_1_1s = {
   "and": [
     {
       "some": [
@@ -220,6 +220,51 @@ export const with_struct_inside_group_2 = {
         { "and": [
           { "==": [  { "var": "user.name" },  "denis"  ] },
           { ">=": [  { "var": "user.age" },  18  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { "==": [  { "var": "quiz.name" },  "ethics"  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_2_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { "==": [  { "var": "quiz.name" },  "ethics"  ] },
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { ">": [  { "var": "quiz.max_score" },  70  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1_1s = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { ">": [  { "var": "quiz.max_score" },  70  ] },
+          { "<": [  { "var": "score" },  70  ] }
         ] }
       ]
     }
