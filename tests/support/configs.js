@@ -336,6 +336,28 @@ export const with_group_inside_struct = (BasicConfig) => ({
               valueSources: ["value"],
             }
           }
+        },
+        bikes: {
+          label: "Bikes",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            price: {
+              type: "number",
+              valueSources: ["value"],
+            },
+            type: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Road", "Mountain"],
+              },
+              valueSources: ["value"],
+            },
+          }
+        },
+        other: {
+          type: "text",
+          valueSources: ["value"],
         }
       }
     },

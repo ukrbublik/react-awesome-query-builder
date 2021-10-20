@@ -294,8 +294,21 @@ export const with_two_groups_1 = {
     }
   ]
 };
-  
-export const with_group_inside_struct = {
+
+export const with_group_inside_struct_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        { "and": [
+          { "==": [ { "var": "vendor" }, "Toyota" ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_group_inside_struct_2 = {
   "and": [
     {
       "some": [

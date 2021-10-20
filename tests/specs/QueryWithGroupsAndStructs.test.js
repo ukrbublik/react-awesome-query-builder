@@ -464,11 +464,30 @@ describe("query with !struct inside !group", () => {
 describe("query with !group inside !struct", () => {
 
   describe("with 1 group, 1 subfield", () => {
-    // todo
+    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct_1, "JsonLogic", {
+      "sql": "vehicles.cars.vendor = 'Toyota'",
+      "mongo": {
+        "vehicles.cars": {
+          "$elemMatch": {
+            "vendor": "Toyota"
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              { "==": [  { "var": "vendor" }, "Toyota"  ] }
+            ]
+          }
+        ]
+      }
+    });
   });
 
   describe("with 1 group, 2 subfields", () => {
-    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct, "JsonLogic", {
+    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct_2, "JsonLogic", {
       "sql": "(vehicles.cars.vendor = 'Toyota' AND vehicles.cars.year = 2006)",
       "mongo": {
         "vehicles.cars": {
