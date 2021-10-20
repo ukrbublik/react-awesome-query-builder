@@ -306,15 +306,14 @@ describe("query with !struct inside !group", () => {
     });
   });
 
-  describe("with 1 struct, 2 subfields", () => {
-    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_2, "JsonLogic", {
-      "query": "(results.user.name == \"denis\" && results.user.age >= 18 && results.score == 5)",
-      "queryHuman": "(Results.user.name = denis AND Results.user.age >= 18 AND Results.score = 5)",
-      "sql": "(results.user.name = 'denis' AND results.user.age >= 18 AND results.score = 5)",
+  describe("with 1 struct, 1 subfield and 1 simple field", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1, "JsonLogic", {
+      "query": "(results.user.age >= 18 && results.score == 5)",
+      "queryHuman": "(Results.user.age >= 18 AND Results.score = 5)",
+      "sql": "(results.user.age >= 18 AND results.score = 5)",
       "mongo": {
         "results": {
           "$elemMatch": {
-            "user.name": "denis",
             "user.age": { "$gte": 18 },
             "score": 5
           }
@@ -326,9 +325,37 @@ describe("query with !struct inside !group", () => {
             "some": [
               { "var": "results" },
               { "and": [
-                { "==": [  { "var": "user.name" },  "denis"  ] },
                 { ">=": [  { "var": "user.age" },  18  ] },
                 { "==": [  { "var": "score" },  5  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 1 struct, 2 subfields", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_2, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.user.age >= 18)",
+      "queryHuman": "(Results.user.name = denis AND Results.user.age >= 18)",
+      "sql": "(results.user.name = 'denis' AND results.user.age >= 18)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "user.age": { "$gte": 18 }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { ">=": [  { "var": "user.age" },  18  ] }
               ] }
             ]
           }

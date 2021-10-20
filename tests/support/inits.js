@@ -198,6 +198,20 @@ export const with_struct_inside_group = {
   ]
 };
 
+export const with_struct_inside_group_1_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { "==": [  { "var": "score" },  5  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
 export const with_struct_inside_group_2 = {
   "and": [
     {
@@ -205,8 +219,7 @@ export const with_struct_inside_group_2 = {
         { "var": "results" },
         { "and": [
           { "==": [  { "var": "user.name" },  "denis"  ] },
-          { ">=": [  { "var": "user.age" },  18  ] },
-          { "==": [  { "var": "score" },  5  ] }
+          { ">=": [  { "var": "user.age" },  18  ] }
         ] }
       ]
     }
