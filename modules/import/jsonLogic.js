@@ -280,6 +280,8 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
 const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
   const conjKey = conv.conjunctions[op];
   const {fieldSeparator} = config.settings;
+  const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+  const isParentGroup = parentFieldConfig?.type == "!group";
   if (conjKey) {
     let type = "group";
     const children = vals
@@ -287,7 +289,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
     const complexFields = Object.entries(children)
-      .filter(([_k, v]) => v.properties !== undefined && v.properties.field !== undefined && v.properties.field.indexOf(fieldSeparator) != -1)
+      .filter(([_k, v]) => v?.properties?.field?.includes(fieldSeparator))
       .map(([_k, v]) => (v.properties.field.split(fieldSeparator)));
     const complexFieldsParents = complexFields
       .map(parts => parts.slice(0, parts.length - 1).join(fieldSeparator));
@@ -309,18 +311,24 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     // TIP: `needSplit` will be true if using mode=struct and there are fields of different groups on one level
     //      (like "a.b" and "x.z" -> need to split them with hierarchy)
     // TIP: Even if fields are of same root parent (like "a.b", "a.c.d"), still we may need to create hierarchy of `rule_group`s
-    const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
+    const needSplit = !isParentGroup && !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
     let groupToId = {};
     Object.entries(children).map(([k, v]) => {
       if (v.type == "group" || v.type == "rule_group") {
         // put as-is
         children1[k] = v;
       } else {
-        const groupFields = usedRuleGroups.filter((f) => v.properties.field.indexOf(f) == 0);
+        const groupFields = usedRuleGroups.filter((f) => v?.properties?.field?.indexOf(f) == 0);
         const groupField = groupFields.length > 0 ? groupFields.sort((a, b) => (b.length - a.length))[0] : null;
         if (!groupField) {
           // not in rule_group (can be simple field or in struct) - put as-is
           children1[k] = v;
+
+          //?
+          if (parentField) {
+            properties.field = parentField;
+            type = "rule_group";
+          }
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
