@@ -72,7 +72,7 @@ describe("query with !struct and !group", () => {
     });
   });
 
-  describe("should handle if !group isnot wrapped in #some", () => {
+  describe("should handle if !group isnot wrapped in #some (old format)", () => {
     export_checks(configs.with_struct_and_group, inits.with_struct_and_group_mixed_obsolete, "JsonLogic", {
       "query": "(results.slider == 22 && user.firstName == \"abc\")",
       "queryHuman": "(Results.Slider = 22 AND Username = abc)",
@@ -500,6 +500,36 @@ describe("query with !group inside !struct", () => {
                 "and": [
                   { "==": [  { "var": "vendor" }, "Toyota"  ] },
                   { "==": [  { "var": "year" }, 2006  ] }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("insane nesting", () => {
+    export_checks(configs.with_group_and_struct_deep, inits.with_group_and_struct_deep, "JsonLogic", {
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              {
+                "and": [
+                  { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+                  {
+                    "some": [
+                      { "var": "manufactured.type" },
+                      {
+                        "and": [
+                          { "==": [ { "var": "segment" }, "C" ] },
+                          { "==": [ { "var": "class" }, "Mid" ] }
+                        ]
+                      }
+                    ]
+                  }
                 ]
               }
             ]

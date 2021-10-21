@@ -318,6 +318,32 @@ export const with_group_inside_struct_2 = {
   ]
 };
 
+export const with_group_and_struct_deep = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        {
+          "and": [
+            { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+            {
+              "some": [
+                { "var": "manufactured.type" },
+                {
+                  "and": [
+                    { "==": [ { "var": "segment" }, "C" ] },
+                    { "==": [ { "var": "class" }, "Mid" ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 export const with_number_field_compare = {
   "and": [
     { "==": [ { "var": "num" }, { "var": "num2" } ] }
