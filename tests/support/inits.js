@@ -361,6 +361,14 @@ export const with_group_and_struct_deep_old = {
   ]
 };
 
+export const with_group_and_struct_deep_old2 = {
+  "and": [
+    { "==": [ { "var": "vehicles.cars.manufactured.vendor" }, "Toyota" ] },
+    { "==": [ { "var": "vehicles.cars.manufactured.type.segment" }, "C" ] },
+    { "==": [ { "var": "vehicles.cars.manufactured.type.class" }, "Mid" ] },
+  ]
+};
+
 export const with_number_field_compare = {
   "and": [
     { "==": [ { "var": "num" }, { "var": "num2" } ] }

@@ -545,6 +545,12 @@ describe("query with !group inside !struct", () => {
     });
   });
 
+  describe("insane nesting in old format 2", () => {
+    export_checks(configs.with_group_and_struct_deep, inits.with_group_and_struct_deep_old2, "JsonLogic", {
+      "logic": inits.with_group_and_struct_deep
+    });
+  });
+
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
