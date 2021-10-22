@@ -83,7 +83,8 @@ export const defaultConjunction = (config) =>
   config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
 
 export const defaultGroupProperties = (config, fieldConfig = null) => new Immutable.Map({
-  conjunction: defaultGroupConjunction(config, fieldConfig)
+  conjunction: defaultGroupConjunction(config, fieldConfig),
+  not: false
 });
 
 export const defaultItemProperties = (config, item) => {

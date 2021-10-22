@@ -1,5 +1,7 @@
 # Changelog
 
+- master
+  - Add explicit `not: false` in new group (issue #512)
 - 4.6.0
   - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroupExt etc) to field's, operartor's and widget's props (PR #510)
   - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
