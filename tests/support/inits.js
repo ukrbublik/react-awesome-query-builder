@@ -344,6 +344,23 @@ export const with_group_and_struct_deep = {
   ]
 };
 
+export const with_group_and_struct_deep_old = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        {
+          "and": [
+            { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+            { "==": [ { "var": "manufactured.type.segment" }, "C" ] },
+            { "==": [ { "var": "manufactured.type.class" }, "Mid" ] },
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 export const with_number_field_compare = {
   "and": [
     { "==": [ { "var": "num" }, { "var": "num2" } ] }

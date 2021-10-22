@@ -398,7 +398,7 @@ export const with_group_and_struct_deep = (BasicConfig) => ({
                       label: "Segment",
                       type: "select",
                       fieldSettings: {
-                        listValues: ["B", "C", "D", "E"],
+                        listValues: ["A", "B", "C", "D", "E"],
                       },
                     },
                     class: {
