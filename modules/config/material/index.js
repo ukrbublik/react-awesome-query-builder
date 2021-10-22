@@ -1,8 +1,8 @@
 import MaterialWidgets from "../../components/widgets/material";
-import BasicConfig from "../basic";
+import BasicConfig, {stringifyForDisplay} from "../basic";
 import React from "react";
 import {SqlString} from "../../utils/sql";
-import {stringifyForDisplay} from "../basic";
+
 
 const {
   MaterialBooleanWidget,

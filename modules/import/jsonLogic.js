@@ -1,10 +1,10 @@
 import uuid from "../utils/uuid";
-import {defaultValue, isJsonLogic} from "../utils/stuff";
+import {defaultValue, isJsonLogic,shallowEqual} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
-import {shallowEqual} from "../utils/stuff";
+
 import moment from "moment";
 
 // http://jsonlogic.com/
@@ -297,9 +297,9 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
         const parts = f.split(fieldSeparator);
         const ancs = Object.fromEntries(
           parts.slice(0, -1)
-          .map((f, i, parts) => [...parts.slice(0, i), f])
-          .map(fp => [fp.join(fieldSeparator), getFieldConfig(config, fp)])
-          .filter(([_f, fc]) => fc.type == "!group")
+            .map((f, i, parts) => [...parts.slice(0, i), f])
+            .map(fp => [fp.join(fieldSeparator), getFieldConfig(config, fp)])
+            .filter(([_f, fc]) => fc.type == "!group")
         );
         return [f, Object.keys(ancs)];
       })
