@@ -2,6 +2,7 @@
 
 - master
   - Add explicit `not: false` in new group (issue #512)
+  - Fix: don't automatically add one rule to query when it become empty when `canLeaveEmptyGroup=true` (issue #504)
 - 4.6.0
   - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroupExt etc) to field's, operartor's and widget's props (PR #510)
   - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
