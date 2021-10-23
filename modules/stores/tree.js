@@ -64,8 +64,8 @@ const removeGroup = (state, path, config) => {
   if (isEmptyParentGroup && !canLeaveEmptyGroup) {
     // check ancestors for emptiness (and delete 'em if empty)
     state = fixEmptyGroupsInTree(state);
-
-    if (isEmptyTree(state)) {
+    
+    if (isEmptyTree(state) && !canLeaveEmptyGroup) {
       // if whole query is empty, add one empty rule to root
       state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
@@ -81,6 +81,7 @@ const removeGroup = (state, path, config) => {
 const removeRule = (state, path, config) => {
   state = removeItem(state, path);
 
+  const {canLeaveEmptyGroup} = config.settings;
   const parentPath = path.pop();
   const parent = state.getIn(expandTreePath(parentPath));
 
@@ -93,9 +94,9 @@ const removeRule = (state, path, config) => {
   
   const isParentRuleGroup = parent.get("type") == "rule_group";
   const isEmptyParentGroup = !hasChildren(state, parentPath);
-  const canLeaveEmpty = isEmptyParentGroup && (isParentRuleGroup 
-    ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere 
-    : config.settings.canLeaveEmptyGroup);
+  const canLeaveEmpty = isParentRuleGroup 
+    ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere
+    : canLeaveEmptyGroup;
   
   if (isEmptyParentGroup && !canLeaveEmpty) {
     if (isParentRuleGroup) {
@@ -106,7 +107,7 @@ const removeRule = (state, path, config) => {
     // check ancestors for emptiness (and delete 'em if empty)
     state = fixEmptyGroupsInTree(state);
 
-    if (isEmptyTree(state)) {
+    if (isEmptyTree(state) && !canLeaveEmptyGroup) {
       // if whole query is empty, add one empty rule to root
       state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
