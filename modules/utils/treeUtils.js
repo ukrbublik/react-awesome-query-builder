@@ -88,6 +88,13 @@ export const fixPathsInTree = (tree) => {
 
     const children = item.get("children1");
     if (children) {
+      if (children.constructor.name == "Map") {
+        // protect: should me OrderedMap, not Map (issue #501)
+        newTree = newTree.setIn(
+          expandTreePath(itemPath, "children1"), 
+          new Immutable.OrderedMap(children)
+        );
+      }
       children.map((child, _childId) => {
         _processNode(child, itemPath, lev + 1);
       });
