@@ -15,7 +15,7 @@ describe("query with conjunction", () => {
   describe("export", () => {
     export_checks(configs.with_number_and_string, inits.with_number_and_string, "JsonLogic", {
       query: '(num < 2 || login == "ukrbublik")',
-      queryHuman: '(Number < 2 OR login = ukrbublik)',
+      queryHuman: "(Number < 2 OR login = ukrbublik)",
       sql: "(num < 2 OR login = 'ukrbublik')",
       mongo: {
         "$or": [

@@ -154,9 +154,7 @@ export const with_nested_group = {
           }, {
             "some": [
               { "var": "user" },
-              {
-                "==": [  { "var": "name" },  "denis"  ]
-              }
+              { "==": [  { "var": "name" },  "denis"  ] }
             ]
           }
         ]
@@ -178,9 +176,7 @@ export const two_rules_with_nested_group = {
         { "var": "results" },
         { "some": [
           { "var": "user" }, 
-          {
-            "==": [ { "var": "name" },  "aaa" ]
-          }
+          { "==": [ { "var": "name" },  "aaa" ] }
         ] }
       ]
     }
@@ -193,6 +189,79 @@ export const with_struct_inside_group = {
       "some": [
         { "var": "results" },
         { "==": [  { "var": "user.name" },  "ddd"  ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1s = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { "==": [  { "var": "score" },  5  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { ">=": [  { "var": "user.age" },  18  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { "==": [  { "var": "quiz.name" },  "ethics"  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_2_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { "==": [  { "var": "quiz.name" },  "ethics"  ] },
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { ">": [  { "var": "quiz.max_score" },  70  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1_1s = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { ">": [  { "var": "quiz.max_score" },  70  ] },
+          { "<": [  { "var": "score" },  70  ] }
+        ] }
       ]
     }
   ]
@@ -219,6 +288,84 @@ export const with_two_groups_1 = {
     {
       "==": [ { "var": "num" },  -1 ]
     }
+  ]
+};
+
+export const with_group_inside_struct_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        { "and": [
+          { "==": [ { "var": "vendor" }, "Toyota" ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_group_inside_struct_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        { "and": [
+          { "==": [ { "var": "vendor" }, "Toyota" ] },
+          { "==": [ { "var": "year" }, 2006 ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_group_and_struct_deep = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        {
+          "and": [
+            { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+            {
+              "some": [
+                { "var": "manufactured.type" },
+                {
+                  "and": [
+                    { "==": [ { "var": "segment" }, "C" ] },
+                    { "==": [ { "var": "class" }, "Mid" ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const with_group_and_struct_deep_old = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        {
+          "and": [
+            { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+            { "==": [ { "var": "manufactured.type.segment" }, "C" ] },
+            { "==": [ { "var": "manufactured.type.class" }, "Mid" ] },
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const with_group_and_struct_deep_old2 = {
+  "and": [
+    { "==": [ { "var": "vehicles.cars.manufactured.vendor" }, "Toyota" ] },
+    { "==": [ { "var": "vehicles.cars.manufactured.type.segment" }, "C" ] },
+    { "==": [ { "var": "vehicles.cars.manufactured.type.class" }, "Mid" ] },
   ]
 };
 

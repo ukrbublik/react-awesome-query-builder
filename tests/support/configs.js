@@ -283,8 +283,139 @@ export const with_struct_inside_group = (BasicConfig) => ({
           subfields: {
             name: {
               type: "text",
+            },
+            age: {
+              type: "number",
             }
           }
+        },
+        quiz: {
+          type: "!struct",
+          subfields: {
+            name: {
+              type: "text",
+            },
+            max_score: {
+              type: "number",
+            }
+          }
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_inside_struct = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            vendor: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Ford", "Toyota", "Tesla"],
+              },
+              valueSources: ["value"],
+            },
+            year: {
+              type: "number",
+              fieldSettings: {
+                min: 1990,
+                max: 2021,
+              },
+              valueSources: ["value"],
+            }
+          }
+        },
+        bikes: {
+          label: "Bikes",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            price: {
+              type: "number",
+              valueSources: ["value"],
+            },
+            type: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Road", "Mountain"],
+              },
+              valueSources: ["value"],
+            },
+          }
+        },
+        other: {
+          type: "text",
+          valueSources: ["value"],
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_and_struct_deep = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            manufactured: {
+              label: "Manufactured",
+              type: "!struct",
+              subfields: {
+                vendor: {
+                  type: "select",
+                  fieldSettings: {
+                    listValues: ["Ford", "Toyota", "Tesla"],
+                  },
+                },
+                type: {
+                  label: "Type",
+                  type: "!group",
+                  mode: "some",
+                  subfields: {
+                    segment: {
+                      label: "Segment",
+                      type: "select",
+                      fieldSettings: {
+                        listValues: ["A", "B", "C", "D", "E"],
+                      },
+                    },
+                    class: {
+                      label: "Class",
+                      type: "select",
+                      fieldSettings: {
+                        listValues: ["Mid", "Cabriolet", "Offroad"],
+                      },
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        other: {
+          type: "text",
         }
       }
     },

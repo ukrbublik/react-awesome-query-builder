@@ -72,7 +72,7 @@ describe("query with !struct and !group", () => {
     });
   });
 
-  describe("should handle if !group isnot wrapped in #some", () => {
+  describe("should handle if !group isnot wrapped in #some (old format)", () => {
     export_checks(configs.with_struct_and_group, inits.with_struct_and_group_mixed_obsolete, "JsonLogic", {
       "query": "(results.slider == 22 && user.firstName == \"abc\")",
       "queryHuman": "(Results.Slider = 22 AND Username = abc)",
@@ -198,7 +198,7 @@ describe("query with nested !group", () => {
     });
   });
 
-  describe("with two nested groups", () => {
+  describe("with two nested groups - import with old format, export to new format", () => {
     export_checks(configs.with_nested_group, inits.with_two_groups_1, "JsonLogic", {
       "query": "((results.user.name == \"ddd\" && results.score == 2) && group2.inside == 33 && results.score == 2)",
       "queryHuman": "((Results.user.name = ddd AND Results.score = 2) AND Group2.inside = 33 AND Results.score = 2)",
@@ -243,9 +243,7 @@ describe("query with nested !group", () => {
                   {
                     "some": [
                       { "var": "user" },
-                      {
-                        "==": [ { "var": "name" },  "ddd" ]
-                      }
+                      { "==": [ { "var": "name" },  "ddd" ] }
                     ]
                   },
                   {
@@ -258,17 +256,13 @@ describe("query with nested !group", () => {
           {
             "some": [
               { "var": "group2" },
-              {
-                "==": [ { "var": "inside" },  33 ]
-              }
+              { "==": [ { "var": "inside" },  33 ] }
             ]
           },
           {
             "some": [
               { "var": "results" },
-              {
-                "==": [ { "var": "score" },  2 ]
-              }
+              { "==": [ { "var": "score" },  2 ] }
             ]
           }
         ]
@@ -281,7 +275,7 @@ describe("query with nested !group", () => {
 
 describe("query with !struct inside !group", () => {
 
-  describe("export", () => {
+  describe("with 1 struct, 1 subfield", () => {
     export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group, "JsonLogic", {
       "query": "results.user.name == \"ddd\"",
       "queryHuman": "Results.user.name = ddd",
@@ -303,6 +297,257 @@ describe("query with !struct inside !group", () => {
           }
         ]
       }
+    });
+  });
+
+  describe("with 1 struct, 1 subfield and 1 simple field", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1s, "JsonLogic", {
+      "query": "(results.user.age >= 18 && results.score == 5)",
+      "queryHuman": "(Results.user.age >= 18 AND Results.score = 5)",
+      "sql": "(results.user.age >= 18 AND results.score = 5)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.age": { "$gte": 18 },
+            "score": 5
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { ">=": [  { "var": "user.age" },  18  ] },
+                { "==": [  { "var": "score" },  5  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 1 struct, 2 subfields", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_2, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.user.age >= 18)",
+      "queryHuman": "(Results.user.name = denis AND Results.user.age >= 18)",
+      "sql": "(results.user.name = 'denis' AND results.user.age >= 18)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "user.age": { "$gte": 18 }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { ">=": [  { "var": "user.age" },  18  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 2 structs, 1 subfield per each", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.quiz.name == \"ethics\")",
+      "queryHuman": "(Results.user.name = denis AND Results.quiz.name = ethics)",
+      "sql": "(results.user.name = 'denis' AND results.quiz.name = 'ethics')",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "quiz.name": "ethics"
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { "==": [  { "var": "quiz.name" },  "ethics"  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 2 structs, 2 subfields per each", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_2_2, "JsonLogic", {
+      "query": "(results.user.name == \"denis\" && results.quiz.name == \"ethics\" && results.user.age >= 18 && results.quiz.max_score > 70)",
+      "queryHuman": "(Results.user.name = denis AND Results.quiz.name = ethics AND Results.user.age >= 18 AND Results.quiz.max_score > 70)",
+      "sql": "(results.user.name = 'denis' AND results.quiz.name = 'ethics' AND results.user.age >= 18 AND results.quiz.max_score > 70)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.name": "denis",
+            "quiz.name": "ethics",
+            "user.age": { "$gte": 18 },
+            "quiz.max_score": { "$gt": 70 }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { "==": [  { "var": "user.name" },  "denis"  ] },
+                { "==": [  { "var": "quiz.name" },  "ethics"  ] },
+                { ">=": [  { "var": "user.age" },  18  ] },
+                { ">": [  { "var": "quiz.max_score" },  70  ] },
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 2 structs, 1 subfield per each and 1 simple field", () => {
+    export_checks(configs.with_struct_inside_group, inits.with_struct_inside_group_1_1_1s, "JsonLogic", {
+      "query": "(results.user.age >= 18 && results.quiz.max_score > 70 && results.score < 70)",
+      "queryHuman": "(Results.user.age >= 18 AND Results.quiz.max_score > 70 AND Results.score < 70)",
+      "sql": "(results.user.age >= 18 AND results.quiz.max_score > 70 AND results.score < 70)",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "user.age": { "$gte": 18 },
+            "quiz.max_score": { "$gt": 70 },
+            "score": { "$lt": 70 }
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              { "and": [
+                { ">=": [  { "var": "user.age" },  18  ] },
+                { ">": [  { "var": "quiz.max_score" },  70  ] },
+                { "<": [  { "var": "score" },  70  ] }
+              ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe("query with !group inside !struct", () => {
+
+  describe("with 1 group, 1 subfield", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct_1, "JsonLogic", {
+      "sql": "vehicles.cars.vendor = 'Toyota'",
+      "mongo": {
+        "vehicles.cars": {
+          "$elemMatch": {
+            "vendor": "Toyota"
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              { "==": [  { "var": "vendor" }, "Toyota"  ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("with 1 group, 2 subfields", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_group_inside_struct_2, "JsonLogic", {
+      "sql": "(vehicles.cars.vendor = 'Toyota' AND vehicles.cars.year = 2006)",
+      "mongo": {
+        "vehicles.cars": {
+          "$elemMatch": {
+            "vendor": "Toyota",
+            "year": 2006
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              {
+                "and": [
+                  { "==": [  { "var": "vendor" }, "Toyota"  ] },
+                  { "==": [  { "var": "year" }, 2006  ] }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("insane nesting", () => {
+    export_checks(configs.with_group_and_struct_deep, inits.with_group_and_struct_deep, "JsonLogic", {
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "vehicles.cars" },
+              {
+                "and": [
+                  { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+                  {
+                    "some": [
+                      { "var": "manufactured.type" },
+                      {
+                        "and": [
+                          { "==": [ { "var": "segment" }, "C" ] },
+                          { "==": [ { "var": "class" }, "Mid" ] }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("insane nesting in old format", () => {
+    export_checks(configs.with_group_and_struct_deep, inits.with_group_and_struct_deep_old, "JsonLogic", {
+      "logic": inits.with_group_and_struct_deep
+    });
+  });
+
+  describe("insane nesting in old format 2", () => {
+    export_checks(configs.with_group_and_struct_deep, inits.with_group_and_struct_deep_old2, "JsonLogic", {
+      "logic": inits.with_group_and_struct_deep
     });
   });
 
