@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
@@ -36,7 +36,7 @@ const MaterialProvider = ({config, children}) => {
   const themeConfig = settingsTheme.material;
   const locale = settingsLocale.material;
   const useTheme = themeConfig || locale;
-  const theme = useTheme ? createMuiTheme(themeConfig, locale) : null;
+  const theme = useTheme ? createTheme(themeConfig, locale) : null;
 
   const base = (<div className="mui">{children}</div>);
   const withProviders = (
