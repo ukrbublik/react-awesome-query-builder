@@ -29,14 +29,13 @@ import mapValues from "lodash/mapValues";
  */
 const addNewGroup = (state, path, groupUuid, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
+  const groupPath = path.push(groupUuid);
   const {maxNumberOfRules, shouldCreateEmptyGroup} = config.settings;
   const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
   state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
 
   if (!children) {
-    const groupPath = path.push(groupUuid);
-    // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
     state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
     // Add one empty rule into new group
@@ -171,9 +170,16 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
   _addChildren1(config, item, children);
 
   if (canAddNewRule) {
-    state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
+    const childrenPath = expandTreePath(path, "children1");
+    const hasChildren = !!state.getIn(childrenPath);
+    const newChildren = new Immutable.OrderedMap({
       [id]: new Immutable.Map(item)
-    }));
+    });
+    if (!hasChildren) {
+      state = state.setIn(childrenPath, newChildren);
+    } else {
+      state = state.mergeIn(childrenPath, newChildren);
+    }
   }
   state = fixPathsInTree(state);
   return state;
