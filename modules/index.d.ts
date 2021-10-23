@@ -729,6 +729,7 @@ export interface BehaviourSettings {
   clearValueOnChangeOp?: boolean,
   canLeaveEmptyGroup?: boolean,
   shouldCreateEmptyGroup?: boolean,
+  forceShowConj?: boolean,
   immutableGroupsMode?: boolean,
   immutableFieldsMode?: boolean,
   immutableOpsMode?: boolean,
