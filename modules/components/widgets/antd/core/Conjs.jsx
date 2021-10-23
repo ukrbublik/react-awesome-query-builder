@@ -35,11 +35,13 @@ export default class ConjsButtons extends PureComponent {
     const {readonly, disabled, not, conjunctionOptions, config, setConjunction, notLabel, showNot} = this.props;
     const conjsCount = Object.keys(conjunctionOptions).length;
     const lessThenTwo = disabled;
+    const {forceShowConj, renderSize} = config.settings;
+    const showConj = forceShowConj || conjsCount > 1 && !lessThenTwo;
 
     return (
       <ButtonGroup
         key="group-conjs-buttons"
-        size={config.settings.renderSize}
+        size={renderSize}
         disabled={disabled || readonly}
       >
         {showNot && (readonly ? not : true)
@@ -50,7 +52,7 @@ export default class ConjsButtons extends PureComponent {
             disabled={readonly}
           >{notLabel}</Button>
         }
-        {conjsCount > 1 && !lessThenTwo && map(conjunctionOptions, (item, _index) => readonly && !item.checked ? null : (
+        {showConj && map(conjunctionOptions, (item, _index) => (readonly || disabled) && !item.checked ? null : (
           <ConjsButton
             key={item.id}
             item={item}
