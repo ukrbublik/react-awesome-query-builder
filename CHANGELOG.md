@@ -1,6 +1,6 @@
 # Changelog
 
-- master
+- 4.7.0
   - Add explicit `not: false` in new group (issue #512)
   - Fix: don't automatically add one rule to query when it become empty when `canLeaveEmptyGroup=true` (issue #504)
   - Added config `forceShowConj` (issue #474)
