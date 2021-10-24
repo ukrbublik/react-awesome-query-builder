@@ -15,7 +15,7 @@ const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mo
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
-const initialSkin = "antd";
+const initialSkin = window._initialSkin || "antd";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
@@ -31,6 +31,12 @@ const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
   _initValue: initValue,
 } });
 window.dispatchEvent(updateEvent);
+
+declare global {
+  interface Window {
+    _initialSkin: string;
+  }
+}
 
 interface CustomEventDetail {
   config: Config;
@@ -120,6 +126,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         config,
         tree: checkTree(this.state.tree, config)
       });
+      window._initialSkin = skin;
     };
 
     clearValue = () => {
