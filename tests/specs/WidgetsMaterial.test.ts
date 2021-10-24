@@ -2,8 +2,21 @@ import moment from "moment";
 import { expect } from "chai";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb_material } from "../support/utils";
+import { with_qb_material, hexToRgbString } from "../support/utils";
 
+describe("material-ui theming", () => {
+  it("applies secondary color", () => {
+    with_qb_material(configs.with_theme_material, inits.with_bool, "JsonLogic", (qb) => {
+      const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
+      expect(boolSwitch, "boolSwitch").to.have.length(1);
+      const boolSwitchNode = boolSwitch.at(0).getDOMNode() as HTMLElement;
+      const boolSwitchStyle = getComputedStyle(boolSwitchNode);
+      expect(boolSwitchStyle.getPropertyValue('color'), "boolSwitch color").to.eq(hexToRgbString("#edf2ff"));
+    }, {
+      attach: true
+    });
+  });
+});
 
 describe("material-ui widgets interactions", () => {
 
