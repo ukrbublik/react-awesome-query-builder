@@ -93,9 +93,9 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
   let qb: ReactWrapper;
   let qbWrapper: HTMLElement;
   act(() => {
-    let mountOptions: MountRendererProps = {};
+    const mountOptions: MountRendererProps = {};
     if (options?.attach) {
-      qbWrapper = global.document.createElement('div');
+      qbWrapper = global.document.createElement("div");
       global.document.body.appendChild(qbWrapper);
       mountOptions.attachTo = qbWrapper;
     }
@@ -250,13 +250,7 @@ const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onC
 };
 
 export function hexToRgb(hex: string) {
-  // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-    return r + r + g + g + b + b;
-  });
-
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
     r: parseInt(result[1], 16),
     g: parseInt(result[2], 16),

@@ -9,9 +9,9 @@ describe("material-ui theming", () => {
     with_qb_material(configs.with_theme_material, inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
       expect(boolSwitch, "boolSwitch").to.have.length(1);
-      const boolSwitchNode = boolSwitch.at(0).getDOMNode() as HTMLElement;
+      const boolSwitchNode = boolSwitch.at(0).getDOMNode() ;
       const boolSwitchStyle = getComputedStyle(boolSwitchNode);
-      expect(boolSwitchStyle.getPropertyValue('color'), "boolSwitch color").to.eq(hexToRgbString("#edf2ff"));
+      expect(boolSwitchStyle.getPropertyValue("color"), "boolSwitch color").to.eq(hexToRgbString("#edf2ff"));
     }, {
       attach: true
     });
