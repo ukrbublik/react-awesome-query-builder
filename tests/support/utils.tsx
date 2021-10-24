@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { mount, shallow, ReactWrapper } from "enzyme";
+import { mount, shallow, ReactWrapper, MountRendererProps } from "enzyme";
 import { act } from "react-dom/test-utils";
 import sinon, {spy} from "sinon";
 import { expect } from "chai";
@@ -35,6 +35,9 @@ interface Tasks {
   expect_checks: (expects: ExtectedExports) => void;
   config: Config;
 }
+interface DoOptions {
+  attach?: boolean;
+}
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
@@ -51,25 +54,25 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   return checkTree(tree, config);
 };
 
-export  const with_qb = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
-  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
+export  const with_qb = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
 };
 
-export  const with_qb_ant = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
-  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
+export  const with_qb_ant = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
 };
 
-export  const with_qb_material = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
-  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks);
+export  const with_qb_material = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
   
-export  const with_qb_skins = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
-  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks);
-  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks);
-  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks);
+export  const with_qb_skins = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
+  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
+  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
   
-const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn) => {
+const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   const config = config_fn(BasicConfig);
   const onChange = spy();
   const tree = load_tree(value, config, valueFormat);
@@ -88,22 +91,37 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
   };
 
   let qb: ReactWrapper;
+  let qbWrapper: HTMLElement;
   act(() => {
+    const mountOptions: MountRendererProps = {};
+    if (options?.attach) {
+      qbWrapper = global.document.createElement("div");
+      global.document.body.appendChild(qbWrapper);
+      mountOptions.attachTo = qbWrapper;
+    }
     qb = mount(
       <Query
         {...config}
         value={tree}
         renderBuilder={render_builder}
         onChange={onChange}
-      />
+      />, 
+      mountOptions
     ) as ReactWrapper;
   });
 
   // @ts-ignore
   checks(qb, onChange, tasks);
 
-  // @ts-ignore
-  qb.unmount();
+  if (options?.attach) {
+    // @ts-ignore
+    qb.detach();
+    // @ts-ignore
+    global.document.body.removeChild(qbWrapper);
+  } else {
+    // @ts-ignore
+    qb.unmount();
+  }
   
   onChange.resetHistory();
 };
@@ -230,3 +248,22 @@ const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onC
   const {logic: changedTreeJl} = jsonLogicFormat(call.args[0], config);
   expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
 };
+
+export function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+export function hexToRgbString(hex: string) {
+  const rgb = hexToRgb(hex);
+  if (rgb) {
+    const {r, g, b} = rgb;
+    return `rgb(${r}, ${g}, ${b})`;
+  } else {
+    return null;
+  }
+}

@@ -114,7 +114,26 @@ export const with_date_and_time = (BasicConfig) => ({
     },
   },
 });
-  
+
+
+export const with_theme_material = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    theme: {
+      material: {
+        palette: {
+          primary: {
+            main: "#5e00d7",
+          },
+          secondary: {
+            main: "#edf2ff",
+          },
+        },
+      }
+    },
+  }
+});
   
 export const with_select = (BasicConfig) => ({
   ...BasicConfig,
