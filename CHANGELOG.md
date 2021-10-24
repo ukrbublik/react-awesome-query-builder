@@ -1,8 +1,22 @@
 # Changelog
 
-- 4.5.3
+- 4.7.0
+  - Add explicit `not: false` in new group (issue #512)
+  - Fix: don't automatically add one rule to query when it become empty when `canLeaveEmptyGroup=true` (issue #504)
+  - Added config `forceShowConj` (issue #474)
+  - Fixed import of complex hierarchy fields (combination of !group and !struct) from JsonLogic (issues #517, #333)
+  - Fixed non-ordered map bug (issue #501)
+- 4.6.0
   - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroupExt etc) to field's, operartor's and widget's props (PR #510)
   - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
+  - Added 3rd param `actionMeta` to `onChange()` to get info about action (PR #445) (issue #351)
+  - Added demo of using actions programmatically (see `run actions` in demo app) (PR #445)
+  - Added config `shouldCreateEmptyGroup` (default `false`) (PR #445)
+  - Now config `canLeaveEmptyGroup` is true by default (PR #445) (issue #504)
+  - Breaking changes for format with `isForDisplay=true` - don't wrap strings with `"`, replace `==` with `=` (PR #518)
+  - Fixed type definition for export utils - can return undefined (PR #516)
+  - Fixed use of `hideOperator` (PR #523) (issue #292)
+  - Documented `cancelText` (PR #524) (issue #520)
 - 4.5.2
   - Added rule `id` to field's, operartor's and widget's props. Added config of the selected field to the operator props as `fieldConfig` (issue #502) (PR #503)
 - 4.5.1

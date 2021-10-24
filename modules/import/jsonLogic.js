@@ -1,9 +1,10 @@
 import uuid from "../utils/uuid";
-import {defaultValue, isJsonLogic} from "../utils/stuff";
+import {defaultValue, isJsonLogic,shallowEqual} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+
 import moment from "moment";
 
 // http://jsonlogic.com/
@@ -104,7 +105,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
       || convertFunc(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertVal(logic, fieldConfig, widget, config, meta);
   } else if(expectedType == "rule") {
-    ret = convertConj(op, vals, conv, config, not, meta, parentField) 
+    ret = convertConj(op, vals, conv, config, not, meta, parentField, false) 
     || convertOp(op, vals, conv, config, not, meta, parentField);
   }
 
@@ -277,26 +278,37 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
 };
 
 
-const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
+const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRuleGroup = false) => {
   const conjKey = conv.conjunctions[op];
   const {fieldSeparator} = config.settings;
+  const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+  const isParentGroup = parentFieldConfig?.type == "!group";
   if (conjKey) {
     let type = "group";
     const children = vals
       .map(v => convertFromLogic(v, conv, config, "rule", meta, false, null, null, parentField))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
-    const complexFields = Object.entries(children)
-      .filter(([_k, v]) => v.properties !== undefined && v.properties.field !== undefined && v.properties.field.indexOf(fieldSeparator) != -1)
-      .map(([_k, v]) => (v.properties.field.split(fieldSeparator)));
-    const complexFieldsParents = complexFields
-      .map(parts => parts.slice(0, parts.length - 1).join(fieldSeparator));
-    const complexFieldsConfigs = arrayToObject(
-      arrayUniq(complexFieldsParents).map(f => [f, getFieldConfig(config, f)])
+    const complexFields = Object.values(children)
+      .map(v => v?.properties?.field)
+      .filter(f => f && f.includes(fieldSeparator));
+    const complexFieldsGroupAncestors = Object.fromEntries(
+      arrayUniq(complexFields).map(f => {
+        const parts = f.split(fieldSeparator);
+        const ancs = Object.fromEntries(
+          parts.slice(0, -1)
+            .map((f, i, parts) => [...parts.slice(0, i), f])
+            .map(fp => [fp.join(fieldSeparator), getFieldConfig(config, fp)])
+            .filter(([_f, fc]) => fc.type == "!group")
+        );
+        return [f, Object.keys(ancs)];
+      })
     );
-    const complexFieldsInRuleGroup = complexFieldsParents
-      .filter((f) => complexFieldsConfigs[f].type == "!group");
-    const usedRuleGroups = arrayUniq(complexFieldsInRuleGroup);
+    const childrenInRuleGroup = Object.values(children)
+      .map(v => v?.properties?.field)
+      .map(f => complexFieldsGroupAncestors[f])
+      .filter(ancs => ancs && ancs.length);
+    const usedRuleGroups = arrayUniq(Object.values(complexFieldsGroupAncestors).flat());
     const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
     let properties = {
@@ -306,58 +318,57 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     const id = uuid();
 
     let children1 = {};
-    // TIP: `needSplit` will be true if using mode=struct and there are fields of different groups on one level
-    //      (like "a.b" and "x.z" -> need to split them with hierarchy)
-    // TIP: Even if fields are of same root parent (like "a.b", "a.c.d"), still we may need to create hierarchy of `rule_group`s
-    const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
     let groupToId = {};
     Object.entries(children).map(([k, v]) => {
       if (v.type == "group" || v.type == "rule_group") {
         // put as-is
         children1[k] = v;
       } else {
-        const groupFields = usedRuleGroups.filter((f) => v.properties.field.indexOf(f) == 0);
-        const groupField = groupFields.length > 0 ? groupFields.sort((a, b) => (b.length - a.length))[0] : null;
+        const field = v?.properties?.field;
+        const groupAncestors = complexFieldsGroupAncestors[field];
+        const groupField = groupAncestors?.at(-1);
         if (!groupField) {
           // not in rule_group (can be simple field or in struct) - put as-is
           children1[k] = v;
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
-          groupField.split(fieldSeparator).map((f, i, a) => {
-            const p = a.slice(0, i);
-            let ff = [...p, f].join(fieldSeparator);
-            ff = normalizeField(config, ff);
-            const ffConfig = getFieldConfig(config, ff) || {};
-            if (!needSplit && i == 0) {
-              type = "rule_group";
-              properties.field = ff;
-              properties.mode = ffConfig.mode;
-              groupToId[ff] = id;
-            } else {
-              let groupId = groupToId[ff];
-              if (!groupId) {
-                groupId = uuid();
-                groupToId[ff] = groupId;
-                ch[groupId] = {
-                  type: "rule_group",
-                  id: groupId,
-                  children1: {},
-                  properties: {
-                    conjunction: conjKey,
-                    not: false,
-                    field: ff,
-                    mode: ffConfig.mode,
-                  }
-                };
-              }
-              ch = ch[groupId].children1;
+          let parentFieldParts = parentField ? parentField.split(fieldSeparator) : [];
+          const isInParent = shallowEqual(parentFieldParts, groupField.split(fieldSeparator).slice(0, parentFieldParts.length));
+          if (!isInParent)
+            parentFieldParts = []; // should not be
+          const traverseGroupFields = groupField
+            .split(fieldSeparator)
+            .slice(parentFieldParts.length)
+            .map((f, i, parts) => [...parentFieldParts, ...parts.slice(0, i), f].join(fieldSeparator))
+            .map(f => normalizeField(config, f))
+            .map((f) => ({f, fc: getFieldConfig(config, f) || {}}))
+            .filter(({fc}) => (fc.type != "!struct"));
+          traverseGroupFields.map(({f: gf, fc: gfc}, i) => {
+            let groupId = groupToId[gf];
+            if (!groupId) {
+              groupId = uuid();
+              groupToId[gf] = groupId;
+              ch[groupId] = {
+                type: "rule_group",
+                id: groupId,
+                children1: {},
+                properties: {
+                  conjunction: conjKey,
+                  not: false,
+                  field: gf,
+                  mode: gfc.mode,
+                }
+              };
             }
+            ch = ch[groupId].children1;
           });
           ch[k] = v;
         }
       }
     });
+
+    // tip: for isRuleGroup=true correct type and properties will be set out of this func
 
     return {
       type: type,
@@ -578,13 +589,15 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     const _not = false;
 
     if (conv.conjunctions[conj] !== undefined) {
-      res = convertConj(conj, havingVals, conv, config, _not, meta, field);
+      res = convertConj(conj, havingVals, conv, config, _not, meta, field, true);
     } else {
       // need to be wrapped in `rule_group`
       const rule = convertOp(conj, havingVals, conv, config, _not, meta, field);
       res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
     }
+    res.type = "rule_group";
     Object.assign(res.properties, {
+      field: field,
       mode: fieldConfig.mode,
       not: (canRev ? false : not),
       operator: opKey,

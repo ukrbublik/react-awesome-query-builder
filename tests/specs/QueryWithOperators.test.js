@@ -7,7 +7,7 @@ describe("query with ops", () => {
   describe("export", () => {
     export_checks(configs.with_all_types, inits.with_ops, "JsonLogic", {
       "query": "(num != 2 && str Like \"abc\" && str Not Like \"xyz\" && num >= 1 && num <= 2 && !(num >= 3 && num <= 4) && !num && color IN (\"yellow\") && color NOT IN (\"green\") && multicolor != [\"yellow\"])",
-      "queryHuman": "(Number != 2 AND String Like \"abc\" AND String Not Like \"xyz\" AND Number BETWEEN 1 AND 2 AND NOT(Number BETWEEN 3 AND 4) AND Number IS EMPTY AND Color IN (\"Yellow\") AND Color NOT IN (\"Green\") AND Colors != [\"Yellow\"])",
+      "queryHuman": "(Number != 2 AND String Like abc AND String Not Like xyz AND Number BETWEEN 1 AND 2 AND NOT (Number BETWEEN 3 AND 4) AND Number IS EMPTY AND Color IN (Yellow) AND Color NOT IN (Green) AND Colors != [Yellow])",
       "sql": "(num <> 2 AND str LIKE '%abc%' AND str NOT LIKE '%xyz%' AND num BETWEEN 1 AND 2 AND num NOT BETWEEN 3 AND 4 AND num IS EMPTY AND color IN ('yellow') AND color NOT IN ('green') AND multicolor != 'yellow')",
       "mongo": {
         "num": {

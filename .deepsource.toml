@@ -1,0 +1,16 @@
+version = 1
+
+test_patterns = ["tests/**"]
+
+exclude_patterns = [
+  "sandbox_simple/**",
+  "sandbox/**",
+  "scripts/**"
+]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]
+  plugins = ["react"]

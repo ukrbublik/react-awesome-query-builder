@@ -286,10 +286,12 @@ Behaviour settings:
 |canRegroup |true |Allow move rules (or groups) in/out groups during reorder? +
   False - allow "safe" reorder, means only reorder at same level
 |showNot |true |Show `NOT` together with `AND`/`OR`?
+|forceShowConj |false |Show conjuction for 1 rule in group?
 |maxNumberOfRules | |Maximum number of rules which can be added to the query builder
 |maxNesting | |Max nesting for rule groups. +
   Set `1` if you don't want to use groups at all. This will remove also `Add group` button.
-|canLeaveEmptyGroup |true |Leave empty group after deletion or add 1 clean rule immediately?
+|canLeaveEmptyGroup |true |True - leave empty group after deletion of rules, false - automatically remove empty groups + add 1 empty rule to empty root
+|shouldCreateEmptyGroup |false |False - automatically add 1 empty rule into new group
 |immutableGroupsMode |false |Not allow to add/delete rules or groups, but allow change
 |immutableFieldsMode |false |Not allow to change fields
 |immutableOpsMode |false |Not allow to change operators
@@ -398,9 +400,11 @@ Localization:
 |removeRuleConfirmOptions.title |Are you sure delete this rule?
 |removeRuleConfirmOptions.okText |Yes
 |removeRuleConfirmOptions.okType |`danger`
+|removeRuleConfirmOptions.cancelText |Cancel
 |removeGroupConfirmOptions.title |Are you sure delete this group?
 |removeGroupConfirmOptions.okText |Yes
 |removeGroupConfirmOptions.okType |`danger`
+|removeGroupConfirmOptions.cancelText |Cancel
 |===
 
 
@@ -540,7 +544,7 @@ const {
     type: 'text',
     valueSrc: 'value',
     factory: (props) => <TextWidget {...props} />,
-    formatValue: (val, _fieldDef, _wgtDef, isForDisplay) => (isForDisplay ? '"' + val + '"' : JSON.stringify(val)),
+    formatValue: (val, _fieldDef, _wgtDef, isForDisplay) => (isForDisplay ? val.toString() : JSON.stringify(val)),
     mongoFormatValue: (val, _fieldDef, _wgtDef) => (val),
     // Options:
     valueLabel: "Text",
@@ -581,6 +585,7 @@ const {
 |labelYes, labelNo | | |Option for `<BooleanWidget>`
 |customProps | | |You can pass any props directly to widget with `customProps`. +
   For example enable search for https://ant.design/components/select/[`<Select>`] widget: `customProps: {showSearch: true}`
+|hideOperator | | |Hide operator?
 |===
 
 NOTE: There is special `field` widget, rendered by `<ValueFieldWidget>`. +

@@ -114,7 +114,26 @@ export const with_date_and_time = (BasicConfig) => ({
     },
   },
 });
-  
+
+
+export const with_theme_material = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    theme: {
+      material: {
+        palette: {
+          primary: {
+            main: "#5e00d7",
+          },
+          secondary: {
+            main: "#edf2ff",
+          },
+        },
+      }
+    },
+  }
+});
   
 export const with_select = (BasicConfig) => ({
   ...BasicConfig,
@@ -283,8 +302,139 @@ export const with_struct_inside_group = (BasicConfig) => ({
           subfields: {
             name: {
               type: "text",
+            },
+            age: {
+              type: "number",
             }
           }
+        },
+        quiz: {
+          type: "!struct",
+          subfields: {
+            name: {
+              type: "text",
+            },
+            max_score: {
+              type: "number",
+            }
+          }
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_inside_struct = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            vendor: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Ford", "Toyota", "Tesla"],
+              },
+              valueSources: ["value"],
+            },
+            year: {
+              type: "number",
+              fieldSettings: {
+                min: 1990,
+                max: 2021,
+              },
+              valueSources: ["value"],
+            }
+          }
+        },
+        bikes: {
+          label: "Bikes",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            price: {
+              type: "number",
+              valueSources: ["value"],
+            },
+            type: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Road", "Mountain"],
+              },
+              valueSources: ["value"],
+            },
+          }
+        },
+        other: {
+          type: "text",
+          valueSources: ["value"],
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_and_struct_deep = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            manufactured: {
+              label: "Manufactured",
+              type: "!struct",
+              subfields: {
+                vendor: {
+                  type: "select",
+                  fieldSettings: {
+                    listValues: ["Ford", "Toyota", "Tesla"],
+                  },
+                },
+                type: {
+                  label: "Type",
+                  type: "!group",
+                  mode: "some",
+                  subfields: {
+                    segment: {
+                      label: "Segment",
+                      type: "select",
+                      fieldSettings: {
+                        listValues: ["A", "B", "C", "D", "E"],
+                      },
+                    },
+                    class: {
+                      label: "Class",
+                      type: "select",
+                      fieldSettings: {
+                        listValues: ["Mid", "Cabriolet", "Offroad"],
+                      },
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        other: {
+          type: "text",
         }
       }
     },
@@ -425,6 +575,15 @@ export const with_all_types__show_error = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     showErrorMessage: true,
+  }
+});
+
+export const dont_leave_empty_group = (BasicConfig) => ({
+  ...simple_with_numbers_and_str(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    canLeaveEmptyGroup: false,
+    shouldCreateEmptyGroup: false
   }
 });
 
@@ -655,7 +814,7 @@ export const with_group_array = (BasicConfig) => ({
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }
@@ -698,7 +857,7 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }

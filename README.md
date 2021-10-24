@@ -38,7 +38,7 @@ Now [Material-UI](https://material-ui.com/) is also supported!
   (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
-- TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples))
+- TypeScript support (see [types](/modules/index.d.ts) and [demo in TS](/examples))
 
 
 ## Getting started
@@ -62,9 +62,9 @@ See [basic usage](#usage) for minimum code example.
 See [API](#api) and [config](#config-format) for documentation. 
 
 Demo apps:
-- [`npm start`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`npm run sandbox-ts`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- [`npm run sandbox-js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+- [`npm start`](/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`npm run sandbox-ts`](/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- [`npm run sandbox-js`](/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 
 
 
@@ -321,15 +321,16 @@ export const Demo: React.FC = () => {
 
 ### `<Query />`
 Props:
-- `{...config}` - destructured query [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
+- `{...config}` - destructured query [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
-- `onChange` - callback when value changed. Params: `value` (in Immutable format), `config`.
+- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/modules/index.d.ts)).
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
+- `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically (for list of actions see `Actions` in [`index.d.ts`](/modules/index.d.ts)).
 
 ### `<Builder />`
 Render this component only inside `Query.renderBuilder()` like in example above:
@@ -382,7 +383,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 This library uses configarion driven aprroach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
 At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
-See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) for full documentation.
+See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
 
@@ -401,7 +402,7 @@ It's recommended to update your version.
 | 0.x     | :x:                |
 
 ### Changelog
-See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CHANGELOG.md)
+See [`CHANGELOG`](/CHANGELOG.md)
 
 ### Migration from v1 to v2
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
@@ -417,20 +418,20 @@ Open `http://localhost:3001/` in a browser.
 You will see demo app with hot reload of demo code and local library code. 
 
 ### Directory structure
-- `modules` - Main source code of library
-  - `components` - Core React components
-    - `widgets` - Components to render list of fields, operators, values of different types. Built with UI frameworks
-  - `config` - Basic config lives here. See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) docs.
-  - `export` - Code for export to JsonLogic, MongoDb, SQL, ElasticSearch, plain string
-  - `import` - Code for import from JsonLogic
-  - `actions` - Redux actions
-  - `stores/tree.js` - Redux store
-  - `index.d.ts` - TS definitions
-- `css` - Styles for query builder
-- `examples` - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- `sandbox` - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- `sandbox_simple` - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
-- `tests` - All tests are here. Uses Karma, Mocha, Chai, Enzyme
+- [`modules`](/modules) - Main source code of library
+  - [`components`](/modules/components) - Core React components
+    - [`widgets`](/modules/components/widgets) - Components to render list of fields, operators, values of different types. Built with UI frameworks
+  - [`config`](/modules/config) - Basic config lives here. See [`CONFIG`](/CONFIG.adoc) docs.
+  - [`export`](/modules/export) - Code for export to JsonLogic, MongoDb, SQL, ElasticSearch, plain string
+  - [`import`](/modules/import) - Code for import from JsonLogic
+  - [`actions`](/modules/actions) - Redux actions
+  - [`stores/tree.js`](/modules/stores/tree.js) - Redux store
+  - [`index.d.ts`](/modules/index.d.ts) - TS definitions
+- [`css`](/css) - Styles for query builder
+- [`examples`](/examples) - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`sandbox`](/sandbox) - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- [`sandbox_simple`](/sandbox_simple) - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+- [`tests`](/tests) - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts
 - `npm run install-all` - Install npm packages in root, examples, sandboxes. **Required for other scripts!**
@@ -447,14 +448,14 @@ Pull Requests are always welcomed :)
 
 ### Other UI frameworks
 Currently there are 3 collections of widgets:
-- [antdesign widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/antd)
-- [material widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/material)
-- [vanilla widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/vanilla)
+- [antdesign widgets](/modules/components/widgets/antd)
+- [material widgets](/modules/components/widgets/material)
+- [vanilla widgets](/modules/components/widgets/vanilla)
 
 Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
 You can use vanilla widgets as skeleton.  
 Then to enable new widgets you need to create config overrides like this:
-[material config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/material/index.js)
+[material config](/modules/config/material/index.js)
 
 
 

@@ -16,7 +16,7 @@ describe("query with subquery and datetime types", () => {
   describe("export", () => {
     export_checks(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", {
       "query": "(datetime == \"2020-05-18 21:50:01\" || (date == \"2020-05-18\" && time == \"00:50:00\"))",
-      "queryHuman": "(DateTime == \"18.05.2020 21:50\" OR (Date == \"18.05.2020\" AND Time == \"00:50\"))",
+      "queryHuman": "(DateTime = 18.05.2020 21:50 OR (Date = 18.05.2020 AND Time = 00:50))",
       "sql": "(datetime = '2020-05-18 21:50:01.000' OR (date = '2020-05-18' AND time = '00:50:00'))",
       "mongo": {
         "$or": [
@@ -62,7 +62,7 @@ describe("query with subquery and select types", () => {
   describe("export", () => {
     export_checks(configs.with_select, inits.with_select_and_multiselect, "JsonLogic", {
       "query": "(color == \"yellow\" && multicolor == [\"yellow\", \"green\"])",
-      "queryHuman": "(Color == \"Yellow\" AND Colors == [\"Yellow\", \"Green\"])",
+      "queryHuman": "(Color = Yellow AND Colors = [Yellow, Green])",
       "sql": "(color = 'yellow' AND multicolor = 'yellow,green')",
       "mongo": {
         "color": "yellow",

@@ -96,7 +96,7 @@ describe("antdesign widgets interactions", () => {
     with_qb_ant(configs.with_all_types, inits.with_treeselect, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
       expect_checks({
         "query": "selecttree == \"2\"",
-        "queryHuman": "Color (tree) == \"Red\"",
+        "queryHuman": "Color (tree) = Red",
         "sql": "selecttree = '2'",
         "mongo": {
           "selecttree": "2"
@@ -122,7 +122,7 @@ describe("antdesign widgets interactions", () => {
     with_qb_ant(configs.with_all_types, inits.with_multiselecttree, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
       expect_checks({
         "query": "multiselecttree == [\"2\", \"5\"]",
-        "queryHuman": "Colors (tree) == [\"Red\", \"Green\"]",
+        "queryHuman": "Colors (tree) = [Red, Green]",
         "sql": "multiselecttree = '2,5'",
         "mongo": {
           "multiselecttree": [ "2", "5" ]
@@ -259,7 +259,7 @@ describe("antdesign widgets interactions", () => {
       with_qb_ant(configs.with_all_types, inits.with_range_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
         expect_checks({
           "query": "date >= \"2020-05-10\" && date <= \"2020-05-15\"",
-          "queryHuman": "Date BETWEEN \"10.05.2020\" AND \"15.05.2020\"",
+          "queryHuman": "Date BETWEEN 10.05.2020 AND 15.05.2020",
           "sql": "date BETWEEN '2020-05-10' AND '2020-05-15'",
           "mongo": {
             "date": { "$gte": "2020-05-10T00:00:00.000Z", "$lte": "2020-05-15T00:00:00.000Z" }

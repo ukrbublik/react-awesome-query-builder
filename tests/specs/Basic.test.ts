@@ -48,7 +48,7 @@ describe("basic query", () => {
     describe("should work with simple value in JsonLogic format not in group", () => {
       export_checks(configs.simple_with_number, inits.with_number_not_in_group, "JsonLogic", {
         query: "num == 2",
-        queryHuman: "Number == 2",
+        queryHuman: "Number = 2",
         sql: "num = 2",
         mongo: {num: 2},
         logic: {
@@ -80,7 +80,7 @@ describe("basic query", () => {
   describe("export", () => {
     export_checks(configs.simple_with_number, inits.tree_with_number, "default", {
       query: "num == 2",
-      queryHuman: "Number == 2",
+      queryHuman: "Number = 2",
       sql: "num = 2",
       mongo: {num: 2},
       logic: {
