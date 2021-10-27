@@ -73,22 +73,24 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
     render = () => (
       <div>
+        <div>
+          <select value={this.state.skin} onChange={this.changeSkin}>
+            <option key="vanilla">vanilla</option>
+            <option key="antd">antd</option>
+            <option key="material">material</option>
+          </select>
+          <button onClick={this.resetValue}>reset</button>
+          <button onClick={this.clearValue}>clear</button>
+          <button onClick={this.runActions}>run actions</button>
+          <button onClick={this.validate}>validate</button>
+        </div>
+        
         <Query
           {...this.state.config}
           value={this.state.tree}
           onChange={this.onChange}
           renderBuilder={this.renderBuilder}
         />
-
-        <select value={this.state.skin} onChange={this.changeSkin}>
-          <option key="vanilla">vanilla</option>
-          <option key="antd">antd</option>
-          <option key="material">material</option>
-        </select>
-        <button onClick={this.resetValue}>reset</button>
-        <button onClick={this.clearValue}>clear</button>
-        <button onClick={this.runActions}>run actions</button>
-        <button onClick={this.validate}>validate</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
