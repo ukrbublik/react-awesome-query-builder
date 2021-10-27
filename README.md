@@ -1,23 +1,47 @@
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/ukrbublik/react-awesome-query-builder/gh-pages/logo_full_200.png" height="160" />
+  <a href="https://ukrbublik.github.io/react-awesome-query-builder/" rel="noopener" target="_blank"><img src="https://raw.githubusercontent.com/ukrbublik/react-awesome-query-builder/gh-pages/logo_full_200.png" /></a>
 </p>
 
-[![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder) [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) [![Smoke](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml/badge.svg)](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml?query=branch%3Amaster) [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder) [![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design) [![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=Material%20UI)](https://material-ui.com) [![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
-[![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/) [![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx) [![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple?file=/src/demo/config_simple.js)
+[![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder)
+[![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder)
+[![Smoke](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml/badge.svg)](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml?query=branch%3Amaster)
+[![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder)
+[![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design)
+[![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=Material%20UI)](https://material-ui.com)
+[![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
+[![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/)
+[![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx)
+[![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple?file=/src/demo/config_simple.js)
 
+
+User-friendly React component to build queries (filters).
+
+Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/). 
+Using awesome [Ant Design](https://ant.design/) v4 for widgets. 
+Now [Material-UI](https://material-ui.com/) is also supported!
+
+See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
 [![Open in codesandbox.io](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx)
 
-User-friendly React component to build queries.
-
-Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
-
-Using awesome [Ant Design](https://ant.design/) v4 for widgets
-
-Now [Material-UI](https://material-ui.com/) is also supported!
-
-[Demo page](https://ukrbublik.github.io/react-awesome-query-builder)
+* [Features](#features)
+* [Getting started](#getting-started)
+* [Usage](#usage)
+  * [Minimal JavaScript example with class component](#minimal-javascript-example-with-class-component)
+  * [Minimal TypeScript example with function component](#minimal-typescript-example-with-function-component)
+* [API](#api)
+  * [Config format](#config-format)
+* [Versions](#versions)
+  * [Changelog](#changelog)
+  * [Migration from v1 to v2](#migration-from-v1-to-v2)
+* [Development](#development)
+  * [Directory structure](#directory-structure) 
+  * [Scripts](#scripts)
+  * [Other UI frameworks](#other-ui-frameworks)
+* [Contributing](#contributing)
+  * [Code Contributors](#code-contributors)
+  * [Financial Contributors](#financial-contributors)
 
 
 ### Features
@@ -74,7 +98,7 @@ Demo apps:
 
 ## Usage
 
-#### Minimal Javascript example with class component
+#### Minimal JavaScript example with class component
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
@@ -463,7 +487,7 @@ Then to enable new widgets you need to create config overrides like this:
 
 
 
-## Contributors
+## Contributing
 
 ### Code Contributors
 
@@ -473,6 +497,10 @@ This project exists thanks to all the people who contribute. [[Contribute](CONTR
 ### Financial Contributors
 
 Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/react-awesome-query-builder/contribute)]
+
+If you mention in an GitHub issue that you are a sponsor, we will prioritize helping you.
+
+As a sponsor you can ask to implement a feature that is not in a todo list or motivate for faster implementation.
 
 #### Individuals
 
@@ -492,9 +520,6 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/react-awesome-query-builder/organization/7/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/7/avatar.svg"></a>
 <a href="https://opencollective.com/react-awesome-query-builder/organization/8/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/react-awesome-query-builder/organization/9/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/9/avatar.svg"></a>
-
-
-react-awesome-query-builder is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
 
 
 
