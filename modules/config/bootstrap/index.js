@@ -68,11 +68,7 @@ const widgets = {
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => {
-      return (props.asyncFetch || props.showSearch) 
-        ? <BootstrapAutocompleteWidget {...props} /> 
-        : <BootstrapSelectWidget {...props} />;
-    },
+    factory: (props) => <BootstrapSelectWidget {...props} />,
   },
   slider: {
     ...BasicConfig.widgets.slider,
@@ -93,27 +89,6 @@ const widgets = {
   datetime: {
     ...BasicConfig.widgets.datetime,
     factory: (props) => <BootstrapDateTimeWidget {...props} />,
-  },
-
-  rangeslider: {
-    type: "number",
-    jsType: "number",
-    valueSrc: "value",
-    factory: (props) => <BootstrapRangeWidget {...props} />,
-    valueLabel: "Range",
-    valuePlaceholder: "Select range",
-    valueLabels: [
-      { label: "Number from", placeholder: "Enter number from" },
-      { label: "Number to", placeholder: "Enter number to" },
-    ],
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
-    },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
-    },
-    singleWidget: "slider",
-    toJS: (val, fieldSettings) => (val),
   },
 };
 
