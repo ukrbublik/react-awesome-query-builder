@@ -23,7 +23,7 @@ import BootstrapValueSources from "./core/BootstrapValueSources";
 import BootstrapConfirm from "./core/BootstrapConfirm";
 
 // provider
-export const BootstrapProvider = ({config, children}) => children;
+const BootstrapProvider = ({config, children}) => children;
 
 export default {
   BootstrapTextWidget,

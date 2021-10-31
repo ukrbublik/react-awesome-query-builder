@@ -60,11 +60,7 @@ const widgets = {
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props) => {
-      return (props.asyncFetch || props.showSearch) 
-        ? <BootstrapAutocompleteWidget multiple {...props} /> 
-        : <BootstrapMultiSelectWidget {...props} />;
-    },
+    factory: (props) => <BootstrapMultiSelectWidget {...props} />,
   },
   select: {
     ...BasicConfig.widgets.select,
