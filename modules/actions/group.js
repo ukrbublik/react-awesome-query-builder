@@ -30,6 +30,6 @@ export const setNot = (config, path, not) => ({
  */
 export const setLock = (config, path, lock) => ({
   type: constants.SET_LOCK,
-  path: path,
+  path: toImmutableList(path),
   lock: lock
 });

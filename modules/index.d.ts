@@ -83,7 +83,6 @@ interface RuleGroupProperties extends BasicItemProperties {
 interface GroupProperties extends BasicItemProperties {
   conjunction: string,
   not?: boolean,
-  isLocked?: boolean,
 }
 
 type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
@@ -187,7 +186,7 @@ export interface Config {
 /////////////////
 
 type Placement = "after" | "before" | "append" | "prepend";
-type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
 interface BaseAction {
   type: ActionType,
 

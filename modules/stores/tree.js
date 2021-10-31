@@ -699,7 +699,7 @@ export default (config) => {
     }
 
     case constants.SET_LOCK: {
-      set.tree = setLock(state.tree, action.path, action.field, action.lock);
+      set.tree = setLock(state.tree, action.path, action.lock);
       break;
     }
 
