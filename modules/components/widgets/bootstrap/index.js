@@ -1,5 +1,3 @@
-import { ConfirmProvider, useConfirm } from "material-ui-confirm";
-
 // value widgets
 import BootstrapTextWidget from "./value/BootstrapText";
 import BootstrapTextAreaWidget from "./value/BootstrapTextArea";
@@ -44,7 +42,6 @@ export default {
   BootstrapConjs,
   BootstrapValueSources,
   BootstrapConfirm,
-  MaterialUseConfirm: useConfirm,
 
   BootstrapProvider,
 };
