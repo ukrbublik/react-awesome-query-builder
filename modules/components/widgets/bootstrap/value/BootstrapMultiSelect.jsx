@@ -1,55 +1,35 @@
 import React from "react";
 import {mapListValues} from "../../../../utils/stuff";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import Checkbox from "@material-ui/core/Checkbox";
-import ListItemText from "@material-ui/core/ListItemText";
-import omit from "lodash/omit";
 
-export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
-  const renderOptions = (selectedValues) => 
+export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
+  const renderOptions = () => 
     mapListValues(listValues, ({title, value}) => {
-      return (
-        <MenuItem key={value} value={value}>
-          <Checkbox checked={selectedValues.indexOf(value) > -1} />
-          <ListItemText primary={title} />
-        </MenuItem>
-      );
+      return <option key={value} value={value}>{title}</option>;
     });
 
-  const renderValue = (selectedValues) => {
-    if (!readonly && !selectedValues.length)
-      return placeholder;
-    const selectedTitles = mapListValues(listValues, ({title, value}) => (
-      selectedValues.indexOf(value) > -1 ? title : null
-    )).filter(v => v !== null);
-    return selectedTitles.join(", ");
+  const getMultiSelectValues = (multiselect) => {
+    let values = [];
+    const options = multiselect.options;
+    for (let i = 0 ; i < options.length ; i++) {
+      const opt = options[i];
+      if (opt.selected) {
+        values.push(opt.value);
+      }
+    }
+    if (!values.length)
+      values = undefined; //not allow []
+    return values;
   };
 
-  const hasValue = value != null && value.length > 0;
-
-  const onChange = e => {
-    if (e.target.value === undefined)
-      return;
-    setValue(e.target.value);
-  };
-
+  const onChange = e => setValue(getMultiSelectValues(e.target));
+  
   return (
-    <FormControl>
-      <Select multiple
-        autoWidth
-        displayEmpty
-        label={!readonly ? placeholder : ""}
-        onChange={onChange}
-        value={hasValue ? value : []}
-        disabled={readonly}
-        readOnly={readonly}
-        renderValue={renderValue}
-        {...omit(customProps, ["showSearch", "input", "showCheckboxes"])}
-      >
-        {renderOptions(hasValue ? value : [])}
-      </Select>
-    </FormControl>
+    <select multiple
+      onChange={onChange}
+      value={value}
+      disabled={readonly}
+    >
+      {renderOptions()}
+    </select>
   );
 };

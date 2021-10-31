@@ -1,30 +1,33 @@
 import React from "react";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
+import { Button } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
-export default ({type, label, onClick, config}) => {
+export default ({ type, label, onClick, config }) => {
   const typeToOnlyIcon = {
-    "delGroup": <DeleteIcon />,
-    "delRuleGroup": <DeleteIcon />,
-    "delRule": <DeleteIcon />,
-    "addRuleGroup": <AddIcon />,
-    "addRuleGroupExt": <AddIcon />,
+    delGroup: faTrashAlt,
+    delRuleGroup: faTrashAlt,
+    delRule: faTrashAlt,
+    addRuleGroup: faPlus,
+    addRuleGroupExt: faPlus,
   };
   const typeToIcon = {
-    "addRule": <AddIcon />,
-    "addGroup": <AddIcon />,
+    addRule: faPlus,
+    addGroup: faPlus,
   };
   const typeToColor = {
-    "addRule": "default",
-    "addGroup": "primary",
-    "delGroup": "secondary",
-    "delRuleGroup": "secondary",
-    "delRule": "secondary",
+    addRule: "primary",
+    addGroup: "primary",
+    delGroup: "danger",
+    delRuleGroup: "danger",
+    delRule: "danger",
   };
-  if (typeToOnlyIcon[type])
-    return <IconButton size="small" onClick={onClick} color={typeToColor[type]}>{typeToOnlyIcon[type]}</IconButton>;
-  else
-    return <Button size="small" onClick={onClick} color={typeToColor[type]} startIcon={typeToIcon[type]}>{label}</Button>;
+
+  let isOnlyIcon = typeToOnlyIcon[type];
+
+  return (
+    <Button size="small" color={typeToColor[type]} onClick={onClick}>
+      <FontAwesomeIcon icon={isOnlyIcon ? typeToOnlyIcon[type] : typeToIcon[type]} /> {!isOnlyIcon && label}
+    </Button>
+  );
 };

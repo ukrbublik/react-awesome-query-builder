@@ -1,9 +1,4 @@
-import React from "react";
-import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
-
 
 // value widgets
 import BootstrapTextWidget from "./value/BootstrapText";
@@ -28,31 +23,7 @@ import BootstrapValueSources from "./core/BootstrapValueSources";
 import BootstrapConfirm from "./core/BootstrapConfirm";
 
 // provider
-const BootstrapProvider = ({config, children}) => {
-  const settingsTheme = config.settings.theme || {};
-  const settingsLocale = config.settings.locale || {};
-  const themeConfig = settingsTheme.material;
-  const locale = settingsLocale.material; //WIP: locale for bootstrap
-  const useTheme = themeConfig || locale;
-  const theme = useTheme ? createTheme(themeConfig, locale) : null;
-
-  const base = (<div className="mui">{children}</div>);
-  const withProviders = (
-    <MuiPickersUtilsProvider utils={MomentUtils}>
-      <ConfirmProvider>
-        {base}
-      </ConfirmProvider>
-    </MuiPickersUtilsProvider>
-  );
-  const withTheme = theme ? (
-    <ThemeProvider theme={theme}>
-      {withProviders}
-    </ThemeProvider>
-  ) : withProviders;
-
-  return withTheme;
-};
-
+export const BootstrapProvider = ({config, children}) => children;
 
 export default {
   BootstrapTextWidget,
