@@ -956,7 +956,6 @@ export interface BootstrapWidgets {
   BootstrapProvider: ElementType<ProviderProps>,
   BootstrapValueSources: ElementType<ValueSourcesProps>,
   BootstrapConfirm: ConfirmFunc,
-  BootstrapUseConfirm: () => Function,
 
   // bootstrap value widgets
   BootstrapBooleanWidget: ElementType<BooleanWidgetProps>,

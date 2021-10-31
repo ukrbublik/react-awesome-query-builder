@@ -1,8 +1,6 @@
 import BootstrapWidgets from "../../components/widgets/bootstrap";
-import BasicConfig, {stringifyForDisplay} from "../basic";
+import BasicConfig from "../basic";
 import React from "react";
-import {SqlString} from "../../utils/sql";
-
 
 const {
   BootstrapBooleanWidget,
@@ -24,7 +22,6 @@ const {
 
   BootstrapProvider,
   BootstrapConfirm,
-  BootstrapUseConfirm,
 } = BootstrapWidgets;
 
 
@@ -40,7 +37,6 @@ const settings = {
   renderValueSources: (props) => <BootstrapValueSources {...props} />,
   renderProvider: (props) => <BootstrapProvider {...props} />,
   renderConfirm: BootstrapConfirm,
-  useConfirm: BootstrapUseConfirm,
 };
 
 
