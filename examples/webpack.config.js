@@ -96,11 +96,11 @@ module.exports = {
         port: PORT,
         historyApiFallback: true,
         hot: true,
+        static: {
+          directory: path.join(__dirname, '/'),
+        },
     },
-    entry: [
-        //'react-hot-loader/patch', // seems like excess
-        './index',
-    ],
+    entry: './index',
     output: {
         path: DIST,
         filename: 'bundle.js'
