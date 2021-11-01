@@ -241,6 +241,7 @@ export class BasicGroup extends PureComponent {
         totalRulesCnt={this.props.totalRulesCnt}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
+        //todo: isLocked ?
       />
     );
   }
@@ -250,6 +251,8 @@ export class BasicGroup extends PureComponent {
   }
 
   reordableNodesCnt() {
+    if (this.props.isLocked)
+      return 0;
     return this.props.reordableNodesCnt;
   }
 
@@ -277,7 +280,7 @@ export class BasicGroup extends PureComponent {
   renderConjs() {
     const {
       config, children1, id,
-      selectedConjunction, setConjunction, not, setNot
+      selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
     const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
@@ -289,7 +292,7 @@ export class BasicGroup extends PureComponent {
 
     const renderProps = {
       disabled: this.isOneChild(),
-      readonly: immutableGroupsMode,
+      readonly: immutableGroupsMode || isLocked,
       selectedConjunction: selectedConjunction,
       setConjunction: immutableGroupsMode ? dummyFn : setConjunction,
       conjunctionOptions: conjunctionOptions,
@@ -299,6 +302,7 @@ export class BasicGroup extends PureComponent {
       setNot: immutableGroupsMode ? dummyFn : setNot,
       notLabel: notLabel,
       showNot: this.showNot(),
+      isLocked: isLocked
     };
     return <Conjs {...renderProps} />;
   }

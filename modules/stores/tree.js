@@ -130,6 +130,7 @@ const setNot = (state, path, not) =>
  */
 const setLock = (state, path, lock) =>
   state.setIn(expandTreePath(path, "properties", "isLocked"), lock);
+  //todo: fixPathsInTree - recursively process isLocked
 
 /**
  * @param {Immutable.Map} state

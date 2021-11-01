@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "antd";
 import { PlusOutlined, PlusCircleOutlined, DeleteFilled } from "@ant-design/icons";
 
-export default ({type, onClick, label, config: {settings}}) => {
+export default ({type, onClick, label, readonly, config: {settings}}) => {
   const typeToIcon = {
     "addRule": <PlusOutlined />,
     "addGroup": <PlusCircleOutlined />,
@@ -41,6 +41,7 @@ export default ({type, onClick, label, config: {settings}}) => {
       className={typeToClass[type]}
       onClick={onClick}
       size={renderSize}
+      disabled={readonly}
     >{btnLabel}</Button>
   );
 };

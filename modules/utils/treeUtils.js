@@ -148,6 +148,7 @@ export const getFlatTree = (tree) => {
     const collapsed = item.get("collapsed");
     const id = item.get("id");
     const children = item.get("children1");
+    const isLocked = item.getIn(["properties", "isLocked"]);
     const childrenIds = children ? children.map((_child, childId) => childId) : null;
 
     const itemsBefore = flat.length;
@@ -186,6 +187,7 @@ export const getFlatTree = (tree) => {
       bottom: (insideCollapsed ? null : top) + height,
       collapsed: collapsed,
       node: item,
+      isLocked: isLocked,
     };
   }
 

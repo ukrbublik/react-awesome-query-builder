@@ -18,7 +18,7 @@ export class RuleGroupActions extends PureComponent {
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn 
-      type="addRuleGroup" onClick={addRule} label={addRuleLabel} config={config}
+      type="addRuleGroup" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config}
     />;
 
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && <Btn 

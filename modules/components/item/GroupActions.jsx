@@ -30,10 +30,10 @@ export class GroupActions extends PureComponent {
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn
-      type="addRule" onClick={addRule} label={addRuleLabel} config={config}
+      type="addRule" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config}
     />;
     const addGroupBtn = !immutableGroupsMode && canAddGroup && <Btn
-      type="addGroup" onClick={addGroup} label={addGroupLabel} config={config}
+      type="addGroup" onClick={addGroup} label={addGroupLabel} readonly={isLocked} config={config}
     />;
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && <Btn
       type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config}

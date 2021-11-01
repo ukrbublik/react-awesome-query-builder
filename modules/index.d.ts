@@ -365,6 +365,7 @@ export interface ButtonProps {
   onClick(): void, 
   label: string,
   config?: Config,
+  readonly?: boolean,
 }
 
 export interface CheckboxProps {

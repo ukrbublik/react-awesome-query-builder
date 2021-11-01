@@ -56,7 +56,7 @@ class Rule extends PureComponent {
 
     onPropsChanged(nextProps) {
       const prevProps = this.props;
-      const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt"];
+      const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
       if (needUpdateMeta) {
@@ -116,7 +116,7 @@ class Rule extends PureComponent {
     }
 
     renderField() {
-      const {config} = this.props;
+      const {config, isLocked} = this.props;
       const { immutableFieldsMode } = config.settings;
 
       return <FieldWrapper
@@ -126,14 +126,14 @@ class Rule extends PureComponent {
         selectedField={this.props.selectedField}
         setField={!immutableFieldsMode ? this.props.setField : dummyFn}
         parentField={this.props.parentField}
-        readonly={immutableFieldsMode}
+        readonly={immutableFieldsMode || isLocked}
         id={this.props.id}
         groupId={this.props.groupId}
       />;
     }
 
     renderOperator () {
-      const {config} = this.props;
+      const {config, isLocked} = this.props;
       const {
         selectedFieldPartsLabels, selectedFieldWidgetConfig, showOperator, showOperatorLabel
       } = this.meta;
@@ -149,14 +149,14 @@ class Rule extends PureComponent {
         showOperator={showOperator}
         showOperatorLabel={showOperatorLabel}
         selectedFieldWidgetConfig={selectedFieldWidgetConfig}
-        readonly={immutableOpsMode}
+        readonly={immutableOpsMode || isLocked}
         id={this.props.id}
         groupId={this.props.groupId}
       />;
     }
 
     renderWidget() {
-      const {config, valueError} = this.props;
+      const {config, valueError, isLocked} = this.props;
       const { showWidget } = this.meta;
       const { immutableValuesMode } = config.settings;
       if (!showWidget) return null;
@@ -173,7 +173,7 @@ class Rule extends PureComponent {
         config={config}
         setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
         setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
-        readonly={immutableValuesMode}
+        readonly={immutableValuesMode || isLocked}
         id={this.props.id}
         groupId={this.props.groupId}
       />;
@@ -272,7 +272,7 @@ class Rule extends PureComponent {
       } = config.settings;
       
       return showLock && (
-        <div key="rule-lock" className="rule--header">
+        <div key="rule-lock" className={classNames("rule--header", isLocked && "force-show")}>
           {<Checkbox 
             type="lock" id={id} value={isLocked} setValue={this.setLock} label={lockLabel} config={config}
           />}
