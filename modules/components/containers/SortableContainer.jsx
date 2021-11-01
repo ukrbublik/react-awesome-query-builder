@@ -519,11 +519,12 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isStructChange = isPend || isParentChange;
       const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
         || toII.parentType == "rule_group";
-
+      const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
+      
       if (maxNesting && (newLev + 1) > maxNesting)
         return false;
       
-      if (isStructChange && (!canRegroup || isForbiddenStructChange))
+      if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;
       
       let res = true;
