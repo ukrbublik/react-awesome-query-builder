@@ -60,12 +60,18 @@ export const jsonLogicFormat = (item, config) => {
 const formatItem = (item, config, meta, isRoot, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
+  const properties = item.get("properties") || new Map();
+  const isLocked = properties.get("isLocked");
+  let ret;
   if (type === "group" || type === "rule_group") {
-    return formatGroup(item, config, meta, isRoot, parentField);
+    ret = formatGroup(item, config, meta, isRoot, parentField);
   } else if (type === "rule") {
-    return formatRule(item, config, meta, parentField);
+    ret = formatRule(item, config, meta, parentField);
   }
-  return undefined;
+  if (isLocked && ret) {
+    ret = { "locked": ret };
+  }
+  return ret;
 };
 
 
