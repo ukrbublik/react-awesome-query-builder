@@ -740,6 +740,7 @@ export interface BehaviourSettings {
   canRegroup?: boolean,
   showNot?: boolean,
   showLock?: boolean,
+  canDeleteLocked?: boolean,
   maxNesting?: number,
   setOpOnChangeField: Array<ChangeFieldStrategy>,
   clearValueOnChangeField?: boolean,

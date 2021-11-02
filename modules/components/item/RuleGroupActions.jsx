@@ -10,18 +10,18 @@ export class RuleGroupActions extends PureComponent {
     const {
       immutableGroupsMode, addRuleLabel, delGroupLabel,
       renderButton: Btn, renderCheckbox: Checkbox,
-      lockLabel, showLock,
+      lockLabel, showLock, canDeleteLocked,
     } = config.settings;
 
     const setLockSwitch = showLock && <Checkbox 
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
     />;
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn 
+    const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
       type="addRuleGroup" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config}
     />;
 
-    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && <Btn 
+    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn 
       type="delRuleGroup" onClick={removeSelf} label={delGroupLabel} config={config}
     />;
 

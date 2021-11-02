@@ -64,7 +64,7 @@ class Rule extends PureComponent {
       }
     }
 
-    getMeta({selectedField, selectedOperator, config, reordableNodesCnt}) {
+    getMeta({selectedField, selectedOperator, config, reordableNodesCnt, isLocked}) {
       const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
       const selectedFieldConfig = getFieldConfig(config, selectedField);
       const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
@@ -74,7 +74,7 @@ class Rule extends PureComponent {
       const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
       const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
-      const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1;
+      const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
       const showOperator = selectedField && !hideOperator;
       const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
       const showWidget = isFieldAndOpSelected;
@@ -248,16 +248,17 @@ class Rule extends PureComponent {
     }
 
     renderDel() {
-      const {config} = this.props;
+      const {config, isLocked} = this.props;
       const {
         deleteLabel, 
         immutableGroupsMode, 
-        renderButton: Btn
+        renderButton: Btn,
+        canDeleteLocked
       } = config.settings;
 
       return (
         <div key="rule-del" className="rule--header">
-          {!immutableGroupsMode && <Btn 
+          {!immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && <Btn 
             type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
           />}
         </div>

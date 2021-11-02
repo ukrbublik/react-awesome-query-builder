@@ -305,6 +305,7 @@ Behaviour settings:
   For type == `select`/`multiselect` you can optionally check `listValues`
 |groupOperators |`['all', 'some', 'none']` |Operators usable in `!group` fields with `array` mode
 |showLock |false |Show "Lock" switch for rule to make it read-only
+|canDeleteLocked |false |Show "Delete" button for locked rule?
 |===
 
 TIP: For fully read-only mode use these settings:

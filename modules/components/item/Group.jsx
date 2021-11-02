@@ -257,8 +257,8 @@ export class BasicGroup extends PureComponent {
   }
 
   showDragIcon() {
-    const { config, isRoot, reordableNodesCnt } = this.props;
-    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
+    const { config, isRoot, reordableNodesCnt, isLocked } = this.props;
+    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
   }
 
   renderDrag() {

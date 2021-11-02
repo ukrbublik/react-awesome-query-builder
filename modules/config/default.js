@@ -40,6 +40,7 @@ export const settings = {
   canReorder: true,
   canRegroup: true,
   showLock: false,
+  canDeleteLocked: false,
   showNot: true,
   canLeaveEmptyGroup: true,
   shouldCreateEmptyGroup: false,

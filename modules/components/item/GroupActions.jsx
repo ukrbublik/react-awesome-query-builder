@@ -21,7 +21,7 @@ export class GroupActions extends PureComponent {
     const {
       immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
       renderButton: Btn, renderCheckbox: Checkbox, renderButtonGroup: BtnGrp,
-      lockLabel, showLock,
+      lockLabel, showLock, canDeleteLocked,
     } = config.settings;
     const position = groupActionsPositionList[groupActionsPosition || defaultPosition];
 
@@ -29,13 +29,13 @@ export class GroupActions extends PureComponent {
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
     />;
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule && <Btn
+    const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn
       type="addRule" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config}
     />;
-    const addGroupBtn = !immutableGroupsMode && canAddGroup && <Btn
+    const addGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
       type="addGroup" onClick={addGroup} label={addGroupLabel} readonly={isLocked} config={config}
     />;
-    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && <Btn
+    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn
       type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config}
     />;
 

@@ -9,6 +9,7 @@ import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 import Immutable from "immutable";
+import clone from "clone";
 
 const stringify = JSON.stringify;
 const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
@@ -83,6 +84,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
           <button onClick={this.clearValue}>clear</button>
           <button onClick={this.runActions}>run actions</button>
           <button onClick={this.validate}>validate</button>
+        <button onClick={this.switchShowLock}>show lock: {this.state.config.settings.showLock ? "on" : "off"}</button>
         </div>
         
         <Query
@@ -106,6 +108,12 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       });
       initTree = _initTree;
       initValue = _initValue;
+    }
+
+    switchShowLock = () => {
+      const newConfig: Config = clone(this.state.config);
+      newConfig.settings.showLock = !newConfig.settings.showLock;
+      this.setState({config: newConfig});
     }
 
     resetValue = () => {
