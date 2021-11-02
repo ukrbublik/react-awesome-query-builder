@@ -10,6 +10,8 @@ export default (className) => (GroupOrRule) =>
       isDraggingMe: PropTypes.bool,
       onDragStart: PropTypes.func,
       dragging: PropTypes.object, //{id, x, y, w, h}
+      isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
     };
 
     constructor(props) {
@@ -34,7 +36,7 @@ export default (className) => (GroupOrRule) =>
         ...otherProps
       } = this.props;
       const {
-        isLocked,
+        isTrueLocked,
       } = otherProps;
 
       let styles = {};
@@ -49,7 +51,7 @@ export default (className) => (GroupOrRule) =>
       const cn = classNames(className, "group-or-rule",
         isDraggingMe && isDraggingTempo ? "qb-draggable" : null,
         isDraggingMe && !isDraggingTempo ? "qb-placeholder" : null,
-        isLocked ? "locked" : null
+        isTrueLocked ? "locked" : null
       );
 
       return (

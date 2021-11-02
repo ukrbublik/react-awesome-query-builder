@@ -26,6 +26,7 @@ const createRuleContainer = (Rule) =>
       reordableNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
       isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
       isDraggingTempo: PropTypes.bool,
@@ -136,6 +137,7 @@ const createRuleContainer = (Rule) =>
               totalRulesCnt={this.props.totalRulesCnt}
               asyncListValues={this.props.asyncListValues}
               isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             /> : null
             ,
             <Rule
@@ -164,6 +166,7 @@ const createRuleContainer = (Rule) =>
               totalRulesCnt={this.props.totalRulesCnt}
               asyncListValues={this.props.asyncListValues}
               isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             />
           ]}
         </div>

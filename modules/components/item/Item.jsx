@@ -11,10 +11,22 @@ const types = [
   "rule_group"
 ];
 
+const getProperties = (props) => {
+  const properties = props.properties.toObject();
+  const result = {...properties};
+  if (props.isParentLocked) {
+    result.isLocked = true;
+  }
+  if (properties.isLocked) {
+    result.isTrueLocked = true;
+  }
+  return result;
+};
+
 const typeMap = {
   rule: (props) => (
     <Rule
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
       path={props.path}
@@ -29,7 +41,7 @@ const typeMap = {
   ),
   group: (props) => (
     <Group 
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
       path={props.path}
@@ -46,7 +58,7 @@ const typeMap = {
   ),
   rule_group: (props) => (
     <RuleGroup 
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
       path={props.path}
@@ -63,7 +75,7 @@ const typeMap = {
   ),
   rule_group_ext: (props) => (
     <RuleGroupExt 
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
       path={props.path}
@@ -96,6 +108,7 @@ class Item extends PureComponent {
     onDragStart: PropTypes.func,
     parentField: PropTypes.string, //from RuleGroup
     isDraggingTempo: PropTypes.bool,
+    isParentLocked: PropTypes.bool,
   };
 
   render() {

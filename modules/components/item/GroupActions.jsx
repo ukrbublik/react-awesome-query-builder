@@ -15,7 +15,7 @@ export class GroupActions extends PureComponent {
   render() {
     const {
       config, 
-      addRule, addGroup, removeSelf, setLock, isLocked, id,
+      addRule, addGroup, removeSelf, setLock, isLocked, isTrueLocked, id,
       canAddGroup, canAddRule, canDeleteGroup
     } = this.props;
     const {
@@ -25,7 +25,7 @@ export class GroupActions extends PureComponent {
     } = config.settings;
     const position = groupActionsPositionList[groupActionsPosition || defaultPosition];
 
-    const setLockSwitch = showLock && <Checkbox 
+    const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Checkbox 
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
     />;
 

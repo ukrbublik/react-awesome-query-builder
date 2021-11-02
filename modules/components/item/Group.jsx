@@ -28,6 +28,7 @@ export class BasicGroup extends PureComponent {
     isDraggingMe: PropTypes.bool,
     isDraggingTempo: PropTypes.bool,
     isLocked: PropTypes.bool,
+    isTrueLocked: PropTypes.bool,
     //actions
     handleDraggerMouseDown: PropTypes.func,
     onDragStart: PropTypes.func,
@@ -183,7 +184,7 @@ export class BasicGroup extends PureComponent {
   }
 
   renderActions() {
-    const {config, addRule, addGroup, isLocked, id} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <GroupActions
       config={config}
@@ -195,6 +196,7 @@ export class BasicGroup extends PureComponent {
       removeSelf={this.removeSelf}
       setLock={this.setLock}
       isLocked={isLocked}
+      isTrueLocked={isTrueLocked}
       id={id}
     />;
   }
@@ -219,7 +221,7 @@ export class BasicGroup extends PureComponent {
 
   renderItem(item) {
     const props = this.props;
-    const {config, actions, onDragStart} = props;
+    const {config, actions, onDragStart, isLocked} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
     const type = isRuleGroup ? "rule_group" : item.get("type");
     
@@ -241,7 +243,7 @@ export class BasicGroup extends PureComponent {
         totalRulesCnt={this.props.totalRulesCnt}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
-        //todo: isLocked ?
+        isParentLocked={isLocked}
       />
     );
   }

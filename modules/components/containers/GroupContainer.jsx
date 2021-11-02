@@ -24,6 +24,7 @@ const createGroupContainer = (Group) =>
       field: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
       isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
       isDraggingTempo: PropTypes.bool,
@@ -177,6 +178,7 @@ const createGroupContainer = (Group) =>
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             /> : null
             ,
             <Group
@@ -211,6 +213,7 @@ const createGroupContainer = (Group) =>
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             />
           ]}
         </div>

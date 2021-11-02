@@ -5,7 +5,7 @@ export class RuleGroupExtActions extends PureComponent {
     const {
       config, 
       addRule, canAddRule, canDeleteGroup, removeSelf, 
-      setLock, isLocked, id,
+      setLock, isLocked, isTrueLocked, id,
     } = this.props;
     const {
       immutableGroupsMode, addSubRuleLabel, delGroupLabel,
@@ -13,7 +13,7 @@ export class RuleGroupExtActions extends PureComponent {
       lockLabel, showLock, canDeleteLocked,
     } = config.settings;
 
-    const setLockSwitch = showLock && <Checkbox 
+    const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Checkbox 
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
     />;
 

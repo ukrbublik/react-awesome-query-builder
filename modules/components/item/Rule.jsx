@@ -32,6 +32,7 @@ class Rule extends PureComponent {
       parentField: PropTypes.string, //from RuleGroup
       valueError: PropTypes.any,
       isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //path: PropTypes.instanceOf(Immutable.List),
       //actions
       handleDraggerMouseDown: PropTypes.func,
@@ -266,13 +267,13 @@ class Rule extends PureComponent {
     }
 
     renderLock() {
-      const {config, isLocked, id} = this.props;
+      const {config, isLocked, isTrueLocked, id} = this.props;
       const {
         lockLabel, showLock,
         renderCheckbox: Checkbox
       } = config.settings;
       
-      return showLock && (
+      return showLock && !(isLocked && !isTrueLocked) && (
         <div key="rule-lock" className={classNames("rule--header", isLocked && "force-show")}>
           {<Checkbox 
             type="lock" id={id} value={isLocked} setValue={this.setLock} label={lockLabel} config={config}
