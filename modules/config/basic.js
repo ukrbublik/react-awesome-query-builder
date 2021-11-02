@@ -5,7 +5,6 @@ import {SqlString} from "../utils/sql";
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 const {
   //vanilla
