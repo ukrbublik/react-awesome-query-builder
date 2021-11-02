@@ -237,7 +237,7 @@ export default (skin: string) => {
     },
     // canReorder: true,
     // canRegroup: true,
-    showLock: true,
+    // showLock: true,
     canDeleteLocked: false,
     // showNot: true,
     // showLabels: true,
