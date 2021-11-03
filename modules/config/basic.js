@@ -485,7 +485,7 @@ const operators = {
 
 //----------------------------  widgets
 
-export const stringifyForDisplay = (v) => (v === null ? "NULL" : v.toString());
+export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());
 
 const widgets = {
   text: {
