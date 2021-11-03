@@ -84,7 +84,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
           <button onClick={this.clearValue}>clear</button>
           <button onClick={this.runActions}>run actions</button>
           <button onClick={this.validate}>validate</button>
-        <button onClick={this.switchShowLock}>show lock: {this.state.config.settings.showLock ? "on" : "off"}</button>
+          <button onClick={this.switchShowLock}>show lock: {this.state.config.settings.showLock ? "on" : "off"}</button>
         </div>
         
         <Query
