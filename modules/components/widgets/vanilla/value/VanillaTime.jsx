@@ -1,7 +1,7 @@
 import React from "react";
 
 export default (props) => {
-  const {value, setValue, config, valueFormat, use12Hours, readonly} = props;
+  const {value, setValue, config, valueFormat, use12Hours, readonly, customProps } = props;
 
   const onChange = e => {
     let value = e.target.value;
@@ -11,6 +11,6 @@ export default (props) => {
   };
   
   return (
-    <input type="time"  value={value || ""}  disabled={readonly} onChange={onChange} />
+    <input type="time"  value={value || ""}  disabled={readonly} onChange={onChange} {...customProps} />
   );
 };
