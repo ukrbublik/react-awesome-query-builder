@@ -1,7 +1,8 @@
 import React from "react";
 import {mapListValues} from "../../../../utils/stuff";
+import omit from "lodash/omit";
 
-export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
+export default ({listValues, value, setValue, allowCustomValues, readonly, customProps,}) => {
   const renderOptions = () => 
     mapListValues(listValues, ({title, value}) => {
       return <option key={value} value={value}>{title}</option>;
@@ -28,6 +29,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
       onChange={onChange}
       value={value}
       disabled={readonly}
+      {...omit(customProps, ["showSearch", "input", "showCheckboxes"])}
     >
       {renderOptions()}
     </select>
