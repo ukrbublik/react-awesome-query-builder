@@ -1,5 +1,12 @@
 # Changelog
 
+- 4.7.1
+  - Fixed potential inconsistent order of fields (issue #335) (PR #553)
+  - Bump `webpack-dev-server` from 3.11.2 to 4.4.0 (PR #540)
+  - Change `FieldItems` type definition from map to array (issues #550, #363) (PR #551)
+  - Spreading `customProps` to vanilla widgets (PR #546)
+  - Fix for `allowCustomValues` (PR #545)
+  - Use minimum `material-ui` version 4.12.3 and use new `createTheme` instead of deprecated `createMuiTheme` (issue #463) (PR #531)
 - 4.7.0
   - Add explicit `not: false` in new group (issue #512)
   - Fix: don't automatically add one rule to query when it become empty when `canLeaveEmptyGroup=true` (issue #504)
