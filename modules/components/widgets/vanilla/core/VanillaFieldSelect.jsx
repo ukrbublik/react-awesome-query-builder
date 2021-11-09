@@ -2,8 +2,7 @@ import React from "react";
 
 export default ({items, setField, selectedKey, readonly}) => {
   const renderOptions = (fields) => (
-    Object.keys(fields).map(fieldKey => {
-      const field = fields[fieldKey];
+    fields.map(field => {
       const {items, path, label, disabled} = field;
       if (items) {
         return <optgroup disabled={disabled} key={path} label={label}>{renderOptions(items)}</optgroup>;
