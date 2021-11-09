@@ -16,10 +16,23 @@
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
-    "react-scripts": "^3.4.3",
-    "react-awesome-query-builder": "^4.1.1",
+    "react-awesome-query-builder": "^4.7.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
+  },
+  "devDependencies": {
+    "react-scripts": "^4.0.3"
+  },
+  "eslintConfig": {
+    "ignorePatterns": [
+      "**/build/*",
+      "**/dist/*",
+      "**/node_modules/*"
+    ],
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
