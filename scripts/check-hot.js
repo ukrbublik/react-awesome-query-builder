@@ -86,7 +86,7 @@ const end = (err) => {
 const check = () => {
   const prcOutClean = cleanStr(prcOutBuf.toString());
   
-  if (prcOutClean.indexOf('｢wdm｣: Failed to compile.') != -1) {
+  if (prcOutClean.indexOf(' compiled with ') != -1) {
     isCompiled = false;
     stopTimerCompile();
     setTimeout(() => {
@@ -94,7 +94,7 @@ const check = () => {
     }, EXIT_TIMEOUT);
   }
 
-  if (prcOutClean.indexOf('｢wdm｣: Compiled successfully.') != -1) {
+  if (prcOutClean.indexOf(' compiled successfully in ') != -1) {
     isCompiled = true;
     stopTimerCompile();
     setTimeout(() => {
