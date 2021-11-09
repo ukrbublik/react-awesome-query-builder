@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "esnext",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "lib": [
       "dom",
       "dom.iterable"
@@ -11,21 +11,19 @@
     "allowJs": true,
     "outDir": "ts_out",
     "declaration": true,
-    
     "strict": true,
     "alwaysStrict": true,
     "strictNullChecks": false,
     "noImplicitReturns": true,
-
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
-
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src/**/*"
