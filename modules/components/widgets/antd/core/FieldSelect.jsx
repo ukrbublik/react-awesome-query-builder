@@ -3,7 +3,6 @@ import { Tooltip, Select } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/domUtils";
 import PropTypes from "prop-types";
 const { Option, OptGroup } = Select;
-import keys from "lodash/keys";
 
 
 export default class FieldSelect extends PureComponent {
@@ -79,8 +78,7 @@ export default class FieldSelect extends PureComponent {
   }
 
   renderSelectItems(fields) {
-    return keys(fields).map(fieldKey => {
-      const field = fields[fieldKey];
+    return fields.map(field => {
       const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled} = field;
       const pathKey = path || key;
       if (items) {
