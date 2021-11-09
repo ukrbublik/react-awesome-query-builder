@@ -617,7 +617,7 @@ export type FieldItem = {
   tooltip?: string,
   disabled?: boolean,
 }
-type FieldItems = TypedMap<FieldItem>;
+type FieldItems = FieldItem[];
 
 export interface FieldProps {
   items: FieldItems,
