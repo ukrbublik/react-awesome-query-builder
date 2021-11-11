@@ -247,7 +247,64 @@ export const with_struct_and_group = (BasicConfig) => ({
     ...BasicConfig.settings,
   }
 });
-  
+
+export const with_group_struct = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "struct",
+      subfields: {
+        score: {
+          type: "number",
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_some = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        score: {
+          type: "number",
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_array = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "array",
+      subfields: {
+        score: {
+          type: "number",
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
 export const with_nested_group = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -770,7 +827,7 @@ export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
 });
 
 
-export const with_group_array = (BasicConfig) => ({
+export const with_group_array_cars = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
     str: {

@@ -530,7 +530,6 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   }
 };
 
-
 const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   if (!op) return undefined;
 
@@ -556,13 +555,28 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   // Otherwise try to revert
   const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
   let canRev = true;
-  if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
-    canRev = false;
+  // if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
+  //   canRev = false;
 
-  // Fix "some ! in"
-  if (fieldConfig.type == "!group" && having && Object.keys(having)[0] == "!") {
-    not = !not;
-    having = having["!"];
+  let conj;
+  let havingVals;
+  if (fieldConfig.type == "!group" && having) {
+    conj = Object.keys(having)[0];
+    havingVals = having[conj];
+    if (!Array.isArray(havingVals))
+      havingVals = [ havingVals ];
+
+    // Preprocess "!": Try to reverse op in single rule in having
+    // Eg. use `not_equal` instead of `not` `equal`
+    const isEmptyOp = conj == "!" && (havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0]) && conv.varKeys.includes(Object.keys(havingVals[0])[0]));
+    if (conj == "!" && !isEmptyOp) {
+      not = !not;
+      having = having["!"];
+      conj = Object.keys(having)[0];
+      havingVals = having[conj];
+      if (!Array.isArray(havingVals))
+        havingVals = [ havingVals ];
+    }
   }
 
   // Use reversed op
@@ -584,22 +598,29 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   let res;
 
   if (fieldConfig.type == "!group" && having) {
-    const conj = Object.keys(having)[0];
-    const havingVals = having[conj];
-    const _not = false;
-
     if (conv.conjunctions[conj] !== undefined) {
-      res = convertConj(conj, havingVals, conv, config, _not, meta, field, true);
+      res = convertConj(conj, havingVals, conv, config, not, meta, field, true);
+      not = false; // not was applied to group
     } else {
       // need to be wrapped in `rule_group`
-      const rule = convertOp(conj, havingVals, conv, config, _not, meta, field);
+      const rule = convertOp(conj, havingVals, conv, config, not && canRev, meta, field);
+      if (not && canRev && !rule?.properties?.not) {
+        not = false; // op was reversed in rule
+      }
       res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
     }
+    if (!res)
+      return undefined;
+    
     res.type = "rule_group";
+    if (not) {
+      Object.assign(res.properties, {
+        not: not,
+      });
+    }
     Object.assign(res.properties, {
       field: field,
       mode: fieldConfig.mode,
-      not: (canRev ? false : not),
       operator: opKey,
     });
     if (fieldConfig.mode == "array") {
@@ -616,7 +637,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       children1: {},
       properties: {
         conjunction: defaultGroupConjunction(config, fieldConfig),
-        not: (canRev ? false : not),
+        not: not,
         mode: fieldConfig.mode,
         field: field,
         operator: opKey,
@@ -644,11 +665,10 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         asyncListValues,
       }
     };
-  }
-
-  if (not && canRev) {
-    //meta.errors.push(`No rev op for ${opKey}`);
-    res = wrapInDefaultConj(res, config, not);
+    if (not) {
+      //meta.errors.push(`No rev op for ${opKey}`);
+      res = wrapInDefaultConj(res, config, not);
+    }
   }
 
   return res;

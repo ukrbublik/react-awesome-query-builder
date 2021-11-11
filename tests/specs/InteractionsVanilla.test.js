@@ -117,7 +117,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from group_ext to simple", () => {
-    with_qb(configs.with_group_array, inits.with_group_array, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule_group_ext .group--field--count--rule .rule--field select")
         .simulate("change", { target: { value: "str" } });
@@ -147,7 +147,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from simple to group_ext", () => {
-    with_qb(configs.with_group_array, inits.with_text, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_group_array_cars, inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });

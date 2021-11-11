@@ -12,7 +12,7 @@ const isCI = !!process.env.CI;
 module.exports = function(config) {
   config.set({
     basePath: "",
-    frameworks: ["mocha", "chai", "es6-shim"],
+    frameworks: ["webpack", "mocha", "chai", "es6-shim"],
     plugins: [
       "karma-mocha",
       "karma-chai",

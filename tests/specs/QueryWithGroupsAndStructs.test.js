@@ -101,6 +101,53 @@ describe("query with !struct and !group", () => {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
+describe("query with !group", () => {
+
+  describe("should handle ! in some (when group mode is some)", () => {
+    export_checks(configs.with_group_some, inits.with_is_empty_in_some, "JsonLogic", {
+      "logic": inits.with_is_empty_in_some
+    });
+  });
+
+  describe("should handle is_empty in some (when bad subfield)", () => {
+    export_checks(configs.with_group_some, inits.with_bad_subfield_in_group, "JsonLogic", {
+      "logic": undefined
+    });
+  });
+
+  describe("should handle is_empty in some (when group mode is struct)", () => {
+    export_checks(configs.with_group_struct, inits.with_is_empty_in_some, "JsonLogic", {
+      "logic": {
+        "and": [{
+          "!": { "var": "results.score" }
+        } ]
+      }
+    });
+  });
+
+  describe("should handle is_empty in some (when group mode is array)", () => {
+    export_checks(configs.with_group_array, inits.with_is_empty_in_some, "JsonLogic", {
+      "logic": inits.with_is_empty_in_some
+    });
+  });
+
+  describe("should handle select_not_any_in in some (when group mode is array)", () => {
+    export_checks(configs.with_group_array_cars, inits.with_select_not_any_in_in_some, "JsonLogic", {
+      "logic": inits.with_select_not_any_in_in_some,
+      "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+    });
+  });
+
+  describe("should handle not and in some (when group mode is array)", () => {
+    export_checks(configs.with_group_array_cars, inits.with_not_and_in_some, "JsonLogic", {
+      "logic": inits.with_not_and_in_some,
+      "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+    });
+  });
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
 describe("query with nested !group", () => {
 
   describe("with one group rule", () => {
@@ -558,7 +605,7 @@ describe("query with !group inside !struct", () => {
 describe("query with !group mode array", () => {
 
   describe("export", () => {
-    export_checks(configs.with_group_array, inits.with_group_array, "JsonLogic", {
+    export_checks(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", {
       "query": "COUNT OF cars WHERE (vendor == \"Toyota\" && year >= 2010) > 2",
       "queryHuman": "COUNT OF Cars WHERE (vendor = Toyota AND year >= 2010) > 2",
       "sql": "(cars.vendor = 'Toyota' AND cars.year >= 2010)",
