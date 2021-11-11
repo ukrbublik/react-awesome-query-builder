@@ -1,5 +1,7 @@
 # Changelog
 
+- 4.7.2
+  - Fixed import of rule_group with `not` (issue #548) (PR #559)
 - 4.7.1
   - Fixed potential inconsistent order of fields (issue #335) (PR #553)
   - Bump `webpack-dev-server` from 3.11.2 to 4.4.0 (PR #540)
