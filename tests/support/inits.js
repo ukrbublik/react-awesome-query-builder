@@ -142,7 +142,52 @@ export const with_struct_and_group_mixed_obsolete = {
     { "==": [ { "var": "user.firstName" }, "abc" ] },
   ]
 };
-  
+
+export const with_is_empty_in_some = {
+  "and": [
+    { "some": [
+      { "var": "results" },
+      {
+        "!": { "var": "score" }
+      }
+    ] }
+  ]
+};
+
+export const with_bad_subfield_in_group = {
+  "and": [
+    { "some": [
+      { "var": "results" },
+      {
+        "!": { "var": "bad-subfield" }
+      }
+    ] }
+  ]
+};
+
+export const with_select_not_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "!": 
+        { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      }
+    ] }
+  ]
+};
+
+export const with_not_and_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [
+        { "!": { "var": "year" } },
+        { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      ] } }
+    ] }
+  ]
+};
+
 export const with_nested_group = {
   "and": [
     { "some": [
@@ -646,7 +691,7 @@ export const with_jl_value = {
   ]
 };
 
-export const with_group_array = {
+export const with_group_array_cars = {
   "and": [
     { ">": [
       { "reduce": [

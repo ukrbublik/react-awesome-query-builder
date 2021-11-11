@@ -7,7 +7,7 @@ const lib_name = 'react-awesome-query-builder';
 
 module.exports = {
     mode: "development",
-    devtool: 'inline-source-map',
+    // devtool: 'inline-source-map',
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {

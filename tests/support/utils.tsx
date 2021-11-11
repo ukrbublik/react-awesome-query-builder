@@ -146,6 +146,11 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
       doIt("should work to query string", () => {
         const res = queryString(tree, config);
         expect(res).to.equal(expects["query"]);
+      });
+    }
+
+    if (expects["queryHuman"] !== undefined) {
+      doIt("should work to human query string", () => {
         const res2 = queryString(tree, config, true);
         expect(res2).to.equal(expects["queryHuman"]);
       });
@@ -215,8 +220,17 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
 
 export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
   const config = config_fn(BasicConfig);
-  const tree = load_tree(value, config, valueFormat);
-  do_export_checks(config, tree, expects, true);
+  let tree;
+  try {
+    tree = load_tree(value, config, valueFormat);
+  } catch(e) {
+    it('should load tree', () => {
+      throw e;
+    });
+  }
+  if (tree) {
+    do_export_checks(config, tree, expects, true);
+  }
 };
 
 export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
