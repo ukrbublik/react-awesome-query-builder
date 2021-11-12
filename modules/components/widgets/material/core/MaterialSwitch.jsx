@@ -1,10 +1,10 @@
 import React from "react";
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
-import LockIcon from '@material-ui/icons/Lock';
+import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
+import LockOpenIcon from "@material-ui/icons/LockOpen";
+import LockIcon from "@material-ui/icons/Lock";
 
 export default ({value, setValue, label, checkedLabel, hideLabel, id, config, type}) => {
   const {renderSize} = config.settings;

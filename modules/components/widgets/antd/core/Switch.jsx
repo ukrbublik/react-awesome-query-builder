@@ -1,6 +1,5 @@
 import React from "react";
-import { Switch } from 'antd';
-import { Button } from 'antd';
+import { Switch , Button } from "antd";
 import { LockFilled, UnlockOutlined } from "@ant-design/icons";
 
 export default ({value, setValue, label, checkedLabel, hideLabel, id, config, type}) => {
