@@ -685,6 +685,7 @@ export interface LocaleSettings {
   funcLabel?: string,
   operatorPlaceholder?: string,
   lockLabel?: string,
+  lockedLabel?: string,
   deleteLabel?: string,
   addGroupLabel?: string,
   addRuleLabel?: string,
