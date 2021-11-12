@@ -948,6 +948,7 @@ export interface MaterialWidgets {
   // material core widgets
   MaterialFieldSelect: ElementType<FieldProps>,
   MaterialConjs: ElementType<ConjsProps>,
+  MaterialSwitch: ElementType<SwitchProps>,
   MaterialButton: ElementType<ButtonProps>,
   MaterialButtonGroup: ElementType<ButtonGroupProps>,
   MaterialProvider: ElementType<ProviderProps>,

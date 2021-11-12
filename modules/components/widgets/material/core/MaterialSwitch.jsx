@@ -9,7 +9,6 @@ import LockIcon from "@material-ui/icons/Lock";
 export default ({value, setValue, label, checkedLabel, hideLabel, id, config, type}) => {
   const {renderSize} = config.settings;
   const onChange = e => setValue(e.target.checked);
-  const onSwitch = switchValue => setValue(switchValue);
   const onClick = () => setValue(!value);
   const postfix = type;
   const showLabel = value ? (checkedLabel || label) : label;

@@ -391,6 +391,7 @@ Localization:
 |funcPlaceholder |Select function
 |operatorPlaceholder |Select operator
 |lockLabel |Lock
+|lockedLabel |Locked
 |deleteLabel |`null`
 |delGroupLabel |`null`
 |addGroupLabel |Add group
