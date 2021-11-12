@@ -368,10 +368,12 @@ export interface ButtonProps {
   readonly?: boolean,
 }
 
-export interface CheckboxProps {
+export interface SwitchProps {
   value: boolean,
   setValue(newValue?: boolean): void,
   label: string,
+  checkedLabel?: string,
+  hideLabel?: boolean,
   config?: Config,
 }
 
@@ -711,7 +713,7 @@ export interface RenderSettings {
   renderConjs?: Factory<ConjsProps>,
   renderButton?: Factory<ButtonProps>,
   renderButtonGroup?: Factory<ButtonGroupProps>,
-  renderCheckbox?: Factory<CheckboxProps>,
+  renderSwitch?: Factory<SwitchProps>,
   renderProvider?: Factory<ProviderProps>,
   renderValueSources?: Factory<ValueSourcesProps>,
   renderConfirm?: ConfirmFunc,
@@ -887,7 +889,7 @@ interface VanillaWidgets {
   // vanilla core widgets
   VanillaFieldSelect: ElementType<FieldProps>,
   VanillaConjs: ElementType<ConjsProps>,
-  VanillaCheckbox: ElementType<CheckboxProps>,
+  VanillaSwitch: ElementType<SwitchProps>,
   VanillaButton: ElementType<ButtonProps>,
   VanillaButtonGroup: ElementType<ButtonGroupProps>,
   VanillaProvider: ElementType<ProviderProps>,
@@ -916,6 +918,7 @@ export interface AntdWidgets {
   Button: ElementType<ButtonProps>,
   ButtonGroup: ElementType<ButtonGroupProps>,
   Conjs: ElementType<ConjsProps>,
+  Switch: ElementType<SwitchProps>,
   Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
   confirm: ConfirmFunc,

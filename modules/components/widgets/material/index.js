@@ -26,6 +26,7 @@ import MaterialFieldSelect from "./core/MaterialFieldSelect";
 import MaterialButton from "./core/MaterialButton";
 import MaterialButtonGroup from "./core/MaterialButtonGroup";
 import MaterialConjs from "./core/MaterialConjs";
+import MaterialSwitch from "./core/MaterialSwitch";
 import MaterialValueSources from "./core/MaterialValueSources";
 import MaterialConfirm from "./core/MaterialConfirm";
 
@@ -75,6 +76,7 @@ export default {
   MaterialButton,
   MaterialButtonGroup,
   MaterialConjs,
+  MaterialSwitch,
   MaterialValueSources,
   MaterialConfirm,
   MaterialUseConfirm: useConfirm,

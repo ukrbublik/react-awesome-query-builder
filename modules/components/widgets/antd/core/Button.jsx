@@ -9,7 +9,6 @@ export default ({type, onClick, label, readonly, config: {settings}}) => {
     "delRule": <DeleteFilled />, //?
     "delGroup": <DeleteFilled />,
     "delRuleGroup": <DeleteFilled />,
-
     "addRuleGroup": <PlusOutlined />,
   };
 
@@ -19,7 +18,6 @@ export default ({type, onClick, label, readonly, config: {settings}}) => {
     "delRule": "action action--DELETE", //?
     "delGroup": "action action--DELETE",
     "delRuleGroup": "action action--DELETE",
-
     "addRuleGroup": <PlusOutlined />,
   };
 

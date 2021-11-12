@@ -14,6 +14,7 @@ const {
   Button,
   ButtonGroup,
   Conjs,
+  Switch,
   ValueSources,
 
   Provider,
@@ -48,6 +49,7 @@ const settings = {
   
   renderFunc: (props) => <FieldSelect {...props} />,
   renderConjs: (props) => <Conjs {...props} />,
+  renderSwitch: (props) => <Switch {...props} />,
   renderButton: (props) => <Button {...props} />,
   renderButtonGroup: (props) => <ButtonGroup {...props} />,
   renderValueSources: (props) => <ValueSources {...props} />,

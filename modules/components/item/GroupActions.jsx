@@ -20,13 +20,13 @@ export class GroupActions extends PureComponent {
     } = this.props;
     const {
       immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
-      renderButton: Btn, renderCheckbox: Checkbox, renderButtonGroup: BtnGrp,
-      lockLabel, showLock, canDeleteLocked,
+      renderButton: Btn, renderSwitch: Switch, renderButtonGroup: BtnGrp,
+      lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
     const position = groupActionsPositionList[groupActionsPosition || defaultPosition];
 
-    const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Checkbox 
-      type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
+    const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Switch 
+      type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} checkedLabel={lockedLabel} config={config}
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn

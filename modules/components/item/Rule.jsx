@@ -257,36 +257,33 @@ class Rule extends PureComponent {
         canDeleteLocked
       } = config.settings;
 
-      return (
-        <div key="rule-del" className="rule--header">
-          {!immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && <Btn 
-            type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
-          />}
-        </div>
+      return !immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && (
+        <Btn 
+          type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
+        />
       );
     }
 
     renderLock() {
       const {config, isLocked, isTrueLocked, id} = this.props;
       const {
-        lockLabel, showLock,
-        renderCheckbox: Checkbox
+        lockLabel, lockedLabel, showLock,
+        renderSwitch: Switch
       } = config.settings;
       
       return showLock && !(isLocked && !isTrueLocked) && (
-        <div key="rule-lock" className={classNames("rule--header", isLocked && "force-show")}>
-          {<Checkbox 
-            type="lock" id={id} value={isLocked} setValue={this.setLock} label={lockLabel} config={config}
-          />}
-        </div>
+        <Switch 
+          type="lock" id={id} value={isLocked} setValue={this.setLock} label={lockLabel} checkedLabel={lockedLabel} hideLabel={true} config={config}
+        />
       );
     }
 
     render () {
       const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
-      const { valueSrc, value } = this.props;
+      const { valueSrc, value, config } = this.props;
       const canShrinkValue = valueSrc.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
-      
+      const { renderButtonGroup: BtnGrp } = config.settings;
+
       const parts = [
         this.renderField(),
         this.renderOperator(),
@@ -308,8 +305,12 @@ class Rule extends PureComponent {
           <div className="rule--body--wrapper">
             {body}{error}
           </div>
-          {lock}
-          {del}
+          <div className="rule--header">
+            <BtnGrp config={config}>
+              {lock}
+              {del}
+            </BtnGrp>
+          </div>
         </>
       );
     }

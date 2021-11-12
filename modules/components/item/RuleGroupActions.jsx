@@ -9,12 +9,12 @@ export class RuleGroupActions extends PureComponent {
     } = this.props;
     const {
       immutableGroupsMode, addRuleLabel, delGroupLabel,
-      renderButton: Btn, renderCheckbox: Checkbox,
-      lockLabel, showLock, canDeleteLocked,
+      renderButton: Btn, renderSwitch: Switch, renderButtonGroup: BtnGrp,
+      lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
 
-    const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Checkbox 
-      type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} config={config}
+    const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Switch 
+      type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} checkedLabel={lockedLabel} hideLabel={true} config={config}
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
@@ -27,9 +27,11 @@ export class RuleGroupActions extends PureComponent {
 
     return (
       <div className={"group--actions"}>
-        {setLockSwitch}
-        {addRuleBtn}
-        {delGroupBtn}
+        <BtnGrp config={config}>
+          {setLockSwitch}
+          {addRuleBtn}
+          {delGroupBtn}
+        </BtnGrp>
       </div>
     );
   }

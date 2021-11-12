@@ -192,6 +192,7 @@ export default (skin: string) => {
     funcPlaceholder: "Select function",
     operatorPlaceholder: "Select operator",
     lockLabel: "Lock",
+    lockedLabel: "Locked",
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",

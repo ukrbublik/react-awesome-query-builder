@@ -8,7 +8,7 @@ const {
   VanillaProvider,
   VanillaValueSources,
   vanillaConfirm,
-  VanillaCheckbox,
+  VanillaSwitch,
 } = Widgets;
 
 export const settings = {
@@ -23,7 +23,7 @@ export const settings = {
   renderOperator: (props) => <VanillaFieldSelect {...props} />,
   renderFunc: (props) => <VanillaFieldSelect {...props} />,
   renderConjs: (props) => <VanillaConjs {...props} />,
-  renderCheckbox: (props) => <VanillaCheckbox {...props} />,
+  renderSwitch: (props) => <VanillaSwitch {...props} />,
   renderButton: (props) => <VanillaButton {...props} />,
   renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
   renderProvider: (props) => <VanillaProvider {...props} />,
@@ -71,6 +71,7 @@ export const settings = {
   funcPlaceholder: "Select function",
   operatorPlaceholder: "Select operator",
   lockLabel: "Lock",
+  lockedLabel: "Locked",
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",

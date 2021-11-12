@@ -332,7 +332,7 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
-|renderConjs, renderButton, renderButtonGroup, renderCheckbox, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
+|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
