@@ -2,7 +2,7 @@
 import Immutable from "immutable";
 import {
   expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
-  getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren
+  getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, defaultOperator, 
@@ -129,8 +129,7 @@ const setNot = (state, path, not) =>
  * @param {bool} lock
  */
 const setLock = (state, path, lock) =>
-  state.setIn(expandTreePath(path, "properties", "isLocked"), lock);
-  //todo: fixPathsInTree - recursively process isLocked
+  removeIsLockedInTree(state.setIn(expandTreePath(path, "properties", "isLocked"), lock));
 
 /**
  * @param {Immutable.Map} state

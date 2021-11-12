@@ -70,6 +70,35 @@ export const removePathsInTree = (tree) => {
 
 
 /**
+ * Remove `isLocked` in items that inherit parent's `isLocked`
+ * @param {Immutable.Map} tree
+ * @return {Immutable.Map} tree
+ */
+export const removeIsLockedInTree = (tree) => {
+  let newTree = tree;
+
+  function _processNode (item, path, isParentLocked = false) {
+    const itemPath = path.push(item.get("id"));
+    const isLocked = item.getIn(["properties", "isLocked"]);
+    if (isParentLocked && isLocked) {
+      newTree = newTree.deleteIn(expandTreePath(itemPath, "properties", "isLocked"));
+    }
+
+    const children = item.get("children1");
+    if (children) {
+      children.map((child, _childId) => {
+        _processNode(child, itemPath, isLocked || isParentLocked);
+      });
+    }
+  }
+
+  _processNode(tree, new Immutable.List());
+
+  return newTree;
+};
+
+
+/**
  * Set correct `path` in every item
  * @param {Immutable.Map} tree
  * @return {Immutable.Map} tree
