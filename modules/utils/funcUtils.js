@@ -159,7 +159,7 @@ const getDefaultArgValue = ({defaultValue: value}) => {
 * @param {*} argVal 
 * @param {object} argConfig 
 */
-export const setArgValue = (value, argKey, argVal, argConfig) => {
+export const setArgValue = (value, argKey, argVal, argConfig, config) => {
   if (value && value.get("func")) {
     value = value.setIn(["args", argKey, "value"], argVal);
 
@@ -181,7 +181,7 @@ export const setArgValue = (value, argKey, argVal, argConfig) => {
 * @param {string} argValSrc 
 * @param {object} argConfig 
 */
-export const setArgValueSrc = (value, argKey, argValSrc, argConfig) => {
+export const setArgValueSrc = (value, argKey, argValSrc, _argConfig, _config) => {
   if (value && value.get("func")) {
     value = value.setIn(["args", argKey], new Immutable.Map({valueSrc: argValSrc}));
   }

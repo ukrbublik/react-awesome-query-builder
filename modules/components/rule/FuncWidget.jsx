@@ -55,19 +55,21 @@ export default class FuncWidget extends PureComponent {
   };
 
   setArgValue = (argKey, argVal) => {
+    const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition) );
+    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition, config) );
   };
 
   setArgValueSrc = (argKey, argValSrc) => {
+    const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition) );
+    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config) );
   };
 
   renderFuncSelect = () => {
