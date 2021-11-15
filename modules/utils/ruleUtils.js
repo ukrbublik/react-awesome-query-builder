@@ -280,15 +280,16 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   if (fieldConfig && fieldConfig.widgets) {
     for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
+      // if (!config.widgets[widget]) {
+      //   continue;
+      // }
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
-      if (widget == "field" && config._fieldsCntByType) {
-        if (!config._fieldsCntByType[fieldConfig.type])
-          canAdd = false;
+      if (widget == "field") {
+        canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig).length > 0;
       }
-      if (widget == "func" && config._funcsCntByType) {
-        if (!config._funcsCntByType[fieldConfig.type])
-          canAdd = false;
+      if (widget == "func") {
+        canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig).length > 0;
       }
       // If can't check operators, don't add
       // Func args don't have operators
@@ -338,21 +339,28 @@ export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) =
   return widgets;
 };
 
+export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
+  if (!fieldDefinition)
+    return valueSrcs;
+  return valueSrcs.filter(vs => {
+    let canAdd = true;
+    if (vs == "field") {
+      if (config._fieldsCntByType)
+        canAdd = canAdd && config._fieldsCntByType[fieldDefinition.type] > 1;
+    }
+    if (vs == "func") {
+      if (config._funcsCntByType)
+        canAdd = canAdd && !!config._funcsCntByType[fieldDefinition.type];
+      if (fieldDefinition.funcs)
+        canAdd = canAdd && fieldDefinition.funcs.length > 0;
+    }
+    return canAdd;
+  });
+};
+
 export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null, leftFieldForFunc = null) => {
   const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
-  const filteredValueSrcs = valueSrcs.filter(vs => {
-    if (vs == "field" && fieldDefinition) {
-      return config._fieldsCntByType[fieldDefinition.type] > 1;
-    }
-    if (vs == "func" && fieldDefinition) {
-      if (!config._funcsCntByType[fieldDefinition.type])
-        return false;
-      if (fieldDefinition.funcs)
-        return fieldDefinition.funcs.length > 0;
-      return true;
-    }
-    return true;
-  });
+  const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition);
   return filteredValueSrcs;
 };
 

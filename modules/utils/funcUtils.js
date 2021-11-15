@@ -1,5 +1,6 @@
 
 import {getFieldConfig, getFuncConfig} from "../utils/configUtils";
+import {filterValueSourcesForField} from "../utils/ruleUtils";
 import Immutable from "immutable";
 
 // helpers
@@ -125,7 +126,8 @@ export const setFunc = (value, funcKey, config) => {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
       const {valueSources, defaultValue} = argConfig;
-      const firstValueSrc = valueSources.length ? valueSources[0] : undefined;
+      const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+      const firstValueSrc = filteredValueSources.length ? filteredValueSources[0] : undefined;
       const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
       const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
       if (defaultValue !== undefined) {
