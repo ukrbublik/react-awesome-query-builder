@@ -345,8 +345,11 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
   return valueSrcs.filter(vs => {
     let canAdd = true;
     if (vs == "field") {
-      if (config._fieldsCntByType)
-        canAdd = canAdd && config._fieldsCntByType[fieldDefinition.type] > 1;
+      if (config._fieldsCntByType) {
+        // tip: LHS field can be used as arg in RHS function
+        const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
+        canAdd = canAdd && config._fieldsCntByType[fieldDefinition.type] > minCnt;
+      }
     }
     if (vs == "func") {
       if (config._funcsCntByType)

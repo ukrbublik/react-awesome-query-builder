@@ -37,8 +37,9 @@ export const completeFuncValue = (value, config) => {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
       const {valueSources, isOptional, defaultValue} = argConfig;
+      const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
       const args = complValue.get("args");
-      const argDefaultValueSrc = valueSources.length == 1 ? valueSources[0] : undefined;
+      const argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = (argVal ? argVal.get("valueSrc") : undefined) || argDefaultValueSrc;
@@ -163,7 +164,9 @@ export const setArgValue = (value, argKey, argVal, argConfig) => {
     value = value.setIn(["args", argKey, "value"], argVal);
 
     // set default arg value sorce
-    const argDefaultValueSrc = argConfig.valueSources.length == 1 ? argConfig.valueSources[0] : undefined;
+    const {valueSources} = argConfig;
+    const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+    const argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
     if (argDefaultValueSrc) {
       value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
     }

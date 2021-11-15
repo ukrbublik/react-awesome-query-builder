@@ -46,7 +46,7 @@ export default class ValueField extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentField}) {
+  getItems({config, field, operator, parentField, isFuncArg}) {
     const {canCompareFieldWithField} = config.settings;
 
     const fieldSeparator = config.settings.fieldSeparator;
@@ -54,7 +54,7 @@ export default class ValueField extends PureComponent {
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
@@ -87,7 +87,7 @@ export default class ValueField extends PureComponent {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
@@ -101,7 +101,7 @@ export default class ValueField extends PureComponent {
     } else {
       expectedType = leftFieldConfig.type;
     }
-
+    
     function _filter(list, path) {
       for (let rightFieldKey in list) {
         let subfields = list[rightFieldKey].subfields;
@@ -114,7 +114,8 @@ export default class ValueField extends PureComponent {
           if(_filter(subfields, subpath) == 0)
             delete list[rightFieldKey];
         } else {
-          let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
+          // tip: LHS field can be used as arg in RHS function
+          let canUse = rightFieldConfig.type == expectedType && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
