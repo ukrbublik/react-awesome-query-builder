@@ -87,28 +87,6 @@ const widgets = {
 
 const types = {
   ...BasicConfig.types,
-  number: {
-    ...BasicConfig.types.number,
-    widgets: {
-      ...BasicConfig.types.number.widgets,
-      rangeslider: {
-        opProps: {
-          between: {
-            isSpecialRange: true,
-          },
-          not_between: {
-            isSpecialRange: true,
-          }
-        },
-        operators: [
-          "between",
-          "not_between",
-          "is_empty",
-          "is_not_empty",
-        ],
-      }
-    },
-  },
 };
 
 export default {

@@ -26,7 +26,7 @@ export default ({ type, label, onClick, config }) => {
   let isOnlyIcon = typeToOnlyIcon[type];
 
   return (
-    <Button size="small" color={typeToColor[type]} onClick={onClick}>
+    <Button size="sm" color={typeToColor[type]} onClick={onClick}>
       <FontAwesomeIcon icon={isOnlyIcon ? typeToOnlyIcon[type] : typeToIcon[type]} /> {!isOnlyIcon && label}
     </Button>
   );

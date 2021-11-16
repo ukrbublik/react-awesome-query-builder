@@ -1,5 +1,6 @@
 import React from "react";
+import { ButtonGroup } from "reactstrap";
 
 export default ({children, config}) => {
-  return <>{children}</>;
+  return <ButtonGroup>{children}</ButtonGroup>;
 };
