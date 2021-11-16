@@ -947,6 +947,7 @@ interface ReadyWidgets extends VanillaWidgets {
 export interface MaterialWidgets {
   // material core widgets
   MaterialFieldSelect: ElementType<FieldProps>,
+  MaterialFieldAutocomplete: ElementType<FieldProps>,
   MaterialConjs: ElementType<ConjsProps>,
   MaterialSwitch: ElementType<SwitchProps>,
   MaterialButton: ElementType<ButtonProps>,

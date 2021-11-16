@@ -19,6 +19,7 @@ const {
   MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
+  MaterialFieldAutocomplete,
   MaterialConjs,
   MaterialSwitch,
   MaterialButton,
@@ -34,7 +35,9 @@ const {
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => <MaterialFieldSelect {...props} />,
+  renderField: (props) => props?.customProps?.showSearch 
+    ? <MaterialFieldAutocomplete {...props} /> 
+    : <MaterialFieldSelect {...props} />,
   renderOperator: (props) => <MaterialFieldSelect {...props} />,
   renderFunc: (props) => <MaterialFieldSelect {...props} />,
   renderConjs: (props) => <MaterialConjs {...props} />,

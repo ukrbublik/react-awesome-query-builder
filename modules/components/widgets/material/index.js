@@ -21,6 +21,7 @@ import MaterialAutocompleteWidget from "./value/MaterialAutocomplete";
 
 // field select widgets
 import MaterialFieldSelect from "./core/MaterialFieldSelect";
+import MaterialFieldAutocomplete from "./core/MaterialFieldAutocomplete";
 
 // core components
 import MaterialButton from "./core/MaterialButton";
@@ -72,6 +73,7 @@ export default {
   MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
+  MaterialFieldAutocomplete,
 
   MaterialButton,
   MaterialButtonGroup,
