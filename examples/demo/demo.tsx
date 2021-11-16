@@ -314,20 +314,6 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
           </div>
           <hr/>
           <div>
-          elasticSearchFormat: 
-            <pre style={preStyle}>
-              {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-          mongodbFormat: 
-            <pre style={preStyle}>
-              {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
             <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
             { errors.length > 0 
               && <pre style={preErrorStyle}>
@@ -344,6 +330,20 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
                 {stringify(data, undefined, 2)}
               </pre>
             }
+          </div>
+          <hr/>
+          <div>
+          mongodbFormat: 
+            <pre style={preStyle}>
+              {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+            </pre>
+          </div>
+          <hr/>
+          <div>
+          elasticSearchFormat: 
+            <pre style={preStyle}>
+              {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
+            </pre>
           </div>
           <hr/>
           <div>

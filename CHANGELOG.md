@@ -1,5 +1,8 @@
 # Changelog
 
+- 4.8.0
+  - Added read-only mode switch for rules and groups, see `showLock` option and `locked` JsonLogic op (issue #377) (PR #490)
+  - Fixed issue with frozen config (issue #345) (PR #490)
 - 4.7.2
   - Fixed import of rule_group with `not` (issue #548) (PR #559)
 - 4.7.1

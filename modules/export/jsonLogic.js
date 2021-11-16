@@ -62,14 +62,15 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const isLocked = properties.get("isLocked");
+  const {lockedOp} = config.settings.jsonLogic;
   let ret;
   if (type === "group" || type === "rule_group") {
     ret = formatGroup(item, config, meta, isRoot, parentField);
   } else if (type === "rule") {
     ret = formatRule(item, config, meta, parentField);
   }
-  if (isLocked && ret) {
-    ret = { "locked": ret };
+  if (isLocked && ret && lockedOp) {
+    ret = { [lockedOp] : ret };
   }
   return ret;
 };

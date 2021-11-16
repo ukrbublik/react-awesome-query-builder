@@ -86,5 +86,6 @@ export const settings = {
   jsonLogic: {
     groupVarKey: "var",
     altVarKey: "var",
+    lockedOp: "locked"
   }
 };

@@ -73,11 +73,13 @@ const buildConv = (config) => {
     }
   }
 
+  const {groupVarKey, altVarKey} = config.settings.jsonLogic;
+
   return {
     operators,
     conjunctions,
     funcs,
-    varKeys: ["var", config.settings.jsonLogic.groupVarKey, config.settings.jsonLogic.altVarKey],
+    varKeys: ["var", groupVarKey, altVarKey],
   };
 };
 
@@ -94,9 +96,10 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
+  const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
   const isRev = op == "!" && !isEmptyOp;
-  const isLocked = op == "locked";
+  const isLocked = lockedOp && op == lockedOp;
   if (isLocked) {
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, not, fieldConfig, widget, parentField, true);
   } else if (isRev) {
