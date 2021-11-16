@@ -5,6 +5,7 @@
   - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
   - Fix: Filter value sources for func args correctly. LHS field can be used as arg in RHS function. (PR #490)
   - MUI - Support showSearch (autocomplete) for field select widget (issue #479 #521) (PR #563)
+  - AntDesign - Fix FieldSelect with 3+ level !struct nesting (issue #224) (PR #564)
 - 4.7.2
   - Fixed import of rule_group with `not` (issue #548) (PR #559)
 - 4.7.1
