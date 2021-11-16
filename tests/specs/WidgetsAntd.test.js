@@ -9,7 +9,7 @@ describe("antdesign widgets render", () => {
   it("should render select by default", () => {
     with_qb_ant(configs.with_struct, inits.with_nested, "JsonLogic", (qb) => {
       expect(qb.find(".query-builder")).to.have.length(1);
-      expect(qb.find(".ant-select-selection-item").at(0).text()).to.equal("user.info.firstName");
+      expect(qb.find(".ant-select-selection-item").at(0).text()).to.equal("  firstName");
     });
   });
 
