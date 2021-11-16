@@ -13,6 +13,7 @@ import { ruRU } from "@material-ui/core/locale";
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 import MaterialConfig from "react-awesome-query-builder/config/material";
+import BootstrapConfig from "react-awesome-query-builder/config/bootstrap";
 const {
   FieldSelect,
   FieldDropdown,
@@ -25,6 +26,7 @@ const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
   antd: AntdConfig,
   material: MaterialConfig,
+  bootstrap: BootstrapConfig
 };
 
 export default (skin: string) => {

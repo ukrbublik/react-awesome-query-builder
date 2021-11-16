@@ -527,6 +527,7 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 import {Widgets} from 'react-awesome-query-builder';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import MaterialWidgets from 'react-awesome-query-builder/lib/components/widgets/material';
+import BootstrapWidgets from 'react-awesome-query-builder/lib/components/widgets/bootstrap';
 const {
     TextWidget,
     NumberWidget,
@@ -542,6 +543,11 @@ const {
     MaterialNumberWidget,
     ...
 } = MaterialWidgets;
+const {
+    BootstrapTextWidget,
+    BootstrapNumberWidget,
+    ...
+} = BootstrapWidgets;
 ----
 
 [source,javascript]
