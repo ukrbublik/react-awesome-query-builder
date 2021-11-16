@@ -20,8 +20,9 @@ const emptyArray = [];
 export default (props) => {
   const {
     allowCustomValues, multiple,
-    value: selectedValue, customProps, readonly, config
+    value: selectedValue, customProps, readonly, config, groupBy, filterOptionsConfig
   } = props;
+  const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
 
   // hook
   const {
@@ -64,7 +65,7 @@ export default (props) => {
   const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
   
   const filterOptions = (options, params) => {
-    const filtered = defaultFilterOptions(options, params);
+    const filtered = filterOptionsFn(options, params);
     const extended = extendOptions(filtered, params);
     return extended;
   };
@@ -135,7 +136,7 @@ export default (props) => {
         {option.title}
       </React.Fragment>;
     } else {
-      return <React.Fragment>{option.title}</React.Fragment>;
+      return <React.Fragment>{option.renderTitle || option.title}</React.Fragment>;
     }
   };
 
@@ -161,6 +162,7 @@ export default (props) => {
         disabled={readonly}
         readOnly={readonly}
         options={options}
+        groupBy={groupBy}
         getOptionLabel={getOptionLabel}
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
