@@ -1,9 +1,9 @@
 # Changelog
 
 - 4.8.0
-  - Added read-only mode switch for rules and groups, see `showLock` option and `locked` JsonLogic op (issue #377) (PR #490)
+  - Added read-only mode switch for rules and groups. See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`. Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
   - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
-  - Fix: filter value sources for func args correctly (PR #490)
+  - Fix: Filter value sources for func args correctly. LHS field can be used as arg in RHS function. (PR #490)
 - 4.7.2
   - Fixed import of rule_group with `not` (issue #548) (PR #559)
 - 4.7.1
