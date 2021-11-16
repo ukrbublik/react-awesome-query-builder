@@ -4,24 +4,29 @@ import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
 import {normalizeListValues} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
+import clone from "clone";
 
 
 export const extendConfig = (config) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
-  if (config.__extended)
+  if (config.__extended) {
     return config;
+  }
     
   config.settings = merge({}, defaultSettings, config.settings);
   config._fieldsCntByType = {};
   config._funcsCntByType = {};
 
+  config.types = clone(config.types);
   _extendTypesConfig(config.types, config);
 
+  config.fields = clone(config.fields);
   config.__fieldNames = {};
   _extendFieldsConfig(config.fields, config);
 
+  config.funcs = clone(config.funcs);
   _extendFuncArgsConfig(config.funcs, config);
 
   moment.locale(config.settings.locale.moment);
