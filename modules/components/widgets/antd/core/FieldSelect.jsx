@@ -86,13 +86,13 @@ export default class FieldSelect extends PureComponent {
       if (items) {
         const simpleItems = items.filter(it => !it.items);
         const complexItems = items.filter(it => !!it.items);
-          const gr = simpleItems.length
-            ? [<OptGroup
-                key={pathKey}
-                label={groupPrefix+label}
-              >{this.renderSelectItems(simpleItems, level+1)}</OptGroup>]
-            : [];
-          const list = complexItems.length ? this.renderSelectItems(complexItems, level+1) : [];
+        const gr = simpleItems.length
+          ? [<OptGroup
+            key={pathKey}
+            label={groupPrefix+label}
+          >{this.renderSelectItems(simpleItems, level+1)}</OptGroup>]
+          : [];
+        const list = complexItems.length ? this.renderSelectItems(complexItems, level+1) : [];
         return [...gr, ...list];
       } else {
         const option = tooltip ? <Tooltip title={tooltip}>{prefix+label}</Tooltip> : prefix+label;
