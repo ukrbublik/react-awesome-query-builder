@@ -1,5 +1,6 @@
 
 import {getFieldConfig, getFuncConfig} from "../utils/configUtils";
+import {filterValueSourcesForField} from "../utils/ruleUtils";
 import Immutable from "immutable";
 
 // helpers
@@ -36,8 +37,9 @@ export const completeFuncValue = (value, config) => {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
       const {valueSources, isOptional, defaultValue} = argConfig;
+      const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
       const args = complValue.get("args");
-      const argDefaultValueSrc = valueSources.length == 1 ? valueSources[0] : undefined;
+      const argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
       const argVal = args ? args.get(argKey) : undefined;
       const argValue = argVal ? argVal.get("value") : undefined;
       const argValueSrc = (argVal ? argVal.get("valueSrc") : undefined) || argDefaultValueSrc;
@@ -125,7 +127,8 @@ export const setFunc = (value, funcKey, config) => {
     for (const argKey in funcConfig.args) {
       const argConfig = funcConfig.args[argKey];
       const {valueSources, defaultValue} = argConfig;
-      const firstValueSrc = valueSources.length ? valueSources[0] : undefined;
+      const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+      const firstValueSrc = filteredValueSources.length ? filteredValueSources[0] : undefined;
       const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
       const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
       if (defaultValue !== undefined) {
@@ -156,12 +159,14 @@ const getDefaultArgValue = ({defaultValue: value}) => {
 * @param {*} argVal 
 * @param {object} argConfig 
 */
-export const setArgValue = (value, argKey, argVal, argConfig) => {
+export const setArgValue = (value, argKey, argVal, argConfig, config) => {
   if (value && value.get("func")) {
     value = value.setIn(["args", argKey, "value"], argVal);
 
     // set default arg value sorce
-    const argDefaultValueSrc = argConfig.valueSources.length == 1 ? argConfig.valueSources[0] : undefined;
+    const {valueSources} = argConfig;
+    const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+    const argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
     if (argDefaultValueSrc) {
       value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
     }
@@ -176,7 +181,7 @@ export const setArgValue = (value, argKey, argVal, argConfig) => {
 * @param {string} argValSrc 
 * @param {object} argConfig 
 */
-export const setArgValueSrc = (value, argKey, argValSrc, argConfig) => {
+export const setArgValueSrc = (value, argKey, argValSrc, _argConfig, _config) => {
   if (value && value.get("func")) {
     value = value.setIn(["args", argKey], new Immutable.Map({valueSrc: argValSrc}));
   }

@@ -20,6 +20,7 @@ const {
 
   MaterialFieldSelect,
   MaterialConjs,
+  MaterialSwitch,
   MaterialButton,
   MaterialButtonGroup,
   MaterialValueSources,
@@ -37,6 +38,7 @@ const settings = {
   renderOperator: (props) => <MaterialFieldSelect {...props} />,
   renderFunc: (props) => <MaterialFieldSelect {...props} />,
   renderConjs: (props) => <MaterialConjs {...props} />,
+  renderSwitch: (props) => <MaterialSwitch {...props} />,
   renderButton: (props) => <MaterialButton {...props} />,
   renderButtonGroup: (props) => <MaterialButtonGroup {...props} />,
   renderValueSources: (props) => <MaterialValueSources {...props} />,

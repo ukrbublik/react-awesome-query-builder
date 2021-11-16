@@ -7,7 +7,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
-import {getFieldPathLabels} from "../../utils/ruleUtils";
+import {getFieldPathLabels, getValueSourcesForFieldOp} from "../../utils/ruleUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
 const classNames = require("classnames");
@@ -31,12 +31,15 @@ class Rule extends PureComponent {
       isDraggingTempo: PropTypes.bool,
       parentField: PropTypes.string, //from RuleGroup
       valueError: PropTypes.any,
+      isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //path: PropTypes.instanceOf(Immutable.List),
       //actions
       handleDraggerMouseDown: PropTypes.func,
       setField: PropTypes.func,
       setOperator: PropTypes.func,
       setOperatorOption: PropTypes.func,
+      setLock: PropTypes.func,
       removeSelf: PropTypes.func,
       setValue: PropTypes.func,
       setValueSrc: PropTypes.func,
@@ -47,13 +50,14 @@ class Rule extends PureComponent {
       super(props);
       useOnPropsChanged(this);
       this.removeSelf = this.removeSelf.bind(this);
+      this.setLock = this.setLock.bind(this);
 
       this.onPropsChanged(props);
     }
 
     onPropsChanged(nextProps) {
       const prevProps = this.props;
-      const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt"];
+      const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
       const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
       if (needUpdateMeta) {
@@ -61,7 +65,7 @@ class Rule extends PureComponent {
       }
     }
 
-    getMeta({selectedField, selectedOperator, config, reordableNodesCnt}) {
+    getMeta({selectedField, selectedOperator, config, reordableNodesCnt, isLocked}) {
       const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
       const selectedFieldConfig = getFieldConfig(config, selectedField);
       const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
@@ -71,7 +75,7 @@ class Rule extends PureComponent {
       const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
       const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
-      const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1;
+      const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
       const showOperator = selectedField && !hideOperator;
       const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
       const showWidget = isFieldAndOpSelected;
@@ -81,6 +85,10 @@ class Rule extends PureComponent {
         selectedFieldPartsLabels, selectedFieldWidgetConfig,
         showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
       };
+    }
+
+    setLock(lock) {
+      this.props.setLock(lock);
     }
 
     removeSelf() {
@@ -109,7 +117,7 @@ class Rule extends PureComponent {
     }
 
     renderField() {
-      const {config} = this.props;
+      const {config, isLocked} = this.props;
       const { immutableFieldsMode } = config.settings;
 
       return <FieldWrapper
@@ -119,14 +127,14 @@ class Rule extends PureComponent {
         selectedField={this.props.selectedField}
         setField={!immutableFieldsMode ? this.props.setField : dummyFn}
         parentField={this.props.parentField}
-        readonly={immutableFieldsMode}
+        readonly={immutableFieldsMode || isLocked}
         id={this.props.id}
         groupId={this.props.groupId}
       />;
     }
 
     renderOperator () {
-      const {config} = this.props;
+      const {config, isLocked} = this.props;
       const {
         selectedFieldPartsLabels, selectedFieldWidgetConfig, showOperator, showOperatorLabel
       } = this.meta;
@@ -142,14 +150,14 @@ class Rule extends PureComponent {
         showOperator={showOperator}
         showOperatorLabel={showOperatorLabel}
         selectedFieldWidgetConfig={selectedFieldWidgetConfig}
-        readonly={immutableOpsMode}
+        readonly={immutableOpsMode || isLocked}
         id={this.props.id}
         groupId={this.props.groupId}
       />;
     }
 
     renderWidget() {
-      const {config, valueError} = this.props;
+      const {config, valueError, isLocked} = this.props;
       const { showWidget } = this.meta;
       const { immutableValuesMode } = config.settings;
       if (!showWidget) return null;
@@ -166,7 +174,7 @@ class Rule extends PureComponent {
         config={config}
         setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
         setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
-        readonly={immutableValuesMode}
+        readonly={immutableValuesMode || isLocked}
         id={this.props.id}
         groupId={this.props.groupId}
       />;
@@ -241,27 +249,41 @@ class Rule extends PureComponent {
     }
 
     renderDel() {
-      const {config} = this.props;
+      const {config, isLocked} = this.props;
       const {
-        deleteLabel, renderSize, 
+        deleteLabel, 
         immutableGroupsMode, 
-        renderButton: Btn
+        renderButton: Btn,
+        canDeleteLocked
       } = config.settings;
 
-      return (
-        <div key="rule-header" className="rule--header">
-          {!immutableGroupsMode && <Btn 
-            type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
-          />}
-        </div>
+      return !immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && (
+        <Btn 
+          type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
+        />
+      );
+    }
+
+    renderLock() {
+      const {config, isLocked, isTrueLocked, id} = this.props;
+      const {
+        lockLabel, lockedLabel, showLock,
+        renderSwitch: Switch
+      } = config.settings;
+      
+      return showLock && !(isLocked && !isTrueLocked) && (
+        <Switch 
+          type="lock" id={id} value={isLocked} setValue={this.setLock} label={lockLabel} checkedLabel={lockedLabel} hideLabel={true} config={config}
+        />
       );
     }
 
     render () {
       const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
-      const { valueSrc, value } = this.props;
+      const { valueSrc, value, config } = this.props;
       const canShrinkValue = valueSrc.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
-      
+      const { renderButtonGroup: BtnGrp } = config.settings;
+
       const parts = [
         this.renderField(),
         this.renderOperator(),
@@ -274,6 +296,7 @@ class Rule extends PureComponent {
 
       const error = this.renderError();
       const drag = this.renderDrag();
+      const lock = this.renderLock();
       const del = this.renderDel();
       
       return (
@@ -282,7 +305,12 @@ class Rule extends PureComponent {
           <div className="rule--body--wrapper">
             {body}{error}
           </div>
-          {del}
+          <div className="rule--header">
+            <BtnGrp config={config}>
+              {lock}
+              {del}
+            </BtnGrp>
+          </div>
         </>
       );
     }

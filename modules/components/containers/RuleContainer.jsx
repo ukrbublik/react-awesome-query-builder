@@ -25,6 +25,8 @@ const createRuleContainer = (Rule) =>
       operatorOptions: PropTypes.object,
       reordableNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
+      isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
       isDraggingTempo: PropTypes.bool,
@@ -40,6 +42,10 @@ const createRuleContainer = (Rule) =>
 
     removeSelf = () => {
       this.props.actions.removeRule(this.props.path);
+    }
+
+    setLock = (lock = null) => {
+      this.props.actions.setLock(this.props.path, lock);
     }
 
     setField = (field) => {
@@ -115,6 +121,7 @@ const createRuleContainer = (Rule) =>
               setField={this.dummyFn}
               setOperator={this.dummyFn}
               setOperatorOption={this.dummyFn}
+              setLock={this.dummyFn}
               removeSelf={this.dummyFn}
               setValue={this.dummyFn}
               setValueSrc={this.dummyFn}
@@ -129,6 +136,8 @@ const createRuleContainer = (Rule) =>
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
               asyncListValues={this.props.asyncListValues}
+              isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             /> : null
             ,
             <Rule
@@ -138,6 +147,7 @@ const createRuleContainer = (Rule) =>
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
+              setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
@@ -155,6 +165,8 @@ const createRuleContainer = (Rule) =>
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
               asyncListValues={this.props.asyncListValues}
+              isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             />
           ]}
         </div>

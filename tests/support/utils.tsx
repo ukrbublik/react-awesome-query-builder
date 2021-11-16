@@ -224,7 +224,7 @@ export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat
   try {
     tree = load_tree(value, config, valueFormat);
   } catch(e) {
-    it('should load tree', () => {
+    it("should load tree", () => {
       throw e;
     });
   }

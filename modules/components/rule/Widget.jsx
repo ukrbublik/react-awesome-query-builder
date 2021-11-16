@@ -211,8 +211,8 @@ export default class Widget extends PureComponent {
   renderValueSources = (delta, meta, props) => {
     const {config, isFuncArg, leftField, operator, readonly} = props;
     const {settings} = config;
-    const { valueSources, widgets, _field } = meta;
-    const field = isFuncArg ? leftField : _field;
+    const { valueSources, widgets, aField } = meta;
+    const field = isFuncArg ? leftField : aField;
     const {valueSrc, setValueSrcHandler} = widgets[delta];
     const {valueSourcesInfo, renderValueSources: ValueSources} = settings;
     const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {

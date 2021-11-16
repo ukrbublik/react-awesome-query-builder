@@ -57,26 +57,30 @@ type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
 
-interface RuleProperties {
+interface BasicItemProperties {
+  isLocked?: boolean,
+}
+
+interface RuleProperties extends BasicItemProperties {
   field: string | Empty,
   operator: string | Empty,
   value: Array<RuleValue>,
   valueSrc?: Array<ValueSource>,
   valueType?: Array<string>,
   valueError?: Array<string>,
-  operatorOptions?: AnyObject
+  operatorOptions?: AnyObject,
 }
 
 interface RuleGroupExtProperties extends RuleProperties {
   mode: RuleGroupMode,
 }
 
-interface RuleGroupProperties {
+interface RuleGroupProperties extends BasicItemProperties {
   field: string | Empty,
   mode?: RuleGroupMode,
 }
 
-interface GroupProperties {
+interface GroupProperties extends BasicItemProperties {
   conjunction: string,
   not?: boolean,
 }
@@ -182,7 +186,7 @@ export interface Config {
 /////////////////
 
 type Placement = "after" | "before" | "append" | "prepend";
-type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
 interface BaseAction {
   type: ActionType,
 
@@ -191,6 +195,7 @@ interface BaseAction {
 
   conjunction?: string,
   not?: boolean,
+  lock?: boolean,
   field?: string,
   operator?: string,
   delta?: number, // for SET_VALUE
@@ -219,6 +224,7 @@ export interface Actions {
   addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
   removeGroup(path: IdPath): undefined;
   setNot(path: IdPath, not: boolean): undefined;
+  setLock(path: IdPath, lock: boolean): undefined;
   setConjunction(path: IdPath, conjunction: string): undefined;
   setField(path: IdPath, field: string): undefined;
   setOperator(path: IdPath, operator: string): undefined;
@@ -359,6 +365,16 @@ export interface ButtonProps {
   onClick(): void, 
   label: string,
   config?: Config,
+  readonly?: boolean,
+}
+
+export interface SwitchProps {
+  value: boolean,
+  setValue(newValue?: boolean): void,
+  label: string,
+  checkedLabel?: string,
+  hideLabel?: boolean,
+  config?: Config,
 }
 
 export interface ButtonGroupProps {
@@ -428,7 +444,7 @@ export interface ProximityOptions extends ProximityConfig {
 
 interface BaseOperator {
   label: string,
-  reversedOp: string,
+  reversedOp?: string,
   isNotOp?: boolean,
   cardinality?: number,
   formatOp?: FormatOperator,
@@ -668,6 +684,8 @@ export interface LocaleSettings {
   funcPlaceholder?: string,
   funcLabel?: string,
   operatorPlaceholder?: string,
+  lockLabel?: string,
+  lockedLabel?: string,
   deleteLabel?: string,
   addGroupLabel?: string,
   addRuleLabel?: string,
@@ -696,6 +714,7 @@ export interface RenderSettings {
   renderConjs?: Factory<ConjsProps>,
   renderButton?: Factory<ButtonProps>,
   renderButtonGroup?: Factory<ButtonGroupProps>,
+  renderSwitch?: Factory<SwitchProps>,
   renderProvider?: Factory<ProviderProps>,
   renderValueSources?: Factory<ValueSourcesProps>,
   renderConfirm?: ConfirmFunc,
@@ -723,6 +742,8 @@ export interface BehaviourSettings {
   canReorder?: boolean,
   canRegroup?: boolean,
   showNot?: boolean,
+  showLock?: boolean,
+  canDeleteLocked?: boolean,
   maxNesting?: number,
   setOpOnChangeField: Array<ChangeFieldStrategy>,
   clearValueOnChangeField?: boolean,
@@ -869,6 +890,7 @@ interface VanillaWidgets {
   // vanilla core widgets
   VanillaFieldSelect: ElementType<FieldProps>,
   VanillaConjs: ElementType<ConjsProps>,
+  VanillaSwitch: ElementType<SwitchProps>,
   VanillaButton: ElementType<ButtonProps>,
   VanillaButtonGroup: ElementType<ButtonGroupProps>,
   VanillaProvider: ElementType<ProviderProps>,
@@ -897,6 +919,7 @@ export interface AntdWidgets {
   Button: ElementType<ButtonProps>,
   ButtonGroup: ElementType<ButtonGroupProps>,
   Conjs: ElementType<ConjsProps>,
+  Switch: ElementType<SwitchProps>,
   Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
   confirm: ConfirmFunc,
@@ -925,6 +948,7 @@ export interface MaterialWidgets {
   // material core widgets
   MaterialFieldSelect: ElementType<FieldProps>,
   MaterialConjs: ElementType<ConjsProps>,
+  MaterialSwitch: ElementType<SwitchProps>,
   MaterialButton: ElementType<ButtonProps>,
   MaterialButtonGroup: ElementType<ButtonGroupProps>,
   MaterialProvider: ElementType<ProviderProps>,

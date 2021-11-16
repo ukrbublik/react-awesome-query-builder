@@ -8,6 +8,7 @@ const {
   VanillaProvider,
   VanillaValueSources,
   vanillaConfirm,
+  VanillaSwitch,
 } = Widgets;
 
 export const settings = {
@@ -22,6 +23,7 @@ export const settings = {
   renderOperator: (props) => <VanillaFieldSelect {...props} />,
   renderFunc: (props) => <VanillaFieldSelect {...props} />,
   renderConjs: (props) => <VanillaConjs {...props} />,
+  renderSwitch: (props) => <VanillaSwitch {...props} />,
   renderButton: (props) => <VanillaButton {...props} />,
   renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
   renderProvider: (props) => <VanillaProvider {...props} />,
@@ -37,6 +39,8 @@ export const settings = {
   maxLabelsLength: 100,
   canReorder: true,
   canRegroup: true,
+  showLock: false,
+  canDeleteLocked: false,
   showNot: true,
   canLeaveEmptyGroup: true,
   shouldCreateEmptyGroup: false,
@@ -66,6 +70,8 @@ export const settings = {
   fieldPlaceholder: "Select field",
   funcPlaceholder: "Select function",
   operatorPlaceholder: "Select operator",
+  lockLabel: "Lock",
+  lockedLabel: "Locked",
   deleteLabel: null,
   addGroupLabel: "Add group",
   addRuleLabel: "Add rule",
@@ -80,5 +86,6 @@ export const settings = {
   jsonLogic: {
     groupVarKey: "var",
     altVarKey: "var",
+    lockedOp: "locked"
   }
 };

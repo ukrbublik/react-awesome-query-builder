@@ -27,6 +27,8 @@ export class BasicGroup extends PureComponent {
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     isDraggingMe: PropTypes.bool,
     isDraggingTempo: PropTypes.bool,
+    isLocked: PropTypes.bool,
+    isTrueLocked: PropTypes.bool,
     //actions
     handleDraggerMouseDown: PropTypes.func,
     onDragStart: PropTypes.func,
@@ -35,6 +37,7 @@ export class BasicGroup extends PureComponent {
     removeSelf: PropTypes.func.isRequired,
     setConjunction: PropTypes.func.isRequired,
     setNot: PropTypes.func.isRequired,
+    setLock: PropTypes.func.isRequired,
     actions: PropTypes.object.isRequired,
   };
 
@@ -42,11 +45,16 @@ export class BasicGroup extends PureComponent {
     super(props);
 
     this.removeSelf = this.removeSelf.bind(this);
+    this.setLock = this.setLock.bind(this);
     this.renderItem = this.renderItem.bind(this);
   }
 
   isGroupTopPosition() {
     return startsWith(this.props.config.settings.groupActionsPosition || defaultPosition, "top");
+  }
+
+  setLock(lock) {
+    this.props.setLock(lock);
   }
 
   removeSelf() {
@@ -176,7 +184,7 @@ export class BasicGroup extends PureComponent {
   }
 
   renderActions() {
-    const {config, addRule, addGroup} = this.props;
+    const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <GroupActions
       config={config}
@@ -186,6 +194,10 @@ export class BasicGroup extends PureComponent {
       canAddRule={this.canAddRule()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
+      setLock={this.setLock}
+      isLocked={isLocked}
+      isTrueLocked={isTrueLocked}
+      id={id}
     />;
   }
 
@@ -209,7 +221,7 @@ export class BasicGroup extends PureComponent {
 
   renderItem(item) {
     const props = this.props;
-    const {config, actions, onDragStart} = props;
+    const {config, actions, onDragStart, isLocked} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;
     const type = isRuleGroup ? "rule_group" : item.get("type");
     
@@ -231,6 +243,7 @@ export class BasicGroup extends PureComponent {
         totalRulesCnt={this.props.totalRulesCnt}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
+        isParentLocked={isLocked}
       />
     );
   }
@@ -240,12 +253,14 @@ export class BasicGroup extends PureComponent {
   }
 
   reordableNodesCnt() {
+    if (this.props.isLocked)
+      return 0;
     return this.props.reordableNodesCnt;
   }
 
   showDragIcon() {
-    const { config, isRoot, reordableNodesCnt } = this.props;
-    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1;
+    const { config, isRoot, reordableNodesCnt, isLocked } = this.props;
+    return config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
   }
 
   renderDrag() {
@@ -267,7 +282,7 @@ export class BasicGroup extends PureComponent {
   renderConjs() {
     const {
       config, children1, id,
-      selectedConjunction, setConjunction, not, setNot
+      selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
     const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
@@ -279,7 +294,7 @@ export class BasicGroup extends PureComponent {
 
     const renderProps = {
       disabled: this.isOneChild(),
-      readonly: immutableGroupsMode,
+      readonly: immutableGroupsMode || isLocked,
       selectedConjunction: selectedConjunction,
       setConjunction: immutableGroupsMode ? dummyFn : setConjunction,
       conjunctionOptions: conjunctionOptions,
@@ -289,6 +304,7 @@ export class BasicGroup extends PureComponent {
       setNot: immutableGroupsMode ? dummyFn : setNot,
       notLabel: notLabel,
       showNot: this.showNot(),
+      isLocked: isLocked
     };
     return <Conjs {...renderProps} />;
   }

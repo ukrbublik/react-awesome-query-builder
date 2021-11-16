@@ -304,6 +304,9 @@ Behaviour settings:
   `(string leftField, Object leftFieldConfig, string rightField, Object rightFieldConfig) => boolean` +
   For type == `select`/`multiselect` you can optionally check `listValues`
 |groupOperators |`['all', 'some', 'none']` |Operators usable in `!group` fields with `array` mode
+|showLock |false |Show "Lock" switch for rules and groups to make them read-only ("admin mode") +
+  NOTE: To preserve read-only state of rules in JsonLogic, please use `jsonLogic.add_operation("locked", v => v);` in your code
+|canDeleteLocked |false |Show "Delete" button for locked rule?
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -330,7 +333,7 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
-|renderConjs, renderButton, renderButtonGroup, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
+|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
 |showLabels |false |Show labels above all fields?
 |maxLabelsLength |100 |To shorten long labels of fields/values (by length, i.e. number of chars)
 |dropdownPlacement |`bottomLeft` |Placement of antdesign's https://ant.design/components/dropdown/[dropdown] pop-up menu
@@ -388,6 +391,8 @@ Localization:
 |fieldPlaceholder |Select field
 |funcPlaceholder |Select function
 |operatorPlaceholder |Select operator
+|lockLabel |Lock
+|lockedLabel |Locked
 |deleteLabel |`null`
 |delGroupLabel |`null`
 |addGroupLabel |Add group

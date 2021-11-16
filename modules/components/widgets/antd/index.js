@@ -24,6 +24,7 @@ import FieldTreeSelect from "./core/FieldTreeSelect";
 import Button from "./core/Button";
 import ButtonGroup from "./core/ButtonGroup";
 import Conjs from "./core/Conjs";
+import Switch from "./core/Switch";
 import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
@@ -52,6 +53,7 @@ export default {
   Button,
   ButtonGroup,
   Conjs,
+  Switch,
   ValueSources,
   confirm,
 

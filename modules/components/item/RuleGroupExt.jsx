@@ -97,22 +97,23 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderField() {
-    const { immutableFieldsMode } = this.props.config.settings;
+    const { config, selectedField, setField, parentField, id, groupId, isLocked } = this.props;
+    const { immutableFieldsMode } = config.settings;
     return <FieldWrapper
       key="field"
       classname={"rule--field"}
-      config={this.props.config}
-      selectedField={this.props.selectedField}
-      setField={this.props.setField}
-      parentField={this.props.parentField}
-      readonly={immutableFieldsMode}
-      id={this.props.id}
-      groupId={this.props.groupId}
+      config={config}
+      selectedField={selectedField}
+      setField={setField}
+      parentField={parentField}
+      readonly={immutableFieldsMode || isLocked}
+      id={id}
+      groupId={groupId}
     />;
   }
 
   renderOperator() {
-    const {config, selectedField, selectedOperator, setField, setOperator} = this.props;
+    const {config, selectedField, selectedOperator, setField, setOperator, isLocked} = this.props;
     const { immutableFieldsMode } = config.settings;
     const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
@@ -131,14 +132,14 @@ class RuleGroupExt extends BasicGroup {
       showOperator={showOperator}
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}
-      readonly={immutableFieldsMode}
+      readonly={immutableFieldsMode || isLocked}
       id={this.props.id}
       groupId={this.props.groupId}
     />;
   }
 
   renderWidget() {
-    const {config, selectedField, selectedOperator} = this.props;
+    const {config, selectedField, selectedOperator, isLocked} = this.props;
     const { immutableValuesMode } = config.settings;
     const isFieldAndOpSelected = selectedField && selectedOperator;
     const showWidget = isFieldAndOpSelected;
@@ -155,7 +156,7 @@ class RuleGroupExt extends BasicGroup {
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={dummyFn}
-      readonly={immutableValuesMode}
+      readonly={immutableValuesMode || isLocked}
       id={this.props.id}
       groupId={this.props.groupId}
     />;
@@ -168,7 +169,7 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderActions() {
-    const {config, addRule} = this.props;
+    const {config, addRule, isLocked, isTrueLocked, id} = this.props;
 
     return <RuleGroupExtActions
       config={config}
@@ -176,10 +177,16 @@ class RuleGroupExt extends BasicGroup {
       canAddRule={this.canAddRule()}
       canDeleteGroup={this.canDeleteGroup()}
       removeSelf={this.removeSelf}
+      setLock={this.setLock}
+      isLocked={isLocked}
+      isTrueLocked={isTrueLocked}
+      id={id}
     />;
   }
 
   reordableNodesCnt() {
+    if (this.props.isLocked)
+      return 0;
     const {children1} = this.props;
     return children1.size;
   }

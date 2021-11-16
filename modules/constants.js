@@ -9,6 +9,7 @@ export const SET_OPERATOR = "SET_OPERATOR";
 export const SET_VALUE = "SET_VALUE";
 export const SET_VALUE_SRC = "SET_VALUE_SRC";
 export const SET_OPERATOR_OPTION = "SET_OPERATOR_OPTION";
+export const SET_LOCK = "SET_LOCK";
 
 export const SET_TREE = "SET_TREE";
 

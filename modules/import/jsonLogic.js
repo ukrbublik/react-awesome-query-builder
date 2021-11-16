@@ -73,16 +73,18 @@ const buildConv = (config) => {
     }
   }
 
+  const {groupVarKey, altVarKey} = config.settings.jsonLogic;
+
   return {
     operators,
     conjunctions,
     funcs,
-    varKeys: ["var", config.settings.jsonLogic.groupVarKey, config.settings.jsonLogic.altVarKey],
+    varKeys: ["var", groupVarKey, altVarKey],
   };
 };
 
 
-const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null) => {
+const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
   let op, vals;
   if (isJsonLogic(logic)) {
     op = Object.keys(logic)[0];
@@ -94,9 +96,13 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
+  const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
   const isRev = op == "!" && !isEmptyOp;
-  if (isRev) {
+  const isLocked = lockedOp && op == lockedOp;
+  if (isLocked) {
+    ret = convertFromLogic(vals[0], conv, config, expectedType, meta, not, fieldConfig, widget, parentField, true);
+  } else if (isRev) {
     // reverse with not
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
   } else if(expectedType == "val") {
@@ -112,6 +118,10 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let afterErrorsCnt = meta.errors.length;
   if (op != "!" && ret === undefined && afterErrorsCnt == beforeErrorsCnt) {
     meta.errors.push(`Can't parse logic ${JSON.stringify(logic)}`);
+  }
+
+  if (isLocked) {
+    ret.properties.isLocked = true;
   }
 
   return ret;

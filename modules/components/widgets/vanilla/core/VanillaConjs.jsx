@@ -9,7 +9,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
   const renderOptions = () => 
     Object.keys(conjunctionOptions).map(key => {
       const {id, name, label, checked} = conjunctionOptions[key];
-      let postfix = setConjunction.isDummyFn ? "__dummy" : "";
+      const postfix = setConjunction.isDummyFn ? "__dummy" : "";
       if ((readonly || disabled) && !checked)
         return null;
       return [
@@ -20,10 +20,11 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
     });
   
   const renderNot = () => {
+    const postfix = "not";
     return [
-      <input key={id}  type="checkbox" id={id + "__not"} checked={not} disabled={readonly} onChange={onNotChange} />
+      <input key={id+postfix}  type="checkbox" id={id+postfix} checked={not} disabled={readonly} onChange={onNotChange} />
       ,
-      <label key={id+"label"}  htmlFor={id + "__not"}>{notLabel || "NOT"}</label>
+      <label key={id+postfix+"label"}  htmlFor={id+postfix}>{notLabel || "NOT"}</label>
     ];
   };
 
