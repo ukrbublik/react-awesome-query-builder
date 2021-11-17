@@ -4,10 +4,14 @@ import React from "react";
 
 const {
   FluentText,
+  FluentFieldSelect,
 } = FluentWidgets;
 
 const settings = {
   ...BasicConfig.settings,
+  renderField: (props) => <FluentFieldSelect {...props} />,
+  renderOperator: (props) => <FluentFieldSelect {...props} />,
+  renderFunc: (props) => <FluentFieldSelect {...props} />,
 };
 
 const widgets = {
