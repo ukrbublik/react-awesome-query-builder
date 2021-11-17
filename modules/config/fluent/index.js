@@ -4,7 +4,10 @@ import React from "react";
 
 const {
   FluentText,
+
   FluentFieldSelect,
+  FluentButton,
+  FluentValueSources,
 } = FluentWidgets;
 
 const settings = {
@@ -12,6 +15,15 @@ const settings = {
   renderField: (props) => <FluentFieldSelect {...props} />,
   renderOperator: (props) => <FluentFieldSelect {...props} />,
   renderFunc: (props) => <FluentFieldSelect {...props} />,
+
+  // renderConjs: (props) => <MaterialConjs {...props} />,
+  // renderSwitch: (props) => <MaterialSwitch {...props} />,
+  renderButton: (props) => <FluentButton {...props} />,
+  // renderButtonGroup: (props) => <MaterialButtonGroup {...props} />,
+  renderValueSources: (props) => <FluentValueSources {...props} />,
+  // renderProvider: (props) => <MaterialProvider {...props} />,
+  // renderConfirm: MaterialConfirm,
+  // useConfirm: MaterialUseConfirm,
 };
 
 const widgets = {

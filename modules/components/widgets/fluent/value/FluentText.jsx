@@ -1,5 +1,6 @@
 import React from "react";
 import { TextField } from '@fluentui/react/lib/TextField';
+import { Stack, IStackProps, IStackStyles } from '@fluentui/react/lib/Stack';
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength} = props;
@@ -14,6 +15,7 @@ export default (props) => {
   const textValue = value || "";
 
   return (
+    <Stack>
     <TextField 
       value={textValue}
       label={!readonly && showLabels ? placeholder : ""}
@@ -22,5 +24,6 @@ export default (props) => {
       onChange={onChange}
       {...customProps}
     />
+    </Stack>
   );
 };

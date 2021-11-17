@@ -1,5 +1,6 @@
 import React from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownStyles, IDropdownOption } from '@fluentui/react/lib/Dropdown';
+import { Stack, IStackProps, IStackStyles } from '@fluentui/react/lib/Stack';
 
 export default ({items, setField, selectedKey, readonly, placeholder}) => {
   const getOptions = (fields, level = 0) => (
@@ -30,6 +31,7 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
   
   const hasValue = selectedKey != null;
   return (
+    <Stack>
     <Dropdown 
       placeholder={placeholder}
       onChange={onChange}
@@ -37,5 +39,6 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
       disabled={readonly}
       options={getOptions(items)}
     />
+    </Stack>
   );
 };
