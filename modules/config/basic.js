@@ -312,6 +312,31 @@ const operators = {
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
   },
+  is_null: {
+    label: "Is null",
+    labelForFormat: "IS NULL",
+    sqlOp: "IS NULL",
+    cardinality: 0,
+    reversedOp: "is_not_null",
+    formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      return isForDisplay ? `${field} IS NULL` : `!${field}`;
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
+    jsonLogic: "!"
+  },
+  is_not_null: {
+    label: "Is not null",
+    labelForFormat: "IS NOT NULL",
+    sqlOp: "IS NOT NULL",
+    cardinality: 0,
+    reversedOp: "is_null",
+    formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      return isForDisplay ? `${field} IS NOT NULL` : `!!${field}`;
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
+    jsonLogic: "!!",
+    elasticSearchQueryType: "exists",
+  },
   select_equals: {
     label: "==",
     labelForFormat: "==",
@@ -773,6 +798,8 @@ const types = {
           "not_equal",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
           "like",
           "not_like",
           "starts_with",
@@ -788,6 +815,8 @@ const types = {
           "not_equal",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
           "like",
           "not_like",
           "starts_with",
@@ -822,6 +851,8 @@ const types = {
           "not_between",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       },
       slider: {
@@ -834,6 +865,8 @@ const types = {
           "greater_or_equal",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null"
         ],
       },
     },
@@ -852,7 +885,9 @@ const types = {
           "between",
           "not_between",
           "is_empty",
-          "is_not_empty"
+          "is_not_empty",
+          "is_null",
+          "is_not_null"
         ]
       }
     },
@@ -872,6 +907,8 @@ const types = {
           "not_between",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ]
       }
     },
@@ -891,6 +928,8 @@ const types = {
           "not_between",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       }
     },
@@ -905,6 +944,8 @@ const types = {
           "select_not_equals",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
         widgetProps: {
           customProps: {
@@ -918,6 +959,8 @@ const types = {
           "select_not_any_in",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       },
     },
@@ -931,6 +974,8 @@ const types = {
           "multiselect_not_equals",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ]
       }
     },
@@ -942,6 +987,8 @@ const types = {
         operators: [
           "equal",
           "not_equal",
+          "is_null",
+          "is_not_null",
         ],
         widgetProps: {
           //you can enable this if you don't use fields as value sources

@@ -837,6 +837,8 @@ export interface BasicConfig extends Config {
     ends_with: BinaryOperator,
     between: Operator2,
     not_between: Operator2,
+    is_null: UnaryOperator,
+    is_not_null: UnaryOperator,
     is_empty: UnaryOperator,
     is_not_empty: UnaryOperator,
     select_equals: BinaryOperator,

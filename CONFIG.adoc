@@ -83,6 +83,8 @@ const {
         ends_with,
         between,
         not_between,
+        is_null,
+        is_not_null,
         is_empty,
         is_not_empty,
         select_equals, // like `equal`, but for select
