@@ -373,7 +373,9 @@ const operators = {
         return `${field} IN (${values})`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-      return `${field} IN (${values.join(", ")})`;
+      if (valueSrc == "value") {
+        return `${field} IN (${values.join(", ")})`;
+      } else return undefined; // not supported
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
     reversedOp: "select_not_any_in",
@@ -392,7 +394,9 @@ const operators = {
         return `${field} NOT IN (${values})`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-      return `${field} NOT IN (${values.join(", ")})`;
+      if (valueSrc == "value") {
+        return `${field} NOT IN (${values.join(", ")})`;
+      } else return undefined; // not supported
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$nin", v => v, false),
     reversedOp: "select_any_in",

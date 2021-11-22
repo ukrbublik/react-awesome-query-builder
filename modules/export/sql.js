@@ -157,9 +157,14 @@ const formatRule = (item, config, meta) => {
     operatorOptions,
   ];
 
-  let ret = fn(...args);
+  let ret;
+  ret = fn(...args);
   if (isRev) {
     ret = config.settings.sqlFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+  }
+  if (ret === undefined) {
+    meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(', ')}`);
+    return undefined;
   }
   return ret;
 };
