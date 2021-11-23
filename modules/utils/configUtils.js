@@ -2,7 +2,7 @@ import merge from "lodash/merge";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {normalizeListValues} from "./stuff";
+import {normalizeListValues, mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 
@@ -53,10 +53,7 @@ function _extendTypeConfig(type, typeConfig, config) {
   for (let widget in typeConfig.widgets) {
     let typeWidgetConfig = typeConfig.widgets[widget];
     if (typeWidgetConfig.operators) {
-      if (!operators)
-        operators = [];
-            
-      operators = operators.concat(typeWidgetConfig.operators.slice());
+      operators = mergeArraysSmart(operators, typeWidgetConfig.operators);
     }
     if (typeWidgetConfig.defaultOperator)
       defaultOperator = typeWidgetConfig.defaultOperator;
