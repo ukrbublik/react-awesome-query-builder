@@ -177,7 +177,7 @@ const operators = {
     labelForFormat: "Like",
     reversedOp: "not_like",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} LIKE ${values}`;
       } else return undefined; // not supported
@@ -195,7 +195,7 @@ const operators = {
     reversedOp: "like",
     labelForFormat: "Not Like",
     sqlOp: "NOT LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} NOT LIKE ${values}`;
       } else return undefined; // not supported
@@ -207,7 +207,7 @@ const operators = {
     label: "Starts with",
     labelForFormat: "Starts with",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} LIKE ${values}`;
       } else return undefined; // not supported
@@ -220,7 +220,7 @@ const operators = {
     label: "Ends with",
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} LIKE ${values}`;
       } else return undefined; // not supported
@@ -289,11 +289,18 @@ const operators = {
   is_empty: {
     label: "Is empty",
     labelForFormat: "IS EMPTY",
-    sqlOp: "IS EMPTY",
     cardinality: 0,
     reversedOp: "is_not_empty",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
+      return isForDisplay ? `${field} IS EMPTY` : `${field} IS EMPTY`;
+    },
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      if (valueSrc == "value") {
+        if (fieldDef.type == 'text') {
+          return `${field} = ''`;
+        }
+      }
+      return undefined; // not supported
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
     jsonLogic: "!",
@@ -302,11 +309,18 @@ const operators = {
     isNotOp: true,
     label: "Is not empty",
     labelForFormat: "IS NOT EMPTY",
-    sqlOp: "IS NOT EMPTY",
     cardinality: 0,
     reversedOp: "is_empty",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
+      return isForDisplay ? `${field} IS NOT EMPTY` : `${field} IS NOT EMPTY`;
+    },
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      if (valueSrc == "value") {
+        if (fieldDef.type == 'text') {
+          return `${field} <> ''`;
+        }
+      }
+      return undefined; // not supported
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
     jsonLogic: "!!",
@@ -372,7 +386,7 @@ const operators = {
       else
         return `${field} IN (${values})`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} IN (${values.join(", ")})`;
       } else return undefined; // not supported
@@ -393,7 +407,7 @@ const operators = {
       else
         return `${field} NOT IN (${values})`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} NOT IN (${values.join(", ")})`;
       } else return undefined; // not supported
@@ -412,7 +426,7 @@ const operators = {
       else
         return `${field} ${opStr} ${values}`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value")
       // set
         return `${field} = '${values.map(v => SqlString.trim(v)).join(",")}'`;
@@ -439,7 +453,7 @@ const operators = {
       else
         return `${field} != ${values}`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value")
       // set
         return `${field} != '${values.map(v => SqlString.trim(v)).join(",")}'`;
@@ -466,7 +480,7 @@ const operators = {
       const prox = operatorOptions.get("proximity");
       return `${field} ${val1} NEAR/${prox} ${val2}`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       const val1 = values.first();
       const val2 = values.get(1);
       const aVal1 = SqlString.trim(val1);
