@@ -295,14 +295,13 @@ const operators = {
       return isForDisplay ? `${field} IS EMPTY` : `${field} IS EMPTY`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        if (fieldDef.type == 'text') {
-          return `${field} = ''`;
-        }
+      if (fieldDef.type == 'text') {
+        // todo: ISNULL
+        return `${field} = ''`;
       }
       return undefined; // not supported
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
+    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false), // todo! change
     jsonLogic: "!",
   },
   is_not_empty: {
@@ -315,14 +314,13 @@ const operators = {
       return isForDisplay ? `${field} IS NOT EMPTY` : `${field} IS NOT EMPTY`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        if (fieldDef.type == 'text') {
-          return `${field} <> ''`;
-        }
+      if (fieldDef.type == 'text') {
+        // todo: ISNULL
+        return `${field} <> ''`;
       }
       return undefined; // not supported
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
+    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false), // todo! change
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
   },
@@ -336,7 +334,7 @@ const operators = {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
-    jsonLogic: "!"
+    jsonLogic: "!" // todo! change, compare with null
   },
   is_not_null: {
     label: "Is not null",
@@ -348,7 +346,7 @@ const operators = {
       return isForDisplay ? `${field} IS NOT NULL` : `!!${field}`;
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
-    jsonLogic: "!!",
+    jsonLogic: "!!", // todo! change, compare with null
     elasticSearchQueryType: "exists",
   },
   select_equals: {
