@@ -11,7 +11,7 @@ import {defaultConjunction} from "../utils/defaultUtils";
 import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
-import {SqlString} from "../utils/sql";
+import {SqlString} from "../utils/export";
 
 
 export const sqlFormat = (tree, config) => {

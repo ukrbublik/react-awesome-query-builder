@@ -1,7 +1,7 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as Operators from "../components/operators";
-import {SqlString} from "../utils/sql";
+import {SqlString, sqlEmptyValue, mongoEmptyValue} from "../utils/export";
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
@@ -64,17 +64,19 @@ const conjunctions = {
 //----------------------------  operators
 
 // helpers for mongo format
-export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
+export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
-  const mv = mc(value);
+  const mv = mc(value, fieldDef);
   if (mv === undefined)
     return undefined;
   if (not) {
+    if (!useExpr && (!mop || mop == "$eq"))
+      return { [field]: { "$ne": mv } }; // short form
     return !useExpr
       ? { [field]: { "$not": { [mop]: mv } } } 
       : { "$not": { [mop]: [$field, mv] } };
   } else {
-    if (!useExpr && mop == "$eq")
+    if (!useExpr && (!mop || mop == "$eq"))
       return { [field]: mv }; // short form
     return !useExpr
       ? { [field]: { [mop]: mv } } 
@@ -82,7 +84,7 @@ export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
   }
 };
 
-export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
+export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr, valueSrcs, valueTypes, opDef, operatorOptions, fieldDef) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   if (not) {
     return !useExpr

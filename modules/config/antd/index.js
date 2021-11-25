@@ -2,7 +2,7 @@ import en_US from "antd/lib/locale-provider/en_US";
 import AntdWidgets from "../../components/widgets/antd";
 import BasicConfig, {stringifyForDisplay} from "../basic";
 import {getTitleInListValues} from "../../utils/stuff";
-import {SqlString} from "../../utils/sql";
+import {SqlString} from "../../utils/export";
 import React from "react";
 
 

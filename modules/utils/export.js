@@ -21,4 +21,28 @@ SqlString.escapeLike = (val, any_start = true, any_end = true) => {
   return res;
 };
 
-export {SqlString};
+const sqlEmptyValue = (fieldDef) => {
+  let v = '';
+  const type = fieldDef?.type;
+  if (type == "date") {
+    v = `'1970-01-01'`;
+  } else if (type == "datetime") {
+    v = `'1970-01-01 00:00'`;
+  } else if (type == "time") {
+    v = `'00:00'`;
+  } else if (type == "number") {
+    v = `0`;
+  }
+  return v;
+};
+
+const mongoEmptyValue = (fieldDef) => {
+  let v = '';
+  const type = fieldDef?.type;
+  if (type == "number") {
+    v = 0;
+  }
+  return v;
+};
+
+export {SqlString, sqlEmptyValue, mongoEmptyValue};
