@@ -22,7 +22,7 @@ SqlString.escapeLike = (val, any_start = true, any_end = true) => {
 };
 
 const sqlEmptyValue = (fieldDef) => {
-  let v = '';
+  let v = `''`;
   const type = fieldDef?.type;
   if (type == "date") {
     v = `'1970-01-01'`;
