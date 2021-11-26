@@ -297,9 +297,10 @@ const operators = {
       return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      return `${field} = ${sqlEmptyValue(fieldDef)}`;
+      const empty = sqlEmptyValue(fieldDef);
+      return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", (v, fieldDef) => mongoEmptyValue(fieldDef), false),
+    mongoFormatOp: mongoFormatOp1.bind(null, "$in", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
     jsonLogic: "!",
   },
   is_not_empty: {
@@ -312,9 +313,10 @@ const operators = {
       return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      return `${field} <> ${sqlEmptyValue(fieldDef)}`;
+      const empty = sqlEmptyValue(fieldDef);
+      return `COALESCE(${field}, ${empty}) <> ${empty}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$ne", (v, fieldDef) => mongoEmptyValue(fieldDef), false),
+    mongoFormatOp: mongoFormatOp1.bind(null, "$nin", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
   },
@@ -327,7 +329,7 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
-    //mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
+    // check if value is null OR not exists
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => null, false),
     jsonLogic: "==",
   },
@@ -340,7 +342,7 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NOT NULL` : `!!${field}`;
     },
-    //mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
+    // check if value exists and is not null
     mongoFormatOp: mongoFormatOp1.bind(null, "$ne", v => null, false),
     jsonLogic: "!=",
     elasticSearchQueryType: "exists",
