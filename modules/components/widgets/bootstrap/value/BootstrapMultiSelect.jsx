@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 import {mapListValues} from "../../../../utils/stuff";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
@@ -20,16 +21,15 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
       values = undefined; //not allow []
     return values;
   };
-
-  const onChange = e => setValue(getMultiSelectValues(e.target));
   
   return (
-    <select multiple
-      onChange={onChange}
+    <Input multiple
+      bsSize={"sm"}
+      onChange={(e) => setValue(getMultiSelectValues(e.target))}
       value={value}
       disabled={readonly}
     >
       {renderOptions()}
-    </select>
+    </Input>
   );
 };
