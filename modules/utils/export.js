@@ -25,9 +25,10 @@ const sqlEmptyValue = (fieldDef) => {
   let v = `''`;
   const type = fieldDef?.type;
   if (type == "date") {
-    v = `'1970-01-01'`;
+    //todo: support other SQL dialects?  0001-01-01 for oracle, 1970-01-01 for timestamp
+    v = `'0000-00-00'`;
   } else if (type == "datetime") {
-    v = `'1970-01-01 00:00'`;
+    v = `'0000-00-00 00:00'`;
   } else if (type == "time") {
     v = `'00:00'`;
   } else if (type == "number") {

@@ -294,16 +294,12 @@ const operators = {
     cardinality: 0,
     reversedOp: "is_not_empty",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return isForDisplay ? `${field} IS EMPTY` : `${field} IS EMPTY`;
+      return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (fieldDef.type == 'text') {
-        // todo: ISNULL
-        return `${field} = ''`;
-      }
-      return undefined; // not supported
+      return `${field} = ${sqlEmptyValue(fieldDef)}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false), // todo! change
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", (v, fieldDef) => mongoEmptyValue(fieldDef), false),
     jsonLogic: "!",
   },
   is_not_empty: {
@@ -313,16 +309,12 @@ const operators = {
     cardinality: 0,
     reversedOp: "is_empty",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      return isForDisplay ? `${field} IS NOT EMPTY` : `${field} IS NOT EMPTY`;
+      return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
     },
     sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (fieldDef.type == 'text') {
-        // todo: ISNULL
-        return `${field} <> ''`;
-      }
-      return undefined; // not supported
+      return `${field} <> ${sqlEmptyValue(fieldDef)}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false), // todo! change
+    mongoFormatOp: mongoFormatOp1.bind(null, "$ne", (v, fieldDef) => mongoEmptyValue(fieldDef), false),
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
   },
@@ -335,8 +327,9 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
-    jsonLogic: "!" // todo! change, compare with null
+    //mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => null, false),
+    jsonLogic: "==",
   },
   is_not_null: {
     label: "Is not null",
@@ -347,8 +340,9 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NOT NULL` : `!!${field}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
-    jsonLogic: "!!", // todo! change, compare with null
+    //mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
+    mongoFormatOp: mongoFormatOp1.bind(null, "$ne", v => null, false),
+    jsonLogic: "!=",
     elasticSearchQueryType: "exists",
   },
   select_equals: {
@@ -867,8 +861,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -881,8 +875,8 @@ const types = {
           "less_or_equal",
           "greater",
           "greater_or_equal",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null"
         ],
@@ -902,8 +896,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null"
         ]
@@ -923,8 +917,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ]
@@ -944,8 +938,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -960,8 +954,8 @@ const types = {
         operators: [
           "select_equals",
           "select_not_equals",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -975,8 +969,8 @@ const types = {
         operators: [
           "select_any_in",
           "select_not_any_in",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -990,8 +984,8 @@ const types = {
         operators: [
           "multiselect_equals",
           "multiselect_not_equals",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ]

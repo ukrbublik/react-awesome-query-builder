@@ -460,89 +460,90 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   const opk = op + "/" + cardinality;
   const {fieldSeparator} = config.settings;
   let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
-  if (opKeys) {
-    let jlField, args = [];
-    const rangeOps = ["<", "<=", ">", ">="];
-    if (rangeOps.includes(op) && arity == 3) {
-      jlField = vals[1];
-      args = [ vals[0], vals[2] ];
-    } else if (isRevArgs) {
-      jlField = vals[1];
-      args = [ vals[0] ];
-    } else {
-      [jlField, ...args] = vals;
-    }
-
-    if (!isJsonLogic(jlField)) {
-      errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
-      return;
-    }
-    let k = Object.keys(jlField)[0];
-    let v = Object.values(jlField)[0];
-    
-    let field, having, isGroup;
-    if (conv.varKeys.includes(k) && typeof v == "string") {
-      field = v;
-    }
-    if (isGroup0) {
-      isGroup = true;
-      having = args[0];
-      args = [];
-    }
-    // reduce/filter for group ext
-    if (k == "reduce" && Array.isArray(v) && v.length == 3) {
-      let [filter, acc, init] = v;
-      if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
-        k = Object.keys(filter)[0];
-        v = Object.values(filter)[0];
-        if (k == "filter") {
-          let [group, filter] = v;
-          if (isJsonLogic(group)) {
-            k = Object.keys(group)[0];
-            v = Object.values(group)[0];
-            if (conv.varKeys.includes(k) && typeof v == "string") {
-              field = v;
-              having = filter;
-              isGroup = true;
-            }
-          }
-        } else if (conv.varKeys.includes(k) && typeof v == "string") {
-          field = v;
-          isGroup = true;
-        }
-      }
-    }
-    
-    if (!field) {
-      errors.push(`Unknown field ${JSON.stringify(jlField)}`);
-      return;
-    }
-    if (parentField)
-      field = [parentField, field].join(fieldSeparator);
-    field = normalizeField(config, field);
-
-    const fieldConfig = getFieldConfig(config, field);
-    if (!fieldConfig) {
-      errors.push(`No config for field ${field}`);
-      return;
-    }
-
-    let opKey = opKeys[0];
-    if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
-      // eg. for "equal" and "select_equals"
-      opKeys = opKeys
-        .filter(k => fieldConfig.operators.includes(k));
-      if (opKeys.length == 0) {
-        errors.push(`No corresponding ops for field ${field}`);
-        return;
-      }
-      opKey = opKeys[0];
-    }
-    
-    return {
-      field, fieldConfig, opKey, args, having
-    };
+  if (!opKeys)
+    return;
+  
+  let jlField, args = [];
+  const rangeOps = ["<", "<=", ">", ">="];
+  if (rangeOps.includes(op) && arity == 3) {
+    jlField = vals[1];
+    args = [ vals[0], vals[2] ];
+  } else if (isRevArgs) {
+    jlField = vals[1];
+    args = [ vals[0] ];
+  } else {
+    [jlField, ...args] = vals;
   }
+
+  if (!isJsonLogic(jlField)) {
+    errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
+    return;
+  }
+  let k = Object.keys(jlField)[0];
+  let v = Object.values(jlField)[0];
+  
+  let field, having, isGroup;
+  if (conv.varKeys.includes(k) && typeof v == "string") {
+    field = v;
+  }
+  if (isGroup0) {
+    isGroup = true;
+    having = args[0];
+    args = [];
+  }
+  // reduce/filter for group ext
+  if (k == "reduce" && Array.isArray(v) && v.length == 3) {
+    let [filter, acc, init] = v;
+    if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
+      k = Object.keys(filter)[0];
+      v = Object.values(filter)[0];
+      if (k == "filter") {
+        let [group, filter] = v;
+        if (isJsonLogic(group)) {
+          k = Object.keys(group)[0];
+          v = Object.values(group)[0];
+          if (conv.varKeys.includes(k) && typeof v == "string") {
+            field = v;
+            having = filter;
+            isGroup = true;
+          }
+        }
+      } else if (conv.varKeys.includes(k) && typeof v == "string") {
+        field = v;
+        isGroup = true;
+      }
+    }
+  }
+  
+  if (!field) {
+    errors.push(`Unknown field ${JSON.stringify(jlField)}`);
+    return;
+  }
+  if (parentField)
+    field = [parentField, field].join(fieldSeparator);
+  field = normalizeField(config, field);
+
+  const fieldConfig = getFieldConfig(config, field);
+  if (!fieldConfig) {
+    errors.push(`No config for field ${field}`);
+    return;
+  }
+
+  let opKey = opKeys[0];
+  if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
+    // eg. for "equal" and "select_equals"
+    opKeys = opKeys
+      .filter(k => fieldConfig.operators.includes(k));
+    if (opKeys.length == 0) {
+      errors.push(`No corresponding ops for field ${field}`);
+      return;
+    }
+    opKey = opKeys[0];
+  }
+  
+  return {
+    field, fieldConfig, opKey, args, having
+  };
 };
 
 const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
