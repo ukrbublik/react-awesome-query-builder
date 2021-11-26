@@ -37,6 +37,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Config format](#config-format)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 4.9.0](#migration-to-490)
   * [Migration from v1 to v2](#migration-from-v1-to-v2)
 * [Development](#development)
   * [Directory structure](#directory-structure) 
@@ -434,6 +435,14 @@ It's recommended to update your version.
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 4.9.0
+Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`. 
+Now these operstors can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions). 
+Changed meaning of `is_empty` - now it's just strict comparing with empty string. 
+Before change the meaning was similar to `is_null`. 
+If you used `is_empty` for text types with intention of comparing with null, please replace `is_empty` -> `is_null`, `is_not_empty` -> `is_not_null` in saved query values. 
+If you used JsonLogic for saving, you need to replace `{"!": {"var": "your_field"}}` -> `{"==": [{"var": "your_field"}, null]}` and `{"!!": {"var": "your_field"}}` -> `{"!=": [{"var": "your_field"}, null]}`.
 
 ### Migration from v1 to v2
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  

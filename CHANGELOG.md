@@ -1,5 +1,10 @@
 # Changelog
 
+- 4.9.0
+  - Added `is_null` and `is_not_null` operators (issue #494) (PR #522)
+  - ! Breaking change for operators `is_empty` and `is_not_empty`. Left for text type only, for other types will be auto converted to `is_null`/`is_not_null`. Changed meaning of `is_empty` - now it's just strict comparing with empty string. Before change meaning was similar to `is_null` (and export to SQL was wrong because of non-existent operator `IS EMPTY`). (issue #494)
+  - Fixed order of operators for field when merging operators from 2+ widgets
+  - Added last param `fieldDef` for functions to format operators
 - 4.8.0
   - Added read-only mode switch for rules and groups. See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`. Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
   - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
