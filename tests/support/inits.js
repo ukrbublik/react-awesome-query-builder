@@ -148,7 +148,7 @@ export const with_is_empty_in_some = {
     { "some": [
       { "var": "results" },
       {
-        "!": { "var": "score" }
+        "!": { "var": "grade" }
       }
     ] }
   ]
@@ -181,7 +181,7 @@ export const with_not_and_in_some = {
     { "some": [
       { "var": "cars" },
       { "!": { "and": [
-        { "!": { "var": "year" } },
+        { "==": [ { "var": "year" }, null ] },
         { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
       ] } }
     ] }
