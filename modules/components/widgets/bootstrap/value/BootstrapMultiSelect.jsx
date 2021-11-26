@@ -23,11 +23,13 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
   };
   
   return (
-    <Input multiple
+    <Input
+      type="select"
       bsSize={"sm"}
       onChange={(e) => setValue(getMultiSelectValues(e.target))}
       value={value}
       disabled={readonly}
+      multiple
     >
       {renderOptions()}
     </Input>
