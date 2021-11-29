@@ -290,7 +290,7 @@ export interface BaseWidget {
   mongoFormatValue?: MongoFormatValue;
   elasticSearchFormatValue?: ElasticSearchFormatValue;
   hideOperator?: boolean;
-  jsonLogic?: Function | JsonLogicFormatValue;
+  jsonLogic?: JsonLogicFormatValue;
   //obsolete:
   validateValue?: ValidateValue;
 }
