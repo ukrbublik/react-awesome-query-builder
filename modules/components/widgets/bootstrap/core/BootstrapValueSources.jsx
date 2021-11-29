@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 
 export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) => {
   const renderOptions = (valueSources) => (
@@ -6,16 +7,16 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
       <option key={srcKey} value={srcKey}>{info.label}</option>
     ))
   );
-
-  const onChange = e => setValueSrc(e.target.value);
   
   return (
-    <select 
-      onChange={onChange}
+    <Input 
+      type={"select"}
+      bsSize={"sm"}
+      onChange={(e) => setValueSrc(e.target.value)}
       value={valueSrc}
       disabled={readonly}
     >
       {renderOptions(valueSources)}
-    </select>
+    </Input>
   );
 };
