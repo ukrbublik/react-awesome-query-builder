@@ -16,7 +16,7 @@ describe("antdesign widgets render", () => {
   it("should render cascader", () => {
     with_qb_ant(configs.with_cascader, inits.with_nested, "JsonLogic", (qb) => {
       expect(qb.find(".query-builder")).to.have.length(1);
-      expect(qb.find(".ant-cascader-picker-label").text()).to.equal("User / info / firstName");
+      expect(qb.find(".ant-cascader .ant-select-selector").text()).to.equal("User / info / firstName");
     });
   });
 
