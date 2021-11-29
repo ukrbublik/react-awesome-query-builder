@@ -240,10 +240,11 @@ export interface Actions {
 // Widgets, WidgetProps
 /////////////////
 
-type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
-type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
+type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type MongoFormatValue =     (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
+type JsonLogicFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
+type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
 type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 interface BaseWidgetProps {
@@ -276,21 +277,22 @@ export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 
 export interface BaseWidget {
-  customProps?: AnyObject,
-  type: string,
-  jsType?: string,
-  factory: Factory<WidgetProps>,
-  valueSrc?: ValueSource,
-  valuePlaceholder?: string,
-  valueLabel?: string,
-  fullWidth?: boolean,
-  formatValue: FormatValue,
-  sqlFormatValue: SqlFormatValue,
-  mongoFormatValue?: MongoFormatValue,
-  elasticSearchFormatValue?: ElasticSearchFormatValue,
-  hideOperator?: boolean,
+  customProps?: AnyObject;
+  type: string;
+  jsType?: string;
+  factory: Factory<WidgetProps>;
+  valueSrc?: ValueSource;
+  valuePlaceholder?: string;
+  valueLabel?: string;
+  fullWidth?: boolean;
+  formatValue: FormatValue;
+  sqlFormatValue: SqlFormatValue;
+  mongoFormatValue?: MongoFormatValue;
+  elasticSearchFormatValue?: ElasticSearchFormatValue;
+  hideOperator?: boolean;
+  jsonLogic?: JsonLogicFormatValue;
   //obsolete:
-  validateValue?: ValidateValue,
+  validateValue?: ValidateValue;
 }
 export interface RangeableWidget extends BaseWidget {
   singleWidget?: string,
