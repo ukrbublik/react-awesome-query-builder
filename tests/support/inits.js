@@ -737,6 +737,39 @@ export const with_autocomplete_a = {
   }]
 };
 
+export const with_different_groups = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        {
+          "and": [
+            { "==": [ { "var": "score" }, 5 ] },
+            { "==": [ { "var": "grade" }, "A" ] }
+          ]
+        }
+      ]
+    },
+    {
+      "some": [
+        { "var": "cars" },
+        {
+          "and": [
+            { "==": [ { "var": "vendor" }, "Toyota" ] },
+            { "==": [ { "var": "year" }, 2006 ] }
+          ]
+        }
+      ]
+    },
+    {
+      "or": [
+        { "==": [ { "var": "num" }, 5 ] },
+        { "==": [ { "var": "str" }, "five" ] }
+      ]
+    }
+  ]
+};
+
 // rare
 export const with_fieldName = {
   "and": [{

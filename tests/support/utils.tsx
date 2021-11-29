@@ -20,6 +20,7 @@ import MaterialConfig from "react-awesome-query-builder/config/material";
 type TreeValueFormat = "JsonLogic" | "default" | null;
 type TreeValue = JsonLogicTree | JsonTree | undefined;
 type ConfigFn = (_: Config) => Config;
+type ConfigFns = ConfigFn | [ConfigFn];
 type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
@@ -54,26 +55,27 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   return checkTree(tree, config);
 };
 
-export  const with_qb = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
+export  const with_qb = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  await do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
 };
 
-export  const with_qb_ant = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
+export  const with_qb_ant = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  await do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
 };
 
-export  const with_qb_material = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+export  const with_qb_material = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
   
-export  const with_qb_skins = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   await do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
   await do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
   await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
   
-const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  const config = config_fn(BasicConfig);
+const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as [ConfigFn];
+  const config = config_fns.reduce((c, f) => f(c), BasicConfig);
   const onChange = spy();
   const tree = load_tree(value, config, valueFormat);
 
@@ -90,7 +92,6 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFn, value: TreeV
     config: config,
   };
 
-  let qb: ReactWrapper;
   let qbWrapper: HTMLElement;
   
   const mountOptions: MountRendererProps = {};
@@ -101,18 +102,18 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFn, value: TreeV
   }
 
   //await act(async () => {
-    qb = mount(
-      <Query
-        {...config}
-        value={tree}
-        renderBuilder={render_builder}
-        onChange={onChange}
-      />, 
-      mountOptions
-    ) as ReactWrapper;
+  const qb = mount(
+    <Query
+      {...config}
+      value={tree}
+      renderBuilder={render_builder}
+      onChange={onChange}
+    />, 
+    mountOptions
+  ) as ReactWrapper;
   
-    // @ts-ignore
-    await checks(qb, onChange, tasks);
+  // @ts-ignore
+  await checks(qb, onChange, tasks);
   //});
 
   if (options?.attach) {

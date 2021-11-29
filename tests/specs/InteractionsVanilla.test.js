@@ -264,4 +264,16 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("should render labels with showLabels=true", () => {
+    with_qb([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
+      //todo
+    });
+  });
+
+  it("should render admin mode with showLock=true", () => {
+    with_qb([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
+      //todo
+    });
+  });
+
 });

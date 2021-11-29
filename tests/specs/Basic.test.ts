@@ -21,26 +21,26 @@ describe("library", () => {
 describe("basic query", () => {
 
   describe("import", () => {
-    it("should work with empty value", () => {
-      with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper) => {
+    it("should work with empty value", async () => {
+      await with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
-    it("should work with empty JsonLogic tree", () => {
-      with_qb(configs.simple_with_number, undefined, "JsonLogic", (qb: ReactWrapper) => {
+    it("should work with empty JsonLogic tree", async () => {
+      await with_qb(configs.simple_with_number, undefined, "JsonLogic", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
-    it("should work with simple value", () => {
-      with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb: ReactWrapper) => {
+    it("should work with simple value", async () => {
+      await with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
-    it("should work with simple value in JsonLogic format", () => {
-      with_qb(configs.simple_with_number, inits.with_number, "JsonLogic", (qb: ReactWrapper) => {
+    it("should work with simple value in JsonLogic format", async () => {
+      await with_qb(configs.simple_with_number, inits.with_number, "JsonLogic", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
