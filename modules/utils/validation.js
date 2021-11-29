@@ -79,8 +79,8 @@ function validateRule (item, path, itemId, meta, c) {
   const {showErrorMessage} = config.settings;
   let id = item.get("id");
   let properties = item.get("properties");
-  let field = properties.get("field");
-  let operator = properties.get("operator");
+  let field = properties.get("field") || null;
+  let operator = properties.get("operator") || null;
   let operatorOptions = properties.get("operatorOptions");
   let valueSrc = properties.get("valueSrc");
   let value = properties.get("value");
@@ -103,29 +103,41 @@ function validateRule (item, path, itemId, meta, c) {
 
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
-  if (!fieldDefinition)
+  if (field && !fieldDefinition) {
+    console.warn(`No config for field ${field}`);
     field = null;
+  }
   if (field == null) {
     properties = ["operator", "operatorOptions", "valueSrc", "value"].reduce((map, key) => map.delete(key), properties);
     operator = null;
   }
 
   //validate operator
-  operator = properties.get("operator");
+  // Backward compatibility: obsolete operator range_between
   if (operator == "range_between" || operator == "range_not_between") {
-    // fix obsolete operators
     operator = operator == "range_between" ? "between" : "not_between";
+    console.info(`Fixed operator ${properties.get("operator")} to ${operator}`);
     properties = properties.set("operator", operator);
   }
   const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
-  if (!operatorDefinition)
+  if (operator && !operatorDefinition) {
+    console.warn(`No config for operator ${operator}`);
     operator = null;
+  }
   const availOps = field ? getOperatorsForField(config, field) : [];
   if (!availOps) {
     console.warn(`Type of field ${field} is not supported`);
     operator = null;
-  } else if (availOps.indexOf(operator) == -1) {
-    operator = null;
+  } else if (operator && availOps.indexOf(operator) == -1) {
+    if (operator == "is_empty" || operator == "is_not_empty") {
+      // Backward compatibility: is_empty #494
+      operator = operator == "is_empty" ? "is_null" : "is_not_null";
+      console.info(`Fixed operator ${properties.get("operator")} to ${operator} for ${field}`);
+      properties = properties.set("operator", operator);
+    } else {
+      console.warn(`Operator ${operator} is not supported for field ${field}`);
+      operator = null;
+    }
   }
   if (operator == null) {
     properties = properties.delete("operatorOptions");

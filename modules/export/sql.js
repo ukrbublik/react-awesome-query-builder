@@ -11,7 +11,7 @@ import {defaultConjunction} from "../utils/defaultUtils";
 import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
-import {SqlString} from "../utils/sql";
+import {SqlString} from "../utils/export";
 
 
 export const sqlFormat = (tree, config) => {
@@ -122,16 +122,16 @@ const formatRule = (item, config, meta) => {
   if (!fn) {
     const sqlOp = operatorDefinition.sqlOp || operator;
     if (cardinality == 0) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
         return `${field} ${sqlOp}`;
       };
     } else if (cardinality == 1) {
-      fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions) => {
+      fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
         return `${field} ${sqlOp} ${value}`;
       };
     } else if (cardinality == 2) {
       // between
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
         const valFrom = values.first();
         const valTo = values.get(1);
         return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
@@ -155,11 +155,17 @@ const formatRule = (item, config, meta) => {
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
     omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
     operatorOptions,
+    fieldDefinition,
   ];
 
-  let ret = fn(...args);
+  let ret;
+  ret = fn(...args);
   if (isRev) {
     ret = config.settings.sqlFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+  }
+  if (ret === undefined) {
+    meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(", ")}`);
+    return undefined;
   }
   return ret;
 };

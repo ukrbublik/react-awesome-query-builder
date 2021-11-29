@@ -37,14 +37,11 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Config format](#config-format)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 4.9.0](#migration-to-490)
   * [Migration from v1 to v2](#migration-from-v1-to-v2)
-* [Development](#development)
-  * [Directory structure](#directory-structure) 
-  * [Scripts](#scripts)
-  * [Other UI frameworks](#other-ui-frameworks)
 * [Contributing](#contributing)
-  * [Code Contributors](#code-contributors)
-  * [Financial Contributors](#financial-contributors)
+  * [Code Contributing](#code-contributing)
+  * [Financial Contributing](#financial-contributing)
 
 
 ### Features
@@ -435,6 +432,14 @@ It's recommended to update your version.
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
 
+### Migration to 4.9.0
+Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`. 
+Now these operstors can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions). 
+Changed meaning of `is_empty` - now it's just strict comparing with empty string. 
+Before change the meaning was similar to `is_null`. 
+If you used `is_empty` for text types with intention of comparing with null, please replace `is_empty` -> `is_null`, `is_not_empty` -> `is_not_null` in saved query values. 
+If you used JsonLogic for saving, you need to replace `{"!": {"var": "your_field"}}` -> `{"==": [{"var": "your_field"}, null]}` and `{"!!": {"var": "your_field"}}` -> `{"!=": [{"var": "your_field"}, null]}`.
+
 ### Migration from v1 to v2
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
 Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
@@ -443,61 +448,14 @@ Support of other UI frameworks (like Bootstrap) are planned for future, see [Oth
 
 
 
-## Development
-Clone this repo and run `npm start`. 
-Open `http://localhost:3001/` in a browser. 
-You will see demo app with hot reload of demo code and local library code. 
-
-### Directory structure
-- [`modules`](/modules) - Main source code of library
-  - [`components`](/modules/components) - Core React components
-    - [`widgets`](/modules/components/widgets) - Components to render list of fields, operators, values of different types. Built with UI frameworks
-  - [`config`](/modules/config) - Basic config lives here. See [`CONFIG`](/CONFIG.adoc) docs.
-  - [`export`](/modules/export) - Code for export to JsonLogic, MongoDb, SQL, ElasticSearch, plain string
-  - [`import`](/modules/import) - Code for import from JsonLogic
-  - [`actions`](/modules/actions) - Redux actions
-  - [`stores/tree.js`](/modules/stores/tree.js) - Redux store
-  - [`index.d.ts`](/modules/index.d.ts) - TS definitions
-- [`css`](/css) - Styles for query builder
-- [`examples`](/examples) - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`sandbox`](/sandbox) - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- [`sandbox_simple`](/sandbox_simple) - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
-- [`tests`](/tests) - All tests are here. Uses Karma, Mocha, Chai, Enzyme
-
-### Scripts
-- `npm run install-all` - Install npm packages in root, examples, sandboxes. **Required for other scripts!**
-- `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
-- `npm run lint` - Run ESLint and TSC (in root, tests, examples, sandboxes)
-- `npm run lint-fix` - Run ESLint with `--fix` option (in root, tests, examples, sandboxes)
-- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
-- `npm run smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
-- `npm run build` - Build npm module to `lib`, build minified production package to `build`
-- `npm run build-examples` - Build demo with webpack to `examples/build`
-
-Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
-Pull Requests are always welcomed :)
-
-### Other UI frameworks
-Currently there are 3 collections of widgets:
-- [antdesign widgets](/modules/components/widgets/antd)
-- [material widgets](/modules/components/widgets/material)
-- [vanilla widgets](/modules/components/widgets/vanilla)
-
-Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
-You can use vanilla widgets as skeleton.  
-Then to enable new widgets you need to create config overrides like this:
-[material config](/modules/config/material/index.js)
-
-
-
 ## Contributing
 
-### Code Contributors
+### Code Contributing
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 <a href="https://github.com/ukrbublik/react-awesome-query-builder/graphs/contributors"><img src="https://opencollective.com/react-awesome-query-builder/contributors.svg?width=890&button=false" /></a>
 
-### Financial Contributors
+### Financial Contributing
 
 Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/react-awesome-query-builder/contribute)]
 

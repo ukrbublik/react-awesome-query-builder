@@ -41,7 +41,7 @@ describe("query with !struct and !group", () => {
     export_checks(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", {
       "query": "((results.slider == 22 && results.stock == true) && user.firstName == \"abc\" && !!user.login)",
       "queryHuman": "((Results.Slider = 22 AND Results.In stock) AND Username = abc AND User.login IS NOT EMPTY)",
-      "sql": "((results.slider = 22 AND results.stock = true) AND user.firstName = 'abc' AND user.login IS NOT EMPTY)",
+      "sql": "((results.slider = 22 AND results.stock = true) AND user.firstName = 'abc' AND COALESCE(user.login, '') <> '')",
       "mongo": {
         "results": {
           "$elemMatch": {
@@ -51,7 +51,7 @@ describe("query with !struct and !group", () => {
         },
         "user.firstName": "abc",
         "user.login": {
-          "$exists": true
+          "$nin": ["", null]
         }
       },
       "logic": {
@@ -119,7 +119,7 @@ describe("query with !group", () => {
     export_checks(configs.with_group_struct, inits.with_is_empty_in_some, "JsonLogic", {
       "logic": {
         "and": [{
-          "!": { "var": "results.score" }
+          "!": { "var": "results.grade" }
         } ]
       }
     });

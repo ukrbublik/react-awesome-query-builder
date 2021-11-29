@@ -200,7 +200,7 @@ const formatRule = (item, config, meta, parentField = null) => {
 
   const formattedField = formatField(meta, config, field, parentField);
 
-  return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, isRev);
+  return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
 };
 
 
@@ -361,7 +361,7 @@ const formatField = (meta, config, field, parentField = null) => {
 };
 
 
-const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, isRev = false) => {
+const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
@@ -372,8 +372,11 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
   let fn = typeof operatorDefinition.jsonLogic == "function" ? operatorDefinition.jsonLogic : null;
   if (!fn) {
     const rangeOps = ["<", "<=", ">", ">="];
+    const eqOps = ["==", "!="];
     fn = (field, op, val, opDef, opOpts) => {
-      if (cardinality == 0)
+      if (cardinality == 0 && eqOps.includes(formatteOp))
+        return { [formatteOp]: [formattedField, null] };
+      else if (cardinality == 0)
         return { [formatteOp]: formattedField };
       else if (cardinality == 1 && isReverseArgs)
         return { [formatteOp]: [formattedValue, formattedField] };
@@ -391,6 +394,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     formattedValue,
     omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
     operatorOptions,
+    fieldDefinition,
   ];
   let ruleQuery = fn(...args);
 

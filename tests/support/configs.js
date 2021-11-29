@@ -257,8 +257,8 @@ export const with_group_struct = (BasicConfig) => ({
       type: "!group",
       mode: "struct",
       subfields: {
-        score: {
-          type: "number",
+        grade: {
+          type: "text",
         }
       }
     },
@@ -276,8 +276,8 @@ export const with_group_some = (BasicConfig) => ({
       type: "!group",
       mode: "some",
       subfields: {
-        score: {
-          type: "number",
+        grade: {
+          type: "text",
         }
       }
     },
@@ -295,8 +295,8 @@ export const with_group_array = (BasicConfig) => ({
       type: "!group",
       mode: "array",
       subfields: {
-        score: {
-          type: "number",
+        grade: {
+          type: "text",
         }
       }
     },

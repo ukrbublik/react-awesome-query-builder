@@ -1,7 +1,7 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as Operators from "../components/operators";
-import {SqlString} from "../utils/sql";
+import {SqlString, sqlEmptyValue, mongoEmptyValue} from "../utils/export";
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
@@ -64,17 +64,19 @@ const conjunctions = {
 //----------------------------  operators
 
 // helpers for mongo format
-export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
+export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
-  const mv = mc(value);
+  const mv = mc(value, fieldDef);
   if (mv === undefined)
     return undefined;
   if (not) {
+    if (!useExpr && (!mop || mop == "$eq"))
+      return { [field]: { "$ne": mv } }; // short form
     return !useExpr
       ? { [field]: { "$not": { [mop]: mv } } } 
       : { "$not": { [mop]: [$field, mv] } };
   } else {
-    if (!useExpr && mop == "$eq")
+    if (!useExpr && (!mop || mop == "$eq"))
       return { [field]: mv }; // short form
     return !useExpr
       ? { [field]: { [mop]: mv } } 
@@ -82,7 +84,7 @@ export const mongoFormatOp1 = (mop, mc, not,  field, _op, value, useExpr) => {
   }
 };
 
-export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr) => {
+export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr, valueSrcs, valueTypes, opDef, operatorOptions, fieldDef) => {
   const $field = typeof field == "string" && !field.startsWith("$") ? "$"+field : field;
   if (not) {
     return !useExpr
@@ -177,7 +179,7 @@ const operators = {
     labelForFormat: "Like",
     reversedOp: "not_like",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} LIKE ${values}`;
       } else return undefined; // not supported
@@ -195,7 +197,7 @@ const operators = {
     reversedOp: "like",
     labelForFormat: "Not Like",
     sqlOp: "NOT LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} NOT LIKE ${values}`;
       } else return undefined; // not supported
@@ -207,7 +209,7 @@ const operators = {
     label: "Starts with",
     labelForFormat: "Starts with",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} LIKE ${values}`;
       } else return undefined; // not supported
@@ -220,7 +222,7 @@ const operators = {
     label: "Ends with",
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value") {
         return `${field} LIKE ${values}`;
       } else return undefined; // not supported
@@ -289,26 +291,32 @@ const operators = {
   is_empty: {
     label: "Is empty",
     labelForFormat: "IS EMPTY",
-    sqlOp: "IS EMPTY",
     cardinality: 0,
     reversedOp: "is_not_empty",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      const empty = sqlEmptyValue(fieldDef);
+      return `COALESCE(${field}, ${empty}) = ${empty}`;
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, "$in", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
     jsonLogic: "!",
   },
   is_not_empty: {
     isNotOp: true,
     label: "Is not empty",
     labelForFormat: "IS NOT EMPTY",
-    sqlOp: "IS NOT EMPTY",
     cardinality: 0,
     reversedOp: "is_empty",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      const empty = sqlEmptyValue(fieldDef);
+      return `COALESCE(${field}, ${empty}) <> ${empty}`;
+    },
+    mongoFormatOp: mongoFormatOp1.bind(null, "$nin", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
   },
@@ -321,8 +329,9 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => false, false),
-    jsonLogic: "!"
+    // check if value is null OR not exists
+    mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => null, false),
+    jsonLogic: "==",
   },
   is_not_null: {
     label: "Is not null",
@@ -333,8 +342,9 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NOT NULL` : `!!${field}`;
     },
-    mongoFormatOp: mongoFormatOp1.bind(null, "$exists", v => true, false),
-    jsonLogic: "!!",
+    // check if value exists and is not null
+    mongoFormatOp: mongoFormatOp1.bind(null, "$ne", v => null, false),
+    jsonLogic: "!=",
     elasticSearchQueryType: "exists",
   },
   select_equals: {
@@ -372,8 +382,10 @@ const operators = {
       else
         return `${field} IN (${values})`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-      return `${field} IN (${values.join(", ")})`;
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      if (valueSrc == "value") {
+        return `${field} IN (${values.join(", ")})`;
+      } else return undefined; // not supported
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
     reversedOp: "select_not_any_in",
@@ -391,8 +403,10 @@ const operators = {
       else
         return `${field} NOT IN (${values})`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
-      return `${field} NOT IN (${values.join(", ")})`;
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      if (valueSrc == "value") {
+        return `${field} NOT IN (${values.join(", ")})`;
+      } else return undefined; // not supported
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$nin", v => v, false),
     reversedOp: "select_any_in",
@@ -408,7 +422,7 @@ const operators = {
       else
         return `${field} ${opStr} ${values}`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value")
       // set
         return `${field} = '${values.map(v => SqlString.trim(v)).join(",")}'`;
@@ -435,7 +449,7 @@ const operators = {
       else
         return `${field} != ${values}`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (valueSrc == "value")
       // set
         return `${field} != '${values.map(v => SqlString.trim(v)).join(",")}'`;
@@ -462,7 +476,7 @@ const operators = {
       const prox = operatorOptions.get("proximity");
       return `${field} ${val1} NEAR/${prox} ${val2}`;
     },
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions) => {
+    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       const val1 = values.first();
       const val2 = values.get(1);
       const aVal1 = SqlString.trim(val1);
@@ -849,8 +863,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -863,8 +877,8 @@ const types = {
           "less_or_equal",
           "greater",
           "greater_or_equal",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null"
         ],
@@ -884,8 +898,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null"
         ]
@@ -905,8 +919,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ]
@@ -926,8 +940,8 @@ const types = {
           "greater_or_equal",
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -942,8 +956,8 @@ const types = {
         operators: [
           "select_equals",
           "select_not_equals",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -957,8 +971,8 @@ const types = {
         operators: [
           "select_any_in",
           "select_not_any_in",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ],
@@ -972,8 +986,8 @@ const types = {
         operators: [
           "multiselect_equals",
           "multiselect_not_equals",
-          "is_empty",
-          "is_not_empty",
+          // "is_empty",
+          // "is_not_empty",
           "is_null",
           "is_not_null",
         ]
