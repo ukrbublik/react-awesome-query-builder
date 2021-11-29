@@ -20,7 +20,7 @@ import MaterialConfig from "react-awesome-query-builder/config/material";
 type TreeValueFormat = "JsonLogic" | "default" | null;
 type TreeValue = JsonLogicTree | JsonTree | undefined;
 type ConfigFn = (_: Config) => Config;
-type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => void;
+type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
@@ -54,25 +54,25 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   return checkTree(tree, config);
 };
 
-export  const with_qb = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+export  const with_qb = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
 };
 
-export  const with_qb_ant = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+export  const with_qb_ant = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
 };
 
-export  const with_qb_material = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
+export  const with_qb_material = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
   
-export  const with_qb_skins = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
-  do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
-  do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
+export  const with_qb_skins = async (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  await do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
   
-const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   const config = config_fn(BasicConfig);
   const onChange = spy();
   const tree = load_tree(value, config, valueFormat);
@@ -92,13 +92,15 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
 
   let qb: ReactWrapper;
   let qbWrapper: HTMLElement;
-  act(() => {
-    const mountOptions: MountRendererProps = {};
-    if (options?.attach) {
-      qbWrapper = global.document.createElement("div");
-      global.document.body.appendChild(qbWrapper);
-      mountOptions.attachTo = qbWrapper;
-    }
+  
+  const mountOptions: MountRendererProps = {};
+  if (options?.attach) {
+    qbWrapper = global.document.createElement("div");
+    global.document.body.appendChild(qbWrapper);
+    mountOptions.attachTo = qbWrapper;
+  }
+
+  //await act(async () => {
     qb = mount(
       <Query
         {...config}
@@ -108,10 +110,10 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
       />, 
       mountOptions
     ) as ReactWrapper;
-  });
-
-  // @ts-ignore
-  checks(qb, onChange, tasks);
+  
+    // @ts-ignore
+    await checks(qb, onChange, tasks);
+  //});
 
   if (options?.attach) {
     // @ts-ignore
@@ -280,4 +282,10 @@ export function hexToRgbString(hex: string) {
   } else {
     return null;
   }
+}
+
+export function sleep(delay: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
 }

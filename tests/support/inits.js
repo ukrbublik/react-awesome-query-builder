@@ -728,6 +728,15 @@ export const with_group_array_custom_operator = {
   ]
 };
 
+export const with_autocomplete_a = {
+  "and": [{
+    "==": [
+      { "var": "autocomplete" },
+      "a"
+    ]
+  }]
+};
+
 // rare
 export const with_fieldName = {
   "and": [{

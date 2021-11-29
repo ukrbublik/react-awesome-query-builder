@@ -8,7 +8,7 @@ const {
   FieldTreeSelect,
 } = AntdWidgets;
 import { BasicFuncs } from "react-awesome-query-builder";
-
+import { simulatedAsyncFetch } from "./autocomplete";
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -893,6 +893,24 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
       jsonLogic: "custom_group_operator",
     },
   }
+});
+
+export const with_autocomplete = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    autocomplete: {
+      label: "Autocomplete",
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
+    },
+  },
 });
 
 // rare
