@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, maxLength} = props;
@@ -8,10 +9,13 @@ export default (props) => {
       val = undefined; // don't allow empty value
     setValue(val);
   };
+  
   const textValue = value || "";
+
   return (
-    <input
-      type="text" 
+    <Input
+      type="text"
+      bsSize={"sm"}
       value={textValue} 
       placeholder={placeholder} 
       disabled={readonly} 

@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, maxLength, maxRows, fullWidth} = props;
@@ -10,7 +11,9 @@ export default (props) => {
   };
   const textValue = value || "";
   return (
-    <textarea
+    <Input
+      type={"textarea"}
+      bsSize={"sm"}
       value={textValue} 
       placeholder={placeholder}
       disabled={readonly}
