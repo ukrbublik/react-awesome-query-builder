@@ -36,6 +36,10 @@ export default ({
     paddingBottom: "0.45rem"
   };
 
+  const stylesDropdownMenuWrapper = {
+    minWidth: "100%"
+  };
+
   const toggle = () => {
     setIsOpen(!isOpen);
   }
@@ -57,6 +61,7 @@ export default ({
         {hasValue ? value : ""}
       </DropdownToggle>
       <DropdownMenu
+        style={stylesDropdownMenuWrapper}
         onChange={(e) => setValue(e.target.value)}
         value={hasValue ? value : ""}
       >

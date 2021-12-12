@@ -5,7 +5,7 @@ import {mapListValues} from "../../../../utils/stuff";
 export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
   const renderOptions = () => 
     mapListValues(listValues, ({title, value}) => {
-      return <option key={value} value={value}>{title}</option>;
+      return <option key={value} className="dropdown-item" value={value}>{title}</option>;
     });
 
   const getMultiSelectValues = (multiselect) => {
