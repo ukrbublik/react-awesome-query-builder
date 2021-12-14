@@ -40,30 +40,23 @@ export default ({
     minWidth: "100%"
   };
 
-  const toggle = () => {
-    setIsOpen(!isOpen);
-  }
-
   return (
     <Dropdown
       isOpen={isOpen}
       onClick={() => (!isOpen ? setIsOpen(true) : setIsOpen(false))}
       disabled={readonly}
-      toggle={() => toggle()}
+      toggle={() => setIsOpen(!isOpen)}
     >
       <DropdownToggle
         tag={"button"}
         className={"form-select"}
         style={stylesDropdownWrapper}
         color={"transparent"}
-        onChange={(e) => setValue(e.target.value)}
       >
         {hasValue ? value : ""}
       </DropdownToggle>
       <DropdownMenu
         style={stylesDropdownMenuWrapper}
-        onChange={(e) => setValue(e.target.value)}
-        value={hasValue ? value : ""}
       >
         {!hasValue && <DropdownItem disabled value={""}></DropdownItem>}
         {renderOptions()}
