@@ -37,7 +37,7 @@ export default ({
   };
 
   const stylesDropdownMenuWrapper = {
-    minWidth: "100%"
+    //minWidth: "100%"
   };
 
   return (
@@ -56,6 +56,7 @@ export default ({
         {hasValue ? value : ""}
       </DropdownToggle>
       <DropdownMenu
+        container="body"
         style={stylesDropdownMenuWrapper}
       >
         {!hasValue && <DropdownItem disabled value={""}></DropdownItem>}
