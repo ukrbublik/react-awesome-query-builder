@@ -354,7 +354,6 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 } else if (dragDirs.vrt < 0) { //up
                   if (hovII.lev >= itemInfo.lev) {
                     //take whole group
-                    //todo: 5 is magic for now (bottom margin), configure it!
                     const isClimbToHover = ((hovRect.bottom - dragRect.top) >= 2);
                     if (isClimbToHover && hovII.top < dragInfo.itemInfo.top) {
                       trgII = hovII;
@@ -520,11 +519,12 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isStructChange = isPend || isParentChange;
       const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
         || toII.parentType == "rule_group";
-
+      const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
+      
       if (maxNesting && (newLev + 1) > maxNesting)
         return false;
       
-      if (isStructChange && (!canRegroup || isForbiddenStructChange))
+      if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;
       
       let res = true;

@@ -15,6 +15,7 @@ const createGroupContainer = (Group) =>
       actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       not: PropTypes.bool,
       conjunction: PropTypes.string,
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
@@ -22,6 +23,8 @@ const createGroupContainer = (Group) =>
       reordableNodesCnt: PropTypes.number,
       field: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
+      isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
       isDraggingTempo: PropTypes.bool,
@@ -95,6 +98,10 @@ const createGroupContainer = (Group) =>
       this.props.actions.setNot(this.props.path, not);
     }
 
+    setLock = (lock = null) => {
+      this.props.actions.setLock(this.props.path, lock);
+    }
+
     dummyFn = () => {}
 
     removeSelf = () => {
@@ -133,7 +140,6 @@ const createGroupContainer = (Group) =>
       // allow removal of the root group.
       const allowFurtherNesting = typeof maxNesting === "undefined" || currentNesting < maxNesting;
       const isRoot = currentNesting == 1;
-
       return (
         <div
           className={"group-or-rule-container group-container"}
@@ -143,6 +149,7 @@ const createGroupContainer = (Group) =>
             isDraggingMe ? <Group
               key={"dragging"}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
@@ -153,6 +160,7 @@ const createGroupContainer = (Group) =>
               selectedConjunction={this.selectedConjunction}
               setConjunction={this.dummyFn}
               setNot={this.dummyFn}
+              setLock={this.dummyFn}
               removeSelf={this.dummyFn}
               addGroup={this.dummyFn}
               addRule={this.dummyFn}
@@ -169,11 +177,14 @@ const createGroupContainer = (Group) =>
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
+              isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             /> : null
             ,
             <Group
               key={this.props.id}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
@@ -184,6 +195,7 @@ const createGroupContainer = (Group) =>
               selectedConjunction={this.selectedConjunction}
               setConjunction={isInDraggingTempo ? this.dummyFn : this.setConjunction}
               setNot={isInDraggingTempo ? this.dummyFn : this.setNot}
+              setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
@@ -200,6 +212,8 @@ const createGroupContainer = (Group) =>
               selectedField={this.props.field || null}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
+              isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             />
           ]}
         </div>

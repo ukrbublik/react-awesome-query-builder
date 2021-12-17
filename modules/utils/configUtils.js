@@ -2,26 +2,31 @@ import merge from "lodash/merge";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {normalizeListValues} from "./stuff";
+import {normalizeListValues, mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
+import clone from "clone";
 
 
 export const extendConfig = (config) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
-  if (config.__extended)
+  if (config.__extended) {
     return config;
+  }
     
   config.settings = merge({}, defaultSettings, config.settings);
   config._fieldsCntByType = {};
   config._funcsCntByType = {};
 
+  config.types = clone(config.types);
   _extendTypesConfig(config.types, config);
 
+  config.fields = clone(config.fields);
   config.__fieldNames = {};
   _extendFieldsConfig(config.fields, config);
 
+  config.funcs = clone(config.funcs);
   _extendFuncArgsConfig(config.funcs, config);
 
   moment.locale(config.settings.locale.moment);
@@ -48,10 +53,7 @@ function _extendTypeConfig(type, typeConfig, config) {
   for (let widget in typeConfig.widgets) {
     let typeWidgetConfig = typeConfig.widgets[widget];
     if (typeWidgetConfig.operators) {
-      if (!operators)
-        operators = [];
-            
-      operators = operators.concat(typeWidgetConfig.operators.slice());
+      operators = mergeArraysSmart(operators, typeWidgetConfig.operators);
     }
     if (typeWidgetConfig.defaultOperator)
       defaultOperator = typeWidgetConfig.defaultOperator;

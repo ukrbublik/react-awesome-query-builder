@@ -19,7 +19,7 @@ export default (props) => {
     <FormControl fullWidth={fullWidth}>
       <TextField 
         fullWidth={fullWidth}
-        rowsMax={maxRows || defaultMaxRows}
+        maxRows={maxRows || defaultMaxRows}
         multiline={true}
         value={textValue}
         placeholder={!readonly ? placeholder : ""}

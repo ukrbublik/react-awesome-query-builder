@@ -12,6 +12,8 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 
 export default class FuncWidget extends PureComponent {
   static propTypes = {
+    id: PropTypes.string,
+    groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
     operator: PropTypes.string,
@@ -53,28 +55,31 @@ export default class FuncWidget extends PureComponent {
   };
 
   setArgValue = (argKey, argVal) => {
+    const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition) );
+    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition, config) );
   };
 
   setArgValueSrc = (argKey, argValSrc) => {
+    const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition) );
+    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config) );
   };
 
   renderFuncSelect = () => {
-    const {config, field, operator, customProps, value, readonly, parentFuncs} = this.props;
+    const {config, field, operator, customProps, value, readonly, parentFuncs, id, groupId} = this.props;
     const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
       config, field, operator, customProps, readonly, parentFuncs,
+      id, groupId,
     };
     const {showLabels, funcLabel} = config.settings;
     const widgetLabel = showLabels
@@ -116,7 +121,7 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, operator, value, readonly, parentFuncs} = this.props;
+    const {config, field, operator, value, readonly, parentFuncs, id, groupId} = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
@@ -137,6 +142,8 @@ export default class FuncWidget extends PureComponent {
       argDefinition,
       readonly,
       parentFuncs,
+      id,
+      groupId,
     };
     //tip: value & valueSrc will be converted to Immutable.List at <Widget>
 
@@ -215,6 +222,8 @@ class ArgWidget extends PureComponent {
     setValueSrc: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
     parentFuncs: PropTypes.array,
+    id: PropTypes.string,
+    groupId: PropTypes.string,
   };
 
   setValue = (_delta, value, _widgetType) => {

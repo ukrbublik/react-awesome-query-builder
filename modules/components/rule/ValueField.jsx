@@ -12,6 +12,8 @@ import clone from "clone";
 
 export default class ValueField extends PureComponent {
   static propTypes = {
+    id: PropTypes.string,
+    groupId: PropTypes.string,
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
@@ -44,7 +46,7 @@ export default class ValueField extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentField}) {
+  getItems({config, field, operator, parentField, isFuncArg}) {
     const {canCompareFieldWithField} = config.settings;
 
     const fieldSeparator = config.settings.fieldSeparator;
@@ -52,7 +54,7 @@ export default class ValueField extends PureComponent {
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
@@ -85,7 +87,7 @@ export default class ValueField extends PureComponent {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
@@ -99,7 +101,7 @@ export default class ValueField extends PureComponent {
     } else {
       expectedType = leftFieldConfig.type;
     }
-
+    
     function _filter(list, path) {
       for (let rightFieldKey in list) {
         let subfields = list[rightFieldKey].subfields;
@@ -112,7 +114,8 @@ export default class ValueField extends PureComponent {
           if(_filter(subfields, subpath) == 0)
             delete list[rightFieldKey];
         } else {
-          let canUse = rightFieldConfig.type == expectedType && rightFieldFullkey != leftFieldFullkey;
+          // tip: LHS field can be used as arg in RHS function
+          let canUse = rightFieldConfig.type == expectedType && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
@@ -183,7 +186,7 @@ export default class ValueField extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setValue, readonly} = this.props;
+    const {config, customProps, setValue, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
       config,
@@ -191,6 +194,8 @@ export default class ValueField extends PureComponent {
       setField: setValue,
       readonly,
       items: this.items,
+      id,
+      groupId,
       ...this.meta
     };
     return renderField(renderProps);

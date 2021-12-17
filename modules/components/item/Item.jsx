@@ -11,11 +11,24 @@ const types = [
   "rule_group"
 ];
 
+const getProperties = (props) => {
+  const properties = props.properties.toObject();
+  const result = {...properties};
+  if (props.isParentLocked) {
+    result.isLocked = true;
+  }
+  if (properties.isLocked) {
+    result.isTrueLocked = true;
+  }
+  return result;
+};
+
 const typeMap = {
   rule: (props) => (
     <Rule
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       reordableNodesCnt={props.reordableNodesCnt}
@@ -28,8 +41,9 @@ const typeMap = {
   ),
   group: (props) => (
     <Group 
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
@@ -44,8 +58,9 @@ const typeMap = {
   ),
   rule_group: (props) => (
     <RuleGroup 
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
@@ -60,8 +75,9 @@ const typeMap = {
   ),
   rule_group_ext: (props) => (
     <RuleGroupExt 
-      {...props.properties.toObject()}
+      {...getProperties(props)}
       id={props.id}
+      groupId={props.groupId}
       path={props.path}
       actions={props.actions}
       config={props.config}
@@ -82,6 +98,7 @@ class Item extends PureComponent {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
+    groupId: PropTypes.string,
     type: PropTypes.oneOf(types).isRequired,
     path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
     properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
@@ -91,6 +108,7 @@ class Item extends PureComponent {
     onDragStart: PropTypes.func,
     parentField: PropTypes.string, //from RuleGroup
     isDraggingTempo: PropTypes.bool,
+    isParentLocked: PropTypes.bool,
   };
 
   render() {

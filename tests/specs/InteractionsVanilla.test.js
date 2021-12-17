@@ -6,8 +6,8 @@ import { with_qb } from "../support/utils";
 
 
 describe("interactions on vanilla", () => {
-  it("click on remove single rule will leave empty rule", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+  it("click on remove single rule will leave empty rule if canLeaveEmptyGroup=false", () => {
+    with_qb(configs.dont_leave_empty_group, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--header button")
         .first()
@@ -22,8 +22,8 @@ describe("interactions on vanilla", () => {
     });
   });
 
-  it("click on remove group will leave empty rule", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_group, "JsonLogic", (qb, onChange) => {
+  it("click on remove group will leave empty rule if canLeaveEmptyGroup=false", () => {
+    with_qb(configs.dont_leave_empty_group, inits.with_group, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--children .group .group--header .group--actions button")
         .at(2)
@@ -50,8 +50,8 @@ describe("interactions on vanilla", () => {
     });
   });
 
-  it("click on add group will add new group with one empty rule", () => {
-    with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+  it("click on add group will add new group with one empty rule if shouldCreateEmptyGroup=false", () => {
+    with_qb(configs.dont_leave_empty_group, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")
         .at(1)
@@ -117,7 +117,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from group_ext to simple", () => {
-    with_qb(configs.with_group_array, inits.with_group_array, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule_group_ext .group--field--count--rule .rule--field select")
         .simulate("change", { target: { value: "str" } });
@@ -147,7 +147,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from simple to group_ext", () => {
-    with_qb(configs.with_group_array, inits.with_text, "JsonLogic", (qb, onChange) => {
+    with_qb(configs.with_group_array_cars, inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });

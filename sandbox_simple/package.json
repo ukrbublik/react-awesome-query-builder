@@ -21,6 +21,20 @@
     "react": "file:../node_modules/react",
     "react-dom": "file:../node_modules/react-dom"
   },
+  "devDependencies": {
+    "react-scripts": "^4.0.3"
+  },
+  "eslintConfig": {
+    "ignorePatterns": [
+      "**/build/*",
+      "**/dist/*",
+      "**/node_modules/*"
+    ],
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",

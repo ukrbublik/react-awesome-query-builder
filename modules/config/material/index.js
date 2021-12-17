@@ -1,7 +1,8 @@
 import MaterialWidgets from "../../components/widgets/material";
-import BasicConfig from "../basic";
+import BasicConfig, {stringifyForDisplay} from "../basic";
 import React from "react";
-import {SqlString} from "../../utils/sql";
+import {SqlString} from "../../utils/export";
+
 
 const {
   MaterialBooleanWidget,
@@ -18,7 +19,9 @@ const {
   MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
+  MaterialFieldAutocomplete,
   MaterialConjs,
+  MaterialSwitch,
   MaterialButton,
   MaterialButtonGroup,
   MaterialValueSources,
@@ -32,10 +35,13 @@ const {
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => <MaterialFieldSelect {...props} />,
+  renderField: (props) => props?.customProps?.showSearch 
+    ? <MaterialFieldAutocomplete {...props} /> 
+    : <MaterialFieldSelect {...props} />,
   renderOperator: (props) => <MaterialFieldSelect {...props} />,
   renderFunc: (props) => <MaterialFieldSelect {...props} />,
   renderConjs: (props) => <MaterialConjs {...props} />,
+  renderSwitch: (props) => <MaterialSwitch {...props} />,
   renderButton: (props) => <MaterialButton {...props} />,
   renderButtonGroup: (props) => <MaterialButtonGroup {...props} />,
   renderValueSources: (props) => <MaterialValueSources {...props} />,
@@ -108,7 +114,7 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? val : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -139,6 +145,8 @@ const types = {
           "not_between",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       }
     },

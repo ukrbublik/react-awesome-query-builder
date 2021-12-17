@@ -2,11 +2,11 @@
 import Immutable from "immutable";
 import {
   expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
-  getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren
+  getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, defaultOperator, 
-  defaultOperatorOptions, defaultRoot
+  defaultOperatorOptions, defaultRoot, defaultItemProperties
 } from "../utils/defaultUtils";
 import * as constants from "../constants";
 import uuid from "../utils/uuid";
@@ -17,30 +17,33 @@ import {
   getOperatorsForField, getFirstOperator, getWidgetForFieldOp,
   getNewValueForFieldOp
 } from "../utils/ruleUtils";
-import {deepEqual, defaultValue} from "../utils/stuff";
+import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
 import {validateValue} from "../utils/validation";
-
+import omit from "lodash/omit";
+import mapValues from "lodash/mapValues";
 
 /**
  * @param {object} config
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, properties, config) => {
-  const groupUuid = uuid();
+const addNewGroup = (state, path, groupUuid, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
-  const {maxNumberOfRules} = config.settings;
+  const groupPath = path.push(groupUuid);
+  const {maxNumberOfRules, shouldCreateEmptyGroup} = config.settings;
   const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
-  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config);
+  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
 
-  const groupPath = path.push(groupUuid);
-  // If we don't set the empty map, then the following merge of addItem will create a Map rather than an OrderedMap for some reason
-  state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
+  if (!children) {
+    state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
-  if (canAddNewRule) {
-    state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+    // Add one empty rule into new group
+    if (canAddNewRule && !shouldCreateEmptyGroup) {
+      state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+    }
   }
+
   state = fixPathsInTree(state);
   
   return state;
@@ -56,12 +59,12 @@ const removeGroup = (state, path, config) => {
 
   const {canLeaveEmptyGroup} = config.settings;
   const parentPath = path.slice(0, -1);
-  const isEmptyGroup = !hasChildren(state, parentPath);
-  if (isEmptyGroup && !canLeaveEmptyGroup) {
+  const isEmptyParentGroup = !hasChildren(state, parentPath);
+  if (isEmptyParentGroup && !canLeaveEmptyGroup) {
     // check ancestors for emptiness (and delete 'em if empty)
     state = fixEmptyGroupsInTree(state);
-
-    if (isEmptyTree(state)) {
+    
+    if (isEmptyTree(state) && !canLeaveEmptyGroup) {
       // if whole query is empty, add one empty rule to root
       state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
@@ -77,6 +80,7 @@ const removeGroup = (state, path, config) => {
 const removeRule = (state, path, config) => {
   state = removeItem(state, path);
 
+  const {canLeaveEmptyGroup} = config.settings;
   const parentPath = path.pop();
   const parent = state.getIn(expandTreePath(parentPath));
 
@@ -88,12 +92,12 @@ const removeRule = (state, path, config) => {
   const hasGroupCountRule = parentField && parentOperator && parentOperatorConfig.cardinality != 0; // && parentValue != undefined;
   
   const isParentRuleGroup = parent.get("type") == "rule_group";
-  const isEmptyGroup = !hasChildren(state, parentPath);
-  const canLeaveEmpty = isEmptyGroup && (isParentRuleGroup 
-    ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere 
-    : config.settings.canLeaveEmptyGroup);
+  const isEmptyParentGroup = !hasChildren(state, parentPath);
+  const canLeaveEmpty = isParentRuleGroup 
+    ? hasGroupCountRule && parentFieldConfig.initialEmptyWhere
+    : canLeaveEmptyGroup;
   
-  if (isEmptyGroup && !canLeaveEmpty) {
+  if (isEmptyParentGroup && !canLeaveEmpty) {
     if (isParentRuleGroup) {
       // deleted last rule from rule_group, so delete whole rule_group
       state = state.deleteIn(expandTreePath(parentPath));
@@ -102,7 +106,7 @@ const removeRule = (state, path, config) => {
     // check ancestors for emptiness (and delete 'em if empty)
     state = fixEmptyGroupsInTree(state);
 
-    if (isEmptyTree(state)) {
+    if (isEmptyTree(state) && !canLeaveEmptyGroup) {
       // if whole query is empty, add one empty rule to root
       state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
@@ -122,10 +126,40 @@ const setNot = (state, path, not) =>
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
+ * @param {bool} lock
+ */
+const setLock = (state, path, lock) =>
+  removeIsLockedInTree(state.setIn(expandTreePath(path, "properties", "isLocked"), lock));
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
  * @param {string} conjunction
  */
 const setConjunction = (state, path, conjunction) =>
   state.setIn(expandTreePath(path, "properties", "conjunction"), conjunction);
+
+// convert children deeply from JS to Immutable
+const _addChildren1 = (config, item, children) => {
+  if (children && Array.isArray(children)) {
+    item.children1 = new Immutable.OrderedMap(
+      children.reduce((map, it) => {
+        const id1 = uuid();
+        const it1 = {
+          ...it,
+          properties: defaultItemProperties(config, it).merge(it.properties || {}),
+          id: id1
+        };
+        _addChildren1(config, it1, it1.children1);
+        //todo: guarantee order
+        return {
+          ...map,
+          [id1]: new Immutable.Map(it1)
+        };
+      }, {})
+    );
+  }
+};
 
 /**
  * @param {Immutable.Map} state
@@ -135,15 +169,25 @@ const setConjunction = (state, path, conjunction) =>
  * @param {Immutable.OrderedMap} properties
  * @param {object} config
  */
-const addItem = (state, path, type, id, properties, config) => {
+const addItem = (state, path, type, id, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
   const {maxNumberOfRules} = config.settings;
   const canAddNewRule = !(type == "rule" && maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
+  const item = {type, id, properties};
+  _addChildren1(config, item, children);
+
   if (canAddNewRule) {
-    state = state.mergeIn(expandTreePath(path, "children1"), new Immutable.OrderedMap({
-      [id]: new Immutable.Map({type, id, properties})
-    }));
+    const childrenPath = expandTreePath(path, "children1");
+    const hasChildren = !!state.getIn(childrenPath);
+    const newChildren = new Immutable.OrderedMap({
+      [id]: new Immutable.Map(item)
+    });
+    if (!hasChildren) {
+      state = state.setIn(childrenPath, newChildren);
+    } else {
+      state = state.mergeIn(childrenPath, newChildren);
+    }
   }
   state = fixPathsInTree(state);
   return state;
@@ -413,6 +457,7 @@ const setOperator = (state, path, newOperator, config) => {
  */
 const setValue = (state, path, delta, value, valueType, config, asyncListValues, __isInternal) => {
   const {fieldSeparator, showErrorMessage} = config.settings;
+  let isInternalValueChange;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
   if (valueSrc === "field" && Array.isArray(value))
     value = value.join(fieldSeparator);
@@ -466,7 +511,7 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
       }
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), value);
       state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), calculatedValueType);
-      state.__isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
+      isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
     }
   }
   if (showErrorMessage) {
@@ -474,10 +519,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   }
   if (__isInternal && (isValid && isLastError || !isValid && !isLastError)) {
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
-    state.__isInternalValueChange = false;
+    isInternalValueChange = false;
   }
-
-  return state;
+  
+  return {tree: state, isInternalValueChange};
 };
 
 /**
@@ -561,6 +606,11 @@ const calculateValueType = (value, valueSrc, config) => {
   return calculatedValueType;
 };
 
+const getField = (state, path) => {
+  const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
+  return field;
+};
+
 const emptyDrag = {
   dragging: {
     id: null,
@@ -575,6 +625,24 @@ const emptyDrag = {
   },
 };
 
+const getActionMeta = (action, state) => {
+  const actionKeysToOmit = [
+    "config", "asyncListValues", "__isInternal"
+  ];
+  const actionTypesToIgnore = [
+    constants.SET_TREE,
+    constants.SET_DRAG_START,
+    constants.SET_DRAG_PROGRESS,
+    constants.SET_DRAG_END,
+  ];
+  let meta = mapValues(omit(action, actionKeysToOmit), applyToJS);
+  let affectedField = action.path && getField(state.tree, action.path) || action.field;
+  if (affectedField)
+    meta.affectedField = affectedField;
+  if (actionTypesToIgnore.includes(action.type) || action.type.indexOf("@@redux") == 0)
+    meta = null;
+  return meta;
+};
 
 /**
  * @param {Immutable.Map} state
@@ -583,71 +651,116 @@ const emptyDrag = {
 export default (config) => {
   const emptyTree = defaultRoot(config);
   const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
-  const unset = {__isInternalValueChange: undefined};
     
   return (state = emptyState, action) => {
+    const unset = {__isInternalValueChange: undefined, __lastAction: undefined};
+    let set = {};
+    let actionMeta = getActionMeta(action, state);
+
     switch (action.type) {
-    case constants.SET_TREE:
-      return Object.assign({}, state, {...unset}, {tree: action.tree});
+    case constants.SET_TREE: {
+      set.tree = action.tree;
+      break;
+    }
 
-    case constants.ADD_NEW_GROUP:
-      return Object.assign({}, state, {...unset}, {tree: addNewGroup(state.tree, action.path, action.properties, action.config)});
+    case constants.ADD_GROUP: {
+      set.tree = addNewGroup(state.tree, action.path, action.id, action.properties, action.config,  action.children);
+      break;
+    }
 
-    case constants.ADD_GROUP:
-      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "group", action.id, action.properties, action.config)});
+    case constants.REMOVE_GROUP: {
+      set.tree = removeGroup(state.tree, action.path, action.config);
+      break;
+    }
 
-    case constants.REMOVE_GROUP:
-      return Object.assign({}, state, {...unset}, {tree: removeGroup(state.tree, action.path, action.config)});
+    case constants.ADD_RULE: {
+      set.tree = addItem(state.tree, action.path, action.ruleType, action.id, action.properties, action.config, action.children);
+      break;
+    }
 
-    case constants.ADD_RULE:
-      return Object.assign({}, state, {...unset}, {tree: addItem(state.tree, action.path, "rule", action.id, action.properties, action.config)});
+    case constants.REMOVE_RULE: {
+      set.tree = removeRule(state.tree, action.path, action.config);
+      break;
+    }
 
-    case constants.REMOVE_RULE:
-      return Object.assign({}, state, {...unset}, {tree: removeRule(state.tree, action.path, action.config)});
+    case constants.SET_CONJUNCTION: {
+      set.tree = setConjunction(state.tree, action.path, action.conjunction);
+      break;
+    }
 
-    case constants.SET_CONJUNCTION:
-      return Object.assign({}, state, {...unset}, {tree: setConjunction(state.tree, action.path, action.conjunction)});
+    case constants.SET_NOT: {
+      set.tree = setNot(state.tree, action.path, action.not);
+      break;
+    }
 
-    case constants.SET_NOT:
-      return Object.assign({}, state, {...unset}, {tree: setNot(state.tree, action.path, action.not)});
+    case constants.SET_FIELD: {
+      set.tree = setField(state.tree, action.path, action.field, action.config);
+      break;
+    }
 
-    case constants.SET_FIELD:
-      return Object.assign({}, state, {...unset}, {tree: setField(state.tree, action.path, action.field, action.config)});
+    case constants.SET_LOCK: {
+      set.tree = setLock(state.tree, action.path, action.lock);
+      break;
+    }
 
-    case constants.SET_OPERATOR:
-      return Object.assign({}, state, {...unset}, {tree: setOperator(state.tree, action.path, action.operator, action.config)});
+    case constants.SET_OPERATOR: {
+      set.tree = setOperator(state.tree, action.path, action.operator, action.config);
+      break;
+    }
 
     case constants.SET_VALUE: {
-      let set = {};
-      const tree = setValue(state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.asyncListValues, action.__isInternal);
-      if (tree.__isInternalValueChange)
-        set.__isInternalValueChange = true;
-      return Object.assign({}, state, {...unset, ...set}, {tree});
+      const {tree, isInternalValueChange} = setValue(
+        state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.asyncListValues, action.__isInternal
+      );
+      set.__isInternalValueChange = isInternalValueChange;
+      set.tree = tree;
+      break;
     }
 
-    case constants.SET_VALUE_SRC:
-      return Object.assign({}, state, {...unset}, {tree: setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config)});
-
-    case constants.SET_OPERATOR_OPTION:
-      return Object.assign({}, state, {...unset}, {tree: setOperatorOption(state.tree, action.path, action.name, action.value)});
-
-    case constants.MOVE_ITEM:
-      return Object.assign({}, state, {...unset}, {tree: moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config)});
-
-
-    case constants.SET_DRAG_START:
-      return Object.assign({}, state, {...unset}, {dragStart: action.dragStart, dragging: action.dragging, mousePos: action.mousePos});
-
-    case constants.SET_DRAG_PROGRESS:
-      return Object.assign({}, state, {...unset}, {mousePos: action.mousePos, dragging: action.dragging});
-
-    case constants.SET_DRAG_END:
-      return Object.assign({}, state, {...unset}, {...emptyDrag, tree: checkEmptyGroups(state.tree, config)});
-
-
-    default:
-      return state;
+    case constants.SET_VALUE_SRC: {
+      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config);
+      break;
     }
+
+    case constants.SET_OPERATOR_OPTION: {
+      set.tree = setOperatorOption(state.tree, action.path, action.name, action.value);
+      break;
+    }
+
+    case constants.MOVE_ITEM: {
+      set.tree = moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config);
+      break;
+    }
+
+    case constants.SET_DRAG_START: {
+      set.dragStart = action.dragStart;
+      set.dragging = action.dragging;
+      set.mousePos = action.mousePos;
+      break;
+    }
+
+    case constants.SET_DRAG_PROGRESS: {
+      set.mousePos = action.mousePos;
+      set.dragging = action.dragging;
+      break;
+    }
+
+    case constants.SET_DRAG_END: {
+      set.tree = checkEmptyGroups(state.tree, config);
+      set = { ...set, ...emptyDrag };
+      break;
+    }
+
+    default: {
+      break;
+    }
+    }
+
+    if (actionMeta) {
+      set.__lastAction = actionMeta;
+    }
+    
+    return {...state, ...unset, ...set};
   };
 
 };

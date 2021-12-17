@@ -142,7 +142,52 @@ export const with_struct_and_group_mixed_obsolete = {
     { "==": [ { "var": "user.firstName" }, "abc" ] },
   ]
 };
-  
+
+export const with_is_empty_in_some = {
+  "and": [
+    { "some": [
+      { "var": "results" },
+      {
+        "!": { "var": "grade" }
+      }
+    ] }
+  ]
+};
+
+export const with_bad_subfield_in_group = {
+  "and": [
+    { "some": [
+      { "var": "results" },
+      {
+        "!": { "var": "bad-subfield" }
+      }
+    ] }
+  ]
+};
+
+export const with_select_not_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "!": 
+        { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+      }
+    ] }
+  ]
+};
+
+export const with_not_and_in_some = {
+  "and": [
+    { "some": [
+      { "var": "cars" },
+      { "!": { "and": [
+        { "==": [ { "var": "year" }, null ] },
+        { "!": { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] } }
+      ] } }
+    ] }
+  ]
+};
+
 export const with_nested_group = {
   "and": [
     { "some": [
@@ -154,9 +199,7 @@ export const with_nested_group = {
           }, {
             "some": [
               { "var": "user" },
-              {
-                "==": [  { "var": "name" },  "denis"  ]
-              }
+              { "==": [  { "var": "name" },  "denis"  ] }
             ]
           }
         ]
@@ -178,9 +221,7 @@ export const two_rules_with_nested_group = {
         { "var": "results" },
         { "some": [
           { "var": "user" }, 
-          {
-            "==": [ { "var": "name" },  "aaa" ]
-          }
+          { "==": [ { "var": "name" },  "aaa" ] }
         ] }
       ]
     }
@@ -193,6 +234,79 @@ export const with_struct_inside_group = {
       "some": [
         { "var": "results" },
         { "==": [  { "var": "user.name" },  "ddd"  ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1s = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { "==": [  { "var": "score" },  5  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { ">=": [  { "var": "user.age" },  18  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { "==": [  { "var": "quiz.name" },  "ethics"  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_2_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { "==": [  { "var": "user.name" },  "denis"  ] },
+          { "==": [  { "var": "quiz.name" },  "ethics"  ] },
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { ">": [  { "var": "quiz.max_score" },  70  ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_struct_inside_group_1_1_1s = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        { "and": [
+          { ">=": [  { "var": "user.age" },  18  ] },
+          { ">": [  { "var": "quiz.max_score" },  70  ] },
+          { "<": [  { "var": "score" },  70  ] }
+        ] }
       ]
     }
   ]
@@ -219,6 +333,84 @@ export const with_two_groups_1 = {
     {
       "==": [ { "var": "num" },  -1 ]
     }
+  ]
+};
+
+export const with_group_inside_struct_1 = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        { "and": [
+          { "==": [ { "var": "vendor" }, "Toyota" ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_group_inside_struct_2 = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        { "and": [
+          { "==": [ { "var": "vendor" }, "Toyota" ] },
+          { "==": [ { "var": "year" }, 2006 ] }
+        ] }
+      ]
+    }
+  ]
+};
+
+export const with_group_and_struct_deep = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        {
+          "and": [
+            { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+            {
+              "some": [
+                { "var": "manufactured.type" },
+                {
+                  "and": [
+                    { "==": [ { "var": "segment" }, "C" ] },
+                    { "==": [ { "var": "class" }, "Mid" ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const with_group_and_struct_deep_old = {
+  "and": [
+    {
+      "some": [
+        { "var": "vehicles.cars" },
+        {
+          "and": [
+            { "==": [ { "var": "manufactured.vendor" }, "Toyota" ] },
+            { "==": [ { "var": "manufactured.type.segment" }, "C" ] },
+            { "==": [ { "var": "manufactured.type.class" }, "Mid" ] },
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const with_group_and_struct_deep_old2 = {
+  "and": [
+    { "==": [ { "var": "vehicles.cars.manufactured.vendor" }, "Toyota" ] },
+    { "==": [ { "var": "vehicles.cars.manufactured.type.segment" }, "C" ] },
+    { "==": [ { "var": "vehicles.cars.manufactured.type.class" }, "Mid" ] },
   ]
 };
 
@@ -499,7 +691,7 @@ export const with_jl_value = {
   ]
 };
 
-export const with_group_array = {
+export const with_group_array_cars = {
   "and": [
     { ">": [
       { "reduce": [

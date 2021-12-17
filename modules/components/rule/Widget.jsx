@@ -27,6 +27,7 @@ export default class Widget extends PureComponent {
     readonly: PropTypes.bool,
     asyncListValues: PropTypes.array,
     id: PropTypes.string,
+    groupId: PropTypes.string,
     //actions
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
@@ -172,7 +173,7 @@ export default class Widget extends PureComponent {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id} = props;
+    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId} = props;
     const {settings} = config;
     const { widgets, iValues, aField } = meta;
     const value = isFuncArg ? iValues : values;
@@ -188,6 +189,7 @@ export default class Widget extends PureComponent {
         {valueSrc == "func" ? null : widgetLabel}
         <WidgetFactory
           id={id}
+          groupId={groupId}
           valueSrc={valueSrc}
           delta={delta}
           value={value}
@@ -209,8 +211,8 @@ export default class Widget extends PureComponent {
   renderValueSources = (delta, meta, props) => {
     const {config, isFuncArg, leftField, operator, readonly} = props;
     const {settings} = config;
-    const { valueSources, widgets, _field } = meta;
-    const field = isFuncArg ? leftField : _field;
+    const { valueSources, widgets, aField } = meta;
+    const field = isFuncArg ? leftField : aField;
     const {valueSrc, setValueSrcHandler} = widgets[delta];
     const {valueSourcesInfo, renderValueSources: ValueSources} = settings;
     const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {

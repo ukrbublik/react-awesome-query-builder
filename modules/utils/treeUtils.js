@@ -70,6 +70,35 @@ export const removePathsInTree = (tree) => {
 
 
 /**
+ * Remove `isLocked` in items that inherit parent's `isLocked`
+ * @param {Immutable.Map} tree
+ * @return {Immutable.Map} tree
+ */
+export const removeIsLockedInTree = (tree) => {
+  let newTree = tree;
+
+  function _processNode (item, path, isParentLocked = false) {
+    const itemPath = path.push(item.get("id"));
+    const isLocked = item.getIn(["properties", "isLocked"]);
+    if (isParentLocked && isLocked) {
+      newTree = newTree.deleteIn(expandTreePath(itemPath, "properties", "isLocked"));
+    }
+
+    const children = item.get("children1");
+    if (children) {
+      children.map((child, _childId) => {
+        _processNode(child, itemPath, isLocked || isParentLocked);
+      });
+    }
+  }
+
+  _processNode(tree, new Immutable.List());
+
+  return newTree;
+};
+
+
+/**
  * Set correct `path` in every item
  * @param {Immutable.Map} tree
  * @return {Immutable.Map} tree
@@ -88,6 +117,13 @@ export const fixPathsInTree = (tree) => {
 
     const children = item.get("children1");
     if (children) {
+      if (children.constructor.name == "Map") {
+        // protect: should me OrderedMap, not Map (issue #501)
+        newTree = newTree.setIn(
+          expandTreePath(itemPath, "children1"), 
+          new Immutable.OrderedMap(children)
+        );
+      }
       children.map((child, _childId) => {
         _processNode(child, itemPath, lev + 1);
       });
@@ -136,11 +172,12 @@ export const getFlatTree = (tree) => {
   let items = {};
   let realHeight = 0;
 
-  function _flatizeTree (item, path, insideCollapsed, lev, info, parentType) {
+  function _flatizeTree (item, path, insideCollapsed, insideLocked, lev, info, parentType) {
     const type = item.get("type");
     const collapsed = item.get("collapsed");
     const id = item.get("id");
     const children = item.get("children1");
+    const isLocked = item.getIn(["properties", "isLocked"]);
     const childrenIds = children ? children.map((_child, childId) => childId) : null;
 
     const itemsBefore = flat.length;
@@ -152,7 +189,7 @@ export const getFlatTree = (tree) => {
     if (children) {
       let subinfo = {};
       children.map((child, _childId) => {
-        _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, lev + 1, subinfo, type);
+        _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, insideLocked || isLocked, lev + 1, subinfo, type);
       });
       if (!collapsed) {
         info.height = (info.height || 0) + (subinfo.height || 0);
@@ -179,10 +216,11 @@ export const getFlatTree = (tree) => {
       bottom: (insideCollapsed ? null : top) + height,
       collapsed: collapsed,
       node: item,
+      isLocked: isLocked || insideLocked,
     };
   }
 
-  _flatizeTree(tree, [], false, 0, {}, null);
+  _flatizeTree(tree, [], false, false, 0, {}, null);
 
   for (let i = 0 ; i < flat.length ; i++) {
     const prevId = i > 0 ? flat[i-1] : null;

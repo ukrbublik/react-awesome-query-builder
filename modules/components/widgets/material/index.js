@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
@@ -21,11 +21,13 @@ import MaterialAutocompleteWidget from "./value/MaterialAutocomplete";
 
 // field select widgets
 import MaterialFieldSelect from "./core/MaterialFieldSelect";
+import MaterialFieldAutocomplete from "./core/MaterialFieldAutocomplete";
 
 // core components
 import MaterialButton from "./core/MaterialButton";
 import MaterialButtonGroup from "./core/MaterialButtonGroup";
 import MaterialConjs from "./core/MaterialConjs";
+import MaterialSwitch from "./core/MaterialSwitch";
 import MaterialValueSources from "./core/MaterialValueSources";
 import MaterialConfirm from "./core/MaterialConfirm";
 
@@ -36,7 +38,7 @@ const MaterialProvider = ({config, children}) => {
   const themeConfig = settingsTheme.material;
   const locale = settingsLocale.material;
   const useTheme = themeConfig || locale;
-  const theme = useTheme ? createMuiTheme(themeConfig, locale) : null;
+  const theme = useTheme ? createTheme(themeConfig, locale) : null;
 
   const base = (<div className="mui">{children}</div>);
   const withProviders = (
@@ -71,10 +73,12 @@ export default {
   MaterialAutocompleteWidget,
 
   MaterialFieldSelect,
+  MaterialFieldAutocomplete,
 
   MaterialButton,
   MaterialButtonGroup,
   MaterialConjs,
+  MaterialSwitch,
   MaterialValueSources,
   MaterialConfirm,
   MaterialUseConfirm: useConfirm,

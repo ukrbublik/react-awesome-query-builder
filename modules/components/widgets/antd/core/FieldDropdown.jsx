@@ -1,6 +1,5 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import keys from "lodash/keys";
 import { Menu, Dropdown, Tooltip, Button } from "antd";
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
@@ -30,8 +29,7 @@ export default class FieldDropdown extends PureComponent {
   }
 
   renderMenuItems(fields) {
-    return keys(fields).map(fieldKey => {
-      const field = fields[fieldKey];
+    return fields.map(field => {
       const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
       const pathKey = path || key;
       const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;

@@ -1,6 +1,6 @@
 /* eslint-disable no-extra-semi */
 
-import {List as ImmutableList, Map as ImmutableMap} from "immutable";
+import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 
 
@@ -9,25 +9,14 @@ import {ElementType, ReactElement, Factory} from "react";
 /////////////////
 
 type AnyObject = object;
+type Empty = null | undefined;
 
-type MongoValue = any;
-
-type ElasticSearchQueryType = string;
-
-type JsonLogicResult = {
-  logic?: JsonLogicTree,
-  data?: Object,
-  errors?: Array<string>
-}
-type JsonLogicTree = Object;
-type JsonLogicValue = any;
-type JsonLogicField = { "var": string }
-
-type RuleValue = boolean | number | string | Date | Array<string> | any;
+type IdPath = Array<string> | ImmutableList<string>;
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
 }
+
 type TypedMap<T> = {
   [key: string]: T;
 }
@@ -38,61 +27,92 @@ type TypedKeyMap<K extends string|number, T> = {
   [key: string]: T;
   [key: number]: T;
 }
-type Empty = null | undefined;
+
+// for export/import
+
+type MongoValue = any;
+type ElasticSearchQueryType = string;
+
+type JsonLogicResult = {
+  logic?: JsonLogicTree,
+  data?: Object,
+  errors?: Array<string>
+}
+type JsonLogicTree = Object;
+type JsonLogicValue = any;
+type JsonLogicField = { "var": string };
+
+////////////////
+// query value
+/////////////////
+
+type RuleValue = boolean | number | string | Date | Array<string> | any;
 
 type ValueSource = "value" | "field" | "func" | "const";
-type RuleGroupModes = "struct" | "some" | "array";
+type RuleGroupMode = "struct" | "some" | "array";
+type ItemType = "group" | "rule_group" | "rule";
+type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
+
 type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
 }
 
+interface BasicItemProperties {
+  isLocked?: boolean,
+}
+
+interface RuleProperties extends BasicItemProperties {
+  field: string | Empty,
+  operator: string | Empty,
+  value: Array<RuleValue>,
+  valueSrc?: Array<ValueSource>,
+  valueType?: Array<string>,
+  valueError?: Array<string>,
+  operatorOptions?: AnyObject,
+}
+
+interface RuleGroupExtProperties extends RuleProperties {
+  mode: RuleGroupMode,
+}
+
+interface RuleGroupProperties extends BasicItemProperties {
+  field: string | Empty,
+  mode?: RuleGroupMode,
+}
+
+interface GroupProperties extends BasicItemProperties {
+  conjunction: string,
+  not?: boolean,
+}
+
+type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
+type JsonItem = JsonGroup|JsonAnyRule;
 type JsonGroup = {
   type: "group",
   id?: string,
-  children1?: {[id: string]: JsonGroup|JsonRule|JsonRuleGroup|JsonRuleGroupExt},
-  properties?: {
-    conjunction: string,
-    not?: boolean,
-  }
+  // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
+  children1?: {[id: string]: JsonItem} | [JsonItem],
+  properties?: GroupProperties
 }
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule},
-  properties?: {
-    field: string | Empty,
-    mode?: RuleGroupModes,
-  }
+  children1?: {[id: string]: JsonRule} | [JsonRule],
+  properties?: RuleGroupProperties
 }
 type JsonRuleGroupExt = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule},
-  properties?: {
-    field: string | Empty,
-    mode: RuleGroupModes,
-    operator: string | Empty,
-    value: Array<RuleValue>,
-    valueSrc: Array<ValueSource>,
-    valueType: Array<string>,
-    valueError?: Array<string>,
-  }
+  children1?: {[id: string]: JsonRule} | [JsonRule],
+  properties?: RuleGroupExtProperties
 }
 type JsonRule = {
   type: "rule",
-  properties: {
-    field: string | Empty,
-    operator: string | Empty,
-    value: Array<RuleValue>,
-    valueSrc: Array<ValueSource>,
-    valueType: Array<string>,
-    valueError?: Array<string>,
-    operatorOptions?: AnyObject
-  }
+  properties: RuleProperties,
 }
 export type JsonTree = JsonGroup;
 
-export type ImmutableTree = ImmutableMap<string, string|Object>;
+export type ImmutableTree = ImmutableOMap<string, any>;
 
 
 ////////////////
@@ -102,11 +122,11 @@ export type ImmutableTree = ImmutableMap<string, string|Object>;
 export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
-  queryBuilderFormat(tree: ImmutableTree, config: Config): Object;
-  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string;
-  sqlFormat(tree: ImmutableTree, config: Config): string;
-  mongodbFormat(tree: ImmutableTree, config: Config): Object;
-  elasticSearchFormat(tree: ImmutableTree, config: Config): Object;
+  queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
+  sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
+  mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
   // load, save
   getTree(tree: ImmutableTree, light?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
@@ -118,12 +138,21 @@ export interface Utils {
   // other
   uuid(): string;
   simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
+  // config utils
+  ConfigUtils: {
+    getFieldConfig(config: Config, field: string): Field | null;
+    getFuncConfig(config: Config, func: string): Func | null;
+    getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
+    getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
+    getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  }
 }
 
 export interface BuilderProps {
   tree: ImmutableTree,
   config: Config,
-  actions: {[key: string]: Function},
+  actions: Actions,
+  dispatch: Dispatch,
 }
 
 export interface QueryProps {
@@ -135,7 +164,7 @@ export interface QueryProps {
   fields: Fields;
   funcs?: Funcs;
   value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config): void;
+  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
   renderBuilder(props: BuilderProps): ReactElement;
 }
 
@@ -152,15 +181,70 @@ export interface Config {
   funcs?: Funcs,
 }
 
+/////////////////
+// Actions
+/////////////////
+
+type Placement = "after" | "before" | "append" | "prepend";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+interface BaseAction {
+  type: ActionType,
+
+  id?: string, // for ADD_RULE, ADD_GROUP - id of new item
+  path?: IdPath, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
+
+  conjunction?: string,
+  not?: boolean,
+  lock?: boolean,
+  field?: string,
+  operator?: string,
+  delta?: number, // for SET_VALUE
+  value?: RuleValue,
+  valueType?: string,
+  srcKey?: ValueSource,
+  name?: string, // for SET_OPERATOR_OPTION
+  fromPath?: IdPath, // for MOVE_ITEM
+  toPath?: IdPath, // for MOVE_ITEM
+  placement?: Placement, // for MOVE_ITEM
+  properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
+}
+export interface InputAction extends BaseAction {
+  config: Config,
+}
+export interface ActionMeta extends BaseAction {
+  affectedField?: string, // gets field name from `path` (or `field` for first SET_FIELD)
+}
+
+export type Dispatch = (action: InputAction) => void;
+
+export interface Actions {
+  // tip: children will be converted to immutable ordered map in `_addChildren1`
+  addRule(path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
+  removeRule(path: IdPath): undefined;
+  addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
+  removeGroup(path: IdPath): undefined;
+  setNot(path: IdPath, not: boolean): undefined;
+  setLock(path: IdPath, lock: boolean): undefined;
+  setConjunction(path: IdPath, conjunction: string): undefined;
+  setField(path: IdPath, field: string): undefined;
+  setOperator(path: IdPath, operator: string): undefined;
+  setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
+  setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
+  setOperatorOption(path: IdPath, name: string, value: RuleValue): undefined;
+  moveItem(fromPath: IdPath, toPath: IdPath, placement: Placement): undefined;
+  setTree(tree: ImmutableTree): undefined;
+}
+
 
 /////////////////
 // Widgets, WidgetProps
 /////////////////
 
-type FormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type MongoFormatValue =    (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
-type ValidateValue =       (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
+type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type MongoFormatValue =     (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
+type JsonLogicFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
+type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
 type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 interface BaseWidgetProps {
@@ -168,12 +252,15 @@ interface BaseWidgetProps {
   setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
+  parentField?: string,
   operator: string,
   fieldDefinition: Field,
   config: Config,
   delta?: number,
   customProps?: AnyObject,
   readonly?: boolean,
+  id?: string, // id of rule
+  groupId?: string, // id of parent group
 }
 interface RangeWidgetProps extends BaseWidgetProps {
   placeholders: Array<string>,
@@ -190,20 +277,22 @@ export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
 
 export interface BaseWidget {
-  customProps?: AnyObject,
-  type: string,
-  jsType?: string,
-  factory: Factory<WidgetProps>,
-  valueSrc?: ValueSource,
-  valuePlaceholder?: string,
-  valueLabel?: string,
-  fullWidth?: boolean,
-  formatValue: FormatValue,
-  sqlFormatValue: SqlFormatValue,
-  mongoFormatValue?: MongoFormatValue,
-  elasticSearchFormatValue?: ElasticSearchFormatValue,
+  customProps?: AnyObject;
+  type: string;
+  jsType?: string;
+  factory: Factory<WidgetProps>;
+  valueSrc?: ValueSource;
+  valuePlaceholder?: string;
+  valueLabel?: string;
+  fullWidth?: boolean;
+  formatValue: FormatValue;
+  sqlFormatValue: SqlFormatValue;
+  mongoFormatValue?: MongoFormatValue;
+  elasticSearchFormatValue?: ElasticSearchFormatValue;
+  hideOperator?: boolean;
+  jsonLogic?: JsonLogicFormatValue;
   //obsolete:
-  validateValue?: ValidateValue,
+  validateValue?: ValidateValue;
 }
 export interface RangeableWidget extends BaseWidget {
   singleWidget?: string,
@@ -255,7 +344,7 @@ export interface ConjunctionOption {
 }
 
 export interface ConjsProps {
-  path: string, 
+  id: string, 
   readonly?: boolean,
   disabled?: boolean,
   selectedConjunction?: string,
@@ -277,6 +366,16 @@ export interface ButtonProps {
   type: "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup", 
   onClick(): void, 
   label: string,
+  config?: Config,
+  readonly?: boolean,
+}
+
+export interface SwitchProps {
+  value: boolean,
+  setValue(newValue?: boolean): void,
+  label: string,
+  checkedLabel?: string,
+  hideLabel?: boolean,
   config?: Config,
 }
 
@@ -320,9 +419,9 @@ export interface RuleErrorProps {
 /////////////////
 
 type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean) => string;
-type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => Object;
-type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject) => string;
-type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject) => JsonLogicTree;
+type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
+type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
@@ -347,7 +446,7 @@ export interface ProximityOptions extends ProximityConfig {
 
 interface BaseOperator {
   label: string,
-  reversedOp: string,
+  reversedOp?: string,
   isNotOp?: boolean,
   cardinality?: number,
   formatOp?: FormatOperator,
@@ -504,7 +603,7 @@ interface FieldStruct extends BaseField {
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
-  mode: RuleGroupModes,
+  mode: RuleGroupMode,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
@@ -529,18 +628,18 @@ export type Fields = TypedMap<FieldOrGroup>;
 export type FieldItem = {
   items?: FieldItems, 
   key: string, 
-  path?: string, 
+  path?: string, // field path with separator
   label: string, 
   fullLabel?: string, 
   altLabel?: string, 
   tooltip?: string,
   disabled?: boolean,
 }
-type FieldItems = TypedMap<FieldItem>;
+type FieldItems = FieldItem[];
 
 export interface FieldProps {
   items: FieldItems,
-  setField(path: string): void,
+  setField(fieldPath: string): void,
   selectedKey: string | Empty,
   selectedKeys?: Array<string> | Empty,
   selectedPath?: Array<string> | Empty,
@@ -552,8 +651,9 @@ export interface FieldProps {
   placeholder?: string,
   selectedOpts?: {tooltip?: string},
   readonly?: boolean,
+  id?: string, // id of rule
+  groupId?: string, // id of parent group
 }
-
 
 /////////////////
 // Settings
@@ -588,6 +688,8 @@ export interface LocaleSettings {
   funcPlaceholder?: string,
   funcLabel?: string,
   operatorPlaceholder?: string,
+  lockLabel?: string,
+  lockedLabel?: string,
   deleteLabel?: string,
   addGroupLabel?: string,
   addRuleLabel?: string,
@@ -596,14 +698,16 @@ export interface LocaleSettings {
   notLabel?: string,
   valueSourcesPopupTitle?: string,
   removeRuleConfirmOptions?: {
-      title?: string,
-      okText?: string,
-      okType?: string,
+    title?: string,
+    okText?: string,
+    okType?: string,
+    cancelText?: string,
   },
   removeGroupConfirmOptions?: {
     title?: string,
     okText?: string,
     okType?: string,
+    cancelText?: string,
   },
 }
 
@@ -614,6 +718,7 @@ export interface RenderSettings {
   renderConjs?: Factory<ConjsProps>,
   renderButton?: Factory<ButtonProps>,
   renderButtonGroup?: Factory<ButtonGroupProps>,
+  renderSwitch?: Factory<SwitchProps>,
   renderProvider?: Factory<ProviderProps>,
   renderValueSources?: Factory<ValueSourcesProps>,
   renderConfirm?: ConfirmFunc,
@@ -641,11 +746,15 @@ export interface BehaviourSettings {
   canReorder?: boolean,
   canRegroup?: boolean,
   showNot?: boolean,
+  showLock?: boolean,
+  canDeleteLocked?: boolean,
   maxNesting?: number,
   setOpOnChangeField: Array<ChangeFieldStrategy>,
   clearValueOnChangeField?: boolean,
   clearValueOnChangeOp?: boolean,
   canLeaveEmptyGroup?: boolean,
+  shouldCreateEmptyGroup?: boolean,
+  forceShowConj?: boolean,
   immutableGroupsMode?: boolean,
   immutableFieldsMode?: boolean,
   immutableOpsMode?: boolean,
@@ -672,10 +781,10 @@ export type Settings = LocaleSettings & RenderSettings & BehaviourSettings & Oth
 // Funcs
 /////////////////
 
-type SqlFormatFunc = (formattedArgs: { [key: string]: string }) => string;
-type FormatFunc = (formattedArgs: { [key: string]: string }, isForDisplay: boolean) => string;
-type MongoFormatFunc = (formattedArgs: { [key: string]: MongoValue }) => MongoValue;
-type JsonLogicFormatFunc = (formattedArgs: { [key: string]: JsonLogicValue }) => JsonLogicTree;
+type SqlFormatFunc = (formattedArgs: TypedMap<string>) => string;
+type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
+type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
+type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 
 interface FuncGroup {
@@ -732,6 +841,8 @@ export interface BasicConfig extends Config {
     ends_with: BinaryOperator,
     between: Operator2,
     not_between: Operator2,
+    is_null: UnaryOperator,
+    is_not_null: UnaryOperator,
     is_empty: UnaryOperator,
     is_not_empty: UnaryOperator,
     select_equals: BinaryOperator,
@@ -785,6 +896,7 @@ interface VanillaWidgets {
   // vanilla core widgets
   VanillaFieldSelect: ElementType<FieldProps>,
   VanillaConjs: ElementType<ConjsProps>,
+  VanillaSwitch: ElementType<SwitchProps>,
   VanillaButton: ElementType<ButtonProps>,
   VanillaButtonGroup: ElementType<ButtonGroupProps>,
   VanillaProvider: ElementType<ProviderProps>,
@@ -813,6 +925,7 @@ export interface AntdWidgets {
   Button: ElementType<ButtonProps>,
   ButtonGroup: ElementType<ButtonGroupProps>,
   Conjs: ElementType<ConjsProps>,
+  Switch: ElementType<SwitchProps>,
   Provider: ElementType<ProviderProps>,
   ValueSources: ElementType<ValueSourcesProps>,
   confirm: ConfirmFunc,
@@ -840,7 +953,9 @@ interface ReadyWidgets extends VanillaWidgets {
 export interface MaterialWidgets {
   // material core widgets
   MaterialFieldSelect: ElementType<FieldProps>,
+  MaterialFieldAutocomplete: ElementType<FieldProps>,
   MaterialConjs: ElementType<ConjsProps>,
+  MaterialSwitch: ElementType<SwitchProps>,
   MaterialButton: ElementType<ButtonProps>,
   MaterialButtonGroup: ElementType<ButtonGroupProps>,
   MaterialProvider: ElementType<ProviderProps>,

@@ -1,9 +1,10 @@
 import uuid from "../utils/uuid";
-import {defaultValue, isJsonLogic} from "../utils/stuff";
+import {defaultValue, isJsonLogic,shallowEqual} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+
 import moment from "moment";
 
 // http://jsonlogic.com/
@@ -72,16 +73,18 @@ const buildConv = (config) => {
     }
   }
 
+  const {groupVarKey, altVarKey} = config.settings.jsonLogic;
+
   return {
     operators,
     conjunctions,
     funcs,
-    varKeys: ["var", config.settings.jsonLogic.groupVarKey, config.settings.jsonLogic.altVarKey],
+    varKeys: ["var", groupVarKey, altVarKey],
   };
 };
 
 
-const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null) => {
+const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
   let op, vals;
   if (isJsonLogic(logic)) {
     op = Object.keys(logic)[0];
@@ -93,9 +96,13 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
+  const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
   const isRev = op == "!" && !isEmptyOp;
-  if (isRev) {
+  const isLocked = lockedOp && op == lockedOp;
+  if (isLocked) {
+    ret = convertFromLogic(vals[0], conv, config, expectedType, meta, not, fieldConfig, widget, parentField, true);
+  } else if (isRev) {
     // reverse with not
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
   } else if(expectedType == "val") {
@@ -104,13 +111,17 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
       || convertFunc(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertVal(logic, fieldConfig, widget, config, meta);
   } else if(expectedType == "rule") {
-    ret = convertConj(op, vals, conv, config, not, meta, parentField) 
+    ret = convertConj(op, vals, conv, config, not, meta, parentField, false) 
     || convertOp(op, vals, conv, config, not, meta, parentField);
   }
 
   let afterErrorsCnt = meta.errors.length;
   if (op != "!" && ret === undefined && afterErrorsCnt == beforeErrorsCnt) {
     meta.errors.push(`Can't parse logic ${JSON.stringify(logic)}`);
+  }
+
+  if (isLocked) {
+    ret.properties.isLocked = true;
   }
 
   return ret;
@@ -277,26 +288,37 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
 };
 
 
-const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
+const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRuleGroup = false) => {
   const conjKey = conv.conjunctions[op];
   const {fieldSeparator} = config.settings;
+  const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+  const isParentGroup = parentFieldConfig?.type == "!group";
   if (conjKey) {
     let type = "group";
     const children = vals
       .map(v => convertFromLogic(v, conv, config, "rule", meta, false, null, null, parentField))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
-    const complexFields = Object.entries(children)
-      .filter(([_k, v]) => v.properties !== undefined && v.properties.field !== undefined && v.properties.field.indexOf(fieldSeparator) != -1)
-      .map(([_k, v]) => (v.properties.field.split(fieldSeparator)));
-    const complexFieldsParents = complexFields
-      .map(parts => parts.slice(0, parts.length - 1).join(fieldSeparator));
-    const complexFieldsConfigs = arrayToObject(
-      arrayUniq(complexFieldsParents).map(f => [f, getFieldConfig(config, f)])
+    const complexFields = Object.values(children)
+      .map(v => v?.properties?.field)
+      .filter(f => f && f.includes(fieldSeparator));
+    const complexFieldsGroupAncestors = Object.fromEntries(
+      arrayUniq(complexFields).map(f => {
+        const parts = f.split(fieldSeparator);
+        const ancs = Object.fromEntries(
+          parts.slice(0, -1)
+            .map((f, i, parts) => [...parts.slice(0, i), f])
+            .map(fp => [fp.join(fieldSeparator), getFieldConfig(config, fp)])
+            .filter(([_f, fc]) => fc.type == "!group")
+        );
+        return [f, Object.keys(ancs)];
+      })
     );
-    const complexFieldsInRuleGroup = complexFieldsParents
-      .filter((f) => complexFieldsConfigs[f].type == "!group");
-    const usedRuleGroups = arrayUniq(complexFieldsInRuleGroup);
+    const childrenInRuleGroup = Object.values(children)
+      .map(v => v?.properties?.field)
+      .map(f => complexFieldsGroupAncestors[f])
+      .filter(ancs => ancs && ancs.length);
+    const usedRuleGroups = arrayUniq(Object.values(complexFieldsGroupAncestors).flat());
     const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
     let properties = {
@@ -306,58 +328,57 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null) => {
     const id = uuid();
 
     let children1 = {};
-    // TIP: `needSplit` will be true if using mode=struct and there are fields of different groups on one level
-    //      (like "a.b" and "x.z" -> need to split them with hierarchy)
-    // TIP: Even if fields are of same root parent (like "a.b", "a.c.d"), still we may need to create hierarchy of `rule_group`s
-    const needSplit = !(usedTopRuleGroups.length == 1 && complexFieldsInRuleGroup.length == Object.keys(children).length);
     let groupToId = {};
     Object.entries(children).map(([k, v]) => {
       if (v.type == "group" || v.type == "rule_group") {
         // put as-is
         children1[k] = v;
       } else {
-        const groupFields = usedRuleGroups.filter((f) => v.properties.field.indexOf(f) == 0);
-        const groupField = groupFields.length > 0 ? groupFields.sort((a, b) => (b.length - a.length))[0] : null;
+        const field = v?.properties?.field;
+        const groupAncestors = complexFieldsGroupAncestors[field];
+        const groupField = groupAncestors?.at(-1);
         if (!groupField) {
           // not in rule_group (can be simple field or in struct) - put as-is
           children1[k] = v;
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
-          groupField.split(fieldSeparator).map((f, i, a) => {
-            const p = a.slice(0, i);
-            let ff = [...p, f].join(fieldSeparator);
-            ff = normalizeField(config, ff);
-            const ffConfig = getFieldConfig(config, ff) || {};
-            if (!needSplit && i == 0) {
-              type = "rule_group";
-              properties.field = ff;
-              properties.mode = ffConfig.mode;
-              groupToId[ff] = id;
-            } else {
-              let groupId = groupToId[ff];
-              if (!groupId) {
-                groupId = uuid();
-                groupToId[ff] = groupId;
-                ch[groupId] = {
-                  type: "rule_group",
-                  id: groupId,
-                  children1: {},
-                  properties: {
-                    conjunction: conjKey,
-                    not: false,
-                    field: ff,
-                    mode: ffConfig.mode,
-                  }
-                };
-              }
-              ch = ch[groupId].children1;
+          let parentFieldParts = parentField ? parentField.split(fieldSeparator) : [];
+          const isInParent = shallowEqual(parentFieldParts, groupField.split(fieldSeparator).slice(0, parentFieldParts.length));
+          if (!isInParent)
+            parentFieldParts = []; // should not be
+          const traverseGroupFields = groupField
+            .split(fieldSeparator)
+            .slice(parentFieldParts.length)
+            .map((f, i, parts) => [...parentFieldParts, ...parts.slice(0, i), f].join(fieldSeparator))
+            .map(f => normalizeField(config, f))
+            .map((f) => ({f, fc: getFieldConfig(config, f) || {}}))
+            .filter(({fc}) => (fc.type != "!struct"));
+          traverseGroupFields.map(({f: gf, fc: gfc}, i) => {
+            let groupId = groupToId[gf];
+            if (!groupId) {
+              groupId = uuid();
+              groupToId[gf] = groupId;
+              ch[groupId] = {
+                type: "rule_group",
+                id: groupId,
+                children1: {},
+                properties: {
+                  conjunction: conjKey,
+                  not: false,
+                  field: gf,
+                  mode: gfc.mode,
+                }
+              };
             }
+            ch = ch[groupId].children1;
           });
           ch[k] = v;
         }
       }
     });
+
+    // tip: for isRuleGroup=true correct type and properties will be set out of this func
 
     return {
       type: type,
@@ -429,96 +450,101 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   // but don't confuse with "all-in" for multiselect
   const isAllInForMultiselect = op == "all" && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
   const isGroup0 = !isAllInForMultiselect && config.settings.groupOperators.includes(op);
-  const cardinality = isGroup0 ? 0 : arity - 1;
+  const eqOps = ["==", "!="];
+  let cardinality = isGroup0 ? 0 : arity - 1;
+  if (isGroup0)
+    cardinality = 0;
+  else if (eqOps.includes(op) && cardinality == 1 && vals[1] === null)
+    cardinality = 0;
 
   const opk = op + "/" + cardinality;
   const {fieldSeparator} = config.settings;
   let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
-  if (opKeys) {
-    let jlField, args = [];
-    const rangeOps = ["<", "<=", ">", ">="];
-    if (rangeOps.includes(op) && arity == 3) {
-      jlField = vals[1];
-      args = [ vals[0], vals[2] ];
-    } else if (isRevArgs) {
-      jlField = vals[1];
-      args = [ vals[0] ];
-    } else {
-      [jlField, ...args] = vals;
-    }
-
-    if (!isJsonLogic(jlField)) {
-      errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
-      return;
-    }
-    let k = Object.keys(jlField)[0];
-    let v = Object.values(jlField)[0];
-    
-    let field, having, isGroup;
-    if (conv.varKeys.includes(k) && typeof v == "string") {
-      field = v;
-    }
-    if (isGroup0) {
-      isGroup = true;
-      having = args[0];
-      args = [];
-    }
-    // reduce/filter for group ext
-    if (k == "reduce" && Array.isArray(v) && v.length == 3) {
-      let [filter, acc, init] = v;
-      if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
-        k = Object.keys(filter)[0];
-        v = Object.values(filter)[0];
-        if (k == "filter") {
-          let [group, filter] = v;
-          if (isJsonLogic(group)) {
-            k = Object.keys(group)[0];
-            v = Object.values(group)[0];
-            if (conv.varKeys.includes(k) && typeof v == "string") {
-              field = v;
-              having = filter;
-              isGroup = true;
-            }
-          }
-        } else if (conv.varKeys.includes(k) && typeof v == "string") {
-          field = v;
-          isGroup = true;
-        }
-      }
-    }
-    
-    if (!field) {
-      errors.push(`Unknown field ${JSON.stringify(jlField)}`);
-      return;
-    }
-    if (parentField)
-      field = [parentField, field].join(fieldSeparator);
-    field = normalizeField(config, field);
-
-    const fieldConfig = getFieldConfig(config, field);
-    if (!fieldConfig) {
-      errors.push(`No config for field ${field}`);
-      return;
-    }
-
-    let opKey = opKeys[0];
-    if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
-      // eg. for "equal" and "select_equals"
-      opKeys = opKeys
-        .filter(k => fieldConfig.operators.includes(k));
-      if (opKeys.length == 0) {
-        errors.push(`No corresponding ops for field ${field}`);
-        return;
-      }
-      opKey = opKeys[0];
-    }
-    
-    return {
-      field, fieldConfig, opKey, args, having
-    };
+  if (!opKeys)
+    return;
+  
+  let jlField, args = [];
+  const rangeOps = ["<", "<=", ">", ">="];
+  if (rangeOps.includes(op) && arity == 3) {
+    jlField = vals[1];
+    args = [ vals[0], vals[2] ];
+  } else if (isRevArgs) {
+    jlField = vals[1];
+    args = [ vals[0] ];
+  } else {
+    [jlField, ...args] = vals;
   }
-};
 
+  if (!isJsonLogic(jlField)) {
+    errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
+    return;
+  }
+  let k = Object.keys(jlField)[0];
+  let v = Object.values(jlField)[0];
+  
+  let field, having, isGroup;
+  if (conv.varKeys.includes(k) && typeof v == "string") {
+    field = v;
+  }
+  if (isGroup0) {
+    isGroup = true;
+    having = args[0];
+    args = [];
+  }
+  // reduce/filter for group ext
+  if (k == "reduce" && Array.isArray(v) && v.length == 3) {
+    let [filter, acc, init] = v;
+    if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
+      k = Object.keys(filter)[0];
+      v = Object.values(filter)[0];
+      if (k == "filter") {
+        let [group, filter] = v;
+        if (isJsonLogic(group)) {
+          k = Object.keys(group)[0];
+          v = Object.values(group)[0];
+          if (conv.varKeys.includes(k) && typeof v == "string") {
+            field = v;
+            having = filter;
+            isGroup = true;
+          }
+        }
+      } else if (conv.varKeys.includes(k) && typeof v == "string") {
+        field = v;
+        isGroup = true;
+      }
+    }
+  }
+  
+  if (!field) {
+    errors.push(`Unknown field ${JSON.stringify(jlField)}`);
+    return;
+  }
+  if (parentField)
+    field = [parentField, field].join(fieldSeparator);
+  field = normalizeField(config, field);
+
+  const fieldConfig = getFieldConfig(config, field);
+  if (!fieldConfig) {
+    errors.push(`No config for field ${field}`);
+    return;
+  }
+
+  let opKey = opKeys[0];
+  if (opKeys.length > 1 && fieldConfig && fieldConfig.operators) {
+    // eg. for "equal" and "select_equals"
+    opKeys = opKeys
+      .filter(k => fieldConfig.operators.includes(k));
+    if (opKeys.length == 0) {
+      errors.push(`No corresponding ops for field ${field}`);
+      return;
+    }
+    opKey = opKeys[0];
+  }
+  
+  return {
+    field, fieldConfig, opKey, args, having
+  };
+};
 
 const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   if (!op) return undefined;
@@ -545,13 +571,28 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   // Otherwise try to revert
   const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
   let canRev = true;
-  if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
-    canRev = false;
+  // if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
+  //   canRev = false;
 
-  // Fix "some ! in"
-  if (fieldConfig.type == "!group" && having && Object.keys(having)[0] == "!") {
-    not = !not;
-    having = having["!"];
+  let conj;
+  let havingVals;
+  if (fieldConfig.type == "!group" && having) {
+    conj = Object.keys(having)[0];
+    havingVals = having[conj];
+    if (!Array.isArray(havingVals))
+      havingVals = [ havingVals ];
+
+    // Preprocess "!": Try to reverse op in single rule in having
+    // Eg. use `not_equal` instead of `not` `equal`
+    const isEmptyOp = conj == "!" && (havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0]) && conv.varKeys.includes(Object.keys(havingVals[0])[0]));
+    if (conj == "!" && !isEmptyOp) {
+      not = !not;
+      having = having["!"];
+      conj = Object.keys(having)[0];
+      havingVals = having[conj];
+      if (!Array.isArray(havingVals))
+        havingVals = [ havingVals ];
+    }
   }
 
   // Use reversed op
@@ -573,20 +614,29 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   let res;
 
   if (fieldConfig.type == "!group" && having) {
-    const conj = Object.keys(having)[0];
-    const havingVals = having[conj];
-    const _not = false;
-
     if (conv.conjunctions[conj] !== undefined) {
-      res = convertConj(conj, havingVals, conv, config, _not, meta, field);
+      res = convertConj(conj, havingVals, conv, config, not, meta, field, true);
+      not = false; // not was applied to group
     } else {
       // need to be wrapped in `rule_group`
-      const rule = convertOp(conj, havingVals, conv, config, _not, meta, field);
+      const rule = convertOp(conj, havingVals, conv, config, not && canRev, meta, field);
+      if (not && canRev && !rule?.properties?.not) {
+        not = false; // op was reversed in rule
+      }
       res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
     }
+    if (!res)
+      return undefined;
+    
+    res.type = "rule_group";
+    if (not) {
+      Object.assign(res.properties, {
+        not: not,
+      });
+    }
     Object.assign(res.properties, {
+      field: field,
       mode: fieldConfig.mode,
-      not: (canRev ? false : not),
       operator: opKey,
     });
     if (fieldConfig.mode == "array") {
@@ -603,7 +653,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       children1: {},
       properties: {
         conjunction: defaultGroupConjunction(config, fieldConfig),
-        not: (canRev ? false : not),
+        not: not,
         mode: fieldConfig.mode,
         field: field,
         operator: opKey,
@@ -631,11 +681,10 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         asyncListValues,
       }
     };
-  }
-
-  if (not && canRev) {
-    //meta.errors.push(`No rev op for ${opKey}`);
-    res = wrapInDefaultConj(res, config, not);
+    if (not) {
+      //meta.errors.push(`No rev op for ${opKey}`);
+      res = wrapInDefaultConj(res, config, not);
+    }
   }
 
   return res;

@@ -157,7 +157,7 @@ const LINEAR_REGRESSION = {
     val: {
       label: "Value",
       type: "number",
-      valueSources: ["field", "value"],
+      valueSources: ["value", "field"],
     },
     bias: {
       label: "Bias",

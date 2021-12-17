@@ -1,4 +1,47 @@
 # Changelog
+
+- 4.9.0
+  - Added `is_null` and `is_not_null` operators (issue #494) (PR #522)
+  - ! Breaking change for operators `is_empty` and `is_not_empty`. Left for text type only, for other types will be auto converted to `is_null`/`is_not_null`. Changed meaning of `is_empty` - now it's just strict comparing with empty string. Before change meaning was similar to `is_null` (and export to SQL was wrong because of non-existent operator `IS EMPTY`). (issue #494) (PR #573)
+  - Fixed order of operators for field when merging operators from 2+ widgets (PR #573)
+  - Added last param `fieldDef` for functions to format operators (PR #573)
+  - Added `jsonLogic` to widget TS def (PR #572)
+- 4.8.0
+  - Added read-only mode switch for rules and groups. See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`. Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
+  - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
+  - Fix: Filter value sources for func args correctly. LHS field can be used as arg in RHS function. (PR #490)
+  - MUI - Support showSearch (autocomplete) for field select widget (issue #479 #521) (PR #563)
+  - AntDesign - Fix FieldSelect with 3+ level !struct nesting (issue #224) (PR #564)
+- 4.7.2
+  - Fixed import of rule_group with `not` (issue #548) (PR #559)
+- 4.7.1
+  - Fixed potential inconsistent order of fields (issue #335) (PR #553)
+  - Bump `webpack-dev-server` from 3.11.2 to 4.4.0 (PR #540)
+  - Change `FieldItems` type definition from map to array (issues #550, #363) (PR #551)
+  - Spreading `customProps` to vanilla widgets (PR #546)
+  - Fix for `allowCustomValues` (PR #545)
+  - Use minimum `material-ui` version 4.12.3 and use new `createTheme` instead of deprecated `createMuiTheme` (issue #463) (PR #531)
+- 4.7.0
+  - Add explicit `not: false` in new group (issue #512)
+  - Fix: don't automatically add one rule to query when it become empty when `canLeaveEmptyGroup=true` (issue #504)
+  - Added config `forceShowConj` (issue #474)
+  - Fixed import of complex hierarchy fields (combination of !group and !struct) from JsonLogic (issues #517, #333)
+  - Fixed non-ordered map bug (issue #501)
+- 4.6.0
+  - Added `groupId` (id of the parent Item - Group, RuleGroup, RuleGroupExt etc) to field's, operartor's and widget's props (PR #510)
+  - Fixed export to ES when group is empty (broken 'Clear' button in demo app) (PR #511)
+  - Added 3rd param `actionMeta` to `onChange()` to get info about action (PR #445) (issue #351)
+  - Added demo of using actions programmatically (see `run actions` in demo app) (PR #445)
+  - Added config `shouldCreateEmptyGroup` (default `false`) (PR #445)
+  - Now config `canLeaveEmptyGroup` is true by default (PR #445) (issue #504)
+  - Breaking changes for format with `isForDisplay=true` - don't wrap strings with `"`, replace `==` with `=` (PR #518)
+  - Fixed type definition for export utils - can return undefined (PR #516)
+  - Fixed use of `hideOperator` (PR #523) (issue #292)
+  - Documented `cancelText` (PR #524) (issue #520)
+- 4.5.2
+  - Added rule `id` to field's, operartor's and widget's props. Added config of the selected field to the operator props as `fieldConfig` (issue #502) (PR #503)
+- 4.5.1
+  - Fixed export of field name to ES (broken demo app)
 - 4.5.0
   - Added basic support of export to ElasticSearch (PR #469)
   - Export all helper funcs from configUtils (PR #493)
@@ -43,18 +86,18 @@
   - Fixed issue #413 with func arg with 1 value source which is not value
 - 4.0.3
   - Fixed issue #386 with import select field from JsonLogic (reason: bug with func/field widget in getWidgetForFieldOp)
-  - Fixed issue #387 with subgroups in Material UI 
+  - Fixed issue #387 with subgroups in Material UI
 - 4.0.2
   - Fixed MaterialConfig import for TS projects (issue #368)
 - 4.0.1
   - Added custom context to isolate Query Builder store (PR #350)
   - Added support for React 17 as a peer dependency
 - 4.0.0
-  - Removed setting `useGroupsAsArrays`. 
-    Instead added field config `mode` for type `!group` with values: 
-      `some` (default, corresponding useGroupsAsArrays = true), 
-      `array` (new, user can choose one of group operators), 
-      `struct` (obsolete, corresponding useGroupsAsArrays = false).
+  - Removed setting `useGroupsAsArrays`.
+    Instead added field config `mode` for type `!group` with values:
+    `some` (default, corresponding useGroupsAsArrays = true),
+    `array` (new, user can choose one of group operators),
+    `struct` (obsolete, corresponding useGroupsAsArrays = false).
   - For type=`!group` and mode=`array`:
     - new field configs are available: `conjunctions`, `showNot`, `operators`, `defaultOperator`, `initialEmptyWhere`
     - you can use group operators `some`, `none`, `all` or operators with 1 integer opearnd (for count): `equal`, `not_equal`, `less`, `between`, ..
@@ -75,7 +118,7 @@
   - Fixed issue #252 ("Cannot update a component from inside the function body of a different component")
   - Issue #190: Fixed TS def for getTree/2 - added 2nd param light?
 - 2.1.17
-  - Dropped support of loading query in obsolete Immutable string format used in versions 0.* (issue #254)
+  - Dropped support of loading query in obsolete Immutable string format used in versions 0.\* (issue #254)
 - 2.1.16
   - Fixed issues with export to Mongo and JsonLogic of queries with nested groups (#279, #279)
 - 2.1.15
@@ -143,7 +186,7 @@
 - 1.3.7
   - Fixed issue #168 with dot in field name
 - 1.3.6
-  - Added config options to disable inputs: `immutableFieldsMode`, `immutableOpsMode`, `immutableValuesMode` 
+  - Added config options to disable inputs: `immutableFieldsMode`, `immutableOpsMode`, `immutableValuesMode`
 - 1.3.5
   - Issue #158
 - 1.3.3
@@ -156,7 +199,7 @@
   - Added support of `!group`
 - 1.2.0
   - Added `treeselect` and `treemultiselect` types
-  - Changed format of `listValues` from `{<value>: <title>}` to `[{value, title}]` (old is supported). 
+  - Changed format of `listValues` from `{<value>: <title>}` to `[{value, title}]` (old is supported).
     Tree select also use `listValues`, format is compatible with simple select - `[{value, title, parent}]`
 - 1.1.3
   - Fixed console warnings
@@ -207,7 +250,7 @@
   - added: `allowCustomValues` (issue #88)
   - change: removed `renderFieldAndOpAsDropdown`, replaced by `renderField` (issue #109)
   - added `renderOperator` (issue #89)
-  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree`  (old format is supported) (issue #61)
+  - change: query value now can be exported to JSON (instead of `Immutable.Map`), and loaded with `loadTree` (old format is supported) (issue #61)
   - added: `canRegroup`
   - rename: `readonlyMode` -> `immutableGroupsMode`
   - rename: `get_children` -> `renderBuilder`

@@ -9,6 +9,8 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 
 export default class Operator extends PureComponent {
   static propTypes = {
+    id: PropTypes.string,
+    groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string,
@@ -58,7 +60,7 @@ export default class Operator extends PureComponent {
     
     return {
       placeholder, items,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts,fieldConfig
+      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, fieldConfig
     };
   }
 
@@ -78,10 +80,11 @@ export default class Operator extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setOperator, readonly,id} = this.props;
+    const {config, customProps, setOperator, readonly, id, groupId} = this.props;
     const {renderOperator} = config.settings;
     const renderProps = {
       id,
+      groupId,
       config, 
       customProps, 
       readonly,

@@ -1,9 +1,10 @@
 import en_US from "antd/lib/locale-provider/en_US";
 import AntdWidgets from "../../components/widgets/antd";
-import BasicConfig from "../basic";
+import BasicConfig, {stringifyForDisplay} from "../basic";
 import {getTitleInListValues} from "../../utils/stuff";
-import {SqlString} from "../../utils/sql";
+import {SqlString} from "../../utils/export";
 import React from "react";
+
 
 const {
   FieldSelect,
@@ -13,6 +14,7 @@ const {
   Button,
   ButtonGroup,
   Conjs,
+  Switch,
   ValueSources,
 
   Provider,
@@ -47,6 +49,7 @@ const settings = {
   
   renderFunc: (props) => <FieldSelect {...props} />,
   renderConjs: (props) => <Conjs {...props} />,
+  renderSwitch: (props) => <Switch {...props} />,
   renderButton: (props) => <Button {...props} />,
   renderButtonGroup: (props) => <ButtonGroup {...props} />,
   renderValueSources: (props) => <ValueSources {...props} />,
@@ -116,7 +119,7 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? val : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -133,7 +136,7 @@ const widgets = {
     valuePlaceholder: "Select value",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? '"' + valLabel + '"' : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
@@ -149,7 +152,7 @@ const widgets = {
     valuePlaceholder: "Select values",
     formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
       let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(v => '"' + v + '"') : vals.map(v => JSON.stringify(v));
+      return isForDisplay ? valsLabels.map(stringifyForDisplay) : vals.map(JSON.stringify);
     },
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
       return vals.map(v => SqlString.escape(v));
@@ -179,6 +182,8 @@ const types = {
           "not_between",
           "is_empty",
           "is_not_empty",
+          "is_null",
+          "is_not_null",
         ],
       }
     },

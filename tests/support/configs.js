@@ -7,6 +7,7 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
+import { BasicFuncs } from "react-awesome-query-builder";
 
 
 export const simple_with_number = (BasicConfig) => ({
@@ -114,7 +115,26 @@ export const with_date_and_time = (BasicConfig) => ({
     },
   },
 });
-  
+
+
+export const with_theme_material = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    theme: {
+      material: {
+        palette: {
+          primary: {
+            main: "#5e00d7",
+          },
+          secondary: {
+            main: "#edf2ff",
+          },
+        },
+      }
+    },
+  }
+});
   
 export const with_select = (BasicConfig) => ({
   ...BasicConfig,
@@ -228,7 +248,64 @@ export const with_struct_and_group = (BasicConfig) => ({
     ...BasicConfig.settings,
   }
 });
-  
+
+export const with_group_struct = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "struct",
+      subfields: {
+        grade: {
+          type: "text",
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_some = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        grade: {
+          type: "text",
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_array = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "array",
+      subfields: {
+        grade: {
+          type: "text",
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
 export const with_nested_group = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -283,8 +360,139 @@ export const with_struct_inside_group = (BasicConfig) => ({
           subfields: {
             name: {
               type: "text",
+            },
+            age: {
+              type: "number",
             }
           }
+        },
+        quiz: {
+          type: "!struct",
+          subfields: {
+            name: {
+              type: "text",
+            },
+            max_score: {
+              type: "number",
+            }
+          }
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_inside_struct = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            vendor: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Ford", "Toyota", "Tesla"],
+              },
+              valueSources: ["value"],
+            },
+            year: {
+              type: "number",
+              fieldSettings: {
+                min: 1990,
+                max: 2021,
+              },
+              valueSources: ["value"],
+            }
+          }
+        },
+        bikes: {
+          label: "Bikes",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            price: {
+              type: "number",
+              valueSources: ["value"],
+            },
+            type: {
+              type: "select",
+              fieldSettings: {
+                listValues: ["Road", "Mountain"],
+              },
+              valueSources: ["value"],
+            },
+          }
+        },
+        other: {
+          type: "text",
+          valueSources: ["value"],
+        }
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+  }
+});
+
+export const with_group_and_struct_deep = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    vehicles: {
+      label: "Vehicles",
+      type: "!struct",
+      subfields: {
+        cars: {
+          label: "Cars",
+          type: "!group",
+          mode: "some",
+          subfields: {
+            manufactured: {
+              label: "Manufactured",
+              type: "!struct",
+              subfields: {
+                vendor: {
+                  type: "select",
+                  fieldSettings: {
+                    listValues: ["Ford", "Toyota", "Tesla"],
+                  },
+                },
+                type: {
+                  label: "Type",
+                  type: "!group",
+                  mode: "some",
+                  subfields: {
+                    segment: {
+                      label: "Segment",
+                      type: "select",
+                      fieldSettings: {
+                        listValues: ["A", "B", "C", "D", "E"],
+                      },
+                    },
+                    class: {
+                      label: "Class",
+                      type: "select",
+                      fieldSettings: {
+                        listValues: ["Mid", "Cabriolet", "Offroad"],
+                      },
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        other: {
+          type: "text",
         }
       }
     },
@@ -428,52 +636,19 @@ export const with_all_types__show_error = (BasicConfig) => ({
   }
 });
 
+export const dont_leave_empty_group = (BasicConfig) => ({
+  ...simple_with_numbers_and_str(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    canLeaveEmptyGroup: false,
+    shouldCreateEmptyGroup: false
+  }
+});
+
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
-  //todo: use BasicFuncs
   funcs: {
-    LOWER: {
-      label: "Lowercase",
-      mongoFunc: "$toLower",
-      jsonLogic: "toLowerCase",
-      returnType: "text",
-      args: {
-        str: {
-          label: "String",
-          type: "text",
-          valueSources: ["value", "field"],
-        },
-      }
-    },
-    LINEAR_REGRESSION: {
-      label: "Linear regression",
-      returnType: "number",
-      formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
-      sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
-      mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
-      jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
-      renderBrackets: ["", ""],
-      renderSeps: [" * ", " + "],
-      args: {
-        coef: {
-          label: "Coef",
-          type: "number",
-          defaultValue: 1,
-          valueSources: ["value"],
-        },
-        val: {
-          label: "Value",
-          type: "number",
-          valueSources: ["value"],
-        },
-        bias: {
-          label: "Bias",
-          type: "number",
-          defaultValue: 0,
-          valueSources: ["value"],
-        }
-      }
-    },
+    ...BasicFuncs,
   },
   fields: {
     num: {
@@ -611,7 +786,7 @@ export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
 });
 
 
-export const with_group_array = (BasicConfig) => ({
+export const with_group_array_cars = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
     str: {
@@ -655,7 +830,7 @@ export const with_group_array = (BasicConfig) => ({
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }
@@ -698,7 +873,7 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }

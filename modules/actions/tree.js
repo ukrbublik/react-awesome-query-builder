@@ -1,4 +1,5 @@
 import uuid from "../utils/uuid";
+import {toImmutableList} from "../utils/stuff";
 import {defaultRuleProperties, defaultGroupProperties} from "../utils/defaultUtils";
 import * as constants from "../constants";
 import Immutable from "immutable";
@@ -19,9 +20,11 @@ export const setTree = (config, tree) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addRule = (config, path, properties) => ({
+export const addRule = (config, path, properties, ruleType = "rule", children = null) => ({
   type: constants.ADD_RULE,
-  path: path,
+  ruleType: ruleType,
+  children: children,
+  path: toImmutableList(path),
   id: uuid(),
   properties: defaultRuleProperties(config).merge(properties || {}),
   config: config
@@ -33,7 +36,7 @@ export const addRule = (config, path, properties) => ({
  */
 export const removeRule = (config, path) => ({
   type: constants.REMOVE_RULE,
-  path: path,
+  path: toImmutableList(path),
   config: config
 });
 
@@ -42,9 +45,11 @@ export const removeRule = (config, path) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addGroup = (config, path, properties) => ({
-  type: constants.ADD_NEW_GROUP,
-  path: path,
+export const addGroup = (config, path, properties, children = null) => ({
+  type: constants.ADD_GROUP,
+  path: toImmutableList(path),
+  children: children,
+  id: uuid(),
   properties: defaultGroupProperties(config).merge(properties || {}),
   config: config
 });
@@ -55,7 +60,7 @@ export const addGroup = (config, path, properties) => ({
  */
 export const removeGroup = (config, path) => ({
   type: constants.REMOVE_GROUP,
-  path: path,
+  path: toImmutableList(path),
   config: config
 });
 
@@ -67,8 +72,8 @@ export const removeGroup = (config, path) => ({
  */
 export const moveItem = (config, fromPath, toPath, placement) => ({
   type: constants.MOVE_ITEM,
-  fromPath: new Immutable.List(fromPath),
-  toPath: new Immutable.List(toPath),
+  fromPath: toImmutableList(fromPath),
+  toPath: toImmutableList(toPath),
   placement: placement,
   config: config,
 });

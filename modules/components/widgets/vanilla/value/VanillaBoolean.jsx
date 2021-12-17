@@ -2,7 +2,10 @@ import React from "react";
 import uuid from "../../../../utils/uuid";
 
 export default (props) => {
-  const {value, setValue, config, labelYes, labelNo, readonly} = props;
+  const {value, setValue, config, labelYes, labelNo, readonly, customProps = {}} = props;
+  const customRadioYesProps = customProps.radioYes || {};
+  const customRadioNoProps = customProps.radioNo || {};
+
   const onCheckboxChange = e => setValue(e.target.checked);
   const onRadioChange = e => setValue(e.target.value == "true");
   const id = uuid(), id2 = uuid();
@@ -13,9 +16,9 @@ export default (props) => {
   // </>;
 
   return <>
-    <input key={id}  type="radio" id={id} value={true} checked={!!value} disabled={readonly} onChange={onRadioChange} />
+    <input key={id}  type="radio" id={id} value={true} checked={!!value} disabled={readonly} onChange={onRadioChange} { ...customRadioYesProps }/>
     <label style={{display: "inline"}} key={id+"label"}  htmlFor={id}>{labelYes}</label>
-    <input key={id2}  type="radio" id={id2} value={false} checked={!value} disabled={readonly} onChange={onRadioChange} />
+    <input key={id2}  type="radio" id={id2} value={false} checked={!value} disabled={readonly} onChange={onRadioChange} { ...customRadioNoProps } />
     <label style={{display: "inline"}} key={id2+"label"}  htmlFor={id2}>{labelNo}</label>
   </>;
 
