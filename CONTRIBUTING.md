@@ -43,10 +43,11 @@ Feel free to open PR to add new reusable types/widgets/operators (eg., regex ope
 Pull Requests are always welcomed :)
 
 ### Other UI frameworks
-Currently there are 3 collections of widgets:
+Currently there are 4 collections of widgets:
 - [antdesign widgets](/modules/components/widgets/antd)
 - [material widgets](/modules/components/widgets/material)
 - [vanilla widgets](/modules/components/widgets/vanilla)
+- [mui widgets](/modules/components/widgets/mui)
 
 Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
 You can use vanilla widgets as skeleton.  

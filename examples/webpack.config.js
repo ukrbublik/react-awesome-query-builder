@@ -60,6 +60,8 @@ if (isAnalyze) {
         new BundleAnalyzerPlugin()
     ];
 }
+
+// No hot-loader available for React 17.0.2 which is required for MUI v5
 // if (isDev) {
 //     aliases = {
 //         ...aliases,

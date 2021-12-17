@@ -1,7 +1,7 @@
 import MuiWidgets from "../../components/widgets/mui";
-import BasicConfig from "../basic";
+import BasicConfig, {stringifyForDisplay} from "../basic";
 import React from "react";
-import {SqlString} from "../../utils/sql";
+import {SqlString} from "../../utils/export";
 
 const {
   MuiBooleanWidget,
@@ -108,7 +108,7 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? val : JSON.stringify(val);
+      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
