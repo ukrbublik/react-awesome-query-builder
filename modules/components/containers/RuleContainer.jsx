@@ -11,6 +11,7 @@ const createRuleContainer = (Rule) =>
   class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
+      groupId: PropTypes.string,
       config: PropTypes.object.isRequired,
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       operator: PropTypes.string,
@@ -24,6 +25,8 @@ const createRuleContainer = (Rule) =>
       operatorOptions: PropTypes.object,
       reordableNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
+      isLocked: PropTypes.bool,
+      isTrueLocked: PropTypes.bool,
       //connected:
       dragging: PropTypes.object, //{id, x, y, w, h}
       isDraggingTempo: PropTypes.bool,
@@ -39,6 +42,10 @@ const createRuleContainer = (Rule) =>
 
     removeSelf = () => {
       this.props.actions.removeRule(this.props.path);
+    }
+
+    setLock = (lock = null) => {
+      this.props.actions.setLock(this.props.path, lock);
     }
 
     setField = (field) => {
@@ -107,12 +114,14 @@ const createRuleContainer = (Rule) =>
             isDraggingMe ? <Rule
               key={"dragging"}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={true}
               isDraggingTempo={true}
               dragging={this.props.dragging}
               setField={this.dummyFn}
               setOperator={this.dummyFn}
               setOperatorOption={this.dummyFn}
+              setLock={this.dummyFn}
               removeSelf={this.dummyFn}
               setValue={this.dummyFn}
               setValueSrc={this.dummyFn}
@@ -127,14 +136,18 @@ const createRuleContainer = (Rule) =>
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
               asyncListValues={this.props.asyncListValues}
+              isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             /> : null
             ,
             <Rule
               key={this.props.id}
               id={this.props.id}
+              groupId={this.props.groupId}
               isDraggingMe={isDraggingMe}
               isDraggingTempo={isInDraggingTempo}
               onDragStart={this.props.onDragStart}
+              setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
@@ -152,6 +165,8 @@ const createRuleContainer = (Rule) =>
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
               asyncListValues={this.props.asyncListValues}
+              isLocked={this.props.isLocked}
+              isTrueLocked={this.props.isTrueLocked}
             />
           ]}
         </div>

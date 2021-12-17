@@ -51,9 +51,11 @@ export const queryBuilderFormat = (item, config) => {
   let meta = {
     usedFields: []
   };
-
+  const res = formatItem(item, config, meta);
+  if (!res)
+    return undefined;
   return {
-    ...formatItem(item, config, meta), 
+    ...res, 
     ...meta
   };
 };

@@ -195,6 +195,8 @@ export default (skin: string) => {
     fieldPlaceholder: "Select field",
     funcPlaceholder: "Select function",
     operatorPlaceholder: "Select operator",
+    lockLabel: "Lock",
+    lockedLabel: "Locked",
     deleteLabel: null,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
@@ -206,11 +208,13 @@ export default (skin: string) => {
       title: "Are you sure delete this rule?",
       okText: "Yes",
       okType: "danger",
+      cancelText: "Cancel"
     },
     removeGroupConfirmOptions: {
       title: "Are you sure delete this group?",
       okText: "Yes",
       okType: "danger",
+      cancelText: "Cancel"
     },
   };
 
@@ -238,11 +242,16 @@ export default (skin: string) => {
     },
     // canReorder: true,
     // canRegroup: true,
+    // showLock: true,
     // showNot: true,
     // showLabels: true,
     maxNesting: 5,
     canLeaveEmptyGroup: true,
+    shouldCreateEmptyGroup: false,
     showErrorMessage: true,
+    customFieldSelectProps: {
+      showSearch: true
+    },
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
@@ -353,7 +362,7 @@ export default (skin: string) => {
           type: "number",
           fieldSettings: {
             min: 1990,
-            max: 2020,
+            max: 2021,
           },
           valueSources: ["value"],
         }

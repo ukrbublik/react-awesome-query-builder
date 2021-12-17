@@ -1,19 +1,47 @@
-# react-awesome-query-builder
-[![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder) [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) [![Smoke](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml/badge.svg)](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml?query=branch%3Amaster) [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder) [![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design) [![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=Material%20UI)](https://material-ui.com) [![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
-[![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/) [![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx) [![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple?file=/src/demo/config_simple.js)
 
+<p align="center">
+  <a href="https://ukrbublik.github.io/react-awesome-query-builder/" rel="noopener" target="_blank"><img src="https://raw.githubusercontent.com/ukrbublik/react-awesome-query-builder/gh-pages/logo_full_200.png" /></a>
+</p>
+<! --
+[![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 
+[![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
+-->
+
+[![npm](https://img.shields.io/npm/v/react-awesome-query-builder.svg)](https://www.npmjs.com/package/react-awesome-query-builder)
+[![Smoke](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml/badge.svg?text=Test)](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml?query=branch%3Amaster)
+[![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 
+[![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder)
+[![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design)
+[![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=Material%20UI)](https://material-ui.com)
+[![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/)
+[![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx)
+[![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple?file=/src/demo/config_simple.js)
+
+
+User-friendly React component to build queries (filters).
+
+Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/). 
+Using awesome [Ant Design](https://ant.design/) v4 for widgets. 
+Now [Material-UI](https://material-ui.com/) is also supported!
+
+See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
 [![Open in codesandbox.io](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx)
 
-User-friendly React component to build queries.
-
-Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/)
-
-Using awesome [Ant Design](https://ant.design/) v4 for widgets
-
-Now [Material-UI](https://material-ui.com/) is also supported!
-
-[Demo page](https://ukrbublik.github.io/react-awesome-query-builder)
+* [Features](#features)
+* [Getting started](#getting-started)
+* [Usage](#usage)
+  * [Minimal JavaScript example with class component](#minimal-javascript-example-with-class-component)
+  * [Minimal TypeScript example with function component](#minimal-typescript-example-with-function-component)
+* [API](#api)
+  * [Config format](#config-format)
+* [Versions](#versions)
+  * [Changelog](#changelog)
+  * [Migration to 4.9.0](#migration-to-490)
+  * [Migration from v1 to v2](#migration-from-v1-to-v2)
+* [Contributing](#contributing)
+  * [Code Contributing](#code-contributing)
+  * [Financial Contributing](#financial-contributing)
 
 
 ### Features
@@ -38,7 +66,7 @@ Now [Material-UI](https://material-ui.com/) is also supported!
   (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
-- TypeScript support (see [types](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/index.d.ts) and [demo in TS](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples))
+- TypeScript support (see [types](/modules/index.d.ts) and [demo in TS](/examples))
 
 
 ## Getting started
@@ -62,15 +90,15 @@ See [basic usage](#usage) for minimum code example.
 See [API](#api) and [config](#config-format) for documentation. 
 
 Demo apps:
-- [`npm start`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`npm run sandbox-ts`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- [`npm run sandbox-js`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+- [`npm start`](/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`npm run sandbox-ts`](/sandbox) - demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
+- [`npm run sandbox-js`](/sandbox_simple) - demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
 
 
 
 ## Usage
 
-#### Minimal Javascript example with class component
+#### Minimal JavaScript example with class component
 ```javascript
 import React, {Component} from 'react';
 import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query-builder';
@@ -321,15 +349,16 @@ export const Demo: React.FC = () => {
 
 ### `<Query />`
 Props:
-- `{...config}` - destructured query [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc)
+- `{...config}` - destructured query [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
-- `onChange` - callback when value changed. Params: `value` (in Immutable format), `config`.
+- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/modules/index.d.ts)).
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
+- `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically (for list of actions see `Actions` in [`index.d.ts`](/modules/index.d.ts)).
 
 ### `<Builder />`
 Render this component only inside `Query.renderBuilder()` like in example above:
@@ -382,7 +411,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 This library uses configarion driven aprroach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
 At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
-See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) for full documentation.
+See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
 
@@ -401,7 +430,15 @@ It's recommended to update your version.
 | 0.x     | :x:                |
 
 ### Changelog
-See [`CHANGELOG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CHANGELOG.md)
+See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 4.9.0
+Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`. 
+Now these operstors can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions). 
+Changed meaning of `is_empty` - now it's just strict comparing with empty string. 
+Before change the meaning was similar to `is_null`. 
+If you used `is_empty` for text types with intention of comparing with null, please replace `is_empty` -> `is_null`, `is_not_empty` -> `is_not_null` in saved query values. 
+If you used JsonLogic for saving, you need to replace `{"!": {"var": "your_field"}}` -> `{"==": [{"var": "your_field"}, null]}` and `{"!!": {"var": "your_field"}}` -> `{"!=": [{"var": "your_field"}, null]}`.
 
 ### Migration from v1 to v2
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
@@ -411,63 +448,20 @@ Support of other UI frameworks (like Bootstrap) are planned for future, see [Oth
 
 
 
-## Development
-Clone this repo and run `npm start`. 
-Open `http://localhost:3001/` in a browser. 
-You will see demo app with hot reload of demo code and local library code. 
+## Contributing
 
-### Directory structure
-- `modules` - Main source code of library
-  - `components` - Core React components
-    - `widgets` - Components to render list of fields, operators, values of different types. Built with UI frameworks
-  - `config` - Basic config lives here. See [`CONFIG`](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/CONFIG.adoc) docs.
-  - `export` - Code for export to JsonLogic, MongoDb, SQL, ElasticSearch, plain string
-  - `import` - Code for import from JsonLogic
-  - `actions` - Redux actions
-  - `stores/tree.js` - Redux store
-  - `index.d.ts` - TS definitions
-- `css` - Styles for query builder
-- `examples` - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- `sandbox` - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
-- `sandbox_simple` - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
-- `tests` - All tests are here. Uses Karma, Mocha, Chai, Enzyme
-
-### Scripts
-- `npm run install-all` - Install npm packages in root, examples, sandboxes. **Required for other scripts!**
-- `npm test` - Run tests with Karma and update coverage. Requires Node.js v10+
-- `npm run lint` - Run ESLint and TSC (in root, tests, examples, sandboxes)
-- `npm run lint-fix` - Run ESLint with `--fix` option (in root, tests, examples, sandboxes)
-- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
-- `npm run smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
-- `npm run build` - Build npm module to `lib`, build minified production package to `build`
-- `npm run build-examples` - Build demo with webpack to `examples/build`
-
-Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
-Pull Requests are always welcomed :)
-
-### Other UI frameworks
-Currently there are 3 collections of widgets:
-- [antdesign widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/antd)
-- [material widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/material)
-- [vanilla widgets](https://github.com/ukrbublik/react-awesome-query-builder/tree/master/modules/components/widgets/vanilla)
-
-Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
-You can use vanilla widgets as skeleton.  
-Then to enable new widgets you need to create config overrides like this:
-[material config](https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/material/index.js)
-
-
-
-## Contributors
-
-### Code Contributors
+### Code Contributing
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
 <a href="https://github.com/ukrbublik/react-awesome-query-builder/graphs/contributors"><img src="https://opencollective.com/react-awesome-query-builder/contributors.svg?width=890&button=false" /></a>
 
-### Financial Contributors
+### Financial Contributing
 
 Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/react-awesome-query-builder/contribute)]
+
+If you mention in an GitHub issue that you are a sponsor, we will prioritize helping you.
+
+As a sponsor you can ask to implement a feature that is not in a todo list or motivate for faster implementation.
 
 #### Individuals
 
@@ -487,9 +481,6 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/react-awesome-query-builder/organization/7/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/7/avatar.svg"></a>
 <a href="https://opencollective.com/react-awesome-query-builder/organization/8/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/8/avatar.svg"></a>
 <a href="https://opencollective.com/react-awesome-query-builder/organization/9/website"><img src="https://opencollective.com/react-awesome-query-builder/organization/9/avatar.svg"></a>
-
-
-react-awesome-query-builder is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
 
 
 

@@ -1,5 +1,5 @@
-
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
+import {defaultConjunction} from "../utils/defaultUtils";
 
 
 /**
@@ -216,8 +216,12 @@ function buildParameters(queryType, value, operator, fieldName, config) {
  * @private
  */
 function buildEsRule(fieldName, value, operator, config, valueSrc) {
+  if (!fieldName || !operator || value == undefined)
+    return undefined; // rule is not fully entered
   let op = operator;
   let opConfig = config.operators[op];
+  if (!opConfig)
+    return undefined; // unknown operator
   let { elasticSearchQueryType } = opConfig;
 
   // not
@@ -282,9 +286,13 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
  * @returns {object} - The ES group
  */
 function buildEsGroup(children, conjunction, recursiveFxn, config) {
+  if (!children || !children.size)
+    return undefined;
   const childrenArray = children.valueSeq().toArray();
   const occurrence = determineOccurrence(conjunction);
-  const result = childrenArray.map((c) => recursiveFxn(c, config));
+  const result = childrenArray.map((c) => recursiveFxn(c, config)).filter(v => v !== undefined);
+  if (!result.length)
+    return undefined;
   const resultFlat = result.flat(Infinity);
   return {
     bool: {
@@ -297,15 +305,15 @@ export function elasticSearchFormat(tree, config) {
   // -- format the es dsl here
   if (!tree) return undefined;
   const type = tree.get("type");
-  const properties = tree.get("properties");
+  const properties = tree.get("properties") || new Map();
 
   if (type === "rule" && properties.get("field")) {
     // -- field is null when a new blank rule is added
     const operator = properties.get("operator");
     const field = properties.get("field");
     const value = properties.get("value").toJS();
-    const _valueType = properties.get("valueType").get(0);
-    const valueSrc = properties.get("valueSrc").get(0);
+    const _valueType = properties.get("valueType")?.get(0);
+    const valueSrc = properties.get("valueSrc")?.get(0);
 
     if (valueSrc === "func") {
       // -- elastic search doesn't support functions (that is post processing)
@@ -323,7 +331,9 @@ export function elasticSearchFormat(tree, config) {
   }
 
   if (type === "group" || type === "rule_group") {
-    const conjunction = tree.get("properties").get("conjunction");
+    let conjunction = properties.get("conjunction");
+    if (!conjunction)
+      conjunction = defaultConjunction(config);
     const children = tree.get("children1");
     return buildEsGroup(children, conjunction, elasticSearchFormat, config);
   }

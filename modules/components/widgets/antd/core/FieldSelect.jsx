@@ -3,7 +3,6 @@ import { Tooltip, Select } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/domUtils";
 import PropTypes from "prop-types";
 const { Option, OptGroup } = Select;
-import keys from "lodash/keys";
 
 
 export default class FieldSelect extends PureComponent {
@@ -78,20 +77,25 @@ export default class FieldSelect extends PureComponent {
     return res;
   }
 
-  renderSelectItems(fields) {
-    return keys(fields).map(fieldKey => {
-      const field = fields[fieldKey];
+  renderSelectItems(fields, level = 0) {
+    return fields.map(field => {
       const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled} = field;
+      const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
+      const prefix = level > 1 ? "\u00A0\u00A0".repeat(level-1) : "";
       const pathKey = path || key;
       if (items) {
-        return <OptGroup
-          key={pathKey}
-          label={label}
-        >
-          {this.renderSelectItems(items)}
-        </OptGroup>;
+        const simpleItems = items.filter(it => !it.items);
+        const complexItems = items.filter(it => !!it.items);
+        const gr = simpleItems.length
+          ? [<OptGroup
+            key={pathKey}
+            label={groupPrefix+label}
+          >{this.renderSelectItems(simpleItems, level+1)}</OptGroup>]
+          : [];
+        const list = complexItems.length ? this.renderSelectItems(complexItems, level+1) : [];
+        return [...gr, ...list];
       } else {
-        const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
+        const option = tooltip ? <Tooltip title={tooltip}>{prefix+label}</Tooltip> : prefix+label;
         return <Option
           key={pathKey}
           value={pathKey}
@@ -103,7 +107,7 @@ export default class FieldSelect extends PureComponent {
           {option}
         </Option>;
       }
-    });
+    }).flat(Infinity);
   }
 
 }

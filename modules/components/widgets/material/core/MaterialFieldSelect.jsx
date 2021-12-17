@@ -6,13 +6,15 @@ import FormControl from "@material-ui/core/FormControl";
 
 export default ({items, setField, selectedKey, readonly, placeholder}) => {
   const renderOptions = (fields, level = 0) => (
-    Object.keys(fields).map(fieldKey => {
-      const field = fields[fieldKey];
+    fields.map(field => {
       const {items, path, label, disabled} = field;
       const prefix = "\u00A0\u00A0".repeat(level);
       if (items) {
         return [
-          <ListSubheader disabled={disabled} key={path} disableSticky={true}>{label}</ListSubheader>,
+          <ListSubheader disabled={disabled} key={path} disableSticky={true}>
+            {prefix && <span>{prefix}</span>}
+            {label}
+          </ListSubheader>,
           renderOptions(items, level+1),
         ];
       } else {

@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment";
 
 export default (props) => {
-  const {value, setValue, config, valueFormat, use12Hours, readonly} = props;
+  const {value, setValue, config, valueFormat, use12Hours, readonly, customProps, } = props;
 
   const onChange = e => {
     let value = e.target.value;
@@ -20,6 +20,6 @@ export default (props) => {
     dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
   
   return (
-    <input type="datetime-local"  value={dtValue}  disabled={readonly} onChange={onChange} />
+    <input type="datetime-local"  value={dtValue}  disabled={readonly} onChange={onChange} {...customProps} />
   );
 };

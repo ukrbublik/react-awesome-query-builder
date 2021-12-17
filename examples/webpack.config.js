@@ -94,14 +94,13 @@ module.exports = {
     devtool: isProd ? 'source-map' : 'source-map',
     devServer: {
         port: PORT,
-        inline: true,
         historyApiFallback: true,
         hot: true,
+        static: {
+          directory: path.join(__dirname, '/'),
+        },
     },
-    entry: [
-        //'react-hot-loader/patch', // seems like excess
-        './index',
-    ],
+    entry: './index',
     output: {
         path: DIST,
         filename: 'bundle.js'

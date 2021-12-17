@@ -227,6 +227,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
     omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
     operatorOptions,
+    fieldDef,
   ];
   let ruleQuery = fn(...args);
   if (wrapExpr) {

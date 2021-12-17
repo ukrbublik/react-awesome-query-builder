@@ -10,7 +10,7 @@ describe("rare features", () => {
   it("export uses fieldName", () => {
     export_checks(configs.with_fieldName, inits.with_number, "JsonLogic", {
       "query": "state.input.num == 2",
-      "queryHuman": "Number == 2",
+      "queryHuman": "Number = 2",
       "sql": "state.input.num = 2",
       "mongo": {
         "state.input.num": 2
@@ -33,7 +33,7 @@ describe("rare features", () => {
   it("import uses fieldName", () => {
     export_checks(configs.with_fieldName, inits.with_fieldName, "JsonLogic", {
       "query": "state.input.num == 2",
-      "queryHuman": "Number == 2",
+      "queryHuman": "Number = 2",
       "sql": "state.input.num = 2",
       "mongo": {
         "state.input.num": 2

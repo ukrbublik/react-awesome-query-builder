@@ -1,7 +1,7 @@
 import React from "react";
 
 export default (props) => {
-  const {value, setValue, config, readonly, placeholder, maxLength} = props;
+  const {value, setValue, config, readonly, placeholder, maxLength, customProps, } = props;
   const onChange = e => {
     let val = e.target.value;
     if (val === "")
@@ -17,6 +17,7 @@ export default (props) => {
       disabled={readonly} 
       onChange={onChange}
       maxLength={maxLength}
+      {...customProps}
     />
   );
 };

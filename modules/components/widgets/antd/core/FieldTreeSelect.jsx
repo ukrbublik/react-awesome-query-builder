@@ -3,7 +3,6 @@ import { Tooltip, TreeSelect } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../../../utils/domUtils";
 import {useOnPropsChanged} from "../../../../utils/reactUtils";
 import PropTypes from "prop-types";
-import keys from "lodash/keys";
 
 
 export default class FieldTreeSelect extends PureComponent {
@@ -46,8 +45,7 @@ export default class FieldTreeSelect extends PureComponent {
   }
 
   getTreeData(fields, fn = null) {
-    return keys(fields).map(fieldKey => {
-      const field = fields[fieldKey];
+    return fields.map(field => {
       const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
       if (fn)
         fn(field);

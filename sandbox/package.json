@@ -17,22 +17,34 @@
     "build-vite": "tsc && vite build --mode dev --debug",
     "serve": "vite preview"
   },
+  "eslintConfig": {
+    "ignorePatterns": [
+      "**/build/*",
+      "**/dist/*",
+      "**/node_modules/*",
+      "vite.config.ts"
+    ],
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
     "react-awesome-query-builder": "file:..",
-    "react": "file:../node_modules/react",
-    "react-dom": "file:../node_modules/react-dom",
-    "antd": "^4.16.13",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
-    "@material-ui/core": "^4.11.2",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "4.0.0-alpha.57",
-    "@material-ui/pickers": "^3.3.10",
     "@mui/icons-material": "^5.0.1",
     "@mui/lab": "^5.0.0-alpha.49",
     "@mui/material": "^5.0.2",
-    "material-ui-confirm": "^3.0.0"
+    "material-ui-confirm": "^3.0.0",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@material-ui/pickers": "^3.3.10",
+    "antd": "^4.16.13",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "browserslist": {
     "production": [
@@ -53,6 +65,6 @@
     "@types/lodash": "^4.14.170",
     "@types/react": "^16.14.0",
     "@types/react-dom": "^17.0.8",
-    "typescript": "^4.3.2"
+    "typescript": "^4.4.4"
   }
 }

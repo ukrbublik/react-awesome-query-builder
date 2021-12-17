@@ -1,4 +1,5 @@
 import * as constants from "../constants";
+import {toImmutableList} from "../utils/stuff";
 
 /**
  * @param {object} config
@@ -7,7 +8,7 @@ import * as constants from "../constants";
  */
 export const setField = (config, path, field) => ({
   type: constants.SET_FIELD,
-  path: path,
+  path: toImmutableList(path),
   field: field,
   config: config
 });
@@ -19,7 +20,7 @@ export const setField = (config, path, field) => ({
  */
 export const setOperator = (config, path, operator) => ({
   type: constants.SET_OPERATOR,
-  path: path,
+  path: toImmutableList(path),
   operator: operator,
   config: config
 });
@@ -35,7 +36,7 @@ export const setOperator = (config, path, operator) => ({
  */
 export const setValue = (config, path, delta, value, valueType, asyncListValues, __isInternal) => ({
   type: constants.SET_VALUE,
-  path: path,
+  path: toImmutableList(path),
   delta: delta,
   value: value,
   valueType: valueType,
@@ -52,7 +53,7 @@ export const setValue = (config, path, delta, value, valueType, asyncListValues,
  */
 export const setValueSrc = (config, path, delta, srcKey) => ({
   type: constants.SET_VALUE_SRC,
-  path: path,
+  path: toImmutableList(path),
   delta: delta,
   srcKey: srcKey,
   config: config
@@ -66,7 +67,7 @@ export const setValueSrc = (config, path, delta, srcKey) => ({
  */
 export const setOperatorOption = (config, path, name, value) => ({
   type: constants.SET_OPERATOR_OPTION,
-  path: path,
+  path: toImmutableList(path),
   name: name,
   value: value,
   config: config

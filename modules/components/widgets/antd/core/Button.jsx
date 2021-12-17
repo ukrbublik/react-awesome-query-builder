@@ -2,14 +2,13 @@ import React from "react";
 import { Button } from "antd";
 import { PlusOutlined, PlusCircleOutlined, DeleteFilled } from "@ant-design/icons";
 
-export default ({type, onClick, label, config: {settings}}) => {
+export default ({type, onClick, label, readonly, config: {settings}}) => {
   const typeToIcon = {
     "addRule": <PlusOutlined />,
     "addGroup": <PlusCircleOutlined />,
     "delRule": <DeleteFilled />, //?
     "delGroup": <DeleteFilled />,
     "delRuleGroup": <DeleteFilled />,
-
     "addRuleGroup": <PlusOutlined />,
   };
 
@@ -19,7 +18,6 @@ export default ({type, onClick, label, config: {settings}}) => {
     "delRule": "action action--DELETE", //?
     "delGroup": "action action--DELETE",
     "delRuleGroup": "action action--DELETE",
-
     "addRuleGroup": <PlusOutlined />,
   };
 
@@ -41,6 +39,7 @@ export default ({type, onClick, label, config: {settings}}) => {
       className={typeToClass[type]}
       onClick={onClick}
       size={renderSize}
+      disabled={readonly}
     >{btnLabel}</Button>
   );
 };

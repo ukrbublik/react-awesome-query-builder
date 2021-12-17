@@ -150,14 +150,14 @@ export const getTitleInListValues = (listValues, value) => {
   if (listValues == undefined)
     return value;
   const it = getItemInListValues(listValues, value);
-  return it !== undefined ? it.title : undefined;
+  return it !== undefined ? it.title : value;
 };
 
 export const getValueInListValues = (listValues, value) => {
   if (listValues == undefined)
     return value;
   const it = getItemInListValues(listValues, value);
-  return it !== undefined ? it.value : undefined;
+  return it !== undefined ? it.value : value;
 };
 
 export const mapListValues = (listValues, mapFn) => {
@@ -290,4 +290,56 @@ export function sleep(delay) {
   return new Promise((resolve) => {
     setTimeout(resolve, delay);
   });
+}
+
+export const isImmutable = (v) => {
+  return typeof v === "object" && v !== null && typeof v.toJS === "function";
+};
+
+export function applyToJS(v) {
+  return (isImmutable(v) ? v.toJS() : v);
+}
+
+export function toImmutableList(v) {
+  return (isImmutable(v) ? v : new Immutable.List(v));
+}
+
+// [1, 4, 9] + [1, 5, 9] => [1, 4, 5, 9]
+// Used for merging arrays of operators for different widgets of 1 type
+export function mergeArraysSmart(arr1, arr2) {
+  if (!arr1) arr1 = [];
+  if (!arr2) arr2 = [];
+  return arr2
+    .map(op => [op, arr1.indexOf(op)])
+    .map(([op, ind], i, orig) => {
+      if (ind == -1) {
+        const next = orig.slice(i+1);
+        const prev = orig.slice(0, i);
+        const after = prev.reverse().find(([_cop, ci]) => ci != -1);
+        const before = next.find(([_cop, ci]) => ci != -1);
+        if (before)
+          return [op, "before", before[0]];
+        else if (after)
+          return [op, "after", after[0]];
+        else
+          return [op, "append", null];
+      } else {
+      // already exists
+        return null;
+      }
+    })
+    .filter(x => x !== null)
+    .reduce((acc, [newOp, rel, relOp]) => {
+      const ind = acc.indexOf(relOp);
+      if (acc.indexOf(newOp) == -1) {
+        if (ind > -1) {
+        // insert after or before
+          acc.splice( ind + (rel == "after" ? 1 : 0), 0, newOp );
+        } else {
+        // insert to end or start
+          acc.splice( (rel == "append" ? Infinity : 0), 0, newOp );
+        }
+      }
+      return acc;
+    }, arr1.slice());
 }

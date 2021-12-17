@@ -14,6 +14,8 @@ import clone from "clone";
 
 export default class FuncSelect extends PureComponent {
   static propTypes = {
+    id: PropTypes.string,
+    groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     field: PropTypes.string.isRequired,
     operator: PropTypes.string,
@@ -174,7 +176,7 @@ export default class FuncSelect extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setValue, readonly} = this.props;
+    const {config, customProps, setValue, readonly, id, groupId} = this.props;
     const {renderFunc} = config.settings;
     const renderProps = {
       config,
@@ -182,6 +184,8 @@ export default class FuncSelect extends PureComponent {
       readonly,
       setField: setValue,
       items: this.items,
+      id,
+      groupId,
       ...this.meta
     };
     return renderFunc(renderProps);

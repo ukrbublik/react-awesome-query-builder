@@ -1,4 +1,4 @@
-export default 
+const value = 
 {
   "and": [
     {
@@ -27,3 +27,4 @@ export default
     }
   ]
 };
+export default value;

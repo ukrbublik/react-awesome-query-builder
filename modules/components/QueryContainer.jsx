@@ -21,6 +21,7 @@ const ConnectedQuery = connect(
     return {
       tree: state.tree,
       __isInternalValueChange: state.__isInternalValueChange,
+      __lastAction: state.__lastAction,
     };
   },
   null,
