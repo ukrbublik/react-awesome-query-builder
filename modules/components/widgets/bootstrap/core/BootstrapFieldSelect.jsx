@@ -20,7 +20,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
     maxHeight: "400px",
   };
 
-  const renderOptions = (fields) =>
+  const renderOptions = (fields, isGroupItem) =>
     Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
       const { items, path, label, disabled } = field;
@@ -35,7 +35,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
             >
               {label}
             </DropdownItem>
-            {renderOptions(items)}
+            {renderOptions(items, true)}
             <DropdownItem key={`${label}-divider`} divider />
           </>
         );
@@ -46,6 +46,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
             key={path}
             onClick={(e) => setField(e.target.value)}
             value={path}
+            className={isGroupItem && "px-4"}
           >
             {label}
           </DropdownItem>
