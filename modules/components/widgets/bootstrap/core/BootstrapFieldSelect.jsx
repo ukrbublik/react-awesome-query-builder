@@ -20,13 +20,13 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
     maxHeight: "400px",
   };
 
-  const renderOptions = (fields, isGroupItem) =>
+  const renderOptions = (fields, isGroupItem = false) =>
     Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
       const { items, path, label, disabled } = field;
       if (items) {
         return (
-          <>
+          <div key={`dropdown-itemGroup-${path}`}>
             <DropdownItem
               header
               key={`${path}-header`}
@@ -36,8 +36,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
               {label}
             </DropdownItem>
             {renderOptions(items, true)}
-            <DropdownItem key={`${label}-divider`} divider />
-          </>
+          </div>
         );
       } else {
         return (
@@ -46,7 +45,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
             key={path}
             onClick={(e) => setField(e.target.value)}
             value={path}
-            className={isGroupItem && "px-4"}
+            className={isGroupItem ? "px-4" : undefined}
           >
             {label}
           </DropdownItem>
@@ -92,7 +91,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
         {hasValue ? renderValue(selectedKey) : ""}
       </DropdownToggle>
       <DropdownMenu container="body" style={stylesDropdownMenuWrapper}>
-        {!hasValue && <DropdownItem disabled value={""}></DropdownItem>}
+        {!hasValue && <DropdownItem key={"body"} disabled value={""}></DropdownItem>}
         {renderOptions(items)}
       </DropdownMenu>
     </Dropdown>
