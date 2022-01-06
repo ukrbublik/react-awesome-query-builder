@@ -197,7 +197,7 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     formattedValue,
     valueSrc,
     valueType,
-    omit(operatorDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    omit(operatorDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
     isForDisplay,
     fieldDef,
@@ -238,7 +238,7 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
         isForDisplay
       ];
       if (operator) {

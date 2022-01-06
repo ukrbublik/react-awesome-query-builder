@@ -46,4 +46,9 @@ const mongoEmptyValue = (fieldDef) => {
   return v;
 };
 
-export {SqlString, sqlEmptyValue, mongoEmptyValue};
+const spelEscape = (v) => {
+  //todo: wrap in '', escape '
+  return v;
+};
+
+export {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape};

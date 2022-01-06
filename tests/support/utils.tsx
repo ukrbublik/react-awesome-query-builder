@@ -12,7 +12,7 @@ import {
 const {
   uuid, 
   checkTree, loadTree, loadFromJsonLogic, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
+  queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import MaterialConfig from "react-awesome-query-builder/config/material";
@@ -25,6 +25,7 @@ interface ExtectedExports {
   query?: string;
   queryHuman?: string;
   sql?: string;
+  spel?: string;
   mongo?: Object;
   elasticSearch?: Object;
   logic?: JsonLogicTree;
@@ -162,6 +163,13 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
         expect(res).to.equal(expects["sql"]);
       });
     }
+  
+    if (expects["spel"] !== undefined) {
+      doIt("should work to SpEL", () => {
+        const res = spelFormat(tree, config);
+        expect(res).to.equal(expects["spel"]);
+      });
+    }
     
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
@@ -211,6 +219,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
       query: queryString(tree, config),
       queryHuman: queryString(tree, config, true),
       sql: sqlFormat(tree, config),
+      spel: spelFormat(tree, config),
       mongo: mongodbFormat(tree, config),
       logic: logic,
     };

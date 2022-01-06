@@ -28,8 +28,9 @@ Optionally you can override some options in basic config or add your own types/w
 
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
 They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
-Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc` for building MongoDb query with `QbUtils.mongodbFormat()`. +
-And `sqlFormatConj`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `sqlFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
+Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
+And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
+And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
 TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`demo config`]
@@ -447,6 +448,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `children` - list of already formatted queries (strings) to be joined with conjuction
 |mongoConj |+ for MongoDB format |https://docs.mongodb.com/manual/reference/operator/query-logical/[Name] of logical operator for MongoDb
 |sqlFormatConj |+ for SQL format |See `formatConj`
+|spelFormatConj |+ for SpEL format |See `formatConj`
 |reversedConj | |Opposite logical operator. +
   Can be used to optimize `!(A OR B)` to `!A && !B` (done for MongoDB format)
 |===
@@ -485,15 +487,19 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
   `value` - string (already formatted value) for `cardinality==1` -or- `Immutable.List` of strings for `cardinality>1`
 |labelForFormat | | |If `formatOp` is missing, `labelForFormat` will be used to join operands when building query string
 |mongoFormatOp |+ for MongoDB format | |Function for formatting MongoDb expression, used to join operands into rule. +
-  `(string field, string op, mixed value, bool useExpr, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` +
+  `(string field, string op, mixed value, bool useExpr, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `useExpr` - true if resulted expression will be wrapped in https://docs.mongodb.com/manual/reference/operator/query/expr/index.html[`{'$expr': {...}}`] (used only if you compare field with another field or function) (you need to use aggregation operators in this case, like https://docs.mongodb.com/manual/reference/operator/aggregation/eq/[$eq (aggregation)] instead of https://docs.mongodb.com/manual/reference/operator/query/eq/[$eq])
 |sqlOp |+ for SQL format | |Operator name in SQL
-|sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query if just `sqlOp` is not enough. +
-  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions) => object` +
+|sqlFormatOp |- for SQL format | |Function for advanced formatting SQL WHERE query when just `sqlOp` is not enough. +
+  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
+  `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
+|spelOp |+ for SpEL format | |Operator name in SpEL
+|spelFormatOp |- for SpEL format | |Function for advanced formatting query in SpEL when just `spelOp` is not enough. +
+  `(string field, string op, mixed value, string valueSrc, string valueType, Object opDef, Object operatorOptions, Object fieldDef) => string` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2`
 |jsonLogic |+ for http://jsonlogic.com[JsonLogic] | |String (eg. `'<'`) -or- function for advanced formatting  +
-  `(object field, string op, mixed value, Object opDef, Object operatorOptions) => object` +
+  `(object field, string op, mixed value, Object opDef, Object operatorOptions, Object fieldDef) => object` +
   `value` - mixed for `cardinality==1` -or- `Array` for `cardinality>2` +
   `field` - already formatted `{"var": <some field>}`
 |elasticSearchQueryType |+ for ElasticSearch format | |String (eg. `term`) -or- function `(string valueType) => string` +
@@ -583,6 +589,8 @@ const {
 |mongoFormatValue |- for MongoDB format |v => v |Function for formatting widget's value in MongoDb query. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
 |sqlFormatValue |- for SQL format |`v => SqlString.escape(v)` |Function for formatting widget's value in SQL WHERE query. +
+  `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
+|spelFormatValue |- for SpEL format | |Function for formatting widget's value in SpEL query. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => string`
 |jsonLogic |- for http://jsonlogic.com[JsonLogic] |v => v |Function for formatting widget's value for JsonLogic. +
   `(mixed val, Object fieldDef, Object wgtDef, string op, Object opDef) => any`
@@ -693,6 +701,9 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
   where `args` is object `{<arg name> : <arg value>}`
 |sqlFunc |- for SQL format |same as func key |Func name in SQL
 |sqlFormatFunc |- for SQL format | |Can be used instead of `sqlFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
+  Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
+|spelFunc |- for SpEL format |same as func key |Func name in SpEL
+|spelFormatFunc |- for SpEL format | |Can be used instead of `spelFunc`. Function with 1 param - args object `{<arg name> : <arg value>}`, should return formatted function expression string. +
   Example: SUM function can be formatted with `({a, b}) => a + " + " + b`
 |mongoFunc |- for MongoDB format |same as func key |Func name in Mongo
 |mongoArgsAsObject | |false |Some functions like https://docs.mongodb.com/manual/reference/operator/aggregation/rtrim/[$rtrim] supports named args, other ones like https://docs.mongodb.com/manual/reference/operator/aggregation/slice/[$slice] takes args as array

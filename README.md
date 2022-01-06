@@ -412,6 +412,8 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Convert query value to MongoDb query object.
   #### sqlFormat (immutableValue, config) -> String
   Convert query value to SQL where string.
+  #### spelFormat (immutableValue, config) -> String
+  Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
   #### elasticSearchFormat (immutableValue, config) -> Object
   Convert query value to ElasticSearch query object.
   #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}

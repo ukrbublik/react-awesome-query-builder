@@ -1,7 +1,7 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as Operators from "../components/operators";
-import {SqlString, sqlEmptyValue, mongoEmptyValue} from "../utils/export";
+import {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape} from "../utils/export";
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
@@ -32,6 +32,10 @@ const conjunctions = {
   AND: {
     label: "And",
     mongoConj: "$and",
+    jsonLogicConj: "and",
+    sqlConj: "AND",
+    spelConj: "and",
+    spelConjs: ["and", "&&"],
     reversedConj: "OR",
     formatConj: (children, conj, not, isForDisplay) => {
       return children.size > 1
@@ -43,10 +47,19 @@ const conjunctions = {
         ? (not ? "NOT " : "") + "(" + children.join(" " + "AND" + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
+    spelFormatConj: (children, conj, not) => {
+      return children.size > 1
+        ? (not ? "!" : "") + "(" + children.join(" " + "and" + " ") + ")"
+        : (not ? "!(" : "") + children.first() + (not ? ")" : "");
+    },
   },
   OR: {
     label: "Or",
     mongoConj: "$or",
+    jsonLogicConj: "or",
+    sqlConj: "OR",
+    spelConj: "or",
+    spelConjs: ["or", "||"],
     reversedConj: "AND",
     formatConj: (children, conj, not, isForDisplay) => {
       return children.size > 1
@@ -57,6 +70,11 @@ const conjunctions = {
       return children.size > 1
         ? (not ? "NOT " : "") + "(" + children.join(" " + "OR" + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
+    },
+    spelFormatConj: (children, conj, not) => {
+      return children.size > 1
+        ? (not ? "!" : "") + "(" + children.join(" " + "or" + " ") + ")"
+        : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
 };
@@ -111,6 +129,8 @@ const operators = {
     label: "==",
     labelForFormat: "==",
     sqlOp: "=",
+    spelOp: "==",
+    spelOps: ["==", "eq"],
     reversedOp: "not_equal",
     formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
       const opStr = isForDisplay ? "=" : opDef.label;
@@ -128,6 +148,8 @@ const operators = {
     label: "!=",
     labelForFormat: "!=",
     sqlOp: "<>",
+    spelOp: "!=",
+    spelOps: ["!=", "ne"],
     reversedOp: "equal",
     formatOp: (field, op, value, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay, fieldDef) => {
       if (valueTypes == "boolean" && isForDisplay)
@@ -142,6 +164,8 @@ const operators = {
     label: "<",
     labelForFormat: "<",
     sqlOp: "<",
+    spelOp: "<",
+    spelOps: ["<", "lt"],
     reversedOp: "greater_or_equal",
     mongoFormatOp: mongoFormatOp1.bind(null, "$lt", v => v, false),
     jsonLogic: "<",
@@ -151,6 +175,8 @@ const operators = {
     label: "<=",
     labelForFormat: "<=",
     sqlOp: "<=",
+    spelOp: "<=",
+    spelOps: ["<=", "le"],
     reversedOp: "greater",
     mongoFormatOp: mongoFormatOp1.bind(null, "$lte", v => v, false),
     jsonLogic: "<=",
@@ -160,6 +186,8 @@ const operators = {
     label: ">",
     labelForFormat: ">",
     sqlOp: ">",
+    spelOp: ">",
+    spelOps: [">", "gt"],
     reversedOp: "less_or_equal",
     mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => v, false),
     jsonLogic: ">",
@@ -169,6 +197,8 @@ const operators = {
     label: ">=",
     labelForFormat: ">=",
     sqlOp: ">=",
+    spelOp: ">=",
+    spelOps: [">=", "ge"],
     reversedOp: "less",
     mongoFormatOp: mongoFormatOp1.bind(null, "$gte", v => v, false),
     jsonLogic: ">=",
@@ -179,11 +209,8 @@ const operators = {
     labelForFormat: "Like",
     reversedOp: "not_like",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        return `${field} LIKE ${values}`;
-      } else return undefined; // not supported
-    },
+    spelOp: ".contains",
+    spelOps: ["matches", ".contains"],
     mongoFormatOp: mongoFormatOp1.bind(null, "$regex", v => (typeof v == "string" ? escapeRegExp(v) : undefined), false),
     //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
     jsonLogic: "in",
@@ -197,11 +224,6 @@ const operators = {
     reversedOp: "like",
     labelForFormat: "Not Like",
     sqlOp: "NOT LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        return `${field} NOT LIKE ${values}`;
-      } else return undefined; // not supported
-    },
     mongoFormatOp: mongoFormatOp1.bind(null, "$regex", v => (typeof v == "string" ? escapeRegExp(v) : undefined), true),
     valueSources: ["value"],
   },
@@ -209,11 +231,8 @@ const operators = {
     label: "Starts with",
     labelForFormat: "Starts with",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        return `${field} LIKE ${values}`;
-      } else return undefined; // not supported
-    },
+    spelOp: ".startsWith",
+    spelOps: ["matches", ".startsWith"],
     mongoFormatOp: mongoFormatOp1.bind(null, "$regex", v => (typeof v == "string" ? "^" + escapeRegExp(v) : undefined), false),
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
@@ -222,11 +241,8 @@ const operators = {
     label: "Ends with",
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
-    sqlFormatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        return `${field} LIKE ${values}`;
-      } else return undefined; // not supported
-    },
+    spelOp: ".endsWidth",
+    spelOps: ["matches", ".endsWidth"],
     mongoFormatOp: mongoFormatOp1.bind(null, "$regex", v => (typeof v == "string" ? escapeRegExp(v) + "$" : undefined), false),
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
@@ -243,6 +259,11 @@ const operators = {
         return `${field} BETWEEN ${valFrom} AND ${valTo}`;
       else
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
+    },
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      const valFrom = values.first();
+      const valTo = values.get(1);
+      return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
     mongoFormatOp: mongoFormatOp2.bind(null, ["$gte", "$lte"], false),
     valueLabels: [
@@ -271,6 +292,19 @@ const operators = {
     labelForFormat: "NOT BETWEEN",
     sqlOp: "NOT BETWEEN",
     cardinality: 2,
+    formatOp: (field, op, values, valueSrcs, valueTypes, opDef, operatorOptions, isForDisplay) => {
+      let valFrom = values.first();
+      let valTo = values.get(1);
+      if (isForDisplay)
+        return `${field} NOT BETWEEN ${valFrom} AND ${valTo}`;
+      else
+        return `(${field} < ${valFrom} || ${field} > ${valTo})`;
+    },
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      const valFrom = values.first();
+      const valTo = values.get(1);
+      return `(${field} < ${valFrom} or ${field} > ${valTo})`;
+    },
     mongoFormatOp: mongoFormatOp2.bind(null, ["$gte", "$lte"], true),
     valueLabels: [
       "Value from",
@@ -536,6 +570,21 @@ const widgets = {
     factory: (props) => <VanillaTextWidget {...props} />,
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
+    },
+    spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      if (opDef.spelOp == "matches" && op != 'regex') {
+        let regex;
+        if (op == 'starts_with') {
+          regex = `(?s)^${escapeRegExp(val)}.*`;
+        } else if (op == 'ends_with') {
+          regex = `(?s).*${escapeRegExp(val)}$`;
+        } else { // op == 'like'
+          regex = `(?s).*${escapeRegExp(val)}.*`; //tip: can use (?sui) for case-insensitive
+        }
+        return spelEscape(regex);
+      } else {
+        return spelEscape(val);
+      }
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
@@ -1087,6 +1136,11 @@ const settings = {
   sqlFormatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition) => {
     if (q == undefined) return undefined;
     return "NOT(" + q + ")";
+  },
+  spelFormatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition) => {
+    if (q == undefined) return undefined;
+    //return "not(" + q + ")"; // also possible
+    return "!(" + q + ")";
   },
   formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
     if (q == undefined) return undefined;

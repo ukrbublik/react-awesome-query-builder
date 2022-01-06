@@ -87,7 +87,8 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
-  const conj = conjunction.toLowerCase();
+  const conjunctionDefinition = config.conjunctions[conjunction];
+  const conj = conjunctionDefinition.jsonLogicConj || conjunction.toLowerCase();
   const not = properties.get("not");
   if (conj != "and" && conj != "or") {
     meta.errors.push(`Conjunction ${conj} is not supported`);
@@ -260,7 +261,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         asyncListValues
       },
       //useful options: valueFormat for date/time
-      omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
+      omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
     ];
     if (operator) {
       args.push(operator);
@@ -392,7 +393,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     formattedField,
     operator,
     formattedValue,
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
     fieldDefinition,
   ];

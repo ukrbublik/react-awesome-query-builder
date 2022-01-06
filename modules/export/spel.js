@@ -11,10 +11,9 @@ import {defaultConjunction} from "../utils/defaultUtils";
 import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
-import {SqlString} from "../utils/export";
+import {spelEscape} from "../utils/export";
 
-
-export const sqlFormat = (tree, config) => {
+export const spelFormat = (tree, config) => {
   //meta is mutable
   let meta = {
     errors: []
@@ -23,7 +22,7 @@ export const sqlFormat = (tree, config) => {
   const res = formatItem(tree, config, meta);
 
   if (meta.errors.length)
-    console.warn("Errors while exporting to SQL:", meta.errors);
+    console.warn("Errors while exporting to SpEL:", meta.errors);
   return res;
 };
 
@@ -66,7 +65,7 @@ const formatGroup = (item, config, meta) => {
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  return conjunctionDefinition.sqlFormatConj(list, conjunction, not);
+  return conjunctionDefinition.spelFormatConj(list, conjunction, not);
 };
 
 
@@ -112,29 +111,28 @@ const formatRule = (item, config, meta) => {
 
   //find fn to format expr
   let isRev = false;
-  let fn = operatorDefinition.sqlFormatOp;
+  let fn = operatorDefinition.spelFormatOp;
   if (!fn && reversedOp) {
-    fn = revOperatorDefinition.sqlFormatOp;
+    fn = revOperatorDefinition.spelFormatOp;
     if (fn) {
       isRev = true;
     }
   }
-  if (!fn) {
-    const sqlOp = operatorDefinition.sqlOp || operator;
+  const spelOp = operatorDefinition.spelOp;
+  if (!fn && spelOp) {
     if (cardinality == 0) {
       fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        return `${field} ${sqlOp}`;
+        if (spelOp[0] == ".")
+          return `${field}${spelOp}()`;
+        else
+          return `${field} ${spelOp}`;
       };
     } else if (cardinality == 1) {
       fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        return `${field} ${sqlOp} ${value}`;
-      };
-    } else if (cardinality == 2) {
-      // between
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        const valFrom = values.first();
-        const valTo = values.get(1);
-        return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
+        if (spelOp[0] == ".")
+          return `${field}${spelOp}(${value})`;
+        else
+          return `${field} ${spelOp} ${value}`;
       };
     }
   }
@@ -161,7 +159,7 @@ const formatRule = (item, config, meta) => {
   let ret;
   ret = fn(...args);
   if (isRev) {
-    ret = config.settings.sqlFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+    ret = config.settings.spelFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
   }
   if (ret === undefined) {
     meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(", ")}`);
@@ -180,8 +178,8 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue);
   } else {
-    if (typeof fieldWidgetDef.sqlFormatValue === "function") {
-      const fn = fieldWidgetDef.sqlFormatValue;
+    if (typeof fieldWidgetDef.spelFormatValue === "function") {
+      const fn = fieldWidgetDef.spelFormatValue;
       const args = [
         currentValue,
         pick(fieldDef, ["fieldSettings", "listValues"]),
@@ -198,7 +196,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
       }
       ret = fn(...args);
     } else {
-      ret = SqlString.escape(currentValue);
+      ret = spelEscape(currentValue);
     }
   }
   return ret;
@@ -222,7 +220,7 @@ const formatFunc = (meta, config, currentValue) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.sqlFunc || funcKey;
+  const funcName = funcConfig.spelFunc || funcKey;
 
   let formattedArgs = {};
   for (const argKey in funcConfig.args) {
@@ -242,8 +240,8 @@ const formatFunc = (meta, config, currentValue) => {
   }
 
   let ret;
-  if (typeof funcConfig.sqlFormatFunc === "function") {
-    const fn = funcConfig.sqlFormatFunc;
+  if (typeof funcConfig.spelFormatFunc === "function") {
+    const fn = funcConfig.spelFormatFunc;
     const args = [
       formattedArgs
     ];

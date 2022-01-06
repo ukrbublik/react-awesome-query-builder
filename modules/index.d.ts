@@ -125,6 +125,7 @@ export interface Utils {
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
+  spelFormat(tree: ImmutableTree, config: Config): string | undefined;
   mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
   elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
   // load, save
@@ -244,7 +245,7 @@ type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, is
 type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type MongoFormatValue =     (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
-type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
+type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
 type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 interface BaseWidgetProps {
@@ -326,12 +327,18 @@ export type Widgets = TypedMap<Widget>;
 
 type FormatConj = (children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
 type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
+type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
 
 export interface Conjunction {
   label: string,
   formatConj: FormatConj,
   sqlFormatConj: SqlFormatConj,
+  spelFormatConj: SpelFormatConj,
   mongoConj: string,
+  jsonLogicConj?: string,
+  sqlConj?: string,
+  spelConj?: string,
+  spelConjs?: [string],
   reversedConj?: string,
 }
 export type Conjunctions = TypedMap<Conjunction>;
@@ -418,9 +425,10 @@ export interface RuleErrorProps {
 // Operators
 /////////////////
 
-type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean) => string;
+type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
 type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
 type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type SpelFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
@@ -454,6 +462,9 @@ interface BaseOperator {
   mongoFormatOp?: MongoFormatOperator,
   sqlOp?: string,
   sqlFormatOp?: SqlFormatOperator,
+  spelOp?: string,
+  spelOps?: [string],
+  spelFormatOp?: SpelFormatOperator,
   jsonLogic?: string | JsonLogicFormatOperator,
   _jsonLogicIsRevArgs?: boolean,
   elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType,
@@ -665,6 +676,7 @@ type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
 type SqlFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
+type SpelFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
 type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
 type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | Array<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
@@ -768,6 +780,7 @@ export interface OtherSettings {
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse,
   sqlFormatReverse?: SqlFormatReverse,
+  spelFormatReverse?: SpelFormatReverse,
   formatField?: FormatField,
   formarAggr?: FormatAggr,
 }

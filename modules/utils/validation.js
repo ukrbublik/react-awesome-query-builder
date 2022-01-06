@@ -214,6 +214,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
     if (!validError) {
       const fieldConfig = getFieldConfig(config, field);
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
       const rightFieldDefinition = (valueSrc == "field" ? getFieldConfig(config, value) : null);
       const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
@@ -223,6 +224,8 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
         const args = [
           fixedValue, 
           fieldSettings,
+          operator,
+          operatorDefinition
         ];
         if (valueSrc == "field")
           args.push(rightFieldDefinition);

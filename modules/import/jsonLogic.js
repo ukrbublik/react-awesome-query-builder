@@ -53,7 +53,8 @@ const buildConv = (config) => {
 
   let conjunctions = {};
   for (let conjKey in config.conjunctions) {
-    const ck = conjKey.toLowerCase();
+    const conjunctionDefinition = config.conjunctions[conjKey];
+    const ck = conjunctionDefinition.jsonLogicConj || conjKey.toLowerCase();
     conjunctions[ck] = conjKey;
   }
 

@@ -225,7 +225,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     useExpr,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
     fieldDef,
   ];
@@ -261,7 +261,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
       ];
       if (operator) {
         args.push(operator);
