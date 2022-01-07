@@ -8,10 +8,10 @@ import {
 import { mapListValues } from "../../../../utils/stuff";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedValues, setSelectedValues] = useState(value ?? []);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedValues, setSelectedValues] = useState(value ?? []);
 
-    const renderOptions = () =>
+  const renderOptions = () =>
     mapListValues(listValues, ({ title, value }) => {
       return (
         <DropdownItem
@@ -25,15 +25,15 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
       );
     });
 
-    const stylesDropdownWrapper = {
-      lineHeight: "105%",
-      minHeight: "1.7rem",
-      paddingBottom: "0.45rem"
-    };
+  const stylesDropdownWrapper = {
+    lineHeight: "105%",
+    minHeight: "1.7rem",
+    paddingBottom: "0.45rem"
+  };
   
-    const stylesDropdownMenuWrapper = {
-      minWidth: "100%"
-    };
+  const stylesDropdownMenuWrapper = {
+    minWidth: "100%"
+  };
 
   const getMultiSelectValues = (value, options) => {
 
