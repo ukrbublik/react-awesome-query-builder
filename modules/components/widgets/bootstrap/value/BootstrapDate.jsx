@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 
 export default (props) => {
   const {value, setValue, config, valueFormat, readonly} = props;
@@ -11,6 +12,6 @@ export default (props) => {
   };
   
   return (
-    <input type="date"  value={value || ""}  disabled={readonly} onChange={onChange} />
+    <Input type="date" bsSize={"sm"} value={value || ""} disabled={readonly} onChange={onChange} />
   );
 };
