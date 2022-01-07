@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 
 export default (props) => {
   const {value, setValue, config, readonly, min, max, step, placeholder} = props;
@@ -12,6 +13,6 @@ export default (props) => {
   };
   const numberValue = value == undefined ? "" : value;
   return (
-    <input type="number"  value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <Input type="number" bsSize={"sm"} value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
   );
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "reactstrap";
 import moment from "moment";
 
 export default (props) => {
@@ -20,6 +21,6 @@ export default (props) => {
     dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
   
   return (
-    <input type="datetime-local"  value={dtValue}  disabled={readonly} onChange={onChange} />
+    <Input type="datetime-local" bsSize={"sm"} value={dtValue} disabled={readonly} onChange={onChange} />
   );
 };
