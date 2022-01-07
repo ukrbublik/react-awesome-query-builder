@@ -20,17 +20,16 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
     minWidth: "100%"
   };
 
-  const renderOptions = (valueSources) => (
+  const renderOptions = (valueSources) =>
     valueSources.map(([srcKey, info]) => (
       <DropdownItem
-          key={srcKey}
-          onClick={(e) => setValueSrc(e.target.value)}
-          value={srcKey}
-        >
-          {info.label}
-        </DropdownItem>
-    ))
-  );
+        key={srcKey}
+        onClick={(e) => setValueSrc(e.target.value)}
+        value={srcKey}
+      >
+        {info.label}
+      </DropdownItem>
+    ));
 
   return (
     <Dropdown

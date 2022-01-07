@@ -20,8 +20,9 @@ export default (props) => {
           color={value === true ? "success" : "secondary"}
           onClick={onRadioChange}
           size={"sm"}
-          children={<FontAwesomeIcon icon={faCheck} />}
-        />
+        >
+          <FontAwesomeIcon icon={faCheck} />
+        </Button>
         <Button
           id={id2}
           value={false}
@@ -30,8 +31,9 @@ export default (props) => {
           color={value === false ? "danger" : "secondary"}
           onClick={onRadioChange}
           size={"sm"}
-          children={<FontAwesomeIcon icon={faTimes} />}
-        />
+        >
+          <FontAwesomeIcon icon={faTimes} />
+        </Button>
       </ButtonGroup>
     </>
   );
