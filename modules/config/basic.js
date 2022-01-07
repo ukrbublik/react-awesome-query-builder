@@ -49,7 +49,7 @@ const conjunctions = {
     },
     spelFormatConj: (children, conj, not) => {
       return children.size > 1
-        ? (not ? "!" : "") + "(" + children.join(" " + "and" + " ") + ")"
+        ? (not ? "!" : "") + "(" + children.join(" " + "&&" + " ") + ")"
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
@@ -73,7 +73,7 @@ const conjunctions = {
     },
     spelFormatConj: (children, conj, not) => {
       return children.size > 1
-        ? (not ? "!" : "") + "(" + children.join(" " + "or" + " ") + ")"
+        ? (not ? "!" : "") + "(" + children.join(" " + "||" + " ") + ")"
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
@@ -303,7 +303,7 @@ const operators = {
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       const valFrom = values.first();
       const valTo = values.get(1);
-      return `(${field} < ${valFrom} or ${field} > ${valTo})`;
+      return `(${field} < ${valFrom} || ${field} > ${valTo})`;
     },
     mongoFormatOp: mongoFormatOp2.bind(null, ["$gte", "$lte"], true),
     valueLabels: [
@@ -334,6 +334,9 @@ const operators = {
       const empty = sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      return `${field} <= ''`;
+    },
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
     jsonLogic: "!",
   },
@@ -350,6 +353,9 @@ const operators = {
       const empty = sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) <> ${empty}`;
     },
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      return `${field} > ''`;
+    },
     mongoFormatOp: mongoFormatOp1.bind(null, "$nin", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
@@ -362,6 +368,9 @@ const operators = {
     reversedOp: "is_not_null",
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NULL` : `!${field}`;
+    },
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      return `${field} == null`;
     },
     // check if value is null OR not exists
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => null, false),
@@ -376,6 +385,9 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return isForDisplay ? `${field} IS NOT NULL` : `!!${field}`;
     },
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      return `${field} != null`;
+    },
     // check if value exists and is not null
     mongoFormatOp: mongoFormatOp1.bind(null, "$ne", v => null, false),
     jsonLogic: "!=",
@@ -389,6 +401,8 @@ const operators = {
       const opStr = isForDisplay ? "=" : "==";
       return `${field} ${opStr} ${value}`;
     },
+    spelOp: "==",
+    spelOps: ["==", "eq"],
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     reversedOp: "select_not_equals",
     jsonLogic: "==",
@@ -402,6 +416,8 @@ const operators = {
     formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
       return `${field} != ${value}`;
     },
+    spelOp: "!=",
+    spelOps: ["!=", "ne"],
     mongoFormatOp: mongoFormatOp1.bind(null, "$ne", v => v, false),
     reversedOp: "select_equals",
     jsonLogic: "!=",
@@ -1139,7 +1155,6 @@ const settings = {
   },
   spelFormatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition) => {
     if (q == undefined) return undefined;
-    //return "not(" + q + ")"; // also possible
     return "!(" + q + ")";
   },
   formatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition, isForDisplay) => {
