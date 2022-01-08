@@ -78,6 +78,7 @@ const formatRule = (item, config, meta) => {
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
   const iValue = properties.get("value");
+  const asyncListValues = properties.get("asyncListValues");
   if (field == null || operator == null)
     return undefined;
 
@@ -97,7 +98,7 @@ const formatRule = (item, config, meta) => {
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
     let fv = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, asyncListValues
     );
     if (fv !== undefined) {
       valueSrcs.push(valueSrc);
@@ -171,7 +172,7 @@ const formatRule = (item, config, meta) => {
 };
 
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef) => {
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, asyncListValues) => {
   if (currentValue === undefined)
     return undefined;
   let ret;
@@ -184,7 +185,10 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
       const fn = fieldWidgetDef.sqlFormatValue;
       const args = [
         currentValue,
-        pick(fieldDef, ["fieldSettings", "listValues"]),
+        {
+          ...pick(fieldDef, ["fieldSettings", "listValues"]),
+          asyncListValues
+        },
         //useful options: valueFormat for date/time
         omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
       ];
@@ -231,7 +235,10 @@ const formatFunc = (meta, config, currentValue) => {
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-    const formattedArgVal = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+    const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
+    const formattedArgVal = formatValue(
+      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues
+    );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
