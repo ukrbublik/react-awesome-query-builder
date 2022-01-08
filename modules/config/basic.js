@@ -1209,13 +1209,16 @@ const settings = {
   formatAggr: (whereStr, aggrField, operator, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay, aggrFieldDef) => {
     const {labelForFormat, cardinality} = opDef;
     if (cardinality == 0) {
-      return `${labelForFormat} OF ${aggrField} HAVE ${whereStr}`;
+      const cond = whereStr ? ` HAVE ${whereStr}` : "";
+      return `${labelForFormat} OF ${aggrField}${cond}`;
     } else if (cardinality == undefined || cardinality == 1) {
-      return `COUNT OF ${aggrField} WHERE ${whereStr} ${labelForFormat} ${value}`;
+      const cond = whereStr ? ` WHERE ${whereStr}` : "";
+      return `COUNT OF ${aggrField}${cond} ${labelForFormat} ${value}`;
     } else if (cardinality == 2) {
+      const cond = whereStr ? ` WHERE ${whereStr}` : "";
       let valFrom = value.first();
       let valTo = value.get(1);
-      return `COUNT OF ${aggrField} WHERE ${whereStr} ${labelForFormat} ${valFrom} AND ${valTo}`;
+      return `COUNT OF ${aggrField}${cond} ${labelForFormat} ${valFrom} AND ${valTo}`;
     }
   },
   canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {

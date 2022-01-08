@@ -32,7 +32,7 @@ const formatItem = (item, config, meta, isForDisplay = false, parentField = null
   const type = item.get("type");
   const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group") && children && children.size) {
+  if ((type === "group" || type === "rule_group") ) {
     return formatGroup(item, config, meta, isForDisplay, parentField);
   } else if (type === "rule") {
     return formatRule(item, config, meta, isForDisplay, parentField);
@@ -47,15 +47,17 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
   const children = item.get("children1");
+  if (!children) return undefined;
 
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
   const groupField = isRuleGroup && mode == "array" ? properties.get("field") : null;
+  const canHaveEmptyChildren = isRuleGroup && mode == "array";
   const not = properties.get("not");
   const list = children
     .map((currentChild) => formatItem(currentChild, config, meta, isForDisplay, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!list.size)
+  if (!canHaveEmptyChildren && !list.size)
     return undefined;
 
   let conjunction = properties.get("conjunction");
@@ -63,12 +65,12 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  const conjStr = conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
+  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay) : null;
   
   let ret;
   if (groupField) {
     const aggrArgs = formatRule(item, config, meta, isForDisplay, parentField, true);
-    if (conjStr && aggrArgs) {
+    if (aggrArgs) {
       const isRev = aggrArgs.pop();
       const args = [
         conjStr,

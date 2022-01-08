@@ -48,6 +48,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const properties = item.get("properties") || new Map();
   const children = item.get("children1");
   const {canShortMongoQuery} = config.settings;
+  if (!children) return undefined;
 
   const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
   const parentPath = parents
