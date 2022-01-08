@@ -33,9 +33,8 @@ const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   if (!item) return undefined;
 
   const type = item.get("type");
-  const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group") && children && children.size) {
+  if ((type === "group" || type === "rule_group")) {
     return formatGroup(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
   } else if (type === "rule") {
     return formatRule(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
@@ -61,6 +60,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
+  const canHaveEmptyChildren = groupField && mode == "array";
 
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children
@@ -68,7 +68,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       [...parents, item], currentChild, config, meta, not, true, mode == "array" ? (f => `$$el.${f}`) : undefined)
     )
     .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!list.size)
+  if (!canHaveEmptyChildren && !list.size)
     return undefined;
 
   let conjunction = properties.get("conjunction");
@@ -83,9 +83,9 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const mongoConj = conjunctionDefinition.mongoConj;
 
   let resultQuery;
-  if (list.size == 1)
+  if (list.size == 1) {
     resultQuery = list.first();
-  else {
+  } else if (list.size > 1) {
     const rules = list.toList().toJS();
     const canShort = canShortMongoQuery && (mongoConj == "$and");
     if (canShort) {
@@ -124,7 +124,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   if (groupField) {
     if (mode == "array") {
-      const filterQuery = {
+      const totalQuery = {
+        "$size": groupFieldName
+      };
+      const filterQuery = resultQuery ? {
         "$size": {
           "$filter": {
             input: "$" + groupFieldName,
@@ -132,10 +135,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
             cond: resultQuery
           }
         }
-      };
-      const totalQuery = {
-        "$size": groupFieldName
-      };
+      } : totalQuery;
       resultQuery = formatItem(
         parents, item.set("type", "rule"), config, meta, false, false, (_f => filterQuery), totalQuery
       );
