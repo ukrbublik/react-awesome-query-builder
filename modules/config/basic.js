@@ -335,6 +335,7 @@ const operators = {
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      //tip: is empty or null
       return `${field} <= ''`;
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
@@ -354,6 +355,7 @@ const operators = {
       return `COALESCE(${field}, ${empty}) <> ${empty}`;
     },
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      //tip: is not empty and not null
       return `${field} > ''`;
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$nin", (v, fieldDef) => [mongoEmptyValue(fieldDef), null], false),
@@ -645,6 +647,7 @@ const widgets = {
         return SqlString.escape(val);
       }
     },
+    spelFormatValue: (val) => spelEscape(val),
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
     fullWidth: true,
@@ -666,6 +669,7 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val) => spelEscape(val),
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -682,6 +686,7 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val) => spelEscape(val),
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -699,6 +704,7 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val) => spelEscape(val),
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -716,6 +722,7 @@ const widgets = {
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
       return vals.map(v => SqlString.escape(v));
     },
+    spelFormatValue: (vals) => vals.map(v => spelEscape(v)),
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -740,6 +747,10 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       const dateVal = moment(val, wgtDef.valueFormat);
       return SqlString.escape(dateVal.format("YYYY-MM-DD"));
+    },
+    spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      const dateVal = moment(val, wgtDef.valueFormat);
+      return `new java.text.SimpleDateFormat('yyyy-MM-dd').parse('${dateVal.format("YYYY-MM-DD")}')`;
     },
     jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
     toJS: (val, fieldSettings) => {
@@ -773,6 +784,11 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       const dateVal = moment(val, wgtDef.valueFormat);
       return SqlString.escape(dateVal.format("HH:mm:ss"));
+    },
+    spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      const dateVal = moment(val, wgtDef.valueFormat);
+      return `LocalTime.parse('${dateVal.format("HH:mm:ss")}')`;
+      //return `new java.text.SimpleDateFormat('HH:mm:ss').parse('${dateVal.format("HH:mm:ss")}')`;
     },
     jsonLogic: (val, fieldDef, wgtDef) => {
       // return seconds of day
@@ -827,6 +843,10 @@ const widgets = {
       const dateVal = moment(val, wgtDef.valueFormat);
       return SqlString.escape(dateVal.toDate());
     },
+    spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      const dateVal = moment(val, wgtDef.valueFormat);
+      return `new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').parse('${dateVal.format("YYYY-MM-DD HH:mm:ss")}')`;
+    },
     jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
     toJS: (val, fieldSettings) => {
       const dateVal = moment(val, fieldSettings.valueFormat);
@@ -850,6 +870,9 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
+      return (val ? "true" : "false");
+    },
     defaultValue: false,
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
@@ -861,6 +884,9 @@ const widgets = {
       return isForDisplay ? (rightFieldDef.label || val) : val;
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef, rightFieldDef) => {
+      return val;
+    },
+    spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return val;
     },
     valueLabel: "Field to compare",

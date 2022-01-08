@@ -243,6 +243,7 @@ export interface Actions {
 
 type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SpelFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type MongoFormatValue =     (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
 type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
@@ -286,8 +287,9 @@ export interface BaseWidget {
   valuePlaceholder?: string;
   valueLabel?: string;
   fullWidth?: boolean;
-  formatValue: FormatValue;
-  sqlFormatValue: SqlFormatValue;
+  formatValue?: FormatValue;
+  sqlFormatValue?: SqlFormatValue;
+  spelFormatValue?: SpelFormatValue;
   mongoFormatValue?: MongoFormatValue;
   elasticSearchFormatValue?: ElasticSearchFormatValue;
   hideOperator?: boolean;
@@ -305,7 +307,8 @@ export interface FieldWidget {
   valuePlaceholder?: string,
   valueLabel?: string,
   formatValue: FormatValue, // with rightFieldDef
-  sqlFormatValue: SqlFormatValue, // with rightFieldDef
+  sqlFormatValue?: SqlFormatValue, // with rightFieldDef
+  spelFormatValue?: SpelFormatValue, // with rightFieldDef
   //obsolete:
   validateValue?: ValidateValue,
 }
