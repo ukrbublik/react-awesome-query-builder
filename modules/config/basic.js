@@ -437,6 +437,14 @@ const operators = {
         return `${field} IN (${values.join(", ")})`;
       } else return undefined; // not supported
     },
+    spelOp: ".containsAll",
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      if (valueSrc == "value") {
+        return `${field}.containsAll({${values.join(", ")}})`;
+      } else {
+        return `${field}.containsAll(${values})`;
+      }
+    },
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
     reversedOp: "select_not_any_in",
     jsonLogic: "in",
@@ -478,6 +486,14 @@ const operators = {
         return `${field} = '${values.map(v => SqlString.trim(v)).join(",")}'`;
       else
         return undefined; //not supported
+    },
+    spelOp: ".equals",
+    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
+      if (valueSrc == "value") {
+        return `${field}.equals({${values.join(", ")}})`;
+      } else {
+        return `${field}.equals(${values})`;
+      }
     },
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     reversedOp: "multiselect_not_equals",
