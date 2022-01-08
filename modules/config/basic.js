@@ -787,7 +787,7 @@ const widgets = {
     },
     spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       const dateVal = moment(val, wgtDef.valueFormat);
-      return `LocalTime.parse('${dateVal.format("HH:mm:ss")}')`;
+      return `T(java.time.LocalTime).parse('${dateVal.format("HH:mm:ss")}')`;
       //return `new java.text.SimpleDateFormat('HH:mm:ss').parse('${dateVal.format("HH:mm:ss")}')`;
     },
     jsonLogic: (val, fieldDef, wgtDef) => {
