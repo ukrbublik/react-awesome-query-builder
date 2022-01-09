@@ -47,9 +47,10 @@ const conjunctions = {
         ? (not ? "NOT " : "") + "(" + children.join(" " + "AND" + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
-    spelFormatConj: (children, conj, not) => {
+    spelFormatConj: (children, conj, not, omitBrackets) => {
+      if (not) omitBrackets = false;
       return children.size > 1
-        ? (not ? "!" : "") + "(" + children.join(" " + "&&" + " ") + ")"
+        ? (not ? "!" : "") + (omitBrackets ? "" : "(") + children.join(" " + "&&" + " ") + (omitBrackets ? "" : ")")
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
@@ -71,9 +72,10 @@ const conjunctions = {
         ? (not ? "NOT " : "") + "(" + children.join(" " + "OR" + " ") + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
-    spelFormatConj: (children, conj, not) => {
+    spelFormatConj: (children, conj, not, omitBrackets) => {
+      if (not) omitBrackets = false;
       return children.size > 1
-        ? (not ? "!" : "") + "(" + children.join(" " + "||" + " ") + ")"
+        ? (not ? "!" : "") + (omitBrackets ? "" : "(") + children.join(" " + "||" + " ") + (omitBrackets ? "" : ")")
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
   },
@@ -261,8 +263,8 @@ const operators = {
         return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      const valFrom = values.first();
-      const valTo = values.get(1);
+      const valFrom = values[0];
+      const valTo = values[1];
       return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
     mongoFormatOp: mongoFormatOp2.bind(null, ["$gte", "$lte"], false),
@@ -301,8 +303,8 @@ const operators = {
         return `(${field} < ${valFrom} || ${field} > ${valTo})`;
     },
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      const valFrom = values.first();
-      const valTo = values.get(1);
+      const valFrom = values[0];
+      const valTo = values[1];
       return `(${field} < ${valFrom} || ${field} > ${valTo})`;
     },
     mongoFormatOp: mongoFormatOp2.bind(null, ["$gte", "$lte"], true),
@@ -571,6 +573,7 @@ const operators = {
     labelForFormat: "SOME",
     cardinality: 0,
     jsonLogic: "some",
+    spelFormatOp: (filteredSize) => `${filteredSize} > 0`,
     mongoFormatOp: mongoFormatOp1.bind(null, "$gt", v => 0, false),
   },
   all: {
@@ -578,6 +581,7 @@ const operators = {
     labelForFormat: "ALL",
     cardinality: 0,
     jsonLogic: "all",
+    spelFormatOp: (filteredSize, op, fullSize) => `${filteredSize} == ${fullSize}`,
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
   },
   none: {
@@ -585,6 +589,7 @@ const operators = {
     labelForFormat: "NONE",
     cardinality: 0,
     jsonLogic: "none",
+    spelFormatOp: (filteredSize) => `${filteredSize} == 0`,
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => 0, false),
   }
 };
@@ -1191,11 +1196,11 @@ const settings = {
     else
       return field;
   },
-  sqlFormatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition) => {
+  sqlFormatReverse: (q) => {
     if (q == undefined) return undefined;
     return "NOT(" + q + ")";
   },
-  spelFormatReverse: (q, operator, reversedOp, operatorDefinition, revOperatorDefinition) => {
+  spelFormatReverse: (q) => {
     if (q == undefined) return undefined;
     return "!(" + q + ")";
   },

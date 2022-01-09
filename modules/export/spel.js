@@ -19,7 +19,7 @@ export const spelFormat = (tree, config) => {
     errors: []
   };
 
-  const res = formatItem(tree, config, meta);
+  const res = formatItem(tree, config, meta, null);
 
   if (meta.errors.length)
     console.warn("Errors while exporting to SpEL:", meta.errors);
@@ -27,162 +27,262 @@ export const spelFormat = (tree, config) => {
 };
 
 
-const formatItem = (item, config, meta) => {
+const formatItem = (item, config, meta, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
-  const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group") && children && children.size) {
-    return formatGroup(item, config, meta);
+  if ((type === "group" || type === "rule_group")) {
+    return formatGroup(item, config, meta, parentField);
   } else if (type === "rule") {
-    return formatRule(item, config, meta);
+    return formatRule(item, config, meta, parentField);
   }
 
   return undefined;
 };
 
 
-const formatGroup = (item, config, meta) => {
+const formatGroup = (item, config, meta, parentField = null) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
+  const mode = properties.get("mode");
   const children = item.get("children1");
-
-  const groupField = type === "rule_group" ? properties.get("field") : null;
-  const groupFieldDef = getFieldConfig(config, groupField) || {};
-  if (groupFieldDef.mode == "array") {
-    meta.errors.push(`Aggregation is not supported for ${groupField}`);
-  }
-
-  const not = properties.get("not");
-  const list = children
-    .map((currentChild) => formatItem(currentChild, config, meta))
-    .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!list.size)
-    return undefined;
+  const field = properties.get("field");
+  if (!children) return undefined;
 
   let conjunction = properties.get("conjunction");
   if (!conjunction)
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
+  const not = properties.get("not");
 
-  return conjunctionDefinition.spelFormatConj(list, conjunction, not);
+  const isRuleGroup = type === "rule_group";
+  const isRuleGroupArray = isRuleGroup && mode != "struct";
+  const groupField = isRuleGroupArray ? field : parentField;
+  const groupFieldDef = getFieldConfig(config, groupField) || {};
+  const isSpelArray = groupFieldDef.isSpelArray;
+  
+  // check op for reverse
+  const groupOperator = properties.get("operator");
+  const realGroupOperator = checkOp(config, groupOperator, field);
+  const isGroupOpRev = realGroupOperator != groupOperator;
+  const realGroupOperatorDefinition = groupOperator && getOperatorConfig(config, realGroupOperator, field) || null;
+  const isGroup0 = isRuleGroup && (!realGroupOperator || realGroupOperatorDefinition.cardinality == 0);
+  
+  // build value for aggregation op
+  const [formattedValue, valueSrc, valueType] = formatItemValue(
+    config, properties, meta, realGroupOperator, parentField
+  );
+  
+  // build filter in aggregation
+  const list = children
+    .map((currentChild) => formatItem(currentChild, config, meta, groupField))
+    .filter((currentChild) => typeof currentChild !== "undefined");
+
+  if (isRuleGroupArray && !isGroup0) {
+    // "count" rule can have no "having" children, but should have number value
+    if (formattedValue == undefined)
+      return undefined;
+  } else {
+    if (!list.size)
+      return undefined;
+  }
+
+  const omitBrackets = true;
+  const filter = list.size ? conjunctionDefinition.spelFormatConj(list, conjunction, not, omitBrackets) : null;
+
+  // build result
+  let ret;
+  if (isRuleGroupArray) {
+    const formattedField = formatField(meta, config, field, parentField);
+    const getSize = isSpelArray ? ".length" : ".size()";
+    const fullSize = `${formattedField}${getSize}`;
+    const filteredSize = filter ? `${formattedField}.?[${filter}]${getSize}` : fullSize;
+    const groupValue = isGroup0 ? filteredSize : formattedValue;
+    // format expression
+    ret = formatExpression(
+      meta, config, properties, filteredSize, groupValue, realGroupOperator, valueSrc, valueType, isGroupOpRev
+    );
+  } else {
+    ret = filter;
+  }
+  
+  return ret;
 };
 
-
-const formatRule = (item, config, meta) => {
-  const properties = item.get("properties") || new Map();
-  const field = properties.get("field");
-  const operator = properties.get("operator");
-  const operatorOptions = properties.get("operatorOptions");
-  const iValueSrc = properties.get("valueSrc");
-  const iValueType = properties.get("valueType");
-  const iValue = properties.get("value");
-  if (field == null || operator == null)
-    return undefined;
-
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const reversedOp = operatorDefinition.reversedOp;
-  const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
+const buildFnToFormatOp = (operator, operatorDefinition) => {
+  const spelOp = operatorDefinition.spelOp;
+  if (!spelOp) return undefined;
+  let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  if (cardinality == 0) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      if (spelOp[0] == ".")
+        return `${field}${spelOp}()`;
+      else
+        return `${field} ${spelOp}`;
+    };
+  } else if (cardinality == 1) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      if (spelOp[0] == ".")
+        return `${field}${spelOp}(${values})`;
+      else
+        return `${field} ${spelOp} ${values}`;
+    };
+  }
+  return fn;
+};
 
-  //format value
-  let valueSrcs = [];
-  let valueTypes = [];
-  const fvalue = iValue.map((currentValue, ind) => {
-    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
-    const valueType = iValueType ? iValueType.get(ind) : null;
-    const cValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    let fv = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition
-    );
-    if (fv !== undefined) {
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
-  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
-  if (hasUndefinedValues || fvalue.size < cardinality)
-    return undefined;
-  const formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
+const formatExpression = (meta, config, properties, formattedField, formattedValue, operator, valueSrc, valueType, isRev = false) => {
+  const field = properties.get("field");
+  const opDef = getOperatorConfig(config, operator, field) || {};
+  const fieldDef = getFieldConfig(config, field) || {};
+  const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  let isRev = false;
-  let fn = operatorDefinition.spelFormatOp;
-  if (!fn && reversedOp) {
-    fn = revOperatorDefinition.spelFormatOp;
-    if (fn) {
-      isRev = true;
-    }
-  }
-  const spelOp = operatorDefinition.spelOp;
-  if (!fn && spelOp) {
-    if (cardinality == 0) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        if (spelOp[0] == ".")
-          return `${field}${spelOp}()`;
-        else
-          return `${field} ${spelOp}`;
-      };
-    } else if (cardinality == 1) {
-      fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        if (spelOp[0] == ".")
-          return `${field}${spelOp}(${value})`;
-        else
-          return `${field} ${spelOp} ${value}`;
-      };
-    }
-  }
+  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
   }
-      
-  //format field
-  const formattedField = formatField(meta, config, field);
-      
+
   //format expr
   const args = [
     formattedField,
     operator,
     formattedValue,
-    (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
-    (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    valueSrc,
+    valueType,
+    omit(opDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
-    fieldDefinition,
+    fieldDef,
   ];
-
   let ret;
   ret = fn(...args);
+
+  //rev
   if (isRev) {
-    ret = config.settings.spelFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+    ret = config.settings.spelFormatReverse(ret);
   }
+
   if (ret === undefined) {
-    meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(", ")}`);
-    return undefined;
+    meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrc}`);
   }
+
   return ret;
 };
 
+const checkOp = (config, operator, field) => {
+  if (!operator) return undefined;
+  let opDef = getOperatorConfig(config, operator, field) || {};
+  let reversedOp = opDef.reversedOp;
+  let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
 
-const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef) => {
+  let isRev = false;
+  const canFormatOp = opDef.spelOp || opDef.spelFormatOp;
+  const canFormatRevOp = revOpDef.spelOp || revOpDef.spelFormatOp;
+  if (!canFormatOp && !canFormatRevOp) {
+    return undefined;
+  }
+  if (!canFormatRevOp && canFormatRevOp) {
+    isRev = true;
+    [operator, reversedOp] = [reversedOp, operator];
+    [opDef, revOpDef] = [revOpDef, opDef];
+  }
+  return operator;
+};
+
+const formatRule = (item, config, meta, parentField = null) => {
+  const properties = item.get("properties") || new Map();
+  const field = properties.get("field");
+  let operator = properties.get("operator");
+  if (field == null || operator == null)
+    return undefined;
+
+  // check op for reverse
+  const realOp = checkOp(config, operator, field);
+  if (!realOp) {
+    meta.errors.push(`Operator ${operator} is not supported`);
+    return undefined;
+  }
+  const isRev = realOp != operator;
+
+  //format value
+  const [formattedValue, valueSrc, valueType] = formatItemValue(
+    config, properties, meta, realOp, parentField
+  );
+  if (formattedValue === undefined)
+    return undefined;
+      
+  //format field
+  const formattedField = formatField(meta, config, field, parentField);
+  
+  // format expression
+  let res = formatExpression(
+    meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType, isRev
+  );
+  return res;
+};
+
+const formatItemValue = (config, properties, meta, operator, parentField) => {
+  const field = properties.get("field");
+  const iValueSrc = properties.get("valueSrc");
+  const iValueType = properties.get("valueType");
+  const fieldDef = getFieldConfig(config, field) || {};
+  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const iValue = properties.get("value");
+  const asyncListValues = properties.get("asyncListValues");
+  
+  let valueSrcs = [];
+  let valueTypes = [];
+  let formattedValue;
+  
+  if (iValue != undefined) {
+    const fvalue = iValue.map((currentValue, ind) => {
+      const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+      const valueType = iValueType ? iValueType.get(ind) : null;
+      const cValue = completeValue(currentValue, valueSrc, config);
+      const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const fv = formatValue(
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDefinition, parentField, asyncListValues
+      );
+      if (fv !== undefined) {
+        valueSrcs.push(valueSrc);
+        valueTypes.push(valueType);
+      }
+      return fv;
+    });
+    const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+    if (!( fvalue.size < cardinality || hasUndefinedValues )) {
+      formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
+    }
+  }
+  
+  return [
+    formattedValue, 
+    (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
+    (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
+  ];
+};
+
+const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField = null, asyncListValues) => {
   if (currentValue === undefined)
     return undefined;
   let ret;
   if (valueSrc == "field") {
-    ret = formatField(meta, config, currentValue);
+    ret = formatField(meta, config, currentValue, parentField);
   } else if (valueSrc == "func") {
-    ret = formatFunc(meta, config, currentValue);
+    ret = formatFunc(meta, config, currentValue, parentField);
   } else {
     if (typeof fieldWidgetDef.spelFormatValue === "function") {
       const fn = fieldWidgetDef.spelFormatValue;
       const args = [
         currentValue,
-        pick(fieldDef, ["fieldSettings", "listValues"]),
+        {
+          ...pick(fieldDef, ["fieldSettings", "listValues"]),
+          asyncListValues
+        },
         //useful options: valueFormat for date/time
         omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
       ];
@@ -202,7 +302,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   return ret;
 };
 
-const formatField = (meta, config, field) => {
+const formatField = (meta, config, field, parentField = null) => {
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -210,13 +310,25 @@ const formatField = (meta, config, field) => {
   const fieldPartsLabels = getFieldPathLabels(field, config);
   const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
   const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
-  const fieldName = formatFieldName(field, config, meta);
+  let fieldName = formatFieldName(field, config, meta);
+  if (parentField) {
+    const parentFieldDef = getFieldConfig(config, parentField) || {};
+    let parentFieldName = parentField;
+    if (parentFieldDef.fieldName) {
+      parentFieldName = parentFieldDef.fieldName;
+    }
+    if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
+      fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
+    } else {
+      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+    }
+  }
   const formattedField = formatFieldFn(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
   return formattedField;
 };
 
 
-const formatFunc = (meta, config, currentValue) => {
+const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
@@ -229,7 +341,10 @@ const formatFunc = (meta, config, currentValue) => {
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-    const formattedArgVal = formatValue(meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null);
+    const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
+    const formattedArgVal = formatValue(
+      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+    );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
@@ -247,10 +362,13 @@ const formatFunc = (meta, config, currentValue) => {
     ];
     ret = fn(...args);
   } else {
-    const argsStr = Object.entries(formattedArgs)
-      .map(([k, v]) => v)
-      .join(", ");
-    ret = `${funcName}(${argsStr})`;
+    const args = Object.entries(formattedArgs).map(([k, v]) => v);
+    if (funcName[0] == "." && args.length) {
+      const [obj, ...params] = args;
+      ret = `${obj}${funcName}(${params.join(", ")})`;
+    } else {
+      ret = `${funcName}(${args.join(", ")})`;
+    }
   }
   return ret;
 };

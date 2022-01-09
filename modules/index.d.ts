@@ -330,7 +330,7 @@ export type Widgets = TypedMap<Widget>;
 
 type FormatConj = (children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
 type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
-type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
+type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
 
 export interface Conjunction {
   label: string,
@@ -428,9 +428,9 @@ export interface RuleErrorProps {
 // Operators
 /////////////////
 
-type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
+type FormatOperator = (field: string, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
 type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
-type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type SqlFormatOperator = (field: string, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type SpelFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
@@ -618,6 +618,7 @@ interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
   mode: RuleGroupMode,
+  isSpelArray?: boolean,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
@@ -628,6 +629,7 @@ interface FieldGroupExt extends BaseField {
   initialEmptyWhere?: boolean,
   showNot?: boolean,
   conjunctions?: Array<string>,
+  isSpelArray?: boolean,
 }
 
 export type Field = SimpleField;
@@ -678,11 +680,11 @@ type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "botto
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
-type SqlFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
-type SpelFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
+type SqlFormatReverse = (q: string) => string;
+type SpelFormatReverse = (q: string) => string;
 type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
-type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | Array<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
+type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {

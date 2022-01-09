@@ -69,11 +69,33 @@ const formatGroup = (item, config, meta) => {
   return conjunctionDefinition.sqlFormatConj(list, conjunction, not);
 };
 
+const buildFnToFormatOp = (operator, operatorDefinition) => {
+  const sqlOp = operatorDefinition.sqlOp || operator;
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  let fn;
+  if (cardinality == 0) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return `${field} ${sqlOp}`;
+    };
+  } else if (cardinality == 1) {
+    fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return `${field} ${sqlOp} ${value}`;
+    };
+  } else if (cardinality == 2) {
+    // between
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      const valFrom = values.first();
+      const valTo = values.get(1);
+      return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
+    };
+  }
+  return fn;
+};
 
 const formatRule = (item, config, meta) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
-  const operator = properties.get("operator");
+  let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
@@ -83,10 +105,24 @@ const formatRule = (item, config, meta) => {
     return undefined;
 
   const fieldDefinition = getFieldConfig(config, field) || {};
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const reversedOp = operatorDefinition.reversedOp;
-  const revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  let opDef = getOperatorConfig(config, operator, field) || {};
+  let reversedOp = opDef.reversedOp;
+  let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
+  const cardinality = defaultValue(opDef.cardinality, 1);
+
+  // check op
+  let isRev = false;
+  const canFormatOp = opDef.sqlOp || opDef.sqlFormatOp;
+  const canFormatRevOp = revOpDef.sqlOp || revOpDef.sqlFormatOp;
+  if (!canFormatOp && !canFormatRevOp) {
+    meta.errors.push(`Operator ${operator} is not supported`);
+    return undefined;
+  }
+  if (!canFormatRevOp && canFormatRevOp) {
+    isRev = true;
+    [operator, reversedOp] = [reversedOp, operator];
+    [opDef, revOpDef] = [revOpDef, opDef];
+  }
 
   //format value
   let valueSrcs = [];
@@ -98,7 +134,7 @@ const formatRule = (item, config, meta) => {
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
     let fv = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, operatorDefinition, asyncListValues
+      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, opDef, asyncListValues
     );
     if (fv !== undefined) {
       valueSrcs.push(valueSrc);
@@ -112,33 +148,7 @@ const formatRule = (item, config, meta) => {
   const formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
 
   //find fn to format expr
-  let isRev = false;
-  let fn = operatorDefinition.sqlFormatOp;
-  if (!fn && reversedOp) {
-    fn = revOperatorDefinition.sqlFormatOp;
-    if (fn) {
-      isRev = true;
-    }
-  }
-  if (!fn) {
-    const sqlOp = operatorDefinition.sqlOp || operator;
-    if (cardinality == 0) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        return `${field} ${sqlOp}`;
-      };
-    } else if (cardinality == 1) {
-      fn = (field, op, value, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        return `${field} ${sqlOp} ${value}`;
-      };
-    } else if (cardinality == 2) {
-      // between
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-        const valFrom = values.first();
-        const valTo = values.get(1);
-        return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
-      };
-    }
-  }
+  const fn = opDef.sqlFormatOp || buildFnToFormatOp(operator, opDef);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -154,7 +164,7 @@ const formatRule = (item, config, meta) => {
     formattedValue,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(opDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
     fieldDefinition,
   ];
@@ -162,7 +172,7 @@ const formatRule = (item, config, meta) => {
   let ret;
   ret = fn(...args);
   if (isRev) {
-    ret = config.settings.sqlFormatReverse(ret, operator, reversedOp, operatorDefinition, revOperatorDefinition);
+    ret = config.settings.sqlFormatReverse(ret);
   }
   if (ret === undefined) {
     meta.errors.push(`Operator ${operator} is not supported for value source ${valueSrcs.join(", ")}`);

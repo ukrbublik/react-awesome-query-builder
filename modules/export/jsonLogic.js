@@ -99,7 +99,6 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const groupField = isRuleGroup && mode != "struct" ? field : parentField;
   const groupOperator = properties.get("operator");
   const groupOperatorDefinition = groupOperator && getOperatorConfig(config, groupOperator, field) || null;
-  const groupValue = properties.get("value");
   const formattedValue = formatItemValue(config, properties, meta, groupOperator, parentField);
   const isGroup0 = isRuleGroup && (!groupOperator || groupOperatorDefinition.cardinality == 0);
 
@@ -129,22 +128,23 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
 
   // rule_group (issue #246)
   if (isRuleGroup && mode != "struct") {
+    const formattedField = formatField(meta, config, field, parentField);
     if (isGroup0) {
       // config.settings.groupOperators
       const op = groupOperator || "some";
       resultQuery = {
         [op]: [
-          formatField(meta, config, field, parentField),
+          formattedField,
           resultQuery
         ]
       };
     } else {
       // there is rule for count
       const filter = !list.size 
-        ? formatField(meta, config, field, parentField)
+        ? formattedField
         : {
           "filter": [
-            formatField(meta, config, field, parentField),
+            formattedField,
             resultQuery
           ]
         };
@@ -180,8 +180,6 @@ const formatRule = (item, config, meta, parentField = null) => {
   let operatorDefinition = getOperatorConfig(config, operator, field) || {};
   let reversedOp = operatorDefinition.reversedOp;
   let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-  const _fieldType = fieldDefinition.type || "undefined";
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
 
   // check op
   let isRev = false;
@@ -361,34 +359,37 @@ const formatField = (meta, config, field, parentField = null) => {
   return ret;
 };
 
+const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue) => {
+  let formatteOp = operator;
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
+  if (typeof operatorDefinition.jsonLogic == "string")
+    formatteOp = operatorDefinition.jsonLogic;
+  const rangeOps = ["<", "<=", ">", ">="];
+  const eqOps = ["==", "!="];
+  const fn = (field, op, val, opDef, opOpts) => {
+    if (cardinality == 0 && eqOps.includes(formatteOp))
+      return { [formatteOp]: [formattedField, null] };
+    else if (cardinality == 0)
+      return { [formatteOp]: formattedField };
+    else if (cardinality == 1 && isReverseArgs)
+      return { [formatteOp]: [formattedValue, formattedField] };
+    else if (cardinality == 1)
+      return { [formatteOp]: [formattedField, formattedValue] };
+    else if (cardinality == 2 && rangeOps.includes(formatteOp))
+      return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
+    else
+      return { [formatteOp]: [formattedField, ...formattedValue] };
+  };
+  return fn;
+};
 
 const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
-  let formatteOp = operator;
-  if (typeof operatorDefinition.jsonLogic == "string")
-    formatteOp = operatorDefinition.jsonLogic;
-  let fn = typeof operatorDefinition.jsonLogic == "function" ? operatorDefinition.jsonLogic : null;
-  if (!fn) {
-    const rangeOps = ["<", "<=", ">", ">="];
-    const eqOps = ["==", "!="];
-    fn = (field, op, val, opDef, opOpts) => {
-      if (cardinality == 0 && eqOps.includes(formatteOp))
-        return { [formatteOp]: [formattedField, null] };
-      else if (cardinality == 0)
-        return { [formatteOp]: formattedField };
-      else if (cardinality == 1 && isReverseArgs)
-        return { [formatteOp]: [formattedValue, formattedField] };
-      else if (cardinality == 1)
-        return { [formatteOp]: [formattedField, formattedValue] };
-      else if (cardinality == 2 && rangeOps.includes(formatteOp))
-        return { [formatteOp]: [formattedValue[0], formattedField, formattedValue[1]] };
-      else
-        return { [formatteOp]: [formattedField, ...formattedValue] };
-    };
-  }
+  let fn = typeof operatorDefinition.jsonLogic == "function" ? 
+    operatorDefinition.jsonLogic : 
+    buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);
   const args = [
     formattedField,
     operator,

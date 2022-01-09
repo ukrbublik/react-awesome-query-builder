@@ -133,6 +133,28 @@ const formatItemValue = (config, properties, meta, _operator, isForDisplay, pare
   ];
 };
 
+const buildFnToFormatOp = (operator, operatorDefinition) => {
+  const fop = operatorDefinition.labelForFormat || operator;
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  let fn;
+  if (cardinality == 0) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      return `${field} ${fop}`;
+    };
+  } else if (cardinality == 1) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      return `${field} ${fop} ${values}`;
+    };
+  } else if (cardinality == 2) {
+    // between
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      const valFrom = values.first();
+      const valTo = values.get(1);
+      return `${field} ${fop} ${valFrom} AND ${valTo}`;
+    };
+  }
+  return fn;
+};
 
 const formatRule = (item, config, meta, isForDisplay = false, parentField = null, returnArgs = false) => {
   const properties = item.get("properties") || new Map();
@@ -146,7 +168,6 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   let operatorDef = getOperatorConfig(config, operator, field) || {};
   let reversedOp = operatorDef.reversedOp;
   let revOperatorDef = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(operatorDef.cardinality, 1);
   
   //check op
   let isRev = false;
@@ -159,27 +180,10 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
       [operatorDef, revOperatorDef] = [revOperatorDef, operatorDef];
     }
   }
-  const fop = operatorDef.labelForFormat || operator;
 
   //find fn to format expr
-  if (!fn) {
-    if (cardinality == 0) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-        return `${field} ${fop}`;
-      };
-    } else if (cardinality == 1) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-        return `${field} ${fop} ${values}`;
-      };
-    } else if (cardinality == 2) {
-      // between
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-        const valFrom = values.first();
-        const valTo = values.get(1);
-        return `${field} ${fop} ${valFrom} AND ${valTo}`;
-      };
-    }
-  }
+  if (!fn)
+    fn = buildFnToFormatOp(operator, operatorDef);
   if (!fn)
     return undefined;
 
