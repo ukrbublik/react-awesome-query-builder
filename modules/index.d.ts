@@ -603,6 +603,7 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: ListValues,
   allowCustomValues?: boolean,
+  isContextVariable?: boolean,
 }
 interface SimpleField extends ValueField {
   label2?: string,
