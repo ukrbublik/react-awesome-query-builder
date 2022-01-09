@@ -9,6 +9,7 @@ const NOW = {
   jsonLogicCustomOps: {
     now: () => new Date(),
   },
+  spelFunc: "new java.util.Date()",
   sqlFormatFunc: () => "NOW()",
   mongoFormatFunc: () => new Date(),
   formatFunc: () => "NOW",
@@ -40,6 +41,7 @@ const RELATIVE_DATETIME = {
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
   mongoFormatFunc: null, //todo: support?
+  //todo: spel
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {
@@ -100,6 +102,7 @@ const LOWER = {
   label: "Lowercase",
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
+  spelFunc: ".toLowerCase",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
     toLowerCase: (str) => str.toLowerCase(),
@@ -118,6 +121,7 @@ const UPPER = {
   label: "Uppercase",
   mongoFunc: "$toUpper",
   jsonLogic: "toUpperCase",
+  spelFunc: ".toUpperCase",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
     toUpperCase: (str) => str.toUpperCase(),
@@ -137,6 +141,7 @@ const LINEAR_REGRESSION = {
   returnType: "number",
   formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
   sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
+  spelFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
   jsonLogicImport: (v) => {

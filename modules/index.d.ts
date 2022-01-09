@@ -803,6 +803,7 @@ type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => st
 type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
+type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup {
   type?: "!struct",
@@ -815,6 +816,7 @@ export interface Func {
   args: TypedMap<FuncArg>,
   label?: string,
   sqlFunc?: string,
+  spelFunc?: string,
   mongoFunc?: string,
   mongoArgsAsObject?: boolean,
   jsonLogic?: string | JsonLogicFormatFunc,
@@ -828,6 +830,7 @@ export interface Func {
   mongoFormatFunc?: MongoFormatFunc,
   renderBrackets?: Array<ReactElement | string>,
   renderSeps?: Array<ReactElement | string>,
+  spelFormatFunc?: SpelFormatFunc,
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
