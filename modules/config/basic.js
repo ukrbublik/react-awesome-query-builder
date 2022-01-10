@@ -1195,6 +1195,29 @@ const settings = {
     else
       return field;
   },
+  formatSpelField: (field, parentField, parts, partsExt, fieldDefinition, config) => {
+    let fieldName = partsExt.map(({key, parent}, ind) => {
+      if (ind == 0) {
+        if (parent == "[map]")
+          return `#this[${spelEscape(key)}]`;
+        else if (parent == "[class]")
+          return key;
+        else
+          return key;
+      } else {
+        if (parent == "map" || parent == "[map]")
+          return `[${spelEscape(key)}]`;
+        else if (parent == "class" || parent == "[class]")
+          return `.${key}`;
+        else
+          return `.${key}`;
+      }
+    }).join("");
+    if (fieldDefinition.isSpelVariable) {
+      fieldName = "#" + fieldName;
+    }
+    return fieldName;
+  },
   sqlFormatReverse: (q) => {
     if (q == undefined) return undefined;
     return "NOT(" + q + ")";

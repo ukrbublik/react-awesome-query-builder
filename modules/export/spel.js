@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
 import {
-  getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName
+  getFieldPath, getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
@@ -312,10 +312,9 @@ const formatField = (meta, config, field, parentField = null) => {
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  const _fieldKeys = getFieldPath(field, config);
-  const fieldPartsLabels = getFieldPathLabels(field, config);
-  const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
-  const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
+  const _fieldKeys = getFieldPath(field, config, parentField);
+  const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
+  const formatFieldFn = config.settings.formatSpelField;
   let fieldName = formatFieldName(field, config, meta);
   if (parentField) {
     const parentFieldDef = getFieldConfig(config, parentField) || {};
@@ -329,12 +328,26 @@ const formatField = (meta, config, field, parentField = null) => {
     } else {
       meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
     }
-  } else {
-    if (fieldDefinition.isContextVariable) {
-      fieldName = "#" + fieldName;
-    }
   }
-  const formattedField = formatFieldFn(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
+  const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
+    let parent;
+    if (parentCnf) {
+      if (parentCnf.type == "!struct" || parentCnf.type == "!group" && parentCnf.mode == "struct")
+        parent = cnf.isSpelMap ? "map" : "class";
+      else if (parentCnf.type == "!group")
+        parent = cnf.isSpelItemMap ? "[map]" : "[class]";
+      else
+        parent = "class";
+    }
+    const isSpelVariable = cnf.isSpelVariable;
+    return {
+      key,
+      parent,
+      isSpelVariable
+    };
+  });
+  const formattedField = formatFieldFn(fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);
+  console.log(2, fieldPartsMeta, formattedField, fieldPartsConfigs)
   return formattedField;
 };
 

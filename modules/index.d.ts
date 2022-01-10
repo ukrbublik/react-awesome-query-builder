@@ -603,7 +603,7 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: ListValues,
   allowCustomValues?: boolean,
-  isContextVariable?: boolean,
+  isSpelVariable?: boolean,
 }
 interface SimpleField extends ValueField {
   label2?: string,
@@ -614,12 +614,14 @@ interface SimpleField extends ValueField {
 interface FieldStruct extends BaseField {
   type: "!struct",
   subfields: Fields,
+  isSpelMap?: boolean,
 }
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
   mode: RuleGroupMode,
   isSpelArray?: boolean,
+  isSpelItemMap?: boolean,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
@@ -631,6 +633,7 @@ interface FieldGroupExt extends BaseField {
   showNot?: boolean,
   conjunctions?: Array<string>,
   isSpelArray?: boolean,
+  isSpelItemMap?: boolean,
 }
 
 export type Field = SimpleField;
@@ -676,6 +679,11 @@ export interface FieldProps {
 // Settings
 /////////////////
 
+type SpelFieldMeta = {
+  key: string,
+  parent: "map" | "class" | "[class]" | "[map]" | null,
+  isSpelVariable?: boolean,
+};
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}}
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
@@ -684,6 +692,7 @@ type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinit
 type SqlFormatReverse = (q: string) => string;
 type SpelFormatReverse = (q: string) => string;
 type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
+type FormatSpelField = (field: string, parentField: string | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
 type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
 type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
@@ -788,6 +797,7 @@ export interface OtherSettings {
   sqlFormatReverse?: SqlFormatReverse,
   spelFormatReverse?: SpelFormatReverse,
   formatField?: FormatField,
+  formatSpelField?: FormatSpelField,
   formarAggr?: FormatAggr,
 }
 

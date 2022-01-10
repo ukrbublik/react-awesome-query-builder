@@ -29,7 +29,7 @@ Optionally you can override some options in basic config or add your own types/w
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
 They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
-And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
+And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
