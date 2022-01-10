@@ -96,6 +96,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
     const formattedField = formatField(meta, config, field, parentField);
     const getSize = isSpelArray ? ".length" : ".size()";
     const fullSize = `${formattedField}${getSize}`;
+    // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-collection-selection
     const filteredSize = filter ? `${formattedField}.?[${filter}]${getSize}` : fullSize;
     const groupValue = isGroup0 ? filteredSize : formattedValue;
     // format expression
@@ -324,7 +325,7 @@ const formatField = (meta, config, field, parentField = null) => {
     }
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
-      fieldName = "#this." + fieldName;
+      // fieldName = "#this." + fieldName;
     } else {
       meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
     }
