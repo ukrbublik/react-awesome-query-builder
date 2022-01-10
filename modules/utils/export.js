@@ -48,41 +48,12 @@ const mongoEmptyValue = (fieldDef) => {
 
 
 const spelEscapeString = (val) => {
-  var CHARS_GLOBAL_REGEXP = /[\0\b\t\n\r\x1a\"\'\\]/g; // eslint-disable-line no-control-regex
-  var CHARS_ESCAPE_MAP    = {
-    '\0'   : '\\0',
-    '\b'   : '\\b',
-    '\t'   : '\\t',
-    '\n'   : '\\n',
-    '\r'   : '\\r',
-    '\x1a' : '\\Z',
-    '"'    : '\\"',
-    '\''   : '\\\'',
-    '\\'   : '\\\\'
-  };
-
-  var chunkIndex = CHARS_GLOBAL_REGEXP.lastIndex = 0;
-  var escapedVal = '';
-  var match;
-
-  while ((match = CHARS_GLOBAL_REGEXP.exec(val))) {
-    escapedVal += val.slice(chunkIndex, match.index) + CHARS_ESCAPE_MAP[match[0]];
-    chunkIndex = CHARS_GLOBAL_REGEXP.lastIndex;
-  }
-
-  if (chunkIndex === 0) {
-    // Nothing was escaped
-    return "'" + val + "'";
-  }
-
-  if (chunkIndex < val.length) {
-    return "'" + escapedVal + val.slice(chunkIndex) + "'";
-  }
-
-  return "'" + escapedVal + "'";
+  // Strings are delimited by single quotes. To put a single quote itself in a string, use two single quote characters. 
+  return "'" + val.replace(/\'/g, "''") + "'";
 };
 
 const spelEscape = (val) => {
+  // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-ref-literal
   if (val === undefined || val === null) {
     return 'null';
   }
