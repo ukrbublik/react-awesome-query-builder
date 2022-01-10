@@ -1,7 +1,7 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as Operators from "../components/operators";
-import {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape} from "../utils/export";
+import {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList} from "../utils/export";
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
@@ -441,14 +441,7 @@ const operators = {
         return `${field} IN (${values.join(", ")})`;
       } else return undefined; // not supported
     },
-    spelOp: ".containsAll",
-    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        return `${field}.containsAll({${values.join(", ")}})`;
-      } else {
-        return `${field}.containsAll(${values})`;
-      }
-    },
+    spelOp: "#contains", // tip: # means first arg is object
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
     reversedOp: "select_not_any_in",
     jsonLogic: "in",
@@ -473,6 +466,7 @@ const operators = {
     mongoFormatOp: mongoFormatOp1.bind(null, "$nin", v => v, false),
     reversedOp: "select_any_in",
   },
+  //todo: multiselect_contains - for SpEL it would be `.containsAll`
   multiselect_equals: {
     label: "Equals",
     labelForFormat: "==",
@@ -492,13 +486,6 @@ const operators = {
         return undefined; //not supported
     },
     spelOp: ".equals",
-    spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
-      if (valueSrc == "value") {
-        return `${field}.equals({${values.join(", ")}})`;
-      } else {
-        return `${field}.equals(${values})`;
-      }
-    },
     mongoFormatOp: mongoFormatOp1.bind(null, "$eq", v => v, false),
     reversedOp: "multiselect_not_equals",
     jsonLogic2: "all-in",
@@ -611,7 +598,7 @@ const widgets = {
       return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
     spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      if (opDef.spelOp == "matches" && op != 'regex') {
+      if (opDef.spelOp == "matches" && op != "regex") {
         let regex;
         if (op == 'starts_with') {
           regex = `(?s)^${escapeRegExp(val)}.*`;
@@ -674,7 +661,10 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
-    spelFormatValue: (val) => spelEscape(val),
+    spelFormatValue: (val, fieldDef, wgtDef) => {
+      const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
+      return spelEscape(val, isFloat);
+    },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -727,7 +717,16 @@ const widgets = {
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
       return vals.map(v => SqlString.escape(v));
     },
-    spelFormatValue: (vals) => vals.map(v => spelEscape(v)),
+    spelFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
+      const isCallable = opDef.spelOp && opDef.spelOp[0] == "#";
+      let res = spelEscape(vals); // inline list
+      if (isCallable) {
+        // `{1,2}.contains(1)` NOT works
+        // `{1,2}.?[true].contains(1)` works
+        res = spelFixList(res);
+      }
+      return res;
+    },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -876,7 +875,7 @@ const widgets = {
       return SqlString.escape(val);
     },
     spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return (val ? "true" : "false");
+      return spelEscape(val);
     },
     defaultValue: false,
     toJS: (val, fieldSettings) => (val),

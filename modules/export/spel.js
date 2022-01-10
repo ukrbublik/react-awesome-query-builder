@@ -112,21 +112,26 @@ const formatGroup = (item, config, meta, parentField = null) => {
 const buildFnToFormatOp = (operator, operatorDefinition) => {
   const spelOp = operatorDefinition.spelOp;
   if (!spelOp) return undefined;
+  const objectIsFirstArg = spelOp[0] == "#";
+  const isMethod = spelOp[0] == "." || objectIsFirstArg;
+  const sop = isMethod ? spelOp.slice(1) : spelOp;
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   if (cardinality == 0) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (spelOp[0] == ".")
-        return `${field}${spelOp}()`;
+      if (isMethod)
+        return `${field}.${sop}()`;
       else
-        return `${field} ${spelOp}`;
+        return `${field} ${sop}`;
     };
   } else if (cardinality == 1) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (spelOp[0] == ".")
-        return `${field}${spelOp}(${values})`;
+      if (objectIsFirstArg)
+        return `${values}.${sop}(${field})`;
+      else if (isMethod)
+        return `${field}.${sop}(${values})`;
       else
-        return `${field} ${spelOp} ${values}`;
+        return `${field} ${sop} ${values}`;
     };
   }
   return fn;
