@@ -347,7 +347,6 @@ const formatField = (meta, config, field, parentField = null) => {
     };
   });
   const formattedField = formatFieldFn(fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);
-  console.log(2, fieldPartsMeta, formattedField, fieldPartsConfigs)
   return formattedField;
 };
 

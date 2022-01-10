@@ -12,7 +12,7 @@ import Immutable from "immutable";
 import clone from "clone";
 
 const stringify = JSON.stringify;
-const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
+const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -52,6 +52,10 @@ interface DemoQueryBuilderState {
 }
 
 type ImmOMap = Immutable.OrderedMap<string, any>;
+
+//test
+const spelStr = "a == 1 || b['g'] == 'g''g'";
+loadFromSpel(spelStr, loadedConfig);
 
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
@@ -287,6 +291,10 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     }
 
     renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
+      // const spelStr = spelFormat(immutableTree, config);
+      // const imm = loadFromSpel(spelStr, config);
+      // console.log( getTree(imm) );
+
       const isValid = isValidTree(immutableTree);
       const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
       return (

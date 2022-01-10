@@ -135,6 +135,7 @@ export interface Utils {
   isValidTree(tree: ImmutableTree): boolean;
   // import
   loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree;
+  loadFromSpel(spelStr: string, config: Config): ImmutableTree;
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
