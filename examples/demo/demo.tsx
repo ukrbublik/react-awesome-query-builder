@@ -48,14 +48,13 @@ interface CustomEventDetail {
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
-  skin: String,
+  skin: string,
+  spelStr: string;
+  spelErrors: Array<string>;
 }
 
 type ImmOMap = Immutable.OrderedMap<string, any>;
 
-//test
-const spelStr = "a == 1 || b['g'] == 'g''g'";
-loadFromSpel(spelStr, loadedConfig);
 
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
     private immutableTree: ImmutableTree;
@@ -73,7 +72,9 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     state = {
       tree: initTree, 
       config: loadedConfig,
-      skin: initialSkin
+      skin: initialSkin,
+      spelStr: "",
+      spelErrors: [] as Array<string>
     };
 
     render = () => (
@@ -98,6 +99,18 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
           onChange={this.onChange}
           renderBuilder={this.renderBuilder}
         />
+
+        <div className="query-import-spel">
+          SpEL:
+          <input type="text" size={150} value={this.state.spelStr} onChange={this.onChangeSpelStr} />
+          <button onClick={this.importFromSpel}>import</button>
+          <br />
+          { this.state.spelErrors.length > 0 
+              && <pre style={preErrorStyle}>
+                {stringify(this.state.spelErrors, undefined, 2)}
+              </pre> 
+            }
+        </div>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
@@ -132,6 +145,27 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         tree: checkTree(this.state.tree, this.state.config)
       });
     }
+
+    onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const spelStr = e.target.value;
+      this.setState({
+        spelStr
+      });
+    };
+
+    importFromSpel = () => {
+      const [tree, spelErrors] = loadFromSpel(this.state.spelStr, this.state.config);
+      if (tree) {
+        this.setState({
+          tree: checkTree(tree, this.state.config),
+          spelErrors: []
+        });
+      } else {
+        this.setState({
+          spelErrors
+        });
+      }
+    };
 
     changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const skin = e.target.value;
@@ -291,10 +325,6 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     }
 
     renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
-      // const spelStr = spelFormat(immutableTree, config);
-      // const imm = loadFromSpel(spelStr, config);
-      // console.log( getTree(imm) );
-
       const isValid = isValidTree(immutableTree);
       const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
       return (

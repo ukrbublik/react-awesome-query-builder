@@ -2,7 +2,7 @@ import en_US from "antd/lib/locale-provider/en_US";
 import AntdWidgets from "../../components/widgets/antd";
 import BasicConfig, {stringifyForDisplay} from "../basic";
 import {getTitleInListValues} from "../../utils/stuff";
-import {SqlString} from "../../utils/export";
+import {SqlString, spelEscape} from "../../utils/export";
 import React from "react";
 
 
@@ -124,6 +124,7 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val) => spelEscape(val),
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),
   },
@@ -141,6 +142,7 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val) => spelEscape(val),
     toJS: (val, fieldSettings) => (val),
   },
   treemultiselect: {
@@ -157,6 +159,7 @@ const widgets = {
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
       return vals.map(v => SqlString.escape(v));
     },
+    spelFormatValue: (val) => spelEscape(val),
     toJS: (val, fieldSettings) => (val),
   },
 };

@@ -42,6 +42,7 @@ type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 
+
 ////////////////
 // query value
 /////////////////
@@ -135,7 +136,7 @@ export interface Utils {
   isValidTree(tree: ImmutableTree): boolean;
   // import
   loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree;
-  loadFromSpel(spelStr: string, config: Config): ImmutableTree;
+  loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
