@@ -243,8 +243,8 @@ const operators = {
     label: "Ends with",
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
-    spelOp: ".endsWidth",
-    spelOps: ["matches", ".endsWidth"],
+    spelOp: ".endsWith",
+    spelOps: ["matches", ".endsWith"],
     mongoFormatOp: mongoFormatOp1.bind(null, "$regex", v => (typeof v == "string" ? escapeRegExp(v) + "$" : undefined), false),
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
