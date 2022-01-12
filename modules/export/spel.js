@@ -87,7 +87,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
       return undefined;
   }
 
-  const omitBrackets = true;
+  const omitBrackets = isRuleGroup;
   const filter = list.size ? conjunctionDefinition.spelFormatConj(list, conjunction, not, omitBrackets) : null;
 
   // build result
