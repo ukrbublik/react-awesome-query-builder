@@ -189,7 +189,7 @@ const checkOp = (config, operator, field) => {
   if (!canFormatOp && !canFormatRevOp) {
     return undefined;
   }
-  if (!canFormatRevOp && canFormatRevOp) {
+  if (!canFormatOp && canFormatRevOp) {
     isRev = true;
     [operator, reversedOp] = [reversedOp, operator];
     [opDef, revOpDef] = [revOpDef, opDef];
