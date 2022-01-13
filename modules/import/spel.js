@@ -393,6 +393,3 @@ const wrapInDefaultConj = (rule, config, not = false) => {
     }
   };
 };
-
-// todo: date == new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-11')
-// todo: T(java.time.LocalTime).parse()
