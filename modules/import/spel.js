@@ -223,14 +223,14 @@ const convertPath = (parts, meta) => {
   return !isError ? res : undefined;
 };
 
-const convertArg = (spel, conv, config, meta) => {
+const convertArg = (spel, conv, config, meta, parentSpel) => {
   const {fieldSeparator} = config.settings;
-  const literalTypes = [
-    "number",
-    "string",
-    "boolean",
-    "null"
-  ];
+  const literalTypes = {
+    number: "number",
+    string: "text",
+    boolean: "boolean",
+    null: "null" // should not be
+  };
   
   if (spel.type == "compound") {
     // complex field
@@ -248,11 +248,16 @@ const convertArg = (spel, conv, config, meta) => {
       //valueType: todo
       value: spel.val,
     };
-  } else if (literalTypes.includes(spel.type)) {
+  } else if (literalTypes[spel.type]) {
+    let value = spel.val;
+    const valueType = literalTypes[spel.type];
+    if (parentSpel.isUnary) {
+      value = -value;
+    }
     return {
       valueSrc: "value",
-      valueType: spel.type,
-      value: spel.val,
+      valueType,
+      value,
     };
   } else if (spel.type == "!func") {
     const {obj, methodName, args} = spel;
@@ -266,7 +271,7 @@ const convertArg = (spel, conv, config, meta) => {
     //todo: make dynamic
     if (funcToOpMap[methodName]) {
       const parts = convertPath(obj, meta);
-      const convertedArgs = args.map(v => convertArg(v, conv, config, meta));
+      const convertedArgs = args.map(v => convertArg(v, conv, config, meta, spel));
       if (parts && convertedArgs.length == 1) {
         const field = parts.join(fieldSeparator);
         const opKey = funcToOpMap[methodName];
@@ -311,6 +316,12 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     let op = spel.type.slice("op-".length);
     const vals = spel.children.map(child => convertToTree(child, conv, config, meta, spel));
     let opKey;
+    const isUnary = (op == "minus" || op == "plus") && vals.length == 1;
+
+    if (isUnary) {
+      spel.isUnary = true;
+      return convertToTree(spel.children[0], conv, config, meta, spel);
+    }
 
     if (conv.operators[op]) {
       const opKeys = conv.operators[op];
@@ -359,7 +370,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       meta.errors.push(`[spel] Can't convert op ${op}`);
     }
   } else {
-    res = convertArg(spel, conv, config, meta);
+    res = convertArg(spel, conv, config, meta, parentSpel);
     if (res && !res.type && !parentSpel) {
       res = undefined;
       meta.errors.push(`[spel] Can't convert rule of type ${spel.type}, it looks like var/literal`);
