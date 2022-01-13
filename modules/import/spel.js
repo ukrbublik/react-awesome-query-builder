@@ -232,21 +232,24 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     null: "null" // should not be
   };
   
+  const groupFieldParts = parentSpel?._groupField ? [parentSpel?._groupField] : [];
   if (spel.type == "compound") {
     // complex field
     const parts = convertPath(spel.children, meta);
     if (!parts) return undefined;
+    const fullParts = [...groupFieldParts, ...parts];
     return {
       valueSrc: "field",
       //valueType: todo
-      value: parts.join(fieldSeparator),
+      value: fullParts.join(fieldSeparator),
     };
   } else if (spel.type == "variable" || spel.type == "property") {
     // normal field
+    const fullParts = [...groupFieldParts, spel.val];
     return {
       valueSrc: "field",
       //valueType: todo
-      value: spel.val,
+      value: fullParts.join(fieldSeparator),
     };
   } else if (literalTypes[spel.type]) {
     let value = spel.val;
@@ -310,11 +313,32 @@ const buildRule = (field, opKey, convertedArgs) => {
   return res;
 };
 
+const buildRueGroup = ({groupFieldValue, groupFilter}, opKey, convertedArgs) => {
+  if (groupFilter.valueSrc != 'field')
+    throw `Bad groupFilter: ${JSON.stringify(groupFilter)}`;
+  const groupField = groupFilter.value;
+  let groupOpRule = buildRule(groupField, opKey, convertedArgs);
+  let res = {
+    ...groupFieldValue,
+    type: "rule_group",
+    properties: {
+      ...groupOpRule.properties,
+      ...groupFieldValue.properties,
+    }
+  };
+  return res;
+};
+
 const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
   let res;
   if (spel.type.indexOf("op-") == 0) {
     let op = spel.type.slice("op-".length);
-    const vals = spel.children.map(child => convertToTree(child, conv, config, meta, spel));
+    const vals = spel.children.map(child => 
+      convertToTree(child, conv, config, meta, {
+        ...spel,
+        _groupField: parentSpel?._groupField
+      })
+    );
     let opKey;
     const isUnary = (op == "minus" || op == "plus") && vals.length == 1;
 
@@ -323,14 +347,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       return convertToTree(spel.children[0], conv, config, meta, spel);
     }
 
-    if (conv.operators[op]) {
-      const opKeys = conv.operators[op];
-      if (opKeys.length > 1) {
-        console.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
-        //todo
-      }
-      opKey = opKeys[0];
-    }
+    const opKeys = conv.operators[op];
 
     // todo: make dynamic, use basic config
     if (op == "eq" && spel.children[1].type == "null") {
@@ -359,16 +376,43 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
           not: spel.not
         }
       };
-    } else if (opKey) {
+    } else if (opKeys) {
       const fieldObj = vals[0];
       if (fieldObj.valueSrc != "field")
         console.warn(`[spel] Expected field ${JSON.stringify(fieldObj)}`);
       const field = fieldObj.value;
       const convertedArgs = vals.slice(1);
-      res = buildRule(field, opKey, convertedArgs);
+
+      let opKey = opKeys[0];
+      if (opKeys.length > 1) {
+        console.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
+
+        //todo: it's naive
+        const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
+        if (op == "eq") {
+          const ws =  widgets.find(({op, widget}) => (widget != "field"));
+          opKey = ws.op;
+        }
+      }
+
+      if (fieldObj.groupFilter) {
+        res = buildRueGroup(fieldObj, opKey, convertedArgs);
+      } else {
+        res = buildRule(field, opKey, convertedArgs);
+      }
     } else {
       meta.errors.push(`[spel] Can't convert op ${op}`);
     }
+  } else if (spel.type == "!aggr") {
+    const groupFilter = convertToTree(spel.source[0], conv, config, meta, spel);
+    const groupFieldValue = convertToTree(spel.filter, conv, config, meta, {
+      ...spel, 
+      _groupField: groupFilter.value
+    });
+    res = {
+      groupFieldValue,
+      groupFilter
+    };
   } else {
     res = convertArg(spel, conv, config, meta, parentSpel);
     if (res && !res.type && !parentSpel) {
