@@ -151,6 +151,10 @@ const convertCompiled = (expr, meta) => {
       val.args = val.args.map(child => convertCompiled(child, meta));
     }
   }
+  // convert list
+  if (type == "list") {
+    val = val.map(item => convertCompiled(item, meta));
+  }
 
   return {
     type,
@@ -262,22 +266,49 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       valueType,
       value,
     };
+  } else if (spel.type == "list") {
+    let values = spel.val.map(v => convertArg(v, conv, config, meta, spel));
+    let value = values.map(v => v.value);
+    const valueType = "multiselect";
+    return {
+      valueSrc: "value",
+      valueType,
+      value,
+    };
   } else if (spel.type == "!func") {
     const {obj, methodName, args} = spel;
     
     const funcToOpMap = {
-      contains: "like",
-      startsWith: "starts_with",
-      endsWith: "starts_with",
+      [".contains"]: "like",
+      [".startsWith"]: "starts_with",
+      [".endsWith"]: "ends_with",
+      ["#contains"]: "select_any_in",
     };
 
+    const convertedArgs = args.map(v => convertArg(v, conv, config, meta, spel));
+
     //todo: make dynamic
-    if (funcToOpMap[methodName]) {
+    if (methodName == "contains" && obj[0].type == "list") {
+      // {'yellow', 'green'}.?[true].contains(color)
+      if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
+        meta.errors.push(`Expected arg to fn ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
+        return undefined;
+      }
+      const field = convertedArgs[0].value;
+      const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
+      if (!( convertedObj.length == 1 && convertedObj[0].valueType == "multiselect" )) {
+        meta.errors.push(`Expected object of fn ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
+        return undefined;
+      }
+      const opKey = funcToOpMap["#"+methodName];
+      const list = convertedObj[0];
+      return buildRule(field, opKey, [list]);
+    } else if (funcToOpMap["."+methodName]) {
+      // user.login.startsWith('gg')
+      const opKey = funcToOpMap["."+methodName];
       const parts = convertPath(obj, meta);
-      const convertedArgs = args.map(v => convertArg(v, conv, config, meta, spel));
       if (parts && convertedArgs.length == 1) {
         const field = parts.join(fieldSeparator);
-        const opKey = funcToOpMap[methodName];
         return buildRule(field, opKey, convertedArgs);
       }
     }
