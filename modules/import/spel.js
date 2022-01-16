@@ -84,7 +84,7 @@ const convertCompiled = (expr, meta) => {
       child.type == "selection"
     );
     if (selection && selection.children.length != 1) {
-      meta.errors.push(`Selection should have 1 child, but got ${selection.children.length}}`);
+      meta.errors.push(`Selection should have 1 child, but got ${selection.children.length}`);
     }
     const filter = selection ? selection.children[0] : null;
     const lastChild = children[children.length - 1];
@@ -154,6 +154,21 @@ const convertCompiled = (expr, meta) => {
   // convert list
   if (type == "list") {
     val = val.map(item => convertCompiled(item, meta));
+  }
+  // convert constructor
+  if (type == "constructorref") {
+    const qid = children.find(child => child.type == "qualifiedidentifier");
+    const cls = qid?.val;
+    if (!cls) {
+      meta.errors.push(`Can't find qualifiedidentifier in constructorref children: ${JSON.stringify(children)}`);
+      return undefined;
+    }
+    const args = children.filter(child => child.type != "qualifiedidentifier");
+    return {
+      type: "!new",
+      cls,
+      args
+    };
   }
 
   return {
@@ -267,8 +282,9 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       value,
     };
   } else if (spel.type == "list") {
-    let values = spel.val.map(v => convertArg(v, conv, config, meta, spel));
-    let value = values.map(v => v.value);
+    const values = spel.val.map(v => convertArg(v, conv, config, meta, spel));
+    const _itemType = values.length ? values[0].valueType : null;
+    const value = values.map(v => v.value);
     const valueType = "multiselect";
     return {
       valueSrc: "value",
@@ -278,6 +294,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   } else if (spel.type == "!func") {
     const {obj, methodName, args} = spel;
     
+    // todo: get from conv
     const funcToOpMap = {
       [".contains"]: "like",
       [".startsWith"]: "starts_with",
@@ -285,19 +302,22 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       ["#contains"]: "select_any_in",
     };
 
-    const convertedArgs = args.map(v => convertArg(v, conv, config, meta, spel));
+    const convertedArgs = args.map(v => convertArg(v, conv, config, meta, {
+      ...spel,
+      _groupField: parentSpel?._groupField
+    }));
+    const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
 
-    //todo: make dynamic
+    //todo: make dynamic: use funcToOpMap and check obj type in basic config
     if (methodName == "contains" && obj[0].type == "list") {
       // {'yellow', 'green'}.?[true].contains(color)
       if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
-        meta.errors.push(`Expected arg to fn ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
+        meta.errors.push(`Expected arg to method ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
         return undefined;
       }
       const field = convertedArgs[0].value;
-      const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
       if (!( convertedObj.length == 1 && convertedObj[0].valueType == "multiselect" )) {
-        meta.errors.push(`Expected object of fn ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
+        meta.errors.push(`Expected object of method ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
         return undefined;
       }
       const opKey = funcToOpMap["#"+methodName];
@@ -308,15 +328,46 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       const opKey = funcToOpMap["."+methodName];
       const parts = convertPath(obj, meta);
       if (parts && convertedArgs.length == 1) {
-        const field = parts.join(fieldSeparator);
+        const fullParts = [...groupFieldParts, ...parts];
+        const field = fullParts.join(fieldSeparator);
         return buildRule(field, opKey, convertedArgs);
       }
+    } else if (methodName == "parse" && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
+      // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
+      const args = obj[0].args.map(v => convertArg(v, conv, config, meta, {
+        ...spel,
+        _groupField: parentSpel?._groupField
+      }));
+      if (!( args.length == 1 && args[0].valueType == "text" )) {
+        meta.errors.push(`Expected args of ${obj[0].cls.join(".")}.${methodName} to be 1 string but got: ${JSON.stringify(args)}`);
+        return undefined;
+      }
+      if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
+        meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
+        return undefined;
+      }
+      const dateFormat = args[0].value;
+      const dateString = convertedArgs[0].value;
+      const valueType = dateFormat.includes(" ") ? "datetime" : "date";
+      const field = null;
+      const widget = valueType;
+      const fieldConfig = getFieldConfig(config, field);
+      const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
+      const valueFormat = widgetConfig.valueFormat;
+      const value = moment(dateString, moment.ISO_8601).format(valueFormat);
+      return {
+        valueSrc: "value",
+        valueType,
+        value,
+      };
+    } else {
+      meta.errors.push(`Unsupported method ${methodName}`);
     }
-
-    meta.errors.push(`[spel] todo: !func`);
   } else if (spel.type == "method") {
     const {methodName, args} = spel.val;
     meta.errors.push(`[spel] todo: method`);
+  } else if (spel.type == "constructorref") {
+    meta.errors.push(`Can't convert constructorref ${spel}`);
   } else {
     meta.errors.push(`[spel] Can't convert arg of type ${spel.type}`);
   }
