@@ -11,14 +11,14 @@ import {
 } from "react-awesome-query-builder";
 const {
   uuid, 
-  checkTree, loadTree, loadFromJsonLogic, isJsonLogic, elasticSearchFormat,
+  checkTree, loadTree, loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
   queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import MaterialConfig from "react-awesome-query-builder/config/material";
 
-type TreeValueFormat = "JsonLogic" | "default" | null;
-type TreeValue = JsonLogicTree | JsonTree | undefined;
+type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
+type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => void;
 interface ExtectedExports {
@@ -50,9 +50,17 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     else
       valueFormat = "default";
   }
-  const loadFn = valueFormat == "JsonLogic" ? loadFromJsonLogic : loadTree;
-  const tree = loadFn(value, config);
-  return checkTree(tree, config);
+  let errors: string[] = [];
+  let tree: ImmutableTree | undefined;
+  if (valueFormat == "JsonLogic") {
+    tree = loadFromJsonLogic(value, config);
+  } else if (valueFormat == "SpEL") {
+    [tree, errors] = loadFromSpel(value as string, config);
+  } else {
+    tree = loadTree(value as JsonTree);
+  }
+  tree = tree ? checkTree(tree, config) : undefined;
+  return {tree, errors};
 };
 
 export  const with_qb = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
@@ -76,17 +84,20 @@ export  const with_qb_skins = (config_fn: ConfigFn, value: TreeValue, valueForma
 const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   const config = config_fn(BasicConfig);
   const onChange = spy();
-  const tree = load_tree(value, config, valueFormat);
+  const {tree, errors} = load_tree(value, config, valueFormat);
+  if (errors?.length) {
+    console.error("Error while loading: " + errors.join("; "));
+  }
 
   const tasks: Tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
-      expect_jlogic_before_and_after(config, tree, onChange, jlogics, changeIndex);
+      expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
     },
     expect_queries: (queries) => {
-      expect_queries_before_and_after(config, tree, onChange, queries);
+      expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
     },
     expect_checks: (expects) => {
-      do_export_checks(config, tree, expects, false, true);
+      do_export_checks(config, tree as ImmutableTree, expects, false, true);
     },
     config: config,
   };
@@ -103,7 +114,7 @@ const do_with_qb = (BasicConfig: Config, config_fn: ConfigFn, value: TreeValue, 
     qb = mount(
       <Query
         {...config}
-        value={tree}
+        value={tree as ImmutableTree}
         renderBuilder={render_builder}
         onChange={onChange}
       />, 
@@ -229,23 +240,31 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
 
 export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
   const config = config_fn(BasicConfig);
-  let tree;
+  let tree, errors: string[] = [];
   try {
-    tree = load_tree(value, config, valueFormat);
+    ({tree, errors} = load_tree(value, config, valueFormat));
   } catch(e) {
     it("should load tree", () => {
       throw e;
     });
   }
-  if (tree) {
-    do_export_checks(config, tree, expects, true);
+  if (errors?.length) {
+    it("should load tree", () => {
+      throw errors.join("; ");
+    });
+  } else {
+    do_export_checks(config, tree as ImmutableTree, expects, true);
   }
 };
 
 export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
   const config = config_fn(BasicConfig);
-  const tree = load_tree(value, config, valueFormat);
-  do_export_checks(config, tree, expects, true, true);
+  const {tree, errors} = load_tree(value, config, valueFormat);
+  if (errors?.length) {
+    throw errors.join("; ");
+  } else {
+    do_export_checks(config, tree as ImmutableTree, expects, true, true);
+  }
 };
 
 const expect_queries_before_and_after = (config: Config, tree: ImmutableTree, onChange: sinon.SinonSpy, queries: Array<string>) => {

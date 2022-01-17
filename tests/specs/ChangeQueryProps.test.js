@@ -7,8 +7,9 @@ import { with_qb, load_tree } from "../support/utils";
 describe("change props", () => {
   it("change tree via props triggers onChange", () => {
     with_qb(configs.simple_with_2_numbers, inits.with_num_and_num2, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+      const {tree, errors} = load_tree(inits.with_number, configs.simple_with_2_numbers(BasicConfig), "JsonLogic");
       await qb.setProps({
-        value: load_tree(inits.with_number, configs.simple_with_2_numbers(BasicConfig), "JsonLogic")
+        value: tree
       });
       expect_jlogic([null, inits.with_number]);
       expect(onChange.getCall(1)).to.equal(null);
