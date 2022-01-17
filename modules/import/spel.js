@@ -170,6 +170,20 @@ const convertCompiled = (expr, meta) => {
       args
     };
   }
+  // convert type
+  if (type == "typeref") {
+    const qid = children.find(child => child.type == "qualifiedidentifier");
+    const cls = qid?.val;
+    if (!cls) {
+      meta.errors.push(`Can't find qualifiedidentifier in typeref children: ${JSON.stringify(children)}`);
+      return undefined;
+    }
+    const args = children.filter(child => child.type != "qualifiedidentifier");
+    return {
+      type: "!type",
+      cls
+    };
+  }
 
   return {
     type,
@@ -306,10 +320,10 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       ...spel,
       _groupField: parentSpel?._groupField
     }));
-    const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
 
     //todo: make dynamic: use funcToOpMap and check obj type in basic config
     if (methodName == "contains" && obj[0].type == "list") {
+      const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
       // {'yellow', 'green'}.?[true].contains(color)
       if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
         meta.errors.push(`Expected arg to method ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
@@ -349,12 +363,33 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       const dateFormat = args[0].value;
       const dateString = convertedArgs[0].value;
       const valueType = dateFormat.includes(" ") ? "datetime" : "date";
-      const field = null;
+      const field = null; // todo
       const widget = valueType;
       const fieldConfig = getFieldConfig(config, field);
       const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
       const valueFormat = widgetConfig.valueFormat;
-      const value = moment(dateString, moment.ISO_8601).format(valueFormat);
+      const dateVal = moment(dateString, moment.ISO_8601);
+      const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
+      return {
+        valueSrc: "value",
+        valueType,
+        value,
+      };
+    } else if (methodName == "parse" && obj[0].type == "!type" && obj[0].cls.at(-1) == "LocalTime") {
+      // time == T(java.time.LocalTime).parse('02:03:00')
+      if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
+        meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
+        return undefined;
+      }
+      const timeString = convertedArgs[0].value;
+      const valueType = "time";
+      const field = null; // todo
+      const widget = valueType;
+      const fieldConfig = getFieldConfig(config, field);
+      const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
+      const valueFormat = widgetConfig.valueFormat;
+      const dateVal = moment(timeString, "HH:mm:ss");
+      const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
       return {
         valueSrc: "value",
         valueType,
@@ -365,11 +400,11 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     }
   } else if (spel.type == "method") {
     const {methodName, args} = spel.val;
-    meta.errors.push(`[spel] todo: method`);
+    meta.errors.push(`todo: method`);
   } else if (spel.type == "constructorref") {
     meta.errors.push(`Can't convert constructorref ${spel}`);
   } else {
-    meta.errors.push(`[spel] Can't convert arg of type ${spel.type}`);
+    meta.errors.push(`Can't convert arg of type ${spel.type}`);
   }
   return undefined;
 };
@@ -483,7 +518,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         res = buildRule(field, opKey, convertedArgs);
       }
     } else {
-      meta.errors.push(`[spel] Can't convert op ${op}`);
+      meta.errors.push(`Can't convert op ${op}`);
     }
   } else if (spel.type == "!aggr") {
     const groupFilter = convertToTree(spel.source[0], conv, config, meta, spel);
@@ -499,7 +534,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     res = convertArg(spel, conv, config, meta, parentSpel);
     if (res && !res.type && !parentSpel) {
       res = undefined;
-      meta.errors.push(`[spel] Can't convert rule of type ${spel.type}, it looks like var/literal`);
+      meta.errors.push(`Can't convert rule of type ${spel.type}, it looks like var/literal`);
     }
   }
   return res;
