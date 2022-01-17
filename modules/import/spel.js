@@ -494,26 +494,48 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       };
     } else if (opKeys) {
       const fieldObj = vals[0];
-      if (fieldObj.valueSrc != "field")
-        console.warn(`[spel] Expected field ${JSON.stringify(fieldObj)}`);
-      const field = fieldObj.value;
-      const convertedArgs = vals.slice(1);
-
+      let convertedArgs = vals.slice(1);
       let opKey = opKeys[0];
-      if (opKeys.length > 1) {
-        console.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
-
-        //todo: it's naive
-        const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
-        if (op == "eq") {
-          const ws = widgets.find(({op, widget}) => (widget != "field"));
-          opKey = ws.op;
-        }
-      }
 
       if (fieldObj.groupFieldValue) {
+        // 1. group
+        if (fieldObj.groupFieldValue.valueSrc != "field") {
+          meta.errors.push(`Expected group field ${JSON.stringify(fieldObj)}`);
+        }
+        const groupField = fieldObj.groupFieldValue.value;
+        
+        // some/all/none
+        const opArg = convertedArgs[0];
+        if (opArg && opArg.groupFieldValue && opArg.groupFieldValue.valueSrc == "field" && opArg.groupFieldValue.value == groupField) {
+          // group.?[...].size() == group.size()
+          opKey = "all";
+          convertedArgs = [];
+        } else if (opKey == "equal" && opArg.valueSrc == "value" && opArg.valueType == "number" && opArg.value == 0) {
+          opKey = "none";
+          convertedArgs = [];
+        } else if (opKey == "greater" && opArg.valueSrc == "value" && opArg.valueType == "number" && opArg.value == 0) {
+          opKey = "some";
+          convertedArgs = [];
+        }
+
         res = buildRuleGroup(fieldObj, opKey, convertedArgs, config);
       } else {
+        // 2. not group
+        if (fieldObj.valueSrc != "field") {
+          meta.errors.push(`Expected field ${JSON.stringify(fieldObj)}`);
+        }
+        const field = fieldObj.value;
+
+        if (opKeys.length > 1) {
+          console.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
+
+          //todo: it's naive
+          const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
+          if (op == "eq") {
+            const ws = widgets.find(({op, widget}) => (widget != "field"));
+            opKey = ws.op;
+          }
+        }
         res = buildRule(field, opKey, convertedArgs);
       }
     } else {
@@ -528,7 +550,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       ...spel, 
       _groupField: groupFieldValue.value
     });
-    if (groupFilter.type == "rule") {
+    if (groupFilter?.type == "rule") {
       groupFilter = wrapInDefaultConj(groupFilter, config);
     }
     res = {
