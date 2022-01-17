@@ -89,9 +89,13 @@ const convertCompiled = (expr, meta) => {
     const lastChild = children[children.length - 1];
     const isSize = lastChild.type == "method" && lastChild.val.methodName == "size";
     const isLength = lastChild.type == "property" && lastChild.val == "length";
-    const source = children.filter(child => 
+    const sourceParts = children.filter(child => 
       child !== selection && child !== lastChild
     );
+    const source = {
+      type: "compound",
+      children: sourceParts
+    };
     if (isSize || isLength) {
       return {
         type: "!aggr",
@@ -444,27 +448,69 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
   return res;
 };
 
+
+const compareArgs = (left, right,  spel, conv, config, meta, parentSpel = null) => {
+  if (left.type == right.type) {
+    if (left.type == "!aggr") {
+      const [leftSource, rightSource] = [left.source, right.source].map(v => convertArg(v, conv, config, meta, {
+        ...spel,
+        _groupField: parentSpel?._groupField
+      }));
+      //todo: check same filter
+      console.log(1, leftSource, rightSource);
+      return leftSource.value == rightSource.value;
+    } else {
+      const [leftVal, rightVal] = [left, right].map(v => convertArg(v, conv, config, meta, {
+        ...spel,
+        _groupField: parentSpel?._groupField
+      }));
+      console.log(2, leftVal, rightVal);
+      return leftVal.value == rightVal.value;
+    }
+  }
+  return false;
+};
+
 const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
   if(!spel) return undefined;
   let res;
   if (spel.type.indexOf("op-") == 0) {
     let op = spel.type.slice("op-".length);
-    const vals = spel.children.map(child => 
-      convertToTree(child, conv, config, meta, {
-        ...spel,
-        _groupField: parentSpel?._groupField
-      })
-    );
-    let opKey;
-    const isUnary = (op == "minus" || op == "plus") && vals.length == 1;
 
+    // unary
+    const isUnary = (op == "minus" || op == "plus") && spel.children.length == 1;
     if (isUnary) {
       spel.isUnary = true;
       return convertToTree(spel.children[0], conv, config, meta, spel);
     }
 
-    const opKeys = conv.operators[op];
+    // between
+    let isBetweenNormal = (op == "and" && spel.children.length == 2 && spel.children[0].type == "op-ge" && spel.children[1].type == "op-le");
+    let isBetweenRev = (op == "or" && spel.children.length == 2 && spel.children[0].type == "op-lt" && spel.children[1].type == "op-gt");
+    let isBetween = isBetweenNormal || isBetweenRev;
+    if (isBetween) {
+      const [left, from] = spel.children[0].children;
+      const [right, to] = spel.children[1].children;
+      const isNumbers = from.type == "number" && to.type == "number";
+      const isSameSource = compareArgs(left, right,  spel, conv, config, meta, parentSpel);
+      if (isNumbers && isSameSource) {
+        const fromValue = from.val;
+        const toValue = to.val;
+        const oneSpel = {
+          type: "op-between",
+          children: [
+            left,
+            from,
+            to
+          ]
+        };
+        return convertToTree(oneSpel, conv, config, meta, parentSpel);
+      }
+    }
 
+    // find op
+    let opKeys = conv.operators[op];
+    let opKey;
     // todo: make dynamic, use basic config
     if (op == "eq" && spel.children[1].type == "null") {
       opKey = "is_null";
@@ -474,7 +520,18 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       opKey = "is_empty";
     } else if (op == "gt" && spel.children[1].type == "string" && spel.children[1].val == "") {
       opKey = "is_not_empty";
+    } else if (op == "between") {
+      opKey = "between";
+      opKeys = ["between"];
     }
+
+    // convert children
+    const vals = spel.children.map(child => 
+      convertToTree(child, conv, config, meta, {
+        ...spel,
+        _groupField: parentSpel?._groupField
+      })
+    );
     
     if (op == "and" || op == "or") {
       const children1 = {};
@@ -495,7 +552,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     } else if (opKeys) {
       const fieldObj = vals[0];
       let convertedArgs = vals.slice(1);
-      let opKey = opKeys[0];
+      opKey = opKeys[0];
 
       if (fieldObj.groupFieldValue) {
         // 1. group
@@ -542,7 +599,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       meta.errors.push(`Can't convert op ${op}`);
     }
   } else if (spel.type == "!aggr") {
-    const groupFieldValue = convertToTree(spel.source[0], conv, config, meta, {
+    const groupFieldValue = convertToTree(spel.source, conv, config, meta, {
       ...spel, 
       _groupField: parentSpel?._groupField
     });

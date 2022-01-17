@@ -158,13 +158,11 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       if (tree) {
         this.setState({
           tree: checkTree(tree, this.state.config),
-          spelErrors: []
-        });
-      } else {
-        this.setState({
-          spelErrors
         });
       }
+      this.setState({
+        spelErrors
+      });
     };
 
     changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
