@@ -98,7 +98,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
     const fullSize = `${formattedField}${getSize}`;
     // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-collection-selection
     const filteredSize = filter ? `${formattedField}.?[${filter}]${getSize}` : fullSize;
-    const groupValue = isGroup0 ? filteredSize : formattedValue;
+    const groupValue = isGroup0 ? fullSize : formattedValue;
     // format expression
     ret = formatExpression(
       meta, config, properties, filteredSize, groupValue, realGroupOperator, valueSrc, valueType, isGroupOpRev

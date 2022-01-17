@@ -35,7 +35,6 @@ export const loadFromSpel = (spelStr, config) => {
     console.log("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
-    // let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
     if (jsTree && jsTree.type != "group") {
       jsTree = wrapInDefaultConj(jsTree, extendedConfig);
     }
@@ -396,13 +395,9 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
         value,
       };
     } else {
+      // todo: conv.funcs
       meta.errors.push(`Unsupported method ${methodName}`);
     }
-  } else if (spel.type == "method") {
-    const {methodName, args} = spel.val;
-    meta.errors.push("todo: method");
-  } else if (spel.type == "constructorref") {
-    meta.errors.push(`Can't convert constructorref ${spel}`);
   } else {
     meta.errors.push(`Can't convert arg of type ${spel.type}`);
   }
@@ -430,23 +425,27 @@ const buildRule = (field, opKey, convertedArgs) => {
   return res;
 };
 
-const buildRueGroup = ({groupFieldValue, groupFilter}, opKey, convertedArgs) => {
-  if (groupFilter.valueSrc != "field")
-    throw `Bad groupFilter: ${JSON.stringify(groupFilter)}`;
-  const groupField = groupFilter.value;
+const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, config) => {
+  if (groupFieldValue.valueSrc != "field")
+    throw `Bad groupFieldValue: ${JSON.stringify(groupFieldValue)}`;
+  const groupField = groupFieldValue.value;
   let groupOpRule = buildRule(groupField, opKey, convertedArgs);
+  const fieldConfig = getFieldConfig(config, groupField);
+  const mode = fieldConfig?.mode;
   let res = {
-    ...groupFieldValue,
+    ...groupFilter,
     type: "rule_group",
     properties: {
       ...groupOpRule.properties,
-      ...groupFieldValue.properties,
+      ...groupFilter.properties,
+      mode
     }
   };
   return res;
 };
 
 const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
+  if(!spel) return undefined;
   let res;
   if (spel.type.indexOf("op-") == 0) {
     let op = spel.type.slice("op-".length);
@@ -507,13 +506,13 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         //todo: it's naive
         const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
         if (op == "eq") {
-          const ws =  widgets.find(({op, widget}) => (widget != "field"));
+          const ws = widgets.find(({op, widget}) => (widget != "field"));
           opKey = ws.op;
         }
       }
 
-      if (fieldObj.groupFilter) {
-        res = buildRueGroup(fieldObj, opKey, convertedArgs);
+      if (fieldObj.groupFieldValue) {
+        res = buildRuleGroup(fieldObj, opKey, convertedArgs, config);
       } else {
         res = buildRule(field, opKey, convertedArgs);
       }
@@ -521,14 +520,20 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       meta.errors.push(`Can't convert op ${op}`);
     }
   } else if (spel.type == "!aggr") {
-    const groupFilter = convertToTree(spel.source[0], conv, config, meta, spel);
-    const groupFieldValue = convertToTree(spel.filter, conv, config, meta, {
+    const groupFieldValue = convertToTree(spel.source[0], conv, config, meta, {
       ...spel, 
-      _groupField: groupFilter.value
+      _groupField: parentSpel?._groupField
     });
+    let groupFilter = convertToTree(spel.filter, conv, config, meta, {
+      ...spel, 
+      _groupField: groupFieldValue.value
+    });
+    if (groupFilter.type == "rule") {
+      groupFilter = wrapInDefaultConj(groupFilter, config);
+    }
     res = {
-      groupFieldValue,
-      groupFilter
+      groupFilter,
+      groupFieldValue
     };
   } else {
     res = convertArg(spel, conv, config, meta, parentSpel);
