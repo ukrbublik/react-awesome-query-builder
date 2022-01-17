@@ -289,7 +289,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     };
   } else if (literalTypes[spel.type]) {
     let value = spel.val;
-    const valueType = literalTypes[spel.type];
+    let valueType = literalTypes[spel.type];
     if (parentSpel.isUnary) {
       value = -value;
     }
@@ -339,7 +339,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       }
       const opKey = funcToOpMap["#"+methodName];
       const list = convertedObj[0];
-      return buildRule(field, opKey, [list]);
+      return buildRule(config, field, opKey, [list]);
     } else if (funcToOpMap["."+methodName]) {
       // user.login.startsWith('gg')
       const opKey = funcToOpMap["."+methodName];
@@ -347,7 +347,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       if (parts && convertedArgs.length == 1) {
         const fullParts = [...groupFieldParts, ...parts];
         const field = fullParts.join(fieldSeparator);
-        return buildRule(field, opKey, convertedArgs);
+        return buildRule(config, field, opKey, convertedArgs);
       }
     } else if (methodName == "parse" && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
       // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
@@ -408,10 +408,11 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   return undefined;
 };
 
-const buildRule = (field, opKey, convertedArgs) => {
+const buildRule = (config, field, opKey, convertedArgs) => {
   if (convertedArgs.filter(v => v === undefined).length) {
     return undefined;
   }
+  const fieldConfig = getFieldConfig(config, field);
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
   let res = {
@@ -422,7 +423,11 @@ const buildRule = (field, opKey, convertedArgs) => {
       operator: opKey,
       value: convertedArgs.map(v => v.value),
       valueSrc: convertedArgs.map(v => v.valueSrc),
-      valueType: convertedArgs.map(v => v.valueType),
+      valueType: convertedArgs.map(v => {
+        if (v.valueSrc == "value" && fieldConfig.type)
+          return fieldConfig.type;
+        return v.valueType;
+      }),
       asyncListValues,
     }
   };
@@ -433,7 +438,7 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
   if (groupFieldValue.valueSrc != "field")
     throw `Bad groupFieldValue: ${JSON.stringify(groupFieldValue)}`;
   const groupField = groupFieldValue.value;
-  let groupOpRule = buildRule(groupField, opKey, convertedArgs);
+  let groupOpRule = buildRule(config, groupField, opKey, convertedArgs);
   const fieldConfig = getFieldConfig(config, groupField);
   const mode = fieldConfig?.mode;
   let res = {
@@ -494,8 +499,8 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       const isNumbers = from.type == "number" && to.type == "number";
       const isSameSource = compareArgs(left, right,  spel, conv, config, meta, parentSpel);
       if (isNumbers && isSameSource) {
-        const fromValue = from.val;
-        const toValue = to.val;
+        const _fromValue = from.val;
+        const _toValue = to.val;
         const oneSpel = {
           type: "op-between",
           children: [
@@ -593,7 +598,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
             opKey = ws.op;
           }
         }
-        res = buildRule(field, opKey, convertedArgs);
+        res = buildRule(config, field, opKey, convertedArgs);
       }
     } else {
       meta.errors.push(`Can't convert op ${op}`);
