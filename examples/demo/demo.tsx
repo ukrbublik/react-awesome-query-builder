@@ -109,7 +109,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
               && <pre style={preErrorStyle}>
                 {stringify(this.state.spelErrors, undefined, 2)}
               </pre> 
-            }
+          }
         </div>
 
         <div className="query-builder-result">

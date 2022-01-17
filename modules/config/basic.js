@@ -600,9 +600,9 @@ const widgets = {
     spelFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       if (opDef.spelOp == "matches" && op != "regex") {
         let regex;
-        if (op == 'starts_with') {
+        if (op == "starts_with") {
           regex = `(?s)^${escapeRegExp(val)}.*`;
-        } else if (op == 'ends_with') {
+        } else if (op == "ends_with") {
           regex = `(?s).*${escapeRegExp(val)}$`;
         } else { // op == 'like'
           regex = `(?s).*${escapeRegExp(val)}.*`; //tip: can use (?sui) for case-insensitive

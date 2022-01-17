@@ -1,4 +1,4 @@
-import { StandardContext, SpelExpressionEvaluator } from 'spel2js/src/main';
+import { StandardContext, SpelExpressionEvaluator } from "spel2js/src/main";
 import uuid from "../utils/uuid";
 import {defaultValue, isJsonLogic,shallowEqual} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
@@ -30,16 +30,16 @@ export const loadFromSpel = (spelStr, config) => {
   }
   
   if (compiledExpression) {
-    console.log('compiledExpression:', compiledExpression);
+    console.log("compiledExpression:", compiledExpression);
     convertedObj = convertCompiled(compiledExpression, meta);
-    console.log('convertedObj:', convertedObj, meta);
+    console.log("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
     // let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
     if (jsTree && jsTree.type != "group") {
       jsTree = wrapInDefaultConj(jsTree, extendedConfig);
     }
-    console.log('jsTree:', jsTree);
+    console.log("jsTree:", jsTree);
   }
 
   const immTree = jsTree ? loadTree(jsTree) : undefined;
@@ -142,7 +142,7 @@ const convertCompiled = (expr, meta) => {
       val = expr.getValue();
     }
   } catch(e) {
-    console.error("[spel2js] Error in getValue()", e)
+    console.error("[spel2js] Error in getValue()", e);
   }
 
   // convert method/function args
@@ -400,7 +400,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     }
   } else if (spel.type == "method") {
     const {methodName, args} = spel.val;
-    meta.errors.push(`todo: method`);
+    meta.errors.push("todo: method");
   } else if (spel.type == "constructorref") {
     meta.errors.push(`Can't convert constructorref ${spel}`);
   } else {
@@ -431,7 +431,7 @@ const buildRule = (field, opKey, convertedArgs) => {
 };
 
 const buildRueGroup = ({groupFieldValue, groupFilter}, opKey, convertedArgs) => {
-  if (groupFilter.valueSrc != 'field')
+  if (groupFilter.valueSrc != "field")
     throw `Bad groupFilter: ${JSON.stringify(groupFilter)}`;
   const groupField = groupFilter.value;
   let groupOpRule = buildRule(groupField, opKey, convertedArgs);

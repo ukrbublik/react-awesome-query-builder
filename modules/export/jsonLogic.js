@@ -387,9 +387,9 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
 const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  let fn = typeof operatorDefinition.jsonLogic == "function" ? 
-    operatorDefinition.jsonLogic : 
-    buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);
+  let fn = typeof operatorDefinition.jsonLogic == "function" 
+    ? operatorDefinition.jsonLogic 
+    : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);
   const args = [
     formattedField,
     operator,
