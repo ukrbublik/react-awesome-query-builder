@@ -17,15 +17,30 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
   };
 
   const stylesDropdownMenuWrapper = {
-    minWidth: "100%"
+    //minWidth: "100%"
+  };
+
+  const onChange = e => {
+    if (e.target.value === undefined)
+      return;
+    setValueSrc(e.target.value);
+  };
+
+  const getValueSrcLabel = (valueSrc) => {
+    const valueSrcInfo = valueSources
+      .filter(([srcKey, _info]) => srcKey == valueSrc)
+      .map(([_srcKey, info]) => info)
+      .shift();
+    return valueSrcInfo?.label || valueSrc;
   };
 
   const renderOptions = (valueSources) =>
     valueSources.map(([srcKey, info]) => (
       <DropdownItem
         key={srcKey}
-        onClick={(e) => setValueSrc(e.target.value)}
+        onClick={onChange}
         value={srcKey}
+        active={valueSrc == srcKey}
       >
         {info.label}
       </DropdownItem>
@@ -44,9 +59,10 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {valueSrc ?? ""}
+        {valueSrc ? getValueSrcLabel(valueSrc) : <span>&nbsp;</span>}
       </DropdownToggle>
       <DropdownMenu
+        container="body"
         style={stylesDropdownMenuWrapper}
       >
         {renderOptions(valueSources)}

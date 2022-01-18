@@ -20,6 +20,12 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
     maxHeight: "400px",
   };
 
+  const onChange = e => {
+    if (e.target.value === undefined)
+      return;
+    setField(e.target.value);
+  };
+
   const renderOptions = (fields, isGroupItem = false) =>
     Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
@@ -30,7 +36,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
             <DropdownItem
               header
               key={`${path}-header`}
-              onClick={(e) => setField(e.target.value)}
+              onClick={onChange}
               value={path}
             >
               {label}
@@ -43,9 +49,10 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
           <DropdownItem
             disabled={disabled}
             key={path}
-            onClick={(e) => setField(e.target.value)}
+            onClick={onChange}
             value={path}
             className={isGroupItem ? "px-4" : undefined}
+            active={selectedKey == path}
           >
             {label}
           </DropdownItem>
@@ -88,9 +95,12 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {hasValue ? renderValue(selectedKey) : ""}
+        {hasValue ? renderValue(selectedKey) : <span>&nbsp;</span>}
       </DropdownToggle>
-      <DropdownMenu container="body" style={stylesDropdownMenuWrapper}>
+      <DropdownMenu 
+        container="body" 
+        style={stylesDropdownMenuWrapper}
+      >
         {!hasValue && <DropdownItem key={"body"} disabled value={""}></DropdownItem>}
         {renderOptions(items)}
       </DropdownMenu>

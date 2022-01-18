@@ -9,25 +9,45 @@ import { mapListValues } from "../../../../utils/stuff";
 
 export default ({
   listValues,
-  value,
+  value: selectedValue,
   setValue,
   allowCustomValues,
   readonly,
 }) => {
+  const onChange = e => {
+    if (e.target.value === undefined)
+      return;
+    setValue(e.target.value);
+  };
+
   const renderOptions = () =>
     mapListValues(listValues, ({ title, value }) => {
       return (
         <DropdownItem
           key={value}
-          onClick={(e) => setValue(e.target.value)}
+          onClick={onChange}
           value={value}
+          active={selectedValue == value}
         >
           {title}
         </DropdownItem>
       );
     });
 
-  const hasValue = value != null;
+  const renderValue = (selectedValue) => {
+    if (!readonly && selectedValue == null)
+      return placeholder;
+    return getListValueTitle(selectedValue);
+  };
+
+  const getListValueTitle = (selectedValue) => 
+    mapListValues(listValues, ({title, value}) => 
+      (value === selectedValue ? title : null)
+    )
+    .filter(v => v !== null)
+    .shift();
+
+  const hasValue = selectedValue != null;
   const [isOpen, setIsOpen] = useState(false);
 
   const stylesDropdownWrapper = {
@@ -53,7 +73,7 @@ export default ({
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {hasValue ? value : ""}
+        {hasValue ? renderValue(selectedValue) : <span>&nbsp;</span>}
       </DropdownToggle>
       <DropdownMenu
         container="body"

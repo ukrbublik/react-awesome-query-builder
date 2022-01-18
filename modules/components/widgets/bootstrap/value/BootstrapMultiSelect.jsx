@@ -11,12 +11,19 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState(value ?? []);
 
+  const onChange = e => {
+    let value = getMultiSelectValues(e.target.value, listValues);
+    if (value.length == 0)
+      value = undefined;
+    setValue(value);
+  };
+
   const renderOptions = () =>
     mapListValues(listValues, ({ title, value }) => {
       return (
         <DropdownItem
           key={value}
-          onClick={(e) => setValue(getMultiSelectValues(e.target.value, listValues))}
+          onClick={onChange}
           value={value}
           active={selectedValues.some(x => x === value)}
         >
@@ -32,11 +39,20 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
   };
   
   const stylesDropdownMenuWrapper = {
-    minWidth: "100%"
+    //minWidth: "100%"
+  };
+
+
+  const renderValue = (selectedValues) => {
+    if (!readonly && !selectedValues.length)
+      return placeholder;
+    const selectedTitles = mapListValues(listValues, ({title, value}) => (
+      selectedValues.indexOf(value) > -1 ? title : null
+    )).filter(v => v !== null);
+    return selectedTitles.join(", ");
   };
 
   const getMultiSelectValues = (value, options) => {
-
     if (!value) return selectedValues;
 
     let isNewSelection = !selectedValues.includes(value);
@@ -67,9 +83,10 @@ export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {selectedValues.join(", ")}
+        {selectedValues.length ? renderValue(selectedValues) : <span>&nbsp;</span>}
       </DropdownToggle>
       <DropdownMenu
+        container="body"
         style={stylesDropdownMenuWrapper}
       >
         {renderOptions()}
