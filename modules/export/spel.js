@@ -113,7 +113,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
 const buildFnToFormatOp = (operator, operatorDefinition) => {
   const spelOp = operatorDefinition.spelOp;
   if (!spelOp) return undefined;
-  const objectIsFirstArg = spelOp[0] == "#";
+  const objectIsFirstArg = spelOp[0] == "$";
   const isMethod = spelOp[0] == "." || objectIsFirstArg;
   const sop = isMethod ? spelOp.slice(1) : spelOp;
   let fn;
