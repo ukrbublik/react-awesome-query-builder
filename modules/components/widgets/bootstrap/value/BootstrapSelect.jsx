@@ -13,6 +13,7 @@ export default ({
   setValue,
   allowCustomValues,
   readonly,
+  placeholder,
 }) => {
   const onChange = e => {
     if (e.target.value === undefined)
@@ -44,8 +45,8 @@ export default ({
     mapListValues(listValues, ({title, value}) => 
       (value === selectedValue ? title : null)
     )
-    .filter(v => v !== null)
-    .shift();
+      .filter(v => v !== null)
+      .shift();
 
   const hasValue = selectedValue != null;
   const [isOpen, setIsOpen] = useState(false);

@@ -7,7 +7,7 @@ import {
 } from "reactstrap";
 import { mapListValues } from "../../../../utils/stuff";
 
-export default ({listValues, value, setValue, allowCustomValues, readonly}) => {
+export default ({listValues, value, setValue, allowCustomValues, placeholder, readonly}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValues, setSelectedValues] = useState(value ?? []);
 
