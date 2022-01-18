@@ -5,6 +5,8 @@ import {
   DropdownToggle,
   DropdownItem,
 } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
 export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) => {
 
@@ -42,7 +44,7 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
         value={srcKey}
         active={valueSrc == srcKey}
       >
-        {info.label}
+        {info.label || srcKey}
       </DropdownItem>
     ));
 
@@ -54,12 +56,13 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
       toggle={() => setIsOpen(!isOpen)}
     >
       <DropdownToggle
-        tag={"button"}
-        className={"form-select"}
+        tag={"span"}
+        className={"btn"}
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {valueSrc ? getValueSrcLabel(valueSrc) : <span>&nbsp;</span>}
+        {/*valueSrc ? getValueSrcLabel(valueSrc) : <span>&nbsp;</span>*/}
+        <FontAwesomeIcon icon={faEllipsisV} />
       </DropdownToggle>
       <DropdownMenu
         container="body"
