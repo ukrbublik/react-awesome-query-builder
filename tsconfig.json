@@ -17,7 +17,8 @@
     "noImplicitReturns": true,
 
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true
   },
   "include": [
     "modules/**/*"
