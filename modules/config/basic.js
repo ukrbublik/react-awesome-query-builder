@@ -441,7 +441,7 @@ const operators = {
         return `${field} IN (${values.join(", ")})`;
       } else return undefined; // not supported
     },
-    spelOp: "#contains", // tip: # means first arg is object
+    spelOp: "$contains", // tip: $ means first arg is object
     mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
     reversedOp: "select_not_any_in",
     jsonLogic: "in",

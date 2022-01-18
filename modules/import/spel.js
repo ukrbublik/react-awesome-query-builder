@@ -181,10 +181,22 @@ const convertCompiled = (expr, meta) => {
       meta.errors.push(`Can't find qualifiedidentifier in typeref children: ${JSON.stringify(children)}`);
       return undefined;
     }
-    const args = children.filter(child => child.type != "qualifiedidentifier");
+    const _args = children.filter(child => child.type != "qualifiedidentifier");
     return {
       type: "!type",
       cls
+    };
+  }
+  // convert function/method
+  if (type == "function" || type == "method") {
+    // `foo()` is method, `#foo()` is function
+    // let's use common property `methodName` and just add `isVar` for function
+    const {functionName, methodName, args} = val;
+    return {
+      type: "!func",
+      methodName: functionName || methodName,
+      isVar: type == "function",
+      args
     };
   }
 
@@ -309,14 +321,14 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       value,
     };
   } else if (spel.type == "!func") {
-    const {obj, methodName, args} = spel;
+    const {obj, methodName, args, isVar} = spel;
     
     // todo: get from conv
     const funcToOpMap = {
       [".contains"]: "like",
       [".startsWith"]: "starts_with",
       [".endsWith"]: "ends_with",
-      ["#contains"]: "select_any_in",
+      ["$contains"]: "select_any_in",
     };
 
     const convertedArgs = args.map(v => convertArg(v, conv, config, meta, {
@@ -325,7 +337,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     }));
 
     //todo: make dynamic: use funcToOpMap and check obj type in basic config
-    if (methodName == "contains" && obj[0].type == "list") {
+    if (methodName == "contains" && obj && obj[0].type == "list") {
       const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
       // {'yellow', 'green'}.?[true].contains(color)
       if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
@@ -337,7 +349,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
         meta.errors.push(`Expected object of method ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
         return undefined;
       }
-      const opKey = funcToOpMap["#"+methodName];
+      const opKey = funcToOpMap["$"+methodName];
       const list = convertedObj[0];
       return buildRule(config, field, opKey, [list]);
     } else if (funcToOpMap["."+methodName]) {
@@ -349,7 +361,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
         const field = fullParts.join(fieldSeparator);
         return buildRule(config, field, opKey, convertedArgs);
       }
-    } else if (methodName == "parse" && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
+    } else if (methodName == "parse" && obj && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
       // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
       const args = obj[0].args.map(v => convertArg(v, conv, config, meta, {
         ...spel,
@@ -378,7 +390,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
         valueType,
         value,
       };
-    } else if (methodName == "parse" && obj[0].type == "!type" && obj[0].cls.at(-1) == "LocalTime") {
+    } else if (methodName == "parse" && obj && obj[0].type == "!type" && obj[0].cls.at(-1) == "LocalTime") {
       // time == T(java.time.LocalTime).parse('02:03:00')
       if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
         meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
@@ -424,7 +436,7 @@ const buildRule = (config, field, opKey, convertedArgs) => {
       value: convertedArgs.map(v => v.value),
       valueSrc: convertedArgs.map(v => v.valueSrc),
       valueType: convertedArgs.map(v => {
-        if (v.valueSrc == "value" && fieldConfig.type)
+        if (v.valueSrc == "value" && fieldConfig?.type)
           return fieldConfig.type;
         return v.valueType;
       }),
@@ -541,9 +553,11 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     if (op == "and" || op == "or") {
       const children1 = {};
       vals.forEach(v => {
-        const id = uuid();
-        v.id = id;
-        children1[id] = v;
+        if (v) {
+          const id = uuid();
+          v.id = id;
+          children1[id] = v;
+        }
       });
       res = {
         type: "group",
