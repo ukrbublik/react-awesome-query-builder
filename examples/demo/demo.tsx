@@ -79,6 +79,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
             <option key="vanilla">vanilla</option>
             <option key="antd">antd</option>
             <option key="material">material</option>
+            <option key="bootstrap">bootstrap</option>
           </select>
           <button onClick={this.resetValue}>reset</button>
           <button onClick={this.clearValue}>clear</button>
