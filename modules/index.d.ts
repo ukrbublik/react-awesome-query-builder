@@ -509,6 +509,8 @@ interface Type {
   valueSources?: Array<ValueSource>,
   defaultOperator?: string,
   widgets: TypedMap<WidgetConfigForType>,
+  mainWidget?: string,
+  excludeOperators?: Array<string>,
 }
 export type Types = TypedMap<Type>;
 

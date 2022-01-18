@@ -53,7 +53,11 @@ function _extendTypeConfig(type, typeConfig, config) {
   for (let widget in typeConfig.widgets) {
     let typeWidgetConfig = typeConfig.widgets[widget];
     if (typeWidgetConfig.operators) {
-      operators = mergeArraysSmart(operators, typeWidgetConfig.operators);
+      let typeWidgetOperators = typeWidgetConfig.operators;
+      if (typeConfig.excludeOperators) {
+        typeWidgetOperators = typeWidgetOperators.filter(op => !typeConfig.excludeOperators.includes(op));
+      }
+      operators = mergeArraysSmart(operators, typeWidgetOperators);
     }
     if (typeWidgetConfig.defaultOperator)
       defaultOperator = typeWidgetConfig.defaultOperator;
@@ -121,7 +125,7 @@ function _extendFuncArgsConfig(subconfig, config) {
 function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
   let operators = null, defaultOperator = null;
   const typeConfig = config.types[fieldConfig.type];
-  const excludeOperators = fieldConfig.excludeOperators || [];
+  const excludeOperatorsForField = fieldConfig.excludeOperators || [];
   if (fieldConfig.type != "!struct" && fieldConfig.type != "!group") {
     if (!typeConfig) {
       //console.warn(`No type config for ${fieldConfig.type}`);
@@ -140,20 +144,22 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
       fieldConfig._isFuncArg = true;
     fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
     fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
+    const excludeOperatorsForType = typeConfig.excludeOperators || [];
     for (let widget in typeConfig.widgets) {
       let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
       const typeWidgetConfig = typeConfig.widgets[widget] || {};
       if (!isFuncArg) {
         //todo: why I've excluded isFuncArg ?
-        const shouldIncludeOperators = fieldConfig.preferWidgets && (widget == "field" || fieldConfig.preferWidgets.includes(widget)) || excludeOperators.length > 0;
+        const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
+        const shouldIncludeOperators = fieldConfig.preferWidgets && 
+          (widget == "field" || fieldConfig.preferWidgets.includes(widget))
+          || excludeOperators.length > 0;
         if (fieldWidgetConfig.operators) {
-          if (!operators)
-            operators = [];
-          operators = operators.concat(fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o)));
+          const addOperators = fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
+          operators = [...(operators || []), ...addOperators];
         } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
-          if (!operators)
-            operators = [];
-          operators = operators.concat(typeWidgetConfig.operators.filter(o => !excludeOperators.includes(o)));
+          const addOperators = typeWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
+          operators = [...(operators || []), ...addOperators];
         }
         if (fieldWidgetConfig.defaultOperator)
           defaultOperator = fieldWidgetConfig.defaultOperator;

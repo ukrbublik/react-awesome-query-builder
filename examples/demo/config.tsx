@@ -158,6 +158,10 @@ export default (skin: string) => {
   const types: Types = {
     ...InitialConfig.types,
     // examples of  overriding
+    text: {
+      ...InitialConfig.types.text,
+      excludeOperators: ["proximity"],
+    },
     boolean: merge(InitialConfig.types.boolean, {
       widgets: {
         boolean: {
@@ -267,7 +271,6 @@ export default (skin: string) => {
         firstName: {
           label2: "Username", //only for menu's toggler
           type: "text",
-          excludeOperators: ["proximity"],
           fieldSettings: {
             validateValue: (val: string, fieldSettings) => {
               return (val.length < 10);
@@ -281,7 +284,6 @@ export default (skin: string) => {
         login: {
           type: "text",
           tableName: "t1", // legacy: PR #18, PR #20
-          excludeOperators: ["proximity"],
           fieldSettings: {
             validateValue: (val: string, fieldSettings) => {
               return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
