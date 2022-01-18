@@ -68,8 +68,8 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   - [Bootstrap](https://reactstrap.github.io/)
   - vanilla
   (Using another UI framework and custom widgets is possible, see below)
-- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), ElasticSearch or your custom format
-- Import from [JsonLogic](http://jsonlogic.com)
+- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
+- Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
 - TypeScript support (see [types](/modules/index.d.ts) and [demo in TS](/examples))
 
 
