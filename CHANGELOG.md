@@ -6,6 +6,7 @@
   - Fixed order of operators for field when merging operators from 2+ widgets (PR #573)
   - Added last param `fieldDef` for functions to format operators (PR #573)
   - Added `jsonLogic` to widget TS def (PR #572)
+  - Export `TreeUtils` (PR #597)
 - 4.8.0
   - Added read-only mode switch for rules and groups. See `showLock` and `canDeleteLocked` config options, custom JsonLogic op `locked`, `setLock` action, `lockLabel` and `lockedLabel`. Added Switch components, see `renderSwitch`. (issue #377) (PR #490)
   - Fixed issue with frozen config (`Object.freeze`) by using `clone` (issue #345) (PR #490)
