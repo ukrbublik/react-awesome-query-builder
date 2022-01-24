@@ -27,13 +27,13 @@ import mapValues from "lodash/mapValues";
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, groupUuid, properties, config, children = null) => {
+const addNewGroup = (state, path, type, groupUuid, properties, config, children = null) => {
   const rulesNumber = getTotalRulesCountInTree(state);
   const groupPath = path.push(groupUuid);
   const {maxNumberOfRules, shouldCreateEmptyGroup} = config.settings;
   const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
 
-  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
+  state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
 
   if (!children) {
     state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
@@ -663,8 +663,13 @@ export default (config) => {
       break;
     }
 
+    case constants.ADD_CASE_GROUP: {
+      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, action.config,  action.children);
+      break;
+    }
+
     case constants.ADD_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, action.id, action.properties, action.config,  action.children);
+      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, action.config,  action.children);
       break;
     }
 

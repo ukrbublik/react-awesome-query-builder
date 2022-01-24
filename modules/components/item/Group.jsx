@@ -206,7 +206,7 @@ export class BasicGroup extends PureComponent {
   }
   canAddRule = () => {
     const {maxNumberOfRules} = this.props.config.settings;
-    const {totalRulesCnt} = this.props;
+    const totalRulesCnt = this.totalRulesCnt();
     if (maxNumberOfRules) {
       return totalRulesCnt < maxNumberOfRules;
     }
@@ -240,7 +240,7 @@ export class BasicGroup extends PureComponent {
         children1={item.get("children1")}
         //tree={props.tree}
         reordableNodesCnt={this.reordableNodesCnt()}
-        totalRulesCnt={this.props.totalRulesCnt}
+        totalRulesCnt={this.totalRulesCnt()}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
         isParentLocked={isLocked}
@@ -250,6 +250,10 @@ export class BasicGroup extends PureComponent {
 
   extraPropsForItem(_item) {
     return {};
+  }
+
+  totalRulesCnt() {
+    return this.props.totalRulesCnt;
   }
 
   reordableNodesCnt() {

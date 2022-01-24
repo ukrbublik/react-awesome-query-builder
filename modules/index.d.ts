@@ -86,8 +86,28 @@ interface GroupProperties extends BasicItemProperties {
   not?: boolean,
 }
 
+interface SwitchGroupProperties extends BasicItemProperties {
+
+}
+
+interface CaseGroupProperties extends BasicItemProperties {
+
+}
+
 type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
 type JsonItem = JsonGroup|JsonAnyRule;
+type JsonSwitchGroup = {
+  type: "switch_group",
+  id?: string,
+  children1?: {[id: string]: JsonCaseGroup} | [JsonCaseGroup],
+  properties?: SwitchGroupProperties
+};
+type JsonCaseGroup = {
+  type: "case_group",
+  id?: string,
+  children1?: {[id: string]: JsonGroup} | [JsonGroup],
+  properties?: CaseGroupProperties
+};
 type JsonGroup = {
   type: "group",
   id?: string,
@@ -111,7 +131,7 @@ type JsonRule = {
   type: "rule",
   properties: RuleProperties,
 }
-export type JsonTree = JsonGroup;
+export type JsonTree = JsonGroup|JsonSwitchGroup;
 
 export type ImmutableTree = ImmutableOMap<string, any>;
 
@@ -792,6 +812,7 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
+  ternaryMode?: boolean,
 }
 
 export interface OtherSettings {

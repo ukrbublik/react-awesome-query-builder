@@ -172,7 +172,7 @@ export const getFlatTree = (tree) => {
   let items = {};
   let realHeight = 0;
 
-  function _flatizeTree (item, path, insideCollapsed, insideLocked, lev, info, parentType) {
+  function _flatizeTree (item, path, insideCollapsed, insideLocked, lev, info, parentType, caseId) {
     const type = item.get("type");
     const collapsed = item.get("collapsed");
     const id = item.get("id");
@@ -189,7 +189,10 @@ export const getFlatTree = (tree) => {
     if (children) {
       let subinfo = {};
       children.map((child, _childId) => {
-        _flatizeTree(child, path.concat(id), insideCollapsed || collapsed, insideLocked || isLocked, lev + 1, subinfo, type);
+        _flatizeTree(
+          child, path.concat(id), insideCollapsed || collapsed, insideLocked || isLocked, 
+          lev + 1, subinfo, type, type == "case_group" ? id : caseId
+        );
       });
       if (!collapsed) {
         info.height = (info.height || 0) + (subinfo.height || 0);
@@ -203,6 +206,7 @@ export const getFlatTree = (tree) => {
       type: type,
       parent: path.length ? path[path.length-1] : null,
       parentType: parentType,
+      caseId: caseId,
       path: path.concat(id),
       lev: lev,
       leaf: !children,
@@ -220,7 +224,7 @@ export const getFlatTree = (tree) => {
     };
   }
 
-  _flatizeTree(tree, [], false, false, 0, {}, null);
+  _flatizeTree(tree, [], false, false, 0, {}, null, null);
 
   for (let i = 0 ; i < flat.length ; i++) {
     const prevId = i > 0 ? flat[i-1] : null;
@@ -245,9 +249,17 @@ export const getTotalReordableNodesCountInTree = (tree) => {
   let cnt = 0;
 
   function _processNode (item, path, lev) {
-    const id = item.get("id");
-    const children = item.get("children1");
-    const isRuleGroup = item.get("type") == "rule_group";
+    let id, children, type;
+    if (typeof item.get === "function") {
+      id = item.get("id");
+      children = item.get("children1");
+      type = item.get("type");
+    } else {
+      id = item.id;
+      children = item.children1;
+      type = item.type;
+    }
+    const isRuleGroup = type == "rule_group";
     cnt++;
     //tip: rules in rule-group can be reordered only inside
     if (children && !isRuleGroup) {
@@ -273,10 +285,19 @@ export const getTotalRulesCountInTree = (tree) => {
   let cnt = 0;
 
   function _processNode (item, path, lev) {
-    const id = item.get("id");
-    const children = item.get("children1");
-    const isGroup = item.get("type") == "group";
-    //const isRuleGroup = item.get("type") == "rule_group";
+    let id, children, type;
+    if (typeof item.get === "function") {
+      id = item.get("id");
+      children = item.get("children1");
+      type = item.get("type");
+    } else {
+      id = item.id;
+      children = item.children1;
+      type = item.type;
+    }
+    
+    const isGroup = type == "group";
+    //const isRuleGroup = type == "rule_group";
     if (children && isGroup) {
       children.map((child, _childId) => {
         _processNode(child, path.concat(id), lev + 1);

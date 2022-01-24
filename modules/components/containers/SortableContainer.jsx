@@ -311,6 +311,13 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         } else {
           const hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
           hovCNodeEl = hovNodeEl ? hovNodeEl.closest(".group-or-rule-container") : null;
+          if (!hovCNodeEl && hovNodeEl && hovNodeEl.classList.contains("query-builder-container")) {
+            // fix 2022-01-24 - get root .group-or-rule-container
+            const rootGroupContainer = hovNodeEl?.firstChild?.firstChild;
+            if (rootGroupContainer && rootGroupContainer.classList.contains("group-or-rule-container")) {
+              hovCNodeEl = rootGroupContainer;
+            }
+          }
         }
         if (!hovCNodeEl) {
           console.log("out of tree bounds!");
@@ -413,10 +420,13 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                   }
                   //alt
                   if (canMoveBeforeAfterGroup && altII) {
+                    // fix 2022-01-24: do prepend/append instead of before/after for root
                     if (dragDirs.vrt > 0) { //down
-                      altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
+                      const placement = altII.lev != 0 ? constants.PLACEMENT_AFTER : constants.PLACEMENT_APPEND;
+                      altMoves.push([placement, altII, altII.lev]);
                     } else if (dragDirs.vrt < 0) { //up
-                      altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
+                      const placement = altII.lev != 0 ? constants.PLACEMENT_BEFORE : constants.PLACEMENT_PREPEND;
+                      altMoves.push([placement, altII, altII.lev]);
                     }
                   }
                 }
@@ -512,13 +522,23 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         return false;
 
       const canRegroup = this.props.config.settings.canRegroup;
+      const canRegroupCases = this.props.config.settings.canRegroupCases;
       const maxNesting = this.props.config.settings.maxNesting;
       const newLev = toParentII ? toParentII.lev : 0;
+      const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
+      const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
-      const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
-        || toII.parentType == "rule_group";
+      const isForbiddenStructChange = 
+        // can't restruct `rule_group`
+        fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group" 
+        // can't move `case_group` anywhere but before/after anoter `case_group`
+        || fromII.type == "case_group" && !isLev1
+        // only `case_group` can be placed under `switch_group`
+        || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
+        // can't move rule/group to another case
+        || !canRegroupCases && fromII.caseId != toII.caseId;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
       
       if (maxNesting && (newLev + 1) > maxNesting)
@@ -530,7 +550,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       let res = true;
       if (canMoveFn)
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);
-      return res;
+        return res;
     }
 
     move (fromII, toII, placement, toParentII) {

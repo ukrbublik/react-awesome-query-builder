@@ -42,7 +42,7 @@ export const isImmutableTree = (tree) => {
 };
 
 export const isTree = (tree) => {
-  return typeof tree == "object" && tree.type == "group";
+  return typeof tree == "object" && (tree.type == "group" || tree.type == "switch_group");
 };
 
 export {isJsonLogic};

@@ -4,11 +4,15 @@ import Rule from "./Rule";
 import Group from "./Group";
 import RuleGroup from "./RuleGroup";
 import RuleGroupExt from "./RuleGroupExt";
+import SwitchGroup from "./SwitchGroup";
+import CaseGroup from "./CaseGroup";
 
 const types = [
   "rule",
   "group",
-  "rule_group"
+  "rule_group",
+  "switch_group",
+  "case_group"
 ];
 
 const getProperties = (props) => {
@@ -88,6 +92,40 @@ const typeMap = {
       isDraggingTempo={props.isDraggingTempo}
       children1={props.children1}
       parentField={props.parentField}
+    />
+  ),
+  switch_group: (props) => (
+    <SwitchGroup 
+      {...getProperties(props)}
+      id={props.id}
+      groupId={props.groupId}
+      path={props.path}
+      actions={props.actions}
+      config={props.config}
+      //tree={props.tree}
+      reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
+      onDragStart={props.onDragStart}
+      isDraggingTempo={props.isDraggingTempo}
+      children1={props.children1}
+      parentField={null}
+    />
+  ),
+  case_group: (props) => (
+    <CaseGroup 
+      {...getProperties(props)}
+      id={props.id}
+      groupId={props.groupId}
+      path={props.path}
+      actions={props.actions}
+      config={props.config}
+      //tree={props.tree}
+      reordableNodesCnt={props.reordableNodesCnt}
+      totalRulesCnt={props.totalRulesCnt}
+      onDragStart={props.onDragStart}
+      isDraggingTempo={props.isDraggingTempo}
+      children1={props.children1}
+      parentField={null}
     />
   ),
 };
