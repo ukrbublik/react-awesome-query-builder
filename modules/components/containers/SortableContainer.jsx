@@ -581,7 +581,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;
       
-      if (fromII.caseId != toII.caseId) {
+      if (fromII.type != "case_group" && fromII.caseId != toII.caseId) {
         const isLastFromCase = fromCaseII ? fromCaseII._height == 2 : false;
         const newRulesInTargetCase = toCaseII ? toCaseII.leafsCount + 1 : 0;
         if (maxNumberOfRules && newRulesInTargetCase > maxNumberOfRules)

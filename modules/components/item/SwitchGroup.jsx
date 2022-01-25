@@ -52,7 +52,6 @@ class SwitchGroup extends BasicGroup {
   reordableNodesCntForItem(item) {
     if (this.props.isLocked)
       return 0;
-      return 111;
     const { canLeaveEmptyCase } = this.props.config.settings;
     const totalCasesCnt = this.props.children1.size;
     const cnt = getTotalReordableNodesCountInTree(item);
