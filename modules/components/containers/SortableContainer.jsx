@@ -464,8 +464,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
               //add case
               const addCaseII = am => {
                 const toII = am[1];
-                const caseII = toII.caseId ? this.tree.items[toII.caseId] : null;
-                return [...am, caseII];
+                const fromCaseII = itemInfo.caseId ? this.tree.items[itemInfo.caseId] : null;
+                const toCaseII = toII.caseId ? this.tree.items[toII.caseId] : null;
+                return [...am, fromCaseII, toCaseII];
               };
               availMoves = availMoves.map(addCaseII);
               altMoves = altMoves.map(addCaseII);
@@ -495,7 +496,8 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 const placement = am[0],
                   toII = am[1],
                   _lev = am[2],
-                  _caseII = am[3];
+                  _fromCaseII = am[3],
+                  _toCaseII = am[4];
                 let toParentII = null;
                 if (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND)
                   toParentII = toII;
@@ -503,14 +505,14 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                   toParentII = this.tree.items[toII.parent];
                 if (toParentII && toParentII.parent == null)
                   toParentII = null;
-                am[4] = toParentII;
+                am[5] = toParentII;
                 return am;
               });
 
               let bestMode = null;
-              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], canMoveFn));
+              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], am[5], canMoveFn));
               if (canMoveBeforeAfterGroup && filteredMoves.length == 0 && altMoves.length > 0) {
-                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], canMoveFn));
+                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], am[5], canMoveFn));
               }
               const levs = filteredMoves.map(am => am[2]);
               const curLev = itemInfo.lev;
@@ -548,13 +550,13 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       return false;
     }
 
-    canMove (fromII, toII, placement, toCaseII, toParentII, canMoveFn) {
+    canMove (fromII, toII, placement, fromCaseII, toCaseII, toParentII, canMoveFn) {
       if (!fromII || !toII)
         return false;
       if (fromII.id === toII.id)
         return false;
 
-      const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules } = this.props.config.settings;
+      const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules, canLeaveEmptyCase } = this.props.config.settings;
       const newLev = toParentII ? toParentII.lev + 1 : toII.lev;
       const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
@@ -580,10 +582,12 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         return false;
       
       if (fromII.caseId != toII.caseId) {
-        const newRulesInTargetCase = toCaseII.leafsCount + 1;
+        const isLastFromCase = fromCaseII ? fromCaseII._height == 2 : false;
+        const newRulesInTargetCase = toCaseII ? toCaseII.leafsCount + 1 : 0;
         if (maxNumberOfRules && newRulesInTargetCase > maxNumberOfRules)
           return false;
-        // todo: use canLeaveEmptyCase
+        if (isLastFromCase && !canLeaveEmptyCase)
+          return false;
       }
 
       let res = true;

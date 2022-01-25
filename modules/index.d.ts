@@ -803,6 +803,7 @@ export interface BehaviourSettings {
   clearValueOnChangeField?: boolean,
   clearValueOnChangeOp?: boolean,
   canLeaveEmptyGroup?: boolean,
+  canLeaveEmptyCase?: boolean,
   shouldCreateEmptyGroup?: boolean,
   forceShowConj?: boolean,
   immutableGroupsMode?: boolean,

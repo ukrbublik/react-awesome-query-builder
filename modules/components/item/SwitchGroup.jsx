@@ -35,7 +35,7 @@ class SwitchGroup extends BasicGroup {
   
   renderFooterWrapper = () => null;
   canAddGroup = () => {
-    const maxNumberOfCases = this.props.config.settings.maxNumberOfCases;
+    const { maxNumberOfCases } = this.props.config.settings;
     const totalCasesCnt = this.props.children1.size;
     if (maxNumberOfCases) {
       return totalCasesCnt < maxNumberOfCases;
@@ -52,7 +52,11 @@ class SwitchGroup extends BasicGroup {
   reordableNodesCntForItem(item) {
     if (this.props.isLocked)
       return 0;
-    return getTotalReordableNodesCountInTree(item);
+      return 111;
+    const { canLeaveEmptyCase } = this.props.config.settings;
+    const totalCasesCnt = this.props.children1.size;
+    const cnt = getTotalReordableNodesCountInTree(item);
+    return cnt == 1 && canLeaveEmptyCase && totalCasesCnt > 1 ? 111 : cnt;
   }
 
   renderHeaderWrapper() {

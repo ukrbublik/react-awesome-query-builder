@@ -252,6 +252,12 @@ export class BasicGroup extends PureComponent {
     return {};
   }
 
+  reordableNodesCnt() {
+    if (this.props.isLocked)
+      return 0;
+    return this.props.reordableNodesCnt;
+  }
+
   totalRulesCntForItem(_item) {
     return this.props.totalRulesCnt;
   }
@@ -259,11 +265,12 @@ export class BasicGroup extends PureComponent {
   reordableNodesCntForItem(_item) {
     if (this.props.isLocked)
       return 0;
-    return this.props.reordableNodesCnt;
+    return this.reordableNodesCnt();
   }
 
   showDragIcon() {
-    const { config, isRoot, reordableNodesCnt, isLocked } = this.props;
+    const { config, isRoot, isLocked } = this.props;
+    const reordableNodesCnt = this.reordableNodesCnt();
     return config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
   }
 

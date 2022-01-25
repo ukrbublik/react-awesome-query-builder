@@ -184,7 +184,7 @@ class RuleGroupExt extends BasicGroup {
     />;
   }
 
-  reordableNodesCnt() {
+  reordableNodesCntForItem(_item) {
     if (this.props.isLocked)
       return 0;
     const {children1} = this.props;
