@@ -28,23 +28,24 @@ import mapValues from "lodash/mapValues";
  * @param {Immutable.Map} properties
  */
 const addNewGroup = (state, path, type, groupUuid, properties, config, children = null) => {
-  const rulesNumber = getTotalRulesCountInTree(state);
+  const {shouldCreateEmptyGroup} = config.settings;
   const groupPath = path.push(groupUuid);
-  const {maxNumberOfRules, shouldCreateEmptyGroup} = config.settings;
-  const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
+  const canAddNewRule = !shouldCreateEmptyGroup;
 
+  const origState = state;
   state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
+  if (state !== origState) {
+    if (!children) {
+      state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
-  if (!children) {
-    state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
-
-    // Add one empty rule into new group
-    if (canAddNewRule && !shouldCreateEmptyGroup) {
-      state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+      // Add one empty rule into new group
+      if (canAddNewRule) {
+        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+      }
     }
-  }
 
-  state = fixPathsInTree(state);
+    state = fixPathsInTree(state);
+  }
   
   return state;
 };
@@ -170,16 +171,36 @@ const _addChildren1 = (config, item, children) => {
  * @param {object} config
  */
 const addItem = (state, path, type, id, properties, config, children = null) => {
-  const rulesNumber = getTotalRulesCountInTree(state);
-  const {maxNumberOfRules} = config.settings;
-  const canAddNewRule = !(type == "rule" && maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
-
+  if (type == "switch_group")
+    throw new Error("Can't add switch_group programmatically");
+  const { maxNumberOfCases, maxNumberOfRules, maxNesting } = config.settings;
+  const rootType = state.get("type");
+  const isTernary = rootType == "switch_group";
+  const targetItem = state.getIn(expandTreePath(path));
+  const caseGroup = isTernary ? state.getIn(expandTreePath(path.take(2))) : null;
+  const childrenPath = expandTreePath(path, "children1");
+  const targetChildren = state.getIn(childrenPath);
+  const hasChildren = !!targetChildren;
+  const targetChildrenSize = hasChildren ? targetChildren.size : null;
+  let currentNumber, maxNumber;
+  if (type == "case_group") {
+    currentNumber = targetChildrenSize;
+    maxNumber = maxNumberOfCases;
+  } else if (type == "group") {
+    currentNumber = path.size;
+    maxNumber = maxNesting;
+  } else if (targetItem?.get("type") == "rule_group") {
+    // don't restrict
+  } else {
+    currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
+    maxNumber = maxNumberOfRules;
+  }
+  const canAdd = maxNumber && currentNumber ? (currentNumber < maxNumber) : true;
+  
   const item = {type, id, properties};
   _addChildren1(config, item, children);
 
-  if (canAddNewRule) {
-    const childrenPath = expandTreePath(path, "children1");
-    const hasChildren = !!state.getIn(childrenPath);
+  if (canAdd) {
     const newChildren = new Immutable.OrderedMap({
       [id]: new Immutable.Map(item)
     });
@@ -188,8 +209,8 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
     } else {
       state = state.mergeIn(childrenPath, newChildren);
     }
+    state = fixPathsInTree(state);
   }
-  state = fixPathsInTree(state);
   return state;
 };
 

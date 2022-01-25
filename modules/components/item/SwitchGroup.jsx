@@ -10,6 +10,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
 import Widget from "../rule/Widget";
+import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../../utils/treeUtils";
 const classNames = require("classnames");
 
 
@@ -19,11 +20,6 @@ const classNames = require("classnames");
 class SwitchGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
-    // selectedField: PropTypes.string,
-    // selectedOperator: PropTypes.string,
-    // parentField: PropTypes.string,
-    // setField: PropTypes.func,
-    // setOperator: PropTypes.func,
   };
 
   constructor(props) {
@@ -38,9 +34,26 @@ class SwitchGroup extends BasicGroup {
   childrenClassName = () => "switch_group--children";
   
   renderFooterWrapper = () => null;
-  canAddGroup = () => true;
+  canAddGroup = () => {
+    const maxNumberOfCases = this.props.config.settings.maxNumberOfCases;
+    const totalCasesCnt = this.props.children1.size;
+    if (maxNumberOfCases) {
+      return totalCasesCnt < maxNumberOfCases;
+    }
+    return true;
+  }
   canAddRule = () => false;
   canDeleteGroup = () => false;
+
+  totalRulesCntForItem(item) {
+    return getTotalRulesCountInTree(item);
+  }
+
+  reordableNodesCntForItem(item) {
+    if (this.props.isLocked)
+      return 0;
+    return getTotalReordableNodesCountInTree(item);
+  }
 
   renderHeaderWrapper() {
     return (
@@ -85,78 +98,6 @@ class SwitchGroup extends BasicGroup {
   }
 
 
-  // renderField() {
-  //   const { config, selectedField, setField, parentField, id, groupId, isLocked } = this.props;
-  //   const { immutableFieldsMode } = config.settings;
-  //   return <FieldWrapper
-  //     key="field"
-  //     classname={"rule--field"}
-  //     config={config}
-  //     selectedField={selectedField}
-  //     setField={setField}
-  //     parentField={parentField}
-  //     readonly={immutableFieldsMode || isLocked}
-  //     id={id}
-  //     groupId={groupId}
-  //   />;
-  // }
-
-  // renderOperator() {
-  //   const {config, selectedField, selectedOperator, setField, setOperator, isLocked} = this.props;
-  //   const { immutableFieldsMode } = config.settings;
-  //   const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
-  //   const hideOperator = selectedFieldWidgetConfig.hideOperator;
-  //   const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
-  //   const showOperator = selectedField && !hideOperator;
-
-  //   return <OperatorWrapper
-  //     key="operator"
-  //     classname={"group--operator"}
-  //     config={config}
-  //     selectedField={selectedField}
-  //     selectedOperator={selectedOperator}
-  //     setField={setField}
-  //     setOperator={setOperator}
-  //     selectedFieldPartsLabels={["group"]}
-  //     showOperator={showOperator}
-  //     showOperatorLabel={showOperatorLabel}
-  //     selectedFieldWidgetConfig={selectedFieldWidgetConfig}
-  //     readonly={immutableFieldsMode || isLocked}
-  //     id={this.props.id}
-  //     groupId={this.props.groupId}
-  //   />;
-  // }
-
-  // renderWidget() {
-  //   const {config, selectedField, selectedOperator, isLocked} = this.props;
-  //   const { immutableValuesMode } = config.settings;
-  //   const isFieldAndOpSelected = selectedField && selectedOperator;
-  //   const showWidget = isFieldAndOpSelected;
-  //   if (!showWidget) return null;
-
-  //   const widget = <Widget
-  //     key="values"
-  //     isForRuleGruop={true}
-  //     field={this.props.selectedField}
-  //     operator={this.props.selectedOperator}
-  //     value={this.props.value}
-  //     valueSrc={"value"}
-  //     valueError={null}
-  //     config={config}
-  //     setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
-  //     setValueSrc={dummyFn}
-  //     readonly={immutableValuesMode || isLocked}
-  //     id={this.props.id}
-  //     groupId={this.props.groupId}
-  //   />;
-
-  //   return (
-  //     <Col key={"widget-for-"+this.props.selectedOperator} className="rule--value">
-  //       {widget}
-  //     </Col>
-  //   );
-  // }
-
   renderActions() {
     const {config, addCaseGroup, isLocked, isTrueLocked, id} = this.props;
 
@@ -173,12 +114,6 @@ class SwitchGroup extends BasicGroup {
     />;
   }
 
-  reordableNodesCnt() {
-    if (this.props.isLocked)
-      return 0;
-    const {children1} = this.props;
-    return children1.size;
-  }
 
   // extraPropsForItem(_item) {
   //   return {

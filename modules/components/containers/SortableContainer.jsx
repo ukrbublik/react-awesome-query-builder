@@ -421,12 +421,34 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                   //alt
                   if (canMoveBeforeAfterGroup && altII) {
                     // fix 2022-01-24: do prepend/append instead of before/after for root
+                    const isToRoot = altII.lev == 0;
+                    // fix 2022-01-25: fix prepend/append instead of before/after for case_group
+                    const isToCase = altII.type == "case_group" && itemInfo.type != "case_group";
+                    let prevCaseId = altII.prev && this.tree.items[altII.prev].caseId;
+                    let nextCaseId = altII.next && this.tree.items[altII.next].caseId;
+                    if (itemInfo.caseId == prevCaseId)
+                      prevCaseId = null;
+                    if (itemInfo.caseId == nextCaseId)
+                      nextCaseId = null;
+                    const prevCase = prevCaseId && this.tree.items[prevCaseId];
+                    const nextCase = nextCaseId && this.tree.items[nextCaseId];
+
                     if (dragDirs.vrt > 0) { //down
-                      const placement = altII.lev != 0 ? constants.PLACEMENT_AFTER : constants.PLACEMENT_APPEND;
-                      altMoves.push([placement, altII, altII.lev]);
+                      if (isToRoot) {
+                        altMoves.push([constants.PLACEMENT_APPEND, altII, altII.lev+1]);
+                      } else if (isToCase && nextCase) {
+                        altMoves.push([constants.PLACEMENT_PREPEND, nextCase, nextCase.lev+1]);
+                      } else {
+                        altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
+                      }
                     } else if (dragDirs.vrt < 0) { //up
-                      const placement = altII.lev != 0 ? constants.PLACEMENT_BEFORE : constants.PLACEMENT_PREPEND;
-                      altMoves.push([placement, altII, altII.lev]);
+                      if (isToRoot) {
+                        altMoves.push([constants.PLACEMENT_PREPEND, altII, altII.lev+1]);
+                      } else if (isToCase && prevCase) {
+                        altMoves.push([constants.PLACEMENT_APPEND, prevCase, prevCase.lev+1]);
+                      } else {
+                        altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
+                      }
                     }
                   }
                 }
@@ -439,6 +461,15 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 }
               }
               
+              //add case
+              const addCaseII = am => {
+                const toII = am[1];
+                const caseII = toII.caseId ? this.tree.items[toII.caseId] : null;
+                return [...am, caseII];
+              };
+              availMoves = availMoves.map(addCaseII);
+              altMoves = altMoves.map(addCaseII);
+
               //sanitize
               availMoves = availMoves.filter(am => {
                 const placement = am[0];
@@ -462,7 +493,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 return !isInside;
               }).map(am => {
                 const placement = am[0],
-                  toII = am[1];
+                  toII = am[1],
+                  _lev = am[2],
+                  _caseII = am[3];
                 let toParentII = null;
                 if (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND)
                   toParentII = toII;
@@ -470,14 +503,14 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                   toParentII = this.tree.items[toII.parent];
                 if (toParentII && toParentII.parent == null)
                   toParentII = null;
-                am[3] = toParentII;
+                am[4] = toParentII;
                 return am;
               });
 
               let bestMode = null;
-              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
+              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], canMoveFn));
               if (canMoveBeforeAfterGroup && filteredMoves.length == 0 && altMoves.length > 0) {
-                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
+                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], canMoveFn));
               }
               const levs = filteredMoves.map(am => am[2]);
               const curLev = itemInfo.lev;
@@ -515,16 +548,14 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       return false;
     }
 
-    canMove (fromII, toII, placement, toParentII, canMoveFn) {
+    canMove (fromII, toII, placement, toCaseII, toParentII, canMoveFn) {
       if (!fromII || !toII)
         return false;
       if (fromII.id === toII.id)
         return false;
 
-      const canRegroup = this.props.config.settings.canRegroup;
-      const canRegroupCases = this.props.config.settings.canRegroupCases;
-      const maxNesting = this.props.config.settings.maxNesting;
-      const newLev = toParentII ? toParentII.lev : 0;
+      const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules } = this.props.config.settings;
+      const newLev = toParentII ? toParentII.lev + 1 : toII.lev;
       const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
@@ -537,16 +568,24 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         || fromII.type == "case_group" && !isLev1
         // only `case_group` can be placed under `switch_group`
         || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
+        || fromII.type != "case_group" && toII.type == "switch_group"
         // can't move rule/group to another case
         || !canRegroupCases && fromII.caseId != toII.caseId;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
-      
-      if (maxNesting && (newLev + 1) > maxNesting)
+
+      if (maxNesting && newLev > maxNesting)
         return false;
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;
       
+      if (fromII.caseId != toII.caseId) {
+        const newRulesInTargetCase = toCaseII.leafsCount + 1;
+        if (maxNumberOfRules && newRulesInTargetCase > maxNumberOfRules)
+          return false;
+        // todo: use canLeaveEmptyCase
+      }
+
       let res = true;
       if (canMoveFn)
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);
