@@ -35,7 +35,7 @@ export const loadFromSpel = (spelStr, config) => {
     console.log("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
-    if (jsTree && jsTree.type != "group") {
+    if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
       jsTree = wrapInDefaultConj(jsTree, extendedConfig);
     }
     console.log("jsTree:", jsTree);
@@ -146,6 +146,22 @@ const convertCompiled = (expr, meta) => {
     }
   } catch(e) {
     console.error("[spel2js] Error in getValue()", e);
+  }
+
+  // ternary
+  if (type == "ternary") {
+    let flat = [];
+    function _processTernaryChildren(tern) {
+      let [cond, if_val, else_val] = tern;
+      flat.push([cond, if_val]);
+      if (else_val.type == "ternary") {
+        _processTernaryChildren(else_val.children);
+      } else {
+        flat.push([undefined, else_val]);
+      }
+    }
+    _processTernaryChildren(children);
+    val = flat;
   }
 
   // convert method/function args
@@ -302,7 +318,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   } else if (literalTypes[spel.type]) {
     let value = spel.val;
     let valueType = literalTypes[spel.type];
-    if (parentSpel.isUnary) {
+    if (parentSpel?.isUnary) {
       value = -value;
     }
     return {
@@ -632,6 +648,56 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     res = {
       groupFilter,
       groupFieldValue
+    };
+  } else if (spel.type == "ternary") {
+    const children1 = {};
+    spel.val.forEach(v => {
+      const [cond, val] = v;
+
+      const convertedVal = convertArg(val, conv, config, meta, {
+        ...spel,
+        _groupField: null
+      });
+      const valProperties = convertedVal ?{
+        value: [convertedVal.value],
+        valueSrc: [convertedVal.valueSrc],
+        valueType: [convertedVal.valueType]
+      } : {};
+
+      let caseI;
+      if (cond) {
+        caseI = convertToTree(cond, conv, config, meta, spel);
+        if (caseI && caseI.type) {
+          if (caseI.type != "group") {
+            caseI = wrapInDefaultConj(caseI, config);
+          }
+          caseI.type = "case_group";
+        } else {
+          meta.errors.push(`Unexpected case: ${JSON.stringify(caseI)}`);
+          caseI = undefined;
+        }
+      } else {
+        caseI = {
+          id: uuid(),
+          type: "case_group",
+          properties: {}
+        };
+      }
+
+      if (caseI) {
+        caseI.properties = {
+          ...caseI.properties,
+          ...valProperties
+        };
+
+        children1[caseI.id] = caseI;
+      }
+    });
+    res = {
+      type: "switch_group",
+      id: uuid(),
+      children1,
+      properties: {}
     };
   } else {
     res = convertArg(spel, conv, config, meta, parentSpel);
