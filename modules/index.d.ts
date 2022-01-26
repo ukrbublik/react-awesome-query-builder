@@ -845,7 +845,6 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
-  ternaryMode?: boolean,
 }
 
 export interface OtherSettings {

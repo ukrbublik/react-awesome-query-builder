@@ -437,28 +437,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       meta.errors.push(`Unsupported method ${methodName}`);
     }
   } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
-    // flatize
-    let flat = [];
-    function _processConcatChildren(children) {
-      children.map(child => {
-        if (child.type == "op-plus") {
-          _processConcatChildren(child.children);
-        } else {
-          const convertedChild = convertArg(child, conv, config, meta, spel);
-          if (convertedChild) {
-            flat.push(convertedChild);
-          } else {
-            meta.errors.push(`Can't convert ${child.type} in concatenation`);
-          }
-        }
-      })
-    }
-    _processConcatChildren(spel.children);
-    return {
-      valueSrc: "value",
-      valueType: "case_value",
-      value: flat,
-    };
+    return buildCaseValueConcat(spel, conv, config, meta);
   } else {
     meta.errors.push(`Can't convert arg of type ${spel.type}`);
   }
@@ -588,7 +567,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     }
 
     // convert children
-    const vals = spel.children.map(child => 
+    const convertChildren = () => spel.children.map(child => 
       convertToTree(child, conv, config, meta, {
         ...spel,
         _groupField: parentSpel?._groupField
@@ -597,10 +576,14 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     
     if (op == "and" || op == "or") {
       const children1 = {};
+      const vals = convertChildren();
       vals.forEach(v => {
         if (v) {
           const id = uuid();
           v.id = id;
+          if (v.type == undefined) {
+            console.log(222)
+          }
           children1[id] = v;
         }
       });
@@ -614,6 +597,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         }
       };
     } else if (opKeys) {
+      const vals = convertChildren();
       const fieldObj = vals[0];
       let convertedArgs = vals.slice(1);
       opKey = opKeys[0];
@@ -660,7 +644,13 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         res = buildRule(config, field, opKey, convertedArgs);
       }
     } else {
-      meta.errors.push(`Can't convert op ${op}`);
+      if (!parentSpel) {
+        // try to parse whole `"str" + prop + #var` as ternary
+        res = buildSimpleSwitch(spel, conv, config, meta);
+      }
+      if (!res) {
+        meta.errors.push(`Can't convert op ${op}`);
+      }
     }
   } else if (spel.type == "!aggr") {
     const groupFieldValue = convertToTree(spel.source, conv, config, meta, {
@@ -682,54 +672,8 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     const children1 = {};
     spel.val.forEach(v => {
       const [cond, val] = v;
-
-      let valProperties = {};
-      const convVal = convertArg(val, conv, config, meta, {
-        ...spel,
-        _groupField: null
-      });
-      const widgetDef = config.widgets["case_value"];
-      const importCaseValue = widgetDef?.spelImportValue;
-      if (importCaseValue) {
-        const [normVal, normErrors] = importCaseValue(convVal);
-        normErrors.map(e => meta.errors.push(e));
-        if (normVal) {
-          valProperties = {
-            value: [normVal],
-            valueSrc: ["value"],
-            valueType: ["case_value"]
-          };
-        }
-      } else {
-        meta.errors.push(`No fucntion to import case value`);
-      }
-
-      let caseI;
-      if (cond) {
-        caseI = convertToTree(cond, conv, config, meta, spel);
-        if (caseI && caseI.type) {
-          if (caseI.type != "group") {
-            caseI = wrapInDefaultConj(caseI, config);
-          }
-          caseI.type = "case_group";
-        } else {
-          meta.errors.push(`Unexpected case: ${JSON.stringify(caseI)}`);
-          caseI = undefined;
-        }
-      } else {
-        caseI = {
-          id: uuid(),
-          type: "case_group",
-          properties: {}
-        };
-      }
-
+      const caseI = buildCase(cond, val, conv, config, meta, spel);
       if (caseI) {
-        caseI.properties = {
-          ...caseI.properties,
-          ...valProperties
-        };
-
         children1[caseI.id] = caseI;
       }
     });
@@ -742,11 +686,116 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
   } else {
     res = convertArg(spel, conv, config, meta, parentSpel);
     if (res && !res.type && !parentSpel) {
-      res = undefined;
-      meta.errors.push(`Can't convert rule of type ${spel.type}, it looks like var/literal`);
+      // try to parse whole `"1"` as ternary
+      const sw = buildSimpleSwitch(spel, conv, config, meta);
+      if (sw) {
+        res = sw;
+      } else {
+        res = undefined;
+        meta.errors.push(`Can't convert rule of type ${spel.type}, it looks like var/literal`);
+      }
     }
   }
   return res;
+};
+
+const buildSimpleSwitch = (val, conv, config, meta) => {
+  let children1 = {};
+  const cond = null;
+  const caseI = buildCase(cond, val, conv, config, meta);
+  if (caseI) {
+    children1[caseI.id] = caseI;
+  }
+  let res = {
+    type: "switch_group",
+    id: uuid(),
+    children1,
+    properties: {}
+  };
+  return res;
+};
+
+const buildCase = (cond, val, conv, config, meta, spel = null) => {
+  const valProperties = buildCaseValProperties(config, meta, conv, val, spel);
+
+  let caseI;
+  if (cond) {
+    caseI = convertToTree(cond, conv, config, meta, spel);
+    if (caseI && caseI.type) {
+      if (caseI.type != "group") {
+        caseI = wrapInDefaultConj(caseI, config);
+      }
+      caseI.type = "case_group";
+    } else {
+      meta.errors.push(`Unexpected case: ${JSON.stringify(caseI)}`);
+      caseI = undefined;
+    }
+  } else {
+    caseI = {
+      id: uuid(),
+      type: "case_group",
+      properties: {}
+    };
+  }
+
+  if (caseI) {
+    caseI.properties = {
+      ...caseI.properties,
+      ...valProperties
+    };
+  }
+
+  return caseI;
+};
+
+const buildCaseValueConcat = (spel, conv, config, meta) => {
+  let flat = [];
+  function _processConcatChildren(children) {
+    children.map(child => {
+      if (child.type == "op-plus") {
+        _processConcatChildren(child.children);
+      } else {
+        const convertedChild = convertArg(child, conv, config, meta, spel);
+        if (convertedChild) {
+          flat.push(convertedChild);
+        } else {
+          meta.errors.push(`Can't convert ${child.type} in concatenation`);
+        }
+      }
+    })
+  }
+  _processConcatChildren(spel.children);
+  return {
+    valueSrc: "value",
+    valueType: "case_value",
+    value: flat,
+  };
+};
+
+const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
+  let valProperties = {};
+  let convVal;
+  if (val.type == "op-plus") {
+    convVal = buildCaseValueConcat(val, conv, config, meta);
+  } else {
+    convVal = convertArg(val, conv, config, meta, spel);
+  }
+  const widgetDef = config.widgets["case_value"];
+  const importCaseValue = widgetDef?.spelImportValue;
+  if (importCaseValue) {
+    const [normVal, normErrors] = importCaseValue(convVal);
+    normErrors.map(e => meta.errors.push(e));
+    if (normVal) {
+      valProperties = {
+        value: [normVal],
+        valueSrc: ["value"],
+        valueType: ["case_value"]
+      };
+    }
+  } else {
+    meta.errors.push(`No fucntion to import case value`);
+  }
+  return valProperties;
 };
 
 const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
