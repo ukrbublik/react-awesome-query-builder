@@ -299,6 +299,7 @@ export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
 export type SelectWidgetProps = BaseWidgetProps & SelectFieldSettings;
 export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
+export type CaseValueWidgetProps = BaseWidgetProps & CaseValueFieldSettings;
 
 export interface BaseWidget {
   customProps?: AnyObject;
@@ -341,6 +342,7 @@ export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
 export type SelectWidget = BaseWidget & SelectFieldSettings;
 export type TreeSelectWidget = BaseWidget & TreeSelectFieldSettings;
+export type CaseValueWidget = BaseWidget & CaseValueFieldSettings;
 
 export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget | TreeSelectWidget  | RangeableWidget | BaseWidget;
 export type Widgets = TypedMap<Widget>;
@@ -445,6 +447,7 @@ export interface ConfirmModalProps {
 export interface RuleErrorProps {
   error: string,
 }
+
 
 /////////////////
 // Operators
@@ -602,6 +605,8 @@ export interface TreeSelectFieldSettings extends BasicFieldSettings {
 export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
+}
+export interface CaseValueFieldSettings extends BasicFieldSettings {
 }
 export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | TextFieldSettings | BasicFieldSettings;
 
@@ -927,6 +932,7 @@ export interface BasicConfig extends Config {
     boolean: BooleanWidget,
     field: FieldWidget,
     func: FieldWidget,
+    case_value: CaseValueWidget,
   },
   types: {
     text: Type,
@@ -939,6 +945,7 @@ export interface BasicConfig extends Config {
     treeselect: Type,
     treemultiselect: Type,
     boolean: Type,
+    case_value: Type,
   },
   settings: Settings,
 }

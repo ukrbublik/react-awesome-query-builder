@@ -907,6 +907,17 @@ const widgets = {
     customProps: {
       //showSearch: true
     }
+  },
+  case_value: {
+    valueSrc: "value",
+    type: "case_value",
+    spelFormatValue: (val) => spelEscape(val),
+    factory: ({value, setValue}) =>  
+      <input 
+        type="text" 
+        value={value || ''} 
+        onChange={e => setValue(e.target.value)} 
+      />
   }
 };
 
@@ -1181,7 +1192,13 @@ const types = {
         }
       }
     }
-  }
+  },
+  "case_value": {
+    mainWidget: "case_value",
+    widgets: {
+      case_value: {}
+    }
+  },
 };
 
 //----------------------------  settings

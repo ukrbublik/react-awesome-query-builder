@@ -205,6 +205,15 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
+  if (field == "!case_value") {
+    return {
+      type: "case_value",
+      mainWidget: "case_value",
+      widgets: {
+        "case_value": config.widgets["case_value"]
+      }
+    };
+  }
   const fieldSeparator = config.settings.fieldSeparator;
   //field = normalizeField(config, field);
   const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
@@ -328,7 +337,7 @@ export const getOperatorConfig = (config, operator, field = null) => {
 export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
   if (!field)
     return null;
-  if (!(operator || widget) && valueSrc != "const")
+  if (!(operator || widget) && valueSrc != "const" && field != "!case_value")
     return null;
   const fieldConfig = getFieldConfig(config, field);
   if (!widget)

@@ -253,7 +253,7 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
 };
 
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
-  const isFuncArg = typeof field == "object" && !!field.func && !!field.arg;
+  const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
   const {showLabels} = config.settings;
   const fieldConfig = getFieldConfig(config, field);
   const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
@@ -317,7 +317,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       }
       // If can't check operators, don't add
       // Func args don't have operators
-      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg)
+      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg && field != "!case_value")
         canAdd = false;
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;

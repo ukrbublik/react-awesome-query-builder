@@ -122,7 +122,7 @@ export class BasicGroup extends PureComponent {
 
   isOneChild() {
     const {children1} = this.props;
-    return children1.size < 2;
+    return children1 ? children1.size < 2 : true;
   }
 
   renderChildrenWrapper() {
@@ -301,7 +301,7 @@ export class BasicGroup extends PureComponent {
     const conjunctionOptions = this.conjunctionOptions();
     if (!this.showConjs())
       return null;
-    if (!children1.size)
+    if (!children1 || !children1.size)
       return null;
 
     const renderProps = {

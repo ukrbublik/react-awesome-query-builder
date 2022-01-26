@@ -300,7 +300,25 @@ ul.ant-select-selection__rendered {
       }
     }
   }
+}
 
+.case_group--body {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  .case_group--children {
+    flex: auto;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .case_group--value {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
 }
 
 /******************************************************************************/

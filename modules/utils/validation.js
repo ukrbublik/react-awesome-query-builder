@@ -273,29 +273,31 @@ const validateValueInList = (value, listValues) => {
 */
 const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   let fixedValue = value;
-  const fieldConfig = getFieldConfig(config, field);
-  const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-  const wConfig = config.widgets[w];
-  const wType = wConfig.type;
-  const jsType = wConfig.jsType;
-  const fieldSettings = fieldConfig.fieldSettings;
+  if (field) {
+    const fieldConfig = getFieldConfig(config, field);
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const wConfig = config.widgets[w];
+    const wType = wConfig.type;
+    const jsType = wConfig.jsType;
+    const fieldSettings = fieldConfig.fieldSettings;
 
-  if (valueType != wType)
-    return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
-  if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
-    return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
-  }
+    if (valueType != wType)
+      return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
+    if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
+      return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
+    }
 
-  if (fieldSettings) {
-    const listValues = asyncListValues || fieldSettings.listValues;
-    if (listValues && !fieldSettings.allowCustomValues) {
-      return validateValueInList(value, listValues);
-    }
-    if (fieldSettings.min != null && value < fieldSettings.min) {
-      return [`Value ${value} < min ${fieldSettings.min}`, value];
-    }
-    if (fieldSettings.max != null && value > fieldSettings.max) {
-      return [`Value ${value} > max ${fieldSettings.max}`, value];
+    if (fieldSettings) {
+      const listValues = asyncListValues || fieldSettings.listValues;
+      if (listValues && !fieldSettings.allowCustomValues) {
+        return validateValueInList(value, listValues);
+      }
+      if (fieldSettings.min != null && value < fieldSettings.min) {
+        return [`Value ${value} < min ${fieldSettings.min}`, value];
+      }
+      if (fieldSettings.max != null && value > fieldSettings.max) {
+        return [`Value ${value} > max ${fieldSettings.max}`, value];
+      }
     }
   }
 

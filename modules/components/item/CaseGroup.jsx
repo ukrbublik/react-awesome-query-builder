@@ -4,13 +4,9 @@ import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {GroupActions} from "./GroupActions";
-import FieldWrapper from "../rule/FieldWrapper";
-import OperatorWrapper from "../rule/OperatorWrapper";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
-import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
 import Widget from "../rule/Widget";
-import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../../utils/treeUtils";
 const classNames = require("classnames");
 
 
@@ -26,6 +22,8 @@ class CaseGroup extends BasicGroup {
     // setField: PropTypes.func,
     // setOperator: PropTypes.func,
     parentReordableNodesCnt: PropTypes.number,
+    value: PropTypes.any,
+    setValue: PropTypes.func,
   };
 
   constructor(props) {
@@ -37,6 +35,10 @@ class CaseGroup extends BasicGroup {
   onPropsChanged(nextProps) {
   }
 
+  isDefaultCase() {
+    return this.props.children1 == undefined;
+  }
+
   reordableNodesCnt() {
     return this.props.parentReordableNodesCnt;
   }
@@ -46,6 +48,8 @@ class CaseGroup extends BasicGroup {
   renderFooterWrapper = () => null;
 
   renderHeaderWrapper() {
+    if (this.isDefaultCase())
+      return null;
     return (
       <div key="group-header" className={classNames(
         "group--header", 
@@ -54,9 +58,36 @@ class CaseGroup extends BasicGroup {
         this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
       )}>
         {this.renderHeader()}
-        {this.renderGroupField()}
+        {this.renderCaseTitle()}
         {this.renderActions()}
       </div>
+    );
+  }
+
+  renderValue() {
+    const { config, isLocked, value, setValue, id } = this.props;
+    const { immutableValuesMode } = config.settings;
+
+    const widget = <Widget
+      key="values"
+      isCaseValue={true}
+      field={"!case_value"}
+      operator={null}
+      value={value}
+      valueSrc={"value"}
+      valueError={null}
+      config={config}
+      setValue={!immutableValuesMode ? setValue : dummyFn}
+      setValueSrc={dummyFn}
+      readonly={immutableValuesMode || isLocked}
+      id={id}
+      groupId={null}
+    />;
+
+    return (
+      <Col className="case_group--value">
+        {widget}
+      </Col>
     );
   }
 
@@ -69,17 +100,37 @@ class CaseGroup extends BasicGroup {
     );
   }
 
-  renderGroupField() {
+  renderCaseTitle() {
+    return null;
+  }
+
+  renderChildrenWrapper() {
     return (
-      <div className={"group--field--count--rule"}>
-        {/* {this.renderField()}
-        {this.renderOperator()}
-        {this.renderWidget()} */}
+      <div className={"case_group--body"}>
+        {this.renderCondition()}
+        {this.renderValue()}
       </div>
     );
   }
 
+  renderCondition() {
+    if (this.isDefaultCase()) {
+      return (
+        <div className={classNames(
+          "group--children",
+          this.childrenClassName()
+        )}>
+          {"default"}
+        </div>
+      );
+    } else {
+      return super.renderChildrenWrapper();
+    }
+  }
+
   renderActions() {
+    if (this.isDefaultCase())
+      return null;
     const {config, addGroup, addRule, isLocked, isTrueLocked, id} = this.props;
     return <GroupActions
       config={config}

@@ -41,6 +41,8 @@ export default class Widget extends PureComponent {
     parentField: PropTypes.string,
     // for func in func
     parentFuncs: PropTypes.array,
+    // for case_value
+    isCaseValue: PropTypes.bool,
   };
 
   constructor(props) {
@@ -87,12 +89,12 @@ export default class Widget extends PureComponent {
 
   getMeta({
     config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, 
-    isForRuleGruop, isFuncArg, leftField, asyncListValues
+    isForRuleGruop, isCaseValue, isFuncArg, leftField, asyncListValues
   }) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     let iValueSrcs = valueSrcs;
     let iValues = values;
-    if (isFuncArg || isForRuleGruop) {
+    if (isFuncArg || isForRuleGruop || isCaseValue) {
       iValueSrcs = Immutable.List([valueSrcs]);
       iValues = Immutable.List([values]);
     }
@@ -101,13 +103,13 @@ export default class Widget extends PureComponent {
     const defaultWidget = getWidgetForFieldOp(config, field, operator);
     const _widgets = getWidgetsForFieldOp(config, field, operator);
     const operatorDefinition = isFuncArg ? funcArgDummyOpDef : getOperatorConfig(config, operator, field);
-    if (fieldDefinition == null || operatorDefinition == null) {
+    if ((fieldDefinition == null || operatorDefinition == null) && !isCaseValue) {
       return null;
     }
-    const isSpecialRange = operatorDefinition.isSpecialRange;
+    const isSpecialRange = operatorDefinition?.isSpecialRange;
     const isSpecialRangeForSrcField = isSpecialRange && (iValueSrcs.get(0) == "field" || iValueSrcs.get(1) == "field");
     const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
-    const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition.cardinality, 1);
+    const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition?.cardinality, 1);
     if (cardinality === 0) {
       return null;
     }
@@ -122,10 +124,10 @@ export default class Widget extends PureComponent {
         widget = widgetDefinition.singleWidget;
         widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
       }
-      const widgetType = widgetDefinition.type;
+      const widgetType = widgetDefinition?.type;
       const valueLabel = getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange);
       const widgetValueLabel = getValueLabel(config, field, operator, delta, null, isTrueSpecialRange);
-      const sepText = operatorDefinition.textSeparators ? operatorDefinition.textSeparators[delta] : null;
+      const sepText = operatorDefinition?.textSeparators ? operatorDefinition?.textSeparators[delta] : null;
       const setValueSrcHandler = this._onChangeValueSrc.bind(this, delta);
 
       let valueLabels = null;
@@ -139,7 +141,7 @@ export default class Widget extends PureComponent {
           placeholder: [ valueLabels[0].placeholder, valueLabels[1].placeholder ],
           label: [ valueLabels[0].label, valueLabels[1].label ],
         };
-        textSeparators = operatorDefinition.textSeparators;
+        textSeparators = operatorDefinition?.textSeparators;
       }
 
       const setValueHandler = this._setValue.bind(this, isSpecialRange, delta, widgetType);
@@ -273,6 +275,7 @@ export default class Widget extends PureComponent {
   render() {
     if (!this.meta) return null;
     const { defaultWidget, cardinality } = this.meta;
+    if (!defaultWidget) return null;
     const name = defaultWidget;
 
     return (

@@ -4,12 +4,8 @@ import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {GroupActions} from "./GroupActions";
-import FieldWrapper from "../rule/FieldWrapper";
-import OperatorWrapper from "../rule/OperatorWrapper";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
-import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
-import Widget from "../rule/Widget";
 import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../../utils/treeUtils";
 const classNames = require("classnames");
 

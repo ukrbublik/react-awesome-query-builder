@@ -35,11 +35,72 @@ const formatItem = (item, config, meta, parentField = null) => {
     return formatGroup(item, config, meta, parentField);
   } else if (type === "rule") {
     return formatRule(item, config, meta, parentField);
+  } else if (type == "switch_group") {
+    return formatSwitch(item, config, meta, parentField);
+  } else if (type == "case_group") {
+    return formatCase(item, config, meta, parentField);
   }
 
   return undefined;
 };
 
+const formatCase = (item, config, meta, parentField = null) => {
+  const type = item.get("type");
+  if (type != "case_group") {
+    meta.errors.push(`Unexpected child of type ${type} inside switch`);
+    return undefined;
+  }
+  const properties = item.get("properties") || new Map();
+  
+  const [formattedValue, valueSrc, valueType] = formatItemValue(
+    config, properties, meta, null, "!case_value"
+  );
+
+  const cond = formatGroup(item, config, meta, parentField);
+  return [cond, formattedValue];
+};
+
+const formatSwitch = (item, config, meta, parentField = null) => {
+  const properties = item.get("properties") || new Map();
+  const children = item.get("children1");
+  if (!children) return undefined;
+  const cases = children
+    .map((currentChild) => formatCase(currentChild, config, meta, null))
+    .filter((currentChild) => typeof currentChild !== "undefined")
+    .toArray();
+  
+  if (!cases.length) return undefined;
+
+  if (cases.length == 1 && !cases[0][0]) {
+    // only 1 case without condition
+    return cases[0][1];
+  }
+
+  let filteredCases = [];
+  for (let i = 0 ; i < cases.length ; i++) {
+    if (i != (cases.length - 1) && !cases[i][0]) {
+      meta.errors.push(`No condition for case ${cases[i][1]}`);
+    } else {
+      filteredCases.push(cases[i]);
+      if (i == (cases.length - 1) && cases[i][0]) {
+        // no default - add null as default
+        filteredCases.push([undefined, null]);
+      }
+    }
+  }
+
+  let left = "", right = "";
+  for (let i = 0 ; i < filteredCases.length ; i++) {
+    const [cond, value] = filteredCases[i];
+    if (i != (filteredCases.length - 1)) {
+      left += `(${cond} ? ${value} : `;
+      right += `)`;
+    } else {
+      left += `${value}`;
+    }
+  }
+  return left + right;
+};
 
 const formatGroup = (item, config, meta, parentField = null) => {
   const type = item.get("type");
@@ -230,7 +291,10 @@ const formatRule = (item, config, meta, parentField = null) => {
 };
 
 const formatItemValue = (config, properties, meta, operator, parentField) => {
-  const field = properties.get("field");
+  let field = properties.get("field");
+  if (parentField == "!case_value") {
+    field = "!case_value";
+  }
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
   const fieldDef = getFieldConfig(config, field) || {};

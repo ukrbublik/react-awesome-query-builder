@@ -21,9 +21,11 @@ class RuleGroupExt extends BasicGroup {
     ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string,
+    value: PropTypes.any,
     parentField: PropTypes.string,
     setField: PropTypes.func,
     setOperator: PropTypes.func,
+    setValue: PropTypes.func,
   };
 
   constructor(props) {

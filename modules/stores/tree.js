@@ -485,6 +485,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+  const operatorConfig = getOperatorConfig(config, operator, field);
+  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
   const isEndValue = false;
   const canFix = false;
@@ -503,8 +505,6 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   if (showErrorMessage) {
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
-    const operatorConfig = getOperatorConfig(config, operator, field);
-    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
     const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
         
     if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
@@ -515,7 +515,15 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);
     }
   }
-    
+  
+  const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
+  if (!lastValueArr) {
+    state = state
+      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
+  }
+
   const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta + ""));
   const lastError = state.getIn(expandTreePath(path, "properties", "valueError", delta));
   const isLastEmpty = lastValue == undefined;
