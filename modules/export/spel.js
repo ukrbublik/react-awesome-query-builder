@@ -53,7 +53,7 @@ const formatCase = (item, config, meta, parentField = null) => {
   const properties = item.get("properties") || new Map();
   
   const [formattedValue, valueSrc, valueType] = formatItemValue(
-    config, properties, meta, null, "!case_value"
+    config, properties, meta, null, parentField, "!case_value"
   );
 
   const cond = formatGroup(item, config, meta, parentField);
@@ -91,7 +91,11 @@ const formatSwitch = (item, config, meta, parentField = null) => {
 
   let left = "", right = "";
   for (let i = 0 ; i < filteredCases.length ; i++) {
-    const [cond, value] = filteredCases[i];
+    let [cond, value] = filteredCases[i];
+    if (value == undefined)
+      value = "null";
+    if (cond == undefined)
+      cond = "true";
     if (i != (filteredCases.length - 1)) {
       left += `(${cond} ? ${value} : `;
       right += `)`;
@@ -131,7 +135,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   
   // build value for aggregation op
   const [formattedValue, valueSrc, valueType] = formatItemValue(
-    config, properties, meta, realGroupOperator, parentField
+    config, properties, meta, realGroupOperator, parentField, null
   );
   
   // build filter in aggregation
@@ -275,7 +279,7 @@ const formatRule = (item, config, meta, parentField = null) => {
 
   //format value
   const [formattedValue, valueSrc, valueType] = formatItemValue(
-    config, properties, meta, realOp, parentField
+    config, properties, meta, realOp, parentField, null
   );
   if (formattedValue === undefined)
     return undefined;
@@ -290,13 +294,13 @@ const formatRule = (item, config, meta, parentField = null) => {
   return res;
 };
 
-const formatItemValue = (config, properties, meta, operator, parentField) => {
+const formatItemValue = (config, properties, meta, operator, parentField, expectedValueType = null) => {
   let field = properties.get("field");
-  if (parentField == "!case_value") {
-    field = "!case_value";
-  }
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
+  if (expectedValueType == "!case_value" || iValueType && iValueType.get(0) == "case_value") {
+    field = "!case_value";
+  }
   const fieldDef = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
@@ -403,7 +407,7 @@ const formatField = (meta, config, field, parentField = null) => {
       else
         parent = "class";
     }
-    const isSpelVariable = cnf.isSpelVariable;
+    const isSpelVariable = cnf?.isSpelVariable;
     return {
       key,
       parent,

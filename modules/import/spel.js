@@ -300,19 +300,25 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   if (spel.type == "compound") {
     // complex field
     const parts = convertPath(spel.children, meta);
-    if (!parts) return undefined;
+    if (!parts) {
+      return undefined;
+    }
     const fullParts = [...groupFieldParts, ...parts];
+    const isVariable = spel.children?.[0]?.type == "variable";
     return {
       valueSrc: "field",
       //valueType: todo
+      isVariable,
       value: fullParts.join(fieldSeparator),
     };
   } else if (spel.type == "variable" || spel.type == "property") {
     // normal field
     const fullParts = [...groupFieldParts, spel.val];
+    const isVariable = spel.type == "variable";
     return {
       valueSrc: "field",
       //valueType: todo
+      isVariable,
       value: fullParts.join(fieldSeparator),
     };
   } else if (literalTypes[spel.type]) {
@@ -430,6 +436,29 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       // todo: conv.funcs
       meta.errors.push(`Unsupported method ${methodName}`);
     }
+  } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
+    // flatize
+    let flat = [];
+    function _processConcatChildren(children) {
+      children.map(child => {
+        if (child.type == "op-plus") {
+          _processConcatChildren(child.children);
+        } else {
+          const convertedChild = convertArg(child, conv, config, meta, spel);
+          if (convertedChild) {
+            flat.push(convertedChild);
+          } else {
+            meta.errors.push(`Can't convert ${child.type} in concatenation`);
+          }
+        }
+      })
+    }
+    _processConcatChildren(spel.children);
+    return {
+      valueSrc: "value",
+      valueType: "case_value",
+      value: flat,
+    };
   } else {
     meta.errors.push(`Can't convert arg of type ${spel.type}`);
   }
@@ -654,15 +683,26 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     spel.val.forEach(v => {
       const [cond, val] = v;
 
-      const convertedVal = convertArg(val, conv, config, meta, {
+      let valProperties = {};
+      const convVal = convertArg(val, conv, config, meta, {
         ...spel,
         _groupField: null
       });
-      const valProperties = convertedVal ?{
-        value: [convertedVal.value],
-        valueSrc: [convertedVal.valueSrc],
-        valueType: [convertedVal.valueType]
-      } : {};
+      const widgetDef = config.widgets["case_value"];
+      const importCaseValue = widgetDef?.spelImportValue;
+      if (importCaseValue) {
+        const [normVal, normErrors] = importCaseValue(convVal);
+        normErrors.map(e => meta.errors.push(e));
+        if (normVal) {
+          valProperties = {
+            value: [normVal],
+            valueSrc: ["value"],
+            valueType: ["case_value"]
+          };
+        }
+      } else {
+        meta.errors.push(`No fucntion to import case value`);
+      }
 
       let caseI;
       if (cond) {

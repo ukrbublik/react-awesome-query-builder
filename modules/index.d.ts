@@ -140,6 +140,23 @@ export type ImmutableTree = ImmutableOMap<string, any>;
 // Query, Builder, Utils, Config
 /////////////////
 
+interface SpelConcatPart {
+  value: string;
+  type: "property" | "variable" | "const";
+}
+type SpelConcatParts = SpelConcatPart[];
+interface SpelConcatCaseValue {
+  valueType: "case_value";
+  value: SpelConcatNormalValue[];
+}
+interface SpelConcatNormalValue {
+  value: string;
+  valueType: string;
+  valueSrc: "value" | "field";
+  isVariable?: boolean;
+}
+type SpelConcatValue = SpelConcatNormalValue | SpelConcatCaseValue;
+
 export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
@@ -168,6 +185,11 @@ export interface Utils {
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
     getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
     getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  };
+  ExportUtils: {
+    spelEscape(val: any): string;
+    spelFormatConcat(parts: SpelConcatParts): string;
+    spelImportConcat(val: SpelConcatValue): [SpelConcatParts?, string[]],
   }
 }
 
@@ -263,6 +285,8 @@ export interface Actions {
 // Widgets, WidgetProps
 /////////////////
 
+type SpelImportValue = (val: any) => [any, string[]];
+
 type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SpelFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
@@ -313,6 +337,7 @@ export interface BaseWidget {
   formatValue?: FormatValue;
   sqlFormatValue?: SqlFormatValue;
   spelFormatValue?: SpelFormatValue;
+  spelImportValue?: SpelImportValue;
   mongoFormatValue?: MongoFormatValue;
   elasticSearchFormatValue?: ElasticSearchFormatValue;
   hideOperator?: boolean;

@@ -127,4 +127,55 @@ const spelEscape = (val, numberToFloat = false, arrayToArray = false) => {
   }
 };
 
-export {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList};
+const spelFormatConcat = (parts) => {
+  if (parts && Array.isArray(parts) && parts.length) {
+    return parts
+      .map(part => {
+        if (part.type == "const") {
+          return spelEscape(part.value);
+        } else if (part.type == "property") {
+          return ""+part.value;
+        } else if (part.type == "variable") {
+          return "#"+part.value;
+        } return undefined;
+      })
+      .filter(r => r != undefined)
+      .join(" + ");
+  } else {
+    return "null";
+  }
+};
+
+// `val` is {value, valueType, valueSrc}
+// If `valueType` == "case_value", `value` is array of such items (to be considered as concatenation)
+const spelImportConcat = (val) => {
+  if (val == undefined)
+    return [undefined, []];
+  let errors = [];
+  const parts = val.valueType == "case_value" ? val.value : [val];
+  const res = parts.map(child => {
+    if (child.valueSrc == "value") {
+      if (child.value === null) {
+        return undefined;
+      } else {
+        return {
+          type: "const", 
+          value: child.value
+        };
+      }
+    } else if (child.valueSrc == "field") {
+      return {
+        type: (child.isVariable ? "variable" : "property"), 
+        value: child.value
+      };
+    } else {
+      errors.push(`Unsupported valueSrc ${child.valueSrc} in concatenation`);
+    }
+  }).filter(v => v != undefined);
+  return [res, errors];
+};
+
+export {
+  SqlString, sqlEmptyValue, 
+  mongoEmptyValue, spelEscape, spelFixList, spelFormatConcat, spelImportConcat
+};

@@ -911,7 +911,12 @@ const widgets = {
   case_value: {
     valueSrc: "value",
     type: "case_value",
-    spelFormatValue: (val) => spelEscape(val),
+    spelFormatValue: (val) => {
+      return spelEscape(val === "" ? null : val);
+    },
+    spelImportValue: (val) => {
+      return [val.value, []];
+    },
     factory: ({value, setValue}) =>  
       <input 
         type="text" 
