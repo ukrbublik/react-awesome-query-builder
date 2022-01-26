@@ -581,10 +581,11 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         if (v) {
           const id = uuid();
           v.id = id;
-          if (v.type == undefined) {
-            console.log(222)
+          if (v.type != undefined) {
+            children1[id] = v;
+          } else {
+            meta.errors.push(`Bad item in AND/OR: ${JSON.stringify(v)}`);
           }
-          children1[id] = v;
         }
       });
       res = {
