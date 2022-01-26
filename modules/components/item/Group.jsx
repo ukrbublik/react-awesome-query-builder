@@ -241,6 +241,7 @@ export class BasicGroup extends PureComponent {
         //tree={props.tree}
         reordableNodesCnt={this.reordableNodesCntForItem(item)}
         totalRulesCnt={this.totalRulesCntForItem(item)}
+        parentReordableNodesCnt={this.reordableNodesCnt()}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
         isParentLocked={isLocked}

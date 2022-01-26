@@ -25,6 +25,7 @@ class CaseGroup extends BasicGroup {
     // parentField: PropTypes.string,
     // setField: PropTypes.func,
     // setOperator: PropTypes.func,
+    parentReordableNodesCnt: PropTypes.number,
   };
 
   constructor(props) {
@@ -34,6 +35,10 @@ class CaseGroup extends BasicGroup {
   }
 
   onPropsChanged(nextProps) {
+  }
+
+  reordableNodesCnt() {
+    return this.props.parentReordableNodesCnt;
   }
 
   childrenClassName = () => "case_group--children";

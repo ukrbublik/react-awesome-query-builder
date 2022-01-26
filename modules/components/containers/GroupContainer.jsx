@@ -184,6 +184,7 @@ const createGroupContainer = (Group) =>
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
+              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
             /> : null
             ,
             <Group
@@ -220,6 +221,7 @@ const createGroupContainer = (Group) =>
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
+              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
             />
           ]}
         </div>

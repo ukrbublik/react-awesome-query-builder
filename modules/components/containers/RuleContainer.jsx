@@ -138,6 +138,7 @@ const createRuleContainer = (Rule) =>
               asyncListValues={this.props.asyncListValues}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
+              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
             /> : null
             ,
             <Rule
@@ -167,6 +168,7 @@ const createRuleContainer = (Rule) =>
               asyncListValues={this.props.asyncListValues}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
+              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
             />
           ]}
         </div>

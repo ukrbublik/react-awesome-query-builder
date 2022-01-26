@@ -45,6 +45,12 @@ class SwitchGroup extends BasicGroup {
   canAddRule = () => false;
   canDeleteGroup = () => false;
 
+  reordableNodesCnt() {
+    const totalCasesCnt = this.props.children1.size;
+    //todo: -1 for default
+    return totalCasesCnt;
+  }
+
   totalRulesCntForItem(item) {
     return getTotalRulesCountInTree(item);
   }
