@@ -87,7 +87,8 @@ const convertCompiled = (expr, meta) => {
     }
     const filter = selection ? selection.children[0] : null;
     const lastChild = children[children.length - 1];
-    const isSize = lastChild.type == "method" && lastChild.val.methodName == "size";
+    const isSize = lastChild.type == "method" && lastChild.val.methodName == "size" 
+      || lastChild.type == "!func" && lastChild.methodName == "size" ;
     const isLength = lastChild.type == "property" && lastChild.val == "length";
     const sourceParts = children.filter(child => 
       child !== selection && child !== lastChild
@@ -602,7 +603,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       const fieldObj = vals[0];
       let convertedArgs = vals.slice(1);
       opKey = opKeys[0];
-
+      
       if (fieldObj.groupFieldValue) {
         // 1. group
         if (fieldObj.groupFieldValue.valueSrc != "field") {
