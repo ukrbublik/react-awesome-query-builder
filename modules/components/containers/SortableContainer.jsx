@@ -590,6 +590,14 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
           return false;
       }
 
+      if (fromII.type == "case_group" && (
+        fromII.isDefaultCase || toII.isDefaultCase || 
+        toII.type == "switch_group" && placement == constants.PLACEMENT_APPEND
+      )) {
+        // leave default case alone
+        return false;
+      }
+
       let res = true;
       if (canMoveFn)
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);

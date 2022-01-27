@@ -200,12 +200,22 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
   const item = {type, id, properties};
   _addChildren1(config, item, children);
 
+  const isLastDefaultCase = type == "case_group" && targetChildren.last().get("children1") == null;
+
   if (canAdd) {
     const newChildren = new Immutable.OrderedMap({
       [id]: new Immutable.Map(item)
     });
     if (!hasChildren) {
       state = state.setIn(childrenPath, newChildren);
+    } else if (isLastDefaultCase) {
+      const last = targetChildren.last();
+      const newChildrenWithLast = new Immutable.OrderedMap({
+        [id]: new Immutable.Map(item),
+        [last.get("id")]: last
+      });
+      state = state.deleteIn(expandTreePath(childrenPath, "children1", last.get("id")));
+      state = state.mergeIn(childrenPath, newChildrenWithLast);
     } else {
       state = state.mergeIn(childrenPath, newChildren);
     }

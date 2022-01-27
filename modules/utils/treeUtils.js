@@ -195,6 +195,7 @@ export const getFlatTree = (tree) => {
       parent: path.length ? path[path.length-1] : null,
       parentType: parentType,
       caseId: type == "case_group" ? id : caseId,
+      isDefaultCase: type == "case_group" && !children,
       path: path.concat(id),
       lev: lev,
       leaf: !children,
