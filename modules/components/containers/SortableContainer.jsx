@@ -563,11 +563,10 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
-      const isForbiddenStructChange = 
+      // can't move `case_group` anywhere but before/after anoter `case_group`
+      const isForbiddenStructChange = fromII.type == "case_group" && !isLev1
         // can't restruct `rule_group`
-        fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group" 
-        // can't move `case_group` anywhere but before/after anoter `case_group`
-        || fromII.type == "case_group" && !isLev1
+        || fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group" 
         // only `case_group` can be placed under `switch_group`
         || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
         || fromII.type != "case_group" && toII.type == "switch_group"
@@ -591,17 +590,18 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       }
 
       if (fromII.type == "case_group" && (
-        fromII.isDefaultCase || toII.isDefaultCase || 
-        toII.type == "switch_group" && placement == constants.PLACEMENT_APPEND
+        fromII.isDefaultCase || toII.isDefaultCase
+        || toII.type == "switch_group" && placement == constants.PLACEMENT_APPEND
       )) {
         // leave default case alone
         return false;
       }
 
       let res = true;
-      if (canMoveFn)
+      if (canMoveFn) {
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);
-        return res;
+      }
+      return res;
     }
 
     move (fromII, toII, placement, toParentII) {

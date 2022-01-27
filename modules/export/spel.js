@@ -98,7 +98,7 @@ const formatSwitch = (item, config, meta, parentField = null) => {
       cond = "true";
     if (i != (filteredCases.length - 1)) {
       left += `(${cond} ? ${value} : `;
-      right += `)`;
+      right += ")";
     } else {
       left += `${value}`;
     }

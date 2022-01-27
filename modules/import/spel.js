@@ -151,18 +151,7 @@ const convertCompiled = (expr, meta) => {
 
   // ternary
   if (type == "ternary") {
-    let flat = [];
-    function _processTernaryChildren(tern) {
-      let [cond, if_val, else_val] = tern;
-      flat.push([cond, if_val]);
-      if (else_val.type == "ternary") {
-        _processTernaryChildren(else_val.children);
-      } else {
-        flat.push([undefined, else_val]);
-      }
-    }
-    _processTernaryChildren(children);
-    val = flat;
+    val = flatizeTernary(children);
   }
 
   // convert method/function args
@@ -224,6 +213,20 @@ const convertCompiled = (expr, meta) => {
   };
 };
 
+const flatizeTernary = (children) => {
+  let flat = [];
+  function _processTernaryChildren(tern) {
+    let [cond, if_val, else_val] = tern;
+    flat.push([cond, if_val]);
+    if (else_val.type == "ternary") {
+      _processTernaryChildren(else_val.children);
+    } else {
+      flat.push([undefined, else_val]);
+    }
+  }
+  _processTernaryChildren(children);
+  return flat;
+};
 
 const buildConv = (config) => {
   let operators = {};
@@ -764,7 +767,7 @@ const buildCaseValueConcat = (spel, conv, config, meta) => {
           meta.errors.push(`Can't convert ${child.type} in concatenation`);
         }
       }
-    })
+    });
   }
   _processConcatChildren(spel.children);
   return {
@@ -795,7 +798,7 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
       };
     }
   } else {
-    meta.errors.push(`No fucntion to import case value`);
+    meta.errors.push("No fucntion to import case value");
   }
   return valProperties;
 };

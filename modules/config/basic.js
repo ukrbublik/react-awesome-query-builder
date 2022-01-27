@@ -920,7 +920,7 @@ const widgets = {
     factory: ({value, setValue}) =>  
       <input 
         type="text" 
-        value={value || ''} 
+        value={value || ""} 
         onChange={e => setValue(e.target.value)} 
       />
   }

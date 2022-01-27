@@ -151,8 +151,8 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
       if (!isFuncArg) {
         //todo: why I've excluded isFuncArg ?
         const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
-        const shouldIncludeOperators = fieldConfig.preferWidgets && 
-          (widget == "field" || fieldConfig.preferWidgets.includes(widget))
+        const shouldIncludeOperators = fieldConfig.preferWidgets
+          && (widget == "field" || fieldConfig.preferWidgets.includes(widget))
           || excludeOperators.length > 0;
         if (fieldWidgetConfig.operators) {
           const addOperators = fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
