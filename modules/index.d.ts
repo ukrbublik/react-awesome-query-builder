@@ -189,7 +189,7 @@ export interface Utils {
   ExportUtils: {
     spelEscape(val: any): string;
     spelFormatConcat(parts: SpelConcatParts): string;
-    spelImportConcat(val: SpelConcatValue): [SpelConcatParts?, string[]],
+    spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>],
   }
 }
 
