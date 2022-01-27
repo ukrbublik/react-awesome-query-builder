@@ -771,6 +771,7 @@ export interface LocaleSettings {
   lockedLabel?: string,
   deleteLabel?: string,
   addGroupLabel?: string,
+  addCaseLabel?: string,
   addRuleLabel?: string,
   addSubRuleLabel?: string,
   delGroupLabel?: string,

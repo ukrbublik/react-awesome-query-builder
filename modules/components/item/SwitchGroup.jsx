@@ -107,6 +107,7 @@ class SwitchGroup extends BasicGroup {
     const {config, addCaseGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <GroupActions
+      isForSwitch={true}
       config={config}
       addGroup={addCaseGroup}
       canAddRule={this.canAddRule()}
