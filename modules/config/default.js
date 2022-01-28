@@ -74,7 +74,7 @@ export const settings = {
   lockedLabel: "Locked",
   deleteLabel: null,
   addGroupLabel: "Add group",
-  addCaseLabel: "Add case",
+  addCaseLabel: "Add condition",
   addRuleLabel: "Add rule",
   addSubRuleLabel: "Add sub rule",
   delGroupLabel: "",

@@ -180,7 +180,7 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
   const caseGroup = isTernary ? state.getIn(expandTreePath(path.take(2))) : null;
   const childrenPath = expandTreePath(path, "children1");
   const targetChildren = state.getIn(childrenPath);
-  const hasChildren = !!targetChildren;
+  const hasChildren = !!targetChildren && targetChildren.size;
   const targetChildrenSize = hasChildren ? targetChildren.size : null;
   let currentNumber, maxNumber;
   if (type == "case_group") {
@@ -200,7 +200,7 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
   const item = {type, id, properties};
   _addChildren1(config, item, children);
 
-  const isLastDefaultCase = type == "case_group" && targetChildren.last().get("children1") == null;
+  const isLastDefaultCase = type == "case_group" && hasChildren && targetChildren.last().get("children1") == null;
 
   if (canAdd) {
     const newChildren = new Immutable.OrderedMap({
