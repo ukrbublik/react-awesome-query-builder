@@ -10,7 +10,9 @@
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
-    "react-awesome-query-builder": "file:.."
+    "react-awesome-query-builder": "file:..",
+    "react-router-dom": "^6.2.1",
+    "react-select": "^5.2.2"
   },
   "devDependencies": {}
 }

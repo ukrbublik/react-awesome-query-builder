@@ -79,7 +79,7 @@ const formatSwitch = (item, config, meta, parentField = null) => {
   let filteredCases = [];
   for (let i = 0 ; i < cases.length ; i++) {
     if (i != (cases.length - 1) && !cases[i][0]) {
-      meta.errors.push(`No condition for case ${cases[i][1]}`);
+      meta.errors.push(`No condition for case ${i}`);
     } else {
       filteredCases.push(cases[i]);
       if (i == (cases.length - 1) && cases[i][0]) {

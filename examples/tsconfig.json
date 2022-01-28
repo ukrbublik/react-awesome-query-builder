@@ -27,6 +27,7 @@
   },
   "include": [
     "demo/**/*",
+    "demo_switch/**/*",
     "index.tsx"
   ]
 }
