@@ -42,12 +42,14 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 - Use `BasicConfig` for simple vanilla UI
 - Use `AntdConfig` for more advanced UI with https://ant.design/[AntDesign] widgets
 - Use `MaterialConfig` for https://material-ui.com/[Material-UI] widgets
+- Use `BootstrapConfig` for https://reactstrap.github.io/[Bootstrap] widgets
 [source,javascript]
 ----
 import {BasicConfig} from 'react-awesome-query-builder';
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
-const InitialConfig = BasicConfig; // or AntdConfig or MaterialConfig
+import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
+const InitialConfig = BasicConfig; // or AntdConfig or BootstrapConfig or MaterialConfig
 
 const myConfig = {
   ...InitialConfig, // reuse basic config
@@ -100,11 +102,11 @@ const {
       textarea,
       number,
       slider,
-      rangeslider, // missing in `BasicConfig`
+      rangeslider, // missing in `BasicConfig`, `BootstrapConfig`
       select,
       multiselect,
-      treeselect, // missing in `BasicConfig` and in `MaterialConfig`
-      treemultiselect, // missing in `BasicConfig` and in `MaterialConfig`
+      treeselect, // missing in `BasicConfig`, `MaterialConfig`, `BootstrapConfig`
+      treemultiselect, // missing in `BasicConfig`, `MaterialConfig`, `BootstrapConfig`
       date,
       time,
       datetime,
@@ -527,6 +529,7 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 import {Widgets} from 'react-awesome-query-builder';
 import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
 import MaterialWidgets from 'react-awesome-query-builder/lib/components/widgets/material';
+import BootstrapWidgets from 'react-awesome-query-builder/lib/components/widgets/bootstrap';
 const {
     TextWidget,
     NumberWidget,
@@ -542,6 +545,11 @@ const {
     MaterialNumberWidget,
     ...
 } = MaterialWidgets;
+const {
+    BootstrapTextWidget,
+    BootstrapNumberWidget,
+    ...
+} = BootstrapWidgets;
 ----
 
 [source,javascript]

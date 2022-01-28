@@ -978,6 +978,28 @@ export interface MaterialWidgets {
   MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
 
+export interface BootstrapWidgets {
+  // bootstrap core widgets
+  BootstrapFieldSelect: ElementType<FieldProps>,
+  BootstrapConjs: ElementType<ConjsProps>,
+  BootstrapButton: ElementType<ButtonProps>,
+  BootstrapButtonGroup: ElementType<ButtonGroupProps>,
+  BootstrapProvider: ElementType<ProviderProps>,
+  BootstrapValueSources: ElementType<ValueSourcesProps>,
+  BootstrapConfirm: ConfirmFunc,
+
+  // bootstrap value widgets
+  BootstrapBooleanWidget: ElementType<BooleanWidgetProps>,
+  BootstrapTextWidget: ElementType<TextWidgetProps>,
+  BootstrapTextAreaWidget: ElementType<TextWidgetProps>,
+  BootstrapDateWidget: ElementType<DateTimeWidgetProps>,
+  BootstrapTimeWidget: ElementType<DateTimeWidgetProps>,
+  BootstrapDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  BootstrapMultiSelectWidget: ElementType<SelectWidgetProps>,
+  BootstrapSelectWidget: ElementType<SelectWidgetProps>,
+  BootstrapNumberWidget: ElementType<NumberWidgetProps>,
+  BootstrapSliderWidget: ElementType<NumberWidgetProps>,
+}
 
 export interface MuiWidgets {
   // material core widgets
