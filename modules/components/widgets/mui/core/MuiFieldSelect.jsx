@@ -52,6 +52,7 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
   return (
     <FormControl>
       <Select
+        variant="standard"
         autoWidth
         displayEmpty
         placeholder={placeholder}

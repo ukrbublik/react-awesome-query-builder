@@ -154,7 +154,7 @@ export default (props) => {
         label={placeholder}
         onChange={onChange}
         value={value}
-        getOptionSelected={getOptionSelected}
+        //getOptionSelected={getOptionSelected}
         disabled={readonly}
         readOnly={readonly}
         options={options}
@@ -165,7 +165,7 @@ export default (props) => {
         renderOption={renderOption}
         filterOptions={filterOptions}
         size="small"
-        inputWidth={inputWidth}
+        //inputWidth={inputWidth}
         {...customAutocompleteProps}
       ></StyledAutocomplete>
     </FormControl>
