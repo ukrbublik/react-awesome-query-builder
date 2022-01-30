@@ -35,6 +35,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, place
   return (
     <FormControl>
       <Select
+        variant="standard"
         autoWidth
         displayEmpty
         placeholder={!readonly ? placeholder : ""}
