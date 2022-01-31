@@ -120,8 +120,7 @@ const convertCompiled = (expr, meta) => {
       }
     });
     // method
-    const isMethod = lastChild.type == "method";
-    if (isMethod) {
+    if (lastChild.type == "method") {
       const obj = children.filter(child => 
         child !== lastChild
       );
@@ -130,6 +129,16 @@ const convertCompiled = (expr, meta) => {
         obj,
         methodName: lastChild.val.methodName,
         args: lastChild.val.args
+      };
+    }
+    // !func
+    if (lastChild.type == "!func") {
+      const obj = children.filter(child => 
+        child !== lastChild
+      );
+      return {
+        ...lastChild,
+        obj,
       };
     }
   }
@@ -456,6 +465,8 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
     meta.errors.push(`No config for field ${field}`);
     return undefined;
   }
+  const widget = getWidgetForFieldOp(config, field, opKey);
+  const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
   let res = {
@@ -467,8 +478,9 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
       value: convertedArgs.map(v => v.value),
       valueSrc: convertedArgs.map(v => v.valueSrc),
       valueType: convertedArgs.map(v => {
-        if (v.valueSrc == "value" && fieldConfig?.type)
-          return fieldConfig.type;
+        if (v.valueSrc == "value") {
+          return widgetConfig?.type || fieldConfig?.type || v.valueType;
+        }
         return v.valueType;
       }),
       asyncListValues,
