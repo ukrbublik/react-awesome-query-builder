@@ -140,7 +140,7 @@ export type ImmutableTree = ImmutableOMap<string, any>;
 // Query, Builder, Utils, Config
 /////////////////
 
-interface SpelConcatPart {
+export interface SpelConcatPart {
   value: string;
   type: "property" | "variable" | "const";
 }

@@ -211,7 +211,7 @@ export class BasicGroup extends PureComponent {
       return totalRulesCnt < maxNumberOfRules;
     }
     return true;
-  };
+  }
   canDeleteGroup() {
     return !this.props.isRoot;
   }

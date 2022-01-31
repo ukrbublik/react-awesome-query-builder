@@ -25,7 +25,7 @@ const Demo: React.FC = () => {
   const [state, setState] = useState({
     tree: emptyTree,
     config: config,
-    spelStr: '',
+    spelStr: "",
     spelErrors: [] as string[],
   });
 
@@ -56,7 +56,7 @@ const Demo: React.FC = () => {
       tree: tree ? QbUtils.checkTree(tree, state.config) : state.tree,
       spelErrors
     });
-  }
+  };
 
   const renderQueryBuilder = () => (
     <Query

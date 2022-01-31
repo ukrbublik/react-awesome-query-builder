@@ -43,7 +43,7 @@ class SwitchGroup extends BasicGroup {
   }
   canAddRule() {
     return false;
-  };
+  }
 
   reordableNodesCnt() {
     // result will be passed to each case's `parentReordableNodesCnt` prop

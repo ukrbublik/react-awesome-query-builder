@@ -1,32 +1,36 @@
-import React from "react";
-import { FC, memo } from 'react'
-import Creatable from 'react-select/creatable'
-import { MultiValue } from 'react-select'
+import React, { FC, memo } from "react";
+import Creatable from "react-select/creatable";
+import { MultiValue } from "react-select";
+import { SpelConcatPart } from "react-awesome-query-builder";
 
-const options = [
-  {
-    id: 'foo',
-    label: 'Foo',
-    properties: ['REQUIRED', 'CREATE', 'UPDATE'],
-    type: { format: 'INTEGER' },
-  },
-  {
-    id: 'bar',
-    label: 'Bar',
-    properties: ['REQUIRED', 'CREATE', 'UPDATE'],
-    type: { format: 'INTEGER' },
-  },
-]
-
-interface Item {
-  value: string
-  type: string
+interface OptionItem {
+  id: string
+  label: string
+  properties?: any
+  type?: any
+  __isNew__?: boolean
 }
+
+const options: OptionItem[] = [
+  {
+    id: "foo",
+    label: "Foo",
+    properties: ["REQUIRED", "CREATE", "UPDATE"],
+    type: { format: "INTEGER" },
+  },
+  {
+    id: "bar",
+    label: "Bar",
+    properties: ["REQUIRED", "CREATE", "UPDATE"],
+    type: { format: "INTEGER" },
+  },
+];
+
 
 interface Iprops {
   k: string
-  value?: Item[]
-  setValue(value: Item[]): void
+  value?: SpelConcatPart[]
+  setValue(value: SpelConcatPart[]): void
 }
 
 const MltSelector: FC<Iprops> = ({
@@ -34,26 +38,26 @@ const MltSelector: FC<Iprops> = ({
   value,
   setValue,
 }) => {
-  function initMltSelectValueHandler(list: any[], val: Item[]) {
+  function initMltSelectValueHandler(list: OptionItem[], val: SpelConcatPart[]) {
     if (val) {
-      return val.map((item) => {
-        let res = item.type != "const" && list && list.find((obj) => obj.id === item.value)
+      return val.map((item: SpelConcatPart) => {
+        let res = item.type != "const" && list && list.find((obj) => obj.id === item.value);
         if (!res) {
-          res = { id: item.value, label: item.value, value: item.value, __isNew__: true }
+          res = { id: item.value, label: item.value, __isNew__: true };
         }
-        return res
-      })
+        return res;
+      });
     }
     return [];
   }
 
-  function changeHandler(values: MultiValue<any>, actionMeta: any, setValue: (value: Item[]) => void): any[] {
+  function changeHandler(values: MultiValue<OptionItem>, actionMeta: any, setValue: (value: SpelConcatPart[]) => void): any[] {
     const res = values.map((val) => ({
-        value: val.id || val.label,
-        type: val.__isNew__ ? "const" : "property"
-    }))
-    setValue(res)
-    return res
+      value: val.id || val.label,
+      type: val.__isNew__ ? "const" : "property"
+    }));
+    setValue(res as SpelConcatPart[]);
+    return res;
   }
 
   return (
@@ -63,13 +67,13 @@ const MltSelector: FC<Iprops> = ({
       isMulti
       options={options}
       value={initMltSelectValueHandler(options, value)}
-      getOptionValue={(option: any) => option.id}
-      getOptionLabel={(option: any) => option.label}
+      getOptionValue={(option: OptionItem) => option.id}
+      getOptionLabel={(option: OptionItem) => option.label}
       onChange={(values, actionMeta) => {
-        changeHandler(values, actionMeta, setValue)
+        changeHandler(values, actionMeta, setValue);
       }}
     />
-  )
-}
+  );
+};
 
-export default memo(MltSelector)
+export default memo(MltSelector);
