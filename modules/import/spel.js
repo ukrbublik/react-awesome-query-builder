@@ -1,11 +1,9 @@
-import { StandardContext, SpelExpressionEvaluator } from "spel2js/src/main";
+import { SpelExpressionEvaluator } from "spel2js/src/main";
 import uuid from "../utils/uuid";
-import {defaultValue, isJsonLogic,shallowEqual} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
-import {fixPathsInTree} from "../utils/treeUtils";
 
 import moment from "moment";
 
@@ -504,14 +502,12 @@ const compareArgs = (left, right,  spel, conv, config, meta, parentSpel = null) 
         _groupField: parentSpel?._groupField
       }));
       //todo: check same filter
-      console.log(1, leftSource, rightSource);
       return leftSource.value == rightSource.value;
     } else {
       const [leftVal, rightVal] = [left, right].map(v => convertArg(v, conv, config, meta, {
         ...spel,
         _groupField: parentSpel?._groupField
       }));
-      console.log(2, leftVal, rightVal);
       return leftVal.value == rightVal.value;
     }
   }
