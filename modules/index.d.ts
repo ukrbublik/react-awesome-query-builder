@@ -817,7 +817,7 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>,
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
-  renderSwitchPrefix?: Factory<>,
+  renderSwitchPrefix?: Factory<AnyObject>,
   defaultSliderWidth?: string,
   defaultSelectWidth?: string,
   defaultSearchWidth?: string,
