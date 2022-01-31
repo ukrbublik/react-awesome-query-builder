@@ -171,6 +171,7 @@ export interface Utils {
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   isValidTree(tree: ImmutableTree): boolean;
+  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
   // import
   loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree;
   loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];

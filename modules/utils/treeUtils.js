@@ -384,6 +384,28 @@ export const getLightTree = (tree) => {
   return newTree;
 };
 
+export const getSwitchValues = (tree) => {
+  let vals = [];
+  const children = tree.get("children1");
+  if (children) {
+    children.map((child) => {
+      const value = child.getIn(["properties", "value"]);
+      let caseValue;
+      if (value && value.size == 1) {
+        caseValue = value.get(0);
+        if (Array.isArray(caseValue) && caseValue.length == 0) {
+          caseValue = null;
+        }
+      } else {
+        caseValue = null;
+      }
+      vals = [...vals, caseValue];
+    });
+  }
+
+  return vals;
+};
+
 export const isEmptyTree = (tree) => (!tree.get("children1") || tree.get("children1").size == 0);
 
 export const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;

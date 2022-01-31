@@ -73,6 +73,10 @@ const Demo: React.FC = () => {
       <pre>
         {QbUtils.spelFormat(state.tree, state.config)}
       </pre>
+      Values:
+      <pre>
+        {JSON.stringify(QbUtils.getSwitchValues(state.tree), undefined, 2)}
+      </pre>
     </div>
   );
 
