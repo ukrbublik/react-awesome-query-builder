@@ -65,7 +65,7 @@ export default class Operator extends PureComponent {
   }
 
   buildOptions(config, fields, ops) {
-    if (!fields)
+    if (!fields || !ops)
       return null;
 
     return keys(fields).sort((a, b) => (ops.indexOf(a) - ops.indexOf(b))).map(fieldKey => {
@@ -91,6 +91,8 @@ export default class Operator extends PureComponent {
       setField: setOperator,
       ...this.meta
     };
+    if (!renderProps.items)
+      return null;
     return renderOperator(renderProps);
   }
 
