@@ -218,7 +218,7 @@ const flatizeTernary = (children) => {
   function _processTernaryChildren(tern) {
     let [cond, if_val, else_val] = tern;
     flat.push([cond, if_val]);
-    if (else_val.type == "ternary") {
+    if (else_val?.type == "ternary") {
       _processTernaryChildren(else_val.children);
     } else {
       flat.push([undefined, else_val]);
@@ -292,6 +292,8 @@ const convertPath = (parts, meta) => {
 };
 
 const convertArg = (spel, conv, config, meta, parentSpel) => {
+  if (spel == undefined)
+    return undefined;
   const {fieldSeparator} = config.settings;
   const literalTypes = {
     number: "number",
@@ -780,7 +782,7 @@ const buildCaseValueConcat = (spel, conv, config, meta) => {
 const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   let valProperties = {};
   let convVal;
-  if (val.type == "op-plus") {
+  if (val?.type == "op-plus") {
     convVal = buildCaseValueConcat(val, conv, config, meta);
   } else {
     convVal = convertArg(val, conv, config, meta, spel);
