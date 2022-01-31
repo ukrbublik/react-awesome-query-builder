@@ -27,15 +27,16 @@ import mapValues from "lodash/mapValues";
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, type, groupUuid, properties, config, children = null) => {
+const addNewGroup = (state, path, type, groupUuid, properties, config, children = null, meta = {}) => {
   const {shouldCreateEmptyGroup} = config.settings;
   const groupPath = path.push(groupUuid);
   const canAddNewRule = !shouldCreateEmptyGroup;
+  const isDefaultCase = !!meta?.isDefaultCase;
 
   const origState = state;
   state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
   if (state !== origState) {
-    if (!children) {
+    if (!children && !isDefaultCase) {
       state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
       // Add one empty rule into new group
@@ -703,12 +704,12 @@ export default (config) => {
     }
 
     case constants.ADD_CASE_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, action.config,  action.children);
+      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, action.config,  action.children, action.meta);
       break;
     }
 
     case constants.ADD_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, action.config,  action.children);
+      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, action.config,  action.children, action.meta);
       break;
     }
 

@@ -16,11 +16,6 @@ const classNames = require("classnames");
 class CaseGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
-    // selectedField: PropTypes.string,
-    // selectedOperator: PropTypes.string,
-    // parentField: PropTypes.string,
-    // setField: PropTypes.func,
-    // setOperator: PropTypes.func,
     parentReordableNodesCnt: PropTypes.number,
     value: PropTypes.any,
     setValue: PropTypes.func,
@@ -40,7 +35,27 @@ class CaseGroup extends BasicGroup {
   }
 
   reordableNodesCnt() {
+    // `parentReordableNodesCnt` is number of cases to reorder
     return this.props.parentReordableNodesCnt;
+  }
+
+  reordableNodesCntForItem(_item) {
+    // `reordableNodesCnt` is number of nodes is current case
+    if (this.props.isLocked)
+      return 0;
+    return this.props.reordableNodesCnt;
+  }
+
+  totalRulesCntForItem(_item) {
+    // `totalRulesCnt` is number of nodes is current case
+    return this.props.totalRulesCnt;
+  }
+
+  showDragIcon() {
+    // default impl of `showDragIcon()` uses `this.reordableNodesCnt()`
+    if (this.isDefaultCase())
+      return false;
+    return super.showDragIcon();
   }
 
   childrenClassName = () => "case_group--children";
@@ -48,8 +63,6 @@ class CaseGroup extends BasicGroup {
   renderFooterWrapper = () => null;
 
   renderHeaderWrapper() {
-    if (this.isDefaultCase())
-      return null;
     return (
       <div key="group-header" className={classNames(
         "group--header", 
@@ -57,11 +70,62 @@ class CaseGroup extends BasicGroup {
         this.showDragIcon() ? "with--drag" : "hide--drag",
         this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
       )}>
-        {this.renderHeader()}
-        {this.renderCaseTitle()}
+        {this.renderHeaderLeft()}
+        {this.renderHeaderCenter()}
         {this.renderActions()}
       </div>
     );
+  }
+
+  renderChildrenWrapper() {
+    if (this.isDefaultCase())
+      return null;
+    // body has 2 columns: condition & value
+    return (
+      <div className={"case_group--body"}>
+        {this.renderCondition()}
+        {this.renderValue()}
+      </div>
+    );
+  }
+
+  renderHeaderLeft() {
+    if (this.isDefaultCase()) {
+      const { defaultCaseLabel } = this.props.config.settings;
+      return defaultCaseLabel || "";
+    }
+    // default impl:
+    return (
+      <div className={"group--conjunctions"}>
+        {this.renderConjs()}
+        {this.renderDrag()}
+      </div>
+    );
+  }
+
+  renderCondition() {
+    if (this.isDefaultCase())
+      return null;
+    return super.renderChildrenWrapper();
+  }
+
+  renderHeaderCenter() {
+    if (this.isDefaultCase())
+      return this.renderValue();
+    else
+      return null;
+  }
+
+  canAddGroup() {
+    if (this.isDefaultCase())
+      return false;
+    return super.canAddGroup();
+  }
+
+  canAddRule() {
+    if (this.isDefaultCase())
+      return false;
+    return super.canAddRule();
   }
 
   renderValue() {
@@ -91,46 +155,7 @@ class CaseGroup extends BasicGroup {
     );
   }
 
-  renderHeader() {
-    return (
-      <div className={"group--conjunctions"}>
-        {this.renderConjs()}
-        {this.renderDrag()}
-      </div>
-    );
-  }
-
-  renderCaseTitle() {
-    return null;
-  }
-
-  renderChildrenWrapper() {
-    return (
-      <div className={"case_group--body"}>
-        {this.renderCondition()}
-        {this.renderValue()}
-      </div>
-    );
-  }
-
-  renderCondition() {
-    if (this.isDefaultCase()) {
-      return (
-        <div className={classNames(
-          "group--children",
-          this.childrenClassName()
-        )}>
-          {"default"}
-        </div>
-      );
-    } else {
-      return super.renderChildrenWrapper();
-    }
-  }
-
   renderActions() {
-    if (this.isDefaultCase())
-      return null;
     const {config, addGroup, addRule, isLocked, isTrueLocked, id} = this.props;
     return <GroupActions
       config={config}
@@ -148,18 +173,13 @@ class CaseGroup extends BasicGroup {
   }
 
   isEmptyCurrentGroup() {
+    // used to confirm self-deletion
     const { value } = this.props;
     const oneValue = value && value.size ? value.get(0) : null;
     const hasValue = oneValue != null && (Array.isArray(oneValue) ? oneValue.length > 0 : true);
     return super.isEmptyCurrentGroup() && !hasValue;
   }
 
-
-  // extraPropsForItem(_item) {
-  //   return {
-  //     parentField: this.props.selectedField
-  //   };
-  // }
 }
 
 

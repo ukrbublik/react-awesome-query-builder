@@ -29,6 +29,7 @@ export const settings = {
   renderProvider: (props) => <VanillaProvider {...props} />,
   renderValueSources: (props) => <VanillaValueSources {...props} />,
   renderConfirm: vanillaConfirm,
+  renderSwitchPrefix: () => <>{""}</>,
 
   valueSourcesInfo: {
     value: {},
@@ -75,6 +76,8 @@ export const settings = {
   deleteLabel: null,
   addGroupLabel: "Add group",
   addCaseLabel: "Add condition",
+  addDefaultCaseLabel: "Add default condition",
+  defaultCaseLabel: "default:",
   addRuleLabel: "Add rule",
   addSubRuleLabel: "Add sub rule",
   delGroupLabel: "",

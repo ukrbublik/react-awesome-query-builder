@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
-import {GroupActions} from "./GroupActions";
+import {SwitchGroupActions} from "./SwitchGroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../../utils/treeUtils";
@@ -30,7 +30,10 @@ class SwitchGroup extends BasicGroup {
   childrenClassName = () => "switch_group--children";
   
   renderFooterWrapper = () => null;
-  canAddGroup = () => {
+  hasDefaultCase = () => {
+    return this.props.children1.size && this.props.children1.filter(c => c.get("children1") == null).size > 0;
+  }
+  canAddGroup() {
     const { maxNumberOfCases } = this.props.config.settings;
     const totalCasesCnt = this.props.children1.size;
     if (maxNumberOfCases) {
@@ -38,13 +41,18 @@ class SwitchGroup extends BasicGroup {
     }
     return true;
   }
-  canAddRule = () => false;
-  canDeleteGroup = () => false;
+  canAddRule() {
+    return false;
+  };
 
   reordableNodesCnt() {
+    // result will be passed to each case's `parentReordableNodesCnt` prop
     const totalCasesCnt = this.props.children1.size;
-    //todo: -1 for default
-    return totalCasesCnt;
+    let casesToReorder = totalCasesCnt;
+    if (this.hasDefaultCase()) {
+      casesToReorder--;
+    }
+    return casesToReorder;
   }
 
   totalRulesCntForItem(item) {
@@ -54,10 +62,19 @@ class SwitchGroup extends BasicGroup {
   reordableNodesCntForItem(item) {
     if (this.props.isLocked)
       return 0;
-    const { canLeaveEmptyCase } = this.props.config.settings;
+    const { canLeaveEmptyCase, canRegroupCases } = this.props.config.settings;
+
     const totalCasesCnt = this.props.children1.size;
-    const cnt = getTotalReordableNodesCountInTree(item);
-    return cnt == 1 && canLeaveEmptyCase && totalCasesCnt > 1 ? 111 : cnt;
+    let casesToReorder = totalCasesCnt;
+    if (this.hasDefaultCase()) {
+      casesToReorder--;
+    }
+
+    const nodesInCase = getTotalReordableNodesCountInTree(item);
+    let cnt = nodesInCase;
+    if (cnt == 1 && canRegroupCases && canLeaveEmptyCase && casesToReorder > 1)
+      cnt = 111;
+    return cnt;
   }
 
   renderHeaderWrapper() {
@@ -69,7 +86,6 @@ class SwitchGroup extends BasicGroup {
         this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
       )}>
         {this.renderHeader()}
-        {this.renderGroupField()}
         {this.renderActions()}
       </div>
     );
@@ -84,18 +100,9 @@ class SwitchGroup extends BasicGroup {
     );
   }
 
-  renderGroupField() {
-    return (
-      <div className={"group--field--count--rule"}>
-        {/* {this.renderField()}
-        {this.renderOperator()}
-        {this.renderWidget()} */}
-      </div>
-    );
-  }
-
   renderConjs() {
-    return "switch";
+    const { renderSwitchPrefix } = this.props.config.settings;
+    return renderSwitchPrefix ? renderSwitchPrefix() : null;
   }
 
   showNot() {
@@ -104,15 +111,14 @@ class SwitchGroup extends BasicGroup {
 
 
   renderActions() {
-    const {config, addCaseGroup, isLocked, isTrueLocked, id} = this.props;
+    const {config, addCaseGroup, addDefaultCaseGroup, isLocked, isTrueLocked, id} = this.props;
 
-    return <GroupActions
-      isForSwitch={true}
+    return <SwitchGroupActions
       config={config}
-      addGroup={addCaseGroup}
-      canAddRule={this.canAddRule()}
+      addCaseGroup={addCaseGroup}
+      addDefaultCaseGroup={addDefaultCaseGroup}
+      canAddDefault={!this.hasDefaultCase()}
       canAddGroup={this.canAddGroup()}
-      canDeleteGroup={this.canDeleteGroup()}
       setLock={this.setLock}
       isLocked={isLocked}
       isTrueLocked={isTrueLocked}
@@ -120,12 +126,6 @@ class SwitchGroup extends BasicGroup {
     />;
   }
 
-
-  // extraPropsForItem(_item) {
-  //   return {
-  //     parentField: this.props.selectedField
-  //   };
-  // }
 }
 
 

@@ -201,10 +201,10 @@ export class BasicGroup extends PureComponent {
     />;
   }
 
-  canAddGroup = () => {
+  canAddGroup() {
     return this.props.allowFurtherNesting;
   }
-  canAddRule = () => {
+  canAddRule() {
     const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
     const totalRulesCnt = this.props.totalRulesCnt;
     if (maxNumberOfRules) {
@@ -212,7 +212,9 @@ export class BasicGroup extends PureComponent {
     }
     return true;
   };
-  canDeleteGroup = () => !this.props.isRoot;
+  canDeleteGroup() {
+    return !this.props.isRoot;
+  }
 
   renderChildren() {
     const {children1} = this.props;

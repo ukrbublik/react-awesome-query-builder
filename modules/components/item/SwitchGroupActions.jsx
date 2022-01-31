@@ -11,17 +11,16 @@ const groupActionsPositionList = {
 const defaultPosition = "topRight";
 
 
-export class GroupActions extends PureComponent {
+export class SwitchGroupActions extends PureComponent {
   render() {
     const {
       config, 
-      addRule, addGroup, removeSelf, setLock, isLocked, isTrueLocked, id,
-      canAddGroup, canAddRule, canDeleteGroup
+      addCaseGroup, addDefaultCaseGroup, setLock, isLocked, isTrueLocked, id, canAddGroup, canAddDefault
     } = this.props;
     const {
-      immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
+      immutableGroupsMode, addCaseLabel, addDefaultCaseLabel, groupActionsPosition, 
       renderButton: Btn, renderSwitch: Switch, renderButtonGroup: BtnGrp,
-      lockLabel, lockedLabel, showLock, canDeleteLocked,
+      lockLabel, lockedLabel, showLock,
     } = config.settings;
     const position = groupActionsPositionList[groupActionsPosition || defaultPosition];
 
@@ -29,23 +28,20 @@ export class GroupActions extends PureComponent {
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} checkedLabel={lockedLabel} config={config}
     />;
 
-    const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn
-      type="addRule" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config}
+    const addCaseGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
+      type="addCaseGroup" onClick={addCaseGroup} label={addCaseLabel} readonly={isLocked} config={config}
     />;
-    const addGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
-      type="addGroup" onClick={addGroup} label={addGroupLabel} readonly={isLocked} config={config}
-    />;
-    const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn
-      type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config}
+
+    const addDefaultCaseGroupBtn = !immutableGroupsMode && canAddDefault && !isLocked && <Btn
+      type="addDefaultCaseGroup" onClick={addDefaultCaseGroup} label={addDefaultCaseLabel} readonly={isLocked} config={config}
     />;
 
     return (
       <div className={`group--actions ${position}`}>
         <BtnGrp config={config}>
           {setLockSwitch}
-          {addRuleBtn}
-          {addGroupBtn}
-          {delGroupBtn}
+          {addCaseGroupBtn}
+          {addDefaultCaseGroupBtn}
         </BtnGrp>
       </div>
     );

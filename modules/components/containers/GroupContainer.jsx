@@ -116,6 +116,10 @@ const createGroupContainer = (Group) =>
       this.props.actions.addCaseGroup(this.props.path);
     }
 
+    addDefaultCaseGroup = () => {
+      this.props.actions.addDefaultCaseGroup(this.props.path);
+    }
+
     addRule = () => {
       this.props.actions.addRule(this.props.path);
     }
@@ -168,6 +172,7 @@ const createGroupContainer = (Group) =>
               removeSelf={this.dummyFn}
               addGroup={this.dummyFn}
               addCaseGroup={this.dummyFn}
+              addDefaultCaseGroup={this.dummyFn}
               addRule={this.dummyFn}
               setField={this.dummyFn}
               setOperator={this.dummyFn}
@@ -205,6 +210,7 @@ const createGroupContainer = (Group) =>
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
               addCaseGroup={isInDraggingTempo ? this.dummyFn : this.addCaseGroup}
+              addDefaultCaseGroup={isInDraggingTempo ? this.dummyFn : this.addDefaultCaseGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
