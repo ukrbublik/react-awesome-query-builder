@@ -454,6 +454,7 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
   const fieldConfig = getFieldConfig(config, field);
   if (!fieldConfig) {
     meta.errors.push(`No config for field ${field}`);
+    return undefined;
   }
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
@@ -481,6 +482,8 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
     throw `Bad groupFieldValue: ${JSON.stringify(groupFieldValue)}`;
   const groupField = groupFieldValue.value;
   let groupOpRule = buildRule(config, meta, groupField, opKey, convertedArgs);
+  if (!groupOpRule)
+    return undefined;
   const fieldConfig = getFieldConfig(config, groupField);
   const mode = fieldConfig?.mode;
   let res = {

@@ -104,7 +104,7 @@ function validateRule (item, path, itemId, meta, c) {
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
   if (field && !fieldDefinition) {
-    logger.warn(`No config for field ${field}`);
+    console.warn(`No config for field ${field}`);
     field = null;
   }
   if (field == null) {
