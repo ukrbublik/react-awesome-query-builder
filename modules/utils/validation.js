@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
 } from "./configUtils";
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
-import {defaultValue, deepEqual, getItemInListValues} from "../utils/stuff";
+import {defaultValue, deepEqual, getItemInListValues, logger} from "../utils/stuff";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import omit from "lodash/omit";
 
@@ -104,7 +104,7 @@ function validateRule (item, path, itemId, meta, c) {
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
   if (field && !fieldDefinition) {
-    console.warn(`No config for field ${field}`);
+    logger.warn(`No config for field ${field}`);
     field = null;
   }
   if (field == null) {

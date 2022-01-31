@@ -6,7 +6,7 @@ import {
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, logger} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
@@ -22,7 +22,7 @@ export const spelFormat = (tree, config) => {
   const res = formatItem(tree, config, meta, null);
 
   if (meta.errors.length)
-    console.warn("Errors while exporting to SpEL:", meta.errors);
+    logger.warn("Errors while exporting to SpEL:", meta.errors);
   return res;
 };
 

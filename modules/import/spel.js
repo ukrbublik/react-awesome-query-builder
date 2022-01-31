@@ -4,9 +4,8 @@ import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
-
+import {logger} from "../utils/stuff";
 import moment from "moment";
-
 
 export const loadFromSpel = (spelStr, config) => {
   //meta is mutable
@@ -23,25 +22,25 @@ export const loadFromSpel = (spelStr, config) => {
     const compileRes = SpelExpressionEvaluator.compile(spelStr);
     compiledExpression = compileRes._compiledExpression;
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     meta.errors.push(e);
   }
   
   if (compiledExpression) {
-    console.log("compiledExpression:", compiledExpression);
+    logger.log("compiledExpression:", compiledExpression);
     convertedObj = convertCompiled(compiledExpression, meta);
-    console.log("convertedObj:", convertedObj, meta);
+    logger.log("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
     if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
       jsTree = wrapInDefaultConj(jsTree, extendedConfig);
     }
-    console.log("jsTree:", jsTree);
+    logger.log("jsTree:", jsTree);
   }
 
   const immTree = jsTree ? loadTree(jsTree) : undefined;
   if (meta.errors.length)
-    console.warn("Errors while importing from SpEL:", meta.errors);
+    logger.warn("Errors while importing from SpEL:", meta.errors);
   return [immTree, meta.errors];
 };
 
@@ -144,7 +143,7 @@ const convertCompiled = (expr, meta) => {
       val = expr.getValue();
     }
   } catch(e) {
-    console.error("[spel2js] Error in getValue()", e);
+    logger.error("[spel2js] Error in getValue()", e);
   }
 
   // ternary
@@ -244,7 +243,7 @@ const buildConv = (config) => {
         operators[opk] = [];
       operators[opk].push(opKey);
     } else {
-      console.log(`[spel] No spelOp for operator ${opKey}`);
+      logger.log(`[spel] No spelOp for operator ${opKey}`);
     }
   }
 
@@ -377,7 +376,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       }
       const opKey = funcToOpMap["$"+methodName];
       const list = convertedObj[0];
-      return buildRule(config, field, opKey, [list]);
+      return buildRule(config, meta, field, opKey, [list]);
     } else if (funcToOpMap["."+methodName]) {
       // user.login.startsWith('gg')
       const opKey = funcToOpMap["."+methodName];
@@ -385,7 +384,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       if (parts && convertedArgs.length == 1) {
         const fullParts = [...groupFieldParts, ...parts];
         const field = fullParts.join(fieldSeparator);
-        return buildRule(config, field, opKey, convertedArgs);
+        return buildRule(config, meta, field, opKey, convertedArgs);
       }
     } else if (methodName == "parse" && obj && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
       // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
@@ -448,11 +447,14 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   return undefined;
 };
 
-const buildRule = (config, field, opKey, convertedArgs) => {
+const buildRule = (config, meta, field, opKey, convertedArgs) => {
   if (convertedArgs.filter(v => v === undefined).length) {
     return undefined;
   }
   const fieldConfig = getFieldConfig(config, field);
+  if (!fieldConfig) {
+    meta.errors.push(`No config for field ${field}`);
+  }
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
   let res = {
@@ -474,11 +476,11 @@ const buildRule = (config, field, opKey, convertedArgs) => {
   return res;
 };
 
-const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, config) => {
+const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, config, meta) => {
   if (groupFieldValue.valueSrc != "field")
     throw `Bad groupFieldValue: ${JSON.stringify(groupFieldValue)}`;
   const groupField = groupFieldValue.value;
-  let groupOpRule = buildRule(config, groupField, opKey, convertedArgs);
+  let groupOpRule = buildRule(config, meta, groupField, opKey, convertedArgs);
   const fieldConfig = getFieldConfig(config, groupField);
   const mode = fieldConfig?.mode;
   let res = {
@@ -626,7 +628,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
           convertedArgs = [];
         }
 
-        res = buildRuleGroup(fieldObj, opKey, convertedArgs, config);
+        res = buildRuleGroup(fieldObj, opKey, convertedArgs, config, meta);
       } else {
         // 2. not group
         if (fieldObj.valueSrc != "field") {
@@ -635,7 +637,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         const field = fieldObj.value;
 
         if (opKeys.length > 1) {
-          console.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
+          logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
 
           //todo: it's naive
           const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
@@ -644,7 +646,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
             opKey = ws.op;
           }
         }
-        res = buildRule(config, field, opKey, convertedArgs);
+        res = buildRule(config, meta, field, opKey, convertedArgs);
       }
     } else {
       if (!parentSpel) {

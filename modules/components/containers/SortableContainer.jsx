@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import {connect} from "react-redux";
 import {getFlatTree} from "../../utils/treeUtils";
+import {logger} from "../../utils/stuff";
 import context from "../../stores/context";
 import * as constants from "../../constants";
 import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
-const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
 
 
 const createSortableContainer = (Builder, CanMoveFn = null) => 
@@ -320,7 +320,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
           }
         }
         if (!hovCNodeEl) {
-          console.log("out of tree bounds!");
+          logger.log("out of tree bounds!");
         } else {
           const isGroup = hovCNodeEl.classList.contains("group-container");
           const hovNodeId = hovCNodeEl.getAttribute("data-id");
@@ -536,7 +536,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       if (moveInfo) {
         this.move(itemInfo, moveInfo[1], moveInfo[0], moveInfo[3]);
 
-        // if (isDev())  console.log("DRAG-N-DROP", JSON.stringify({
+        // logger.log("DRAG-N-DROP", JSON.stringify({
         //   dragRect,
         //   plhRect,
         //   treeRect,
@@ -605,7 +605,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
     }
 
     move (fromII, toII, placement, toParentII) {
-      //if (isDev())  console.log("move", fromII, toII, placement, toParentII);
+      //logger.log("move", fromII, toII, placement, toParentII);
       this.props.actions.moveItem(fromII.path, toII.path, placement);
     }
 
