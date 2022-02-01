@@ -47,6 +47,7 @@ export default (props) => {
 
   const InputCmp = (
     <TextField 
+      variant="standard"
       type="number"
       value={inputValue}
       placeholder={placeholder}

@@ -18,6 +18,13 @@ export default (props) => {
   const hasSeconds = timeFormat.indexOf(":ss") != -1;
   const timeValue = value ? moment(value, timeFormat) : null;
 
+  const renderInput = (params) => 
+    <TextField 
+      size="small" 
+      variant="standard"
+      {...params}
+    />
+
   return (
     <FormControl>
       <TimePicker
@@ -29,7 +36,7 @@ export default (props) => {
         value={timeValue || null}
         onChange={handleChange}
         views={hasSeconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
-        renderInput={(params) => <TextField size="small" {...params} />}
+        renderInput={renderInput}
         {...customProps}
       />
     </FormControl>

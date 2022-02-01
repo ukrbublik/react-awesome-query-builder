@@ -17,6 +17,7 @@ export default (props) => {
   return (
     <FormControl>
       <TextField 
+        variant="standard"
         value={textValue}
         placeholder={!readonly ? placeholder : ""}
         InputProps={{
