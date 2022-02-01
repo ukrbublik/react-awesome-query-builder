@@ -94,6 +94,7 @@ export default (props) => {
   const renderInput = (params) => {
     return (
       <TextField 
+        variant="standard"
         {...params} 
         InputProps={{
           ...params.InputProps,
@@ -121,19 +122,25 @@ export default (props) => {
     />;
   });
 
-  const renderOption = (option, { selected }) => {
+  const isOptionEqualToValue = (option, value) => {
+    return option?.value == value;
+  };
+
+  const renderOption = (props, option) => {
+    const { title, value } = option;
+    const selected = (selectedValue || []).includes(value);
     if (multiple && showCheckboxes != false) {
-      return <React.Fragment>
+      return <div {...props}>
         <Checkbox
           icon={nonCheckedIcon}
           checkedIcon={checkedIcon}
           style={{ marginRight: 8 }}
           checked={selected}
         />
-        {option.title}
-      </React.Fragment>;
+        {title}
+      </div>;
     } else {
-      return <React.Fragment>{option.title}</React.Fragment>;
+      return <div {...props}>{title}</div>;
     }
   };
 
@@ -154,18 +161,17 @@ export default (props) => {
         label={placeholder}
         onChange={onChange}
         value={value}
-        //getOptionSelected={getOptionSelected}
         disabled={readonly}
         readOnly={readonly}
         options={options}
         getOptionLabel={getOptionLabel}
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
-        renderTags={renderTags}
+        //renderTags={renderTags}
         renderOption={renderOption}
         filterOptions={filterOptions}
+        isOptionEqualToValue={isOptionEqualToValue}
         size="small"
-        //inputWidth={inputWidth}
         {...customAutocompleteProps}
       ></StyledAutocomplete>
     </FormControl>
