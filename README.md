@@ -81,7 +81,7 @@ npm i react-awesome-query-builder --save
 
 For AntDesign widgets only:
 ```
-npm i antd --save
+npm i antd @ant-design/icons --save
 ```
 
 For Material-UI widgets only:
