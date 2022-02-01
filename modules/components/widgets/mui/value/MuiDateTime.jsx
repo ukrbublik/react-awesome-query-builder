@@ -16,6 +16,13 @@ export default (props) => {
 
   const dateTimeFormat = dateFormat + " " + timeFormat;
   
+  const renderInput = (params) => 
+    <TextField 
+      size="small" 
+      variant="standard"
+      {...params}
+    />
+
   return (
     <FormControl>
       <DateTimePicker
@@ -26,7 +33,7 @@ export default (props) => {
         inputFormat={dateTimeFormat}
         value={value || null}
         onChange={handleChange}
-        renderInput={(props) => <TextField size="small" {...props} />}
+        renderInput={renderInput}
         {...customProps}
       />
     </FormControl>

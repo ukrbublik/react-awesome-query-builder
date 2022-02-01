@@ -13,6 +13,13 @@ export default (props) => {
   const handleChange = (value) => {
     setValue(formatSingleValue(value));
   };
+  
+  const renderInput = (params) => 
+    <TextField 
+      size="small" 
+      variant="standard"
+      {...params}
+    />
 
   return (
     <FormControl>
@@ -23,7 +30,7 @@ export default (props) => {
         inputFormat={dateFormat}
         value={value || null}
         onChange={handleChange}
-        renderInput={(props) => <TextField size="small" {...props} />}
+        renderInput={renderInput}
         {...customProps}
       />
     </FormControl>

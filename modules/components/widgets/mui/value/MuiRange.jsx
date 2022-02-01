@@ -84,6 +84,7 @@ export default (props) => {
 
   const FromInputCmp = (
     <TextField 
+      variant="standard"
       type="number"
       value={valueFrom}
       placeholder={placeholders[0]}
@@ -105,6 +106,7 @@ export default (props) => {
 
   const ToInputCmp = (
     <TextField 
+      variant="standard"
       type="number"
       value={valueTo}
       placeholder={placeholders[1]}
