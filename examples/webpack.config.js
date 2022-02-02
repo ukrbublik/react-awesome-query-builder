@@ -3,6 +3,7 @@ const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const MODE = process.env.NODE_ENV || "development";
 const PORT = 3001;
@@ -61,13 +62,12 @@ if (isAnalyze) {
     ];
 }
 
-// No hot-loader available for React 17.0.2 which is required for MUI v5
-// if (isDev) {
-//     aliases = {
-//         ...aliases,
-//         'react-dom': '@hot-loader/react-dom',
-//     };
-// }
+if (isDev) {
+    plugins = [
+        ...plugins,
+        new ReactRefreshWebpackPlugin()
+    ];
+}
 
 const babel_options = {
     presets: [
@@ -80,8 +80,8 @@ const babel_options = {
         ["@babel/plugin-proposal-class-properties", { "loose": true }],
         ["@babel/plugin-proposal-private-methods", { "loose": true }],
         ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
-        "@babel/plugin-transform-runtime", // or can use 'react-hot-loader/webpack' instead
-        "react-hot-loader/babel",
+        "@babel/plugin-transform-runtime",
+        "react-refresh/babel",
         ["import", {
             "libraryName": "antd",
             "style": false,
@@ -118,16 +118,6 @@ module.exports = {
     },
     module: {
         rules: [
-            // {
-            //     test: /\.tsx?$/,
-            //     loader: 'ts-loader',
-            //     exclude: /node_modules/,
-            // },
-            // {
-            //     test: /\.jsx?$/,
-            //     use: 'react-hot-loader/webpack',
-            //     exclude: /node_modules/
-            // },
             {
                 test: /\.[jt]sx?$/,
                 exclude: /node_modules/,
