@@ -12,7 +12,10 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
       const prefix = "\u00A0\u00A0".repeat(level);
       if (items) {
         return [
-          <ListSubheader disabled={disabled} key={path} disableSticky={true}>{label}</ListSubheader>,
+          <ListSubheader disabled={disabled} key={path} disableSticky={true}>
+            {prefix && <span>{prefix}</span>}
+            {label}
+          </ListSubheader>,
           renderOptions(items, level+1),
         ];
       } else {

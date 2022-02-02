@@ -21,11 +21,13 @@ import MuiAutocompleteWidget from "./value/MuiAutocomplete";
 
 // field select widgets
 import MuiFieldSelect from "./core/MuiFieldSelect";
+import MuiFieldAutocomplete from "./core/MuiFieldAutocomplete";
 
 // core components
 import MuiButton from "./core/MuiButton";
 import MuiButtonGroup from "./core/MuiButtonGroup";
 import MuiConjs from "./core/MuiConjs";
+import MuiSwitch from "./core/MuiSwitch";
 import MuiValueSources from "./core/MuiValueSources";
 import MuiConfirm from "./core/MuiConfirm";
 
@@ -77,10 +79,12 @@ export default {
   MuiAutocompleteWidget,
 
   MuiFieldSelect,
+  MuiFieldAutocomplete,
 
   MuiButton,
   MuiButtonGroup,
   MuiConjs,
+  MuiSwitch,
   MuiValueSources,
   MuiConfirm,
   MuiUseConfirm: useConfirm,

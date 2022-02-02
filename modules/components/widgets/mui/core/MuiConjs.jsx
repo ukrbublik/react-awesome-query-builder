@@ -7,12 +7,14 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
   //TIP: disabled=true if only 1 rule; readonly=true if immutable mode
   const conjsCount = Object.keys(conjunctionOptions).length;
   const lessThenTwo = disabled;
+  const {forceShowConj} = config.settings;
+  const showConj = forceShowConj || conjsCount > 1 && !lessThenTwo;
 
   const renderOptions = () => 
     Object.keys(conjunctionOptions).map(key => {
       const {id, name, label, checked} = conjunctionOptions[key];
       let postfix = setConjunction.isDummyFn ? "__dummy" : "";
-      if (readonly && !checked)
+      if ((readonly || disabled) && !checked)
         return null;
       return (
         <Button 
@@ -21,7 +23,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
           color={checked ? "primary" : "neutral"} 
           value={key} 
           onClick={onClick.bind(null, key)} 
-          disabled={readonly}
+          disabled={readonly || disabled}
         >
           {label}
         </Button>
@@ -56,7 +58,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
         disabled={readonly}
       >
         {showNot && renderNot()}
-        {conjsCount > 1 && !lessThenTwo && renderOptions()}
+        {showConj && renderOptions()}
       </ButtonGroup>
     </FormControl>
   );

@@ -1004,7 +1004,9 @@ export interface BootstrapWidgets {
 export interface MuiWidgets {
   // material core widgets
   MuiFieldSelect: ElementType<FieldProps>,
+  MuiFieldAutocomplete: ElementType<FieldProps>,
   MuiConjs: ElementType<ConjsProps>,
+  MuiSwitch: ElementType<SwitchProps>,
   MuiButton: ElementType<ButtonProps>,
   MuiButtonGroup: ElementType<ButtonGroupProps>,
   MuiProvider: ElementType<ProviderProps>,

@@ -4,17 +4,17 @@ import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
-export default ({type, label, onClick, config}) => {
+export default ({type, label, onClick, readonly, config}) => {
   const typeToOnlyIcon = {
     "delGroup": <DeleteIcon />,
     "delRuleGroup": <DeleteIcon />,
     "delRule": <DeleteIcon />,
     "addRuleGroup": <AddIcon />,
-    "addRuleGroupExt": <AddIcon />,
   };
   const typeToIcon = {
     "addRule": <AddIcon />,
     "addGroup": <AddIcon />,
+    "addRuleGroupExt": <AddIcon />,
   };
   const typeToColor = {
     "addRule": "neutral",
@@ -24,7 +24,7 @@ export default ({type, label, onClick, config}) => {
     "delRule": "secondary",
   };
   if (typeToOnlyIcon[type])
-    return <IconButton size="small" onClick={onClick} color={typeToColor[type]}>{typeToOnlyIcon[type]}</IconButton>;
+    return <IconButton size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]}>{typeToOnlyIcon[type]}</IconButton>;
   else
-    return <Button size="small" onClick={onClick} color={typeToColor[type]} startIcon={typeToIcon[type]}>{label}</Button>;
+    return <Button size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]} startIcon={typeToIcon[type]}>{label}</Button>;
 };

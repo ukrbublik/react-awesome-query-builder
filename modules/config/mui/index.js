@@ -18,7 +18,9 @@ const {
   MuiAutocompleteWidget,
 
   MuiFieldSelect,
+  MuiFieldAutocomplete,
   MuiConjs,
+  MuiSwitch,
   MuiButton,
   MuiButtonGroup,
   MuiValueSources,
@@ -32,10 +34,13 @@ const {
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => <MuiFieldSelect {...props} />,
+  renderField: (props) => props?.customProps?.showSearch 
+    ? <MuiFieldAutocomplete {...props} /> 
+    : <MuiFieldSelect {...props} />,
   renderOperator: (props) => <MuiFieldSelect {...props} />,
   renderFunc: (props) => <MuiFieldSelect {...props} />,
   renderConjs: (props) => <MuiConjs {...props} />,
+  renderSwitch: (props) => <MuiSwitch {...props} />,
   renderButton: (props) => <MuiButton {...props} />,
   renderButtonGroup: (props) => <MuiButtonGroup {...props} />,
   renderValueSources: (props) => <MuiValueSources {...props} />,

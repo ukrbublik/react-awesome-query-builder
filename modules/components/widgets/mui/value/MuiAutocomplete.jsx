@@ -17,12 +17,12 @@ const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
 
-
 export default (props) => {
   const {
     allowCustomValues, multiple,
-    value: selectedValue, customProps, readonly, config
+    value: selectedValue, customProps, readonly, config, groupBy, filterOptionsConfig
   } = props;
+  const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
 
   // hook
   const {
@@ -49,7 +49,7 @@ export default (props) => {
   const {defaultSelectWidth, defaultSearchWidth} = config.settings;
   const {width, showCheckboxes, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
-  const inputWidth = customInputProps.width || defaultSearchWidth;
+  const inputWidth = customInputProps.width || defaultSearchWidth; // todo: use as min-width for Autocomplete comp
   customInputProps = omit(customInputProps, ["width"]);
   const customAutocompleteProps = omit(rest, ["showSearch", "showCheckboxes"]);
 
@@ -65,7 +65,7 @@ export default (props) => {
   const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
   
   const filterOptions = (options, params) => {
-    const filtered = defaultFilterOptions(options, params);
+    const filtered = filterOptionsFn(options, params);
     const extended = extendOptions(filtered, params);
     return extended;
   };
@@ -107,7 +107,7 @@ export default (props) => {
   };
 
   const renderOption = (props, option) => {
-    const { title, value } = option;
+    const { title, renderTitle, value } = option;
     const selected = (selectedValue || []).includes(value);
     if (multiple && showCheckboxes != false) {
       return <div {...props}>
@@ -120,7 +120,7 @@ export default (props) => {
         {title}
       </div>;
     } else {
-      return <div {...props}>{title}</div>;
+      return <div {...props}>{renderTitle || title}</div>;
     }
   };
 
@@ -144,6 +144,7 @@ export default (props) => {
         disabled={readonly}
         readOnly={readonly}
         options={options}
+        groupBy={groupBy}
         getOptionLabel={getOptionLabel}
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
