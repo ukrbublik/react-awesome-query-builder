@@ -8,7 +8,6 @@ import Chip from "@mui/material/Chip";
 import Checkbox from "@mui/material/Checkbox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import styled from "@emotion/styled";
 
 import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
 
@@ -17,26 +16,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
-const StyledAutocomplete = styled(Autocomplete)`
-& .MuiAutocomplete-input {
-  min-width: ${props => props.inputWidth || "0px"} !important;
-}
-`;
 
-const StyledChip = styled(Chip)`
-& .MuiChip-root {
-  height: auto;
-}
-& .MuiChip-label {
-  margin-top: 3px;
-  margin-bottom: 3px;
-}
-`;
-
-const StyledCircularProgress = styled(CircularProgress)`
-right: 35px;
-position: absolute;
-`;
 
 export default (props) => {
   const {
@@ -101,7 +81,7 @@ export default (props) => {
           readOnly: readonly,
           endAdornment: (
             <React.Fragment>
-              {isLoading ? <StyledCircularProgress color="inherit" size={20}  /> : null}
+              {isLoading ? <CircularProgress color="inherit" size={20}  /> : null}
               {params.InputProps.endAdornment}
             </React.Fragment>
           ),
@@ -115,7 +95,7 @@ export default (props) => {
   };
 
   const renderTags = (value, getTagProps) => value.map((option, index) => {
-    return <StyledChip
+    return <Chip
       key={index}
       label={getOptionLabel(option)}
       {...getTagProps({ index })}
@@ -146,7 +126,7 @@ export default (props) => {
 
   return (
     <FormControl fullWidth={fullWidth}>
-      <StyledAutocomplete
+      <Autocomplete
         disableCloseOnSelect={multiple}
         fullWidth={fullWidth}
         multiple={multiple}
@@ -173,7 +153,7 @@ export default (props) => {
         isOptionEqualToValue={isOptionEqualToValue}
         size="small"
         {...customAutocompleteProps}
-      ></StyledAutocomplete>
+      />
     </FormControl>
   );
 };

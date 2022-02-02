@@ -84,9 +84,14 @@ For AntDesign widgets only:
 npm i antd --save
 ```
 
-For Material-UI widgets only:
+For Material-UI 4 widgets only:
 ```
 npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm --save
+```
+
+For MUI 5 widgets only:
+```
+npm i @mui/material @mui/lab @mui/icons-material material-ui-confirm --save
 ```
 
 For Bootstrap widgets only:
