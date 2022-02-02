@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Query, Builder, Utils, 
   //types:
@@ -25,6 +25,7 @@ let initTree: ImmutableTree;
 //initTree = checkTree(loadTree(initValue), loadedConfig);
 initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
+
 // Trick to hot-load new config when you edit `config.tsx`
 const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
   config: loadedConfig,
@@ -48,321 +49,332 @@ interface CustomEventDetail {
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
-  skin: String,
+  skin: string,
 }
 
 type ImmOMap = Immutable.OrderedMap<string, any>;
 
-export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
-    private immutableTree: ImmutableTree;
-    private config: Config;
-    private _actions: Actions;
+interface DemoQueryBuilderMemo {
+  immutableTree?: ImmutableTree,
+  config?: Config,
+  _actions?: Actions,
+}
 
-    componentDidMount() {
-      window.addEventListener("update", this.onConfigChanged);
-    }
+const DemoQueryBuilder: React.FC = () => {
+  let memo: DemoQueryBuilderMemo = {};
 
-    componentWillUnmount() {
-      window.removeEventListener("update", this.onConfigChanged);
-    }
+  const [state, setState] = useState<DemoQueryBuilderState>({
+    tree: initTree, 
+    config: loadedConfig,
+    skin: initialSkin
+  });
 
-    state = {
-      tree: initTree, 
-      config: loadedConfig,
-      skin: initialSkin
+  useEffect(() => {
+    window.addEventListener("update", onConfigChanged);
+    return () => {
+      window.removeEventListener("update", onConfigChanged);
     };
+  });
 
-    render = () => (
-      <div>
-        <div>
-          <select value={this.state.skin} onChange={this.changeSkin}>
-            <option key="vanilla">vanilla</option>
-            <option key="antd">antd</option>
-            <option key="material">material</option>
-            <option key="mui">mui</option>
-            <option key="bootstrap">bootstrap</option>
-          </select>
-          <button onClick={this.resetValue}>reset</button>
-          <button onClick={this.clearValue}>clear</button>
-          <button onClick={this.runActions}>run actions</button>
-          <button onClick={this.validate}>validate</button>
-          <button onClick={this.switchShowLock}>show lock: {this.state.config.settings.showLock ? "on" : "off"}</button>
-        </div>
-        
-        <Query
-          {...this.state.config}
-          value={this.state.tree}
-          onChange={this.onChange}
-          renderBuilder={this.renderBuilder}
-        />
 
-        <div className="query-builder-result">
-          {this.renderResult(this.state)}
+  const onConfigChanged = (e: Event) => {
+    const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
+    console.log("Updating config...");
+    setState({
+      ...state,
+      config,
+    });
+    initTree = _initTree;
+    initValue = _initValue;
+  }
+
+  const switchShowLock = () => {
+    const newConfig: Config = clone(state.config);
+    newConfig.settings.showLock = !newConfig.settings.showLock;
+    setState({...state, config: newConfig});
+  }
+
+  const resetValue = () => {
+    setState({
+      ...state,
+      tree: initTree, 
+    });
+  };
+
+  const validate = () => {
+    setState({
+      ...state,
+      tree: checkTree(state.tree, state.config)
+    });
+  }
+
+  const changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const skin = e.target.value;
+    const config = loadConfig(e.target.value);
+    setState({
+      ...state,
+      skin,
+      config,
+      tree: checkTree(state.tree, config)
+    });
+    window._initialSkin = skin;
+  };
+
+  const clearValue = () => {
+    setState({
+      ...state,
+      tree: loadTree(emptyInitValue), 
+    });
+  };
+
+  const renderBuilder = (props: BuilderProps) => {
+    memo._actions = props.actions;
+    return (
+      <div className="query-builder-container" style={{padding: "10px"}}>
+        <div className="query-builder qb-lite">
+          <Builder {...props} />
         </div>
       </div>
-    )
-
-    onConfigChanged = (e: Event) => {
-      const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
-      console.log("Updating config...");
-      this.setState({
-        config,
-      });
-      initTree = _initTree;
-      initValue = _initValue;
-    }
-
-    switchShowLock = () => {
-      const newConfig: Config = clone(this.state.config);
-      newConfig.settings.showLock = !newConfig.settings.showLock;
-      this.setState({config: newConfig});
-    }
-
-    resetValue = () => {
-      this.setState({
-        tree: initTree, 
-      });
-    };
-
-    validate = () => {
-      this.setState({
-        tree: checkTree(this.state.tree, this.state.config)
-      });
-    }
-
-    changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const skin = e.target.value;
-      const config = loadConfig(e.target.value);
-      this.setState({
-        skin,
-        config,
-        tree: checkTree(this.state.tree, config)
-      });
-      window._initialSkin = skin;
-    };
-
-    clearValue = () => {
-      this.setState({
-        tree: loadTree(emptyInitValue), 
-      });
-    };
-
-    renderBuilder = (props: BuilderProps) => {
-      this._actions = props.actions;
-      return (
-        <div className="query-builder-container" style={{padding: "10px"}}>
-          <div className="query-builder qb-lite">
-            <Builder {...props} />
-          </div>
-        </div>
-      );
-    }
+    );
+  }
+  
+  const onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
+    if (actionMeta)
+      console.info(actionMeta);
+    memo.immutableTree = immutableTree;
+    memo.config = config;
+    updateResult();
     
-    onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
-      if (actionMeta)
-        console.info(actionMeta);
-      this.immutableTree = immutableTree;
-      this.config = config;
-      this.updateResult();
-      
-      const jsonTree = getTree(immutableTree); //can be saved to backend
+    const jsonTree = getTree(immutableTree); //can be saved to backend
+  }
+
+  const updateResult = throttle(() => {
+    setState({...state, tree: memo.immutableTree, config: memo.config});
+  }, 100)
+
+  // Demonstrates how actions can be called programmatically
+  const runActions = () => {
+    const rootPath = [ state.tree.get("id") as string ];
+    const isEmptyTree = !state.tree.get("children1");
+    const firstPath = [
+      state.tree.get("id"), 
+      ((state.tree.get("children1") as ImmOMap)?.first() as ImmOMap)?.get("id")
+    ];
+    const lastPath = [
+      state.tree.get("id"), 
+      ((state.tree.get("children1") as ImmOMap)?.last() as ImmOMap)?.get("id")
+    ];
+
+    // Change root group to NOT OR
+    memo._actions.setNot(rootPath, true);
+    memo._actions.setConjunction(rootPath, "OR");
+
+    // Move first item
+    if (!isEmptyTree) {
+      memo._actions.moveItem(firstPath, lastPath, "before");
     }
 
-    updateResult = throttle(() => {
-      this.setState({tree: this.immutableTree, config: this.config});
-    }, 100)
+    // Remove last rule
+    if (!isEmptyTree) {
+      memo._actions.removeRule(lastPath);
+    }
 
-    // Demonstrates how actions can be called programmatically
-    runActions = () => {
-      const rootPath = [ this.state.tree.get("id") as string ];
-      const isEmptyTree = !this.state.tree.get("children1");
-      const firstPath = [
-        this.state.tree.get("id"), 
-        ((this.state.tree.get("children1") as ImmOMap)?.first() as ImmOMap)?.get("id")
-      ];
-      const lastPath = [
-        this.state.tree.get("id"), 
-        ((this.state.tree.get("children1") as ImmOMap)?.last() as ImmOMap)?.get("id")
-      ];
+    // Change first rule to `num between 2 and 4`
+    if (!isEmptyTree) {
+      memo._actions.setField(firstPath, "num");
+      memo._actions.setOperator(firstPath, "between");
+      memo._actions.setValueSrc(firstPath, 0, "value");
+      memo._actions.setValue(firstPath, 0, 2, "number");
+      memo._actions.setValue(firstPath, 1, 4, "number");
+    }
 
-      // Change root group to NOT OR
-      this._actions.setNot(rootPath, true);
-      this._actions.setConjunction(rootPath, "OR");
+    // Add rule `login == "denis"`
+    memo._actions.addRule(
+      rootPath,
+      {
+        field: "user.login",
+        operator: "equal",
+        value: ["denis"],
+        valueSrc: ["value"],
+        valueType: ["text"]
+      },
+    );
 
-      // Move first item
-      if (!isEmptyTree) {
-        this._actions.moveItem(firstPath, lastPath, "before");
-      }
+    // Add rule `login == firstName`
+    memo._actions.addRule(
+      rootPath,
+      {
+        field: "user.login",
+        operator: "equal",
+        value: ["user.firstName"],
+        valueSrc: ["field"]
+      },
+    );
 
-      // Remove last rule
-      if (!isEmptyTree) {
-        this._actions.removeRule(lastPath);
-      }
-
-      // Change first rule to `num between 2 and 4`
-      if (!isEmptyTree) {
-        this._actions.setField(firstPath, "num");
-        this._actions.setOperator(firstPath, "between");
-        this._actions.setValueSrc(firstPath, 0, "value");
-        this._actions.setValue(firstPath, 0, 2, "number");
-        this._actions.setValue(firstPath, 1, 4, "number");
-      }
-
-      // Add rule `login == "denis"`
-      this._actions.addRule(
-        rootPath,
+    // Add rule-group `cars` with `year == 2021`
+    memo._actions.addRule(
+      rootPath,
+      {
+        field: "cars",
+        mode: "array",
+        operator: "all",
+      },
+      "rule_group",
+      [
         {
-          field: "user.login",
-          operator: "equal",
-          value: ["denis"],
-          valueSrc: ["value"],
-          valueType: ["text"]
-        },
-      );
-
-      // Add rule `login == firstName`
-      this._actions.addRule(
-        rootPath,
-        {
-          field: "user.login",
-          operator: "equal",
-          value: ["user.firstName"],
-          valueSrc: ["field"]
-        },
-      );
-
-      // Add rule-group `cars` with `year == 2021`
-      this._actions.addRule(
-        rootPath,
-        {
-          field: "cars",
-          mode: "array",
-          operator: "all",
-        },
-        "rule_group",
-        [
-          {
-            type: "rule",
-            properties: {
-              field: "cars.year",
-              operator: "equal",
-              value: [2021]
-            }
+          type: "rule",
+          properties: {
+            field: "cars.year",
+            operator: "equal",
+            value: [2021]
           }
-        ]
-      );
+        }
+      ]
+    );
 
-      // Add group with `slider == 40` and subgroup `slider < 20`
-      this._actions.addGroup(
-        rootPath,
+    // Add group with `slider == 40` and subgroup `slider < 20`
+    memo._actions.addGroup(
+      rootPath,
+      {
+        conjunction: "AND"
+      },
+      [
         {
-          conjunction: "AND"
+          type: "rule",
+          properties: {
+            field: "slider",
+            operator: "equal",
+            value: [40]
+          }
         },
-        [
-          {
-            type: "rule",
-            properties: {
-              field: "slider",
-              operator: "equal",
-              value: [40]
-            }
+        {
+          type: "group",
+          properties: {
+            conjunction: "AND"
           },
-          {
-            type: "group",
-            properties: {
-              conjunction: "AND"
+          children1: [
+            {
+              type: "rule",
+              properties: {
+                field: "slider",
+                operator: "less",
+                value: [20]
+              }
             },
-            children1: [
-              {
-                type: "rule",
-                properties: {
-                  field: "slider",
-                  operator: "less",
-                  value: [20]
-                }
-              },
-            ]
-          }
-        ]
-      );
-    }
+          ]
+        }
+      ]
+    );
+  }
 
-    renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
-      const isValid = isValidTree(immutableTree);
-      const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
-      return (
+  const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
+    const isValid = isValidTree(immutableTree);
+    const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+    return (
+      <div>
+        {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
+        <br />
         <div>
-          {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
-          <br />
-          <div>
-          stringFormat: 
-            <pre style={preStyle}>
-              {stringify(queryString(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-          humanStringFormat: 
-            <pre style={preStyle}>
-              {stringify(queryString(immutableTree, config, true), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-          sqlFormat: 
-            <pre style={preStyle}>
-              {stringify(sqlFormat(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-            <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
-            { errors.length > 0 
-              && <pre style={preErrorStyle}>
-                {stringify(errors, undefined, 2)}
-              </pre> 
-            }
-            { !!logic
-              && <pre style={preStyle}>
-                {"// Rule"}:<br />
-                {stringify(logic, undefined, 2)}
-                <br />
-                <hr />
-                {"// Data"}:<br />
-                {stringify(data, undefined, 2)}
-              </pre>
-            }
-          </div>
-          <hr/>
-          <div>
-          mongodbFormat: 
-            <pre style={preStyle}>
-              {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-          elasticSearchFormat: 
-            <pre style={preStyle}>
-              {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
-            </pre>
-          </div>
-          <hr/>
-          <div>
-          Tree: 
-            <pre style={preStyle}>
-              {stringify(getTree(immutableTree), undefined, 2)}
-            </pre>
-          </div>
-          {/* <hr/>
-        <div>
-          queryBuilderFormat: 
-            <pre style={preStyle}>
-              {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
-            </pre>
-        </div> */}
+        stringFormat: 
+          <pre style={preStyle}>
+            {stringify(queryString(immutableTree, config), undefined, 2)}
+          </pre>
         </div>
-      );
-    }
+        <hr/>
+        <div>
+        humanStringFormat: 
+          <pre style={preStyle}>
+            {stringify(queryString(immutableTree, config, true), undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
+        sqlFormat: 
+          <pre style={preStyle}>
+            {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
+          <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
+          { errors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(errors, undefined, 2)}
+            </pre> 
+          }
+          { !!logic
+            && <pre style={preStyle}>
+              {"// Rule"}:<br />
+              {stringify(logic, undefined, 2)}
+              <br />
+              <hr />
+              {"// Data"}:<br />
+              {stringify(data, undefined, 2)}
+            </pre>
+          }
+        </div>
+        <hr/>
+        <div>
+        mongodbFormat: 
+          <pre style={preStyle}>
+            {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
+        elasticSearchFormat: 
+          <pre style={preStyle}>
+            {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
+        Tree: 
+          <pre style={preStyle}>
+            {stringify(getTree(immutableTree), undefined, 2)}
+          </pre>
+        </div>
+        {/* <hr/>
+      <div>
+        queryBuilderFormat: 
+          <pre style={preStyle}>
+            {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
+          </pre>
+      </div> */}
+      </div>
+    );
+  }
 
-}
+  return (
+    <div>
+      <div>
+        <select value={state.skin} onChange={changeSkin}>
+          <option key="vanilla">vanilla</option>
+          <option key="antd">antd</option>
+          <option key="material">material</option>
+          <option key="mui">mui</option>
+          <option key="bootstrap">bootstrap</option>
+        </select>
+        <button onClick={resetValue}>reset</button>
+        <button onClick={clearValue}>clear</button>
+        <button onClick={runActions}>run actions</button>
+        <button onClick={validate}>validate</button>
+        <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
+      </div>
+      
+      <Query
+        {...state.config}
+        value={state.tree}
+        onChange={onChange}
+        renderBuilder={renderBuilder}
+      />
+
+      <div className="query-builder-result">
+        {renderResult(state)}
+      </div>
+    </div>
+  )
+};
+
+
+export default DemoQueryBuilder;
