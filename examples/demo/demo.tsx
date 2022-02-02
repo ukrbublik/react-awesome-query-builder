@@ -61,7 +61,7 @@ interface DemoQueryBuilderMemo {
 }
 
 const DemoQueryBuilder: React.FC = () => {
-  let memo: DemoQueryBuilderMemo = {};
+  const memo: DemoQueryBuilderMemo = {};
 
   const [state, setState] = useState<DemoQueryBuilderState>({
     tree: initTree, 
@@ -86,13 +86,13 @@ const DemoQueryBuilder: React.FC = () => {
     });
     initTree = _initTree;
     initValue = _initValue;
-  }
+  };
 
   const switchShowLock = () => {
     const newConfig: Config = clone(state.config);
     newConfig.settings.showLock = !newConfig.settings.showLock;
     setState({...state, config: newConfig});
-  }
+  };
 
   const resetValue = () => {
     setState({
@@ -106,7 +106,7 @@ const DemoQueryBuilder: React.FC = () => {
       ...state,
       tree: checkTree(state.tree, state.config)
     });
-  }
+  };
 
   const changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skin = e.target.value;
@@ -146,11 +146,11 @@ const DemoQueryBuilder: React.FC = () => {
     updateResult();
     
     const jsonTree = getTree(immutableTree); //can be saved to backend
-  }
+  };
 
   const updateResult = throttle(() => {
     setState({...state, tree: memo.immutableTree, config: memo.config});
-  }, 100)
+  }, 100);
 
   // Demonstrates how actions can be called programmatically
   const runActions = () => {
@@ -265,7 +265,7 @@ const DemoQueryBuilder: React.FC = () => {
         }
       ]
     );
-  }
+  };
 
   const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
     const isValid = isValidTree(immutableTree);
@@ -343,7 +343,7 @@ const DemoQueryBuilder: React.FC = () => {
       </div> */}
       </div>
     );
-  }
+  };
 
   return (
     <div>
@@ -373,7 +373,7 @@ const DemoQueryBuilder: React.FC = () => {
         {renderResult(state)}
       </div>
     </div>
-  )
+  );
 };
 
 

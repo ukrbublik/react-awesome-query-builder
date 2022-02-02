@@ -10,5 +10,5 @@ import "../css/styles.scss";
 const rootElement = window.document.getElementById("root");
 
 ReactDOM.render((
-    <Demo />
+  <Demo />
 ), rootElement);

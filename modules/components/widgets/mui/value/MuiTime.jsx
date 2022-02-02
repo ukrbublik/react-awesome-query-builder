@@ -23,7 +23,7 @@ export default (props) => {
       size="small" 
       variant="standard"
       {...params}
-    />
+    />;
 
   return (
     <FormControl>
