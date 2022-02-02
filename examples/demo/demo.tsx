@@ -127,16 +127,16 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
-  const renderBuilder = (props: BuilderProps) => {
-    memo._actions = props.actions;
+  const renderBuilder = (bprops: BuilderProps) => {
+    memo._actions = bprops.actions;
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
         <div className="query-builder qb-lite">
-          <Builder {...props} />
+          <Builder {...bprops} />
         </div>
       </div>
     );
-  }
+  };
   
   const onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
     if (actionMeta)
