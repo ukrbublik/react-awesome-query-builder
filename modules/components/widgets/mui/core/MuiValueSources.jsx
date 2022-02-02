@@ -7,13 +7,6 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import styled from "@emotion/styled";
-
-const StyledPopover = styled(Popover)`
-  & .MuiPopover-paper {
-    padding: 16px;
-  }
-`;
 
 export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -57,7 +50,7 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
         <ExpandMoreSharpIcon />
       </IconButton>
     
-      <StyledPopover    
+      <Popover    
         open={open}
         anchorEl={anchorEl}
         anchorOrigin={{
@@ -74,13 +67,13 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
         }}
         disablePortal
       >
-        <FormControl component="fieldset">
+        <FormControl component="fieldset" sx={{ p: 2 }}>
           <FormLabel component="legend">{title}</FormLabel>
           <RadioGroup value={valueSrc || "value"} onChange={handleChange}>
             {renderOptions(valueSources)}
           </RadioGroup>
         </FormControl>
-      </StyledPopover>
+      </Popover>
     </div>
   );
 };
