@@ -12,7 +12,8 @@
 [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 
 [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder)
 [![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design)
-[![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=Material%20UI)](https://material-ui.com)
+[![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=MUI)](https://material-ui.com)
+[![bootstrap](https://img.shields.io/badge/skin-Bootstrap-blue?logo=Bootstrap)](https://reactstrap.github.io/)
 [![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/)
 [![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox?file=/src/demo/config_simple.tsx)
 [![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/sandbox_simple?file=/src/demo/config_simple.js)
@@ -61,8 +62,11 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   - another fields (of same type)
   - function (arguments also can be values/fields/funcs)
 - Reordering (drag-n-drop) support for rules and groups of rules
-- Using awesome [Ant Design](https://ant.design/) as UI framework with rich features.  
-  Now [Material-UI](https://material-ui.com/) is also supported!  
+- Themes:
+  - [Ant Design](https://ant.design/)
+  - [Material-UI](https://material-ui.com/)
+  - [Bootstrap](https://reactstrap.github.io/)
+  - vanilla
   (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com)
@@ -83,6 +87,11 @@ npm i antd --save
 For Material-UI widgets only:
 ```
 npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm --save
+```
+
+For Bootstrap widgets only:
+```
+npm i bootstrap reactstrap @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/react-fontawesome --save
 ```
 
 See [basic usage](#usage) for minimum code example. 
@@ -108,12 +117,14 @@ import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import 'antd/dist/antd.css'; // or import "react-awesome-query-builder/css/antd.less";
 // For Material-UI widgets only:
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
+// For Bootstrap widgets only:
+import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
 
 import 'react-awesome-query-builder/lib/css/styles.css';
 import 'react-awesome-query-builder/lib/css/compact_styles.css'; //optional, for more compact styles
 
 // Choose your skin (ant/material/vanilla):
-const InitialConfig = AntdConfig; // or MaterialConfig or BasicConfig
+const InitialConfig = AntdConfig; // or MaterialConfig or BootstrapConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
 const config = {
@@ -227,12 +238,14 @@ import AntdConfig from "react-awesome-query-builder/lib/config/antd";
 import "antd/dist/antd.css"; // or import "react-awesome-query-builder/css/antd.less";
 // For Material-UI widgets only:
 //import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+// For Bootstrap widgets only:
+//import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
 
 import "react-awesome-query-builder/lib/css/styles.css";
 import "react-awesome-query-builder/lib/css/compact_styles.css"; //optional, for more compact styles
 
 // Choose your skin (ant/material/vanilla):
-const InitialConfig = AntdConfig; // or MaterialConfig or BasicConfig
+const InitialConfig = AntdConfig; // or MaterialConfig or BootstrapConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
 const config: Config = {
@@ -358,6 +371,8 @@ Props:
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
+- If you put query builder component inside [Fluent-UI](https://developer.microsoft.com/en-us/fluentui)'s `<Panel />`, please:
+  - set css `.ms-Layer.ms-Layer--fixed.root-119 { z-index: 900 !important; }`
 - `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically (for list of actions see `Actions` in [`index.d.ts`](/modules/index.d.ts)).
 
 ### `<Builder />`
