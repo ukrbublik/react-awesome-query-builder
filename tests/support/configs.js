@@ -8,7 +8,7 @@ const {
   FieldTreeSelect,
 } = AntdWidgets;
 import { BasicFuncs } from "react-awesome-query-builder";
-
+import { simulatedAsyncFetch } from "./autocomplete";
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -785,6 +785,22 @@ export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
   }
 });
 
+export const with_settings_show_labels = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    showLabels: true
+  }
+});
+
+export const with_settings_show_lock = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    showLock: true
+  }
+});
+
 
 export const with_group_array_cars = (BasicConfig) => ({
   ...BasicConfig,
@@ -893,6 +909,72 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
       jsonLogic: "custom_group_operator",
     },
   }
+});
+
+export const with_autocomplete = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    autocomplete: {
+      label: "Autocomplete",
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
+    },
+  },
+});
+
+export const with_different_groups = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        score: {
+          type: "number",
+        },
+        grade: {
+          type: "text",
+        }
+      }
+    },
+    cars: {
+      label: "Cars",
+      type: "!group",
+      mode: "array",
+      subfields: {
+        vendor: {
+          type: "select",
+          fieldSettings: {
+            listValues: ["Ford", "Toyota", "Tesla"],
+          },
+        },
+        year: {
+          type: "number",
+          fieldSettings: {
+            min: 1990,
+            max: 2021,
+          },
+        }
+      }
+    },
+    num: {
+      label: "Number",
+      type: "number",
+      preferWidgets: ["number"],
+    },
+    str: {
+      label: "String",
+      type: "text",
+    },
+  },
 });
 
 // rare

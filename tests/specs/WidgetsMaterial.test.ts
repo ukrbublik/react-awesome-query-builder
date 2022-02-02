@@ -5,8 +5,8 @@ import * as inits from "../support/inits";
 import { with_qb_material, hexToRgbString } from "../support/utils";
 
 describe("material-ui theming", () => {
-  it("applies secondary color", () => {
-    with_qb_material(configs.with_theme_material, inits.with_bool, "JsonLogic", (qb) => {
+  it("applies secondary color", async () => {
+    await with_qb_material(configs.with_theme_material, inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
       expect(boolSwitch, "boolSwitch").to.have.length(1);
       const boolSwitchNode = boolSwitch.at(0).getDOMNode() ;
@@ -20,8 +20,8 @@ describe("material-ui theming", () => {
 
 describe("material-ui widgets interactions", () => {
 
-  it("change date", () => {
-    with_qb_material(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("change date", async () => {
+    await with_qb_material(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       // open date picker for '2020-05-18'
       const openPickerBtn = qb.find(".rule--widget--DATE button.MuiIconButton-root");
       expect(openPickerBtn, "openPickerBtn").to.have.length(1);
@@ -69,8 +69,8 @@ describe("material-ui widgets interactions", () => {
     });
   });
 
-  it("change time value", () => {
-    with_qb_material(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("change time value", async () => {
+    await with_qb_material(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       const {onChange: onChangeDate} = qb
         .find("KeyboardDateInput")
         .props();
