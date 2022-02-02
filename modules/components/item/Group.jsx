@@ -76,7 +76,7 @@ export class BasicGroup extends PureComponent {
 
   isEmptyCurrentGroup() {
     const children = this.props.children1;
-    return children.size == 0
+    return !children || children.size == 0
       || children.size == 1 && this.isEmpty(children.first());
   }
 
@@ -87,7 +87,7 @@ export class BasicGroup extends PureComponent {
 
   isEmptyGroup(group) {
     const children = group.get("children1");
-    return children.size == 0
+    return !children || children.size == 0
       || children.size == 1 && this.isEmpty(children.first());
   }
 
