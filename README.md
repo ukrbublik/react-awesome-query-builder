@@ -86,12 +86,12 @@ npm i antd --save
 
 For Material-UI 4 widgets only:
 ```
-npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm --save
+npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm@2 --save
 ```
 
 For MUI 5 widgets only:
 ```
-npm i @mui/material @mui/lab @mui/icons-material material-ui-confirm --save
+npm i @mui/material @mui/lab @mui/icons-material material-ui-confirm@3 --save
 ```
 
 For Bootstrap widgets only:
