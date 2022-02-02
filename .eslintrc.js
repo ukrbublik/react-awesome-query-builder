@@ -141,8 +141,6 @@ module.exports = {
         "files": ["sandbox/**/*.ts", "sandbox/**/*.tsx"],
         "parserOptions": {
           "project": 'sandbox/tsconfig.json',
-          "tsconfigRootDir": __dirname,
-          "sourceType": "module"
         },
       },
       {

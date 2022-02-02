@@ -2,7 +2,7 @@
   "name": "react-awesome-query-builder-demo",
   "version": "0.5.0",
   "description": "Demo for react-awesome-query-builder",
-  "main": "./src/index.jsx",
+  "main": "src/index.jsx",
   "readme": "README.md",
   "repository": {
     "type": "git",
@@ -31,18 +31,15 @@
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
-    "react-awesome-query-builder": "file:..",
-    "@mui/icons-material": "^5.2.4",
-    "@mui/lab": "^5.0.0-alpha.60",
-    "@mui/material": "^5.2.4",
-    "material-ui-confirm": "^3.0.0",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/pickers": "^3.3.10",
     "antd": "^4.16.13",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "material-ui-confirm": "^2.1.2",
+    "react": "^16.14.0",
+    "react-awesome-query-builder": "^4.7.0",
+    "react-dom": "^16.14.0"
   },
   "browserslist": {
     "production": [
@@ -61,8 +58,8 @@
     "vite": "^2.5.0",
     "react-scripts": "^4.0.3",
     "@types/lodash": "^4.14.170",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.2",
+    "@types/react": "^16.14.0",
+    "@types/react-dom": "^17.0.8",
     "typescript": "^4.4.4"
   }
 }
