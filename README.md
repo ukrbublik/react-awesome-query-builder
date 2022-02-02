@@ -84,9 +84,14 @@ For AntDesign widgets only:
 npm i antd --save
 ```
 
-For Material-UI widgets only:
+For Material-UI 4 widgets only:
 ```
-npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm --save
+npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers material-ui-confirm@2 --save
+```
+
+For MUI 5 widgets only:
+```
+npm i @mui/material @emotion/react @emotion/styled @mui/lab @mui/icons-material material-ui-confirm@3 --save
 ```
 
 For Bootstrap widgets only:
@@ -115,8 +120,9 @@ import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query
 // For AntDesign widgets only:
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
 import 'antd/dist/antd.css'; // or import "react-awesome-query-builder/css/antd.less";
-// For Material-UI widgets only:
+// For MUI 4/5 widgets only:
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
+import MuiConfig from 'react-awesome-query-builder/lib/config/mui';
 // For Bootstrap widgets only:
 import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
 
@@ -124,7 +130,7 @@ import 'react-awesome-query-builder/lib/css/styles.css';
 import 'react-awesome-query-builder/lib/css/compact_styles.css'; //optional, for more compact styles
 
 // Choose your skin (ant/material/vanilla):
-const InitialConfig = AntdConfig; // or MaterialConfig or BootstrapConfig or BasicConfig
+const InitialConfig = AntdConfig; // or MaterialConfig or MuiConfig or BootstrapConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
 const config = {
@@ -236,8 +242,9 @@ import {
 // For AntDesign widgets only:
 import AntdConfig from "react-awesome-query-builder/lib/config/antd";
 import "antd/dist/antd.css"; // or import "react-awesome-query-builder/css/antd.less";
-// For Material-UI widgets only:
-//import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+// For MUI 4/5 widgets only:
+//import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
+//import MuiConfig from 'react-awesome-query-builder/lib/config/mui';
 // For Bootstrap widgets only:
 //import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
 
@@ -245,7 +252,7 @@ import "react-awesome-query-builder/lib/css/styles.css";
 import "react-awesome-query-builder/lib/css/compact_styles.css"; //optional, for more compact styles
 
 // Choose your skin (ant/material/vanilla):
-const InitialConfig = AntdConfig; // or MaterialConfig or BootstrapConfig or BasicConfig
+const InitialConfig = AntdConfig; // or MaterialConfig or MuiConfig or BootstrapConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
 const config: Config = {

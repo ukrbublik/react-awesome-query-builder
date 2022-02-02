@@ -1,4 +1,7 @@
 # Changelog
+- 5.0.0
+  - Support MUI v5 (PR #628)
+  - Upgraded to React 17. Moved from RHL to react-refresh. Converted demo app to FC. (PR #628)
 - 4.10.0
   - Support Bootstrap (via `reactstrap`) (PR #604)
 - 4.9.0
