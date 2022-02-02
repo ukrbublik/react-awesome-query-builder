@@ -81,7 +81,7 @@ const babel_options = {
         ["@babel/plugin-proposal-private-methods", { "loose": true }],
         ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
         "@babel/plugin-transform-runtime",
-        "react-refresh/babel",
+        ...(isDev ? ["react-refresh/babel"] : []),
         ["import", {
             "libraryName": "antd",
             "style": false,
