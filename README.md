@@ -429,6 +429,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 - Import:
   #### loadFromJsonLogic (jsonLogicObject, config) -> Immutable
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
+  #### _loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]
   #### loadFromSpel (string, config) -> [Immutable, errors]
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
 

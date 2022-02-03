@@ -11,7 +11,7 @@ import {
 } from "react-awesome-query-builder";
 const {
   uuid, 
-  checkTree, loadTree, loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
+  checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
   queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
@@ -54,7 +54,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   let errors: string[] = [];
   let tree: ImmutableTree | undefined;
   if (valueFormat == "JsonLogic") {
-    tree = loadFromJsonLogic(value, config);
+    [tree, errors] = _loadFromJsonLogic(value, config);
   } else if (valueFormat == "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
   } else {

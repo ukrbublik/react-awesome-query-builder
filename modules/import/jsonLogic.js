@@ -1,5 +1,5 @@
 import uuid from "../utils/uuid";
-import {defaultValue, isJsonLogic,shallowEqual} from "../utils/stuff";
+import {defaultValue, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
@@ -13,8 +13,11 @@ import moment from "moment";
 const arrayUniq = (arr) => Array.from(new Set(arr));
 const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
 
-
 export const loadFromJsonLogic = (logicTree, config) => {
+  return _loadFromJsonLogic(logicTree, config, false);
+};
+
+export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: []
@@ -26,9 +29,16 @@ export const loadFromJsonLogic = (logicTree, config) => {
     jsTree = wrapInDefaultConj(jsTree, extendedConfig);
   }
   const immTree = jsTree ? loadTree(jsTree) : undefined;
-  if (meta.errors.length)
-    console.warn("Errors while importing from JsonLogic:", meta.errors);
-  return immTree;
+
+  if (returnErrors) {
+    if (meta.errors.length)
+      logger.warn("Errors while importing from JsonLogic:", meta.errors);
+    return [immTree, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while importing from JsonLogic:", meta.errors);
+    return immTree;
+  }
 };
 
 

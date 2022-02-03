@@ -7,7 +7,11 @@ import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils
 import {logger} from "../utils/stuff";
 import moment from "moment";
 
-export const loadFromSpel = (spelStr, config) => {
+export const loadFromSpel = (logicTree, config) => {
+  return _loadFromSpel(logicTree, config, true);
+};
+
+export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: []
@@ -22,7 +26,6 @@ export const loadFromSpel = (spelStr, config) => {
     const compileRes = SpelExpressionEvaluator.compile(spelStr);
     compiledExpression = compileRes._compiledExpression;
   } catch (e) {
-    logger.error(e);
     meta.errors.push(e);
   }
   
@@ -39,9 +42,16 @@ export const loadFromSpel = (spelStr, config) => {
   }
 
   const immTree = jsTree ? loadTree(jsTree) : undefined;
-  if (meta.errors.length)
-    logger.warn("Errors while importing from SpEL:", meta.errors);
-  return [immTree, meta.errors];
+
+  if (returnErrors) {
+    if (meta.errors.length)
+      logger.warn("Errors while importing from SpEL:", meta.errors);
+    return [immTree, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while importing from SpEL:", meta.errors);
+    return immTree;
+  }
 };
 
 const convertCompiled = (expr, meta) => {

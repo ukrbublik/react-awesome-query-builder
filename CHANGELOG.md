@@ -7,6 +7,7 @@
   - Rename `Like` -> `Contains`. Moved `is_empty`, `is_null` to end of operators list (PR #613)
   - Support MUI v5 (PR #628)
   - Upgraded to React 17. Moved from RHL to react-refresh. Converted demo app to FC. (PR #628)
+  - Added `Utils._loadFromJsonLogic()` that returns `[tree, errors]` (issue #621)
 - 4.10.0
   - Support Bootstrap (via `reactstrap`) (PR #604)
 - 4.9.0
