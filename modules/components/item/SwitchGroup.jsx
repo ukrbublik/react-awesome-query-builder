@@ -32,7 +32,7 @@ class SwitchGroup extends BasicGroup {
   renderFooterWrapper = () => null;
   hasDefaultCase = () => {
     return this.props.children1.size && this.props.children1.filter(c => c.get("children1") == null).size > 0;
-  }
+  };
   canAddGroup() {
     const { maxNumberOfCases } = this.props.config.settings;
     const totalCasesCnt = this.props.children1.size;

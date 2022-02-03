@@ -114,11 +114,11 @@ const createGroupContainer = (Group) =>
 
     addCaseGroup = () => {
       this.props.actions.addCaseGroup(this.props.path);
-    }
+    };
 
     addDefaultCaseGroup = () => {
       this.props.actions.addDefaultCaseGroup(this.props.path);
-    }
+    };
 
     addRule = () => {
       this.props.actions.addRule(this.props.path);
