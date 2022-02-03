@@ -81,11 +81,11 @@ export default class Widget extends PureComponent {
     } else {
       this.props.setValue(delta, value, widgetType, asyncListValues, __isInternal);
     }
-  }
+  };
 
   _onChangeValueSrc = (delta, srcKey) => {
     this.props.setValueSrc(delta, srcKey);
-  }
+  };
 
   getMeta({
     config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, 
@@ -208,7 +208,7 @@ export default class Widget extends PureComponent {
         />
       </div>
     );
-  }
+  };
 
   renderValueSources = (delta, meta, props) => {
     const {config, isFuncArg, leftField, operator, readonly} = props;
@@ -241,7 +241,7 @@ export default class Widget extends PureComponent {
           title={settings.valueSourcesPopupTitle}
         />
       </div>;
-  }
+  };
 
   renderSep = (delta, meta, props) => {
     const {config} = props;
@@ -258,7 +258,7 @@ export default class Widget extends PureComponent {
         {sepLabel}
         <span>{sepText}</span>
       </div>;
-  }
+  };
 
   renderWidgetDelta = (delta) => {
     const sep = this.renderSep(delta, this.meta, this.props);
@@ -270,7 +270,7 @@ export default class Widget extends PureComponent {
       sources,
       widgetCmp,
     ];
-  }
+  };
 
   render() {
     if (!this.meta) return null;

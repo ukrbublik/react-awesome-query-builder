@@ -1,4 +1,4 @@
-import sinon from "sinon";
+import sinon, {assert} from "sinon";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb } from "../support/utils";
@@ -77,11 +77,11 @@ describe("drag-n-drop", () => {
     });
     
     do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
-      sinon.assert.notCalled(onChange);
+      assert.notCalled(onChange);
     });
     
     do_test(configs.simple_with_number_max_nesting_1, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
-      sinon.assert.notCalled(onChange);
+      assert.notCalled(onChange);
     });
   });
 
@@ -113,7 +113,7 @@ describe("drag-n-drop", () => {
     });
     
     do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange, _tasks) => {
-      sinon.assert.notCalled(onChange);
+      assert.notCalled(onChange);
     });
   });
 

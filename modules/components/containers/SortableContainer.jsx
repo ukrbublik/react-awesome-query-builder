@@ -140,7 +140,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
     _getEventTarget = (e, dragStart) => {
       return e && e.__mocked_window || document.body || window;
-    }
+    };
 
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest(".query-builder");
@@ -192,7 +192,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       target.addEventListener("mouseup", this.onDragEnd);
 
       this.props.setDragStart(dragStart, dragging, mousePos);
-    }
+    };
 
 
     onDrag = (e, doHandleDrag = true) => {
@@ -256,7 +256,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         if (e.preventDefault)
           e.preventDefault();
       }
-    }
+    };
 
     onDragEnd = () => {
       let treeEl = this.props.dragStart.treeEl;
@@ -270,7 +270,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       const target = this.eventTarget || this._getEventTarget();
       target.removeEventListener("mousemove", this.onDrag);
       target.removeEventListener("mouseup", this.onDragEnd);
-    }
+    };
     
 
     handleDrag (dragInfo, e, canMoveFn) {

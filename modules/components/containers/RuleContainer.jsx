@@ -38,35 +38,35 @@ const createRuleContainer = (Rule) =>
       this.dummyFn.isDummyFn = true;
     }
 
-    dummyFn = () => {}
+    dummyFn = () => {};
 
     removeSelf = () => {
       this.props.actions.removeRule(this.props.path);
-    }
+    };
 
     setLock = (lock = null) => {
       this.props.actions.setLock(this.props.path, lock);
-    }
+    };
 
     setField = (field) => {
       this.props.actions.setField(this.props.path, field);
-    }
+    };
 
     setOperator = (operator) => {
       this.props.actions.setOperator(this.props.path, operator);
-    }
+    };
 
     setOperatorOption = (name, value) => {
       this.props.actions.setOperatorOption(this.props.path, name, value);
-    }
+    };
 
     setValue = (delta, value, type, asyncListValues, __isInternal) => {
       this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, __isInternal);
-    }
+    };
 
     setValueSrc = (delta, srcKey) => {
       this.props.actions.setValueSrc(this.props.path, delta, srcKey);
-    }
+    };
 
     shouldComponentUpdate(nextProps, nextState) {
       let prevProps = this.props;

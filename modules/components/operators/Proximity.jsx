@@ -28,7 +28,7 @@ export default class Proximity extends PureComponent {
 
   handleChange = (value) => {
     this.props.setOption("proximity", parseInt(value));
-  }
+  };
 
   render() {
     const {

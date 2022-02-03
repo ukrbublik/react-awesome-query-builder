@@ -26,7 +26,7 @@ export default (className) => (GroupOrRule) =>
       if (this.props.onDragStart) {
         this.props.onDragStart(nodeId, dom, e);
       }
-    }
+    };
 
     render () {
       const {

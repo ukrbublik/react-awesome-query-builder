@@ -9,7 +9,7 @@ class ConjsButton extends PureComponent {
     const {setConjunction, item} = this.props;
     const conj = item.key;
     setConjunction(conj);
-  }
+  };
 
   render() {
     const {disabled, item} = this.props;
@@ -29,7 +29,7 @@ export default class ConjsButtons extends PureComponent {
     const {setNot, not} = this.props;
     if (setNot)
       setNot(!not);
-  }
+  };
 
   render() {
     const {readonly, disabled, not, conjunctionOptions, config, setConjunction, notLabel, showNot} = this.props;

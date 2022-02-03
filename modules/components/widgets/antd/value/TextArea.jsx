@@ -20,7 +20,7 @@ export default class TextAreaWidget extends PureComponent {
     const v = ev.target.value;
     const val = v === "" ? undefined : v; // don't allow empty value
     this.props.setValue(val);
-  }
+  };
 
   render() {
     const {config, placeholder, customProps, value, readonly, maxLength, maxRows, fullWidth} = this.props;

@@ -27,14 +27,14 @@ export default class FieldCascader extends PureComponent {
     const dotNotationToPath = str => str.split(".");
     const parentPath = parentField ? dotNotationToPath(parentField) : [];
     this.props.setField([...parentPath, ...keys]);
-  }
+  };
 
   filterOption = (inputValue, path) => {
     const keysForFilter = ["label", "key", "altLabel"];
     return path.some(option => (
       keysForFilter.map(k => option[k]).join("\0").toLowerCase().indexOf(inputValue.toLowerCase()) > -1
     ));
-  }
+  };
 
   render() {
     const {

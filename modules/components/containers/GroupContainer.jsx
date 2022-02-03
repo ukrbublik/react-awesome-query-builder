@@ -88,29 +88,29 @@ const createGroupContainer = (Group) =>
     _selectedConjunction = (props) => {
       props = props || this.props;
       return props.conjunction || defaultGroupConjunction(props.config, props.field);
-    }
+    };
 
     setConjunction = (conj = null) => {
       this.props.actions.setConjunction(this.props.path, conj);
-    }
+    };
 
     setNot = (not = null) => {
       this.props.actions.setNot(this.props.path, not);
-    }
+    };
 
     setLock = (lock = null) => {
       this.props.actions.setLock(this.props.path, lock);
-    }
+    };
 
-    dummyFn = () => {}
+    dummyFn = () => {};
 
     removeSelf = () => {
       this.props.actions.removeGroup(this.props.path);
-    }
+    };
 
     addGroup = () => {
       this.props.actions.addGroup(this.props.path);
-    }
+    };
 
     addCaseGroup = () => {
       this.props.actions.addCaseGroup(this.props.path);
@@ -122,21 +122,21 @@ const createGroupContainer = (Group) =>
 
     addRule = () => {
       this.props.actions.addRule(this.props.path);
-    }
+    };
 
     // for RuleGroup
     setField = (field) => {
       this.props.actions.setField(this.props.path, field);
-    }
+    };
 
     // for RuleGroupExt
     setOperator = (operator) => {
       this.props.actions.setOperator(this.props.path, operator);
-    }
+    };
 
     setValue = (delta, value, type) => {
       this.props.actions.setValue(this.props.path, delta, value, type);
-    }
+    };
 
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
