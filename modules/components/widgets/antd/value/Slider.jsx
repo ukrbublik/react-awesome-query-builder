@@ -29,7 +29,7 @@ export default class SliderWidget extends PureComponent {
   };
 
   state = {
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -48,9 +48,9 @@ export default class SliderWidget extends PureComponent {
     if (__isInternal)
       this.setState({internalValue: val});
     this.props.setValue(val, undefined, __isInternal);
-  }
+  };
 
-  tipFormatter = (val) => (val != undefined ? val.toString() : undefined)
+  tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
   UNSAFE_componentWillUpdate(nextProps, nextState) {
     // RHL fix

@@ -229,12 +229,12 @@ class ArgWidget extends PureComponent {
   setValue = (_delta, value, _widgetType) => {
     const {setValue, argKey} = this.props;
     setValue(argKey, value);
-  }
+  };
 
   setValueSrc = (_delta, valueSrc, _widgetType) => {
     const {setValueSrc, argKey} = this.props;
     setValueSrc(argKey, valueSrc);
-  }
+  };
 
   render() {
     const {funcKey, parentFuncs} = this.props;

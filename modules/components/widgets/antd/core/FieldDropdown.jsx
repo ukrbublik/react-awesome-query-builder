@@ -26,7 +26,7 @@ export default class FieldDropdown extends PureComponent {
 
   onChange = ({key, keyPath}) => {
     this.props.setField(key);
-  }
+  };
 
   renderMenuItems(fields) {
     return fields.map(field => {

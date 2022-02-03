@@ -46,12 +46,12 @@ export default class MultiSelectWidget extends PureComponent {
     if (val && !val.length)
       val = undefined; //not allow []
     this.props.setValue(val);
-  }
+  };
 
   filterOption = (input, option) => {
     const dataForFilter = option.children || option.value;
     return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  }
+  };
 
   render() {
     const {config, placeholder, allowCustomValues, customProps, value, readonly} = this.props;
