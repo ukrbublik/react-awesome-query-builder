@@ -55,12 +55,12 @@ export default class TreeSelectWidget extends PureComponent {
       val = val.map(v => v.value);
     }
     this.props.setValue(val);
-  }
+  };
 
   filterTreeNode = (input, option) => {
     const dataForFilter = option.title;
     return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  }
+  };
 
 
   render() {

@@ -25,7 +25,7 @@ export default class FieldSelect extends PureComponent {
 
   onChange = (key) => {
     this.props.setField(key);
-  }
+  };
 
   filterOption = (input, option) => {
     const dataForFilter = option;
@@ -34,7 +34,7 @@ export default class FieldSelect extends PureComponent {
       .map(k => (typeof dataForFilter[k] == "string" ? dataForFilter[k] : ""))
       .join("\0");
     return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  }
+  };
 
   render() {
     const {

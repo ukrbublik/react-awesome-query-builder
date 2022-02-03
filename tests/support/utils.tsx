@@ -250,7 +250,7 @@ const expect_queries_before_and_after = (config: Config, tree: ImmutableTree, on
   
   const call = onChange.getCall(0);
   if (!call) throw new Error("onChange was not called");
-  const changedTreeString = queryString(call.args[0], config);
+  const changedTreeString = queryString(call.args[0] as ImmutableTree, config);
   expect(changedTreeString).to.equal(queries[1]);
 };
 
@@ -262,7 +262,7 @@ const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onC
   
   const call = onChange.getCall(changeIndex);
   if (!call) throw new Error("onChange was not called");
-  const {logic: changedTreeJl} = jsonLogicFormat(call.args[0], config);
+  const {logic: changedTreeJl} = jsonLogicFormat(call.args[0] as ImmutableTree, config);
   expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
 };
 

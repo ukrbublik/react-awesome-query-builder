@@ -173,7 +173,7 @@ export class BasicGroup extends PureComponent {
       return null;
 
     return typeof BeforeActions === "function" ? <BeforeActions {...this.props}/> : BeforeActions;
-  }
+  };
 
   renderAfterActions = () => {
     const AfterActions = this.props.config.settings.renderAfterActions;
@@ -181,7 +181,7 @@ export class BasicGroup extends PureComponent {
       return null;
 
     return typeof AfterActions === "function" ? <AfterActions {...this.props}/> : AfterActions;
-  }
+  };
 
   renderActions() {
     const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
@@ -203,7 +203,7 @@ export class BasicGroup extends PureComponent {
 
   canAddGroup = () => {
     return this.props.allowFurtherNesting;
-  }
+  };
   canAddRule = () => {
     const {maxNumberOfRules} = this.props.config.settings;
     const {totalRulesCnt} = this.props;

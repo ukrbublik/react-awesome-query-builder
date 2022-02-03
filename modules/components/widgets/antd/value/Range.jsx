@@ -30,7 +30,7 @@ export default class RangeWidget extends PureComponent {
   };
 
   state = {
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -49,7 +49,7 @@ export default class RangeWidget extends PureComponent {
 
   handleChange = (value) => {
     this.props.setValue(value);
-  }
+  };
 
   handleChangeFrom = (valueFrom) => {
     let value = this.props.value || [undefined, undefined];
@@ -60,7 +60,7 @@ export default class RangeWidget extends PureComponent {
     // if (value[1] == undefined)
     //   value[1] = valueFrom;
     this.props.setValue(value);
-  }
+  };
   
   handleChangeTo = (valueTo) => {
     let value = this.props.value || [undefined, undefined];
@@ -71,9 +71,9 @@ export default class RangeWidget extends PureComponent {
     // if (value[0] == undefined)
     //   value[0] = valueTo;
     this.props.setValue(value);
-  }
+  };
 
-  tipFormatter = (val) => (val != undefined ? val.toString() : "")
+  tipFormatter = (val) => (val != undefined ? val.toString() : "");
 
   render() {
     const {config, placeholders, customProps, value,  min, max, step, marks, textSeparators, readonly} = this.props;

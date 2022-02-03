@@ -78,7 +78,7 @@ export default class FieldTreeSelect extends PureComponent {
 
   onChange = (key) => {
     this.props.setField(key);
-  }
+  };
 
   filterTreeNode = (input, option) => {
     const dataForFilter = option;
@@ -88,7 +88,7 @@ export default class FieldTreeSelect extends PureComponent {
         .map(k => (typeof dataForFilter[k] == "string" ? dataForFilter[k] : ""))
         .join("\0");
     return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  }
+  };
 
   render() {
     const {

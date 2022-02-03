@@ -426,7 +426,7 @@ export default (skin: string) => {
       valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
-        validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
+        validateValue: (val: string, fieldSettings: DateTimeFieldSettings) => {
           // example of date validation
           const dateVal = moment(val, fieldSettings.valueFormat);
           return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
