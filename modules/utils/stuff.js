@@ -76,7 +76,7 @@ function shallowEqualArrays(arrA, arrB, deep = false) {
   }
 
   for (var i = 0; i < len; i++) {
-    var isEqual = deep ? shallowEqual(arrA[i], arrB[i]) : arrA[i] === arrB[i];
+    var isEqual = deep ? shallowEqual(arrA[i], arrB[i], deep) : arrA[i] === arrB[i];
     if (!isEqual) {
       return false;
     }
