@@ -352,6 +352,8 @@ export const getLogger = (devMode = false) => {
     error: () => {},
     log: () => {},
     warn: () => {},
+    debug: () => {},
+    info: () => {},
   };
 };
 

@@ -30,22 +30,20 @@ export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
   }
   
   if (compiledExpression) {
-    logger.log("compiledExpression:", compiledExpression);
+    logger.debug("compiledExpression:", compiledExpression);
     convertedObj = convertCompiled(compiledExpression, meta);
-    logger.log("convertedObj:", convertedObj, meta);
+    logger.debug("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
     if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
       jsTree = wrapInDefaultConj(jsTree, extendedConfig);
     }
-    logger.log("jsTree:", jsTree);
+    logger.debug("jsTree:", jsTree);
   }
 
   const immTree = jsTree ? loadTree(jsTree) : undefined;
 
   if (returnErrors) {
-    if (meta.errors.length)
-      logger.warn("Errors while importing from SpEL:", meta.errors);
     return [immTree, meta.errors];
   } else {
     if (meta.errors.length)

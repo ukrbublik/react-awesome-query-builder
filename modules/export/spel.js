@@ -14,16 +14,24 @@ import {Map} from "immutable";
 import {spelEscape} from "../utils/export";
 
 export const spelFormat = (tree, config) => {
+  return _spelFormat(tree, config, false);
+};
+
+export const _spelFormat = (tree, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: []
   };
 
   const res = formatItem(tree, config, meta, null);
-
-  if (meta.errors.length)
-    logger.warn("Errors while exporting to SpEL:", meta.errors);
-  return res;
+  
+  if (returnErrors) {
+    return [res, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while exporting to SpEL:", meta.errors);
+    return res;
+  }
 };
 
 

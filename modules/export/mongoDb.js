@@ -14,8 +14,11 @@ import {settings as defaultSettings} from "../config/default";
 // helpers
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
-
 export const mongodbFormat = (tree, config) => {
+  return _mongodbFormat(tree, config, false);
+};
+
+export const _mongodbFormat = (tree, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: []
@@ -23,9 +26,13 @@ export const mongodbFormat = (tree, config) => {
 
   const res = formatItem([], tree, config, meta);
 
-  if (meta.errors.length)
-    console.warn("Errors while exporting to MongoDb:", meta.errors);
-  return res;
+  if (returnErrors) {
+    return [res, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while exporting to MongoDb:", meta.errors);
+    return res;
+  }
 };
 
 

@@ -13,8 +13,11 @@ import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 import {SqlString} from "../utils/export";
 
-
 export const sqlFormat = (tree, config) => {
+  return _sqlFormat(tree, config, false);
+};
+
+export const _sqlFormat = (tree, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: []
@@ -22,9 +25,13 @@ export const sqlFormat = (tree, config) => {
 
   const res = formatItem(tree, config, meta);
 
-  if (meta.errors.length)
-    console.warn("Errors while exporting to SQL:", meta.errors);
-  return res;
+  if (returnErrors) {
+    return [res, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while exporting to SQL:", meta.errors);
+    return res;
+  }
 };
 
 

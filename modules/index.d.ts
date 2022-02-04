@@ -163,8 +163,11 @@ export interface Utils {
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
+  _sqlFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   spelFormat(tree: ImmutableTree, config: Config): string | undefined;
+  _spelFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
   elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
   // load, save
   getTree(tree: ImmutableTree, light?: boolean): JsonTree;

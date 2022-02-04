@@ -12,7 +12,7 @@ import Immutable from "immutable";
 import clone from "clone";
 
 const stringify = JSON.stringify;
-const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree} = Utils;
+const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -290,44 +290,62 @@ const DemoQueryBuilder: React.FC = () => {
 
   const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
     const isValid = isValidTree(immutableTree);
-    const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+    const treeJs = getTree(immutableTree);
+    const {logic, data: logicData, errors: logicErrors} = jsonLogicFormat(immutableTree, config);
+    const [spel, spelErrors] = _spelFormat(immutableTree, config);
+    const queryStr = queryString(immutableTree, config);
+    const humanQueryStr = queryString(immutableTree, config, true);
+    const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
+    const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
+    const elasticSearch = elasticSearchFormat(immutableTree, config);
+
     return (
       <div>
         {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
         <br />
         <div>
         spelFormat: 
+          { spelErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(spelErrors, undefined, 2)}
+            </pre> 
+          }
           <pre style={preStyle}>
-            {stringify(spelFormat(immutableTree, config), undefined, 2)}
+            {stringify(spel, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         stringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config), undefined, 2)}
+            {stringify(queryStr, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         humanStringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config, true), undefined, 2)}
+            {stringify(humanQueryStr, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         sqlFormat: 
+          { sqlErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(sqlErrors, undefined, 2)}
+            </pre> 
+          }
           <pre style={preStyle}>
-            {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            {stringify(sql, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
-          { errors.length > 0 
+          { logicErrors.length > 0 
             && <pre style={preErrorStyle}>
-              {stringify(errors, undefined, 2)}
+              {stringify(logicErrors, undefined, 2)}
             </pre> 
           }
           { !!logic
@@ -337,29 +355,34 @@ const DemoQueryBuilder: React.FC = () => {
               <br />
               <hr />
               {"// Data"}:<br />
-              {stringify(data, undefined, 2)}
+              {stringify(logicData, undefined, 2)}
             </pre>
           }
         </div>
         <hr/>
         <div>
         mongodbFormat: 
+          { mongoErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(mongoErrors, undefined, 2)}
+            </pre> 
+          }
           <pre style={preStyle}>
-            {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+            {stringify(mongo, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         elasticSearchFormat: 
           <pre style={preStyle}>
-            {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
+            {stringify(elasticSearch, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         Tree: 
           <pre style={preStyle}>
-            {stringify(getTree(immutableTree), undefined, 2)}
+            {stringify(treeJs, undefined, 2)}
           </pre>
         </div>
         {/* <hr/>
