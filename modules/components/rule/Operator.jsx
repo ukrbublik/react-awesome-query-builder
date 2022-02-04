@@ -38,16 +38,17 @@ export default class Operator extends PureComponent {
 
   getMeta({config, selectedField, selectedOperator}) {
     const fieldConfig = getFieldConfig(config, selectedField);
+    const operators = fieldConfig?.operators;
     const operatorOptions 
       = mapValues(
         pickBy(
           config.operators, 
-          (item, key) => fieldConfig && fieldConfig.operators && fieldConfig.operators.indexOf(key) !== -1
+          (item, key) => operators?.indexOf(key) !== -1
         ), 
         (_opts, op) => getOperatorConfig(config, op, selectedField)
       );
       
-    const items = this.buildOptions(config, operatorOptions, fieldConfig.operators);
+    const items = this.buildOptions(config, operatorOptions, operators);
 
     const isOpSelected = !!selectedOperator;
     const currOp = isOpSelected ? operatorOptions[selectedOperator] : null;
@@ -65,7 +66,7 @@ export default class Operator extends PureComponent {
   }
 
   buildOptions(config, fields, ops) {
-    if (!fields)
+    if (!fields || !ops)
       return null;
 
     return keys(fields).sort((a, b) => (ops.indexOf(a) - ops.indexOf(b))).map(fieldKey => {
@@ -91,6 +92,8 @@ export default class Operator extends PureComponent {
       setField: setOperator,
       ...this.meta
     };
+    if (!renderProps.items)
+      return null;
     return renderOperator(renderProps);
   }
 

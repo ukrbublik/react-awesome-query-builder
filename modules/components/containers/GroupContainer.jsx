@@ -112,6 +112,14 @@ const createGroupContainer = (Group) =>
       this.props.actions.addGroup(this.props.path);
     };
 
+    addCaseGroup = () => {
+      this.props.actions.addCaseGroup(this.props.path);
+    };
+
+    addDefaultCaseGroup = () => {
+      this.props.actions.addDefaultCaseGroup(this.props.path);
+    };
+
     addRule = () => {
       this.props.actions.addRule(this.props.path);
     };
@@ -163,6 +171,8 @@ const createGroupContainer = (Group) =>
               setLock={this.dummyFn}
               removeSelf={this.dummyFn}
               addGroup={this.dummyFn}
+              addCaseGroup={this.dummyFn}
+              addDefaultCaseGroup={this.dummyFn}
               addRule={this.dummyFn}
               setField={this.dummyFn}
               setOperator={this.dummyFn}
@@ -179,6 +189,7 @@ const createGroupContainer = (Group) =>
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
+              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
             /> : null
             ,
             <Group
@@ -198,6 +209,8 @@ const createGroupContainer = (Group) =>
               setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               addGroup={isInDraggingTempo ? this.dummyFn : this.addGroup}
+              addCaseGroup={isInDraggingTempo ? this.dummyFn : this.addCaseGroup}
+              addDefaultCaseGroup={isInDraggingTempo ? this.dummyFn : this.addDefaultCaseGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
@@ -214,6 +227,7 @@ const createGroupContainer = (Group) =>
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
+              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
             />
           ]}
         </div>

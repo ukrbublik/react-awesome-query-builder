@@ -45,6 +45,16 @@ describe("basic query", () => {
       });
     });
 
+    describe("should work with simple value in SpEL format", () => {
+      export_checks(configs.simple_with_number, inits.spel_with_number, "SpEL", {
+        logic: {
+          and: [
+            { "==": [{ "var": "num" }, 2] }
+          ]
+        },
+      });
+    });
+
     describe("should work with simple value in JsonLogic format not in group", () => {
       export_checks(configs.simple_with_number, inits.with_number_not_in_group, "JsonLogic", {
         query: "num == 2",
@@ -60,25 +70,34 @@ describe("basic query", () => {
     });
 
     describe("should handle undefined value in JsonLogic format", () => {
-      export_checks(configs.simple_with_number, inits.with_undefined_as_number, "JsonLogic", {});
+      export_checks(configs.simple_with_number, inits.with_undefined_as_number, "JsonLogic", {}, [
+        "Can't parse logic undefined"
+      ]);
     });
 
     describe("should handle unexpected json logic value in JsonLogic format", () => {
-      export_checks(configs.simple_with_number, inits.with_jl_value, "JsonLogic", {});
+      export_checks(configs.simple_with_number, inits.with_jl_value, "JsonLogic", {}, [
+        "Unexpected logic in value: {\"+\":[1,2]}"
+      ]);
     });
 
     describe("should handle unknown field", () => {
-      export_checks(configs.simple_with_number, inits.with_nested, "JsonLogic", {});
+      export_checks(configs.simple_with_number, inits.with_nested, "JsonLogic", {}, [
+        "No config for field user.info.firstName"
+      ]);
     });
 
     describe("should handle unknown type", () => {
-      export_checks(configs.with_wrong_type, inits.with_number, "JsonLogic", {});
+      export_checks(configs.with_wrong_type, inits.with_number, "JsonLogic", {}, [
+        "No widget for type not-a-text"
+      ]);
     });
 
   });
 
   describe("export", () => {
     export_checks(configs.simple_with_number, inits.tree_with_number, "default", {
+      spel: "num == 2",
       query: "num == 2",
       queryHuman: "Number = 2",
       sql: "num = 2",

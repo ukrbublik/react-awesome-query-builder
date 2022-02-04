@@ -23,10 +23,12 @@
     "paths": {
       "react-awesome-query-builder": ["modules"],
       "react-awesome-query-builder/*": ["modules/*"],
-    }
+    },
+    "skipLibCheck": true
   },
   "include": [
     "demo/**/*",
+    "demo_switch/**/*",
     "index.tsx"
   ]
 }

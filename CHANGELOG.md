@@ -1,7 +1,13 @@
 # Changelog
 - 5.0.0
+  - Support of SpEL for import and export. See `loadFromSpel` and `spelFormat` in `Utils` (PR #613)
+  - Added `excludeOperators` for type config (PR #613)
+    See `excludeOperators: ["proximity"]` in demo
+  - Changed export of `not_between` op for text format (`!(num >= 3 && num <= 4)` -> `(num < 3 || num > 4)`) (PR #613)
+  - Rename `Like` -> `Contains`. Moved `is_empty`, `is_null` to end of operators list (PR #613)
   - Support MUI v5 (PR #628)
   - Upgraded to React 17. Moved from RHL to react-refresh. Converted demo app to FC. (PR #628)
+  - Added `Utils._loadFromJsonLogic()` that returns `[tree, errors]` (issue #621)
 - 4.10.0
   - Support Bootstrap (via `reactstrap`) (PR #604)
 - 4.9.0

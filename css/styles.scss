@@ -284,6 +284,42 @@ ul.ant-select-selection__rendered {
   }
 }
 
+/******************************************************************************/
+/** CASE_GROUP *********************************************************************/
+/******************************************************************************/
+
+.case_group {
+  border-width: 2px;
+}
+
+.switch_group {
+  & > .group--children {
+    & > .group-or-rule-container > .group-or-rule {
+      &::before, &::after {
+          height: calc(50% + 12px); // for `border-width: 2px`
+      }
+    }
+  }
+}
+
+.case_group--body {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  .case_group--children {
+    flex: auto;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .case_group--value {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
+}
 
 /******************************************************************************/
 /** RULE_GROUP *********************************************************************/

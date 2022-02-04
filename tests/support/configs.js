@@ -1,5 +1,4 @@
 import React from "react";
-import sinon from "sinon";
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import AntdWidgets from "react-awesome-query-builder/components/widgets/antd";
 const {
@@ -9,6 +8,7 @@ const {
 } = AntdWidgets;
 import { BasicFuncs } from "react-awesome-query-builder";
 import { simulatedAsyncFetch } from "./autocomplete";
+import { spy } from "sinon";
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -757,7 +757,7 @@ export const with_settings_confirm = (BasicConfig) => ({
       okText: "Yes",
       okType: "danger",
     },
-    renderConfirm: sinon.spy(),
+    renderConfirm: spy(),
     /*({onOk, okText, cancelText, title}) => {
       if (confirm(title)) {
         onOk();

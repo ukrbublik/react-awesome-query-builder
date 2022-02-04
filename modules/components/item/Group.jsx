@@ -76,7 +76,7 @@ export class BasicGroup extends PureComponent {
 
   isEmptyCurrentGroup() {
     const children = this.props.children1;
-    return children.size == 0
+    return !children || children.size == 0
       || children.size == 1 && this.isEmpty(children.first());
   }
 
@@ -87,7 +87,7 @@ export class BasicGroup extends PureComponent {
 
   isEmptyGroup(group) {
     const children = group.get("children1");
-    return children.size == 0
+    return !children || children.size == 0
       || children.size == 1 && this.isEmpty(children.first());
   }
 
@@ -122,7 +122,7 @@ export class BasicGroup extends PureComponent {
 
   isOneChild() {
     const {children1} = this.props;
-    return children1.size < 2;
+    return children1 ? children1.size < 2 : true;
   }
 
   renderChildrenWrapper() {
@@ -201,18 +201,20 @@ export class BasicGroup extends PureComponent {
     />;
   }
 
-  canAddGroup = () => {
+  canAddGroup() {
     return this.props.allowFurtherNesting;
-  };
-  canAddRule = () => {
-    const {maxNumberOfRules} = this.props.config.settings;
-    const {totalRulesCnt} = this.props;
+  }
+  canAddRule() {
+    const maxNumberOfRules = this.props.config.settings.maxNumberOfRules;
+    const totalRulesCnt = this.props.totalRulesCnt;
     if (maxNumberOfRules) {
       return totalRulesCnt < maxNumberOfRules;
     }
     return true;
-  };
-  canDeleteGroup = () => !this.props.isRoot;
+  }
+  canDeleteGroup() {
+    return !this.props.isRoot;
+  }
 
   renderChildren() {
     const {children1} = this.props;
@@ -239,8 +241,9 @@ export class BasicGroup extends PureComponent {
         actions={actions}
         children1={item.get("children1")}
         //tree={props.tree}
-        reordableNodesCnt={this.reordableNodesCnt()}
-        totalRulesCnt={this.props.totalRulesCnt}
+        reordableNodesCnt={this.reordableNodesCntForItem(item)}
+        totalRulesCnt={this.totalRulesCntForItem(item)}
+        parentReordableNodesCnt={this.reordableNodesCnt()}
         onDragStart={onDragStart}
         isDraggingTempo={this.props.isDraggingTempo}
         isParentLocked={isLocked}
@@ -258,8 +261,19 @@ export class BasicGroup extends PureComponent {
     return this.props.reordableNodesCnt;
   }
 
+  totalRulesCntForItem(_item) {
+    return this.props.totalRulesCnt;
+  }
+
+  reordableNodesCntForItem(_item) {
+    if (this.props.isLocked)
+      return 0;
+    return this.reordableNodesCnt();
+  }
+
   showDragIcon() {
-    const { config, isRoot, reordableNodesCnt, isLocked } = this.props;
+    const { config, isRoot, isLocked } = this.props;
+    const reordableNodesCnt = this.reordableNodesCnt();
     return config.settings.canReorder && !isRoot && reordableNodesCnt > 1 && !isLocked;
   }
 
@@ -289,7 +303,7 @@ export class BasicGroup extends PureComponent {
     const conjunctionOptions = this.conjunctionOptions();
     if (!this.showConjs())
       return null;
-    if (!children1.size)
+    if (!children1 || !children1.size)
       return null;
 
     const renderProps = {

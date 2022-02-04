@@ -27,24 +27,26 @@ import mapValues from "lodash/mapValues";
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, groupUuid, properties, config, children = null) => {
-  const rulesNumber = getTotalRulesCountInTree(state);
+const addNewGroup = (state, path, type, groupUuid, properties, config, children = null, meta = {}) => {
+  const {shouldCreateEmptyGroup} = config.settings;
   const groupPath = path.push(groupUuid);
-  const {maxNumberOfRules, shouldCreateEmptyGroup} = config.settings;
-  const canAddNewRule = !(maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
+  const canAddNewRule = !shouldCreateEmptyGroup;
+  const isDefaultCase = !!meta?.isDefaultCase;
 
-  state = addItem(state, path, "group", groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
+  const origState = state;
+  state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
+  if (state !== origState) {
+    if (!children && !isDefaultCase) {
+      state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
 
-  if (!children) {
-    state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
-
-    // Add one empty rule into new group
-    if (canAddNewRule && !shouldCreateEmptyGroup) {
-      state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+      // Add one empty rule into new group
+      if (canAddNewRule) {
+        state = addItem(state, groupPath, "rule", uuid(), defaultRuleProperties(config), config);
+      }
     }
-  }
 
-  state = fixPathsInTree(state);
+    state = fixPathsInTree(state);
+  }
   
   return state;
 };
@@ -170,26 +172,56 @@ const _addChildren1 = (config, item, children) => {
  * @param {object} config
  */
 const addItem = (state, path, type, id, properties, config, children = null) => {
-  const rulesNumber = getTotalRulesCountInTree(state);
-  const {maxNumberOfRules} = config.settings;
-  const canAddNewRule = !(type == "rule" && maxNumberOfRules && (rulesNumber + 1) > maxNumberOfRules);
-
+  if (type == "switch_group")
+    throw new Error("Can't add switch_group programmatically");
+  const { maxNumberOfCases, maxNumberOfRules, maxNesting } = config.settings;
+  const rootType = state.get("type");
+  const isTernary = rootType == "switch_group";
+  const targetItem = state.getIn(expandTreePath(path));
+  const caseGroup = isTernary ? state.getIn(expandTreePath(path.take(2))) : null;
+  const childrenPath = expandTreePath(path, "children1");
+  const targetChildren = state.getIn(childrenPath);
+  const hasChildren = !!targetChildren && targetChildren.size;
+  const targetChildrenSize = hasChildren ? targetChildren.size : null;
+  let currentNumber, maxNumber;
+  if (type == "case_group") {
+    currentNumber = targetChildrenSize;
+    maxNumber = maxNumberOfCases;
+  } else if (type == "group") {
+    currentNumber = path.size;
+    maxNumber = maxNesting;
+  } else if (targetItem?.get("type") == "rule_group") {
+    // don't restrict
+  } else {
+    currentNumber = isTernary ? getTotalRulesCountInTree(caseGroup) : getTotalRulesCountInTree(state);
+    maxNumber = maxNumberOfRules;
+  }
+  const canAdd = maxNumber && currentNumber ? (currentNumber < maxNumber) : true;
+  
   const item = {type, id, properties};
   _addChildren1(config, item, children);
 
-  if (canAddNewRule) {
-    const childrenPath = expandTreePath(path, "children1");
-    const hasChildren = !!state.getIn(childrenPath);
+  const isLastDefaultCase = type == "case_group" && hasChildren && targetChildren.last().get("children1") == null;
+
+  if (canAdd) {
     const newChildren = new Immutable.OrderedMap({
       [id]: new Immutable.Map(item)
     });
     if (!hasChildren) {
       state = state.setIn(childrenPath, newChildren);
+    } else if (isLastDefaultCase) {
+      const last = targetChildren.last();
+      const newChildrenWithLast = new Immutable.OrderedMap({
+        [id]: new Immutable.Map(item),
+        [last.get("id")]: last
+      });
+      state = state.deleteIn(expandTreePath(childrenPath, "children1", last.get("id")));
+      state = state.mergeIn(childrenPath, newChildrenWithLast);
     } else {
       state = state.mergeIn(childrenPath, newChildren);
     }
+    state = fixPathsInTree(state);
   }
-  state = fixPathsInTree(state);
   return state;
 };
 
@@ -464,6 +496,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+  const operatorConfig = getOperatorConfig(config, operator, field);
+  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
   const isEndValue = false;
   const canFix = false;
@@ -482,8 +516,6 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   if (showErrorMessage) {
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
-    const operatorConfig = getOperatorConfig(config, operator, field);
-    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
     const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
         
     if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
@@ -494,7 +526,15 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);
     }
   }
-    
+  
+  const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
+  if (!lastValueArr) {
+    state = state
+      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
+  }
+
   const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta + ""));
   const lastError = state.getIn(expandTreePath(path, "properties", "valueError", delta));
   const isLastEmpty = lastValue == undefined;
@@ -663,8 +703,13 @@ export default (config) => {
       break;
     }
 
+    case constants.ADD_CASE_GROUP: {
+      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, action.config,  action.children, action.meta);
+      break;
+    }
+
     case constants.ADD_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, action.id, action.properties, action.config,  action.children);
+      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, action.config,  action.children, action.meta);
       break;
     }
 

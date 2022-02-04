@@ -42,6 +42,7 @@ type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 
+
 ////////////////
 // query value
 /////////////////
@@ -85,8 +86,28 @@ interface GroupProperties extends BasicItemProperties {
   not?: boolean,
 }
 
+interface SwitchGroupProperties extends BasicItemProperties {
+
+}
+
+interface CaseGroupProperties extends BasicItemProperties {
+
+}
+
 type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
 type JsonItem = JsonGroup|JsonAnyRule;
+type JsonSwitchGroup = {
+  type: "switch_group",
+  id?: string,
+  children1?: {[id: string]: JsonCaseGroup} | [JsonCaseGroup],
+  properties?: SwitchGroupProperties
+};
+type JsonCaseGroup = {
+  type: "case_group",
+  id?: string,
+  children1?: {[id: string]: JsonGroup} | [JsonGroup],
+  properties?: CaseGroupProperties
+};
 type JsonGroup = {
   type: "group",
   id?: string,
@@ -110,7 +131,7 @@ type JsonRule = {
   type: "rule",
   properties: RuleProperties,
 }
-export type JsonTree = JsonGroup;
+export type JsonTree = JsonGroup|JsonSwitchGroup;
 
 export type ImmutableTree = ImmutableOMap<string, any>;
 
@@ -119,21 +140,45 @@ export type ImmutableTree = ImmutableOMap<string, any>;
 // Query, Builder, Utils, Config
 /////////////////
 
+export interface SpelConcatPart {
+  value: string;
+  type: "property" | "variable" | "const";
+}
+type SpelConcatParts = SpelConcatPart[];
+interface SpelConcatCaseValue {
+  valueType: "case_value";
+  value: SpelConcatNormalValue[];
+}
+interface SpelConcatNormalValue {
+  value: string;
+  valueType: string;
+  valueSrc: "value" | "field";
+  isVariable?: boolean;
+}
+type SpelConcatValue = SpelConcatNormalValue | SpelConcatCaseValue;
+
 export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
+  _sqlFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
+  spelFormat(tree: ImmutableTree, config: Config): string | undefined;
+  _spelFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
   elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
   // load, save
   getTree(tree: ImmutableTree, light?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   isValidTree(tree: ImmutableTree): boolean;
+  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
   // import
-  loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree;
+  loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree | undefined;
+  _loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): [ImmutableTree | undefined, Array<string>];
+  loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
@@ -145,6 +190,11 @@ export interface Utils {
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
     getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
     getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  };
+  ExportUtils: {
+    spelEscape(val: any): string;
+    spelFormatConcat(parts: SpelConcatParts): string;
+    spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>],
   }
 }
 
@@ -186,7 +236,7 @@ export interface Config {
 /////////////////
 
 type Placement = "after" | "before" | "append" | "prepend";
-type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
+type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "ADD_CASE_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
 interface BaseAction {
   type: ActionType,
 
@@ -240,11 +290,14 @@ export interface Actions {
 // Widgets, WidgetProps
 /////////////////
 
+type SpelImportValue = (val: any) => [any, string[]];
+
 type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SpelFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type MongoFormatValue =     (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
-type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings) => boolean | string | null;
+type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
 type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 interface BaseWidgetProps {
@@ -275,6 +328,7 @@ export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
 export type SelectWidgetProps = BaseWidgetProps & SelectFieldSettings;
 export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
 export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
+export type CaseValueWidgetProps = BaseWidgetProps & CaseValueFieldSettings;
 
 export interface BaseWidget {
   customProps?: AnyObject;
@@ -285,8 +339,10 @@ export interface BaseWidget {
   valuePlaceholder?: string;
   valueLabel?: string;
   fullWidth?: boolean;
-  formatValue: FormatValue;
-  sqlFormatValue: SqlFormatValue;
+  formatValue?: FormatValue;
+  sqlFormatValue?: SqlFormatValue;
+  spelFormatValue?: SpelFormatValue;
+  spelImportValue?: SpelImportValue;
   mongoFormatValue?: MongoFormatValue;
   elasticSearchFormatValue?: ElasticSearchFormatValue;
   hideOperator?: boolean;
@@ -304,7 +360,8 @@ export interface FieldWidget {
   valuePlaceholder?: string,
   valueLabel?: string,
   formatValue: FormatValue, // with rightFieldDef
-  sqlFormatValue: SqlFormatValue, // with rightFieldDef
+  sqlFormatValue?: SqlFormatValue, // with rightFieldDef
+  spelFormatValue?: SpelFormatValue, // with rightFieldDef
   //obsolete:
   validateValue?: ValidateValue,
 }
@@ -315,6 +372,7 @@ export type BooleanWidget = BaseWidget & BooleanFieldSettings;
 export type NumberWidget = RangeableWidget & NumberFieldSettings;
 export type SelectWidget = BaseWidget & SelectFieldSettings;
 export type TreeSelectWidget = BaseWidget & TreeSelectFieldSettings;
+export type CaseValueWidget = BaseWidget & CaseValueFieldSettings;
 
 export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget | TreeSelectWidget  | RangeableWidget | BaseWidget;
 export type Widgets = TypedMap<Widget>;
@@ -326,12 +384,18 @@ export type Widgets = TypedMap<Widget>;
 
 type FormatConj = (children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
 type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
+type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
 
 export interface Conjunction {
   label: string,
   formatConj: FormatConj,
   sqlFormatConj: SqlFormatConj,
+  spelFormatConj: SpelFormatConj,
   mongoConj: string,
+  jsonLogicConj?: string,
+  sqlConj?: string,
+  spelConj?: string,
+  spelConjs?: [string],
   reversedConj?: string,
 }
 export type Conjunctions = TypedMap<Conjunction>;
@@ -414,13 +478,15 @@ export interface RuleErrorProps {
   error: string,
 }
 
+
 /////////////////
 // Operators
 /////////////////
 
-type FormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean) => string;
+type FormatOperator = (field: string, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
 type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
-type SqlFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type SqlFormatOperator = (field: string, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type SpelFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
@@ -454,6 +520,9 @@ interface BaseOperator {
   mongoFormatOp?: MongoFormatOperator,
   sqlOp?: string,
   sqlFormatOp?: SqlFormatOperator,
+  spelOp?: string,
+  spelOps?: [string],
+  spelFormatOp?: SpelFormatOperator,
   jsonLogic?: string | JsonLogicFormatOperator,
   _jsonLogicIsRevArgs?: boolean,
   elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType,
@@ -493,6 +562,8 @@ interface Type {
   valueSources?: Array<ValueSource>,
   defaultOperator?: string,
   widgets: TypedMap<WidgetConfigForType>,
+  mainWidget?: string,
+  excludeOperators?: Array<string>,
 }
 export type Types = TypedMap<Type>;
 
@@ -565,6 +636,8 @@ export interface BooleanFieldSettings extends BasicFieldSettings {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
 }
+export interface CaseValueFieldSettings extends BasicFieldSettings {
+}
 export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | TextFieldSettings | BasicFieldSettings;
 
 interface BaseField {
@@ -589,6 +662,7 @@ interface ValueField extends BaseField {
   //obsolete - moved to FieldSettings
   listValues?: ListValues,
   allowCustomValues?: boolean,
+  isSpelVariable?: boolean,
 }
 interface SimpleField extends ValueField {
   label2?: string,
@@ -599,11 +673,14 @@ interface SimpleField extends ValueField {
 interface FieldStruct extends BaseField {
   type: "!struct",
   subfields: Fields,
+  isSpelMap?: boolean,
 }
 interface FieldGroup extends BaseField {
   type: "!group",
   subfields: Fields,
   mode: RuleGroupMode,
+  isSpelArray?: boolean,
+  isSpelItemMap?: boolean,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
@@ -614,6 +691,8 @@ interface FieldGroupExt extends BaseField {
   initialEmptyWhere?: boolean,
   showNot?: boolean,
   conjunctions?: Array<string>,
+  isSpelArray?: boolean,
+  isSpelItemMap?: boolean,
 }
 
 export type Field = SimpleField;
@@ -659,15 +738,22 @@ export interface FieldProps {
 // Settings
 /////////////////
 
+type SpelFieldMeta = {
+  key: string,
+  parent: "map" | "class" | "[class]" | "[map]" | null,
+  isSpelVariable?: boolean,
+};
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}}
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
 type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
-type SqlFormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator) => string;
+type SqlFormatReverse = (q: string) => string;
+type SpelFormatReverse = (q: string) => string;
 type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
+type FormatSpelField = (field: string, parentField: string | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
 type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
-type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | Array<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
+type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {
@@ -692,6 +778,9 @@ export interface LocaleSettings {
   lockedLabel?: string,
   deleteLabel?: string,
   addGroupLabel?: string,
+  addCaseLabel?: string,
+  addDefaultCaseLabel?: string,
+  defaultCaseLabel?: string,
   addRuleLabel?: string,
   addSubRuleLabel?: string,
   delGroupLabel?: string,
@@ -734,6 +823,7 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>,
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
+  renderSwitchPrefix?: Factory<AnyObject>,
   defaultSliderWidth?: string,
   defaultSelectWidth?: string,
   defaultSearchWidth?: string,
@@ -745,6 +835,7 @@ export interface BehaviourSettings {
   canCompareFieldWithField?: CanCompareFieldWithField,
   canReorder?: boolean,
   canRegroup?: boolean,
+  canRegroupCases?: boolean,
   showNot?: boolean,
   showLock?: boolean,
   canDeleteLocked?: boolean,
@@ -753,6 +844,7 @@ export interface BehaviourSettings {
   clearValueOnChangeField?: boolean,
   clearValueOnChangeOp?: boolean,
   canLeaveEmptyGroup?: boolean,
+  canLeaveEmptyCase?: boolean,
   shouldCreateEmptyGroup?: boolean,
   forceShowConj?: boolean,
   immutableGroupsMode?: boolean,
@@ -760,6 +852,7 @@ export interface BehaviourSettings {
   immutableOpsMode?: boolean,
   immutableValuesMode?: boolean,
   maxNumberOfRules?: Number,
+  maxNumberOfCases?: Number,
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
@@ -770,7 +863,9 @@ export interface OtherSettings {
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse,
   sqlFormatReverse?: SqlFormatReverse,
+  spelFormatReverse?: SpelFormatReverse,
   formatField?: FormatField,
+  formatSpelField?: FormatSpelField,
   formarAggr?: FormatAggr,
 }
 
@@ -786,6 +881,7 @@ type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => st
 type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
+type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup {
   type?: "!struct",
@@ -798,6 +894,7 @@ export interface Func {
   args: TypedMap<FuncArg>,
   label?: string,
   sqlFunc?: string,
+  spelFunc?: string,
   mongoFunc?: string,
   mongoArgsAsObject?: boolean,
   jsonLogic?: string | JsonLogicFormatFunc,
@@ -811,6 +908,7 @@ export interface Func {
   mongoFormatFunc?: MongoFormatFunc,
   renderBrackets?: Array<ReactElement | string>,
   renderSeps?: Array<ReactElement | string>,
+  spelFormatFunc?: SpelFormatFunc,
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
@@ -869,6 +967,7 @@ export interface BasicConfig extends Config {
     boolean: BooleanWidget,
     field: FieldWidget,
     func: FieldWidget,
+    case_value: CaseValueWidget,
   },
   types: {
     text: Type,
@@ -881,6 +980,7 @@ export interface BasicConfig extends Config {
     treeselect: Type,
     treemultiselect: Type,
     boolean: Type,
+    case_value: Type,
   },
   settings: Settings,
 }

@@ -68,8 +68,8 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   - [Bootstrap](https://reactstrap.github.io/)
   - vanilla
   (Using another UI framework and custom widgets is possible, see below)
-- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), ElasticSearch or your custom format
-- Import from [JsonLogic](http://jsonlogic.com)
+- Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
+- Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
 - TypeScript support (see [types](/modules/index.d.ts) and [demo in TS](/examples))
 
 
@@ -81,7 +81,7 @@ npm i react-awesome-query-builder --save
 
 For AntDesign widgets only:
 ```
-npm i antd --save
+npm i antd @ant-design/icons --save
 ```
 
 For Material-UI 4 widgets only:
@@ -229,7 +229,7 @@ class DemoQueryBuilder extends Component {
 #### Minimal TypeScript example with function component
 ([Codesandbox](https://codesandbox.io/s/relaxed-sun-erhnu?file=/src/demo/demo.tsx))
 ```typescript
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
 // types
 import {
@@ -307,22 +307,22 @@ export const Demo: React.FC = () => {
     config: config
   });
 
-  const onChange = (immutableTree: ImmutableTree, config: Config) => {
+  const onChange = useCallback((immutableTree: ImmutableTree, config: Config) => {
     // Tip: for better performance you can apply `throttle` - see `examples/demo`
-    setState({ tree: immutableTree, config: config });
+    setState(prevState => { ...prevState, tree: immutableTree, config: config });
 
     const jsonTree = QbUtils.getTree(immutableTree);
     console.log(jsonTree);
     // `jsonTree` can be saved to backend, and later loaded to `queryValue`
-  };
+  }, []);
 
-  const renderBuilder = (props: BuilderProps) => (
+  const renderBuilder = useCallback((props: BuilderProps) => (
     <div className="query-builder-container" style={{ padding: "10px" }}>
       <div className="query-builder qb-lite">
         <Builder {...props} />
       </div>
     </div>
-  );
+  ), []);
 
   return (
     <div>
@@ -375,6 +375,7 @@ Props:
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
+- Please apply `useCallback` for `onChange` and `renderBuilder` for performance reason
 - If you put query builder component inside [Material-UI](https://github.com/mui-org/material-ui)'s `<Dialog />` or `<Popover />`, please:
   - use prop `disableEnforceFocus={true}` for dialog or popver
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
@@ -419,6 +420,8 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Convert query value to MongoDb query object.
   #### sqlFormat (immutableValue, config) -> String
   Convert query value to SQL where string.
+  #### spelFormat (immutableValue, config) -> String
+  Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
   #### elasticSearchFormat (immutableValue, config) -> Object
   Convert query value to ElasticSearch query object.
   #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}
@@ -427,6 +430,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 - Import:
   #### loadFromJsonLogic (jsonLogicObject, config) -> Immutable
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
+  #### _loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]
+  #### loadFromSpel (string, config) -> [Immutable, errors]
+  Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
+
 
 
 ### Config format

@@ -49,22 +49,26 @@ export default class Builder extends Component {
   }
 
   render() {
-    const reordableNodesCnt = getTotalReordableNodesCountInTree(this.props.tree);
-    const totalRulesCnt = getTotalRulesCountInTree(this.props.tree);
-    const id = this.props.tree.get("id");
+    const tree = this.props.tree;
+    const rootType = tree.get("type");
+    const isTernary = rootType == "switch_group";
+    const reordableNodesCnt = isTernary ? null : getTotalReordableNodesCountInTree(tree);
+    const totalRulesCnt = isTernary ? null : getTotalRulesCountInTree(tree);
+    const id = tree.get("id");
     return (
       <Item 
         key={id}
         id={id}
         path={this.path}
-        type={this.props.tree.get("type")}
-        properties={this.props.tree.get("properties") || new Map()}
+        type={rootType}
+        properties={tree.get("properties") || new Map()}
         config={this.props.config}
         actions={this.props.actions}
-        children1={this.props.tree.get("children1") || new Map()}
-        //tree={this.props.tree}
+        children1={tree.get("children1") || new Map()}
+        //tree={tree}
         reordableNodesCnt={reordableNodesCnt}
         totalRulesCnt={totalRulesCnt}
+        parentReordableNodesCnt={0}
         onDragStart={this.props.onDragStart}
       />
     );

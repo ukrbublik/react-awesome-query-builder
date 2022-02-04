@@ -1,7 +1,7 @@
 import MaterialWidgets from "../../components/widgets/material";
 import BasicConfig, {stringifyForDisplay} from "../basic";
 import React from "react";
-import {SqlString} from "../../utils/export";
+import {SqlString, spelEscape} from "../../utils/export";
 
 
 const {
@@ -119,6 +119,7 @@ const widgets = {
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
       return SqlString.escape(val);
     },
+    spelFormatValue: (val) => spelEscape(val),
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),
   },
@@ -143,8 +144,6 @@ const types = {
         operators: [
           "between",
           "not_between",
-          "is_empty",
-          "is_not_empty",
           "is_null",
           "is_not_null",
         ],

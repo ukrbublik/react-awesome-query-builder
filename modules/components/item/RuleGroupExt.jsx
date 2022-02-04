@@ -21,9 +21,11 @@ class RuleGroupExt extends BasicGroup {
     ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
     selectedOperator: PropTypes.string,
+    value: PropTypes.any,
     parentField: PropTypes.string,
     setField: PropTypes.func,
     setOperator: PropTypes.func,
+    setValue: PropTypes.func,
   };
 
   constructor(props) {
@@ -184,7 +186,7 @@ class RuleGroupExt extends BasicGroup {
     />;
   }
 
-  reordableNodesCnt() {
+  reordableNodesCntForItem(_item) {
     if (this.props.isLocked)
       return 0;
     const {children1} = this.props;

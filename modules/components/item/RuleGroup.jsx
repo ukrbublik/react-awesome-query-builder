@@ -38,7 +38,7 @@ class RuleGroup extends BasicGroup {
   canAddRule = () => true;
   canDeleteGroup = () => false;
 
-  reordableNodesCnt() {
+  reordableNodesCntForItem(_item) {
     if (this.props.isLocked)
       return 0;
     const {children1} = this.props;

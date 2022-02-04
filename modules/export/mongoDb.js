@@ -14,8 +14,11 @@ import {settings as defaultSettings} from "../config/default";
 // helpers
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
-
 export const mongodbFormat = (tree, config) => {
+  return _mongodbFormat(tree, config, false);
+};
+
+export const _mongodbFormat = (tree, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: []
@@ -23,9 +26,13 @@ export const mongodbFormat = (tree, config) => {
 
   const res = formatItem([], tree, config, meta);
 
-  if (meta.errors.length)
-    console.warn("Errors while exporting to MongoDb:", meta.errors);
-  return res;
+  if (returnErrors) {
+    return [res, meta.errors];
+  } else {
+    if (meta.errors.length)
+      console.warn("Errors while exporting to MongoDb:", meta.errors);
+    return res;
+  }
 };
 
 
@@ -33,9 +40,8 @@ const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   if (!item) return undefined;
 
   const type = item.get("type");
-  const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group") && children && children.size) {
+  if ((type === "group" || type === "rule_group")) {
     return formatGroup(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
   } else if (type === "rule") {
     return formatRule(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
@@ -49,6 +55,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const properties = item.get("properties") || new Map();
   const children = item.get("children1");
   const {canShortMongoQuery} = config.settings;
+  if (!children) return undefined;
 
   const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
   const parentPath = parents
@@ -61,6 +68,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
+  const canHaveEmptyChildren = groupField && mode == "array";
 
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children
@@ -68,7 +76,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       [...parents, item], currentChild, config, meta, not, true, mode == "array" ? (f => `$$el.${f}`) : undefined)
     )
     .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!list.size)
+  if (!canHaveEmptyChildren && !list.size)
     return undefined;
 
   let conjunction = properties.get("conjunction");
@@ -83,9 +91,9 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const mongoConj = conjunctionDefinition.mongoConj;
 
   let resultQuery;
-  if (list.size == 1)
+  if (list.size == 1) {
     resultQuery = list.first();
-  else {
+  } else if (list.size > 1) {
     const rules = list.toList().toJS();
     const canShort = canShortMongoQuery && (mongoConj == "$and");
     if (canShort) {
@@ -124,7 +132,10 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 
   if (groupField) {
     if (mode == "array") {
-      const filterQuery = {
+      const totalQuery = {
+        "$size": groupFieldName
+      };
+      const filterQuery = resultQuery ? {
         "$size": {
           "$filter": {
             input: "$" + groupFieldName,
@@ -132,10 +143,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
             cond: resultQuery
           }
         }
-      };
-      const totalQuery = {
-        "$size": groupFieldName
-      };
+      } : totalQuery;
       resultQuery = formatItem(
         parents, item.set("type", "rule"), config, meta, false, false, (_f => filterQuery), totalQuery
       );
@@ -225,7 +233,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     useExpr,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
     fieldDef,
   ];
@@ -261,7 +269,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
       ];
       if (operator) {
         args.push(operator);

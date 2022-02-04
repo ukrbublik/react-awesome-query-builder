@@ -32,7 +32,7 @@ const formatItem = (item, config, meta, isForDisplay = false, parentField = null
   const type = item.get("type");
   const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group") && children && children.size) {
+  if ((type === "group" || type === "rule_group") ) {
     return formatGroup(item, config, meta, isForDisplay, parentField);
   } else if (type === "rule") {
     return formatRule(item, config, meta, isForDisplay, parentField);
@@ -47,15 +47,17 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
   const children = item.get("children1");
+  if (!children) return undefined;
 
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
   const groupField = isRuleGroup && mode == "array" ? properties.get("field") : null;
+  const canHaveEmptyChildren = isRuleGroup && mode == "array";
   const not = properties.get("not");
   const list = children
     .map((currentChild) => formatItem(currentChild, config, meta, isForDisplay, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!list.size)
+  if (!canHaveEmptyChildren && !list.size)
     return undefined;
 
   let conjunction = properties.get("conjunction");
@@ -63,12 +65,12 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  const conjStr = conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay);
+  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay) : null;
   
   let ret;
   if (groupField) {
     const aggrArgs = formatRule(item, config, meta, isForDisplay, parentField, true);
-    if (conjStr && aggrArgs) {
+    if (aggrArgs) {
       const isRev = aggrArgs.pop();
       const args = [
         conjStr,
@@ -131,6 +133,28 @@ const formatItemValue = (config, properties, meta, _operator, isForDisplay, pare
   ];
 };
 
+const buildFnToFormatOp = (operator, operatorDefinition) => {
+  const fop = operatorDefinition.labelForFormat || operator;
+  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  let fn;
+  if (cardinality == 0) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      return `${field} ${fop}`;
+    };
+  } else if (cardinality == 1) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      return `${field} ${fop} ${values}`;
+    };
+  } else if (cardinality == 2) {
+    // between
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      const valFrom = values.first();
+      const valTo = values.get(1);
+      return `${field} ${fop} ${valFrom} AND ${valTo}`;
+    };
+  }
+  return fn;
+};
 
 const formatRule = (item, config, meta, isForDisplay = false, parentField = null, returnArgs = false) => {
   const properties = item.get("properties") || new Map();
@@ -144,7 +168,6 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   let operatorDef = getOperatorConfig(config, operator, field) || {};
   let reversedOp = operatorDef.reversedOp;
   let revOperatorDef = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(operatorDef.cardinality, 1);
   
   //check op
   let isRev = false;
@@ -157,27 +180,10 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
       [operatorDef, revOperatorDef] = [revOperatorDef, operatorDef];
     }
   }
-  const fop = operatorDef.labelForFormat || operator;
 
   //find fn to format expr
-  if (!fn) {
-    if (cardinality == 0) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-        return `${field} ${fop}`;
-      };
-    } else if (cardinality == 1) {
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-        return `${field} ${fop} ${values}`;
-      };
-    } else if (cardinality == 2) {
-      // between
-      fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-        const valFrom = values.first();
-        const valTo = values.get(1);
-        return `${field} ${fop} ${valFrom} AND ${valTo}`;
-      };
-    }
-  }
+  if (!fn)
+    fn = buildFnToFormatOp(operator, operatorDef);
   if (!fn)
     return undefined;
 
@@ -197,7 +203,7 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     formattedValue,
     valueSrc,
     valueType,
-    omit(operatorDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic"]),
+    omit(operatorDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
     operatorOptions,
     isForDisplay,
     fieldDef,
@@ -238,7 +244,7 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue"]),
+        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
         isForDisplay
       ];
       if (operator) {

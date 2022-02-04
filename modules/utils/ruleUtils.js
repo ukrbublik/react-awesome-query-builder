@@ -228,8 +228,32 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
     .filter(label => label != null);
 };
 
+export const getFieldPartsConfigs = (field, config, parentField = null) => {
+  if (!field)
+    return null;
+  const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
+  const fieldSeparator = config.settings.fieldSeparator;
+  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
+  return parts
+    .slice(parentParts.length)
+    .map((_curr, ind, arr) => arr.slice(0, ind+1))
+    .map((parts) => ({
+      part: [...parentParts, ...parts].join(fieldSeparator),
+      key: parts[parts.length - 1]
+    }))
+    .map(({part, key}) => {
+      const cnf = getFieldRawConfig(config, part);
+      return {key, cnf};
+    })
+    .map(({key, cnf}, ind, arr) => {
+      const parentCnf = ind > 0 ? arr[ind - 1].cnf : parentFieldDef;
+      return [key, cnf, parentCnf];
+    });
+};
+
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
-  const isFuncArg = typeof field == "object" && !!field.func && !!field.arg;
+  const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
   const {showLabels} = config.settings;
   const fieldConfig = getFieldConfig(config, field);
   const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
@@ -293,7 +317,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       }
       // If can't check operators, don't add
       // Func args don't have operators
-      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg)
+      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg && field != "!case_value")
         canAdd = false;
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;

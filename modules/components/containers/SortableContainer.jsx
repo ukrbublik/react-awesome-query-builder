@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import {connect} from "react-redux";
 import {getFlatTree} from "../../utils/treeUtils";
+import {logger} from "../../utils/stuff";
 import context from "../../stores/context";
 import * as constants from "../../constants";
 import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
-const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
 
 
 const createSortableContainer = (Builder, CanMoveFn = null) => 
@@ -311,9 +311,16 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         } else {
           const hovNodeEl = document.elementFromPoint(trgCoord.x, trgCoord.y-1);
           hovCNodeEl = hovNodeEl ? hovNodeEl.closest(".group-or-rule-container") : null;
+          if (!hovCNodeEl && hovNodeEl && hovNodeEl.classList.contains("query-builder-container")) {
+            // fix 2022-01-24 - get root .group-or-rule-container
+            const rootGroupContainer = hovNodeEl?.firstChild?.firstChild;
+            if (rootGroupContainer && rootGroupContainer.classList.contains("group-or-rule-container")) {
+              hovCNodeEl = rootGroupContainer;
+            }
+          }
         }
         if (!hovCNodeEl) {
-          console.log("out of tree bounds!");
+          logger.log("out of tree bounds!");
         } else {
           const isGroup = hovCNodeEl.classList.contains("group-container");
           const hovNodeId = hovCNodeEl.getAttribute("data-id");
@@ -413,10 +420,35 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                   }
                   //alt
                   if (canMoveBeforeAfterGroup && altII) {
+                    // fix 2022-01-24: do prepend/append instead of before/after for root
+                    const isToRoot = altII.lev == 0;
+                    // fix 2022-01-25: fix prepend/append instead of before/after for case_group
+                    const isToCase = altII.type == "case_group" && itemInfo.type != "case_group";
+                    let prevCaseId = altII.prev && this.tree.items[altII.prev].caseId;
+                    let nextCaseId = altII.next && this.tree.items[altII.next].caseId;
+                    if (itemInfo.caseId == prevCaseId)
+                      prevCaseId = null;
+                    if (itemInfo.caseId == nextCaseId)
+                      nextCaseId = null;
+                    const prevCase = prevCaseId && this.tree.items[prevCaseId];
+                    const nextCase = nextCaseId && this.tree.items[nextCaseId];
+
                     if (dragDirs.vrt > 0) { //down
-                      altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
+                      if (isToRoot) {
+                        altMoves.push([constants.PLACEMENT_APPEND, altII, altII.lev+1]);
+                      } else if (isToCase && nextCase) {
+                        altMoves.push([constants.PLACEMENT_PREPEND, nextCase, nextCase.lev+1]);
+                      } else {
+                        altMoves.push([constants.PLACEMENT_AFTER, altII, altII.lev]);
+                      }
                     } else if (dragDirs.vrt < 0) { //up
-                      altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
+                      if (isToRoot) {
+                        altMoves.push([constants.PLACEMENT_PREPEND, altII, altII.lev+1]);
+                      } else if (isToCase && prevCase) {
+                        altMoves.push([constants.PLACEMENT_APPEND, prevCase, prevCase.lev+1]);
+                      } else {
+                        altMoves.push([constants.PLACEMENT_BEFORE, altII, altII.lev]);
+                      }
                     }
                   }
                 }
@@ -429,6 +461,16 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 }
               }
               
+              //add case
+              const addCaseII = am => {
+                const toII = am[1];
+                const fromCaseII = itemInfo.caseId ? this.tree.items[itemInfo.caseId] : null;
+                const toCaseII = toII.caseId ? this.tree.items[toII.caseId] : null;
+                return [...am, fromCaseII, toCaseII];
+              };
+              availMoves = availMoves.map(addCaseII);
+              altMoves = altMoves.map(addCaseII);
+
               //sanitize
               availMoves = availMoves.filter(am => {
                 const placement = am[0];
@@ -452,7 +494,10 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                 return !isInside;
               }).map(am => {
                 const placement = am[0],
-                  toII = am[1];
+                  toII = am[1],
+                  _lev = am[2],
+                  _fromCaseII = am[3],
+                  _toCaseII = am[4];
                 let toParentII = null;
                 if (placement == constants.PLACEMENT_APPEND || placement == constants.PLACEMENT_PREPEND)
                   toParentII = toII;
@@ -460,14 +505,14 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
                   toParentII = this.tree.items[toII.parent];
                 if (toParentII && toParentII.parent == null)
                   toParentII = null;
-                am[3] = toParentII;
+                am[5] = toParentII;
                 return am;
               });
 
               let bestMode = null;
-              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
+              let filteredMoves = availMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], am[5], canMoveFn));
               if (canMoveBeforeAfterGroup && filteredMoves.length == 0 && altMoves.length > 0) {
-                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], canMoveFn));
+                filteredMoves = altMoves.filter(am => this.canMove(itemInfo, am[1], am[0], am[3], am[4], am[5], canMoveFn));
               }
               const levs = filteredMoves.map(am => am[2]);
               const curLev = itemInfo.lev;
@@ -491,7 +536,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       if (moveInfo) {
         this.move(itemInfo, moveInfo[1], moveInfo[0], moveInfo[3]);
 
-        // if (isDev())  console.log("DRAG-N-DROP", JSON.stringify({
+        // logger.log("DRAG-N-DROP", JSON.stringify({
         //   dragRect,
         //   plhRect,
         //   treeRect,
@@ -505,36 +550,62 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       return false;
     }
 
-    canMove (fromII, toII, placement, toParentII, canMoveFn) {
+    canMove (fromII, toII, placement, fromCaseII, toCaseII, toParentII, canMoveFn) {
       if (!fromII || !toII)
         return false;
       if (fromII.id === toII.id)
         return false;
 
-      const canRegroup = this.props.config.settings.canRegroup;
-      const maxNesting = this.props.config.settings.maxNesting;
-      const newLev = toParentII ? toParentII.lev : 0;
+      const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules, canLeaveEmptyCase } = this.props.config.settings;
+      const newLev = toParentII ? toParentII.lev + 1 : toII.lev;
+      const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
+      const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
       const isParentChange = fromII.parent != toII.parent;
       const isStructChange = isPend || isParentChange;
-      const isForbiddenStructChange = fromII.parentType == "rule_group" || toII.type == "rule_group" 
-        || toII.parentType == "rule_group";
+      // can't move `case_group` anywhere but before/after anoter `case_group`
+      const isForbiddenStructChange = fromII.type == "case_group" && !isLev1
+        // can't restruct `rule_group`
+        || fromII.parentType == "rule_group" || toII.type == "rule_group" || toII.parentType == "rule_group" 
+        // only `case_group` can be placed under `switch_group`
+        || fromII.type != "case_group" && toII.type == "case_group" && isBeforeAfter
+        || fromII.type != "case_group" && toII.type == "switch_group"
+        // can't move rule/group to another case
+        || !canRegroupCases && fromII.caseId != toII.caseId;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
-      
-      if (maxNesting && (newLev + 1) > maxNesting)
+
+      if (maxNesting && newLev > maxNesting)
         return false;
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))
         return false;
       
+      if (fromII.type != "case_group" && fromII.caseId != toII.caseId) {
+        const isLastFromCase = fromCaseII ? fromCaseII._height == 2 : false;
+        const newRulesInTargetCase = toCaseII ? toCaseII.leafsCount + 1 : 0;
+        if (maxNumberOfRules && newRulesInTargetCase > maxNumberOfRules)
+          return false;
+        if (isLastFromCase && !canLeaveEmptyCase)
+          return false;
+      }
+
+      if (fromII.type == "case_group" && (
+        fromII.isDefaultCase || toII.isDefaultCase
+        || toII.type == "switch_group" && placement == constants.PLACEMENT_APPEND
+      )) {
+        // leave default case alone
+        return false;
+      }
+
       let res = true;
-      if (canMoveFn)
+      if (canMoveFn) {
         res = canMoveFn(fromII.node.toJS(), toII.node.toJS(), placement, toParentII ? toParentII.node.toJS() : null);
+      }
       return res;
     }
 
     move (fromII, toII, placement, toParentII) {
-      //if (isDev())  console.log("move", fromII, toII, placement, toParentII);
+      //logger.log("move", fromII, toII, placement, toParentII);
       this.props.actions.moveItem(fromII.path, toII.path, placement);
     }
 

@@ -29,6 +29,7 @@ export const settings = {
   renderProvider: (props) => <VanillaProvider {...props} />,
   renderValueSources: (props) => <VanillaValueSources {...props} />,
   renderConfirm: vanillaConfirm,
+  renderSwitchPrefix: () => <>{"Conditions"}</>,
 
   valueSourcesInfo: {
     value: {},
@@ -74,6 +75,9 @@ export const settings = {
   lockedLabel: "Locked",
   deleteLabel: null,
   addGroupLabel: "Add group",
+  addCaseLabel: "Add condition",
+  addDefaultCaseLabel: "Add default condition",
+  defaultCaseLabel: "Default:",
   addRuleLabel: "Add rule",
   addSubRuleLabel: "Add sub rule",
   delGroupLabel: "",

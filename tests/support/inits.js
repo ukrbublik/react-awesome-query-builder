@@ -792,3 +792,5 @@ export const with_groupVarKey = {
     }
   ]
 };
+
+export const spel_with_number = "num == 2";

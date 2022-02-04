@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
 } from "./configUtils";
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
-import {defaultValue, deepEqual, getItemInListValues} from "../utils/stuff";
+import {defaultValue, deepEqual, getItemInListValues, logger} from "../utils/stuff";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import omit from "lodash/omit";
 
@@ -33,7 +33,7 @@ function validateItem (item, path, itemId, meta, c) {
   const type = item.get("type");
   const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group") && children && children.size) {
+  if ((type === "group" || type === "rule_group" || type == "case_group" || type == "switch_group") && children && children.size) {
     return validateGroup(item, path, itemId, meta, c);
   } else if (type === "rule") {
     return validateRule(item, path, itemId, meta, c);
@@ -104,7 +104,7 @@ function validateRule (item, path, itemId, meta, c) {
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
   if (field && !fieldDefinition) {
-    console.warn(`No config for field ${field}`);
+    logger.warn(`No config for field ${field}`);
     field = null;
   }
   if (field == null) {
@@ -214,6 +214,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
     if (!validError) {
       const fieldConfig = getFieldConfig(config, field);
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
       const rightFieldDefinition = (valueSrc == "field" ? getFieldConfig(config, value) : null);
       const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
@@ -223,6 +224,8 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
         const args = [
           fixedValue, 
           fieldSettings,
+          operator,
+          operatorDefinition
         ];
         if (valueSrc == "field")
           args.push(rightFieldDefinition);
@@ -270,29 +273,31 @@ const validateValueInList = (value, listValues) => {
 */
 const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   let fixedValue = value;
-  const fieldConfig = getFieldConfig(config, field);
-  const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-  const wConfig = config.widgets[w];
-  const wType = wConfig.type;
-  const jsType = wConfig.jsType;
-  const fieldSettings = fieldConfig.fieldSettings;
+  if (field) {
+    const fieldConfig = getFieldConfig(config, field);
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const wConfig = config.widgets[w];
+    const wType = wConfig.type;
+    const jsType = wConfig.jsType;
+    const fieldSettings = fieldConfig.fieldSettings;
 
-  if (valueType != wType)
-    return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
-  if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
-    return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
-  }
+    if (valueType != wType)
+      return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
+    if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
+      return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
+    }
 
-  if (fieldSettings) {
-    const listValues = asyncListValues || fieldSettings.listValues;
-    if (listValues && !fieldSettings.allowCustomValues) {
-      return validateValueInList(value, listValues);
-    }
-    if (fieldSettings.min != null && value < fieldSettings.min) {
-      return [`Value ${value} < min ${fieldSettings.min}`, value];
-    }
-    if (fieldSettings.max != null && value > fieldSettings.max) {
-      return [`Value ${value} > max ${fieldSettings.max}`, value];
+    if (fieldSettings) {
+      const listValues = asyncListValues || fieldSettings.listValues;
+      if (listValues && !fieldSettings.allowCustomValues) {
+        return validateValueInList(value, listValues);
+      }
+      if (fieldSettings.min != null && value < fieldSettings.min) {
+        return [`Value ${value} < min ${fieldSettings.min}`, value];
+      }
+      if (fieldSettings.max != null && value > fieldSettings.max) {
+        return [`Value ${value} > max ${fieldSettings.max}`, value];
+      }
     }
   }
 

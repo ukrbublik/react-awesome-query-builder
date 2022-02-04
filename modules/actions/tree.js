@@ -45,6 +45,37 @@ export const removeRule = (config, path) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
+export const addDefaultCaseGroup = (config, path, properties, children = null) => ({
+  type: constants.ADD_CASE_GROUP,
+  path: toImmutableList(path),
+  children: children,
+  id: uuid(),
+  properties: defaultGroupProperties(config).merge(properties || {}),
+  config: config,
+  meta: {
+    isDefaultCase: true
+  }
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
+ */
+export const addCaseGroup = (config, path, properties, children = null) => ({
+  type: constants.ADD_CASE_GROUP,
+  path: toImmutableList(path),
+  children: children,
+  id: uuid(),
+  properties: defaultGroupProperties(config).merge(properties || {}),
+  config: config
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
+ */
 export const addGroup = (config, path, properties, children = null) => ({
   type: constants.ADD_GROUP,
   path: toImmutableList(path),

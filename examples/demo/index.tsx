@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Query, Builder, Utils, 
   //types:
@@ -12,7 +12,7 @@ import Immutable from "immutable";
 import clone from "clone";
 
 const stringify = JSON.stringify;
-const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, isValidTree} = Utils;
+const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -50,6 +50,8 @@ interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
   skin: string,
+  spelStr: string;
+  spelErrors: Array<string>;
 }
 
 type ImmOMap = Immutable.OrderedMap<string, any>;
@@ -66,7 +68,9 @@ const DemoQueryBuilder: React.FC = () => {
   const [state, setState] = useState<DemoQueryBuilderState>({
     tree: initTree, 
     config: loadedConfig,
-    skin: initialSkin
+    skin: initialSkin,
+    spelStr: "",
+    spelErrors: [] as Array<string>
   });
 
   useEffect(() => {
@@ -108,6 +112,23 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
+  const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const spelStr = e.target.value;
+    setState({
+      ...state,
+      spelStr
+    });
+  };
+
+  const importFromSpel = () => {
+    const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
+    setState({
+      ...state, 
+      tree: tree ? checkTree(tree, state.config) : state.tree,
+      spelErrors
+    });
+  };
+
   const changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skin = e.target.value;
     const config = loadConfig(e.target.value);
@@ -127,7 +148,7 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
-  const renderBuilder = (bprops: BuilderProps) => {
+  const renderBuilder = useCallback((bprops: BuilderProps) => {
     memo._actions = bprops.actions;
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
@@ -136,20 +157,18 @@ const DemoQueryBuilder: React.FC = () => {
         </div>
       </div>
     );
-  };
+  }, []);
   
-  const onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
+  const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
     if (actionMeta)
       console.info(actionMeta);
     memo.immutableTree = immutableTree;
     memo.config = config;
     updateResult();
-    
-    const jsonTree = getTree(immutableTree); //can be saved to backend
-  };
+  }, []);
 
   const updateResult = throttle(() => {
-    setState({...state, tree: memo.immutableTree, config: memo.config});
+    setState(prevState => ({...prevState, tree: memo.immutableTree, config: memo.config}));
   }, 100);
 
   // Demonstrates how actions can be called programmatically
@@ -269,37 +288,62 @@ const DemoQueryBuilder: React.FC = () => {
 
   const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
     const isValid = isValidTree(immutableTree);
-    const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+    const treeJs = getTree(immutableTree);
+    const {logic, data: logicData, errors: logicErrors} = jsonLogicFormat(immutableTree, config);
+    const [spel, spelErrors] = _spelFormat(immutableTree, config);
+    const queryStr = queryString(immutableTree, config);
+    const humanQueryStr = queryString(immutableTree, config, true);
+    const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
+    const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
+    const elasticSearch = elasticSearchFormat(immutableTree, config);
+
     return (
       <div>
         {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
         <br />
         <div>
+        spelFormat: 
+          { spelErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(spelErrors, undefined, 2)}
+            </pre> 
+          }
+          <pre style={preStyle}>
+            {stringify(spel, undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
         stringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config), undefined, 2)}
+            {stringify(queryStr, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         humanStringFormat: 
           <pre style={preStyle}>
-            {stringify(queryString(immutableTree, config, true), undefined, 2)}
+            {stringify(humanQueryStr, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         sqlFormat: 
+          { sqlErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(sqlErrors, undefined, 2)}
+            </pre> 
+          }
           <pre style={preStyle}>
-            {stringify(sqlFormat(immutableTree, config), undefined, 2)}
+            {stringify(sql, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
-          { errors.length > 0 
+          { logicErrors.length > 0 
             && <pre style={preErrorStyle}>
-              {stringify(errors, undefined, 2)}
+              {stringify(logicErrors, undefined, 2)}
             </pre> 
           }
           { !!logic
@@ -309,29 +353,34 @@ const DemoQueryBuilder: React.FC = () => {
               <br />
               <hr />
               {"// Data"}:<br />
-              {stringify(data, undefined, 2)}
+              {stringify(logicData, undefined, 2)}
             </pre>
           }
         </div>
         <hr/>
         <div>
         mongodbFormat: 
+          { mongoErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(mongoErrors, undefined, 2)}
+            </pre> 
+          }
           <pre style={preStyle}>
-            {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
+            {stringify(mongo, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         elasticSearchFormat: 
           <pre style={preStyle}>
-            {stringify(elasticSearchFormat(immutableTree, config), undefined, 2)}
+            {stringify(elasticSearch, undefined, 2)}
           </pre>
         </div>
         <hr/>
         <div>
         Tree: 
           <pre style={preStyle}>
-            {stringify(getTree(immutableTree), undefined, 2)}
+            {stringify(treeJs, undefined, 2)}
           </pre>
         </div>
         {/* <hr/>
@@ -368,6 +417,18 @@ const DemoQueryBuilder: React.FC = () => {
         onChange={onChange}
         renderBuilder={renderBuilder}
       />
+
+      <div className="query-import-spel">
+        SpEL:
+        <input type="text" size={150} value={state.spelStr} onChange={onChangeSpelStr} />
+        <button onClick={importFromSpel}>import</button>
+        <br />
+        { state.spelErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(state.spelErrors, undefined, 2)}
+            </pre> 
+        }
+      </div>
 
       <div className="query-builder-result">
         {renderResult(state)}
