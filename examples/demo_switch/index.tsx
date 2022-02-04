@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Query, Builder, Utils as QbUtils,
   JsonSwitchGroup,
@@ -29,17 +29,17 @@ const Demo: React.FC = () => {
     spelErrors: [] as string[],
   });
 
-  const onChange = (tree: ImmutableTree, config: Config) => {
-    setState({ ...state, tree, config });
-  };
+  const onChange = useCallback((tree: ImmutableTree, config: Config) => {
+    setState(prevState => ({ ...prevState, tree, config }));
+  }, []);
 
-  const renderBuilder = (props: BuilderProps) => (
+  const renderBuilder = useCallback((props: BuilderProps) => (
     <div className="query-builder-container" style={{ padding: "10px" }}>
       <div className="query-builder qb-lite">
         <Builder {...props} />
       </div>
     </div>
-  );
+  ), []);
 
   const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
     const spelStr = e.target.value;

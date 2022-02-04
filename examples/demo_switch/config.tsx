@@ -48,7 +48,8 @@ export default (): Config => {
         min: 10,
         max: 100
       },
-      preferWidgets: ["slider", "rangeslider"]
+      preferWidgets: ["slider", "rangeslider"],
+      isSpelVariable: true
     },
     color: {
       label: "Color",

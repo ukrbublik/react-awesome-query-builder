@@ -52,9 +52,9 @@ export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
   }
 };
 
-const convertCompiled = (expr, meta) => {
+const convertCompiled = (expr, meta, parentExpr = null) => {
   const type = expr.getType();
-  let children = expr.getChildren().map(child => convertCompiled(child, meta));
+  let children = expr.getChildren().map(child => convertCompiled(child, meta, expr));
 
   // flatize OR/AND
   if (type == "op-or" || type == "op-and") {
@@ -171,12 +171,17 @@ const convertCompiled = (expr, meta) => {
   // convert method/function args
   if (typeof val === "object" && val !== null) {
     if (val.methodName || val.functionName) {
-      val.args = val.args.map(child => convertCompiled(child, meta));
+      val.args = val.args.map(child => convertCompiled(child, meta, expr));
     }
   }
   // convert list
   if (type == "list") {
-    val = val.map(item => convertCompiled(item, meta));
+    val = val.map(item => convertCompiled(item, meta, expr));
+
+    // fix whole expression wrapped in `{}`
+    if (!parentExpr && val.length == 1) {
+      return val[0];
+    }
   }
   // convert constructor
   if (type == "constructorref") {
@@ -354,8 +359,8 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     };
   } else if (spel.type == "list") {
     const values = spel.val.map(v => convertArg(v, conv, config, meta, spel));
-    const _itemType = values.length ? values[0].valueType : null;
-    const value = values.map(v => v.value);
+    const _itemType = values.length ? values[0]?.valueType : null;
+    const value = values.map(v => v?.value);
     const valueType = "multiselect";
     return {
       valueSrc: "value",

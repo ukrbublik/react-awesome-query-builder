@@ -84,7 +84,7 @@ const spelInlineList = (vals, toArray = false) => {
   if (javaType == "float") {
     escapedVals = vals.map(v => spelEscape(v, true));
   } else {
-    escapedVals = vals.map(spelEscape);
+    escapedVals = vals.map(v => spelEscape(v));
   }
 
   // build inline list or array
