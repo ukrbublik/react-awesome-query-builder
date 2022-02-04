@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Query, Builder, Utils, 
   //types:
@@ -148,7 +148,7 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
-  const renderBuilder = (bprops: BuilderProps) => {
+  const renderBuilder = useCallback((bprops: BuilderProps) => {
     memo._actions = bprops.actions;
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
@@ -157,20 +157,18 @@ const DemoQueryBuilder: React.FC = () => {
         </div>
       </div>
     );
-  };
+  }, []);
   
-  const onChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
+  const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
     if (actionMeta)
       console.info(actionMeta);
     memo.immutableTree = immutableTree;
     memo.config = config;
     updateResult();
-    
-    const jsonTree = getTree(immutableTree); //can be saved to backend
-  };
+  }, []);
 
   const updateResult = throttle(() => {
-    setState({...state, tree: memo.immutableTree, config: memo.config});
+    setState(prevState => ({...prevState, tree: memo.immutableTree, config: memo.config}));
   }, 100);
 
   // Demonstrates how actions can be called programmatically
