@@ -512,14 +512,16 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
   const fieldConfig = getFieldConfig(config, groupField);
   const mode = fieldConfig?.mode;
   let res = {
-    ...groupFilter,
+    ...(groupFilter || {}),
     type: "rule_group",
     properties: {
       ...groupOpRule.properties,
-      ...groupFilter.properties,
+      ...(groupFilter?.properties || {}),
       mode
     }
   };
+  if (!res.id)
+    res.id = uuid();
   return res;
 };
 
@@ -635,7 +637,9 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       let convertedArgs = vals.slice(1);
       opKey = opKeys[0];
       
-      if (fieldObj.groupFieldValue) {
+      if (!fieldObj) {
+        // LHS can't be parsed
+      } else if (fieldObj.groupFieldValue) {
         // 1. group
         if (fieldObj.groupFieldValue.valueSrc != "field") {
           meta.errors.push(`Expected group field ${JSON.stringify(fieldObj)}`);
@@ -692,7 +696,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     });
     let groupFilter = convertToTree(spel.filter, conv, config, meta, {
       ...spel, 
-      _groupField: groupFieldValue.value
+      _groupField: groupFieldValue?.value
     });
     if (groupFilter?.type == "rule") {
       groupFilter = wrapInDefaultConj(groupFilter, config);
@@ -701,6 +705,11 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       groupFilter,
       groupFieldValue
     };
+    if (!parentSpel) {
+      // !aggr can't be in root, it should be compared with something
+      res = undefined;
+      meta.errors.push(`Unexpected !aggr in root`);
+    }
   } else if (spel.type == "ternary") {
     const children1 = {};
     spel.val.forEach(v => {

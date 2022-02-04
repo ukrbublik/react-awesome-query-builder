@@ -24,7 +24,7 @@ export const _spelFormat = (tree, config, returnErrors = true) => {
   };
 
   const res = formatItem(tree, config, meta, null);
-  
+
   if (returnErrors) {
     return [res, meta.errors];
   } else {
@@ -135,7 +135,10 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const isSpelArray = groupFieldDef.isSpelArray;
   
   // check op for reverse
-  const groupOperator = properties.get("operator");
+  let groupOperator = properties.get("operator");
+  if (!groupOperator && (!mode || mode == "some")) {
+    groupOperator = "some";
+  }
   const realGroupOperator = checkOp(config, groupOperator, field);
   const isGroupOpRev = realGroupOperator != groupOperator;
   const realGroupOperatorDefinition = groupOperator && getOperatorConfig(config, realGroupOperator, field) || null;
