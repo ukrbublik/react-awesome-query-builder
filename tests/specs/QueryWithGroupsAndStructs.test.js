@@ -112,7 +112,9 @@ describe("query with !group", () => {
   describe("should handle is_empty in some (when bad subfield)", () => {
     export_checks(configs.with_group_some, inits.with_bad_subfield_in_group, "JsonLogic", {
       "logic": undefined
-    });
+    }, [
+      "No config for field results.bad-subfield"
+    ]);
   });
 
   describe("should handle is_empty in some (when group mode is struct)", () => {
@@ -314,7 +316,9 @@ describe("query with nested !group", () => {
           }
         ]
       }
-    });
+    }, [
+      "No config for field num"
+    ]);
   });
 });
 

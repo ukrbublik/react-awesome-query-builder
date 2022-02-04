@@ -241,7 +241,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
   }
 };
 
-export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
+export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = []) => {
   const config = config_fn(BasicConfig);
   let tree, errors: string[] = [];
   try {
@@ -251,10 +251,19 @@ export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat
       throw e;
     });
   }
+
   if (errors?.length) {
-    it("should load tree", () => {
-      throw errors.join("; ");
-    });
+    if (expectedErrors?.length) {
+      it("should return errors", () => {
+        expect(errors.join("; ")).to.equal(expectedErrors.join("; "));
+      });
+      
+      do_export_checks(config, tree as ImmutableTree, expects, true);
+    } else {
+      it("should load tree without errors", () => {
+        throw new Error(errors.join("; "));
+      });
+    }
   } else {
     do_export_checks(config, tree as ImmutableTree, expects, true);
   }
@@ -264,7 +273,7 @@ export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, value
   const config = config_fn(BasicConfig);
   const {tree, errors} = load_tree(value, config, valueFormat);
   if (errors?.length) {
-    throw errors.join("; ");
+    throw new Error(errors.join("; "));
   } else {
     do_export_checks(config, tree as ImmutableTree, expects, true, true);
   }
