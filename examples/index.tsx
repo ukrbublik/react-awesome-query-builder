@@ -16,10 +16,10 @@ import "../css/styles.scss";
 const rootElement = window.document.getElementById("root");
 
 ReactDOM.render((
-  <BrowserRouter>
+  <BrowserRouter basename={location.host == "ukrbublik.github.io" ? "/react-awesome-query-builder" : "/"}>
     <Routes>
       <Route path="/" element={<Demo />} />
-      <Route path="switch" element={<DemoSwitch />} />
+      <Route path="/switch" element={<DemoSwitch />} />
     </Routes>
   </BrowserRouter>
 ), rootElement);
