@@ -574,6 +574,9 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 const setValueSrc = (state, path, delta, srcKey, config) => {
   const {showErrorMessage} = config.settings;
 
+  const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
+  const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+
   state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
   state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
   state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
@@ -583,20 +586,33 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), null);
 
     // if current operator is range, clear possible range error
-    const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
-    const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
     const operatorConfig = getOperatorConfig(config, operator, field);
     const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
     if (operatorConfig.validateValues) {
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), null);
     }
   }
-    
+  
+  // set valueSrc
   if (typeof srcKey === "undefined") {
     state = state.setIn(expandTreePath(path, "properties", "valueSrc", delta + ""), null);
   } else {
     state = state.setIn(expandTreePath(path, "properties", "valueSrc", delta + ""), srcKey);
   }
+
+  // maybe set default value
+  if (srcKey) {
+    const properties = state.getIn(expandTreePath(path, "properties"));
+    // this call should return canReuseValue = false and provide default value
+    const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      config, config, properties, field, operator, "valueSrc", true
+    );
+    if (!canReuseValue && newValueSrc.get(delta) == srcKey) {
+      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), newValue.get(delta));
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), newValueType.get(delta));
+    }
+  }
+
   return state;
 };
 
