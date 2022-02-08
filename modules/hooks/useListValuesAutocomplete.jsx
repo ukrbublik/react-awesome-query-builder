@@ -1,12 +1,12 @@
 import React from "react";
 import debounce from "lodash/debounce";
-import {mapListValues, listValuesToArray} from "../utils/stuff";
-import {mergeListValues, listValueToOption, getListValue} from "../utils/autocomplete";
+import { mapListValues, listValuesToArray } from "../utils/stuff";
+import { mergeListValues, listValueToOption, getListValue } from "../utils/autocomplete";
 
 
 const useListValuesAutocomplete = ({
   asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
-  asyncListValues: selectedAsyncListValues, 
+  asyncListValues: selectedAsyncListValues,
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder
 }, {
@@ -29,26 +29,26 @@ const useListValuesAutocomplete = ({
   const asyncFectchCnt = React.useRef(0);
   const componentIsMounted = React.useRef(true);
   const isSelectedLoadMore = React.useRef(false);
-  
+
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
-  const listValues = asyncFetch 
+  const listValues = asyncFetch
     ? (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
     : staticListValues;
   //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
   const canInitialLoad = open && asyncFetch
-    && asyncListValues === undefined 
+    && asyncListValues === undefined
     && (forceAsyncSearch ? inputValue : true);
   const isInitialLoading = canInitialLoad && isLoading;
-  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 
+  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0
     && asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || "") === inputValue;
   const canShowLoadMore = !isLoading && canLoadMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
   // const selectedListValue = hasValue ? getListValue(selectedValue, listValues) : null;
   // const selectedOption = listValueToOption(selectedListValue);
-  
+
   // fetch
   const fetchListValues = async (filter = null, isLoadMore = false) => {
     // clear obsolete meta
@@ -57,7 +57,7 @@ const useListValuesAutocomplete = ({
     }
 
     const offset = isLoadMore && asyncListValues ? asyncListValues.length : 0;
-    const meta = isLoadMore && asyncFetchMeta || !useLoadMore && {pageSize: 0};
+    const meta = isLoadMore && asyncFetchMeta || !useLoadMore && { pageSize: 0 };
 
     const newAsyncFetchCnt = ++asyncFectchCnt.current;
     const res = await asyncFetch(filter, offset, meta);
@@ -66,7 +66,7 @@ const useListValuesAutocomplete = ({
       return null;
     }
 
-    const {values, hasMore, meta: newMeta} = res && res.values ? res : {values: res};
+    const { values, hasMore, meta: newMeta } = res && res.values ? res : { values: res };
     const nValues = listValuesToArray(values);
     let assumeHasMore;
     let newValues;
@@ -79,11 +79,11 @@ const useListValuesAutocomplete = ({
         assumeHasMore = newValues.length > 0;
       }
     }
-    
+
     // save new meta
     const realNewMeta = hasMore != null || newMeta != null || assumeHasMore != null ? {
-      ...(assumeHasMore != null ? {hasMore: assumeHasMore} : {}),
-      ...(hasMore != null ? {hasMore} : {}),
+      ...(assumeHasMore != null ? { hasMore: assumeHasMore } : {}),
+      ...(hasMore != null ? { hasMore } : {}),
       ...(newMeta != null ? newMeta : {}),
       filter
     } : undefined;
@@ -147,7 +147,7 @@ const useListValuesAutocomplete = ({
       isSelectedLoadMore.current = true;
     } else {
       if (multiple) {
-        let newSelectedListValues = option.map( o => 
+        let newSelectedListValues = option.map(o =>
           o.value != null ? o : getListValue(o, listValues)
         );
         let newSelectedValues = newSelectedListValues.map(o => o.value);
@@ -187,6 +187,12 @@ const useListValuesAutocomplete = ({
     }
   };
 
+  // to keep compatibility with antD
+  const onSearch = async (newInputValue) => {
+    await onInputChange(null, newInputValue);
+    return;
+  };
+
   // Options
   const extendOptions = (options, params) => {
     const filtered = [...options];
@@ -221,7 +227,7 @@ const useListValuesAutocomplete = ({
   const getOptionLabel = (valueOrOption) => {
     if (valueOrOption == null)
       return null;
-    const option = valueOrOption.value != undefined ? valueOrOption 
+    const option = valueOrOption.value != undefined ? valueOrOption
       : listValueToOption(getListValue(valueOrOption, listValues));
     if (!option && valueOrOption.specialValue) {
       // special last 'Load more...' item
@@ -242,14 +248,15 @@ const useListValuesAutocomplete = ({
     options,
     listValues,
     hasValue,
-    
+
     open,
     onOpen,
     onClose,
     onChange,
     inputValue,
     onInputChange,
-    
+    onSearch,
+
     canShowLoadMore,
     isInitialLoading,
     isLoading,

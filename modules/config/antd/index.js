@@ -1,8 +1,8 @@
 import en_US from "antd/lib/locale-provider/en_US";
 import AntdWidgets from "../../components/widgets/antd";
-import BasicConfig, {stringifyForDisplay} from "../basic";
-import {getTitleInListValues} from "../../utils/stuff";
-import {SqlString, spelEscape} from "../../utils/export";
+import BasicConfig, { stringifyForDisplay } from "../basic";
+import { getTitleInListValues } from "../../utils/stuff";
+import { SqlString, spelEscape } from "../../utils/export";
 import React from "react";
 
 
@@ -28,6 +28,7 @@ const {
   RangeWidget,
   SelectWidget,
   MultiSelectWidget,
+  AutocompleteWidget,
   TreeSelectWidget,
   DateWidget,
   BooleanWidget,
@@ -46,7 +47,7 @@ const settings = {
 
   renderOperator: (props) => <FieldSelect {...props} />,
   // renderOperator: (props) => <FieldDropdown {...props} />,
-  
+
   renderFunc: (props) => <FieldSelect {...props} />,
   renderConjs: (props) => <Conjs {...props} />,
   renderSwitch: (props) => <Switch {...props} />,
@@ -80,11 +81,19 @@ const widgets = {
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props) => <MultiSelectWidget {...props} />,
+    factory: (props) => {
+      return (props.asyncFetch || props.showSearch)
+        ? <AutocompleteWidget multiple {...props} />
+        : <MultiSelectWidget {...props} />;
+    },
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => <SelectWidget {...props} />,
+    factory: (props) => {
+      return (props.asyncFetch || props.showSearch)
+        ? <AutocompleteWidget {...props} />
+        : <SelectWidget {...props} />;
+    },
   },
   slider: {
     ...BasicConfig.widgets.slider,
