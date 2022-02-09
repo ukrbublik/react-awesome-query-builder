@@ -18,8 +18,8 @@ const rootElement = window.document.getElementById("root");
 ReactDOM.render((
   <BrowserRouter basename={location.host == "ukrbublik.github.io" ? "/react-awesome-query-builder" : "/"}>
     <Routes>
-      <Route path="/" element={<Demo />} />
       <Route path="/switch" element={<DemoSwitch />} />
+      <Route path="*" element={<Demo />} />
     </Routes>
   </BrowserRouter>
 ), rootElement);
