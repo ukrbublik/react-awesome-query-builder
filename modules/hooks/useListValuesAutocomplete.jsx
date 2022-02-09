@@ -139,6 +139,14 @@ const useListValuesAutocomplete = ({
     }
   };
 
+  const onDropdownVisibleChange = (open) => {
+    if (open) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  };
+
   const onChange = async (_e, option) => {
     if (option && option.specialValue == "LOAD_MORE") {
       isSelectedLoadMore.current = true;
@@ -252,6 +260,7 @@ const useListValuesAutocomplete = ({
     open,
     onOpen,
     onClose,
+    onDropdownVisibleChange,
     onChange,
     inputValue,
     onInputChange,
