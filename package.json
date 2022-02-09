@@ -88,7 +88,7 @@
     "prop-types": "^15.7.2",
     "react-redux": "^7.2.2",
     "redux": "^4.1.0",
-    "spel2js": "github:ukrbublik/spel2js#getRaw",
+    "spel2js": "^0.2.8",
     "sqlstring": "^2.3.2"
   },
   "peerDependencies": {

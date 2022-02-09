@@ -1,4 +1,4 @@
-import { SpelExpressionEvaluator } from "spel2js/src/main";
+import { SpelExpressionEvaluator } from "spel2js";
 import uuid from "../utils/uuid";
 import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
