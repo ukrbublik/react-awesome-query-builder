@@ -66,7 +66,7 @@ export default (props) => {
   
   const filterOptions = (options, params) => {
     const filtered = filterOptionsFn(options, params);
-    const extended = extendOptions(filtered, params);
+    const extended = extendOptions(filtered);
     return extended;
   };
 

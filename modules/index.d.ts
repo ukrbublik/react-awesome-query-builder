@@ -1037,6 +1037,7 @@ export interface AntdWidgets {
   SliderWidget: ElementType<NumberWidgetProps>,
   RangeWidget: ElementType<RangeSliderWidgetProps>,
   SelectWidget: ElementType<SelectWidgetProps>,
+  AutocompleteWidget: ElementType<SelectWidgetProps>,
   MultiSelectWidget: ElementType<SelectWidgetProps>,
   TreeSelectWidget: ElementType<TreeSelectWidgetProps>,
   DateWidget: ElementType<DateTimeWidgetProps>,

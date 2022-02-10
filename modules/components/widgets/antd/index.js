@@ -12,6 +12,7 @@ import SliderWidget from "./value/Slider";
 import RangeWidget from "./value/Range";
 import BooleanWidget from "./value/Boolean";
 import MultiSelectWidget from "./value/MultiSelect";
+import AutocompleteWidget from "./value/Autocomplete";
 import TreeSelectWidget from "./value/TreeSelect";
 
 // field select widgets
@@ -29,7 +30,7 @@ import ValueSources from "./core/ValueSources";
 import confirm from "./core/confirm";
 
 import { ConfigProvider } from "antd";
-const Provider = ({config, children}) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
+const Provider = ({ config, children }) => <ConfigProvider locale={config.settings.locale.antd}>{children}</ConfigProvider>;
 
 export default {
   DateWidget,
@@ -43,6 +44,7 @@ export default {
   RangeWidget,
   BooleanWidget,
   MultiSelectWidget,
+  AutocompleteWidget,
   TreeSelectWidget,
 
   FieldSelect,

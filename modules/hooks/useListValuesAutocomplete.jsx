@@ -1,18 +1,19 @@
 import React from "react";
 import debounce from "lodash/debounce";
-import {mapListValues, listValuesToArray} from "../utils/stuff";
-import {mergeListValues, listValueToOption, getListValue} from "../utils/autocomplete";
+import { mapListValues, listValuesToArray } from "../utils/stuff";
+import { mergeListValues, listValueToOption, getListValue } from "../utils/autocomplete";
 
 
 const useListValuesAutocomplete = ({
   asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
-  asyncListValues: selectedAsyncListValues, 
+  asyncListValues: selectedAsyncListValues,
   listValues: staticListValues, allowCustomValues,
   value: selectedValue, setValue, placeholder
 }, {
   debounceTimeout,
   multiple
 }) => {
+  const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
   const loadMoreTitle = "Load more...";
   const loadingMoreTitle = "Loading more...";
   const aPlaceholder = forceAsyncSearch ? "Type to search" : placeholder;
@@ -29,26 +30,26 @@ const useListValuesAutocomplete = ({
   const asyncFectchCnt = React.useRef(0);
   const componentIsMounted = React.useRef(true);
   const isSelectedLoadMore = React.useRef(false);
-  
+
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
-  const listValues = asyncFetch 
+  const listValues = asyncFetch
     ? (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
     : staticListValues;
   //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
   const canInitialLoad = open && asyncFetch
-    && asyncListValues === undefined 
+    && asyncListValues === undefined
     && (forceAsyncSearch ? inputValue : true);
   const isInitialLoading = canInitialLoad && isLoading;
-  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0 
+  const canLoadMore = !isInitialLoading && listValues && listValues.length > 0
     && asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || "") === inputValue;
   const canShowLoadMore = !isLoading && canLoadMore;
   const options = mapListValues(listValues, listValueToOption);
   const hasValue = selectedValue != null;
   // const selectedListValue = hasValue ? getListValue(selectedValue, listValues) : null;
   // const selectedOption = listValueToOption(selectedListValue);
-  
+
   // fetch
   const fetchListValues = async (filter = null, isLoadMore = false) => {
     // clear obsolete meta
@@ -57,7 +58,7 @@ const useListValuesAutocomplete = ({
     }
 
     const offset = isLoadMore && asyncListValues ? asyncListValues.length : 0;
-    const meta = isLoadMore && asyncFetchMeta || !useLoadMore && {pageSize: 0};
+    const meta = isLoadMore && asyncFetchMeta || !useLoadMore && { pageSize: 0 };
 
     const newAsyncFetchCnt = ++asyncFectchCnt.current;
     const res = await asyncFetch(filter, offset, meta);
@@ -66,7 +67,7 @@ const useListValuesAutocomplete = ({
       return null;
     }
 
-    const {values, hasMore, meta: newMeta} = res && res.values ? res : {values: res};
+    const { values, hasMore, meta: newMeta } = res && res.values ? res : { values: res };
     const nValues = listValuesToArray(values);
     let assumeHasMore;
     let newValues;
@@ -79,11 +80,11 @@ const useListValuesAutocomplete = ({
         assumeHasMore = newValues.length > 0;
       }
     }
-    
+
     // save new meta
     const realNewMeta = hasMore != null || newMeta != null || assumeHasMore != null ? {
-      ...(assumeHasMore != null ? {hasMore: assumeHasMore} : {}),
-      ...(hasMore != null ? {hasMore} : {}),
+      ...(assumeHasMore != null ? { hasMore: assumeHasMore } : {}),
+      ...(hasMore != null ? { hasMore } : {}),
       ...(newMeta != null ? newMeta : {}),
       filter
     } : undefined;
@@ -139,15 +140,30 @@ const useListValuesAutocomplete = ({
     }
   };
 
+  const onDropdownVisibleChange = (open) => {
+    if (open) {
+      onOpen();
+    } else {
+      onClose();
+    }
+  };
+
+  const isSpecialValue = (option) => {
+    const specialValue = option?.specialValue || option?.value;
+    return knownSpecialValues.includes(specialValue);
+  };
+
   const onChange = async (_e, option) => {
-    if (option && option.specialValue == "LOAD_MORE") {
+    const specialValue = option?.specialValue || option?.value;
+    if (specialValue == "LOAD_MORE") {
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
-    } else if (option && option.specialValue == "LOADING_MORE") {
+    } else if (specialValue == "LOADING_MORE") {
       isSelectedLoadMore.current = true;
     } else {
       if (multiple) {
-        let newSelectedListValues = option.map( o => 
+        const options = option;
+        let newSelectedListValues = options.map(o =>
           o.value != null ? o : getListValue(o, listValues)
         );
         let newSelectedValues = newSelectedListValues.map(o => o.value);
@@ -187,8 +203,17 @@ const useListValuesAutocomplete = ({
     }
   };
 
+  // to keep compatibility with antD
+  const onSearch = async (newInputValue) => {
+    if (newInputValue === "" && !open) {
+      return;
+    }
+
+    await onInputChange(null, newInputValue);
+  };
+
   // Options
-  const extendOptions = (options, params) => {
+  const extendOptions = (options) => {
     const filtered = [...options];
     if (useLoadMore) {
       if (canShowLoadMore) {
@@ -221,7 +246,7 @@ const useListValuesAutocomplete = ({
   const getOptionLabel = (valueOrOption) => {
     if (valueOrOption == null)
       return null;
-    const option = valueOrOption.value != undefined ? valueOrOption 
+    const option = valueOrOption.value != undefined ? valueOrOption
       : listValueToOption(getListValue(valueOrOption, listValues));
     if (!option && valueOrOption.specialValue) {
       // special last 'Load more...' item
@@ -242,18 +267,21 @@ const useListValuesAutocomplete = ({
     options,
     listValues,
     hasValue,
-    
+
     open,
     onOpen,
     onClose,
+    onDropdownVisibleChange,
     onChange,
+    
     inputValue,
     onInputChange,
-    
+    onSearch,
     canShowLoadMore,
     isInitialLoading,
     isLoading,
     isLoadingMore,
+    isSpecialValue,
 
     extendOptions,
     getOptionSelected,

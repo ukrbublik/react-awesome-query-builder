@@ -2,7 +2,7 @@
 import React from "react";
 import merge from "lodash/merge";
 import {
-  BasicConfig,
+  BasicConfig, Utils,
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, Funcs,
 } from "react-awesome-query-builder";
@@ -18,6 +18,25 @@ const {
   FieldTreeSelect,
 } = AntdWidgets;
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
+
+const { simulateAsyncFetch } = Utils;
+
+const demoListValues = [
+  { title: "A", value: "a" },
+  { title: "AA", value: "aa" },
+  { title: "AAA1", value: "aaa1" },
+  { title: "AAA2", value: "aaa2" },
+  { title: "B", value: "b" },
+  { title: "C", value: "c" },
+  { title: "D", value: "d" },
+  { title: "E", value: "e" },
+  { title: "F", value: "f" },
+  { title: "G", value: "g" },
+  { title: "H", value: "h" },
+  { title: "I", value: "i" },
+  { title: "J", value: "j" },
+];
+const simulatedAsyncFetch = simulateAsyncFetch(demoListValues, 3);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -153,18 +172,26 @@ const fields: Fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
+        {
+          value: "1", title: "Warm colors", children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" }
+          ]
+        },
+        {
+          value: "4", title: "Cool colors", children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6", title: "Blue", children: [
+                {
+                  value: "7", title: "Sub blue", children: [
+                    { value: "8", title: "Sub sub blue and a long text" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ],
     }
   },
@@ -174,18 +201,26 @@ const fields: Fields = {
     fieldSettings: {
       treeExpandAll: true,
       listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
+        {
+          value: "1", title: "Warm colors", children: [
+            { value: "2", title: "Red" },
+            { value: "3", title: "Orange" }
+          ]
+        },
+        {
+          value: "4", title: "Cool colors", children: [
+            { value: "5", title: "Green" },
+            {
+              value: "6", title: "Blue", children: [
+                {
+                  value: "7", title: "Sub blue", children: [
+                    { value: "8", title: "Sub sub blue and a long text" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       ]
     }
   },
@@ -197,6 +232,30 @@ const fields: Fields = {
       labelYes: "+",
       labelNo: "-"
     }
+  },
+  autocomplete: {
+    label: "Autocomplete",
+    type: "select",
+    valueSources: ["value"],
+    fieldSettings: {
+      asyncFetch: simulatedAsyncFetch,
+      useAsyncSearch: true,
+      useLoadMore: true,
+      forceAsyncSearch: false,
+      allowCustomValues: false
+    },
+  },
+  autocompleteMultiple: {
+    label: "AutocompleteMultiple",
+    type: "multiselect",
+    valueSources: ["value"],
+    fieldSettings: {
+      asyncFetch: simulatedAsyncFetch,
+      useAsyncSearch: true,
+      useLoadMore: true,
+      forceAsyncSearch: false,
+      allowCustomValues: false
+    },
   },
 };
 
@@ -330,7 +389,7 @@ const settings: Settings = {
   // showLabels: true,
   maxNesting: 3,
   canLeaveEmptyGroup: true, //after deletion
-    
+
   // renderField: (props) => <FieldCascader {...props} />,
   // renderOperator: (props) => <FieldDropdown {...props} />,
   // renderFunc: (props) => <FieldSelect {...props} />,

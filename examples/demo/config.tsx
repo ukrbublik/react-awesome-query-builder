@@ -1,9 +1,9 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import merge from "lodash/merge";
 import {
   BasicConfig, BasicFuncs, Utils,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs, 
+  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
   DateTimeFieldSettings,
 } from "react-awesome-query-builder";
 import moment from "moment";
@@ -22,7 +22,7 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-const {simulateAsyncFetch} = Utils;
+const { simulateAsyncFetch } = Utils;
 
 const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,
@@ -36,19 +36,19 @@ export default (skin: string) => {
   const InitialConfig = skinToConfig[skin] as BasicConfig;
 
   const demoListValues = [
-    {title: "A", value: "a"},
-    {title: "AA", value: "aa"},
-    {title: "AAA1", value: "aaa1"},
-    {title: "AAA2", value: "aaa2"},
-    {title: "B", value: "b"},
-    {title: "C", value: "c"},
-    {title: "D", value: "d"},
-    {title: "E", value: "e"},
-    {title: "F", value: "f"},
-    {title: "G", value: "g"},
-    {title: "H", value: "h"},
-    {title: "I", value: "i"},
-    {title: "J", value: "j"},
+    { title: "A", value: "a" },
+    { title: "AA", value: "aa" },
+    { title: "AAA1", value: "aaa1" },
+    { title: "AAA2", value: "aaa2" },
+    { title: "B", value: "b" },
+    { title: "C", value: "c" },
+    { title: "D", value: "d" },
+    { title: "E", value: "e" },
+    { title: "F", value: "f" },
+    { title: "G", value: "g" },
+    { title: "H", value: "h" },
+    { title: "I", value: "i" },
+    { title: "J", value: "j" },
   ];
   const simulatedAsyncFetch = simulateAsyncFetch(demoListValues, 3);
 
@@ -535,24 +535,44 @@ export default (skin: string) => {
       fieldSettings: {
         treeExpandAll: true,
         listValues: [
-          { value: "1", title: "Warm colors", children: [
-            { value: "2", title: "Red" },
-            { value: "3", title: "Orange" }
-          ] },
-          { value: "4", title: "Cool colors", children: [
-            { value: "5", title: "Green" },
-            { value: "6", title: "Blue", children: [
-              { value: "7", title: "Sub blue", children: [
-                { value: "8", title: "Sub sub blue and a long text" }
-              ] }
-            ] }
-          ] }
+          {
+            value: "1", title: "Warm colors", children: [
+              { value: "2", title: "Red" },
+              { value: "3", title: "Orange" }
+            ]
+          },
+          {
+            value: "4", title: "Cool colors", children: [
+              { value: "5", title: "Green" },
+              {
+                value: "6", title: "Blue", children: [
+                  {
+                    value: "7", title: "Sub blue", children: [
+                      { value: "8", title: "Sub sub blue and a long text" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
         ]
       }
     },
     autocomplete: {
       label: "Autocomplete",
       type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
+    },
+    autocompleteMultiple: {
+      label: "AutocompleteMultiple",
+      type: "multiselect",
       valueSources: ["value"],
       fieldSettings: {
         asyncFetch: simulatedAsyncFetch,
