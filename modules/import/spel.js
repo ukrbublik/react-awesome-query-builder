@@ -708,7 +708,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
     if (!parentSpel) {
       // !aggr can't be in root, it should be compared with something
       res = undefined;
-      meta.errors.push(`Unexpected !aggr in root`);
+      meta.errors.push("Unexpected !aggr in root");
     }
   } else if (spel.type == "ternary") {
     const children1 = {};

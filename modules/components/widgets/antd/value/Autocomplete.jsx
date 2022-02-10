@@ -8,12 +8,9 @@ import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomple
 const Option = Select.Option;
 
 export default (props) => {
-  const { config, placeholder, allowCustomValues, customProps, value, readonly, multiple } = props;
+  const { config, placeholder, allowCustomValues, customProps, value, readonly, multiple, useAsyncSearch } = props;
 
-  const filterOption = (input, option) => {
-    const dataForFilter = option.children || option.value;
-    return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-  };
+
   // hook
   const {
     open,
@@ -111,6 +108,7 @@ export default (props) => {
 
   return (
     <Select
+      filterOption={useAsyncSearch ? false : true}
       dropdownRender={dropdownRender}
       allowClear={true}
       notFoundContent={isLoading ? "Loading..." : null}
@@ -130,7 +128,7 @@ export default (props) => {
       size={renderSize}
       loading={isLoading}
       value={aValue}
-      searchValue={inputValue}
+      //searchValue={inputValue}
       open={open}
       {...customProps}
     >

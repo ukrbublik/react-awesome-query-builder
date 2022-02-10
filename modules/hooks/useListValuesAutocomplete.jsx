@@ -205,8 +205,11 @@ const useListValuesAutocomplete = ({
 
   // to keep compatibility with antD
   const onSearch = async (newInputValue) => {
+    if (newInputValue === "" && !open) {
+      return;
+    }
+
     await onInputChange(null, newInputValue);
-    return;
   };
 
   // Options
