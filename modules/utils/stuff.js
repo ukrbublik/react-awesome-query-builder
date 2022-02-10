@@ -357,5 +357,17 @@ export const getLogger = (devMode = false) => {
   };
 };
 
+export const getFirstDefined = (arr = []) => {
+  let ret;
+  for (let i = 0 ; i < arr.length ; i++) {
+    const v = arr[i];
+    if (v !== undefined) {
+      ret = v;
+      break;
+    }
+  }
+  return ret;
+};
+
 export const logger = getLogger();
 

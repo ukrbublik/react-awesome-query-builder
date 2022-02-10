@@ -1,7 +1,7 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig
 } from "./configUtils";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, getFirstDefined} from "../utils/stuff";
 import Immutable from "immutable";
 import {validateValue} from "../utils/validation";
 import last from "lodash/last";
@@ -19,10 +19,10 @@ const selectTypes = [
  * @param {Immutable.Map} current
  * @param {string} newField
  * @param {string} newOperator
- * @param {string} changedField
+ * @param {string} changedProp
  * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError}
  */
-export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedField = null, canFix = true) {
+export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true) {
   if (!oldConfig)
     oldConfig = config;
   const currentField = current.get("field");
@@ -32,7 +32,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const currentValueType = current.get("valueType", new Immutable.List());
   const currentAsyncListValues = current.get("asyncListValues");
 
-  //const isValidatingTree = (changedField === null);
+  //const isValidatingTree = (changedProp === null);
   const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
 
   //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
@@ -43,11 +43,11 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const newFieldConfig = getFieldConfig(config, newField);
 
   let canReuseValue = currentField && currentOperator && newOperator && currentValue != undefined
-    && (!changedField 
-      || changedField == "field" && !clearValueOnChangeField 
-      || changedField == "operator" && !clearValueOnChangeOp)
+    && (!changedProp 
+      || changedProp == "field" && !clearValueOnChangeField 
+      || changedProp == "operator" && !clearValueOnChangeOp)
     && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
-  if (canReuseValue && selectTypes.includes(currentFieldConfig.type) && changedField == "field") {
+  if (canReuseValue && selectTypes.includes(currentFieldConfig.type) && changedProp == "field") {
     // different fields of select types has different listValues
     canReuseValue = false;
   }
@@ -89,7 +89,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
       );
       const isValid = !validateError;
-      if (!isValid && showErrorMessage && changedField != "field") {
+      if (!isValid && showErrorMessage && changedProp != "field") {
         // allow bad value
         // but not on field change - in that case just drop bad value that can't be reused
         // ? maybe we should also drop bad value on op change?
@@ -103,6 +103,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     }
   }
 
+  // reuse value OR get defaultValue for cardinality 1 (it means default range values is not supported yet, todo)
   let newValue = null, newValueSrc = null, newValueType = null, newValueError = null;
   newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let v = undefined;
@@ -113,16 +114,16 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
           v = valueFixes[i];
         }
       }
-    } else if (operatorCardinality == 1 && (firstWidgetConfig || newFieldConfig)) {
-      if (newFieldConfig.defaultValue !== undefined)
-        v = newFieldConfig.defaultValue;
-      else if (newFieldConfig.fieldSettings && newFieldConfig.fieldSettings.defaultValue !== undefined)
-        v = newFieldConfig.fieldSettings.defaultValue;
-      else if (firstWidgetConfig.defaultValue !== undefined)
-        v = firstWidgetConfig.defaultValue;
+    } else if (operatorCardinality == 1) {
+      v = getFirstDefined([
+        newFieldConfig?.defaultValue,
+        newFieldConfig?.fieldSettings?.defaultValue,
+        firstWidgetConfig?.defaultValue
+      ]);
     }
     return v;
   }));
+
   newValueSrc = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let vs = null;
     if (canReuseValue) {
@@ -135,6 +136,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     }
     return vs;
   }));
+
   if (showErrorMessage) {
     if (newOperatorConfig && newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
       // last element in `valueError` list is for range validation error
@@ -148,6 +150,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     }
     newValueError = new Immutable.List(valueErrors);
   }
+
   newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let vt = null;
     if (canReuseValue) {
