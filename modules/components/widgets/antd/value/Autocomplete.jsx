@@ -75,7 +75,7 @@ export default (props) => {
 
   const specialOptions = filteredOptions?.filter(option => !!option.specialValue).map((option) => (
     <a 
-      style={{ padding: '5px 10px', display: 'block', cursor: 'pointer' }}
+      style={{ padding: "5px 10px", display: "block", cursor: "pointer" }}
       key={option.specialValue} 
       disabled={getOptionDisabled(option)}
       onClick={onSpecialClick(option.specialValue)}
