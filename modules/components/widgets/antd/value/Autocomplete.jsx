@@ -1,6 +1,5 @@
-import React, { PureComponent, useMemo } from "react";
-import PropTypes from "prop-types";
-import { Select, Spin } from "antd";
+import React, { useMemo } from "react";
+import { Select, Spin, Divider } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../../../utils/domUtils";
 import { mapListValues } from "../../../../utils/stuff";
 import { useOnPropsChanged } from "../../../../utils/reactUtils";
@@ -20,6 +19,7 @@ export default (props) => {
     open,
     onDropdownVisibleChange,
     onChange,
+    isSpecialValue,
     onSearch,
     inputValue,
     options,
@@ -34,9 +34,11 @@ export default (props) => {
     multiple
   });
 
-  let optionsMaxWidth = useMemo(() => {
-    options.reduce((max, option) => {
-      max = Math.max(max, calcTextWidth(option.title, null));
+  const filteredOptions = extendOptions(options);
+
+  const optionsMaxWidth = useMemo(() => {
+    return filteredOptions.reduce((max, option) => {
+      return Math.max(max, calcTextWidth(option.title, null));
     }, 0);
   }, [options]);
 
@@ -46,7 +48,7 @@ export default (props) => {
   const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
   const dropdownWidth = optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
   const minWidth = width || defaultSelectWidth;
-
+  
   const style = {
     width: (multiple ? undefined : minWidth),
     minWidth: minWidth
@@ -58,8 +60,59 @@ export default (props) => {
   const mode = !multiple ? undefined : (allowCustomValues ? "tags" : "multiple");
   const dynamicPlaceholder = !readonly ? aPlaceholder : "";
 
+  // rendering special 'Load more' option has side effect: on change rc-select will save its title as internal value in own state
+  const renderedOptions = filteredOptions?.filter(option => !option.specialValue).map((option) => (
+    <Option 
+      key={option.value} 
+      value={option.value} 
+      disabled={getOptionDisabled(option)}
+    >
+      {getOptionLabel(option)}
+    </Option>
+  ));
+
+  const onSpecialClick = (specialValue) => () => {
+    const option = filteredOptions.find(opt => opt.specialValue == specialValue);
+    onChange(null, option);
+  };
+
+  const specialOptions = filteredOptions?.filter(option => !!option.specialValue).map((option) => (
+    <a 
+      style={{ padding: '5px 10px', display: 'block', cursor: 'pointer' }}
+      key={option.specialValue} 
+      disabled={getOptionDisabled(option)}
+      onClick={onSpecialClick(option.specialValue)}
+    >
+      {getOptionLabel(option)}
+    </a>
+  ));
+
+  const aOnSelect = async (label, option) => {
+    if (isSpecialValue(option)) {
+      await onChange(label, option);
+    }
+  };
+
+  const aOnChange = async (label, option) => {
+    if (!isSpecialValue(option)) {
+      await onChange(label, option);
+    }
+  };
+
+  const dropdownRender = (menu) => (
+    <div>
+      {menu}
+      <Divider />
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        {specialOptions}
+      </div>
+    </div>
+  );
+
   return (
     <Select
+      dropdownRender={dropdownRender}
+      allowClear={true}
       notFoundContent={isLoading ? "Loading..." : null}
       disabled={readonly}
       mode={mode}
@@ -69,20 +122,19 @@ export default (props) => {
       dropdownMatchSelectWidth={customProps?.dropdownMatchSelectWidth || false}
       placeholder={customProps?.placeholder || dynamicPlaceholder}
       onDropdownVisibleChange={onDropdownVisibleChange}
-      onChange={onChange}
+      onChange={aOnChange}
+      onSelect={aOnSelect}
       onSearch={onSearch}
       showArrow
       showSearch
-      {...customProps}
       size={renderSize}
       loading={isLoading}
       value={aValue}
+      searchValue={inputValue}
       open={open}
-      filterOption={false}
+      {...customProps}
     >
-      {options?.map((option) => (
-        <Option key={option.value} value={option.value} disabled={getOptionDisabled(option)}>{getOptionLabel(option)}</Option>
-      ))}
+      {renderedOptions}
     </Select>
   );
 };

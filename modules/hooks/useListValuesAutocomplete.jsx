@@ -13,6 +13,7 @@ const useListValuesAutocomplete = ({
   debounceTimeout,
   multiple
 }) => {
+  const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
   const loadMoreTitle = "Load more...";
   const loadingMoreTitle = "Loading more...";
   const aPlaceholder = forceAsyncSearch ? "Type to search" : placeholder;
@@ -147,15 +148,22 @@ const useListValuesAutocomplete = ({
     }
   };
 
+  const isSpecialValue = (option) => {
+    const specialValue = option?.specialValue || option?.value;
+    return knownSpecialValues.includes(specialValue);
+  };
+
   const onChange = async (_e, option) => {
-    if (option && option.specialValue == "LOAD_MORE") {
+    const specialValue = option?.specialValue || option?.value;
+    if (specialValue == "LOAD_MORE") {
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
-    } else if (option && option.specialValue == "LOADING_MORE") {
+    } else if (specialValue == "LOADING_MORE") {
       isSelectedLoadMore.current = true;
     } else {
       if (multiple) {
-        let newSelectedListValues = option.map(o =>
+        const options = option;
+        let newSelectedListValues = options.map(o =>
           o.value != null ? o : getListValue(o, listValues)
         );
         let newSelectedValues = newSelectedListValues.map(o => o.value);
@@ -202,7 +210,7 @@ const useListValuesAutocomplete = ({
   };
 
   // Options
-  const extendOptions = (options, params) => {
+  const extendOptions = (options) => {
     const filtered = [...options];
     if (useLoadMore) {
       if (canShowLoadMore) {
@@ -262,14 +270,15 @@ const useListValuesAutocomplete = ({
     onClose,
     onDropdownVisibleChange,
     onChange,
+    
     inputValue,
     onInputChange,
     onSearch,
-
     canShowLoadMore,
     isInitialLoading,
     isLoading,
     isLoadingMore,
+    isSpecialValue,
 
     extendOptions,
     getOptionSelected,
