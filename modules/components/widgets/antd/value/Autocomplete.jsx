@@ -99,10 +99,14 @@ export default (props) => {
   const dropdownRender = (menu) => (
     <div>
       {menu}
-      <Divider />
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {specialOptions}
-      </div>
+      {specialOptions.length > 0
+        && <>
+          <Divider style={{ margin: "0px" }}/>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {specialOptions}
+          </div>
+        </>
+      }
     </div>
   );
 
