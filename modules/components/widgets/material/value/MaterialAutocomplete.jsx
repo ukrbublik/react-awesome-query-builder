@@ -125,7 +125,9 @@ export default (props) => {
   });
 
   const renderOption = (option, { selected }) => {
-    if (multiple && showCheckboxes != false) {
+    if (option.specialValue) {
+      return <React.Fragment>{option.renderTitle || option.title}</React.Fragment>;
+    } else if (multiple && showCheckboxes != false) {
       return <React.Fragment>
         <Checkbox
           icon={nonCheckedIcon}
