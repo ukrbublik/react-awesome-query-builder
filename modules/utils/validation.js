@@ -254,7 +254,9 @@ const validateValueInList = (value, listValues) => {
       if (vv == undefined) {
         return [`Value ${value[i]} is not in list of values`, value];
       } else {
-        value[i] = vv.value;
+        if (value[i] !== vv.value) {
+          value[i] = vv.value;
+        }
       }
     }
   } else {
