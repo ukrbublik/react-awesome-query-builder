@@ -249,7 +249,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 };
 
 const validateValueInList = (value, listValues) => {
-  const values = List.isList(value) ? value.toJS() : (values instanceof Array ? [...values] : undefined);
+  const values = List.isList(value) ? value.toJS() : (value instanceof Array ? [...value] : undefined);
   if (values) {
     for (let i = 0 ; i < values.length ; i++) {
       const vv = getItemInListValues(listValues, values[i]);
