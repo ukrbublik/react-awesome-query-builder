@@ -11,8 +11,9 @@ object-assign
 */
 
 /*!
- * Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com
+ * Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ * Copyright 2022 Fonticons, Inc.
  */
 
 /*!
@@ -33,7 +34,7 @@ object-assign
  */
 
 /**
- * React Router v6.2.1
+ * React Router v6.2.2
  *
  * Copyright (c) Remix Software Inc.
  *
@@ -43,7 +44,7 @@ object-assign
  * @license MIT
  */
 
-/** @license MUI v5.3.0
+/** @license MUI v5.4.4
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
