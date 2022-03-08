@@ -5,6 +5,7 @@ import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "
 import {defaultValue, deepEqual, getItemInListValues, logger} from "../utils/stuff";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import omit from "lodash/omit";
+import { List } from "immutable";
 
 
 const typeOf = (v) => {
@@ -248,15 +249,17 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 };
 
 const validateValueInList = (value, listValues) => {
-  if (value instanceof Array) {
-    for (let i = 0 ; i < value.length ; i++) {
-      const vv = getItemInListValues(listValues, value[i]);
+  const values = List.isList(value) ? value.toJS() : (values instanceof Array ? [...values] : undefined);
+  if (values) {
+    for (let i = 0 ; i < values.length ; i++) {
+      const vv = getItemInListValues(listValues, values[i]);
       if (vv == undefined) {
-        return [`Value ${value[i]} is not in list of values`, value];
+        return [`Value ${value[i]} is not in list of values`, values];
       } else {
-        value[i] = vv.value;
+        values[i] = vv.value;
       }
     }
+    return [null, values];
   } else {
     const vv = getItemInListValues(listValues, value);
     if (vv == undefined) {
@@ -264,8 +267,8 @@ const validateValueInList = (value, listValues) => {
     } else {
       value = vv.value;
     }
+    return [null, value];
   }
-  return [null, value];
 };
 
 /**
