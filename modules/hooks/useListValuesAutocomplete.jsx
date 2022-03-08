@@ -157,8 +157,8 @@ const useListValuesAutocomplete = ({
   };
 
   const onChange = async (_e, option) => {
-    let specialValue = option?.specialValue || option?.value || 
-      multiple && option.map(opt => opt?.specialValue || opt?.value).find(v => !!v);
+    let specialValue = option?.specialValue || option?.value 
+      || multiple && option.map(opt => opt?.specialValue || opt?.value).find(v => !!v);
     if (specialValue == "LOAD_MORE") {
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
