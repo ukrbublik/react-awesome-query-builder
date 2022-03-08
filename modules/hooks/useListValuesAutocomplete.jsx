@@ -135,6 +135,9 @@ const useListValuesAutocomplete = ({
   const onClose = (_e) => {
     if (isSelectedLoadMore.current) {
       isSelectedLoadMore.current = false;
+      if (multiple) {
+        setOpen(false);
+      }
     } else {
       setOpen(false);
     }
@@ -154,7 +157,8 @@ const useListValuesAutocomplete = ({
   };
 
   const onChange = async (_e, option) => {
-    const specialValue = option?.specialValue || option?.value;
+    let specialValue = option?.specialValue || option?.value 
+      || multiple && option.map(opt => opt?.specialValue || opt?.value).find(v => !!v);
     if (specialValue == "LOAD_MORE") {
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);

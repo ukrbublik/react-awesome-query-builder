@@ -109,7 +109,9 @@ export default (props) => {
   const renderOption = (props, option) => {
     const { title, renderTitle, value } = option;
     const selected = (selectedValue || []).includes(value);
-    if (multiple && showCheckboxes != false) {
+    if (option.specialValue) {
+      return <div {...props}>{renderTitle || title}</div>;
+    } else if (multiple && showCheckboxes != false) {
       return <div {...props}>
         <Checkbox
           icon={nonCheckedIcon}
