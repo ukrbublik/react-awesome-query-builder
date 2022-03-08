@@ -1,4 +1,10 @@
 # Changelog
+- 5.1.0
+  - Use spel2js 0.2.8 instead of my branch (PR #638) (issues #634, #643, #654)
+  - Add async load to antd (PR #640) (issues #616, #425)
+  - Fix autocomplete (PRs #655, #641)
+  - Fix setting defaultValue on set value src (PR #639) (issue #635)
+  - Fix validation of multiselect func arg (PR #656) (issue #587)
 - 5.0.0
   - Support of SpEL for import and export. See `loadFromSpel` and `spelFormat` in `Utils` (PR #613)
   - Added `excludeOperators` for type config (PR #613)
