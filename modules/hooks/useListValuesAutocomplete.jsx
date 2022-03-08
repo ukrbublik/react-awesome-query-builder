@@ -135,6 +135,9 @@ const useListValuesAutocomplete = ({
   const onClose = (_e) => {
     if (isSelectedLoadMore.current) {
       isSelectedLoadMore.current = false;
+      if (multiple) {
+        setOpen(false);
+      }
     } else {
       setOpen(false);
     }
