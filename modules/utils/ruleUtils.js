@@ -403,6 +403,7 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
 };
 
 export const formatFieldName = (field, config, meta, parentField = null) => {
+  if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);

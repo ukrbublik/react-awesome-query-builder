@@ -388,6 +388,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
 };
 
 const formatField = (meta, config, field, parentField = null) => {
+  if (!field) return;
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);

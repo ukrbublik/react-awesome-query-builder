@@ -50,7 +50,18 @@ export {isJsonLogic};
 function jsTreeToImmutable(tree) {
   return fromJS(tree, function (key, value) {
     let outValue;
-    if (key == "value" && value.get(0) && value.get(0).toJS !== undefined) {
+    if (key == "properties") {
+      outValue = value.toOrderedMap();
+
+      // `value` should be undefined instead of null
+      // JSON doesn't support undefined and replaces undefined -> null
+      // So fix: null -> undefined
+      for (let i = 0 ; i < 2 ; i++) {
+        if (outValue.get("value")?.get(i) === null) {
+          outValue = outValue.setIn(["value", i], undefined);
+        }
+      }
+    } else if (key == "value" && value.get(0) && value.get(0).toJS !== undefined) {
       const valueJs = value.get(0).toJS();
       if (valueJs.func) {
         outValue = value.toOrderedMap();
