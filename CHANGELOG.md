@@ -1,4 +1,6 @@
 # Changelog
+- 5.1.1
+  - Fix value null instead of undefined in JSON (PR #657) (issue #653)
 - 5.1.0
   - Use spel2js 0.2.8 instead of my branch (PR #638) (issues #634, #643, #654)
   - Add async load to antd (PR #640) (issues #616, #425)
