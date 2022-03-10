@@ -23,9 +23,15 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
-export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups = false, removeInvalidRules = false) => {
+export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+  if (removeEmptyGroups === undefined) {
+    removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
+  }
+  if (removeIncompleteRules === undefined) {
+    removeIncompleteRules = config.settings.removeIncompleteRulesOnLoad;
+  }
   const c = {
-    config, oldConfig, removeEmptyGroups, removeInvalidRules
+    config, oldConfig, removeEmptyGroups, removeIncompleteRules
   };
   return validateItem(tree, [], null, {}, c);
 };
@@ -76,7 +82,7 @@ function validateGroup (item, path, itemId, meta, c) {
 
 
 function validateRule (item, path, itemId, meta, c) {
-  const {removeInvalidRules, config, oldConfig} = c;
+  const {removeIncompleteRules, config, oldConfig} = c;
   const {showErrorMessage} = config.settings;
   let id = item.get("id");
   let properties = item.get("properties");
@@ -94,7 +100,7 @@ function validateRule (item, path, itemId, meta, c) {
     value: value ? value.toJS() : null,
     valueError: valueError ? valueError.toJS() : null,
   };
-  let _wasValid = field && operator && value && !value.find((v, ind) => (v === undefined));
+  let _wasValid = field && operator && value && !value.includes(undefined);
 
   if (!id && itemId) {
     id = itemId;
@@ -179,13 +185,12 @@ function validateRule (item, path, itemId, meta, c) {
     valueError: valueError ? valueError.toJS() : null,
   };
   const sanitized = !deepEqual(oldSerialized, newSerialized);
-  const isValid = field && operator && value && !value.find((v, _ind) => (v === undefined));
+  const isComplete = field && operator && value && !value.includes(undefined);
   if (sanitized)
     meta.sanitized = true;
-
-  if (sanitized && !isValid && removeInvalidRules)
+  if (!isComplete && removeIncompleteRules)
     item = undefined;
-  if (sanitized && item)
+  else if (sanitized)
     item = item.set("properties", properties);
 
   return item;

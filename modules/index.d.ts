@@ -856,6 +856,8 @@ export interface BehaviourSettings {
   showErrorMessage?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
+  removeEmptyGroupsOnLoad?: boolean,
+  removeIncompleteRulesOnLoad?: boolean,
 }
 
 export interface OtherSettings {
