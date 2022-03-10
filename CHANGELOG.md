@@ -1,6 +1,7 @@
 # Changelog
 - 5.1.2
   - Added config `removeIncompleteRulesOnLoad` (default false) (PR #661) (issue #642)
+  - Fix error when using same field for comparison as argument of function (PR #662) (issue #612)
 - 5.1.1
   - Fix value null instead of undefined in JSON (PR #657) (issue #653)
 - 5.1.0
