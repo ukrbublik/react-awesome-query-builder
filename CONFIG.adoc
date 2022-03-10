@@ -312,6 +312,7 @@ Behaviour settings:
 |showLock |false |Show "Lock" switch for rules and groups to make them read-only ("admin mode") +
   NOTE: To preserve read-only state of rules in JsonLogic, please use `jsonLogic.add_operation("locked", v => v);` in your code
 |canDeleteLocked |false |Show "Delete" button for locked rule?
+|removeIncompleteRulesOnLoad |false |Remove incomplete rules (w/o value) in `Utils.checkTree()`?
 |===
 
 TIP: For fully read-only mode use these settings:

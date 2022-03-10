@@ -8,7 +8,7 @@ import {validateTree} from "../utils/validation";
 
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
-  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig, true, true);
+  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig);
   tree = fixPathsInTree(tree);
   return tree;
 };
