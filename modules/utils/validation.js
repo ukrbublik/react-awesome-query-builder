@@ -318,12 +318,13 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
 */
 const validateFieldValue = (leftField, field, value, _valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   const {fieldSeparator} = config.settings;
+  const isFuncArg = typeof field == "object" && field?._isFuncArg;
   const leftFieldStr = Array.isArray(leftField) ? leftField.join(fieldSeparator) : leftField;
   const rightFieldStr = Array.isArray(value) ? value.join(fieldSeparator) : value;
   const rightFieldDefinition = getFieldConfig(config, value);
   if (!rightFieldDefinition)
     return [`Unknown field ${value}`, value];
-  if (rightFieldStr == leftFieldStr)
+  if (rightFieldStr == leftFieldStr && !isFuncArg)
     return [`Can't compare field ${leftField} with itself`, value];
   if (valueType && valueType != rightFieldDefinition.type)
     return [`Field ${value} is of type ${rightFieldDefinition.type}, but expected ${valueType}`, value];
