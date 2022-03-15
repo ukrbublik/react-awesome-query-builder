@@ -33,6 +33,12 @@ describe("basic query", () => {
       });
     });
 
+    it("should work with empty group", async () => {
+      await with_qb(configs.simple_with_number, inits.tree_with_empty_group, "default", (qb: ReactWrapper) => {
+        expect(qb.find(".query-builder")).to.have.length(1);
+      });
+    });
+
     it("should work with simple value", async () => {
       await with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb: ReactWrapper) => {
         expect(qb.find(".query-builder")).to.have.length(1);
