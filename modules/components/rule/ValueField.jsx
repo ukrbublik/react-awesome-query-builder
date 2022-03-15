@@ -33,8 +33,8 @@ export default class ValueField extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "operator", "isFuncArg", "placeholder"];
-    const keysForMeta = ["config", "field", "operator", "value", "parentField"];
+    const keysForItems = ["config", "field", "operator", "isFuncArg", "parentField"];
+    const keysForMeta = ["config", "field", "operator", "value", "placeholder", "isFuncArg", "parentField"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -46,15 +46,14 @@ export default class ValueField extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentField, isFuncArg}) {
+  getItems({config, field, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
-
     const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
@@ -87,13 +86,15 @@ export default class ValueField extends PureComponent {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     let expectedType;
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
-    if (widget) {
+    if (isFuncArg && fieldDefinition) {
+      expectedType = fieldDefinition.type;
+    } else if (widget) {
       let widgetConfig = config.widgets[widget];
       let widgetType = widgetConfig.type;
       //expectedType = leftFieldConfig.type;
