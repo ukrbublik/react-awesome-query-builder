@@ -1,4 +1,7 @@
 # Changelog
+- 5.2.0
+  - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)
+    `Utils.getTree(tree, true, false)` will behave same as before this change.
 - 5.1.2
   - Added config `removeIncompleteRulesOnLoad` (default false) (PR #661) (issue #642)
   - Fix error when using same field for comparison as argument of function (PR #662) (issue #612)
