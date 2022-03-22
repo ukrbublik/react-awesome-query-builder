@@ -585,6 +585,7 @@ interface TreeItem extends ListItem {
   selectable?: boolean,
   disableCheckbox?: boolean,
   checkable?: boolean,
+  path?: Array<string>
 }
 type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
