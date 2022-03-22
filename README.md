@@ -400,7 +400,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
 ### `Utils`
 - Save, load:
-  #### getTree (immutableValue, light = true) -> Object
+  #### getTree (immutableValue, light = true, children1AsArray = true) -> Object
   Convert query value from internal Immutable format to JS format. 
   You can use it to save value on backend in `onChange` callback of `<Query>`.  
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)

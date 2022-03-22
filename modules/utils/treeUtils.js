@@ -361,13 +361,13 @@ export const getTreeBadFields = (tree) => {
 
 // Remove fields that can be calced: "id", "path"
 // Remove empty fields: "operatorOptions"
-export const getLightTree = (tree) => {
+export const getLightTree = (tree, children1AsArray = false) => {
   let newTree = tree;
 
   function _processNode (item, itemId) {
     if (item.path)
       delete item.path;
-    if (itemId)
+    if (!children1AsArray && itemId)
       delete item.id;
     let properties = item.properties;
     if (properties) {
@@ -379,6 +379,9 @@ export const getLightTree = (tree) => {
     if (children) {
       for (let id in children) {
         _processNode(children[id], id);
+      }
+      if (children1AsArray) {
+        item.children1 = Object.values(children);
       }
     }
   }
