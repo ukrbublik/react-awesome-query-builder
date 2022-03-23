@@ -4,12 +4,12 @@ import {extendConfig} from "../utils/configUtils";
 import {getTreeBadFields, getLightTree} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
 
-export const getTree = (immutableTree, light = true) => {
+export const getTree = (immutableTree, light = true, children1AsArray = true) => {
   if (!immutableTree) return undefined;
   let tree = immutableTree;
   tree = tree.toJS();
   if (light)
-    tree = getLightTree(tree);
+    tree = getLightTree(tree, children1AsArray);
   return tree;
 };
 
@@ -72,6 +72,8 @@ function jsTreeToImmutable(tree) {
     } else if (key == "asyncListValues") {
       // keep in JS format
       outValue = value.toJS();
+    } else if (key == "children1" && Immutable.Iterable.isIndexed(value)) {
+      outValue = new Immutable.OrderedMap(value.map(child => [child.get("id"), child]));
     } else {
       outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
     }

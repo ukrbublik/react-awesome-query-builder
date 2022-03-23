@@ -170,7 +170,7 @@ export interface Utils {
   _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
   elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
   // load, save
-  getTree(tree: ImmutableTree, light?: boolean): JsonTree;
+  getTree(tree: ImmutableTree, light?: boolean, children1AsArray?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   isValidTree(tree: ImmutableTree): boolean;
