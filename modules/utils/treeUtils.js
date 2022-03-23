@@ -318,14 +318,13 @@ export const getTotalRulesCountInTree = (tree) => {
       type = item.type;
     }
     
-    const isRuleGroup = type == "rule_group";
-    if (children && !isRuleGroup) {
+    if (type == "rule" || type == "rule_group") {
+      // tip: count rule_group as 1 rule
+      cnt++;
+    } else if (children) {
       children.map((child, _childId) => {
         _processNode(child, path.concat(id), lev + 1);
       });
-    } else {
-      // tip: count rule_group as 1 rule
-      cnt++;
     }
   }
 
