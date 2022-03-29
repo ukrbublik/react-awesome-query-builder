@@ -94,11 +94,11 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         // but not on field change - in that case just drop bad value that can't be reused
         // ? maybe we should also drop bad value on op change?
         valueErrors[i] = validateError;
+      } else if (canFix && fixedValue !== v) {
+        valueFixes[i] = fixedValue;
       } else if (!isValidSrc || !isValid) {
         canReuseValue = false;
         break;
-      } else if (canFix && fixedValue !== v) {
-        valueFixes[i] = fixedValue;
       }
     }
   }

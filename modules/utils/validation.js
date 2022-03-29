@@ -250,21 +250,20 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
     console.warn("[RAQB validate]", `Field ${field}: ${validError}`);
   }
 
-  return [validError, validError ? value : fixedValue];
+  return [validError, canFix ? fixedValue : value];
 };
 
 const validateValueInList = (value, listValues) => {
   const values = List.isList(value) ? value.toJS() : (value instanceof Array ? [...value] : undefined);
   if (values) {
-    for (let i = 0 ; i < values.length ; i++) {
-      const vv = getItemInListValues(listValues, values[i]);
+    return values.reduce(([err, fixed], val) => {
+      const vv = getItemInListValues(listValues, val);
       if (vv == undefined) {
-        return [`Value ${value[i]} is not in list of values`, values];
+        return [err || `Value ${val} is not in list of values`, fixed];
       } else {
-        values[i] = vv.value;
+        return [err, [...fixed, vv.value]];
       }
-    }
-    return [null, values];
+    }, [null, []]);
   } else {
     const vv = getItemInListValues(listValues, value);
     if (vv == undefined) {
