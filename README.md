@@ -38,6 +38,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Config format](#config-format)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 5.2.0](#migration-to-520)
   * [Migration to 4.9.0](#migration-to-490)
   * [Migration from v1 to v2](#migration-from-v1-to-v2)
 * [Contributing](#contributing)
@@ -463,7 +464,7 @@ It's recommended to update your version.
 See [`CHANGELOG`](/CHANGELOG.md)
 
 ### Migration to 5.2.0
-Breaking change: `children1` is now indexed array (instead of object) in result of `Utils.getTree()` to preserve items order. 
+Breaking change: `children1` is now indexed array (instead of object) in result of `Utils.getTree()` to preserve items order.  
 Before:
 ```js
 children1: {
@@ -478,7 +479,7 @@ children1: [
   { id: '<id2>', type: 'rule', properties: ... },
 ]
 ```
-`Utils.loadTree()` is backward comatible with children1 being array or object. 
+`Utils.loadTree()` is backward comatible with children1 being array or object.  
 But if you rely on previous format (maybe do post-processing of `getTree()` result), please use `Utils.getTree(tree, true, false)` - it will behave same as before this change. 
 
 ### Migration to 4.9.0
