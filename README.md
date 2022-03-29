@@ -452,6 +452,7 @@ It's recommended to update your version.
 ### Supported versions
 | Version | Supported          |
 | ------- | ------------------ |
+| 5.x     | :white_check_mark: |
 | 4.x     | :white_check_mark: |
 | 3.x     | :white_check_mark: |
 | 2.x     | :white_check_mark: |
@@ -460,6 +461,25 @@ It's recommended to update your version.
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 5.2.0
+Breaking change: `children1` is now indexed array (instead of object) in result of `Utils.getTree()` to preserve items order. 
+Before:
+```js
+children1: {
+  '<id1>': { type: 'rule', properties: ... },
+  '<id2>': { type: 'rule', properties: ... }
+}
+```
+After:
+```js
+children1: [
+  { id: '<id1>', type: 'rule', properties: ... },
+  { id: '<id2>', type: 'rule', properties: ... },
+]
+```
+`Utils.loadTree()` is backward comatible with children1 being array or object. 
+But if you rely on previous format (maybe do post-processing of `getTree()` result), please use `Utils.getTree(tree, true, false)` - it will behave same as before this change. 
 
 ### Migration to 4.9.0
 Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`. 
