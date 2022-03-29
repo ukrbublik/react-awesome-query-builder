@@ -447,7 +447,7 @@ See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 ## Versions
 
-Versions 4.x are backward-compatible with 2.x and 3.x. 
+Versions 5.x are backward-compatible with 2.x 3.x 4.x.  
 It's recommended to update your version.
 
 ### Supported versions
@@ -483,11 +483,11 @@ children1: [
 But if you rely on previous format (maybe do post-processing of `getTree()` result), please use `Utils.getTree(tree, true, false)` - it will behave same as before this change. 
 
 ### Migration to 4.9.0
-Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`. 
-Now these operstors can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions). 
-Changed meaning of `is_empty` - now it's just strict comparing with empty string. 
-Before change the meaning was similar to `is_null`. 
-If you used `is_empty` for text types with intention of comparing with null, please replace `is_empty` -> `is_null`, `is_not_empty` -> `is_not_null` in saved query values. 
+Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`.  
+Now these operstors can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions).  
+Changed meaning of `is_empty` - now it's just strict comparing with empty string.  
+Before change the meaning was similar to `is_null`.  
+If you used `is_empty` for text types with intention of comparing with null, please replace `is_empty` -> `is_null`, `is_not_empty` -> `is_not_null` in saved query values.  
 If you used JsonLogic for saving, you need to replace `{"!": {"var": "your_field"}}` -> `{"==": [{"var": "your_field"}, null]}` and `{"!!": {"var": "your_field"}}` -> `{"!=": [{"var": "your_field"}, null]}`.
 
 ### Migration from v1 to v2
