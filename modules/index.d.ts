@@ -912,6 +912,7 @@ export interface Func {
   renderBrackets?: Array<ReactElement | string>,
   renderSeps?: Array<ReactElement | string>,
   spelFormatFunc?: SpelFormatFunc,
+  allowSelfNesting?: boolean,
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,

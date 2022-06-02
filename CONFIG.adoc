@@ -724,4 +724,5 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |args.<arg>.isOptional | |false |Last args can be optional
 |renderBrackets | |`['(', ')']` |Can render custom function brackets in UI (or not render).
 |renderSeps | |`[', ']` |Can render custom arguments separators in UI (other than `,`).
+|allowSelfNesting | |false |Allows the function to be used within its own parameters.
 |===
