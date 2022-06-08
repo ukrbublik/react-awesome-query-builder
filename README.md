@@ -438,7 +438,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
 
 ### Config format
-This library uses configarion driven aprroach. 
+This library uses configarion driven aproach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
 At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
 See [`CONFIG`](/CONFIG.adoc) for full documentation.
@@ -464,7 +464,7 @@ It's recommended to update your version.
 See [`CHANGELOG`](/CHANGELOG.md)
 
 ### Migration to 5.2.0
-Breaking change: `children1` is now indexed array (instead of object) in result of `Utils.getTree()` to preserve items order.  
+Breaking change: `children1` is now an indexed array (instead of object) in result of `Utils.getTree()` to preserve items order.  
 Before:
 ```js
 children1: {
@@ -484,7 +484,7 @@ But if you rely on previous format (maybe do post-processing of `getTree()` resu
 
 ### Migration to 4.9.0
 Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`.  
-Now these operstors can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions).  
+Now these operators can be used for text type only (for other types they will be auto converted to `is_null`/`is_not_null` during loading of query value created with previous versions).  
 Changed meaning of `is_empty` - now it's just strict comparing with empty string.  
 Before change the meaning was similar to `is_null`.  
 If you used `is_empty` for text types with intention of comparing with null, please replace `is_empty` -> `is_null`, `is_not_empty` -> `is_not_null` in saved query values.  
