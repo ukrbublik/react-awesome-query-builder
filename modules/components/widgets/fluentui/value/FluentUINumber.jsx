@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextField } from '@fluentui/react';
+import { NumberWidgetProps } from 'react-awesome-query-builder';
 
 const FluentUINumber = (props) => {
   const { value, setValue, readonly, min, max, step, placeholder } = props;

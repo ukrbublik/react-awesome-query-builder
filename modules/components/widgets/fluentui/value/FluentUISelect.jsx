@@ -1,25 +1,31 @@
 import React from "react";
 import {mapListValues} from "../../../../utils/stuff";
+import {Dropdown} from "@fluentui/react"
 import omit from "lodash/omit";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, customProps,}) => {
-  const renderOptions = () => 
-    mapListValues(listValues, ({title, value}) => {
-      return <option key={value} value={value}>{title}</option>;
-    });
+  var onChange = function onChange(_, option) {
+    if (option.key === undefined) return;
+    setValue(option.key.toString());
+  };
 
-  const onChange = e => setValue(e.target.value);
-  
-  const hasValue = value != null;
+  var renderOptions = function renderOptions(fields) {
+    var options = []
+    mapListValues(listValues, ({ title, value }) => {
+      options.push({
+        key: value,
+        text: title
+      })
+    })
+    return(options); 
+  };
+
   return (
-    <select
-      onChange={onChange}
-      value={hasValue ? value : ""}
-      disabled={readonly}
-      {...omit(customProps, ["showSearch", "input"])}
-    >
-      {!hasValue && <option disabled value={""}></option>}
-      {renderOptions()}
-    </select>
+    <Dropdown
+    options={renderOptions(listValues)}
+    selectedKey={value}
+    onChange={onChange}
+    style={{width: 200}}
+    />
   );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import {DatePicker} from '@fluentui/react'
 
 export default (props) => {
   const {value, setValue, config, valueFormat, readonly, customProps, } = props;
@@ -12,6 +13,8 @@ export default (props) => {
   };
   
   return (
-    <input type="date"  value={value || ""}  disabled={readonly} onChange={onChange} {...customProps} />
-  );
-};
+    <DatePicker
+    onChange={onChange}
+    />
+  )
+}; 

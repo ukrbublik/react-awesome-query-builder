@@ -1,21 +1,35 @@
+import { IconButton, DefaultButton } from "@fluentui/react";
 import React from "react";
 
 export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) => {
-  const renderOptions = (valueSources) => (
-    valueSources.map(([srcKey, info]) => (
-      <option key={srcKey} value={srcKey}>{info.label}</option>
-    ))
-  );
+  var [checked, setChecked] = React.useState(false); 
 
-  const onChange = e => setValueSrc(e.target.value);
-  
+  const renderOptions = (valueSources) => {
+    var options = [];
+    valueSources.map(([srcKey, info]) => (
+      options.push({
+        key: srcKey,
+        text: info.label
+      })
+    ))
+    return {onItemClick:onChange, items: options}; 
+  }
+
+  const onChange = (e, item) => {
+    if (e.target.value === undefined)
+      return;
+    setValueSrc(e.target.value);
+  }
+
   return (
-    <select 
-      onChange={onChange}
-      value={valueSrc}
-      disabled={readonly}
-    >
-      {renderOptions(valueSources)}
-    </select>
+    <IconButton
+    menuProps={renderOptions(valueSources)}
+    text="here"
+    title="ValueSource"
+    onChange={onChange}
+    iconProps={{iconName: 'ChevronRight'}}
+    onRenderMenuIcon={() => <div/>} 
+    />
   );
 };
+

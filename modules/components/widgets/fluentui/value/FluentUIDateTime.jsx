@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import {DatePicker, TimePicker} from "@fluentui/react"
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly, customProps, } = props;
@@ -20,6 +21,13 @@ export default (props) => {
     dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
   
   return (
-    <input type="datetime-local"  value={dtValue}  disabled={readonly} onChange={onChange} {...customProps} />
+    <div>
+      <TimePicker /> 
+      <DatePicker
+        onChange={onChange}
+        disabled={readonly}
+      />
+    </div>
+   
   );
 };

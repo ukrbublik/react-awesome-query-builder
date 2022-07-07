@@ -1,23 +1,26 @@
-import React from "react";
+import React from 'react';
+import { TextField } from '@fluentui/react';
 
-export default (props) => {
-  const {value, setValue, config, readonly, placeholder, maxLength, customProps, } = props;
-  const onChange = e => {
-    let val = e.target.value;
-    if (val === "")
-      val = undefined; // don't allow empty value
+const FluentUIText = (props) => {
+  var value = props.value,
+    setValue = props.setValue,
+    readonly = props.readonly,
+    placeholder = props.placeholder,
+    maxLength = props.maxLength;
+  var onChange = function onChange(e, val) {
+    if (val === '') val = undefined; // don't allow empty value
     setValue(val);
   };
-  const textValue = value || "";
+  var textValue = value || '';
+
   return (
-    <input
-      type="text" 
-      value={textValue} 
-      placeholder={placeholder} 
-      disabled={readonly} 
+    <TextField
+      value={textValue}
+      placeholder={placeholder}
+      disabled={readonly}
       onChange={onChange}
       maxLength={maxLength}
-      {...customProps}
     />
   );
 };
+export default FluentUIText;

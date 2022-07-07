@@ -20,6 +20,9 @@ import FluentUIConjs from "./core/FluentUIConjs";
 import FluentUIValueSources from "./core/FluentUIValueSources";
 import FluentUIConfirm from "./core/FluentUIConfirm";
 
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
+initializeIcons();
+
 // provider
 const FluentUIProvider = ({config, children}) => children;
 

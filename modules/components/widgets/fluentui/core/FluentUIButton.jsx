@@ -24,7 +24,7 @@ const FluentUIButton=(props)=> {
       <IconButton 
       onClick= {onClick}
       disabled={readonly}
-      iconProps= {{ iconName: typeToOnlyIcon[type] }}
+      iconProps= {{iconName: typeToOnlyIcon[type] }}
       color='primary'
       />
     )
@@ -33,7 +33,7 @@ const FluentUIButton=(props)=> {
       <ActionButton
       key={type}
       onClick={onClick}
-      iconProps={{ iconName: typeToIcon[type] }}
+      iconProps={{iconName: typeToIcon[type] }}
       disabled={readonly} 
       text={label}
       />

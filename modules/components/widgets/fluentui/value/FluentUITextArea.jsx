@@ -1,4 +1,5 @@
 import React from "react";
+import {TextField} from "@fluentui/react"
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, maxLength, maxRows, fullWidth, customProps, } = props;
@@ -10,16 +11,11 @@ export default (props) => {
   };
   const textValue = value || "";
   return (
-    <textarea
-      value={textValue} 
-      placeholder={placeholder}
-      disabled={readonly}
-      onChange={onChange}
-      maxLength={maxLength}
-      style={{
-        width: fullWidth ? "100%" : undefined
-      }}
-      {...customProps}
-    />
+   <TextField
+   readonly={readonly}
+   multiline rows={maxRows}
+   maxLength={maxLength}
+
+   />
   );
 };
