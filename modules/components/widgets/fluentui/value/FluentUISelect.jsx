@@ -3,7 +3,7 @@ import {mapListValues} from "../../../../utils/stuff";
 import {Dropdown} from "@fluentui/react"
 import omit from "lodash/omit";
 
-export default ({listValues, value, setValue, allowCustomValues, readonly, customProps,}) => {
+export default ({listValues, value, setValue, allowCustomValues, readonly, customProps}) => {
   var onChange = function onChange(_, option) {
     if (option.key === undefined) return;
     setValue(option.key.toString());
@@ -26,6 +26,7 @@ export default ({listValues, value, setValue, allowCustomValues, readonly, custo
     selectedKey={value}
     onChange={onChange}
     style={{width: 200}}
+    disabled={readonly}
     />
   );
 };

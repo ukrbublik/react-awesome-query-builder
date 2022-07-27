@@ -1,37 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import {mapListValues} from "../../../../utils/stuff";
 import omit from "lodash/omit";
+import { Dropdown } from "@fluentui/react";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, customProps,}) => {
+  const [selectedKeys, setSelectedKeys] = useState(value ?? []);
+
   const renderOptions = () => 
     mapListValues(listValues, ({title, value}) => {
-      return <option key={value} value={value}>{title}</option>;
+      return { key: value, text: title };
     });
 
-  const getMultiSelectValues = (multiselect) => {
-    let values = [];
-    const options = multiselect.options;
-    for (let i = 0 ; i < options.length ; i++) {
-      const opt = options[i];
-      if (opt.selected) {
-        values.push(opt.value);
-      }
+  const onChange = (e, item) =>{
+    if (item) {
+      setSelectedKeys(
+        item.selected ? [...selectedKeys, item.key] : selectedKeys.filter(key => key !== item.key),
+      );
+      setValue(selectedKeys); 
     }
-    if (!values.length)
-      values = undefined; //not allow []
-    return values;
   };
-
-  const onChange = e => setValue(getMultiSelectValues(e.target));
   
   return (
-    <select multiple
+    <Dropdown
+      placeholder="Select options"
+      selectedKeys={selectedKeys}
+      // eslint-disable-next-line react/jsx-no-bind
       onChange={onChange}
-      value={value}
+      multiSelect
+      options={renderOptions()}
       disabled={readonly}
-      {...omit(customProps, ["showSearch", "input", "showCheckboxes"])}
-    >
-      {renderOptions()}
-    </select>
+    />
   );
 };

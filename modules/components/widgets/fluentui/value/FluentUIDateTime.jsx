@@ -1,11 +1,11 @@
 import React from "react";
 import moment from "moment";
-import {DatePicker, TimePicker} from "@fluentui/react"
+import { DatePicker, TimePicker} from "@fluentui/react"
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly, customProps, } = props;
 
-  const onChange = e => {
+  const onDateChange = e => {
     let value = e.target.value;
     if (value == "")
       value = undefined;
@@ -14,18 +14,26 @@ export default (props) => {
     setValue(value);
   };
 
-  let dtValue = value;
-  if (!value)
-    dtValue = "";
-  else
-    dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
+  const onTimeChange = e => {
+
+  }
+  // let dtValue = value;
+  // if (!value)
+  //   dtValue = "";
+  // else
+  //   dtValue = moment(value).format("YYYY-MM-DDTHH:mm");
   
   return (
     <div>
-      <TimePicker /> 
       <DatePicker
-        onChange={onChange}
-        disabled={readonly}
+      disabled={readonly}
+      onChange={onDateChange}
+       /> 
+      <TimePicker 
+      useHour12={use12Hours}
+      showSeconds={true}
+      disabled={readonly}
+      onChange={onTimeChange}
       />
     </div>
    

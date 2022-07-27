@@ -15,7 +15,6 @@ export default (props) => {
    readonly={readonly}
    multiline rows={maxRows}
    maxLength={maxLength}
-
    />
   );
 };

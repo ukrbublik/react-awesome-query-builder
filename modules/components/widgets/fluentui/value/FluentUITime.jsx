@@ -1,4 +1,5 @@
 import React from "react";
+import {TimePicker} from '@fluentui/react';
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly, customProps } = props;
@@ -11,6 +12,20 @@ export default (props) => {
   };
   
   return (
-    <input type="time"  value={value || ""}  disabled={readonly} onChange={onChange} {...customProps} />
+   <TimePicker
+    styles={{
+      optionsContainerWrapper: {
+        height: '500px',
+      },
+      root: {
+        width: '70%',
+      },
+    }}
+    useHour12={use12Hours}
+    onChange={onChange}
+    disabled={readonly}
+    allowFreeform={true}
+    showSeconds={true}
+   />
   );
 };

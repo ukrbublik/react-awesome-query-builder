@@ -14,9 +14,9 @@ export default (props) => {
   return (
     <div style={{width: defaultSliderWidth || width}}>
     <Slider 
-      min={0}
-      max={10}
-      step={1}
+      min={min}
+      max={max}
+      step={step}
       value={value}
       disabled={readonly}
       marks={marks}
