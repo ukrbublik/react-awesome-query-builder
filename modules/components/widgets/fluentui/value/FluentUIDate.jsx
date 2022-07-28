@@ -1,19 +1,35 @@
 import React from "react";
-import {DatePicker} from '@fluentui/react'
+import { DatePicker } from "@fluentui/react";
 
 export default (props) => {
-  const {value, setValue, config, valueFormat, readonly, customProps, } = props;
+  const {
+    value,
+    setValue,
+    config,
+    valueFormat,
+    dateFormat,
+    readonly,
+    customProps,
+    placeholder,
+  } = props;
 
-  const onChange = e => {
-    let value = e.target.value;
-    if (value == "")
-      value = undefined;
-    setValue(value);
+  const formatSingleValue = (value) => {
+    return value ? moment(value, valueFormat).format(dateFormat) : undefined;
   };
-  
+
+  const onChange = (e, value) => {
+    if (value == "") value = undefined;
+    setValue(formatSingleValue(value));
+  };
+
   return (
     <DatePicker
-    onChange={onChange}
+      disabled={readonly}
+      value={value}
+      onChange={onChange}
+      style={{ width: "auto", marginRight: "0.25rem" }}
+      placeholder={placeholder}
+      {...customProps}
     />
-  )
-}; 
+  );
+};

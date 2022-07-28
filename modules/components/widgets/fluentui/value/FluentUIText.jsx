@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextField } from '@fluentui/react';
+import React from "react";
+import { TextField } from "@fluentui/react";
 
 const FluentUIText = (props) => {
   var value = props.value,
@@ -7,11 +7,12 @@ const FluentUIText = (props) => {
     readonly = props.readonly,
     placeholder = props.placeholder,
     maxLength = props.maxLength;
+
   var onChange = function onChange(e, val) {
-    if (val === '') val = undefined; // don't allow empty value
+    if (val === "") val = undefined; // don't allow empty value
     setValue(val);
   };
-  var textValue = value || '';
+  var textValue = value || "";
 
   return (
     <TextField

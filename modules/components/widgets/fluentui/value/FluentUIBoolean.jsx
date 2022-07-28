@@ -1,5 +1,5 @@
-import React from 'react';
-import { Toggle } from '@fluentui/react';
+import React from "react";
+import { Toggle } from "@fluentui/react";
 
 const FluentUIBoolean = (props) => {
   var value = props.value,
@@ -12,8 +12,8 @@ const FluentUIBoolean = (props) => {
     return setValue(!value);
   };
 
-  var onText = typeof labelYes === 'string' ? labelYes : 'Yes';
-  var offText = typeof labelNo === 'string' ? labelNo : 'No';
+  var onText = typeof labelYes === "string" ? labelYes : "Yes";
+  var offText = typeof labelNo === "string" ? labelNo : "No";
 
   return (
     <Toggle

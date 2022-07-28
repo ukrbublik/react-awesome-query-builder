@@ -1,13 +1,12 @@
-import React from 'react';
-import { TextField } from '@fluentui/react';
-import { NumberWidgetProps } from 'react-awesome-query-builder';
+import React from "react";
+import { TextField } from "@fluentui/react";
 
 const FluentUINumber = (props) => {
   const { value, setValue, readonly, min, max, step, placeholder } = props;
-  
+
   const onChange = (e, val) => {
-    var newVal; 
-    if (val === '' || val === null || val === undefined) {
+    var newVal;
+    if (val === "" || val === null || val === undefined) {
       newVal = undefined;
     } else {
       newVal = Number.isInteger(step) ? parseInt(val) : parseFloat(val);
@@ -17,6 +16,7 @@ const FluentUINumber = (props) => {
 
   return (
     <TextField
+      style={{ width: "auto" }}
       type="number"
       value={value}
       placeholder={placeholder}
