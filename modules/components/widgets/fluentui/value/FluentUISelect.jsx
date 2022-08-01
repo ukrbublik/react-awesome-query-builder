@@ -32,8 +32,9 @@ export default ({
       options={renderOptions(listValues)}
       selectedKey={value}
       onChange={onChange}
-      style={{ width: "auto" }}
+      dropdownWidth={'auto'}
       disabled={readonly}
+      {...customProps}
     />
   );
 };

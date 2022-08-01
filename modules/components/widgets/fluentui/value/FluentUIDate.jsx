@@ -1,5 +1,6 @@
 import React from "react";
 import { DatePicker } from "@fluentui/react";
+import moment from 'moment';
 
 export default (props) => {
   const {
@@ -13,20 +14,16 @@ export default (props) => {
     placeholder,
   } = props;
 
-  const formatSingleValue = (value) => {
-    return value ? moment(value, valueFormat).format(dateFormat) : undefined;
-  };
-
-  const onChange = (e, value) => {
-    if (value == "") value = undefined;
-    setValue(formatSingleValue(value));
+  const onChange = ( newValue) => {
+    if (newValue == "") newValue = undefined;
+    setValue(moment(new Date(newValue)));
   };
 
   return (
     <DatePicker
       disabled={readonly}
       value={value}
-      onChange={onChange}
+      onSelectDate={onChange}
       style={{ width: "auto", marginRight: "0.25rem" }}
       placeholder={placeholder}
       {...customProps}

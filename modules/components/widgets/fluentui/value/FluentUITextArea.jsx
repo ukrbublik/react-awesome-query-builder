@@ -28,6 +28,7 @@ export default (props) => {
       placeholder={placeholder}
       value={textValue}
       onChange={onChange}
+      {...customProps}
     />
   );
 };

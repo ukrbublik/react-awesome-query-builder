@@ -14,8 +14,6 @@ export default (props) => {
     marks,
     readonly,
   } = props;
-  // const customInputProps = customProps.input || {};
-  // const customSliderProps = customProps.slider || customProps;
   const { defaultSliderWidth } = config.settings;
 
   const onChange = (newValue) => {
@@ -45,11 +43,17 @@ export default (props) => {
       onChange={onChange}
     />
   );
+  const stylesWrapper = {
+    display: "flex", flexDirection: "row" 
+  }
+  const stylesSliderWrapper = {
+    width: defaultSliderWidth || width
+  }
 
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
+    <div style={stylesWrapper}>
       {InputCmp}
-      <div style={{ width: defaultSliderWidth || width }}>{SliderCmp}</div>
+      <div style={stylesSliderWrapper}>{SliderCmp}</div>
     </div>
   );
 };

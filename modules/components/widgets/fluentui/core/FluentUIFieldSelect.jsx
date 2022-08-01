@@ -41,7 +41,7 @@ const FluentUIFieldSelect = (props) => {
       options={renderOptions(items)}
       selectedKey={selectedKey}
       onChange={onChange}
-      style={{ width: "auto" }}
+      dropdownWidth={'auto'}
     />
   );
 };
