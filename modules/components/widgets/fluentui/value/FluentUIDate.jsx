@@ -14,17 +14,18 @@ export default (props) => {
     placeholder,
   } = props;
 
-  const onChange = ( newValue) => {
-    if (newValue == "") newValue = undefined;
-    setValue(moment(new Date(newValue)));
+  const onChange = (date) => {
+    if (date == "" ) date = undefined;
+    var dateValue=moment(new Date(date)).format(valueFormat);
+    setValue(dateValue) 
   };
 
   return (
     <DatePicker
       disabled={readonly}
-      value={value}
+      selectedDate={value}
       onSelectDate={onChange}
-      style={{ width: "auto", marginRight: "0.25rem" }}
+      style={{ width: "auto", marginRight: "0.25rem", width: '150px'}}
       placeholder={placeholder}
       {...customProps}
     />

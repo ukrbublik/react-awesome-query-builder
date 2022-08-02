@@ -18,6 +18,10 @@ const FluentUIConjs = (props) => {
   var forceShowConj = config.settings.forceShowConj;
   var showConj = forceShowConj || (conjsCount > 1 && !lessThenTwo);
 
+  const styleNot = {
+    backgroundColor: not ?  '#fed9cc' : '#ffffff'
+  }
+
   var renderOptions = function renderOptions() {
     return Object.keys(conjunctionOptions).map(function (key) {
       var _conjunctionOptions$k = conjunctionOptions[key],
@@ -53,6 +57,7 @@ const FluentUIConjs = (props) => {
         onClick={onNotClick.bind(null, !not)}
         disabled={readonly}
         text={notLabel || "NOT"}
+        style={styleNot}
       />
     );
   };

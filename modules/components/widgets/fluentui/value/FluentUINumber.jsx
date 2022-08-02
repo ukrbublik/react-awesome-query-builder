@@ -16,7 +16,6 @@ const FluentUINumber = (props) => {
 
   return (
     <TextField
-      style={{ width: "auto" }}
       type="number"
       value={value}
       placeholder={placeholder}

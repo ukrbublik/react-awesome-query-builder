@@ -14,6 +14,7 @@ const FluentUIFieldSelect = (props) => {
 
   var renderOptions = function renderOptions(fields) {
     var options = [];
+    var divKey = 0; 
     Object.keys(fields).map(function (fieldKey) {
       var opt = {};
       var field = fields[fieldKey];
@@ -25,12 +26,19 @@ const FluentUIFieldSelect = (props) => {
         opt.key = path;
         opt.text = label;
         opt.itemType = DropdownMenuItemType.Header;
+        var itemOptions=renderOptions(items);
+        options.push(opt);
+        for (var i of itemOptions) {
+          options.push(i);
+        }
+        options.push({ key: 'divider_'+divKey.toString(), text: '-', itemType: DropdownMenuItemType.Divider });
+        divKey +=1
       } else {
         opt.key = path;
         opt.text = label;
         opt.disabled = disabled;
+        options.push(opt);
       }
-      options.push(opt);
     });
     return options;
   };
