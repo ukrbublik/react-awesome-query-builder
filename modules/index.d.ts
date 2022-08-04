@@ -206,6 +206,11 @@ export interface BuilderProps {
   dispatch: Dispatch,
 }
 
+export interface ItemBuilderProps extends BuilderProps {
+  type: "rule" | "group" | "rule_group" | "switch_group" | "case_group";
+  itemComponent: ReactElement;
+}
+
 export interface QueryProps {
   conjunctions: Conjunctions;
   operators: Operators;
@@ -815,6 +820,7 @@ export interface RenderSettings {
   renderConfirm?: ConfirmFunc,
   useConfirm?: () => Function,
   renderSize?: AntdSize,
+  renderItem?: Factory<ItemBuilderProps>,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
   showLabels?: boolean,
