@@ -207,7 +207,7 @@ export interface BuilderProps {
 }
 
 export interface ItemBuilderProps extends BuilderProps {
-  type: "rule" | "group" | "rule_group" | "switch_group" | "case_group";
+  type: ItemType;
   itemComponent: ReactElement;
 }
 
