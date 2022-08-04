@@ -206,9 +206,12 @@ export interface BuilderProps {
   dispatch: Dispatch,
 }
 
-export interface ItemBuilderProps extends BuilderProps {
+export interface ItemBuilderProps {
+  config: Config;
+  actions: Actions;
+  properties: TypedMap<any>;
   type: ItemType;
-  itemComponent: ReactElement;
+  itemComponent: Factory<ItemProperties>;
 }
 
 export interface QueryProps {
