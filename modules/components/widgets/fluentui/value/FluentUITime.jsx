@@ -26,22 +26,21 @@ export default (props) => {
 
   const timeValue = value ? moment(value, valueFormat) : null;
 
+  const stylesOptionsContainer = {
+    optionsContainerWrapper: {
+      height: "500px",
+    }
+  }
   return (
     <TimePicker
-      styles={{
-        optionsContainerWrapper: {
-          height: "500px",
-        },
-        root: {
-          width: "70%",
-        },
-      }}
+      styles={stylesOptionsContainer}
       useHour12={use12Hours}
       onChange={onChange}
       disabled={readonly}
       allowFreeform={true}
       showSeconds={hasSeconds}
       value={value}
+      useComboBoxAsMenuWidth
       {...customProps}
     />
   );

@@ -34,6 +34,14 @@ export default (props) => {
     }
   };
 
+  const stylesTimePicker = {
+    marginRight: '5px'
+  }
+
+  const stylesDatePicker = {
+    width: '150px'
+  }
+
   return (
     <div style={{display: 'flex', flexDirection: 'row'}}>
       <TimePicker
@@ -41,13 +49,14 @@ export default (props) => {
         showSeconds={true}
         disabled={readonly}
         onChange={onTimeChange}
-        style={{marginRight: '5px'}}
+        useComboBoxAsMenuWidth
+        style={stylesTimePicker}
       />
       <DatePicker 
         disabled={readonly} 
         selectedDate={date} 
         onSelectDate={onDateChange} 
-        style={{width: '150px'}}
+        style={stylesDatePicker}
       />
     </div>
   );

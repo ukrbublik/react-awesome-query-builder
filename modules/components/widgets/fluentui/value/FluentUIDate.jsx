@@ -20,12 +20,15 @@ export default (props) => {
     setValue(dateValue) 
   };
 
+  const stylesDatePicker = {
+    width: "auto", marginRight: "0.25rem", width: '150px'
+  }
   return (
     <DatePicker
       disabled={readonly}
       selectedDate={value}
       onSelectDate={onChange}
-      style={{ width: "auto", marginRight: "0.25rem", width: '150px'}}
+      style={stylesDatePicker}
       placeholder={placeholder}
       {...customProps}
     />
