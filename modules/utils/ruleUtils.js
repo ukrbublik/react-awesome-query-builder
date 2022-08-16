@@ -89,14 +89,19 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
       );
       const isValid = !validateError;
-      if (!isValid && showErrorMessage && changedProp != "field") {
-        // allow bad value
-        // but not on field change - in that case just drop bad value that can't be reused
-        // ? maybe we should also drop bad value on op change?
+      // allow bad value with error message
+      // but not on field change - in that case just drop bad value that can't be reused
+      // ? maybe we should also drop bad value on op change?
+      const fixValue = fixedValue !== v;
+      const dropValue = !isValidSrc || !isValid && (changedProp == "field" || !showErrorMessage && !fixValue);
+      const showValueError = !isValid && showErrorMessage && !dropValue && !fixValue;
+      if (showValueError) {
         valueErrors[i] = validateError;
-      } else if (canFix && fixedValue !== v) {
+      }
+      if (fixValue) {
         valueFixes[i] = fixedValue;
-      } else if (!isValidSrc || !isValid) {
+      }
+      if (dropValue) {
         canReuseValue = false;
         break;
       }

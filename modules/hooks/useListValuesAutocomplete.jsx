@@ -170,7 +170,7 @@ const useListValuesAutocomplete = ({
         let newSelectedListValues = options.map(o =>
           o.value != null ? o : getListValue(o, listValues)
         );
-        let newSelectedValues = newSelectedListValues.map(o => o.value);
+        let newSelectedValues = newSelectedListValues.filter(o => o !== undefined).map(o => o.value);
         if (!newSelectedValues.length)
           newSelectedValues = undefined; //not allow []
         setValue(newSelectedValues, newSelectedListValues);

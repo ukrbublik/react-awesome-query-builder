@@ -166,7 +166,8 @@ function validateRule (item, path, itemId, meta, c) {
   //validate values
   valueSrc = properties.get("valueSrc");
   value = properties.get("value");
-  let {newValue, newValueSrc, newValueError} = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, true);
+  const canFix = !showErrorMessage;
+  let {newValue, newValueSrc, newValueError} = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix);
   value = newValue;
   valueSrc = newValueSrc;
   valueError = newValueError;
@@ -249,21 +250,30 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
   if (isRawValue && validError) {
     console.warn("[RAQB validate]", `Field ${field}: ${validError}`);
   }
-
-  return [validError, canFix ? fixedValue : value];
+  
+  return [validError, fixedValue];
 };
 
-const validateValueInList = (value, listValues) => {
+const validateValueInList = (value, listValues, canFix) => {
   const values = List.isList(value) ? value.toJS() : (value instanceof Array ? [...value] : undefined);
   if (values) {
-    return values.reduce(([err, fixed], val) => {
+    let ret = values.reduce(([err, fixedArr, badValues], val) => {
       const vv = getItemInListValues(listValues, val);
       if (vv == undefined) {
-        return [err || `Value ${val} is not in list of values`, fixed];
+        badValues = [...badValues, val];
+        const plural = badValues.length > 1;
+        return [
+          `${plural ? "Values" : "Value"} ${badValues.join(", ")} ${plural ? "are" : "is"} not in list of values`, 
+          [...fixedArr, val], badValues
+        ];
       } else {
-        return [err, [...fixed, vv.value]];
+        return [err, [...fixedArr, vv.value], badValues];
       }
-    }, [null, []]);
+    }, [null, [], []]);
+    if (!canFix) {
+      ret[1] = value; // need to preserve same object, see `fixedValue !== v` at ruleUtils.js
+    }
+    return ret;
   } else {
     const vv = getItemInListValues(listValues, value);
     if (vv == undefined) {
@@ -279,7 +289,6 @@ const validateValueInList = (value, listValues) => {
 * 
 */
 const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
-  let fixedValue = value;
   if (field) {
     const fieldConfig = getFieldConfig(config, field);
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -297,13 +306,13 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     if (fieldSettings) {
       const listValues = asyncListValues || fieldSettings.listValues;
       if (listValues && !fieldSettings.allowCustomValues) {
-        return validateValueInList(value, listValues);
+        return validateValueInList(value, listValues, canFix);
       }
       if (fieldSettings.min != null && value < fieldSettings.min) {
-        return [`Value ${value} < min ${fieldSettings.min}`, value];
+        return [`Value ${value} < min ${fieldSettings.min}`, canFix ? fieldSettings.min : value];
       }
       if (fieldSettings.max != null && value > fieldSettings.max) {
-        return [`Value ${value} > max ${fieldSettings.max}`, value];
+        return [`Value ${value} > max ${fieldSettings.max}`, canFix ? fieldSettings.max : value];
       }
     }
   }

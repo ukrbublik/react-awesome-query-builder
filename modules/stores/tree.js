@@ -500,14 +500,13 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
   const isEndValue = false;
-  const canFix = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
+  const canFix = false;
   const [validateError, fixedValue] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
   );
-    
   const isValid = !validateError;
-  if (isValid && fixedValue !== value) {
+  if (fixedValue !== value) {
     // eg, get exact value from listValues (not string)
     value = fixedValue;
   }
