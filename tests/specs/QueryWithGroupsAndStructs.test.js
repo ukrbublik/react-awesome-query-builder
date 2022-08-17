@@ -6,13 +6,13 @@ import { with_qb_skins, export_checks } from "../support/utils";
 describe("query with !struct and !group", () => {
 
   describe("import", () => {
-    it("should work with value of JsonLogic format", () => {
-      with_qb_skins(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", (qb) => {
+    it("should work with value of JsonLogic format", async () => {
+      await with_qb_skins(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
-    it("should handle custom operator in !group arrays", () => {
-      with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+    it("should handle custom operator in !group arrays", async () => {
+      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
         expect_checks({
           "logic": {
             "and": [

@@ -35,14 +35,14 @@ describe("query with func", () => {
     });
   });
 
-  it("should render func with antd", () => {
-    with_qb_ant(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("should render func with antd", async () => {
+    await with_qb_ant(configs.with_funcs, inits.with_func_tolower_from_field, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       expect(qb.find("FuncWidget")).to.have.length(1);
     });
   });
 
-  it("set function for number", () => {
-    with_qb(configs.with_funcs, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("set function for number", async () => {
+    await with_qb(configs.with_funcs, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--valuesrc select")
         .simulate("change", { target: { value: "func" } });

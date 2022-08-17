@@ -6,8 +6,8 @@ import { with_qb_skins, export_checks } from "../support/utils";
 describe("query with field compare", () => {
 
   describe("import", () => {
-    it("should work with simple value of JsonLogic format", () => {
-      with_qb_skins(configs.simple_with_2_numbers, inits.with_number_field_compare, "JsonLogic", (qb) => {
+    it("should work with simple value of JsonLogic format", async () => {
+      await with_qb_skins(configs.simple_with_2_numbers, inits.with_number_field_compare, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
