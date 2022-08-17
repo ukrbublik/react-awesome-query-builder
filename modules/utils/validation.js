@@ -4,6 +4,7 @@ import {
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
 import {defaultValue, deepEqual, getItemInListValues, logger} from "../utils/stuff";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
+import {fixPathsInTree} from "../utils/treeUtils";
 import omit from "lodash/omit";
 import { List } from "immutable";
 
@@ -21,6 +22,13 @@ const isTypeOf = (v, type) => {
   if (type == "number" && !isNaN(v))
     return true; //can be casted
   return false;
+};
+
+
+export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
+  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig);
+  tree = fixPathsInTree(tree);
+  return tree;
 };
 
 export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
@@ -248,7 +256,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
   }
 
   if (isRawValue && validError) {
-    console.warn("[RAQB validate]", `Field ${field}: ${validError}`);
+    logger.warn("[RAQB validate]", `Field ${field}: ${validError}`);
   }
   
   return [validError, fixedValue];

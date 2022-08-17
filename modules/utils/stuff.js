@@ -344,9 +344,9 @@ export function mergeArraysSmart(arr1, arr2) {
     }, arr1.slice());
 }
 
-const isDev = () => (process && process.env && process.env.NODE_ENV == "development");
+const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");
 
-export const getLogger = (devMode = false) => {
+export const getLogger = (devMode) => {
   const verbose = devMode != undefined ? devMode : isDev(); 
   return verbose ? console : {
     error: () => {},

@@ -12,7 +12,7 @@ import Immutable from "immutable";
 import clone from "clone";
 
 const stringify = JSON.stringify;
-const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree} = Utils;
+const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, checkTree, isValidTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -22,8 +22,8 @@ const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
-//initTree = checkTree(loadTree(initValue), loadedConfig);
-initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+//initTree = loadTree(initValue);
+initTree = loadFromJsonLogic(initLogic, loadedConfig); // <- this will work same  
 
 
 // Trick to hot-load new config when you edit `config.tsx`
@@ -124,7 +124,7 @@ const DemoQueryBuilder: React.FC = () => {
     const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
     setState({
       ...state, 
-      tree: tree ? checkTree(tree, state.config) : state.tree,
+      tree: tree || state.tree,
       spelErrors
     });
   };
@@ -135,8 +135,7 @@ const DemoQueryBuilder: React.FC = () => {
     setState({
       ...state,
       skin,
-      config,
-      tree: checkTree(state.tree, config)
+      config
     });
     window._initialSkin = skin;
   };

@@ -3,34 +3,18 @@ import PropTypes from "prop-types";
 import createTreeStore from "../stores/tree";
 import context from "../stores/context";
 import {createStore} from "redux";
-import {connect, Provider} from "react-redux";
+import {Provider} from "react-redux";
 import * as actions from "../actions";
 import {extendConfig} from "../utils/configUtils";
 import {shallowEqual, immutableEqual} from "../utils/stuff";
 import {defaultRoot} from "../utils/defaultUtils";
+import {validateAndFixTree} from "../utils/validation";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import pick from "lodash/pick";
-import Query, {validateAndFixTree} from "./Query";
+import ConnectedQuery from "./Query";
 
 
 const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs"];
-
-
-const ConnectedQuery = connect(
-  (state) => {
-    return {
-      tree: state.tree,
-      __isInternalValueChange: state.__isInternalValueChange,
-      __lastAction: state.__lastAction,
-    };
-  },
-  null,
-  null,
-  {
-    context
-  }
-)(Query);
-ConnectedQuery.displayName = "ConnectedQuery";
 
 
 export default class QueryContainer extends Component {
@@ -76,18 +60,22 @@ export default class QueryContainer extends Component {
     const isConfigChanged = !shallowEqual(oldConfig, nextConfig, true);
     if (isConfigChanged) {
       nextConfig = extendConfig(nextConfig);
-      this.setState({config: nextConfig});
     }
-    
+
     // compare trees
     const storeValue = this.state.store.getState().tree;
     const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
+    const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
+    //tip: don't validate, it will be done at reducer
+
+    if (isConfigChanged) {
+      this.setState({config: nextConfig});
+    }
+    
     if (isTreeChanged) {
-      const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
-      const validatedTree = validateAndFixTree(nextTree, null, nextConfig, oldConfig);
       return Promise.resolve().then(() => {
         this.state.store.dispatch(
-          actions.tree.setTree(nextProps, validatedTree)
+          actions.tree.setTree(nextConfig, nextTree)
         );
       });
     }

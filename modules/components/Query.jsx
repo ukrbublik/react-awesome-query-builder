@@ -1,26 +1,22 @@
 import React, { PureComponent } from "react";
+import {connect} from "react-redux";
+import context from "../stores/context";
 import PropTypes from "prop-types";
 import * as actions from "../actions";
-import {fixPathsInTree} from "../utils/treeUtils";
 import {immutableEqual} from "../utils/stuff";
 import {useOnPropsChanged, bindActionCreators} from "../utils/reactUtils";
-import {validateTree} from "../utils/validation";
+import {validateAndFixTree} from "../utils/validation";
 
 
-export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
-  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig);
-  tree = fixPathsInTree(tree);
-  return tree;
-};
-
-
-export default class Query extends PureComponent {
+class Query extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func,
     renderBuilder: PropTypes.func,
     tree: PropTypes.any, //instanceOf(Immutable.Map)
     //dispatch: PropTypes.func.isRequired,
+    //__isInternalValueChange
+    //__lastAction
   };
 
   constructor(props) {
@@ -29,7 +25,9 @@ export default class Query extends PureComponent {
 
     this._updateActions(props);
 
-    this.validatedTree = this.validateTree(props, props);
+    //tip: already validated with QueryContainer
+    this.validatedTree = props.tree;
+
     //props.onChange && props.onChange(this.validatedTree, props.config);
   }
 
@@ -74,3 +72,23 @@ export default class Query extends PureComponent {
     return renderBuilder(builderProps);
   }
 }
+
+
+const ConnectedQuery = connect(
+  (state) => {
+    return {
+      tree: state.tree,
+      __isInternalValueChange: state.__isInternalValueChange,
+      __lastAction: state.__lastAction,
+    };
+  },
+  null,
+  null,
+  {
+    context
+  }
+)(Query);
+ConnectedQuery.displayName = "ConnectedQuery";
+
+
+export default ConnectedQuery;
