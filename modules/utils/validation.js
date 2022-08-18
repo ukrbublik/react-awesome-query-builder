@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
 } from "./configUtils";
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
-import {defaultValue, deepEqual, getItemInListValues, logger} from "../utils/stuff";
+import {defaultValue, deepEqual, getItemInListValues, logger, immutableEqual} from "../utils/stuff";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree} from "../utils/treeUtils";
 import omit from "lodash/omit";
@@ -24,6 +24,25 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
+export const createValidationMemo = () => {
+  let originalTree;
+  let validatedTree;
+  let configId;
+
+  return (config, tree, validateTreeFn) => {
+    if (!tree) {
+      return null;
+    }
+    if (config.__configId === configId && (immutableEqual(tree, originalTree) || immutableEqual(tree, validatedTree))) {
+      return validatedTree;
+    } else {
+      configId = config.__configId;
+      originalTree = tree;
+      validatedTree = validateTreeFn();
+      return validatedTree;
+    }
+  };
+};
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
   let tree = validateTree(newTree, _oldTree, newConfig, oldConfig);

@@ -1,20 +1,16 @@
 import React, { Component, PureComponent } from "react";
 import PropTypes from "prop-types";
-import createTreeStore from "../stores/tree";
+import treeStoreReducer from "../stores/tree";
 import context from "../stores/context";
 import {createStore} from "redux";
 import {Provider} from "react-redux";
 import * as actions from "../actions";
-import {extendConfig} from "../utils/configUtils";
-import {shallowEqual, immutableEqual} from "../utils/stuff";
+import {createConfigMemo} from "../utils/configUtils";
+import {immutableEqual} from "../utils/stuff";
 import {defaultRoot} from "../utils/defaultUtils";
-import {validateAndFixTree} from "../utils/validation";
+import {validateAndFixTree, createValidationMemo} from "../utils/validation";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
-import pick from "lodash/pick";
 import ConnectedQuery from "./Query";
-
-
-const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs"];
 
 
 export default class QueryContainer extends Component {
@@ -36,16 +32,21 @@ export default class QueryContainer extends Component {
     super(props, context);
     useOnPropsChanged(this);
 
-    const config = pick(props, configKeys);
-    const extendedConfig = extendConfig(config);
+    this.getMemoizedConfig = createConfigMemo();
+    this.getMemoizedTree = createValidationMemo();
+    
+    const config = this.getMemoizedConfig(props);
     const tree = props.value;
-    const validatedTree = tree ? validateAndFixTree(tree, null, config, config) : null;
+    const validatedTree = this.getMemoizedTree(config, tree, () => 
+      validateAndFixTree(tree, null, config, config)
+    );
 
-    const store = createTreeStore({...config, tree: validatedTree});
+    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree);
+    const store = createStore(reducer);
 
     this.state = {
-      store: createStore(store),
-      config: extendedConfig,
+      store,
+      config
     };
   }
 
@@ -55,27 +56,26 @@ export default class QueryContainer extends Component {
 
   onPropsChanged(nextProps) {
     // compare configs
-    const oldConfig = pick(this.props, configKeys);
-    let nextConfig = pick(nextProps, configKeys);
-    const isConfigChanged = !shallowEqual(oldConfig, nextConfig, true);
-    if (isConfigChanged) {
-      nextConfig = extendConfig(nextConfig);
-    }
+    const oldConfig = this.state.config;
+    const nextConfig = this.getMemoizedConfig(nextProps);
+    const isConfigChanged = oldConfig !== nextConfig;
 
     // compare trees
     const storeValue = this.state.store.getState().tree;
     const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
-    const nextTree = nextProps.value || defaultRoot({ ...nextProps, tree: null });
-    //tip: don't validate, it will be done at reducer
+    const currentTree = isTreeChanged ? nextProps.value || defaultRoot(nextProps) : storeValue;
 
     if (isConfigChanged) {
       this.setState({config: nextConfig});
     }
     
-    if (isTreeChanged) {
+    if (isTreeChanged || isConfigChanged) {
+      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, () => 
+        validateAndFixTree(currentTree, null, nextConfig, oldConfig)
+      );
       return Promise.resolve().then(() => {
         this.state.store.dispatch(
-          actions.tree.setTree(nextConfig, nextTree)
+          actions.tree.setTree(nextConfig, validatedTree)
         );
       });
     }
@@ -91,8 +91,8 @@ export default class QueryContainer extends Component {
       <QueryWrapper config={config}>
         <Provider store={store} context={context}>
           <ConnectedQuery
-            store={store}
             config={config}
+            getMemoizedTree={this.getMemoizedTree}
             onChange={onChange}
             renderBuilder={renderBuilder || get_children}
           />

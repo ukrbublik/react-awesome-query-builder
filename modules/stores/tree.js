@@ -703,9 +703,13 @@ const getActionMeta = (action, state) => {
  * @param {Immutable.Map} state
  * @param {object} action
  */
-export default (config) => {
+export default (config, tree, getMemoizedTree) => {
   const emptyTree = defaultRoot(config);
-  const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
+  const initTree = tree || emptyTree;
+  const emptyState = {
+    tree: initTree, 
+    ...emptyDrag
+  };
     
   return (state = emptyState, action) => {
     const unset = {__isInternalValueChange: undefined, __lastAction: undefined};
@@ -714,7 +718,9 @@ export default (config) => {
 
     switch (action.type) {
     case constants.SET_TREE: {
-      const validatedTree = validateAndFixTree(action.tree, state.tree, action.config || config, config);
+      const validatedTree = getMemoizedTree(action.config, action.tree, () => 
+        validateAndFixTree(action.tree, state.tree, action.config, action.config)
+      );
       set.tree = validatedTree;
       break;
     }

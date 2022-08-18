@@ -5,16 +5,68 @@ import moment from "moment";
 import {normalizeListValues, mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
+import pick from "lodash/pick";
 
 
-export const extendConfig = (config) => {
+const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs"];
+
+const pickConfig = (props) => {
+  return pick(props, configKeys);
+};
+
+export const createConfigMemo = () => {
+  const configStore = new Map();
+  const maxSize = 2; // current and prev
+  let configId = 0;
+
+  const extendAndStore = (config) => {
+    const extendedConfig = extendConfig(config, ++configId);
+    if ((configStore.size + 1) > maxSize) {
+      configStore.delete(configStore.keys()[0]);
+    }
+    configStore.set(config, extendedConfig);
+    return extendedConfig;
+  };
+
+  const findExtended = (findConfig) => {
+    // strict find:
+    // return configStore.get(findConfig) || configStore.values().find(ec => ec === findConfig);
+
+    for (const savedConfig of configStore.keys()) {
+      const found = configKeys.map(k => savedConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      if (found) {
+        return configStore.get(savedConfig);
+      }
+    }
+
+    for (const extendedConfig of configStore.values()) {
+      const found = configKeys.map(k => extendedConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      if (found) {
+        return extendedConfig;
+      }
+    }
+
+    return null;
+  };
+
+  const findOrExtend = (config) => {
+    return findExtended(config) || extendAndStore(config);
+  };
+  
+  return (props) => findOrExtend(pickConfig(props));
+};
+
+
+
+export const extendConfig = (config, configId) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
-  if (config.__extended) {
+  if (config.__configId) {
     return config;
   }
-    
+  
+  config = {...config};
   config.settings = merge({}, defaultSettings, config.settings);
   config._fieldsCntByType = {};
   config._funcsCntByType = {};
@@ -31,10 +83,10 @@ export const extendConfig = (config) => {
 
   moment.locale(config.settings.locale.moment);
 
-  Object.defineProperty(config, "__extended", {
+  Object.defineProperty(config, "__configId", {
     enumerable: false,
     writable: false,
-    value: true
+    value: configId
   });
 
   return config;
