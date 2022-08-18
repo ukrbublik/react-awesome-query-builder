@@ -8,7 +8,7 @@ import * as actions from "../actions";
 import {createConfigMemo} from "../utils/configUtils";
 import {immutableEqual} from "../utils/stuff";
 import {defaultRoot} from "../utils/defaultUtils";
-import {validateAndFixTree, createValidationMemo} from "../utils/validation";
+import {createValidationMemo} from "../utils/validation";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import ConnectedQuery from "./Query";
 
@@ -37,9 +37,7 @@ export default class QueryContainer extends Component {
     
     const config = this.getMemoizedConfig(props);
     const tree = props.value;
-    const validatedTree = this.getMemoizedTree(config, tree, () => 
-      validateAndFixTree(tree, null, config, config)
-    );
+    const validatedTree = this.getMemoizedTree(config, tree);
 
     const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree);
     const store = createStore(reducer);
@@ -70,9 +68,7 @@ export default class QueryContainer extends Component {
     }
     
     if (isTreeChanged || isConfigChanged) {
-      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, () => 
-        validateAndFixTree(currentTree, null, nextConfig, oldConfig)
-      );
+      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig);
       return Promise.resolve().then(() => {
         this.state.store.dispatch(
           actions.tree.setTree(nextConfig, validatedTree)

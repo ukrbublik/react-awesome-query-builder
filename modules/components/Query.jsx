@@ -5,11 +5,7 @@ import PropTypes from "prop-types";
 import * as actions from "../actions";
 import {immutableEqual} from "../utils/stuff";
 import {useOnPropsChanged, liteShouldComponentUpdate, bindActionCreators} from "../utils/reactUtils";
-import {validateAndFixTree} from "../utils/validation";
 
-const validateTree = (props, oldProps) => {
-  return validateAndFixTree(props.tree, oldProps.tree, props.config, oldProps.config);
-};
 
 class Query extends Component {
   static propTypes = {
@@ -32,9 +28,7 @@ class Query extends Component {
     // For preventive validation (tree and config consistency)
     // When config has chnaged from QueryContainer, 
     //  but new dispatched validated tree value is not in redux store yet (tree prop is old)
-    this.validatedTree = props.getMemoizedTree(props.config, props.tree, () => 
-      validateTree(props, props)
-    );
+    this.validatedTree = props.getMemoizedTree(props.config, props.tree);
     this.oldValidatedTree = this.validatedTree;
 
     //props.onChange && props.onChange(this.validatedTree, props.config);
@@ -46,13 +40,13 @@ class Query extends Component {
   }
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
-    tree: (nextValue, prevValue, state) => {
+    tree: (nextValue) => {
       if (nextValue === this.oldValidatedTree && this.oldValidatedTree === this.validatedTree) {
         // got dispatched value
         return false;
       }
       return true;
-    },
+    }
   });
 
   onPropsChanged(nextProps) {
@@ -66,9 +60,7 @@ class Query extends Component {
     this.validatedTree = newTree;
     if (oldConfig !== newConfig) {
       this._updateActions(nextProps);
-      this.validatedTree = nextProps.getMemoizedTree(newConfig, newTree, () => 
-        validateTree(nextProps, this.props)
-      );
+      this.validatedTree = nextProps.getMemoizedTree(newConfig, newTree, oldConfig);
     }
 
     const validatedTreeChanged = !immutableEqual(this.validatedTree, this.oldValidatedTree);

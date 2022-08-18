@@ -29,7 +29,7 @@ export const createValidationMemo = () => {
   let validatedTree;
   let configId;
 
-  return (config, tree, validateTreeFn) => {
+  return (config, tree, oldConfig) => {
     if (!tree) {
       return null;
     }
@@ -38,7 +38,7 @@ export const createValidationMemo = () => {
     } else {
       configId = config.__configId;
       originalTree = tree;
-      validatedTree = validateTreeFn();
+      validatedTree = validateAndFixTree(tree, null, config, oldConfig || config);
       return validatedTree;
     }
   };
