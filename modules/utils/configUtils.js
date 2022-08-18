@@ -1,4 +1,5 @@
 import merge from "lodash/merge";
+import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
@@ -86,7 +87,7 @@ export const extendConfig = (config, configId) => {
   Object.defineProperty(config, "__configId", {
     enumerable: false,
     writable: false,
-    value: configId
+    value: configId || uuid()
   });
 
   return config;
@@ -179,6 +180,20 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
   const typeConfig = config.types[fieldConfig.type];
   const excludeOperatorsForField = fieldConfig.excludeOperators || [];
   if (fieldConfig.type != "!struct" && fieldConfig.type != "!group") {
+    const keysToPutInFieldSettings = ["listValues", "allowCustomValues", "validateValue"];
+    if (!fieldConfig.fieldSettings)
+      fieldConfig.fieldSettings = {};
+    for (const k of keysToPutInFieldSettings) {
+      if (fieldConfig[k]) {
+        fieldConfig.fieldSettings[k] = fieldConfig[k];
+        delete fieldConfig[k];
+      }
+    }
+
+    if (fieldConfig.fieldSettings.listValues) {
+      fieldConfig.fieldSettings.listValues = normalizeListValues(fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings);
+    }
+
     if (!typeConfig) {
       //console.warn(`No type config for ${fieldConfig.type}`);
       fieldConfig.disabled = true;
@@ -227,20 +242,6 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
         fieldConfig.operators = Array.from(new Set(operators));
       if (!fieldConfig.defaultOperator && defaultOperator)
         fieldConfig.defaultOperator = defaultOperator;
-    }
-
-    const keysToPutInFieldSettings = ["listValues", "allowCustomValues", "validateValue"];
-    if (!fieldConfig.fieldSettings)
-      fieldConfig.fieldSettings = {};
-    for (const k of keysToPutInFieldSettings) {
-      if (fieldConfig[k]) {
-        fieldConfig.fieldSettings[k] = fieldConfig[k];
-        delete fieldConfig[k];
-      }
-    }
-
-    if (fieldConfig.fieldSettings.listValues) {
-      fieldConfig.fieldSettings.listValues = normalizeListValues(fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings);
     }
   }
 

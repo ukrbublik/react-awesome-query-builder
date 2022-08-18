@@ -185,6 +185,7 @@ export interface Utils {
   simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   // config utils
   ConfigUtils: {
+    extendConfig(config: Config): Config;
     getFieldConfig(config: Config, field: string): Field | null;
     getFuncConfig(config: Config, func: string): Func | null;
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
