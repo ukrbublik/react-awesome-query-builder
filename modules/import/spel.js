@@ -674,7 +674,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
           //todo: it's naive
           const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
           if (op == "eq") {
-            const ws = widgets.find(({op, widget}) => (widget != "field"));
+            const ws = widgets.find(({op, widget}) => (widget && widget != "field"));
             opKey = ws.op;
           }
         }
