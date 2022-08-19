@@ -718,9 +718,7 @@ export default (config, tree, getMemoizedTree) => {
 
     switch (action.type) {
     case constants.SET_TREE: {
-      const validatedTree = getMemoizedTree(action.config, action.tree, () => 
-        validateAndFixTree(action.tree, state.tree, action.config, action.config)
-      );
+      const validatedTree = getMemoizedTree(action.config, action.tree);
       set.tree = validatedTree;
       break;
     }

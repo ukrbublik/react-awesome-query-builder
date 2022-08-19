@@ -282,7 +282,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
   return [validError, fixedValue];
 };
 
-const validateValueInList = (value, listValues, canFix, isEndValue) => {
+const validateValueInList = (value, listValues, canFix, isEndValue, removeInvalidMultiSelectValuesOnLoad) => {
   const values = List.isList(value) ? value.toJS() : (value instanceof Array ? [...value] : undefined);
   if (values) {
     const [goodValues, badValues] = values.reduce(([goodVals, badVals], val) => {
@@ -297,7 +297,11 @@ const validateValueInList = (value, listValues, canFix, isEndValue) => {
     const err = badValues.length ? 
       `${plural ? "Values" : "Value"} ${badValues.join(", ")} ${plural ? "are" : "is"} not in list of values` : null;
     // always remove bad values at tree validation as user can't unselect them (except AntDesign widget)
-    canFix = canFix || isEndValue;
+    if (removeInvalidMultiSelectValuesOnLoad !== undefined) {
+      canFix = removeInvalidMultiSelectValuesOnLoad;
+    } else {
+      canFix = canFix || isEndValue;
+    }
     return [err, canFix ? goodValues : value];
   } else {
     const vv = getItemInListValues(listValues, value);
@@ -331,7 +335,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     if (fieldSettings) {
       const listValues = asyncListValues || fieldSettings.listValues;
       if (listValues && !fieldSettings.allowCustomValues) {
-        return validateValueInList(value, listValues, canFix, isEndValue);
+        return validateValueInList(value, listValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad);
       }
       if (fieldSettings.min != null && value < fieldSettings.min) {
         return [`Value ${value} < min ${fieldSettings.min}`, canFix ? fieldSettings.min : value];

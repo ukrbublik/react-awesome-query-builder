@@ -856,10 +856,12 @@ export interface BehaviourSettings {
   maxNumberOfRules?: Number,
   maxNumberOfCases?: Number,
   showErrorMessage?: boolean,
+
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
   removeEmptyGroupsOnLoad?: boolean,
   removeIncompleteRulesOnLoad?: boolean,
+  removeInvalidMultiSelectValuesOnLoad?: boolean,
 }
 
 export interface OtherSettings {

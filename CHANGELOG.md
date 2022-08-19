@@ -7,6 +7,7 @@
   - Fixed `getTotalRulesCountInTree()` == 1 (should be 0) for clear tree (PR #673) (issue #583)
   - Handle validation of bad multiselect value correctly (PR #XXX) (issue #674)
     Remove bad values from list, don't unset whole value.
+    Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
 - 5.1.2
   - Added config `removeIncompleteRulesOnLoad` (default false) (PR #661) (issue #642)
   - Fix error when using same field for comparison as argument of function (PR #662) (issue #612)
