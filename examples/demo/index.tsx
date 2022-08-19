@@ -22,8 +22,8 @@ const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
-//initTree = loadTree(initValue);
-initTree = loadFromJsonLogic(initLogic, loadedConfig); // <- this will work same  
+//initTree = checkTree(loadTree(initValue), loadedConfig);
+initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 
 // Trick to hot-load new config when you edit `config.tsx`
@@ -124,7 +124,7 @@ const DemoQueryBuilder: React.FC = () => {
     const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
     setState({
       ...state, 
-      tree: tree || state.tree,
+      tree: tree ? checkTree(tree, state.config) : state.tree,
       spelErrors
     });
   };
@@ -135,7 +135,8 @@ const DemoQueryBuilder: React.FC = () => {
     setState({
       ...state,
       skin,
-      config
+      config,
+      tree: checkTree(state.tree, config)
     });
     window._initialSkin = skin;
   };

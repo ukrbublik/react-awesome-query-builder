@@ -194,7 +194,8 @@ function validateRule (item, path, itemId, meta, c) {
   valueSrc = properties.get("valueSrc");
   value = properties.get("value");
   const canFix = !showErrorMessage;
-  let {newValue, newValueSrc, newValueError} = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix);
+  const isEndValue = true;
+  let {newValue, newValueSrc, newValueError} = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix, isEndValue);
   value = newValue;
   valueSrc = newValueSrc;
   valueError = newValueError;
@@ -284,23 +285,19 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
 const validateValueInList = (value, listValues, canFix) => {
   const values = List.isList(value) ? value.toJS() : (value instanceof Array ? [...value] : undefined);
   if (values) {
-    let ret = values.reduce(([err, fixedArr, badValues], val) => {
+    const [goodValues, badValues] = values.reduce(([goodVals, badVals], val) => {
       const vv = getItemInListValues(listValues, val);
       if (vv == undefined) {
-        badValues = [...badValues, val];
-        const plural = badValues.length > 1;
-        return [
-          `${plural ? "Values" : "Value"} ${badValues.join(", ")} ${plural ? "are" : "is"} not in list of values`, 
-          [...fixedArr, val], badValues
-        ];
+        return [goodVals, [...badVals, val]];
       } else {
-        return [err, [...fixedArr, vv.value], badValues];
+        return [[...goodVals, vv.value], badVals];
       }
-    }, [null, [], []]);
-    if (!canFix) {
-      ret[1] = value; // need to preserve same object, see `fixedValue !== v` at ruleUtils.js
-    }
-    return ret;
+    }, [[], []]);
+    const plural = badValues.length > 1;
+    const err = badValues.length ? 
+      `${plural ? "Values" : "Value"} ${badValues.join(", ")} ${plural ? "are" : "is"} not in list of values` : null;
+    canFix = true; // always remove bad values as user can't unselect them (except AntDesign widget)
+    return [err, canFix ? goodValues : value, badValues];
   } else {
     const vv = getItemInListValues(listValues, value);
     if (vv == undefined) {

@@ -42,7 +42,8 @@ class Query extends Component {
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
     tree: (nextValue) => {
       if (nextValue === this.oldValidatedTree && this.oldValidatedTree === this.validatedTree) {
-        // got dispatched value
+        // Got value dispatched from QueryContainer
+        // Ignore, because we've just rendered it
         return false;
       }
       return true;

@@ -57,7 +57,9 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
   }
   
   if (field && operator) {
-    let {newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(config, config, current, field, operator, "operator", false);
+    let {newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      config, config, current, field, operator, "operator", false
+    );
     current = current
       .set("value", newValue)
       .set("valueSrc", newValueSrc)
