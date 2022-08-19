@@ -8,6 +8,7 @@
   - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
     Remove bad values from list, don't unset whole value.
     Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
+  - Fix `loadFromSpel` for `select_equals` op (PR #740) (issue #704)
 - 5.1.2
   - Added config `removeIncompleteRulesOnLoad` (default false) (PR #661) (issue #642)
   - Fix error when using same field for comparison as argument of function (PR #662) (issue #612)
