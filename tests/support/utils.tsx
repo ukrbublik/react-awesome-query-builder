@@ -12,7 +12,7 @@ import {
 const {
   uuid, 
   checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree,
+  queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import AntdConfig from "react-awesome-query-builder/config/antd";
 import MaterialConfig from "react-awesome-query-builder/config/material";
@@ -98,6 +98,8 @@ export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, val
 const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as [ConfigFn];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig);
+  // normally config should be saved at state in `onChange`, see README
+  const extendedConfig = ConfigUtils.extendConfig(config);
   const onChange = spy();
   const {tree, errors} = load_tree(value, config, valueFormat);
   if (errors?.length) {
@@ -112,7 +114,7 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
       expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
     },
     expect_checks: (expects) => {
-      do_export_checks(config, tree as ImmutableTree, expects, false, true);
+      do_export_checks(extendedConfig, tree as ImmutableTree, expects, false, true);
     },
     config: config,
   };

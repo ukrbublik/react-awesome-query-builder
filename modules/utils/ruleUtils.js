@@ -22,7 +22,7 @@ const selectTypes = [
  * @param {string} changedProp
  * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError}
  */
-export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true) {
+export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true, isEndValue = false) {
   if (!oldConfig)
     oldConfig = config;
   const currentField = current.get("field");
@@ -83,22 +83,28 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       let isValidSrc = (valueSources.find(v => v == vSrc) != null);
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
-      const isEndValue = !canFix;
       const asyncListValues = currentAsyncListValues;
       const [validateError, fixedValue] = validateValue(
         config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
       );
       const isValid = !validateError;
-      if (!isValid && showErrorMessage && changedProp != "field") {
-        // allow bad value
-        // but not on field change - in that case just drop bad value that can't be reused
-        // ? maybe we should also drop bad value on op change?
+      // Allow bad value with error message
+      // But not on field change - in that case just drop bad value that can't be reused
+      // ? Maybe we should also drop bad value on op change?
+      // For bad multiselect value we have both error message + fixed value.
+      //  If we show error message, it will gone on next tree validation
+      const fixValue = fixedValue !== v;
+      const dropValue = !isValidSrc || !isValid && (changedProp == "field" || !showErrorMessage && !fixValue);
+      const showValueError = !!validateError && showErrorMessage && !dropValue && !fixValue;
+      if (showValueError) {
         valueErrors[i] = validateError;
-      } else if (!isValidSrc || !isValid) {
+      }
+      if (fixValue) {
+        valueFixes[i] = fixedValue;
+      }
+      if (dropValue) {
         canReuseValue = false;
         break;
-      } else if (canFix && fixedValue !== v) {
-        valueFixes[i] = fixedValue;
       }
     }
   }

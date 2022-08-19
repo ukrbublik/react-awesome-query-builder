@@ -7,7 +7,7 @@ import { with_qb, empty_value, export_checks } from "../support/utils";
 
 
 describe("rare features", () => {
-  it("export uses fieldName", () => {
+  describe("export uses fieldName", () => {
     export_checks(configs.with_fieldName, inits.with_number, "JsonLogic", {
       "query": "state.input.num == 2",
       "queryHuman": "Number = 2",
@@ -30,7 +30,7 @@ describe("rare features", () => {
     });
   });
 
-  it("import uses fieldName", () => {
+  describe("import uses fieldName", () => {
     export_checks(configs.with_fieldName, inits.with_fieldName, "JsonLogic", {
       "query": "state.input.num == 2",
       "queryHuman": "Number = 2",
@@ -53,7 +53,7 @@ describe("rare features", () => {
     });
   });
 
-  it("uses groupVarKey and altVarKey", () => {
+  describe("uses groupVarKey and altVarKey", () => {
     export_checks(configs.with_groupVarKey, inits.with_groupVarKey, "JsonLogic", {
       "query": "(stock == true && results.score > 8)",
       "queryHuman": "(In stock AND Results.score > 8)",

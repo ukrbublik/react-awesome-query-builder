@@ -6,8 +6,8 @@ import { with_qb } from "../support/utils";
 
 
 describe("validation", () => {
-  it("shows error when change number value to > max", () => {
-    with_qb(configs.with_all_types__show_error, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("shows error when change number value to > max", async () => {
+    await with_qb(configs.with_all_types__show_error, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "200" } });

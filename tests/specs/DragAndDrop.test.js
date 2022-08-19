@@ -7,8 +7,8 @@ import { simulate_drag_n_drop } from "../support/dnd";
 
 describe("drag-n-drop", () => {
 
-  it("should move rule after second rule", () => {
-    with_qb(configs.simple_with_number, inits.with_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
+  it("should move rule after second rule", async () => {
+    await with_qb(configs.simple_with_number, inits.with_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
       const firstRule = qb.find(".rule").at(0);
       const secondRule = qb.find(".rule").at(1);
 
@@ -28,8 +28,8 @@ describe("drag-n-drop", () => {
     });
   });
 
-  it("should move group before rule", () => {
-    with_qb(configs.simple_with_number, inits.with_number_and_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
+  it("should move group before rule", async () => {
+    await with_qb(configs.simple_with_number, inits.with_number_and_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
       const firstRule = qb.find(".rule").at(0);
       const group = qb.find(".group--children .group").at(0);
 
@@ -49,9 +49,9 @@ describe("drag-n-drop", () => {
     });
   });
 
-  it("should move rule into group", () => {
-    const do_test = (config, value, checks) => {
-      with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
+  it("should move rule into group", async () => {
+    const do_test = async (config, value, checks) => {
+      await with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
         const secondRule = qb.find(".rule").at(1);
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
@@ -69,25 +69,25 @@ describe("drag-n-drop", () => {
       });
     };
 
-    do_test(configs.simple_with_number, inits.with_numbers_and_group, (config, value, onChange, {expect_queries}) => {
+    await do_test(configs.simple_with_number, inits.with_numbers_and_group, (config, value, onChange, {expect_queries}) => {
       expect_queries([
         "(num == 1 || num == 2 || (num == 3 && num == 4))",
         "(num == 1 || (num == 2 && num == 3 && num == 4))"
       ]);
     });
     
-    do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
+    await do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
       assert.notCalled(onChange);
     });
     
-    do_test(configs.simple_with_number_max_nesting_1, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
+    await do_test(configs.simple_with_number_max_nesting_1, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
       assert.notCalled(onChange);
     });
   });
 
-  it("should move rule out of group", () => {
-    const do_test = (config, value, checks) => {
-      with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
+  it("should move rule out of group", async () => {
+    const do_test = async (config, value, checks) => {
+      await with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
         const firstRuleInGroup = qb.find(".rule").at(1);
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
@@ -105,20 +105,20 @@ describe("drag-n-drop", () => {
       });
     };
 
-    do_test(configs.simple_with_number, inits.with_number_and_group_3, (config, value, onChange, {expect_queries}) => {
+    await do_test(configs.simple_with_number, inits.with_number_and_group_3, (config, value, onChange, {expect_queries}) => {
       expect_queries([
         "(num == 1 || (num == 2 && num == 3 && num == 4))",
         "(num == 1 || num == 2 || (num == 3 && num == 4))"
       ]);
     });
     
-    do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange, _tasks) => {
+    await do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange, _tasks) => {
       assert.notCalled(onChange);
     });
   });
 
-  it("should move group before group", () => {
-    with_qb(configs.simple_with_number_without_regroup, inits.with_groups, "JsonLogic", (qb, onChange, {expect_queries}) => {
+  it("should move group before group", async () => {
+    await with_qb(configs.simple_with_number_without_regroup, inits.with_groups, "JsonLogic", (qb, onChange, {expect_queries}) => {
       const firstGroup = qb.find(".group--children .group").at(0);
       const secondGroup = qb.find(".group--children .group").at(1);
       const firstGroupHeader = firstGroup.find(".group--header").first();

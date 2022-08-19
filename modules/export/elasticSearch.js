@@ -236,6 +236,8 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
   // handle if value 0 has multiple values like a select in a array
   const widget = getWidgetForFieldOp(config, fieldName, op, valueSrc);
   const widgetConfig = config.widgets[widget];
+  if (!widgetConfig)
+    return undefined; // unknown widget
   const { elasticSearchFormatValue } = widgetConfig;
 
   /** In most cases the queryType will be static however in some casese (like between) the query type will change

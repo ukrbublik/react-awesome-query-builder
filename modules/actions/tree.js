@@ -12,7 +12,8 @@ import Immutable from "immutable";
  */
 export const setTree = (config, tree) => ({
   type: constants.SET_TREE,
-  tree: tree
+  tree: tree,
+  config: config
 });
 
 /**

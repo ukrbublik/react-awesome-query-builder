@@ -13,8 +13,8 @@ describe("proximity", () => {
     });
   });
 
-  it("change NEAR", () => {
-    with_qb(configs.with_prox, inits.with_prox, "default", (qb, onChange, {expect_queries}) => {
+  it("change NEAR", async () => {
+    await with_qb(configs.with_prox, inits.with_prox, "default", (qb, onChange, {expect_queries}) => {
       qb
         .find(".rule .rule--operator-options .rule--operator .operator--options select")
         .simulate("change", { target: { value: "5" } });

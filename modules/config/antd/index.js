@@ -62,6 +62,8 @@ const settings = {
     ...BasicConfig.settings.locale,
     antd: en_US,
   },
+
+  removeInvalidMultiSelectValuesOnLoad: false, // can be removed manually in UI
 };
 
 
