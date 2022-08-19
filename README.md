@@ -92,7 +92,7 @@ npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers
 
 For MUI 5 widgets only:
 ```
-npm i @mui/material @emotion/react @emotion/styled @mui/lab @mui/icons-material material-ui-confirm@3 --save
+npm i @mui/material @emotion/react @emotion/styled @mui/lab @mui/icons-material @mui/x-date-pickers material-ui-confirm@3 --save
 ```
 
 For Bootstrap widgets only:

@@ -1,5 +1,5 @@
 import React from "react";
-import DatePicker from "@mui/lab/DatePicker";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 
