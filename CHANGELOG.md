@@ -5,7 +5,7 @@
   - Support React 18. Migrate to x-date-pickers. (PR #734) (issues #710, #732)
   - Add path property at `index.d.ts` (PR #671) (issue #669)
   - Fixed `getTotalRulesCountInTree()` == 1 (should be 0) for clear tree (PR #673) (issue #583)
-  - Handle validation of bad multiselect value correctly (PR #XXX) (issue #674)
+  - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
     Remove bad values from list, don't unset whole value.
     Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
 - 5.1.2

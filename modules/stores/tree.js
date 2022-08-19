@@ -18,7 +18,7 @@ import {
   getNewValueForFieldOp
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
-import {validateValue, validateAndFixTree} from "../utils/validation";
+import {validateValue} from "../utils/validation";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
 

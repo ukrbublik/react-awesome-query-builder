@@ -276,7 +276,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
   }
 
   if (isRawValue && validError) {
-    logger.warn("[RAQB validate]", `Field ${field}: ${validError}`);
+    console.warn("[RAQB validate]", `Field ${field}: ${validError}`);
   }
   
   return [validError, fixedValue];
