@@ -294,8 +294,7 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
       }
     }, [[], []]);
     const plural = badValues.length > 1;
-    const err = badValues.length ? 
-      `${plural ? "Values" : "Value"} ${badValues.join(", ")} ${plural ? "are" : "is"} not in list of values` : null;
+    const err = badValues.length ? `${plural ? "Values" : "Value"} ${badValues.join(", ")} ${plural ? "are" : "is"} not in list of values` : null;
     // always remove bad values at tree validation as user can't unselect them (except AntDesign widget)
     if (removeInvalidMultiSelectValuesOnLoad !== undefined) {
       canFix = removeInvalidMultiSelectValuesOnLoad;
