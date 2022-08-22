@@ -113,7 +113,7 @@ export default class FuncSelect extends PureComponent {
           if (canUseFuncForField)
             canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
           // don't use func in func (can be configurable, but usually users don't need this)
-          if (parentFuncs && parentFuncs.includes(funcFullkey))
+          if (!funcConfig.allowSelfNesting && parentFuncs && parentFuncs.includes(funcFullkey))
             canUse = false;
           if (!canUse)
             delete list[funcKey];
