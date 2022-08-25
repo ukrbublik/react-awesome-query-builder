@@ -79,7 +79,7 @@ describe("query with conjunction", () => {
       },
       "elasticSearch": {
         "bool": {
-          "should": [
+          "should_not": [
             {
               "range": {
                 "num": {
