@@ -3,6 +3,7 @@
   - Fix type applied to filter funcs as another func's arg value (PR #743) (issue #586)
   - Allow self nesting of functions with `allowSelfNesting` (PR #698)
   - ES: Fix `greater` op (PR #749) (issue #744)
+  - ES: Fix NOT (PR #750) (issue #723)
 - 5.2.0
   - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)
     `Utils.getTree(tree, true, false)` will behave same as before this change.

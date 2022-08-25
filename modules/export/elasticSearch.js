@@ -103,22 +103,23 @@ function buildEsWildcardParameters(value) {
  * returns the ES occurrence required for bool queries
  *
  * @param {string} combinator - query group type or rule condition
+ * @param {bool} not
  * @returns {string} - ES occurrence type. See constants.js
  * @private
  */
-function determineOccurrence(combinator) {
+function determineOccurrence(combinator, not) {
   //todo: move into config, like mongoConj
   switch (combinator) {
   case "AND":
-    return "must";
+    return not ? "must_not" : "must";
     // -- AND
 
   case "OR":
-    return "should";
+    return not ? "should_not" : "should";
     // -- OR
 
   case "NOT":
-    return "must_not";
+    return not ? "must" : "must_not";
     // -- NOT AND
 
   default:
@@ -283,15 +284,16 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
  *
  * @param {object} children - The contents of the group
  * @param {string} conjunction - The way the contents of the group are joined together i.e. AND OR
+ * @param {bool} not
  * @param {Function} recursiveFxn - The recursive fxn to build the contents of the groups children
  * @private
  * @returns {object} - The ES group
  */
-function buildEsGroup(children, conjunction, recursiveFxn, config) {
+function buildEsGroup(children, conjunction, not, recursiveFxn, config) {
   if (!children || !children.size)
     return undefined;
   const childrenArray = children.valueSeq().toArray();
-  const occurrence = determineOccurrence(conjunction);
+  const occurrence = determineOccurrence(conjunction, not);
   const result = childrenArray.map((c) => recursiveFxn(c, config)).filter(v => v !== undefined);
   if (!result.length)
     return undefined;
@@ -333,10 +335,11 @@ export function elasticSearchFormat(tree, config) {
   }
 
   if (type === "group" || type === "rule_group") {
+    const not = properties.get("not");
     let conjunction = properties.get("conjunction");
     if (!conjunction)
       conjunction = defaultConjunction(config);
     const children = tree.get("children1");
-    return buildEsGroup(children, conjunction, elasticSearchFormat, config);
+    return buildEsGroup(children, conjunction, not, elasticSearchFormat, config);
   }
 }
