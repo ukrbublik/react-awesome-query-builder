@@ -77,7 +77,7 @@ function buildEsRangeParameters(value, operator) {
 
   case "greater":
     return {
-      gte: "".concat(dateTime)
+      gt: "".concat(dateTime)
     };
 
   default:
