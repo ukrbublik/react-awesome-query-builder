@@ -24,7 +24,7 @@ jobs:
         rm -rf /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder/gh-pages
-        cp ./examples/build/bundle.* /tmp/react-awesome-query-builder/gh-pages/
+        cp ./examples/build/*bundle* /tmp/react-awesome-query-builder/gh-pages/
     - uses: actions/checkout@v1
       with:
         ref: gh-pages
@@ -33,7 +33,7 @@ jobs:
         cp -R /tmp/react-awesome-query-builder/gh-pages/* .
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add ./bundle.*
+        git add ./*bundle*
         git commit -m "update to ${GITHUB_SHA}"
     - name: Push changes
       uses: ad-m/github-push-action@master

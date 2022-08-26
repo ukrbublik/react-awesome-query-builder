@@ -500,14 +500,13 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
   const isEndValue = false;
-  const canFix = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
+  const canFix = false;
   const [validateError, fixedValue] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
   );
-    
   const isValid = !validateError;
-  if (isValid && fixedValue !== value) {
+  if (fixedValue !== value) {
     // eg, get exact value from listValues (not string)
     value = fixedValue;
   }
@@ -704,9 +703,13 @@ const getActionMeta = (action, state) => {
  * @param {Immutable.Map} state
  * @param {object} action
  */
-export default (config) => {
+export default (config, tree, getMemoizedTree) => {
   const emptyTree = defaultRoot(config);
-  const emptyState = Object.assign({}, {tree: emptyTree}, emptyDrag);
+  const initTree = tree || emptyTree;
+  const emptyState = {
+    tree: initTree, 
+    ...emptyDrag
+  };
     
   return (state = emptyState, action) => {
     const unset = {__isInternalValueChange: undefined, __lastAction: undefined};
@@ -715,7 +718,8 @@ export default (config) => {
 
     switch (action.type) {
     case constants.SET_TREE: {
-      set.tree = action.tree;
+      const validatedTree = getMemoizedTree(action.config, action.tree);
+      set.tree = validatedTree;
       break;
     }
 

@@ -1,8 +1,8 @@
 import React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import AdapterMoment from "@mui/lab/AdapterMoment"; // TODO: set moment to dayjs
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
 
 
 // value widgets

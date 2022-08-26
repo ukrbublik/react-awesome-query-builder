@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   Query, Builder, Utils, 
   //types:
@@ -63,7 +63,7 @@ interface DemoQueryBuilderMemo {
 }
 
 const DemoQueryBuilder: React.FC = () => {
-  const memo: DemoQueryBuilderMemo = {};
+  const memo: React.MutableRefObject<DemoQueryBuilderMemo> = useRef({});
 
   const [state, setState] = useState<DemoQueryBuilderState>({
     tree: initTree, 
@@ -149,7 +149,7 @@ const DemoQueryBuilder: React.FC = () => {
   };
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
-    memo._actions = bprops.actions;
+    memo.current._actions = bprops.actions;
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
         <div className="query-builder qb-lite">
@@ -162,13 +162,13 @@ const DemoQueryBuilder: React.FC = () => {
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
     if (actionMeta)
       console.info(actionMeta);
-    memo.immutableTree = immutableTree;
-    memo.config = config;
+    memo.current.immutableTree = immutableTree;
+    memo.current.config = config;
     updateResult();
   }, []);
 
   const updateResult = throttle(() => {
-    setState(prevState => ({...prevState, tree: memo.immutableTree, config: memo.config}));
+    setState(prevState => ({...prevState, tree: memo.current.immutableTree, config: memo.current.config}));
   }, 100);
 
   // Demonstrates how actions can be called programmatically
@@ -185,30 +185,30 @@ const DemoQueryBuilder: React.FC = () => {
     ];
 
     // Change root group to NOT OR
-    memo._actions.setNot(rootPath, true);
-    memo._actions.setConjunction(rootPath, "OR");
+    memo.current._actions.setNot(rootPath, true);
+    memo.current._actions.setConjunction(rootPath, "OR");
 
     // Move first item
     if (!isEmptyTree) {
-      memo._actions.moveItem(firstPath, lastPath, "before");
+      memo.current._actions.moveItem(firstPath, lastPath, "before");
     }
 
     // Remove last rule
     if (!isEmptyTree) {
-      memo._actions.removeRule(lastPath);
+      memo.current._actions.removeRule(lastPath);
     }
 
     // Change first rule to `num between 2 and 4`
     if (!isEmptyTree) {
-      memo._actions.setField(firstPath, "num");
-      memo._actions.setOperator(firstPath, "between");
-      memo._actions.setValueSrc(firstPath, 0, "value");
-      memo._actions.setValue(firstPath, 0, 2, "number");
-      memo._actions.setValue(firstPath, 1, 4, "number");
+      memo.current._actions.setField(firstPath, "num");
+      memo.current._actions.setOperator(firstPath, "between");
+      memo.current._actions.setValueSrc(firstPath, 0, "value");
+      memo.current._actions.setValue(firstPath, 0, 2, "number");
+      memo.current._actions.setValue(firstPath, 1, 4, "number");
     }
 
     // Add rule `login == "denis"`
-    memo._actions.addRule(
+    memo.current._actions.addRule(
       rootPath,
       {
         field: "user.login",
@@ -220,7 +220,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add rule `login == firstName`
-    memo._actions.addRule(
+    memo.current._actions.addRule(
       rootPath,
       {
         field: "user.login",
@@ -231,7 +231,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add rule-group `cars` with `year == 2021`
-    memo._actions.addRule(
+    memo.current._actions.addRule(
       rootPath,
       {
         field: "cars",
@@ -252,7 +252,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add group with `slider == 40` and subgroup `slider < 20`
-    memo._actions.addGroup(
+    memo.current._actions.addGroup(
       rootPath,
       {
         conjunction: "AND"

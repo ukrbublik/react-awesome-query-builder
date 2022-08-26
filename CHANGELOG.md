@@ -1,7 +1,20 @@
 # Changelog
+- 5.2.1
+  - Fix type applied to filter funcs as another func's arg value (PR #743) (issue #586)
+  - Allow self nesting of functions with `allowSelfNesting` (PR #698)
+  - ES: Fix `greater` op (PR #749) (issue #744)
+  - ES: Fix NOT (PR #750) (issue #723)
 - 5.2.0
   - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)
     `Utils.getTree(tree, true, false)` will behave same as before this change.
+  - Support React 18. Migrate to x-date-pickers. (PR #734) (issues #710, #732)
+  - Add path property at `index.d.ts` (PR #671) (issue #669)
+  - Fixed `getTotalRulesCountInTree()` == 1 (should be 0) for clear tree (PR #673) (issue #583)
+  - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
+    Remove bad values from list, don't unset whole value.
+    Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
+  - Fix `loadFromSpel` for `select_equals` op (PR #740) (issue #704)
+  - Fix `loadFromSpel` for `is_empty` and `is_not_empty` ops (PR #713) (issues #714, #699)
 - 5.1.2
   - Added config `removeIncompleteRulesOnLoad` (default false) (PR #661) (issue #642)
   - Fix error when using same field for comparison as argument of function (PR #662) (issue #612)

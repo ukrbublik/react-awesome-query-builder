@@ -593,8 +593,10 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       opKey = "is_not_null";
     } else if (op == "le" && spel.children[1].type == "string" && spel.children[1].val == "") {
       opKey = "is_empty";
+      opKeys = ["is_empty"];
     } else if (op == "gt" && spel.children[1].type == "string" && spel.children[1].val == "") {
       opKey = "is_not_empty";
+      opKeys = ["is_not_empty"];
     } else if (op == "between") {
       opKey = "between";
       opKeys = ["between"];
@@ -674,7 +676,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
           //todo: it's naive
           const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
           if (op == "eq") {
-            const ws = widgets.find(({op, widget}) => (widget != "field"));
+            const ws = widgets.find(({op, widget}) => (widget && widget != "field"));
             opKey = ws.op;
           }
         }

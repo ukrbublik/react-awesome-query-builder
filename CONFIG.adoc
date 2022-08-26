@@ -312,7 +312,9 @@ Behaviour settings:
 |showLock |false |Show "Lock" switch for rules and groups to make them read-only ("admin mode") +
   NOTE: To preserve read-only state of rules in JsonLogic, please use `jsonLogic.add_operation("locked", v => v);` in your code
 |canDeleteLocked |false |Show "Delete" button for locked rule?
-|removeIncompleteRulesOnLoad |false |Remove incomplete rules (w/o value) in `Utils.checkTree()`?
+|removeIncompleteRulesOnLoad |false |Remove incomplete rules (w/o value) during validation in `Utils.checkTree()`?
+|removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
+  By default `true`, but `false` for AntDesign as can be removed manually
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -724,4 +726,5 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |args.<arg>.isOptional | |false |Last args can be optional
 |renderBrackets | |`['(', ')']` |Can render custom function brackets in UI (or not render).
 |renderSeps | |`[', ']` |Can render custom arguments separators in UI (other than `,`).
+|allowSelfNesting | |false |Allows the function to be used within its own arguments.
 |===

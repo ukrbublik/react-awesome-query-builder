@@ -167,10 +167,16 @@ const useListValuesAutocomplete = ({
     } else {
       if (multiple) {
         const options = option;
-        let newSelectedListValues = options.map(o =>
-          o.value != null ? o : getListValue(o, listValues)
-        );
-        let newSelectedValues = newSelectedListValues.map(o => o.value);
+        let newSelectedListValues = options.map((o, i) => {
+          const item = o.value != null ? o : getListValue(o, listValues);
+          // AntDesign puts array of labels in `_e` (`option` is array of objects, but custom option is always `{}`)
+          // MUI puts array of labels in `option`
+          const customItem = allowCustomValues && !item ? (Array.isArray(_e) ? _e[i] : o) : null;
+          return item || customItem;
+        });
+        let newSelectedValues = newSelectedListValues
+          .filter(o => o !== undefined)
+          .map(o => (o.value !== undefined ? o.value : o));
         if (!newSelectedValues.length)
           newSelectedValues = undefined; //not allow []
         setValue(newSelectedValues, newSelectedListValues);

@@ -1,4 +1,4 @@
-/examples/build/bundle.*
+/examples/build/*bundle*
 /build/
 /coverage/
 /junit/

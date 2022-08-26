@@ -5,8 +5,8 @@ import { with_qb_skins, export_checks } from "../support/utils";
 
 describe("query with conjunction", () => {
   describe("import", () => {
-    it("should work with simple value of JsonLogic format", () => {
-      with_qb_skins(configs.with_number_and_string, inits.with_number_and_string, "JsonLogic", (qb) => {
+    it("should work with simple value of JsonLogic format", async () => {
+      await with_qb_skins(configs.with_number_and_string, inits.with_number_and_string, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
@@ -79,7 +79,7 @@ describe("query with conjunction", () => {
       },
       "elasticSearch": {
         "bool": {
-          "should": [
+          "should_not": [
             {
               "range": {
                 "num": {

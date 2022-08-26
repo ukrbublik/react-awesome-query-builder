@@ -474,7 +474,7 @@ export const with_datetime = {
 };
 
 export const with_select = {
-  "and": [{  "==": [ { "var": "color" }, "red" ]  }]
+  "and": [{  "==": [ { "var": "color" }, "orange" ]  }]
 };
 
 export const with_bool = {

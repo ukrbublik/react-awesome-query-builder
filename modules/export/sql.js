@@ -219,7 +219,11 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
       }
       ret = fn(...args);
     } else {
-      ret = SqlString.escape(currentValue);
+      if (Array.isArray(currentValue)) {
+        ret = currentValue.map(v => SqlString.escape(v));
+      } else {
+        ret = SqlString.escape(currentValue);
+      }
     }
   }
   return ret;

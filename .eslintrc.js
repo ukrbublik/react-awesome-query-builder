@@ -12,6 +12,7 @@ module.exports = {
         "**/dist/*",
         "**/node_modules/*",
         "bundle.js",
+        "*.bundle.js",
         "webpack.config.js",
         "vite.config.ts"
     ],

@@ -5,8 +5,8 @@ import { with_qb_ant } from "../support/utils";
 
 describe("interactions on antd", () => {
 
-  it("set not", () => {
-    with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("set not", async () => {
+    await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".group--conjunctions .ant-btn-group button")
         .at(0)
@@ -17,8 +17,8 @@ describe("interactions on antd", () => {
     });
   });
 
-  it("change conjunction from AND to OR", () => {
-    with_qb_ant(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+  it("change conjunction from AND to OR", async () => {
+    await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".group--conjunctions .ant-btn-group button")
         .at(2)
@@ -32,14 +32,14 @@ describe("interactions on antd", () => {
     });
   });
 
-  it("should render labels with showLabels=true", () => {
-    with_qb_ant([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
+  it("should render labels with showLabels=true", async () => {
+    await with_qb_ant([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
       //todo
     });
   });
 
-  it("should render admin mode with showLock=true", () => {
-    with_qb_ant([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
+  it("should render admin mode with showLock=true", async () => {
+    await with_qb_ant([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
       //todo
     });
   });

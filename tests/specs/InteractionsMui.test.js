@@ -26,14 +26,14 @@ describe("interactions on MUI", () => {
     });
   });
 
-  it("should render labels with showLabels=true", () => {
-    with_qb_material([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
+  it("should render labels with showLabels=true", async () => {
+    await with_qb_material([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
       //todo
     });
   });
 
-  it("should render admin mode with showLock=true", () => {
-    with_qb_material([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
+  it("should render admin mode with showLock=true", async () => {
+    await with_qb_material([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
       //todo
     });
   });

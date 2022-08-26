@@ -6,8 +6,8 @@ import { with_qb_skins, export_checks } from "../support/utils";
 describe("query with subquery and datetime types", () => {
 
   describe("import", () => {
-    it("should work with simple value of JsonLogic format", () => {
-      with_qb_skins(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb) => {
+    it("should work with simple value of JsonLogic format", async () => {
+      await with_qb_skins(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
@@ -52,8 +52,8 @@ describe("query with subquery and datetime types", () => {
 describe("query with subquery and select types", () => {
 
   describe("import", () => {
-    it("should work with value of JsonLogic format", () => {
-      with_qb_skins(configs.with_select, inits.with_select_and_multiselect, "JsonLogic", (qb) => {
+    it("should work with value of JsonLogic format", async () => {
+      await with_qb_skins(configs.with_select, inits.with_select_and_multiselect, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
