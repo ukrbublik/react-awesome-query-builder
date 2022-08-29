@@ -1,4 +1,6 @@
 # Changelog
+- next
+  - Added `renderItem` (PR #729)
 - 5.2.1
   - Fix type applied to filter funcs as another func's arg value (PR #743) (issue #586)
   - Allow self nesting of functions with `allowSelfNesting` (PR #698)
