@@ -158,8 +158,12 @@ class Item extends PureComponent {
   render() {
     const { type, ...props } = this.props;
     const mode = props.properties.get("mode");
-    const postfix = mode == "array" ? "_ext" : "";
-    const Cmp = typeMap[type + postfix];
+    const postfix = mode == "array" ? "_ext" : "";    
+    const renderItem = props.config.settings.renderItem;
+    let Cmp = typeMap[type + postfix];
+    if (renderItem) {
+      return renderItem({...props, type, itemComponent: Cmp});
+    }
     if (!Cmp) return null;
     return Cmp(props);
   }
