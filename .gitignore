@@ -1,15 +1,12 @@
 /examples/build/*bundle*
-/build/
-/coverage/
-/junit/
 /sandbox/build/
 /sandbox/dist/
 /sandbox_simple/build/
 ts_out/
 node_modules/
 package-lock.json
+yarn.lock
 npm-debug.log
-/lib/
 .idea
 .eslintcache
 .DS_Store
