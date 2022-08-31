@@ -1,6 +1,3 @@
-/examples/build/*bundle*
-/sandbox/build/
-/sandbox/dist/
 /sandbox_simple/build/
 ts_out/
 node_modules/

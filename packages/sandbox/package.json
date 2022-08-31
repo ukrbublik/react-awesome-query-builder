@@ -1,5 +1,5 @@
 {
-  "name": "react-awesome-query-builder-demo",
+  "name": "@react-awesome-query-builder/sandbox",
   "version": "0.5.0",
   "description": "Demo for react-awesome-query-builder",
   "main": "src/index.jsx",
@@ -31,6 +31,7 @@
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {
+    "@react-awesome-query-builder/core": "*",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
@@ -38,7 +39,6 @@
     "antd": "^4.16.13",
     "material-ui-confirm": "^2.1.2",
     "react": "^16.14.0",
-    "react-awesome-query-builder": "^4.7.0",
     "react-dom": "^16.14.0"
   },
   "browserslist": {

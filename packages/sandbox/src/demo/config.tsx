@@ -5,12 +5,12 @@ import {
   BasicConfig, Utils,
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
-} from "react-awesome-query-builder";
+} from "@react-awesome-query-builder/core";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
-import AntdConfig from "react-awesome-query-builder/lib/config/antd";
-import AntdWidgets from "react-awesome-query-builder/lib/components/widgets/antd";
-import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+import AntdConfig from "@react-awesome-query-builder/core/config/antd";
+import AntdWidgets from "@react-awesome-query-builder/core/components/widgets/antd";
+import MaterialConfig from "@react-awesome-query-builder/core/config/material";
 const {
   FieldSelect,
   FieldDropdown,

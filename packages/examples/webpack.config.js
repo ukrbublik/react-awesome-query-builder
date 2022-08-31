@@ -65,6 +65,7 @@ if (isAnalyze) {
 if (isDev) {
     plugins = [
         ...plugins,
+        new webpack.HotModuleReplacementPlugin(),
         new ReactRefreshWebpackPlugin()
     ];
 }
@@ -98,9 +99,10 @@ module.exports = {
         port: PORT,
         historyApiFallback: true,
         hot: true,
-        static: {
-          directory: path.join(__dirname, '/'),
-        },
+        inline: true,
+        // static: {
+        //   directory: path.join(__dirname, '/'),
+        // },
     },
     entry: './index',
     output: {
