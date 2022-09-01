@@ -1,4 +1,7 @@
 # Changelog
+- 5.3.1
+  - Support `@fortawesome/react-fontawesome 0.2.x` (issue #757)
+  - Fix `loadFromSpel` for `select_not_equals` op (PR #761) (issue #704)
 - 5.3.0
   - Added `renderItem` (PR #729)
 - 5.2.1
