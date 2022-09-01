@@ -2,7 +2,7 @@
 import React, {Component} from "react";
 import {
   Query, Builder, Utils,
-} from "react-awesome-query-builder";
+} from "@react-awesome-query-builder/core";
 import throttle from "lodash/throttle";
 import loadedConfig from "./config_simple"; // <- you can try './config_complex' for more complex examples
 import loadedInitValue from "./init_value";

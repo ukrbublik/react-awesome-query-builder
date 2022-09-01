@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Demo from "./demo/demo";
 
-import "react-awesome-query-builder/lib/css/styles.css";
+import "@react-awesome-query-builder/core/css/styles.css";
 
 function App() {
   return (
