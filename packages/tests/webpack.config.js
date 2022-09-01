@@ -31,7 +31,10 @@ module.exports = {
                         },
                     },
                 ],
-                exclude: /node_modules/
+                exclude: /node_modules/,
+                resolve: {
+                  fullySpecified: false,
+                }
             },
             {
                 test: /\.[tj]sx?$/,
@@ -51,7 +54,10 @@ module.exports = {
                         },
                     },
                 ],
-                exclude: /node_modules/
+                exclude: /node_modules/,
+                resolve: {
+                  fullySpecified: false,
+                }
             },
             {
                 test: /\.css$/,

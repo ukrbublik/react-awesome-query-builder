@@ -98,10 +98,10 @@ module.exports = {
         port: PORT,
         historyApiFallback: true,
         hot: true,
-        inline: true,
-        // static: {
-        //   directory: path.join(__dirname, '/'),
-        // },
+        // inline: true,
+        static: {
+          directory: path.join(__dirname, '/'),
+        },
     },
     entry: './index',
     output: {
@@ -128,7 +128,10 @@ module.exports = {
                         ...babel_options,
                         cacheDirectory: true
                     }
-                }]
+                }],
+                resolve: {
+                  fullySpecified: false,
+                }
             },
             {
                 test: /\.css$/,

@@ -1,9 +1,12 @@
-const webpack = require('webpack');
-const path = require('path');
-const CompressionPlugin = require('compression-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+import webpack from 'webpack';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import CompressionPlugin from 'compression-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import MomentLocalesPlugin from 'moment-locales-webpack-plugin';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const MODE = process.env.NODE_ENV || "development";
 const BUILD = path.resolve(__dirname, 'build/');
 const MODULES = path.resolve(__dirname, 'modules/');
@@ -39,7 +42,7 @@ if (isAnalyze) {
     ];
 }
 
-module.exports = {
+export default {
     plugins,
     optimization,
     mode: MODE,
@@ -71,6 +74,9 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: 'ts-loader',
                 exclude: /node_modules/,
+                resolve: {
+                  fullySpecified: false,
+                }
             },
             {
                 test: /\.jsx?$/,
@@ -78,7 +84,10 @@ module.exports = {
                 options: {
                     cacheDirectory: true
                 },
-                exclude: /node_modules/
+                exclude: /node_modules/,
+                resolve: {
+                  fullySpecified: false,
+                }
             },
             {
                 test: /\.css$/,
