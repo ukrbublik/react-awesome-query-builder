@@ -30,7 +30,6 @@ module.exports = {
     "parserOptions": {
         "ecmaVersion": 11,
         "ecmaFeatures": {
-            "legacyDecorators": true,
             "jsx": true
         },
         "sourceType": "module"

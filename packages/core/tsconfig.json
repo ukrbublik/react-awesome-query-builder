@@ -7,7 +7,6 @@
       "dom",
       "dom.iterable"
     ],
-    "experimentalDecorators": true,
     "allowJs": true,
     "outDir": "ts_out",
     "noEmit": true,

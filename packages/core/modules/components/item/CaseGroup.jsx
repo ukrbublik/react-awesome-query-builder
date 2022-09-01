@@ -7,12 +7,9 @@ import {GroupActions} from "./GroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import Widget from "../rule/Widget";
-const classNames = require("classnames");
+import classNames from "classnames";
 
 
-@GroupContainer
-@Draggable("group case_group")
-@ConfirmFn
 class CaseGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
@@ -182,5 +179,5 @@ class CaseGroup extends BasicGroup {
 
 }
 
+export default GroupContainer(Draggable("group case_group")(ConfirmFn(CaseGroup)));
 
-export default CaseGroup;

@@ -1,4 +1,4 @@
-let SqlString = require("sqlstring");
+import SqlString from "sqlstring";
 
 SqlString.trim = (val) => {
   if (val.charAt(0) == "'")

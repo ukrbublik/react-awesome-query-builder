@@ -10,12 +10,9 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
 import Widget from "../rule/Widget";
-const classNames = require("classnames");
+import classNames from "classnames";
 
 
-@GroupContainer
-@Draggable("group rule_group_ext")
-@ConfirmFn
 class RuleGroupExt extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
@@ -201,4 +198,5 @@ class RuleGroupExt extends BasicGroup {
 }
 
 
-export default RuleGroupExt;
+export default GroupContainer(Draggable("group rule_group_ext")(ConfirmFn(RuleGroupExt)));
+

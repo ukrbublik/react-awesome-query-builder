@@ -10,12 +10,9 @@ import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../../uti
 import {getFieldPathLabels, getValueSourcesForFieldOp} from "../../utils/ruleUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
-const classNames = require("classnames");
+import classNames from "classnames";
 
 
-@RuleContainer
-@Draggable("rule")
-@ConfirmFn
 class Rule extends PureComponent {
   static propTypes = {
     id: PropTypes.string.isRequired,
@@ -318,4 +315,4 @@ class Rule extends PureComponent {
 }
 
 
-export default Rule;
+export default RuleContainer(Draggable("rule")(ConfirmFn(Rule)));

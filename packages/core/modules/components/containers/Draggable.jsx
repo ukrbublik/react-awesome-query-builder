@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-const classNames = require("classnames");
+import classNames from "classnames";
 
 
 export default (className) => (GroupOrRule) =>

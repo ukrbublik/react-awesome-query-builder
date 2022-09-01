@@ -4,7 +4,7 @@ import context from "../../stores/context";
 import {getFieldConfig} from "../../utils/configUtils";
 import {pureShouldComponentUpdate} from "../../utils/reactUtils";
 import {connect} from "react-redux";
-const classNames = require("classnames");
+import classNames from "classnames";
 
 
 const createRuleContainer = (Rule) => 

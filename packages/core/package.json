@@ -4,7 +4,14 @@
   "description": "Core",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
+  "type": "module",
   "main": "lib",
+  "exports": {
+    ".": "./modules/index.jsx",
+    "./config/antd": "./modules/config/antd/index.jsx",
+    "./components/widgets/antd": "./modules/components/widgets/antd/index.jsx",
+    "./css/styles.css": "./lib/css/styles.css"
+  },
   "types": "modules/index.d.ts",
   "scripts": {
     "prepare": "yarn build-npm",
@@ -55,7 +62,6 @@
     "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.5",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-proposal-decorators": "^7.14.5",
     "@babel/plugin-proposal-private-methods": "^7.14.5",
     "@babel/plugin-transform-modules-commonjs": "^7.14.5",
     "@babel/plugin-transform-runtime": "^7.14.5",

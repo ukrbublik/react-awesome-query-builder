@@ -9,9 +9,6 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import {ConfirmFn} from "../utils";
 
 
-@GroupContainer
-@Draggable("group rule_group")
-@ConfirmFn
 class RuleGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
@@ -96,4 +93,4 @@ class RuleGroup extends BasicGroup {
 }
 
 
-export default RuleGroup;
+export default GroupContainer(Draggable("group rule_group")(ConfirmFn(RuleGroup)));

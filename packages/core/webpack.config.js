@@ -44,7 +44,7 @@ module.exports = {
     optimization,
     mode: MODE,
     entry: [
-        './modules/index.js',
+        './modules/index.jsx',
     ],
     output: {
         library: LibName,

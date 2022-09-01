@@ -8,8 +8,7 @@ import uuid from "../utils/uuid";
 import {pureShouldComponentUpdate} from "../utils/reactUtils";
 
 
-@SortableContainer
-export default class Builder extends Component {
+class Builder extends Component {
   static propTypes = {
     tree: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     config: PropTypes.object.isRequired,
@@ -74,3 +73,5 @@ export default class Builder extends Component {
     );
   }
 }
+
+export default SortableContainer(Builder);

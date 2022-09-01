@@ -7,12 +7,9 @@ import {SwitchGroupActions} from "./SwitchGroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
 import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../../utils/treeUtils";
-const classNames = require("classnames");
+import classNames from "classnames";
 
 
-@GroupContainer
-@Draggable("group switch_group")
-@ConfirmFn
 class SwitchGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
@@ -129,4 +126,4 @@ class SwitchGroup extends BasicGroup {
 }
 
 
-export default SwitchGroup;
+export default GroupContainer(Draggable("group switch_group")(ConfirmFn(SwitchGroup)));
