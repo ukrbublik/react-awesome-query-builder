@@ -19,10 +19,6 @@
       "**/dist/*",
       "**/node_modules/*",
       "vite.config.ts"
-    ],
-    "extends": [
-      "react-app",
-      "react-app/jest"
     ]
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
