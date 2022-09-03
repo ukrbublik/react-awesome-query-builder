@@ -1,6 +1,7 @@
-/sandbox_simple/build/
 ts_out/
 node_modules/
+dist/
+build/
 package-lock.json
 yarn.lock
 npm-debug.log

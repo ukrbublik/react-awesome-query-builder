@@ -1,10 +1,9 @@
-/examples/build/*bundle*
-/build/
-/coverage/
-/junit/
-/sandbox/build/
-/sandbox/dist/
-/sandbox_simple/build/
+/packages/examples/build/*bundle*
+/packages/core/build/
+/packages/tests/coverage/
+/packages/tests/junit/
+/packages/sandbox/dist/
+/packages/sandbox_simple/dist/
 ts_out/
 node_modules/
 package-lock.json

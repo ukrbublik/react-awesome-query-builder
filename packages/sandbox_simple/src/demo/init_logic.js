@@ -1,5 +1,5 @@
-const value = 
-{
+const value 
+= {
   "and": [
     {
       "==": [
