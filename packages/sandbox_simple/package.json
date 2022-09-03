@@ -8,6 +8,8 @@
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
   },
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "license": "MIT",
   "scripts": {
     "start": "vite",
     "build": "vite build --mode dev --debug",
@@ -16,8 +18,6 @@
     "eslint": "eslint --ext .jsx --ext .js ./src/",
     "lint-fix": "eslint --ext .jsx --ext .js --fix ./src/"
   },
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT",
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
     "react": "^16.14.0",

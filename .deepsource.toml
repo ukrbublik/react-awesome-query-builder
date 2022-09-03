@@ -3,8 +3,8 @@ version = 1
 test_patterns = ["tests/**"]
 
 exclude_patterns = [
-  "sandbox_simple/**",
-  "sandbox/**",
+  "packages/sandbox/**",
+  "packages/sandbox_simple/**",
   "scripts/**"
 ]
 

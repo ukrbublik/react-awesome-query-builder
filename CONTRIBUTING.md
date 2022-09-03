@@ -53,5 +53,5 @@ Currently there are 5 collections of widgets:
 Let's say you want to create new collection of Bootstrap widgets to be used in this lib (and submit PR which is always welcomed!).  
 You can use vanilla widgets as skeleton.  
 Then to enable new widgets you need to create config overrides like this:
-[material config](/modules/config/material/index.js)
+[material config](/modules/config/material/index.jsx)
 

@@ -10,6 +10,12 @@
     ".": "./modules/index.jsx",
     "./config/antd": "./modules/config/antd/index.jsx",
     "./components/widgets/antd": "./modules/components/widgets/antd/index.jsx",
+    "./config/mui": "./modules/config/mui/index.jsx",
+    "./components/widgets/mui": "./modules/components/widgets/mui/index.jsx",
+    "./config/material": "./modules/config/material/index.jsx",
+    "./components/widgets/material": "./modules/components/widgets/material/index.jsx",
+    "./config/bootstrap": "./modules/config/bootstrap/index.jsx",
+    "./components/widgets/bootstrap": "./modules/components/widgets/bootstrap/index.jsx",
     "./css/styles.css": "./lib/css/styles.css"
   },
   "types": "modules/index.d.ts",
