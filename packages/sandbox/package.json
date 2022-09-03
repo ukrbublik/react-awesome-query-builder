@@ -15,8 +15,8 @@
     "build": "tsc && vite build --mode dev --debug",
     "serve": "vite preview",
     "lint": "yarn eslint && yarn tsc",
-    "eslint": "eslint --ext .jsx --ext .js ./src/",
-    "lint-fix": "eslint --ext .jsx --ext .js --fix ./src/",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./src/",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./src/",
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {

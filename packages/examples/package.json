@@ -6,7 +6,11 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve",
     "build": "cross-env NODE_ENV=production CSS=0 webpack",
-    "analyze": "cross-env NODE_ENV=production ANALYZE=1 webpack"
+    "analyze": "cross-env NODE_ENV=production ANALYZE=1 webpack",
+    "lint": "yarn eslint && yarn tsc",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts .",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix .",
+    "tsc": "tsc -p . --noEmit"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "dependencies": {

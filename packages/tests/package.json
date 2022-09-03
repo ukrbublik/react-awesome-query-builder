@@ -4,7 +4,10 @@
   "description": "Tests",
   "scripts": {
     "test": "karma start ./karma.conf.js",
-    "tsc": "tsc -p . --noEmit"
+    "lint": "yarn eslint && yarn tsc",
+    "tsc": "tsc -p . --noEmit",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./specs/ ./support/",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./specs/ ./support/"
   },
   "main": "karma.conf.js",
   "dependencies": {

@@ -44,11 +44,6 @@ module.exports = {
         "react": {
             "version": "detect"
         },
-        "import/resolver": {
-            "webpack": {
-                "config": "./webpack.config.js"
-            }
-        },
         "import/extensions": [
             ".js",
             ".jsx",
@@ -62,7 +57,7 @@ module.exports = {
             ]
         },
         "import/core-modules": [
-            "react-awesome-query-builder/lib/css/styles.css"
+            "@react-awesome-query-builder/core/css/styles.css"
         ]
     },
     "parser": "@typescript-eslint/parser",
@@ -126,27 +121,54 @@ module.exports = {
     },
     "overrides": [
       {
-        "files": ["modules/**/*.ts", "modules/**/*.tsx"],
+        "files": ["packages/core/modules/**/*.ts", "packages/core/modules/**/*.tsx"],
         "parserOptions": {
-        "project": 'tsconfig.json',
+          "project": 'tsconfig.json',
         },
       },
       {
-        "files": ["examples/**/*.ts", "examples/**/*.tsx"],
+        "files": ["packages/examples/**/*.ts", "packages/examples/**/*.tsx"],
         "parserOptions": {
-          "project": 'examples/tsconfig.json',
+          "project": 'tsconfig.json',
         },
       },
       {
-        "files": ["sandbox/**/*.ts", "sandbox/**/*.tsx"],
-        "parserOptions": {
-          "project": 'sandbox/tsconfig.json',
+        "files": ["packages/examples/**/*"],
+        "settings": {
+            "import/resolver": {
+                "typescript": true,
+                "webpack": {
+                    "config": "./webpack.config.js"
+                }
+            },
         },
       },
       {
-        "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+        "files": ["packages/sandbox/**/*.ts", "packages/sandbox/**/*.tsx"],
         "parserOptions": {
-          "project": 'tests/tsconfig.json',
+          "project": './tsconfig.json',
+        },
+        "settings": {
+            "import/resolver": {
+               "typescript": true
+            },
+        },
+      },
+      {
+        "files": ["packages/tests/**/*.ts", "packages/tests/**/*.tsx"],
+        "parserOptions": {
+            "project": './tsconfig.json',
+        },
+      },
+      {
+        "files": ["packages/tests/**/*"],
+        "settings": {
+            "import/resolver": {
+                "typescript": true,
+                "webpack": {
+                    "config": "./webpack.config.js"
+                }
+            },
         },
       },
       {
@@ -171,7 +193,6 @@ module.exports = {
             "@typescript-eslint/prefer-regexp-exec": 0,
             "@typescript-eslint/no-empty-function": 0,
             "@typescript-eslint/ban-ts-comment": 0
-
         }
       },
     ],
