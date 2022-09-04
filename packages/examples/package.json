@@ -10,9 +10,11 @@
     "lint": "yarn eslint && yarn tsc",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts .",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix .",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "check-hot": "node ./scripts/check-hot.js"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "license": "MIT",
   "dependencies": {
     "@react-awesome-query-builder/core": "*"
   },

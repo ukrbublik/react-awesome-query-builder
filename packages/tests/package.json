@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Tests",
   "scripts": {
+    "build": "echo 'No need to build tests'",
     "test": "karma start ./karma.conf.js",
     "lint": "yarn eslint && yarn tsc",
     "tsc": "tsc -p . --noEmit",

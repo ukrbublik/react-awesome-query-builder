@@ -4,10 +4,13 @@ orbs:
 jobs:
   test:
     docker:
-      - image: cimg/node:12.22-browsers
+      - image: cimg/node:14.20-browsers
     steps:
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
+      - run:
+          name: Install yarn
+          command: npm install --global yarn
       - run:
           name: Check install
           command: |
@@ -15,6 +18,7 @@ jobs:
             chromedriver --version
             node --version
             npm --version
+            yarn --version
       - checkout
       # - restore_cache:
       #     keys:
@@ -22,7 +26,7 @@ jobs:
       #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}
       - run:
           name: Install
-          command: npm run install-all
+          command: yarn
       # - save_cache:
       #     key: node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #     paths:
@@ -32,30 +36,30 @@ jobs:
       #       - sandbox_simple/node_modules
       - run:
           name: Lint
-          command: npm run lint
+          command: yarn lint
       - run:
           name: Test
-          command: npm run test
+          command: yarn test
       - store_test_results:
-          path: ./junit
+          path: ./packages/tests/junit
       - store_artifacts:
-          path: ./junit
+          path: ./packages/tests/junit
           destination: junit
       - store_artifacts:
-          path: ./coverage/lcov
+          path: ./packages/tests/coverage/lcov
           destination: lcov
       - store_artifacts:
-          path: ./coverage/html
+          path: ./packages/tests/coverage/html
           destination: coverage
       - run:
           name: Build
-          command: npm run build-all
+          command: yarn build-all
       - store_artifacts:
-          path: ./examples/build
+          path: ./packages/examples/build
           destination: examples
       - run:
           name: Hot
-          command: npm run check-hot
+          command: yarn check-hot
 
 workflows:
   smoke:

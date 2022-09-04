@@ -11,28 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - name: Install
-        run: npm run install-all
+          node-version: 14
+      - name: Install yarn
+        run: npm install --global yarn
+      - name: Install packages
+        run: yarn
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Lint
-        run: npm run lint
+        run: yarn lint
       - name: Test
-        run: npm run test
+        run: yarn test
       - name: Artifact - coverage
         uses: actions/upload-artifact@v2
         with:
           name: coverage
-          path: coverage
+          path: packages/tests/coverage
       - name: Build
-        run: npm run build-all
+        run: yarn build-all
       - name: Artifact - examples build
         uses: actions/upload-artifact@v2
         with:
           name: examples-build
-          path: examples/build
+          path: packages/examples/build
       - name: Hot
-        run: npm run check-hot
+        run: yarn check-hot

@@ -10,25 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - run: npm i
+          node-version: 14
+      - run: npm install --global yarn
+      - run: yarn
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - run: npm run lint-lite
-      - run: npm test
+      - run: yarn lint
+      - run: yarn test
 
   publish-gpr:
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 14
           registry-url: https://npm.pkg.github.com/
-      - run: npm i
-      - run: npm run for-gpr
-      - run: npm publish
+      - run: npm install --global yarn
+      - run: yarn
+      - run: yarn for-gpr
+      - run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

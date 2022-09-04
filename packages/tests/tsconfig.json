@@ -16,10 +16,10 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "baseUrl": "..",
+    "baseUrl": ".",
     "paths": {
-      "@react-awesome-query-builder/core": ["core/modules"],
-      "@react-awesome-query-builder/core/*": ["core/modules/*"]
+      "@react-awesome-query-builder/core": ["../core/modules"],
+      "@react-awesome-query-builder/core/*": ["../core/modules/*"]
     }
   },
   "include": [

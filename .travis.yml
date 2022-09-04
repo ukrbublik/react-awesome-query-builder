@@ -8,16 +8,12 @@ before_install:
   # https://stackoverflow.com/questions/22475849/node-js-error-enospc#32600959
   - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 install:
-  - npm run install-all
+  - npm install --global yarn
+  - yarn
 cache:
   npm: false
-  # directories:
-  #   - node_modules
-  #   - examples/node_modules
-  #   - sandbox/node_modules
-  #   - sandbox_simple/node_modules
 script:
-  - npm run smoke
+  - yarn smoke
 branches:
   only: 
     - master

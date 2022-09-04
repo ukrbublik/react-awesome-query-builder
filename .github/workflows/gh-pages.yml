@@ -10,22 +10,23 @@ jobs:
     name: Update GitHub pages
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         ref: master
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v3
       with:
-        node-version: '12.x'
-    - run: npm install
+        node-version: 14
+    - run: npm install --global yarn
+    - run: yarn
     - name: Build examples
-      run: npm run build-examples
+      run: yarn build-examples
     - name: Copy build
       run: |
         rm -rf /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder/gh-pages
-        cp ./examples/build/*bundle* /tmp/react-awesome-query-builder/gh-pages/
-    - uses: actions/checkout@v1
+        cp ./packages/examples/build/*bundle* /tmp/react-awesome-query-builder/gh-pages/
+    - uses: actions/checkout@v2
       with:
         ref: gh-pages
     - name: Commit build

@@ -13,7 +13,6 @@ const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
-const RAQB_NODE_MODULES = path.resolve(EXAMPLES, '../node_modules/');
 const MODULES = path.resolve(EXAMPLES, '../core/modules/');
 const DIST = path.resolve(EXAMPLES, './build');
 
@@ -109,11 +108,6 @@ module.exports = {
         filename: 'bundle.js'
     },
     resolve: {
-        // modules: [
-        //     // combine with parent node_modules
-        //     'node_modules',
-        //     RAQB_NODE_MODULES,
-        // ],
         alias: aliases,
         extensions: ['.tsx', '.ts', '.js', '.jsx']
     },
