@@ -11,8 +11,7 @@ import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import { ruRU as muiRuRU } from "@mui/material/locale";
 
-import AntdConfig from "@react-awesome-query-builder/core/config/antd";
-import AntdWidgets from "@react-awesome-query-builder/core/components/widgets/antd";
+import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import MaterialConfig from "@react-awesome-query-builder/core/config/material";
 import MuiConfig from "@react-awesome-query-builder/core/config/mui";
 import BootstrapConfig from "@react-awesome-query-builder/core/config/bootstrap";

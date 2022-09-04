@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
-import {useOnPropsChanged} from "../../../../utils/reactUtils";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends PureComponent {

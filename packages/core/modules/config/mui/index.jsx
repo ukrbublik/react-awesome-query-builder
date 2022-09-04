@@ -1,5 +1,6 @@
 import MuiWidgets from "../../components/widgets/mui";
-import BasicConfig, {stringifyForDisplay} from "../basic";
+import BasicConfig from "../basic";
+import {stringifyForDisplay} from "../../utils/export";
 import React from "react";
 import {SqlString} from "../../utils/export";
 

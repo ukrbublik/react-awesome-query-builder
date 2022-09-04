@@ -1,10 +1,10 @@
 import en_US from "antd/lib/locale-provider/en_US";
-import AntdWidgets from "../../components/widgets/antd";
-import BasicConfig, { stringifyForDisplay } from "../basic";
-import { getTitleInListValues } from "../../utils/stuff";
-import { SqlString, spelEscape } from "../../utils/export";
+import AntdWidgets from "../widgets";
+import { Utils, BasicConfig } from "@react-awesome-query-builder/core";
 import React from "react";
 
+const { getTitleInListValues } = Utils.StuffUtils;
+const { SqlString, spelEscape, stringifyForDisplay } = Utils.ExportUtils;
 
 const {
   FieldSelect,

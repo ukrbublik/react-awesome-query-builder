@@ -7,13 +7,13 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 const MODE = process.env.NODE_ENV || "development";
 const PORT = 3001;
-const lib_name = '@react-awesome-query-builder/core';
 const isProd = (MODE != "development");
 const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
 const MODULES = path.resolve(EXAMPLES, '../core/modules/');
+const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
 const DIST = path.resolve(EXAMPLES, './build');
 
 let plugins = [
@@ -28,7 +28,8 @@ let plugins = [
     }),
 ];
 let aliases = {
-    [lib_name]: MODULES
+    '@react-awesome-query-builder/core': MODULES,
+    '@react-awesome-query-builder/antd': ANTD_MODULES,
 };
 let style_loaders = [{
     loader: "style-loader"

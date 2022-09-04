@@ -9,26 +9,22 @@
     ],
     "allowJs": true,
     "outDir": "ts_out",
-    "declaration": true,
+    "noEmit": true,
 
     "strict": true,
     "alwaysStrict": true,
-    "strictNullChecks": false,
     "noImplicitReturns": true,
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "baseUrl": ".",
+    "skipLibCheck": true,
+    
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
-      "@react-awesome-query-builder/core/*": ["../core/modules/*"],
-      "@react-awesome-query-builder/antd": ["../antd/modules"],
-    },
-    "skipLibCheck": true
+      "@react-awesome-query-builder/core/*": ["../core/modules/*"]
+    }
   },
   "include": [
-    "demo/**/*",
-    "demo_switch/**/*",
-    "index.tsx"
+    "modules/**/*"
   ]
 }

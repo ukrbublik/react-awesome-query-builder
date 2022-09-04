@@ -2,7 +2,7 @@ import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
   BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps, TreeSelectWidgetProps
-} from "../../..";
+} from "@react-awesome-query-builder/core";
 
 export interface AntdWidgets {
   // antd core widgets

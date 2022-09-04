@@ -1,4 +1,6 @@
-import SqlString from "sqlstring";
+import SqlStringOrig from "sqlstring";
+
+export const SqlString = SqlStringOrig;
 
 SqlString.trim = (val) => {
   if (val.charAt(0) == "'")
@@ -21,7 +23,7 @@ SqlString.escapeLike = (val, any_start = true, any_end = true) => {
   return res;
 };
 
-const sqlEmptyValue = (fieldDef) => {
+export const sqlEmptyValue = (fieldDef) => {
   let v = "''";
   const type = fieldDef?.type;
   if (type == "date") {
@@ -37,7 +39,7 @@ const sqlEmptyValue = (fieldDef) => {
   return v;
 };
 
-const mongoEmptyValue = (fieldDef) => {
+export const mongoEmptyValue = (fieldDef) => {
   let v = "";
   const type = fieldDef?.type;
   if (type == "number") {
@@ -98,13 +100,13 @@ const spelInlineList = (vals, toArray = false) => {
   return res;
 };
 
-const spelFixList = (val) => {
+export const spelFixList = (val) => {
   // `{1,2}.contains(1)` NOT works
   // `{1,2}.?[true].contains(1)` works
   return `${val}.?[true]`;
 };
 
-const spelEscape = (val, numberToFloat = false, arrayToArray = false) => {
+export const spelEscape = (val, numberToFloat = false, arrayToArray = false) => {
   // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-ref-literal
   if (val === undefined || val === null) {
     return "null";
@@ -127,7 +129,7 @@ const spelEscape = (val, numberToFloat = false, arrayToArray = false) => {
   }
 };
 
-const spelFormatConcat = (parts) => {
+export const spelFormatConcat = (parts) => {
   if (parts && Array.isArray(parts) && parts.length) {
     return parts
       .map(part => {
@@ -148,7 +150,7 @@ const spelFormatConcat = (parts) => {
 
 // `val` is {value, valueType, valueSrc}
 // If `valueType` == "case_value", `value` is array of such items (to be considered as concatenation)
-const spelImportConcat = (val) => {
+export const spelImportConcat = (val) => {
   if (val == undefined)
     return [undefined, []];
   let errors = [];
@@ -175,7 +177,4 @@ const spelImportConcat = (val) => {
   return [res, errors];
 };
 
-export {
-  SqlString, sqlEmptyValue, 
-  mongoEmptyValue, spelEscape, spelFixList, spelFormatConcat, spelImportConcat
-};
+export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());

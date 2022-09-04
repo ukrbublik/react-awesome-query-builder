@@ -16,7 +16,8 @@
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
   "dependencies": {
-    "@react-awesome-query-builder/core": "*"
+    "@react-awesome-query-builder/core": "*",
+    "@react-awesome-query-builder/antd": "*"
   },
   "devDependencies": {
     "react-router-dom": "^6.2.1",

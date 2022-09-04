@@ -5,6 +5,7 @@ import {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList} from
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
+import { stringifyForDisplay } from "../utils/export";
 
 const {
   //vanilla
@@ -583,8 +584,6 @@ const operators = {
 
 
 //----------------------------  widgets
-
-export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());
 
 const widgets = {
   text: {

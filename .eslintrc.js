@@ -127,6 +127,12 @@ module.exports = {
         },
       },
       {
+        "files": ["packages/antd/**/*.ts", "packages/antd/**/*.tsx"],
+        "parserOptions": {
+          "project": 'tsconfig.json',
+        },
+      },
+      {
         "files": ["packages/examples/**/*.ts", "packages/examples/**/*.tsx"],
         "parserOptions": {
           "project": 'tsconfig.json',

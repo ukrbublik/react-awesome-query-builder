@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Cascader, Tooltip } from "antd";
-import {removePrefixPath} from "../../../../utils/stuff";
+import { Utils } from "@react-awesome-query-builder/core";
+const {removePrefixPath} = Utils.StuffUtils;
 
 
 export default class FieldCascader extends PureComponent {
