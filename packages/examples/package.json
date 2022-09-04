@@ -18,5 +18,8 @@
   "dependencies": {
     "@react-awesome-query-builder/core": "*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "react-router-dom": "^6.2.1",
+    "webpack-dev-server": "^4.4.0"
+  }
 }
