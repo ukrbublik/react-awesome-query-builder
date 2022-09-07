@@ -2,13 +2,12 @@ module.exports = {
     "env": {
         "browser": true,
         "es6": true,
-        "mocha": true,
-        "jest": true,
         "node": true
     },
     "ignorePatterns": [
         "**/ts_out/*",
         "**/build/*",
+        "**/scripts/*",
         "**/dist/*",
         "**/node_modules/*",
         "bundle.js",
@@ -19,20 +18,13 @@ module.exports = {
     "extends": [
         "eslint:recommended",
         "plugin:import/recommended",
-        "plugin:import/typescript",
+        // "plugin:import/typescript", // not needed for JS
         "plugin:react/recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
+        // "plugin:@typescript-eslint/eslint-recommended", // not needed for JS
     ],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
-    },
-    "parserOptions": {
-        "ecmaVersion": 11,
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "sourceType": "module"
     },
     "plugins": [
         "react",
@@ -40,27 +32,41 @@ module.exports = {
         "import",
         "@typescript-eslint"
     ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 11,
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "sourceType": "module",
+        "project": "tsconfig.json", // resolves dynamically for each package
+    },
     "settings": {
         "react": {
             "version": "detect"
         },
         "import/extensions": [
-            ".js",
-            ".jsx",
-            ".ts",
-            ".tsx"
+            ".js", ".jsx",
+            // ".ts", ".tsx"
         ],
         "import/parsers": {
             "@typescript-eslint/parser": [
-                ".ts", 
-                ".tsx"
-            ]
+                ".ts", ".tsx"
+            ],
+        },
+        "import/resolver": {
+            // order matters, so push "node" to end as fallback
+            "typescript": {
+                // "alwaysTryTypes": true,
+               "project": "packages/*/tsconfig.json",
+            },
+            "node": true,
         },
         "import/core-modules": [
             "@react-awesome-query-builder/core/css/styles.css"
-        ]
+        ],
+        "import/internal-regex": /^@react-awesome-query-builder/
     },
-    "parser": "@typescript-eslint/parser",
     "rules": {
         "indent": [
             "error",
@@ -117,66 +123,50 @@ module.exports = {
         "prefer-const": [
             //todo: set to warn
             "off", {}
+        ],
+        "import/no-named-as-default-member": [
+            "off", {}
         ]
     },
     "overrides": [
       {
-        "files": ["packages/core/modules/**/*.ts", "packages/core/modules/**/*.tsx"],
-        "parserOptions": {
-          "project": 'tsconfig.json',
-        },
-      },
-      {
-        "files": ["packages/antd/**/*.ts", "packages/antd/**/*.tsx"],
-        "parserOptions": {
-          "project": 'tsconfig.json',
-        },
-      },
-      {
-        "files": ["packages/examples/**/*.ts", "packages/examples/**/*.tsx"],
-        "parserOptions": {
-          "project": 'tsconfig.json',
-        },
-      },
-      {
-        "files": ["packages/examples/**/*"],
-        "settings": {
-            "import/resolver": {
-                "typescript": true,
-                "webpack": {
-                    "config": "./webpack.config.js"
-                }
-            },
-        },
-      },
-      {
-        "files": ["packages/sandbox/**/*.ts", "packages/sandbox/**/*.tsx"],
-        "parserOptions": {
-          "project": './tsconfig.json',
-        },
-        "settings": {
-            "import/resolver": {
-               "typescript": true
-            },
-        },
-      },
-      {
-        "files": ["packages/tests/**/*.ts", "packages/tests/**/*.tsx"],
-        "parserOptions": {
-            "project": './tsconfig.json',
-        },
-      },
-      {
         "files": ["packages/tests/**/*"],
+        "env": {
+            "mocha": true,
+            "jasmine": true,
+        },
         "settings": {
-            "import/resolver": {
-                "typescript": true,
-                "webpack": {
-                    "config": "./webpack.config.js"
-                }
-            },
+            "import/core-modules": [
+                "sinon",
+                "chai"
+            ],
+            // "import/resolver": {
+            //     "webpack": {
+            //         "config": "./webpack.config.js"
+            //     }
+            // },
         },
       },
+      {
+        "files": ["packages/sandbox_simple/**/*"],
+        "parser": "@babel/eslint-parser",
+        "parserOptions": {
+            "requireConfigFile": false,
+            "babelOptions": {
+                "presets": [
+                    "@babel/preset-env",
+                    "@babel/preset-react"
+                ],
+            },
+            "sourceType": "module",
+        },
+        "settings": {
+            "import/core-modules": [
+                "react"
+            ],
+        },
+      },
+
       {
         "files": ["**/*.ts", "**/*.tsx"],
         "extends": [

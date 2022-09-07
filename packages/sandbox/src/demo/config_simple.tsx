@@ -8,8 +8,7 @@ import {
 } from "@react-awesome-query-builder/core";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
-import AntdConfig from "@react-awesome-query-builder/core/config/antd";
-import AntdWidgets from "@react-awesome-query-builder/core/components/widgets/antd";
+import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import MaterialConfig from "@react-awesome-query-builder/core/config/material";
 const {
   FieldSelect,

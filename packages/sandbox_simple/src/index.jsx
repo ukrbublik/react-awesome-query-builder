@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "react-dom";
 import Demo from "./demo/demo";
 
 import "@react-awesome-query-builder/core/css/styles.css";
@@ -13,5 +13,5 @@ function App() {
 }
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
+render(<App />, rootElement);
 

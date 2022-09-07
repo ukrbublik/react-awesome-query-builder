@@ -1,8 +1,7 @@
 import MuiWidgets from "../../components/widgets/mui";
 import BasicConfig from "../basic";
-import {stringifyForDisplay} from "../../utils/export";
+import {SqlString, stringifyForDisplay} from "../../utils/export";
 import React from "react";
-import {SqlString} from "../../utils/export";
 
 const {
   MuiBooleanWidget,

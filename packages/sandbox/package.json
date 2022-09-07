@@ -6,7 +6,8 @@
   "readme": "README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git"
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/sandbox"
   },
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",

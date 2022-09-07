@@ -6,8 +6,14 @@
   "license": "MIT",
   "type": "module",
   "main": "lib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/core"
+  },
   "exports": {
     ".": "./modules/index.jsx",
+    "./components/widgets": "./modules/components/widgets/index.jsx",
     "./config/mui": "./modules/config/mui/index.jsx",
     "./components/widgets/mui": "./modules/components/widgets/mui/index.jsx",
     "./config/material": "./modules/config/material/index.jsx",

@@ -1,8 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
 
-const CORE = path.resolve(__dirname, "../core");
-const MODULES = path.resolve(__dirname, '../core/modules');
+const CORE = path.resolve(__dirname, "../core/modules");
+const ANTD = path.resolve(__dirname, "../antd/modules");
 const TESTS = path.resolve(__dirname);
 
 
@@ -38,7 +38,10 @@ module.exports = {
             },
             {
                 test: /\.[tj]sx?$/,
-                include: [ CORE ],
+                include: [
+                    CORE,
+                    ANTD
+                ],
                 use: [ 
                     {
                         loader: '@jsdevtools/coverage-istanbul-loader',
@@ -93,7 +96,8 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         alias: {
-            '@react-awesome-query-builder/core': MODULES,
+            '@react-awesome-query-builder/core': CORE,
+            '@react-awesome-query-builder/antd': ANTD,
         },
         fallback: {
           fs: false,

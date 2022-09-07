@@ -1,8 +1,7 @@
 import MaterialWidgets from "../../components/widgets/material";
 import BasicConfig from "../basic";
-import {stringifyForDisplay} from "../../utils/export";
+import {SqlString, spelEscape, stringifyForDisplay} from "../../utils/export";
 import React from "react";
-import {SqlString, spelEscape} from "../../utils/export";
 
 
 const {

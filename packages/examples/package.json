@@ -2,6 +2,13 @@
   "name": "@react-awesome-query-builder/examples",
   "version": "0.4.0",
   "description": "Local hot-reloadable demo for react-awesome-query-builder",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/examples"
+  },
   "main": "index.tsx",
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve",
@@ -13,8 +20,6 @@
     "tsc": "tsc -p . --noEmit",
     "check-hot": "node ./scripts/check-hot.js"
   },
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT",
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
     "@react-awesome-query-builder/antd": "*"

@@ -4,6 +4,11 @@
   "description": "AntDesign widgets",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/antd"
+  },
   "type": "module",
   "main": "lib",
   "exports": {
@@ -13,6 +18,7 @@
   "scripts": {
     "lint": "yarn eslint && yarn tsc",
     "tsc": "tsc -p . --noEmit",
+    "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
   },

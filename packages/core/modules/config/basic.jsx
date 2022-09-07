@@ -1,11 +1,13 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as Operators from "../components/operators";
-import {SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList} from "../utils/export";
+import {
+  SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList,
+  stringifyForDisplay
+} from "../utils/export";
 import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
-import { stringifyForDisplay } from "../utils/export";
 
 const {
   //vanilla

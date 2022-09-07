@@ -2,6 +2,13 @@
   "name": "@react-awesome-query-builder/tests",
   "version": "1.0.0",
   "description": "Tests",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/tests"
+  },
   "scripts": {
     "build": "echo 'No need to build tests'",
     "test": "karma start ./karma.conf.js",
@@ -12,7 +19,8 @@
   },
   "main": "karma.conf.js",
   "dependencies": {
-    "@react-awesome-query-builder/core": "*"
+    "@react-awesome-query-builder/core": "*",
+    "@react-awesome-query-builder/antd": "*"
   },
   "devDependencies": {
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
@@ -43,7 +51,5 @@
   "peerDependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
-  },
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT"
+  }
 }

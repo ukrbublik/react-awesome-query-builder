@@ -14,7 +14,7 @@ const {
   checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
   queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
-import AntdConfig from "@react-awesome-query-builder/core/config/antd";
+import { AntdConfig } from "@react-awesome-query-builder/antd";
 import MaterialConfig from "@react-awesome-query-builder/core/config/material";
 import MuiConfig from "@react-awesome-query-builder/core/config/mui";
 import BootstrapConfig from "@react-awesome-query-builder/core/config/bootstrap";

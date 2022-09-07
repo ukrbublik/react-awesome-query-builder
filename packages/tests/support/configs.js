@@ -1,10 +1,9 @@
 import React from "react";
-import AntdConfig from "@react-awesome-query-builder/core/config/antd";
-import AntdWidgets from "@react-awesome-query-builder/core/components/widgets/antd";
+import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import BootstrapWidgets from "@react-awesome-query-builder/core/components/widgets/bootstrap";
 import MaterialWidgets from "@react-awesome-query-builder/core/components/widgets/material";
 import MuiWidgets from "@react-awesome-query-builder/core/components/widgets/mui";
-import VanillaWidgets from "@react-awesome-query-builder/core/components/widgets/vanilla";
+import * as VanillaWidgets from "@react-awesome-query-builder/core/components/widgets";
 const {
   FieldDropdown,
   FieldCascader,
@@ -12,7 +11,7 @@ const {
 } = AntdWidgets;
 import { BasicFuncs } from "@react-awesome-query-builder/core";
 import { simulatedAsyncFetch } from "./autocomplete";
-import { spy } from "sinon";
+import sinon from "sinon";
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -761,7 +760,7 @@ export const with_settings_confirm = (BasicConfig) => ({
       okText: "Yes",
       okType: "danger",
     },
-    renderConfirm: spy(),
+    renderConfirm: sinon.spy(),
     /*({onOk, okText, cancelText, title}) => {
       if (confirm(title)) {
         onOk();
