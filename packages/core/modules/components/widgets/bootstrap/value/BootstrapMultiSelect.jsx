@@ -5,7 +5,7 @@ import {
   DropdownToggle,
   DropdownItem,
 } from "reactstrap";
-import { mapListValues } from "../../../../utils/stuff";
+import { mapListValues } from "../../../../utils/listValues";
 
 export default ({listValues, value, setValue, allowCustomValues, placeholder, readonly}) => {
   const [isOpen, setIsOpen] = useState(false);

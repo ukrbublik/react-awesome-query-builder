@@ -3,6 +3,7 @@ const path = require('path');
 
 const CORE = path.resolve(__dirname, "../core/modules");
 const ANTD = path.resolve(__dirname, "../antd/modules");
+const MUI = path.resolve(__dirname, "../mui/modules");
 const TESTS = path.resolve(__dirname);
 
 
@@ -40,7 +41,8 @@ module.exports = {
                 test: /\.[tj]sx?$/,
                 include: [
                     CORE,
-                    ANTD
+                    ANTD,
+                    MUI
                 ],
                 use: [ 
                     {
@@ -98,6 +100,7 @@ module.exports = {
         alias: {
             '@react-awesome-query-builder/core': CORE,
             '@react-awesome-query-builder/antd': ANTD,
+            '@react-awesome-query-builder/mui': MUI,
         },
         fallback: {
           fs: false,

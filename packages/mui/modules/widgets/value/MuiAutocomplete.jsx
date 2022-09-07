@@ -8,8 +8,8 @@ import Chip from "@mui/material/Chip";
 import Checkbox from "@mui/material/Checkbox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-
-import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
+import { Hooks } from "@react-awesome-query-builder/core";
+const { useListValuesAutocomplete } = Hooks;
 
 const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;

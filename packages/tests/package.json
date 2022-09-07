@@ -20,7 +20,8 @@
   "main": "karma.conf.js",
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
-    "@react-awesome-query-builder/antd": "*"
+    "@react-awesome-query-builder/antd": "*",
+    "@react-awesome-query-builder/mui": "*"
   },
   "devDependencies": {
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",

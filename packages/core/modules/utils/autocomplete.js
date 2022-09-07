@@ -1,4 +1,5 @@
-import {listValuesToArray, sleep, mapListValues} from "./stuff";
+import {sleep} from "./stuff";
+import {listValuesToArray, mapListValues} from "./listValues";
 
 export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (search, offset, meta) => {
   const pageSize = meta.pageSize != undefined ? meta.pageSize : cPageSize;

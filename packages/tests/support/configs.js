@@ -1,8 +1,8 @@
 import React from "react";
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
+import { MuiWidgets } from "@react-awesome-query-builder/mui";
 import BootstrapWidgets from "@react-awesome-query-builder/core/components/widgets/bootstrap";
 import MaterialWidgets from "@react-awesome-query-builder/core/components/widgets/material";
-import MuiWidgets from "@react-awesome-query-builder/core/components/widgets/mui";
 import * as VanillaWidgets from "@react-awesome-query-builder/core/components/widgets";
 const {
   FieldDropdown,

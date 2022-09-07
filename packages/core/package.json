@@ -14,8 +14,6 @@
   "exports": {
     ".": "./modules/index.jsx",
     "./components/widgets": "./modules/components/widgets/index.jsx",
-    "./config/mui": "./modules/config/mui/index.jsx",
-    "./components/widgets/mui": "./modules/components/widgets/mui/index.jsx",
     "./config/material": "./modules/config/material/index.jsx",
     "./components/widgets/material": "./modules/components/widgets/material/index.jsx",
     "./config/bootstrap": "./modules/config/bootstrap/index.jsx",
@@ -47,8 +45,6 @@
     "sqlstring": "^2.3.3"
   },
   "peerDependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.0 || ^6.1.0",
     "@fortawesome/free-solid-svg-icons": "^5.15.4 || ^6.0.0",
     "@fortawesome/react-fontawesome": "^0.1.16",
@@ -56,20 +52,13 @@
     "@material-ui/icons": "^4.0.0",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.2.10",
-    "@mui/icons-material": "^5.2.4",
-    "@mui/lab": "^5.0.0-alpha.60",
-    "@mui/material": "^5.2.4",
-    "@mui/x-date-pickers": "^5.0.0-beta.2",
     "bootstrap": "^5.1.3",
-    "material-ui-confirm": "^2.0.1 || ^3.0.0",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "reactstrap": "^9.0.0"
   },
   "devDependencies": {
     "moment-locales-webpack-plugin": "^1.2.0",
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
@@ -77,10 +66,6 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.3.10",
-    "@mui/icons-material": "^5.2.4",
-    "@mui/lab": "^5.0.0-alpha.60",
-    "@mui/material": "^5.2.4",
-    "@mui/x-date-pickers": "^5.0.0-beta.6",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.7.7",
@@ -90,7 +75,6 @@
     "bootstrap": "^5.1.3",
     "dayjs": "^1.10.5",
     "lerna": "^5.4.3",
-    "material-ui-confirm": "^3.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "reactstrap": "^9.0.0"

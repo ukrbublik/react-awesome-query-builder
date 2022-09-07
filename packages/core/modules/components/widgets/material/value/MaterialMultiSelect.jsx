@@ -1,5 +1,5 @@
 import React from "react";
-import {mapListValues} from "../../../../utils/stuff";
+import {mapListValues} from "../../../../utils/listValues";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";

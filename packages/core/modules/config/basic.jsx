@@ -5,7 +5,8 @@ import {
   SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList,
   stringifyForDisplay
 } from "../utils/export";
-import {escapeRegExp, getTitleInListValues} from "../utils/stuff";
+import {escapeRegExp} from "../utils/stuff";
+import {getTitleInListValues} from "../utils/listValues";
 import moment from "moment";
 import {settings as defaultSettings} from "../config/default";
 

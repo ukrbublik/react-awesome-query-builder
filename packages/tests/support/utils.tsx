@@ -16,7 +16,7 @@ const {
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import MaterialConfig from "@react-awesome-query-builder/core/config/material";
-import MuiConfig from "@react-awesome-query-builder/core/config/mui";
+import { MuiConfig } from "@react-awesome-query-builder/mui";
 import BootstrapConfig from "@react-awesome-query-builder/core/config/bootstrap";
 
 

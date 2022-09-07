@@ -1,6 +1,6 @@
 import React from "react";
 import debounce from "lodash/debounce";
-import { mapListValues, listValuesToArray } from "../utils/stuff";
+import { mapListValues, listValuesToArray } from "../utils/listValues";
 import { mergeListValues, listValueToOption, getListValue } from "../utils/autocomplete";
 
 

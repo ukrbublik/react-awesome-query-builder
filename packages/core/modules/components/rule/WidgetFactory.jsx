@@ -1,5 +1,5 @@
 import React from "react";
-import {getTitleInListValues} from "../../utils/stuff";
+import {getTitleInListValues} from "../../utils/listValues";
 
 export default ({
   delta, isFuncArg, valueSrc,

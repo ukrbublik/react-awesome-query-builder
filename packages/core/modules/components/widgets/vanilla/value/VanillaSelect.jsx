@@ -1,5 +1,5 @@
 import React from "react";
-import {mapListValues} from "../../../../utils/stuff";
+import {mapListValues} from "../../../../utils/listValues";
 import omit from "lodash/omit";
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, customProps,}) => {
