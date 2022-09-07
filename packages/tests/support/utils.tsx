@@ -17,7 +17,7 @@ const {
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 import { MaterialConfig } from "@react-awesome-query-builder/material";
-import BootstrapConfig from "@react-awesome-query-builder/core/config/bootstrap";
+import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 
 
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;

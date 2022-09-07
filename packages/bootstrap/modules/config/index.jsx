@@ -1,5 +1,5 @@
-import BootstrapWidgets from "../../components/widgets/bootstrap";
-import BasicConfig from "../basic";
+import BootstrapWidgets from "../widgets";
+import { BasicConfig } from "@react-awesome-query-builder/core";
 import React from "react";
 
 const {

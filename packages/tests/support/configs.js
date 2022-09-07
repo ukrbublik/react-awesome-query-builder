@@ -2,8 +2,7 @@ import React from "react";
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import { MuiWidgets } from "@react-awesome-query-builder/mui";
 import { MaterialWidgets } from "@react-awesome-query-builder/material";
-import BootstrapWidgets from "@react-awesome-query-builder/core/components/widgets/bootstrap";
-import * as VanillaWidgets from "@react-awesome-query-builder/core/components/widgets";
+import { BootstrapWidgets } from "@react-awesome-query-builder/bootstrap";
 const {
   FieldDropdown,
   FieldCascader,

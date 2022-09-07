@@ -5,6 +5,7 @@ const CORE = path.resolve(__dirname, "../core/modules");
 const ANTD = path.resolve(__dirname, "../antd/modules");
 const MUI = path.resolve(__dirname, "../mui/modules");
 const MATERIAL = path.resolve(__dirname, "../material/modules");
+const BOOTSTRAP = path.resolve(__dirname, "../bootstrap/modules");
 const TESTS = path.resolve(__dirname);
 
 
@@ -44,7 +45,8 @@ module.exports = {
                     CORE,
                     ANTD,
                     MUI,
-                    MATERIAL
+                    MATERIAL,
+                    BOOTSTRAP
                 ],
                 use: [ 
                     {
@@ -104,6 +106,7 @@ module.exports = {
             '@react-awesome-query-builder/antd': ANTD,
             '@react-awesome-query-builder/mui': MUI,
             '@react-awesome-query-builder/material': MATERIAL,
+            '@react-awesome-query-builder/bootstrap': BOOTSTRAP,
         },
         fallback: {
           fs: false,
