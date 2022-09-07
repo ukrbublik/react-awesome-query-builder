@@ -24,6 +24,8 @@ export default class FuncSelect extends PureComponent {
     setValue: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
     parentFuncs: PropTypes.array,
+    fieldDefinition: PropTypes.object,
+    isFuncArg: PropTypes.bool,
   };
 
   constructor(props) {
@@ -35,7 +37,7 @@ export default class FuncSelect extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "operator"];
+    const keysForItems = ["config", "field", "operator", "isFuncArg"];
     const keysForMeta = ["config", "field", "value"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
@@ -48,9 +50,9 @@ export default class FuncSelect extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentFuncs}) {
+  getItems({config, field, operator, parentFuncs, fieldDefinition, isFuncArg}) {
     const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField, parentFuncs);
+    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
     const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
@@ -82,13 +84,17 @@ export default class FuncSelect extends PureComponent {
     };
   }
 
-  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField, parentFuncs) {
+  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     let expectedType;
+    let targetDefinition = leftFieldConfig;
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
-    if (widget) {
+    if (isFuncArg && fieldDefinition) {
+      targetDefinition = fieldDefinition;
+      expectedType = fieldDefinition.type;
+    } else if (widget) {
       let widgetConfig = config.widgets[widget];
       let widgetType = widgetConfig.type;
       //expectedType = leftFieldConfig.type;
@@ -108,12 +114,12 @@ export default class FuncSelect extends PureComponent {
             delete list[funcKey];
         } else {
           let canUse = funcConfig.returnType == expectedType;
-          if (leftFieldConfig.funcs)
-            canUse = canUse && leftFieldConfig.funcs.includes(funcFullkey);
+          if (targetDefinition.funcs)
+            canUse = canUse && targetDefinition.funcs.includes(funcFullkey);
           if (canUseFuncForField)
             canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
           // don't use func in func (can be configurable, but usually users don't need this)
-          if (parentFuncs && parentFuncs.includes(funcFullkey))
+          if (!funcConfig.allowSelfNesting && parentFuncs && parentFuncs.map(([func, _arg]) => func).includes(funcFullkey))
             canUse = false;
           if (!canUse)
             delete list[funcKey];

@@ -36,7 +36,7 @@ export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
     if (jsTree && jsTree.type != "group" && jsTree.type != "switch_group") {
-      jsTree = wrapInDefaultConj(jsTree, extendedConfig);
+      jsTree = wrapInDefaultConj(jsTree, extendedConfig, convertedObj["not"]);
     }
     logger.debug("jsTree:", jsTree);
   }
@@ -675,8 +675,9 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
 
           //todo: it's naive
           const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
-          if (op == "eq") {
-            const ws = widgets.find(({op, widget}) => (widget && widget != "field"));
+          
+          if (op == "eq" || op == "ne") {
+            const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
             opKey = ws.op;
           }
         }
@@ -863,7 +864,7 @@ const wrapInDefaultConj = (rule, config, not = false) => {
     children1: { [rule.id]: rule },
     properties: {
       conjunction: defaultConjunction(config),
-      not: not
+      not: not || false
     }
   };
 };

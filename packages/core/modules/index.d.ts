@@ -206,6 +206,14 @@ export interface BuilderProps {
   dispatch: Dispatch,
 }
 
+export interface ItemBuilderProps {
+  config: Config;
+  actions: Actions;
+  properties: TypedMap<any>;
+  type: ItemType;
+  itemComponent: Factory<ItemProperties>;
+}
+
 export interface QueryProps {
   conjunctions: Conjunctions;
   operators: Operators;
@@ -815,6 +823,7 @@ export interface RenderSettings {
   renderConfirm?: ConfirmFunc,
   useConfirm?: () => Function,
   renderSize?: AntdSize,
+  renderItem?: Factory<ItemBuilderProps>,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
   showLabels?: boolean,
@@ -914,6 +923,7 @@ export interface Func {
   renderBrackets?: Array<ReactElement | string>,
   renderSeps?: Array<ReactElement | string>,
   spelFormatFunc?: SpelFormatFunc,
+  allowSelfNesting?: boolean,
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,

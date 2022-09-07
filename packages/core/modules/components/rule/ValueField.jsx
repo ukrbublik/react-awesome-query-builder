@@ -22,6 +22,8 @@ export default class ValueField extends PureComponent {
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
     parentField: PropTypes.string,
+    fieldDefinition: PropTypes.object,
+    isFuncArg: PropTypes.bool,
   };
 
   constructor(props) {

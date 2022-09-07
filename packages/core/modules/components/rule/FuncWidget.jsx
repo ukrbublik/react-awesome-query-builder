@@ -22,6 +22,8 @@ export default class FuncWidget extends PureComponent {
     setValue: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
     parentFuncs: PropTypes.array,
+    fieldDefinition: PropTypes.object,
+    isFuncArg: PropTypes.bool,
   };
 
   constructor(props) {
@@ -73,12 +75,13 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderFuncSelect = () => {
-    const {config, field, operator, customProps, value, readonly, parentFuncs, id, groupId} = this.props;
+    const {config, field, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
     const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
-      config, field, operator, customProps, readonly, parentFuncs,
+      config, field, operator, customProps, readonly, parentFuncs, 
+      isFuncArg, fieldDefinition,
       id, groupId,
     };
     const {showLabels, funcLabel} = config.settings;
@@ -237,14 +240,14 @@ class ArgWidget extends PureComponent {
   };
 
   render() {
-    const {funcKey, parentFuncs} = this.props;
+    const {funcKey, argKey, parentFuncs} = this.props;
     return (
       <Widget
         {...this.props} 
         setValue={this.setValue} 
         setValueSrc={this.setValueSrc} 
         isFuncArg={true}
-        parentFuncs={[...(parentFuncs || []), funcKey]}
+        parentFuncs={[...(parentFuncs || []), [funcKey, argKey]]}
       />
     );
   }
