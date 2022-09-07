@@ -3,7 +3,7 @@ import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {normalizeListValues, mergeArraysSmart} from "./stuff";
+import {mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 import pick from "lodash/pick";
@@ -191,7 +191,11 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     }
 
     if (fieldConfig.fieldSettings.listValues) {
-      fieldConfig.fieldSettings.listValues = normalizeListValues(fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings);
+      if (config.settings.normalizeListValues) {
+        fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues(
+          fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings
+        );
+      }
     }
 
     if (!typeConfig) {

@@ -1,9 +1,10 @@
 import en_US from "antd/lib/locale-provider/en_US";
 import AntdWidgets from "../widgets";
+import { normalizeListValues } from "../utils/stuff";
 import { Utils, BasicConfig } from "@react-awesome-query-builder/core";
 import React from "react";
 
-const { getTitleInListValues } = Utils.StuffUtils;
+const { getTitleInListValues } = Utils.ListUtils;
 const { SqlString, spelEscape, stringifyForDisplay } = Utils.ExportUtils;
 
 const {
@@ -64,6 +65,7 @@ const settings = {
   },
 
   removeInvalidMultiSelectValuesOnLoad: false, // can be removed manually in UI
+  normalizeListValues: normalizeListValues,
 };
 
 

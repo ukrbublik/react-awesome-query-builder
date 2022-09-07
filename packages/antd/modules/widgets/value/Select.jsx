@@ -1,10 +1,11 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
-import {mapListValues} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import { Select } from "antd";
 import omit from "lodash/omit";
+import { Utils } from "@react-awesome-query-builder/core";
+const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 
 export default class SelectWidget extends PureComponent {
