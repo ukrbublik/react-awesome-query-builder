@@ -31,18 +31,6 @@ module.exports = function(config) {
         watched: true,
         served: true,
         included: true,
-      }, 
-      {
-        pattern: "../core/modules/**/*",
-        watched: false,
-        served: true,
-        included: false,
-      }, 
-      {
-        pattern: "../core/css/**/*",
-        watched: false,
-        served: true,
-        included: false,
       }
     ],
     exclude: [],

@@ -102,6 +102,7 @@
     "webpack": "^5.61.0",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.9.1",
+    "copy-webpack-plugin": "^11.0.0",
     "compression-webpack-plugin": "^9.0.0"
   }
 }

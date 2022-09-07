@@ -2,6 +2,10 @@ ts_out/
 node_modules/
 dist/
 build/
+lib/
+coverage/
+junit/
+
 package-lock.json
 yarn.lock
 npm-debug.log

@@ -14,7 +14,9 @@
   "exports": {
     ".": "./modules/index.jsx",
     "./css/styles.css": "./lib/css/styles.css",
-    "./css/compact_styles.css": "./lib/css/compact_styles.css"
+    "./css/compact_styles.css": "./lib/css/compact_styles.css",
+    "./css/styles.scss": "./css/styles.scss",
+    "./css/antd.less": "./lib/css/antd.less"
   },
   "types": "modules/index.d.ts",
   "scripts": {

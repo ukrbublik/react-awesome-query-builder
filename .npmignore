@@ -1,12 +1,11 @@
-/packages/examples/build/*bundle*
-/packages/core/build/
-/packages/tests/coverage/
-/packages/tests/junit/
-/packages/sandbox/dist/
-/packages/sandbox_simple/dist/
+dist/
+build/
 ts_out/
+junit/
+coverage/
 node_modules/
 package-lock.json
+yarn.lock
 npm-debug.log
 .idea
 .eslintcache

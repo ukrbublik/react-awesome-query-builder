@@ -6,7 +6,7 @@ import {
   ImmutableTree,
   BuilderProps
 } from "@react-awesome-query-builder/core";
-import "../../core/css/styles.scss";
+import "@react-awesome-query-builder/core/css/styles.scss";
 import getConfig from "./config";
 
 const config: Config = getConfig();
