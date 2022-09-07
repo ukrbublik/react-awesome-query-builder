@@ -21,7 +21,8 @@
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
     "@react-awesome-query-builder/antd": "*",
-    "@react-awesome-query-builder/mui": "*"
+    "@react-awesome-query-builder/mui": "*",
+    "@react-awesome-query-builder/material": "*"
   },
   "devDependencies": {
     "react": "^17.0.2",

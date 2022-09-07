@@ -14,11 +14,10 @@
   "exports": {
     ".": "./modules/index.jsx",
     "./components/widgets": "./modules/components/widgets/index.jsx",
-    "./config/material": "./modules/config/material/index.jsx",
-    "./components/widgets/material": "./modules/components/widgets/material/index.jsx",
     "./config/bootstrap": "./modules/config/bootstrap/index.jsx",
     "./components/widgets/bootstrap": "./modules/components/widgets/bootstrap/index.jsx",
-    "./css/styles.css": "./lib/css/styles.css"
+    "./css/styles.css": "./lib/css/styles.css",
+    "./css/compact_styles.css": "./lib/css/compact_styles.css"
   },
   "types": "modules/index.d.ts",
   "scripts": {
@@ -32,7 +31,6 @@
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
   },
   "dependencies": {
-    "@date-io/moment": "^1.3.13",
     "classnames": "^2.3.1",
     "clone": "^2.1.2",
     "immutable": "^3.8.2",
@@ -48,10 +46,6 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.0 || ^6.1.0",
     "@fortawesome/free-solid-svg-icons": "^5.15.4 || ^6.0.0",
     "@fortawesome/react-fontawesome": "^0.1.16",
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.0.0",
-    "@material-ui/lab": "^4.0.0-alpha.57",
-    "@material-ui/pickers": "^3.2.10",
     "bootstrap": "^5.1.3",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0",
@@ -62,10 +56,6 @@
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.57",
-    "@material-ui/pickers": "^3.3.10",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.7.7",
@@ -73,8 +63,6 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "bootstrap": "^5.1.3",
-    "dayjs": "^1.10.5",
-    "lerna": "^5.4.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "reactstrap": "^9.0.0"

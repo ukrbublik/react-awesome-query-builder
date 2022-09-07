@@ -9,7 +9,7 @@ import {
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
-import MaterialConfig from "@react-awesome-query-builder/core/config/material";
+import { MaterialConfig } from "@react-awesome-query-builder/material";
 const {
   FieldSelect,
   FieldDropdown,

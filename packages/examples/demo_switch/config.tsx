@@ -3,7 +3,7 @@ import {
   Utils as QbUtils, 
   Widgets, Fields, Config, Settings, SpelConcatPart
 } from "@react-awesome-query-builder/core";
-import MaterialConfig from "@react-awesome-query-builder/core/config/material";
+import { MaterialConfig } from "@react-awesome-query-builder/material";
 import ReactSelect from "./select";
 
 export default (): Config => {

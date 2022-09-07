@@ -22,6 +22,7 @@
       "@react-awesome-query-builder/core/*": ["../core/modules/*"],
       "@react-awesome-query-builder/antd": ["../antd/modules"],
       "@react-awesome-query-builder/mui": ["../mui/modules"],
+      "@react-awesome-query-builder/material": ["../material/modules"],
     }
   },
   "include": [

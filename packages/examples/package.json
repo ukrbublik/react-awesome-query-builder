@@ -24,6 +24,7 @@
     "@react-awesome-query-builder/core": "*",
     "@react-awesome-query-builder/antd": "*",
     "@react-awesome-query-builder/mui": "*",
+    "@react-awesome-query-builder/material": "*",
     "react-select": "^5.2.2",
     "react-router-dom": "^6.2.1"
   },

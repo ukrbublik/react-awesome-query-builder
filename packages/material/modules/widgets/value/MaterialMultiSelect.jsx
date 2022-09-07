@@ -1,11 +1,12 @@
 import React from "react";
-import {mapListValues} from "../../../../utils/listValues";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import Checkbox from "@material-ui/core/Checkbox";
 import ListItemText from "@material-ui/core/ListItemText";
 import omit from "lodash/omit";
+import { Utils } from "@react-awesome-query-builder/core";
+const { mapListValues } = Utils.ListUtils;
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {
   const renderOptions = (selectedValues) => 

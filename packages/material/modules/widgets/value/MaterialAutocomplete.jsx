@@ -9,8 +9,8 @@ import Checkbox from "@material-ui/core/Checkbox";
 import { makeStyles } from "@material-ui/core/styles";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-
-import useListValuesAutocomplete from "../../../../hooks/useListValuesAutocomplete";
+import { Hooks } from "@react-awesome-query-builder/core";
+const { useListValuesAutocomplete } = Hooks;
 
 const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;

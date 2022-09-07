@@ -42,15 +42,17 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 
 - Use `BasicConfig` for simple vanilla UI
 - Use `AntdConfig` for more advanced UI with https://ant.design/[AntDesign] widgets
-- Use `MaterialConfig` for https://material-ui.com/[Material-UI] widgets
+- Use `MaterialConfig` for https://v4.mui.com/[Material-UI v4] widgets
+- Use `MuiConfig` for https://mui.com/[MUI] widgets
 - Use `BootstrapConfig` for https://reactstrap.github.io/[Bootstrap] widgets
 [source,javascript]
 ----
-import {BasicConfig} from 'react-awesome-query-builder';
-import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
-import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
-const InitialConfig = BasicConfig; // or AntdConfig or BootstrapConfig or MaterialConfig
+import {BasicConfig} from '@react-awesome-query-builder/core';
+import {AntdConfig from '@react-awesome-query-builder/antd';
+import {MaterialConfig} from '@react-awesome-query-builder/material';
+import {MuiConfig} from '@react-awesome-query-builder/mui';
+import {BootstrapConfig} from "@react-awesome-query-builder/bootstrap";
+const InitialConfig = BasicConfig; // or AntdConfig or MuiConfig or BootstrapConfig
 
 const myConfig = {
   ...InitialConfig, // reuse basic config
@@ -236,8 +238,8 @@ Example:
 ----
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
 import { ruRU } from '@material-ui/core/locale';
-import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
-import {Widgets} from 'react-awesome-query-builder';
+import { AntdWidgets } from '@react-awesome-query-builder/antd';
+import {Widgets} from '@react-awesome-query-builder/core';
 const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
 

@@ -15,6 +15,7 @@ const EXAMPLES = __dirname;
 const MODULES = path.resolve(EXAMPLES, '../core/modules/');
 const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
 const MUI_MODULES = path.resolve(EXAMPLES, '../mui/modules/');
+const MATERIAL_MODULES = path.resolve(EXAMPLES, '../material/modules/');
 const DIST = path.resolve(EXAMPLES, './build');
 
 let plugins = [
@@ -32,6 +33,7 @@ let aliases = {
     '@react-awesome-query-builder/core': MODULES,
     '@react-awesome-query-builder/antd': ANTD_MODULES,
     '@react-awesome-query-builder/mui': MUI_MODULES,
+    '@react-awesome-query-builder/material': MATERIAL_MODULES,
 };
 let style_loaders = [{
     loader: "style-loader"
