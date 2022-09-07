@@ -4,7 +4,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "version": "5.2.0",
+  "version": "6.0.0",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
     "query-builder",

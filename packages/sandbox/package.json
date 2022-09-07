@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox",
-  "version": "0.5.0",
+  "version": "6.0.0",
   "description": "Demo for react-awesome-query-builder",
   "main": "src/index.jsx",
   "readme": "README.md",
