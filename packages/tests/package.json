@@ -24,6 +24,8 @@
     "@react-awesome-query-builder/mui": "*"
   },
   "devDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@types/chai": "^4.2.18",
     "@types/enzyme": "^3.10.8",
