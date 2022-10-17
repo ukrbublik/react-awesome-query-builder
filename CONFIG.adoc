@@ -155,7 +155,7 @@ Example:
   },
   // complex
   user: {
-    type: '!struct', // special keyword for comlex fields
+    type: '!struct', // special keyword for complex fields
     label: 'User',
     subfields: {
       // subfields of complex field
