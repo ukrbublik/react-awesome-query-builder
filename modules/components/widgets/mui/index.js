@@ -45,12 +45,11 @@ const MuiProvider = ({config, children}) => {
       },
     }
   });
-
-  const base = (<div className="mui">{children}</div>);
+  
   const withProviders = (
     <LocalizationProvider dateAdapter={AdapterMoment} >
       <ConfirmProvider>
-        {base}
+       <div className="mui">{children}</div>
       </ConfirmProvider>
     </LocalizationProvider>
   );
