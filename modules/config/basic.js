@@ -467,6 +467,13 @@ const operators = {
     reversedOp: "select_any_in",
   },
   //todo: multiselect_contains - for SpEL it would be `.containsAll`
+  multiselect_contains: {
+    label: "Contains",
+    jsonLogic2: "some-in",
+    jsonLogic: (field, op, vals) => ({
+      "some": [ field, {"in": [{"var": ""}, vals]} ]
+    }),
+  },
   multiselect_equals: {
     label: "Equals",
     labelForFormat: "==",
@@ -1111,6 +1118,7 @@ const types = {
     widgets: {
       multiselect: {
         operators: [
+          "multiselect_contains",
           "multiselect_equals",
           "multiselect_not_equals",
           // "is_empty",
