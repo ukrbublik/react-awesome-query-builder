@@ -470,7 +470,6 @@ const operators = {
     label: "Contains",
     jsonLogic2: "some-in",
     jsonLogic: (field, op, vals) => ({
-      // it's not "equals", but "includes" operator - just for example
       "some": [ field, {"in": [{"var": ""}, vals]} ]
     }),
   },
