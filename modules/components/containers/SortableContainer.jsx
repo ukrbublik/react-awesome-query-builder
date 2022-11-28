@@ -7,8 +7,9 @@ import * as constants from "../../constants";
 import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
-import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
+import {pureShouldComponentUpdate, useOnPropsChanged, isUsingLegacyReactDomRender} from "../../utils/reactUtils";
 
+let _isReorderingTree = false;
 
 const createSortableContainer = (Builder, CanMoveFn = null) => 
   class SortableContainer extends Component {
@@ -55,6 +56,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
     componentDidUpdate(_prevProps, _prevState) {
       let dragging = this.props.dragging;
       let startDragging = this.props.dragStart;
+      _isReorderingTree = false;
       if (startDragging && startDragging.id) {
         dragging.itemInfo = this.tree.items[dragging.id];
         if (dragging.itemInfo) {
@@ -144,6 +146,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
     onDragStart = (id, dom, e) => {
       let treeEl = dom.closest(".query-builder");
+      if (this._isUsingLegacyReactDomRender === undefined) {
+        this._isUsingLegacyReactDomRender = isUsingLegacyReactDomRender(treeEl);
+      }
       document.body.classList.add("qb-dragging");
       treeEl.classList.add("qb-dragging");
       let treeElContainer = treeEl.closest(".query-builder-container") || treeEl;
@@ -605,6 +610,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
     }
 
     move (fromII, toII, placement, toParentII) {
+      if (!this._isUsingLegacyReactDomRender) {
+        _isReorderingTree = true;
+      }
       //logger.log("move", fromII, toII, placement, toParentII);
       this.props.actions.moveItem(fromII.path, toII.path, placement);
     }
@@ -641,3 +649,4 @@ export default (Builder, CanMoveFn = null) => {
   return ConnectedSortableContainer;
 };
 
+export { _isReorderingTree };
