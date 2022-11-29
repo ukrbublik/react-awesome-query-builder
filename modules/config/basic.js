@@ -466,12 +466,37 @@ const operators = {
     mongoFormatOp: mongoFormatOp1.bind(null, "$nin", v => v, false),
     reversedOp: "select_any_in",
   },
+  // it's not "contains all", but "contains any" operator
   multiselect_contains: {
     label: "Contains",
+    labelForFormat: "CONTAINS",
+    formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      if (valueSrc == "value")
+        return `${field} CONTAINS [${values.join(", ")}]`;
+      else
+        return `${field} CONTAINS ${values}`;
+    },
+    reversedOp: "multiselect_not_contains",
     jsonLogic2: "some-in",
     jsonLogic: (field, op, vals) => ({
       "some": [ field, {"in": [{"var": ""}, vals]} ]
     }),
+    //spelOp: ".containsAll",
+    spelOp: "CollectionUtils.containsAny()",
+    elasticSearchQueryType: "term",
+    mongoFormatOp: mongoFormatOp1.bind(null, "$in", v => v, false),
+  },
+  multiselect_not_contains: {
+    isNotOp: true,
+    label: "Not contains",
+    labelForFormat: "NOT CONTAINS",
+    formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      if (valueSrc == "value")
+        return `${field} NOT CONTAINS [${values.join(", ")}]`;
+      else
+        return `${field} NOT CONTAINS ${values}`;
+    },
+    reversedOp: "multiselect_contains"
   },
   multiselect_equals: {
     label: "Equals",
@@ -1118,6 +1143,7 @@ const types = {
       multiselect: {
         operators: [
           "multiselect_contains",
+          "multiselect_not_contains",
           "multiselect_equals",
           "multiselect_not_equals",
           // "is_empty",

@@ -191,7 +191,8 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   if (!spelOp) return undefined;
   const objectIsFirstArg = spelOp[0] == "$";
   const isMethod = spelOp[0] == "." || objectIsFirstArg;
-  const sop = isMethod ? spelOp.slice(1) : spelOp;
+  const isFunction = spelOp.substring(spelOp.length - 2) == "()";
+  const sop = isMethod ? spelOp.slice(1) : (isFunction ? spelOp.substring(0, spelOp.length - 2) : spelOp);
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   if (cardinality == 0) {
@@ -205,6 +206,8 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       if (objectIsFirstArg)
         return `${values}.${sop}(${field})`;
+      else if (isFunction)
+        return `${sop}(${field}, ${values})`;
       else if (isMethod)
         return `${field}.${sop}(${values})`;
       else
