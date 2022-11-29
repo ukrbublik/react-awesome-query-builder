@@ -871,6 +871,7 @@ export interface BehaviourSettings {
   removeEmptyGroupsOnLoad?: boolean,
   removeIncompleteRulesOnLoad?: boolean,
   removeInvalidMultiSelectValuesOnLoad?: boolean,
+  groupOperators?: Array<string>,
 }
 
 export interface OtherSettings {
