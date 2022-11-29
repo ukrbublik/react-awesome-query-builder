@@ -95,6 +95,7 @@ const {
         select_any_in,
         select_not_any_in,
         multiselect_contains,
+        multiselect_not_contains,
         multiselect_equals, // like `equal`, but for multiselect
         multiselect_not_equals,
         proximity, // complex operator with options

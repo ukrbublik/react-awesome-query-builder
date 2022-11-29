@@ -1,4 +1,6 @@
 # Changelog
+- 5.4.0
+  - Add `multiselect_contains` operator (PR #813) (issue #702)
 - 5.3.2
   - Fix drag-n-drop issue in React 18 using `ReactDOM.createRoot()` (PR #815) (issue #792)
   - Type fix: add `id` for `JsonRule` (PR #799) (issue #791)
