@@ -16,6 +16,7 @@
   },
   "types": "modules/index.d.ts",
   "scripts": {
+    "prepare": "yarn build",
     "lint": "yarn eslint && yarn tsc",
     "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",

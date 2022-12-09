@@ -8,7 +8,6 @@ import {completeValue} from "../utils/funcUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {Map} from "immutable";
-import {settings as defaultSettings} from "../config/default";
 
 
 // helpers
@@ -327,7 +326,7 @@ const formatRightField = (meta, config, rightField, parentPath) => {
     const _fieldKeys = getFieldPath(rightField, config);
     const fieldPartsLabels = getFieldPathLabels(rightField, config);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
-    const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
+    const formatFieldFn = config.settings.formatField;
     const rightFieldName = formatFieldName(rightField, config, meta, parentPath);
     const formattedField = formatFieldFn(rightFieldName, fieldParts, fieldFullLabel, rightFieldDefinition, config, false);
     ret = "$" + formattedField;

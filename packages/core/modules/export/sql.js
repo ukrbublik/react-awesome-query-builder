@@ -8,7 +8,6 @@ import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {defaultValue} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 import {SqlString} from "../utils/export";
@@ -237,7 +236,7 @@ const formatField = (meta, config, field) => {
   const _fieldKeys = getFieldPath(field, config);
   const fieldPartsLabels = getFieldPathLabels(field, config);
   const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
-  const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
+  const formatFieldFn = config.settings.formatField;
   const fieldName = formatFieldName(field, config, meta);
   const formattedField = formatFieldFn(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
   return formattedField;

@@ -8,7 +8,6 @@ import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {defaultValue, logger} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 import {spelEscape} from "../utils/export";

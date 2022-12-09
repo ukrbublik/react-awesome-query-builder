@@ -1,5 +1,6 @@
 import React from "react";
-import {getTitleInListValues} from "../../utils/listValues";
+import { Utils } from "@react-awesome-query-builder/core";
+const { getTitleInListValues } = Utils.ListUtils;
 
 export default ({
   delta, isFuncArg, valueSrc,

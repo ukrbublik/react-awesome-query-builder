@@ -4,6 +4,8 @@
     "module": "esnext",
     "jsx": "preserve",
     "lib": [
+      "dom",
+      "dom.iterable"
     ],
     "allowJs": true,
     "outDir": "ts_out",
@@ -15,6 +17,10 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@react-awesome-query-builder/core": ["../core/modules"],
+    },
     "skipLibCheck": true
   },
   "include": [

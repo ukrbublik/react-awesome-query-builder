@@ -2,6 +2,7 @@
 
 import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
+import {AbstractConfig} from "@react-awesome-query-builder/core";
 
 ////////////////
 // common
@@ -195,9 +196,6 @@ export interface Utils {
     spelEscape(val: any): string;
     spelFormatConcat(parts: SpelConcatParts): string;
     spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>],
-  },
-  ListUtils: {
-    getTitleInListValues(listValues: ListValues, val: any): string;
   }
 }
 
@@ -478,6 +476,16 @@ export interface ValueSourcesProps {
   title: string,
 }
 
+export interface ConfirmModalProps {
+  onOk(): void, 
+  okText: string, 
+  cancelText?: string, 
+  title: string,
+}
+
+export interface RuleErrorProps {
+  error: string,
+}
 
 
 /////////////////
@@ -993,12 +1001,50 @@ export interface BasicConfig extends Config {
 }
 
 
+/////////////////
+// ReadyWidgets
+/////////////////
+
+export type ConfirmFunc = (opts: ConfirmModalProps) => void;
+
+interface VanillaWidgets {
+  // vanilla core widgets
+  VanillaFieldSelect: ElementType<FieldProps>,
+  VanillaConjs: ElementType<ConjsProps>,
+  VanillaSwitch: ElementType<SwitchProps>,
+  VanillaButton: ElementType<ButtonProps>,
+  VanillaButtonGroup: ElementType<ButtonGroupProps>,
+  VanillaProvider: ElementType<ProviderProps>,
+  VanillaValueSources: ElementType<ValueSourcesProps>,
+  vanillaConfirm: ConfirmFunc,
+
+  // vanilla core widgets
+  VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
+  VanillaTextWidget: ElementType<TextWidgetProps>,
+  VanillaTextAreaWidget: ElementType<TextWidgetProps>,
+  VanillaDateWidget: ElementType<DateTimeWidgetProps>,
+  VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
+  VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaSelectWidget: ElementType<SelectWidgetProps>,
+  VanillaNumberWidget: ElementType<NumberWidgetProps>,
+  VanillaSliderWidget: ElementType<NumberWidgetProps>,
+}
+
+
+
+interface ReadyWidgets extends VanillaWidgets {
+  ValueFieldWidget: ElementType<WidgetProps>,
+  FuncWidget: ElementType<WidgetProps>,
+}
+
 
 
 
 
 /////////////////
 
-export declare const Utils: Utils;
-export declare const CoreConfig: BasicConfig;
-export declare const BasicFuncs: Funcs;
+export declare const Query: Query;
+export declare const Builder: Builder;
+export declare const BasicConfig: BasicConfig;
+export declare const Widgets: ReadyWidgets;

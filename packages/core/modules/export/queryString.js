@@ -8,7 +8,6 @@ import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {defaultValue} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {settings as defaultSettings} from "../config/default";
 import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 
@@ -274,7 +273,7 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
     const fieldPartsLabels = getFieldPathLabels(field, config, cutParentField ? parentField : null);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
-    const formatFieldFn = config.settings.formatField || defaultSettings.formatField;
+    const formatFieldFn = config.settings.formatField;
     const fieldName = formatFieldName(field, config, meta, cutParentField ? parentField : null);
     ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
   }

@@ -1,6 +1,3 @@
-import React from "react";
-import * as Widgets from "../components/widgets";
-import * as Operators from "../components/operators";
 import {
   SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList,
   stringifyForDisplay
@@ -8,26 +5,8 @@ import {
 import {escapeRegExp} from "../utils/stuff";
 import {getTitleInListValues} from "../utils/listValues";
 import moment from "moment";
-import {settings as defaultSettings} from "../config/default";
+import {settings as defaultSettings} from "./default";
 
-const {
-  //vanilla
-  VanillaBooleanWidget,
-  VanillaTextWidget,
-  VanillaTextAreaWidget,
-  VanillaDateWidget,
-  VanillaTimeWidget,
-  VanillaDateTimeWidget,
-  VanillaMultiSelectWidget,
-  VanillaSelectWidget,
-  VanillaNumberWidget,
-  VanillaSliderWidget,
-
-  //common
-  ValueFieldWidget,
-  FuncWidget
-} = Widgets;
-const { ProximityOperator } = Operators;
 
 
 //----------------------------  conjunctions
@@ -551,7 +530,6 @@ const operators = {
       optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
       optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
       optionPlaceholder: "Select words between", // placeholder for "near" selectbox
-      factory: (props) => <ProximityOperator {...props} />,
       minProximity: 2,
       maxProximity: 10,
       defaults: {
@@ -595,7 +573,6 @@ const widgets = {
     valueSrc: "value",
     valueLabel: "String",
     valuePlaceholder: "Enter string",
-    factory: (props) => <VanillaTextWidget {...props} />,
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
@@ -630,7 +607,6 @@ const widgets = {
     valueSrc: "value",
     valueLabel: "Text",
     valuePlaceholder: "Enter text",
-    factory: (props) => <VanillaTextAreaWidget {...props} />,
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
       return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
     },
@@ -650,7 +626,6 @@ const widgets = {
     type: "number",
     jsType: "number",
     valueSrc: "value",
-    factory: (props) => <VanillaNumberWidget {...props} />,
     valueLabel: "Number",
     valuePlaceholder: "Enter number",
     valueLabels: [
@@ -674,7 +649,6 @@ const widgets = {
     type: "number",
     jsType: "number",
     valueSrc: "value",
-    factory: (props) => <VanillaSliderWidget {...props} />,
     valueLabel: "Number",
     valuePlaceholder: "Enter number or move slider",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -691,7 +665,6 @@ const widgets = {
     type: "select",
     jsType: "string",
     valueSrc: "value",
-    factory: (props) => <VanillaSelectWidget {...props} />,
     valueLabel: "Value",
     valuePlaceholder: "Select value",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -709,7 +682,6 @@ const widgets = {
     type: "multiselect",
     jsType: "array",
     valueSrc: "value",
-    factory: (props) => <VanillaMultiSelectWidget {...props} />,
     valueLabel: "Values",
     valuePlaceholder: "Select values",
     formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
@@ -736,7 +708,6 @@ const widgets = {
     type: "date",
     jsType: "string",
     valueSrc: "value",
-    factory: (props) => <VanillaDateWidget {...props} />,
     dateFormat: "DD.MM.YYYY",
     valueFormat: "YYYY-MM-DD",
     useKeyboard: true,
@@ -772,7 +743,6 @@ const widgets = {
     type: "time",
     jsType: "string",
     valueSrc: "value",
-    factory: (props) => <VanillaTimeWidget {...props} />,
     timeFormat: "HH:mm",
     valueFormat: "HH:mm:ss",
     use12Hours: false,
@@ -829,7 +799,6 @@ const widgets = {
     type: "datetime",
     jsType: "string",
     valueSrc: "value",
-    factory: (props) => <VanillaDateTimeWidget {...props} />,
     timeFormat: "HH:mm",
     dateFormat: "DD.MM.YYYY",
     valueFormat: "YYYY-MM-DD HH:mm:ss",
@@ -867,7 +836,6 @@ const widgets = {
     type: "boolean",
     jsType: "boolean",
     valueSrc: "value",
-    factory: (props) => <VanillaBooleanWidget {...props} />,
     labelYes: "Yes",
     labelNo: "No",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
@@ -885,7 +853,6 @@ const widgets = {
   },
   field: {
     valueSrc: "field",
-    factory: (props) => <ValueFieldWidget {...props} />,
     formatValue: (val, fieldDef, wgtDef, isForDisplay, op, opDef, rightFieldDef) => {
       return isForDisplay ? (rightFieldDef.label || val) : val;
     },
@@ -897,18 +864,11 @@ const widgets = {
     },
     valueLabel: "Field to compare",
     valuePlaceholder: "Select field to compare",
-    customProps: {
-      showSearch: true
-    }
   },
   func: {
     valueSrc: "func",
-    factory: (props) => <FuncWidget {...props} />,
     valueLabel: "Function",
     valuePlaceholder: "Select function",
-    customProps: {
-      //showSearch: true
-    }
   },
   case_value: {
     valueSrc: "value",
@@ -918,13 +878,7 @@ const widgets = {
     },
     spelImportValue: (val) => {
       return [val.value, []];
-    },
-    factory: ({value, setValue}) =>  
-      <input 
-        type="text" 
-        value={value || ""} 
-        onChange={e => setValue(e.target.value)} 
-      />
+    }
   }
 };
 
@@ -1090,11 +1044,6 @@ const types = {
           "is_null",
           "is_not_null",
         ],
-        widgetProps: {
-          customProps: {
-            showSearch: true
-          }
-        },
       },
       multiselect: {
         operators: [
@@ -1291,14 +1240,7 @@ const settings = {
       widget: "func",
     }
   },
-  customFieldSelectProps: {
-    showSearch: true
-  },
 
-  defaultSliderWidth: "200px",
-  defaultSelectWidth: "200px",
-  defaultSearchWidth: "100px",
-  defaultMaxRows: 5,
 };
 
 //----------------------------
