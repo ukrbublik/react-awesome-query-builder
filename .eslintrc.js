@@ -63,7 +63,7 @@ module.exports = {
             "node": true,
         },
         "import/core-modules": [
-            "@react-awesome-query-builder/core/css/styles.css"
+            "@react-awesome-query-builder/ui/css/styles.css"
         ],
         "import/ignore": [
             /\.(scss|less|css)$/
@@ -166,7 +166,7 @@ module.exports = {
         "settings": {
             "import/core-modules": [
                 "react",
-                "@react-awesome-query-builder/core/css/styles.css"
+                "@react-awesome-query-builder/ui/css/styles.css"
             ],
         },
       },

@@ -1,4 +1,5 @@
 import React, { Component, PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import treeStoreReducer from "../stores/tree";
 import context from "../stores/context";
@@ -7,10 +8,10 @@ import {Provider} from "react-redux";
 import * as actions from "../actions";
 import {createConfigMemo} from "../utils/configUtils";
 import {immutableEqual} from "../utils/stuff";
-import {defaultRoot} from "../utils/defaultUtils";
 import {createValidationMemo} from "../utils/validation";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import ConnectedQuery from "./Query";
+const {defaultRoot} = Utils.DefaultUtils;
 
 
 export default class QueryContainer extends Component {

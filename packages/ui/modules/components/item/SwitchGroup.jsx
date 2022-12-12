@@ -1,4 +1,5 @@
 import React from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
@@ -6,8 +7,8 @@ import {BasicGroup} from "./Group";
 import {SwitchGroupActions} from "./SwitchGroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
-import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../../utils/treeUtils";
 import classNames from "classnames";
+const {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} = Utils.TreeUtils;
 
 
 class SwitchGroup extends BasicGroup {

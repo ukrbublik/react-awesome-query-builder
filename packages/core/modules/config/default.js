@@ -26,19 +26,7 @@ export const settings = {
   setOpOnChangeField: ["keep", "default"], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
   groupOperators: ["some", "all", "none"],
 
-  convertableWidgets: {
-    "number": ["slider", "rangeslider"],
-    "slider": ["number", "rangeslider"],
-    "rangeslider": ["number", "slider"],
-    "text": ["textarea"],
-    "textarea": ["text"]
-  },
   defaultGroupConjunction: "AND",
-  jsonLogic: {
-    groupVarKey: "var",
-    altVarKey: "var",
-    lockedOp: "locked"
-  },
 
   // localization
   locale: {

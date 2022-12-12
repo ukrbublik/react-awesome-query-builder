@@ -47,7 +47,7 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 - Use `BootstrapConfig` for https://reactstrap.github.io/[Bootstrap] widgets
 [source,javascript]
 ----
-import {BasicConfig} from '@react-awesome-query-builder/core';
+import {BasicConfig} from '@react-awesome-query-builder/ui';
 import {AntdConfig from '@react-awesome-query-builder/antd';
 import {MaterialConfig} from '@react-awesome-query-builder/material';
 import {MuiConfig} from '@react-awesome-query-builder/mui';

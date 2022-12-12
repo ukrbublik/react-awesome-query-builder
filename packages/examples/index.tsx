@@ -9,9 +9,9 @@ import {
   Route
 } from "react-router-dom";
 
-import "@react-awesome-query-builder/core/css/antd.less"; // or import "antd/dist/antd.css";
-import "@react-awesome-query-builder/core/css/styles.scss";
-//import '@react-awesome-query-builder/core/css/compact_styles.scss'; //optional
+import "@react-awesome-query-builder/ui/css/antd.less"; // or import "antd/dist/antd.css";
+import "@react-awesome-query-builder/ui/css/styles.scss";
+//import '@react-awesome-query-builder/ui/css/compact_styles.scss'; //optional
 
 const rootElement = window.document.getElementById("root");
 

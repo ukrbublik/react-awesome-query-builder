@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import merge from "lodash/merge";
 import {
-  BasicConfig, BasicFuncs, Utils,
+  BasicFuncs, Utils,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, OperatorProximity, Funcs,
+  Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
   DateTimeFieldSettings,
 } from "@react-awesome-query-builder/core";
+import {
+  BasicConfig,
+  // types:
+  Settings
+} from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
@@ -21,7 +26,7 @@ const {
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-const { simulateAsyncFetch } = Utils;
+const { simulateAsyncFetch } = Utils.Autocomplete;
 
 const skinToConfig: Record<string, Config> = {
   vanilla: BasicConfig,

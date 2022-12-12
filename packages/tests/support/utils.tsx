@@ -6,9 +6,13 @@ import { expect } from "chai";
 const stringify = JSON.stringify;
 
 import {
-  Query, Builder, Utils, BasicConfig, 
-  JsonLogicTree, JsonTree, Config, ImmutableTree, BuilderProps
+  Utils,
+  JsonLogicTree, JsonTree, Config, ImmutableTree
 } from "@react-awesome-query-builder/core";
+import {
+  Query, Builder, BasicConfig,
+  BuilderProps
+} from "@react-awesome-query-builder/ui";
 const {
   uuid, 
   checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,

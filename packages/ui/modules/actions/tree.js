@@ -1,9 +1,9 @@
-import uuid from "../utils/uuid";
+import { Utils } from "@react-awesome-query-builder/core";
 import {toImmutableList} from "../utils/stuff";
-import {defaultRuleProperties, defaultGroupProperties} from "../utils/defaultUtils";
 import * as constants from "../constants";
 import Immutable from "immutable";
-
+const { uuid } = Utils;
+const { defaultRuleProperties, defaultGroupProperties } = Utils.DefaultUtils;
 
 
 /**

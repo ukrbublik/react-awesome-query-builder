@@ -2,7 +2,7 @@ import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
   BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps
-} from "@react-awesome-query-builder/core";
+} from "@react-awesome-query-builder/ui";
 
 export interface BootstrapWidgets {
   // bootstrap core widgets

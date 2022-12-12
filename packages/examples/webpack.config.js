@@ -13,8 +13,9 @@ const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
-const CORE_CSS = path.resolve(EXAMPLES, '../core/css/');
+const UI_CSS = path.resolve(EXAMPLES, '../ui/css/');
 const CORE_MODULES = path.resolve(EXAMPLES, '../core/modules/');
+const UI_MODULES = path.resolve(EXAMPLES, '../ui/modules/');
 const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
 const MUI_MODULES = path.resolve(EXAMPLES, '../mui/modules/');
 const MATERIAL_MODULES = path.resolve(EXAMPLES, '../material/modules/');
@@ -34,7 +35,8 @@ let plugins = [
 ];
 
 let aliases = {
-    '@react-awesome-query-builder/core/css': CORE_CSS,
+    '@react-awesome-query-builder/ui/css': UI_CSS,
+    '@react-awesome-query-builder/ui': UI_MODULES,
     '@react-awesome-query-builder/core': CORE_MODULES,
     '@react-awesome-query-builder/antd': ANTD_MODULES,
     '@react-awesome-query-builder/mui': MUI_MODULES,

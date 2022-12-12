@@ -1,4 +1,5 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import RuleContainer from "../containers/RuleContainer";
 import Draggable from "../containers/Draggable";
@@ -6,11 +7,11 @@ import OperatorWrapper from "../rule/OperatorWrapper";
 import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
-import {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} from "../../utils/configUtils";
-import {getFieldPathLabels, getValueSourcesForFieldOp} from "../../utils/ruleUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
 import classNames from "classnames";
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
+const {getFieldPathLabels} = Utils.RuleUtils;
 
 
 class Rule extends PureComponent {

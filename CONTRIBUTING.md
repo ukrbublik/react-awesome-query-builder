@@ -23,7 +23,7 @@ You will see demo app with hot reload of demo code and local library code.
   - [`actions`](/packages/core/modules/actions) - Redux actions
   - [`stores/tree.js`](/packages/core/modules/stores/tree.js) - Redux store
   - [`index.d.ts`](/packages/core/modules/index.d.ts) - TS definitions
-- [`packages/core/css`](/packages/core/css) - Styles for query builder
+- [`packages/ui/css`](/packages/ui/css) - Styles for query builder
 - [`packages/examples`](/packages/examples) - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
 - [`packages/sandbox`](/packages/sandbox) - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
 - [`packages/sandbox_simple`](/packages/sandbox_simple) - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.

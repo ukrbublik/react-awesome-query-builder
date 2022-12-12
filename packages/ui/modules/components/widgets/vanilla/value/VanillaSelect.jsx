@@ -1,6 +1,7 @@
 import React from "react";
-import {mapListValues} from "../../../../utils/listValues";
+import { Utils } from "@react-awesome-query-builder/core";
 import omit from "lodash/omit";
+const { mapListValues } = Utils.ListUtils;
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, customProps,}) => {
   const renderOptions = () => 

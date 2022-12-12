@@ -2,10 +2,15 @@
 import React from "react";
 import merge from "lodash/merge";
 import {
-  BasicConfig, Utils,
+  Utils,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, Settings, LocaleSettings, Funcs,
+  Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs,
 } from "@react-awesome-query-builder/core";
+import {
+  BasicConfig,
+  // types:
+  Settings
+} from "@react-awesome-query-builder/ui";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
@@ -18,7 +23,7 @@ const {
 } = AntdWidgets;
 const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
 
-const { simulateAsyncFetch } = Utils;
+const { simulateAsyncFetch } = Utils.Autocomplete;
 
 const demoListValues = [
   { title: "A", value: "a" },

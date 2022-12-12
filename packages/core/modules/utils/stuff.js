@@ -105,6 +105,14 @@ function shallowEqualObjects(objA, objB, deep = false) {
   return true;
 }
 
+const isImmutable = (v) => {
+  return typeof v === "object" && v !== null && typeof v.toJS === "function";
+};
+
+export function applyToJS(v) {
+  return (isImmutable(v) ? v.toJS() : v);
+}
+
 export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
 };

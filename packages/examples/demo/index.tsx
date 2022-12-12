@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
-  Query, Builder, Utils, 
+  Utils, 
   //types:
-  ImmutableTree, Config, BuilderProps, JsonTree, JsonLogicTree, ActionMeta, Actions
+  ImmutableTree, Config, JsonTree, JsonLogicTree, ActionMeta, Actions
 } from "@react-awesome-query-builder/core";
+import {
+  Query, Builder, 
+  //types:
+  BuilderProps
+} from "@react-awesome-query-builder/ui";
 import throttle from "lodash/throttle";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";

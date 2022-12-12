@@ -1,10 +1,11 @@
 import React, { Component } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import mapValues from "lodash/mapValues";
 import context from "../../stores/context";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
 import {connect} from "react-redux";
-import {defaultGroupConjunction} from "../../utils/defaultUtils";
+const {defaultGroupConjunction} = Utils.DefaultUtils;
 
 
 const createGroupContainer = (Group) => 

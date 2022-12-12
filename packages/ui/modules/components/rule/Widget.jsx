@@ -1,18 +1,15 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import range from "lodash/range";
-import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig
-} from "../../utils/configUtils";
-import {
-  getValueSourcesForFieldOp, getWidgetsForFieldOp, getWidgetForFieldOp, getValueLabel
-} from "../../utils/ruleUtils";
 import {defaultValue} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
 import Immutable from "immutable";
 import WidgetFactory from "./WidgetFactory";
 import {Col} from "../utils";
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
+const {getValueSourcesForFieldOp, getWidgetsForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
 
 const funcArgDummyOpDef = {cardinality: 1};
 

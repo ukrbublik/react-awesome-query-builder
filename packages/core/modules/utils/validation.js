@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
 } from "./configUtils";
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
-import {defaultValue, deepEqual, logger, immutableEqual} from "../utils/stuff";
+import {defaultValue, deepEqual, logger} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree} from "../utils/treeUtils";
@@ -23,26 +23,6 @@ const isTypeOf = (v, type) => {
   if (type == "number" && !isNaN(v))
     return true; //can be casted
   return false;
-};
-
-export const createValidationMemo = () => {
-  let originalTree;
-  let validatedTree;
-  let configId;
-
-  return (config, tree, oldConfig) => {
-    if (!tree) {
-      return null;
-    }
-    if (config.__configId === configId && (immutableEqual(tree, originalTree) || immutableEqual(tree, validatedTree))) {
-      return validatedTree;
-    } else {
-      configId = config.__configId;
-      originalTree = tree;
-      validatedTree = validateAndFixTree(tree, null, config, oldConfig || config);
-      return validatedTree;
-    }
-  };
 };
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {

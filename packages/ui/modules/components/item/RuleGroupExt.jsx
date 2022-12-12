@@ -1,4 +1,5 @@
 import React from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
@@ -8,9 +9,9 @@ import FieldWrapper from "../rule/FieldWrapper";
 import OperatorWrapper from "../rule/OperatorWrapper";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, ConfirmFn} from "../utils";
-import {getFieldWidgetConfig, getFieldConfig} from "../../utils/configUtils";
 import Widget from "../rule/Widget";
 import classNames from "classnames";
+const {getFieldConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 
 
 class RuleGroupExt extends BasicGroup {

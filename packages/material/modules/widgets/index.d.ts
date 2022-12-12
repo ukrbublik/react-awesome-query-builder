@@ -2,7 +2,7 @@ import { ElementType } from "react";
 import {
   FieldProps, ConjsProps, SwitchProps, ButtonProps, ButtonGroupProps, ProviderProps, ValueSourcesProps, ConfirmFunc,
   BooleanWidgetProps, TextWidgetProps, DateTimeWidgetProps, SelectWidgetProps, NumberWidgetProps, RangeSliderWidgetProps
-} from "@react-awesome-query-builder/core";
+} from "@react-awesome-query-builder/ui";
 
 export interface MaterialWidgets {
   // material core widgets

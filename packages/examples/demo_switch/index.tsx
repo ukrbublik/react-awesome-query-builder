@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from "react";
 import {
-  Query, Builder, Utils as QbUtils,
+  Utils as QbUtils,
   JsonSwitchGroup,
   Config,
-  ImmutableTree,
-  BuilderProps
+  ImmutableTree
 } from "@react-awesome-query-builder/core";
-import "@react-awesome-query-builder/core/css/styles.scss";
+import {
+  Query, Builder, BuilderProps
+} from "@react-awesome-query-builder/ui";
+import "@react-awesome-query-builder/ui/css/styles.scss";
 import getConfig from "./config";
 
 const config: Config = getConfig();

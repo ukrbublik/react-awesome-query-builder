@@ -1,6 +1,6 @@
 import React, { Component } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import {connect} from "react-redux";
-import {getFlatTree} from "../../utils/treeUtils";
 import {logger} from "../../utils/stuff";
 import context from "../../stores/context";
 import * as constants from "../../constants";
@@ -8,6 +8,7 @@ import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
+const {getFlatTree} = Utils.TreeUtils;
 
 
 const createSortableContainer = (Builder, CanMoveFn = null) => 

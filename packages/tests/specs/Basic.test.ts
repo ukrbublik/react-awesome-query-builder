@@ -1,4 +1,4 @@
-import { Query, Builder, BasicConfig } from "@react-awesome-query-builder/core";
+import { Query, Builder, BasicConfig } from "@react-awesome-query-builder/ui";
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";

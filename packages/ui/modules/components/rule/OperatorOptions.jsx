@@ -1,6 +1,7 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
-import {getOperatorConfig} from "../../utils/configUtils";
+const {getOperatorConfig} = Utils.ConfigUtils;
 
 export default class OperatorOptions extends PureComponent {
   static propTypes = {

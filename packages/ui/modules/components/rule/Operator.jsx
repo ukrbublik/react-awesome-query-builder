@@ -1,10 +1,11 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
-import {getFieldConfig, getOperatorConfig} from "../../utils/configUtils";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
 import {useOnPropsChanged} from "../../utils/reactUtils";
+const {getFieldConfig, getOperatorConfig} = Utils.ConfigUtils;
 
 
 export default class Operator extends PureComponent {

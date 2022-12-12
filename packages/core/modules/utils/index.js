@@ -1,9 +1,11 @@
-export {validateTree} from "./validation";
-export {simulateAsyncFetch} from "./autocomplete";
+export {validateTree, validateAndFixTree} from "./validation";
 export {default as uuid} from "./uuid";
 export * as ConfigUtils from "./configUtils";
+export * as RuleUtils from "./ruleUtils";
+export * as FuncUtils from "./funcUtils";
 export * as DefaultUtils from "./defaultUtils";
 export * as TreeUtils from "./treeUtils";
 export * as ExportUtils from "./export";
 export * as ListUtils from "./listValues";
+export * as Autocomplete from "./autocomplete";
 export {getSwitchValues} from "./treeUtils";

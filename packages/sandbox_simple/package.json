@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
+    "@react-awesome-query-builder/ui": "*",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
+    "@react-awesome-query-builder/ui": "*",
     "@react-awesome-query-builder/antd": "*",
     "@react-awesome-query-builder/mui": "*",
     "@react-awesome-query-builder/material": "*",

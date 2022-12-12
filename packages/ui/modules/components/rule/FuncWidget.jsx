@@ -1,13 +1,12 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import FuncSelect from "./FuncSelect";
-import {
-  getFuncConfig
-} from "../../utils/configUtils";
 import Widget from "./Widget";
 import {Col} from "../utils";
-import {setFunc, setArgValue, setArgValueSrc} from "../../utils/funcUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
+const {getFuncConfig} = Utils.ConfigUtils;
+const {setFunc, setArgValue, setArgValueSrc} = Utils.FuncUtils;
 
 
 export default class FuncWidget extends PureComponent {

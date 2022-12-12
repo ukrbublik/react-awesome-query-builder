@@ -1,12 +1,11 @@
+import { Utils } from "@react-awesome-query-builder/core";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Immutable, {Map} from "immutable";
 import { Item } from "./item/Item";
 import SortableContainer from "./containers/SortableContainer";
-import {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} from "../utils/treeUtils";
-import uuid from "../utils/uuid";
 import {pureShouldComponentUpdate} from "../utils/reactUtils";
-
+const { getTotalReordableNodesCountInTree, getTotalRulesCountInTree } = Utils.TreeUtils;
 
 class Builder extends Component {
   static propTypes = {

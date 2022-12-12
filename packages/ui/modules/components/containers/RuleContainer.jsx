@@ -1,10 +1,11 @@
 import React, { Component } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import context from "../../stores/context";
-import {getFieldConfig} from "../../utils/configUtils";
 import {pureShouldComponentUpdate} from "../../utils/reactUtils";
 import {connect} from "react-redux";
 import classNames from "classnames";
+const {getFieldConfig} = Utils.ConfigUtils;
 
 
 const createRuleContainer = (Rule) => 

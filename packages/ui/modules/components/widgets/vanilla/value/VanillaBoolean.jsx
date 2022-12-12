@@ -1,5 +1,6 @@
 import React from "react";
-import uuid from "../../../../utils/uuid";
+import { Utils } from "@react-awesome-query-builder/core";
+const { uuid } = Utils;
 
 export default (props) => {
   const {value, setValue, config, labelYes, labelNo, readonly, customProps = {}} = props;

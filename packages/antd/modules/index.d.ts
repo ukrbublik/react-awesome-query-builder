@@ -1,4 +1,4 @@
-import {BasicConfig} from "@react-awesome-query-builder/core";
+import {BasicConfig} from "@react-awesome-query-builder/ui";
 import {AntdWidgets} from "./widgets";
 
 export declare const AntdConfig: BasicConfig;

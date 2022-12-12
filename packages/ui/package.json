@@ -30,6 +30,7 @@
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
   },
   "dependencies": {
+    "@react-awesome-query-builder/core": "*",
     "classnames": "^2.3.1",
     "prop-types": "^15.7.2",
     "react-redux": "^7.2.2",

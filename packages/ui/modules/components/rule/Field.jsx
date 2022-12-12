@@ -1,11 +1,12 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
-import {getFieldConfig} from "../../utils/configUtils";
-import {getFieldPath, getFieldPathLabels} from "../../utils/ruleUtils";
 import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
+const {getFieldPath, getFieldPathLabels} = Utils.RuleUtils;
+const {getFieldConfig} = Utils.ConfigUtils;
 
 
 export default class Field extends PureComponent {

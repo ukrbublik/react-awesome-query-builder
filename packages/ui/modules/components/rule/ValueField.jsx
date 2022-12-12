@@ -1,12 +1,13 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
-import {getFieldConfig} from "../../utils/configUtils";
-import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} from "../../utils/ruleUtils";
 import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 import clone from "clone";
+const {getFieldConfig} = Utils.ConfigUtils;
+const {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 

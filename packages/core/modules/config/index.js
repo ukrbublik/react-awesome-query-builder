@@ -1162,12 +1162,14 @@ const types = {
 const settings = {
   ...defaultSettings,
 
-  formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
-    if (isForDisplay)
-      return label2;
-    else
-      return field;
+  convertableWidgets: {
+    "number": ["slider", "rangeslider"],
+    "slider": ["number", "rangeslider"],
+    "rangeslider": ["number", "slider"],
+    "text": ["textarea"],
+    "textarea": ["text"]
   },
+
   formatSpelField: (field, parentField, parts, partsExt, fieldDefinition, config) => {
     let fieldName = partsExt.map(({key, parent}, ind) => {
       if (ind == 0) {
@@ -1221,6 +1223,12 @@ const settings = {
       return `COUNT OF ${aggrField}${cond} ${labelForFormat} ${valFrom} AND ${valTo}`;
     }
   },
+  jsonLogic: {
+    groupVarKey: "var",
+    altVarKey: "var",
+    lockedOp: "locked"
+  },
+  
   canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig) => {
     //for type == 'select'/'multiselect' you can check listValues
     return true;
