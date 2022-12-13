@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 
 const CORE = path.resolve(__dirname, "../core/modules");
+const UI = path.resolve(__dirname, "../ui/modules");
 const ANTD = path.resolve(__dirname, "../antd/modules");
 const MUI = path.resolve(__dirname, "../mui/modules");
 const MATERIAL = path.resolve(__dirname, "../material/modules");
@@ -43,6 +44,7 @@ module.exports = {
                 test: /\.[tj]sx?$/,
                 include: [
                     CORE,
+                    UI,
                     ANTD,
                     MUI,
                     MATERIAL,
@@ -103,6 +105,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         alias: {
             '@react-awesome-query-builder/core': CORE,
+            '@react-awesome-query-builder/ui': UI,
             '@react-awesome-query-builder/antd': ANTD,
             '@react-awesome-query-builder/mui': MUI,
             '@react-awesome-query-builder/material': MATERIAL,

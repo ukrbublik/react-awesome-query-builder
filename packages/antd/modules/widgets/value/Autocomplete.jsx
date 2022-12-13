@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Select, Spin, Divider } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
-import { Hooks } from "@react-awesome-query-builder/core";
+import { Hooks } from "@react-awesome-query-builder/ui";
 const { useListValuesAutocomplete } = Hooks;
 const Option = Select.Option;
 

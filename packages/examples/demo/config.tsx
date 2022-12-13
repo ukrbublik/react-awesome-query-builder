@@ -254,7 +254,7 @@ export default (skin: string) => {
     // canRegroup: true,
     // showLock: true,
     // showNot: true,
-    showLabels: true,
+    // showLabels: true,
     maxNesting: 5,
     canLeaveEmptyGroup: true,
     shouldCreateEmptyGroup: false,

@@ -7,7 +7,7 @@ import {
   defaultRuleProperties, defaultGroupProperties, defaultOperator, 
   defaultOperatorOptions, defaultRoot, defaultItemProperties
 } from "../utils/defaultUtils";
-import * as constants from "../constants";
+import * as constants from "./constants";
 import uuid from "../utils/uuid";
 import {
   getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig

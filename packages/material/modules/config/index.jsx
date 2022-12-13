@@ -1,5 +1,6 @@
 import MaterialWidgets from "../widgets";
-import { Utils, BasicConfig } from "@react-awesome-query-builder/core";
+import { Utils } from "@react-awesome-query-builder/core";
+import { BasicConfig } from "@react-awesome-query-builder/ui";
 import React from "react";
 const { SqlString, spelEscape, stringifyForDisplay } = Utils.ExportUtils;
 

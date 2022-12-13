@@ -181,7 +181,7 @@ export interface Utils {
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
-  
+
   Autocomplete: {
     simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   };
