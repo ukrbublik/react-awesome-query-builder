@@ -192,7 +192,9 @@ module.exports = {
             "@typescript-eslint/unbound-method": 0,
             "@typescript-eslint/prefer-regexp-exec": 0,
             "@typescript-eslint/no-empty-function": 0,
-            "@typescript-eslint/ban-ts-comment": 0
+            "@typescript-eslint/ban-ts-comment": 0,
+            "@typescript-eslint/no-floating-promises": 0
+
         }
       },
     ],

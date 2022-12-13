@@ -128,6 +128,7 @@ type JsonRuleGroupExt = {
 }
 type JsonRule = {
   type: "rule",
+  id?: string,
   properties: RuleProperties,
 }
 export type JsonTree = JsonGroup|JsonSwitchGroup;
@@ -447,7 +448,7 @@ export interface ConjunctionOption {
 }
 
 export interface ConjsProps {
-  id: string, 
+  id: string,
   readonly?: boolean,
   disabled?: boolean,
   selectedConjunction?: string,
@@ -780,6 +781,7 @@ export interface BehaviourSettings {
   removeEmptyGroupsOnLoad?: boolean,
   removeIncompleteRulesOnLoad?: boolean,
   removeInvalidMultiSelectValuesOnLoad?: boolean,
+  groupOperators?: Array<string>,
 }
 
 export interface OtherSettings {
@@ -873,6 +875,8 @@ export interface CoreConfig extends Config {
     select_not_equals: BinaryOperator,
     select_any_in: BinaryOperator,
     select_not_any_in: BinaryOperator,
+    multiselect_contains: BinaryOperator,
+    multiselect_not_contains: BinaryOperator,
     multiselect_equals: BinaryOperator,
     multiselect_not_equals: BinaryOperator,
     proximity: OperatorProximity,

@@ -2,6 +2,33 @@ import React from "react";
 import mapValues from "lodash/mapValues";
 import {shallowEqual} from "./stuff";
 
+const getReactContainerType = (el) => {
+  if (el._reactRootContainer) {
+    return "root";
+  }
+  if (Object.getOwnPropertyNames(el).filter(k => k.startsWith("__reactContainer")).length > 0) {
+    return "container";
+  }
+  return undefined;
+};
+
+const getReactRootNodeType = (node) => {
+  if (!node) {
+    return undefined;
+  }
+  const type = getReactContainerType(node);
+  if (type !== undefined) {
+    return type;
+  } else {
+    return getReactRootNodeType(node.parentNode);
+  }
+};
+
+export const isUsingLegacyReactDomRender = (node) => {
+  return getReactRootNodeType(node) === "root";
+};
+
+
 export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState) => {
   const prevProps = self.props;
   const prevState = self.state;

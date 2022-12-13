@@ -1,4 +1,11 @@
 # Changelog
+- 5.4.0
+  - Add `multiselect_contains` operator (PR #813) (issue #702)
+- 5.3.2
+  - Fix drag-n-drop issue in React 18 using `ReactDOM.createRoot()` (PR #815) (issue #792)
+  - Type fix: add `id` for `JsonRule` (PR #799) (issue #791)
+  - Type fix: Add typings for `groupOperators` (PR #798)
+  - Fix: `not` operation at the root not detected when importing from SpEL (PR #767) (issue #766)
 - 5.3.1
   - Support `@fortawesome/react-fontawesome 0.2.x` (issue #757)
   - Fix `loadFromSpel` for `select_not_equals` op (PR #761) (issue #704)

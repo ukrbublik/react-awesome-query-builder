@@ -254,7 +254,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
     : toPath.size > 1 ? getItemByPath(state, targetPath) : null;
   const targetChildren = target ? target.get("children1") : null;
 
-  if (!source || !target)
+  if (!source || !target || !from)
     return state;
 
   const isSameParent = (source.get("id") == target.get("id"));
