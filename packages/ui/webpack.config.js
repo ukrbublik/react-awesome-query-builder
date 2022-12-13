@@ -75,7 +75,7 @@ export default {
                 loader: 'ts-loader',
                 exclude: /node_modules/,
                 resolve: {
-                  fullySpecified: false,
+                  //fullySpecified: false,
                 }
             },
             {
@@ -86,7 +86,7 @@ export default {
                 },
                 exclude: /node_modules/,
                 resolve: {
-                  fullySpecified: false,
+                  //fullySpecified: false,
                 }
             },
             {

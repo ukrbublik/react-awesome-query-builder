@@ -142,7 +142,7 @@ module.exports = {
                     }
                 }],
                 resolve: {
-                  fullySpecified: false,
+                  //fullySpecified: false,
                 }
             },
             {

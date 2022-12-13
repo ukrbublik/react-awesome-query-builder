@@ -37,7 +37,7 @@ module.exports = {
                 ],
                 exclude: /node_modules/,
                 resolve: {
-                  fullySpecified: false,
+                  //fullySpecified: false,
                 }
             },
             {
@@ -67,7 +67,7 @@ module.exports = {
                 ],
                 exclude: /node_modules/,
                 resolve: {
-                  fullySpecified: false,
+                  //fullySpecified: false,
                 }
             },
             {

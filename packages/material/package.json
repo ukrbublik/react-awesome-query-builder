@@ -9,12 +9,17 @@
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
     "directory": "packages/material"
   },
-  "type": "module",
-  "main": "lib",
+  "main": "./lib/index.js",
+  "module": "./modules/index.jsx",
+  "types": "./modules/index.d.ts",
   "exports": {
-    ".": "./modules/index.jsx"
+    ".": {
+      "types": "./modules/index.d.ts",
+      "import": "./modules/index.jsx",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
   },
-  "types": "modules/index.d.ts",
   "scripts": {
     "prepare": "yarn build",
     "lint": "yarn eslint && yarn tsc",

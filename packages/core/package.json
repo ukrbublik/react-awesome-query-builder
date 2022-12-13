@@ -4,17 +4,22 @@
   "description": "Core",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
-  "type": "module",
-  "main": "lib",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
     "directory": "packages/core"
   },
+  "main": "./lib/index.js",
+  "module": "./modules/index.js",
+  "types": "./modules/index.d.ts",
   "exports": {
-    ".": "./modules/index.js"
+    ".": {
+      "types": "./modules/index.d.ts",
+      "import": "./modules/index.js",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
   },
-  "types": "modules/index.d.ts",
   "scripts": {
     "prepare": "yarn build",
     "build": "sh ./scripts/build-npm.sh",
