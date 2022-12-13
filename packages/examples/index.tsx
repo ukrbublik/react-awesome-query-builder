@@ -9,7 +9,7 @@ import {
   Route
 } from "react-router-dom";
 
-import "@react-awesome-query-builder/ui/css/antd.less"; // or import "antd/dist/antd.css";
+import "antd/dist/antd.css"; // or import "@react-awesome-query-builder/ui/css/antd.less"
 import "@react-awesome-query-builder/ui/css/styles.scss";
 //import '@react-awesome-query-builder/ui/css/compact_styles.scss'; //optional
 

@@ -120,7 +120,7 @@ import {Query, Builder, BasicConfig, Utils as QbUtils} from 'react-awesome-query
 
 // For AntDesign widgets only:
 import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import 'antd/dist/antd.css'; // or import "react-awesome-query-builder/css/antd.less";
+import 'antd/dist/antd.css';
 // For MUI 4/5 widgets only:
 import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
 import MuiConfig from 'react-awesome-query-builder/lib/config/mui';
@@ -242,7 +242,7 @@ import {
 
 // For AntDesign widgets only:
 import AntdConfig from "react-awesome-query-builder/lib/config/antd";
-import "antd/dist/antd.css"; // or import "react-awesome-query-builder/css/antd.less";
+import "antd/dist/antd.css";
 // For MUI 4/5 widgets only:
 //import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
 //import MuiConfig from 'react-awesome-query-builder/lib/config/mui';
