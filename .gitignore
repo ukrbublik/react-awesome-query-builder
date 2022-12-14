@@ -2,7 +2,6 @@ ts_out/
 node_modules/
 dist/
 build/
-lib/
 coverage/
 junit/
 
@@ -12,3 +11,5 @@ npm-debug.log
 .idea
 .eslintcache
 .DS_Store
+
+lib/

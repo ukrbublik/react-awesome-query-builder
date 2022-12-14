@@ -8,13 +8,13 @@ export const defaultValue = (value, _default) => {
   return (typeof value === "undefined") ? _default : value;
 };
 
-export const immutableEqual = function(v1, v2) {
-  if (v1 === v2) {
-    return true;
-  } else {
-    return v1.equals(v2);
-  }
-};
+// const immutableEqual = function(v1, v2) {
+//   if (v1 === v2) {
+//     return true;
+//   } else {
+//     return v1.equals(v2);
+//   }
+// };
 
 export const deepEqual = function(v1, v2) {
   if (v1 === v2) {
@@ -26,18 +26,18 @@ export const deepEqual = function(v1, v2) {
   }
 };
 
-//Do sets have same values?
-const eqSet = function (as, bs) {
-  if (as.size !== bs.size) return false;
-  for (var a of as) if (!bs.has(a)) return false;
-  return true;
-};
+// //Do sets have same values?
+// const eqSet = function (as, bs) {
+//   if (as.size !== bs.size) return false;
+//   for (var a of as) if (!bs.has(a)) return false;
+//   return true;
+// };
 
 
-//Do arrays have same values?
-const eqArrSet = function (arr1, arr2) {
-  return eqSet(new Set(arr1), new Set(arr2));
-};
+// //Do arrays have same values?
+// const eqArrSet = function (arr1, arr2) {
+//   return eqSet(new Set(arr1), new Set(arr2));
+// };
 
 export const shallowEqual = (a, b, deep = false) => {
   if (a === b) {

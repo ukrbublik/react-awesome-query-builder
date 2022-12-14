@@ -1,8 +1,5 @@
 import Immutable, { Map } from "immutable";
 
-// RegExp.quote = function (str) {
-//     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
-// };
 
 export const defaultValue = (value, _default) => {
   return (typeof value === "undefined") ? _default : value;
@@ -24,15 +21,15 @@ export const immutableEqual = function(v1, v2) {
   }
 };
 
-export const deepEqual = function(v1, v2) {
-  if (v1 === v2) {
-    return true;
-  } else if (Map.isMap(v1)) {
-    return v1.equals(v2);
-  } else {
-    return JSON.stringify(v1) == JSON.stringify(v2);
-  }
-};
+// const deepEqual = function(v1, v2) {
+//   if (v1 === v2) {
+//     return true;
+//   } else if (Map.isMap(v1)) {
+//     return v1.equals(v2);
+//   } else {
+//     return JSON.stringify(v1) == JSON.stringify(v2);
+//   }
+// };
 
 
 export const shallowEqual = (a, b, deep = false) => {
@@ -102,13 +99,6 @@ function shallowEqualObjects(objA, objB, deep = false) {
 }
 
 
-
-export function sleep(delay) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay);
-  });
-}
-
 const isImmutable = (v) => {
   return typeof v === "object" && v !== null && typeof v.toJS === "function";
 };
@@ -117,7 +107,6 @@ const isImmutable = (v) => {
 export function toImmutableList(v) {
   return (isImmutable(v) ? v : new Immutable.List(v));
 }
-
 
 
 const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");

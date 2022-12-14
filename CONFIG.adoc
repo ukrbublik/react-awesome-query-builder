@@ -241,7 +241,6 @@ Example:
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
 import { ruRU } from '@material-ui/core/locale';
 import { AntdWidgets } from '@react-awesome-query-builder/antd';
-import {Widgets} from '@react-awesome-query-builder/core';
 const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
 
@@ -541,25 +540,26 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 
 [source,javascript]
 ----
-import {Widgets} from 'react-awesome-query-builder';
-import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
-import MaterialWidgets from 'react-awesome-query-builder/lib/components/widgets/material';
-import BootstrapWidgets from 'react-awesome-query-builder/lib/components/widgets/bootstrap';
+import {VanillaWidgets} from '@react-awesome-query-builder/ui';
+import {AntdWidgets} from '@react-awesome-query-builder/antd';
+import {MaterialWidgets} from '@react-awesome-query-builder/material'; // MUI v4
+import {MuiWidgets} from '@react-awesome-query-builder/mui';
+import {BootstrapWidgets} from '@react-awesome-query-builder/bootstrap';
+const {
+    VanillaTextWidget,
+    VanillaNumberWidget,
+    ...
+} = VanillaWidgets;
 const {
     TextWidget,
     NumberWidget,
     ...
 } = AntdWidgets;
 const {
-    VanillaTextWidget,
-    VanillaNumberWidget,
+    MuiTextWidget,
+    MuiNumberWidget,
     ...
-} = Widgets;
-const {
-    MaterialTextWidget,
-    MaterialNumberWidget,
-    ...
-} = MaterialWidgets;
+} = MuiWidgets;
 const {
     BootstrapTextWidget,
     BootstrapNumberWidget,

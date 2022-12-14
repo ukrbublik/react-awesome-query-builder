@@ -222,4 +222,4 @@ interface VanillaWidgets {
 export declare const Query: Query;
 export declare const Builder: Builder;
 export declare const BasicConfig: BasicConfig;
-export declare const Widgets: VanillaWidgets;
+export declare const VanillaWidgets: VanillaWidgets;
