@@ -19,6 +19,7 @@
 - 5.2.0
   - ! Breaking change: `children1` is now array in result of `getTree()` to preserve items order (PR #672) (issues #589, #670)
     `Utils.getTree(tree, true, false)` will behave same as before this change.
+  - ! Breaking change: `removeIncompleteRulesOnLoad` and `removeEmptyGroupsOnLoad` now default to `true`, set them to `false` in your `settings` to preserve the current behaviour. (PR #733) (issue #674)
   - Support React 18. Migrate to x-date-pickers. (PR #734) (issues #710, #732)
   - Add path property at `index.d.ts` (PR #671) (issue #669)
   - Fixed `getTotalRulesCountInTree()` == 1 (should be 0) for clear tree (PR #673) (issue #583)
