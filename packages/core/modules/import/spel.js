@@ -491,6 +491,16 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
+
+  const value = convertedArgs.map(function (v) {return v.value});
+
+  if (opKey === 'equal' && value && value[0] === null) {
+    opKey = 'is_null';
+  }
+  if (opKey === 'not_equal' && value && value[0] === null) {
+    opKey = 'is_not_null';
+  }
+  
   let res = {
     type: "rule",
     id: uuid(),
