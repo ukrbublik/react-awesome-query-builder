@@ -72,7 +72,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
-- TypeScript support (see [types](/modules/index.d.ts) and [demo in TS](/examples))
+- TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
 
 
 ## Getting started
@@ -95,6 +95,7 @@ graph LR;
 
 `ui` re-exports from `core`, other packages re-export from `ui`. 
 For using this library on frontend you need to install and use only `ui` (for basic widgets) or one of framework-specific packages (`antd` / `mui` / `bootstrap`). 
+
 For using this library on server-side (Node.js) you need only `core`. 
 This is useful if you want to pass query value from frontend to backend in JSON format and perform [export](#utils) eg. to SQL on server-side for security reasons.
 
@@ -140,7 +141,7 @@ import {BootstrapConfig} from '@react-awesome-query-builder/bootstrap';
 import '@react-awesome-query-builder/ui/css/styles.css';
 import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
 
-// Choose your skin (ant/material/vanilla):
+// Choose your skin (antd/mui/vanilla):
 const InitialConfig = AntdConfig; // or MuiConfig or BootstrapConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
@@ -259,7 +260,7 @@ import "antd/dist/antd.css";
 import '@react-awesome-query-builder/ui/css/styles.css';
 import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
 
-// Choose your skin (ant/material/vanilla):
+// Choose your skin (antd/mui/vanilla):
 const InitialConfig = AntdConfig; // or MuiConfig or BootstrapConfig or BasicConfig
 
 // You need to provide your own config. See below 'Config format'
@@ -381,9 +382,9 @@ export const Demo: React.FC = () => {
 
 ### `<Query />`
 Props:
-- `{...config}` - destructured query [`CONFIG`](/CONFIG.adoc)
+- `{...config}` - destructured [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
-- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/modules/index.d.ts)).
+- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
@@ -393,7 +394,7 @@ Props:
   - set css `.MuiPopover-root, .MuiDialog-root { z-index: 900 !important; }` (or 1000 for AntDesign v3)
 - If you put query builder component inside [Fluent-UI](https://developer.microsoft.com/en-us/fluentui)'s `<Panel />`, please:
   - set css `.ms-Layer.ms-Layer--fixed.root-119 { z-index: 900 !important; }`
-- `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically (for list of actions see `Actions` in [`index.d.ts`](/modules/index.d.ts)).
+- `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically (for list of actions see `Actions` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
 
 ### `<Builder />`
 Render this component only inside `Query.renderBuilder()` like in example above:

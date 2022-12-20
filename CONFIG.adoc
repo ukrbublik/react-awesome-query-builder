@@ -239,7 +239,8 @@ Example:
 [source,javascript]
 ----
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
-import { ruRU } from '@material-ui/core/locale';
+import { ruRU } from '@material-ui/core/locale'; //v4
+import { ruRU as muiRuRU } from '@mui/material/locale';
 import { AntdWidgets } from '@react-awesome-query-builder/antd';
 const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
@@ -264,6 +265,7 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
       moment: 'ru',
       antd: ru_RU,
       material: ruRU,
+      mui: muiRuRU,
   },
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
@@ -370,8 +372,10 @@ Other settings:
 |key |default |meaning
 |locale.moment |"en" |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
 |locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
-|locale.material |`enUS` |Locale object used for https://material-ui.com/ru/guides/localization/[MaterialUI] widgets
-|theme.material |{} |Options for https://material-ui.com/ru/customization/theming/[createMuiTheme]
+|locale.material |`enUS` |Locale object used for https://v4.mui.com/getting-started/installation/[MaterialUI v4] widgets
+|locale.mui |`enUS` |Locale object used for https://mui.com/material-ui/guides/localization/[MUI] widgets
+|theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
+|theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +

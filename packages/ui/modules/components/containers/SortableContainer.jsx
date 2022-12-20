@@ -3,7 +3,7 @@ import { Utils } from "@react-awesome-query-builder/core";
 import {connect} from "react-redux";
 import {logger} from "../../utils/stuff";
 import context from "../../stores/context";
-import * as constants from "../../constants";
+import * as constants from "../../stores/constants";
 import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
