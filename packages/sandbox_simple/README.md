@@ -1,4 +1,4 @@
-# react-awesome-query-builder-demo-simple
+# @react-awesome-query-builder/sandbox-simple
 
 Demo app built with `vite`.  
 Uses vanilla widgets.  
@@ -16,5 +16,5 @@ Or create own temaplte on [codesandbox.io](https://codesandbox.io/) by importing
 yarn
 yarn start
 ```
-Open `http://localhost:5173` in a browser.  
+Open `http://localhost:5174` in a browser.  
 Feel free to play with code in `src/demo` dir.  

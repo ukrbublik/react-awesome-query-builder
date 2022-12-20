@@ -17,6 +17,6 @@ yarn
 yarn start
 # yarn build
 ```
-Open `http://localhost:5173` in a browser.  
+Open `http://localhost:5174` in a browser.  
 Feel free to play with code in `src/demo` dir.  
 
