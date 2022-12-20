@@ -12,18 +12,13 @@ import {
   ItemProperties,
   ValueSource,
   TypedValueSourceMap,
-  // re-export
-  ConjunctionOption, ConjsProps,
-  FieldItem, FieldProps,
+  ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
   TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps
 } from "@react-awesome-query-builder/core";
-export type {
-  ConjunctionOption, ConjsProps,
-  FieldItem, FieldProps,
-  WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
-  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps
-};
+
+// re-export
+export * from "@react-awesome-query-builder/core";
 
 ////////////////
 // common

@@ -306,7 +306,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     const jsType = wConfig.jsType;
     const fieldSettings = fieldConfig.fieldSettings;
 
-    if (valueType != wType)
+    if (valueType && valueType != wType)
       return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
     if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
       return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];

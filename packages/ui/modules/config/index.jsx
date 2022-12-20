@@ -1,6 +1,6 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
-import * as Operators from "../components/operators";
+import * as CustomOperators from "../components/operators";
 import {CoreConfig} from "@react-awesome-query-builder/core";
 
 const {
@@ -30,7 +30,7 @@ const {
   ValueFieldWidget,
   FuncWidget
 } = Widgets;
-const { ProximityOperator } = Operators;
+const { ProximityOperator } = CustomOperators;
 
 
 //----------------------------  conjunctions

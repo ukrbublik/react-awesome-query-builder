@@ -680,6 +680,8 @@ const emptyDrag = {
 };
 
 const getActionMeta = (action, state) => {
+  if (!action || !action.type)
+    return null;
   const actionKeysToOmit = [
     "config", "asyncListValues", "__isInternal"
   ];
@@ -715,7 +717,7 @@ export default (config, tree, getMemoizedTree) => {
     let set = {};
     let actionMeta = getActionMeta(action, state);
 
-    switch (action.type) {
+    switch (action?.type) {
     case constants.SET_TREE: {
       const validatedTree = getMemoizedTree(action.config, action.tree);
       set.tree = validatedTree;

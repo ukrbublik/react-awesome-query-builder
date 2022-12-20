@@ -4,12 +4,13 @@ import {
   BasicFuncs, Utils,
   // types:
   Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
-  DateTimeFieldSettings,
+  //DateTimeFieldSettings,
 } from "@react-awesome-query-builder/core";
 import {
   BasicConfig,
   // types:
-  Settings
+  Settings,
+  DateTimeFieldSettings
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/lib/locale-provider/ru_RU";

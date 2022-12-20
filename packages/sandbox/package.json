@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox",
-  "version": "6.0.0",
+  "version": "6.0.0-beta.0",
   "description": "Demo for react-awesome-query-builder",
   "main": "src/index.jsx",
   "readme": "README.md",
@@ -21,8 +21,8 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/core": "*",
-    "@react-awesome-query-builder/ui": "*",
+    "@react-awesome-query-builder/antd": "*",
+    "@react-awesome-query-builder/mui": "*",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.4",
@@ -30,7 +30,6 @@
     "@mui/material": "^5.2.4",
     "@mui/system": "^5.2.4",
     "@mui/x-date-pickers": "^5.0.0-beta.6",
-    "material-ui-confirm": "^3.0.0",
     "antd": "^4.16.13",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"

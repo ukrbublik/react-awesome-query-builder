@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/mui",
-  "version": "6.0.0",
+  "version": "6.0.0-beta.0",
   "description": "MUI 5 widgets",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
@@ -30,7 +30,8 @@
   },
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
-    "@react-awesome-query-builder/ui": "*"
+    "@react-awesome-query-builder/ui": "*",
+    "material-ui-confirm": "^3.0.5"
   },
   "peerDependencies": {
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
@@ -40,8 +41,7 @@
     "@mui/material": "^5.2.4",
     "@mui/x-date-pickers": "^5.0.0-beta.2",
     "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
-    "material-ui-confirm": "^3.0.0"
+    "@emotion/styled": "^11.6.0"
   },
   "devDependencies": {
     "react": "^17.0.2",
@@ -52,7 +52,6 @@
     "@mui/system": "^5.10.4",
     "@mui/x-date-pickers": "^5.0.0",
     "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "material-ui-confirm": "^3.0.5"
+    "@emotion/styled": "^11.10.4"
   }
 }

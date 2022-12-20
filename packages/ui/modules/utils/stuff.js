@@ -104,9 +104,9 @@ const isImmutable = (v) => {
 };
 
 
-export function toImmutableList(v) {
-  return (isImmutable(v) ? v : new Immutable.List(v));
-}
+// export function toImmutableList(v) {
+//   return (isImmutable(v) ? v : new Immutable.List(v));
+// }
 
 
 const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");

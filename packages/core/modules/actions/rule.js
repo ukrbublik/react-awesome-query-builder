@@ -1,4 +1,4 @@
-import * as constants from "../constants";
+import * as constants from "../stores/constants";
 import {toImmutableList} from "../utils/stuff";
 
 /**

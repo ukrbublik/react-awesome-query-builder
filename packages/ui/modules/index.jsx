@@ -4,7 +4,10 @@ import Builder from "./components/Builder";
 import BasicConfig from "./config";
 import * as Hooks from "./hooks";
 import * as VanillaWidgets from "./components/widgets/index";
-import * as Operators from "./components/operators";
+import * as CustomOperators from "./components/operators";
 
-export {Query, Builder, VanillaWidgets, Operators, Hooks, BasicConfig};
+// re-export
+export * from "@react-awesome-query-builder/core";
+
+export {Query, Builder, BasicConfig, VanillaWidgets, CustomOperators, Hooks};
 

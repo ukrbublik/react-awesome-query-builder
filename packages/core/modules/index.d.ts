@@ -275,8 +275,34 @@ interface TreeState {
   tree: ImmutableTree,
   __lastAction?: ActionMeta,
 }
-type TreeReducer = (state: TreeState, action: InputAction) => TreeState;
-type TreeStore = (config: Config, tree: ImmutableTree) => TreeReducer;
+type TreeReducer = (state?: TreeState, action?: InputAction) => TreeState;
+type TreeStore = (config: Config, tree?: ImmutableTree) => TreeReducer;
+
+export interface TreeActions {
+  tree: {
+    setTree(config: Config, tree: ImmutableTree): InputAction,
+    addRule(config: Config, path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): InputAction,
+    removeRule(config: Config, path: IdPath): InputAction,
+    addDefaultCaseGroup(config: Config, path: IdPath, properties?: ItemProperties, children?: Array<JsonAnyRule>): InputAction,
+    addCaseGroup(config: Config, path: IdPath, properties?: ItemProperties, children?: Array<JsonAnyRule>): InputAction,
+    addGroup(config: Config, path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): InputAction,
+    removeGroup(config: Config, path: IdPath): InputAction;
+    moveItem(config: Config, fromPath: IdPath, toPath: IdPath, placement: Placement): InputAction;
+  },
+  group: {
+    setConjunction(config: Config, path: IdPath, conjunction: string): InputAction;
+    setNot(config: Config, path: IdPath, not: boolean): InputAction;
+    setLock(config: Config, path: IdPath, lock: boolean): InputAction;
+  },
+  rule: {
+    setField(config: Config, path: IdPath, field: string): InputAction;
+    setOperator(config: Config, path: IdPath, operator: string): InputAction;
+    setValue(config: Config, path: IdPath, delta: number, value: RuleValue, valueType: string): InputAction;
+    setValueSrc(config: Config, path: IdPath, delta: number, valueSrc: ValueSource): InputAction;
+    setOperatorOption(config: Config, path: IdPath, name: string, value: RuleValue): InputAction;
+  },
+}
+
 
 /////////////////
 // WidgetProps
@@ -917,12 +943,12 @@ export interface CoreConfig extends Config {
 
 
 
-
-
-
 /////////////////
 
 export declare const Utils: Utils;
 export declare const CoreConfig: CoreConfig;
 export declare const BasicFuncs: Funcs;
 export declare const TreeStore: TreeStore;
+export declare const TreeActions: TreeActions;
+
+

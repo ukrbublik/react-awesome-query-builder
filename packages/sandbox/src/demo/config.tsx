@@ -2,26 +2,21 @@
 import React from "react";
 import merge from "lodash/merge";
 import {
-  Utils,
+  Utils, BasicConfig,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
-} from "@react-awesome-query-builder/core";
-import {
-  BasicConfig,
-  // types:
-  Settings
+  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
 } from "@react-awesome-query-builder/ui";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
-import { ruRU } from "@material-ui/core/locale";
+import { ruRU } from "@mui/material/locale";
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
-import { MaterialConfig } from "@react-awesome-query-builder/material";
+import { MuiConfig } from "@react-awesome-query-builder/mui";
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
+const InitialConfig = AntdConfig; // or BasicConfig or MuiConfig
 
 const { simulateAsyncFetch } = Utils.Autocomplete;
 
@@ -401,7 +396,7 @@ const localeSettings: LocaleSettings = {
   locale: {
     moment: "ru",
     antd: ru_RU,
-    material: ruRU,
+    mui: ruRU,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
