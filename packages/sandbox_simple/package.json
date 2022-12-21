@@ -15,14 +15,15 @@
     "start": "vite",
     "build": "vite build --mode dev --debug",
     "serve": "vite preview",
-    "lint": "yarn eslint",
+    "lint": "pnpm run eslint",
     "eslint": "eslint --ext .jsx --ext .js ./src/",
     "lint-fix": "eslint --ext .jsx --ext .js --fix ./src/"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "*",
+    "@react-awesome-query-builder/ui": "workspace:*",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^2.0.1",

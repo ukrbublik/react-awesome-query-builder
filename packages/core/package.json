@@ -21,9 +21,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "prepare": "yarn build",
+    "prepare": "pnpm run build",
     "build": "sh ./scripts/build-npm.sh",
-    "lint": "yarn eslint && yarn tsc",
+    "lint": "npm run eslint && npm run tsc",
     "tsc": "tsc -p . --noEmit",
     "eslint": "eslint --ext .js --ext .ts  ./modules/",
     "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/"
@@ -37,6 +37,7 @@
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.14.5",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.7.7",

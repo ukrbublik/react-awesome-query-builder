@@ -21,8 +21,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "prepare": "yarn build",
-    "lint": "yarn eslint && yarn tsc",
+    "prepare": "pnpm run build",
+    "lint": "pnpm run eslint && pnpm run tsc",
     "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
@@ -31,8 +31,9 @@
   "dependencies": {
     "@date-io/core": "^1.3.13",
     "@date-io/moment": "^1.3.13",
-    "@react-awesome-query-builder/ui": "*",
-    "material-ui-confirm": "^2.1.3"
+    "@react-awesome-query-builder/ui": "workspace:*",
+    "material-ui-confirm": "^2.1.3",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
     "@material-ui/core": "^4.12.3",
@@ -43,6 +44,8 @@
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.14.5",
+    "@types/react": "^17.0.39",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",

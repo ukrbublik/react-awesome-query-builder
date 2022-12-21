@@ -26,15 +26,15 @@
     "./css/antd.less": "./lib/css/antd.less"
   },
   "scripts": {
-    "prepare": "yarn build",
+    "prepare": "npm run build",
     "build": "sh ./scripts/build-npm.sh",
-    "lint": "yarn eslint && yarn tsc",
+    "lint": "npm run eslint && npm run tsc",
     "tsc": "tsc -p . --noEmit",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
   },
   "dependencies": {
-    "@react-awesome-query-builder/core": "*",
+    "@react-awesome-query-builder/core": "workspace:*",
     "classnames": "^2.3.1",
     "lodash": "^4.17.21",
     "prop-types": "^15.7.2",
@@ -46,6 +46,7 @@
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.14.5",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.18",

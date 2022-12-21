@@ -1,15 +1,17 @@
 {
   "name": "@react-awesome-query-builder/main",
   "private": true,
-  "workspaces": [
-    "packages/core",
-    "packages/ui",
-    "packages/antd",
-    "packages/mui",
-    "packages/material",
-    "packages/bootstrap",
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/core",
+      "packages/ui",
+      "packages/antd",
+      "packages/mui",
+      "packages/material",
+      "packages/bootstrap",
+      "packages/*"
+    ]
+  },
   "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
   "keywords": [
@@ -48,9 +50,9 @@
     "sandbox-js": "yarn workspace @react-awesome-query-builder/sandbox-simple start",
     "sandbox": "yarn sandbox-ts",
     "start": "yarn examples",
-    "lint": "yarn workspaces run lint",
+    "lint": "npm run lint --workspaces",
     "lint-fix": "yarn workspaces run lint-fix",
-    "test": "yarn workspace @react-awesome-query-builder/tests test",
+    "test": "npm run test --workspace=@react-awesome-query-builder/tests",
     "reinstall": "yarn clean && yarn",
     "smoke": "yarn lint && yarn test && yarn build-all && yarn check-hot",
     "resmoke": "yarn reinstall && yarn smoke"

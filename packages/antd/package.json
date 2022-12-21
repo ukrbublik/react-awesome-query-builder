@@ -21,15 +21,17 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "prepare": "yarn build",
-    "lint": "yarn eslint && yarn tsc",
+    "prepare": "pnpm run build",
+    "lint": "pnpm run eslint && pnpm run tsc",
     "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "*"
+    "@react-awesome-query-builder/ui": "workspace:*",
+    "lodash": "^4.17.21",
+    "prop-types": "^15.7.2"
   },
   "peerDependencies": {
     "@ant-design/icons": "^4.0.0",
@@ -38,6 +40,8 @@
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.14.5",
+    "@types/react": "^17.0.39",
     "@ant-design/icons": "^4.7.0",
     "antd": "^4.16.13",
     "react": "^17.0.2",

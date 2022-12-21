@@ -15,7 +15,7 @@
     "start": "vite",
     "build": "tsc && vite build --mode dev --debug",
     "serve": "vite preview",
-    "lint": "yarn eslint && yarn tsc",
+    "lint": "pnpm run eslint && pnpm run tsc",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./src/",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./src/",
     "tsc": "tsc -p . --noEmit"
@@ -28,13 +28,15 @@
     "@mui/material": "^5.2.4",
     "@mui/system": "^5.2.4",
     "@mui/x-date-pickers": "^5.0.0-beta.6",
-    "@react-awesome-query-builder/antd": "*",
-    "@react-awesome-query-builder/mui": "*",
+    "@react-awesome-query-builder/antd": "workspace:*",
+    "@react-awesome-query-builder/mui": "workspace:*",
     "antd": "^4.16.13",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@babel/core": "^7.14.5",
     "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.18",

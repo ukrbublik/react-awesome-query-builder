@@ -21,26 +21,28 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "prepare": "yarn build",
-    "lint": "yarn eslint && yarn tsc",
+    "prepare": "pnpm run build",
+    "lint": "pnpm run eslint && pnpm run tsc",
     "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "*"
+    "@react-awesome-query-builder/ui": "workspace:*"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.0 || ^6.1.0",
     "@fortawesome/free-solid-svg-icons": "^5.15.4 || ^6.0.0",
-    "@fortawesome/react-fontawesome": "^0.1.16",
+    "@fortawesome/react-fontawesome": ">=0.1.16 <1.0",
     "bootstrap": "^5.1.3",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "reactstrap": "^9.0.0"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.14.5",
+    "@types/react": "^17.0.39",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
