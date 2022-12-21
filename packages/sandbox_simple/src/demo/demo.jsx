@@ -1,8 +1,7 @@
 /*eslint no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import React, {Component} from "react";
-import { Utils } from "@react-awesome-query-builder/core";
 import {
-  Query, Builder
+  Utils, Query, Builder
 } from "@react-awesome-query-builder/ui";
 import throttle from "lodash/throttle";
 import loadedConfig from "./config_simple"; // <- you can try './config_complex' for more complex examples

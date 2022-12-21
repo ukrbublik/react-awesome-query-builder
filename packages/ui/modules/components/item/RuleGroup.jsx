@@ -39,7 +39,7 @@ class RuleGroup extends BasicGroup {
     if (this.props.isLocked)
       return 0;
     const {children1} = this.props;
-    return children1.size;
+    return children1?.size || 0;
   }
 
   renderChildrenWrapper() {

@@ -5,7 +5,7 @@ import {
   DropdownToggle,
   DropdownItem,
 } from "reactstrap";
-import { Utils } from "@react-awesome-query-builder/core";
+import { Utils } from "@react-awesome-query-builder/ui";
 const { mapListValues } = Utils.ListUtils;
 
 export default ({listValues, value, setValue, allowCustomValues, placeholder, readonly}) => {

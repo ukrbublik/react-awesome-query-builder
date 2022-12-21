@@ -4,7 +4,7 @@ import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import { Select } from "antd";
 import omit from "lodash/omit";
-import { Utils } from "@react-awesome-query-builder/core";
+import { Utils } from "@react-awesome-query-builder/ui";
 const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 

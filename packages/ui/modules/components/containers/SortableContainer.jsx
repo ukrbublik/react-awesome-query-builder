@@ -4,10 +4,10 @@ import {connect} from "react-redux";
 import {logger} from "../../utils/stuff";
 import context from "../../stores/context";
 import * as constants from "../../stores/constants";
-import clone from "clone";
 import PropTypes from "prop-types";
 import * as actions from "../../actions";
 import {pureShouldComponentUpdate, useOnPropsChanged, isUsingLegacyReactDomRender} from "../../utils/reactUtils";
+const {clone} = Utils;
 const {getFlatTree} = Utils.TreeUtils;
 
 let _isReorderingTree = false;

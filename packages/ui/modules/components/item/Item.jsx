@@ -16,7 +16,7 @@ const types = [
 ];
 
 const getProperties = (props) => {
-  const properties = props.properties.toObject();
+  const properties = props.properties?.toObject() || {};
   const result = {...properties};
   if (props.isParentLocked) {
     result.isLocked = true;
@@ -157,7 +157,7 @@ class Item extends PureComponent {
 
   render() {
     const { type, ...props } = this.props;
-    const mode = props.properties.get("mode");
+    const mode = props.properties?.get("mode");
     const postfix = mode == "array" ? "_ext" : "";    
     const renderItem = props.config.settings.renderItem;
     let Cmp = typeMap[type + postfix];

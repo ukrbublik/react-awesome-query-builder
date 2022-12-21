@@ -5,11 +5,11 @@ import range from "lodash/range";
 import {defaultValue} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
-import Immutable from "immutable";
 import WidgetFactory from "./WidgetFactory";
 import {Col} from "../utils";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getValueSourcesForFieldOp, getWidgetsForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
+const { createListFromArray } = Utils.DefaultUtils;
 
 const funcArgDummyOpDef = {cardinality: 1};
 
@@ -92,8 +92,8 @@ export default class Widget extends PureComponent {
     let iValueSrcs = valueSrcs;
     let iValues = values;
     if (isFuncArg || isForRuleGruop || isCaseValue) {
-      iValueSrcs = Immutable.List([valueSrcs]);
-      iValues = Immutable.List([values]);
+      iValueSrcs = createListFromArray([valueSrcs]);
+      iValues = createListFromArray([values]);
     }
 
     const fieldDefinition = getFieldConfig(config, field);

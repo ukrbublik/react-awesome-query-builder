@@ -5,7 +5,7 @@ import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
-import clone from "clone";
+const {clone} = Utils;
 const {getFieldConfig} = Utils.ConfigUtils;
 const {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 

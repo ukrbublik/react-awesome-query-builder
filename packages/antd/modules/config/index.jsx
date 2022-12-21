@@ -1,8 +1,7 @@
 import en_US from "antd/lib/locale-provider/en_US";
 import AntdWidgets from "../widgets";
 import { normalizeListValues } from "../utils/stuff";
-import { Utils } from "@react-awesome-query-builder/core";
-import { BasicConfig } from "@react-awesome-query-builder/ui";
+import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 import React from "react";
 
 const { getTitleInListValues } = Utils.ListUtils;

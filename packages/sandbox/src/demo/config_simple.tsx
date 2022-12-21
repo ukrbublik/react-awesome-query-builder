@@ -3,12 +3,12 @@ import React from "react";
 import merge from "lodash/merge";
 import {
   Utils, BasicConfig,
+  AntdConfig, AntdWidgets,
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs,
-} from "@react-awesome-query-builder/ui";
+} from "@react-awesome-query-builder/antd";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
 import { ruRU } from "@mui/material/locale";
-import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 const {
   FieldSelect,

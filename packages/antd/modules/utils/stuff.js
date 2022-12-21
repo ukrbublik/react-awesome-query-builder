@@ -1,4 +1,4 @@
-import { Utils } from "@react-awesome-query-builder/core";
+import { Utils } from "@react-awesome-query-builder/ui";
 const { getItemInListValues, listValuesToArray } = Utils.ListUtils;
 
 

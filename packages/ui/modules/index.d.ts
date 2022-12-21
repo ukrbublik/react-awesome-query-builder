@@ -1,6 +1,5 @@
 /* eslint-disable no-extra-semi */
 
-import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 import {
   Config, Conjunctions, Operators, Widgets, Types, Fields, Funcs, Settings as CoreSettings, CoreConfig,

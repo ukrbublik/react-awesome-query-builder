@@ -3,7 +3,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import omit from "lodash/omit";
-import { Utils } from "@react-awesome-query-builder/core";
+import { Utils } from "@react-awesome-query-builder/ui";
 const { mapListValues } = Utils.ListUtils;
 
 export default ({listValues, value, setValue, allowCustomValues, readonly, placeholder, customProps}) => {

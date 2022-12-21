@@ -4,6 +4,7 @@
     "module": "esnext",
     "jsx": "preserve",
     "lib": [
+      "es2015"
     ],
     "allowJs": true,
     "outDir": "ts_out",

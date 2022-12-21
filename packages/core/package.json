@@ -1,7 +1,7 @@
 {
   "name": "@react-awesome-query-builder/core",
   "version": "6.0.0-beta.0",
-  "description": "Core",
+  "description": "User-friendly query builder for React. Core",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
   "repository": {
@@ -37,10 +37,9 @@
     "sqlstring": "^2.3.3"
   },
   "devDependencies": {
-    "moment-locales-webpack-plugin": "^1.2.0",
     "@types/clone": "^2.1.1",
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.7.7",
-    "@types/react": "^18.0.17"
+    "@types/react": "^17.0.39"
   }
 }

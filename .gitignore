@@ -11,5 +11,8 @@ npm-debug.log
 .idea
 .eslintcache
 .DS_Store
+.pnpm-debug.log
+pnpm-lock.yaml
+.yarn/
 
 lib/

@@ -1,8 +1,9 @@
 import React from "react";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import moment from "moment";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { moment } = Utils;
 
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps} = props;

@@ -1,7 +1,6 @@
-import MuiWidgets from "../widgets";
-import { Utils } from "@react-awesome-query-builder/core";
-import { BasicConfig } from "@react-awesome-query-builder/ui";
 import React from "react";
+import MuiWidgets from "../widgets";
+import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 
 const { SqlString, stringifyForDisplay } = Utils.ExportUtils;
 

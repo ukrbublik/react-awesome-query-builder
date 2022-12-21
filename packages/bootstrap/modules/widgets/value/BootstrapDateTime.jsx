@@ -1,6 +1,7 @@
 import React from "react";
 import { Input } from "reactstrap";
-import moment from "moment";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { moment } = Utils;
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly} = props;

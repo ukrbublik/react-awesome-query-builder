@@ -1,5 +1,6 @@
 import React from "react";
-import moment from "moment";
+import { Utils } from "@react-awesome-query-builder/core";
+const { moment } = Utils;
 
 export default (props) => {
   const {value, setValue, config, valueFormat, use12Hours, readonly, customProps, } = props;

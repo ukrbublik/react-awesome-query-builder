@@ -1,15 +1,10 @@
 /*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import React, {Component} from "react";
 import {
-  Utils, 
+  Utils, Query, Builder,
   //types:
-  ImmutableTree, Config, JsonTree, JsonLogicTree
-} from "@react-awesome-query-builder/core";
-import {
-  Query, Builder,
-  //types:
-  BuilderProps
-} from "@react-awesome-query-builder/ui";
+  BuilderProps, ImmutableTree, Config, JsonTree, JsonLogicTree
+} from "@react-awesome-query-builder/antd";
 import throttle from "lodash/throttle";
 import loadedConfig from "./config_simple"; // <- you can try './config' for more complex examples
 import loadedInitValue from "./init_value";

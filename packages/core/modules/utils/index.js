@@ -1,3 +1,5 @@
+export {default as clone} from "clone";
+export {default as moment} from "moment";
 export {validateTree, validateAndFixTree} from "./validation";
 export {default as uuid} from "./uuid";
 export * as ConfigUtils from "./configUtils";

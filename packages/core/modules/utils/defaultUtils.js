@@ -111,3 +111,9 @@ export const defaultRoot = (config) => {
     properties: defaultGroupProperties(config)
   });
 };
+
+export const createListFromArray = (ids) => {
+  return new Immutable.List(ids);
+};
+
+export const emptyProperies = () => new Immutable.Map();

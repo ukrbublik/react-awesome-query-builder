@@ -1,7 +1,7 @@
 {
   "name": "@react-awesome-query-builder/ui",
   "version": "6.0.0-beta.0",
-  "description": "React UI",
+  "description": "User-friendly query builder for React. Core React UI",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "license": "MIT",
   "repository": {
@@ -26,9 +26,8 @@
     "./css/antd.less": "./lib/css/antd.less"
   },
   "scripts": {
-    "prepare": "yarn build-npm",
-    "build-npm": "sh ./scripts/build-npm.sh",
-    "build": "yarn build-npm",
+    "prepare": "yarn build",
+    "build": "sh ./scripts/build-npm.sh",
     "lint": "yarn eslint && yarn tsc",
     "tsc": "tsc -p . --noEmit",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
@@ -36,8 +35,8 @@
   },
   "dependencies": {
     "@react-awesome-query-builder/core": "*",
-    "lodash": "^4.17.21",
     "classnames": "^2.3.1",
+    "lodash": "^4.17.21",
     "prop-types": "^15.7.2",
     "react-redux": "^7.2.2",
     "redux": "^4.2.0"
@@ -48,8 +47,8 @@
   },
   "devDependencies": {
     "@types/prop-types": "^15.7.3",
-    "@types/react": "^18.0.17",
-    "@types/react-dom": "^18.0.6",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.18",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   }

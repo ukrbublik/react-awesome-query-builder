@@ -1,5 +1,5 @@
 import React from "react";
-import { Utils } from "@react-awesome-query-builder/core";
+import { Utils } from "@react-awesome-query-builder/ui";
 import { Button, ButtonGroup } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faCheck } from "@fortawesome/free-solid-svg-icons";

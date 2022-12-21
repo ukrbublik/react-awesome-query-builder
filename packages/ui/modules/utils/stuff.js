@@ -1,5 +1,3 @@
-import Immutable, { Map } from "immutable";
-
 
 export const defaultValue = (value, _default) => {
   return (typeof value === "undefined") ? _default : value;
@@ -37,9 +35,9 @@ export const shallowEqual = (a, b, deep = false) => {
     return true;
   } else if (Array.isArray(a))
     return shallowEqualArrays(a, b, deep);
-  else if (Map.isMap(a))
+  else if (a && typeof a.equals === "function")
     return a.equals(b);
-  else if (typeof a == "object")
+  else if (typeof a === "object")
     return shallowEqualObjects(a, b, deep);
   else
     return a === b;

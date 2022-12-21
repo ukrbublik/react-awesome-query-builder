@@ -4,6 +4,7 @@
     "module": "esnext",
     "jsx": "react-jsx",
     "lib": [
+      "es2015",
       "dom",
       "dom.iterable"
     ],

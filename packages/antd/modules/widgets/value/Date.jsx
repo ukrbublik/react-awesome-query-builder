@@ -1,8 +1,9 @@
 import React, { PureComponent } from "react";
+import { Utils } from "@react-awesome-query-builder/ui";
 import PropTypes from "prop-types";
 import { DatePicker } from "antd";
 const { RangePicker } = DatePicker;
-import moment from "moment";
+const { moment } = Utils;
 
 
 export default class DateWidget extends PureComponent {

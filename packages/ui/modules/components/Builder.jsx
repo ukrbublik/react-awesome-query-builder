@@ -1,11 +1,11 @@
 import { Utils } from "@react-awesome-query-builder/core";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Immutable, {Map} from "immutable";
 import { Item } from "./item/Item";
 import SortableContainer from "./containers/SortableContainer";
 import {pureShouldComponentUpdate} from "../utils/reactUtils";
 const { getTotalReordableNodesCountInTree, getTotalRulesCountInTree } = Utils.TreeUtils;
+const { createListFromArray, emptyProperies } = Utils.DefaultUtils;
 
 class Builder extends Component {
   static propTypes = {
@@ -43,7 +43,7 @@ class Builder extends Component {
 
   _updPath (props) {
     const id = props.tree.get("id");
-    this.path = Immutable.List.of(id);
+    this.path = createListFromArray([id]);
   }
 
   render() {
@@ -59,10 +59,10 @@ class Builder extends Component {
         id={id}
         path={this.path}
         type={rootType}
-        properties={tree.get("properties") || new Map()}
+        properties={tree.get("properties") || emptyProperies()}
         config={this.props.config}
         actions={this.props.actions}
-        children1={tree.get("children1") || new Map()}
+        children1={tree.get("children1") || emptyProperies()}
         //tree={tree}
         reordableNodesCnt={reordableNodesCnt}
         totalRulesCnt={totalRulesCnt}

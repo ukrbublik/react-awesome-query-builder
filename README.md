@@ -480,12 +480,18 @@ See [`CHANGELOG`](/CHANGELOG.md)
 ### Migration to 6.0.0
 
 From version 6 library is divided into [packages](/packages). 
+Please remove package `react-awesome-query-builder` and install one of
+- `@react-awesome-query-builder/ui`
+- `@react-awesome-query-builder/mui`
+- `@react-awesome-query-builder/antd`
+- `@react-awesome-query-builder/bootstrap`
+
 Library code is backward-compatible with version 2-5. 
 You just need to change your imports. 
 
 ```diff
 - import { Utils, Export, Import, BasicFuncs } from 'react-awesome-query-builder';
-+ import { Utils, Export, Import, BasicFuncs } from '@react-awesome-query-builder/core';
++ import { Utils, Export, Import, BasicFuncs } from '@react-awesome-query-builder/ui';
 
 - import { Query, Builder, BasicConfig, Widgets, Operators } from 'react-awesome-query-builder';
 + import { Query, Builder, BasicConfig, VanillaWidgets, CustomOperators } from '@react-awesome-query-builder/ui';

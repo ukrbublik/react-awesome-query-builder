@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { TimePicker } from "antd";
-import moment from "moment";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { moment } = Utils;
 
 
 export default class TimeWidget extends PureComponent {

@@ -29,11 +29,11 @@ class SwitchGroup extends BasicGroup {
   
   renderFooterWrapper = () => null;
   hasDefaultCase = () => {
-    return this.props.children1.size && this.props.children1.filter(c => c.get("children1") == null).size > 0;
+    return this.props.children1?.size && this.props.children1.filter(c => c.get("children1") == null).size > 0;
   };
   canAddGroup() {
     const { maxNumberOfCases } = this.props.config.settings;
-    const totalCasesCnt = this.props.children1.size;
+    const totalCasesCnt = this.props.children1?.size || 0;
     if (maxNumberOfCases) {
       return totalCasesCnt < maxNumberOfCases;
     }
@@ -45,7 +45,7 @@ class SwitchGroup extends BasicGroup {
 
   reordableNodesCnt() {
     // result will be passed to each case's `parentReordableNodesCnt` prop
-    const totalCasesCnt = this.props.children1.size;
+    const totalCasesCnt = this.props.children1?.size || 0;
     let casesToReorder = totalCasesCnt;
     if (this.hasDefaultCase()) {
       casesToReorder--;
@@ -62,7 +62,7 @@ class SwitchGroup extends BasicGroup {
       return 0;
     const { canLeaveEmptyCase, canRegroupCases } = this.props.config.settings;
 
-    const totalCasesCnt = this.props.children1.size;
+    const totalCasesCnt = this.props.children1?.size || 0;
     let casesToReorder = totalCasesCnt;
     if (this.hasDefaultCase()) {
       casesToReorder--;
