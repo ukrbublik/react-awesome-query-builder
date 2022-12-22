@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/mui",
-  "version": "6.0.0-beta.0",
+  "version": "6.0.0",
   "description": "User-friendly query builder for React. MUI 5 widgets",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "workspace:*",
+    "@react-awesome-query-builder/ui": "*",
     "lodash": "^4.17.21",
     "material-ui-confirm": "^3.0.5"
   },
