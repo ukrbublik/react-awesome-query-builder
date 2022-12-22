@@ -1,5 +1,6 @@
 rm -f  ./package-lock.json
 rm -f  ./yarn.json
+rm -f  ./pnpm-lock.yaml
 rm -rf ./node_modules
 
 rm -f  ./packages/*/package-lock.json
@@ -11,3 +12,5 @@ rm -rf ./packages/*/dist
 rm -rf ./packages/*/build
 rm -rf ./packages/*/coverage
 rm -rf ./packages/*/junit
+
+# npx sort-package-json "package.json" "packages/*/package.json"

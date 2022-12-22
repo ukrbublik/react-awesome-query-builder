@@ -8,15 +8,15 @@ import {
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
 } from "@react-awesome-query-builder/antd";
 import ru_RU from "antd/lib/locale-provider/ru_RU";
-import { ruRU } from "@mui/material/locale";
-import { MuiConfig } from "@react-awesome-query-builder/mui";
+import "antd/dist/antd.css";
+import "@react-awesome-query-builder/antd/css/styles.scss";
 const {
   FieldSelect,
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-const InitialConfig = AntdConfig; // or BasicConfig or MuiConfig
+const InitialConfig = AntdConfig;
 
 const { simulateAsyncFetch } = Utils.Autocomplete;
 
@@ -396,7 +396,6 @@ const localeSettings: LocaleSettings = {
   locale: {
     moment: "ru",
     antd: ru_RU,
-    mui: ruRU,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",

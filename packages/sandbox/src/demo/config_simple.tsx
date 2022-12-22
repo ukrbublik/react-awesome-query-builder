@@ -3,20 +3,13 @@ import React from "react";
 import merge from "lodash/merge";
 import {
   Utils, BasicConfig,
-  AntdConfig, AntdWidgets,
+  MuiConfig,
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs,
-} from "@react-awesome-query-builder/antd";
-import ru_RU from "antd/lib/locale-provider/ru_RU";
+} from "@react-awesome-query-builder/mui";
 import { ruRU } from "@mui/material/locale";
-import { MuiConfig } from "@react-awesome-query-builder/mui";
-const {
-  FieldSelect,
-  FieldDropdown,
-  FieldCascader,
-  FieldTreeSelect,
-} = AntdWidgets;
-const InitialConfig = AntdConfig; // or BasicConfig or MaterialConfig
+import "@react-awesome-query-builder/mui/css/styles.scss";
+const InitialConfig = MuiConfig;
 
 const { simulateAsyncFetch } = Utils.Autocomplete;
 
@@ -337,7 +330,6 @@ const types: Types = {
 const localeSettings: LocaleSettings = {
   locale: {
     moment: "ru",
-    antd: ru_RU,
     mui: ruRU,
   },
   valueLabel: "Value",
@@ -389,9 +381,6 @@ const settings: Settings = {
   maxNesting: 3,
   canLeaveEmptyGroup: true, //after deletion
 
-  // renderField: (props) => <FieldCascader {...props} />,
-  // renderOperator: (props) => <FieldDropdown {...props} />,
-  // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
 const funcs: Funcs = {};

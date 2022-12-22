@@ -6,12 +6,12 @@ This packages provides [MUI](https://mui.com/) widgets
 
 Peer dependencies that needs to be installed:
 ```
-yarn add @mui/material @emotion/react @emotion/styled @mui/lab @mui/icons-material @mui/x-date-pickers
+npm i @mui/material @emotion/react @emotion/styled @mui/lab @mui/icons-material @mui/x-date-pickers --save
 ```
 
 Install:
 ```
-yarn add @react-awesome-query-builder/mui
+npm i @react-awesome-query-builder/mui --save
 ```
 
 ## Usage

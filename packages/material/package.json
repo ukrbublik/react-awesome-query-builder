@@ -2,38 +2,54 @@
   "name": "@react-awesome-query-builder/material",
   "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. Material-UI 4 widgets",
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
     "directory": "packages/material"
   },
-  "main": "./lib/index.js",
-  "module": "./modules/index.jsx",
-  "types": "./modules/index.d.ts",
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
       "types": "./modules/index.d.ts",
       "import": "./modules/index.jsx",
       "require": "./lib/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./css/styles.css": "./lib/css/styles.css",
+    "./css/compact_styles.css": "./lib/css/compact_styles.css",
+    "./css/styles.scss": "./lib/css/styles.scss",
+    "./css/compact_styles.scss": "./lib/css/compact_styles.scss"
   },
+  "main": "./lib/index.js",
+  "module": "./modules/index.jsx",
+  "types": "./modules/index.d.ts",
   "scripts": {
-    "prepare": "pnpm run build",
-    "lint": "pnpm run eslint && pnpm run tsc",
-    "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
+    "lint": "npm run eslint && npm run tsc",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
     "@date-io/core": "^1.3.13",
     "@date-io/moment": "^1.3.13",
     "@react-awesome-query-builder/ui": "workspace:*",
-    "material-ui-confirm": "^2.1.3",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "material-ui-confirm": "^2.1.3"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7.14.5",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
+    "@material-ui/pickers": "^3.3.10",
+    "@types/react": "^17.0.39",
+    "moment": "^2.29.4",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "peerDependencies": {
     "@material-ui/core": "^4.12.3",
@@ -42,17 +58,5 @@
     "@material-ui/pickers": "^3.2.10",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
-  },
-  "devDependencies": {
-    "@babel/runtime": "^7.14.5",
-    "@types/react": "^17.0.39",
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.57",
-    "@material-ui/pickers": "^3.3.10",
-    "moment": "^2.29.4",
-    "prop-types": "^15.7.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
   }
 }

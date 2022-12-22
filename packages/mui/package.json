@@ -2,36 +2,54 @@
   "name": "@react-awesome-query-builder/mui",
   "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. MUI 5 widgets",
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
     "directory": "packages/mui"
   },
-  "main": "./lib/index.js",
-  "module": "./modules/index.jsx",
-  "types": "./modules/index.d.ts",
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
       "types": "./modules/index.d.ts",
       "import": "./modules/index.jsx",
       "require": "./lib/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./css/styles.css": "./lib/css/styles.css",
+    "./css/compact_styles.css": "./lib/css/compact_styles.css",
+    "./css/styles.scss": "./lib/css/styles.scss",
+    "./css/compact_styles.scss": "./lib/css/compact_styles.scss"
   },
+  "main": "./lib/index.js",
+  "module": "./modules/index.jsx",
+  "types": "./modules/index.d.ts",
   "scripts": {
-    "prepare": "pnpm run build",
-    "lint": "pnpm run eslint && pnpm run tsc",
-    "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
+    "lint": "npm run eslint && npm run tsc",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
     "@react-awesome-query-builder/ui": "workspace:*",
-    "material-ui-confirm": "^3.0.5",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "material-ui-confirm": "^3.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/runtime": "^7.14.5",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@mui/icons-material": "^5.10.3",
+    "@mui/lab": "^5.0.0-alpha.98",
+    "@mui/material": "^5.10.4",
+    "@mui/system": "^5.10.4",
+    "@mui/x-date-pickers": "^5.0.0",
+    "@types/react": "^17.0.39",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "peerDependencies": {
     "@emotion/react": "^11.7.1",
@@ -42,19 +60,5 @@
     "@mui/x-date-pickers": "^5.0.0-beta.2",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
-  },
-  "devDependencies": {
-    "@babel/runtime": "^7.14.5",
-    "@types/react": "^17.0.39",
-    "@babel/core": "^7.14.5",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "@mui/icons-material": "^5.10.3",
-    "@mui/lab": "^5.0.0-alpha.98",
-    "@mui/material": "^5.10.4",
-    "@mui/system": "^5.10.4",
-    "@mui/x-date-pickers": "^5.0.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
   }
 }

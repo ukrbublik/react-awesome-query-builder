@@ -6,12 +6,12 @@ This packages provides [Ant Design](https://ant.design/) widgets.
 
 Peer dependencies that needs to be installed:
 ```
-yarn add antd @ant-design/icons
+npm i antd @ant-design/icons --save
 ```
 
 Install:
 ```
-yarn add @react-awesome-query-builder/antd
+npm i @react-awesome-query-builder/antd --save
 ```
 
 ## Usage

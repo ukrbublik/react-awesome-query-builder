@@ -101,15 +101,12 @@ This is useful if you want to pass query value from frontend to backend in JSON 
 
 Example of installation if you use [MUI](https://mui.com/):
 ```
-yarn add @react-awesome-query-builder/mui
-
-# or
 npm i @react-awesome-query-builder/mui --save
 ```
 
 Note: We use [yarn](https://classic.yarnpkg.com/). If you want to clone this project and run scripts, please [install yarn](https://classic.yarnpkg.com/en/docs/install):
 ```
-npm install --global yarn
+npm i --global yarn
 ```
 
 See [basic usage](#usage) for minimum code example. 
@@ -480,11 +477,11 @@ See [`CHANGELOG`](/CHANGELOG.md)
 ### Migration to 6.0.0
 
 From version 6 library is divided into [packages](/packages). 
-Please remove package `react-awesome-query-builder` and install one of
-- `@react-awesome-query-builder/ui`
-- `@react-awesome-query-builder/mui`
-- `@react-awesome-query-builder/antd`
-- `@react-awesome-query-builder/bootstrap`
+Please remove package `react-awesome-query-builder` and install one of:
+- [`@react-awesome-query-builder/ui`](/packages/ui)
+- [`@react-awesome-query-builder/mui`](/packages/mui)
+- [`@react-awesome-query-builder/antd`](/packages/antd)
+- [`@react-awesome-query-builder/bootstrap`](/packages/bootstrap)
 
 Library code is backward-compatible with version 2-5. 
 You just need to change your imports. 
@@ -515,6 +512,7 @@ Note that you can import all types and values from a "thickest" package (eg. `@r
 ```js
 import {Utils, Query, Builder, AntdConfig} from '@react-awesome-query-builder/antd';
 ```
+You don't need to install and import `ui` and `core` packages in this case, just use `antd`.
 
 ### Migration to 5.2.0
 Breaking change: `children1` is now an indexed array (instead of object) in result of `Utils.getTree()` to preserve items order.  

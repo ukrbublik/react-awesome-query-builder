@@ -6,12 +6,12 @@ This packages provides [Material-UI v4](https://v4.mui.com/) widgets
 
 Peer dependencies that needs to be installed:
 ```
-yarn add @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers
+npm i @material-ui/core @material-ui/lab @material-ui/icons @material-ui/pickers --save
 ```
 
 Install:
 ```
-yarn add @react-awesome-query-builder/material
+npm i @react-awesome-query-builder/material --save
 ```
 
 ## Usage

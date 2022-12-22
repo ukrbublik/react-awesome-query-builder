@@ -2,49 +2,54 @@
   "name": "@react-awesome-query-builder/antd",
   "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. AntDesign widgets",
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
     "directory": "packages/antd"
   },
-  "main": "./lib/index.js",
-  "module": "./modules/index.jsx",
-  "types": "./modules/index.d.ts",
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
       "types": "./modules/index.d.ts",
       "import": "./modules/index.jsx",
       "require": "./lib/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./css/styles.css": "./lib/css/styles.css",
+    "./css/compact_styles.css": "./lib/css/compact_styles.css",
+    "./css/styles.scss": "./lib/css/styles.scss",
+    "./css/compact_styles.scss": "./lib/css/compact_styles.scss",
+    "./css/antd.less": "./lib/css/antd.less"
   },
+  "main": "./lib/index.js",
+  "module": "./modules/index.jsx",
+  "types": "./modules/index.d.ts",
   "scripts": {
-    "prepare": "pnpm run build",
-    "lint": "pnpm run eslint && pnpm run tsc",
-    "tsc": "tsc -p . --noEmit",
     "build": "sh ./scripts/build-npm.sh",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/"
+    "lint": "npm run eslint && npm run tsc",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
     "@react-awesome-query-builder/ui": "workspace:*",
     "lodash": "^4.17.21",
     "prop-types": "^15.7.2"
   },
+  "devDependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@babel/runtime": "^7.14.5",
+    "@types/react": "^17.0.39",
+    "antd": "^4.16.13",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
   "peerDependencies": {
     "@ant-design/icons": "^4.0.0",
     "antd": "^4.0.0",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
-  },
-  "devDependencies": {
-    "@babel/runtime": "^7.14.5",
-    "@types/react": "^17.0.39",
-    "@ant-design/icons": "^4.7.0",
-    "antd": "^4.16.13",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
   }
 }

@@ -2,16 +2,13 @@
   "name": "@react-awesome-query-builder/core",
   "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. Core",
-  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
     "directory": "packages/core"
   },
-  "main": "./lib/index.js",
-  "module": "./modules/index.js",
-  "types": "./modules/index.d.ts",
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
   "exports": {
     ".": {
       "types": "./modules/index.d.ts",
@@ -20,13 +17,16 @@
     },
     "./package.json": "./package.json"
   },
+  "main": "./lib/index.js",
+  "module": "./modules/index.js",
+  "types": "./modules/index.d.ts",
   "scripts": {
-    "prepare": "pnpm run build",
     "build": "sh ./scripts/build-npm.sh",
-    "lint": "npm run eslint && npm run tsc",
-    "tsc": "tsc -p . --noEmit",
     "eslint": "eslint --ext .js --ext .ts  ./modules/",
-    "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/"
+    "lint": "npm run eslint && npm run tsc",
+    "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
     "clone": "^2.1.2",

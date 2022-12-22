@@ -6,12 +6,12 @@ This packages provides [Bootstrap](https://reactstrap.github.io/) widgets
 
 Peer dependencies that needs to be installed:
 ```
-yarn add bootstrap reactstrap @popperjs/core @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/react-fontawesome
+npm i bootstrap reactstrap @popperjs/core @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons @fortawesome/react-fontawesome --save
 ```
 
 Install:
 ```
-yarn add @react-awesome-query-builder/bootstrap
+npm i @react-awesome-query-builder/bootstrap --save
 ```
 
 ## Usage
