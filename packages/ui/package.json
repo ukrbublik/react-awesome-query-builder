@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/ui",
-  "version": "6.0.0",
+  "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. Core React UI",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/core": "*",
+    "@react-awesome-query-builder/core": "workspace:*",
     "classnames": "^2.3.1",
     "lodash": "^4.17.21",
     "prop-types": "^15.7.2",

@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/bootstrap",
-  "version": "6.0.0",
+  "version": "6.0.0-beta.0",
   "description": "User-friendly query builder for React. Bootstrap widgets",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "*"
+    "@react-awesome-query-builder/ui": "workspace:*"
   },
   "devDependencies": {
     "@babel/runtime": "^7.14.5",
