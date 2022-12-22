@@ -52,7 +52,7 @@ jobs:
           destination: coverage
       - run:
           name: Build
-          command: npm run build-all
+          command: npm run build
       - store_artifacts:
           path: ./packages/examples/build
           destination: examples

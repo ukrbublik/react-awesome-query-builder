@@ -13,6 +13,7 @@ npm-debug.log
 .DS_Store
 .pnpm-debug.log
 pnpm-lock.yaml
+yarn-error.log
 .yarn/
 
 lib/

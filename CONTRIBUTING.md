@@ -47,7 +47,7 @@ You will see demo app with hot reload of demo code and local library code.
 
 ### Scripts
 - `npm i` - Install packages in all workspaces. **Required for other scripts!**
-- `npm run build-all` - Build all packages and examples
+- `npm run build` - Build all packages and examples
 - `npm run test` - Run tests with Karma and update coverage.
 - `npm run lint` - Run ESLint and TSC (in all workspaces)
 - `npm run lint-fix` - Run ESLint with `--fix` option (in in all workspaces)

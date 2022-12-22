@@ -48,7 +48,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build-all": "npm run build --workspaces",
+    "build": "npm run build --workspaces",
     "build-examples": "npm run build --workspace=@react-awesome-query-builder/examples",
     "check-hot": "npm run check-hot --workspace=@react-awesome-query-builder/examples",
     "clean": "sh ./scripts/clean.sh",
@@ -72,6 +72,7 @@
     "@babel/eslint-parser": "^7.14.5",
     "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/plugin-proposal-private-methods": "^7.14.5",
+    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
     "@babel/plugin-transform-modules-commonjs": "^7.14.5",
     "@babel/plugin-transform-runtime": "^7.14.5",
     "@babel/preset-env": "^7.14.5",
@@ -79,7 +80,6 @@
     "@babel/preset-typescript": "^7.14.5",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
-    "babel-plugin-import": "^1.13.3",
     "cross-env": "^7.0.3",
     "eslint": "^8.8.0",
     "eslint-import-resolver-typescript": "^3.5.0",
