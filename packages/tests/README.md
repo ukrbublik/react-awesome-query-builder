@@ -5,8 +5,8 @@ Karma tests.
 
 ### Run
 ```sh
-yarn
-yarn test
+npm i
+npm test
 ```
 Coverage is saved to `coverage/html/index.html`.
 

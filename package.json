@@ -38,17 +38,15 @@
   "funding": "https://opencollective.com/react-awesome-query-builder",
   "license": "MIT",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "workspaces": {
-    "packages": [
-      "packages/core",
-      "packages/ui",
-      "packages/antd",
-      "packages/mui",
-      "packages/material",
-      "packages/bootstrap",
-      "packages/*"
-    ]
-  },
+  "workspaces": [
+    "packages/core",
+    "packages/ui",
+    "packages/antd",
+    "packages/mui",
+    "packages/material",
+    "packages/bootstrap",
+    "packages/*"
+  ],
   "scripts": {
     "build-all": "npm run build --workspaces",
     "build-examples": "npm run build --workspace=@react-awesome-query-builder/examples",
@@ -94,10 +92,13 @@
   },
   "engines": {
     "node": ">=14.15.0",
-    "npm": ">=6",
-    "yarn": ">=1.22.10"
+    "npm": ">=7",
+    "yarn": "^1.22.10"
   },
   "resolutions": {
+    "@types/react": "^17"
+  },
+  "overrides": {
     "@types/react": "^17"
   }
 }

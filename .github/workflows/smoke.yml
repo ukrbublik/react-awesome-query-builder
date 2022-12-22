@@ -14,27 +14,27 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - name: Install yarn
-        run: npm install --global yarn
+      - name: Install npm 8
+        run: npm install --global npm@8
       - name: Install packages
-        run: yarn
+        run: npm i
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Lint
-        run: yarn lint
+        run: npm run lint
       - name: Test
-        run: yarn test
+        run: npm run test
       - name: Artifact - coverage
         uses: actions/upload-artifact@v2
         with:
           name: coverage
           path: packages/tests/coverage
       - name: Build
-        run: yarn build-all
+        run: npm run build-all
       - name: Artifact - examples build
         uses: actions/upload-artifact@v2
         with:
           name: examples-build
           path: packages/examples/build
       - name: Hot
-        run: yarn check-hot
+        run: npm run check-hot

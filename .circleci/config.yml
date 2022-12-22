@@ -9,8 +9,8 @@ jobs:
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - run:
-          name: Install yarn
-          command: npm install --global yarn
+          name: Install npm 8
+          command: npm install --global npm@8
       - run:
           name: Check install
           command: |
@@ -18,7 +18,6 @@ jobs:
             chromedriver --version
             node --version
             npm --version
-            yarn --version
       - checkout
       # - restore_cache:
       #     keys:
@@ -26,7 +25,7 @@ jobs:
       #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}
       - run:
           name: Install
-          command: yarn
+          command: npm i
       # - save_cache:
       #     key: node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #     paths:
@@ -36,10 +35,10 @@ jobs:
       #       - sandbox_simple/node_modules
       - run:
           name: Lint
-          command: yarn lint
+          command: npm run lint
       - run:
           name: Test
-          command: yarn test
+          command: npm run test
       - store_test_results:
           path: ./packages/tests/junit
       - store_artifacts:
@@ -53,13 +52,13 @@ jobs:
           destination: coverage
       - run:
           name: Build
-          command: yarn build-all
+          command: npm run build-all
       - store_artifacts:
           path: ./packages/examples/build
           destination: examples
       - run:
           name: Hot
-          command: yarn check-hot
+          command: npm run check-hot
 
 workflows:
   smoke:

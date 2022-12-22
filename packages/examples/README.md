@@ -8,8 +8,8 @@ Uses complex config to demonstrate anvanced usage.
 
 ### Run
 ```sh
-yarn
-yarn start
+npm i
+npm run start
 ```
 And open `http://localhost:3001` in a browser.  
 Feel free to play with code in `demo` dir.  

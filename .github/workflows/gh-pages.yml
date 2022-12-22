@@ -16,10 +16,10 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 14
-    - run: npm install --global yarn
-    - run: yarn
+    - run: npm install --global npm@8
+    - run: npm i
     - name: Build examples
-      run: yarn build-examples
+      run: npm run build-examples
     - name: Copy build
       run: |
         rm -rf /tmp/react-awesome-query-builder

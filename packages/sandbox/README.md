@@ -13,9 +13,9 @@ Or create own temaplte on [codesandbox.io](https://codesandbox.io/) by importing
 
 ### Run locally
 ```sh
-yarn
-yarn start
-# yarn build
+npm i
+npm run start
+# npm build
 ```
 Open `http://localhost:5174` in a browser.  
 Feel free to play with code in `src/demo` dir.  

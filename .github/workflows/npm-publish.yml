@@ -13,11 +13,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - run: npm install --global yarn
-      - run: yarn
+      - run: npm install --global npm@8
+      - run: npm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - run: yarn lint
-      - run: yarn test
+      - run: npm run lint
+      - run: npm run test
 
   publish-npm:
     needs: test
@@ -28,8 +28,8 @@ jobs:
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
-      - run: npm install --global yarn
-      - run: yarn
-      - run: yarn publish
+      - run: npm install --global npm@8
+      - run: npm i
+      - run: npm run publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

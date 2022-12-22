@@ -9,7 +9,7 @@ Feel free to open PRs to fix bugs, add new features, add new reusable types/widg
 
 
 ## Development
-Clone this repo and run `yarn start`. 
+Clone this repo, install `npm 7+` and run `npm start`. 
 Open `http://localhost:3001/` in a browser. 
 You will see demo app with hot reload of demo code and local library code. 
 
@@ -46,14 +46,14 @@ You will see demo app with hot reload of demo code and local library code.
 - [`packages/tests`](/packages/tests) - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts
-- `yarn` - Install packages in all workspaces. **Required for other scripts!**
-- `yarn test` - Run tests with Karma and update coverage.
-- `yarn lint` - Run ESLint and TSC (in all workspaces)
-- `yarn lint-fix` - Run ESLint with `--fix` option (in in all workspaces)
-- `yarn clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
-- `yarn smoke` - Run tests, lint, build lib, build examples, build sandboxes. Recommended before making PR
-- `yarn build` - Build npm module to `lib`, build minified production package to `build`
-- `yarn build-examples` - Build demo with webpack to `packages/examples/build`
+- `npm i` - Install packages in all workspaces. **Required for other scripts!**
+- `npm run build-all` - Build all packages and examples
+- `npm run test` - Run tests with Karma and update coverage.
+- `npm run lint` - Run ESLint and TSC (in all workspaces)
+- `npm run lint-fix` - Run ESLint with `--fix` option (in in all workspaces)
+- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
+- `npm run smoke` - Run lint, test, build all packages and examples. Recommended before making PR
+- `npm run build-examples` - Build only examples with webpack to `packages/examples/build`
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)

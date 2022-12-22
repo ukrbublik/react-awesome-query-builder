@@ -51,7 +51,7 @@ const stopTimerCompile = () => {
 const end = (err) => {
   stopTimerCompile();
 
-  // Kill `yarn examples`
+  // Kill `npm run examples`
   prc.kill();
 
   // Kill webpack
