@@ -45,7 +45,10 @@
     "packages/mui",
     "packages/material",
     "packages/bootstrap",
-    "packages/*"
+    "packages/tests",
+    "packages/examples",
+    "packages/sandbox",
+    "packages/sandbox_simple"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
