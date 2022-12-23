@@ -4,6 +4,7 @@ dist/
 build/
 coverage/
 junit/
+package/
 
 package-lock.json
 yarn.lock

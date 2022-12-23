@@ -34,7 +34,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "workspace:*",
+    "@react-awesome-query-builder/ui": "workspace:^",
     "lodash": "^4.17.21",
     "prop-types": "^15.7.2"
   },
