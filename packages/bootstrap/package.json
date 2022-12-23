@@ -33,7 +33,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@react-awesome-query-builder/ui": "*"
+    "@react-awesome-query-builder/ui": "workspace:*"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
