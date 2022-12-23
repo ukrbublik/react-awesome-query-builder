@@ -46,14 +46,19 @@ You will see demo app with hot reload of demo code and local library code.
 - [`packages/tests`](/packages/tests) - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts
-- `npm i` - Install packages in all workspaces. **Required for other scripts!**
-- `npm run build` - Build all packages and examples
-- `npm run test` - Run tests with Karma and update coverage.
-- `npm run lint` - Run ESLint and TSC (in all workspaces)
-- `npm run lint-fix` - Run ESLint with `--fix` option (in in all workspaces)
-- `npm run clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
-- `npm run smoke` - Run lint, test, build all packages and examples. Recommended before making PR
-- `npm run build-examples` - Build only examples with webpack to `packages/examples/build`
+We use [pnpm](https://pnpm.io/). Please [install pnpm](https://pnpm.io/installation):
+```
+npm install -g pnpm
+```
+
+Useful scripts:
+- `pnpm i` - Install packages in all workspaces. **Required for other scripts!**
+- `pnpm build` - Build all packages and examples
+- `pnpm test` - Run tests with Karma and update coverage.
+- `pnpm lint` - Run ESLint and TSC (in all workspaces)
+- `pnpm lint-fix` - Run ESLint with `--fix` option (in in all workspaces)
+- `pnpm clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
+- `pnpm smoke` - Run lint, test, build all packages and examples. Recommended before making PR
 
 Feel free to open PR to add new reusable types/widgets/operators (eg., regex operator for string, IP type & widget).  
 Pull Requests are always welcomed :)

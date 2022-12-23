@@ -104,16 +104,20 @@ Example of installation if you use [MUI](https://mui.com/):
 npm i @react-awesome-query-builder/mui --save
 ```
 
-If you want to clone this project and run scripts, please install npm 7+
+Note: We use [pnpm](https://pnpm.io/). If you want to clone this project and run scripts, please [install pnpm](https://pnpm.io/installation):
+```
+npm install -g pnpm
+```
+
 
 See [basic usage](#usage) for minimum code example. 
 
 See [API](#api) and [config](#config-format) for documentation. 
 
 Demo apps:
-- [`npm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`npm run sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses AntDesign widgets.
-- [`npm run sandbox-js`](/packages/sandbox_simple) - simple demo app, built with Vite, not uses TS, uses vanilla widgets.
+- [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses AntDesign widgets.
+- [`pnpm sandbox-js`](/packages/sandbox_simple) - simple demo app, built with Vite, not uses TS, uses vanilla widgets.
 
 
 

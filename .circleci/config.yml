@@ -10,7 +10,7 @@ jobs:
       - browser-tools/install-chromedriver
       - run:
           name: Install npm 8
-          command: npm install --global npm@8
+          command: npm install --global pnpm
       - run:
           name: Check install
           command: |
@@ -18,6 +18,7 @@ jobs:
             chromedriver --version
             node --version
             npm --version
+            pnpm --version
       - checkout
       # - restore_cache:
       #     keys:
@@ -25,7 +26,7 @@ jobs:
       #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}
       - run:
           name: Install
-          command: npm i
+          command: pnpm i
       # - save_cache:
       #     key: node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
       #     paths:
@@ -35,10 +36,10 @@ jobs:
       #       - sandbox_simple/node_modules
       - run:
           name: Lint
-          command: npm run lint
+          command: pnpm lint
       - run:
           name: Test
-          command: npm run test
+          command: pnpm test
       - store_test_results:
           path: ./packages/tests/junit
       - store_artifacts:
@@ -52,13 +53,13 @@ jobs:
           destination: coverage
       - run:
           name: Build
-          command: npm run build
+          command: pnpm build
       - store_artifacts:
           path: ./packages/examples/build
           destination: examples
       - run:
           name: Hot
-          command: npm run check-hot
+          command: pnpm check-hot
 
 workflows:
   smoke:

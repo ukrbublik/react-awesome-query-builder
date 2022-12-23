@@ -51,23 +51,24 @@
     "packages/sandbox_simple"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "build-examples": "npm run build --workspace=@react-awesome-query-builder/examples",
-    "check-hot": "npm run check-hot --workspace=@react-awesome-query-builder/examples",
+    "build": "pnpm run build-libs && pnpm run build-examples",
+    "build-libs": "pnpm --filter @react-awesome-query-builder/examples^... run build",
+    "build-examples": "pnpm --filter !@react-awesome-query-builder/examples^... run build",
+    "test": "pnpm --filter @react-awesome-query-builder/tests run test",
+    "check-hot": "pnpm -r --parallel --aggregate-output --reporter=append-only check-hot",
     "clean": "sh ./scripts/clean.sh",
-    "examples": "npm run start --workspace=@react-awesome-query-builder/examples",
+    "lint": "pnpm -r --parallel --aggregate-output --reporter=append-only run lint",
+    "lint-fix": "pnpm -r --parallel --aggregate-output --reporter=append-only run lint-fix",
+    "examples": "pnpm --filter @react-awesome-query-builder/examples run start",
+    "sandbox-js": "pnpm --filter @react-awesome-query-builder/sandbox-simple run start",
+    "sandbox-ts": "pnpm --filter @react-awesome-query-builder/sandbox run start",
+    "sandbox": "pnpm run sandbox-ts",
+    "start": "pnpm run examples",
+    "resmoke": "pnpm run clean && pnpm i && pnpm run smoke",
+    "smoke": "pnpm run lint && pnpm run test && pnpm run build && pnpm run check-hot",
+
     "for-gpr": "sh ./scripts/for-gpr.sh",
-    "for-npm": "sh ./scripts/for-npm.sh",
-    "lint": "npm run lint --workspaces",
-    "lint-fix": "npm run lint-fix --workspaces",
-    "reinstall": "npm run clean && npm i",
-    "resmoke": "npm run reinstall && npm run smoke",
-    "sandbox": "npm run sandbox-ts",
-    "sandbox-js": "npm run start --workspace=@react-awesome-query-builder/sandbox-simple",
-    "sandbox-ts": "npm run start --workspace=@react-awesome-query-builder/sandbox",
-    "smoke": "npm run lint && npm run test && npm run build-all && npm run check-hot",
-    "start": "npm run examples",
-    "test": "npm run test --workspace=@react-awesome-query-builder/tests"
+    "for-npm": "sh ./scripts/for-npm.sh"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -95,8 +96,7 @@
   },
   "engines": {
     "node": ">=14.15.0",
-    "npm": ">=7",
-    "yarn": "^1.22.10"
+    "pnpm": ">=7"
   },
   "resolutions": {
     "@types/react": "^17"

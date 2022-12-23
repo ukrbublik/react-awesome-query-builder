@@ -8,7 +8,7 @@ let prcErrBuf = Buffer.alloc(0);
 let isCompiled;
 let timerCompile;
 
-const prc = spawn("yarn", ["start"]);
+const prc = spawn("npm", ["start"]);
 
 prc.stdout.on("data", (data) => {
   prcOutBuf = Buffer.concat([prcOutBuf, data]);

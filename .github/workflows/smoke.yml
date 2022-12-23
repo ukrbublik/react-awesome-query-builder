@@ -15,26 +15,26 @@ jobs:
         with:
           node-version: 14
       - name: Install npm 8
-        run: npm install --global npm@8
+        run: npm install --global pnpm
       - name: Install packages
-        run: npm i
+        run: pnpm i
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
       - name: Test
-        run: npm run test
+        run: pnpm test
       - name: Artifact - coverage
         uses: actions/upload-artifact@v2
         with:
           name: coverage
           path: packages/tests/coverage
       - name: Build
-        run: npm run build
+        run: pnpm build
       - name: Artifact - examples build
         uses: actions/upload-artifact@v2
         with:
           name: examples-build
           path: packages/examples/build
       - name: Hot
-        run: npm run check-hot
+        run: pnpm check-hot

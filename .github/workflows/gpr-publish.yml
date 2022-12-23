@@ -13,11 +13,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - run: npm install --global npm@8
-      - run: npm i
+      - run: npm install --global pnpm
+      - run: pnpm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - run: npm run lint
-      - run: npm run test
+      - run: pnpm lint
+      - run: pnpm test
 
   publish-gpr:
     needs: test
@@ -28,9 +28,9 @@ jobs:
         with:
           node-version: 14
           registry-url: https://npm.pkg.github.com/
-      - run: npm install --global npm@8
-      - run: npm i
-      - run: npm run for-gpr
-      - run: npm run publish
+      - run: npm install --global pnpm
+      - run: pnpm i
+      - run: pnpm for-gpr
+      - run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
