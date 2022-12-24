@@ -1,7 +1,7 @@
 
 import {getFieldConfig, getFuncConfig} from "../utils/configUtils";
 import {filterValueSourcesForField} from "../utils/ruleUtils";
-import { Map, isIndexed, fromJS } from "immutable";
+import { Map, Iterable, fromJS } from "immutable";
 
 // helpers
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
@@ -146,7 +146,7 @@ export const setFunc = (value, funcKey, config) => {
 const getDefaultArgValue = ({defaultValue: value}) => {
   if (isObject(value) && !Map.isMap(value) && value.func) {
     return fromJS(value, function (k, v) {
-      return isIndexed(v) ? v.toList() : v.toOrderedMap();
+      return Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
     });
   }
   return value;
