@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig
 } from "./configUtils";
 import {defaultValue, getFirstDefined} from "../utils/stuff";
-import {Map, List} from "immutable";
+import Immutable from "immutable";
 import {validateValue} from "../utils/validation";
 import last from "lodash/last";
 
@@ -16,7 +16,7 @@ const selectTypes = [
 /**
  * @param {object} config
  * @param {object} oldConfig
- * @param {Map} current
+ * @param {Immutable.Map} current
  * @param {string} newField
  * @param {string} newOperator
  * @param {string} changedProp
@@ -28,8 +28,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const currentField = current.get("field");
   const currentOperator = current.get("operator");
   const currentValue = current.get("value");
-  const currentValueSrc = current.get("valueSrc", new List());
-  const currentValueType = current.get("valueType", new List());
+  const currentValueSrc = current.get("valueSrc", new Immutable.List());
+  const currentValueType = current.get("valueType", new Immutable.List());
   const currentAsyncListValues = current.get("asyncListValues");
 
   //const isValidatingTree = (changedProp === null);
@@ -111,7 +111,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 
   // reuse value OR get defaultValue for cardinality 1 (it means default range values is not supported yet, todo)
   let newValue = null, newValueSrc = null, newValueType = null, newValueError = null;
-  newValue = new List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+  newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let v = undefined;
     if (canReuseValue) {
       if (i < currentValue.size) {
@@ -130,7 +130,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     return v;
   }));
 
-  newValueSrc = new List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+  newValueSrc = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let vs = null;
     if (canReuseValue) {
       if (i < currentValueSrc.size)
@@ -154,10 +154,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         valueErrors.push(rangeValidateError);
       }
     }
-    newValueError = new List(valueErrors);
+    newValueError = new Immutable.List(valueErrors);
   }
 
-  newValueType = new List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+  newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let vt = null;
     if (canReuseValue) {
       if (i < currentValueType.size)

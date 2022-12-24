@@ -1,4 +1,4 @@
-import {Map, List, OrderedMap} from "immutable";
+import Immutable from "immutable";
 import uuid from "./uuid";
 import {getFieldConfig, getOperatorConfig} from "./configUtils";
 import {getNewValueForFieldOp, getFirstField, getFirstOperator} from "../utils/ruleUtils";
@@ -27,8 +27,8 @@ export const defaultOperator = (config, field, canGetFirst = true) => {
 export const defaultOperatorOptions = (config, operator, field) => {
   let operatorConfig = operator ? getOperatorConfig(config, operator, field) : null;
   if (!operatorConfig)
-    return null; //new Map();
-  return operatorConfig.options ? new Map(
+    return null; //new Immutable.Map();
+  return operatorConfig.options ? new Immutable.Map(
     operatorConfig.options
     && operatorConfig.options.defaults || {}
   ) : null;
@@ -44,16 +44,16 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
     field = defaultField(config, true, parentRuleGroupPath);
     operator = defaultOperator(config, field);
   }
-  let current = new Map({
+  let current = new Immutable.Map({
     field: field,
     operator: operator,
-    value: new List(),
-    valueSrc: new List(),
+    value: new Immutable.List(),
+    valueSrc: new Immutable.List(),
     //used for complex operators like proximity
     operatorOptions: defaultOperatorOptions(config, operator, field),
   });
   if (showErrorMessage) {
-    current = current.set("valueError", new List());
+    current = current.set("valueError", new Immutable.List());
   }
   
   if (field && operator) {
@@ -84,7 +84,7 @@ export const defaultGroupConjunction = (config, fieldConfig = null) => {
 export const defaultConjunction = (config) =>
   config.settings.defaultConjunction || Object.keys(config.conjunctions)[0];
 
-export const defaultGroupProperties = (config, fieldConfig = null) => new Map({
+export const defaultGroupProperties = (config, fieldConfig = null) => new Immutable.Map({
   conjunction: defaultGroupConjunction(config, fieldConfig),
   not: false
 });
@@ -96,7 +96,7 @@ export const defaultItemProperties = (config, item) => {
 };
 
 export const defaultRule = (id, config) => ({
-  [id]: new Map({
+  [id]: new Immutable.Map({
     type: "rule",
     id: id,
     properties: defaultRuleProperties(config)
@@ -104,16 +104,16 @@ export const defaultRule = (id, config) => ({
 });
 
 export const defaultRoot = (config) => {
-  return new Map({
+  return new Immutable.Map({
     type: "group",
     id: uuid(),
-    children1: new OrderedMap({ ...defaultRule(uuid(), config) }),
+    children1: new Immutable.OrderedMap({ ...defaultRule(uuid(), config) }),
     properties: defaultGroupProperties(config)
   });
 };
 
 export const createListFromArray = (ids) => {
-  return new List(ids);
+  return new Immutable.List(ids);
 };
 
-export const emptyProperies = () => new Map();
+export const emptyProperies = () => new Immutable.Map();

@@ -1,7 +1,7 @@
 
 import {getFieldConfig, getFuncConfig} from "../utils/configUtils";
 import {filterValueSourcesForField} from "../utils/ruleUtils";
-import { Map, Iterable, fromJS } from "immutable";
+import Immutable from "immutable";
 
 // helpers
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
@@ -20,9 +20,9 @@ export const completeValue = (value, valueSrc, config) => {
 };
 
 /**
- * @param {Map} value
+ * @param {Immutable.Map} value
  * @param {object} config
- * @return {Map | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
+ * @return {Immutable.Map | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
  */
 export const completeFuncValue = (value, config) => {
   const _checkFuncValue = (value) => {
@@ -73,7 +73,7 @@ export const completeFuncValue = (value, config) => {
 
 
 /**
- * @param {Map} value 
+ * @param {Immutable.Map} value 
  * @return {array} - [usedFields, badFields]
  */
 const getUsedFieldsInFuncValue = (value, config) => {
@@ -107,19 +107,19 @@ const getUsedFieldsInFuncValue = (value, config) => {
 
 /**
  * Used @ FuncWidget
- * @param {Map} value 
+ * @param {Immutable.Map} value 
  * @param {string} funcKey 
  * @param {object} config 
  */
 export const setFunc = (value, funcKey, config) => {
   const fieldSeparator = config.settings.fieldSeparator;
-  value = value || new Map();
+  value = value || new Immutable.Map();
   if (Array.isArray(funcKey)) {
     // fix for cascader
     funcKey = funcKey.join(fieldSeparator);
   }
   value = value.set("func", funcKey);
-  value = value.set("args", new Map());
+  value = value.set("args", new Immutable.Map());
 
   // defaults
   const funcConfig = funcKey && getFuncConfig(config, funcKey);
@@ -144,9 +144,9 @@ export const setFunc = (value, funcKey, config) => {
 };
 
 const getDefaultArgValue = ({defaultValue: value}) => {
-  if (isObject(value) && !Map.isMap(value) && value.func) {
-    return fromJS(value, function (k, v) {
-      return Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
+  if (isObject(value) && !Immutable.Map.isMap(value) && value.func) {
+    return Immutable.fromJS(value, function (k, v) {
+      return Immutable.Iterable.isIndexed(v) ? v.toList() : v.toOrderedMap();
     });
   }
   return value;
@@ -154,7 +154,7 @@ const getDefaultArgValue = ({defaultValue: value}) => {
 
 /**
 * Used @ FuncWidget
-* @param {Map} value 
+* @param {Immutable.Map} value 
 * @param {string} argKey 
 * @param {*} argVal 
 * @param {object} argConfig 
@@ -176,14 +176,14 @@ export const setArgValue = (value, argKey, argVal, argConfig, config) => {
 
 /**
 * Used @ FuncWidget
-* @param {Map} value 
+* @param {Immutable.Map} value 
 * @param {string} argKey 
 * @param {string} argValSrc 
 * @param {object} argConfig 
 */
 export const setArgValueSrc = (value, argKey, argValSrc, _argConfig, _config) => {
   if (value && value.get("func")) {
-    value = value.setIn(["args", argKey], new Map({valueSrc: argValSrc}));
+    value = value.setIn(["args", argKey], new Immutable.Map({valueSrc: argValSrc}));
   }
   return value;
 };

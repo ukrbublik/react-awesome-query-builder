@@ -1,4 +1,4 @@
-import {List, Map} from "immutable";
+import Immutable from "immutable";
 import {toImmutableList} from "../utils/stuff";
 import * as constants from "../stores/constants";
 import { defaultRuleProperties, defaultGroupProperties } from "../utils/defaultUtils";
@@ -7,7 +7,7 @@ import uuid from "../utils/uuid";
 
 /**
  * @param {object} config
- * @param {Map} tree
+ * @param {Immutable.Map} tree
  */
 export const setTree = (config, tree) => ({
   type: constants.SET_TREE,
@@ -17,8 +17,8 @@ export const setTree = (config, tree) => ({
 
 /**
  * @param {object} config
- * @param {List} path
- * @param {Map} properties
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
  */
 export const addRule = (config, path, properties, ruleType = "rule", children = null) => ({
   type: constants.ADD_RULE,
@@ -32,7 +32,7 @@ export const addRule = (config, path, properties, ruleType = "rule", children = 
 
 /**
  * @param {object} config
- * @param {List} path
+ * @param {Immutable.List} path
  */
 export const removeRule = (config, path) => ({
   type: constants.REMOVE_RULE,
@@ -42,8 +42,8 @@ export const removeRule = (config, path) => ({
 
 /**
  * @param {object} config
- * @param {List} path
- * @param {Map} properties
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
  */
 export const addDefaultCaseGroup = (config, path, properties, children = null) => ({
   type: constants.ADD_CASE_GROUP,
@@ -59,8 +59,8 @@ export const addDefaultCaseGroup = (config, path, properties, children = null) =
 
 /**
  * @param {object} config
- * @param {List} path
- * @param {Map} properties
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
  */
 export const addCaseGroup = (config, path, properties, children = null) => ({
   type: constants.ADD_CASE_GROUP,
@@ -73,8 +73,8 @@ export const addCaseGroup = (config, path, properties, children = null) => ({
 
 /**
  * @param {object} config
- * @param {List} path
- * @param {Map} properties
+ * @param {Immutable.List} path
+ * @param {Immutable.Map} properties
  */
 export const addGroup = (config, path, properties, children = null) => ({
   type: constants.ADD_GROUP,
@@ -87,7 +87,7 @@ export const addGroup = (config, path, properties, children = null) => ({
 
 /**
  * @param {object} config
- * @param {List} path
+ * @param {Immutable.List} path
  */
 export const removeGroup = (config, path) => ({
   type: constants.REMOVE_GROUP,

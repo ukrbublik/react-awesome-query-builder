@@ -13,7 +13,7 @@ import throttle from "lodash/throttle";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
-import { OrderedMap } from "immutable";
+import Immutable from "immutable";
 import clone from "clone";
 
 const stringify = JSON.stringify;
@@ -59,7 +59,7 @@ interface DemoQueryBuilderState {
   spelErrors: Array<string>;
 }
 
-type ImmOMap = OrderedMap<string, any>;
+type ImmOMap = Immutable.OrderedMap<string, any>;
 
 interface DemoQueryBuilderMemo {
   immutableTree?: ImmutableTree,
