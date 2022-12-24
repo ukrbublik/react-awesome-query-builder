@@ -5,16 +5,17 @@ build/
 coverage/
 junit/
 package/
+lib/
 
 package-lock.json
 yarn.lock
 npm-debug.log
-.idea
-.eslintcache
-.DS_Store
 .pnpm-debug.log
 pnpm-lock.yaml
 yarn-error.log
 .yarn/
 
-lib/
+.idea
+.eslintcache
+.DS_Store
+
