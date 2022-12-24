@@ -1,4 +1,4 @@
-import Immutable, { Map } from "immutable";
+import { Map, List } from "immutable";
 
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
@@ -110,7 +110,7 @@ const isImmutable = (v) => {
 };
 
 export function toImmutableList(v) {
-  return (isImmutable(v) ? v : new Immutable.List(v));
+  return (isImmutable(v) ? v : new List(v));
 }
 
 export function applyToJS(v) {

@@ -1,9 +1,9 @@
-import Immutable  from "immutable";
+import { Map, List, OrderedMap } from "immutable";
 
 /**
- * @param {Immutable.List} path
+ * @param {List} path
  * @param {...string} suffix
- * @return {Immutable.List}
+ * @return {List}
  */
 export const expandTreePath = (path, ...suffix) =>
   path.interpose("children1").withMutations((list) => {
@@ -14,9 +14,9 @@ export const expandTreePath = (path, ...suffix) =>
 
 
 /**
- * @param {Immutable.List} path
+ * @param {List} path
  * @param {...string} suffix
- * @return {Immutable.List}
+ * @return {List}
  */
 export const expandTreeSubpath = (path, ...suffix) =>
   path.interpose("children1").withMutations((list) => {
@@ -26,12 +26,12 @@ export const expandTreeSubpath = (path, ...suffix) =>
 
 
 /**
- * @param {Immutable.Map} path
- * @param {Immutable.List} path
- * @return {Immutable.Map}
+ * @param {Map} path
+ * @param {List} path
+ * @return {Map}
  */
 export const getItemByPath = (tree, path) => {
-  let children = new Immutable.OrderedMap({ [tree.get("id")] : tree });
+  let children = new OrderedMap({ [tree.get("id")] : tree });
   let res = tree;
   path.forEach((id) => {
     res = children.get(id);
@@ -43,8 +43,8 @@ export const getItemByPath = (tree, path) => {
 
 /**
  * Remove `path` in every item
- * @param {Immutable.Map} tree
- * @return {Immutable.Map} tree
+ * @param {Map} tree
+ * @return {Map} tree
  */
 export const removePathsInTree = (tree) => {
   let newTree = tree;
@@ -63,7 +63,7 @@ export const removePathsInTree = (tree) => {
     }
   }
 
-  _processNode(tree, new Immutable.List());
+  _processNode(tree, new List());
 
   return newTree;
 };
@@ -71,8 +71,8 @@ export const removePathsInTree = (tree) => {
 
 /**
  * Remove `isLocked` in items that inherit parent's `isLocked`
- * @param {Immutable.Map} tree
- * @return {Immutable.Map} tree
+ * @param {Map} tree
+ * @return {Map} tree
  */
 export const removeIsLockedInTree = (tree) => {
   let newTree = tree;
@@ -92,7 +92,7 @@ export const removeIsLockedInTree = (tree) => {
     }
   }
 
-  _processNode(tree, new Immutable.List());
+  _processNode(tree, new List());
 
   return newTree;
 };
@@ -100,8 +100,8 @@ export const removeIsLockedInTree = (tree) => {
 
 /**
  * Set correct `path` and `id` in every item
- * @param {Immutable.Map} tree
- * @return {Immutable.Map} tree
+ * @param {Map} tree
+ * @return {Map} tree
  */
 export const fixPathsInTree = (tree) => {
   let newTree = tree;
@@ -125,7 +125,7 @@ export const fixPathsInTree = (tree) => {
         // protect: should me OrderedMap, not Map (issue #501)
         newTree = newTree.setIn(
           expandTreePath(itemPath, "children1"), 
-          new Immutable.OrderedMap(children)
+          new OrderedMap(children)
         );
       }
       children.map((child, childId) => {
@@ -134,7 +134,7 @@ export const fixPathsInTree = (tree) => {
     }
   }
 
-  _processNode(tree, new Immutable.List(), 0);
+  _processNode(tree, new List(), 0);
 
 
   return newTree;
@@ -161,14 +161,14 @@ export const fixEmptyGroupsInTree = (tree) => {
     return false;
   }
 
-  _processNode(tree, new Immutable.List(), 0);
+  _processNode(tree, new List(), 0);
 
 
   return newTree;
 };
 
 /**
- * @param {Immutable.Map} tree
+ * @param {Map} tree
  * @return {Object} {flat, items}
  */
 export const getFlatTree = (tree) => {
@@ -262,7 +262,7 @@ export const getFlatTree = (tree) => {
 
 /**
  * Returns count of reorderable(!) nodes
- * @param {Immutable.Map} tree
+ * @param {Map} tree
  * @return {Integer}
  */
 export const getTotalReordableNodesCountInTree = (tree) => {
@@ -298,7 +298,7 @@ export const getTotalReordableNodesCountInTree = (tree) => {
 
 /**
  * Returns count of rules (leafs, i.e. don't count groups)
- * @param {Immutable.Map} tree
+ * @param {Map} tree
  * @return {Integer}
  */
 export const getTotalRulesCountInTree = (tree) => {

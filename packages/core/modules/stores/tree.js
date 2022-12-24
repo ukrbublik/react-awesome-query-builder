@@ -1,4 +1,4 @@
-import Immutable from "immutable";
+import { List, Map, OrderedMap } from "immutable";
 import {
   expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
@@ -23,8 +23,8 @@ import mapValues from "lodash/mapValues";
 
 /**
  * @param {object} config
- * @param {Immutable.List} path
- * @param {Immutable.Map} properties
+ * @param {List} path
+ * @param {Map} properties
  */
 const addNewGroup = (state, path, type, groupUuid, properties, config, children = null, meta = {}) => {
   const {shouldCreateEmptyGroup} = config.settings;
@@ -36,7 +36,7 @@ const addNewGroup = (state, path, type, groupUuid, properties, config, children 
   state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
   if (state !== origState) {
     if (!children && !isDefaultCase) {
-      state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
+      state = state.setIn(expandTreePath(groupPath, "children1"), new OrderedMap());
 
       // Add one empty rule into new group
       if (canAddNewRule) {
@@ -52,8 +52,8 @@ const addNewGroup = (state, path, type, groupUuid, properties, config, children 
 
 /**
  * @param {object} config
- * @param {Immutable.List} path
- * @param {Immutable.Map} properties
+ * @param {List} path
+ * @param {Map} properties
  */
 const removeGroup = (state, path, config) => {
   state = removeItem(state, path);
@@ -67,7 +67,7 @@ const removeGroup = (state, path, config) => {
     
     if (isEmptyTree(state) && !canLeaveEmptyGroup) {
       // if whole query is empty, add one empty rule to root
-      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+      state = addItem(state, new List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
   }
   state = fixPathsInTree(state);
@@ -76,7 +76,7 @@ const removeGroup = (state, path, config) => {
 
 /**
  * @param {object} config
- * @param {Immutable.List} path
+ * @param {List} path
  */
 const removeRule = (state, path, config) => {
   state = removeItem(state, path);
@@ -109,7 +109,7 @@ const removeRule = (state, path, config) => {
 
     if (isEmptyTree(state) && !canLeaveEmptyGroup) {
       // if whole query is empty, add one empty rule to root
-      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+      state = addItem(state, new List(), "rule", uuid(), defaultRuleProperties(config), config);
     }
   }
   state = fixPathsInTree(state);
@@ -117,24 +117,24 @@ const removeRule = (state, path, config) => {
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {bool} not
  */
 const setNot = (state, path, not) =>
   state.setIn(expandTreePath(path, "properties", "not"), not);
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {bool} lock
  */
 const setLock = (state, path, lock) =>
   removeIsLockedInTree(state.setIn(expandTreePath(path, "properties", "isLocked"), lock));
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {string} conjunction
  */
 const setConjunction = (state, path, conjunction) =>
@@ -143,7 +143,7 @@ const setConjunction = (state, path, conjunction) =>
 // convert children deeply from JS to Immutable
 const _addChildren1 = (config, item, children) => {
   if (children && Array.isArray(children)) {
-    item.children1 = new Immutable.OrderedMap(
+    item.children1 = new OrderedMap(
       children.reduce((map, it) => {
         const id1 = uuid();
         const it1 = {
@@ -155,7 +155,7 @@ const _addChildren1 = (config, item, children) => {
         //todo: guarantee order
         return {
           ...map,
-          [id1]: new Immutable.Map(it1)
+          [id1]: new Map(it1)
         };
       }, {})
     );
@@ -163,11 +163,11 @@ const _addChildren1 = (config, item, children) => {
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {string} type
  * @param {string} id
- * @param {Immutable.OrderedMap} properties
+ * @param {OrderedMap} properties
  * @param {object} config
  */
 const addItem = (state, path, type, id, properties, config, children = null) => {
@@ -203,15 +203,15 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
   const isLastDefaultCase = type == "case_group" && hasChildren && targetChildren.last().get("children1") == null;
 
   if (canAdd) {
-    const newChildren = new Immutable.OrderedMap({
-      [id]: new Immutable.Map(item)
+    const newChildren = new OrderedMap({
+      [id]: new Map(item)
     });
     if (!hasChildren) {
       state = state.setIn(childrenPath, newChildren);
     } else if (isLastDefaultCase) {
       const last = targetChildren.last();
-      const newChildrenWithLast = new Immutable.OrderedMap({
-        [id]: new Immutable.Map(item),
+      const newChildrenWithLast = new OrderedMap({
+        [id]: new Map(item),
         [last.get("id")]: last
       });
       state = state.deleteIn(expandTreePath(childrenPath, "children1", last.get("id")));
@@ -225,8 +225,8 @@ const addItem = (state, path, type, id, properties, config, children = null) => 
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  */
 const removeItem = (state, path) => {
   state = state.deleteIn(expandTreePath(path));
@@ -235,9 +235,9 @@ const removeItem = (state, path) => {
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} fromPath
- * @param {Immutable.List} toPath
+ * @param {Map} state
+ * @param {List} fromPath
+ * @param {List} toPath
  * @param {string} placement, see constants PLACEMENT_*: PLACEMENT_AFTER, PLACEMENT_BEFORE, PLACEMENT_APPEND, PLACEMENT_PREPEND
  * @param {object} config
  */
@@ -265,9 +265,9 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
   let sourceSubpathFromTarget = null;
   let targetSubpathFromSource = null;
   if (isSourceInsideTarget) {
-    sourceSubpathFromTarget = Immutable.List(sourcePath.toArray().slice(targetPath.size));
+    sourceSubpathFromTarget = List(sourcePath.toArray().slice(targetPath.size));
   } else if (isTargetInsideSource) {
-    targetSubpathFromSource = Immutable.List(targetPath.toArray().slice(sourcePath.size));
+    targetSubpathFromSource = List(targetPath.toArray().slice(sourcePath.size));
   }
 
   let newTargetChildren = targetChildren, newSourceChildren = sourceChildren;
@@ -280,7 +280,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
   }
 
   if (placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER) {
-    newTargetChildren = Immutable.OrderedMap().withMutations(r => {
+    newTargetChildren = OrderedMap().withMutations(r => {
       for (let [itemId, item] of newTargetChildren.entries()) {
         if (itemId == to.get("id") && placement == constants.PLACEMENT_BEFORE) {
           r.set(from.get("id"), from);
@@ -296,7 +296,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
   } else if (placement == constants.PLACEMENT_APPEND) {
     newTargetChildren = newTargetChildren.merge({[from.get("id")]: from});
   } else if (placement == constants.PLACEMENT_PREPEND) {
-    newTargetChildren = Immutable.OrderedMap({[from.get("id")]: from}).merge(newTargetChildren);
+    newTargetChildren = OrderedMap({[from.get("id")]: from}).merge(newTargetChildren);
   }
 
   if (isTargetInsideSource) {
@@ -315,8 +315,8 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
 
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {string} field
  */
 const setField = (state, path, newField, config) => {
@@ -339,8 +339,8 @@ const setField = (state, path, newField, config) => {
   const currentOperatorOptions = currentProperties.get("operatorOptions");
   const _currentField = currentProperties.get("field");
   const _currentValue = currentProperties.get("value");
-  const _currentValueSrc = currentProperties.get("valueSrc", new Immutable.List());
-  const _currentValueType = currentProperties.get("valueType", new Immutable.List());
+  const _currentValueSrc = currentProperties.get("valueSrc", new List());
+  const _currentValueType = currentProperties.get("valueType", new List());
 
   // If the newly selected field supports the same operator the rule currently
   // uses, keep it selected.
@@ -370,7 +370,7 @@ const setField = (state, path, newField, config) => {
   if (wasRuleGroup && !isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule");
     state = state.deleteIn(expandTreePath(path, "children1"));
-    state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
+    state = state.setIn(expandTreePath(path, "properties"), new OrderedMap());
   }
 
   if (isRuleGroup) {
@@ -390,7 +390,7 @@ const setField = (state, path, newField, config) => {
         valueType: newValueType,
       });
     }
-    state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
+    state = state.setIn(expandTreePath(path, "children1"), new OrderedMap());
     state = state.setIn(expandTreePath(path, "properties"), groupProperties);
     if (newFieldConfig.initialEmptyWhere && operatorCardinality == 1) { // just `COUNT(grp) > 1` without `HAVING ..`
       // no childeren
@@ -424,8 +424,8 @@ const setField = (state, path, newField, config) => {
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {string} operator
  */
 const setOperator = (state, path, newOperator, config) => {
@@ -442,8 +442,8 @@ const setOperator = (state, path, newOperator, config) => {
   state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
     const currentField = current.get("field");
     const currentOperatorOptions = current.get("operatorOptions");
-    const _currentValue = current.get("value", new Immutable.List());
-    const _currentValueSrc = current.get("valueSrc", new Immutable.List());
+    const _currentValue = current.get("value", new List());
+    const _currentValueSrc = current.get("valueSrc", new List());
     const _currentOperator = current.get("operator");
 
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
@@ -478,8 +478,8 @@ const setOperator = (state, path, newOperator, config) => {
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {integer} delta
  * @param {*} value
  * @param {string} valueType
@@ -528,9 +528,9 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
   if (!lastValueArr) {
     state = state
-      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
+      .setIn(expandTreePath(path, "properties", "value"), new List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueType"), new List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueError"), new List(new Array(operatorCardinality)));
   }
 
   const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta + ""));
@@ -564,8 +564,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {integer} delta
  * @param {*} srcKey
  */
@@ -615,8 +615,8 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
 };
 
 /**
- * @param {Immutable.Map} state
- * @param {Immutable.List} path
+ * @param {Map} state
+ * @param {List} path
  * @param {string} name
  * @param {*} value
  */
@@ -625,7 +625,7 @@ const setOperatorOption = (state, path, name, value) => {
 };
 
 /**
- * @param {Immutable.Map} state
+ * @param {Map} state
  */
 const checkEmptyGroups = (state, config) => {
   const {canLeaveEmptyGroup} = config.settings;
@@ -701,7 +701,7 @@ const getActionMeta = (action, state) => {
 };
 
 /**
- * @param {Immutable.Map} state
+ * @param {Map} state
  * @param {object} action
  */
 export default (config, tree, getMemoizedTree) => {
