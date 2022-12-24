@@ -1,4 +1,4 @@
-import { fromJS, Map, List, Iterable, OrderedMap } from "immutable";
+import { fromJS, Map, List, isIndexed, OrderedMap } from "immutable";
 import {validateTree} from "../utils/validation";
 import {extendConfig} from "../utils/configUtils";
 import {getTreeBadFields, getLightTree} from "../utils/treeUtils";
@@ -72,10 +72,10 @@ function jsTreeToImmutable(tree) {
     } else if (key == "asyncListValues") {
       // keep in JS format
       outValue = value.toJS();
-    } else if (key == "children1" && Iterable.isIndexed(value)) {
+    } else if (key == "children1" && isIndexed(value)) {
       outValue = new OrderedMap(value.map(child => [child.get("id"), child]));
     } else {
-      outValue = Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
+      outValue = isIndexed(value) ? value.toList() : value.toOrderedMap();
     }
     return outValue;
   });
