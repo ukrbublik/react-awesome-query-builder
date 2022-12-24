@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/ui",
-  "version": "6.0.0-beta.1",
+  "version": "6.0.0-beta.2",
   "description": "User-friendly query builder for React. Core React UI",
   "repository": {
     "type": "git",
