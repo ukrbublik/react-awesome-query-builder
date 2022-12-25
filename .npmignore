@@ -4,13 +4,12 @@ dist/
 build/
 coverage/
 junit/
+/package/
+*.log
 
 package-lock.json
 yarn.lock
-npm-debug.log
-.pnpm-debug.log
 pnpm-lock.yaml
-yarn-error.log
 .yarn/
 
 .idea
@@ -23,4 +22,3 @@ yarn-error.log
 .vscode
 .circleci
 .travis.yml
-*.log

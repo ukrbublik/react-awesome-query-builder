@@ -1,6 +1,7 @@
 # Changelog
 - 6.0.0
   - Project has been divided into packages (monorepo) (PR #769)
+    Export ESM
 - 5.4.0
   - Add `multiselect_contains` operator (PR #813) (issue #702)
 - 5.3.2

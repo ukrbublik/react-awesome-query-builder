@@ -12,17 +12,17 @@
   "exports": {
     ".": {
       "types": "./modules/index.d.ts",
-      "import": "./modules/index.jsx",
-      "require": "./lib/index.js"
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
     },
     "./package.json": "./package.json",
-    "./css/styles.css": "./lib/css/styles.css",
-    "./css/compact_styles.css": "./lib/css/compact_styles.css",
-    "./css/styles.scss": "./lib/css/styles.scss",
-    "./css/compact_styles.scss": "./lib/css/compact_styles.scss"
+    "./css/styles.css": "./css/styles.css",
+    "./css/compact_styles.css": "./css/compact_styles.css",
+    "./css/styles.scss": "./css/styles.scss",
+    "./css/compact_styles.scss": "./css/compact_styles.scss"
   },
-  "main": "./lib/index.js",
-  "module": "./modules/index.jsx",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
   "types": "./modules/index.d.ts",
   "scripts": {
     "build": "sh ./scripts/build-npm.sh",

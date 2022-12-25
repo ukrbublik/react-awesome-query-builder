@@ -4,19 +4,18 @@ dist/
 build/
 coverage/
 junit/
-package/
-lib/
+/package/
+*.log
 
 package-lock.json
 yarn.lock
-npm-debug.log
-.pnpm-debug.log
 pnpm-lock.yaml
-yarn-error.log
-lerna-debug.log
 .yarn/
 
 .idea
 .eslintcache
 .DS_Store
 
+packages/*/cjs/
+packages/*/esm/
+packages/*/css/
