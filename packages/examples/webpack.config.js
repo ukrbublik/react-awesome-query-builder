@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const fs = require('fs');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -13,7 +14,7 @@ const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
-const UI_CSS = path.resolve(EXAMPLES, '../ui/css/');
+const UI_CSS = path.resolve(EXAMPLES, '../ui/styles/');
 const CORE_MODULES = path.resolve(EXAMPLES, '../core/modules/');
 const UI_MODULES = path.resolve(EXAMPLES, '../ui/modules/');
 const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
@@ -21,6 +22,7 @@ const MUI_MODULES = path.resolve(EXAMPLES, '../mui/modules/');
 const MATERIAL_MODULES = path.resolve(EXAMPLES, '../material/modules/');
 const BOOTSTRAP_MODULES = path.resolve(EXAMPLES, '../bootstrap/modules/');
 const DIST = path.resolve(EXAMPLES, './build');
+const isMono = fs.existsSync(CORE_MODULES);
 
 let plugins = [
     new webpack.DefinePlugin({
@@ -34,7 +36,7 @@ let plugins = [
     }),
 ];
 
-let aliases = {
+let aliases = isMono ? {
     '@react-awesome-query-builder/ui/css': UI_CSS,
     '@react-awesome-query-builder/ui': UI_MODULES,
     '@react-awesome-query-builder/core': CORE_MODULES,
@@ -42,7 +44,7 @@ let aliases = {
     '@react-awesome-query-builder/mui': MUI_MODULES,
     '@react-awesome-query-builder/material': MATERIAL_MODULES,
     '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
-};
+} : {};
 let style_loaders = [{
     loader: "style-loader"
 }];
