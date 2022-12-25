@@ -14,13 +14,17 @@ const isDev = (MODE == "development");
 const isAnalyze = process.env.ANALYZE == "1";
 const isSeparateCss = process.env.CSS == "1";
 const EXAMPLES = __dirname;
-const UI_CSS = path.resolve(EXAMPLES, '../ui/styles/');
 const CORE_MODULES = path.resolve(EXAMPLES, '../core/modules/');
 const UI_MODULES = path.resolve(EXAMPLES, '../ui/modules/');
 const ANTD_MODULES = path.resolve(EXAMPLES, '../antd/modules/');
 const MUI_MODULES = path.resolve(EXAMPLES, '../mui/modules/');
 const MATERIAL_MODULES = path.resolve(EXAMPLES, '../material/modules/');
 const BOOTSTRAP_MODULES = path.resolve(EXAMPLES, '../bootstrap/modules/');
+const UI_CSS = path.resolve(EXAMPLES, '../ui/styles/');
+const ANTD_CSS = path.resolve(EXAMPLES, '../antd/styles/');
+const MUI_CSS = path.resolve(EXAMPLES, '../mui/styles/');
+const MATERIAL_CSS = path.resolve(EXAMPLES, '../material/styles/');
+const BOOTSTRAP_CSS = path.resolve(EXAMPLES, '../bootstrap/styles/');
 const DIST = path.resolve(EXAMPLES, './build');
 const isMono = fs.existsSync(CORE_MODULES);
 
@@ -38,16 +42,33 @@ let plugins = [
 
 let aliases = isMono ? {
     '@react-awesome-query-builder/ui/css': UI_CSS,
-    '@react-awesome-query-builder/ui': UI_MODULES,
+    '@react-awesome-query-builder/antd/css': ANTD_CSS,
+    '@react-awesome-query-builder/mui/css': MUI_CSS,
+    '@react-awesome-query-builder/material/css': MATERIAL_CSS,
+    '@react-awesome-query-builder/bootstrap/css': BOOTSTRAP_CSS,
+    
     '@react-awesome-query-builder/core': CORE_MODULES,
+    '@react-awesome-query-builder/ui': UI_MODULES,
     '@react-awesome-query-builder/antd': ANTD_MODULES,
     '@react-awesome-query-builder/mui': MUI_MODULES,
     '@react-awesome-query-builder/material': MATERIAL_MODULES,
     '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
 } : {};
+
 let style_loaders = [{
     loader: "style-loader"
 }];
+const lazy_style_loaders = isDev ? [
+    ({resource, descriptionData: {name} = {}}) => ({
+    loader: "style-loader", 
+    options: {
+        injectType: (
+            name && name.startsWith('@react-awesome-query-builder') || name === 'antd' || name === 'bootstrap' ?  
+            "lazyStyleTag" : "styleTag"
+        )
+    }
+})
+] : [];
 
 if (isProd) {
     plugins = [
@@ -153,19 +174,19 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: [...style_loaders, "css-loader"]
+                use: [...lazy_style_loaders, "css-loader"]
             },
             {
                 test: /\.scss$/,
-                use: [...style_loaders, {
+                use: [...lazy_style_loaders, {
                     loader: "css-loader"
                 }, {
                     loader: "sass-loader"
-                }]
+                }],
             },
             {
                 test: /\.less$/,
-                use: [...style_loaders, {
+                use: [...lazy_style_loaders, {
                     loader: "css-loader"
                 }, {
                     loader: "less-loader",

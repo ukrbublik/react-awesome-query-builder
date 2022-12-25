@@ -17,10 +17,10 @@ npm i @react-awesome-query-builder/mui --save
 ## Usage
 
 ```js
-import { Query, Builder } from '@react-awesome-query-builder/ui';
-import '@react-awesome-query-builder/ui/css/styles.css';
-
+import { Query, Builder } from '@react-awesome-query-builder/mui';
 import { MuiConfig, MuiWidgets } from "@react-awesome-query-builder/mui";
+import '@react-awesome-query-builder/mui/css/styles.css';
+
 cosnt config = {
   ...MuiConfig,
   // your config

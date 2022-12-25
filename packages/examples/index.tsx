@@ -9,10 +9,6 @@ import {
   Route
 } from "react-router-dom";
 
-import "antd/dist/antd.css"; // or import "@react-awesome-query-builder/ui/css/antd.less"
-import "@react-awesome-query-builder/ui/css/styles.scss";
-//import '@react-awesome-query-builder/ui/css/compact_styles.scss'; //optional
-
 const rootElement = window.document.getElementById("root");
 
 ReactDOM.render((

@@ -131,13 +131,14 @@ import {Query, Builder, BasicConfig, Utils as QbUtils} from '@react-awesome-quer
 import {AntdConfig} from '@react-awesome-query-builder/antd';
 import "antd/dist/antd.css";
 // For MUI widgets only:
-import {MuiConfig} from '@react-awesome-query-builder/mui'; // MUI v5
-import {MaterialConfig} from '@react-awesome-query-builder/material'; // Material-UI v4
+// import {MuiConfig} from '@react-awesome-query-builder/mui'; // MUI v5
+// import {MaterialConfig} from '@react-awesome-query-builder/material'; // Material-UI v4
 // For Bootstrap widgets only:
-import {BootstrapConfig} from '@react-awesome-query-builder/bootstrap';
+// import {BootstrapConfig} from '@react-awesome-query-builder/bootstrap';
+// import "bootstrap/dist/css/bootstrap.min.css";
 
-import '@react-awesome-query-builder/ui/css/styles.css';
-import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
+import '@react-awesome-query-builder/antd/css/styles.css';
+// import '@react-awesome-query-builder/antd/css/compact_styles.css'; //optional, for more compact styles
 
 // Choose your skin (antd/mui/vanilla):
 const InitialConfig = AntdConfig; // or MuiConfig or BootstrapConfig or BasicConfig
@@ -255,8 +256,8 @@ import "antd/dist/antd.css";
 // For Bootstrap widgets only:
 // import {BootstrapConfig} from '@react-awesome-query-builder/bootstrap';
 
-import '@react-awesome-query-builder/ui/css/styles.css';
-import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
+import '@react-awesome-query-builder/antd/css/styles.css';
+//import '@react-awesome-query-builder/antd/css/compact_styles.css'; //optional, for more compact styles
 
 // Choose your skin (antd/mui/vanilla):
 const InitialConfig = AntdConfig; // or MuiConfig or BootstrapConfig or BasicConfig
@@ -513,7 +514,15 @@ Note that you can import all types and values from a "thickest" package (eg. `@r
 ```js
 import {Utils, Query, Builder, AntdConfig} from '@react-awesome-query-builder/antd';
 ```
-You don't need to install and import `ui` and `core` packages in this case, just use `antd`.
+You don't need to install and import `ui` and `core` packages in this case, just use `antd`.  
+Same for styles - please import from the "thickest" package:
+```js
+import '@react-awesome-query-builder/antd/css/styles.css';
+```
+instead of
+```js
+import '@react-awesome-query-builder/ui/css/styles.css';
+```
 
 ### Migration to 5.2.0
 Breaking change: `children1` is now an indexed array (instead of object) in result of `Utils.getTree()` to preserve items order.  

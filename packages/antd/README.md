@@ -17,10 +17,11 @@ npm i @react-awesome-query-builder/antd --save
 ## Usage
 
 ```js
-import { Query, Builder } from '@react-awesome-query-builder/ui';
-import '@react-awesome-query-builder/ui/css/styles.css';
-
+import { Query, Builder } from '@react-awesome-query-builder/antd';
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
+import "antd/dist/antd.css";
+import '@react-awesome-query-builder/antd/css/styles.css';
+
 cosnt config = {
   ...AntdConfig,
   // your config

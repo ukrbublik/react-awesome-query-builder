@@ -17,10 +17,11 @@ npm i @react-awesome-query-builder/bootstrap --save
 ## Usage
 
 ```js
-import { Query, Builder } from '@react-awesome-query-builder/ui';
-import '@react-awesome-query-builder/ui/css/styles.css';
-
+import { Query, Builder } from '@react-awesome-query-builder/bootstrap';
 import { BootstrapConfig, BootstrapWidgets } from "@react-awesome-query-builder/bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import '@react-awesome-query-builder/bootstrap/css/styles.css';
+
 cosnt config = {
   ...BootstrapConfig,
   // your config

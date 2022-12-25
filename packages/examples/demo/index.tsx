@@ -9,6 +9,7 @@ import {
   //types:
   BuilderProps
 } from "@react-awesome-query-builder/ui";
+import ImportSkinStyles from "../skins";
 import throttle from "lodash/throttle";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";
@@ -415,6 +416,8 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={validate}>validate</button>
         <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
       </div>
+
+      <ImportSkinStyles skin={state.skin} />
       
       <Query
         {...state.config}

@@ -9,3 +9,4 @@ cp ./modules/index.d.ts ./cjs/index.d.ts
 cp ./modules/index.d.ts ./esm/index.d.ts
 
 sass styles/:css/ --no-source-map --style=expanded
+cp ./styles/* ./css

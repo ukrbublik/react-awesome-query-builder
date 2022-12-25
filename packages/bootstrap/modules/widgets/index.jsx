@@ -1,6 +1,3 @@
-//bootstrap css
-import "bootstrap/dist/css/bootstrap.min.css";
-
 // value widgets
 import BootstrapTextWidget from "./value/BootstrapText";
 import BootstrapTextAreaWidget from "./value/BootstrapTextArea";

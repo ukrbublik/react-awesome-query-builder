@@ -17,10 +17,10 @@ npm i @react-awesome-query-builder/material --save
 ## Usage
 
 ```js
-import { Query, Builder } from '@react-awesome-query-builder/ui';
-import '@react-awesome-query-builder/ui/css/styles.css';
-
+import { Query, Builder } from '@react-awesome-query-builder/material';
 import { MaterialConfig, MaterialWidgets } from "@react-awesome-query-builder/material";
+import '@react-awesome-query-builder/material/css/styles.css';
+
 cosnt config = {
   ...MaterialConfig,
   // your config

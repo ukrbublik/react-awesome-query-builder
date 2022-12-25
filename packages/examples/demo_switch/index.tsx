@@ -8,7 +8,7 @@ import {
 import {
   Query, Builder, BuilderProps
 } from "@react-awesome-query-builder/ui";
-import "@react-awesome-query-builder/ui/css/styles.scss";
+import "@react-awesome-query-builder/material/css/styles.scss";
 import getConfig from "./config";
 
 const config: Config = getConfig();
