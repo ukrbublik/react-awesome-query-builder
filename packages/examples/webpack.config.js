@@ -127,7 +127,11 @@ module.exports = {
     },
     resolve: {
         alias: aliases,
-        extensions: ['.tsx', '.ts', '.js', '.jsx', '.scss', '.less']
+        extensions: ['.tsx', '.ts', '.js', '.jsx', '.scss', '.less'],
+        fallback: {
+            buffer: false,
+            process: false
+        }
     },
     module: {
         rules: [
