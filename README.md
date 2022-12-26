@@ -515,7 +515,7 @@ Note that you can import all types and values from a "thickest" package (eg. `@r
 import {Utils, Query, Builder, AntdConfig} from '@react-awesome-query-builder/antd';
 ```
 You don't need to install and import `ui` and `core` packages in this case, just use `antd`.  
-Same for styles - please import from the "thickest" package:
+Same for styles - please import from the "thickest" (specific) package:
 ```js
 import '@react-awesome-query-builder/antd/css/styles.css';
 ```
