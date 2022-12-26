@@ -9,7 +9,7 @@ jobs:
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
       - run:
-          name: Install npm 8
+          name: Install pnpm
           command: npm install --global pnpm
       - run:
           name: Check install
@@ -21,19 +21,17 @@ jobs:
             pnpm --version
       - checkout
       # - restore_cache:
+      #     name: Restore pnpm Package Cache
       #     keys:
-      #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
-      #       - node-deps-v1-{{ arch }}-{{checksum "package.json"}}
+      #       - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
       - run:
           name: Install
           command: pnpm i
       # - save_cache:
-      #     key: node-deps-v1-{{ arch }}-{{checksum "package.json"}}-{{checksum "examples/package.json"}}-{{checksum "sandbox/package.json"}}-{{checksum "sandbox_simple/package.json"}}
+      #     name: Save pnpm Package Cache
+      #     key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
       #     paths:
       #       - node_modules
-      #       - examples/node_modules
-      #       - sandbox/node_modules
-      #       - sandbox_simple/node_modules
       - run:
           name: Lint
           command: pnpm lint

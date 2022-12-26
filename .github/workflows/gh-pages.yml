@@ -10,13 +10,16 @@ jobs:
     name: Update GitHub pages
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: master
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
     - uses: actions/setup-node@v3
       with:
         node-version: 14
-    - run: npm install --global pnpm
+        #cache: 'pnpm'
     - run: pnpm i
     - name: Build examples
       run: pnpm build
@@ -26,7 +29,7 @@ jobs:
         mkdir /tmp/react-awesome-query-builder
         mkdir /tmp/react-awesome-query-builder/gh-pages
         cp ./packages/examples/build/*bundle* /tmp/react-awesome-query-builder/gh-pages/
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: gh-pages
     - name: Commit build

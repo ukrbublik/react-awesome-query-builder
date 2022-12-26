@@ -9,11 +9,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - run: npm install --global pnpm
+          #cache: 'pnpm'
       - run: pnpm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - run: pnpm lint
@@ -23,12 +26,15 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - uses: actions/setup-node@v3
         with:
           node-version: 14
+          #cache: 'pnpm'
           registry-url: https://npm.pkg.github.com/
-      - run: npm install --global pnpm
       - run: pnpm i
       - run: pnpm for-gpr
       - run: pnpm -r publish --access public
