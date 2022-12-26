@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
+import { LazyStyleModule } from "../utils";
+// @ts-ignore
 import styles from "@react-awesome-query-builder/ui/css/styles.scss";
 
 const ImportMui: React.FC = () => {
   useEffect(() => {
-    styles.use();
+    (styles as LazyStyleModule).use();
     return () => {
-      styles.unuse();
+      (styles as LazyStyleModule).unuse();
     };
   }, []);
   return null;

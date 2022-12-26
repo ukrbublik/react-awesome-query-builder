@@ -1,14 +1,17 @@
 import React, { useEffect } from "react";
+import { LazyStyleModule } from "../utils";
+// @ts-ignore
 import styles from "@react-awesome-query-builder/bootstrap/css/styles.scss";
+// @ts-ignore
 import bootstrap from "bootstrap/dist/css/bootstrap.min.css";
 
 const ImportMui: React.FC = () => {
   useEffect(() => {
-    bootstrap.use();
-    styles.use();
+    (bootstrap as LazyStyleModule).use();
+    (styles as LazyStyleModule).use();
     return () => {
-      styles.unuse();
-      bootstrap.unuse();
+      (styles as LazyStyleModule).unuse();
+      (bootstrap as LazyStyleModule).unuse();
     };
   }, []);
   return null;
