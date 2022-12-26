@@ -7,7 +7,7 @@
 [![Financial Contributors on Open Collective](https://opencollective.com/react-awesome-query-builder/all/badge.svg?label=financial+contributors)](https://opencollective.com/react-awesome-query-builder)
 -->
 
-[![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/core.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/core)
+[![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/ui.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/ui)
 [![Smoke](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml/badge.svg?text=Test)](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml?query=branch%3Amaster)
 [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 
 [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder)
@@ -81,7 +81,7 @@ From v6 library is divided into packages:
 - [`@react-awesome-query-builder/ui`](/packages/ui) - has core React components like `<Query>` `<Builder>` and CSS, provides config with basic (vanilla) widgets
 - [`@react-awesome-query-builder/antd`](/packages/antd) - provides config with [Ant Design](https://ant.design/) widgets
 - [`@react-awesome-query-builder/mui`](/packages/mui) - provides config with [MUI](https://mui.com/) widgets
-- [`@react-awesome-query-builder/material`](/packages/material) - provides config with [Material-UI v4](https://v4.mui.com/) widgets
+- [`@react-awesome-query-builder/material`](/packages/material) - provides config with [Material-UI v4](https://v4.mui.com/) widgets (deprecated)
 - [`@react-awesome-query-builder/bootstrap`](/packages/bootstrap) - provides config with [Bootstrap](https://reactstrap.github.io/) widgets
 
 ```mermaid
@@ -126,22 +126,13 @@ Demo apps:
 #### Minimal JavaScript example with class component
 ```javascript
 import React, {Component} from 'react';
-import {Query, Builder, BasicConfig, Utils as QbUtils} from '@react-awesome-query-builder/ui';
-// For AntDesign widgets only:
-import {AntdConfig} from '@react-awesome-query-builder/antd';
-import "antd/dist/antd.css";
-// For MUI widgets only:
-// import {MuiConfig} from '@react-awesome-query-builder/mui'; // MUI v5
-// import {MaterialConfig} from '@react-awesome-query-builder/material'; // Material-UI v4
-// For Bootstrap widgets only:
-// import {BootstrapConfig} from '@react-awesome-query-builder/bootstrap';
-// import "bootstrap/dist/css/bootstrap.min.css";
 
-import '@react-awesome-query-builder/antd/css/styles.css';
-// import '@react-awesome-query-builder/antd/css/compact_styles.css'; //optional, for more compact styles
-
-// Choose your skin (antd/mui/vanilla):
-const InitialConfig = AntdConfig; // or MuiConfig or BootstrapConfig or BasicConfig
+// >>>
+import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
+import '@react-awesome-query-builder/ui/css/styles.css';
+//import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
+const InitialConfig = BasicConfig;
+// <<<
 
 // You need to provide your own config. See below 'Config format'
 const config = {
@@ -239,28 +230,20 @@ class DemoQueryBuilder extends Component {
     // `jsonTree` can be saved to backend, and later loaded to `queryValue`
   }
 }
+export default DemoQueryBuilder;
 ```
 
 #### Minimal TypeScript example with function component
 ```typescript
 import React, { useState, useCallback } from "react";
-import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
+
+// >>> 
 import type { JsonGroup, Config, ImmutableTree, BuilderProps } from '@react-awesome-query-builder/ui';
-
-// For AntDesign widgets only:
-import {AntdConfig} from '@react-awesome-query-builder/antd';
-import "antd/dist/antd.css";
-// For MUI widgets only:
-// import {MuiConfig} from '@react-awesome-query-builder/mui'; // MUI v5
-// import {MaterialConfig} from '@react-awesome-query-builder/material'; // Material-UI v4
-// For Bootstrap widgets only:
-// import {BootstrapConfig} from '@react-awesome-query-builder/bootstrap';
-
-import '@react-awesome-query-builder/antd/css/styles.css';
-//import '@react-awesome-query-builder/antd/css/compact_styles.css'; //optional, for more compact styles
-
-// Choose your skin (antd/mui/vanilla):
-const InitialConfig = AntdConfig; // or MuiConfig or BootstrapConfig or BasicConfig
+import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
+import '@react-awesome-query-builder/ui/css/styles.css';
+//import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
+const InitialConfig = BasicConfig;
+// <<<
 
 // You need to provide your own config. See below 'Config format'
 const config: Config = {
@@ -313,7 +296,7 @@ const config: Config = {
 // You can load query value from your backend storage (for saving see `Query.onChange()`)
 const queryValue: JsonGroup = { id: QbUtils.uuid(), type: "group" };
 
-export const Demo: React.FC = () => {
+const DemoQueryBuilder: React.FC = () => {
   const [state, setState] = useState({
     tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
     config: config
@@ -321,7 +304,7 @@ export const Demo: React.FC = () => {
 
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config) => {
     // Tip: for better performance you can apply `throttle` - see `examples/demo`
-    setState(prevState => { ...prevState, tree: immutableTree, config: config });
+    setState(prevState => ({ ...prevState, tree: immutableTree, config: config }));
 
     const jsonTree = QbUtils.getTree(immutableTree);
     console.log(jsonTree);
@@ -373,6 +356,7 @@ export const Demo: React.FC = () => {
     </div>
   );
 };
+export default DemoQueryBuilder;
 ```
 
 
@@ -481,9 +465,10 @@ See [`CHANGELOG`](/CHANGELOG.md)
 From version 6 library is divided into [packages](/packages). 
 Please remove package `react-awesome-query-builder` and install one of:
 - [`@react-awesome-query-builder/ui`](/packages/ui)
-- [`@react-awesome-query-builder/mui`](/packages/mui)
 - [`@react-awesome-query-builder/antd`](/packages/antd)
 - [`@react-awesome-query-builder/bootstrap`](/packages/bootstrap)
+- [`@react-awesome-query-builder/mui`](/packages/mui)
+- [`@react-awesome-query-builder/material`](/packages/material) (deprecated)
 
 Library code is backward-compatible with version 2-5. 
 You just need to change your imports. 
@@ -510,18 +495,26 @@ You just need to change your imports.
 + import '@react-awesome-query-builder/ui/css/compact_styles.css';
 ```
 
-Note that you can import all types and values from a "thickest" package (eg. `@react-awesome-query-builder/antd` if you use AntDesign - it includes all from `ui` and `core`, see [Getting started](#getting-started)):
+Note that you should import all types and values from a single package.
+For example, `@react-awesome-query-builder/antd` if you use AntDesign - it inherits `core` and `ui`:
 ```js
 import {Utils, Query, Builder, AntdConfig} from '@react-awesome-query-builder/antd';
 ```
 You don't need to install and import `ui` and `core` packages in this case, just use `antd`.  
-Same for styles - please import from the "thickest" (specific) package:
+Same for styles - please import from `antd` package:
 ```js
 import '@react-awesome-query-builder/antd/css/styles.css';
 ```
 instead of
 ```js
 import '@react-awesome-query-builder/ui/css/styles.css';
+```
+
+If you use vanilla widgets, please install, import and use only `@react-awesome-query-builder/ui` (it inherits `core`). 
+
+One more thing, if you use Bootstrap widgets, now you need to explicitly import CSS:
+```js
+import "bootstrap/dist/css/bootstrap.min.css";
 ```
 
 ### Migration to 5.2.0

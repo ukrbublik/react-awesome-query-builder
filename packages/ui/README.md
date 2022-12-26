@@ -1,22 +1,17 @@
 # @react-awesome-query-builder/ui
 
+[![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/ui.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/ui)
+
 This package has core React components like `<Query>` `<Builder>` and CSS, provides config with basic (vanilla) widgets.
+
+## Installation
+
+```
+npm i @react-awesome-query-builder/ui --save
+```
 
 ## Usage
 
-```js
-import {
-  Query, Builder, BasicConfig, VanillaWidgets,
-  //types:
-  BuilderProps
-} from "@react-awesome-query-builder/ui";
+Use `BasicConfig`. 
 
-import '@react-awesome-query-builder/ui/css/styles.css';
-import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
-
-cosnt config = {
-  ...BasicConfig,
-  // your config
-};
-// use <Query {...config} /> 
-```
+See [minimal example in readme](https://github.com/ukrbublik/react-awesome-query-builder#usage)

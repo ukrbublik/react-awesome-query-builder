@@ -1,7 +1,15 @@
 # @react-awesome-query-builder/core
 
+[![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/core.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/core)
+
 This package has core functionality to import/export/store query, provides utils and core config. 
 Can be used on server-side, does not require React.
+
+## Installation
+
+```
+npm i @react-awesome-query-builder/core --save
+```
 
 ## Usage
 

@@ -1,5 +1,7 @@
 # @react-awesome-query-builder/sandbox-simple
 
+[![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/sandbox-simple.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/sandbox-simple)
+
 Demo app built with `vite`.  
 Uses vanilla widgets.  
 Not uses TypeScript.  
