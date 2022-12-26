@@ -58,7 +58,7 @@ let aliases = isMono ? {
 let style_loaders = [{
     loader: "style-loader"
 }];
-const lazy_style_loaders = isDev ? [
+const lazy_style_loaders = [
     ({resource, descriptionData: {name} = {}}) => ({
     loader: "style-loader", 
     options: {
@@ -68,7 +68,7 @@ const lazy_style_loaders = isDev ? [
         )
     }
 })
-] : [];
+];
 
 if (isProd) {
     plugins = [
