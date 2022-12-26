@@ -44,12 +44,6 @@
 /******************************************************************************/
 
 
-body.qb-dragging {
-  .ant-tooltip {
-    display: none;
-  }
-}
-
 .query-builder {
   @extend %noselect;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -119,34 +113,7 @@ body.qb-dragging {
   border: 1px dashed red;
 }
 
-/* slider */
-.ant-tooltip-inner {
-  min-height: 18px;
-}
-.ant-slider {
-  margin-bottom: 4px;
-  margin-top: 4px;
-}
-.ant-slider-with-marks {
-  margin-bottom: 10px;
-  margin-top: 4px;
-}
-.ant-slider-track {
-  visibility: visible !important;
-}
 
-/* tree */
-.ant-select-tree-dropdown > div[role="listbox"] {
-  outline: none;
-}
-ul.ant-select-selection__rendered {
-  margin-right: 11px;
-}
-
-/* for antd v4 default is 32 - too big */
-.ant-select-item {
-  min-height: 22px;
-}
 
 /******************************************************************************/
 /** GROUP *********************************************************************/
@@ -410,19 +377,6 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
   display: inline-block;
 }
 
-.mui {
-  #{$seps} {
-    vertical-align: bottom;
-    align-self: flex-end;
-    margin-bottom: 8px;
-  }
-  .rule--operator-options {
-    vertical-align: bottom;
-  }
-  .widget--valuesrc {
-    vertical-align: bottom;
-  }
-}
 
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: 10px;
@@ -448,61 +402,6 @@ div.tooltip-inner {
   }
 }
 
-/******************************************************************************/
-/** CONJUNCTION ***************************************************************/
-/******************************************************************************/
-
-.conjunction {
-  display: inline-block;
-
-  label {
-    display: inline-block;
-    border: 1px solid;
-    cursor: pointer;
-    color: white;
-    text-transform: uppercase;
-    padding: 0.2rem 0.4rem;
-  }
-
-  input {
-    display: none;
-  }
-
-  &[data-state="active"] {
-    label {
-      background-color: #3276b1;
-      border-color: #285e8e;
-    }
-  }
-
-  &[data-state="inactive"] {
-    label {
-      background-color: #428bca;
-      border-color: #357ebd;
-
-      &:hover {
-        background-color: #3276b1;
-        border-color: #285e8e;
-      }
-    }
-  }
-
-  &:first-child {
-    label {
-      border-radius: 3px 0 0 3px;
-    }
-  }
-
-  &:last-child {
-    label {
-      border-radius: 0 3px 3px 0;
-    }
-  }
-
-  &:first-child:last-child {
-    border-radius: 3px;
-  }
-}
 
 /******************************************************************************/
 /** FUNC **********************************************************************/
@@ -679,12 +578,4 @@ $rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
       height: 100%;
     }
   }
-}
-
-/******************************************************************************/
-/** Bootstrap ***********************************************************/
-/******************************************************************************/
-
-.svg-inline--fa {
-  pointer-events: none;
 }
