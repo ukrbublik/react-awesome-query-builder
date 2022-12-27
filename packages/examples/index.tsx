@@ -12,7 +12,7 @@ import {
 const rootElement = window.document.getElementById("root");
 
 ReactDOM.render((
-  <HashRouter basename={location.host == "ukrbublik.github.io" ? "/react-awesome-query-builder" : "/"}>
+  <HashRouter>
     <Routes>
       <Route path="/switch" element={<React.Suspense fallback={<>...</>}><DemoSwitch /></React.Suspense>} />
       <Route path="*" element={<React.Suspense fallback={<>...</>}><Demo /></React.Suspense>} />
