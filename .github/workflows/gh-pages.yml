@@ -6,41 +6,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  page_build:
-    name: Update GitHub pages
+  run:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: master
-    - uses: pnpm/action-setup@v2
-      with:
-        version: 7
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 14
-        #cache: 'pnpm'
-    - run: pnpm i
-    - name: Build examples
-      run: pnpm build
-    - name: Copy build
-      run: |
-        rm -rf /tmp/react-awesome-query-builder
-        mkdir /tmp/react-awesome-query-builder
-        mkdir /tmp/react-awesome-query-builder/gh-pages
-        cp ./packages/examples/build/*bundle* /tmp/react-awesome-query-builder/gh-pages/
-    - uses: actions/checkout@v3
-      with:
-        ref: gh-pages
-    - name: Commit build
-      run: |
-        cp -R /tmp/react-awesome-query-builder/gh-pages/* .
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add ./*bundle*
-        git commit -m "update to ${GITHUB_SHA}"
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        branch: gh-pages
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          #cache: 'pnpm'
+      - name: Install packages
+        run: pnpm i
+      - name: Setup
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Build
+        run: pnpm build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packages/examples/build

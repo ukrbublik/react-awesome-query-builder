@@ -48,7 +48,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
 
 
 ### Features
-[![Screenshot](https://ukrbublik.github.io/react-awesome-query-builder/screenshot.png)](https://ukrbublik.github.io/react-awesome-query-builder)
+[![Screenshot](https://user-images.githubusercontent.com/3238637/209590656-f32497be-6b74-4837-8414-4f44d78215ae.png)](https://ukrbublik.github.io/react-awesome-query-builder)
 - Highly configurable
 - Fields can be of type:
   - simple (string, number, bool, date/time/datetime, list)
