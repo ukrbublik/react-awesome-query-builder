@@ -27,7 +27,8 @@ Now [Material-UI](https://mui.com/) is also supported!
 
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
-[![Open in codesandbox.io](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/workspaces?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
+[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/workspaces?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
+
 
 * [Features](#features)
 * [Getting started](#getting-started)

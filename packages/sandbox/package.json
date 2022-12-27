@@ -17,7 +17,8 @@
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./src/",
     "serve": "vite preview",
     "start": "vite",
-    "tsc": "tsc -p . --noEmit"
+    "tsc": "tsc -p . --noEmit",
+    "sandbox": "node ./scripts/sandbox.js && npm i && npm start"
   },
   "browserslist": {
     "production": [
