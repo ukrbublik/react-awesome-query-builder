@@ -137,6 +137,11 @@ module.exports = {
     devServer: {
         port: PORT,
         host: '0.0.0.0',
+        allowedHosts: [
+            'localhost',
+            '.csb.app', // codesandbox.io
+            '.webcontainer.io', // stackblitz.com
+        ],
         historyApiFallback: true,
         hot: true,
         // inline: true,
