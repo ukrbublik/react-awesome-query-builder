@@ -19,7 +19,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 14
-        cache: 'pnpm'
+        #cache: 'pnpm'
     - run: pnpm i
     - name: Build examples
       run: pnpm build

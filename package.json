@@ -65,10 +65,7 @@
     "sandbox": "pnpm run sandbox-ts",
     "start": "pnpm run examples",
     "resmoke": "pnpm run clean && pnpm i && pnpm run smoke",
-    "smoke": "pnpm run lint && pnpm run test && pnpm run build && pnpm run check-hot",
-
-    "for-gpr": "sh ./scripts/for-gpr.sh",
-    "for-npm": "sh ./scripts/for-npm.sh"
+    "smoke": "pnpm run lint && pnpm run test && pnpm run build && pnpm run check-hot"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",

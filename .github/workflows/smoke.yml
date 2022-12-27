@@ -1,10 +1,9 @@
 name: Smoke
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -51,11 +50,11 @@ jobs:
         with:
           name: sandbox-build
           path: packages/sandbox/dist
-      - name: Artifact -   build
+      - name: Artifact - sandbox_simple build
         uses: actions/upload-artifact@v3
         with:
           name: sandbox_simple-build
-          path: packages/sandbox_simple/build
+          path: packages/sandbox_simple/dist
   check-hot:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,53 @@
+name: Smoko
+
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          # no cache
+      - name: Install packages
+        run: pnpm i
+      - name: Setup
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Artifact - coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: packages/tests/coverage
+      - name: Build
+        run: pnpm build
+      - name: Artifact - examples build
+        uses: actions/upload-artifact@v3
+        with:
+          name: examples-build
+          path: packages/examples/build
+      - name: Artifact - sandbox build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sandbox-build
+          path: packages/sandbox/dist
+      - name: Artifact - sandbox_simple build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sandbox_simple-build
+          path: packages/sandbox_simple/dist
+      - name: Hot
+        run: pnpm check-hot
