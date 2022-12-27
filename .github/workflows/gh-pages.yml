@@ -31,9 +31,9 @@ jobs:
           mkdir /tmp/gh-pages
           cp ./packages/examples/build/* /tmp/gh-pages/
           mkdir /tmp/gh-pages/sandbox
-          cp ./packages/sandbox/dist/* /tmp/gh-pages/sandbox/
+          cp -r ./packages/sandbox/dist/* /tmp/gh-pages/sandbox/
           mkdir /tmp/gh-pages/sandbox_simple
-          cp ./packages/sandbox_simple/dist/* /tmp/gh-pages/sandbox_simple/
+          cp -r ./packages/sandbox_simple/dist/* /tmp/gh-pages/sandbox_simple/
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
