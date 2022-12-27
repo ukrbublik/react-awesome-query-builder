@@ -1,6 +1,3 @@
-// if (process.env['HOME'])
-// HOME: '/home/sandbox',
-// HOSTNAME: 'sse-sandbox-j690z2',
 console.log(process.env)
 
 const fs = require('fs');
@@ -17,4 +14,3 @@ for (const k in pjson['dependencies']) {
 }
 const pjsonStr = JSON.stringify(pjson, null, 2);
 fs.writeFileSync(PACKAGE_JSON, pjsonStr);
-
