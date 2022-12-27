@@ -7,11 +7,17 @@ You can switch between AntDesign, MUI, Bootstrap and vanilla widgets.
 Uses complex config to demonstrate anvanced usage.  
 **Uses TypeScript.**
 
+### Preview
+https://ukrbublik.github.io/react-awesome-query-builder/
 
 ### Run
+From the root of cloned repository:
 ```sh
-npm i
-npm run start
+npm start
 ```
+
 And open `http://localhost:3001` in a browser.  
 Feel free to play with code in `demo` dir.  
+
+### Run in sandbox
+[![Open in stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/ukrbublik/react-awesome-query-builder/tree/workspaces?file=packages%examples%2Fdemo%2Findex.tsx)

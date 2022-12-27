@@ -1,6 +1,6 @@
 
 <p align="center">
-  <a href="https://ukrbublik.github.io/react-awesome-query-builder/" rel="noopener" target="_blank"><img src="https://user-images.githubusercontent.com/3238637/209590656-f32497be-6b74-4837-8414-4f44d78215ae.png" /></a>
+  <a href="https://ukrbublik.github.io/react-awesome-query-builder/" rel="noopener" target="_blank"><img src="https://raw.githubusercontent.com/ukrbublik/react-awesome-query-builder/19344a32349212cb7c9344a553173c2c4bc57ca6/logo_full_200.png" /></a>
 </p>
 <! --
 [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "jsx": "preserve",
+    "lib": ["es2015", "dom", "dom.iterable"],
+    "allowJs": true,
+    "noEmit": true,
+
+    "strict": true,
+    "alwaysStrict": true,
+    "strictNullChecks": false,
+    "noImplicitReturns": true,
+
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+  },
+  "include": ["packages/**/*"]
+}
