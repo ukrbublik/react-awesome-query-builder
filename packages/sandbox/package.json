@@ -18,7 +18,7 @@
     "serve": "vite preview",
     "start": "vite",
     "tsc": "tsc -p . --noEmit",
-    "sandbox": "node ./scripts/sandbox.js && npm i && npm start"
+    "preinstall": "node ./scripts/sandbox.js"
   },
   "browserslist": {
     "production": [
