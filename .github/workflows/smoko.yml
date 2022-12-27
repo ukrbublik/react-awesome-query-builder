@@ -19,8 +19,8 @@ jobs:
         with:
           node-version: 14
           # no cache
-      - name: Install packages
-        run: pnpm i
+      - name: Install packages (fresh)
+        run: rm -f ./pnpm-lock.yaml && pnpm i
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Lint
