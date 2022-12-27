@@ -25,6 +25,15 @@ jobs:
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Build
         run: pnpm build
+      - name: Copy build
+        run: |
+          rm -rf /tmp/gh-pages
+          mkdir /tmp/gh-pages
+          cp ./packages/examples/build/* /tmp/gh-pages/*
+          mkdir /tmp/gh-pages/sandbox
+          cp ./packages/sandbox/dist/* /tmp/gh-pages/sandbox/*
+          mkdir /tmp/gh-pages/sandbox_simple
+          cp ./packages/sandbox_simple/dist/* /tmp/gh-pages/sandbox_simple/*
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
