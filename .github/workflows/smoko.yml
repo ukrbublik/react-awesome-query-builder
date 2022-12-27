@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: 14
           # no cache
-      - name: Install packages (fresh)
+      - name: Clean
+        run: rm -f ./pnpm-lock.yaml && pnpm clean
+      - name: Install packages
         run: rm -f ./pnpm-lock.yaml && pnpm i
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
