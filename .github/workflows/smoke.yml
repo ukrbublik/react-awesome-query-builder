@@ -46,6 +46,16 @@ jobs:
         with:
           name: examples-build
           path: packages/examples/build
+      - name: Artifact - sandbox build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sandbox-build
+          path: packages/sandbox/dist
+      - name: Artifact -   build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sandbox_simple-build
+          path: packages/sandbox_simple/build
   check-hot:
     runs-on: ubuntu-latest
     steps:
@@ -85,4 +95,3 @@ jobs:
         with:
           name: coverage
           path: packages/tests/coverage
-
