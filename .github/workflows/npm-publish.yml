@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-          #cache: 'pnpm'
+          cache: 'pnpm'
       - run: npm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - run: pnpm lint
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 14
-          #cache: 'pnpm'
+          cache: 'pnpm'
           registry-url: https://registry.npmjs.org/
       - run: pnpm i
       - run: pnpm -r publish --access public

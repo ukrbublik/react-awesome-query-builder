@@ -1,5 +1,5 @@
 rm -f  ./package-lock.json
-rm -f  ./pnpm-lock.yaml
+#rm -f  ./pnpm-lock.yaml
 rm -f  ./packages/*/*.log
 rm -rf ./node_modules
 
