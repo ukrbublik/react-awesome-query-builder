@@ -1,5 +1,8 @@
+console.log(process.env)
+
 const fs = require('fs');
 const path = require('path');
+const { exit } = require('process');
 const SCRIPTS = __dirname;
 const ROOT = path.resolve(SCRIPTS, '../');
 const PACKAGE_JSON = path.resolve(ROOT, './package.json');
