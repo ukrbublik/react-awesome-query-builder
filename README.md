@@ -1,6 +1,6 @@
 
 <p align="center">
-  <a href="https://ukrbublik.github.io/react-awesome-query-builder/" rel="noopener" target="_blank"><img src="https://raw.githubusercontent.com/ukrbublik/react-awesome-query-builder/gh-pages/logo_full_200.png" /></a>
+  <a href="https://ukrbublik.github.io/react-awesome-query-builder/" rel="noopener" target="_blank"><img src="https://user-images.githubusercontent.com/3238637/209590656-f32497be-6b74-4837-8414-4f44d78215ae.png" /></a>
 </p>
 <! --
 [![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 
@@ -27,7 +27,7 @@ Now [Material-UI](https://mui.com/) is also supported!
 
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
-[![Open in codesandbox.io](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox?file=/src/demo/config_simple.tsx)
+[![Open in codesandbox.io](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/workspaces?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
 
 * [Features](#features)
 * [Getting started](#getting-started)
