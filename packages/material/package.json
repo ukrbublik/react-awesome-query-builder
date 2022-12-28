@@ -2,6 +2,20 @@
   "name": "@react-awesome-query-builder/material",
   "version": "6.0.0-beta.5",
   "description": "User-friendly query builder for React. Material-UI 4 widgets",
+  "keywords": [
+    "query-builder",
+    "query",
+    "builder",
+    "query builder",
+    "react",
+    "reactjs",
+    "ui",
+    "material",
+    "material-ui",
+    "material-design"
+  ],
+  "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
+  "bugs": "https://github.com/ukrbublik/react-awesome-query-builder/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",

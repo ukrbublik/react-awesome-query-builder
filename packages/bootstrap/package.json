@@ -2,6 +2,19 @@
   "name": "@react-awesome-query-builder/bootstrap",
   "version": "6.0.0-beta.5",
   "description": "User-friendly query builder for React. Bootstrap widgets",
+  "keywords": [
+    "query-builder",
+    "query",
+    "builder",
+    "query builder",
+    "react",
+    "reactjs",
+    "ui",
+    "bootstrap",
+    "reactstrap"
+  ],
+  "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
+  "bugs": "https://github.com/ukrbublik/react-awesome-query-builder/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",

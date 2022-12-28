@@ -8,12 +8,12 @@
     "query",
     "builder",
     "query builder",
-    "react-awesome-query-builder",
-    "react-query-builder",
     "where",
     "clause",
     "operators",
     "expression",
+    "condition",
+    "configurable",
     "react",
     "reactjs",
     "component",
@@ -25,7 +25,9 @@
     "material",
     "material-ui",
     "material-design",
-    "configurable"
+    "mui",
+    "bootstrap",
+    "reactstrap"
   ],
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "bugs": {

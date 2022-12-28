@@ -27,11 +27,12 @@ Now [Material-UI](https://mui.com/) is also supported!
 
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
-[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/workspaces?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
+[![Edit in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/ukrbublik/react-awesome-query-builder/master?file=%2Fpackages%2Fexamples%2Fdemo%2Findex.tsx)
 
 
 * [Features](#features)
 * [Getting started](#getting-started)
+* [Demo apps](#demo-apps)
 * [Usage](#usage)
   * [Minimal JavaScript example with class component](#minimal-javascript-example-with-class-component)
   * [Minimal TypeScript example with function component](#minimal-typescript-example-with-function-component)
@@ -115,11 +116,12 @@ See [basic usage](#usage) for minimum code example.
 
 See [API](#api) and [config](#config-format) for documentation. 
 
-Demo apps:
+
+## Demo apps
+
 - [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
 - [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses AntDesign widgets.
 - [`pnpm sandbox-js`](/packages/sandbox_simple) - simple demo app, built with Vite, not uses TS, uses vanilla widgets.
-
 
 
 ## Usage
