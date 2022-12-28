@@ -29,6 +29,8 @@ Feel free to play with code in `src/demo` dir.
 
 ### Run in sandbox
 [![Open in codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/workspaces/packages/sandbox_simple?file=/src/demo/config_simple.js)
+(if it freezes on "Initializing Sandbox Container" please click "Fork")
 
 [![Open in stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/ukrbublik/react-awesome-query-builder/tree/workspaces?file=packages%2Fsandbox_simple%2Fsrc%2Fdemo%2Fconfig_simple.jsx&terminal=sandbox-js)
+(installing dependencies can take a while)
 
