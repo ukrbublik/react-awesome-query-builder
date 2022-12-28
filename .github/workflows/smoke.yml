@@ -1,38 +1,96 @@
 name: Smoke
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
         with:
           node-version: 14
-      - name: Install
-        run: npm run install-all
+          cache: 'pnpm'
+      - name: Install packages
+        run: pnpm i
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Lint
-        run: npm run lint
-      - name: Test
-        run: npm run test
-      - name: Artifact - coverage
-        uses: actions/upload-artifact@v2
+        run: pnpm lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
-          name: coverage
-          path: coverage
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'pnpm'
+      - name: Install packages
+        run: pnpm i
+      - name: Setup
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Build
-        run: npm run build-all
+        run: pnpm build
       - name: Artifact - examples build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: examples-build
-          path: examples/build
+          path: packages/examples/build
+      - name: Artifact - sandbox build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sandbox-build
+          path: packages/sandbox/dist
+      - name: Artifact - sandbox_simple build
+        uses: actions/upload-artifact@v3
+        with:
+          name: sandbox_simple-build
+          path: packages/sandbox_simple/dist
+  check-hot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'pnpm'
+      - name: Install packages
+        run: pnpm i
+      - name: Setup
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Hot
-        run: npm run check-hot
+        run: pnpm check-hot
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14
+          cache: 'pnpm'
+      - name: Install packages
+        run: pnpm i
+      - name: Setup
+        run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      - name: Test
+        run: pnpm test
+      - name: Artifact - coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: packages/tests/coverage

@@ -1,0 +1,36 @@
+@import '@react-awesome-query-builder/ui/css/styles.scss';
+
+body.qb-dragging {
+  .ant-tooltip {
+    display: none;
+  }
+}
+
+/* slider */
+.ant-tooltip-inner {
+  min-height: 18px;
+}
+.ant-slider {
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+.ant-slider-with-marks {
+  margin-bottom: 10px;
+  margin-top: 4px;
+}
+.ant-slider-track {
+  visibility: visible !important;
+}
+
+/* tree */
+.ant-select-tree-dropdown > div[role="listbox"] {
+  outline: none;
+}
+ul.ant-select-selection__rendered {
+  margin-right: 11px;
+}
+
+/* for antd v4 default is 32 - too big */
+.ant-select-item {
+  min-height: 22px;
+}

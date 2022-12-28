@@ -9,25 +9,33 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
         with:
           node-version: 14
+          #cache: 'pnpm'
       - run: npm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - run: npm run lint-lite
-      - run: npm test
+      - run: pnpm lint
+      - run: pnpm test
 
   publish-npm:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
         with:
           node-version: 14
+          #cache: 'pnpm'
           registry-url: https://registry.npmjs.org/
-      - run: npm i
-      - run: npm publish
+      - run: pnpm i
+      - run: pnpm -r publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

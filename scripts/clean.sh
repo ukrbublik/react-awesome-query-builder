@@ -1,23 +1,16 @@
 rm -f  ./package-lock.json
+#rm -f  ./pnpm-lock.yaml
+rm -f  ./packages/*/*.log
 rm -rf ./node_modules
-rm -rf ./build
-rm -rf ./lib
-rm -rf ./coverage
-rm -rf ./junit
-rm -rf ./ts_out
-rm -rf ./tests/ts_out
 
-rm -rf ./examples/package-lock.json
-rm -rf ./examples/node_modules
-rm -rf ./examples/build/*bundle*
-rm -rf ./examples/ts_out
+rm -f  ./packages/*/package-lock.json
+rm -f  ./packages/*/*.log
+rm -rf ./packages/*/node_modules
+rm -rf ./packages/*/ts_out
+rm -rf ./packages/*/lib
+rm -rf ./packages/*/dist
+rm -rf ./packages/*/build
+rm -rf ./packages/*/coverage
+rm -rf ./packages/*/junit
 
-rm -rf ./sandbox/package-lock.json
-rm -rf ./sandbox/node_modules
-rm -rf ./sandbox/dist
-rm -rf ./sandbox/ts_out
-rm -rf ./sandbox/build
-
-rm -rf ./sandbox_simple/package-lock.json
-rm -rf ./sandbox_simple/node_modules
-rm -rf ./sandbox_simple/build
+# npx sort-package-json "package.json" "packages/*/package.json"

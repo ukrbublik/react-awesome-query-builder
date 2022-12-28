@@ -1,0 +1,81 @@
+{
+  "name": "@react-awesome-query-builder/antd",
+  "version": "6.0.0",
+  "description": "User-friendly query builder for React. AntDesign widgets",
+  "keywords": [
+    "query-builder",
+    "query",
+    "builder",
+    "query builder",
+    "react",
+    "reactjs",
+    "ui",
+    "antd",
+    "antdesign",
+    "ant-design"
+  ],
+  "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
+  "bugs": "https://github.com/ukrbublik/react-awesome-query-builder/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/antd"
+  },
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "exports": {
+    ".": {
+      "types": "./modules/index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
+    },
+    "./package.json": "./package.json",
+    "./css/styles.css": "./css/styles.css",
+    "./css/compact_styles.css": "./css/compact_styles.css",
+    "./css/styles.scss": "./css/styles.scss",
+    "./css/compact_styles.scss": "./css/compact_styles.scss",
+    "./css/antd.less": "./css/antd.less"
+  },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./modules/index.d.ts",
+  "scripts": {
+    "build": "sh ./scripts/build-npm.sh",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts  ./modules/",
+    "lint": "npm run eslint && npm run tsc",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "@react-awesome-query-builder/ui": "workspace:^",
+    "lodash": "^4.17.21",
+    "prop-types": "^15.7.2"
+  },
+  "devDependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.5",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/plugin-proposal-private-methods": "^7.14.5",
+    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.14.5",
+    "@babel/plugin-transform-runtime": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "@babel/preset-typescript": "^7.14.5",
+    "@babel/runtime": "^7.14.5",
+    "@types/react": "^17.0.39",
+    "antd": "^4.16.13",
+    "less": "^4.1.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "sass": "^1.35.0"
+  },
+  "peerDependencies": {
+    "@ant-design/icons": "^4.0.0",
+    "antd": "^4.0.0",
+    "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
+    "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
+  }
+}

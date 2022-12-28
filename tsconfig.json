@@ -3,24 +3,18 @@
     "target": "es6",
     "module": "esnext",
     "jsx": "preserve",
-    "lib": [
-      "dom",
-      "dom.iterable"
-    ],
-    "experimentalDecorators": true,
+    "lib": ["es2015", "dom", "dom.iterable"],
     "allowJs": true,
-    "outDir": "ts_out",
     "noEmit": true,
 
     "strict": true,
     "alwaysStrict": true,
+    "strictNullChecks": false,
     "noImplicitReturns": true,
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
-  "include": [
-    "modules/**/*"
-  ]
+  "include": ["packages/**/*"]
 }

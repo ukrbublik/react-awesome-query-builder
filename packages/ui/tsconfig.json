@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "jsx": "preserve",
+    "lib": [
+      "es2015",
+      "dom",
+      "dom.iterable"
+    ],
+    "allowJs": true,
+    "outDir": "ts_out",
+    "noEmit": true,
+
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@react-awesome-query-builder/core": ["../core/modules"],
+    },
+    "skipLibCheck": true
+  },
+  "include": [
+    "modules/**/*"
+  ]
+}

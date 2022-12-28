@@ -1,0 +1,581 @@
+@mixin flex{
+  display: flex;
+  align-items: center;
+}
+
+@mixin clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin noselect {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+%noselect {
+  @include noselect;
+}
+
+%clearfix {
+  @include clearfix;
+}
+
+%flex{
+  @include flex;
+}
+
+.query-builder {
+  overflow: hidden;
+  &, &::before, &::after {
+    box-sizing: border-box;
+  }
+}
+
+
+/******************************************************************************/
+/** COMMON ********************************************************************/
+/******************************************************************************/
+
+
+.query-builder {
+  @extend %noselect;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.25;
+  margin: 1rem;
+}
+
+.query-builder.qb-dragging {
+  cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
+  button {
+    pointer-events: none;
+  }
+}
+
+.group {
+  background: rgba(250, 240, 210, 0.5);
+  border: 1px solid #DCC896;
+}
+
+.rule {
+  background-color: white;
+  border: 1px solid transparent;
+  padding: 10px;
+}
+
+.rule-with-error .rule {
+  border: 1px solid #e0a1a1;
+}
+
+.rule--body--wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rule--error {
+  color: red;
+  margin-bottom: -5px;
+  margin-top: 5px;
+}
+
+.group-or-rule {
+  border-radius: 5px;
+  position: relative;
+}
+
+.rule_group {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f9f1dd;
+}
+
+.qb-draggable {
+  @extend %noselect;
+  pointer-events: none;
+  position: absolute;
+  opacity: 0.7;
+  z-index: 1000;
+}
+
+.qb-placeholder {
+    border: 1px dashed gray;
+}
+
+.locked {
+  border: 1px dashed red;
+}
+
+
+
+/******************************************************************************/
+/** GROUP *********************************************************************/
+/******************************************************************************/
+.group--header,
+.group--footer{
+  @extend %flex;
+}
+
+.group--children {
+  padding-left: 24px;
+
+  & > .group-or-rule-container > .group-or-rule {
+    &:before {
+        top: -4px;
+        border-width: 0 0 2px 2px;
+    }
+
+     &::after {
+        top: 50%;
+        border-width: 0 0 0 2px;
+    }
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        left: -14px;
+        width: 14px;
+        height: calc(50% + 8px);
+        border-color: #CCC;
+        border-style: solid;    
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+  }
+
+
+  &.hide--conjs > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: 4px 0 0 0;
+        border-width: 2px 0 0 2px;
+      }
+  }
+
+  &.rule_group--children > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        display: none;
+      }
+      &::after {
+        border-radius: 4px 0 0 0;
+        border-width: 2px 0 0 2px;
+      }
+  }
+  & > .group-or-rule-container:first-child > .group-or-rule {
+      &::before {
+        top: -12px;
+        height: calc(50% + 14px);
+      }
+  }
+  & > .group-or-rule-container:last-child > .group-or-rule {
+      &::before {
+        border-radius: 0 0 0 4px;
+      }
+      &::after {
+        display: none;
+      }
+  }
+
+}
+
+.group--children.hide--line {
+    & > .group-or-rule-container > .group-or-rule {
+        &::before, &::after {
+            border-color: rgba(128, 128, 128, 0.1);
+        }
+    }
+}
+
+.qb-draggable {
+    &::before, &::after {
+        display: none;
+    }
+}
+
+.qb-drag-handler {
+  @extend %noselect;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+.group--drag-handler {
+  margin-right: 8px;
+  position: relative;
+  top: 3px;
+}
+.group--conjunctions {
+  .group--drag-handler {
+    margin-left: 10px;
+  }
+}
+
+.group--conjunctions.hide--conj {
+    opacity: 0.3;
+}
+
+.group--actions {
+  margin-left: 10px;
+  flex: 1;
+  display: flex;
+  &--tl,
+  &--bl{
+    justify-content: flex-start;
+  }
+
+  &--tl{
+    margin-left: 20px;
+  }
+
+  &--tc,
+  &--bc {
+    justify-content: center;
+  }
+
+  &--tr,
+  &--br{
+    justify-content: flex-end;
+  }
+
+  .action--DELETE {
+    margin-top: -1px;
+  }
+}
+
+/******************************************************************************/
+/** CASE_GROUP *********************************************************************/
+/******************************************************************************/
+
+.case_group {
+  border-width: 2px;
+}
+
+.switch_group {
+  & > .group--children {
+    & > .group-or-rule-container > .group-or-rule {
+      &::before, &::after {
+          height: calc(50% + 12px); // for `border-width: 2px`
+      }
+    }
+  }
+}
+
+.case_group--body {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  .case_group--children {
+    flex: auto;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .case_group--value {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
+}
+
+/******************************************************************************/
+/** RULE_GROUP *********************************************************************/
+/******************************************************************************/
+
+.rule_group {
+  display: flex;
+  padding-left: 10px;
+
+  .group--drag-handler {
+    align-self: center;
+  }
+  .group--field {
+    align-self: center;
+  }
+  .group--actions {
+    align-self: center;
+    flex: 0;
+  }
+
+  .rule_group--children {
+    flex: 1;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+    .group-or-rule-container {
+      margin-bottom: 5px;
+      margin-top: 5px;
+      padding-right: 5px;
+    }
+
+    padding-left: 18px;
+    &.one--child {
+      padding-left: 10px;
+    }
+
+    & > .group-or-rule-container > .group-or-rule {
+      &::before, &::after {
+          left: -10px;
+          width: 10px;
+          height: calc(50% + 8px);
+      }
+    }
+  }
+}
+
+/******************************************************************************/
+/** RULE_GROUP_EXT *********************************************************************/
+/******************************************************************************/
+
+.group--header.hide--drag.with--conjs {
+  & > .group--field--count--rule {
+    margin-left: 20px;
+  }
+}
+
+/******************************************************************************/
+/** RULE **********************************************************************/
+/******************************************************************************/
+
+.rule {
+  flex: 1;
+  display: flex;
+}
+
+//"remove" button
+.rule--header {
+  @extend %clearfix;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.rule--drag-handler {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+$rule_items: ".rule--field", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
+ ".widget--widget", ".widget--valuesrc", ".widget--sep", ".operator--options--sep",
+ ".rule--before-widget", ".rule--after-widget";
+ 
+$seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep";
+
+#{$rule_items} {
+  display: inline-block;
+}
+
+
+.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
+  margin-left: 10px;
+}
+.widget--valuesrc {
+  margin-right: -8px;
+}
+.widget--valuesrc span i {
+  transform: rotate(90deg);
+}
+.operator--options--sep {
+  margin-right: 10px;
+}
+
+div.tooltip-inner {
+  max-width: 500px;
+}
+
+.rule--field, .group--field, .rule--operator, .widget--widget {
+  label {
+    display: block;
+    font-weight: bold;
+  }
+}
+
+
+/******************************************************************************/
+/** FUNC **********************************************************************/
+/******************************************************************************/
+
+$rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".rule--func--arg", ".rule--func--arg-value", 
+ ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep",
+ ".rule--func--arg-label", ".rule--func--arg-label-sep";
+
+#{$rule_func_items} {
+  display: inline-block;
+}
+
+.rule--func--bracket-before, .rule--func--bracket-after {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.rule--func--bracket-before {
+  margin-left: 5px;
+}
+.rule--func--arg-value > .rule--widget {
+  margin-left: -10px;
+}
+.rule--func--arg-sep {
+  margin-left: 3px;
+  margin-right: 6px;
+}
+.rule--func--arg-label-sep {
+  margin-left: 1px;
+  margin-right: 6px;
+}
+
+
+/******************************************************************************/
+/** Minimalism ****************************************************************/
+/******************************************************************************/
+
+
+@mixin visible_only_for_hovered_group($what) {
+  #{$what} {
+    transition: opacity 0.2s;
+  }
+  .group--header:hover .group--header,
+  .group--header:not(:hover),
+  .rule_group:not(:hover) {
+    #{$what} {
+      opacity: 0;
+    }
+  }
+}
+
+@mixin display_only_for_hovered_group($inactive, $active) {
+  #{$inactive} {
+    transition: padding 0.2s;
+  }
+  .group--header:hover .group--header,
+  .group--header:not(:hover),
+  .rule_group:not(:hover) {
+    #{$inactive} {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+  }
+}
+
+@mixin show_only_for_hovered_rule($what) {
+  #{$what} {
+    transition: opacity 0.2s;
+  }
+  .rule:hover .rule,
+  .rule:not(:hover) {
+    #{$what} {
+      opacity: 0;
+    }
+  }
+}
+
+@mixin force_unvisible($what) {
+  #{$what} {
+    opacity: 0 !important;
+  }
+}
+
+@mixin force_not_display($what) {
+  #{$what} {
+    width: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+  }
+}
+
+$group_actions: ".group--drag-handler", ".group--actions";
+$inactive_conjs: ".group--conjunctions .ant-btn:not(.ant-btn-primary)", ".rule_group_ext--drag-handler";
+$active_conjs: ".group--conjunctions .ant-btn.ant-btn-primary";
+$rule_actions: ".widget--valuesrc", ".rule--drag-handler", ".rule--header";
+
+
+
+.qb-lite {
+  @include visible_only_for_hovered_group($group_actions);
+  @include display_only_for_hovered_group($inactive_conjs, $active_conjs);
+  @include show_only_for_hovered_rule($rule_actions);
+
+  &.qb-dragging {
+    @include force_unvisible(#{$rule_actions, $group_actions});
+    @include force_not_display($inactive_conjs);
+  }
+}
+
+
+
+/******************************************************************************/
+/** Vertical padding ****************************************************************/
+/******************************************************************************/
+
+
+.group--header,
+.group--footer {
+  padding: {
+    left: 10px;
+    right: 10px;
+  }
+  margin: {
+    top: 10px;
+    bottom: 10px;
+  }
+}
+.group-or-rule-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+  &:first-child {
+    margin-top: 0px !important;
+  }
+  &:last-child {
+    margin-bottom: 0px !important;
+  }
+}
+.group--children {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+
+/******************************************************************************/
+/** Shrink textarea ***********************************************************/
+/******************************************************************************/
+
+.rule--body.can--shrink--value {
+  display: flex;
+  align-items: center;
+  .rule--value {
+    flex: 1;
+  }
+  .rule--value > .rule--widget {
+    display: flex;
+    .widget--widget {
+      flex: 1;
+    }
+  }
+  .rule--value > .rule--widget > .widget--valuesrc {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.rule--value > .rule--widget > .widget--valuesrc {
+  .anticon {
+    height: 100%;
+    svg {
+      height: 100%;
+    }
+  }
+}

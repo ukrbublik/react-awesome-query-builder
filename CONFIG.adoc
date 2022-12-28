@@ -27,13 +27,13 @@ Usually it's enough to just reuse link:#basic-config[basic config], provide your
 Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).
 
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
-They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
+They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
-TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`demo config`]
+TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`demo config`]
 
 
 {nbsp} +
@@ -42,15 +42,17 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 
 - Use `BasicConfig` for simple vanilla UI
 - Use `AntdConfig` for more advanced UI with https://ant.design/[AntDesign] widgets
-- Use `MaterialConfig` for https://material-ui.com/[Material-UI] widgets
+- Use `MuiConfig` for https://mui.com/[MUI] widgets
+- Use `MaterialConfig` for https://v4.mui.com/[Material-UI v4] widgets
 - Use `BootstrapConfig` for https://reactstrap.github.io/[Bootstrap] widgets
 [source,javascript]
 ----
-import {BasicConfig} from 'react-awesome-query-builder';
-import AntdConfig from 'react-awesome-query-builder/lib/config/antd';
-import MaterialConfig from 'react-awesome-query-builder/lib/config/material';
-import BootstrapConfig from "react-awesome-query-builder/lib/config/bootstrap";
-const InitialConfig = BasicConfig; // or AntdConfig or BootstrapConfig or MaterialConfig
+import {BasicConfig} from '@react-awesome-query-builder/ui';
+import {AntdConfig from '@react-awesome-query-builder/antd';
+import {MuiConfig} from '@react-awesome-query-builder/mui';
+import {MaterialConfig} from '@react-awesome-query-builder/material';
+import {BootstrapConfig} from "@react-awesome-query-builder/bootstrap";
+const InitialConfig = BasicConfig; // or AntdConfig or MuiConfig or BootstrapConfig
 
 const myConfig = {
   ...InitialConfig, // reuse basic config
@@ -214,7 +216,7 @@ Example:
 |fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
 |fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
 |defaultValue | | |Default value
-|preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
+|preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
@@ -237,9 +239,9 @@ Example:
 [source,javascript]
 ----
 import ru_RU from 'antd/lib/locale-provider/ru_RU';
-import { ruRU } from '@material-ui/core/locale';
-import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
-import {Widgets} from 'react-awesome-query-builder';
+import { ruRU } from '@material-ui/core/locale'; //v4
+import { ruRU as muiRuRU } from '@mui/material/locale';
+import { AntdWidgets } from '@react-awesome-query-builder/antd';
 const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
 ----
 
@@ -263,6 +265,7 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
       moment: 'ru',
       antd: ru_RU,
       material: ruRU,
+      mui: muiRuRU,
   },
   renderField: (props) => <FieldCascader {...props} />,
   renderOperator: (props) => <FieldDropdown {...props} />,
@@ -343,7 +346,7 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
-|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/modules/config/antd.js#L47[example])
+|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54[example])
 |renderItem | |Render Item +
   Able to Customize Render behavior for rule/group items.
 |showLabels |false |Show labels above all fields?
@@ -369,8 +372,10 @@ Other settings:
 |key |default |meaning
 |locale.moment |"en" |Locale (string or array of strings) used for https://momentjs.com/docs/#/i18n/[moment]
 |locale.antd |`en_US` |Locale object used for https://ant.design/docs/react/i18n[AntDesign] widgets
-|locale.material |`enUS` |Locale object used for https://material-ui.com/ru/guides/localization/[MaterialUI] widgets
-|theme.material |{} |Options for https://material-ui.com/ru/customization/theming/[createMuiTheme]
+|locale.material |`enUS` |Locale object used for https://v4.mui.com/getting-started/installation/[MaterialUI v4] widgets
+|locale.mui |`enUS` |Locale object used for https://mui.com/material-ui/guides/localization/[MUI] widgets
+|theme.material |{} |Options for https://v4.mui.com/customization/theming/[createTheme]
+|theme.mui |{} |Options for https://mui.com/material-ui/customization/theming/[createTheme]
 |formatReverse | |Function for formatting query string, used to format rule with reverse operator which haven't `formatOp`. +
   `(string q, string operator, string reversedOp, Object operatorDefinition, Object revOperatorDefinition, bool isForDisplay) => string` +
   `q` - already formatted rule for opposite operator (which have `formatOp`) +
@@ -524,10 +529,10 @@ There is also special `proximity` operator, its options are rendered with `<Prox
 
 [source,javascript]
 ----
-import {Operators: {ProximityOperator}} from 'react-awesome-query-builder';
+import {CustomOperators: {ProximityOperator}} from '@react-awesome-query-builder/ui';
 ----
 
-See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`]
+See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`]
 ====
 
 
@@ -539,25 +544,26 @@ See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/example
 
 [source,javascript]
 ----
-import {Widgets} from 'react-awesome-query-builder';
-import AntdWidgets from 'react-awesome-query-builder/lib/components/widgets/antd';
-import MaterialWidgets from 'react-awesome-query-builder/lib/components/widgets/material';
-import BootstrapWidgets from 'react-awesome-query-builder/lib/components/widgets/bootstrap';
+import {VanillaWidgets} from '@react-awesome-query-builder/ui';
+import {AntdWidgets} from '@react-awesome-query-builder/antd';
+import {MuiWidgets} from '@react-awesome-query-builder/mui';
+import {MaterialWidgets} from '@react-awesome-query-builder/material'; // MUI v4
+import {BootstrapWidgets} from '@react-awesome-query-builder/bootstrap';
+const {
+    VanillaTextWidget,
+    VanillaNumberWidget,
+    ...
+} = VanillaWidgets;
 const {
     TextWidget,
     NumberWidget,
     ...
 } = AntdWidgets;
 const {
-    VanillaTextWidget,
-    VanillaNumberWidget,
+    MuiTextWidget,
+    MuiNumberWidget,
     ...
-} = Widgets;
-const {
-    MaterialTextWidget,
-    MaterialNumberWidget,
-    ...
-} = MaterialWidgets;
+} = MuiWidgets;
 const {
     BootstrapTextWidget,
     BootstrapNumberWidget,
@@ -665,7 +671,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/examples/demo/config.tsx[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.

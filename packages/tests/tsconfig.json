@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "jsx": "preserve",
+    "lib": [
+      "es2015",
+      "dom",
+      "dom.iterable"
+    ],
+    "allowJs": true,
+    "outDir": "ts_out",
+
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@react-awesome-query-builder/core": ["../core/modules"],
+      "@react-awesome-query-builder/ui": ["../ui/modules"],
+      "@react-awesome-query-builder/antd": ["../antd/modules"],
+      "@react-awesome-query-builder/mui": ["../mui/modules"],
+      "@react-awesome-query-builder/material": ["../material/modules"],
+      "@react-awesome-query-builder/bootstrap": ["../bootstrap/modules"],
+    }
+  },
+  "include": [
+    "specs/**/*",
+    "support/**/*"
+  ]
+}

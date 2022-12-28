@@ -1,0 +1,20 @@
+import React, { useEffect } from "react";
+import { LazyStyleModule } from "../utils";
+// @ts-ignore
+import antd from "antd/dist/antd.css"; // or import "@react-awesome-query-builder/antd/css/antd.less"
+// @ts-ignore
+import styles from "@react-awesome-query-builder/antd/css/styles.scss";
+
+const ImportAntd: React.FC = () => {
+  useEffect(() => {
+    (antd as LazyStyleModule).use();
+    (styles as LazyStyleModule).use();
+    return () => {
+      (styles as LazyStyleModule).unuse();
+      (antd as LazyStyleModule).unuse();
+    };
+  }, []);
+  return null;
+};
+
+export default ImportAntd;

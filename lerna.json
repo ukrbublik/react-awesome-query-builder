@@ -1,0 +1,9 @@
+{
+  "useWorkspaces": true,
+  "npmClient": "pnpm",
+  "workspaces": [
+    "./packages/*"
+  ],
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "version": "6.0.0"
+}

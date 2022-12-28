@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "jsx": "preserve",
+    "lib": [
+      "es2015"
+    ],
+    "allowJs": true,
+    "outDir": "ts_out",
+    "noEmit": true,
+
+    "strict": true,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  },
+  "include": [
+    "modules/**/*"
+  ]
+}

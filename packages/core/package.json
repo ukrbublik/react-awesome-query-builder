@@ -1,0 +1,71 @@
+{
+  "name": "@react-awesome-query-builder/core",
+  "version": "6.0.0",
+  "description": "User-friendly query builder for React. Core",
+  "keywords": [
+    "query-builder",
+    "query",
+    "builder",
+    "query builder",
+    "where",
+    "clause",
+    "operators",
+    "expression",
+    "condition",
+    "configurable",
+    "logic"
+  ],
+  "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
+  "bugs": "https://github.com/ukrbublik/react-awesome-query-builder/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/core"
+  },
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "exports": {
+    ".": {
+      "types": "./modules/index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./modules/index.d.ts",
+  "scripts": {
+    "build": "sh ./scripts/build-npm.sh",
+    "eslint": "eslint --ext .js --ext .ts  ./modules/",
+    "lint": "npm run eslint && npm run tsc",
+    "lint-fix": "eslint --ext .js --ext .ts --fix  ./modules/",
+    "prepare": "npm run build",
+    "tsc": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "clone": "^2.1.2",
+    "immutable": "^3.8.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "spel2js": "^0.2.8",
+    "sqlstring": "^2.3.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.5",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/plugin-proposal-private-methods": "^7.14.5",
+    "@babel/plugin-proposal-private-property-in-object": "^7.14.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.14.5",
+    "@babel/plugin-transform-runtime": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "@babel/preset-typescript": "^7.14.5",
+    "@babel/runtime": "^7.14.5",
+    "@types/clone": "^2.1.1",
+    "@types/lodash": "^4.14.170",
+    "@types/node": "^18.7.7",
+    "@types/react": "^17.0.39"
+  }
+}
