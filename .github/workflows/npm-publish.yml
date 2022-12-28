@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 14
           #cache: 'pnpm'
-      - run: npm i
+      - run: pnpm i
       - run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - run: pnpm lint
       - run: pnpm test
