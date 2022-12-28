@@ -22,6 +22,7 @@ import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 import { MaterialConfig } from "@react-awesome-query-builder/material";
 import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
+import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 
 
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
@@ -90,6 +91,10 @@ export  const with_qb_mui = async (config_fn: ConfigFns, value: TreeValue, value
 export  const with_qb_bootstrap = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   await do_with_qb(BootstrapConfig, config_fn, value, valueFormat, checks, options);
 };
+  
+export  const with_qb_fluent = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+  await do_with_qb(FluentUIConfig, config_fn, value, valueFormat, checks, options);
+};
 
 export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   await do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
@@ -97,6 +102,7 @@ export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, val
   await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
   await do_with_qb(MuiConfig, config_fn, value, valueFormat, checks, options);
   await do_with_qb(BootstrapConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb(FluentUIConfig, config_fn, value, valueFormat, checks, options);
 };
   
 const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {

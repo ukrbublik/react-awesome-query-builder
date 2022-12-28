@@ -38,6 +38,7 @@ You will see demo app with hot reload of demo code and local library code.
 - [`packages/mui`](/packages/mui) - Provides config with [MUI](https://mui.com/) widgets
 - [`packages/material`](/packages/material) - Provides config with [Material-UI v4](https://v4.mui.com/) widgets
 - [`packages/bootstrap`](/packages/bootstrap) - Provides config with [Bootstrap](https://reactstrap.github.io/) widgets
+- [`packages/fluent`](/packages/fluent) - Provides config with [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web) widgets
 - [`packages/examples`](/packages/examples) - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
   - [`demo`](/packages/examples/demo) - Advanced demo
   - [`demo_switch`](/packages/examples/demo_switch) - Demo of ternary mode (switch/case) for SpEL

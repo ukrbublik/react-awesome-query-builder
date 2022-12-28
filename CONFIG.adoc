@@ -45,14 +45,16 @@ TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/mast
 - Use `MuiConfig` for https://mui.com/[MUI] widgets
 - Use `MaterialConfig` for https://v4.mui.com/[Material-UI v4] widgets
 - Use `BootstrapConfig` for https://reactstrap.github.io/[Bootstrap] widgets
+- Use `FluentUIConfig` for https://developer.microsoft.com/en-us/fluentui[Fluent UI] widgets
 [source,javascript]
 ----
 import {BasicConfig} from '@react-awesome-query-builder/ui';
-import {AntdConfig from '@react-awesome-query-builder/antd';
+import {AntdConfig} from '@react-awesome-query-builder/antd';
 import {MuiConfig} from '@react-awesome-query-builder/mui';
 import {MaterialConfig} from '@react-awesome-query-builder/material';
 import {BootstrapConfig} from "@react-awesome-query-builder/bootstrap";
-const InitialConfig = BasicConfig; // or AntdConfig or MuiConfig or BootstrapConfig
+import {FluentUIConfig} from "@react-awesome-query-builder/fluent";
+const InitialConfig = BasicConfig; // or AntdConfig or MuiConfig or BootstrapConfig or FluentUIConfig
 
 const myConfig = {
   ...InitialConfig, // reuse basic config
@@ -107,11 +109,11 @@ const {
       textarea,
       number,
       slider,
-      rangeslider, // missing in `BasicConfig`, `BootstrapConfig`
+      rangeslider, // missing in `BasicConfig`, `BootstrapConfig`, `FluentUIConfig`
       select,
       multiselect,
-      treeselect, // missing in `BasicConfig`, `MaterialConfig`, `BootstrapConfig`
-      treemultiselect, // missing in `BasicConfig`, `MaterialConfig`, `BootstrapConfig`
+      treeselect, // present only in `AntdConfig`
+      treemultiselect, // present only in `AntdConfig`
       date,
       time,
       datetime,
@@ -549,6 +551,7 @@ import {AntdWidgets} from '@react-awesome-query-builder/antd';
 import {MuiWidgets} from '@react-awesome-query-builder/mui';
 import {MaterialWidgets} from '@react-awesome-query-builder/material'; // MUI v4
 import {BootstrapWidgets} from '@react-awesome-query-builder/bootstrap';
+import {FluentUIWidgets} from "@react-awesome-query-builder/fluent";
 const {
     VanillaTextWidget,
     VanillaNumberWidget,
@@ -569,6 +572,11 @@ const {
     BootstrapNumberWidget,
     ...
 } = BootstrapWidgets;
+const {
+    FluentUITextWidget,
+    FluentUINumberWidget,
+    ...
+} = FluentUIWidgets;
 ----
 
 [source,javascript]

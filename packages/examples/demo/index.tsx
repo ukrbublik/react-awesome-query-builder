@@ -409,7 +409,7 @@ const DemoQueryBuilder: React.FC = () => {
           <option key="material">material</option>
           <option key="mui">mui</option>
           <option key="bootstrap">bootstrap</option>
-          <option key="fluentui">fluentui</option>
+          <option key="fluent">fluent</option>
         </select>
         <button onClick={resetValue}>reset</button>
         <button onClick={clearValue}>clear</button>

@@ -1,6 +1,7 @@
 import React from "react";
 import { DatePicker } from "@fluentui/react";
-import moment from 'moment';
+import { Utils } from "@react-awesome-query-builder/ui";
+const { moment } = Utils;
 
 export default (props) => {
   const {

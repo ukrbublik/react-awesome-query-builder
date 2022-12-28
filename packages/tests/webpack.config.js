@@ -7,6 +7,7 @@ const ANTD = path.resolve(__dirname, "../antd/modules");
 const MUI = path.resolve(__dirname, "../mui/modules");
 const MATERIAL = path.resolve(__dirname, "../material/modules");
 const BOOTSTRAP = path.resolve(__dirname, "../bootstrap/modules");
+const FLUENT = path.resolve(__dirname, "../fluent/modules");
 const TESTS = path.resolve(__dirname);
 
 
@@ -48,7 +49,8 @@ module.exports = {
                     ANTD,
                     MUI,
                     MATERIAL,
-                    BOOTSTRAP
+                    BOOTSTRAP,
+                    FLUENT
                 ],
                 use: [ 
                     {

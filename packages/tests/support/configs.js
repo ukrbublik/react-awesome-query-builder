@@ -3,6 +3,7 @@ import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import { MuiWidgets } from "@react-awesome-query-builder/mui";
 import { MaterialWidgets } from "@react-awesome-query-builder/material";
 import { BootstrapWidgets } from "@react-awesome-query-builder/bootstrap";
+import { FluentUIWidgets } from "@react-awesome-query-builder/fluent";
 const {
   FieldDropdown,
   FieldCascader,

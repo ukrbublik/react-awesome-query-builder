@@ -1,6 +1,7 @@
-import FluentUIWidgets from "../../components/widgets/FluentUI";
-import BasicConfig from "../basic";
 import React from "react";
+import FluentUIWidgets from "../widgets";
+import { BasicConfig } from "@react-awesome-query-builder/ui";
+
 
 const {
   FluentUIBooleanWidget,

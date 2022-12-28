@@ -1,3 +1,6 @@
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
+initializeIcons();
+
 // value widgets
 import FluentUITextWidget from "./value/FluentUIText";
 import FluentUITextAreaWidget from "./value/FluentUITextArea";
@@ -20,11 +23,9 @@ import FluentUIConjs from "./core/FluentUIConjs";
 import FluentUIValueSources from "./core/FluentUIValueSources";
 import FluentUIConfirm from "./core/FluentUIConfirm";
 
-import { initializeIcons } from '@fluentui/font-icons-mdl2';
-initializeIcons();
-
 // provider
 const FluentUIProvider = ({config, children}) => children;
+
 
 export default {
   FluentUITextWidget,
