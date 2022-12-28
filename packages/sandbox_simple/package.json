@@ -15,7 +15,7 @@
     "eslint": "eslint --ext .jsx --ext .js ./src/",
     "lint": "npm run eslint",
     "lint-fix": "eslint --ext .jsx --ext .js --fix ./src/",
-    "serve": "vite preview",
+    "preview": "vite preview",
     "start": "vite",
     "preinstall": "node ./scripts/patch-versions.js"
   },

@@ -17,7 +17,7 @@
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts .",
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix .",
-    "start": " webpack serve",
+    "start": "webpack serve",
     "tsc": "tsc -p . --noEmit",
     "preinstall": "node ./scripts/patch-versions.js"
   },
