@@ -81,7 +81,7 @@
     "css-loader": "^6.2.0",
     "file-loader": "^6.2.0",
     "less": "^4.1.1",
-    "less-loader": "^10.0.0",
+    "less-loader": "^11.1.0",
     "mini-css-extract-plugin": "^2.2.0",
     "moment-locales-webpack-plugin": "^1.2.0",
     "react-refresh": "^0.14.0",
