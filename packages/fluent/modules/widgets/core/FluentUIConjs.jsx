@@ -19,8 +19,8 @@ const FluentUIConjs = (props) => {
   var showConj = forceShowConj || (conjsCount > 1 && !lessThenTwo);
 
   const styleNot = {
-    backgroundColor: not ?  '#fed9cc' : '#ffffff'
-  }
+    backgroundColor: not ?  "#fed9cc" : "#ffffff"
+  };
 
   var renderOptions = function renderOptions() {
     return Object.keys(conjunctionOptions).map(function (key) {

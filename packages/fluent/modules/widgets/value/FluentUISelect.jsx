@@ -1,7 +1,7 @@
 import React from "react";
-import { mapListValues } from "../../../../utils/stuff";
 import { Dropdown } from "@fluentui/react";
-import omit from "lodash/omit";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { mapListValues } = Utils.ListUtils;
 
 export default ({
   listValues,
@@ -32,7 +32,7 @@ export default ({
       options={renderOptions(listValues)}
       selectedKey={value}
       onChange={onChange}
-      dropdownWidth={'auto'}
+      dropdownWidth={"auto"}
       disabled={readonly}
       {...customProps}
     />

@@ -16,6 +16,10 @@ export default (props) => {
   } = props;
   const { defaultSliderWidth } = config.settings;
 
+  const {width, ...rest} =  customProps || {};
+  const customInputProps = rest.input || {};
+  const customSliderProps = rest.slider || rest;
+
   const onChange = (newValue) => {
     if (newValue === "" || newValue === null) newValue = undefined;
     else newValue = Number(newValue);
@@ -29,6 +33,7 @@ export default (props) => {
       placeholder={placeholder}
       disabled={readonly}
       onChange={onChange}
+      {...customInputProps}
     />
   );
 
@@ -41,14 +46,16 @@ export default (props) => {
       disabled={readonly}
       marks={marks}
       onChange={onChange}
+      {...customSliderProps}
     />
   );
   const stylesWrapper = {
-    display: "flex", flexDirection: "row" 
-  }
+    display: "flex", 
+    flexDirection: "row" 
+  };
   const stylesSliderWrapper = {
-    width: defaultSliderWidth || width
-  }
+    width: width || defaultSliderWidth
+  };
 
   return (
     <div style={stylesWrapper}>

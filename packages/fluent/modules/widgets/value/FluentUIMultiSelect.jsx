@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { mapListValues } from "../../../../utils/stuff";
-import omit from "lodash/omit";
 import { Dropdown } from "@fluentui/react";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { mapListValues } = Utils.ListUtils;
 
 export default ({
   listValues,

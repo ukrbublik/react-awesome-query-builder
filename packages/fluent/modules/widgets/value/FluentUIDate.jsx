@@ -18,12 +18,14 @@ export default (props) => {
   const onChange = (date) => {
     if (date == "" ) date = undefined;
     var dateValue=moment(new Date(date)).format(valueFormat);
-    setValue(dateValue) 
+    setValue(dateValue); 
   };
 
   const stylesDatePicker = {
-    width: "auto", marginRight: "0.25rem", width: '150px'
-  }
+    // width: "auto", 
+    marginRight: "0.25rem", 
+    width: "150px"
+  };
   return (
     <DatePicker
       disabled={readonly}

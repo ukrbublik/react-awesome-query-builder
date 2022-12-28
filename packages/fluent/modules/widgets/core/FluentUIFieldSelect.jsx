@@ -31,8 +31,8 @@ const FluentUIFieldSelect = (props) => {
         for (var i of itemOptions) {
           options.push(i);
         }
-        options.push({ key: 'divider_'+divKey.toString(), text: '-', itemType: DropdownMenuItemType.Divider });
-        divKey +=1
+        options.push({ key: "divider_"+divKey.toString(), text: "-", itemType: DropdownMenuItemType.Divider });
+        divKey +=1;
       } else {
         opt.key = path;
         opt.text = label;
@@ -49,7 +49,7 @@ const FluentUIFieldSelect = (props) => {
       options={renderOptions(items)}
       selectedKey={selectedKey}
       onChange={onChange}
-      dropdownWidth={'auto'}
+      dropdownWidth={"auto"}
     />
   );
 };

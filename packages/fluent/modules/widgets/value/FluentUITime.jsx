@@ -1,6 +1,7 @@
 import React from "react";
 import { TimePicker } from "@fluentui/react";
-import moment from "moment";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { moment } = Utils;
 
 export default (props) => {
   const {
@@ -30,7 +31,7 @@ export default (props) => {
     optionsContainerWrapper: {
       height: "500px",
     }
-  }
+  };
   return (
     <TimePicker
       styles={stylesOptionsContainer}

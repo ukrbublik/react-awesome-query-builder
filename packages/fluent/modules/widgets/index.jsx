@@ -1,4 +1,4 @@
-import { initializeIcons } from '@fluentui/font-icons-mdl2';
+import { initializeIcons } from "@fluentui/font-icons-mdl2";
 initializeIcons();
 
 // value widgets
