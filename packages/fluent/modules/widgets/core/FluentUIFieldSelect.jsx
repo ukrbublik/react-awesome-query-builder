@@ -12,21 +12,22 @@ const FluentUIFieldSelect = (props) => {
     setField(option.key.toString());
   };
 
-  var renderOptions = function renderOptions(fields) {
+  var renderOptions = function renderOptions(fields, level = 0) {
     var options = [];
     var divKey = 0; 
     Object.keys(fields).map(function (fieldKey) {
       var opt = {};
       var field = fields[fieldKey];
+      const prefix = "\u00A0\u00A0".repeat(level);
       var items = field.items,
         path = field.path,
         label = field.label,
         disabled = field.disabled;
       if (items) {
         opt.key = path;
-        opt.text = label;
+        opt.text = prefix + label;
         opt.itemType = DropdownMenuItemType.Header;
-        var itemOptions=renderOptions(items);
+        var itemOptions=renderOptions(items, level+1);
         options.push(opt);
         for (var i of itemOptions) {
           options.push(i);
@@ -35,7 +36,7 @@ const FluentUIFieldSelect = (props) => {
         divKey +=1;
       } else {
         opt.key = path;
-        opt.text = label;
+        opt.text = prefix + label;
         opt.disabled = disabled;
         options.push(opt);
       }

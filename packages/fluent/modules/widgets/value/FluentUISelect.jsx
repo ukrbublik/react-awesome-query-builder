@@ -10,6 +10,7 @@ export default ({
   allowCustomValues,
   readonly,
   customProps,
+  placeholder,
 }) => {
   var onChange = function onChange(_, option) {
     if (option.key === undefined) return;
@@ -29,6 +30,7 @@ export default ({
 
   return (
     <Dropdown
+      placeholder={placeholder}
       options={renderOptions(listValues)}
       selectedKey={value}
       onChange={onChange}

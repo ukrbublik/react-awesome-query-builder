@@ -10,6 +10,7 @@ export default ({
   allowCustomValues,
   readonly,
   customProps,
+  placeholder,
 }) => {
   const [selectedKeys, setSelectedKeys] = useState(value ?? []);
 
@@ -31,7 +32,7 @@ export default ({
 
   return (
     <Dropdown
-      placeholder="Select options"
+      placeholder={placeholder || "Select options"}
       selectedKeys={selectedKeys}
       // eslint-disable-next-line react/jsx-no-bind
       onChange={onChange}

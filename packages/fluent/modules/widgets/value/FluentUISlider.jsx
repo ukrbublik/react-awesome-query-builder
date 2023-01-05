@@ -20,19 +20,33 @@ export default (props) => {
   const customInputProps = rest.input || {};
   const customSliderProps = rest.slider || rest;
 
-  const onChange = (newValue) => {
-    if (newValue === "" || newValue === null) newValue = undefined;
-    else newValue = Number(newValue);
+  const onSliderChange = (newValue) => {
+    if (newValue === "" || newValue === null)
+      newValue = undefined;
+    else
+      newValue = Number(newValue);
+    setValue(newValue);
+  };
+
+  const onInputChange = (e, newValue) => {
+    if (newValue === "" || newValue === null)
+      newValue = undefined;
+    else
+      newValue = Number(newValue);
     setValue(newValue);
   };
 
   const InputCmp = (
     <TextField
+      type="number"
       style={{ width: "auto" }}
       value={value}
+      min={min}
+      max={max}
+      step={step}
       placeholder={placeholder}
       disabled={readonly}
-      onChange={onChange}
+      onChange={onInputChange}
       {...customInputProps}
     />
   );
@@ -45,7 +59,8 @@ export default (props) => {
       value={value}
       disabled={readonly}
       marks={marks}
-      onChange={onChange}
+      showValue={false}
+      onChange={onSliderChange}
       {...customSliderProps}
     />
   );
