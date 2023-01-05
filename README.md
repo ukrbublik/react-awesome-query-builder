@@ -133,7 +133,7 @@ import React, {Component} from 'react';
 // >>>
 import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
 import '@react-awesome-query-builder/ui/css/styles.css';
-//import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
+// or import '@react-awesome-query-builder/ui/css/compact_styles.css';
 const InitialConfig = BasicConfig;
 // <<<
 
@@ -244,7 +244,7 @@ import React, { useState, useCallback } from "react";
 import type { JsonGroup, Config, ImmutableTree, BuilderProps } from '@react-awesome-query-builder/ui';
 import { Utils as QbUtils, Query, Builder, BasicConfig } from '@react-awesome-query-builder/ui';
 import '@react-awesome-query-builder/ui/css/styles.css';
-//import '@react-awesome-query-builder/ui/css/compact_styles.css'; //optional, for more compact styles
+// or import '@react-awesome-query-builder/ui/css/compact_styles.css';
 const InitialConfig = BasicConfig;
 // <<<
 
@@ -495,7 +495,7 @@ You just need to change your imports.
 - import 'react-awesome-query-builder/lib/css/styles.css';
 + import '@react-awesome-query-builder/ui/css/styles.css';
 - import 'react-awesome-query-builder/lib/css/compact_styles.css';
-+ import '@react-awesome-query-builder/ui/css/compact_styles.css';
++ import '@react-awesome-query-builder/ui/css/compact_styles.css'; // instead of styles.css for more compact look
 ```
 
 Note that you should import all types and values from a single package.

@@ -85,7 +85,7 @@ export default class RangeWidget extends PureComponent {
     const [valueFrom, valueTo] = aValue || [null, null];
 
     return (
-      <Col style={{display: "inline-flex"}}>
+      <Col style={{display: "inline-flex", flexWrap: 'wrap'}}>
         <Col style={{float: "left", marginRight: "5px"}}>
           <InputNumber
             disabled={readonly}

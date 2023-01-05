@@ -120,6 +120,12 @@ export class BasicGroup extends PureComponent {
     return conjunctionCount > 1 || this.showNot();
   }
 
+  isNoChildren() {
+    const {children1} = this.props;
+    return children1 ? children1.size == 0 : true;
+  }
+
+
   isOneChild() {
     const {children1} = this.props;
     return children1 ? children1.size < 2 : true;
@@ -147,6 +153,9 @@ export class BasicGroup extends PureComponent {
       <div key="group-header" className={classNames(
         "group--header",
         this.isOneChild() ? "one--child" : "",
+        !this.showConjs() ? "hide--conjs" : "",
+        this.isOneChild() ? "hide--line" : "",
+        this.isNoChildren() ? "no--children" : "",
       )}>
         {this.renderHeader()}
         {isGroupTopPosition && this.renderBeforeActions()}

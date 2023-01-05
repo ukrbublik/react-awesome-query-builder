@@ -13,9 +13,10 @@ export default (props) => {
     setValue(val);
   };
   const numberValue = value == undefined ? "" : value;
-  return [
-    <input key={"number"} type="number"  value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} {...customInputProps} />
-    ,
-    <input key={"range"} type="range"  value={numberValue} disabled={readonly} min={min} max={max} step={step} onChange={onChange} {...customSliderProps} />
-  ];
+  return (
+    <div style={{display: 'inline-flex'}}>
+      <input key={"number"} type="number"  value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} {...customInputProps} />
+      <input key={"range"} type="range"  value={numberValue} disabled={readonly} min={min} max={max} step={step} onChange={onChange} {...customSliderProps} />
+    </div>
+  );
 };

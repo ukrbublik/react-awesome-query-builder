@@ -1,17 +1,3 @@
+@import './vars.scss';
 @import '@react-awesome-query-builder/ui/css/styles.scss';
-
-$seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before", ".rule--func--bracket-after", ".rule--func--arg-sep";
-
-.mui {
-  #{$seps} {
-    vertical-align: bottom;
-    align-self: flex-end;
-    margin-bottom: 8px;
-  }
-  .rule--operator-options {
-    vertical-align: bottom;
-  }
-  .widget--valuesrc {
-    vertical-align: bottom;
-  }
-}
+@import './fixes.scss';
