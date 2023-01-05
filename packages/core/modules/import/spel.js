@@ -690,6 +690,14 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
             opKey = ws.op;
           }
         }
+
+        const opArg = convertedArgs[0];
+        if (opKey === "equal" && opArg?.value === null) {
+          opKey = "is_null";
+        } else if (opKey === "not_equal" && opArg?.value === null) {
+          opKey = "is_not_null";
+        }
+
         res = buildRule(config, meta, field, opKey, convertedArgs);
       }
     } else {
