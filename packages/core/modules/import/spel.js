@@ -491,7 +491,6 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
-
   let res = {
     type: "rule",
     id: uuid(),
@@ -693,9 +692,9 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         }
 
         const opArg = convertedArgs[0];
-        if (opKey === "equal" && opArg.value === null) {
+        if (opKey === "equal" && opArg?.value === null) {
           opKey = "is_null";
-        } else if (opKey === "not_equal" && opArg.value === null) {
+        } else if (opKey === "not_equal" && opArg?.value === null) {
           opKey = "is_not_null";
         }
 
