@@ -1,3 +1,6 @@
+$query-tree-line-radius: 4px !default;
+$query-item-radius: 5px !default;
+
 @mixin flex{
   display: flex;
   align-items: center;
@@ -88,7 +91,7 @@
 }
 
 .group-or-rule {
-  border-radius: 5px;
+  border-radius: $query-item-radius;
   position: relative;
 }
 
@@ -157,7 +160,7 @@
         display: none;
       }
       &::after {
-        border-radius: 4px 0 0 0;
+        border-radius: $query-tree-line-radius 0 0 0;
         border-width: 2px 0 0 2px;
       }
   }
@@ -167,7 +170,7 @@
         display: none;
       }
       &::after {
-        border-radius: 4px 0 0 0;
+        border-radius: $query-tree-line-radius 0 0 0;
         border-width: 2px 0 0 2px;
       }
   }
@@ -179,7 +182,7 @@
   }
   & > .group-or-rule-container:last-child > .group-or-rule {
       &::before {
-        border-radius: 0 0 0 4px;
+        border-radius: 0 0 0 $query-tree-line-radius;
       }
       &::after {
         display: none;
@@ -389,6 +392,19 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
 }
 .operator--options--sep {
   margin-right: 10px;
+}
+
+.rule--operator-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.rule--operator-text-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.rule--operator-text {
 }
 
 div.tooltip-inner {

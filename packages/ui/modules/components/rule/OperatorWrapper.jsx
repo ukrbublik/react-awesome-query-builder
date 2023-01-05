@@ -27,11 +27,13 @@ export default class OperatorWrapper extends PureComponent {
             </Col>;
     const hiddenOperator = showOperatorLabel
             && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
-              <div className="rule--operator">
+              <div className="rule--operator-wrapper">
                 {config.settings.showLabels
                   ? <label className="rule--label">&nbsp;</label>
                   : null}
-                <span>{selectedFieldWidgetConfig.operatorInlineLabel}</span>
+                <div className="rule--operator-text-wrapper">
+                  <span className="rule--operator-text">{selectedFieldWidgetConfig.operatorInlineLabel}</span>
+                </div>
               </div>
             </Col>;
     return [
