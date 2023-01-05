@@ -508,9 +508,7 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
   vertical-align: top;
   margin-right: -8px;
 }
-.widget--valuesrc span i {
-  transform: rotate(90deg);
-}
+
 .operator--options--sep {
   margin-right: 10px;
 }
@@ -710,20 +708,19 @@ $rule_actions: (".widget--valuesrc", ".rule--drag-handler", ".rule--header") !de
 /******************************************************************************/
 
 .rule--body.can--shrink--value {
-  display: flex;
   align-items: center;
   .rule--value {
     flex: 1;
-  }
-  .rule--value > .rule--widget {
-    display: flex;
-    .widget--widget {
+    & > .rule--widget {
       flex: 1;
+      & > .widget--valuesrc {
+        display: flex;
+        align-items: center;
+      }
+      & .widget--widget {
+        flex: 1;
+      }
     }
-  }
-  .rule--value > .rule--widget > .widget--valuesrc {
-    display: flex;
-    align-items: center;
   }
 }
 
