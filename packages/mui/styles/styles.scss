@@ -1,7 +1,3 @@
-@use '@react-awesome-query-builder/ui/css/styles.scss' with (
-  $seps-offset-bottom: 8px,
-);
-
-.MuiIconButton-sizeSmall {
-  padding: 3px; // smaller button
-}
+@import './vars.scss';
+@import '@react-awesome-query-builder/ui/css/styles.scss';
+@import './fixes.scss';

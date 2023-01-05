@@ -1,12 +1,12 @@
+$item-offset-left: 10px !default;
+$item-offset: 5px !default;
+$rulegroup-offset-left: 10px !default;
+$rulegroup-offset: 5px !default;
+$rule-padding: 5px !default;
+$rule-parts-distance: 5px !default;
+$drag-offset-right: 5px !default;
+$rule-group-actions-offset-left: 5px !default;
 
-$item-offset-left: 10px;
-$item-offset: 5px;
-$rulegroup-offset-left: 10px;
-$rulegroup-offset: 5px;
-$rule-padding: 5px;
-$rule-parts-distance: 5px;
-$drag-offset-right: 5px;
-$rule-group-actions-offset-left: 5px;
 
 @import './styles.scss';
 
@@ -15,4 +15,3 @@ $rule-group-actions-offset-left: 5px;
   margin-left: -1px !important;
   margin-top: -1px !important;
 }
-
