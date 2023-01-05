@@ -47,6 +47,8 @@ class RuleGroupExt extends BasicGroup {
       <div key="group-header" className={classNames(
         "group--header", 
         this.isOneChild() ? "one--child" : "",
+        this.isOneChild() ? "hide--line" : "",
+        this.isNoChildren() ? "no--children" : "",
         this.showDragIcon() ? "with--drag" : "hide--drag",
         this.showConjs() && (!this.isOneChild() || this.showNot()) ? "with--conjs" : "hide--conjs"
       )}>

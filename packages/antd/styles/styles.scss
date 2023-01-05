@@ -1,4 +1,7 @@
-@import '@react-awesome-query-builder/ui/css/styles.scss';
+@use '@react-awesome-query-builder/ui/css/styles.scss' as ui with (
+  $inactive_conjs: (".group--conjunctions .ant-btn:not(.ant-btn-primary)"),
+  $active_conjs: (".group--conjunctions .ant-btn.ant-btn-primary"),
+);
 
 body.qb-dragging {
   .ant-tooltip {
@@ -33,4 +36,19 @@ ul.ant-select-selection__rendered {
 /* for antd v4 default is 32 - too big */
 .ant-select-item {
   min-height: 22px;
+}
+
+#{ui.$seps} {
+  vertical-align: bottom;
+  align-self: flex-end;
+  margin-bottom: 3px;
+}
+
+.widget--valuesrc {
+  .anticon {
+    height: 100%;
+    svg {
+      height: 100%;
+    }
+  }
 }
