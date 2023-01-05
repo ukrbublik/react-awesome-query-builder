@@ -38,6 +38,7 @@ You will see demo app with hot reload of demo code and local library code.
 - [`packages/mui`](/packages/mui) - Provides config with [MUI](https://mui.com/) widgets
 - [`packages/material`](/packages/material) - Provides config with [Material-UI v4](https://v4.mui.com/) widgets
 - [`packages/bootstrap`](/packages/bootstrap) - Provides config with [Bootstrap](https://reactstrap.github.io/) widgets
+- [`packages/fluent`](/packages/fluent) - Provides config with [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web) widgets
 - [`packages/examples`](/packages/examples) - Demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
   - [`demo`](/packages/examples/demo) - Advanced demo
   - [`demo_switch`](/packages/examples/demo_switch) - Demo of ternary mode (switch/case) for SpEL
@@ -70,9 +71,11 @@ Currently there are 5 collections of widgets:
 - [material v4 widgets](/packages/material)
 - [mui v5 widgets](/packages/mui)
 - [bootstrap widgets](/packages/bootstrap)
+- [fluent widgets](/packages/fluent)
 
 Let's say you want to create new collection of widgets for new UI framework X to be used in this lib (and submit PR which is always welcomed!).  
 You can use any of this packages as a skeleton, eg. [mui](/packages/mui). I don't recommend to take [antd](/packages/antd) as example as it's more complicated.  
 Create new package `@react-awesome-query-builder/x` in [packages](/packages). 
 For a playground integrate it in [examples](/packages/examples) - add to `dependecies` in [package.json](/packages/examples/package.json), `paths` in [tsconfig.json](/packages/examples/tsconfig.json), `aliases` in [webpack.config.js](/packages/examples/webpack.config.js), `skinToConfig` in [config.tsx](/packages/examples/demo/config.tsx).
 
+Take [PR #727 to add Fluent UI widgets](https://github.com/ukrbublik/react-awesome-query-builder/pull/727) as an example.

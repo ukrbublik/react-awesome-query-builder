@@ -14,6 +14,7 @@
 [![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design)
 [![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=MUI)](https://mui.com)
 [![bootstrap](https://img.shields.io/badge/skin-Bootstrap-blue?logo=Bootstrap)](https://reactstrap.github.io/)
+[![fluent](https://img.shields.io/badge/skin-Fluent%20UI-blue?logo=Microsoft%20Office)](https://developer.microsoft.com/en-us/fluentui)
 [![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/)
 [![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox?file=/src/demo/config_simple.tsx)
 [![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple?file=/src/demo/config_simple.js)
@@ -22,8 +23,8 @@
 User-friendly React component to build queries (filters).
 
 Inspired by [jQuery QueryBuilder](http://querybuilder.js.org/). 
-Using awesome [Ant Design](https://ant.design/) v4 for widgets. 
-Now [Material-UI](https://mui.com/) is also supported!
+Using awesome UI frameworks for widgets: [Ant Design](https://ant.design/), [Material-UI](https://mui.com/), [Bootstrap](https://reactstrap.github.io/). 
+Now [Fluent UI](https://developer.microsoft.com/en-us/fluentui#/get-started/web) is also supported!
 
 See [live demo](https://ukrbublik.github.io/react-awesome-query-builder) 
 
@@ -70,6 +71,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   - [Ant Design](https://ant.design/)
   - [Material-UI](https://mui.com/)
   - [Bootstrap](https://reactstrap.github.io/)
+  - [Fluent UI](https://developer.microsoft.com/en-us/fluentui)
   - vanilla
   (Using another UI framework and custom widgets is possible, see below)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
@@ -85,6 +87,7 @@ From v6 library is divided into packages:
 - [`@react-awesome-query-builder/mui`](/packages/mui) - provides config with [MUI](https://mui.com/) widgets
 - [`@react-awesome-query-builder/material`](/packages/material) - provides config with [Material-UI v4](https://v4.mui.com/) widgets (deprecated)
 - [`@react-awesome-query-builder/bootstrap`](/packages/bootstrap) - provides config with [Bootstrap](https://reactstrap.github.io/) widgets
+- [`@react-awesome-query-builder/fluent`](/packages/fluent) - provides config with [Fluent UI](https://developer.microsoft.com/en-us/fluentui) widgets
 
 ```mermaid
 graph LR;
@@ -93,10 +96,11 @@ graph LR;
   ui-->mui;
   ui-->material;
   ui-->bootstrap;
+  ui-->fluent;
 ```
 
 `ui` re-exports from `core`, other packages re-export from `ui`. 
-For using this library on frontend you need to install and use only `ui` (for basic widgets) or one of framework-specific packages (`antd` / `mui` / `bootstrap`). 
+For using this library on frontend you need to install and use only `ui` (for basic widgets) or one of framework-specific packages (`antd` / `mui` / `bootstrap` / `fluent`). 
 
 For using this library on server-side (Node.js) you need only `core`. 
 This is useful if you want to pass query value from frontend to backend in JSON format and perform [export](#utils) eg. to SQL on server-side for security reasons.
@@ -472,6 +476,7 @@ Please remove package `react-awesome-query-builder` and install one of:
 - [`@react-awesome-query-builder/bootstrap`](/packages/bootstrap)
 - [`@react-awesome-query-builder/mui`](/packages/mui)
 - [`@react-awesome-query-builder/material`](/packages/material) (deprecated)
+- [`@react-awesome-query-builder/fluent`](/packages/fluent)
 
 Library code is backward-compatible with version 2-5. 
 You just need to change your imports. 

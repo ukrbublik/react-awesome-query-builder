@@ -10,6 +10,7 @@
     ],
     "allowJs": true,
     "outDir": "ts_out",
+    "noEmit": true,
 
     "strict": true,
     "alwaysStrict": true,
@@ -17,19 +18,14 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "baseUrl": ".",
+    "skipLibCheck": true,
+    
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
-      "@react-awesome-query-builder/ui": ["../ui/modules"],
-      "@react-awesome-query-builder/antd": ["../antd/modules"],
-      "@react-awesome-query-builder/mui": ["../mui/modules"],
-      "@react-awesome-query-builder/material": ["../material/modules"],
-      "@react-awesome-query-builder/bootstrap": ["../bootstrap/modules"],
-      "@react-awesome-query-builder/fluent": ["../fluent/modules"],
+      "@react-awesome-query-builder/ui": ["../ui/modules"]
     }
   },
   "include": [
-    "specs/**/*",
-    "support/**/*"
+    "modules/**/*"
   ]
 }

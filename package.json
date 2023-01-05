@@ -18,6 +18,7 @@
     "reactjs",
     "component",
     "react-component",
+    "react-components",
     "ui",
     "antd",
     "antdesign",
@@ -27,7 +28,9 @@
     "material-design",
     "mui",
     "bootstrap",
-    "reactstrap"
+    "reactstrap",
+    "fluent",
+    "office-ui-fabric"
   ],
   "homepage": "https://github.com/ukrbublik/react-awesome-query-builder",
   "bugs": {
@@ -47,6 +50,7 @@
     "packages/mui",
     "packages/material",
     "packages/bootstrap",
+    "packages/fluent",
     "packages/tests",
     "packages/examples",
     "packages/sandbox",

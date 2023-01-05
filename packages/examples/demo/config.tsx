@@ -21,6 +21,7 @@ import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 import { MaterialConfig } from "@react-awesome-query-builder/material";
 import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
+import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 const {
   FieldSelect,
   FieldDropdown,
@@ -34,7 +35,8 @@ const skinToConfig: Record<string, Config> = {
   antd: AntdConfig,
   material: MaterialConfig,
   mui: MuiConfig,
-  bootstrap: BootstrapConfig
+  bootstrap: BootstrapConfig,
+  fluent: FluentUIConfig
 };
 
 export default (skin: string) => {
@@ -617,4 +619,3 @@ export default (skin: string) => {
 
   return config;
 };
-

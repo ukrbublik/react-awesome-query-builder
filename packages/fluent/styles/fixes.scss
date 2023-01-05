@@ -1,0 +1,30 @@
+// fixes space at bottom after multiselect
+.widget--widget > .ms-Dropdown-container {
+  display: flex;
+}
+
+// fixes switch vertical center
+.widget--widget > .ms-Toggle {
+  margin-bottom: 0px;
+}
+
+// fixes switch vertical center
+.rule--body--wrapper .rule--value {
+  align-items: center;
+}
+
+.group--actions > .ms-Button {
+  height: 100%;
+}
+
+.group--conjunctions > .ms-Button {
+  min-width: auto;
+  padding: 0px 4px;
+}
+.rule_group .group--actions > .ms-Button {
+  padding: 8px 0;
+}
+
+.widget--valuesrc span .ms-Icon {
+  transform: rotate(90deg);
+}
