@@ -1,6 +1,7 @@
-@use '@react-awesome-query-builder/ui/css/styles.scss' as ui with (
+@use '@react-awesome-query-builder/ui/css/styles.scss' with (
   $inactive_conjs: (".group--conjunctions .ant-btn:not(.ant-btn-primary)"),
   $active_conjs: (".group--conjunctions .ant-btn.ant-btn-primary"),
+  $seps-offset-bottom: 3px,
 );
 
 body.qb-dragging {
@@ -38,11 +39,6 @@ ul.ant-select-selection__rendered {
   min-height: 22px;
 }
 
-#{ui.$seps} {
-  vertical-align: bottom;
-  align-self: flex-end;
-  margin-bottom: 3px;
-}
 
 .widget--valuesrc {
   .anticon {

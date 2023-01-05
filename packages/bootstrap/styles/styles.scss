@@ -1,9 +1,6 @@
-@import '@react-awesome-query-builder/ui/css/styles.scss';
-
-#{$seps} {
-  margin-bottom: 8px;
-}
-
+@use '@react-awesome-query-builder/ui/css/styles.scss' with (
+  $seps-offset-bottom: 8px,
+);
 
 .svg-inline--fa {
   pointer-events: none;

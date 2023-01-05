@@ -1,5 +1,9 @@
+$item-border: 1px !default;
+$case-border: 2px !default;
 $treeline-radius: 4px !default;
+$treeline-thick: 2px !default;
 $item-radius: 5px !default;
+// colors
 $treeline-color: #ccc !default;
 $treeline-disabled-color: rgba(128, 128, 128, 0.1) !default;
 $group-background: rgba(250, 240, 210, 0.5) !default;
@@ -8,18 +12,24 @@ $rule-background: white !default;
 $rule-border-color: transparent !default;
 $rule-with-error-border-color: #e0a1a1 !default;
 $rule-error-color: red !default;
-$rule-group-background: rgba(255, 252, 242, 0.5) !default;
-$rule-group-border-color: #f9f1dd !default;
+$rulegroup-background: rgba(255, 252, 242, 0.5) !default;
+$rulegroup-border-color: #f9f1dd !default;
 $placeholder-border-color: gray !default;
 $locked-border-color: red !default;
-$item-offset-left: 24px;
-$item-offset-vertical: 10px;
-$treeline-thick: 2px;
-$item-border: 1px;
-$case-border: 2px;
-$rulegroup-offset-left: 18px;
-$treeline-offset-from-conjs: 20px;
-$treeline-offset-from-switch: 20px;
+// offsets
+$treeline-offset-from-conjs: 20px !default;
+$treeline-offset-from-switch: 20px !default;
+$item-offset: 10px !default;
+$item-offset-left: 24px !default;
+$rulegroup-offset: 5px !default;
+$rulegroup-offset-left: 18px !default;
+$rule-padding: 10px !default;
+$rule-parts-distance: 10px !default;
+$seps-offset-bottom: 3px !default;
+$drag-offset-right: 8px !default;
+$group-actions-offset-left: 10px !default;
+$group-drag-offset-left: 10px !default;
+$rule-group-actions-offset-left: 10px !default;
 
 
 
@@ -47,21 +57,16 @@ $treeline-offset-from-switch: 20px;
   @include clearfix;
 }
 
-.query-builder {
-  overflow: hidden;
-  &, &::before, &::after {
-    box-sizing: border-box;
-  }
-}
 
 
 /******************************************************************************/
-/** COMMON ********************************************************************/
+/** MAIN ********************************************************************/
 /******************************************************************************/
 
 
 .query-builder {
   @extend %noselect;
+  overflow: hidden;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.25;
@@ -77,7 +82,7 @@ $treeline-offset-from-switch: 20px;
 .rule {
   background-color: $rule-background;
   border: $item-border solid $rule-border-color;
-  padding: 10px;
+  padding: $rule-padding;
 }
 
 .rule-with-error .rule {
@@ -108,8 +113,8 @@ $treeline-offset-from-switch: 20px;
 }
 
 .rule_group {
-  background: $rule-group-background;
-  border: $item-border solid $rule-group-border-color;
+  background: $rulegroup-background;
+  border: $item-border solid $rulegroup-border-color;
 }
 
 
@@ -159,7 +164,7 @@ $treeline-offset-from-switch: 20px;
 /** TREE LINES *********************************************************************/
 /******************************************************************************/
 
-@mixin line_position_for_item($item-border, $item-offset-left) {
+@mixin line_position_for_item($item-border, $item-offset-left, $item-offset) {
   &::before {
     top: calc(-1 * $item-border);
     height: calc(50% + $treeline-thick / 2 + $item-border);
@@ -167,7 +172,7 @@ $treeline-offset-from-switch: 20px;
 
   &::after {
     top: calc(50% + $treeline-thick / 2 );
-    height: calc(50% - $treeline-thick / 2 + $item-offset-vertical + $item-border * 2);
+    height: calc(50% - $treeline-thick / 2 + $item-offset + $item-border * 2);
   }
 
   &::before, &::after {
@@ -179,13 +184,13 @@ $treeline-offset-from-switch: 20px;
 @mixin line_position_for_header($treeline-offset-from-conjs, $item-offset-left) {
   &::before {
     top: calc($treeline-offset-from-conjs);
-    height: calc(100% + $item-offset-vertical - $treeline-offset-from-conjs);
+    height: calc(100% + $item-offset - $treeline-offset-from-conjs);
     left: calc(+1 * ($item-offset-left / 2 - $treeline-thick / 2));
     width: calc($item-offset-left / 2 + $treeline-thick / 2);
   }
 }
 
-@mixin hide_conjs($item-border) {
+@mixin hide_conjs($item-border, $item-offset) {
   & > .group-or-rule-container:first-child > .group-or-rule {
     &::before {
       display: none;
@@ -196,7 +201,7 @@ $treeline-offset-from-switch: 20px;
     }
     &::after {
       top: calc(50% - $treeline-thick / 2 );
-      height: calc(50% + $treeline-thick / 2 + $item-offset-vertical + $item-border * 2);
+      height: calc(50% + $treeline-thick / 2 + $item-offset + $item-border * 2);
     }
   }
 }
@@ -247,7 +252,7 @@ $treeline-offset-from-switch: 20px;
       box-sizing: border-box;
     }
 
-    @include line_position_for_item($item-border, $item-offset-left);
+    @include line_position_for_item($item-border, $item-offset-left, $item-offset);
   }
 
   & > .group-or-rule-container:last-child > .group-or-rule {
@@ -261,7 +266,7 @@ $treeline-offset-from-switch: 20px;
 
   // don't connect line to conjs
   &.hide--conjs {
-    @include hide_conjs($item-border);
+    @include hide_conjs($item-border, $item-offset);
   }
 
   // gray line
@@ -277,9 +282,9 @@ $treeline-offset-from-switch: 20px;
 
 // rule_group
 .rule_group--children {
-  @include hide_conjs($item-border);
+  @include hide_conjs($item-border, $rulegroup-offset);
   & > .group-or-rule-container > .group-or-rule {
-    @include line_position_for_item($item-border, $rulegroup-offset-left)
+    @include line_position_for_item($item-border, $rulegroup-offset-left, $rulegroup-offset)
   }
 }
 
@@ -287,7 +292,7 @@ $treeline-offset-from-switch: 20px;
 .switch_group {
   & > .group--children {
     & > .group-or-rule-container > .group-or-rule {
-      @include line_position_for_item($case-border, $item-offset-left);
+      @include line_position_for_item($case-border, $item-offset-left, $item-offset);
     }
   }
   & > .group--header:not(.no--children):not(.hide--conjs) {
@@ -309,23 +314,49 @@ $treeline-offset-from-switch: 20px;
 .group--footer {
   display: flex;
   align-items: stretch;
+
+  padding: {
+    left: $item-offset;
+    right: $item-offset;
+  }
+  margin: {
+    top: $item-offset;
+    bottom: $item-offset;
+  }
+}
+
+.group-or-rule-container {
+  margin-top: $item-offset;
+  margin-bottom: $item-offset;
+  padding-right: $item-offset;
+  &:first-child {
+    margin-top: 0px !important;
+  }
+  &:last-child {
+    margin-bottom: 0px !important;
+  }
 }
 
 .group--drag-handler {
-  margin-right: 8px;
+  margin-right: $drag-offset-right;
+  margin-top: 3px;
   position: relative;
-  top: 3px;
+  align-self: center;
 }
 .group--conjunctions {
   flex-shrink: 0;
+  display: flex;
+
   .group--drag-handler {
-    margin-left: 10px;
+    margin-left: $group-drag-offset-left;
   }
 }
 
 
 .group--children {
   padding-left: $item-offset-left;
+  margin-top: $item-offset;
+  margin-bottom: $item-offset;
 
   .group--field--count--rule {
     display: flex;
@@ -340,16 +371,17 @@ $treeline-offset-from-switch: 20px;
 }
 
 .group--actions {
-  margin-left: 10px;
+  margin-left: $group-actions-offset-left;
   flex: 1;
   display: flex;
+
   &--tl,
   &--bl{
     justify-content: flex-start;
   }
 
   &--tl{
-    margin-left: 20px;
+    margin-left: calc($group-actions-offset-left * 2);
   }
 
   &--tc,
@@ -378,8 +410,8 @@ $treeline-offset-from-switch: 20px;
 .case_group--body {
   display: flex;
   flex-direction: row;
-  margin-top: $item-offset-vertical;
-  margin-bottom: $item-offset-vertical;
+  margin-top: $item-offset;
+  margin-bottom: $item-offset;
 
   .case_group--children {
     flex: auto;
@@ -390,7 +422,7 @@ $treeline-offset-from-switch: 20px;
   .case_group--value {
     margin-top: 0;
     margin-bottom: 0;
-    margin-right: 10px;
+    margin-right: $item-offset;
   }
 }
 
@@ -401,17 +433,15 @@ $treeline-offset-from-switch: 20px;
 .rule_group {
   display: flex;
   flex-wrap: wrap;
-  padding-left: 10px;
+  padding-left: $rule-padding;
 
-  .group--drag-handler {
-    align-self: center;
-  }
   .group--field {
-    margin-top: $item-offset-vertical;
-    margin-bottom: $item-offset-vertical;
+    margin-top: $item-offset;
+    margin-bottom: $item-offset;
     align-self: center;
   }
   .group--actions {
+    margin-left: $rule-group-actions-offset-left;
     align-self: center;
     flex: 0;
   }
@@ -419,12 +449,12 @@ $treeline-offset-from-switch: 20px;
   .rule_group--children {
     flex: 1;
 
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: $rulegroup-offset;
+    margin-bottom: $rulegroup-offset;
     .group-or-rule-container {
-      margin-bottom: 5px;
-      margin-top: 5px;
-      padding-right: 5px;
+      margin-bottom: $rulegroup-offset;
+      margin-top: $rulegroup-offset;
+      padding-right: $rulegroup-offset;
     }
 
     padding-left: $rulegroup-offset-left;
@@ -471,7 +501,7 @@ $treeline-offset-from-switch: 20px;
 .rule--drag-handler {
   display: flex;
   align-items: center;
-  margin-right: 8px;
+  margin-right: $drag-offset-right;
 }
 
 $rule_items: ".rule--field", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
@@ -487,7 +517,7 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
 #{$seps} {
   vertical-align: bottom;
   align-self: flex-end;
-  margin-bottom: 3px;
+  margin-bottom: $seps-offset-bottom;
 }
 
 .operator--options {
@@ -502,15 +532,15 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
 }
 
 .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
-  margin-left: 10px;
+  margin-left: $rule-parts-distance;
 }
 .widget--valuesrc {
   vertical-align: top;
-  margin-right: -8px;
+  margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
 }
 
 .operator--options--sep {
-  margin-right: 10px;
+  margin-right: $rule-parts-distance;
 }
 
 .rule--operator-wrapper {
@@ -568,7 +598,7 @@ $rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".
   margin-left: 5px;
 }
 .rule--func--arg-value > .rule--widget {
-  margin-left: -10px;
+  margin-left: calc(-1 * $rule-parts-distance);
 }
 .rule--func--arg-sep {
   margin-left: 3px;
@@ -668,39 +698,6 @@ $rule_actions: (".widget--valuesrc", ".rule--drag-handler", ".rule--header") !de
   }
 }
 
-
-
-/******************************************************************************/
-/** Vertical padding ****************************************************************/
-/******************************************************************************/
-
-
-.group--header,
-.group--footer {
-  padding: {
-    left: 10px;
-    right: 10px;
-  }
-  margin: {
-    top: $item-offset-vertical;
-    bottom: $item-offset-vertical;
-  }
-}
-.group-or-rule-container {
-  margin-top: $item-offset-vertical;
-  margin-bottom: $item-offset-vertical;
-  padding-right: 10px;
-  &:first-child {
-    margin-top: 0px !important;
-  }
-  &:last-child {
-    margin-bottom: 0px !important;
-  }
-}
-.group--children {
-  margin-top: $item-offset-vertical;
-  margin-bottom: $item-offset-vertical;
-}
 
 
 /******************************************************************************/

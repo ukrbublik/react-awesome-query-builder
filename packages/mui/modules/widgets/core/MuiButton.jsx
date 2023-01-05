@@ -10,11 +10,11 @@ export default ({type, label, onClick, readonly, config}) => {
     "delRuleGroup": <DeleteIcon />,
     "delRule": <DeleteIcon />,
     "addRuleGroup": <AddIcon />,
+    "addRuleGroupExt": <AddIcon />,
   };
   const typeToIcon = {
     "addRule": <AddIcon />,
     "addGroup": <AddIcon />,
-    "addRuleGroupExt": <AddIcon />,
   };
   const typeToColor = {
     "addRule": "neutral",
