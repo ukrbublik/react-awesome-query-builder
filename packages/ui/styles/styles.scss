@@ -1,10 +1,6 @@
 $query-tree-line-radius: 4px !default;
 $query-item-radius: 5px !default;
 
-@mixin flex{
-  display: flex;
-  align-items: center;
-}
 
 @mixin clearfix {
   &:after {
@@ -28,10 +24,6 @@ $query-item-radius: 5px !default;
 
 %clearfix {
   @include clearfix;
-}
-
-%flex{
-  @include flex;
 }
 
 .query-builder {
@@ -123,7 +115,8 @@ $query-item-radius: 5px !default;
 /******************************************************************************/
 .group--header,
 .group--footer{
-  @extend %flex;
+  display: flex;
+  align-items: stretch;
 }
 
 .group--children {
