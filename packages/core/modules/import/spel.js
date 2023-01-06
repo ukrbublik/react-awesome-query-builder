@@ -594,20 +594,16 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
 
     // find op
     let opKeys = conv.operators[op];
-    let opKey;
     // todo: make dynamic, use basic config
     if (op == "eq" && spel.children[1].type == "null") {
-      opKey = "is_null";
+      opKeys = ["is_null"];
     } else if (op == "ne" && spel.children[1].type == "null") {
-      opKey = "is_not_null";
+      opKeys = ["is_not_null"];
     } else if (op == "le" && spel.children[1].type == "string" && spel.children[1].val == "") {
-      opKey = "is_empty";
       opKeys = ["is_empty"];
     } else if (op == "gt" && spel.children[1].type == "string" && spel.children[1].val == "") {
-      opKey = "is_not_empty";
       opKeys = ["is_not_empty"];
     } else if (op == "between") {
-      opKey = "between";
       opKeys = ["between"];
     }
 
@@ -646,7 +642,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       const vals = convertChildren();
       const fieldObj = vals[0];
       let convertedArgs = vals.slice(1);
-      opKey = opKeys[0];
+      let opKey = opKeys[0];
       
       if (!fieldObj) {
         // LHS can't be parsed
@@ -689,13 +685,6 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
             const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
             opKey = ws.op;
           }
-        }
-
-        const opArg = convertedArgs[0];
-        if (opKey === "equal" && opArg?.value === null) {
-          opKey = "is_null";
-        } else if (opKey === "not_equal" && opArg?.value === null) {
-          opKey = "is_not_null";
         }
 
         res = buildRule(config, meta, field, opKey, convertedArgs);
