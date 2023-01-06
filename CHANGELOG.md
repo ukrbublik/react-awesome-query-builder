@@ -1,4 +1,12 @@
 # Changelog
+- 6.1.0
+  - Improve styles (PR #848)
+    - More `flex`ible styles for low-width
+    - `styles.scss` now has vars that can be overridden to change colos and sizes
+    - Breaking: Now `compact_styles.css` replaces `styles.css`, don't use them together
+    - Breaking: Removed icon in "Add sub rule" button
+  - Added `@react-awesome-query-builder/fluent` package (PR #727)
+  - Fix import of `is_null` and `is_not_null` ops from SpEL (PR #831) (issue #794)
 - 6.0.0
   - Project has been divided into packages (monorepo) (PR #769)
     Export ESM
