@@ -36,6 +36,7 @@
   - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
     Remove bad values from list, don't unset whole value.
     Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
+    ! Breaking change: `removeIncompleteRulesOnLoad` and `removeEmptyGroupsOnLoad` now default to `true`, set them to `false` in your `settings` to preserve the current behaviour
   - Fix `loadFromSpel` for `select_equals` op (PR #740) (issue #704)
   - Fix `loadFromSpel` for `is_empty` and `is_not_empty` ops (PR #713) (issues #714, #699)
 - 5.1.2
