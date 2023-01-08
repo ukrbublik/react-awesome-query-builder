@@ -7,7 +7,7 @@ import {
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
 } from "@react-awesome-query-builder/antd";
-import ru_RU from "antd/lib/locale-provider/ru_RU";
+import ru_RU from "antd/lib/locale/ru_RU";
 import "antd/dist/antd.css";
 import "@react-awesome-query-builder/antd/css/styles.scss";
 const {

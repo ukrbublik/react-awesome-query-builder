@@ -1,4 +1,4 @@
-import en_US from "antd/lib/locale-provider/en_US";
+import en_US from "antd/lib/locale/en_US";
 import AntdWidgets from "../widgets";
 import { normalizeListValues } from "../utils/stuff";
 import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";

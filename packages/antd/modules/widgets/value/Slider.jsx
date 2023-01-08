@@ -91,7 +91,7 @@ export default class SliderWidget extends PureComponent {
           <Slider
             disabled={readonly}
             value={sliderValue}
-            tipFormatter={this.tipFormatter}
+            tooltip={{formatter: this.tipFormatter}}
             min={min}
             max={max}
             included={false}

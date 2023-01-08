@@ -121,7 +121,7 @@ export default class RangeWidget extends PureComponent {
           <Slider
             disabled={readonly}
             value={aValue}
-            tipFormatter={this.tipFormatter}
+            tooltip={{formatter: this.tipFormatter}}
             min={min}
             max={max}
             step={step}
