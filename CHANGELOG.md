@@ -9,6 +9,7 @@
   - Fix import of `is_null` and `is_not_null` ops from SpEL (PR #831) (issue #794)
   - Fix import of NOT from SpEL (PR #852) (issue #834)
     Also fixes export of aggregation expression w/o children filter like `cars.size() == 2`
+  - Support antd 5 (PR #853) (issue #812)
 - 6.0.0
   - Project has been divided into packages (monorepo) (PR #769)
     Export ESM
