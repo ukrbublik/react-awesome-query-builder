@@ -13,7 +13,7 @@ import {
   DateTimeFieldSettings
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
-import ru_RU from "antd/lib/locale/ru_RU";
+import ru_RU from "antd/es/locale/ru_RU";
 import { ruRU } from "@material-ui/core/locale";
 import { ruRU as muiRuRU } from "@mui/material/locale";
 
