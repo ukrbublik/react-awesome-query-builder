@@ -7,7 +7,7 @@ import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {Map} from "immutable";
+import {List, Map} from "immutable";
 
 
 // helpers
@@ -52,9 +52,8 @@ const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = tr
 const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
-  const children = item.get("children1");
+  const children = item.get("children1") || new List();
   const {canShortMongoQuery} = config.settings;
-  if (!children) return undefined;
 
   const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
   const parentPath = parents

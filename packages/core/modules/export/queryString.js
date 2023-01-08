@@ -9,7 +9,7 @@ import pick from "lodash/pick";
 import {defaultValue} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
-import {Map} from "immutable";
+import {List, Map} from "immutable";
 
 
 export const queryString = (item, config, isForDisplay = false) => {
@@ -45,8 +45,7 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
-  const children = item.get("children1");
-  if (!children) return undefined;
+  const children = item.get("children1") || new List();
 
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)

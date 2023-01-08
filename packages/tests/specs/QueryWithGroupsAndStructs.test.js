@@ -131,11 +131,20 @@ describe("query with !group", () => {
     export_checks(configs.with_group_array, inits.with_is_empty_in_some, "JsonLogic", {
       "logic": inits.with_is_empty_in_some
     });
+
+    export_checks(configs.with_group_array, inits.spel_with_is_empty_in_some, "SpEL", {
+      "spel": inits.spel_with_is_empty_in_some
+    });
   });
 
   describe("should handle select_not_any_in in some (when group mode is array)", () => {
     export_checks(configs.with_group_array_cars, inits.with_select_not_any_in_in_some, "JsonLogic", {
       "logic": inits.with_select_not_any_in_in_some,
+      "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
+    });
+
+    export_checks(configs.with_group_array_cars, inits.spel_with_select_not_any_in_in_some, "SpEL", {
+      "spel": inits.spel_with_select_not_any_in_in_some,
       "query": "SOME OF cars HAVE vendor NOT IN (\"Ford\", \"Toyota\")"
     });
   });
@@ -144,6 +153,79 @@ describe("query with !group", () => {
     export_checks(configs.with_group_array_cars, inits.with_not_and_in_some, "JsonLogic", {
       "logic": inits.with_not_and_in_some,
       "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+    });
+
+    export_checks(configs.with_group_array_cars, inits.spel_with_not_and_in_some, "SpEL", {
+      "spel": inits.spel_with_not_and_in_some,
+      "query": "SOME OF cars HAVE NOT (!year && vendor NOT IN (\"Ford\", \"Toyota\"))"
+    });
+  });
+
+  describe("should handle count w/o children (when group mode is array)", () => {
+    export_checks(configs.with_group_array_cars, inits.with_group_count, "JsonLogic", {
+      "logic": inits.with_group_count,
+      "query": "COUNT OF cars == 2"
+    });
+
+    export_checks(configs.with_group_array_cars, inits.spel_with_group_count, "SpEL", {
+      "spel": inits.spel_with_group_count,
+      "query": "COUNT OF cars == 2",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            { "$size": "cars" },
+            2
+          ]
+        }
+      }
+    });
+  });
+
+  describe("should handle not and count w/o children (when group mode is array)", () => {
+    export_checks(configs.with_group_array_cars, inits.with_not_group_count, "JsonLogic", {
+      // will convert not == to !=
+      "logic": inits.with_not_group_count_out,
+      "query": "COUNT OF cars != 2"
+    });
+
+    export_checks(configs.with_group_array_cars, inits.spel_with_not_group_count, "SpEL", {
+      // will convert not == to !=
+      "spel": inits.spel_with_not_group_count_out,
+      "query": "COUNT OF cars != 2"
+    });
+  });
+
+  describe("should handle not aggregate + not filter (when group mode is array)", () => {
+    export_checks(configs.with_group_array_cars, inits.with_not_group_not_filter, "JsonLogic", {
+      // will convert `not ==` to `!=` inside group filter, but not for group conj
+      // todo: why?
+      "logic": inits.with_not_group_not_filter_out,
+      "query": "NOT (COUNT OF cars WHERE vendor != \"Toyota\" == 6)"
+    });
+
+    export_checks(configs.with_group_array_cars, inits.spel_with_not_group_not_filter, "SpEL", {
+      // will convert both `not ==` to `!=`
+      "spel": inits.spel_with_not_group_not_filter_out,
+      "query": "COUNT OF cars WHERE vendor != \"Toyota\" != 6"
+    });
+  });
+
+  describe("should handle not is_null in not some (when group mode is array)", () => {
+    export_checks(configs.with_group_array_cars, inits.with_not_some_not_is_null, "JsonLogic", {
+      "logic": inits.with_not_some_not_is_null_out,
+      "query": "NOT (SOME OF cars HAVE !!vendor)"
+    });
+
+    export_checks(configs.with_group_array_cars, inits.spel_with_not_some_not_is_null, "SpEL", {
+      "spel": inits.spel_with_not_some_not_is_null_out,
+      "query": "NOT (SOME OF cars HAVE !!vendor)"
+    });
+  });
+
+  describe("should handle not contains in not some (when group mode is array)", () => {
+    export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
+      "spel": inits.spel_with_not_some_not_contains_out, // same
+      "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
     });
   });
 });

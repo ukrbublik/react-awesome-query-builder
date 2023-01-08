@@ -168,6 +168,7 @@ export const with_is_empty_in_some = {
     ] }
   ]
 };
+export const spel_with_is_empty_in_some = "results.?[grade <= ''].size() > 0";
 
 export const with_bad_subfield_in_group = {
   "and": [
@@ -190,6 +191,7 @@ export const with_select_not_any_in_in_some = {
     ] }
   ]
 };
+export const spel_with_select_not_any_in_in_some = "cars.?[!({'Ford', 'Toyota'}.?[true].contains(vendor))].size() > 0";
 
 export const with_not_and_in_some = {
   "and": [
@@ -202,6 +204,7 @@ export const with_not_and_in_some = {
     ] }
   ]
 };
+export const spel_with_not_and_in_some = "cars.?[!(year == null && !({'Ford', 'Toyota'}.?[true].contains(vendor)))].size() > 0";
 
 export const with_nested_group = {
   "and": [
@@ -728,6 +731,132 @@ export const with_group_array_cars = {
   ]
 };
 
+export const with_group_count = {
+  "and": [
+    { "==": [
+      { "reduce": [
+        { "var": "cars" },
+        {  "+": [ 1, {  "var": "accumulator" } ] },
+        0
+      ] },
+      2
+    ] }
+  ]
+};
+export const spel_with_group_count = "cars.size() == 2";
+
+export const with_not_group_count = {
+  "and": [
+    { "!": 
+      { "==": [
+        { "reduce": [
+          { "var": "cars" },
+          {  "+": [ 1, {  "var": "accumulator" } ] },
+          0
+        ] },
+        2
+      ] }
+    }
+  ]
+};
+export const with_not_group_count_out = {
+  "and": [
+    { "!=": [
+      { "reduce": [
+        { "var": "cars" },
+        {  "+": [ 1, {  "var": "accumulator" } ] },
+        0
+      ] },
+      2
+    ] }
+  ]
+};
+export const spel_with_not_group_count = "!(cars.size() == 2)";
+export const spel_with_not_group_count_out = "cars.size() != 2";
+
+export const with_not_group_not_filter = {
+  "!": {
+    "and": [
+      { "==": [
+        { "reduce": [
+          {  "filter": [
+            { "var": "cars" },
+            {
+              "!": { "==": [
+                { "var": "vendor" },
+                "Toyota"
+              ] }
+            }
+          ] },
+          { "+": [ 1, { "var": "accumulator" } ] },
+          0
+        ] },
+        6
+      ] }
+    ]
+  }
+};
+export const with_not_group_not_filter_out = {
+  "!": {
+    "and": [
+      { "==": [
+        { "reduce": [
+          {  "filter": [
+            { "var": "cars" },
+            {
+              "!=": [
+                { "var": "vendor" },
+                "Toyota"
+              ]
+            }
+          ] },
+          { "+": [ 1, { "var": "accumulator" } ] },
+          0
+        ] },
+        6
+      ] }
+    ]
+  }
+};
+
+export const spel_with_not_group_not_filter = "!(cars.?[!(vendor == 'Toyota')].size() == 6)";
+export const spel_with_not_group_not_filter_out = "cars.?[vendor != 'Toyota'].size() != 6";
+
+export const with_not_some_not_is_null = {
+  "!": {
+    "and": [
+      { "some": [
+        { "var": "cars" },
+        { "!": {
+          "==": [
+            { "var": "vendor" },
+            null
+          ]
+        } }
+      ] }
+    ]
+  }
+};
+export const with_not_some_not_is_null_out = {
+  "!": {
+    "and": [
+      { "some": [
+        { "var": "cars" },
+        { "!=": [
+          { "var": "vendor" },
+          null
+        ] }
+      ] }
+    ]
+  }
+};
+
+export const spel_with_not_some_not_is_null = "!(cars.?[!(vendor == null)].size() > 0)";
+export const spel_with_not_some_not_is_null_out = "!(cars.?[vendor != null].size() > 0)";
+
+export const spel_with_not_some_not_contains = "!(results.?[!(grade.contains('Toy'))].size() > 0)";
+export const spel_with_not_some_not_contains_out = "!(results.?[!(grade.contains('Toy'))].size() > 0)";
+
 export const with_group_array_custom_operator = {
   "and": [
     { "custom_group_operator": [
@@ -809,3 +938,7 @@ export const with_groupVarKey = {
 };
 
 export const spel_with_number = "num == 2";
+
+export const spel_with_not = "!(num == 2)";
+
+export const spel_with_not_not = "!(num == 2 || !(num == 3))";

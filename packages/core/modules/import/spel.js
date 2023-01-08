@@ -401,13 +401,13 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       }
       const opKey = funcToOpMap["$"+methodName];
       const list = convertedObj[0];
-      return buildRule(config, meta, field, opKey, [list]);
+      return buildRule(config, meta, field, opKey, [list], spel);
     } else if (obj && obj[0].type == "property" && funcToOpMap[obj[0].val + "." + methodName + "()"]) {
       // CollectionUtils.containsAny(multicolor, {'yellow', 'green'})
       const opKey = funcToOpMap[obj[0].val + "." + methodName + "()"];
       const field = convertedArgs[0].value;
       const args = convertedArgs.slice(1);
-      return buildRule(config, meta, field, opKey, args);
+      return buildRule(config, meta, field, opKey, args, spel);
     } else if (funcToOpMap["."+methodName]) {
       // user.login.startsWith('gg')
       const opKey = funcToOpMap["."+methodName];
@@ -415,7 +415,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       if (parts && convertedArgs.length == 1) {
         const fullParts = [...groupFieldParts, ...parts];
         const field = fullParts.join(fieldSeparator);
-        return buildRule(config, meta, field, opKey, convertedArgs);
+        return buildRule(config, meta, field, opKey, convertedArgs, spel);
       }
     } else if (methodName == "parse" && obj && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
       // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
@@ -478,7 +478,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   return undefined;
 };
 
-const buildRule = (config, meta, field, opKey, convertedArgs) => {
+const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
   if (convertedArgs.filter(v => v === undefined).length) {
     return undefined;
   }
@@ -487,10 +487,24 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
     meta.errors.push(`No config for field ${field}`);
     return undefined;
   }
+
+  let canRev = true;
+  let needWrapReverse = false;
+  if (spel?.not && canRev) {
+    const opConfig = config.operators[opKey];
+    if (opConfig.reversedOp) {
+      opKey = opConfig.reversedOp;
+      spel.not = false;
+    } else {
+      needWrapReverse = true;
+    }
+  }
+
   const widget = getWidgetForFieldOp(config, field, opKey);
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
   const asyncListValues = asyncListValuesArr.length ? asyncListValuesArr[0] : undefined;
+
   let res = {
     type: "rule",
     id: uuid(),
@@ -508,6 +522,14 @@ const buildRule = (config, meta, field, opKey, convertedArgs) => {
       asyncListValues,
     }
   };
+
+  if (needWrapReverse) {
+    res = wrapInDefaultConj(res, config, spel?.not);
+    if (spel?.not) {
+      spel.not = false;
+    }
+  }
+
   return res;
 };
 
@@ -556,7 +578,7 @@ const compareArgs = (left, right,  spel, conv, config, meta, parentSpel = null) 
 };
 
 const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
-  if(!spel) return undefined;
+  if (!spel) return undefined;
   let res;
   if (spel.type.indexOf("op-") == 0) {
     let op = spel.type.slice("op-".length);
@@ -594,20 +616,16 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
 
     // find op
     let opKeys = conv.operators[op];
-    let opKey;
     // todo: make dynamic, use basic config
     if (op == "eq" && spel.children[1].type == "null") {
-      opKey = "is_null";
+      opKeys = ["is_null"];
     } else if (op == "ne" && spel.children[1].type == "null") {
-      opKey = "is_not_null";
+      opKeys = ["is_not_null"];
     } else if (op == "le" && spel.children[1].type == "string" && spel.children[1].val == "") {
-      opKey = "is_empty";
       opKeys = ["is_empty"];
     } else if (op == "gt" && spel.children[1].type == "string" && spel.children[1].val == "") {
-      opKey = "is_not_empty";
       opKeys = ["is_not_empty"];
     } else if (op == "between") {
-      opKey = "between";
       opKeys = ["between"];
     }
 
@@ -646,19 +664,28 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       const vals = convertChildren();
       const fieldObj = vals[0];
       let convertedArgs = vals.slice(1);
-      opKey = opKeys[0];
+      const groupField = fieldObj?.groupFieldValue?.value;
+      const opArg = convertedArgs?.[0];
+
       
-      if (!fieldObj) {
-        // LHS can't be parsed
-      } else if (fieldObj.groupFieldValue) {
-        // 1. group
-        if (fieldObj.groupFieldValue.valueSrc != "field") {
-          meta.errors.push(`Expected group field ${JSON.stringify(fieldObj)}`);
-        }
-        const groupField = fieldObj.groupFieldValue.value;
+      let opKey = opKeys[0];
+      if (opKeys.length > 1) {
+        logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
+
+        //todo: it's naive
+        const field = fieldObj?.value;
+        const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
         
-        // some/all/none
-        const opArg = convertedArgs[0];
+        if (op == "eq" || op == "ne") {
+          const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
+          if (ws) {
+            opKey = ws.op;
+          }
+        }
+      }
+
+      // some/all/none
+      if (fieldObj?.groupFieldValue) {
         if (opArg && opArg.groupFieldValue && opArg.groupFieldValue.valueSrc == "field" && opArg.groupFieldValue.value == groupField) {
           // group.?[...].size() == group.size()
           opKey = "all";
@@ -670,6 +697,27 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
           opKey = "some";
           convertedArgs = [];
         }
+      }
+
+      let canRev = true;
+      let needWrapReverse = false;
+      if (spel.not && canRev) {
+        const opConfig = config.operators[opKey];
+        if (opConfig.reversedOp) {
+          opKey = opConfig.reversedOp;
+          spel.not = false;
+        } else {
+          needWrapReverse = true;
+        }
+      }
+      
+      if (!fieldObj) {
+        // LHS can't be parsed
+      } else if (fieldObj.groupFieldValue) {
+        // 1. group
+        if (fieldObj.groupFieldValue.valueSrc != "field") {
+          meta.errors.push(`Expected group field ${JSON.stringify(fieldObj)}`);
+        }
 
         res = buildRuleGroup(fieldObj, opKey, convertedArgs, config, meta);
       } else {
@@ -678,27 +726,15 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
           meta.errors.push(`Expected field ${JSON.stringify(fieldObj)}`);
         }
         const field = fieldObj.value;
-
-        if (opKeys.length > 1) {
-          logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
-
-          //todo: it's naive
-          const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
-          
-          if (op == "eq" || op == "ne") {
-            const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
-            opKey = ws.op;
-          }
-        }
-
-        const opArg = convertedArgs[0];
-        if (opKey === "equal" && opArg?.value === null) {
-          opKey = "is_null";
-        } else if (opKey === "not_equal" && opArg?.value === null) {
-          opKey = "is_not_null";
-        }
-
         res = buildRule(config, meta, field, opKey, convertedArgs);
+      }
+
+      if (needWrapReverse) {
+        if (res.type !== "group") {
+          res = wrapInDefaultConj(res, config, spel.not);
+        } else {
+          res.properties.not = !res.properties.not;
+        }
       }
     } else {
       if (!parentSpel) {
@@ -719,7 +755,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
       _groupField: groupFieldValue?.value
     });
     if (groupFilter?.type == "rule") {
-      groupFilter = wrapInDefaultConj(groupFilter, config);
+      groupFilter = wrapInDefaultConj(groupFilter, config, spel.filter.not);
     }
     res = {
       groupFilter,
@@ -756,6 +792,8 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         res = undefined;
         meta.errors.push(`Can't convert rule of type ${spel.type}, it looks like var/literal`);
       }
+    } else {
+      // res is a rule
     }
   }
   return res;
