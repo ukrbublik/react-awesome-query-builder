@@ -9,7 +9,7 @@ import pick from "lodash/pick";
 import {defaultValue} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
-import Immutable, {Map} from "immutable";
+import {List, Map} from "immutable";
 import {SqlString} from "../utils/export";
 
 export const sqlFormat = (tree, config) => {
@@ -52,7 +52,7 @@ const formatItem = (item, config, meta) => {
 const formatGroup = (item, config, meta) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
-  const children = item.get("children1");
+  const children = item.get("children1") || new List();
 
   const isRuleGroup = (type === "rule_group");
   const groupField = isRuleGroup ? properties.get("field") : null;
@@ -64,7 +64,7 @@ const formatGroup = (item, config, meta) => {
 
   const not = properties.get("not");
   const canHaveEmptyChildren = false; //isRuleGroup && mode == "array";
-  const list = (children || new Immutable.List())
+  const list = children
     .map((currentChild) => formatItem(currentChild, config, meta))
     .filter((currentChild) => typeof currentChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size)

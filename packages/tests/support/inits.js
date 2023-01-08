@@ -854,8 +854,8 @@ export const with_not_some_not_is_null_out = {
 export const spel_with_not_some_not_is_null = "!(cars.?[!(vendor == null)].size() > 0)";
 export const spel_with_not_some_not_is_null_out = "!(cars.?[vendor != null].size() > 0)";
 
-export const spel_with_not_some_not_contains = "!(cars.?[!(vendor.contains('Toy'))].size() > 0)";
-export const spel_with_not_some_not_contains_out = "!(cars.?[!(vendor.contains('Toy'))].size() > 0)";
+export const spel_with_not_some_not_contains = "!(results.?[!(grade.contains('Toy'))].size() > 0)";
+export const spel_with_not_some_not_contains_out = "!(results.?[!(grade.contains('Toy'))].size() > 0)";
 
 export const with_group_array_custom_operator = {
   "and": [

@@ -223,9 +223,9 @@ describe("query with !group", () => {
   });
 
   describe("should handle not contains in not some (when group mode is array)", () => {
-    export_checks(configs.with_group_array_cars, inits.spel_with_not_some_not_contains, "SpEL", {
+    export_checks(configs.with_group_array, inits.spel_with_not_some_not_contains, "SpEL", {
       "spel": inits.spel_with_not_some_not_contains_out, // same
-      "query": "NOT (SOME OF cars HAVE vendor Not Contains \"Toy\")"
+      "query": "NOT (SOME OF results HAVE grade Not Contains \"Toy\")"
     });
   });
 });
