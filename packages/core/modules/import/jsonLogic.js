@@ -585,6 +585,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   let conj;
   let havingVals;
+  let havingNot = false;
   if (fieldConfig.type == "!group" && having) {
     conj = Object.keys(having)[0];
     havingVals = having[conj];
@@ -595,7 +596,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     // Eg. use `not_equal` instead of `not` `equal`
     const isEmptyOp = conj == "!" && (havingVals.length == 1 && havingVals[0] && isJsonLogic(havingVals[0]) && conv.varKeys.includes(Object.keys(havingVals[0])[0]));
     if (conj == "!" && !isEmptyOp) {
-      not = !not;
+      havingNot = true;
       having = having["!"];
       conj = Object.keys(having)[0];
       havingVals = having[conj];
@@ -624,25 +625,19 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   if (fieldConfig.type == "!group" && having) {
     if (conv.conjunctions[conj] !== undefined) {
-      res = convertConj(conj, havingVals, conv, config, not, meta, field, true);
-      not = false; // not was applied to group
+      // group
+      res = convertConj(conj, havingVals, conv, config, havingNot, meta, field, true);
+      havingNot = false;
     } else {
       // need to be wrapped in `rule_group`
-      const rule = convertOp(conj, havingVals, conv, config, not && canRev, meta, field);
-      if (not && canRev && !rule?.properties?.not) {
-        not = false; // op was reversed in rule
-      }
+      const rule = convertOp(conj, havingVals, conv, config, havingNot, meta, field);
+      havingNot = false;
       res = wrapInDefaultConjRuleGroup(rule, field, fieldConfig, config, conv.conjunctions["and"]);
     }
     if (!res)
       return undefined;
     
     res.type = "rule_group";
-    if (not) {
-      Object.assign(res.properties, {
-        not: not,
-      });
-    }
     Object.assign(res.properties, {
       field: field,
       mode: fieldConfig.mode,
@@ -654,6 +649,9 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
       });
+    }
+    if (not) {
+      res = wrapInDefaultConj(res, config, not);
     }
   } else if (fieldConfig.type == "!group" && !having) {
     res = {

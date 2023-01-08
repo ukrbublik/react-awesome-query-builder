@@ -58,6 +58,7 @@ describe("basic query", () => {
             { "==": [{ "var": "num" }, 2] }
           ]
         },
+        spel: "num == 2"
       });
     });
 

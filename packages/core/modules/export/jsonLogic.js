@@ -5,7 +5,7 @@ import {
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
-import {Map} from "immutable";
+import {List, Map} from "immutable";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 
@@ -80,9 +80,8 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
-  const children = item.get("children1");
+  const children = item.get("children1") || new List();
   const field = properties.get("field");
-  if (!children) return undefined;
   
   let conjunction = properties.get("conjunction");
   if (!conjunction)

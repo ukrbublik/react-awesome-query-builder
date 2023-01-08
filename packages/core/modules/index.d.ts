@@ -160,6 +160,7 @@ type SpelConcatValue = SpelConcatNormalValue | SpelConcatCaseValue;
 export interface Utils {
   // export
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
+  // @deprecated
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
