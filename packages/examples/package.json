@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/examples",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "Local hot-reloadable demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -25,6 +25,9 @@
     "@ant-design/icons": "^4.7.0",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "@fluentui/font-icons-mdl2": "^8.2.0",
+    "@fluentui/react": "^8.78.0",
+    "@fluentui/react-icons": "^2.0.175",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
@@ -41,10 +44,10 @@
     "@react-awesome-query-builder/antd": "workspace:^",
     "@react-awesome-query-builder/bootstrap": "workspace:^",
     "@react-awesome-query-builder/core": "workspace:^",
+    "@react-awesome-query-builder/fluent": "workspace:^",
     "@react-awesome-query-builder/material": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
     "@react-awesome-query-builder/ui": "workspace:^",
-    "@react-awesome-query-builder/fluent": "workspace:^",
     "antd": "^5.1.2",
     "bootstrap": "^5.1.3",
     "clone": "^2.1.2",
@@ -56,10 +59,7 @@
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1",
     "react-select": "^5.2.2",
-    "reactstrap": "^9.0.0",
-    "@fluentui/font-icons-mdl2": "^8.2.0",
-    "@fluentui/react": "^8.78.0",
-    "@fluentui/react-icons": "^2.0.175"
+    "reactstrap": "^9.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",

@@ -542,7 +542,9 @@ children1: [
 ]
 ```
 `Utils.loadTree()` is backward comatible with children1 being array or object.  
-But if you rely on previous format (maybe do post-processing of `getTree()` result), please use `Utils.getTree(tree, true, false)` - it will behave same as before this change. 
+But if you rely on previous format (maybe do post-processing of `getTree()` result), please use `Utils.getTree(tree, true, false)` - it will behave same as before this change.  
+
+Another breaking change: `removeIncompleteRulesOnLoad` and `removeEmptyGroupsOnLoad` now default to `true`, set them to `false` in your `settings` to preserve the behaviour before 5.2.0.
 
 ### Migration to 4.9.0
 Version 4.9.0 has a breaking change for operators `is_empty` and `is_not_empty`.  

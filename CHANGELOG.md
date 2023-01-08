@@ -1,4 +1,15 @@
 # Changelog
+- 6.1.0
+  - Improve styles (PR #848)
+    - More `flex`ible styles for low-width
+    - `styles.scss` now has vars that can be overridden to change colos and sizes
+    - Breaking: Now `compact_styles.css` replaces `styles.css`, don't use them together
+    - Breaking: Removed icon in "Add sub rule" button
+  - Added `@react-awesome-query-builder/fluent` package (PR #727)
+  - Fix import of `is_null` and `is_not_null` ops from SpEL (PR #831) (issue #794)
+  - Fix import of NOT from SpEL (PR #852) (issue #834)
+    Also fixes export of aggregation expression w/o children filter like `cars.size() == 2`
+  - Support antd 5 (PR #853) (issue #812)
 - 6.0.0
   - Project has been divided into packages (monorepo) (PR #769)
     Export ESM
@@ -28,6 +39,7 @@
   - Handle validation of bad multiselect value correctly (PR #733) (issue #674)
     Remove bad values from list, don't unset whole value.
     Added config `removeInvalidMultiSelectValuesOnLoad` (true by default, false for AntDesign)
+    ! Breaking change: `removeIncompleteRulesOnLoad` and `removeEmptyGroupsOnLoad` now default to `true`, set them to `false` in your `settings` to preserve the current behaviour
   - Fix `loadFromSpel` for `select_equals` op (PR #740) (issue #704)
   - Fix `loadFromSpel` for `is_empty` and `is_not_empty` ops (PR #713) (issues #714, #699)
 - 5.1.2

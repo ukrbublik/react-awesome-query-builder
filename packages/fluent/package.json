@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/fluent",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "User-friendly query builder for React. Fluent 8 widgets",
   "keywords": [
     "query-builder",
@@ -60,14 +60,14 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.14.5",
     "@babel/runtime": "^7.14.5",
+    "@fluentui/font-icons-mdl2": "^8.2.0",
+    "@fluentui/react": "^8.78.0",
+    "@fluentui/react-icons": "^2.0.175",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.18",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "sass": "^1.35.0",
-    "@fluentui/font-icons-mdl2": "^8.2.0",
-    "@fluentui/react": "^8.78.0",
-    "@fluentui/react-icons": "^2.0.175"
+    "sass": "^1.35.0"
   },
   "peerDependencies": {
     "@fluentui/font-icons-mdl2": "^8.4.2",
