@@ -2,9 +2,9 @@
 
 import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
-import type { Moment } from "moment";
+import type { Moment as MomentType } from "moment";
 
-export type Moment = Moment;
+export type Moment = MomentType;
 
 ////////////////
 // common

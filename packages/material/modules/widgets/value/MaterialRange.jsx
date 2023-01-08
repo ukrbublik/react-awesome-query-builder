@@ -134,7 +134,7 @@ export default (props) => {
 
   const stylesWrapper = {
     display: "inline-flex", 
-    flexWrap: 'wrap'
+    flexWrap: "wrap"
   };
 
   const stylesInputWrapper = {
