@@ -52,7 +52,7 @@ const FluentUIButton = (props) => {
         color="primary"
         styles={{
           root: {
-            backgroundColor: 'transparent'
+            backgroundColor: "transparent"
           }
         }}
       />

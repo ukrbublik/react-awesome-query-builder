@@ -73,7 +73,7 @@ export default class SliderWidget extends PureComponent {
     const sliderValue = aValue == null && min ? min : aValue;
       
     return (
-      <Col style={{display: "inline-flex", flexWrap: 'wrap'}}>
+      <Col style={{display: "inline-flex", flexWrap: "wrap"}}>
         <Col style={{float: "left", marginRight: "5px"}}>
           <InputNumber
             disabled={readonly}
@@ -91,7 +91,7 @@ export default class SliderWidget extends PureComponent {
           <Slider
             disabled={readonly}
             value={sliderValue}
-            tipFormatter={this.tipFormatter}
+            tooltip={{formatter: this.tipFormatter}}
             min={min}
             max={max}
             included={false}

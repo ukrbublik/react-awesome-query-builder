@@ -9,11 +9,12 @@ body.qb-dragging {
   min-height: 18px;
 }
 .ant-slider {
-  margin-bottom: 4px;
+  margin-bottom: 4px !important;
   margin-top: 4px;
 }
-.ant-slider-with-marks {
-  margin-bottom: 10px;
+.ant-slider.ant-slider-with-marks {
+  margin-bottom: 10px !important;
+  margin-left: 10px;
   margin-top: 4px;
 }
 .ant-slider-track {

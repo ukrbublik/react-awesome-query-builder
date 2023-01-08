@@ -80,7 +80,7 @@ export default (props) => {
   const stylesWrapper = {
     display: "inline-flex", 
     alignItems: "center",
-    flexWrap: 'wrap'
+    flexWrap: "wrap"
   };
 
   const stylesInputWrapper = {

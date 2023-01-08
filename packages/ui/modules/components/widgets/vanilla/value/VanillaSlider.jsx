@@ -14,7 +14,7 @@ export default (props) => {
   };
   const numberValue = value == undefined ? "" : value;
   return (
-    <div style={{display: 'inline-flex'}}>
+    <div style={{display: "inline-flex"}}>
       <input key={"number"} type="number"  value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} {...customInputProps} />
       <input key={"range"} type="range"  value={numberValue} disabled={readonly} min={min} max={max} step={step} onChange={onChange} {...customSliderProps} />
     </div>

@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import { Utils } from "@react-awesome-query-builder/ui";
 import PropTypes from "prop-types";
-import { DatePicker } from "antd";
+import { DatePicker } from "../moment";
 const { RangePicker } = DatePicker;
 const { moment } = Utils;
 
@@ -80,8 +80,9 @@ export default class DateWidget extends PureComponent {
 
   handleChange = (value) => {
     const {setValue} = this.props;
-    if (this.isValidValue(value))
+    if (this.isValidValue(value)) {
       setValue(this.formatValue(value));
+    }
   };
 
   render() {
