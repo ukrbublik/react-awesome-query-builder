@@ -12,6 +12,15 @@ const FluentUIFieldSelect = (props) => {
     setField(option.key.toString());
   };
 
+  const onRenderTitle = function onRenderTitle(options) {
+    const option = options[0];
+    return (
+      <div>
+        <span>{option.title}</span>
+      </div>
+    );
+  };
+
   var renderOptions = function renderOptions(fields, level = 0) {
     var options = [];
     var divKey = 0; 
@@ -25,6 +34,7 @@ const FluentUIFieldSelect = (props) => {
         disabled = field.disabled;
       if (items) {
         opt.key = path;
+        opt.title = label;
         opt.text = prefix + label;
         opt.itemType = DropdownMenuItemType.Header;
         var itemOptions=renderOptions(items, level+1);
@@ -32,10 +42,16 @@ const FluentUIFieldSelect = (props) => {
         for (var i of itemOptions) {
           options.push(i);
         }
-        options.push({ key: "divider_"+divKey.toString(), text: "-", itemType: DropdownMenuItemType.Divider });
+        options.push({
+          key: "divider_"+divKey.toString(),
+          text: "-",
+          title: "",
+          itemType: DropdownMenuItemType.Divider
+        });
         divKey +=1;
       } else {
         opt.key = path;
+        opt.title = label;
         opt.text = prefix + label;
         opt.disabled = disabled;
         options.push(opt);
@@ -50,6 +66,7 @@ const FluentUIFieldSelect = (props) => {
       options={renderOptions(items)}
       selectedKey={selectedKey}
       onChange={onChange}
+      onRenderTitle={onRenderTitle}
       dropdownWidth={"auto"}
     />
   );
