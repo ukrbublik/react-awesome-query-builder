@@ -10,13 +10,14 @@ Not uses TypeScript.
 https://ukrbublik.github.io/react-awesome-query-builder/sandbox_simple/
 
 ### Run locally
-Run from the root of cloned repository:
+From the root of cloned repository:
 ```sh
-npm sandbox-js
+pnpm sandbox-js
 ```
 
 Or copy `sandbox_simple` dir and run inside it:
 ```sh
+npm run preinstall
 npm i
 npm start
 ```

@@ -13,7 +13,7 @@ https://ukrbublik.github.io/react-awesome-query-builder/
 ### Run
 From the root of cloned repository:
 ```sh
-npm start
+pnpm start
 ```
 
 And open `http://localhost:3001` in a browser.  

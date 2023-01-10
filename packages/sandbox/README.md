@@ -10,13 +10,14 @@ Uses AntDesign widgets by default.
 https://ukrbublik.github.io/react-awesome-query-builder/sandbox/
 
 ### Run locally
-Run from the root of cloned repository:
+From the root of cloned repository:
 ```sh
-npm sandbox-ts
+pnpm sandbox-ts
 ```
 
 Or copy `sandbox` dir and run inside it:
 ```sh
+npm run preinstall
 npm i
 npm start
 ```

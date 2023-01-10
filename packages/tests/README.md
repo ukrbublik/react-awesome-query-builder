@@ -5,8 +5,8 @@ Karma tests.
 
 ### Run
 ```sh
-npm i
-npm test
+pnpm i
+pnpm test
 ```
 Coverage is saved to `coverage/html/index.html`.
 
