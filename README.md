@@ -451,17 +451,17 @@ See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 Version 5 is backward-compatible with 2-4. 
 From version 6 library is divided into [packages](/packages). 
-It's recommended to update your version to 6.x. You just need to chnage your imports, see [Migration to 6.0.0](#migration-to-600)
+It's recommended to update your version to 6.x. You just need to change your imports, see [Migration to 6.0.0](#migration-to-600)
 
 ### Supported versions
 | Version | Supported          |
 | ------- | ------------------ |
 | 6.x     | :white_check_mark: |
 | 5.x     | :heavy_check_mark: |
-| 4.x     | :heavy_check_mark: |
-| 3.x     | :heavy_check_mark: |
-| 2.x     | :heavy_check_mark: |
-| 1.x     | :warning:          |
+| 4.x     | :warning:          |
+| 3.x     | :x:                |
+| 2.x     | :x:                |
+| 1.x     | :x:                |
 | 0.x     | :x:                |
 
 ### Changelog
