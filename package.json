@@ -1,7 +1,7 @@
 {
   "name": "react-awesome-query-builder",
   "version": "5.4.1",
-  "description": "User-friendly query builder for React. Demo: https://ukrbublik.github.io/react-awesome-query-builder",
+  "description": "User-friendly query builder for React. Please migrate to new @react-awesome-query-builder/* See https://github.com/ukrbublik/react-awesome-query-builder#migration-to-600",
   "keywords": [
     "query-builder",
     "query",
@@ -146,8 +146,8 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "^18.7.7",
     "@types/prop-types": "^15.7.3",
-    "@types/react": "^18.0.17",
-    "@types/react-dom": "^18.0.6",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
     "@types/sinon": "^10.0.2",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
