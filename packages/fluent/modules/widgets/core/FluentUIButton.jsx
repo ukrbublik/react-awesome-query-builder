@@ -7,27 +7,28 @@ const FluentUIButton = (props) => {
     onClick = props.onClick,
     readonly = props.readonly;
 
-  var typeToOnlyIcon = {
+  const hideLabelsFor = {
+    "addRuleGroup": true,
+  };
+  var typeToIcon = {
+    addRuleGroup: "CirclePlus",
+  };
+  var typeToCommandIcon = {
+    addRuleGroupExt: "Add",
+    addRule: "Add",
+    addGroup: "CirclePlus",
     delGroup: "Delete",
     delRuleGroup: "Delete",
     delRule: "Delete",
-    addRuleGroup: "CirclePlus",
-    addRuleGroupExt: "Add",
-  };
-  var typeToIcon = {
-  };
-  var typeToCommandIcon = {
-    addRule: "Add",
-    addGroup: "CirclePlus",
   };
 
-  if (typeToOnlyIcon[type]) {
+  if (!label || hideLabelsFor[type]) {
     return (
       <IconButton
         key={type}
         onClick={onClick}
         disabled={readonly}
-        iconProps={{ iconName: typeToOnlyIcon[type] }}
+        iconProps={{ iconName: typeToIcon[type] || typeToCommandIcon[type]  }}
         color="primary"
       />
     );

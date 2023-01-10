@@ -3,6 +3,12 @@ import { Button } from "antd";
 import { PlusOutlined, PlusCircleOutlined, DeleteFilled } from "@ant-design/icons";
 
 export default ({type, onClick, label, readonly, config: {settings}}) => {
+  const hideLabelsFor = {
+    "addRuleGroup": true
+  };
+  const btnLabel = hideLabelsFor[type] ? "" : label;
+  const hasLabel = !!btnLabel;
+
   const typeToIcon = {
     "addRule": <PlusOutlined />,
     "addGroup": <PlusCircleOutlined />,
@@ -22,17 +28,23 @@ export default ({type, onClick, label, readonly, config: {settings}}) => {
   };
 
   const typeToType = {
-    "delRule": "danger",
-    "delGroup": "danger",
-    "delRuleGroup": "danger",
+    "delRule": "text",
+    // "delGroup": "default",
+    // "delRuleGroup": "default",
+  };
+
+  const dangerFor = {
+    "delRule": true,
+    "delGroup": true,
+    "delRuleGroup": true,
   };
 
   const {renderSize} = settings;
 
-  const btnLabel = type == "addRuleGroup" ? "" : label;
 
   return (
     <Button
+      danger={dangerFor[type] === true}
       key={type}
       type={typeToType[type] || "default"}
       icon={typeToIcon[type]}

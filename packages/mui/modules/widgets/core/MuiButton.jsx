@@ -5,16 +5,18 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
 export default ({type, label, onClick, readonly, config}) => {
-  const typeToOnlyIcon = {
+  const hideLabelsFor = {
+    "addRuleGroup": true,
+    "addRuleGroupExt": true,
+  };
+  const typeToIcon = {
     "delGroup": <DeleteIcon />,
     "delRuleGroup": <DeleteIcon />,
     "delRule": <DeleteIcon />,
-    "addRuleGroup": <AddIcon />,
-    "addRuleGroupExt": <AddIcon />,
-  };
-  const typeToIcon = {
     "addRule": <AddIcon />,
     "addGroup": <AddIcon />,
+    "addRuleGroupExt": <AddIcon />,
+    "addRuleGroup": <AddIcon />,
   };
   const typeToColor = {
     "addRule": "neutral",
@@ -23,8 +25,24 @@ export default ({type, label, onClick, readonly, config}) => {
     "delRuleGroup": "secondary",
     "delRule": "secondary",
   };
-  if (typeToOnlyIcon[type])
-    return <IconButton size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]}>{typeToOnlyIcon[type]}</IconButton>;
-  else
-    return <Button size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]} startIcon={typeToIcon[type]}>{label}</Button>;
+  if (!label || hideLabelsFor[type]) {
+    return (
+      <IconButton
+        size="small" 
+        disabled={readonly} 
+        onClick={onClick} 
+        color={typeToColor[type]}
+      >{typeToIcon[type]}</IconButton>
+    );
+  } else {
+    return (
+      <Button 
+        size="small" 
+        disabled={readonly} 
+        onClick={onClick} 
+        color={typeToColor[type]} 
+        startIcon={typeToIcon[type]}
+      >{label}</Button>
+    );
+  }
 };
