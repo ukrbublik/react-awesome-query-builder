@@ -5,14 +5,16 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 
 export default ({type, label, onClick, readonly, config}) => {
-  const typeToOnlyIcon = {
+  const hideLabelsFor = {
+    "addRuleGroup": true,
+    "addRuleGroupExt": true,
+  };
+  const typeToIcon = {
     "delGroup": <DeleteIcon />,
     "delRuleGroup": <DeleteIcon />,
     "delRule": <DeleteIcon />,
     "addRuleGroup": <AddIcon />,
     "addRuleGroupExt": <AddIcon />,
-  };
-  const typeToIcon = {
     "addRule": <AddIcon />,
     "addGroup": <AddIcon />,
   };
@@ -23,8 +25,8 @@ export default ({type, label, onClick, readonly, config}) => {
     "delRuleGroup": "secondary",
     "delRule": "secondary",
   };
-  if (typeToOnlyIcon[type])
-    return <IconButton size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]}>{typeToOnlyIcon[type]}</IconButton>;
+  if (!label || hideLabelsFor[type])
+    return <IconButton size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]}>{typeToIcon[type]}</IconButton>;
   else
     return <Button size="small" disabled={readonly} onClick={onClick} color={typeToColor[type]} startIcon={typeToIcon[type]}>{label}</Button>;
 };

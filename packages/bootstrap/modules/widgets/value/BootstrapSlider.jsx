@@ -19,11 +19,20 @@ export default (props) => {
 
   const stylesInputWrapper = {
     marginLeft: "5px",
+    display: "inline-flex",
+    width: "auto",
+  };
+
+  const stylesSliderWrapper = {
+    marginLeft: "5px",
+    display: "inline-flex",
+    width: "auto",
+    minWidth: "150px"
   };
 
   const numberValue = value == undefined ? "" : value;
   return (<div style={stylesWrapper}>
     <Input key={"number"} bsSize={"sm"} style={stylesInputWrapper} type="number" value={numberValue} placeholder={placeholder} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
-    <Input key={"range"} bsSize={"sm"} style={stylesInputWrapper} type="range" value={numberValue} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
+    <Input key={"range"} bsSize={"sm"} style={stylesSliderWrapper} type="range" value={numberValue} disabled={readonly} min={min} max={max} step={step} onChange={onChange} />
   </div>);
 };

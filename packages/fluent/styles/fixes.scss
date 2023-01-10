@@ -16,6 +16,9 @@
 .group--actions > .ms-Button {
   height: 100%;
 }
+.rule--header > .ms-Button {
+  height: 100%;
+}
 
 .group--conjunctions > .ms-Button {
   min-width: auto;
@@ -27,4 +30,8 @@
 
 .widget--valuesrc span .ms-Icon {
   transform: rotate(90deg);
+}
+
+.group--header.no--children > .group--actions {
+  min-height: 32px;
 }

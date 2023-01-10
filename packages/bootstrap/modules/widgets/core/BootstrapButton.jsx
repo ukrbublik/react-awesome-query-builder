@@ -4,14 +4,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default ({ type, label, onClick, config }) => {
-  const typeToOnlyIcon = {
+  const hideLabelsFor = {
+    "addRuleGroup": true
+  };
+  const typeToIcon = {
     delGroup: faTrashAlt,
     delRuleGroup: faTrashAlt,
     delRule: faTrashAlt,
     addRuleGroup: faPlus,
     addRuleGroupExt: faPlus,
-  };
-  const typeToIcon = {
     addRule: faPlus,
     addGroup: faPlus,
   };
@@ -23,11 +24,11 @@ export default ({ type, label, onClick, config }) => {
     delRule: "danger",
   };
 
-  let isOnlyIcon = typeToOnlyIcon[type];
+  let isOnlyIcon = hideLabelsFor[type] || !label;
 
   return (
     <Button size="sm" color={typeToColor[type]} onClick={onClick}>
-      <FontAwesomeIcon icon={isOnlyIcon ? typeToOnlyIcon[type] : typeToIcon[type]} /> {!isOnlyIcon && label}
+      <FontAwesomeIcon icon={typeToIcon[type]} /> {!isOnlyIcon && label}
     </Button>
   );
 };
