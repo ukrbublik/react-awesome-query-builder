@@ -64,6 +64,7 @@ export default class FieldSelect extends PureComponent {
         size={config.settings.renderSize}
         onChange={this.onChange}
         value={selectedKey || undefined}
+        optionLabelProp={"label"}
         filterOption={this.filterOption}
         disabled={readonly}
         {...customProps}
