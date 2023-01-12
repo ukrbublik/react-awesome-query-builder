@@ -1,4 +1,8 @@
 # Changelog
+- 6.1.1
+  - Fix CJS build (issue with antd/es and antd/lib) (PR #859) (issue #858)
+  - Fix button labels (PR #856) (issue #824)
+  - Fix whitespace in select (PR #855) (issue #845)
 - 6.1.0
   - Improve styles (PR #848)
     - More `flex`ible styles for low-width

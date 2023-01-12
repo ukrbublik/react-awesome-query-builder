@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/bootstrap",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "User-friendly query builder for React. Bootstrap widgets",
   "keywords": [
     "query-builder",
