@@ -4,7 +4,7 @@ rm -rf ./esm
 rm -rf ./css
 
 babel --extensions ".tsx,.jsx,.js" -d ./cjs ./modules
-find ./cjs -name "*.js" -exec sed -i "" "s+antd/es/+antd/lib/+g" {} +
+find ./cjs -name "*.js" -exec sed -i.bak "s+antd/es/+antd/lib/+g" {} +
 ESM=1 babel --extensions ".tsx,.jsx,.js" -d ./esm ./modules
 cp ./modules/index.d.ts ./cjs/index.d.ts
 cp ./modules/index.d.ts ./esm/index.d.ts
