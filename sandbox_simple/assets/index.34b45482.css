@@ -1,0 +1,532 @@
+/******************************************************************************/
+/** MAIN ********************************************************************/
+/******************************************************************************/
+.qb-drag-handler, .qb-draggable, .query-builder {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.rule--header:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.query-builder {
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.25;
+  margin: 1rem;
+}
+
+.group {
+  background: rgba(250, 240, 210, 0.5);
+  border: 1px solid #DCC896;
+}
+
+.rule {
+  background-color: white;
+  border: 1px solid transparent;
+  padding: 10px;
+}
+
+.rule-with-error .rule {
+  border: 1px solid #e0a1a1;
+}
+
+.rule--body {
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.rule--body--wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.rule--error {
+  color: red;
+  margin-bottom: -5px;
+  margin-top: 5px;
+}
+
+.group-or-rule {
+  border-radius: 5px;
+  position: relative;
+}
+
+.rule_group {
+  background: rgba(255, 252, 242, 0.5);
+  border: 1px solid #f9f1dd;
+}
+
+.locked {
+  border: 1px dashed red;
+}
+
+.qb-placeholder {
+  border: 1px dashed gray;
+}
+
+/******************************************************************************/
+/** DRAG *********************************************************************/
+/******************************************************************************/
+.query-builder.qb-dragging {
+  cursor: -webkit-grabbing !important;
+  cursor: grabbing !important;
+}
+.query-builder.qb-dragging button {
+  pointer-events: none;
+}
+
+.qb-draggable {
+  pointer-events: none;
+  position: absolute;
+  opacity: 0.7;
+  z-index: 1000;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.qb-drag-handler {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+/******************************************************************************/
+/** TREE LINES *********************************************************************/
+/******************************************************************************/
+.group--header:not(.no--children):not(.hide--conjs) {
+  position: relative;
+}
+.group--header:not(.no--children):not(.hide--conjs)::before {
+  z-index: 0;
+  content: "";
+  position: absolute;
+  border-width: 0 0 0 2px;
+  border-color: #ccc;
+  border-style: solid;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.group--header:not(.no--children):not(.hide--conjs).hide--line::before {
+  border-color: rgba(128, 128, 128, 0.1);
+}
+.group--header:not(.no--children):not(.hide--conjs)::before {
+  top: 20px;
+  height: calc(100% + 10px - 20px);
+  left: 11px;
+  width: 13px;
+}
+
+.group--children > .group-or-rule-container > .group-or-rule::before {
+  border-width: 0 0 2px 2px;
+}
+.group--children > .group-or-rule-container > .group-or-rule::after {
+  border-width: 0 0 0 2px;
+}
+.group--children > .group-or-rule-container > .group-or-rule::before, .group--children > .group-or-rule-container > .group-or-rule::after {
+  content: "";
+  position: absolute;
+  border-color: #ccc;
+  border-style: solid;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.group--children > .group-or-rule-container > .group-or-rule::before {
+  top: -1px;
+  height: calc(50% + 1px + 1px);
+}
+.group--children > .group-or-rule-container > .group-or-rule::after {
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 10px + 2px);
+}
+.group--children > .group-or-rule-container > .group-or-rule::before, .group--children > .group-or-rule-container > .group-or-rule::after {
+  left: -14px;
+  width: 13px;
+}
+.group--children > .group-or-rule-container:last-child > .group-or-rule::before {
+  border-radius: 0 0 0 4px;
+}
+.group--children > .group-or-rule-container:last-child > .group-or-rule::after {
+  display: none;
+}
+.group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+.group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: 4px 0 0 0;
+  border-width: 2px 0 0 2px;
+}
+.group--children.hide--conjs > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - 1px);
+  height: calc(50% + 1px + 10px + 2px);
+}
+.group--children.hide--line > .group-or-rule-container > .group-or-rule::before, .group--children.hide--line > .group-or-rule-container > .group-or-rule::after {
+  border-color: rgba(128, 128, 128, 0.1);
+}
+
+.rule_group--children > .group-or-rule-container:first-child > .group-or-rule::before {
+  display: none;
+}
+.rule_group--children > .group-or-rule-container:first-child > .group-or-rule::after {
+  border-radius: 4px 0 0 0;
+  border-width: 2px 0 0 2px;
+}
+.rule_group--children > .group-or-rule-container:first-child > .group-or-rule::after {
+  top: calc(50% - 1px);
+  height: calc(50% + 1px + 5px + 2px);
+}
+.rule_group--children > .group-or-rule-container > .group-or-rule::before {
+  top: -1px;
+  height: calc(50% + 1px + 1px);
+}
+.rule_group--children > .group-or-rule-container > .group-or-rule::after {
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 5px + 2px);
+}
+.rule_group--children > .group-or-rule-container > .group-or-rule::before, .rule_group--children > .group-or-rule-container > .group-or-rule::after {
+  left: -11px;
+  width: 10px;
+}
+
+.switch_group > .group--children > .group-or-rule-container > .group-or-rule::before {
+  top: -2px;
+  height: calc(50% + 1px + 2px);
+}
+.switch_group > .group--children > .group-or-rule-container > .group-or-rule::after {
+  top: calc(50% + 1px);
+  height: calc(50% - 1px + 10px + 4px);
+}
+.switch_group > .group--children > .group-or-rule-container > .group-or-rule::before, .switch_group > .group--children > .group-or-rule-container > .group-or-rule::after {
+  left: -15px;
+  width: 13px;
+}
+.switch_group > .group--header:not(.no--children):not(.hide--conjs)::before {
+  top: 20px;
+  height: calc(100% + 10px - 20px);
+  left: 11px;
+  width: 13px;
+}
+
+.qb-draggable::before, .qb-draggable::after {
+  display: none;
+}
+
+/******************************************************************************/
+/** GROUP *********************************************************************/
+/******************************************************************************/
+.group--header,
+.group--footer {
+  display: flex;
+  align-items: stretch;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.group-or-rule-container {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
+}
+.group-or-rule-container:first-child {
+  margin-top: 0px !important;
+}
+.group-or-rule-container:last-child {
+  margin-bottom: 0px !important;
+}
+
+.group--drag-handler {
+  margin-right: 8px;
+  margin-top: 3px;
+  position: relative;
+  align-self: center;
+}
+
+.group--conjunctions {
+  flex-shrink: 0;
+  display: flex;
+}
+.group--conjunctions .group--drag-handler {
+  margin-left: 10px;
+}
+
+.group--children {
+  padding-left: 24px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.group--children .group--field--count--rule {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.group--conjunctions.hide--conj {
+  opacity: 0.3;
+}
+
+.group--actions {
+  margin-left: 10px;
+  flex: 1;
+  display: flex;
+}
+.group--actions--tl, .group--actions--bl {
+  justify-content: flex-start;
+}
+.group--actions--tl {
+  margin-left: 20px;
+}
+.group--actions--tc, .group--actions--bc {
+  justify-content: center;
+}
+.group--actions--tr, .group--actions--br {
+  justify-content: flex-end;
+}
+
+/******************************************************************************/
+/** CASE_GROUP *********************************************************************/
+/******************************************************************************/
+.case_group {
+  border-width: 2px;
+}
+
+.case_group--body {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.case_group--body .case_group--children {
+  flex: auto;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.case_group--body .case_group--value {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 10px;
+}
+
+/******************************************************************************/
+/** RULE_GROUP *********************************************************************/
+/******************************************************************************/
+.rule_group {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 10px;
+}
+.rule_group .group--field {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  align-self: center;
+}
+.rule_group .group--actions {
+  margin-left: 10px;
+  align-self: center;
+  flex: 0;
+}
+.rule_group .rule_group--children {
+  flex: 1;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-left: 18px;
+}
+.rule_group .rule_group--children .group-or-rule-container {
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-right: 5px;
+}
+.rule_group .rule_group--children.one--child {
+  padding-left: 9px;
+}
+
+/******************************************************************************/
+/** RULE_GROUP_EXT *********************************************************************/
+/******************************************************************************/
+.rule_group_ext .group--actions {
+  flex: none;
+}
+
+.group--header.hide--drag.with--conjs > .group--field--count--rule {
+  margin-left: 20px;
+}
+
+/******************************************************************************/
+/** RULE **********************************************************************/
+/******************************************************************************/
+.rule {
+  flex: 1;
+  display: flex;
+}
+
+.rule--header {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.rule--drag-handler {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.rule--field, .group--field, .rule--operator, .rule--value, .rule--operator-options, .rule--widget, .widget--widget, .widget--valuesrc, .widget--sep, .operator--options--sep, .rule--before-widget, .rule--after-widget {
+  display: inline-block;
+}
+
+.widget--sep, .operator--options--sep, .rule--func--bracket-before, .rule--func--bracket-after, .rule--func--arg-sep {
+  vertical-align: bottom;
+  align-self: flex-end;
+  margin-bottom: 3px;
+}
+
+.operator--options {
+  display: flex;
+}
+
+.rule--value {
+  display: flex;
+}
+
+.rule--widget {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
+  margin-left: 10px;
+}
+
+.widget--valuesrc {
+  vertical-align: top;
+  margin-right: -8px;
+}
+
+.operator--options--sep {
+  margin-right: 10px;
+}
+
+.rule--operator-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rule--operator-text-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+div.tooltip-inner {
+  max-width: 500px;
+}
+
+.rule--field label, .group--field label, .rule--operator label, .widget--widget label {
+  display: block;
+  font-weight: bold;
+}
+
+/******************************************************************************/
+/** FUNC **********************************************************************/
+/******************************************************************************/
+.rule--func--wrapper, .rule--func, .rule--func--args, .rule--func--arg, .rule--func--arg-value, .rule--func--bracket-before, .rule--func--bracket-after, .rule--func--arg-sep, .rule--func--arg-label, .rule--func--arg-label-sep {
+  display: inline-block;
+}
+
+.rule--func--wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.rule--func--args {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.rule--func--arg {
+  display: flex;
+}
+
+.rule--func--bracket-before, .rule--func--bracket-after {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.rule--func--bracket-before {
+  margin-left: 5px;
+}
+
+.rule--func--arg-value > .rule--widget {
+  margin-left: -10px;
+}
+
+.rule--func--arg-sep {
+  margin-left: 3px;
+  margin-right: 6px;
+}
+
+.rule--func--arg-label-sep {
+  margin-left: 1px;
+  margin-right: 6px;
+}
+
+/******************************************************************************/
+/** Minimalism ****************************************************************/
+/******************************************************************************/
+.qb-lite .group--drag-handler, .qb-lite .group--actions {
+  transition: opacity 0.2s;
+}
+.qb-lite .group--header:hover .group--header .group--drag-handler, .qb-lite .group--header:hover .group--header .group--actions,
+.qb-lite .group--header:not(:hover) .group--drag-handler,
+.qb-lite .group--header:not(:hover) .group--actions,
+.qb-lite .rule_group:not(:hover) .group--drag-handler,
+.qb-lite .rule_group:not(:hover) .group--actions {
+  opacity: 0;
+}
+.qb-lite .widget--valuesrc, .qb-lite .rule--drag-handler, .qb-lite .rule--header {
+  transition: opacity 0.2s;
+}
+.qb-lite .rule:hover .rule .widget--valuesrc, .qb-lite .rule:hover .rule .rule--drag-handler, .qb-lite .rule:hover .rule .rule--header,
+.qb-lite .rule:not(:hover) .widget--valuesrc,
+.qb-lite .rule:not(:hover) .rule--drag-handler,
+.qb-lite .rule:not(:hover) .rule--header {
+  opacity: 0;
+}
+.qb-lite.qb-dragging .widget--valuesrc, .qb-lite.qb-dragging .rule--drag-handler, .qb-lite.qb-dragging .rule--header, .qb-lite.qb-dragging .group--drag-handler, .qb-lite.qb-dragging .group--actions {
+  opacity: 0 !important;
+}
+
+/******************************************************************************/
+/** Shrink textarea ***********************************************************/
+/******************************************************************************/
+.rule--body.can--shrink--value {
+  align-items: center;
+}
+.rule--body.can--shrink--value .rule--value {
+  flex: 1;
+}
+.rule--body.can--shrink--value .rule--value > .rule--widget {
+  flex: 1;
+}
+.rule--body.can--shrink--value .rule--value > .rule--widget > .widget--valuesrc {
+  display: flex;
+  align-items: center;
+}
+.rule--body.can--shrink--value .rule--value > .rule--widget .widget--widget {
+  flex: 1;
+}
