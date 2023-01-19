@@ -44,6 +44,7 @@ You will see demo app with hot reload of demo code and local library code.
   - [`demo_switch`](/packages/examples/demo_switch) - Demo of ternary mode (switch/case) for SpEL
 - [`packages/sandbox`](/packages/sandbox) - Demo app with hot reload of only demo code (uses latest version of library from npm), uses TS, uses AntDesign widgets.
 - [`packages/sandbox_simple`](/packages/sandbox_simple) - Demo app with hot reload of only demo code (uses latest version of library from npm), not uses TS, uses vanilla widgets.
+- [`packages/sandbox_next`](/packages/sandbox_next) - Demo app on Next.js with SSR, simple server-side query storage and export
 - [`packages/tests`](/packages/tests) - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts

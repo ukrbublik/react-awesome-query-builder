@@ -124,8 +124,9 @@ See [API](#api) and [config](#config-format) for documentation.
 ## Demo apps
 
 - [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses AntDesign widgets.
+- [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses MUI widgets.
 - [`pnpm sandbox-js`](/packages/sandbox_simple) - simple demo app, built with Vite, not uses TS, uses vanilla widgets.
+- [`pnpm sandbox-next`](/packages/sandbox_next) - simple demo app with server side, built with Next.js, uses TS, uses MUI widgets.
 
 
 ## Usage

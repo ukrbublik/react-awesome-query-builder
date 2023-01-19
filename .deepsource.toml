@@ -5,6 +5,7 @@ test_patterns = ["tests/**"]
 exclude_patterns = [
   "packages/sandbox/**",
   "packages/sandbox_simple/**",
+  "packages/sandbox_next/**",
   "scripts/**"
 ]
 

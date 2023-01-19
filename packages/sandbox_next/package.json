@@ -1,24 +1,24 @@
 {
-  "name": "@react-awesome-query-builder/sandbox",
+  "name": "@react-awesome-query-builder/sandbox-next",
   "version": "6.1.1",
   "description": "Demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
     "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
-    "directory": "packages/sandbox"
+    "directory": "packages/sandbox_next"
   },
   "license": "MIT",
   "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
-  "main": "src/index.tsx",
+  "main": "pages/index.tsx",
   "scripts": {
-    "build": "tsc && vite build --mode dev --debug",
-    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./src/",
-    "lint": "npm run eslint && npm run tsc",
-    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./src/",
-    "preview": "vite preview",
-    "start": "vite",
+    "build": "tsc && next build",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./pages/ ./components/ ./lib/",
+    "lint": "npm run eslint && npm run tsc && next lint",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./pages/ ./components/ ./lib/",
     "tsc": "tsc -p . --noEmit",
-    "preinstall": "node ./scripts/patch-versions.js"
+    "preinstall": "node ./scripts/patch-versions.js",
+    "start": "PORT=3002 next dev",
+    "preview": "PORT=3002 next start"
   },
   "browserslist": {
     "production": [
@@ -33,7 +33,6 @@
     ]
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.4",
@@ -41,9 +40,8 @@
     "@mui/material": "^5.2.4",
     "@mui/system": "^5.2.4",
     "@mui/x-date-pickers": "^5.0.0-beta.6",
-    "@react-awesome-query-builder/antd": "workspace:^",
+    "@react-awesome-query-builder/core": "workspace:^",
     "@react-awesome-query-builder/mui": "workspace:^",
-    "antd": "^5.1.2",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
@@ -53,10 +51,11 @@
     "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.18",
-    "@vitejs/plugin-react": "^2.0.1",
+    "next": "^12.3.2",
+    "@next/eslint-plugin-next": "^13.1.2",
+    "iron-session": "^6.3.1",
     "sass": "^1.35.0",
-    "typescript": "~4.9.4",
-    "vite": "^3.0.9"
+    "typescript": "~4.9.4"
   },
   "readme": "README.md"
 }

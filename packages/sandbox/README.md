@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/sandbox.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/sandbox)
 
 Demo app built with `vite`.
-Uses AntDesign widgets by default.  
+Uses MUI widgets by default.  
 **Uses TypeScript.**
 
 ### Preview

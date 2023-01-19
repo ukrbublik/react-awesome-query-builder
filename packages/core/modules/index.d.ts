@@ -19,9 +19,7 @@ type Optional<T> = {
   [P in keyof T]?: T[P];
 }
 
-type TypedMap<T> = {
-  [key: string]: T;
-}
+type TypedMap<T> = Record<string, T>;
 
 // You can not use a union for types on a key, but can define overloaded accessors of different types.
 // Key can be a string OR number
@@ -603,8 +601,8 @@ interface TreeItem extends ListItem {
 type TreeData = Array<TreeItem>;
 type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
-type AsyncFetchListValues = ListValues;
-interface AsyncFetchListValuesResult {
+export type AsyncFetchListValues = ListValues;
+export interface AsyncFetchListValuesResult {
   values: AsyncFetchListValues,
   hasMore?: boolean,
 }
@@ -710,7 +708,7 @@ interface FieldGroupExt extends BaseField {
 }
 
 export type Field = SimpleField;
-type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
+export type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
 
