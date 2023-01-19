@@ -1,6 +1,6 @@
 import React from "react";
 import { createConfig } from "../../lib/config";
-import { MuiConfig, Config, FieldOrGroup, Utils, AsyncFetchListValuesResult } from "@react-awesome-query-builder/mui";
+import { MuiConfig, Config, FieldOrGroup, AsyncFetchListValuesResult } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
 import { ruRU } from "@mui/material/locale";
 
