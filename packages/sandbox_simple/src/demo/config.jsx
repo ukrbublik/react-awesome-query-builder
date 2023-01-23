@@ -15,7 +15,6 @@ const fields = {
       firstName: {
         label2: "Username", //only for menu's toggler
         type: "text",
-        excludeOperators: ["proximity"],
         mainWidgetProps: {
           valueLabel: "Name",
           valuePlaceholder: "Enter name",
@@ -28,7 +27,6 @@ const fields = {
       },
       login: {
         type: "text",
-        excludeOperators: ["proximity"],
         fieldSettings: {
           validateValue: (val, fieldSettings) => {
             return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
@@ -131,48 +129,6 @@ const fields = {
       allowCustomValues: true
     },
   },
-  selecttree: {
-    label: "Color (tree)",
-    type: "treeselect",
-    fieldSettings: {
-      treeExpandAll: true,
-      listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
-      ],
-    }
-  },
-  multiselecttree: {
-    label: "Colors (tree)",
-    type: "treemultiselect",
-    fieldSettings: {
-      treeExpandAll: true,
-      listValues: [
-        { value: "1", title: "Warm colors", children: [
-          { value: "2", title: "Red" }, 
-          { value: "3", title: "Orange" }
-        ] },
-        { value: "4", title: "Cool colors", children: [
-          { value: "5", title: "Green" }, 
-          { value: "6", title: "Blue", children: [
-            { value: "7", title: "Sub blue", children: [
-              { value: "8", title: "Sub sub blue and a long text" }
-            ] }
-          ] }
-        ] }
-      ]
-    }
-  },
   stock: {
     label: "In stock",
     type: "boolean",
@@ -235,12 +191,6 @@ const widgets = {
     dateFormat: "DD.MM.YYYY",
     valueFormat: "YYYY-MM-DD HH:mm:ss",
   },
-  treeselect: {
-    ...InitialConfig.widgets.treeselect,
-    customProps: {
-      showSearch: true
-    }
-  },
 };
 
 
@@ -301,10 +251,6 @@ const settings = {
       label: "Field",
       widget: "field",
     },
-    func: {
-      label: "Function",
-      widget: "func",
-    }
   },
   // canReorder: false,
   // canRegroup: false,
@@ -312,15 +258,10 @@ const settings = {
   // showLabels: true,
   maxNesting: 3,
   canLeaveEmptyGroup: true, //after deletion
-    
-  // renderField: (props) => <FieldCascader {...props} />,
-  // renderOperator: (props) => <FieldDropdown {...props} />,
-  // renderFunc: (props) => <FieldSelect {...props} />,
+
 };
 
 const funcs = {};
-
-
 
 const config = {
   conjunctions,

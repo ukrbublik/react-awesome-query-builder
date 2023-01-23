@@ -3,7 +3,6 @@ import React, {Component} from "react";
 import {
   Utils, Query, Builder
 } from "@react-awesome-query-builder/ui";
-import throttle from "lodash/throttle";
 import loadedConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
@@ -79,9 +78,9 @@ export default class DemoQueryBuilder extends Component {
     const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
   };
 
-  updateResult = throttle(() => {
+  updateResult = () => {
     this.setState({tree: this.immutableTree, config: this.config});
-  }, 100);
+  };
 
   renderResult = ({tree: immutableTree, config}) => {
     const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
