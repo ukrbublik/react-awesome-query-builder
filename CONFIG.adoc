@@ -195,6 +195,7 @@ Example:
   By default, if nested field is selected (eg. `name` of `user` in example above), `<FieldDropdown>` component will show `name`. +
   Just `name` can be confusing, so can be overriden by setting `label2` to something like `User name`. +
   As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
+|fieldName | | |By default field name for export is constructed from current feild key and ancestors keys joined by `settings.fieldSeparator`. You can override this by specifying `fieldName`
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
