@@ -1,12 +1,12 @@
-# @react-awesome-query-builder/sandbox-mnext
+# @react-awesome-query-builder/sandbox-next
 
 [![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/sandbox-next.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/sandbox-next)
 
 Demo app built with `Next.js`.  
 Uses MUI widgets by default.  
-Contains simple server API to store and load query value from session, see[`pages/api/tree.ts`](/pages/api/tree.ts).  
-Contains exmaple of server API for autocomplete, see[`pages/api/autocomplete.ts`](/pages/api/autocomplete.ts), used on client side with [asyncFetch](/components/demo/config.tsx).  
-See [getServerSideProps](/pages/index.tsx) as example for enabling SSR.  
+Contains simple server API to store and load query value from session, see[`pages/api/tree.ts`](pages/api/tree.ts).  
+Contains exmaple of server API for autocomplete, see[`pages/api/autocomplete.ts`](pages/api/autocomplete.ts), used on client side with [asyncFetch](components/demo/config.tsx).  
+See [getServerSideProps](pages/index.tsx) as example for enabling SSR.  
 
 ### Run locally
 From the root of cloned repository:

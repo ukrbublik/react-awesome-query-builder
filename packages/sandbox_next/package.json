@@ -48,14 +48,20 @@
   },
   "devDependencies": {
     "@babel/core": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "@babel/preset-typescript": "^7.14.5",
     "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.18",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-import": "^1.13.3",
     "next": "^12.3.2",
     "@next/eslint-plugin-next": "^13.1.2",
     "iron-session": "^6.3.1",
     "sass": "^1.35.0",
-    "typescript": "~4.9.4"
+    "typescript": "~4.9.4",
+    "webpack": "^5.61.0"
   },
   "readme": "README.md"
 }

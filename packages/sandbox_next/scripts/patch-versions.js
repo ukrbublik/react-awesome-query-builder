@@ -7,6 +7,7 @@ const isInWorkspace = path.basename(PACKAGES) === 'packages';
 const isInSandbox = process.env['HOME'].indexOf('/sandbox') !== -1;
 
 if (isInSandbox || !isInWorkspace) {
+  const ESLINT_RC = path.resolve(PACKAGE, './.eslintrc.js');
   const PACKAGE_JSON = path.resolve(PACKAGE, './package.json');
   const pjson = require(PACKAGE_JSON);
   for (const k in pjson['dependencies']) {
@@ -16,4 +17,7 @@ if (isInSandbox || !isInWorkspace) {
   }
   const pjsonStr = JSON.stringify(pjson, null, 2);
   fs.writeFileSync(PACKAGE_JSON, pjsonStr);
+  if (fs.existsSync(ESLINT_RC)) {
+    fs.unlinkSync(ESLINT_RC);
+  }
 }

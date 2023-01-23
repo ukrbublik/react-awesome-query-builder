@@ -3,7 +3,7 @@ import React, {Component} from "react";
 import {
   Utils, Query, Builder,
   //types:
-  BuilderProps, ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
+  BuilderProps, ImmutableTree, Config, JsonTree
 } from "@react-awesome-query-builder/mui";
 import { PostResult, GetResult } from "../../pages/api/tree";
 import loadedConfig from "./config";
