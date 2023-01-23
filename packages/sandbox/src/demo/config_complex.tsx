@@ -3,13 +3,20 @@ import React from "react";
 import merge from "lodash/merge";
 import {
   Utils, BasicConfig,
-  MuiConfig,
+  AntdConfig, AntdWidgets,
   // types:
-  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs,
-} from "@react-awesome-query-builder/mui";
-import { ruRU } from "@mui/material/locale";
-import "@react-awesome-query-builder/mui/css/styles.scss";
-const InitialConfig = MuiConfig;
+  Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
+} from "@react-awesome-query-builder/antd";
+import ru_RU from "antd/es/locale/ru_RU";
+//import "antd/dist/antd.css"; // for v4
+import "@react-awesome-query-builder/antd/css/styles.scss";
+const {
+  FieldSelect,
+  FieldDropdown,
+  FieldCascader,
+  FieldTreeSelect,
+} = AntdWidgets;
+const InitialConfig = AntdConfig;
 
 const { simulateAsyncFetch } = Utils.Autocomplete;
 
@@ -43,18 +50,19 @@ const fields: Fields = {
         label2: "Username", //only for menu's toggler
         type: "text",
         excludeOperators: ["proximity"],
-        mainWidgetProps: {
-          valueLabel: "Name",
-          valuePlaceholder: "Enter name",
-        },
         fieldSettings: {
           validateValue: (val: string, fieldSettings) => {
             return (val.length < 10);
           },
         },
+        mainWidgetProps: {
+          valueLabel: "Name",
+          valuePlaceholder: "Enter name",
+        },
       },
       login: {
         type: "text",
+        tableName: "t1", // legacy: PR #18, PR #20
         excludeOperators: ["proximity"],
         fieldSettings: {
           validateValue: (val: string, fieldSettings) => {
@@ -68,6 +76,12 @@ const fields: Fields = {
       }
     }
   },
+  prox1: {
+    label: "prox",
+    tooltip: "Proximity search",
+    type: "text",
+    operators: ["proximity"],
+  },
   num: {
     label: "Number",
     type: "number",
@@ -76,6 +90,7 @@ const fields: Fields = {
       min: -1,
       max: 5
     },
+    funcs: ["LINEAR_REGRESSION"],
   },
   slider: {
     label: "Slider",
@@ -127,6 +142,13 @@ const fields: Fields = {
     type: "select",
     valueSources: ["value"],
     fieldSettings: {
+      // * old format:
+      // listValues: {
+      //     yellow: 'Yellow',
+      //     green: 'Green',
+      //     orange: 'Orange'
+      // },
+      // * new format:
       listValues: [
         { value: "yellow", title: "Yellow" },
         { value: "green", title: "Green" },
@@ -156,34 +178,38 @@ const fields: Fields = {
         orange: "Orange"
       },
       allowCustomValues: true
-    },
+    }
   },
   selecttree: {
     label: "Color (tree)",
     type: "treeselect",
     fieldSettings: {
       treeExpandAll: true,
+      // * deep format (will be auto converted to flat format):
+      // listValues: [
+      //     { value: "1", title: "Warm colors", children: [
+      //         { value: "2", title: "Red" }, 
+      //         { value: "3", title: "Orange" }
+      //     ] },
+      //     { value: "4", title: "Cool colors", children: [
+      //         { value: "5", title: "Green" }, 
+      //         { value: "6", title: "Blue", children: [
+      //             { value: "7", title: "Sub blue", children: [
+      //                 { value: "8", title: "Sub sub blue and a long text" }
+      //             ] }
+      //         ] }
+      //     ] }
+      // ],
+      // * flat format:
       listValues: [
-        {
-          value: "1", title: "Warm colors", children: [
-            { value: "2", title: "Red" },
-            { value: "3", title: "Orange" }
-          ]
-        },
-        {
-          value: "4", title: "Cool colors", children: [
-            { value: "5", title: "Green" },
-            {
-              value: "6", title: "Blue", children: [
-                {
-                  value: "7", title: "Sub blue", children: [
-                    { value: "8", title: "Sub sub blue and a long text" }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+        { value: "1", title: "Warm colors" },
+        { value: "2", title: "Red", parent: "1" },
+        { value: "3", title: "Orange", parent: "1" },
+        { value: "4", title: "Cool colors" },
+        { value: "5", title: "Green", parent: "4" },
+        { value: "6", title: "Blue", parent: "4" },
+        { value: "7", title: "Sub blue", parent: "6" },
+        { value: "8", title: "Sub sub blue and a long text", parent: "7" },
       ],
     }
   },
@@ -259,21 +285,54 @@ const conjunctions: Conjunctions = {
   OR: InitialConfig.conjunctions.OR,
 };
 
+
+const proximity: OperatorProximity = {
+  ...InitialConfig.operators.proximity,
+  valueLabels: [
+    { label: "Word 1", placeholder: "Enter first word" },
+    { label: "Word 2", placeholder: "Enter second word" },
+  ],
+  textSeparators: [
+    //'Word 1',
+    //'Word 2'
+  ],
+  options: {
+    ...InitialConfig.operators.proximity.options,
+    optionLabel: "Near", // label on top of "near" selectbox (for config.settings.showLabels==true)
+    optionTextBefore: "Near", // label before "near" selectbox (for config.settings.showLabels==false)
+    optionPlaceholder: "Select words between", // placeholder for "near" selectbox
+    minProximity: 2,
+    maxProximity: 10,
+    defaults: {
+      proximity: 2
+    },
+    customProps: {}
+  }
+};
+
 const operators: Operators = {
   ...InitialConfig.operators,
   // examples of  overriding
   between: {
     ...InitialConfig.operators.between,
+    valueLabels: [
+      "Value from",
+      "Value to"
+    ],
     textSeparators: [
       "from",
       "to"
     ],
   },
+  proximity,
 };
 
 const widgets: Widgets = {
   ...InitialConfig.widgets,
   // examples of  overriding
+  text: {
+    ...InitialConfig.widgets.text,
+  },
   slider: {
     ...InitialConfig.widgets.slider,
     customProps: {
@@ -301,6 +360,12 @@ const widgets: Widgets = {
     timeFormat: "HH:mm",
     dateFormat: "DD.MM.YYYY",
     valueFormat: "YYYY-MM-DD HH:mm:ss",
+  },
+  func: {
+    ...InitialConfig.widgets.func,
+    customProps: {
+      showSearch: true
+    }
   },
   treeselect: {
     ...InitialConfig.widgets.treeselect,
@@ -330,7 +395,7 @@ const types: Types = {
 const localeSettings: LocaleSettings = {
   locale: {
     moment: "ru",
-    mui: ruRU,
+    antd: ru_RU,
   },
   valueLabel: "Value",
   valuePlaceholder: "Value",
@@ -381,10 +446,56 @@ const settings: Settings = {
   maxNesting: 3,
   canLeaveEmptyGroup: true, //after deletion
 
+  // renderField: (props) => <FieldCascader {...props} />,
+  // renderOperator: (props) => <FieldDropdown {...props} />,
+  // renderFunc: (props) => <FieldSelect {...props} />,
 };
 
-const funcs: Funcs = {};
 
+const funcs: Funcs = {
+  LOWER: {
+    label: "Lowercase",
+    mongoFunc: "$toLower",
+    jsonLogic: ({ str }) => ({ "method": [str, "toLowerCase"] }),
+    returnType: "text",
+    args: {
+      str: {
+        label: "String",
+        type: "text",
+        valueSources: ["value", "field"],
+      },
+    }
+  },
+  LINEAR_REGRESSION: {
+    label: "Linear regression",
+    returnType: "number",
+    formatFunc: ({ coef, bias, val }, _) => `(${coef} * ${val} + ${bias})`,
+    sqlFormatFunc: ({ coef, bias, val }) => `(${coef} * ${val} + ${bias})`,
+    mongoFormatFunc: ({ coef, bias, val }) => ({ "$sum": [{ "$multiply": [coef, val] }, bias] }),
+    jsonLogic: ({ coef, bias, val }) => ({ "+": [{ "*": [coef, val] }, bias] }),
+    renderBrackets: ["", ""],
+    renderSeps: [" * ", " + "],
+    args: {
+      coef: {
+        label: "Coef",
+        type: "number",
+        defaultValue: 1,
+        valueSources: ["value"],
+      },
+      val: {
+        label: "Value",
+        type: "number",
+        valueSources: ["value"],
+      },
+      bias: {
+        label: "Bias",
+        type: "number",
+        defaultValue: 0,
+        valueSources: ["value"],
+      }
+    }
+  },
+};
 
 
 const config: Config = {

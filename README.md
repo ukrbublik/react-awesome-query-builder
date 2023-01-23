@@ -16,7 +16,7 @@
 [![bootstrap](https://img.shields.io/badge/skin-Bootstrap-blue?logo=Bootstrap)](https://reactstrap.github.io/)
 [![fluent](https://img.shields.io/badge/skin-Fluent%20UI-blue?logo=Microsoft%20Office)](https://developer.microsoft.com/en-us/fluentui)
 [![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/)
-[![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox?file=/src/demo/config_simple.tsx)
+[![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox?file=/src/demo/config.tsx)
 [![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple?file=/src/demo/config.jsx)
 
 

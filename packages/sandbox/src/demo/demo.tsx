@@ -6,7 +6,7 @@ import {
   BuilderProps, ImmutableTree, Config, JsonTree, JsonLogicTree
 } from "@react-awesome-query-builder/antd";
 import throttle from "lodash/throttle";
-import loadedConfig from "./config_simple"; // <- you can try './config' for more complex examples
+import loadedConfig from "./config"; // <- you can try './config_complex'
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 const stringify = JSON.stringify;
