@@ -4,7 +4,7 @@ import {
   Utils, Query, Builder
 } from "@react-awesome-query-builder/ui";
 import throttle from "lodash/throttle";
-import loadedConfig from "./config_simple"; // <- you can try './config_complex' for more complex examples
+import loadedConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 const stringify = JSON.stringify;
