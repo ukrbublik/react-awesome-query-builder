@@ -519,7 +519,7 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
         }
         return v.valueType;
       }),
-      asyncListValues,
+      ...(asyncListValues ? {asyncListValues} : {}),
     }
   };
 

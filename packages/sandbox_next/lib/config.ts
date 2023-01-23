@@ -70,10 +70,6 @@ export function createConfig(InitialConfig: CoreConfig): Config {
         min: 0,
         max: 100,
         step: 1,
-        // marks: {
-        //   0: <strong>0%</strong>,
-        //   100: <strong>100%</strong>
-        // },
       },
       //overrides
       widgets: {
@@ -142,64 +138,6 @@ export function createConfig(InitialConfig: CoreConfig): Config {
         allowCustomValues: true
       },
     },
-    // selecttree: {
-    //   label: "Color (tree)",
-    //   type: "treeselect",
-    //   fieldSettings: {
-    //     treeExpandAll: true,
-    //     listValues: [
-    //       {
-    //         value: "1", title: "Warm colors", children: [
-    //           { value: "2", title: "Red" },
-    //           { value: "3", title: "Orange" }
-    //         ]
-    //       },
-    //       {
-    //         value: "4", title: "Cool colors", children: [
-    //           { value: "5", title: "Green" },
-    //           {
-    //             value: "6", title: "Blue", children: [
-    //               {
-    //                 value: "7", title: "Sub blue", children: [
-    //                   { value: "8", title: "Sub sub blue and a long text" }
-    //                 ]
-    //               }
-    //             ]
-    //           }
-    //         ]
-    //       }
-    //     ],
-    //   }
-    // },
-    // multiselecttree: {
-    //   label: "Colors (tree)",
-    //   type: "treemultiselect",
-    //   fieldSettings: {
-    //     treeExpandAll: true,
-    //     listValues: [
-    //       {
-    //         value: "1", title: "Warm colors", children: [
-    //           { value: "2", title: "Red" },
-    //           { value: "3", title: "Orange" }
-    //         ]
-    //       },
-    //       {
-    //         value: "4", title: "Cool colors", children: [
-    //           { value: "5", title: "Green" },
-    //           {
-    //             value: "6", title: "Blue", children: [
-    //               {
-    //                 value: "7", title: "Sub blue", children: [
-    //                   { value: "8", title: "Sub sub blue and a long text" }
-    //                 ]
-    //               }
-    //             ]
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   }
-    // },
     stock: {
       label: "In stock",
       type: "boolean",
@@ -214,7 +152,6 @@ export function createConfig(InitialConfig: CoreConfig): Config {
       type: "select",
       valueSources: ["value"],
       fieldSettings: {
-        // asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
@@ -226,7 +163,6 @@ export function createConfig(InitialConfig: CoreConfig): Config {
       type: "multiselect",
       valueSources: ["value"],
       fieldSettings: {
-        // asyncFetch: simulatedAsyncFetch,
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
