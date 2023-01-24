@@ -492,4 +492,4 @@ export function createConfig(InitialConfig: BasicConfig): Config {
 
   return config;
   
-};
+}
