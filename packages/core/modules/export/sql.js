@@ -179,7 +179,7 @@ const formatRule = (item, config, meta) => {
   ];
 
   let ret;
-  ret = fn(...args);
+  ret = fn.call(config.ctx, ...args);
   if (isRev) {
     ret = config.settings.sqlFormatReverse(ret);
   }
@@ -219,7 +219,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
         args.push(valFieldDefinition);
       }
-      ret = fn(...args);
+      ret = fn.call(config.ctx, ...args);
     } else {
       if (Array.isArray(currentValue)) {
         ret = currentValue.map(v => SqlString.escape(v));
@@ -278,7 +278,7 @@ const formatFunc = (meta, config, currentValue) => {
     const args = [
       formattedArgs
     ];
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else {
     const argsStr = Object.entries(formattedArgs)
       .map(([k, v]) => v)

@@ -346,6 +346,8 @@ export function createConfig(InitialConfig: CoreConfig): Config {
     LOWER: BasicFuncs.LOWER,
   };
 
+  const ctx = InitialConfig.ctx;
+
   const config: Config = {
     conjunctions,
     operators,
@@ -353,7 +355,8 @@ export function createConfig(InitialConfig: CoreConfig): Config {
     types,
     settings,
     fields,
-    funcs
+    funcs,
+    ctx
   };
 
   return config;

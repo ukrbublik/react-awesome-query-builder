@@ -178,10 +178,17 @@ const settings = {
 
 //----------------------------
 
+const ctx = {
+  ...CoreConfig.ctx,
+};
+
+//----------------------------
+
 export default {
   conjunctions,
   operators,
   widgets,
   types,
   settings,
+  ctx,
 };

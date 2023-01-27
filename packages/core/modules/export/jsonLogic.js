@@ -264,7 +264,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
       args.push(operator);
       args.push(operatorDef);
     }
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else {
     ret = currentValue;
   }
@@ -307,7 +307,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const args = [
       formattedArgs,
     ];
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else {
     const funcName = funcConfig.jsonLogic || funcKey;
     const isMethod = !!funcConfig.jsonLogicIsMethod;
@@ -397,7 +397,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     operatorOptions,
     fieldDefinition,
   ];
-  let ruleQuery = fn(...args);
+  let ruleQuery = fn.call(config.ctx, ...args);
 
   if (isRev) {
     ruleQuery = { "!": ruleQuery };

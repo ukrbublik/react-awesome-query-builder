@@ -147,7 +147,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     if (newOperatorConfig && newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
       // last element in `valueError` list is for range validation error
       const jsValues = firstWidgetConfig && firstWidgetConfig.toJS 
-        ? newValue.toJS().map(v => firstWidgetConfig.toJS(v, firstWidgetConfig)) 
+        ? newValue.toJS().map(v => firstWidgetConfig.toJS.call(config.ctx, v, firstWidgetConfig)) 
         : newValue.toJS();
       const rangeValidateError = newOperatorConfig.validateValues(jsValues);
       if (showErrorMessage) {

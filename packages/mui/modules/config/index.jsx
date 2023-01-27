@@ -2,8 +2,6 @@ import React from "react";
 import MuiWidgets from "../widgets";
 import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 
-const { SqlString, stringifyForDisplay } = Utils.ExportUtils;
-
 
 const {
   MuiBooleanWidget,
@@ -114,11 +112,11 @@ const widgets = {
       { label: "Number from", placeholder: "Enter number from" },
       { label: "Number to", placeholder: "Enter number to" },
     ],
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
+    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      return this.SqlString.escape(val);
     },
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),

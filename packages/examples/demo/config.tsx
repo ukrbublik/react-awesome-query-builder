@@ -606,8 +606,10 @@ export default (skin: string) => {
     ...BasicFuncs
   };
 
+  const ctx = InitialConfig.ctx;
 
   const config: Config = {
+    ctx,
     conjunctions,
     operators,
     widgets,

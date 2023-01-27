@@ -4,9 +4,6 @@ import { normalizeListValues } from "../utils/stuff";
 import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 import React from "react";
 
-const { getTitleInListValues } = Utils.ListUtils;
-const { SqlString, spelEscape, stringifyForDisplay } = Utils.ExportUtils;
-
 const {
   FieldSelect,
   FieldDropdown,
@@ -131,13 +128,13 @@ const widgets = {
       { label: "Number from", placeholder: "Enter number from" },
       { label: "Number to", placeholder: "Enter number to" },
     ],
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
+    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      return this.SqlString.escape(val);
     },
-    spelFormatValue: (val) => spelEscape(val),
+    spelFormatValue: function (val) { return this.spelEscape(val); },
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),
   },
@@ -148,14 +145,14 @@ const widgets = {
     factory: (props) => <TreeSelectWidget {...props} />,
     valueLabel: "Value",
     valuePlaceholder: "Select value",
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? stringifyForDisplay(valLabel) : JSON.stringify(val);
+    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+      let valLabel = this.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
+      return isForDisplay ? this.stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      return this.SqlString.escape(val);
     },
-    spelFormatValue: (val) => spelEscape(val),
+    spelFormatValue: function (val) { return this.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
   },
   treemultiselect: {
@@ -165,14 +162,14 @@ const widgets = {
     factory: (props) => <TreeSelectWidget {...props} treeMultiple={true} />,
     valueLabel: "Values",
     valuePlaceholder: "Select values",
-    formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-      let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(stringifyForDisplay) : vals.map(JSON.stringify);
+    formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
+      let valsLabels = vals.map(v => this.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
+      return isForDisplay ? valsLabels.map(this.stringifyForDisplay) : vals.map(JSON.stringify);
     },
-    sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {
-      return vals.map(v => SqlString.escape(v));
+    sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+      return vals.map(v => this.SqlString.escape(v));
     },
-    spelFormatValue: (val) => spelEscape(val),
+    spelFormatValue: function (val) { return this.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
   },
 };

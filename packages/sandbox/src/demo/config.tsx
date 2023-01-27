@@ -439,8 +439,10 @@ export function createConfig(InitialConfig: BasicConfig): Config {
     LOWER: BasicFuncs.LOWER,
   };
   
+  const ctx = InitialConfig.ctx;
   
   const config: Config = {
+    ctx,
     conjunctions,
     operators,
     widgets,

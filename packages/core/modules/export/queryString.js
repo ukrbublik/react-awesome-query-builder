@@ -212,7 +212,7 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     return args;
   } else {
     //format expr
-    let ret = fn(...args);
+    let ret = fn.call(config.ctx, ...args);
 
     //rev
     if (isRev) {
@@ -253,7 +253,7 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
         const valFieldDefinition = getFieldConfig(config, value) || {}; 
         args.push(valFieldDefinition);
       }
-      ret = fn(...args);
+      ret = fn.call(config.ctx, ...args);
     } else {
       ret = value;
     }
@@ -295,7 +295,7 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
-    const formattedArgVal = formatValue(
+    const formattedArgVal = formatValue.call(config.ctx,
       config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues
     );
     const argName = isForDisplay && argConfig.label || argKey;
@@ -312,7 +312,7 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
       formattedArgs,
       isForDisplay
     ];
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else {
     const argsStr = Object.entries(formattedArgsWithNames)
       .map(([k, v]) => (isForDisplay ? `${k}: ${v}` : `${v}`))

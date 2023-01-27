@@ -1,4 +1,3 @@
-import moment from "moment";
 
 const NOW = {
   label: "Now",
@@ -6,6 +5,7 @@ const NOW = {
   jsonLogic: "now",
   //todo: document option `jsonLogicCustomOps`
   //todo: add util to return all used custom ops to be added by user with `jsonLogic.add_operation`
+  //  `this` should be context containing `moment`, just like `config.ctx`
   jsonLogicCustomOps: {
     now: () => new Date(),
   },
@@ -35,7 +35,7 @@ const RELATIVE_DATETIME = {
     return [date, op, val, dim];
   },
   jsonLogicCustomOps: {
-    date_add: (date, val, dim) => moment(date).add(val, dim).toDate()
+    date_add: function (date, val, dim) { return this.moment(date).add(val, dim).toDate(); }
   },
   // MySQL
   //todo: other SQL dialects?

@@ -1,7 +1,6 @@
 import MaterialWidgets from "../widgets";
 import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 import React from "react";
-const { SqlString, spelEscape, stringifyForDisplay } = Utils.ExportUtils;
 
 
 const {
@@ -113,13 +112,15 @@ const widgets = {
       { label: "Number from", placeholder: "Enter number from" },
       { label: "Number to", placeholder: "Enter number to" },
     ],
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
+    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
     },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
+    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+      return this.SqlString.escape(val);
     },
-    spelFormatValue: (val) => spelEscape(val),
+    spelFormatValue: function (val) {
+      return this.spelEscape(val);
+    },
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),
   },

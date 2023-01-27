@@ -235,7 +235,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     operatorOptions,
     fieldDef,
   ];
-  let ruleQuery = fn(...args);
+  let ruleQuery = fn.call(config.ctx, ...args);
   if (wrapExpr) {
     ruleQuery = { "$expr": ruleQuery };
   }
@@ -273,7 +273,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         args.push(operator);
         args.push(operatorDef);
       }
-      ret = fn(...args);
+      ret = fn.call(config.ctx, ...args);
     } else {
       ret = currentValue;
     }
@@ -376,7 +376,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
     const args = [
       formattedArgs,
     ];
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else if (funcConfig.mongoFormatFunc === null) {
     meta.errors.push(`Functon ${funcName} is not supported`);
     return [undefined, false];

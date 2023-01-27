@@ -1,4 +1,5 @@
 import merge from "lodash/merge";
+import omit from "lodash/omit";
 import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
@@ -6,6 +7,7 @@ import moment from "moment";
 import {mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
+import serializeJs from "serialize-javascript";
 
 
 export const extendConfig = (config, configId) => {
@@ -354,4 +356,15 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   const valueFieldSettings = (valueSrc == "value" || !valueSrc) && fieldConfig && fieldConfig.fieldSettings || {}; // useful to take 'validateValue'
   const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
   return mergedConfig;
+};
+
+export const serializeConfig = (config) => {
+  let jsonConfig = serializeJs(omit(config, ["ctx"]));
+  return jsonConfig;
+};
+
+export const deserializeConfig = (jsonConfig, ctx) => {
+  let config = eval("("+jsonConfig+")");
+  config.ctx = ctx;
+  return config;
 };

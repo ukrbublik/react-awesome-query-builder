@@ -42,6 +42,7 @@ type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 
+type ConfigContext = Object;
 
 ////////////////
 // query value
@@ -189,6 +190,8 @@ export interface Utils {
     simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   };
   ConfigUtils: {
+    serializeConfig(config: Config): JsonConfig;
+    deserializeConfig(jsonConfig: JsonConfig, ctx: ConfigContext): Config;
     extendConfig(config: Config): Config;
     getFieldConfig(config: Config, field: string): Field | null;
     getFuncConfig(config: Config, func: string): Func | null;
@@ -219,7 +222,10 @@ export interface Config {
   settings: Settings,
   fields: Fields,
   funcs?: Funcs,
+  ctx: ConfigContext,
 }
+
+export type JsonConfig = string;
 
 /////////////////
 // Actions
