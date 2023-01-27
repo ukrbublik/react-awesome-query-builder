@@ -58,8 +58,8 @@ export class BasicGroup extends PureComponent {
   }
 
   removeSelf() {
-    const {confirmFn} = this.props;
-    const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = this.props.config.settings;
+    const {confirmFn, config} = this.props;
+    const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = config.settings;
     const doRemove = () => {
       this.props.removeSelf();
     };
@@ -68,7 +68,7 @@ export class BasicGroup extends PureComponent {
         onOk: doRemove,
         onCancel: null,
         confirmFn: confirmFn
-      });
+      }, config.ctx);
     } else {
       doRemove();
     }
@@ -308,7 +308,7 @@ export class BasicGroup extends PureComponent {
       selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
-    const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
+    const {immutableGroupsMode, renderConjs, showNot: _showNot, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
     if (!this.showConjs())
       return null;
@@ -329,7 +329,7 @@ export class BasicGroup extends PureComponent {
       showNot: this.showNot(),
       isLocked: isLocked
     };
-    return <Conjs {...renderProps} />;
+    return renderConjs(renderProps, config.ctx);
   }
 
   renderHeader() {

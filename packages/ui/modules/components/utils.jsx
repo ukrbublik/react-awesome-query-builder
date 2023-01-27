@@ -14,7 +14,7 @@ const DragIcon = () => (
 const ConfirmFn = (Cmp) => (
   props => {
     const {useConfirm} = props.config.settings;
-    const confirmFn = useConfirm ? useConfirm() : null;
+    const confirmFn = useConfirm ? useConfirm(props.config.ctx) : null;
     return <Cmp {...props} confirmFn={confirmFn} />;
   }
 );

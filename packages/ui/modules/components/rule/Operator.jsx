@@ -95,7 +95,7 @@ export default class Operator extends PureComponent {
     };
     if (!renderProps.items)
       return null;
-    return renderOperator(renderProps);
+    return renderOperator(renderProps, config.ctx);
   }
 
 

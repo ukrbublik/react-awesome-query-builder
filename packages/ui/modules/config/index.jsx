@@ -98,7 +98,7 @@ const widgets = {
   },
   field: {
     ...CoreConfig.widgets.field,
-    factory: (props) => <ValueFieldWidget {...props} />,
+    factory: (props, {RCE, W: {ValueFieldWidget}}) => RCE(ValueFieldWidget, props),
     customProps: {
       showSearch: true
     }
@@ -180,6 +180,8 @@ const settings = {
 
 const ctx = {
   ...CoreConfig.ctx,
+  W: Widgets,
+  RCE: (C, P) => React.createElement(C, P)
 };
 
 //----------------------------

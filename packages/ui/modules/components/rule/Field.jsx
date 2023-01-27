@@ -136,7 +136,7 @@ export default class Field extends PureComponent {
       setField,
       ...this.meta
     };
-    return renderField(renderProps);
+    return renderField(renderProps, config.ctx);
   }
 
 }

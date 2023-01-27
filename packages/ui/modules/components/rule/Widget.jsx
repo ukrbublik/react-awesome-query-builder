@@ -213,10 +213,11 @@ export default class Widget extends PureComponent {
     const { valueSources, widgets, aField } = meta;
     const field = isFuncArg ? leftField : aField;
     const {valueSrc, setValueSrcHandler} = widgets[delta];
-    const {valueSourcesInfo, renderValueSources: ValueSources} = settings;
+    const {valueSourcesInfo, renderValueSources} = settings;
     const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
       label: valueSourcesInfo[srcKey].label
     }]);
+    const ValueSources = (pr) => renderValueSources(pr, config.ctx);
 
     const sourceLabel = settings.showLabels
       ? <label className="rule--label">&nbsp;</label>

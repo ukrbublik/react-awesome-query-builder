@@ -202,7 +202,7 @@ export default class ValueField extends PureComponent {
       groupId,
       ...this.meta
     };
-    return renderField(renderProps);
+    return renderField(renderProps, config.ctx);
   }
 
 }

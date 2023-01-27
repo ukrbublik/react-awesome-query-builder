@@ -102,7 +102,7 @@ class SwitchGroup extends BasicGroup {
 
   renderConjs() {
     const { renderSwitchPrefix } = this.props.config.settings;
-    return renderSwitchPrefix ? renderSwitchPrefix() : null;
+    return renderSwitchPrefix ? renderSwitchPrefix(config.ctx) : null;
   }
 
   showNot() {

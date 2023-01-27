@@ -82,7 +82,8 @@ export default class QueryContainer extends Component {
     // `get_children` is deprecated!
     const {renderBuilder, get_children, onChange, settings} = this.props;
     const {config, store} = this.state;
-    const {renderProvider: QueryWrapper} = settings;
+    const {renderProvider} = settings;
+    const QueryWrapper = (pr) => renderProvider(pr, config.ctx);
 
     return (
       <QueryWrapper config={config}>
