@@ -1,14 +1,15 @@
 /*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import React, {Component} from "react";
 import {
-  Utils, Query, Builder,
+  Utils, Query, Builder, MuiConfig,
   //types:
-  BuilderProps, ImmutableTree, Config, JsonTree
+  BuilderProps, ImmutableTree, Config, JsonTree, JsonConfig
 } from "@react-awesome-query-builder/mui";
-import { PostResult, GetResult } from "../../pages/api/tree";
+import { PostResult, GetResult, PostBody } from "../../pages/api/tree";
 import loadedConfig from "./config";
 const stringify = JSON.stringify;
 const {getTree, checkTree, loadTree, uuid} = Utils;
+const { serializeConfig, deserializeConfig } = Utils.ConfigUtils;
 
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
@@ -21,24 +22,43 @@ interface DemoQueryBuilderState {
 
 export type DemoQueryBuilderProps = {
   initValue: JsonTree;
+  configStr: JsonConfig;
 }
 
 export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, DemoQueryBuilderState> {
 
+  // state = {
+  //   tree: null as ImmutableTree,
+  //   config: null as Config,
+  //   result: {}
+  // }
   state = {
     tree: checkTree(loadTree(this.props.initValue), loadedConfig),
     config: loadedConfig,
     result: {}
   };
 
-  componentDidMount = async () => {
-    await this.updateResult();
+
+  componentDidMount = () => {
+    this.updateResult();
+
+    // const config = deserializeConfig(this.props.configStr, MuiConfig.ctx);
+    // console.log(config)
+    // this.setState({
+    //   tree: checkTree(loadTree(this.props.initValue), config),
+    //   config,
+    //   result: {}
+    // }, () => {
+    //   this.updateResult();
+    // });
   };
 
-  render = () => (
+  render = () => {
+    console.log(2, this.state.config, loadedConfig)
+    return (
     <div>
       <Query 
-        {...loadedConfig} 
+        {...this.state.config} 
         value={this.state.tree}
         onChange={this.onChange}
         renderBuilder={this.renderBuilder}
@@ -51,7 +71,8 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
         {this.renderResult(this.state)}
       </div>
     </div>
-  );
+    );
+  }
 
   resetValue = () => {
     (async () => {
@@ -83,6 +104,8 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   );
     
   onChange = (tree: ImmutableTree, config: Config) => {
+    console.log('ch config', config, config === this.state.config)
+    console.log('ch tree', getTree(tree))
     this.setState({
       tree, 
       config
@@ -93,13 +116,18 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   updateResult = async () => {
     const jsonTree = getTree(this.state.tree);
+    const jsonConfig = serializeConfig(this.state.config);
+    console.log( 'updateResult config', deserializeConfig(jsonConfig, this.state.config.ctx) );
+    console.log( 'updateResult tree', jsonTree );
 
     const response = await fetch("/api/tree", {
       method: "POST",
-      body: JSON.stringify(jsonTree),
+      body: JSON.stringify({
+        jsonTree,
+        jsonConfig
+      } as PostBody),
     });
     const result = await response.json() as PostResult;
-
     this.setState({result});
   };
 

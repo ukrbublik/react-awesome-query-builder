@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import {
-  Utils,
+  Utils, CoreConfig,
   //types:
-  ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
+  ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult, JsonConfig
 } from "@react-awesome-query-builder/core";
 import { IronSession } from "iron-session";
 import { withSessionRoute } from "../../lib/withSession";
@@ -13,10 +13,16 @@ const {
   uuid, checkTree, loadFromJsonLogic, loadTree,
   jsonLogicFormat, queryString, sqlFormat, mongodbFormat, getTree
 } = Utils;
+const { serializeConfig, deserializeConfig } = Utils.ConfigUtils;
 
 
 type Session = IronSession & {
   tree: JsonTree;
+};
+
+export type PostBody = {
+  jsonTree: JsonTree,
+  jsonConfig: JsonConfig,
 };
 
 export interface PostResult {
@@ -77,17 +83,18 @@ function prepareResult(immutableTree: ImmutableTree, config: Config): PostResult
     qs,
     qsh,
     sql,
-    mongo
+    mongo,
   };
   return result;
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse<PostResult>) {
   const session = req.session as Session;
-  const tree = req.body as JsonTree;
-  const immutableTree: ImmutableTree = loadTree(tree);
-  await saveTree(session, tree);
-  const result = prepareResult(immutableTree, loadedConfig);
+  const { jsonTree, jsonConfig } = JSON.parse(req.body as string) as PostBody;
+  const config = deserializeConfig(jsonConfig, CoreConfig.ctx);
+  const immutableTree: ImmutableTree = loadTree(jsonTree);
+  await saveTree(session, jsonTree);
+  const result = prepareResult(immutableTree, config);
   return res.status(200).json(result);
 }
 

@@ -3,7 +3,11 @@ import { withIronSessionSsr } from "iron-session/next";
 import sessionOptions from "../lib/sessionOptions";
 import Demo, { DemoQueryBuilderProps } from "../components/demo/index";
 import { getSavedTree } from "../pages/api/tree";
+import coreConfig, { createConfig } from "../lib/config";
 import { NextApiRequest } from "next";
+import { Utils } from "@react-awesome-query-builder/core";
+import { MuiConfig } from "@react-awesome-query-builder/mui";
+const { serializeConfig } = Utils.ConfigUtils;
 
 export default Demo;
 
@@ -12,6 +16,7 @@ export const getServerSideProps = withIronSessionSsr<DemoQueryBuilderProps>(
     return {
       props: {
         initValue: await getSavedTree(req as NextApiRequest),
+        configStr: serializeConfig(createConfig(MuiConfig))
       }
     };
   },

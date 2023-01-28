@@ -52,6 +52,7 @@ export const liteShouldComponentUpdate = (self, config) => (nextProps, nextState
         if (changed)
           chs.push(k);
       }
+      console.log(1111, chs)
       if (!chs.length)
         should = false;
     }
