@@ -1,8 +1,0 @@
-{
-  "sandboxes": [
-    "/packages/examples",
-    "/packages/sandbox",
-    "/packages/sandbox_simple",
-    "/packages/sandbox_next"
-  ]
-}

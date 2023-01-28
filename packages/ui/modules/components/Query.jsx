@@ -41,7 +41,6 @@ class Query extends Component {
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
     tree: (nextValue) => {
-      console.log('???', nextValue === this.oldValidatedTree , this.oldValidatedTree === this.validatedTree)
       if (nextValue === this.oldValidatedTree && this.oldValidatedTree === this.validatedTree) {
         // Got value dispatched from QueryContainer
         // Ignore, because we've just rendered it
@@ -72,8 +71,6 @@ class Query extends Component {
   }
 
   render() {
-
-    console.log('+++')
     const {config, renderBuilder, dispatch, __isInternalValueChange} = this.props;
     const builderProps = {
       tree: this.validatedTree,
