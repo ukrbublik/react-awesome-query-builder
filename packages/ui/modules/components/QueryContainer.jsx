@@ -68,7 +68,7 @@ export default class QueryContainer extends Component {
     this.sanitizeTree = isTreeChanged || isConfigChanged;
 
     if (isConfigChanged) {
-      this.QueryWrapper = (pr) => nextConfig.settings.renderProvider(pr, config.ctx);
+      this.QueryWrapper = (pr) => nextConfig.settings.renderProvider(pr, nextConfig.ctx);
       this.setState({config: nextConfig});
     }
     
