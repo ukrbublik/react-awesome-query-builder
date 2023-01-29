@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import merge from "lodash/merge";
 import {connect} from "react-redux";
 import context from "../stores/context";
 import PropTypes from "prop-types";
@@ -17,6 +18,7 @@ class Query extends Component {
     //__isInternalValueChange
     //__lastAction
     //getMemoizedTree: PropTypes.func.isRequired,
+    //sanitizeTree
   };
 
   constructor(props) {
@@ -28,7 +30,16 @@ class Query extends Component {
     // For preventive validation (tree and config consistency)
     // When config has changed from QueryContainer, 
     //  but new dispatched validated tree value is not in redux store yet (tree prop is old)
-    this.validatedTree = props.getMemoizedTree(props.config, props.tree);
+    let config = props.config;
+    if (!props.sanitizeTree) {
+      config = merge(config, {
+        settings: {
+          removeEmptyGroupsOnLoad: false,
+          removeIncompleteRulesOnLoad: false,
+        }
+      });
+    }
+    this.validatedTree = props.getMemoizedTree(config, props.tree);
     this.oldValidatedTree = this.validatedTree;
 
     //props.onChange && props.onChange(this.validatedTree, props.config);

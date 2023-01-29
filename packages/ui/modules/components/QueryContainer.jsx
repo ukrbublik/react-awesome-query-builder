@@ -23,6 +23,7 @@ export default class QueryContainer extends Component {
     operators: PropTypes.object.isRequired,
     widgets: PropTypes.object.isRequired,
     settings: PropTypes.object.isRequired,
+    ctx: PropTypes.object.isRequired,
 
     onChange: PropTypes.func,
     renderBuilder: PropTypes.func,
@@ -47,6 +48,7 @@ export default class QueryContainer extends Component {
       store,
       config
     };
+    this.QueryWrapper = (pr) => config.settings.renderProvider(pr, config.ctx);
   }
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
@@ -63,8 +65,10 @@ export default class QueryContainer extends Component {
     const storeValue = this.state.store.getState().tree;
     const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
     const currentTree = isTreeChanged ? nextProps.value || defaultRoot(nextProps) : storeValue;
+    this.sanitizeTree = isTreeChanged || isConfigChanged;
 
     if (isConfigChanged) {
+      this.QueryWrapper = (pr) => nextConfig.settings.renderProvider(pr, config.ctx);
       this.setState({config: nextConfig});
     }
     
@@ -80,10 +84,9 @@ export default class QueryContainer extends Component {
 
   render() {
     // `get_children` is deprecated!
-    const {renderBuilder, get_children, onChange, settings} = this.props;
+    const {renderBuilder, get_children, onChange} = this.props;
     const {config, store} = this.state;
-    const {renderProvider} = settings;
-    const QueryWrapper = (pr) => renderProvider(pr, config.ctx);
+    const QueryWrapper = this.QueryWrapper;
 
     return (
       <QueryWrapper config={config}>
@@ -91,6 +94,7 @@ export default class QueryContainer extends Component {
           <ConnectedQuery
             config={config}
             getMemoizedTree={this.getMemoizedTree}
+            sanitizeTree={this.sanitizeTree}
             onChange={onChange}
             renderBuilder={renderBuilder || get_children}
           />
