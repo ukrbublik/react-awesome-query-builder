@@ -93,15 +93,14 @@ export default class ValueField extends PureComponent {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
-    let expectedType;
+    const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
+    const widgetConfig = config.widgets[widget];
+    let expectedType;
     if (isFuncArg && fieldDefinition) {
       expectedType = fieldDefinition.type;
-    } else if (widget) {
-      let widgetConfig = config.widgets[widget];
-      let widgetType = widgetConfig.type;
-      //expectedType = leftFieldConfig.type;
-      expectedType = widgetType;
+    } else if (_relyOnWidgetType && widgetConfig) {
+      expectedType = widgetConfig.type;
     } else {
       expectedType = leftFieldConfig.type;
     }
