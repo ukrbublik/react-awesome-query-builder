@@ -121,7 +121,12 @@ export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
 };
 
-
+export const isJSX = (jsx) => (
+  typeof jsx === "object"
+  && jsx !== null
+  && !Array.isArray(jsx)
+  && typeof jsx["type"] === "string" && jsx["props"] !== undefined
+);
 
 export const isJsonLogic = (logic) => (
   typeof logic === "object" // An object

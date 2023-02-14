@@ -4,11 +4,143 @@ import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart} from "./stuff";
+import {mergeArraysSmart, isJsonLogic, isJSX} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 import serializeJs from "serialize-javascript";
 
+
+/////////////
+
+// Keys in config with type RenderedReactElement
+const renderKeysInFieldConfig = {
+  labelYes: {},
+  labelNo: {},
+  marks: { isArr: true },
+};
+const renderKeysInFuncConfig = {
+  renderBrackets: { isArr: true },
+  renderSeps: { isArr: true },
+};
+const renderKeysInSettings = {
+  renderSwitchPrefix: {},
+};
+
+// Keys in config with type JsonLogicFunction
+const jlKeysInWidgetConfig = {
+  factory: {},
+};
+const jlKeysInSettings = {
+  renderConfirm: {},
+  renderField: {},
+};
+
+export const compileConfig = (config) => {
+  config = {...config};
+
+  const opts = createOptsForRCE(config.ctx);
+
+  // todo !!!!!
+  config.ctx.addJsonLogicOperation("RE", (type, props) => ({type, props}));
+  config.ctx.addJsonLogicOperation("MERGE", (obj1, obj2) => ({...obj1, ...obj2}));
+  config.ctx.addJsonLogicOperation("MAP", (entries) => Object.fromEntries(entries));
+
+  config.widgets = clone(config.widgets);
+  _compileWidgetsConfig(config.widgets, config, opts);
+
+  config.fields = clone(config.fields);
+  _compileFieldsConfig(config.fields, config, opts);
+
+  config.funcs = clone(config.funcs);
+  _compileFuncsConfig(config.funcs, config, opts);
+
+  _compileSettings(config.settings, config, opts);
+
+  return config;
+};
+
+function createOptsForRCE(ctx) {
+  return {
+    components: {
+      ...ctx.W,
+      ...ctx.O,
+    },
+    RCE: ctx.RCE,
+  };
+}
+
+function _compileWidgetsConfig(subconfig, config, opts, path = []) {
+  for (let w in subconfig) {
+    const def = subconfig[w];
+    _compileJsonLogicFuncs(jlKeysInWidgetConfig, def, config, opts, ["widgets", ...path, w]);
+  }
+}
+
+function _compileFieldsConfig(subconfig, config, opts, path = []) {
+  for (let field in subconfig) {
+    const def = subconfig[field];
+    const fieldSettings = def?.fieldSettings || {};
+    _compileReactElements(renderKeysInFieldConfig, fieldSettings, config, opts, ["fields", ...path, field]);
+    if (def.subfields) {
+      _compileFieldsConfig(def.subfields, config, opts, [...path, field]);
+    }
+  }
+}
+
+function _compileFuncsConfig(subconfig, config, opts, path = []) {
+  if (!subconfig) return;
+  for (let funcKey in subconfig) {
+    const def = subconfig[funcKey];
+    _compileReactElements(renderKeysInFuncConfig, def, config, opts, ["funcs", ...path, funcKey]);
+    if (def.subfields) {
+      _compileFuncsConfig(def.subfields, config, opts, [...path, funcKey]);
+    }
+  }
+}
+
+function _compileSettings(settings, config, opts, path = []) {
+  _compileReactElements(renderKeysInSettings, settings, config, opts, ["settings", ...path]);
+  _compileJsonLogicFuncs(jlKeysInSettings, settings, config, opts, ["settings", ...path]);
+}
+
+function _compileJsonLogicFuncs(jlKeys, targetObj, config, opts, path) {
+  for (const [key, {}] of Object.entries(jlKeys)) {
+    let val = targetObj[key];
+    targetObj[key] = _compileJsonLogic(val, opts, [...path, key]);
+  }
+}
+
+function _compileReactElements(renderKeys, targetObj, config, opts, path) {
+  for (const [key, {isArr}] of Object.entries(renderKeys)) {
+    let val = targetObj[key];
+    if (val) {
+      if (isArr) {
+        for (const k in val) {
+          val[k] = config.ctx.renderReactElement(val[k], opts, [...path, key, k]);
+        }
+      } else {
+        targetObj[key] = config.ctx.renderReactElement(val, opts, [...path, key]);
+      }
+    }
+  }
+}
+
+function _compileJsonLogic(jl, opts, path) {
+  if (isJsonLogic(jl)) {
+    return function(props, ctx) {
+      const res = ctx.applyJsonLogic(jl, {
+        props,
+      });
+      const opts = createOptsForRCE(ctx);
+      const ret = ctx.renderReactElement(res, opts, path);
+      return ret;
+    };
+  }
+  return jl;
+}
+
+
+/////////////
 
 export const extendConfig = (config, configId) => {
   //operators, defaultOperator - merge
@@ -17,6 +149,8 @@ export const extendConfig = (config, configId) => {
   if (config.__configId) {
     return config;
   }
+
+  config = compileConfig(config);
   
   config = {...config};
   config.settings = merge({}, defaultSettings, config.settings);
@@ -210,6 +344,8 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
   }
 }
 
+/////////////
+
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
@@ -358,13 +494,24 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   return mergedConfig;
 };
 
-export const serializeConfig = (config) => {
-  let jsonConfig = serializeJs(omit(config, ["ctx"]));
-  return jsonConfig;
+/////////////
+
+export const UNSAFE_serializeConfig = (config) => {
+  let strConfig = serializeJs(omit(config, ["ctx"]), {
+    space: 2,
+    unsafe: true,
+  });
+  if (strConfig.includes("__WEBPACK_IMPORTED_MODULE_")) {
+    console.warn("Serialized config should not have references to libraries imported from webpack.");
+  }
+  if (strConfig.includes("\"_store\": {}")) {
+    console.warn("Serialized config should not have JSX.");
+  }
+  return strConfig;
 };
 
-export const deserializeConfig = (jsonConfig, ctx) => {
-  let config = eval("("+jsonConfig+")");
+export const UNSAFE_deserializeConfig = (strConfig, ctx) => {
+  let config = eval("("+strConfig+")");
   config.ctx = ctx;
   return config;
 };

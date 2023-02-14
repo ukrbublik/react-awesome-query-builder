@@ -13,7 +13,8 @@ import {
   TypedValueSourceMap,
   ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
-  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps
+  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps, ConfigContext,
+  RenderedReactElement
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -22,6 +23,13 @@ export * from "@react-awesome-query-builder/core";
 ////////////////
 // common
 /////////////////
+
+
+type ReactKey = string | number;
+interface ReactAttributes {
+    key?: ReactKey | null | undefined;
+}
+type FactoryWithContext<P> = (props?: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 
 type AnyObject = object;
 type TypedMap<T> = {
@@ -141,7 +149,7 @@ export interface RenderSettings {
   renderButton?: Factory<ButtonProps>,
   renderButtonGroup?: Factory<ButtonGroupProps>,
   renderSwitch?: Factory<SwitchProps>,
-  renderProvider?: Factory<ProviderProps>,
+  renderProvider?: FactoryWithContext<ProviderProps>,
   renderValueSources?: Factory<ValueSourcesProps>,
   renderConfirm?: ConfirmFunc,
   useConfirm?: () => Function,
@@ -157,7 +165,7 @@ export interface RenderSettings {
   renderBeforeActions?: Factory<FieldProps>,
   renderAfterActions?: Factory<FieldProps>,
   renderRuleError?: Factory<RuleErrorProps>,
-  renderSwitchPrefix?: Factory<AnyObject>,
+  renderSwitchPrefix?: RenderedReactElement,
   defaultSliderWidth?: string,
   defaultSelectWidth?: string,
   defaultSearchWidth?: string,

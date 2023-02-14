@@ -10,6 +10,8 @@ export type Moment = MomentType;
 // common
 /////////////////
 
+export type RenderedReactElement = ReactElement | string;
+
 type AnyObject = object;
 type Empty = null | undefined;
 
@@ -190,9 +192,10 @@ export interface Utils {
     simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   };
   ConfigUtils: {
-    serializeConfig(config: Config): JsonConfig;
-    deserializeConfig(jsonConfig: JsonConfig, ctx: ConfigContext): Config;
+    UNSAFE_serializeConfig(config: Config): StrConfig;
+    UNSAFE_deserializeConfig(strConfig: StrConfig, ctx: ConfigContext): Config;
     extendConfig(config: Config): Config;
+    compileConfig(config: Config): Config;
     getFieldConfig(config: Config, field: string): Field | null;
     getFuncConfig(config: Config, func: string): Func | null;
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
@@ -225,7 +228,7 @@ export interface Config {
   ctx: ConfigContext,
 }
 
-export type JsonConfig = string;
+export type StrConfig = string;
 
 /////////////////
 // Actions
@@ -626,7 +629,7 @@ export interface NumberFieldSettings extends BasicFieldSettings {
   min?: number,
   max?: number,
   step?: number,
-  marks?: {[mark: number]: ReactElement | string}
+  marks?: {[mark: number]: RenderedReactElement}
 }
 export interface DateTimeFieldSettings extends BasicFieldSettings {
   timeFormat?: string,
@@ -651,8 +654,8 @@ export interface TreeSelectFieldSettings extends BasicFieldSettings {
   treeSelectOnlyLeafs?: boolean,
 }
 export interface BooleanFieldSettings extends BasicFieldSettings {
-  labelYes?: ReactElement | string,
-  labelNo?: ReactElement | string,
+  labelYes?: RenderedReactElement,
+  labelNo?: RenderedReactElement,
 }
 export interface CaseValueFieldSettings extends BasicFieldSettings {
 }
@@ -867,8 +870,8 @@ export interface Func {
   formatFunc?: FormatFunc,
   sqlFormatFunc?: SqlFormatFunc,
   mongoFormatFunc?: MongoFormatFunc,
-  renderBrackets?: Array<ReactElement | string>,
-  renderSeps?: Array<ReactElement | string>,
+  renderBrackets?: Array<RenderedReactElement>,
+  renderSeps?: Array<RenderedReactElement>,
   spelFormatFunc?: SpelFormatFunc,
   allowSelfNesting?: boolean,
 }

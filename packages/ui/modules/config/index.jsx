@@ -47,7 +47,7 @@ const operators = {
     ...CoreConfig.operators.proximity,
     options: {
       ...CoreConfig.operators.proximity.options,
-      factory: (props) => <ProximityOperator {...props} />,
+      factory: (props, {RCE, O: {ProximityOperator}}) => RCE(ProximityOperator, props),
     },
   },
 };
@@ -105,19 +105,15 @@ const widgets = {
   },
   func: {
     ...CoreConfig.widgets.func,
-    factory: (props) => <FuncWidget {...props} />,
+    factory: (props, {RCE, W: {FuncWidget}}) => RCE(FuncWidget, props),
     customProps: {
       //showSearch: true
     }
   },
   case_value: {
     ...CoreConfig.widgets.case_value,
-    factory: ({value, setValue}) =>  
-      <input 
-        type="text" 
-        value={value || ""} 
-        onChange={e => setValue(e.target.value)} 
-      />
+    // simple text value
+    factory: (props, {RCE, W: {VanillaTextWidget}}) =>  RCE(VanillaTextWidget, props),
   }
 };
 
@@ -156,7 +152,7 @@ const settings = {
   renderProvider: (props) => <VanillaProvider {...props} />,
   renderValueSources: (props) => <VanillaValueSources {...props} />,
   renderConfirm: vanillaConfirm,
-  renderSwitchPrefix: () => <>{"Conditions"}</>,
+  renderSwitchPrefix: "Conditions",
 
   customFieldSelectProps: {
     showSearch: true
@@ -180,7 +176,8 @@ const settings = {
 
 const ctx = {
   ...CoreConfig.ctx,
-  W: Widgets,
+  W: {...Widgets},
+  O: {...CustomOperators},
   RCE: (C, P) => React.createElement(C, P)
 };
 

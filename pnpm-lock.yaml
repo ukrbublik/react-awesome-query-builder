@@ -170,6 +170,7 @@ importers:
       '@types/react': ^17
       clone: ^2.1.2
       immutable: ^3.8.2
+      json-logic-js: ^2.0.2
       lodash: ^4.17.21
       moment: ^2.29.4
       serialize-javascript: ^6.0.1
@@ -178,6 +179,7 @@ importers:
     dependencies:
       clone: 2.1.2
       immutable: 3.8.2
+      json-logic-js: 2.0.2
       lodash: 4.17.21
       moment: 2.29.4
       serialize-javascript: 6.0.1
@@ -9047,6 +9049,10 @@ packages:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}
     engines: {node: '>=4'}
     hasBin: true
+
+  /json-logic-js/2.0.2:
+    resolution: {integrity: sha512-ZBtBdMJieqQcH7IX/LaBsr5pX+Y5JIW+EhejtM3Ffg2jdN9Iwf+Ht6TbHnvAZ/YtwyuhPaCBlnvzrwVeWdvGDQ==}
+    dev: false
 
   /json-parse-better-errors/1.0.2:
     resolution: {integrity: sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==}

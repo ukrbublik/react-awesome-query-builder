@@ -6,18 +6,22 @@ import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props, {RCE, W: {MuiFieldAutocomplete, MuiFieldSelect}}) => props?.customProps?.showSearch 
-    ? RCE(MuiFieldAutocomplete, props)
-    : RCE(MuiFieldSelect, props),
+  renderField: {
+    if: [
+      {var: "props.customProps.showSearch"},
+      { RE: ["MuiFieldAutocomplete", {var: "props"}] },
+      { RE: ["MuiFieldSelect", {var: "props"}] },
+    ]
+  }, 
   renderOperator: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
   renderFunc: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
   renderConjs: (props, {RCE, W: {MuiConjs}}) => RCE(MuiConjs, props),
   renderSwitch: (props, {RCE, W: {MuiSwitch}}) => RCE(MuiSwitch, props),
-  //renderButton: (props, {RCE, W: {MuiButton}}) => RCE(MuiButton, props),
-  //renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
+  renderButton: (props, {RCE, W: {MuiButton}}) => RCE(MuiButton, props),
+  renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
-  renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
+  renderConfirm: { RE: ["MuiConfirm", {var: "props"}] },
   useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
 };
 
@@ -38,19 +42,29 @@ const widgets = {
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiMultiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
-        ? RCE(MuiAutocompleteWidget, {...props, multiple: true}) 
-        : RCE(MuiMultiSelectWidget, props);
-    },
+    factory: {
+      if: [
+        { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
+        { RE: ["MuiAutocompleteWidget", { MERGE: [
+          { var: "props" },
+          { MAP: [ [ [ "multiple", true ] ] ] }
+        ]}] },
+        { RE: ["MuiMultiSelectWidget", {var: "props"}] }
+      ]
+    }
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiSelectWidget}}) => {
-      return (props.asyncFetch || props.showSearch) 
-        ? RCE(MuiAutocompleteWidget, props) 
-        : RCE(MuiSelectWidget, props);
-    },
+    factory: {
+      if: [
+        { or: [
+          { var: "props.asyncFetch" },
+          { var: "props.showSearch" }
+        ] },
+        { RE: ["MuiAutocompleteWidget", {var: "props"}] },
+        { RE: ["MuiSelectWidget", {var: "props"}] }
+      ]
+    }
   },
   slider: {
     ...BasicConfig.widgets.slider,
