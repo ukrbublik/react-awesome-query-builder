@@ -3,8 +3,7 @@ import {
   SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList,
   stringifyForDisplay
 } from "../utils/export";
-import JL from "json-logic-js";
-import {escapeRegExp, isJSX} from "../utils/stuff";
+import {escapeRegExp} from "../utils/stuff";
 import {getTitleInListValues} from "../utils/listValues";
 
 // helpers for mongo format
@@ -49,39 +48,7 @@ export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr, valueSrc
   }
 };
 
-export const applyJsonLogic = (logic, data) => {
-  return JL.apply(logic, data);
-};
-
-export const addJsonLogicOperation = (name, op) => {
-  return JL.add_operation(name, op);
-};
-
-export function renderReactElement(jsx, opts, path, key = undefined) {
-  if (isJSX(jsx)) {
-    if (jsx instanceof Array) {
-      return jsx.map((el, i) => renderReactElement(el, opts, path, i));
-    }
-    let { type, props } = jsx;
-    if (typeof type !== "string") {
-      throw new Error(`renderReactElement for ${path.join(".")}: type should be string`);
-    }
-    const Cmp = opts.components[type] || type.toLowerCase();
-    if (props.children) {
-      props = { ...props, children: renderReactElement(props.children, opts, path) };
-    }
-    if (key !== undefined) {
-      props = { ...props, key };
-    }
-    return typeof Cmp === "function" ? Cmp(props) : opts.RCE(Cmp, props);
-  }
-  return jsx;
-}
-
 const ctx = {
-  applyJsonLogic,
-  addJsonLogicOperation,
-  renderReactElement,
   moment,
   SqlString,
   mongoFormatOp1,

@@ -8,7 +8,7 @@ const settings = {
 
   renderField: {
     if: [
-      {var: "props.customProps.showSearch"},
+      { var: "props.customProps.showSearch" },
       { RE: ["MuiFieldAutocomplete", {var: "props"}] },
       { RE: ["MuiFieldSelect", {var: "props"}] },
     ]
@@ -57,10 +57,7 @@ const widgets = {
     ...BasicConfig.widgets.select,
     factory: {
       if: [
-        { or: [
-          { var: "props.asyncFetch" },
-          { var: "props.showSearch" }
-        ] },
+        { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
         { RE: ["MuiAutocompleteWidget", {var: "props"}] },
         { RE: ["MuiSelectWidget", {var: "props"}] }
       ]
