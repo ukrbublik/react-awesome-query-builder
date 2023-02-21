@@ -13,36 +13,37 @@ import JL from "json-logic-js";
 
 /////////////
 
-// type: 'r' - RenderedReactElement, type 'f' - JsonLogicFunction
+// type: "r" - RenderedReactElement, type "rf" - JsonLogicFunction to render React, "f" - JsonLogicFunction
 // x - iterate (with nesting `subfields`)
 const compileMeta = {
   fields: {
     x: {
       fieldSettings: {
-        labelYes: { type: 'r' },
-        labelNo: { type: 'r' },
-        marks: { type: 'r', isArr: true },
+        labelYes: { type: "r" },
+        labelNo: { type: "r" },
+        marks: { type: "r", isArr: true },
+        validateValue: { type: "f", args: ["val"] },
       },
     }
   },
   widgets: {
     x: {
-      factory: { type: 'f' },
+      factory: { type: "rf" },
     }
   },
   funcs: {
     x: {
-      renderBrackets: { type: 'r', isArr: true },
-      renderSeps: { type: 'r', isArr: true },
+      renderBrackets: { type: "r", isArr: true },
+      renderSeps: { type: "r", isArr: true },
     }
   },
   settings: {
-    renderSwitchPrefix: { type: 'r' },
-    renderConfirm: { type: 'f' },
-    renderField: { type: 'f' },
+    renderSwitchPrefix: { type: "rf" },
+    renderConfirm: { type: "rf" },
+    useConfirm: { type: "rf" },
+    renderField: { type: "rf" },
   },
 };
-
 
 export const compileConfig = (config) => {
   if (config.__compliled) {
@@ -57,6 +58,8 @@ export const compileConfig = (config) => {
   addJsonLogicOperation("RE", (type, props) => ({type, props}));
   addJsonLogicOperation("MERGE", (obj1, obj2) => ({...obj1, ...obj2}));
   addJsonLogicOperation("MAP", (entries) => Object.fromEntries(entries));
+  addJsonLogicOperation("strlen", (str) => (str?.length || 0));
+  addJsonLogicOperation("test", (str, pattern, flags) => str?.match(new RegExp(pattern, flags)) != null);
 
   const logs = [];
   _compileConfigParts(config, config, opts, compileMeta, logs);
@@ -99,12 +102,20 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
           targetObj[k] = newVal;
         }
       }
+    } else if (submeta.type === "rf") {
+      const targetObj = subconfig;
+      const val = targetObj[k];
+      const newVal = compileJsonLogicReact(val, opts, newPath);
+      if (newVal !== val) {
+        logs.push(`Compiled JL-RF ${newPath.join(".")}`);
+        targetObj[k] = newVal;
+      }
     } else if (submeta.type === "f") {
       const targetObj = subconfig;
       const val = targetObj[k];
-      const newVal = compileJsonLogic(val, opts, newPath);
+      const newVal = compileJsonLogic(val, opts, newPath, submeta.args);
       if (newVal !== val) {
-        logs.push(`Compiled JL ${newPath.join(".")}`);
+        logs.push(`Compiled JL-F ${newPath.join(".")}`);
         targetObj[k] = newVal;
       }
     } else if (k === "x") {
@@ -124,14 +135,26 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
   }
 }
 
-function compileJsonLogic(jl, opts, path) {
+function compileJsonLogicReact(jl, opts, path) {
   if (isJsonLogic(jl)) {
     return function(props, ctx) {
       const res = applyJsonLogic(jl, {
-        props,
+        props, ctx,
       });
       const opts = createOptsForRCE(ctx);
       const ret = renderReactElement(res, opts, path);
+      return ret;
+    };
+  }
+  return jl;
+}
+
+function compileJsonLogic(jl, opts, path, argNames) {
+  if (isJsonLogic(jl)) {
+    return function(...args) {
+      const ctx = this;
+      const data = argNames.reduce((acc, k, i) => ({...acc, [k]: args[i]}), { args, ctx });
+      const ret = applyJsonLogic(jl, data);
       return ret;
     };
   }
@@ -166,7 +189,7 @@ function renderReactElement(jsx, opts, path, key = undefined) {
       throw new Error(`renderReactElement for ${path.join(".")}: type should be string`);
     }
     const Cmp = opts.components[type] || type.toLowerCase();
-    if (props.children) {
+    if (props?.children) {
       props = { ...props, children: renderReactElement(props.children, opts, path) };
     }
     if (key !== undefined) {

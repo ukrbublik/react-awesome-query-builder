@@ -22,7 +22,7 @@ const settings = {
   renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
   renderConfirm: { RE: ["MuiConfirm", {var: "props"}] },
-  useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
+  useConfirm: { RE: ["MuiUseConfirm"] },
 };
 
 

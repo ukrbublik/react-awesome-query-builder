@@ -245,7 +245,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
         ];
         if (valueSrc == "field")
           args.push(rightFieldDefinition);
-        const validResult = fn(...args);
+        const validResult = fn.call(config.ctx, ...args);
         if (typeof validResult == "boolean") {
           if (validResult == false)
             validError = "Invalid value";

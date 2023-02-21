@@ -125,7 +125,7 @@ export const isJSX = (jsx) => (
   typeof jsx === "object"
   && jsx !== null
   && !Array.isArray(jsx)
-  && typeof jsx["type"] === "string" && jsx["props"] !== undefined
+  && typeof jsx["type"] === "string" && Object.keys(jsx).includes("props")
 );
 
 export const isJsonLogic = (logic) => (

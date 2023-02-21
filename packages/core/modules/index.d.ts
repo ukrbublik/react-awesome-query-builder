@@ -40,6 +40,7 @@ type JsonLogicResult = {
   data?: Object,
   errors?: Array<string>
 }
+type JsonLogicFunction = Object;
 type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
@@ -416,7 +417,7 @@ export interface BaseWidget {
   hideOperator?: boolean;
   jsonLogic?: JsonLogicFormatValue;
   //obsolete:
-  validateValue?: ValidateValue;
+  validateValue?: ValidateValue | JsonLogicFunction;
   //@ui
   factory: Factory<WidgetProps>;
   customProps?: AnyObject;
@@ -433,7 +434,7 @@ export interface FieldWidget {
   sqlFormatValue?: SqlFormatValue, // with rightFieldDef
   spelFormatValue?: SpelFormatValue, // with rightFieldDef
   //obsolete:
-  validateValue?: ValidateValue,
+  validateValue?: ValidateValue | JsonLogicFunction,
   //@ui
   customProps?: AnyObject,
 }
@@ -619,7 +620,7 @@ type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise
 
 
 export interface BasicFieldSettings {
-  validateValue?: ValidateValue,
+  validateValue?: ValidateValue | JsonLogicFunction,
 }
 export interface TextFieldSettings extends BasicFieldSettings {
   maxLength?: number,

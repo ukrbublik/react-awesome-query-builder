@@ -25,18 +25,30 @@ export function createConfig(InitialConfig: CoreConfig): Config {
             valuePlaceholder: "Enter name",
           },
           fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
-              return (val.length < 10);
+            validateValue: {
+              "<": [ {strlen: {var: "val"}}, 10 ]
             },
+            // validateValue: (val: string) => {
+            //   return (val.length < 10);
+            // },
           },
         },
         login: {
           type: "text",
           excludeOperators: ["proximity"],
           fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
-              return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
-            },
+            validateValue: {
+              and: [
+                { "<": [ {strlen: {var: "val"}}, 10 ] },
+                { or: [
+                  { "===": [ {var: "val"}, "" ] },
+                  { test: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
+                ]}
+              ]
+            }
+            // (val: string) => {
+            //   return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
+            // },
           },
           mainWidgetProps: {
             valueLabel: "Login",
