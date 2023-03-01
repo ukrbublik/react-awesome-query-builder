@@ -1,4 +1,5 @@
 import Immutable, { Map } from "immutable";
+import omit from "lodash/omit";
 
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
@@ -119,6 +120,36 @@ export function applyToJS(v) {
 
 export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
+};
+
+export const cleanJSX = (jsx) => {
+  const jsxKeys = ["$$typeof", "_owner", "_store", "ref", "key"];
+
+  const getName = (val) => {
+    if (typeof val === "string") {
+      return val;
+    } else if (typeof val === "function") {
+      return val.name;
+    }
+    return val;
+  }
+
+  if (jsx instanceof Array) {
+    return jsx.map((el, _i) => cleanJSX(el));
+  } else if (typeof jsx === "object" && jsx !== null) {
+    if (isDirtyJSX(jsx)) {
+      const cleaned = omit(jsx, jsxKeys);
+      if (cleaned.type) {
+        cleaned.type = getName(cleaned.type);
+      }
+      return cleaned;
+    }
+  }
+  return jsx;
+};
+
+export const isDirtyJSX = (jsx) => {
+  return Object.keys(jsx).includes("_store");
 };
 
 export const isJSX = (jsx) => (

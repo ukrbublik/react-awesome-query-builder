@@ -172,7 +172,7 @@ export default (skin: string) => {
       ...InitialConfig.types.text,
       excludeOperators: ["proximity"],
     },
-    boolean: merge(InitialConfig.types.boolean, {
+    boolean: merge({}, InitialConfig.types.boolean, {
       widgets: {
         boolean: {
           widgetProps: {

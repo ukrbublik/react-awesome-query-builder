@@ -9,7 +9,8 @@ const useListValuesAutocomplete = ({
   asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
   asyncListValues: selectedAsyncListValues,
   listValues: staticListValues, allowCustomValues,
-  value: selectedValue, setValue, placeholder
+  value: selectedValue, setValue, placeholder, 
+  config
 }, {
   debounceTimeout,
   multiple
@@ -62,7 +63,7 @@ const useListValuesAutocomplete = ({
     const meta = isLoadMore && asyncFetchMeta || !useLoadMore && { pageSize: 0 };
 
     const newAsyncFetchCnt = ++asyncFectchCnt.current;
-    const res = await asyncFetch(filter, offset, meta);
+    const res = await asyncFetch.call(config?.ctx, filter, offset, meta);
     const isFetchCancelled = asyncFectchCnt.current != newAsyncFetchCnt;
     if (isFetchCancelled || !componentIsMounted.current) {
       return null;

@@ -1,8 +1,6 @@
 import pick from "lodash/pick";
 import { Utils } from "@react-awesome-query-builder/core";
-const { extendConfig } = Utils.ConfigUtils;
-
-const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
+const { extendConfig, configKeys } = Utils.ConfigUtils;
 
 const pickConfig = (props) => {
   return pick(props, configKeys);

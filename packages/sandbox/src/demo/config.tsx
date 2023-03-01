@@ -366,7 +366,7 @@ export function createConfig(InitialConfig: BasicConfig): Config {
   const types: Types = {
     ...InitialConfig.types,
     // examples of  overriding
-    boolean: merge(InitialConfig.types.boolean, {
+    boolean: merge({}, InitialConfig.types.boolean, {
       widgets: {
         boolean: {
           widgetProps: {

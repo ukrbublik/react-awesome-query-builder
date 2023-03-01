@@ -195,8 +195,9 @@ export interface Utils {
   ConfigUtils: {
     UNSAFE_serializeConfig(config: Config): StrConfig;
     UNSAFE_deserializeConfig(strConfig: StrConfig, ctx: ConfigContext): Config;
-    extendConfig(config: Config): Config;
+    compressConfig(config: Config, baseConfig: Config): Config;
     compileConfig(config: Config): Config;
+    extendConfig(config: Config): Config;
     getFieldConfig(config: Config, field: string): Field | null;
     getFuncConfig(config: Config, func: string): Func | null;
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
@@ -644,7 +645,7 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   allowCustomValues?: boolean,
   showSearch?: boolean,
   showCheckboxes?: boolean,
-  asyncFetch?: AsyncFetchListValuesFn,
+  asyncFetch?: AsyncFetchListValuesFn | JsonLogicFunction,
   useLoadMore?: boolean,
   useAsyncSearch?: boolean,
   forceAsyncSearch?: boolean,

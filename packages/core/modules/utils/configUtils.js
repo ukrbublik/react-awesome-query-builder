@@ -1,24 +1,99 @@
 import merge from "lodash/merge";
 import omit from "lodash/omit";
+import pick from "lodash/pick";
 import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart, isJsonLogic, isJSX} from "./stuff";
+import {mergeArraysSmart, isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 import serializeJs from "serialize-javascript";
 import JL from "json-logic-js";
+import { BasicFuncs } from "..";
+
 
 
 /////////////
 
-// type: "r" - RenderedReactElement, type "rf" - JsonLogicFunction to render React, "f" - JsonLogicFunction
+const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _stack) => {
+  if (Array.isArray(objValue)) {
+    return srcValue;
+  }
+};
+
+export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
+
+export const compressConfig = (config, baseConfig) => {
+  let zipConfig = pick(config, configKeys);
+  delete zipConfig.ctx;
+
+  const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
+  const _clean = (target, base, path) => {
+    if (isObject(target)) {
+      if (base !== undefined) {
+        for (let k in base) {
+          if (!Object.keys(target).includes(k)) {
+            // deleted in target
+            target[k] = '$$deleted';
+          } else {
+            target[k] = _clean(target[k], base[k], [...path, k]);
+            if (target[k] === undefined) {
+              delete target[k];
+            }
+          }
+        }
+      }
+      for (let k in target) {
+        if (!base || !Object.keys(base).includes(k)) {
+          // new in target
+          _clean(target[k], base?.[k], [...path, k]);
+        }
+      }
+      if (isDirtyJSX(target)) {
+        target = cleanJSX(target);
+      }
+      if (Object.keys(target).length === 0) {
+        target = undefined;
+      }
+    } else if (Array.isArray(target)) {
+      // don't deep compare arrays
+    }
+
+    if (base !== undefined && shallowEqual(target, base)) {
+      return undefined;
+    }
+
+    if (typeof target === "function") {
+      throw new Error(`compressConfig: function at ${path.join(".")} should be converted to JsonLogic`);
+    }
+
+    return target;
+  };
+
+  for (const rootKey of configKeys) {
+    if (!["ctx", "fields"].includes(rootKey)) {
+      const base = rootKey === "funcs" ? BasicFuncs : baseConfig[rootKey];
+      zipConfig[rootKey] = clone(zipConfig[rootKey]);
+      _clean(zipConfig[rootKey], base, [rootKey]);
+    } else {
+      _clean(zipConfig[rootKey], undefined, [rootKey]);
+    }
+  }
+
+  return zipConfig;
+};
+
+/////////////
+
+// type: "r" - RenderedReactElement, "rf" - JsonLogicFunction to render React, "f" - JsonLogicFunction
 // x - iterate (with nesting `subfields`)
 const compileMeta = {
   fields: {
     x: {
       fieldSettings: {
+        asyncFetch: { type: "f", args: ["search", "offset"] },
         labelYes: { type: "r" },
         labelNo: { type: "r" },
         marks: { type: "r", isArr: true },
@@ -55,6 +130,7 @@ export const compileConfig = (config) => {
   const opts = createOptsForRCE(config.ctx);
 
   // todo !!!!!
+  addJsonLogicOperation("CALL", (fn, ctx, ...args) => (fn.call(ctx, ...args)));
   addJsonLogicOperation("RE", (type, props) => ({type, props}));
   addJsonLogicOperation("MERGE", (obj1, obj2) => ({...obj1, ...obj2}));
   addJsonLogicOperation("MAP", (entries) => Object.fromEntries(entries));
@@ -138,6 +214,7 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
 function compileJsonLogicReact(jl, opts, path) {
   if (isJsonLogic(jl)) {
     return function(props, ctx) {
+      ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
       const res = applyJsonLogic(jl, {
         props, ctx,
       });
@@ -152,7 +229,7 @@ function compileJsonLogicReact(jl, opts, path) {
 function compileJsonLogic(jl, opts, path, argNames) {
   if (isJsonLogic(jl)) {
     return function(...args) {
-      const ctx = this;
+      const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
       const data = argNames.reduce((acc, k, i) => ({...acc, [k]: args[i]}), { args, ctx });
       const ret = applyJsonLogic(jl, data);
       return ret;
@@ -176,6 +253,7 @@ function createOptsForRCE(ctx) {
       ...ctx.O,
     },
     RCE: ctx.RCE,
+    ctx,
   };
 }
 
@@ -490,11 +568,7 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
 
   //merge, but don't merge operators (rewrite instead)
   const typeConfig = config.types[argConfig.type] || {};
-  let ret = mergeWith({}, typeConfig, argConfig || {}, (objValue, srcValue, _key, _object, _source, _stack) => {
-    if (Array.isArray(objValue)) {
-      return srcValue;
-    }
-  });
+  let ret = mergeWith({}, typeConfig, argConfig || {}, mergeCustomizerNoArrays);
 
   return ret;
 };
@@ -512,11 +586,7 @@ export const getFieldConfig = (config, field) => {
 
   //merge, but don't merge operators (rewrite instead)
   const typeConfig = config.types[fieldConfig.type] || {};
-  let ret = mergeWith({}, typeConfig, fieldConfig || {}, (objValue, srcValue, _key, _object, _source, _stack) => {
-    if (Array.isArray(objValue)) {
-      return srcValue;
-    }
-  });
+  let ret = mergeWith({}, typeConfig, fieldConfig || {}, mergeCustomizerNoArrays);
 
   return ret;
 };
