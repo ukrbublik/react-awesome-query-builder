@@ -101,32 +101,32 @@ type JsonItem = JsonGroup|JsonAnyRule;
 type JsonSwitchGroup = {
   type: "switch_group",
   id?: string,
-  children1?: {[id: string]: JsonCaseGroup} | [JsonCaseGroup],
+  children1?: {[id: string]: JsonCaseGroup} | JsonCaseGroup[],
   properties?: SwitchGroupProperties
 };
 type JsonCaseGroup = {
   type: "case_group",
   id?: string,
-  children1?: {[id: string]: JsonGroup} | [JsonGroup],
+  children1?: {[id: string]: JsonGroup} | JsonGroup[],
   properties?: CaseGroupProperties
 };
 type JsonGroup = {
   type: "group",
   id?: string,
   // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
-  children1?: {[id: string]: JsonItem} | [JsonItem],
+  children1?: {[id: string]: JsonItem} | JsonItem[],
   properties?: GroupProperties
 }
 type JsonRuleGroup = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule} | [JsonRule],
+  children1?: {[id: string]: JsonRule} | JsonRule[],
   properties?: RuleGroupProperties
 }
 type JsonRuleGroupExt = {
   type: "rule_group",
   id?: string,
-  children1?: {[id: string]: JsonRule} | [JsonRule],
+  children1?: {[id: string]: JsonRule} | JsonRule[],
   properties?: RuleGroupExtProperties
 }
 type JsonRule = {
@@ -460,7 +460,7 @@ export interface Conjunction {
   jsonLogicConj?: string,
   sqlConj?: string,
   spelConj?: string,
-  spelConjs?: [string],
+  spelConjs?: string[],
   reversedConj?: string,
 }
 export type Conjunctions = TypedMap<Conjunction>;
@@ -534,7 +534,7 @@ interface BaseOperator {
   sqlOp?: string,
   sqlFormatOp?: SqlFormatOperator,
   spelOp?: string,
-  spelOps?: [string],
+  spelOps?: string[],
   spelFormatOp?: SpelFormatOperator,
   jsonLogic?: string | JsonLogicFormatOperator,
   _jsonLogicIsRevArgs?: boolean,
