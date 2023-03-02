@@ -101,7 +101,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
     if (!Array.isArray(vals))
       vals = [ vals ];
   }
-
+  
   let ret;
   let beforeErrorsCnt = meta.errors.length;
 
@@ -116,11 +116,11 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
   } else if(expectedType == "val") {
     // not is not used here
-    ret = convertField(op, vals, conv, config, not, meta, parentField)
-      || convertFunc(op, vals, conv, config, not, fieldConfig, meta, parentField)
+    ret = convertField(op, vals, conv, config, not, meta, parentField) 
+      || convertFunc(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertVal(logic, fieldConfig, widget, config, meta);
   } else if(expectedType == "rule") {
-    ret = convertConj(op, vals, conv, config, not, meta, parentField, false)
+    ret = convertConj(op, vals, conv, config, not, meta, parentField, false) 
     || convertOp(op, vals, conv, config, not, meta, parentField);
   }
 
@@ -241,7 +241,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
   }
 
   const fk = (jsonLogicIsMethod ? "#" : "") + func;
-  const funcKeys = (conv.funcs[fk] || []).filter(k =>
+  const funcKeys = (conv.funcs[fk] || []).filter(k => 
     (fieldConfig ? config.funcs[k].returnType == fieldConfig.type : true)
   );
   if (funcKeys.length) {
@@ -329,7 +329,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
       .filter(ancs => ancs && ancs.length);
     const usedRuleGroups = arrayUniq(Object.values(complexFieldsGroupAncestors).flat());
     const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
-
+    
     let properties = {
       conjunction: conjKey,
       not: not
@@ -443,14 +443,14 @@ const wrapInDefaultConj = (rule, config, not = false) => {
 
 const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   let errors = [];
-  let res = _parseRule(op, arity, vals, parentField, conv, config, errors, false)
+  let res = _parseRule(op, arity, vals, parentField, conv, config, errors, false) 
          || _parseRule(op, arity, vals, parentField, conv, config, errors, true) ;
 
   if (!res) {
     meta.errors.push(errors.join("; ") || `Unknown op ${op}/${arity}`);
     return undefined;
   }
-
+  
   return res;
 };
 
@@ -472,10 +472,9 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   const opk = op + "/" + cardinality;
   const {fieldSeparator} = config.settings;
   let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
-
   if (!opKeys)
     return;
-
+  
   let jlField, args = [];
   const rangeOps = ["<", "<=", ">", ">="];
   if (rangeOps.includes(op) && arity == 3) {
@@ -494,7 +493,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   }
   let k = Object.keys(jlField)[0];
   let v = Object.values(jlField)[0];
-
+  
   let field, having, isGroup;
   if (conv.varKeys.includes(k) && typeof v == "string") {
     field = v;
@@ -527,7 +526,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
       }
     }
   }
-
+  
   if (!field) {
     errors.push(`Unknown field ${JSON.stringify(jlField)}`);
     return;
@@ -553,7 +552,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
     }
     opKey = opKeys[0];
   }
-
+  
   return {
     field, fieldConfig, opKey, args, having
   };
@@ -582,7 +581,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
   // Otherwise try to revert
-  const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot;
+  const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
   let canRev = true;
   // if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
   //   canRev = false;
@@ -640,7 +639,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     }
     if (!res)
       return undefined;
-
+    
     res.type = "rule_group";
     Object.assign(res.properties, {
       field: field,
@@ -700,3 +699,4 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   return res;
 };
+
