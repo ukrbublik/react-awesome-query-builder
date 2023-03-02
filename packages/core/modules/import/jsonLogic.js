@@ -463,8 +463,11 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   let cardinality = isGroup0 ? 0 : arity - 1;
   if (isGroup0)
     cardinality = 0;
-  else if (eqOps.includes(op) && cardinality == 1 && vals[1] === null)
+  else if (eqOps.includes(op) && cardinality == 1 && vals[1] === null) {
+    arity = 1;
     cardinality = 0;
+    vals = [vals[0]];
+  }
 
   const opk = op + "/" + cardinality;
   const {fieldSeparator} = config.settings;
