@@ -16,6 +16,6 @@ const configMixin = {
   } as Partial<Settings>
 };
 
-const config: Config = merge( createConfig(MuiConfig), configMixin );
+const config: Config = merge( {}, createConfig(MuiConfig), configMixin );
 
 export default config;

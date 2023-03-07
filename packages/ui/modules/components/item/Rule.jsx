@@ -8,7 +8,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
+import {Col, DragIcon, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getFieldPathLabels} = Utils.RuleUtils;
@@ -96,7 +96,7 @@ class Rule extends PureComponent {
       this.props.removeSelf();
     };
     if (confirmOptions && !this.isEmptyCurrentRule()) {
-      renderConfirm({...confirmOptions,
+      renderConfirm.call(config.ctx, {...confirmOptions,
         onOk: doRemove,
         onCancel: null,
         confirmFn: confirmFn
@@ -319,4 +319,4 @@ class Rule extends PureComponent {
 }
 
 
-export default RuleContainer(Draggable("rule")(ConfirmFn(Rule)));
+export default RuleContainer(Draggable("rule")(WithConfirmFn(Rule)));

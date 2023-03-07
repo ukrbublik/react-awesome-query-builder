@@ -26,6 +26,6 @@ const configMixin = {
   } as Partial<Settings>
 };
 
-const config: Config = merge( createConfig(AntdConfig), configMixin );
+const config: Config = merge( {}, createConfig(AntdConfig), configMixin );
 
 export default config;

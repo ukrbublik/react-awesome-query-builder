@@ -11,14 +11,14 @@ const DragIcon = () => (
   </svg>
 );
 
-const ConfirmFn = (Cmp) => (
+const WithConfirmFn = (Cmp) => (
   props => {
     const {useConfirm} = props.config.settings;
-    const confirmFn = useConfirm ? useConfirm({}, props.config.ctx) : null;
+    const confirmFn = useConfirm ? useConfirm.call(props.config.ctx, props.config.ctx) : null;
     return <Cmp {...props} confirmFn={confirmFn} />;
   }
 );
 
 export {
-  Col, dummyFn, DragIcon, ConfirmFn
+  Col, dummyFn, DragIcon, WithConfirmFn
 };

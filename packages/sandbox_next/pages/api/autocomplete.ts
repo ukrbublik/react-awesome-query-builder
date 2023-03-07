@@ -19,7 +19,7 @@ const demoListValues = [
   { title: "J", value: "j" },
 ];
 
-const filter: AsyncFetchListValuesFn = Utils.Autocomplete.simulateAsyncFetch(demoListValues, 0, 0);
+const filter: AsyncFetchListValuesFn = Utils.Autocomplete.simulateAsyncFetch(demoListValues, 3, 0);
 
 async function get(req: NextApiRequest, res: NextApiResponse) {
   const search = String(req.query.search) || null;

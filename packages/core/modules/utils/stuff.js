@@ -149,7 +149,7 @@ export const cleanJSX = (jsx) => {
 };
 
 export const isDirtyJSX = (jsx) => {
-  return Object.keys(jsx).includes("_store");
+  return typeof jsx === "object" && jsx !== null && Object.keys(jsx).includes("_store");
 };
 
 export const isJSX = (jsx) => (

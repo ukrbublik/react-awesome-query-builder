@@ -11,6 +11,7 @@ export type Moment = MomentType;
 /////////////////
 
 export type RenderedReactElement = ReactElement | string;
+export type SerializedFunction = JsonLogicFunction | string;
 
 type AnyObject = object;
 type Empty = null | undefined;
@@ -45,7 +46,12 @@ type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 
-type ConfigContext = Object;
+type ConfigContext = {
+  W: Object,
+  O: Object,
+  components?: Object,
+  // todo
+};
 
 ////////////////
 // query value
@@ -195,7 +201,8 @@ export interface Utils {
   ConfigUtils: {
     UNSAFE_serializeConfig(config: Config): StrConfig;
     UNSAFE_deserializeConfig(strConfig: StrConfig, ctx: ConfigContext): Config;
-    compressConfig(config: Config, baseConfig: Config): Config;
+    compressConfig(config: Config, baseConfig: Config): ZipConfig;
+    decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
     compileConfig(config: Config): Config;
     extendConfig(config: Config): Config;
     getFieldConfig(config: Config, field: string): Field | null;
@@ -231,6 +238,8 @@ export interface Config {
 }
 
 export type StrConfig = string;
+
+export type ZipConfig = Omit<Config, "ctx">;
 
 /////////////////
 // Actions
@@ -409,18 +418,18 @@ export interface BaseWidget {
   valuePlaceholder?: string;
   valueLabel?: string;
   fullWidth?: boolean;
-  formatValue?: FormatValue;
-  sqlFormatValue?: SqlFormatValue;
-  spelFormatValue?: SpelFormatValue;
-  spelImportValue?: SpelImportValue;
-  mongoFormatValue?: MongoFormatValue;
-  elasticSearchFormatValue?: ElasticSearchFormatValue;
+  formatValue?: FormatValue | SerializedFunction;
+  sqlFormatValue?: SqlFormatValue | SerializedFunction;
+  spelFormatValue?: SpelFormatValue | SerializedFunction;
+  spelImportValue?: SpelImportValue | SerializedFunction;
+  mongoFormatValue?: MongoFormatValue | SerializedFunction;
+  elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
   hideOperator?: boolean;
-  jsonLogic?: JsonLogicFormatValue;
+  jsonLogic?: JsonLogicFormatValue | SerializedFunction;
   //obsolete:
-  validateValue?: ValidateValue | JsonLogicFunction;
+  validateValue?: ValidateValue | SerializedFunction;
   //@ui
-  factory: Factory<WidgetProps>;
+  factory: Factory<WidgetProps> | SerializedFunction;
   customProps?: AnyObject;
 }
 export interface RangeableWidget extends BaseWidget {
@@ -431,11 +440,11 @@ export interface FieldWidget {
   valueSrc: "field",
   valuePlaceholder?: string,
   valueLabel?: string,
-  formatValue: FormatValue, // with rightFieldDef
-  sqlFormatValue?: SqlFormatValue, // with rightFieldDef
-  spelFormatValue?: SpelFormatValue, // with rightFieldDef
+  formatValue: FormatValue | SerializedFunction, // with rightFieldDef
+  sqlFormatValue?: SqlFormatValue | SerializedFunction, // with rightFieldDef
+  spelFormatValue?: SpelFormatValue | SerializedFunction, // with rightFieldDef
   //obsolete:
-  validateValue?: ValidateValue | JsonLogicFunction,
+  validateValue?: ValidateValue | SerializedFunction,
   //@ui
   customProps?: AnyObject,
 }
@@ -462,9 +471,9 @@ type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boole
 
 export interface Conjunction {
   label: string,
-  formatConj: FormatConj,
-  sqlFormatConj: SqlFormatConj,
-  spelFormatConj: SpelFormatConj,
+  formatConj: FormatConj | SerializedFunction,
+  sqlFormatConj: SqlFormatConj | SerializedFunction,
+  spelFormatConj: SpelFormatConj | SerializedFunction,
   mongoConj: string,
   jsonLogicConj?: string,
   sqlConj?: string,
@@ -519,7 +528,7 @@ interface ProximityConfig {
   minProximity: number,
   maxProximity: number,
   defaults: {
-      proximity: number,
+    proximity: number,
   },
   customProps?: AnyObject,
 }
@@ -529,7 +538,7 @@ export interface ProximityProps extends ProximityConfig {
   config: Config,
 }
 export interface ProximityOptions extends ProximityConfig {
-  factory: Factory<ProximityProps>,
+  factory: Factory<ProximityProps> | SerializedFunction,
 }
 
 interface BaseOperator {
@@ -537,17 +546,17 @@ interface BaseOperator {
   reversedOp?: string,
   isNotOp?: boolean,
   cardinality?: number,
-  formatOp?: FormatOperator,
+  formatOp?: FormatOperator | SerializedFunction,
   labelForFormat?: string,
-  mongoFormatOp?: MongoFormatOperator,
+  mongoFormatOp?: MongoFormatOperator | SerializedFunction,
   sqlOp?: string,
-  sqlFormatOp?: SqlFormatOperator,
+  sqlFormatOp?: SqlFormatOperator | SerializedFunction,
   spelOp?: string,
   spelOps?: [string],
-  spelFormatOp?: SpelFormatOperator,
-  jsonLogic?: string | JsonLogicFormatOperator,
+  spelFormatOp?: SpelFormatOperator | SerializedFunction,
+  jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction,
   _jsonLogicIsRevArgs?: boolean,
-  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType,
+  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction,
   valueSources?: Array<ValueSource>,
 }
 interface UnaryOperator extends BaseOperator {
@@ -558,7 +567,7 @@ interface BinaryOperator extends BaseOperator {
 }
 interface Operator2 extends BaseOperator {
   //cardinality: 2
-  textSeparators: Array<string>,
+  textSeparators: Array<RenderedReactElement>,
   valueLabels: Array<string | {label: string, placeholder: string}>,
   isSpecialRange?: boolean,
 }
@@ -621,7 +630,7 @@ type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise
 
 
 export interface BasicFieldSettings {
-  validateValue?: ValidateValue | JsonLogicFunction,
+  validateValue?: ValidateValue | SerializedFunction,
 }
 export interface TextFieldSettings extends BasicFieldSettings {
   maxLength?: number,
@@ -645,7 +654,7 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   allowCustomValues?: boolean,
   showSearch?: boolean,
   showCheckboxes?: boolean,
-  asyncFetch?: AsyncFetchListValuesFn | JsonLogicFunction,
+  asyncFetch?: AsyncFetchListValuesFn | SerializedFunction,
   useLoadMore?: boolean,
   useAsyncSearch?: boolean,
   forceAsyncSearch?: boolean,
@@ -793,7 +802,7 @@ export interface LocaleSettings {
 
 export interface BehaviourSettings {
   valueSourcesInfo?: ValueSourcesInfo,
-  canCompareFieldWithField?: CanCompareFieldWithField,
+  canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction,
   canReorder?: boolean,
   canRegroup?: boolean,
   canRegroupCases?: boolean,
@@ -826,12 +835,12 @@ export interface BehaviourSettings {
 export interface OtherSettings {
   fieldSeparator?: string,
   fieldSeparatorDisplay?: string,
-  formatReverse?: FormatReverse,
-  sqlFormatReverse?: SqlFormatReverse,
-  spelFormatReverse?: SpelFormatReverse,
-  formatField?: FormatField,
-  formatSpelField?: FormatSpelField,
-  formarAggr?: FormatAggr,
+  formatReverse?: FormatReverse | SerializedFunction,
+  sqlFormatReverse?: SqlFormatReverse | SerializedFunction,
+  spelFormatReverse?: SpelFormatReverse | SerializedFunction,
+  formatField?: FormatField | SerializedFunction,
+  formatSpelField?: FormatSpelField | SerializedFunction,
+  formarAggr?: FormatAggr | SerializedFunction,
 }
 
 export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettings {
@@ -863,18 +872,18 @@ export interface Func {
   spelFunc?: string,
   mongoFunc?: string,
   mongoArgsAsObject?: boolean,
-  jsonLogic?: string | JsonLogicFormatFunc,
+  jsonLogic?: string | JsonLogicFormatFunc | JsonLogicFunction,
   // Deprecated!
   // Calling methods on objects was remvoed in JsonLogic 2.x
   // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean,
-  jsonLogicImport?: JsonLogicImportFunc,
-  formatFunc?: FormatFunc,
-  sqlFormatFunc?: SqlFormatFunc,
-  mongoFormatFunc?: MongoFormatFunc,
+  jsonLogicImport?: JsonLogicImportFunc | SerializedFunction,
+  formatFunc?: FormatFunc | SerializedFunction,
+  sqlFormatFunc?: SqlFormatFunc | SerializedFunction,
+  mongoFormatFunc?: MongoFormatFunc | SerializedFunction,
   renderBrackets?: Array<RenderedReactElement>,
   renderSeps?: Array<RenderedReactElement>,
-  spelFormatFunc?: SpelFormatFunc,
+  spelFormatFunc?: SpelFormatFunc | SerializedFunction,
   allowSelfNesting?: boolean,
 }
 export interface FuncArg extends ValueField {

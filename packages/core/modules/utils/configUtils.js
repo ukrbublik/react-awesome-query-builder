@@ -1,283 +1,14 @@
 import merge from "lodash/merge";
-import omit from "lodash/omit";
-import pick from "lodash/pick";
 import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart, isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
+import {mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
-import serializeJs from "serialize-javascript";
-import JL from "json-logic-js";
-import { BasicFuncs } from "..";
 
-
-
-/////////////
-
-const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _stack) => {
-  if (Array.isArray(objValue)) {
-    return srcValue;
-  }
-};
-
-export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
-
-export const compressConfig = (config, baseConfig) => {
-  let zipConfig = pick(config, configKeys);
-  delete zipConfig.ctx;
-
-  const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
-
-  const _clean = (target, base, path) => {
-    if (isObject(target)) {
-      if (base !== undefined) {
-        for (let k in base) {
-          if (!Object.keys(target).includes(k)) {
-            // deleted in target
-            target[k] = '$$deleted';
-          } else {
-            target[k] = _clean(target[k], base[k], [...path, k]);
-            if (target[k] === undefined) {
-              delete target[k];
-            }
-          }
-        }
-      }
-      for (let k in target) {
-        if (!base || !Object.keys(base).includes(k)) {
-          // new in target
-          _clean(target[k], base?.[k], [...path, k]);
-        }
-      }
-      if (isDirtyJSX(target)) {
-        target = cleanJSX(target);
-      }
-      if (Object.keys(target).length === 0) {
-        target = undefined;
-      }
-    } else if (Array.isArray(target)) {
-      // don't deep compare arrays
-    }
-
-    if (base !== undefined && shallowEqual(target, base)) {
-      return undefined;
-    }
-
-    if (typeof target === "function") {
-      throw new Error(`compressConfig: function at ${path.join(".")} should be converted to JsonLogic`);
-    }
-
-    return target;
-  };
-
-  for (const rootKey of configKeys) {
-    if (!["ctx", "fields"].includes(rootKey)) {
-      const base = rootKey === "funcs" ? BasicFuncs : baseConfig[rootKey];
-      zipConfig[rootKey] = clone(zipConfig[rootKey]);
-      _clean(zipConfig[rootKey], base, [rootKey]);
-    } else {
-      _clean(zipConfig[rootKey], undefined, [rootKey]);
-    }
-  }
-
-  return zipConfig;
-};
-
-/////////////
-
-// type: "r" - RenderedReactElement, "rf" - JsonLogicFunction to render React, "f" - JsonLogicFunction
-// x - iterate (with nesting `subfields`)
-const compileMeta = {
-  fields: {
-    x: {
-      fieldSettings: {
-        asyncFetch: { type: "f", args: ["search", "offset"] },
-        labelYes: { type: "r" },
-        labelNo: { type: "r" },
-        marks: { type: "r", isArr: true },
-        validateValue: { type: "f", args: ["val"] },
-      },
-    }
-  },
-  widgets: {
-    x: {
-      factory: { type: "rf" },
-    }
-  },
-  funcs: {
-    x: {
-      renderBrackets: { type: "r", isArr: true },
-      renderSeps: { type: "r", isArr: true },
-    }
-  },
-  settings: {
-    renderSwitchPrefix: { type: "rf" },
-    renderConfirm: { type: "rf" },
-    useConfirm: { type: "rf" },
-    renderField: { type: "rf" },
-  },
-};
-
-export const compileConfig = (config) => {
-  if (config.__compliled) {
-    return config;
-  }
-
-  config = {...config};
-
-  const opts = createOptsForRCE(config.ctx);
-
-  // todo !!!!!
-  addJsonLogicOperation("CALL", (fn, ctx, ...args) => (fn.call(ctx, ...args)));
-  addJsonLogicOperation("RE", (type, props) => ({type, props}));
-  addJsonLogicOperation("MERGE", (obj1, obj2) => ({...obj1, ...obj2}));
-  addJsonLogicOperation("MAP", (entries) => Object.fromEntries(entries));
-  addJsonLogicOperation("strlen", (str) => (str?.length || 0));
-  addJsonLogicOperation("test", (str, pattern, flags) => str?.match(new RegExp(pattern, flags)) != null);
-
-  const logs = [];
-  _compileConfigParts(config, config, opts, compileMeta, logs);
-  console.log(logs.join("\n"));
-
-  Object.defineProperty(config, "__compliled", {
-    enumerable: false,
-    writable: false,
-    value: true
-  });
-
-  return config;
-};
-
-function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
-  if (!subconfig) return;
-  const isRoot = !path.length;
-  for (const k in meta) {
-    const submeta = meta[k];
-    let newPath = k === "x" ? path : [...path, k];
-    if (isRoot) {
-      logs.push(`Cloned ${newPath.join(".")}`);
-      config[k] = clone(config[k]);
-    }
-    if (submeta.type === "r") {
-      const targetObj = subconfig;
-      const val = targetObj[k];
-      if (submeta.isArr) {
-        for (const ind in val) {
-          const newVal = renderReactElement(val[ind], opts, [...newPath, ind]);
-          if (newVal !== val[ind]) {
-            logs.push(`Compiled ${newPath.join(".")}[${ind}]`);
-            val[ind] = newVal;
-          }
-        }
-      } else {
-        const newVal = renderReactElement(val, opts, newPath);
-        if (newVal !== val) {
-          logs.push(`Compiled R ${newPath.join(".")}`);
-          targetObj[k] = newVal;
-        }
-      }
-    } else if (submeta.type === "rf") {
-      const targetObj = subconfig;
-      const val = targetObj[k];
-      const newVal = compileJsonLogicReact(val, opts, newPath);
-      if (newVal !== val) {
-        logs.push(`Compiled JL-RF ${newPath.join(".")}`);
-        targetObj[k] = newVal;
-      }
-    } else if (submeta.type === "f") {
-      const targetObj = subconfig;
-      const val = targetObj[k];
-      const newVal = compileJsonLogic(val, opts, newPath, submeta.args);
-      if (newVal !== val) {
-        logs.push(`Compiled JL-F ${newPath.join(".")}`);
-        targetObj[k] = newVal;
-      }
-    } else if (k === "x") {
-      for (const field in subconfig) {
-        newPath = [...path, field];
-        const def = subconfig[field];
-        _compileConfigParts(config, def, opts, submeta, logs, newPath);
-        if (def.subfields) {
-          // tip: need to pass `meta`, not `submeta`
-          _compileConfigParts(config, def.subfields, opts, meta, logs, newPath);
-        }
-      }
-    } else {
-      const def = subconfig[k];
-      _compileConfigParts(config, def, opts, submeta, logs, newPath);
-    }
-  }
-}
-
-function compileJsonLogicReact(jl, opts, path) {
-  if (isJsonLogic(jl)) {
-    return function(props, ctx) {
-      ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
-      const res = applyJsonLogic(jl, {
-        props, ctx,
-      });
-      const opts = createOptsForRCE(ctx);
-      const ret = renderReactElement(res, opts, path);
-      return ret;
-    };
-  }
-  return jl;
-}
-
-function compileJsonLogic(jl, opts, path, argNames) {
-  if (isJsonLogic(jl)) {
-    return function(...args) {
-      const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
-      const data = argNames.reduce((acc, k, i) => ({...acc, [k]: args[i]}), { args, ctx });
-      const ret = applyJsonLogic(jl, data);
-      return ret;
-    };
-  }
-  return jl;
-}
-
-function applyJsonLogic(logic, data) {
-  return JL.apply(logic, data);
-};
-
-function addJsonLogicOperation(name, op) {
-  return JL.add_operation(name, op);
-};
-
-function createOptsForRCE(ctx) {
-  return {
-    components: {
-      ...ctx.W,
-      ...ctx.O,
-    },
-    RCE: ctx.RCE,
-    ctx,
-  };
-}
-
-function renderReactElement(jsx, opts, path, key = undefined) {
-  if (isJSX(jsx)) {
-    if (jsx instanceof Array) {
-      return jsx.map((el, i) => renderReactElement(el, opts, path, i));
-    }
-    let { type, props } = jsx;
-    if (typeof type !== "string") {
-      throw new Error(`renderReactElement for ${path.join(".")}: type should be string`);
-    }
-    const Cmp = opts.components[type] || type.toLowerCase();
-    if (props?.children) {
-      props = { ...props, children: renderReactElement(props.children, opts, path) };
-    }
-    if (key !== undefined) {
-      props = { ...props, key };
-    }
-    return typeof Cmp === "function" ? Cmp(props) : opts.RCE(Cmp, props);
-  }
-  return jsx;
-}
-
+import { compileConfig } from "./configSerialize";
+export * from "./configSerialize";
 
 /////////////
 
@@ -485,6 +216,12 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
 
 /////////////
 
+const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _stack) => {
+  if (Array.isArray(objValue)) {
+    return srcValue;
+  }
+};
+
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
@@ -623,26 +360,4 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   const valueFieldSettings = (valueSrc == "value" || !valueSrc) && fieldConfig && fieldConfig.fieldSettings || {}; // useful to take 'validateValue'
   const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
   return mergedConfig;
-};
-
-/////////////
-
-export const UNSAFE_serializeConfig = (config) => {
-  let strConfig = serializeJs(omit(config, ["ctx"]), {
-    space: 2,
-    unsafe: true,
-  });
-  if (strConfig.includes("__WEBPACK_IMPORTED_MODULE_")) {
-    console.warn("Serialized config should not have references to libraries imported from webpack.");
-  }
-  if (strConfig.includes("\"_store\": {}")) {
-    console.warn("Serialized config should not have JSX.");
-  }
-  return strConfig;
-};
-
-export const UNSAFE_deserializeConfig = (strConfig, ctx) => {
-  let config = eval("("+strConfig+")");
-  config.ctx = ctx;
-  return config;
 };

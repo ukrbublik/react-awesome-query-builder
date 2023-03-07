@@ -178,7 +178,7 @@ const ctx = {
   ...CoreConfig.ctx,
   W: {...Widgets},
   O: {...CustomOperators},
-  RCE: (C, P) => React.createElement(C, P)
+  RCE: (C, P) => React.createElement(C, P),
 };
 
 //----------------------------

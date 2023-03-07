@@ -1,10 +1,10 @@
 import React from "react";
 import { createConfig } from "../../lib/config";
-import { MuiConfig, Config, FieldOrGroup, AsyncFetchListValuesResult } from "@react-awesome-query-builder/mui";
+import { MuiConfig, Config, FieldOrGroup, AsyncFetchListValuesResult, Utils } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
-import { ruRU } from "@mui/material/locale";
+import { ukUA } from "@mui/material/locale";
 
-const asyncFetch = async (search: string | null, offset: number): Promise<AsyncFetchListValuesResult> => {
+const autocompleteFetch = async (search: string | null, offset: number): Promise<AsyncFetchListValuesResult> => {
   const response = await fetch("/api/autocomplete?" + new URLSearchParams({
     search: search || "",
     offset: offset && String(offset) || null
@@ -18,31 +18,46 @@ const fieldsMixin: Record<string, Partial<FieldOrGroup>> = {
     fieldSettings: {
       marks: {
         0: <strong>0%</strong>,
-        100: <strong>100%</strong>
+        100: <strong>100%</strong>,
       },
     },
   },
   autocomplete: {
     fieldSettings: {
-      asyncFetch,
+      asyncFetch: "autocompleteFetch",
+      // same as:
+      // asyncFetch: { CALL: [ {var: "ctx.autocompleteFetch"}, null, {var: "search"}, {var: "offset"} ] },
     },
   },
   autocompleteMultiple: {
     fieldSettings: {
-      asyncFetch,
+      asyncFetch: "autocompleteFetch",
     },
   },
 };
 
+export const ctx = merge({}, MuiConfig.ctx, {
+  autocompleteFetch,
+  ukUA,
+});
+
 const configMixin = {
+  ctx,
   fields: fieldsMixin,
   settings: {
     locale: {
-      mui: ruRU
+      mui: { var: "ctx.ukUA" }
+    },
+    theme: {
+      mui: {
+        palette: {
+          primary: { main: '#03a9f4' },
+        },
+      }
     }
   }
 };
 
-const config: Config = merge( createConfig(MuiConfig), configMixin );
+const config: Config = merge( {}, createConfig(MuiConfig), configMixin );
 
 export default config;

@@ -6,7 +6,7 @@ import Draggable from "../containers/Draggable";
 import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
-import {ConfirmFn, DragIcon, dummyFn} from "../utils";
+import {WithConfirmFn, DragIcon, dummyFn} from "../utils";
 
 const defaultPosition = "topRight";
 
@@ -64,7 +64,7 @@ export class BasicGroup extends PureComponent {
       this.props.removeSelf();
     };
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
-      renderConfirm({...confirmOptions,
+      renderConfirm.call(config.ctx, {...confirmOptions,
         onOk: doRemove,
         onCancel: null,
         confirmFn: confirmFn
@@ -342,4 +342,4 @@ export class BasicGroup extends PureComponent {
   }
 }
 
-export default GroupContainer(Draggable("group")(ConfirmFn(BasicGroup)));
+export default GroupContainer(Draggable("group")(WithConfirmFn(BasicGroup)));

@@ -5,7 +5,7 @@ import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {GroupActions} from "./GroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, dummyFn, ConfirmFn} from "../utils";
+import {Col, dummyFn, WithConfirmFn} from "../utils";
 import Widget from "../rule/Widget";
 import classNames from "classnames";
 
@@ -181,5 +181,5 @@ class CaseGroup extends BasicGroup {
 
 }
 
-export default GroupContainer(Draggable("group case_group")(ConfirmFn(CaseGroup)));
+export default GroupContainer(Draggable("group case_group")(WithConfirmFn(CaseGroup)));
 

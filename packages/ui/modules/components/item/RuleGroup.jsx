@@ -6,7 +6,7 @@ import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {ConfirmFn} from "../utils";
+import {WithConfirmFn} from "../utils";
 
 
 class RuleGroup extends BasicGroup {
@@ -93,4 +93,4 @@ class RuleGroup extends BasicGroup {
 }
 
 
-export default GroupContainer(Draggable("group rule_group")(ConfirmFn(RuleGroup)));
+export default GroupContainer(Draggable("group rule_group")(WithConfirmFn(RuleGroup)));

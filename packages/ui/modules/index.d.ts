@@ -14,7 +14,7 @@ import {
   ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
   TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps, ConfigContext,
-  RenderedReactElement
+  RenderedReactElement, SerializedFunction
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -27,7 +27,7 @@ export * from "@react-awesome-query-builder/core";
 
 type ReactKey = string | number;
 interface ReactAttributes {
-    key?: ReactKey | null | undefined;
+  key?: ReactKey | null | undefined;
 }
 type FactoryWithContext<P> = (props?: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 
@@ -142,30 +142,30 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
-  renderField?: Factory<FieldProps>,
-  renderOperator?: Factory<FieldProps>,
-  renderFunc?: Factory<FieldProps>,
-  renderConjs?: Factory<ConjsProps>,
-  renderButton?: Factory<ButtonProps>,
-  renderButtonGroup?: Factory<ButtonGroupProps>,
-  renderSwitch?: Factory<SwitchProps>,
-  renderProvider?: FactoryWithContext<ProviderProps>,
-  renderValueSources?: Factory<ValueSourcesProps>,
-  renderConfirm?: ConfirmFunc,
-  useConfirm?: () => Function,
+  renderField?: Factory<FieldProps> | SerializedFunction,
+  renderOperator?: Factory<FieldProps> | SerializedFunction,
+  renderFunc?: Factory<FieldProps> | SerializedFunction,
+  renderConjs?: Factory<ConjsProps> | SerializedFunction,
+  renderButton?: Factory<ButtonProps> | SerializedFunction,
+  renderButtonGroup?: Factory<ButtonGroupProps> | SerializedFunction,
+  renderSwitch?: Factory<SwitchProps> | SerializedFunction,
+  renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,
+  renderValueSources?: Factory<ValueSourcesProps> | SerializedFunction,
+  renderConfirm?: ConfirmFunc | SerializedFunction,
+  useConfirm?: (() => Function) | SerializedFunction,
   renderSize?: AntdSize,
-  renderItem?: Factory<ItemBuilderProps>,
+  renderItem?: Factory<ItemBuilderProps> | SerializedFunction,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
   showLabels?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: Factory<FieldProps>,
-  renderAfterWidget?: Factory<FieldProps>,
-  renderBeforeActions?: Factory<FieldProps>,
-  renderAfterActions?: Factory<FieldProps>,
-  renderRuleError?: Factory<RuleErrorProps>,
-  renderSwitchPrefix?: RenderedReactElement,
+  renderBeforeWidget?: Factory<FieldProps> | SerializedFunction,
+  renderAfterWidget?: Factory<FieldProps> | SerializedFunction,
+  renderBeforeActions?: Factory<FieldProps> | SerializedFunction,
+  renderAfterActions?: Factory<FieldProps> | SerializedFunction,
+  renderRuleError?: Factory<RuleErrorProps> | SerializedFunction,
+  renderSwitchPrefix?: RenderedReactElement | SerializedFunction,
   defaultSliderWidth?: string,
   defaultSelectWidth?: string,
   defaultSearchWidth?: string,

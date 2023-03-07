@@ -8,7 +8,7 @@ import {RuleGroupExtActions} from "./RuleGroupExtActions";
 import FieldWrapper from "../rule/FieldWrapper";
 import OperatorWrapper from "../rule/OperatorWrapper";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, dummyFn, ConfirmFn} from "../utils";
+import {Col, dummyFn, WithConfirmFn} from "../utils";
 import Widget from "../rule/Widget";
 import classNames from "classnames";
 const {getFieldConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
@@ -201,5 +201,5 @@ class RuleGroupExt extends BasicGroup {
 }
 
 
-export default GroupContainer(Draggable("group rule_group_ext")(ConfirmFn(RuleGroupExt)));
+export default GroupContainer(Draggable("group rule_group_ext")(WithConfirmFn(RuleGroupExt)));
 
