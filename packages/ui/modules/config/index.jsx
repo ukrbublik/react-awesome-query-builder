@@ -3,35 +3,6 @@ import * as Widgets from "../components/widgets";
 import * as CustomOperators from "../components/operators";
 import {CoreConfig} from "@react-awesome-query-builder/core";
 
-const {
-  //value
-  VanillaBooleanWidget,
-  VanillaTextWidget,
-  VanillaTextAreaWidget,
-  VanillaDateWidget,
-  VanillaTimeWidget,
-  VanillaDateTimeWidget,
-  VanillaMultiSelectWidget,
-  VanillaSelectWidget,
-  VanillaNumberWidget,
-  VanillaSliderWidget,
-
-  //core
-  VanillaFieldSelect,
-  VanillaConjs,
-  VanillaButton,
-  VanillaButtonGroup,
-  VanillaProvider,
-  VanillaValueSources,
-  vanillaConfirm,
-  VanillaSwitch,
-
-  //common
-  ValueFieldWidget,
-  FuncWidget
-} = Widgets;
-const { ProximityOperator } = CustomOperators;
-
 
 //----------------------------  conjunctions
 
@@ -58,43 +29,43 @@ const operators = {
 const widgets = {
   text: {
     ...CoreConfig.widgets.text,
-    factory: (props) => <VanillaTextWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaTextWidget}}) => RCE(VanillaTextWidget, props),
   },
   textarea: {
     ...CoreConfig.widgets.textarea,
-    factory: (props) => <VanillaTextAreaWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaTextAreaWidget}}) => RCE(VanillaTextAreaWidget, props),
   },
   number: {
     ...CoreConfig.widgets.number,
-    factory: (props) => <VanillaNumberWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaNumberWidget}}) => RCE(VanillaNumberWidget, props),
   },
   slider: {
     ...CoreConfig.widgets.slider,
-    factory: (props) => <VanillaSliderWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaSliderWidget}}) => RCE(VanillaSliderWidget, props),
   },
   select: {
     ...CoreConfig.widgets.select,
-    factory: (props) => <VanillaSelectWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaSelectWidget}}) => RCE(VanillaSelectWidget, props),
   },
   multiselect: {
     ...CoreConfig.widgets.multiselect,
-    factory: (props) => <VanillaMultiSelectWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaMultiSelectWidget}}) => RCE(VanillaMultiSelectWidget, props),
   },
   date: {
     ...CoreConfig.widgets.date,
-    factory: (props) => <VanillaDateWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaDateWidget}}) => RCE(VanillaDateWidget, props),
   },
   time: {
     ...CoreConfig.widgets.time,
-    factory: (props) => <VanillaTimeWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaTimeWidget}}) => RCE(VanillaTimeWidget, props),
   },
   datetime: {
     ...CoreConfig.widgets.datetime,
-    factory: (props) => <VanillaDateTimeWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaDateTimeWidget}}) => RCE(VanillaDateTimeWidget, props),
   },
   boolean: {
     ...CoreConfig.widgets.boolean,
-    factory: (props) => <VanillaBooleanWidget {...props} />,
+    factory: (props, {RCE, W: {VanillaBooleanWidget}}) => RCE(VanillaBooleanWidget, props),
   },
   field: {
     ...CoreConfig.widgets.field,
@@ -142,16 +113,16 @@ const types = {
 const settings = {
   ...CoreConfig.settings,
 
-  renderField: (props) => <VanillaFieldSelect {...props} />,
-  renderOperator: (props) => <VanillaFieldSelect {...props} />,
-  renderFunc: (props) => <VanillaFieldSelect {...props} />,
-  renderConjs: (props) => <VanillaConjs {...props} />,
-  renderSwitch: (props) => <VanillaSwitch {...props} />,
-  renderButton: (props) => <VanillaButton {...props} />,
-  renderButtonGroup: (props) => <VanillaButtonGroup {...props} />,
-  renderProvider: (props) => <VanillaProvider {...props} />,
-  renderValueSources: (props) => <VanillaValueSources {...props} />,
-  renderConfirm: vanillaConfirm,
+  renderField: (props, {RCE, W: {VanillaFieldSelect}}) => RCE(VanillaFieldSelect, props),
+  renderOperator: (props, {RCE, W: {VanillaFieldSelect}}) => RCE(VanillaFieldSelect, props),
+  renderFunc: (props, {RCE, W: {VanillaFieldSelect}}) => RCE(VanillaFieldSelect, props),
+  renderConjs: (props, {RCE, W: {VanillaConjs}}) => RCE(VanillaConjs, props),
+  renderSwitch: (props, {RCE, W: {VanillaSwitch}}) => RCE(VanillaSwitch, props),
+  renderButton: (props, {RCE, W: {VanillaButton}}) => RCE(VanillaButton, props),
+  renderButtonGroup: (props, {RCE, W: {VanillaButtonGroup}}) => RCE(VanillaButtonGroup, props),
+  renderProvider: (props, {RCE, W: {VanillaProvider}}) => RCE(VanillaProvider, props),
+  renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
+  renderConfirm: (props, {W: {vanillaConfirm}}) => vanillaConfirm(props),
   renderSwitchPrefix: "Conditions",
 
   customFieldSelectProps: {
@@ -176,8 +147,12 @@ const settings = {
 
 const ctx = {
   ...CoreConfig.ctx,
-  W: {...Widgets},
-  O: {...CustomOperators},
+  W: {
+    ...Widgets
+  },
+  O: {
+    ...CustomOperators
+  },
   RCE: (C, P) => React.createElement(C, P),
 };
 

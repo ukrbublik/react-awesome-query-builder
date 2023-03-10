@@ -2,7 +2,7 @@ import React from "react";
 import en_US from "antd/es/locale/en_US";
 import AntdWidgets from "../widgets";
 import { normalizeListValues } from "../utils/stuff";
-import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
+import { BasicConfig } from "@react-awesome-query-builder/ui";
 
 
 

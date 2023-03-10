@@ -1,6 +1,6 @@
 import React from "react";
 import MuiWidgets from "../widgets";
-import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
+import { BasicConfig } from "@react-awesome-query-builder/ui";
 
 
 const settings = {

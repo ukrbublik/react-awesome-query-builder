@@ -5,11 +5,16 @@ import pick from "lodash/pick";
 import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
 import clone from "clone";
 import serializeJs from "serialize-javascript";
-import { applyJsonLogic, addRequiredJsonLogicOperations } from "./jsonLogic";
+import JL from "json-logic-js";
+import { addRequiredJsonLogicOperations } from "./jsonLogic";
 import { BasicFuncs } from "..";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
+
+function applyJsonLogic(logic, data) {
+  return JL.apply(logic, data);
+};
 
 export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
 
