@@ -84,10 +84,10 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),

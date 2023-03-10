@@ -47,10 +47,11 @@ type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 
 type ConfigContext = {
-  W: Object,
-  O: Object,
-  components?: Object,
-  // todo
+  utils: TypedMap<any>,
+  W: TypedMap<ElementType<any>>,
+  O: TypedMap<ElementType<any>>,
+  components?: TypedMap<ElementType<any>>,
+  [key: string]: any;
 };
 
 ////////////////

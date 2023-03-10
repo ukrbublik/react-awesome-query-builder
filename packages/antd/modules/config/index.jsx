@@ -129,12 +129,12 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
-    spelFormatValue: function (val) { return this.spelEscape(val); },
+    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
     singleWidget: "slider",
     toJS: (val, fieldSettings) => (val),
   },
@@ -146,13 +146,13 @@ const widgets = {
     valueLabel: "Value",
     valuePlaceholder: "Select value",
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      let valLabel = this.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? this.stringifyForDisplay(valLabel) : JSON.stringify(val);
+      let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
+      return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
-    spelFormatValue: function (val) { return this.spelEscape(val); },
+    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
   },
   treemultiselect: {
@@ -163,13 +163,13 @@ const widgets = {
     valueLabel: "Values",
     valuePlaceholder: "Select values",
     formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
-      let valsLabels = vals.map(v => this.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(this.stringifyForDisplay) : vals.map(JSON.stringify);
+      let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
+      return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
     },
     sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
-      return vals.map(v => this.SqlString.escape(v));
+      return vals.map(v => this.utils.SqlString.escape(v));
     },
-    spelFormatValue: function (val) { return this.spelEscape(val); },
+    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
   },
 };

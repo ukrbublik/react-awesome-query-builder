@@ -49,17 +49,19 @@ export const mongoFormatOp2 = (mops, not,  field, _op, values, useExpr, valueSrc
 };
 
 const ctx = {
-  moment,
-  SqlString,
-  mongoFormatOp1,
-  mongoFormatOp2,
-  mongoEmptyValue,
-  escapeRegExp,
-  sqlEmptyValue,
-  stringifyForDisplay,
-  getTitleInListValues,
-  spelEscape,
-  spelFixList,
+  utils: {
+    SqlString,
+    moment,
+    mongoFormatOp1,
+    mongoFormatOp2,
+    mongoEmptyValue,
+    escapeRegExp,
+    sqlEmptyValue,
+    stringifyForDisplay,
+    getTitleInListValues,
+    spelEscape,
+    spelFixList,
+  },
 };
 
 export default ctx;

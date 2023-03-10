@@ -77,7 +77,7 @@ const operators = {
       else
         return `${field} ${opStr} ${value}`;
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$eq", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
     jsonLogic: "==",
     elasticSearchQueryType: "term",
   },
@@ -95,7 +95,7 @@ const operators = {
       else
         return `${field} ${opDef.label} ${value}`;
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$ne", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
     jsonLogic: "!=",
   },
   less: {
@@ -105,7 +105,7 @@ const operators = {
     spelOp: "<",
     spelOps: ["<", "lt"],
     reversedOp: "greater_or_equal",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$lt", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$lt", v => v, false, ...args); },
     jsonLogic: "<",
     elasticSearchQueryType: "range",
   },
@@ -116,7 +116,7 @@ const operators = {
     spelOp: "<=",
     spelOps: ["<=", "le"],
     reversedOp: "greater",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$lte", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$lte", v => v, false, ...args); },
     jsonLogic: "<=",
     elasticSearchQueryType: "range",
   },
@@ -127,7 +127,7 @@ const operators = {
     spelOp: ">",
     spelOps: [">", "gt"],
     reversedOp: "less_or_equal",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$gt", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gt", v => v, false, ...args); },
     jsonLogic: ">",
     elasticSearchQueryType: "range",
   },
@@ -138,7 +138,7 @@ const operators = {
     spelOp: ">=",
     spelOps: [">=", "ge"],
     reversedOp: "less",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$gte", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gte", v => v, false, ...args); },
     jsonLogic: ">=",
     elasticSearchQueryType: "range",
   },
@@ -149,7 +149,7 @@ const operators = {
     sqlOp: "LIKE",
     spelOp: ".contains",
     spelOps: ["matches", ".contains"],
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.escapeRegExp(v) : undefined), false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
     //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
     jsonLogic: "in",
     _jsonLogicIsRevArgs: true,
@@ -162,7 +162,7 @@ const operators = {
     reversedOp: "like",
     labelForFormat: "Not Contains",
     sqlOp: "NOT LIKE",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.escapeRegExp(v) : undefined), true, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), true, ...args); },
     valueSources: ["value"],
   },
   starts_with: {
@@ -171,7 +171,7 @@ const operators = {
     sqlOp: "LIKE",
     spelOp: ".startsWith",
     spelOps: ["matches", ".startsWith"],
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$regex", v => (typeof v == "string" ? "^" + this.escapeRegExp(v) : undefined), false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? "^" + this.utils.escapeRegExp(v) : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
   },
@@ -181,7 +181,7 @@ const operators = {
     sqlOp: "LIKE",
     spelOp: ".endsWith",
     spelOps: ["matches", ".endsWith"],
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.escapeRegExp(v) + "$" : undefined), false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) + "$" : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
   },
@@ -203,7 +203,7 @@ const operators = {
       const valTo = values[1];
       return `${field} >= ${valFrom} && ${field} <= ${valTo}`;
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp2(["$gte", "$lte"], false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp2(["$gte", "$lte"], false, ...args); },
     valueLabels: [
       "Value from",
       "Value to"
@@ -243,7 +243,7 @@ const operators = {
       const valTo = values[1];
       return `(${field} < ${valFrom} || ${field} > ${valTo})`;
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp2(["$gte", "$lte"], true, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp2(["$gte", "$lte"], true, ...args); },
     valueLabels: [
       "Value from",
       "Value to"
@@ -269,14 +269,14 @@ const operators = {
       return isForDisplay ? `${field} IS EMPTY` : `!${field}`;
     },
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
-      const empty = this.sqlEmptyValue(fieldDef);
+      const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) = ${empty}`;
     },
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is empty or null
       return `${field} <= ''`;
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$in", (v, fieldDef) => [this.mongoEmptyValue(fieldDef), null], false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", (v, fieldDef) => [this.utils.mongoEmptyValue(fieldDef), null], false, ...args); },
     jsonLogic: "!",
   },
   is_not_empty: {
@@ -289,14 +289,14 @@ const operators = {
       return isForDisplay ? `${field} IS NOT EMPTY` : `!!${field}`;
     },
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
-      const empty = this.sqlEmptyValue(fieldDef);
+      const empty = this.utils.sqlEmptyValue(fieldDef);
       return `COALESCE(${field}, ${empty}) <> ${empty}`;
     },
     spelFormatOp: (field, op, values, valueSrc, valueTypes, opDef, operatorOptions, fieldDef) => {
       //tip: is not empty and not null
       return `${field} > ''`;
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$nin", (v, fieldDef) => [this.mongoEmptyValue(fieldDef), null], false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$nin", (v, fieldDef) => [this.utils.mongoEmptyValue(fieldDef), null], false, ...args); },
     jsonLogic: "!!",
     elasticSearchQueryType: "exists",
   },
@@ -313,7 +313,7 @@ const operators = {
       return `${field} == null`;
     },
     // check if value is null OR not exists
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$eq", v => null, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => null, false, ...args); },
     jsonLogic: "==",
   },
   is_not_null: {
@@ -329,7 +329,7 @@ const operators = {
       return `${field} != null`;
     },
     // check if value exists and is not null
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$ne", v => null, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => null, false, ...args); },
     jsonLogic: "!=",
     elasticSearchQueryType: "exists",
   },
@@ -343,7 +343,7 @@ const operators = {
     },
     spelOp: "==",
     spelOps: ["==", "eq"],
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$eq", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
     reversedOp: "select_not_equals",
     jsonLogic: "==",
     elasticSearchQueryType: "term",
@@ -358,7 +358,7 @@ const operators = {
     },
     spelOp: "!=",
     spelOps: ["!=", "ne"],
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$ne", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
     reversedOp: "select_equals",
     jsonLogic: "!=",
   },
@@ -378,7 +378,7 @@ const operators = {
       } else return undefined; // not supported
     },
     spelOp: "$contains", // tip: $ means first arg is object
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$in", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
     reversedOp: "select_not_any_in",
     jsonLogic: "in",
     elasticSearchQueryType: "term",
@@ -399,7 +399,7 @@ const operators = {
         return `${field} NOT IN (${values.join(", ")})`;
       } else return undefined; // not supported
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$nin", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$nin", v => v, false, ...args); },
     reversedOp: "select_any_in",
   },
   // it's not "contains all", but "contains any" operator
@@ -420,7 +420,7 @@ const operators = {
     //spelOp: ".containsAll",
     spelOp: "CollectionUtils.containsAny()",
     elasticSearchQueryType: "term",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$in", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
   },
   multiselect_not_contains: {
     isNotOp: true,
@@ -448,12 +448,12 @@ const operators = {
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
       if (valueSrc == "value")
       // set
-        return `${field} = '${values.map(v => this.SqlString.trim(v)).join(",")}'`;
+        return `${field} = '${values.map(v => this.utils.SqlString.trim(v)).join(",")}'`;
       else
         return undefined; //not supported
     },
     spelOp: ".equals",
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$eq", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
     reversedOp: "multiselect_not_equals",
     jsonLogic2: "all-in",
     jsonLogic: (field, op, vals) => ({
@@ -476,11 +476,11 @@ const operators = {
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
       if (valueSrc == "value")
       // set
-        return `${field} != '${values.map(v => this.SqlString.trim(v)).join(",")}'`;
+        return `${field} != '${values.map(v => this.utils.SqlString.trim(v)).join(",")}'`;
       else
         return undefined; //not supported
     },
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$ne", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$ne", v => v, false, ...args); },
     reversedOp: "multiselect_equals",
   },
   proximity: {
@@ -503,8 +503,8 @@ const operators = {
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
       const val1 = values.first();
       const val2 = values.get(1);
-      const aVal1 = this.SqlString.trim(val1);
-      const aVal2 = this.SqlString.trim(val2);
+      const aVal1 = this.utils.SqlString.trim(val1);
+      const aVal2 = this.utils.SqlString.trim(val2);
       const prox = operatorOptions.get("proximity");
       return `CONTAINS(${field}, 'NEAR((${aVal1}, ${aVal2}), ${prox})')`;
     },
@@ -527,7 +527,7 @@ const operators = {
     cardinality: 0,
     jsonLogic: "some",
     spelFormatOp: (filteredSize) => `${filteredSize} > 0`,
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$gt", v => 0, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$gt", v => 0, false, ...args); },
   },
   all: {
     label: "All",
@@ -535,7 +535,7 @@ const operators = {
     cardinality: 0,
     jsonLogic: "all",
     spelFormatOp: (filteredSize, op, fullSize) => `${filteredSize} == ${fullSize}`,
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$eq", v => v, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
   },
   none: {
     label: "None",
@@ -543,7 +543,7 @@ const operators = {
     cardinality: 0,
     jsonLogic: "none",
     spelFormatOp: (filteredSize) => `${filteredSize} == 0`,
-    mongoFormatOp: function(...args) { return this.mongoFormatOp1("$eq", v => 0, false, ...args); },
+    mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => 0, false, ...args); },
   }
 };
 
@@ -558,28 +558,28 @@ const widgets = {
     valueLabel: "String",
     valuePlaceholder: "Enter string",
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       if (opDef.spelOp == "matches" && op != "regex") {
         let regex;
         if (op == "starts_with") {
-          regex = `(?s)^${this.escapeRegExp(val)}.*`;
+          regex = `(?s)^${this.utils.escapeRegExp(val)}.*`;
         } else if (op == "ends_with") {
-          regex = `(?s).*${this.escapeRegExp(val)}$`;
+          regex = `(?s).*${this.utils.escapeRegExp(val)}$`;
         } else { // op == 'like'
-          regex = `(?s).*${this.escapeRegExp(val)}.*`; //tip: can use (?sui) for case-insensitive
+          regex = `(?s).*${this.utils.escapeRegExp(val)}.*`; //tip: can use (?sui) for case-insensitive
         }
-        return this.spelEscape(regex);
+        return this.utils.spelEscape(regex);
       } else {
-        return this.spelEscape(val);
+        return this.utils.spelEscape(val);
       }
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
-        return this.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
       } else {
-        return this.SqlString.escape(val);
+        return this.utils.SqlString.escape(val);
       }
     },
     toJS: (val, fieldSettings) => (val),
@@ -592,16 +592,16 @@ const widgets = {
     valueLabel: "Text",
     valuePlaceholder: "Enter text",
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
-        return this.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
+        return this.utils.SqlString.escapeLike(val, op != "starts_with", op != "ends_with");
       } else {
-        return this.SqlString.escape(val);
+        return this.utils.SqlString.escape(val);
       }
     },
-    spelFormatValue: function (val) { return this.spelEscape(val); },
+    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
     fullWidth: true,
@@ -617,14 +617,14 @@ const widgets = {
       { label: "Number to", placeholder: "Enter number to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef) {
       const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
-      return this.spelEscape(val, isFloat);
+      return this.utils.spelEscape(val, isFloat);
     },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
@@ -636,12 +636,12 @@ const widgets = {
     valueLabel: "Number",
     valuePlaceholder: "Enter number or move slider",
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.stringifyForDisplay(val) : JSON.stringify(val);
+      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
-    spelFormatValue: function (val) { return this.spelEscape(val); },
+    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -652,13 +652,13 @@ const widgets = {
     valueLabel: "Value",
     valuePlaceholder: "Select value",
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      let valLabel = this.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? this.stringifyForDisplay(valLabel) : JSON.stringify(val);
+      let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
+      return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
-    spelFormatValue: function (val) { return this.spelEscape(val); },
+    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
     toJS: (val, fieldSettings) => (val),
     mongoFormatValue: (val, fieldDef, wgtDef) => (val),
   },
@@ -669,19 +669,19 @@ const widgets = {
     valueLabel: "Values",
     valuePlaceholder: "Select values",
     formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
-      let valsLabels = vals.map(v => this.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(this.stringifyForDisplay) : vals.map(JSON.stringify);
+      let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
+      return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
     },
     sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
-      return vals.map(v => this.SqlString.escape(v));
+      return vals.map(v => this.utils.SqlString.escape(v));
     },
     spelFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
       const isCallable = opDef.spelOp && opDef.spelOp[0] == "$";
-      let res = this.spelEscape(vals); // inline list
+      let res = this.utils.spelEscape(vals); // inline list
       if (isCallable) {
         // `{1,2}.contains(1)` NOT works
         // `{1,2}.?[true].contains(1)` works
-        res = this.spelFixList(res);
+        res = this.utils.spelFixList(res);
       }
       return res;
     },
@@ -702,26 +702,26 @@ const widgets = {
       { label: "Date to", placeholder: "Enter date to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
-      return this.SqlString.escape(dateVal.format("YYYY-MM-DD"));
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      return this.utils.SqlString.escape(dateVal.format("YYYY-MM-DD"));
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return `new java.text.SimpleDateFormat('yyyy-MM-dd').parse('${dateVal.format("YYYY-MM-DD")}')`;
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
-      return this.moment(val, wgtDef.valueFormat).toDate();
+      return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },
     toJS: function (val, fieldSettings) {
-      const dateVal = this.moment(val, fieldSettings.valueFormat);
+      const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     }
   },
@@ -740,31 +740,31 @@ const widgets = {
       { label: "Time to", placeholder: "Enter time to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.timeFormat) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
-      return this.SqlString.escape(dateVal.format("HH:mm:ss"));
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      return this.utils.SqlString.escape(dateVal.format("HH:mm:ss"));
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return `T(java.time.LocalTime).parse('${dateVal.format("HH:mm:ss")}')`;
       //return `new java.text.SimpleDateFormat('HH:mm:ss').parse('${dateVal.format("HH:mm:ss")}')`;
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
       // return seconds of day
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second");
     },
     toJS: function (val, fieldSettings) {
       // return seconds of day
-      const dateVal = this.moment(val, fieldSettings.valueFormat);
+      const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second") : undefined;
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       // return seconds of day
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.get("hour") * 60 * 60 + dateVal.get("minute") * 60 + dateVal.get("second");
     },
     elasticSearchFormatValue: function elasticSearchFormatValue(queryType, value, operator, fieldName) {
@@ -797,26 +797,26 @@ const widgets = {
       { label: "Datetime to", placeholder: "Enter datetime to" },
     ],
     formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return isForDisplay ? dateVal.format(wgtDef.dateFormat + " " + wgtDef.timeFormat) : JSON.stringify(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
-      return this.SqlString.escape(dateVal.toDate());
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
+      return this.utils.SqlString.escape(dateVal.toDate());
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return `new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').parse('${dateVal.format("YYYY-MM-DD HH:mm:ss")}')`;
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
-      return this.moment(val, wgtDef.valueFormat).toDate();
+      return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },
     toJS: function (val, fieldSettings) {
-      const dateVal = this.moment(val, fieldSettings.valueFormat);
+      const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
-      const dateVal = this.moment(val, wgtDef.valueFormat);
+      const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return dateVal.isValid() ? dateVal.toDate() : undefined;
     }
   },
@@ -830,10 +830,10 @@ const widgets = {
       return isForDisplay ? (val ? "Yes" : "No") : JSON.stringify(!!val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.SqlString.escape(val);
+      return this.utils.SqlString.escape(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.spelEscape(val);
+      return this.utils.spelEscape(val);
     },
     defaultValue: false,
     toJS: (val, fieldSettings) => (val),
@@ -862,7 +862,7 @@ const widgets = {
     valueSrc: "value",
     type: "case_value",
     spelFormatValue: function (val) {
-      return this.spelEscape(val === "" ? null : val);
+      return this.utils.spelEscape(val === "" ? null : val);
     },
     spelImportValue: (val) => {
       return [val.value, []];
@@ -1164,14 +1164,14 @@ const settings = {
     let fieldName = partsExt.map(({key, parent}, ind) => {
       if (ind == 0) {
         if (parent == "[map]")
-          return `#this[${this.spelEscape(key)}]`;
+          return `#this[${this.utils.spelEscape(key)}]`;
         else if (parent == "[class]")
           return key;
         else
           return key;
       } else {
         if (parent == "map" || parent == "[map]")
-          return `[${this.spelEscape(key)}]`;
+          return `[${this.utils.spelEscape(key)}]`;
         else if (parent == "class" || parent == "[class]")
           return `.${key}`;
         else

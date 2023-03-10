@@ -35,7 +35,7 @@ const RELATIVE_DATETIME = {
     return [date, op, val, dim];
   },
   jsonLogicCustomOps: {
-    date_add: function (date, val, dim) { return this.moment(date).add(val, dim).toDate(); }
+    date_add: function (date, val, dim) { return this.utils.moment(date).add(val, dim).toDate(); }
   },
   // MySQL
   //todo: other SQL dialects?
