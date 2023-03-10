@@ -36,7 +36,9 @@ export default class MultiSelectWidget extends PureComponent {
     mapListValues(listValues, ({title, value}) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title, null));
     });
-    this.optionsMaxWidth = optionsMaxWidth;
+    if (!isNaN(optionsMaxWidth) && optionsMaxWidth) {
+      this.optionsMaxWidth = optionsMaxWidth;
+    }
 
     this.options = mapListValues(listValues, ({title, value}) => {
       return (<Option key={value} value={value}>{title}</Option>);
@@ -58,9 +60,10 @@ export default class MultiSelectWidget extends PureComponent {
     const {config, placeholder, allowCustomValues, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
+    const dropdownEmptyWidth = placeholderWidth ? placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
     const aValue = value && value.length ? value : undefined;
-    const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const width = aValue ? null : dropdownEmptyWidth;
+    const dropdownWidth = this.optionsMaxWidth ? this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
     const customSelectProps = omit(customProps, ["showCheckboxes"]);
     
     return (

@@ -5,30 +5,11 @@ import pick from "lodash/pick";
 import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
 import clone from "clone";
 import serializeJs from "serialize-javascript";
-import JL from "json-logic-js";
+import { applyJsonLogic, addRequiredJsonLogicOperations } from "./jsonLogic";
 import { BasicFuncs } from "..";
 
+// Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
-
-/////////////
-
-function applyJsonLogic(logic, data) {
-  return JL.apply(logic, data);
-};
-
-function addJsonLogicOperation(name, op) {
-  return JL.add_operation(name, op);
-};
-
-function addRequiredJsonLogicOperations() {
-  // todo !!!!!
-  addJsonLogicOperation("CALL", (fn, ctx, ...args) => (fn.call(ctx, ...args)));
-  addJsonLogicOperation("RE", (type, props) => ({type, props}));
-  addJsonLogicOperation("MERGE", (obj1, obj2) => ({...obj1, ...obj2}));
-  addJsonLogicOperation("MAP", (entries) => Object.fromEntries(entries));
-  addJsonLogicOperation("strlen", (str) => (str?.length || 0));
-  addJsonLogicOperation("test", (str, pattern, flags) => str?.match(new RegExp(pattern, flags)) != null);
-};
 
 export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
 
@@ -119,6 +100,8 @@ const compileMetaSettings = {
   formatSpelField: { type: "f", args: ["field", "parentField", "parts", "partsExt", "fieldDefinition", "config"] },
   formarAggr: { type: "f", args: ["whereStr", "aggrField", "operator", "value", "valueSrc", "valueType", "opDef", "operatorOptions", "isForDisplay", "aggrFieldDef"] },
   
+  normalizeListValues: { type: "f", args: ["listValues", "type", "fieldSettings"] },
+
   renderConfirm: { type: "f", args: ["props"] },
   useConfirm: { type: "f", args: [] },
 

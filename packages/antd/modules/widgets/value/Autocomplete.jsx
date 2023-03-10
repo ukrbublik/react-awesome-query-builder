@@ -40,8 +40,8 @@ export default (props) => {
   const { defaultSelectWidth, defaultSearchWidth, renderSize } = config.settings;
   const placeholderWidth = calcTextWidth(placeholder);
   const aValue = value && value.length ? value : undefined;
-  const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
-  const dropdownWidth = optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
+  const width = aValue || !placeholderWidth ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+  const dropdownWidth = optionsMaxWidth && !isNaN(optionsMaxWidth) ? optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
   const minWidth = width || defaultSelectWidth;
   
   const style = {

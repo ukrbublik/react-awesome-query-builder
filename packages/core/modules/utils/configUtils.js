@@ -147,7 +147,8 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
 
     if (fieldConfig.fieldSettings.listValues) {
       if (config.settings.normalizeListValues) {
-        fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues(
+        fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues.call(
+          config.ctx,
           fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings
         );
       }
