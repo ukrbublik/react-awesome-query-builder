@@ -1,22 +1,28 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import {
-  Utils,
+  Utils, CoreConfig,
   //types:
-  ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
+  ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult, StrConfig
 } from "@react-awesome-query-builder/core";
 import { IronSession } from "iron-session";
 import { withSessionRoute } from "../../lib/withSession";
-import loadedConfig from "../../lib/config";
+import serverConfig from "../../lib/config";
 import loadedInitValue from "../../lib/init_value";
 import loadedInitLogic from "../../lib/init_logic";
 const {
   uuid, checkTree, loadFromJsonLogic, loadTree,
   jsonLogicFormat, queryString, sqlFormat, mongodbFormat, getTree
 } = Utils;
+const { UNSAFE_serializeConfig, UNSAFE_deserializeConfig } = Utils.ConfigUtils;
 
 
 type Session = IronSession & {
   tree: JsonTree;
+};
+
+export type PostBody = {
+  jsonTree: JsonTree,
+  strConfig: StrConfig,
 };
 
 export interface PostResult {
@@ -54,7 +60,7 @@ export async function getSavedTree(req: NextApiRequest): Promise<JsonTree> {
   const session = req.session as Session;
   let tree: JsonTree = session.tree;
   if (!tree) {
-    tree = getInitialTree(loadedConfig);
+    tree = getInitialTree(serverConfig);
     await saveTree(session, tree);
   }
   return tree;
@@ -77,22 +83,22 @@ function prepareResult(immutableTree: ImmutableTree, config: Config): PostResult
     qs,
     qsh,
     sql,
-    mongo
+    mongo,
   };
   return result;
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse<PostResult>) {
   const session = req.session as Session;
-  const tree = req.body as JsonTree;
-  const immutableTree: ImmutableTree = loadTree(tree);
-  await saveTree(session, tree);
-  const result = prepareResult(immutableTree, loadedConfig);
+  const { jsonTree } = JSON.parse(req.body as string) as PostBody;
+  const immutableTree: ImmutableTree = loadTree(jsonTree);
+  await saveTree(session, jsonTree);
+  const result = prepareResult(immutableTree, serverConfig);
   return res.status(200).json(result);
 }
 
 async function get(req: NextApiRequest, res: NextApiResponse<GetResult>) {
-  const tree: JsonTree = req.query["initial"] ? getInitialTree(loadedConfig) : await getSavedTree(req);
+  const tree: JsonTree = req.query["initial"] ? getInitialTree(serverConfig) : await getSavedTree(req);
   const result: GetResult = {
     tree
   };
@@ -101,7 +107,7 @@ async function get(req: NextApiRequest, res: NextApiResponse<GetResult>) {
 
 async function del(req: NextApiRequest, res: NextApiResponse<GetResult>) {
   const session = req.session as Session;
-  const tree: JsonTree = req.query["initial"] ? getInitialTree(loadedConfig) : getEmptyTree();
+  const tree: JsonTree = req.query["initial"] ? getInitialTree(serverConfig) : getEmptyTree();
   await saveTree(session, tree);
   const result: GetResult = {
     tree

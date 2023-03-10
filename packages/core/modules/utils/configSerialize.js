@@ -192,6 +192,9 @@ export const compressConfig = (config, baseConfig) => {
           // new in target
           target[k] = _clean(target[k], base?.[k], [...path, k]);
         }
+        if (target[k] === undefined) {
+          delete target[k];
+        }
       }
       if (Object.keys(target).length === 0) {
         target = undefined;
@@ -301,7 +304,7 @@ export const compileConfig = (config) => {
 
   const logs = [];
   _compileConfigParts(config, config, opts, compileMeta, logs);
-  console.log(logs.join("\n"));
+  //console.log(logs.join("\n"));
 
   Object.defineProperty(config, "__compliled", {
     enumerable: false,

@@ -242,6 +242,17 @@ export type StrConfig = string;
 
 export type ZipConfig = Omit<Config, "ctx">;
 
+export interface ConfigMixin {
+  conjunctions?: Record<string, Partial<Conjunction>>,
+  operators?: Record<string, Partial<Operator>>,
+  widgets?: Record<string, Partial<Widget>>,
+  types?: Record<string, Partial<Type>>,
+  settings?: Partial<Settings>,
+  fields?: Record<string, Partial<Field>>,
+  funcs?: Record<string, Partial<Funcs>>,
+  ctx?: Partial<ConfigContext>,
+}
+
 /////////////////
 // Actions
 /////////////////
