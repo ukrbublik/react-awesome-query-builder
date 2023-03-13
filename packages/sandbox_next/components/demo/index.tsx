@@ -88,7 +88,8 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   };
 
   updateConfig = async () => {
-    const zipConfig = Utils.ConfigUtils.compressConfig(generateConfig(), MuiConfig);
+    const config = generateConfig();
+    const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
     const response = await fetch("/api/config", {
       method: "POST",
       body: JSON.stringify({
@@ -100,6 +101,8 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
     this.setState({
       zipConfig, 
+      tree: checkTree(this.state.tree, config),
+      config,
     });
   };
 
