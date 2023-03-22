@@ -2,33 +2,37 @@ import { NextApiRequest, NextApiResponse } from "next";
 import {
   Utils, CoreConfig,
   //types:
-  ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult, StrConfig
+  ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
 } from "@react-awesome-query-builder/core";
-import { withSessionRoute, BaseSession, getSessionData, saveSessionData } from "../../lib/withSession";
+import { withSessionRoute, Session, getSessionData, saveSessionData } from "../../lib/withSession";
 import serverConfig from "../../lib/config";
-import loadedInitValue from "../../lib/init_value";
-import loadedInitLogic from "../../lib/init_logic";
+import loadedInitValue from "../../data/init_value";
+import loadedInitLogic from "../../data/init_logic";
 const {
   uuid, checkTree, loadFromJsonLogic, loadTree,
   jsonLogicFormat, queryString, sqlFormat, mongodbFormat, getTree
 } = Utils;
-const { UNSAFE_serializeConfig, UNSAFE_deserializeConfig } = Utils.ConfigUtils;
 
+// API to get/save `jsonTree` to session
+// Initial tree is loaded from `data` dir
+// After saving `jsonTree` is exported to multiple formats on server side and returned in response
+// Note that `serverConfig` is used for export utils
+// TODO: use decompressed saved config for export utils?
 
-export type PostBody = {
+export type PostTreeBody = {
   jsonTree: JsonTree,
-  strConfig: StrConfig,
 };
-
-export interface PostResult {
+export interface PostTreeResult {
   jl?: JsonLogicResult;
   qs?: string;
   qsh?: string;
   sql?: string;
   mongo?: Object;
 }
-
-export interface GetResult {
+export type GetTreeQuery = {
+  initial?: string;
+};
+export interface GetTreeResult {
   tree: JsonTree;
 }
 
@@ -53,19 +57,15 @@ export function getInitialTree(fromLogic = false): JsonTree {
 }
 
 export async function getSavedTree(req: NextApiRequest): Promise<JsonTree> {
-  let tree: JsonTree = getSessionData(req.session as BaseSession).tree;
-  if (!tree) {
-    tree = getInitialTree();
-  }
-  return tree;
+  return getSessionData(req.session).jsonTree || getInitialTree();
 }
 
 
-async function saveTree(session: BaseSession, tree: JsonTree) {
-  await saveSessionData(session, { tree });
+async function saveTree(session: Session, jsonTree: JsonTree) {
+  await saveSessionData(session, { jsonTree });
 }
 
-function prepareResult(immutableTree: ImmutableTree, config: Config): PostResult {
+function prepareResult(immutableTree: ImmutableTree, config: Config): PostTreeResult {
   const jl = jsonLogicFormat(immutableTree, config);
   const qs = queryString(immutableTree, config);
   const qsh = queryString(immutableTree, config, true);
@@ -82,26 +82,26 @@ function prepareResult(immutableTree: ImmutableTree, config: Config): PostResult
   return result;
 }
 
-async function post(req: NextApiRequest, res: NextApiResponse<PostResult>) {
-  const { jsonTree } = JSON.parse(req.body as string) as PostBody;
+async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
+  const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  await saveTree(req.session as BaseSession, jsonTree);
-  const result = prepareResult(immutableTree, serverConfig);
+  await saveTree(req.session, jsonTree);
+  const result: PostTreeResult = prepareResult(immutableTree, serverConfig);
   return res.status(200).json(result);
 }
 
-async function get(req: NextApiRequest, res: NextApiResponse<GetResult>) {
-  const tree: JsonTree = req.query["initial"] ? getInitialTree() : await getSavedTree(req);
-  const result: GetResult = {
+async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
+  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
+  const result: GetTreeResult = {
     tree
   };
   return res.status(200).json(result);
 }
 
-async function del(req: NextApiRequest, res: NextApiResponse<GetResult>) {
-  const tree: JsonTree = req.query["initial"] ? getInitialTree() : getEmptyTree();
-  await saveTree(req.session as BaseSession, tree);
-  const result: GetResult = {
+async function del(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
+  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : getEmptyTree();
+  await saveTree(req.session, tree);
+  const result: GetTreeResult = {
     tree
   };
   return res.status(200).json(result);
@@ -115,7 +115,7 @@ async function route(req: NextApiRequest, res: NextApiResponse) {
   } else if (req.method === "DELETE") {
     return del(req, res);
   } else {
-    return res.status(400);
+    return res.status(400).end();
   }
 }
 

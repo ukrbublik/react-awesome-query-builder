@@ -1,29 +1,22 @@
 
-import { withSessionSsr, BaseSession, SessionData } from "../lib/withSession";
+import { withSessionSsr, getSessionDataForReq } from "../lib/withSession";
 import Demo, { DemoQueryBuilderProps } from "../components/demo/index";
-import { getSavedTree, getInitialTree } from "../pages/api/tree";
-import { getSavedConfig, getInitialConfig } from "../pages/api/config";
-import coreConfig, { createConfig } from "../lib/config";
-import realConfig from "../components/demo/config";
-import { NextApiRequest } from "next";
-import { Utils } from "@react-awesome-query-builder/core";
-import { MuiConfig } from "@react-awesome-query-builder/mui";
-const { UNSAFE_serializeConfig } = Utils.ConfigUtils;
+import { getInitialTree } from "../pages/api/tree";
+import { getInitialConfig } from "../pages/api/config";
 
 export default Demo;
 
+// Get current `jsonTree` and `zipConfig` from session
+// If `jsonTree` is missing, will be loaded from `data` dir
+// If `zipConfig` is missing, will be created from `lib/config` (based on `CoreConfig`) and compressed with `compressConfig`
 export const getServerSideProps = withSessionSsr<DemoQueryBuilderProps>(
   async function getServerSideProps({ req }) {
-    const sid = (req.session as BaseSession).id;
-    const url = `http://${req.headers.host}/api/session?sid=${sid}`;
-    const sessionData: SessionData = await(await fetch(url)).json();
-
+    const sessionData = await getSessionDataForReq(req);
     return {
       props: {
-        initValue: sessionData?.tree || getInitialTree(),
+        jsonTree: sessionData?.jsonTree || getInitialTree(),
         zipConfig: sessionData?.zipConfig || getInitialConfig(),
       }
     };
   }
 );
-

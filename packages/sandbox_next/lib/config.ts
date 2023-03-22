@@ -6,7 +6,11 @@ import {
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity,
 } from "@react-awesome-query-builder/core";
 
-
+// Create config based on InitialConfig - add fields, funcs, some overrides
+// By default exports config created from CoreConfig - can be used on server-side
+//   ! Important !
+//   Don't use JS functions in config, since it can't be used by SSR.
+//   Use JsonLogic functions instead, see `validateValue`.
 
 export function createConfig(InitialConfig: CoreConfig): Config {
 
@@ -42,7 +46,7 @@ export function createConfig(InitialConfig: CoreConfig): Config {
                 { "<": [ {strlen: {var: "val"}}, 10 ] },
                 { or: [
                   { "===": [ {var: "val"}, "" ] },
-                  { test: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
+                  { regexTest: [ {var: "val"}, "^[A-Za-z0-9_-]+$" ] }
                 ]}
               ]
             }

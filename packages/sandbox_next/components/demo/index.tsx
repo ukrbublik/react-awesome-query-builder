@@ -5,13 +5,11 @@ import {
   //types:
   BuilderProps, ImmutableTree, Config, JsonTree, ZipConfig
 } from "@react-awesome-query-builder/mui";
-import { PostResult, GetResult, PostBody } from "../../pages/api/tree";
-import { PostConfigBody } from "../../pages/api/config";
-import { generateConfig } from "./config";
-import { ctx } from "./config";
+import { PostTreeResult, GetTreeResult, PostTreeBody } from "../../pages/api/tree";
+import { PostConfigBody, PostConfigResult } from "../../pages/api/config";
+import { generateNewConfig, mixinConfig } from "./config";
 const stringify = JSON.stringify;
 const {getTree, checkTree, loadTree, uuid} = Utils;
-const { UNSAFE_serializeConfig, UNSAFE_deserializeConfig } = Utils.ConfigUtils;
 
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
@@ -19,12 +17,11 @@ const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
-  result: PostResult;
-  zipConfig: ZipConfig;
+  result: PostTreeResult;
 }
 
 export type DemoQueryBuilderProps = {
-  initValue: JsonTree;
+  jsonTree: JsonTree;
   zipConfig: ZipConfig;
 }
 
@@ -32,12 +29,11 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   constructor(props: DemoQueryBuilderProps) {
     super(props);
-    const config = Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig, ctx);
+    const config = mixinConfig(Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig));
     this.state = {
-      tree: checkTree(loadTree(props.initValue), config),
+      tree: checkTree(loadTree(props.jsonTree), config),
       config,
       result: {},
-      zipConfig: props.zipConfig,
     };
   }
 
@@ -71,11 +67,10 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
       const response = await fetch("/api/tree" + "?initial=true", {
         method: "DELETE",
       });
-      const result = await response.json() as GetResult;
-      const tree: JsonTree = result.tree;
+      const result = await response.json() as GetTreeResult;
 
       this.setState({
-        tree: loadTree(tree), 
+        tree: loadTree(result.tree), 
       });
     })();
   };
@@ -86,9 +81,9 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
       tree: loadTree(emptyInitValue), 
     });
   };
-
+  
   updateConfig = async () => {
-    const config = generateConfig();
+    const config = generateNewConfig(MuiConfig);
     const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
     const response = await fetch("/api/config", {
       method: "POST",
@@ -96,11 +91,9 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
         zipConfig,
       } as PostConfigBody),
     });
-    const result = await response.json();
-    console.log(result)
+    const result = await response.json() as PostConfigResult;
 
     this.setState({
-      zipConfig, 
       tree: checkTree(this.state.tree, config),
       config,
     });
@@ -128,23 +121,17 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   updateResult = async () => {
     const jsonTree = getTree(this.state.tree);
 
-    // const strConfig = UNSAFE_serializeConfig(this.state.config);
-    // const dsrConfig = UNSAFE_deserializeConfig(strConfig, this.state.config.ctx);
-    // console.log( 'updateResult config', dsrConfig );
-    // console.log( 'updateResult tree', jsonTree );
-    // console.log( 'debug config', dsrConfig.conjunctions.AND.formatConj );
-
     const response = await fetch("/api/tree", {
       method: "POST",
       body: JSON.stringify({
         jsonTree,
-      } as PostBody),
+      } as PostTreeBody),
     });
-    const result = await response.json() as PostResult;
+    const result = await response.json() as PostTreeResult;
     this.setState({result});
   };
 
-  renderResult = ({result: {jl, qs, qsh, sql, mongo}, tree: immutableTree} : {result: PostResult, tree: ImmutableTree}) => {
+  renderResult = ({result: {jl, qs, qsh, sql, mongo}, tree: immutableTree} : {result: PostTreeResult, tree: ImmutableTree}) => {
     if(!jl) return null;
     const {logic, data, errors} = jl;
     return (

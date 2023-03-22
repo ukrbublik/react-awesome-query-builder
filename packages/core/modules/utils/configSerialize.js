@@ -25,7 +25,7 @@ export const configKeys = ["conjunctions", "fields", "types", "operators", "widg
 //  "rf" - JsonLogicFunction/string to render React
 //    JL data is { props, ctx }
 //    Should return {type, props} or string, where type or string - React component
-//    Can use { RE: ["SomeComponent", {var: "props"}] } or just return "SomeComponent"
+//    Can use { REACT: ["SomeComponent", {var: "props"}] } or just return "SomeComponent"
 //    Returned component will be searched in ctx.components/ctx.W/ctx.O, see getReactComponentFromCtx()
 //    Will be compiled with compileJsonLogicReact() into function with args (props, ctx) that will return renderReactElement()
 //  "f" - JsonLogicFunction/string
@@ -346,7 +346,7 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
     } else if (submeta.type === "rf") {
       const targetObj = subconfig;
       const val = targetObj[k];
-      const newVal = compileJsonLogicReact(val, opts, newPath);
+      const newVal = compileJsonLogicReact(val, opts, newPath, submeta.onlyJL);
       if (newVal !== val) {
         logs.push(`Compiled JL-RF ${newPath.join(".")}`);
         targetObj[k] = newVal;
@@ -379,7 +379,7 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
   }
 }
 
-function compileJsonLogicReact(jl, opts, path) {
+function compileJsonLogicReact(jl, opts, path, onlyJL = false) {
   if (isJsonLogic(jl)) {
     return function(props, ctx) {
       ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
@@ -400,12 +400,17 @@ function compileJsonLogicReact(jl, opts, path) {
   } else if (typeof jl === "string") {
     return function(props, ctx) {
       ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
-      const re = {
-        type: jl,
-        props
-      };
-      const ret = renderReactElement(re, {ctx}, path);
-      return ret;
+      const fn = jl.split(".").reduce((o, k) => o?.[k], ctx);
+      if (fn) {
+        return fn.call(this, props, ctx);
+      } else {
+        const re = {
+          type: jl,
+          props
+        };
+        const ret = renderReactElement(re, {ctx}, path);
+        return ret;
+      }
     };
   }
   return jl;

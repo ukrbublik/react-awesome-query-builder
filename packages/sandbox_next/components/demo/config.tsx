@@ -1,28 +1,30 @@
 import React from "react";
 import { createConfig } from "../../lib/config";
 import {
-  MuiConfig, Config, FieldOrGroup, AsyncFetchListValuesResult, Utils, Operator, Type, Settings, Widget, ConfigMixin
+  MuiConfig, MuiWidgets, Config, FieldOrGroup, AsyncFetchListValuesResult, Utils, Operator, Type, Settings, Widget, ConfigMixin, CoreConfig, ConfigContext
 } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
 import { ukUA } from "@mui/material/locale";
-import { green, purple } from '@mui/material/colors';
+import { green, purple } from "@mui/material/colors";
 //import { ukUA } from "@mui/x-date-pickers/locales"; // todo: throws "TypeError: date.clone is not a function"
 //import "moment/locale/ru";
+const { MuiFieldAutocomplete, MuiFieldSelect } = MuiWidgets;
+
+// UI mixins for created config - add asyncFetch, custom React components, overrides
+//   ! Important !
+//   Don't add JS functions to config, since it can't be used by SSR.
+//   Use JsonLogic functions instead, see `factory`.
+//   Or add functions to `ctx` and reference them with name in other sections of config (see `autocompleteFetch` or `myRenderField`)
+//   Add custom React components (like `SliderMark`) to `ctx.components`
 
 const autocompleteFetch = async (search: string | null, offset: number): Promise<AsyncFetchListValuesResult> => {
   const response = await fetch("/api/autocomplete?" + new URLSearchParams({
     search: search || "",
-    offset: offset && String(offset) || null
+    offset: offset ? String(offset) : "",
   }).toString());
   const result = await response.json() as AsyncFetchListValuesResult;
   return result;
 };
-
-function randomColor() {
-  let hex = Math.floor(Math.random() * 0xFFFFFF);
-  let color = "#" + hex.toString(16);
-  return color;
-}
 
 const SliderMark: React.FC<{ pct: number }> = ({ pct }) => {
   return <strong><span>{pct}</span><span>%</span></strong>;
@@ -57,11 +59,11 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
     factory: {
       if: [
         { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
-        { RE: ["MuiAutocompleteWidget", { MERGE: [
+        { REACT: ["MuiAutocompleteWidget", { mergeObjects: [
           { var: "props" },
-          { MAP: [ [ [ "multiple", true ] ] ] }
+          { fromEntries: [ [ [ "multiple", true ] ] ] }
         ]}] },
-        { RE: ["MuiMultiSelectWidget", {var: "props"}] }
+        { REACT: ["MuiMultiSelectWidget", {var: "props"}] }
       ]
     }
   },
@@ -69,8 +71,8 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
     factory: {
       if: [
         { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
-        { RE: ["MuiAutocompleteWidget", {var: "props"}] },
-        { RE: ["MuiSelectWidget", {var: "props"}] }
+        { REACT: ["MuiAutocompleteWidget", {var: "props"}] },
+        { REACT: ["MuiSelectWidget", {var: "props"}] }
       ]
     }
   },
@@ -101,22 +103,35 @@ const typesMixin: Record<string, Partial<Type>> = {
   }
 };
 
-export const ctx = merge({}, MuiConfig.ctx, {
-  autocompleteFetch,
-  ukUA,
-  components: {
-    SliderMark
+
+export const ctx = merge(
+  {}, 
+  MuiConfig.ctx, 
+  {
+    autocompleteFetch,
+    myRenderField: (props: any, _ctx: ConfigContext) => {
+      if (props?.customProps?.showSearch) {
+        return <MuiFieldAutocomplete {...props}/>
+      } else {
+        return <MuiFieldSelect {...props}/>
+      }
+    },
+    ukUA,
+    components: {
+      SliderMark
+    }
   }
-});
+);
 
 const renderSettings: Partial<Settings> = {
-  renderField: {
-    if: [
-      { var: "props.customProps.showSearch" },
-      { RE: ["MuiFieldAutocomplete", {var: "props"}] },
-      { RE: ["MuiFieldSelect", {var: "props"}] },
-    ]
-  }, 
+  renderField: "myRenderField",
+  // renderField: {
+  //   if: [
+  //     { var: "props.customProps.showSearch" },
+  //     { REACT: ["MuiFieldAutocomplete", {var: "props"}] },
+  //     { REACT: ["MuiFieldSelect", {var: "props"}] },
+  //   ]
+  // }, 
   renderConfirm: "W.MuiConfirm", // { CALL: [ {var: "ctx.W.MuiConfirm"}, null, {var: "props"} ] },
   useConfirm: "W.MuiUseConfirm", // { CALL: [ {var: "ctx.W.MuiUseConfirm"} ] },
 };
@@ -136,28 +151,36 @@ const configMixin: ConfigMixin = {
   }
 };
 
-export const generateConfig = () => {
-  return mixinConfig({
-    settings: {
-      theme: {
-        mui: {
-          palette: {
-            primary: { main: randomColor() },
-            secondary: { main: randomColor() },
-          },
-        }
-      }
-    }
-  });
-};
+function randomColor() {
+  let hex = Math.floor(Math.random() * 0xFFFFFF);
+  let color = "#" + hex.toString(16);
+  return color;
+}
 
-export const mixinConfig = (customMixin: ConfigMixin) => {
+export const mixinConfig = (baseConfig: Config, customMixin?: ConfigMixin) => {
   return merge(
     {},
-    createConfig(MuiConfig),
+    baseConfig,
     configMixin,
-    customMixin
+    customMixin || {}
   ) as Config;
 };
 
-export default mixinConfig({});
+export const generateNewConfig = (baseConfig: CoreConfig) => {
+  return mixinConfig(
+    createConfig(baseConfig),
+    {
+      settings: {
+        theme: {
+          mui: {
+            palette: {
+              primary: { main: randomColor() },
+              secondary: { main: randomColor() },
+            },
+          }
+        }
+      }
+  }
+  );
+};
+
