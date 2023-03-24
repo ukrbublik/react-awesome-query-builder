@@ -5,11 +5,14 @@ import {
   ZipConfig
 } from "@react-awesome-query-builder/core";
 import { Session, withSessionRoute, getSessionData, saveSessionData } from "../../lib/withSession";
-import serverConfig from "../../lib/config";
+import serverConfig from "../../lib/config_ui";
 
 // API to get/save `zipConfig` to session
-// Initial config is created from `lib/config` (based on `CoreConfig`) and compressed with `compressConfig`
+// Initial config is created from `lib/config_ui` (based on `CoreConfig` with UI mixins) and compressed with `compressConfig`
 
+export type GetConfigQuery = {
+  initial?: string;
+};
 export interface PostConfigBody {
   zipConfig: ZipConfig;
 };
@@ -40,7 +43,7 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostConfigResult>)
 }
 
 async function get(req: NextApiRequest, res: NextApiResponse<GetConfigResult>) {
-  const zipConfig = await getSavedConfig(req);
+  const zipConfig = (req.query as GetConfigQuery).initial ? getInitialConfig() : await getSavedConfig(req);
   const result: GetConfigResult = {
     zipConfig
   };

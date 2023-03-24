@@ -5,7 +5,7 @@ import {
   ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
 } from "@react-awesome-query-builder/core";
 import { withSessionRoute, Session, getSessionData, saveSessionData } from "../../lib/withSession";
-import serverConfig from "../../lib/config";
+import pureServerConfig from "../../lib/config";
 import loadedInitValue from "../../data/init_value";
 import loadedInitLogic from "../../data/init_logic";
 const {
@@ -16,7 +16,7 @@ const {
 // API to get/save `jsonTree` to session
 // Initial tree is loaded from `data` dir
 // After saving `jsonTree` is exported to multiple formats on server side and returned in response
-// Note that `serverConfig` is used for export utils
+// Note that `pureServerConfig` is used for export utils
 // TODO: use decompressed saved config for export utils?
 
 export type PostTreeBody = {
@@ -41,7 +41,7 @@ function getEmptyTree(): JsonTree {
 }
 
 export function getInitialTree(fromLogic = false): JsonTree {
-  const config = serverConfig;
+  const config = pureServerConfig;
   let tree: JsonTree;
   if (fromLogic) {
     const logicTree: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
@@ -86,7 +86,7 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
   const immutableTree: ImmutableTree = loadTree(jsonTree);
   await saveTree(req.session, jsonTree);
-  const result: PostTreeResult = prepareResult(immutableTree, serverConfig);
+  const result: PostTreeResult = prepareResult(immutableTree, pureServerConfig);
   return res.status(200).json(result);
 }
 

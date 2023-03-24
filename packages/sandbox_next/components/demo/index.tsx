@@ -7,12 +7,18 @@ import {
 } from "@react-awesome-query-builder/mui";
 import { PostTreeResult, GetTreeResult, PostTreeBody } from "../../pages/api/tree";
 import { PostConfigBody, PostConfigResult } from "../../pages/api/config";
-import { generateNewConfig, mixinConfig } from "./config";
+import ctx from "./config_ctx";
+import updateConfigWithSomeChanges from "./config_update";
 const stringify = JSON.stringify;
 const {getTree, checkTree, loadTree, uuid} = Utils;
 
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
+
+export type DemoQueryBuilderProps = {
+  jsonTree: JsonTree;
+  zipConfig: ZipConfig;
+}
 
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
@@ -20,16 +26,11 @@ interface DemoQueryBuilderState {
   result: PostTreeResult;
 }
 
-export type DemoQueryBuilderProps = {
-  jsonTree: JsonTree;
-  zipConfig: ZipConfig;
-}
-
 export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, DemoQueryBuilderState> {
 
   constructor(props: DemoQueryBuilderProps) {
     super(props);
-    const config = mixinConfig(Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig));
+    const config = Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig, ctx);
     this.state = {
       tree: checkTree(loadTree(props.jsonTree), config),
       config,
@@ -83,7 +84,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   };
   
   updateConfig = async () => {
-    const config = generateNewConfig(MuiConfig);
+    const config = updateConfigWithSomeChanges(this.state.config);
     const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
     const response = await fetch("/api/config", {
       method: "POST",
@@ -108,11 +109,8 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   );
     
   onChange = (tree: ImmutableTree, config: Config) => {
-    console.log('ch config', config, config === this.state.config)
-    console.log('ch tree', getTree(tree))
     this.setState({
-      tree, 
-      config
+      tree,
     }, () => {
       this.updateResult();
     });

@@ -6,11 +6,13 @@ import {
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity,
 } from "@react-awesome-query-builder/core";
 
-// Create config based on InitialConfig - add fields, funcs, some overrides
-// By default exports config created from CoreConfig - can be used on server-side
+// Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
+// Additional UI modifications are done in `./config_ui` (like `asyncFetch`, `marks`, `factory`)
+//
 //   ! Important !
 //   Don't use JS functions in config, since it can't be used by SSR.
 //   Use JsonLogic functions instead, see `validateValue`.
+//   Or add function to `ctx` and refer to it with a name, see `validateFirstName`
 
 export function createConfig(InitialConfig: CoreConfig): Config {
 
@@ -29,9 +31,12 @@ export function createConfig(InitialConfig: CoreConfig): Config {
             valuePlaceholder: "Enter name",
           },
           fieldSettings: {
-            validateValue: {
-              "<": [ {strlen: {var: "val"}}, 10 ]
-            },
+            validateValue: "validateFirstName",
+            // -or-
+            // validateValue: {
+            //   "<": [ {strlen: {var: "val"}}, 10 ]
+            // },
+            // -incorrect-
             // validateValue: (val: string) => {
             //   return (val.length < 10);
             // },
@@ -50,6 +55,7 @@ export function createConfig(InitialConfig: CoreConfig): Config {
                 ]}
               ]
             }
+            // -incorrect-
             // (val: string) => {
             //   return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
             // },
@@ -362,7 +368,17 @@ export function createConfig(InitialConfig: CoreConfig): Config {
     LOWER: BasicFuncs.LOWER,
   };
 
-  const ctx = InitialConfig.ctx;
+  //  ! Important !
+  //  Context is not saved to compressed config (zipConfig)
+  //  You must provide ctx with ConfigUtils.decompressConfig()
+  //  `validateFirstName` should be defined in `components/demo/config_ctx`
+  //  Implementation here is used for server-side validation
+  const ctx = {
+    ...InitialConfig.ctx,
+    validateFirstName: (val: string) => {
+      return (val.length < 10);
+    },
+  };
 
   const config: Config = {
     conjunctions,
