@@ -1,4 +1,7 @@
 # Changelog
+- 6.1.2
+  - Fix typings for `children1`: tuple -> array (PR #885) (issue #881)
+  - Fix compare fields for case when type != widget.type (PR #875) (issue #758)
 - 6.1.1
   - Fix CJS build (issue with antd/es and antd/lib) (PR #859) (issue #858)
   - Fix button labels (PR #856) (issue #824)
