@@ -9,7 +9,7 @@ export type GetSessionQuery = {
 };
 export type GetSessionResult = SessionData;
 
-async function get(req: NextApiRequest, res: NextApiResponse<GetSessionResult>) {
+function get(req: NextApiRequest, res: NextApiResponse<GetSessionResult>) {
   const query = req.query as GetSessionQuery;
   const sid = query.sid || req.session.id;
   if (sid !== req.session.id && query.pass !== sessionOptions.password) {
@@ -19,7 +19,7 @@ async function get(req: NextApiRequest, res: NextApiResponse<GetSessionResult>) 
   return res.status(200).json(result);
 }
 
-async function route(req: NextApiRequest, res: NextApiResponse) {
+function route(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     return get(req, res);
   } else {

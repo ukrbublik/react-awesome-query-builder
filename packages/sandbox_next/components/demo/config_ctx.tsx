@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  MuiConfig, MuiWidgets, Config, AsyncFetchListValuesResult, ConfigContext
+  MuiConfig, MuiWidgets, AsyncFetchListValuesResult, ConfigContext, FieldProps
 } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
 import { ukUA } from "@mui/material/locale";
@@ -30,11 +30,11 @@ export default merge(
       return (val.length < 10);
     },
     autocompleteFetch,
-    myRenderField: (props: any, _ctx: ConfigContext) => {
-      if (props?.customProps?.showSearch) {
-        return <MuiFieldAutocomplete {...props}/>
+    myRenderField: (props: FieldProps, _ctx: ConfigContext) => {
+      if (props?.customProps["showSearch"]) {
+        return <MuiFieldAutocomplete {...props}/>;
       } else {
-        return <MuiFieldSelect {...props}/>
+        return <MuiFieldSelect {...props}/>;
       }
     },
     ukUA,

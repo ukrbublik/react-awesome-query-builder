@@ -17,7 +17,7 @@ import { IncomingMessage } from "http";
 
 export type SessionData = {
   jsonTree?: JsonTree;
-	zipConfig?: ZipConfig;
+  zipConfig?: ZipConfig;
 };
 export type Session = IronSession & {
   id: string;
@@ -54,37 +54,37 @@ declare module "next" {
 }
 
 // Internal in-memory store
-let allSessions: Record<string, SessionData> = {};
+const allSessions: Record<string, SessionData> = {};
 
 // API to manage session data
 export const saveSessionData = async (session: Session, data: SessionData) => {
-	if (!session.id) {
-		session.id = nanoid();
+  if (!session.id) {
+    session.id = nanoid();
     await session.save();
-	}
+  }
   allSessions[session.id] = {
-		...(allSessions[session.id] || {}),
-		...data
-	};
+    ...(allSessions[session.id] || {}),
+    ...data
+  };
 };
 
 export const getSessionData = (session: Session): SessionData => {
   return {
-		...(allSessions[session.id] || {})
-	};
+    ...(allSessions[session.id] || {})
+  };
 };
 
 export const getSessionDataById = (sid: string): SessionData => {
   return {
-		...(allSessions[sid] || {})
-	};
+    ...(allSessions[sid] || {})
+  };
 };
 
 // Internal method to retrieve session data, used by `getServerSideProps`
 // Using HTTP request is a hack, but direct call `getSessionData()` from `getServerSideProps` entry point will not work
 export const getSessionDataForReq = async (req: IncomingMessage) => {
   const sid = (req.session as Session).id;
-  const url = `http://${req.headers.host}/api/session?sid=${sid}&pass=${sessionOptions.password}`;
-  const sessionData: SessionData = await(await fetch(url)).json();
+  const url = `http://${req.headers.host}/api/session?sid=${sid}&pass=${sessionOptions.password as string}`;
+  const sessionData: SessionData = await (await fetch(url)).json() as SessionData;
   return sessionData;
 };

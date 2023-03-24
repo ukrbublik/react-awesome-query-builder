@@ -44,24 +44,24 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   render = () => {
     return (
-    <div>
-      <Query 
-        {...this.state.config} 
-        value={this.state.tree}
-        onChange={this.onChange}
-        renderBuilder={this.renderBuilder}
-      />
+      <div>
+        <Query 
+          {...this.state.config} 
+          value={this.state.tree}
+          onChange={this.onChange}
+          renderBuilder={this.renderBuilder}
+        />
 
-      <button onClick={this.resetValue}>reset</button>
-      <button onClick={this.clearValue}>clear</button>
-      <button onClick={this.updateConfig}>update config</button>
+        <button onClick={this.resetValue}>reset</button>
+        <button onClick={this.clearValue}>clear</button>
+        <button onClick={this.updateConfig}>update config</button>
 
-      <div className="query-builder-result">
-        {this.renderResult(this.state)}
+        <div className="query-builder-result">
+          {this.renderResult(this.state)}
+        </div>
       </div>
-    </div>
     );
-  }
+  };
 
   resetValue = () => {
     (async () => {
@@ -83,21 +83,23 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
     });
   };
   
-  updateConfig = async () => {
-    const config = updateConfigWithSomeChanges(this.state.config);
-    const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
-    const response = await fetch("/api/config", {
-      method: "POST",
-      body: JSON.stringify({
-        zipConfig,
-      } as PostConfigBody),
-    });
-    const result = await response.json() as PostConfigResult;
+  updateConfig = () => {
+    (async () => {
+      const config = updateConfigWithSomeChanges(this.state.config);
+      const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
+      const response = await fetch("/api/config", {
+        method: "POST",
+        body: JSON.stringify({
+          zipConfig,
+        } as PostConfigBody),
+      });
+      const result = await response.json() as PostConfigResult;
 
-    this.setState({
-      tree: checkTree(this.state.tree, config),
-      config,
-    });
+      this.setState({
+        tree: checkTree(this.state.tree, config),
+        config,
+      });
+    })();
   };
 
   renderBuilder = (props: BuilderProps) => (

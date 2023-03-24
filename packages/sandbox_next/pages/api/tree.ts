@@ -56,7 +56,7 @@ export function getInitialTree(fromLogic = false): JsonTree {
   return tree;
 }
 
-export async function getSavedTree(req: NextApiRequest): Promise<JsonTree> {
+function getSavedTree(req: NextApiRequest): JsonTree {
   return getSessionData(req.session).jsonTree || getInitialTree();
 }
 
@@ -90,8 +90,8 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   return res.status(200).json(result);
 }
 
-async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
-  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
+function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
+  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : getSavedTree(req);
   const result: GetTreeResult = {
     tree
   };
@@ -109,11 +109,11 @@ async function del(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
 
 async function route(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
-    return post(req, res);
+    return await post(req, res);
   } else if (req.method === "GET") {
     return get(req, res);
   } else if (req.method === "DELETE") {
-    return del(req, res);
+    return await del(req, res);
   } else {
     return res.status(400).end();
   }

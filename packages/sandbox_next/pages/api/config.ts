@@ -15,7 +15,7 @@ export type GetConfigQuery = {
 };
 export interface PostConfigBody {
   zipConfig: ZipConfig;
-};
+}
 export interface PostConfigResult {
 }
 export interface GetConfigResult {
@@ -23,16 +23,16 @@ export interface GetConfigResult {
 }
 
 
-export async function getSavedConfig(req: NextApiRequest): Promise<ZipConfig> {
+export function getSavedConfig(req: NextApiRequest): ZipConfig {
   return getSessionData(req.session).zipConfig || getInitialConfig();
 }
 
 export function getInitialConfig() {
-	return Utils.ConfigUtils.compressConfig(serverConfig, CoreConfig);
+  return Utils.ConfigUtils.compressConfig(serverConfig, CoreConfig);
 }
 
 async function saveConfig(session: Session, zipConfig: ZipConfig) {
-	await saveSessionData(session, { zipConfig });
+  await saveSessionData(session, { zipConfig });
 }
 
 async function post(req: NextApiRequest, res: NextApiResponse<PostConfigResult>) {
@@ -42,8 +42,8 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostConfigResult>)
   return res.status(200).json(result);
 }
 
-async function get(req: NextApiRequest, res: NextApiResponse<GetConfigResult>) {
-  const zipConfig = (req.query as GetConfigQuery).initial ? getInitialConfig() : await getSavedConfig(req);
+function get(req: NextApiRequest, res: NextApiResponse<GetConfigResult>) {
+  const zipConfig = (req.query as GetConfigQuery).initial ? getInitialConfig() : getSavedConfig(req);
   const result: GetConfigResult = {
     zipConfig
   };
@@ -52,7 +52,7 @@ async function get(req: NextApiRequest, res: NextApiResponse<GetConfigResult>) {
 
 async function route(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
-    return post(req, res);
+    return await post(req, res);
   } else if (req.method === "GET") {
     return get(req, res);
   } else {

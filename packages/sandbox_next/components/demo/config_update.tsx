@@ -3,8 +3,8 @@ import { Config } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
 
 function randomColor() {
-  let hex = Math.floor(Math.random() * 0xFFFFFF);
-  let color = "#" + hex.toString(16);
+  const hex = Math.floor(Math.random() * 0xFFFFFF);
+  const color = "#" + hex.toString(16);
   return color;
 }
 

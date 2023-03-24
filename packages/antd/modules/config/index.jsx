@@ -33,7 +33,7 @@ const settings = {
   },
 
   removeInvalidMultiSelectValuesOnLoad: false, // can be removed manually in UI
-  normalizeListValues: function(...args) { return this.utils.normalizeListValues.call(null, ...args) },
+  normalizeListValues: function(...args) { return this.utils.normalizeListValues.call(null, ...args); },
 };
 
 

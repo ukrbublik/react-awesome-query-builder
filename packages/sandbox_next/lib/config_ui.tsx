@@ -20,7 +20,7 @@ import pureServerConfig from "./config";
 // It's dummy implementation
 // Just to show how you can include JSX in config and it will be serialized correctly with ConfigUtils.decompressConfig()
 // Real implementation in `components/demo/config_ctx`
-let SliderMark: React.FC<{ pct: number }> = () => null;
+const SliderMark: React.FC<{ pct: number }> = () => null;
 
 const fieldsMixin: Record<string, Partial<FieldOrGroup>> = {
   slider: {
@@ -79,8 +79,8 @@ const operatorsMixin: Record<string, Partial<Operator>> = {
       "Value to"
     ],
     textSeparators: [
-      <strong>from</strong>,
-      <strong>to</strong>,
+      <strong key="from">from</strong>,
+      <strong key="to">to</strong>,
     ],
   },
 };

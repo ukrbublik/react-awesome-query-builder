@@ -3,11 +3,11 @@ import moment from "moment";
 
 function applyJsonLogic(logic, data) {
   return JL.apply(logic, data);
-};
+}
 
 function addJsonLogicOperation(name, op) {
   return JL.add_operation(name, op);
-};
+}
 
 export const customJsonLogicOperations = {
   CALL: (fn, ctx, ...args) => (fn.call(ctx, ...args)),
@@ -26,4 +26,4 @@ export function addRequiredJsonLogicOperations() {
   for (let k in customJsonLogicOperations) {
     addJsonLogicOperation(k, customJsonLogicOperations[k]);
   }
-};
+}

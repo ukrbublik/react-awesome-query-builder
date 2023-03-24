@@ -1255,7 +1255,7 @@ const _addMixins = (config, mixins, doAdd = true) => {
     if (mixinFunc) {
       config = mixinFunc(config, doAdd);
     } else {
-      throw new Error(`Can't ${doAdd ? 'add': 'remove'} mixin ${w}`);
+      throw new Error(`Can't ${doAdd ? "add": "remove"} mixin ${mixName}`);
     }
   }
   return config;
@@ -1303,7 +1303,7 @@ const mixinRangeableWidget = (type, widget) => (config, addMixin = true) => {
     ...config,
     types,
   };
-}
+};
 
 const mixinWidgetRangeslider = (config, addMixin = true) => {
   let { widgets, types } = config;

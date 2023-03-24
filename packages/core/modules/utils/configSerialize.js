@@ -14,7 +14,7 @@ addRequiredJsonLogicOperations();
 
 function applyJsonLogic(logic, data) {
   return JL.apply(logic, data);
-};
+}
 
 export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
 
@@ -178,7 +178,7 @@ export const compressConfig = (config, baseConfig) => {
         for (let k in base) {
           if (!Object.keys(target).includes(k)) {
             // deleted in target
-            target[k] = '$$deleted';
+            target[k] = "$$deleted";
           } else {
             target[k] = _clean(target[k], base[k], [...path, k]);
             if (target[k] === undefined) {
@@ -444,7 +444,7 @@ function compileJsonLogic(jl, opts, path, argNames, onlyJL = false) {
 
 function getReactComponentFromCtx(name, ctx) {
   return ctx?.components?.[name] || ctx.W[name] || ctx.O[name];
-};
+}
 
 function renderReactElement(jsx, opts, path, key = undefined) {
   if (isJSX(jsx)) {
@@ -467,7 +467,7 @@ function renderReactElement(jsx, opts, path, key = undefined) {
     return jsx.map((el, i) => renderReactElement(el, opts, path, ""+i));
   }
   return jsx;
-};
+}
 
 /////////////
 

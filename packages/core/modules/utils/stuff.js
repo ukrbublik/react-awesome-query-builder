@@ -132,7 +132,7 @@ export const cleanJSX = (jsx) => {
       return val.name;
     }
     return val;
-  }
+  };
 
   if (jsx instanceof Array) {
     return jsx.map((el, _i) => cleanJSX(el));
@@ -172,7 +172,7 @@ export const isJsonLogic = (logic) => {
     }
   }
   return isJL;
-}
+};
 
 export function sleep(delay) {
   return new Promise((resolve) => {

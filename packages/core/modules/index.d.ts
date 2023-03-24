@@ -13,7 +13,9 @@ export type Moment = MomentType;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
 
-type AnyObject = object;
+type AnyObject = {
+  [key: string]: unknown;
+};
 type Empty = null | undefined;
 
 type IdPath = Array<string> | ImmutableList<string>;
