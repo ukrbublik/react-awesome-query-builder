@@ -2,7 +2,7 @@ import React from "react";
 import en_US from "antd/es/locale/en_US";
 import AntdWidgets from "../widgets";
 import { normalizeListValues } from "../utils/stuff";
-import { BasicConfig } from "@react-awesome-query-builder/ui";
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 
 
@@ -89,134 +89,22 @@ const widgets = {
   },
 
   rangeslider: {
-    type: "number",
-    jsType: "number",
-    valueSrc: "value",
+    ...BasicConfig.widgets.rangeslider,
     factory: (props, {RCE, W: {RangeWidget}}) => RCE(RangeWidget, props),
-    valueLabel: "Range",
-    valuePlaceholder: "Select range",
-    valueLabels: [
-      { label: "Number from", placeholder: "Enter number from" },
-      { label: "Number to", placeholder: "Enter number to" },
-    ],
-    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
-    },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.utils.SqlString.escape(val);
-    },
-    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    singleWidget: "slider",
-    toJS: (val, fieldSettings) => (val),
   },
   treeselect: {
-    type: "treeselect",
-    jsType: "string",
-    valueSrc: "value",
+    ...BasicConfig.widgets.treeselect,
     factory: (props, {RCE, W: {TreeSelectWidget}}) => RCE(TreeSelectWidget, props),
-    valueLabel: "Value",
-    valuePlaceholder: "Select value",
-    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
-      return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
-    },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.utils.SqlString.escape(val);
-    },
-    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    toJS: (val, fieldSettings) => (val),
   },
   treemultiselect: {
-    type: "treemultiselect",
-    jsType: "array",
-    valueSrc: "value",
+    ...BasicConfig.widgets.treemultiselect,
     factory: (props, {RCE, W: {TreeSelectWidget}}) => RCE(TreeSelectWidget, {...props, treeMultiple: true}),
-    valueLabel: "Values",
-    valuePlaceholder: "Select values",
-    formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
-      let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
-      return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
-    },
-    sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
-      return vals.map(v => this.utils.SqlString.escape(v));
-    },
-    spelFormatValue: function (val) { return this.utils.spelEscape(val); },
-    toJS: (val, fieldSettings) => (val),
   },
 };
 
 
 const types = {
   ...BasicConfig.types,
-  number: {
-    ...BasicConfig.types.number,
-    widgets: {
-      ...BasicConfig.types.number.widgets,
-      rangeslider: {
-        opProps: {
-          between: {
-            isSpecialRange: true,
-          },
-          not_between: {
-            isSpecialRange: true,
-          }
-        },
-        operators: [
-          "between",
-          "not_between",
-          "is_null",
-          "is_not_null",
-        ],
-      }
-    },
-  },
-  date: {
-    ...BasicConfig.types.date,
-    widgets: {
-      date: {
-        ...BasicConfig.types.date.widgets.date,
-        opProps: {
-          between: {
-            isSpecialRange: true,
-            textSeparators: [null, null],
-          },
-          not_between: {
-            isSpecialRange: true,
-            textSeparators: [null, null],
-          }
-        },
-      }
-    },
-  },
-  treeselect: {
-    mainWidget: "treeselect",
-    defaultOperator: "select_equals",
-    widgets: {
-      treeselect: {
-        operators: [
-          "select_equals",
-          "select_not_equals"
-        ],
-      },
-      treemultiselect: {
-        operators: [
-          "select_any_in",
-          "select_not_any_in"
-        ],
-      },
-    },
-  },
-  treemultiselect: {
-    defaultOperator: "multiselect_equals",
-    widgets: {
-      treemultiselect: {
-        operators: [
-          "multiselect_equals",
-          "multiselect_not_equals",
-        ],
-      }
-    },
-  },
 };
 
 const ctx = {
@@ -231,10 +119,18 @@ const ctx = {
   },
 };
 
-export default {
+let config = {
   ...BasicConfig,
   ctx,
   types,
   widgets,
   settings,
 };
+config = Utils.ConfigMixins.addMixins(config, [
+  "rangeslider",
+  "treeselect",
+  "treemultiselect",
+  "rangeable__date",
+]);
+
+export default config;

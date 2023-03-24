@@ -313,9 +313,9 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   if (fieldConfig && fieldConfig.widgets) {
     for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
-      // if (!config.widgets[widget]) {
-      //   continue;
-      // }
+      if (!config.widgets[widget]) {
+        continue;
+      }
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
       if (widget == "field") {

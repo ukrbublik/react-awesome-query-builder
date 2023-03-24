@@ -1,6 +1,6 @@
 import React from "react";
 import MaterialWidgets from "../widgets";
-import { BasicConfig } from "@react-awesome-query-builder/ui";
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 
 const settings = {
@@ -75,55 +75,14 @@ const widgets = {
   },
 
   rangeslider: {
-    type: "number",
-    jsType: "number",
-    valueSrc: "value",
+    ...BasicConfig.widgets.rangeslider,
     factory: (props, {RCE, W: {MaterialRangeWidget}}) => RCE(MaterialRangeWidget, props),
-    valueLabel: "Range",
-    valuePlaceholder: "Select range",
-    valueLabels: [
-      { label: "Number from", placeholder: "Enter number from" },
-      { label: "Number to", placeholder: "Enter number to" },
-    ],
-    formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-      return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
-    },
-    sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.utils.SqlString.escape(val);
-    },
-    spelFormatValue: function (val) {
-      return this.utils.spelEscape(val);
-    },
-    singleWidget: "slider",
-    toJS: (val, fieldSettings) => (val),
   },
 };
 
 
 const types = {
   ...BasicConfig.types,
-  number: {
-    ...BasicConfig.types.number,
-    widgets: {
-      ...BasicConfig.types.number.widgets,
-      rangeslider: {
-        opProps: {
-          between: {
-            isSpecialRange: true,
-          },
-          not_between: {
-            isSpecialRange: true,
-          }
-        },
-        operators: [
-          "between",
-          "not_between",
-          "is_null",
-          "is_not_null",
-        ],
-      }
-    },
-  },
 };
 
 const ctx = {
@@ -134,11 +93,15 @@ const ctx = {
   },
 };
 
-
-export default {
+let config = {
   ...BasicConfig,
   ctx,
   types,
   widgets,
   settings,
 };
+config = Utils.ConfigMixins.addMixins(config, [
+  "rangeslider",
+]);
+
+export default config;

@@ -1,7 +1,7 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as CustomOperators from "../components/operators";
-import {CoreConfig} from "@react-awesome-query-builder/core";
+import { CoreConfig, Utils } from "@react-awesome-query-builder/core";
 
 
 //----------------------------  conjunctions
@@ -158,7 +158,7 @@ const ctx = {
 
 //----------------------------
 
-export default {
+let config = {
   conjunctions,
   operators,
   widgets,
@@ -166,3 +166,10 @@ export default {
   settings,
   ctx,
 };
+config = Utils.ConfigMixins.removeMixins(config, [
+  "rangeslider",
+  "treeselect",
+  "treemultiselect",
+]);
+
+export default config;

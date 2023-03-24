@@ -1241,10 +1241,273 @@ const settings = {
 
 };
 
+//----------------------------
+
+const _addMixins = (config, mixins, doAdd = true) => {
+  const mixinFuncs = {
+    rangeslider: mixinWidgetRangeslider,
+    treeselect: mixinWidgetTreeselect,
+    treemultiselect: mixinWidgetTreemultiselect,
+    rangeable__date: mixinRangeableWidget("date", "date"),
+  };
+  for (const mixName of mixins) {
+    const mixinFunc = mixinFuncs[mixName];
+    if (mixinFunc) {
+      config = mixinFunc(config, doAdd);
+    } else {
+      throw new Error(`Can't ${doAdd ? 'add': 'remove'} mixin ${w}`);
+    }
+  }
+  return config;
+};
+
+const addMixins = (config, mixins) => {
+  return _addMixins(config, mixins, true);
+};
+const removeMixins = (config, mixins) => {
+  return _addMixins(config, mixins, false);
+};
+
+const mixinRangeableWidget = (type, widget) => (config, addMixin = true) => {
+  let { types } = config;
+
+  types = {
+    ...types,
+    [type]: {
+      ...types[type],
+      widgets: {
+        ...types[type].widgets,
+      }
+    }
+  };
+
+  if (addMixin) {
+    types[type].widgets[widget] = {
+      opProps: {
+        between: {
+          isSpecialRange: true,
+          textSeparators: [null, null],
+        },
+        not_between: {
+          isSpecialRange: true,
+          textSeparators: [null, null],
+        }
+      },
+      ...types[type].widgets[widget],
+    };
+  } else {
+    delete types[type].widgets[widget];
+  }
+
+  return {
+    ...config,
+    types,
+  };
+}
+
+const mixinWidgetRangeslider = (config, addMixin = true) => {
+  let { widgets, types } = config;
+
+  widgets = {
+    ...widgets,
+  };
+
+  if (addMixin) {
+    widgets.rangeslider = {
+      type: "number",
+      jsType: "number",
+      valueSrc: "value",
+      valueLabel: "Range",
+      valuePlaceholder: "Select range",
+      valueLabels: [
+        { label: "Number from", placeholder: "Enter number from" },
+        { label: "Number to", placeholder: "Enter number to" },
+      ],
+      formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+        return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
+      },
+      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+        return this.utils.SqlString.escape(val);
+      },
+      spelFormatValue: function (val) { return this.utils.spelEscape(val); },
+      singleWidget: "slider",
+      toJS: (val, fieldSettings) => (val),
+      ...widgets.rangeslider,
+    };
+  } else {
+    delete widgets.rangeslider;
+  }
+
+  types = {
+    ...types,
+    number: {
+      ...types.number,
+      widgets: {
+        ...types.number.widgets,
+      }
+    }
+  };
+
+  if (addMixin) {
+    types.number.widgets.rangeslider = {
+      opProps: {
+        between: {
+          isSpecialRange: true,
+        },
+        not_between: {
+          isSpecialRange: true,
+        }
+      },
+      operators: [
+        "between",
+        "not_between",
+        // "is_empty",
+        // "is_not_empty",
+        "is_null",
+        "is_not_null",
+      ],
+      ...types.number.widgets.rangeslider,
+    };
+  } else {
+    delete types.number.widgets.rangeslider;
+  }
+
+  return {
+    ...config,
+    widgets,
+    types,
+  };
+};
+
+const mixinWidgetTreeselect = (config, addMixin = true) => {
+  let { widgets, types } = config;
+
+  widgets = {
+    ...widgets,
+  };
+
+  if (addMixin) {
+    widgets.treeselect = {
+      type: "treeselect",
+      jsType: "string",
+      valueSrc: "value",
+      valueLabel: "Value",
+      valuePlaceholder: "Select value",
+      formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
+        let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
+        return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
+      },
+      sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
+        return this.utils.SqlString.escape(val);
+      },
+      spelFormatValue: function (val) { return this.utils.spelEscape(val); },
+      toJS: (val, fieldSettings) => (val),
+      ...widgets.treeselect,
+    };
+  } else {
+    delete widgets.treeselect;
+  }
+
+  types = {
+    ...types,
+  };
+
+  if (addMixin) {
+    types.treeselect = {
+      mainWidget: "treeselect",
+      defaultOperator: "select_equals",
+      widgets: {
+        treeselect: {
+          operators: [
+            "select_equals",
+            "select_not_equals"
+          ],
+        },
+        treemultiselect: {
+          operators: [
+            "select_any_in",
+            "select_not_any_in"
+          ],
+        },
+      },
+      ...types.treeselect,
+    };
+  } else {
+    delete types.treeselect;
+  }
+
+  return {
+    ...config,
+    widgets,
+    types,
+  };
+};
+
+const mixinWidgetTreemultiselect = (config, addMixin = true) => {
+  let { widgets, types } = config;
+
+  widgets = {
+    ...widgets,
+  };
+
+  if (addMixin) {
+    widgets.treemultiselect = {
+      type: "treemultiselect",
+      jsType: "array",
+      valueSrc: "value",
+      valueLabel: "Values",
+      valuePlaceholder: "Select values",
+      formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
+        let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
+        return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
+      },
+      sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
+        return vals.map(v => this.utils.SqlString.escape(v));
+      },
+      spelFormatValue: function (val) { return this.utils.spelEscape(val); },
+      toJS: (val, fieldSettings) => (val),
+      ...widgets.treemultiselect,
+    };
+  } else {
+    delete widgets.treemultiselect;
+  }
+
+  types = {
+    ...types,
+  };
+
+  if (addMixin) {
+    types.treemultiselect = {
+      defaultOperator: "multiselect_equals",
+      widgets: {
+        treemultiselect: {
+          operators: [
+            "multiselect_equals",
+            "multiselect_not_equals",
+          ],
+        }
+      },
+      ...types.treemultiselect,
+    };
+  } else {
+    delete types.treemultiselect;
+  }
+
+  return {
+    ...config,
+    widgets,
+    types,
+  };
+};
+
+export const ConfigMixins = {
+  addMixins,
+  removeMixins,
+};
 
 //----------------------------
 
-export default {
+let config = {
   conjunctions,
   operators,
   widgets,
@@ -1252,3 +1515,11 @@ export default {
   settings,
   ctx,
 };
+// Mixin advanced widgets just to allow using it on server-side eg. for export routines
+config = addMixins(config, [
+  "rangeslider",
+  "treeselect",
+  "treemultiselect",
+]);
+
+export default config;

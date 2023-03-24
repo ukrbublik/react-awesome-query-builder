@@ -1,6 +1,6 @@
 import React from "react";
 import BootstrapWidgets from "../widgets";
-import { BasicConfig } from "@react-awesome-query-builder/ui";
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 
 const settings = {
@@ -75,10 +75,11 @@ const ctx = {
   },
 };
 
-export default {
+let config = {
   ...BasicConfig,
   ctx,
   types,
   widgets,
   settings,
 };
+export default config;

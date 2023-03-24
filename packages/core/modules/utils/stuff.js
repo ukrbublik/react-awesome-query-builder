@@ -159,12 +159,20 @@ export const isJSX = (jsx) => (
   && typeof jsx["type"] === "string" && Object.keys(jsx).includes("props")
 );
 
-export const isJsonLogic = (logic) => (
-  typeof logic === "object" // An object
-  && logic !== null // but not null
-  && !Array.isArray(logic) // and not an array
-  && Object.keys(logic).length === 1 // with exactly one key
-);
+export const isJsonLogic = (logic) => {
+  let isJL = typeof logic === "object" // An object
+    && logic !== null // but not null
+    && !Array.isArray(logic) // and not an array
+    && Object.keys(logic).length === 1; // with exactly one key
+  if (isJL) {
+    const op = Object.keys(logic)[0];
+    const args = logic[op];
+    if (typeof args === "object" && !Array.isArray(args)) {
+      isJL = false;
+    }
+  }
+  return isJL;
+}
 
 export function sleep(delay) {
   return new Promise((resolve) => {

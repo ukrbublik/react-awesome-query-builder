@@ -355,7 +355,7 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
       const targetObj = subconfig;
       const val = targetObj[k];
       let newVal = compileJsonLogic(val, opts, newPath, submeta.args, submeta.onlyJL);
-      if (submeta.invokeWith && newVal) {
+      if (submeta.invokeWith && newVal && typeof newVal === "function") {
         newVal = newVal.call(null, ...submeta.invokeWith);
       }
       if (newVal !== val) {
