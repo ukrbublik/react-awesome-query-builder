@@ -4,5 +4,6 @@
     "/packages/sandbox",
     "/packages/sandbox_simple",
     "/packages/sandbox_next"
-  ]
+  ],
+  "node": "14"
 }
