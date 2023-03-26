@@ -12,8 +12,26 @@ import { BasicFuncs } from "..";
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
 
-function applyJsonLogic(logic, data) {
-  return JL.apply(logic, data);
+function applyJsonLogic(logic, data, path) {
+  let ret;
+  try {
+    ret = JL.apply(logic, data);
+  } catch (e) {
+    e.message = `${path.join(".")} :: ${e.message}`;
+    throw e;
+  }
+  return ret;
+}
+
+function callContextFn(_this, fn, args, path) {
+  let ret;
+  try {
+    ret = fn.call(_this, ...args);
+  } catch (e) {
+    e.message = `${path.join(".")} :: ${e.message}`;
+    throw e;
+  }
+  return ret;
 }
 
 export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
@@ -64,8 +82,8 @@ const compileMetaOperator = {
   mongoFormatOp: { type: "f", args: ["field", "op", "vals", "useExpr", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   sqlFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
   spelFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
-  jsonLogic: { type: "f", onlyJL: true, args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"] },
-  elasticSearchQueryType: { type: "f", onlyJL: true, args: ["valueType"] },
+  jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"] },
+  elasticSearchQueryType: { type: "f", ignore: "string", args: ["valueType"] },
   textSeparators: { type: "r", isArr: true },
 };
 
@@ -84,7 +102,7 @@ const compileMetaFunc = {
   renderBrackets: { type: "r", isArr: true },
   renderSeps: { type: "r", isArr: true },
 
-  jsonLogic: { type: "f", onlyJL: true, args: ["formattedArgs"] },
+  jsonLogic: { type: "f", ignore: "string", args: ["formattedArgs"] },
   jsonLogicImport: { type: "f", args: ["val"] },
   formatFunc: { type: "f", args: ["formattedArgs", "isForDisplay"] },
   sqlFormatFunc: { type: "f", args: ["formattedArgs"] },
@@ -94,7 +112,7 @@ const compileMetaFunc = {
 
 const compileMetaSettings = {
   locale: {
-    mui: { type: "f", args: [], invokeWith: [] },
+    mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
 
   canCompareFieldWithField: { type: "f", args: ["leftField", "leftFieldConfig", "rightField", "rightFieldConfig", "op"] },
@@ -346,7 +364,7 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
     } else if (submeta.type === "rf") {
       const targetObj = subconfig;
       const val = targetObj[k];
-      const newVal = compileJsonLogicReact(val, opts, newPath, submeta.onlyJL);
+      const newVal = compileJsonLogicReact(val, opts, newPath, submeta.ignore);
       if (newVal !== val) {
         logs.push(`Compiled JL-RF ${newPath.join(".")}`);
         targetObj[k] = newVal;
@@ -354,7 +372,7 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
     } else if (submeta.type === "f") {
       const targetObj = subconfig;
       const val = targetObj[k];
-      let newVal = compileJsonLogic(val, opts, newPath, submeta.args, submeta.onlyJL);
+      let newVal = compileJsonLogic(val, opts, newPath, submeta.args, submeta.ignore);
       if (submeta.invokeWith && newVal && typeof newVal === "function") {
         newVal = newVal.call(null, ...submeta.invokeWith);
       }
@@ -379,14 +397,14 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
   }
 }
 
-function compileJsonLogicReact(jl, opts, path, onlyJL = false) {
+function compileJsonLogicReact(jl, opts, path, ignore = undefined) {
   if (isJsonLogic(jl)) {
     return function(props, ctx) {
       ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
       const data = {
         props, ctx,
       };
-      let re = applyJsonLogic(jl, data);
+      let re = applyJsonLogic(jl, data, path);
       if (typeof re === "string") {
         re = {
           type: re,
@@ -402,7 +420,7 @@ function compileJsonLogicReact(jl, opts, path, onlyJL = false) {
       ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
       const fn = jl.split(".").reduce((o, k) => o?.[k], ctx);
       if (fn) {
-        return fn.call(this, props, ctx);
+        return callContextFn(this, fn, [props, ctx], path);
       } else {
         const re = {
           type: jl,
@@ -416,24 +434,24 @@ function compileJsonLogicReact(jl, opts, path, onlyJL = false) {
   return jl;
 }
 
-function compileJsonLogic(jl, opts, path, argNames, onlyJL = false) {
-  if (isJsonLogic(jl)) {
+function compileJsonLogic(jl, opts, path, argNames, ignore = undefined) {
+  if (isJsonLogic(jl) && ignore !== "jl") {
     return function(...args) {
       const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
       const data = (argNames || []).reduce((acc, k, i) => ({...acc, [k]: args[i]}), {
         args, ctx
       });
-      const ret = applyJsonLogic(jl, data);
+      const ret = applyJsonLogic(jl, data, path);
       return ret;
     };
-  } else if (typeof jl === "string" && !onlyJL) {
+  } else if (typeof jl === "string" && ignore !== "string") {
     return function(...args) {
       const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
       const fn = jl.split(".").reduce((o, k) => o?.[k], ctx);
       if (fn) {
-        return fn.call(this, ...args);
+        return callContextFn(this, fn, args, path);
       } else {
-        throw new Error(`compileJsonLogic for ${path.join(".")}: Function ${jl} is not found in ctx`);
+        throw new Error(`${path.join(".")} :: Function ${jl} is not found in ctx`);
       }
     };
   }

@@ -57,6 +57,7 @@ export default class QueryContainer extends Component {
 
   onPropsChanged(nextProps) {
     // compare configs
+    const prevProps = this.props;
     const oldConfig = this.state.config;
     const nextConfig = this.getMemoizedConfig(nextProps);
     const isConfigChanged = oldConfig !== nextConfig;
@@ -68,7 +69,9 @@ export default class QueryContainer extends Component {
     this.sanitizeTree = isTreeChanged || isConfigChanged;
 
     if (isConfigChanged) {
-      this.QueryWrapper = (pr) => nextConfig.settings.renderProvider(pr, nextConfig.ctx);
+      if (prevProps.settings.renderProvider !== nextProps.settings.renderProvider) {
+        this.QueryWrapper = (props) => nextConfig.settings.renderProvider(props, nextConfig.ctx);
+      }
       this.setState({config: nextConfig});
     }
     

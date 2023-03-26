@@ -165,11 +165,7 @@ export const isJsonLogic = (logic) => {
     && !Array.isArray(logic) // and not an array
     && Object.keys(logic).length === 1; // with exactly one key
   if (isJL) {
-    const op = Object.keys(logic)[0];
-    const args = logic[op];
-    if (typeof args === "object" && !Array.isArray(args)) {
-      isJL = false;
-    }
+    // additional checks ?
   }
   return isJL;
 };
