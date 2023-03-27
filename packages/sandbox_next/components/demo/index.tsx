@@ -9,6 +9,7 @@ import { PostTreeResult, GetTreeResult, PostTreeBody } from "../../pages/api/tre
 import { PostConfigBody, PostConfigResult } from "../../pages/api/config";
 import ctx from "./config_ctx";
 import updateConfigWithSomeChanges from "./config_update";
+import throttle from "lodash/throttle";
 const stringify = JSON.stringify;
 const {getTree, checkTree, loadTree, uuid} = Utils;
 
@@ -109,14 +110,16 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
       </div>
     </div>
   );
-    
-  onChange = (tree: ImmutableTree, config: Config) => {
+
+  _onChange = (tree: ImmutableTree, config: Config) => {
     this.setState({
       tree,
     }, () => {
       this.updateResult();
     });
   };
+
+  onChange = throttle(this._onChange, 200);
 
   updateResult = async () => {
     const jsonTree = getTree(this.state.tree);
