@@ -1,5 +1,5 @@
 
-import { withSessionSsr, getSessionDataForReq } from "../lib/withSession";
+import { withSessionSsr, getSessionData } from "../lib/withSession";
 import Demo, { DemoQueryBuilderProps } from "../components/demo/index";
 import { getInitialTree } from "../pages/api/tree";
 import { getInitialConfig } from "../pages/api/config";
@@ -11,7 +11,7 @@ export default Demo;
 // If `zipConfig` is missing, will be created from `lib/config` (based on `CoreConfig`) and compressed with `compressConfig`
 export const getServerSideProps = withSessionSsr<DemoQueryBuilderProps>(
   async function getServerSideProps({ req }) {
-    const sessionData = await getSessionDataForReq(req);
+    const sessionData = await getSessionData(req);
     return {
       props: {
         jsonTree: sessionData?.jsonTree || getInitialTree(),

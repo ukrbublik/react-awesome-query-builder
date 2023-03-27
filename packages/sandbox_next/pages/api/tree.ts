@@ -56,13 +56,13 @@ export function getInitialTree(fromLogic = false): JsonTree {
   return tree;
 }
 
-function getSavedTree(req: NextApiRequest): JsonTree {
-  return getSessionData(req.session).jsonTree || getInitialTree();
+async function getSavedTree(req: NextApiRequest): Promise<JsonTree> {
+  return (await getSessionData(req)).jsonTree || getInitialTree();
 }
 
 
-async function saveTree(session: Session, jsonTree: JsonTree) {
-  await saveSessionData(session, { jsonTree });
+async function saveTree(req: NextApiRequest, jsonTree: JsonTree) {
+  await saveSessionData(req, { jsonTree });
 }
 
 function prepareResult(immutableTree: ImmutableTree, config: Config): PostTreeResult {
@@ -85,13 +85,13 @@ function prepareResult(immutableTree: ImmutableTree, config: Config): PostTreeRe
 async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  await saveTree(req.session, jsonTree);
+  await saveTree(req, jsonTree);
   const result: PostTreeResult = prepareResult(immutableTree, pureServerConfig);
   return res.status(200).json(result);
 }
 
-function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
-  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : getSavedTree(req);
+async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
+  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
   const result: GetTreeResult = {
     tree
   };
@@ -100,7 +100,7 @@ function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
 
 async function del(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
   const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : getEmptyTree();
-  await saveTree(req.session, tree);
+  await saveTree(req, tree);
   const result: GetTreeResult = {
     tree
   };
@@ -111,7 +111,7 @@ async function route(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     return await post(req, res);
   } else if (req.method === "GET") {
-    return get(req, res);
+    return await get(req, res);
   } else if (req.method === "DELETE") {
     return await del(req, res);
   } else {

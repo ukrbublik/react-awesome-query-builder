@@ -53,38 +53,32 @@ declare module "next" {
   }
 }
 
-// Internal in-memory store
-const allSessions: Record<string, SessionData> = {};
 
 // API to manage session data
-export const saveSessionData = async (session: Session, data: SessionData) => {
+
+export const saveSessionData = async (req: IncomingMessage, data: SessionData) => {
+  const session = (req.session as Session);
   if (!session.id) {
     session.id = nanoid();
     await session.save();
   }
-  allSessions[session.id] = {
-    ...(allSessions[session.id] || {}),
-    ...data
-  };
+  await setSessionDataForReq(req, data);
 };
 
-export const getSessionData = (session: Session): SessionData => {
-  return {
-    ...(allSessions[session.id] || {})
-  };
-};
 
-export const getSessionDataById = (sid: string): SessionData => {
-  return {
-    ...(allSessions[sid] || {})
-  };
-};
-
-// Internal method to retrieve session data, used by `getServerSideProps`
-// Using HTTP request is a hack, but direct call `getSessionData()` from `getServerSideProps` entry point will not work
-export const getSessionDataForReq = async (req: IncomingMessage) => {
+export const getSessionData = async (req: IncomingMessage) => {
   const sid = (req.session as Session).id;
   const url = `http://${req.headers.host}/api/session?sid=${sid}&pass=${sessionOptions.password as string}`;
   const sessionData: SessionData = await (await fetch(url)).json() as SessionData;
+  return sessionData;
+};
+
+const setSessionDataForReq = async (req: IncomingMessage, data: SessionData) => {
+  const sid = (req.session as Session).id;
+  const url = `http://${req.headers.host}/api/session?sid=${sid}&pass=${sessionOptions.password as string}`;
+  const sessionData: SessionData = await (await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })).json() as SessionData;
   return sessionData;
 };
