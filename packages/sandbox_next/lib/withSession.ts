@@ -76,12 +76,13 @@ export const getSessionData = async (req: IncomingMessage) => {
 const setSessionDataForReq = async (req: IncomingMessage, data: SessionData) => {
   const sid = (req.session as Session).id;
   const url = `http://${req.headers.host}/api/session?sid=${sid}&pass=${sessionOptions.password as string}`;
+  const body = JSON.stringify(data);
   const sessionData: SessionData = await (await fetch(url, {
     method: "POST",
-    body: JSON.stringify(data),
+    body,
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json"
+      "Content-Length": `${body.length}`,
     },
   })).json() as SessionData;
   return sessionData;
