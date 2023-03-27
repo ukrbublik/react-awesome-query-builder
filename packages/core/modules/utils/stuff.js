@@ -142,6 +142,9 @@ export const cleanJSX = (jsx) => {
       if (cleaned.type) {
         cleaned.type = getName(cleaned.type);
       }
+      if (cleaned?.props?.children) {
+        cleaned.props.children = cleanJSX(cleaned.props.children);
+      }
       return cleaned;
     }
   }
@@ -149,14 +152,22 @@ export const cleanJSX = (jsx) => {
 };
 
 export const isDirtyJSX = (jsx) => {
-  return typeof jsx === "object" && jsx !== null && Object.keys(jsx).includes("_store");
+  return typeof jsx === "object"
+    && jsx !== null
+    && !Array.isArray(jsx)
+    && Object.keys(jsx).includes("type")
+    && Object.keys(jsx).includes("props") // even if {}
+    && Object.keys(jsx).includes("key") // even if null
+    && Object.keys(jsx).includes("ref") // even if null
+    && Object.keys(jsx).includes("$$typeof"); // Symbol(react.element)
 };
 
 export const isJSX = (jsx) => (
   typeof jsx === "object"
   && jsx !== null
   && !Array.isArray(jsx)
-  && typeof jsx["type"] === "string" && Object.keys(jsx).includes("props")
+  && typeof jsx["type"] === "string"
+  && Object.keys(jsx).includes("props")
 );
 
 export const isJsonLogic = (logic) => {
