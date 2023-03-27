@@ -79,6 +79,10 @@ const setSessionDataForReq = async (req: IncomingMessage, data: SessionData) => 
   const sessionData: SessionData = await (await fetch(url, {
     method: "POST",
     body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
   })).json() as SessionData;
   return sessionData;
 };
