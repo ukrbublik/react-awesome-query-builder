@@ -1,9 +1,19 @@
 {
+  "packages": [
+    "packages/core",
+    "packages/ui",
+    "packages/antd",
+    "packages/mui",
+    "packages/material",
+    "packages/bootstrap",
+    "packages/fluent"
+  ],
   "sandboxes": [
     "/packages/examples",
     "/packages/sandbox",
     "/packages/sandbox_simple",
     "/packages/sandbox_next"
   ],
-  "node": "14"
+  "node": "18",
+  "buildCommand": "build-libs"
 }
