@@ -38,7 +38,7 @@ function post(req: NextApiRequest, res: NextApiResponse<PostSessionResult>) {
   if (sid !== req.session.id && query.pass !== sessionOptions.password) {
     return res.status(401).end();
   }
-  const sessionData = req.body as PostSessionBody;
+  const sessionData = JSON.parse(req.body as string) as PostSessionBody;
   
   allSessions[sid] = {
     ...(allSessions[sid] || {}),
