@@ -11,7 +11,6 @@ import {
 } from "@react-awesome-query-builder/core";
 import { nanoid } from "nanoid";
 import { IncomingMessage } from "http";
-import fetch from "node-fetch";
 
 // API to manage session data.
 // Wrappers to enable session for routes and SSR
@@ -81,10 +80,10 @@ const setSessionDataForReq = async (req: IncomingMessage, data: SessionData) => 
   const sessionData: SessionData = await (await fetch(url, {
     method: "POST",
     body,
-    // headers: {
-    //   "Content-Type": "application/json",
-    //   "Content-Length": `${body.length}`,
-    // },
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": `${body.length}`,
+    },
   })).json() as SessionData;
   return sessionData;
 };
