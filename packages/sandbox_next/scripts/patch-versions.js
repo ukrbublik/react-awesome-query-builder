@@ -12,7 +12,10 @@ if (isInSandbox || !isInWorkspace) {
   const pjson = require(PACKAGE_JSON);
   for (const k in pjson['dependencies']) {
     if (k.indexOf('@react-awesome-query-builder/') === 0) {
-      pjson['dependencies'][k] = pjson['version'];
+      const curr = pjson['dependencies'][k];
+      if (curr.indexOf('workspace:') !== -1) {
+        pjson['dependencies'][k] = pjson['version'];
+      }
     }
   }
   const pjsonStr = JSON.stringify(pjson, null, 2);
