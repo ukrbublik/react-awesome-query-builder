@@ -62,13 +62,13 @@ Session data is saved to Redis (for deploying to Vercel with Upstash integration
 Initial `jsonTree` (if missing in session data) is loaded from [`data/init_logic`](data/init_logic.js).  
 See [getInitialTree()](pages/api/tree.ts).  
 With `POST /api/tree` query value can be saved to session data, and loaded from session with `GET /api/tree`.  
-Response will contain result of converting provided tree into varios formats (like `Utils.jsonLogicFormat()`, `Utils.sqlFormat()` - done on server-side).  
+Response will contain result of converting provided tree into various formats (like `Utils.jsonLogicFormat()`, `Utils.sqlFormat()` - done on server-side).  
 
 Initial `zipConfig` (if missing in session data) is generated on server-side as follows:
 - based on `CoreConfig` (imported from `@react-awesome-query-builder/core`)
 - added fields, funcs and some overrides in [`lib/config_base`](lib/config_base.ts)
 - added UI mixins (`asyncFetch`, custom React components, `factory` overrides) in [`lib/config`](lib/config.tsx)
-- compressed with [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
+- compressed with [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)  
 See [getInitialZipConfig()](pages/api/config.ts).  
 With `POST /api/config` compressed config can be saved to session data, and loaded from session with `GET /api/config`.  
 Note that you can just put compressed config (response of `http://localhost:3002/api/config?initial=true`) to JSON file in `data`, same as done with initial `jsonTree`, if you want.  
