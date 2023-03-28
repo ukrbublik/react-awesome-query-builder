@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Utils as QbUtils, 
-  Widgets, Fields, Config, Settings, SpelConcatPart
+  Widgets, Fields, Config, Settings, SpelConcatPart, WidgetProps
 } from "@react-awesome-query-builder/core";
 import { MaterialConfig } from "@react-awesome-query-builder/material";
 import ReactSelect from "./select";
@@ -15,7 +15,7 @@ export default (): Config => {
       ...InitialConfig.widgets.case_value,
       spelFormatValue: QbUtils.ExportUtils.spelFormatConcat,
       spelImportValue: QbUtils.ExportUtils.spelImportConcat,
-      factory: ({value, setValue, id}) => 
+      factory: ({value, setValue, id}: WidgetProps) => 
         <ReactSelect 
           value={value as Array<SpelConcatPart>}
           setValue={setValue}

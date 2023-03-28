@@ -4,7 +4,7 @@ import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
 import clone from "clone";
-import serializeJs from "serialize-javascript";
+// import serializeJs from "serialize-javascript";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations } from "./jsonLogic";
 import { BasicFuncs } from "..";
@@ -182,6 +182,13 @@ const compileMeta = {
 /////////////
 
 export const compressConfig = (config, baseConfig) => {
+  if (!config.settings.useConfigCompress) {
+    throw new Error("Please enable `useConfigCompress` in config settings to use compressConfig()");
+  }
+  if (config.__fieldNames) {
+    throw new Error("Don't apply `compressConfig()` to config got from `onChange` callback. " 
+      + "Please don't save config got in 2nd param of `onChange` callback");
+  }
   let zipConfig = pick(config, configKeys);
   delete zipConfig.ctx;
 
@@ -260,6 +267,9 @@ export const compressConfig = (config, baseConfig) => {
 
 
 export const decompressConfig = (zipConfig, baseConfig, ctx) => {
+  if (!zipConfig.settings.useConfigCompress) {
+    throw new Error("Please enable `useConfigCompress` in config settings to use decompressConfig()");
+  }
   let unzipConfig = {};
 
   const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
@@ -489,27 +499,27 @@ function renderReactElement(jsx, opts, path, key = undefined) {
 
 /////////////
 
-const mergeCustomizerCleanJSX = (_objValue, srcValue, _key, _object, _source, _stack) => {
-  if (isDirtyJSX(srcValue)) {
-    return cleanJSX(srcValue);
-  }
-};
+// const mergeCustomizerCleanJSX = (_objValue, srcValue, _key, _object, _source, _stack) => {
+//   if (isDirtyJSX(srcValue)) {
+//     return cleanJSX(srcValue);
+//   }
+// };
 
-export const UNSAFE_serializeConfig = (config) => {
-  const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX);
-  const strConfig = serializeJs(sanitizedConfig, {
-    space: 2,
-    unsafe: true,
-  });
-  if (strConfig.includes("__WEBPACK_IMPORTED_MODULE_")) {
-    throw new Error("Serialized config should not have references to modules imported from webpack.");
-  }
-  return strConfig;
-};
+// export const UNSAFE_serializeConfig = (config) => {
+//   const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX);
+//   const strConfig = serializeJs(sanitizedConfig, {
+//     space: 2,
+//     unsafe: true,
+//   });
+//   if (strConfig.includes("__WEBPACK_IMPORTED_MODULE_")) {
+//     throw new Error("Serialized config should not have references to modules imported from webpack.");
+//   }
+//   return strConfig;
+// };
 
-export const UNSAFE_deserializeConfig = (strConfig, ctx) => {
-  let config = eval("("+strConfig+")");
-  config.ctx = ctx;
-  return config;
-};
+// export const UNSAFE_deserializeConfig = (strConfig, ctx) => {
+//   let config = eval("("+strConfig+")");
+//   config.ctx = ctx;
+//   return config;
+// };
 

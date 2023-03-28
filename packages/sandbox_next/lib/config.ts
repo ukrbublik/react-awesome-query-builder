@@ -341,6 +341,7 @@ export function createConfig(InitialConfig: CoreConfig): Config {
     ...InitialConfig.settings,
     ...localeSettings,
 
+    useConfigCompress: true,
     valueSourcesInfo: {
       value: {
         label: "Value"

@@ -3,7 +3,7 @@ import {
   Utils, CoreConfig,
   //types:
   ZipConfig,
-	Config
+  Config
 } from "@react-awesome-query-builder/core";
 import { Session, withSessionRoute, getSessionData, saveSessionData } from "../../lib/withSession";
 import serverConfig from "../../lib/config_ui";
@@ -24,9 +24,9 @@ export interface GetConfigResult {
 }
 
 export async function decompressSavedConfig(req: NextApiRequest): Promise<Config> {
-	const zipConfig = await getSavedZipConfig(req);
-	const config = Utils.ConfigUtils.decompressConfig(zipConfig, serverConfig);
-	return config;
+  const zipConfig = await getSavedZipConfig(req);
+  const config = Utils.ConfigUtils.decompressConfig(zipConfig, serverConfig);
+  return config;
 }
 
 export async function getSavedZipConfig(req: NextApiRequest): Promise<ZipConfig> {

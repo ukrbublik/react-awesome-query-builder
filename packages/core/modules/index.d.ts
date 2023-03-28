@@ -10,6 +10,7 @@ export type Moment = MomentType;
 // common
 /////////////////
 
+export type FactoryWithContext<P> = (props?: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
 
@@ -48,7 +49,7 @@ type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 
-type ConfigContext = {
+export type ConfigContext = {
   utils: TypedMap<any>,
   W: TypedMap<ElementType<any>>,
   O: TypedMap<ElementType<any>>,
@@ -202,8 +203,8 @@ export interface Utils {
     simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   };
   ConfigUtils: {
-    UNSAFE_serializeConfig(config: Config): StrConfig;
-    UNSAFE_deserializeConfig(strConfig: StrConfig, ctx: ConfigContext): Config;
+    // UNSAFE_serializeConfig(config: Config): StrConfig;
+    // UNSAFE_deserializeConfig(strConfig: StrConfig, ctx: ConfigContext): Config;
     compressConfig(config: Config, baseConfig: Config): ZipConfig;
     decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
     compileConfig(config: Config): Config;
@@ -443,7 +444,7 @@ export interface BaseWidget {
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction;
   //@ui
-  factory: Factory<WidgetProps> | SerializedFunction;
+  factory: FactoryWithContext<WidgetProps> | SerializedFunction;
   customProps?: AnyObject;
 }
 export interface RangeableWidget extends BaseWidget {
@@ -552,7 +553,7 @@ export interface ProximityProps extends ProximityConfig {
   config: Config,
 }
 export interface ProximityOptions extends ProximityConfig {
-  factory: Factory<ProximityProps> | SerializedFunction,
+  factory: FactoryWithContext<ProximityProps> | SerializedFunction,
 }
 
 interface BaseOperator {
@@ -844,6 +845,7 @@ export interface BehaviourSettings {
   removeIncompleteRulesOnLoad?: boolean,
   removeInvalidMultiSelectValuesOnLoad?: boolean,
   groupOperators?: Array<string>,
+  useConfigCompress?: boolean,
 }
 
 export interface OtherSettings {

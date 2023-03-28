@@ -20,7 +20,9 @@ export const extendConfig = (config, configId) => {
     return config;
   }
 
-  config = compileConfig(config);
+  if (config.settings.useConfigCompress) {
+    config = compileConfig(config);
+  }
   
   config = {...config};
   config.settings = merge({}, defaultSettings, config.settings);

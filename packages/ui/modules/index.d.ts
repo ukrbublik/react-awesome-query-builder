@@ -13,7 +13,7 @@ import {
   TypedValueSourceMap,
   ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
-  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps, ConfigContext,
+  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps, ConfigContext, FactoryWithContext,
   RenderedReactElement, SerializedFunction
 } from "@react-awesome-query-builder/core";
 
@@ -29,7 +29,6 @@ type ReactKey = string | number;
 interface ReactAttributes {
   key?: ReactKey | null | undefined;
 }
-type FactoryWithContext<P> = (props?: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 
 type AnyObject = object;
 type TypedMap<T> = {
@@ -142,29 +141,29 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
-  renderField?: Factory<FieldProps> | SerializedFunction,
-  renderOperator?: Factory<FieldProps> | SerializedFunction,
-  renderFunc?: Factory<FieldProps> | SerializedFunction,
-  renderConjs?: Factory<ConjsProps> | SerializedFunction,
-  renderButton?: Factory<ButtonProps> | SerializedFunction,
-  renderButtonGroup?: Factory<ButtonGroupProps> | SerializedFunction,
-  renderSwitch?: Factory<SwitchProps> | SerializedFunction,
+  renderField?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction,
+  renderButton?: FactoryWithContext<ButtonProps> | SerializedFunction,
+  renderButtonGroup?: FactoryWithContext<ButtonGroupProps> | SerializedFunction,
+  renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction,
   renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,
-  renderValueSources?: Factory<ValueSourcesProps> | SerializedFunction,
+  renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
   renderConfirm?: ConfirmFunc | SerializedFunction,
   useConfirm?: (() => Function) | SerializedFunction,
   renderSize?: AntdSize,
-  renderItem?: Factory<ItemBuilderProps> | SerializedFunction,
+  renderItem?: FactoryWithContext<ItemBuilderProps> | SerializedFunction,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
   showLabels?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: Factory<FieldProps> | SerializedFunction,
-  renderAfterWidget?: Factory<FieldProps> | SerializedFunction,
-  renderBeforeActions?: Factory<FieldProps> | SerializedFunction,
-  renderAfterActions?: Factory<FieldProps> | SerializedFunction,
-  renderRuleError?: Factory<RuleErrorProps> | SerializedFunction,
+  renderBeforeWidget?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderAfterWidget?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderBeforeActions?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderAfterActions?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderRuleError?: FactoryWithContext<RuleErrorProps> | SerializedFunction,
   renderSwitchPrefix?: RenderedReactElement | SerializedFunction,
   defaultSliderWidth?: string,
   defaultSelectWidth?: string,

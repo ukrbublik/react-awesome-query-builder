@@ -181,7 +181,7 @@ export class BasicGroup extends PureComponent {
     if (BeforeActions == undefined)
       return null;
 
-    return typeof BeforeActions === "function" ? <BeforeActions {...this.props}/> : BeforeActions;
+    return typeof BeforeActions === "function" ? BeforeActions(this.props, this.props.config.ctx) : BeforeActions;
   };
 
   renderAfterActions = () => {
@@ -189,7 +189,7 @@ export class BasicGroup extends PureComponent {
     if (AfterActions == undefined)
       return null;
 
-    return typeof AfterActions === "function" ? <AfterActions {...this.props}/> : AfterActions;
+    return typeof AfterActions === "function" ? AfterActions(this.props, this.props.config.ctx) : AfterActions;
   };
 
   renderActions() {

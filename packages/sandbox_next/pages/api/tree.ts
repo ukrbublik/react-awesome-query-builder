@@ -15,7 +15,7 @@ const {
 } = Utils;
 
 // API to get/save `jsonTree` to session
-// Initial tree is loaded from `data` dir
+// Initial tree is loaded from `data` dir (by default from `init_logic.js`, or from `init_value.js` if `fromLogic = false`)
 // After saving `jsonTree` is exported to multiple formats on server side and returned in response
 
 interface ConvertResult {
@@ -43,7 +43,7 @@ function getEmptyTree(): JsonTree {
   return {"id": uuid(), "type": "group"};
 }
 
-export function getInitialTree(fromLogic = false): JsonTree {
+export function getInitialTree(fromLogic = true): JsonTree {
   const config = pureServerConfig;
   let tree: JsonTree;
   if (fromLogic) {
