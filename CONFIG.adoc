@@ -324,7 +324,7 @@ Behaviour settings:
 |removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.checkTree()`?
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
-|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.compressConfig()` and `Utils.ConfigUtils.decompressConfig()`. See link:#configctx[config.ctx]
+|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.decompressConfig()`
 |===
 
 TIP: For fully read-only mode use these settings:

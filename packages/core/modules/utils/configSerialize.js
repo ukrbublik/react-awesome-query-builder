@@ -182,9 +182,6 @@ const compileMeta = {
 /////////////
 
 export const compressConfig = (config, baseConfig) => {
-  if (!config.settings.useConfigCompress) {
-    throw new Error("Please enable `useConfigCompress` in config settings to use compressConfig()");
-  }
   if (config.__fieldNames) {
     throw new Error("Don't apply `compressConfig()` to extended config");
   }
@@ -230,7 +227,7 @@ export const compressConfig = (config, baseConfig) => {
       });
     }
 
-    if (base !== undefined && shallowEqual(target, base)) {
+    if (base !== undefined && shallowEqual(target, base, true)) {
       return undefined;
     }
 
@@ -250,7 +247,7 @@ export const compressConfig = (config, baseConfig) => {
       _clean(zipConfig[rootKey], {}, [rootKey]);
     } else if (rootKey === "funcs") {
       // leave only diff for every used func
-      zipConfig[rootKey] = clone(zipConfig[rootKey]);
+      zipConfig[rootKey] = clone(zipConfig[rootKey] || {});
       for (let k in zipConfig[rootKey]) {
         _clean(zipConfig[rootKey][k], BasicFuncs[k], [rootKey, k]);
       }
