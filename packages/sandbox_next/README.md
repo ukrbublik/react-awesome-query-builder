@@ -52,18 +52,21 @@ Feel free to play with code in `components/demo`, `lib`, `pages`.
   - [`config_ctx`](components/demo/config_ctx.tsx) - Config context for `DemoQueryBuilder`
 
 ### Description
+
+#### Session data
 Session data contains:
 - `jsonTree` - query value in JSON format, got from [`Utils.getTree()`](/README.md#gettree-immutablevalue-light--true-children1asarray--true---object)
 - `zipConfig` - compressed query config in JSON format, got from [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
 
-<!-- 
-Session data is saved to Redis (for deploying to Vercel with Upstash integration) or tmp json file (for local run), see [lib/withSession.ts](lib/withSession.ts) if you're interested in session implementation.   -->
+Session data is saved to Redis (for deploying to Vercel with Upstash integration) or tmp json file (for local run), see [lib/withSession.ts](lib/withSession.ts) if you're interested in session implementation.
 
+#### jsonTree
 Initial `jsonTree` (if missing in session data) is loaded from [`data/init_logic`](data/init_logic.js).  
 See [getInitialTree()](pages/api/tree.ts).  
 With `POST /api/tree` query value can be saved to session data, and loaded from session with `GET /api/tree`.  
 Response will contain result of converting provided tree into various formats (like `Utils.jsonLogicFormat()`, `Utils.sqlFormat()` - done on server-side).  
 
+#### zipConfig
 Initial `zipConfig` (if missing in session data) is generated on server-side as follows:
 - based on `CoreConfig` (imported from `@react-awesome-query-builder/core`)
 - added fields, funcs and some overrides in [`lib/config_base`](lib/config_base.ts)
@@ -74,6 +77,7 @@ See [getInitialZipConfig()](pages/api/config.ts).
 With `POST /api/config` compressed config can be saved to session data, and loaded from session with `GET /api/config`.  
 Note that you can just put compressed config (response of `http://localhost:3002/api/config?initial=true`) to JSON file in `data`, same as done with initial `jsonTree`, if you want.  
 
+#### DemoQueryBuilder
 `DemoQueryBuilder` component can use server-side props:
 - It uses [`Utils.decompressConfig(zipConfig, MuiConfig, ctx)`](/README.md#decompressconfigzipconfig-baseconfig-ctx---config) to create initial config to be passed to `<Query>`. `ctx` is imported from [`config_ctx`](components/demo/config_ctx.tsx)
 - Initial tree (to be passed as `value` prop for `<Query>`) is a result of [`Utils.loadTree(jsonTree)`](/README.md#loadtree-jsvalue---immutable)
