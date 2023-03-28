@@ -54,8 +54,6 @@ export default class Widget extends PureComponent {
   };
 
   constructor(props) {
-    console.log("widget constructor");
-    console.log(props);
     super(props);
     useOnPropsChanged(this);
 
@@ -89,8 +87,6 @@ export default class Widget extends PureComponent {
         .filter((ch) => ch).length > 0;
 
     if (needUpdateMeta) {
-      console.log("getMeta");
-      console.log(nextProps);
       this.meta = this.getMeta(nextProps);
     }
   }
@@ -152,32 +148,21 @@ export default class Widget extends PureComponent {
     asyncListValues,
   }) {
     const field = isFuncArg ? { func: fieldFunc, arg: fieldArg } : simpleField;
-    console.log(isFuncArg);
-    console.log(simpleField);
-    console.log(leftField);
-    console.log(field);
-    console.log(fieldSrc);
     let iValueSrcs = valueSrcs;
-    console.log(iValueSrcs);
     let iValues = values;
-    console.log(iValues);
     if (isFuncArg || isForRuleGroup || isCaseValue) {
       iValueSrcs = createListFromArray([valueSrcs]);
       iValues = createListFromArray([values]);
     }
-    console.log(iValueSrcs);
-    console.log(iValues);
 
     const fieldDefinition = isFuncArg
       ? getFieldConfig(config, field)
       : fieldSrc === "func"
       ? getFuncConfig(config, field.get("func"))
       : getFieldConfig(config, field);
-    console.log(fieldDefinition);
     const defaultWidget = isFuncArg
       ? getWidgetForFieldOp(config, field, operator)
       : getWidgetForFieldOp(config, field, operator, null, fieldSrc);
-    console.log(defaultWidget);
     const operatorDefinition = isFuncArg
       ? funcArgDummyOpDef
       : getOperatorConfig(config, operator, field, fieldSrc);
@@ -215,17 +200,12 @@ export default class Widget extends PureComponent {
           null,
           fieldSrc
         );
-    console.log(valueSources);
 
     const widgets = range(0, cardinality).map((delta) => {
       const valueSrc = iValueSrcs.get(delta) || null;
-      console.log(isFuncArg);
-      console.log(field);
-      console.log(fieldSrc);
       let widget = isFuncArg
         ? getWidgetForFieldOp(config, field, operator, valueSrc)
         : getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
-      console.log(widget);
       let widgetDefinition = isFuncArg
         ? getFieldWidgetConfig(config, field, operator, widget, valueSrc)
         : getFieldWidgetConfig(
@@ -236,7 +216,6 @@ export default class Widget extends PureComponent {
             valueSrc,
             fieldSrc
           );
-      console.log(widgetDefinition);
       if (isSpecialRangeForSrcField) {
         widget = widgetDefinition.singleWidget;
         widgetDefinition = getFieldWidgetConfig(

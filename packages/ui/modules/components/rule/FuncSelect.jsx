@@ -81,7 +81,6 @@ export default class FuncSelect extends PureComponent {
   }
 
   getMeta({ config, field, fieldSrc, value }) {
-    console.log(fieldSrc);
     const { funcPlaceholder, fieldSeparatorDisplay } = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;

@@ -23,7 +23,6 @@ export default class FieldCascader extends PureComponent {
   };
 
   onChange = (keys) => {
-    console.log("onChange");
     const { parentField } = this.props;
     const dotNotationToPath = str => str.split(".");
     const parentPath = parentField ? dotNotationToPath(parentField) : [];

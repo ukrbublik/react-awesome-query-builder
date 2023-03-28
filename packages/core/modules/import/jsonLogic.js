@@ -42,7 +42,6 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   let jsTree = logicTree
     ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta)
     : undefined;
-  console.log(jsTree);
   if (jsTree && jsTree.type != "group") {
     jsTree = wrapInDefaultConj(jsTree, extendedConfig);
   }
@@ -217,9 +216,6 @@ const convertFromLogic = (
       parentField
     );
   } else if (expectedType == "val") {
-    console.log("expecting val");
-    console.log(op);
-    console.log(vals);
     // not is not used here
     ret =
       convertField(op, vals, conv, config, not, meta, parentField) ||
@@ -239,7 +235,6 @@ const convertFromLogic = (
       convertConj(op, vals, conv, config, not, meta, parentField, false) ||
       convertOp(op, vals, conv, config, not, meta, parentField);
   }
-  console.log(ret);
 
   let afterErrorsCnt = meta.errors.length;
   if (op != "!" && ret === undefined && afterErrorsCnt == beforeErrorsCnt) {
@@ -402,7 +397,6 @@ const convertFunc = (
         let parsed;
         try {
           parsed = fc.jsonLogicImport(v);
-          console.log(parsed);
         } catch (_e) {
           // given expression `v` can't be parsed into function
         }
@@ -413,7 +407,6 @@ const convertFunc = (
       }
     }
   }
-  console.log(funcKey);
   if (!funcKey) return undefined;
 
   if (funcKey) {
@@ -827,7 +820,6 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   }
 
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
-  console.log(parseRes);
   if (!parseRes) return undefined;
   let { field, fieldSrc, fieldConfig, opKey, args, having } = parseRes;
   let opConfig = config.operators[opKey];
@@ -874,17 +866,9 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     opConfig = config.operators[opKey];
   }
 
-  console.log(field);
-  console.log(fieldSrc);
   const widget = getWidgetForFieldOp(config, field, opKey, null, fieldSrc);
-  console.log(widget);
-  console.log(args);
 
   const convertedArgs = args.map((v) => {
-    console.log(v);
-    console.log(conv);
-    console.log(fieldConfig);
-    console.log(widget);
     const convertedArg = convertFromLogic(
       v,
       conv,
@@ -896,17 +880,14 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       widget,
       parentField
     );
-    console.log(convertedArg);
     return convertedArg;
   });
-  console.log(convertedArgs);
   if (convertedArgs.filter((v) => v === undefined).length) {
     //meta.errors.push(`Undefined arg for field ${field} and op ${opKey}`);
     return undefined;
   }
 
   let res;
-  console.log(fieldConfig);
 
   if (fieldConfig.type == "!group" && having) {
     if (conv.conjunctions[conj] !== undefined) {
@@ -1000,7 +981,6 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         asyncListValues,
       },
     };
-    console.log(res);
     if (not) {
       //meta.errors.push(`No rev op for ${opKey}`);
       res = wrapInDefaultConj(res, config, not);

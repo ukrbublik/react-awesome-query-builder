@@ -25,7 +25,6 @@ export default class FieldDropdown extends PureComponent {
   };
 
   onChange = ({key, keyPath}) => {
-    console.log("onChange");
     this.props.setField(key);
   };
 

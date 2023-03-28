@@ -24,7 +24,6 @@ export default class FieldSelect extends PureComponent {
   };
 
   onChange = (key) => {
-    console.log("onChange");
     this.props.setField(key);
   };
 

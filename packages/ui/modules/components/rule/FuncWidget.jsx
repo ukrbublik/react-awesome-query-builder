@@ -162,7 +162,6 @@ export default class FuncWidget extends PureComponent {
       id,
       groupId,
     } = this.props;
-    console.log(this.props);
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource =
@@ -289,7 +288,6 @@ class ArgWidget extends PureComponent {
 
   render() {
     const { funcKey, argKey, parentFuncs } = this.props;
-    console.log(this.props);
     return (
       <Widget
         {...this.props}

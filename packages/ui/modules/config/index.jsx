@@ -96,10 +96,7 @@ const widgets = {
   },
   field: {
     ...CoreConfig.widgets.field,
-    factory: (props) => {
-      console.log(props);
-      return <ValueFieldWidget {...props} />;
-    },
+    factory: (props) => <ValueFieldWidget {...props} />,
     customProps: {
       showSearch: true,
     },

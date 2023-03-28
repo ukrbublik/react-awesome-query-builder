@@ -55,8 +55,6 @@ export const jsonLogicFormat = (item, config) => {
       }
     }
   }
-  console.log(JSON.stringify(logic));
-  console.log(item);
   return {
     errors,
     logic,

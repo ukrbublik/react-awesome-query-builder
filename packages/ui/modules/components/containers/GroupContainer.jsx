@@ -127,7 +127,6 @@ const createGroupContainer = (Group) =>
 
     // for RuleGroup
     setField = (field) => {
-      console.log("setField");
       this.props.actions.setField(this.props.path, field);
     };
 

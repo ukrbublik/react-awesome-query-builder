@@ -30,8 +30,6 @@ export default class ValueField extends PureComponent {
   };
 
   constructor(props) {
-    console.log("value field constructor");
-    console.log(props);
     super(props);
     useOnPropsChanged(this);
 
@@ -197,7 +195,6 @@ export default class ValueField extends PureComponent {
     fields = clone(fields);
     const fieldSrc = this.props.fieldSrc;
     const fieldSeparator = config.settings.fieldSeparator;
-    console.log(fieldSrc);
     const leftFieldConfig =
       fieldSrc === "func"
         ? getFuncConfig(config, leftFieldFullkey.get("func"))

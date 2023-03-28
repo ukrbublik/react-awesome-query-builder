@@ -77,7 +77,6 @@ export default class FieldTreeSelect extends PureComponent {
   }
 
   onChange = (key) => {
-    console.log("onChange");
     this.props.setField(key);
   };
 
