@@ -5,8 +5,8 @@ import {
   //types:
   BuilderProps, ImmutableTree, Config, JsonTree, ZipConfig
 } from "@react-awesome-query-builder/mui";
-import { PostTreeResult, GetTreeResult, PostTreeBody } from "../../pages/api/tree";
-import { PostConfigBody, PostConfigResult } from "../../pages/api/config";
+import type { PostTreeResult, GetTreeResult, PostTreeBody } from "../../pages/api/tree";
+import type { PostConfigBody, PostConfigResult } from "../../pages/api/config";
 import ctx from "./config_ctx";
 import updateConfigWithSomeChanges from "./config_update";
 import throttle from "lodash/throttle";
@@ -118,7 +118,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   };
 
   _updateResult = async ({ saveTree } = { saveTree: true }) => {
-    const response = await fetch(`/api/tree?saveTree=${saveTree}`, {
+    const response = await fetch(`/api/tree?saveTree=${saveTree ? "true" : "false"}`, {
       method: "POST",
       body: JSON.stringify({
         jsonTree: getTree(this.state.tree),

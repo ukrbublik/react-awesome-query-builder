@@ -25,7 +25,7 @@ interface ConvertResult {
   qsh?: string;
   sql?: string;
   mongo?: Object;
-};
+}
 export type PostTreeQuery = {
   saveTree?: string;
 };

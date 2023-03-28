@@ -1,5 +1,5 @@
 import React from "react";
-import { Config } from "@react-awesome-query-builder/mui";
+import type { Config } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
 
 function randomColor() {
