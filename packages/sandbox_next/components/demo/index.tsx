@@ -32,15 +32,16 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   constructor(props: DemoQueryBuilderProps) {
     super(props);
     const config = Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig, ctx);
+    const tree = checkTree(loadTree(props.jsonTree), config);
     this.state = {
-      tree: checkTree(loadTree(props.jsonTree), config),
+      tree,
       config,
       result: {},
     };
   }
 
   componentDidMount = () => {
-    this.updateResult();
+    this._updateResult({ saveTree: false });
   };
 
   render = () => {
@@ -66,13 +67,10 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   resetValue = () => {
     (async () => {
-      const response = await fetch("/api/tree" + "?initial=true", {
-        method: "DELETE",
-      });
+      const response = await fetch("/api/tree" + "?initial=true");
       const result = await response.json() as GetTreeResult;
-
       this.setState({
-        tree: loadTree(result.tree), 
+        tree: loadTree(result.jsonTree), 
       });
     })();
   };
@@ -94,7 +92,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
           zipConfig,
         } as PostConfigBody),
       });
-      const result = await response.json() as PostConfigResult;
+      const _result = await response.json() as PostConfigResult;
 
       this.setState({
         tree: checkTree(this.state.tree, config),
@@ -111,28 +109,28 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
     </div>
   );
 
-  _onChange = (tree: ImmutableTree, config: Config) => {
+  onChange = (tree: ImmutableTree, config: Config) => {
     this.setState({
-      tree,
+      tree
     }, () => {
-      this.updateResult();
+      this.updateResult({ saveTree: true });
     });
   };
 
-  onChange = throttle(this._onChange, 200);
-
-  updateResult = async () => {
-    const jsonTree = getTree(this.state.tree);
-
-    const response = await fetch("/api/tree", {
+  _updateResult = async ({ saveTree } = { saveTree: true }) => {
+    const response = await fetch(`/api/tree?saveTree=${saveTree}`, {
       method: "POST",
       body: JSON.stringify({
-        jsonTree,
+        jsonTree: getTree(this.state.tree),
       } as PostTreeBody),
     });
     const result = await response.json() as PostTreeResult;
-    this.setState({result});
+    this.setState({
+      result
+    });
   };
+
+  updateResult = throttle(this._updateResult, 200);
 
   renderResult = ({result: {jl, qs, qsh, sql, mongo}, tree: immutableTree} : {result: PostTreeResult, tree: ImmutableTree}) => {
     if(!jl) return null;

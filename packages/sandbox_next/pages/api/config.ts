@@ -24,7 +24,7 @@ export interface GetConfigResult {
 
 
 export async function getSavedConfig(req: NextApiRequest): Promise<ZipConfig> {
-  return (await getSessionData(req)).zipConfig || getInitialConfig();
+  return (await getSessionData(req))?.zipConfig || getInitialConfig();
 }
 
 export function getInitialConfig() {

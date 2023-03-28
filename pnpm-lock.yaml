@@ -577,12 +577,15 @@ importers:
       '@next/eslint-plugin-next': ^13.1.2
       '@react-awesome-query-builder/core': workspace:^
       '@react-awesome-query-builder/mui': workspace:^
+      '@types/jsonfile': ^6.1.1
       '@types/lodash': ^4.14.170
       '@types/react': ^17
       '@types/react-dom': ^17.0.18
+      '@upstash/redis': ^1.20.1
       babel-loader: ^8.2.2
       babel-plugin-import: ^1.13.3
       iron-session: ^6.3.1
+      jsonfile: ^6.1.0
       lodash: ^4.17.21
       nanoid: ^4.0.1
       next: ^12.3.2
@@ -610,12 +613,15 @@ importers:
       '@babel/preset-react': 7.18.6_@babel+core@7.20.7
       '@babel/preset-typescript': 7.18.6_@babel+core@7.20.7
       '@next/eslint-plugin-next': 13.1.2
+      '@types/jsonfile': 6.1.1
       '@types/lodash': 4.14.191
       '@types/react': 17.0.52
       '@types/react-dom': 17.0.18
+      '@upstash/redis': 1.20.1
       babel-loader: 8.3.0_lkd654lvpl423ugsqn5olungie
       babel-plugin-import: 1.13.5
       iron-session: 6.3.1_next@12.3.4
+      jsonfile: 6.1.0
       nanoid: 4.0.1
       next: 12.3.4_2z5snxu2kdhzhyb5hlkwpxdbqy
       sass: 1.57.1
@@ -4751,6 +4757,12 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
 
+  /@types/jsonfile/6.1.1:
+    resolution: {integrity: sha512-GSgiRCVeapDN+3pqA35IkQwasaCh/0YFH5dEF6S88iDvEn901DjOeH3/QPY+XYP1DFzDZPvIvfeEgk+7br5png==}
+    dependencies:
+      '@types/node': 18.11.18
+    dev: true
+
   /@types/keygrip/1.0.2:
     resolution: {integrity: sha512-GJhpTepz2udxGexqos8wgaBx4I/zWIDPh/KOGEwAqtuGDkOUJu5eFvwmdBX4AmB8Odsr+9pHCQqiAqDL/yKMKw==}
     dev: true
@@ -5041,6 +5053,14 @@ packages:
 
   /@ungap/promise-all-settled/1.1.2:
     resolution: {integrity: sha512-sL/cEvJWAnClXw0wHk85/2L0G6Sj8UB0Ctc1TEMbKSsmpRosqhwj9gWgFRZSrBr2f9tiXISwNhCPmlfqUqyb9Q==}
+    dev: true
+
+  /@upstash/redis/1.20.1:
+    resolution: {integrity: sha512-mYwV8uvQROJnq5aOxmQH3KDa0E8+DRdU0zJ/VGQV84HrhQQNy0IsLFFTo97WEhZAlHcJnVbrbwqUK9disWqx/w==}
+    dependencies:
+      isomorphic-fetch: 3.0.0
+    transitivePeerDependencies:
+      - encoding
     dev: true
 
   /@vitejs/plugin-react/2.2.0_vite@3.2.5:
@@ -8940,6 +8960,15 @@ packages:
   /isobject/3.0.1:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /isomorphic-fetch/3.0.0:
+    resolution: {integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==}
+    dependencies:
+      node-fetch: 2.6.7
+      whatwg-fetch: 3.6.2
+    transitivePeerDependencies:
+      - encoding
     dev: true
 
   /istanbul-lib-coverage/3.2.0:
@@ -13647,6 +13676,10 @@ packages:
   /websocket-extensions/0.1.4:
     resolution: {integrity: sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==}
     engines: {node: '>=0.8.0'}
+    dev: true
+
+  /whatwg-fetch/3.6.2:
+    resolution: {integrity: sha512-bJlen0FcuU/0EMLrdbJ7zOnW6ITZLrZMIarMUVmdKtsGvZna8vxKYaexICWPfZ8qwf9fzNq+UEIZrnSaApt6RA==}
     dev: true
 
   /whatwg-url/5.0.0:

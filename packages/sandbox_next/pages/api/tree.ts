@@ -19,21 +19,25 @@ const {
 // Note that `pureServerConfig` is used for export utils
 // TODO: use decompressed saved config for export utils?
 
-export type PostTreeBody = {
-  jsonTree: JsonTree,
-};
-export interface PostTreeResult {
+interface ConvertResult {
   jl?: JsonLogicResult;
   qs?: string;
   qsh?: string;
   sql?: string;
   mongo?: Object;
-}
+};
+export type PostTreeQuery = {
+  saveTree?: string;
+};
+export type PostTreeBody = {
+  jsonTree: JsonTree,
+};
+export type PostTreeResult = ConvertResult;
 export type GetTreeQuery = {
   initial?: string;
 };
-export interface GetTreeResult {
-  tree: JsonTree;
+export type GetTreeResult = ConvertResult & {
+  jsonTree: JsonTree;
 }
 
 function getEmptyTree(): JsonTree {
@@ -57,7 +61,7 @@ export function getInitialTree(fromLogic = false): JsonTree {
 }
 
 async function getSavedTree(req: NextApiRequest): Promise<JsonTree> {
-  return (await getSessionData(req)).jsonTree || getInitialTree();
+  return (await getSessionData(req))?.jsonTree || getInitialTree();
 }
 
 
@@ -65,7 +69,7 @@ async function saveTree(req: NextApiRequest, jsonTree: JsonTree) {
   await saveSessionData(req, { jsonTree });
 }
 
-function prepareResult(immutableTree: ImmutableTree, config: Config): PostTreeResult {
+function convertTree(immutableTree: ImmutableTree, config: Config): ConvertResult {
   const jl = jsonLogicFormat(immutableTree, config);
   const qs = queryString(immutableTree, config);
   const qsh = queryString(immutableTree, config, true);
@@ -84,25 +88,23 @@ function prepareResult(immutableTree: ImmutableTree, config: Config): PostTreeRe
 
 async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
+  const doSaveTree = (req.query as PostTreeQuery).saveTree === "true";
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  await saveTree(req, jsonTree);
-  const result: PostTreeResult = prepareResult(immutableTree, pureServerConfig);
+  const convertResult = convertTree(immutableTree, pureServerConfig);
+  const result: PostTreeResult = convertResult;
+  if (doSaveTree) {
+    await saveTree(req, jsonTree);
+  }
   return res.status(200).json(result);
 }
 
 async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
-  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
+  const jsonTree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
+  const immutableTree: ImmutableTree = loadTree(jsonTree);
+  const convertResult = convertTree(immutableTree, pureServerConfig);
   const result: GetTreeResult = {
-    tree
-  };
-  return res.status(200).json(result);
-}
-
-async function del(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
-  const tree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : getEmptyTree();
-  await saveTree(req, tree);
-  const result: GetTreeResult = {
-    tree
+    jsonTree,
+    ...convertResult
   };
   return res.status(200).json(result);
 }
@@ -112,8 +114,6 @@ async function route(req: NextApiRequest, res: NextApiResponse) {
     return await post(req, res);
   } else if (req.method === "GET") {
     return await get(req, res);
-  } else if (req.method === "DELETE") {
-    return await del(req, res);
   } else {
     return res.status(400).end();
   }
