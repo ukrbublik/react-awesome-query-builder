@@ -1,8 +1,8 @@
 # Changelog
 - 6.2.0
   - Allow saving and loading config from server (PR #866) (issue #817)
-    - New utils in `Utils.ConfigUtils`: `compressConfig()`, `decompressConfig()`
-    - New settings option `useConfigCompress`
+    - New utils: `compressConfig()`, `decompressConfig()`
+    - New `settings.useConfigCompress`
     - Config now has `ctx` property
     - Added new test app `sandbox_next` to demonstrate new server-side features
   - Export utils (like `mongoFormatOp1`, `mongoFormatOp2`) in `CoreConfig.ctx.utils` (PR #866) (issue #890)

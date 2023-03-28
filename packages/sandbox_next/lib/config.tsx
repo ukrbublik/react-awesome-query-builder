@@ -3,22 +3,22 @@ import type {
   Config, FieldOrGroup, Operator, Settings, Widget, ConfigMixin
 } from "@react-awesome-query-builder/ui";
 import merge from "lodash/merge";
-import pureServerConfig from "./config";
+import pureServerConfig from "./config_base";
 
-// UI mixins for config - add asyncFetch, custom React components, factory overrides.
-// Exports a config created from CoreConfig with current mixins - 
-//  can be used on server-side to generate initial compressed config.
-// On browser can be decompressed to a full-featured config with a proper `ctx`
+// Adds UI mixins to config created in `./config` - adds asyncFetch, custom React components, factory overrides.
+// Exported config is used on server-side to generate initial compressed config.
+// On browser can be decompressed to a full-featured config with a proper `ctx`.
 // `ctx` should contain used funcs (like `autocompleteFetch`), React components (like `SliderMark`) - see `components/demo/config_ctx`
 //
 //   ! Important !
-//   Don't add JS functions to config, since it can't be used by SSR.
+//   Don't add JS functions to config, since it can't be used with SSR.
 //   Use JsonLogic functions instead, see `factory`.
 //   Or add functions to `ctx` and reference them with name in other sections of config (see `autocompleteFetch` or `myRenderField`)
 //   Add custom React components (like `SliderMark`) to `ctx.components`
 
+
 // It's dummy implementation
-// Just to show how you can include JSX in config and it will be serialized correctly with ConfigUtils.decompressConfig()
+// Just to show how you can include JSX in config and it will be serialized correctly with ConfigUtils.compressConfig()
 // Real implementation in `components/demo/config_ctx`
 const SliderMark: React.FC<{ pct: number }> = () => null;
 
@@ -53,11 +53,11 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
     factory: {
       if: [
         { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
-        { REACT: ["MuiAutocompleteWidget", { mergeObjects: [
+        { JSX: ["MuiAutocompleteWidget", { mergeObjects: [
           { var: "props" },
           { fromEntries: [ [ [ "multiple", true ] ] ] }
         ]}] },
-        { REACT: ["MuiMultiSelectWidget", {var: "props"}] }
+        { JSX: ["MuiMultiSelectWidget", {var: "props"}] }
       ]
     }
   },
@@ -65,8 +65,8 @@ const widgetsMixin: Record<string, Partial<Widget>> = {
     factory: {
       if: [
         { or: [ { var: "props.asyncFetch" }, { var: "props.showSearch" } ] },
-        { REACT: ["MuiAutocompleteWidget", {var: "props"}] },
-        { REACT: ["MuiSelectWidget", {var: "props"}] }
+        { JSX: ["MuiAutocompleteWidget", {var: "props"}] },
+        { JSX: ["MuiSelectWidget", {var: "props"}] }
       ]
     }
   },
@@ -105,7 +105,7 @@ const configMixin: ConfigMixin = {
 };
 
 
-export const mixinConfig = (baseConfig: Config) => {
+const mixinConfig = (baseConfig: Config) => {
   return merge(
     {},
     baseConfig,

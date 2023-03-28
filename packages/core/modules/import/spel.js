@@ -16,7 +16,7 @@ export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
   let meta = {
     errors: []
   };
-  const extendedConfig = extendConfig(config);
+  const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
   
   let compiledExpression;

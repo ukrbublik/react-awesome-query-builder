@@ -324,7 +324,7 @@ Behaviour settings:
 |removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.checkTree()`?
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
-|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.decompressConfig()`
+|useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -759,9 +759,12 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 
 Required starting from version 6.2.0
 
-Typically you just need to copy it from basic config.
+It is a collection of functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules. 
+The purpose of `ctx` is to isolate non-serializable part of config. 
 
-But if you use server-side config (with `settings.useConfigCompress = true`), you may need to add your custom functions (eg. `validateValue`) to `ctx` and refer to them in other config sections with name.
+Typically you just need to copy it from basic config - `AntdConfig.ctx` for AntDesign, `MuiConfig.ctx` for MUI, `BasicConfig.ctx` for vanilla UI etc.
+
+But if you use server-side config, you may need to add your custom functions (eg. `validateValue`) to `ctx` and refer to them in other config sections with name.
 
 [source,javascript]
 ----
@@ -783,14 +786,80 @@ const ctx = {
   },
 };
 
-const config = {
-  ...BasicConfig,
-  ctx,
-  fields,
+// zipConfig can be passed to backend
+const zipConfig = {
+  fields
 };
+
+// and loaded from backend with providing ctx
+const config = Utils.decompressConfig(zipConfig, BasicConfig, ctx);
 ----
 
 You can't just pass function to `validateValue` in `fieldSettings` because config with functions can't be serialized to JSON and then used in SSR. 
-But with approach as in this example config will be compressed with `const zipConfig = Utils.ConfigUtils.compressConfig(config, BasicConfig)` to JSON format. It will contain only changes to `BasicConfig`, and `ctx` will be omitted. 
-Then on client side it can be decompressed with `Utils.ConfigUtils.decompressConfig(zipConfig, BasicConfig, ctx)`. 
-Note than `ctx` with implementation of `validateFirstName` is required to be provided here. 
+
+The shape of `ctx`:
+[source,javascript]
+----
+const ctx = {
+  // provided in BasicConfig:
+  RCE: React.createElement,
+  W: {
+    VanillaButton,
+    // ... other widgets proviede with the lib
+  },
+  utils: {
+    moment, // used in `formatValue`
+    SqlString, // used in `sqlFormatValue`
+    // ... other utils
+  },
+  // your extensions:
+  components: {
+    MyLabel, // used in `labelYes` and `labelNo` below
+    // ... other custom components used in JSXs in your config
+  },
+  validateFirstName: (val: string) => {
+    return (val.length < 10);
+  },
+  myRenderField: (props: FieldProps, _ctx: ConfigContext) => {
+    if (props?.customProps["showSearch"]) {
+      return <MuiFieldAutocomplete {...props}/>;
+    } else {
+      return <MuiFieldSelect {...props}/>;
+    }
+  },
+  autocompleteFetch, // see implementation in `packages/sandbox_next/components/demo/config_ctx.tsx`
+}
+----
+
+Referring to `ctx` in `zipConfig`:
+[source,javascript]
+----
+const zipConfig = {
+  fields: {
+    firstName: {
+      type: "text",
+      fieldSettings: {
+        validateValue: "validateFirstName",
+      }
+    },
+    in_stock: {
+      type: "boolean",
+      mainWidgetProps: {
+        labelYes: <MyLabel>Yes</MyLabel>,
+        labelNo: <MyLabel>No</MyLabel>,
+      }
+    },
+    autocomplete: {
+      type: "select",
+      fieldSettings: {
+        asyncFetch: "autocompleteFetch",
+      },
+    },
+  },
+  settings: {
+    renderField: "myRenderField",
+    renderButton: "W.VanillaButton",
+  },
+};
+----
+

@@ -590,6 +590,7 @@ importers:
       react: ^17.0.2
       react-dom: ^17.0.2
       sass: ^1.35.0
+      serialize-javascript: ^6.0.1
       typescript: ~4.9.4
       webpack: ^5.61.0
     dependencies:
@@ -623,6 +624,7 @@ importers:
       nanoid: 4.0.1
       next: 12.3.4_2z5snxu2kdhzhyb5hlkwpxdbqy
       sass: 1.57.1
+      serialize-javascript: 6.0.1
       typescript: 4.9.4
       webpack: 5.75.0
 

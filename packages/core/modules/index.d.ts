@@ -198,13 +198,14 @@ export interface Utils {
   isJsonLogic(value: any): boolean;
   // other
   uuid(): string;
+  // ssr
+  compressConfig(config: Config, baseConfig: Config): ZipConfig;
+  decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
 
   Autocomplete: {
     simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   };
   ConfigUtils: {
-    // UNSAFE_serializeConfig(config: Config): StrConfig;
-    // UNSAFE_deserializeConfig(strConfig: StrConfig, ctx: ConfigContext): Config;
     compressConfig(config: Config, baseConfig: Config): ZipConfig;
     decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
     compileConfig(config: Config): Config;

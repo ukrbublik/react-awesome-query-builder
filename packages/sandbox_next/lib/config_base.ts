@@ -10,11 +10,11 @@ import {
 // Additional UI modifications are done in `./config_ui` (like `asyncFetch`, `marks`, `factory`)
 //
 //   ! Important !
-//   Don't use JS functions in config, since it can't be used by SSR.
-//   Use JsonLogic functions instead, see `validateValue`.
+//   Don't use JS functions in config, since it can't be used with SSR.
+//   Use JsonLogic functions instead, see `validateValue` for `login` field.
 //   Or add function to `ctx` and refer to it with a name, see `validateFirstName`
 
-export function createConfig(InitialConfig: CoreConfig): Config {
+function createConfig(InitialConfig: CoreConfig): Config {
 
   const fields: Fields = {
     user: {
@@ -370,10 +370,10 @@ export function createConfig(InitialConfig: CoreConfig): Config {
   };
 
   //  ! Important !
-  //  Context is not saved to compressed config (zipConfig)
-  //  You must provide ctx with ConfigUtils.decompressConfig()
-  //  `validateFirstName` should be defined in `components/demo/config_ctx`
-  //  Implementation here is used for server-side validation
+  //  Context is not saved to compressed config (zipConfig).
+  //  You must provide `ctx` to `ConfigUtils.decompressConfig()`.
+  //  `validateFirstName` should be defined in `components/demo/config_ctx` for using on client-side.
+  //  Implementation here is used for server-side validation.
   const ctx = {
     ...InitialConfig.ctx,
     validateFirstName: (val: string) => {

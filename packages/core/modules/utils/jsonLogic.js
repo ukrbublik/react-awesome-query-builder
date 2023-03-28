@@ -11,7 +11,7 @@ function addJsonLogicOperation(name, op) {
 
 export const customJsonLogicOperations = {
   CALL: (fn, ctx, ...args) => (fn.call(ctx, ...args)),
-  REACT: (type, props) => ({type, props}),
+  JSX: (type, props) => ({type, props}),
   mergeObjects: (obj1, obj2) => ({...obj1, ...obj2}),
   fromEntries: (entries) => Object.fromEntries(entries),
   strlen: (str) => (str?.length || 0),

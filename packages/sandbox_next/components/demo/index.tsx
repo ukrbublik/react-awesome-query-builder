@@ -8,7 +8,8 @@ import {
 import type { PostTreeResult, GetTreeResult, PostTreeBody } from "../../pages/api/tree";
 import type { PostConfigBody, PostConfigResult } from "../../pages/api/config";
 import ctx from "./config_ctx";
-import updateConfigWithSomeChanges from "./config_update";
+import updateConfigWithSomeChanges from "../../lib/config_update";
+import { UNSAFE_serializeConfig, UNSAFE_deserializeConfig } from "../../lib/config_ser";
 import throttle from "lodash/throttle";
 const stringify = JSON.stringify;
 const {getTree, checkTree, loadTree, uuid} = Utils;
@@ -31,7 +32,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   constructor(props: DemoQueryBuilderProps) {
     super(props);
-    const config = Utils.ConfigUtils.decompressConfig(props.zipConfig, MuiConfig, ctx);
+    const config = Utils.decompressConfig(props.zipConfig, MuiConfig, ctx);
     const tree = checkTree(loadTree(props.jsonTree), config);
     this.state = {
       tree,
@@ -42,6 +43,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   componentDidMount = () => {
     console.log("zipConfig:", this.props.zipConfig);
+    console.log("ctx:", ctx);
     this._updateResult({ saveTree: false });
   };
 
@@ -58,6 +60,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
         <button onClick={this.resetValue}>reset</button>
         <button onClick={this.clearValue}>clear</button>
         <button onClick={this.updateConfig}>update config</button>
+        <button onClick={this.stringifyConfig}>stringify config</button>
 
         <div className="query-builder-result">
           {this.renderResult(this.state)}
@@ -82,11 +85,31 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
       tree: loadTree(emptyInitValue), 
     });
   };
+
+  // It's just a test to show ability to serialize an entire config to string and deserialize back
+  stringifyConfig = () => {
+    const strConfig = UNSAFE_serializeConfig(this.state.config);
+    const config = UNSAFE_deserializeConfig(strConfig, ctx) as Config;
+    const spel = Utils.spelFormat(this.state.tree, config);
+    const jl = Utils.jsonLogicFormat(this.state.tree, config);
+    const mongo = Utils.mongodbFormat(this.state.tree, config);
+    const res = {
+      spel,
+      jl,
+      mongo,
+    };
+    console.log("Deserialized config (click to view):", config.conjunctions.AND.formatConj);
+    console.log("Convert result:", res);
+    // this.setState({
+    //   tree: checkTree(this.state.tree, config),
+    //   config,
+    // });
+  };
   
   updateConfig = () => {
     (async () => {
       const config = updateConfigWithSomeChanges(this.state.config);
-      const zipConfig = Utils.ConfigUtils.compressConfig(config, MuiConfig);
+      const zipConfig = Utils.compressConfig(config, MuiConfig);
       const response = await fetch("/api/config", {
         method: "POST",
         body: JSON.stringify({

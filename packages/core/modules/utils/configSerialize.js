@@ -1,16 +1,15 @@
 import merge from "lodash/merge";
-import mergeWith from "lodash/mergeWith";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
 import clone from "clone";
-// import serializeJs from "serialize-javascript";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations } from "./jsonLogic";
 import { BasicFuncs } from "..";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
+
+export { isJSX, isDirtyJSX, cleanJSX };
 
 function applyJsonLogic(logic, data, path) {
   let ret;
@@ -43,7 +42,7 @@ export const configKeys = ["conjunctions", "fields", "types", "operators", "widg
 //  "rf" - JsonLogicFunction/string to render React
 //    JL data is { props, ctx }
 //    Should return {type, props} or string, where type or string - React component
-//    Can use { REACT: ["SomeComponent", {var: "props"}] } or just return "SomeComponent"
+//    Can use { JSX: ["SomeComponent", {var: "props"}] } or just return "SomeComponent"
 //    Returned component will be searched in ctx.components/ctx.W/ctx.O, see getReactComponentFromCtx()
 //    Will be compiled with compileJsonLogicReact() into function with args (props, ctx) that will return renderReactElement()
 //  "f" - JsonLogicFunction/string
@@ -492,30 +491,3 @@ function renderReactElement(jsx, opts, path, key = undefined) {
   }
   return jsx;
 }
-
-/////////////
-
-// const mergeCustomizerCleanJSX = (_objValue, srcValue, _key, _object, _source, _stack) => {
-//   if (isDirtyJSX(srcValue)) {
-//     return cleanJSX(srcValue);
-//   }
-// };
-
-// export const UNSAFE_serializeConfig = (config) => {
-//   const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX);
-//   const strConfig = serializeJs(sanitizedConfig, {
-//     space: 2,
-//     unsafe: true,
-//   });
-//   if (strConfig.includes("__WEBPACK_IMPORTED_MODULE_")) {
-//     throw new Error("Serialized config should not have references to modules imported from webpack.");
-//   }
-//   return strConfig;
-// };
-
-// export const UNSAFE_deserializeConfig = (strConfig, ctx) => {
-//   let config = eval("("+strConfig+")");
-//   config.ctx = ctx;
-//   return config;
-// };
-

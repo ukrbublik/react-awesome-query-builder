@@ -22,7 +22,7 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   let meta = {
     errors: []
   };
-  const extendedConfig = extendConfig(config);
+  const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
   let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
   if (jsTree && jsTree.type != "group") {

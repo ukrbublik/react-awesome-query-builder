@@ -12,7 +12,7 @@ export * from "./configSerialize";
 
 /////////////
 
-export const extendConfig = (config, configId) => {
+export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
@@ -20,7 +20,7 @@ export const extendConfig = (config, configId) => {
     return config;
   }
 
-  if (config.settings.useConfigCompress) {
+  if (canCompile && config.settings.useConfigCompress) {
     config = compileConfig(config);
   }
   

@@ -8,6 +8,7 @@ import { ukUA } from "@mui/material/locale";
 //import "moment/locale/ru";
 const { MuiFieldAutocomplete, MuiFieldSelect } = MuiWidgets;
 
+// Config context for `DemoQueryBuilder` component
 
 const autocompleteFetch = async (search: string | null, offset: number): Promise<AsyncFetchListValuesResult> => {
   const response = await fetch("/api/autocomplete?" + new URLSearchParams({

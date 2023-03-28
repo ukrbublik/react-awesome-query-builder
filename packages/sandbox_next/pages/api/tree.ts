@@ -5,7 +5,7 @@ import {
   ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
 } from "@react-awesome-query-builder/core";
 import { withSessionRoute, Session, getSessionData, saveSessionData } from "../../lib/withSession";
-import pureServerConfig from "../../lib/config";
+import serverConfig from "../../lib/config";
 import loadedInitValue from "../../data/init_value";
 import loadedInitLogic from "../../data/init_logic";
 import { decompressSavedConfig } from "./config";
@@ -44,7 +44,7 @@ function getEmptyTree(): JsonTree {
 }
 
 export function getInitialTree(fromLogic = true): JsonTree {
-  const config = pureServerConfig;
+  const config = serverConfig;
   let tree: JsonTree;
   if (fromLogic) {
     const logicTree: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
