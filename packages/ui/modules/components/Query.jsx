@@ -79,7 +79,6 @@ class Query extends Component {
       dispatch: dispatch,
       __isInternalValueChange
     };
-
     return renderBuilder(builderProps);
   }
 }

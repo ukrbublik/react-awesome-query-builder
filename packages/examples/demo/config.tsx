@@ -239,7 +239,6 @@ export default (skin: string) => {
     defaultSelectWidth: "200px",
     defaultSearchWidth: "100px",
     defaultMaxRows: 5,
-
     valueSourcesInfo: {
       value: {
         label: "Value"
@@ -263,7 +262,7 @@ export default (skin: string) => {
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
     customFieldSelectProps: {
-      showSearch: true
+      showSearch: false
     },
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,

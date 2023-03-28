@@ -3,12 +3,21 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import ListSubheader from "@mui/material/ListSubheader";
 import FormControl from "@mui/material/FormControl";
+import { Utils } from "@react-awesome-query-builder/core";
+const { setFunc } = Utils.FuncUtils;
 
-export default ({items, setField, selectedKey, readonly, placeholder}) => {
-  const renderOptions = (fields, level = 0) => (
-    Object.keys(fields).map(fieldKey => {
+export default ({
+  items,
+  setField,
+  selectedKey,
+  readonly,
+  placeholder,
+  config,
+}) => {
+  const renderOptions = (fields, level = 0) => {
+    return Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
-      const {items, path, label, disabled} = field;
+      const { items, path, label, disabled } = field;
       const prefix = "\u00A0\u00A0".repeat(level);
       if (items) {
         return [
@@ -16,41 +25,44 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
             {prefix && <span>{prefix}</span>}
             {label}
           </ListSubheader>,
-          renderOptions(items, level+1),
+          renderOptions(items, level + 1),
         ];
       } else {
-        return <MenuItem disabled={disabled} key={path} value={path}>
-          {prefix && <span>{prefix}</span>}
-          {label}
-        </MenuItem>;
+        return (
+          <MenuItem disabled={disabled} key={path} value={path}>
+            {prefix && <span>{prefix}</span>}
+            {label}
+          </MenuItem>
+        );
       }
-    })
-  );
+    });
+  };
 
-  const onChange = e => {
-    if (e.target.value === undefined)
-      return;
+  const onChange = (e) => {
+    if (e.target.value === undefined) return;
     setField(e.target.value);
   };
 
   const renderValue = (selectedValue) => {
-    if (!readonly && !selectedValue)
-      return placeholder;
+    if (!readonly && !selectedValue) return placeholder;
     const findLabel = (fields) => {
-      return fields.map(field => {
-        if(!field.items) return field.path === selectedValue ? field.label : null;
+      return fields.map((field) => {
+        if (!field.items)
+          return field.path === selectedValue ? field.label : null;
         return findLabel(field.items);
       });
     };
-    return findLabel(items).filter((v) => {
-      if (Array.isArray(v)) {
-        return v.some((value) => value !== null);
-      } else {
-        return v !== null;
-      }
-    }).pop();
+    return findLabel(items)
+      .filter((v) => {
+        if (Array.isArray(v)) {
+          return v.some((value) => value !== null);
+        } else {
+          return v !== null;
+        }
+      })
+      .pop();
   };
-  
+
   const hasValue = selectedKey != null;
   return (
     <FormControl>

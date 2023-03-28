@@ -1,16 +1,30 @@
 import * as constants from "../stores/constants";
-import {toImmutableList} from "../utils/stuff";
+import { toImmutableList } from "../utils/stuff";
 
 /**
  * @param {object} config
  * @param {Immutable.List} path
  * @param {string} field
  */
-export const setField = (config, path, field) => ({
-  type: constants.SET_FIELD,
+export const setField = (config, path, field) => {
+  return {
+    type: constants.SET_FIELD,
+    path: toImmutableList(path),
+    field: field,
+    config: config,
+  };
+};
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {*} srcKey
+ */
+export const setFieldSrc = (config, path, srcKey) => ({
+  type: constants.SET_FIELD_SRC,
   path: toImmutableList(path),
-  field: field,
-  config: config
+  srcKey: srcKey,
+  config: config,
 });
 
 /**
@@ -22,7 +36,7 @@ export const setOperator = (config, path, operator) => ({
   type: constants.SET_OPERATOR,
   path: toImmutableList(path),
   operator: operator,
-  config: config
+  config: config,
 });
 
 /**
@@ -34,7 +48,15 @@ export const setOperator = (config, path, operator) => ({
  * @param {*} asyncListValues
  * @param {boolean} __isInternal
  */
-export const setValue = (config, path, delta, value, valueType, asyncListValues, __isInternal) => ({
+export const setValue = (
+  config,
+  path,
+  delta,
+  value,
+  valueType,
+  asyncListValues,
+  __isInternal
+) => ({
   type: constants.SET_VALUE,
   path: toImmutableList(path),
   delta: delta,
@@ -42,7 +64,7 @@ export const setValue = (config, path, delta, value, valueType, asyncListValues,
   valueType: valueType,
   asyncListValues: asyncListValues,
   config: config,
-  __isInternal: __isInternal
+  __isInternal: __isInternal,
 });
 
 /**
@@ -56,7 +78,7 @@ export const setValueSrc = (config, path, delta, srcKey) => ({
   path: toImmutableList(path),
   delta: delta,
   srcKey: srcKey,
-  config: config
+  config: config,
 });
 
 /**
@@ -70,5 +92,5 @@ export const setOperatorOption = (config, path, name, value) => ({
   path: toImmutableList(path),
   name: name,
   value: value,
-  config: config
+  config: config,
 });

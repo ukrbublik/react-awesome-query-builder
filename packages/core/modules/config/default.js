@@ -8,7 +8,7 @@ export const settings = {
       return field;
   },
 
-
+  fieldSources: ["field", "func"],
   valueSourcesInfo: {
     value: {},
   },
@@ -54,5 +54,4 @@ export const settings = {
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,
-
 };

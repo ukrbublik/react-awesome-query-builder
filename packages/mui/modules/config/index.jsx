@@ -4,7 +4,6 @@ import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 
 const { SqlString, stringifyForDisplay } = Utils.ExportUtils;
 
-
 const {
   MuiBooleanWidget,
   MuiTextWidget,
@@ -32,14 +31,22 @@ const {
   MuiUseConfirm,
 } = MuiWidgets;
 
-
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => props?.customProps?.showSearch 
-    ? <MuiFieldAutocomplete {...props} /> 
-    : <MuiFieldSelect {...props} />,
-  renderOperator: (props) => <MuiFieldSelect {...props} />,
+  renderFieldSources: (props) => {
+    return <MuiValueSources {...props} />;
+  },
+  renderField: (props) => {
+    return props?.customProps?.showSearch ? (
+      <MuiFieldAutocomplete {...props} />
+    ) : (
+      <MuiFieldSelect {...props} />
+    );
+  },
+  renderOperator: (props) => {
+    return <MuiFieldSelect {...props} />;
+  },
   renderFunc: (props) => <MuiFieldSelect {...props} />,
   renderConjs: (props) => <MuiConjs {...props} />,
   renderSwitch: (props) => <MuiSwitch {...props} />,
@@ -50,7 +57,6 @@ const settings = {
   renderConfirm: MuiConfirm,
   useConfirm: MuiUseConfirm,
 };
-
 
 const widgets = {
   ...BasicConfig.widgets,
@@ -69,17 +75,21 @@ const widgets = {
   multiselect: {
     ...BasicConfig.widgets.multiselect,
     factory: (props) => {
-      return (props.asyncFetch || props.showSearch) 
-        ? <MuiAutocompleteWidget multiple {...props} /> 
-        : <MuiMultiSelectWidget {...props} />;
+      return props.asyncFetch || props.showSearch ? (
+        <MuiAutocompleteWidget multiple {...props} />
+      ) : (
+        <MuiMultiSelectWidget {...props} />
+      );
     },
   },
   select: {
     ...BasicConfig.widgets.select,
     factory: (props) => {
-      return (props.asyncFetch || props.showSearch) 
-        ? <MuiAutocompleteWidget {...props} /> 
-        : <MuiSelectWidget {...props} />;
+      return props.asyncFetch || props.showSearch ? (
+        <MuiAutocompleteWidget {...props} />
+      ) : (
+        <MuiSelectWidget {...props} />
+      );
     },
   },
   slider: {
@@ -121,10 +131,9 @@ const widgets = {
       return SqlString.escape(val);
     },
     singleWidget: "slider",
-    toJS: (val, fieldSettings) => (val),
+    toJS: (val, fieldSettings) => val,
   },
 };
-
 
 const types = {
   ...BasicConfig.types,
@@ -139,15 +148,10 @@ const types = {
           },
           not_between: {
             isSpecialRange: true,
-          }
+          },
         },
-        operators: [
-          "between",
-          "not_between",
-          "is_empty",
-          "is_not_empty",
-        ],
-      }
+        operators: ["between", "not_between", "is_empty", "is_not_empty"],
+      },
     },
   },
 };

@@ -18,10 +18,12 @@ class RuleGroupExt extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
+    fieldSrc: PropTypes.any,
     selectedOperator: PropTypes.string,
     value: PropTypes.any,
     parentField: PropTypes.string,
     setField: PropTypes.func,
+    setFieldSrc: PropTypes.func,
     setOperator: PropTypes.func,
     setValue: PropTypes.func,
   };
@@ -99,14 +101,16 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderField() {
-    const { config, selectedField, setField, parentField, id, groupId, isLocked } = this.props;
+    const { config, selectedField, fieldSrc, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
     const { immutableFieldsMode } = config.settings;
     return <FieldWrapper
       key="field"
       classname={"rule--field"}
       config={config}
       selectedField={selectedField}
+      fieldSrc={fieldSrc}
       setField={setField}
+      setFieldSrc={setFieldSrc}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
       id={id}
@@ -115,7 +119,7 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderOperator() {
-    const {config, selectedField, selectedOperator, setField, setOperator, isLocked} = this.props;
+    const {config, selectedField, fieldSrc, selectedOperator, setField, setFieldSrc, setOperator, isLocked} = this.props;
     const { immutableFieldsMode } = config.settings;
     const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
@@ -127,8 +131,10 @@ class RuleGroupExt extends BasicGroup {
       classname={"group--operator"}
       config={config}
       selectedField={selectedField}
+      fieldSrc={fieldSrc}
       selectedOperator={selectedOperator}
       setField={setField}
+      setFieldSrc={setFieldSrc}
       setOperator={setOperator}
       selectedFieldPartsLabels={["group"]}
       showOperator={showOperator}

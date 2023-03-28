@@ -7,17 +7,11 @@ import RuleGroupExt from "./RuleGroupExt";
 import SwitchGroup from "./SwitchGroup";
 import CaseGroup from "./CaseGroup";
 
-const types = [
-  "rule",
-  "group",
-  "rule_group",
-  "switch_group",
-  "case_group"
-];
+const types = ["rule", "group", "rule_group", "switch_group", "case_group"];
 
 const getProperties = (props) => {
   const properties = props.properties?.toObject() || {};
-  const result = {...properties};
+  const result = { ...properties };
   if (props.isParentLocked) {
     result.isLocked = true;
   }
@@ -28,24 +22,26 @@ const getProperties = (props) => {
 };
 
 const typeMap = {
-  rule: (props) => (
-    <Rule
-      {...getProperties(props)}
-      id={props.id}
-      groupId={props.groupId}
-      path={props.path}
-      actions={props.actions}
-      reordableNodesCnt={props.reordableNodesCnt}
-      totalRulesCnt={props.totalRulesCnt}
-      config={props.config}
-      onDragStart={props.onDragStart}
-      isDraggingTempo={props.isDraggingTempo}
-      parentField={props.parentField}
-      parentReordableNodesCnt={props.parentReordableNodesCnt}
-    />
-  ),
+  rule: (props) => {
+    return (
+      <Rule
+        {...getProperties(props)}
+        id={props.id}
+        groupId={props.groupId}
+        path={props.path}
+        actions={props.actions}
+        reordableNodesCnt={props.reordableNodesCnt}
+        totalRulesCnt={props.totalRulesCnt}
+        config={props.config}
+        onDragStart={props.onDragStart}
+        isDraggingTempo={props.isDraggingTempo}
+        parentField={props.parentField}
+        parentReordableNodesCnt={props.parentReordableNodesCnt}
+      />
+    );
+  },
   group: (props) => (
-    <Group 
+    <Group
       {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
@@ -63,7 +59,7 @@ const typeMap = {
     />
   ),
   rule_group: (props) => (
-    <RuleGroup 
+    <RuleGroup
       {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
@@ -81,7 +77,7 @@ const typeMap = {
     />
   ),
   rule_group_ext: (props) => (
-    <RuleGroupExt 
+    <RuleGroupExt
       {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
@@ -99,7 +95,7 @@ const typeMap = {
     />
   ),
   switch_group: (props) => (
-    <SwitchGroup 
+    <SwitchGroup
       {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
@@ -117,7 +113,7 @@ const typeMap = {
     />
   ),
   case_group: (props) => (
-    <CaseGroup 
+    <CaseGroup
       {...getProperties(props)}
       id={props.id}
       groupId={props.groupId}
@@ -135,7 +131,6 @@ const typeMap = {
     />
   ),
 };
-
 
 class Item extends PureComponent {
   static propTypes = {
@@ -158,11 +153,11 @@ class Item extends PureComponent {
   render() {
     const { type, ...props } = this.props;
     const mode = props.properties?.get("mode");
-    const postfix = mode == "array" ? "_ext" : "";    
+    const postfix = mode == "array" ? "_ext" : "";
     const renderItem = props.config.settings.renderItem;
     let Cmp = typeMap[type + postfix];
     if (renderItem) {
-      return renderItem({...props, type, itemComponent: Cmp});
+      return renderItem({ ...props, type, itemComponent: Cmp });
     }
     if (!Cmp) return null;
     return Cmp(props);

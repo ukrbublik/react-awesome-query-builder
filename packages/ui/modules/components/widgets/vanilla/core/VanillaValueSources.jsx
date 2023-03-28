@@ -7,7 +7,9 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
     ))
   );
 
-  const onChange = e => setValueSrc(e.target.value);
+  const onChange = e => {
+    setValueSrc(e.target.value);
+  };
   
   return (
     <select 

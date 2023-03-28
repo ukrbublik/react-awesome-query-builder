@@ -1,13 +1,14 @@
 import React, { PureComponent } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
-import {truncateString} from "../../utils/stuff";
-import {useOnPropsChanged} from "../../utils/reactUtils";
+import { truncateString } from "../../utils/stuff";
+import { useOnPropsChanged } from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const { clone } = Utils;
-const {getFieldConfig, getFuncConfig} = Utils.ConfigUtils;
-const {getFieldPath, getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const { getFieldConfig, getFuncConfig } = Utils.ConfigUtils;
+const { getFieldPath, getFuncPathLabels, getWidgetForFieldOp } =
+  Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -16,7 +17,8 @@ export default class FuncSelect extends PureComponent {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.string,
@@ -30,7 +32,7 @@ export default class FuncSelect extends PureComponent {
   constructor(props) {
     super(props);
     useOnPropsChanged(this);
-      
+
     this.onPropsChanged(props);
   }
 
@@ -38,8 +40,14 @@ export default class FuncSelect extends PureComponent {
     const prevProps = this.props;
     const keysForItems = ["config", "field", "operator", "isFuncArg"];
     const keysForMeta = ["config", "field", "value"];
-    const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
-    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateItems =
+      !this.items ||
+      keysForItems.map((k) => nextProps[k] !== prevProps[k]).filter((ch) => ch)
+        .length > 0;
+    const needUpdateMeta =
+      !this.meta ||
+      keysForMeta.map((k) => nextProps[k] !== prevProps[k]).filter((ch) => ch)
+        .length > 0;
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
@@ -49,47 +57,94 @@ export default class FuncSelect extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentFuncs, fieldDefinition, isFuncArg}) {
-    const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
+  getItems({
+    config,
+    field,
+    operator,
+    parentFuncs,
+    fieldDefinition,
+    isFuncArg,
+  }) {
+    const { canUseFuncForField } = config.settings;
+    const filteredFuncs = this.filterFuncs(
+      config,
+      config.funcs,
+      field,
+      operator,
+      canUseFuncForField,
+      parentFuncs,
+      isFuncArg,
+      fieldDefinition
+    );
     const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
 
-  getMeta({config, field, value}) {
-    const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
+  getMeta({ config, field, fieldSrc, value }) {
+    console.log(fieldSrc);
+    const { funcPlaceholder, fieldSeparatorDisplay } = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
-
-    const leftFieldConfig = getFieldConfig(config, field);
-    const leftFieldWidgetField = leftFieldConfig.widgets.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    const leftFieldConfig =
+      fieldSrc === "func"
+        ? getFuncConfig(config, field.get("func"))
+        : getFieldConfig(config, field);
+    const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
+    const leftFieldWidgetFieldProps =
+      (leftFieldWidgetField && leftFieldWidgetField.widgetProps) || {};
     const placeholder = !isFuncSelected ? funcPlaceholder : null;
 
-    const currFunc = isFuncSelected ? getFuncConfig(config, selectedFuncKey) : null;
+    const currFunc = isFuncSelected
+      ? getFuncConfig(config, selectedFuncKey)
+      : null;
     const selectedOpts = currFunc || {};
 
     const selectedKeys = getFieldPath(selectedFuncKey, config);
     const selectedPath = getFieldPath(selectedFuncKey, config, true);
     const selectedLabel = this.getFuncLabel(currFunc, selectedFuncKey, config);
     const partsLabels = getFuncPathLabels(selectedFuncKey, config);
-    let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
-    if (selectedFullLabel == selectedLabel)
-      selectedFullLabel = null;
-    
+    let selectedFullLabel = partsLabels
+      ? partsLabels.join(fieldSeparatorDisplay)
+      : null;
+    if (selectedFullLabel == selectedLabel) selectedFullLabel = null;
+
     return {
       placeholder,
-      selectedKey: selectedFuncKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedFullLabel,
+      selectedKey: selectedFuncKey,
+      selectedKeys,
+      selectedPath,
+      selectedLabel,
+      selectedOpts,
+      selectedFullLabel,
     };
   }
 
-  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
+  filterFuncs(
+    config,
+    funcs,
+    leftFieldFullkey,
+    operator,
+    canUseFuncForField,
+    parentFuncs,
+    isFuncArg,
+    fieldDefinition
+  ) {
     funcs = clone(funcs);
+    const fieldSrc = this.props.fieldSrc;
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
+    const leftFieldConfig =
+      fieldSrc === "func"
+        ? getFuncConfig(config, leftFieldFullkey.get("func"))
+        : getFieldConfig(config, leftFieldFullkey);
     let expectedType;
     let targetDefinition = leftFieldConfig;
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
+    const widget = getWidgetForFieldOp(
+      config,
+      leftFieldFullkey,
+      operator,
+      "value",
+      fieldSrc
+    );
     if (isFuncArg && fieldDefinition) {
       targetDefinition = fieldDefinition;
       expectedType = fieldDefinition.type;
@@ -99,7 +154,7 @@ export default class FuncSelect extends PureComponent {
       //expectedType = leftFieldConfig.type;
       expectedType = widgetType;
     } else {
-      expectedType = leftFieldConfig.type;
+      expectedType = leftFieldConfig?.type;
     }
 
     function _filter(list, path) {
@@ -109,19 +164,29 @@ export default class FuncSelect extends PureComponent {
         let funcFullkey = subpath.join(fieldSeparator);
         let funcConfig = getFuncConfig(config, funcFullkey);
         if (funcConfig.type == "!struct") {
-          if(_filter(subfields, subpath) == 0)
-            delete list[funcKey];
+          if (_filter(subfields, subpath) == 0) delete list[funcKey];
         } else {
-          let canUse = funcConfig.returnType == expectedType;
-          if (targetDefinition.funcs)
+          let canUse = !expectedType || funcConfig.returnType == expectedType;
+          if (targetDefinition?.funcs)
             canUse = canUse && targetDefinition.funcs.includes(funcFullkey);
           if (canUseFuncForField)
-            canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);
+            canUse =
+              canUse &&
+              canUseFuncForField(
+                leftFieldFullkey,
+                leftFieldConfig,
+                funcFullkey,
+                funcConfig,
+                operator
+              );
           // don't use func in func (can be configurable, but usually users don't need this)
-          if (!funcConfig.allowSelfNesting && parentFuncs && parentFuncs.map(([func, _arg]) => func).includes(funcFullkey))
+          if (
+            !funcConfig.allowSelfNesting &&
+            parentFuncs &&
+            parentFuncs.map(([func, _arg]) => func).includes(funcFullkey)
+          )
             canUse = false;
-          if (!canUse)
-            delete list[funcKey];
+          if (!canUse) delete list[funcKey];
         }
       }
       return keys(list).length;
@@ -133,38 +198,36 @@ export default class FuncSelect extends PureComponent {
   }
 
   buildOptions(config, funcs, path = null, optGroupLabel = null) {
-    if (!funcs)
-      return null;
-    const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
+    if (!funcs) return null;
+    const { fieldSeparator, fieldSeparatorDisplay } = config.settings;
     const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
 
-    return keys(funcs).map(funcKey => {
+    return keys(funcs).map((funcKey) => {
       const func = funcs[funcKey];
       const label = this.getFuncLabel(func, funcKey, config);
       const partsLabels = getFuncPathLabels(funcKey, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
-      if (fullLabel == label)
-        fullLabel = null;
+      if (fullLabel == label) fullLabel = null;
       const tooltip = func.tooltip;
       const subpath = (path ? path : []).concat(funcKey);
 
       if (func.type == "!struct") {
         return {
           key: funcKey,
-          path: prefix+funcKey,
+          path: prefix + funcKey,
           label,
           fullLabel,
           tooltip,
-          items: this.buildOptions(config, func.subfields, subpath, label)
+          items: this.buildOptions(config, func.subfields, subpath, label),
         };
       } else {
         return {
           key: funcKey,
-          path: prefix+funcKey,
+          path: prefix + funcKey,
           label,
           fullLabel,
           tooltip,
-          grouplabel: optGroupLabel
+          grouplabel: optGroupLabel,
         };
       }
     });
@@ -174,15 +237,17 @@ export default class FuncSelect extends PureComponent {
     if (!funcKey) return null;
     let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
-    let funcParts = Array.isArray(funcKey) ? funcKey : funcKey.split(fieldSeparator);
+    let funcParts = Array.isArray(funcKey)
+      ? funcKey
+      : funcKey.split(fieldSeparator);
     let label = funcOpts.label || last(funcParts);
     label = truncateString(label, maxLabelsLength);
     return label;
   }
 
   render() {
-    const {config, customProps, setValue, readonly, id, groupId} = this.props;
-    const {renderFunc} = config.settings;
+    const { config, customProps, setValue, readonly, id, groupId } = this.props;
+    const { renderFunc } = config.settings;
     const renderProps = {
       config,
       customProps,
@@ -191,9 +256,8 @@ export default class FuncSelect extends PureComponent {
       items: this.items,
       id,
       groupId,
-      ...this.meta
+      ...this.meta,
     };
     return renderFunc(renderProps);
   }
-
 }

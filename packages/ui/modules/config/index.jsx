@@ -1,7 +1,7 @@
 import React from "react";
 import * as Widgets from "../components/widgets";
 import * as CustomOperators from "../components/operators";
-import {CoreConfig} from "@react-awesome-query-builder/core";
+import { CoreConfig } from "@react-awesome-query-builder/core";
 
 const {
   //value
@@ -28,10 +28,9 @@ const {
 
   //common
   ValueFieldWidget,
-  FuncWidget
+  FuncWidget,
 } = Widgets;
 const { ProximityOperator } = CustomOperators;
-
 
 //----------------------------  conjunctions
 
@@ -51,7 +50,6 @@ const operators = {
     },
   },
 };
-
 
 //----------------------------  widgets
 
@@ -98,27 +96,31 @@ const widgets = {
   },
   field: {
     ...CoreConfig.widgets.field,
-    factory: (props) => <ValueFieldWidget {...props} />,
+    factory: (props) => {
+      console.log(props);
+      return <ValueFieldWidget {...props} />;
+    },
     customProps: {
-      showSearch: true
-    }
+      showSearch: true,
+    },
   },
   func: {
     ...CoreConfig.widgets.func,
     factory: (props) => <FuncWidget {...props} />,
     customProps: {
       //showSearch: true
-    }
+    },
   },
   case_value: {
     ...CoreConfig.widgets.case_value,
-    factory: ({value, setValue}) =>  
-      <input 
-        type="text" 
-        value={value || ""} 
-        onChange={e => setValue(e.target.value)} 
+    factory: ({ value, setValue }) => (
+      <input
+        type="text"
+        value={value || ""}
+        onChange={(e) => setValue(e.target.value)}
       />
-  }
+    ),
+  },
 };
 
 //----------------------------  types
@@ -133,12 +135,12 @@ const types = {
         ...CoreConfig.types.select.widgets.select,
         widgetProps: {
           customProps: {
-            showSearch: true
-          }
+            showSearch: true,
+          },
         },
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 //----------------------------  settings
@@ -146,6 +148,7 @@ const types = {
 const settings = {
   ...CoreConfig.settings,
 
+  renderFieldSources: (props) => <VanillaValueSources {...props} />,
   renderField: (props) => <VanillaFieldSelect {...props} />,
   renderOperator: (props) => <VanillaFieldSelect {...props} />,
   renderFunc: (props) => <VanillaFieldSelect {...props} />,
@@ -159,7 +162,7 @@ const settings = {
   renderSwitchPrefix: () => <>{"Conditions"}</>,
 
   customFieldSelectProps: {
-    showSearch: true
+    showSearch: true,
   },
 
   defaultSliderWidth: "200px",
@@ -173,7 +176,6 @@ const settings = {
   showNot: true,
   forceShowConj: false,
   groupActionsPosition: "topRight", // oneOf [topLeft, topCenter, topRight, bottomLeft, bottomCenter, bottomRight]
-  
 };
 
 //----------------------------

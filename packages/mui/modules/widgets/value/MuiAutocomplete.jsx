@@ -53,7 +53,7 @@ export default (props) => {
   customInputProps = omit(customInputProps, ["width"]);
   const customAutocompleteProps = omit(rest, ["showSearch", "showCheckboxes"]);
 
-  const fullWidth = true;
+  const fullWidth = false;
   const minWidth = width || defaultSelectWidth;
   const style = {
     width: (multiple ? undefined : minWidth),

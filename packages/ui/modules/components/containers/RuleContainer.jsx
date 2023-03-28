@@ -2,13 +2,12 @@ import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import context from "../../stores/context";
-import {pureShouldComponentUpdate} from "../../utils/reactUtils";
-import {connect} from "react-redux";
+import { pureShouldComponentUpdate } from "../../utils/reactUtils";
+import { connect } from "react-redux";
 import classNames from "classnames";
-const {getFieldConfig} = Utils.ConfigUtils;
+const { getFieldConfig, getFuncConfig } = Utils.ConfigUtils;
 
-
-const createRuleContainer = (Rule) => 
+const createRuleContainer = (Rule) =>
   class RuleContainer extends Component {
     static propTypes = {
       id: PropTypes.string.isRequired,
@@ -16,8 +15,9 @@ const createRuleContainer = (Rule) =>
       config: PropTypes.object.isRequired,
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       operator: PropTypes.string,
-      field: PropTypes.string,
-      actions: PropTypes.object.isRequired, //{removeRule: Funciton, setField, setOperator, setOperatorOption, setValue, setValueSrc, ...}
+      field: PropTypes.any,
+      fieldSrc: PropTypes.any,
+      actions: PropTypes.object.isRequired, //{removeRule: Function, setField, setFieldSrc, setOperator, setOperatorOption, setValue, setValueSrc, ...}
       onDragStart: PropTypes.func,
       value: PropTypes.any, //depends on widget
       valueSrc: PropTypes.any,
@@ -35,7 +35,7 @@ const createRuleContainer = (Rule) =>
 
     constructor(props) {
       super(props);
-      
+
       this.dummyFn.isDummyFn = true;
     }
 
@@ -53,6 +53,10 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setField(this.props.path, field);
     };
 
+    setFieldSrc = (srcKey) => {
+      this.props.actions.setFieldSrc(this.props.path, srcKey);
+    };
+
     setOperator = (operator) => {
       this.props.actions.setOperator(this.props.path, operator);
     };
@@ -62,7 +66,14 @@ const createRuleContainer = (Rule) =>
     };
 
     setValue = (delta, value, type, asyncListValues, __isInternal) => {
-      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, __isInternal);
+      this.props.actions.setValue(
+        this.props.path,
+        delta,
+        value,
+        type,
+        asyncListValues,
+        __isInternal
+      );
     };
 
     setValueSrc = (delta, srcKey) => {
@@ -76,11 +87,11 @@ const createRuleContainer = (Rule) =>
       let should = pureShouldComponentUpdate(this)(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
-          const draggingId = (nextProps.dragging.id || prevProps.dragging.id);
+          const draggingId = nextProps.dragging.id || prevProps.dragging.id;
           const isDraggingMe = draggingId == nextProps.id;
           let chs = [];
           for (let k in nextProps) {
-            let changed = (nextProps[k] != prevProps[k]);
+            let changed = nextProps[k] != prevProps[k];
             if (k == "dragging" && !isDraggingMe) {
               changed = false; //dragging another item -> ignore
             }
@@ -88,8 +99,7 @@ const createRuleContainer = (Rule) =>
               chs.push(k);
             }
           }
-          if (!chs.length)
-            should = false;
+          if (!chs.length) should = false;
         }
       }
       return should;
@@ -97,51 +107,67 @@ const createRuleContainer = (Rule) =>
 
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const fieldConfig = getFieldConfig(this.props.config, this.props.field);
-      const {showErrorMessage} = this.props.config.settings;
+      const fieldConfig =
+        this.props.fieldSrc === "func"
+          ? getFuncConfig(this.props.config, this.props.field?.get("func"))
+          : getFieldConfig(this.props.config, this.props.field);
+      const { showErrorMessage } = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
 
       const valueError = this.props.valueError;
-      const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+      const oneValueError =
+        (valueError &&
+          valueError
+            .toArray()
+            .filter((e) => !!e)
+            .shift()) ||
+        null;
       const hasError = oneValueError != null && showErrorMessage;
 
       return (
         <div
-          className={classNames("group-or-rule-container", "rule-container", hasError ? "rule-with-error" : null)}
+          className={classNames(
+            "group-or-rule-container",
+            "rule-container",
+            hasError ? "rule-with-error" : null
+          )}
           data-id={this.props.id}
         >
           {[
-            isDraggingMe ? <Rule
-              key={"dragging"}
-              id={this.props.id}
-              groupId={this.props.groupId}
-              isDraggingMe={true}
-              isDraggingTempo={true}
-              dragging={this.props.dragging}
-              setField={this.dummyFn}
-              setOperator={this.dummyFn}
-              setOperatorOption={this.dummyFn}
-              setLock={this.dummyFn}
-              removeSelf={this.dummyFn}
-              setValue={this.dummyFn}
-              setValueSrc={this.dummyFn}
-              selectedField={this.props.field || null}
-              parentField={this.props.parentField || null}
-              selectedOperator={this.props.operator || null}
-              value={this.props.value || null}
-              valueSrc={this.props.valueSrc || null}
-              valueError={this.props.valueError || null}
-              operatorOptions={this.props.operatorOptions}
-              config={this.props.config}
-              reordableNodesCnt={this.props.reordableNodesCnt}
-              totalRulesCnt={this.props.totalRulesCnt}
-              asyncListValues={this.props.asyncListValues}
-              isLocked={this.props.isLocked}
-              isTrueLocked={this.props.isTrueLocked}
-              parentReordableNodesCnt={this.props.parentReordableNodesCnt}
-            /> : null
-            ,
+            isDraggingMe ? (
+              <Rule
+                key={"dragging"}
+                id={this.props.id}
+                groupId={this.props.groupId}
+                isDraggingMe={true}
+                isDraggingTempo={true}
+                dragging={this.props.dragging}
+                setField={this.dummyFn}
+                setFieldSrc={this.dummyFn}
+                setOperator={this.dummyFn}
+                setOperatorOption={this.dummyFn}
+                setLock={this.dummyFn}
+                removeSelf={this.dummyFn}
+                setValue={this.dummyFn}
+                setValueSrc={this.dummyFn}
+                selectedField={this.props.field || null}
+                selectedFieldSrc={this.props.fieldSrc || null}
+                parentField={this.props.parentField || null}
+                selectedOperator={this.props.operator || null}
+                value={this.props.value || null}
+                valueSrc={this.props.valueSrc || null}
+                valueError={this.props.valueError || null}
+                operatorOptions={this.props.operatorOptions}
+                config={this.props.config}
+                reordableNodesCnt={this.props.reordableNodesCnt}
+                totalRulesCnt={this.props.totalRulesCnt}
+                asyncListValues={this.props.asyncListValues}
+                isLocked={this.props.isLocked}
+                isTrueLocked={this.props.isTrueLocked}
+                parentReordableNodesCnt={this.props.parentReordableNodesCnt}
+              />
+            ) : null,
             <Rule
               key={this.props.id}
               id={this.props.id}
@@ -152,11 +178,15 @@ const createRuleContainer = (Rule) =>
               setLock={isInDraggingTempo ? this.dummyFn : this.setLock}
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
+              setFieldSrc={isInDraggingTempo ? this.dummyFn : this.setFieldSrc}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
-              setOperatorOption={isInDraggingTempo ? this.dummyFn : this.setOperatorOption}
+              setOperatorOption={
+                isInDraggingTempo ? this.dummyFn : this.setOperatorOption
+              }
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
               setValueSrc={isInDraggingTempo ? this.dummyFn : this.setValueSrc}
               selectedField={this.props.field || null}
+              selectedFieldSrc={this.props.fieldSrc || null}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
               value={this.props.value || null}
@@ -170,14 +200,12 @@ const createRuleContainer = (Rule) =>
               isLocked={this.props.isLocked}
               isTrueLocked={this.props.isTrueLocked}
               parentReordableNodesCnt={this.props.parentReordableNodesCnt}
-            />
+            />,
           ]}
         </div>
       );
     }
-
   };
-
 
 export default (Rule) => {
   const ConnectedRuleContainer = connect(
@@ -189,7 +217,7 @@ export default (Rule) => {
     null,
     null,
     {
-      context
+      context,
     }
   )(createRuleContainer(Rule));
   ConnectedRuleContainer.displayName = "ConnectedRuleContainer";

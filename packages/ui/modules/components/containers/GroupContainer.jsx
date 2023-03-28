@@ -13,7 +13,7 @@ const createGroupContainer = (Group) =>
     static propTypes = {
       //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
       config: PropTypes.object.isRequired,
-      actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
+      actions: PropTypes.object.isRequired, //{setConjunction: Function, removeGroup, addGroup, addRule, ...}
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       id: PropTypes.string.isRequired,
       groupId: PropTypes.string,
@@ -127,6 +127,7 @@ const createGroupContainer = (Group) =>
 
     // for RuleGroup
     setField = (field) => {
+      console.log("setField");
       this.props.actions.setField(this.props.path, field);
     };
 
