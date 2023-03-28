@@ -68,7 +68,8 @@ Initial `zipConfig` (if missing in session data) is generated on server-side as 
 - based on `CoreConfig` (imported from `@react-awesome-query-builder/core`)
 - added fields, funcs and some overrides in [`lib/config_base`](lib/config_base.ts)
 - added UI mixins (`asyncFetch`, custom React components, `factory` overrides) in [`lib/config`](lib/config.tsx)
-- compressed with [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)  
+- compressed with [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
+
 See [getInitialZipConfig()](pages/api/config.ts).  
 With `POST /api/config` compressed config can be saved to session data, and loaded from session with `GET /api/config`.  
 Note that you can just put compressed config (response of `http://localhost:3002/api/config?initial=true`) to JSON file in `data`, same as done with initial `jsonTree`, if you want.  
@@ -76,6 +77,7 @@ Note that you can just put compressed config (response of `http://localhost:3002
 `DemoQueryBuilder` component can use server-side props:
 - It uses [`Utils.decompressConfig(zipConfig, MuiConfig, ctx)`](/README.md#decompressconfigzipconfig-baseconfig-ctx---config) to create initial config to be passed to `<Query>`. `ctx` is imported from [`config_ctx`](components/demo/config_ctx.tsx)
 - Initial tree (to be passed as `value` prop for `<Query>`) is a result of [`Utils.loadTree(jsonTree)`](/README.md#loadtree-jsvalue---immutable)
+
 On `onChange` callback it calls `POST /api/tree` to update tree on backend and also export tree to various formats on server-side.  
 On click on button `update config` it modified config in state with [`config_update`](lib/config_update.ts), compresses it and sends to `POST /api/config` to save `zipConfig` on backend.  
 On click on button `stringify config` it runs a test to show ability to serialize an entire config to string with [serialize-javascript](https://www.npmjs.com/package/serialize-javascript) package and deserialize back with `eval`, see [`config_ser`](lib/config_ser.js).
