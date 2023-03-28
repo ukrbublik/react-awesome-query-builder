@@ -84,10 +84,7 @@ export default class FuncSelect extends PureComponent {
     const { funcPlaceholder, fieldSeparatorDisplay } = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
-    const leftFieldConfig =
-      fieldSrc === "func"
-        ? getFuncConfig(config, field.get("func"))
-        : getFieldConfig(config, field);
+    const leftFieldConfig = getFieldConfig(config, field, fieldSrc);
     const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
     const leftFieldWidgetFieldProps =
       (leftFieldWidgetField && leftFieldWidgetField.widgetProps) || {};
@@ -131,10 +128,7 @@ export default class FuncSelect extends PureComponent {
     funcs = clone(funcs);
     const fieldSrc = this.props.fieldSrc;
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig =
-      fieldSrc === "func"
-        ? getFuncConfig(config, leftFieldFullkey.get("func"))
-        : getFieldConfig(config, leftFieldFullkey);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
     let expectedType;
     let targetDefinition = leftFieldConfig;
     const widget = getWidgetForFieldOp(

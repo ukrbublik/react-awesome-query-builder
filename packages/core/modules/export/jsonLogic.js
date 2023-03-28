@@ -29,19 +29,13 @@ export const jsonLogicFormat = (item, config) => {
   let data = {};
   for (let ff of usedFields) {
     const fieldSrc = typeof ff === "string" ? "field" : "func";
-    const def =
-      (fieldSrc === "func"
-        ? getFuncConfig(config, ff.get("func"))
-        : getFieldConfig(config, ff)) || {};
     const parts =
       fieldSrc === "func" ? [ff.get("func")] : ff.split(fieldSeparator);
     let tmp = data;
     for (let i = 0; i < parts.length; i++) {
       const p = parts[i];
       const pdef =
-        (fieldSrc === "func"
-          ? getFuncConfig(config, parts.slice(0, i + 1))
-          : getFieldConfig(config, parts.slice(0, i + 1))) || {};
+        getFieldConfig(config, parts.slice(0, i + 1), fieldSrc) || {};
       if (i != parts.length - 1) {
         if (pdef.type == "!group" && pdef.mode != "struct") {
           if (!tmp[p]) tmp[p] = [{}];
@@ -179,10 +173,7 @@ const formatRule = (item, config, meta, parentField = null) => {
 
   if (field == null || operator == null) return undefined;
 
-  const fieldDefinition =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field.get("func"))
-      : getFieldConfig(config, field) || {};
+  const fieldDefinition = getFieldConfig(config, field, fieldSrc) || {};
   let operatorDefinition =
     getOperatorConfig(config, operator, field, fieldSrc) || {};
   let reversedOp = operatorDefinition.reversedOp;
@@ -242,10 +233,7 @@ const formatItemValue = (
   const field = properties.get("field");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
-  const fieldDefinition =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field.get("func"))
-      : getFieldConfig(config, field) || {};
+  const fieldDefinition = getFieldConfig(config, field, fieldSrc) || {};
   const operatorDefinition =
     getOperatorConfig(config, operator, field, fieldSrc) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);

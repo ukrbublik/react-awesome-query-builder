@@ -94,10 +94,11 @@ class Rule extends PureComponent {
       "subfields",
       selectedFieldSrc
     );
-    const selectedFieldConfig =
-      selectedFieldSrc === "func"
-        ? getFuncConfig(config, selectedField?.get("func"))
-        : getFieldConfig(config, selectedField);
+    const selectedFieldConfig = getFieldConfig(
+      config,
+      selectedField,
+      selectedFieldSrc
+    );
     const isSelectedGroup =
       selectedFieldConfig && selectedFieldConfig.type == "!struct";
     const isFieldAndOpSelected =

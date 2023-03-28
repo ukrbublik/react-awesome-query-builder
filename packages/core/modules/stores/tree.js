@@ -467,10 +467,7 @@ const setField = (state, path, newField, config) => {
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
   const currentFieldSrc = currentProperties.get("fieldSrc");
-  const newFieldConfig =
-    currentFieldSrc === "func"
-      ? getFuncConfig(config, newField.get("func"))
-      : getFieldConfig(config, newField);
+  const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
   const isRuleGroup = newFieldConfig.type == "!group";
   const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
   const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
@@ -629,10 +626,7 @@ const setOperator = (state, path, newOperator, config) => {
   const children = state.getIn(expandTreePath(path, "children1"));
   const currentField = properties.get("field");
   const currentFieldSrc = properties.get("fieldSrc");
-  const fieldConfig =
-    currentFieldSrc === "func"
-      ? getFuncConfig(config, currentField.get("func"))
-      : getFieldConfig(config, currentField);
+  const fieldConfig = getFieldConfig(config, currentField, currentFieldSrc);
   const isRuleGroup = fieldConfig.type == "!group";
   const operatorConfig = getOperatorConfig(
     config,

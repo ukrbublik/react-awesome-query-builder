@@ -776,10 +776,7 @@ const _parseRule = (
   }
   if (parentField) field = [parentField, field].join(fieldSeparator);
   field = normalizeField(config, field);
-  const fieldConfig =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field.get("func"))
-      : getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   if (!fieldConfig) {
     errors.push(`No config for field ${field}`);
     return;

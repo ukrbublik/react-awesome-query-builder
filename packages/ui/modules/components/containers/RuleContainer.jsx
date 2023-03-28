@@ -107,10 +107,11 @@ const createRuleContainer = (Rule) =>
 
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const fieldConfig =
-        this.props.fieldSrc === "func"
-          ? getFuncConfig(this.props.config, this.props.field?.get("func"))
-          : getFieldConfig(this.props.config, this.props.field);
+      const fieldConfig = getFieldConfig(
+        this.props.config,
+        this.props.field,
+        this.props.fieldSrc
+      );
       const { showErrorMessage } = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;

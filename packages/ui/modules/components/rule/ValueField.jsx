@@ -156,10 +156,7 @@ export default class ValueField extends PureComponent {
       };
     }
 
-    const leftFieldConfig =
-      this.props.fieldSrc === "func"
-        ? getFuncConfig(config, field.get("func"))
-        : getFieldConfig(config, field);
+    const leftFieldConfig = getFieldConfig(config, field, this.props.fieldSrc);
     const leftFieldWidgetField = leftFieldConfig.widgets.field;
     const leftFieldWidgetFieldProps =
       (leftFieldWidgetField && leftFieldWidgetField.widgetProps) || {};
@@ -195,10 +192,7 @@ export default class ValueField extends PureComponent {
     fields = clone(fields);
     const fieldSrc = this.props.fieldSrc;
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig =
-      fieldSrc === "func"
-        ? getFuncConfig(config, leftFieldFullkey.get("func"))
-        : getFieldConfig(config, leftFieldFullkey);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     const widget = getWidgetForFieldOp(
       config,

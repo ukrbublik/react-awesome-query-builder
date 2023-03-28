@@ -157,9 +157,7 @@ export default class Widget extends PureComponent {
 
     const fieldDefinition = isFuncArg
       ? getFieldConfig(config, field)
-      : fieldSrc === "func"
-      ? getFuncConfig(config, field.get("func"))
-      : getFieldConfig(config, field);
+      : getFieldConfig(config, field, fieldSrc);
     const defaultWidget = isFuncArg
       ? getWidgetForFieldOp(config, field, operator)
       : getWidgetForFieldOp(config, field, operator, null, fieldSrc);

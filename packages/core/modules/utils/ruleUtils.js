@@ -59,14 +59,12 @@ export const getNewValueForFieldOp = function (
   const operatorCardinality = newOperator
     ? defaultValue(newOperatorConfig.cardinality, 1)
     : null;
-  const currentFieldConfig =
-    currentFieldSrc === "func"
-      ? getFuncConfig(oldConfig, currentField?.get("func"))
-      : getFieldConfig(oldConfig, currentField);
-  const newFieldConfig =
-    currentFieldSrc === "func"
-      ? getFuncConfig(config, newField?.get("func"))
-      : getFieldConfig(config, newField);
+  const currentFieldConfig = getFieldConfig(
+    oldConfig,
+    currentField,
+    currentFieldSrc
+  );
+  const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
 
   let canReuseValue =
     currentField &&
@@ -329,10 +327,7 @@ export const getFirstField = (config, parentRuleGroupPath = null) => {
 };
 
 export const getOperatorsForField = (config, field, fieldSrc) => {
-  const fieldConfig =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field.get("func"))
-      : getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const fieldOps = fieldConfig ? fieldConfig.operators : [];
   return fieldOps;
 };
@@ -429,10 +424,7 @@ export const getValueLabel = (
   const isFuncArg =
     field && typeof field == "object" && !!field.func && !!field.arg;
   const { showLabels } = config.settings;
-  const fieldConfig =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field?.get("func"))
-      : getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const fieldWidgetConfig =
     getFieldWidgetConfig(config, field, operator, null, valueSrc, fieldSrc) ||
     {};
@@ -484,10 +476,7 @@ function _getWidgetsAndSrcsForFieldOp(
   const isFuncArg =
     typeof field == "object" &&
     ((!!field.func && !!field.arg) || field._isFuncArg);
-  const fieldConfig =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field?.get("func"))
-      : getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const opConfig = operator ? config.operators[operator] : null;
 
   if (fieldConfig && fieldConfig.widgets) {

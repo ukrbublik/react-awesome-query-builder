@@ -136,9 +136,7 @@ function validateRule(item, path, itemId, meta, c) {
 
   //validate field
   const fieldDefinition = field
-    ? fieldSrc === "func"
-      ? getFuncConfig(config, field.get("func"))
-      : getFieldConfig(config, field)
+    ? getFieldConfig(config, field, fieldSrc)
     : null;
   if (field && !fieldDefinition) {
     logger.warn(`No config for field ${field}`);
@@ -313,10 +311,6 @@ export const validateValue = (
     }
 
     if (!validError) {
-      const fieldConfig =
-        fieldSrc === "func"
-          ? getFuncConfig(config, field.get("func"))
-          : getFieldConfig(config, field);
       const w = getWidgetForFieldOp(
         config,
         field,
@@ -421,10 +415,7 @@ const validateNormalValue = (
   fieldSrc
 ) => {
   if (field) {
-    const fieldConfig =
-      fieldSrc === "func"
-        ? getFuncConfig(config, field.get("func"))
-        : getFieldConfig(config, field);
+    const fieldConfig = getFieldConfig(config, field, fieldSrc);
     const w = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
     const wConfig = config.widgets[w];
     const wType = wConfig.type;

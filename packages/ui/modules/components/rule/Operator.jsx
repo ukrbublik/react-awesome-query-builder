@@ -41,14 +41,12 @@ export default class Operator extends PureComponent {
   }
 
   getMeta({ config, selectedField, selectedFieldSrc, selectedOperator }) {
-    const fieldConfig =
-      selectedFieldSrc === "func"
-        ? getFuncConfig(config, selectedField.get("func"))
-        : getFieldConfig(config, selectedField);
+    const fieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
     const operators = fieldConfig?.operators;
     const operatorOptions = mapValues(
       pickBy(config.operators, (item, key) => operators?.indexOf(key) !== -1),
-      (_opts, op) => getOperatorConfig(config, op, selectedField, selectedFieldSrc)
+      (_opts, op) =>
+        getOperatorConfig(config, op, selectedField, selectedFieldSrc)
     );
 
     const items = this.buildOptions(config, operatorOptions, operators);

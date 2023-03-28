@@ -338,11 +338,12 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
   return ret;
 };
 
-export const getFieldConfig = (config, field) => {
+export const getFieldConfig = (config, field, fieldSrc) => {
   if (!field) return null;
   if (typeof field == "object" && !field.func && !!field.type) return field;
   if (typeof field == "object" && field.func && field.arg)
     return getFuncArgConfig(config, field.func, field.arg);
+  if (fieldSrc === "func") return getFuncConfig(config, field?.get("func"));
   const fieldConfig = getFieldRawConfig(config, field);
   if (!fieldConfig) return null; //throw new Error("Can't find field " + field + ", please check your config");
 
@@ -366,10 +367,7 @@ export const getOperatorConfig = (config, operator, field = null, fieldSrc) => {
   if (!operator) return null;
   const opConfig = config.operators[operator];
   if (field) {
-    const fieldConfig =
-      fieldSrc === "func"
-        ? getFuncConfig(config, field?.get("func"))
-        : getFieldConfig(config, field);
+    const fieldConfig = getFieldConfig(config, field, fieldSrc);
     const widget = getWidgetForFieldOp(config, field, operator, null, fieldSrc);
     const widgetConfig = config.widgets[widget] || {};
     const fieldWidgetConfig =
@@ -400,10 +398,7 @@ export const getFieldWidgetConfig = (
   if (!field) return null;
   if (!(operator || widget) && valueSrc != "const" && field != "!case_value")
     return null;
-  const fieldConfig =
-    fieldSrc === "func"
-      ? getFuncConfig(config, field?.get("func"))
-      : getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   if (!widget)
     widget = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
   const widgetConfig = config.widgets[widget] || {};
