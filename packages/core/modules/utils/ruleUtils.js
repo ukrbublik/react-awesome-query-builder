@@ -232,7 +232,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
     .map((parts) => [...parentParts, ...parts].join(fieldSeparator))
     .map(part => {
       const cnf = getFieldRawConfig(config, part, fieldsKey, subfieldsKey);
-      return cnf && cnf.label || cnf && last(part.split(fieldSeparator));
+      return cnf && cnf.label || last(part.split(fieldSeparator));
     })
     .filter(label => label != null);
 };

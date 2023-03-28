@@ -8,6 +8,7 @@ import { withSessionRoute, Session, getSessionData, saveSessionData } from "../.
 import pureServerConfig from "../../lib/config";
 import loadedInitValue from "../../data/init_value";
 import loadedInitLogic from "../../data/init_logic";
+import { decompressSavedConfig } from "./config";
 const {
   uuid, checkTree, loadFromJsonLogic, loadTree,
   jsonLogicFormat, queryString, sqlFormat, mongodbFormat, getTree
@@ -16,8 +17,6 @@ const {
 // API to get/save `jsonTree` to session
 // Initial tree is loaded from `data` dir
 // After saving `jsonTree` is exported to multiple formats on server side and returned in response
-// Note that `pureServerConfig` is used for export utils
-// TODO: use decompressed saved config for export utils?
 
 interface ConvertResult {
   jl?: JsonLogicResult;
@@ -90,7 +89,8 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
   const doSaveTree = (req.query as PostTreeQuery).saveTree === "true";
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  const convertResult = convertTree(immutableTree, pureServerConfig);
+  const config = await decompressSavedConfig(req); // pureServerConfig
+  const convertResult = convertTree(immutableTree, config);
   const result: PostTreeResult = convertResult;
   if (doSaveTree) {
     await saveTree(req, jsonTree);
@@ -101,7 +101,8 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
 async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
   const jsonTree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  const convertResult = convertTree(immutableTree, pureServerConfig);
+  const config = await decompressSavedConfig(req); // pureServerConfig
+  const convertResult = convertTree(immutableTree, config);
   const result: GetTreeResult = {
     jsonTree,
     ...convertResult

@@ -2,7 +2,7 @@
 import { withSessionSsr, getSessionData } from "../lib/withSession";
 import Demo, { DemoQueryBuilderProps } from "../components/demo/index";
 import { getInitialTree } from "../pages/api/tree";
-import { getInitialConfig } from "../pages/api/config";
+import { getInitialZipConfig } from "../pages/api/config";
 
 export default Demo;
 

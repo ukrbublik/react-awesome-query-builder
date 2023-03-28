@@ -32,7 +32,8 @@ export default (baseConfig: Config) => {
       // Add new field
       fields: {
         [newFieldName]: {
-          type: "text",
+          type: "date",
+          label: `${newFieldName.toUpperCase()}`,
         },
       },
       // Reset boolean widget to basic one
