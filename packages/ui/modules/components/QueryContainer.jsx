@@ -34,7 +34,9 @@ export default class QueryContainer extends Component {
     super(props, context);
     useOnPropsChanged(this);
 
-    this.getMemoizedConfig = createConfigMemo();
+    const { getExtended, getBasic } = createConfigMemo();
+    this.getMemoizedConfig = getExtended;
+    this.getBasicConfig = getBasic;
     this.getMemoizedTree = createValidationMemo();
     
     const config = this.getMemoizedConfig(props);
@@ -97,6 +99,7 @@ export default class QueryContainer extends Component {
           <ConnectedQuery
             config={config}
             getMemoizedTree={this.getMemoizedTree}
+            getBasicConfig={this.getBasicConfig}
             sanitizeTree={this.sanitizeTree}
             onChange={onChange}
             renderBuilder={renderBuilder || get_children}

@@ -18,6 +18,7 @@ class Query extends Component {
     //__isInternalValueChange
     //__lastAction
     //getMemoizedTree: PropTypes.func.isRequired,
+    //getBasicConfig: PropTypes.func.isRequired,
     //sanitizeTree
   };
 
@@ -77,7 +78,8 @@ class Query extends Component {
 
     const validatedTreeChanged = !immutableEqual(this.validatedTree, this.oldValidatedTree);
     if (validatedTreeChanged) {
-      onChange && onChange(this.validatedTree, newConfig, nextProps.__lastAction);
+      const newBasicConfig = nextProps.getBasicConfig(newConfig);
+      onChange && onChange(this.validatedTree, newBasicConfig, nextProps.__lastAction);
     }
   }
 

@@ -186,8 +186,7 @@ export const compressConfig = (config, baseConfig) => {
     throw new Error("Please enable `useConfigCompress` in config settings to use compressConfig()");
   }
   if (config.__fieldNames) {
-    throw new Error("Don't apply `compressConfig()` to config got from `onChange` callback. " 
-      + "Please don't save config got in 2nd param of `onChange` callback");
+    throw new Error("Don't apply `compressConfig()` to extended config");
   }
   let zipConfig = pick(config, configKeys);
   delete zipConfig.ctx;

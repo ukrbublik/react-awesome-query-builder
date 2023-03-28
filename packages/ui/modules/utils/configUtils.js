@@ -20,6 +20,17 @@ export const createConfigMemo = () => {
     return extendedConfig;
   };
 
+  const findBasic = (findConfig) => {
+    for (const basicConfig of configStore.keys()) {
+      const extConfig = configStore.get(basicConfig);
+      const found = configKeys.map(k => extConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      if (found) {
+        return basicConfig;
+      }
+    }
+    return findConfig;
+  };
+
   const findExtended = (findConfig) => {
     // strict find:
     // return configStore.get(findConfig) || configStore.values().find(ec => ec === findConfig);
@@ -45,5 +56,8 @@ export const createConfigMemo = () => {
     return findExtended(config) || extendAndStore(config);
   };
   
-  return (props) => findOrExtend(pickConfig(props));
+  return {
+    getExtended: (props) => findOrExtend(pickConfig(props)),
+    getBasic: findBasic
+  };
 };
