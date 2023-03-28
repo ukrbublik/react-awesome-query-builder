@@ -18,8 +18,6 @@ import { existsSync } from "node:fs";
 // API to manage session data.
 // Wrappers to enable session for routes and SSR
 
-const USE_REDIS = false;
-
 export type SessionData = {
   jsonTree?: JsonTree;
   zipConfig?: ZipConfig;
@@ -62,7 +60,7 @@ declare module "next" {
 
 // Manage session data storage - Redis or local tmp file
 
-const redis = USE_REDIS && process.env.UPSTASH_REDIS_REST_URL ? new Redis({
+const redis = process.env.UPSTASH_REDIS_REST_URL ? new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 }) : null;
