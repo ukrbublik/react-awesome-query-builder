@@ -14,11 +14,11 @@ endif::[]
 
 = Config format
 
-Has 7 sections:
+Has 8 sections:
 
 [source,javascript]
 ----
-{conjunctions, operators, widgets, types, funcs, settings, fields}
+{conjunctions, operators, widgets, types, funcs, settings, fields, ctx}
 ----
 
 Each section is described below.
@@ -324,7 +324,7 @@ Behaviour settings:
 |removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.checkTree()`?
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
-|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.compressConfig()` and `Utils.ConfigUtils.decompressConfig()`
+|useConfigCompress |false |Set to `true` if you use `Utils.ConfigUtils.compressConfig()` and `Utils.ConfigUtils.decompressConfig()`. See link:#configctx[config.ctx]
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -749,3 +749,48 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |renderSeps | |`[', ']` |Can render custom arguments separators in UI (other than `,`).
 |allowSelfNesting | |false |Allows the function to be used within its own arguments.
 |===
+
+
+
+{nbsp} +
+{nbsp} +
+[[configctx]]
+=== config.ctx
+
+Required starting from version 6.2.0
+
+Typically you just need to copy it from basic config.
+
+But if you use server-side config (with `settings.useConfigCompress = true`), you may need to add your custom functions (eg. `validateValue`) to `ctx` and refer to them in other config sections with name.
+
+[source,javascript]
+----
+import {BasicConfig} from '@react-awesome-query-builder/ui';
+
+const fields = {
+  firstName: {
+    type: "text",
+    fieldSettings: {
+      validateValue: "validateFirstName",
+    }
+  },
+};
+
+const ctx = {
+  ...BasicConfig.ctx,
+  validateFirstName: (val: string) => {
+    return (val.length < 10);
+  },
+};
+
+const config = {
+  ...BasicConfig,
+  ctx,
+  fields,
+};
+----
+
+You can't just pass function to `validateValue` in `fieldSettings` because config with functions can't be serialized to JSON and then used in SSR. 
+But with approach as in this example config will be compressed with `const zipConfig = Utils.ConfigUtils.compressConfig(config, BasicConfig)` to JSON format. It will contain only changes to `BasicConfig`, and `ctx` will be omitted. 
+Then on client side it can be decompressed with `Utils.ConfigUtils.decompressConfig(zipConfig, BasicConfig, ctx)`. 
+Note than `ctx` with implementation of `validateFirstName` is required to be provided here. 

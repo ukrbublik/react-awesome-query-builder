@@ -263,7 +263,10 @@ const settings = {
 
 const funcs = {};
 
+const ctx = InitialConfig.ctx;
+
 const config = {
+  ctx,
   conjunctions,
   operators,
   widgets,

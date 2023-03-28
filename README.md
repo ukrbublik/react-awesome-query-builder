@@ -41,6 +41,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Config format](#config-format)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 6.2.0](#migration-to-620)
   * [Migration to 6.0.0](#migration-to-600)
   * [Migration to 5.2.0](#migration-to-520)
   * [Migration to 4.9.0](#migration-to-490)
@@ -467,6 +468,39 @@ It's recommended to update your version to 6.x. You just need to change your imp
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 6.2.0
+
+Now config has new `ctx` property. Make sure you add it to your config.
+
+Typically you just need to copy it from basic config.
+So if you create config like this, you are fine:
+```js
+import { MuiConfig } from "@react-awesome-query-builder/mui";
+export default {
+  ...MuiConfig,
+  fields: {
+    // your fields
+  },
+};
+```
+
+But if you create config without destructuring of basic config, please add `ctx`:
+```js
+import { MuiConfig } from "@react-awesome-query-builder/mui";
+
+const config = {
+  ctx: MuiConfig.ctx, // needs to be added
+  conjunctions,
+  operators,
+  widgets,
+  types,
+  settings,
+  fields,
+  funcs
+};
+export default config;
+```
 
 ### Migration to 6.0.0
 
