@@ -5,15 +5,15 @@ import type {
 import merge from "lodash/merge";
 import pureServerConfig from "./config_base";
 
-// Adds UI mixins to config created in `./config` - adds asyncFetch, custom React components, factory overrides.
-// Exported config is used on server-side to generate initial compressed config.
-// On browser can be decompressed to a full-featured config with a proper `ctx`.
+// Adds UI mixins to config created in `./config_base` - adds `asyncFetch`, custom React components, `factory` overrides.
+// Exported config is used to generate initial compressed config for SSR.
+// On browser it can be decompressed to a full-featured config with a proper `ctx`.
 // `ctx` should contain used funcs (like `autocompleteFetch`), React components (like `SliderMark`) - see `components/demo/config_ctx`
 //
 //   ! Important !
 //   Don't add JS functions to config, since it can't be used with SSR.
+//   Instead add functions to `ctx` and reference them with name in other sections of config (see `autocompleteFetch` or `myRenderField`).
 //   Use JsonLogic functions instead, see `factory`.
-//   Or add functions to `ctx` and reference them with name in other sections of config (see `autocompleteFetch` or `myRenderField`)
 //   Add custom React components (like `SliderMark`) to `ctx.components`
 
 

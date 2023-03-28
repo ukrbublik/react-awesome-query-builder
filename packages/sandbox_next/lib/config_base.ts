@@ -1,18 +1,18 @@
 /*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
 import merge from "lodash/merge";
 import {
-  Utils, BasicFuncs, CoreConfig,
+  BasicFuncs, CoreConfig,
   // types:
   Settings, Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, Funcs, OperatorProximity,
 } from "@react-awesome-query-builder/core";
 
 // Create a config for demo app based on CoreConfig - add fields, funcs, some overrides.
-// Additional UI modifications are done in `./config_ui` (like `asyncFetch`, `marks`, `factory`)
+// Additional UI modifications are done in `./config` (like `asyncFetch`, `marks`, `factory`)
 //
 //   ! Important !
 //   Don't use JS functions in config, since it can't be used with SSR.
-//   Use JsonLogic functions instead, see `validateValue` for `login` field.
-//   Or add function to `ctx` and refer to it with a name, see `validateFirstName`
+//   Instead add function to `ctx` and refer to it with a name, see `validateFirstName`.
+//   Or use JsonLogic functions, see `validateValue` for `login` field.
 
 function createConfig(InitialConfig: CoreConfig): Config {
 

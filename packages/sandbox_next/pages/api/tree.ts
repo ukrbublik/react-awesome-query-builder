@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import {
-  Utils, CoreConfig,
+  Utils,
   //types:
   ImmutableTree, Config, JsonTree, JsonLogicTree, JsonLogicResult
 } from "@react-awesome-query-builder/core";
-import { withSessionRoute, Session, getSessionData, saveSessionData } from "../../lib/withSession";
+import { withSessionRoute, getSessionData, saveSessionData } from "../../lib/withSession";
 import serverConfig from "../../lib/config";
 import loadedInitValue from "../../data/init_value";
 import loadedInitLogic from "../../data/init_logic";
@@ -89,7 +89,7 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
   const doSaveTree = (req.query as PostTreeQuery).saveTree === "true";
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  const config = await decompressSavedConfig(req); // pureServerConfig
+  const config = await decompressSavedConfig(req); // serverConfig
   const convertResult = convertTree(immutableTree, config);
   const result: PostTreeResult = convertResult;
   if (doSaveTree) {
@@ -101,7 +101,7 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
 async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
   const jsonTree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  const config = await decompressSavedConfig(req); // pureServerConfig
+  const config = await decompressSavedConfig(req); // serverConfig
   const convertResult = convertTree(immutableTree, config);
   const result: GetTreeResult = {
     jsonTree,

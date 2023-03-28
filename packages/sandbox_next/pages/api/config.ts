@@ -5,11 +5,11 @@ import {
   ZipConfig,
   Config
 } from "@react-awesome-query-builder/core";
-import { Session, withSessionRoute, getSessionData, saveSessionData } from "../../lib/withSession";
+import { withSessionRoute, getSessionData, saveSessionData } from "../../lib/withSession";
 import serverConfig from "../../lib/config";
 
 // API to get/save `zipConfig` to session
-// Initial config is created from `lib/config_ui` (based on `CoreConfig` with UI mixins) and compressed with `compressConfig`
+// Initial config is created in `lib/config` and compressed with `Utils.compressConfig`
 
 export type GetConfigQuery = {
   initial?: string;

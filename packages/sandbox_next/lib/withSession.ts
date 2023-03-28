@@ -3,7 +3,6 @@ import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
   NextApiHandler,
-  NextApiRequest
 } from "next";
 import { IronSession, IronSessionOptions } from "iron-session";
 import {
