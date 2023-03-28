@@ -25,11 +25,6 @@ export * from "@react-awesome-query-builder/core";
 /////////////////
 
 
-type ReactKey = string | number;
-interface ReactAttributes {
-  key?: ReactKey | null | undefined;
-}
-
 type AnyObject = object;
 type TypedMap<T> = {
   [key: string]: T;

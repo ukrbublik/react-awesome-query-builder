@@ -88,7 +88,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
 
   // It's just a test to show ability to serialize an entire config to string and deserialize back
   stringifyConfig = () => {
-    const strConfig = UNSAFE_serializeConfig(this.state.config);
+    const strConfig = UNSAFE_serializeConfig(this.state.config) as string;
     const config = UNSAFE_deserializeConfig(strConfig, ctx) as Config;
     const spel = Utils.spelFormat(this.state.tree, config);
     const jl = Utils.jsonLogicFormat(this.state.tree, config);

@@ -10,6 +10,11 @@ export type Moment = MomentType;
 // common
 /////////////////
 
+type ReactKey = string | number;
+interface ReactAttributes {
+  key?: ReactKey | null | undefined;
+}
+
 export type FactoryWithContext<P> = (props?: ReactAttributes & P, ctx?: ConfigContext) => ReactElement<P>;
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;

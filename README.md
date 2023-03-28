@@ -38,6 +38,9 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Minimal JavaScript example with class component](#minimal-javascript-example-with-class-component)
   * [Minimal TypeScript example with function component](#minimal-typescript-example-with-function-component)
 * [API](#api)
+  * [<Query>](#query-)
+  * [<Builder>](#builder-)
+  * [Utils](#utils)
   * [Config format](#config-format)
 * [SSR](#ssr)
   * [ctx](#ctx)
@@ -463,9 +466,9 @@ See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
 ## SSR
-You can save and load config from server with help of [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig) and [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config). 
-You need these utils because you can't just send config as-is to server, as it contains functions that can't be serialized to JSON. 
-Note that you need to set `config.settings.useConfigCompress = true` to enable this feature. 
+You can save and load config from server with help of [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig) and [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config).  
+You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
+Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
 
 To put it simple:
 - `ZipConfig` is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
@@ -474,10 +477,10 @@ To put it simple:
 See [sandbox_next demo app](/packages/sandbox_next) that demonstrates server-side features. 
 
 ### ctx
-Obligatory part of config (starting from version 6.2.0).  
+Config context is an obligatory part of config starting from version 6.2.0  
 It is a collection of functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules.  
 The purpose of `ctx` is to isolate non-serializable part of config.  
-See [ctx](/CONFIG.adoc#configctx).  
+See [config.ctx](/CONFIG.adoc#configctx).  
 
 
 ## Versions
@@ -502,7 +505,7 @@ See [`CHANGELOG`](/CHANGELOG.md)
 
 ### Migration to 6.2.0
 
-Now config has new `ctx` property. Make sure you add it to your config.
+Now config has new [`ctx`](#ctx) property. Make sure you add it to your config.
 
 Typically you just need to copy it from basic config.
 So if you create config like this, you are fine:
