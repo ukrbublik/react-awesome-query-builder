@@ -26,10 +26,12 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
     setField(e.target.value);
   };
 
-  const renderOptions = (fields, isGroupItem = false) =>
+  const renderOptions = (fields, isGroupItem = false, level = 0) =>
     Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
       const { items, path, label, disabled } = field;
+      const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
+      const prefix = level > 1 ? "\u00A0\u00A0".repeat(level-1) : "";
       if (items) {
         return (
           <div key={`dropdown-itemGroup-${path}`}>
@@ -39,9 +41,9 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
               onClick={onChange}
               value={path}
             >
-              {label}
+              {groupPrefix+label}
             </DropdownItem>
-            {renderOptions(items, true)}
+            {renderOptions(items, true, level+1)}
           </div>
         );
       } else {
@@ -54,7 +56,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
             className={isGroupItem ? "px-4" : undefined}
             active={selectedKey == path}
           >
-            {label}
+            {prefix+label}
           </DropdownItem>
         );
       }
@@ -62,24 +64,24 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
 
   const hasValue = selectedKey != null;
 
-  const renderValue = (selectedValue) => {
-    if (!readonly && !selectedValue) return placeholder;
-    const findLabel = (fields) => {
-      return fields.map((field) => {
-        if (!field.items)
-          return field.path === selectedValue ? field.label : null;
-        return findLabel(field.items);
-      });
-    };
-    return findLabel(items)
-      .filter((v) => {
-        if (Array.isArray(v)) {
-          return v.some((value) => value !== null);
-        } else {
-          return v !== null;
+  const renderSelected = (allItems, selectedKey) => {
+    if (!readonly && !selectedKey) return placeholder;
+    
+    const _find = (subItems) => {
+      for (const k in subItems) {
+        const item = subItems[k];
+        if (item.path === selectedKey) {
+          return item;
         }
-      })
-      .pop();
+        if (item.items) {
+          const maybeFound = _find(item.items);
+          if (maybeFound) {
+            return maybeFound;
+          }
+        }
+      }
+    };
+    return _find(allItems)?.label || selectedKey;
   };
 
   return (
@@ -95,7 +97,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {hasValue ? renderValue(selectedKey) : <span>&nbsp;</span>}
+        {hasValue ? renderSelected(items, selectedKey) : <span>&nbsp;</span>}
       </DropdownToggle>
       <DropdownMenu 
         container="body" 
