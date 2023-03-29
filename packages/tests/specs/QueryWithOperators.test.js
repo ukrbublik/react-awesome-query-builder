@@ -2,6 +2,8 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { export_checks } from "../support/utils";
 
+import { Utils } from "@react-awesome-query-builder/core";
+import { BasicConfig } from "@react-awesome-query-builder/ui";
 
 describe("query with ops", () => {
   describe("export", () => {
@@ -74,6 +76,17 @@ describe("query with ops", () => {
           }
         ]
       }
+    });
+  });
+
+  describe("round trip", () => {
+    it("should work", () => {
+      const config = configs.with_all_types(BasicConfig);
+      const input = { "and": [{ "==": [{ "var": "color" }, null] }] };
+      const [tree, errs] = Utils._loadFromJsonLogic(input, config, true);
+      expect(errs).to.deep.equal([]);
+      const output = Utils.jsonLogicFormat(tree, config);
+      expect(output.logic).to.deep.equal(input);
     });
   });
 });
