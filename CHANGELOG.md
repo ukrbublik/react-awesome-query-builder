@@ -6,6 +6,8 @@
     - Config now has `ctx` property
     - Added new test app `sandbox_next` to demonstrate new server-side features
   - Export utils (like `mongoFormatOp1`, `mongoFormatOp2`) in `CoreConfig.ctx.utils` (PR #866) (issue #890)
+- 6.1.3
+  - Fix isNull roundtrip (PR #887) (issue #886)
 - 6.1.2
   - Fix typings for `children1`: tuple -> array (PR #885) (issue #881)
   - Fix compare fields for case when type != widget.type (PR #875) (issue #758)
