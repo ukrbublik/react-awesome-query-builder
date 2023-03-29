@@ -80,7 +80,7 @@ describe("query with ops", () => {
 
   describe("round trip", () => {
     it("should work", () => {
-      const config = configs.with_all_types(BasicConfig)
+      const config = configs.with_all_types(BasicConfig);
       const input = { "and": [{ "==": [{ "var": "color" }, null] }] };
       const [tree, errs] = Utils._loadFromJsonLogic(input, config, true);
       expect(errs).to.deep.equal([]);
