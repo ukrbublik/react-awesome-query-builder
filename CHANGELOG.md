@@ -1,4 +1,9 @@
 # Changelog
+- 5.4.2
+  - Fix isNull roundtrip (PR #888) (issue #886)
+- 5.4.1
+  - Please migrate to new @react-awesome-query-builder/*
+    See https://github.com/ukrbublik/react-awesome-query-builder#migration-to-600
 - 5.4.0
   - Add `multiselect_contains` operator (PR #813) (issue #702)
 - 5.3.2

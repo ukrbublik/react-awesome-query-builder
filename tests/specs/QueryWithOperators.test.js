@@ -87,5 +87,5 @@ describe("query with ops", () => {
       const output = Utils.jsonLogicFormat(tree, config);
       expect(output.logic).to.deep.equal(input);
     });
-  })
+  });
 });

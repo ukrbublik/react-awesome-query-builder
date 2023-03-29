@@ -1,6 +1,6 @@
 {
   "name": "react-awesome-query-builder",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "User-friendly query builder for React. Please migrate to new @react-awesome-query-builder/* See https://github.com/ukrbublik/react-awesome-query-builder#migration-to-600",
   "keywords": [
     "query-builder",
