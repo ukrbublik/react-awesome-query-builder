@@ -37,7 +37,7 @@ jobs:
       - name: Build
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
-        run: pnpm build
+        run: pnpm build:ci
       - name: Artifact - examples build
         uses: actions/upload-artifact@v3
         with:
