@@ -35,6 +35,8 @@ jobs:
           name: coverage
           path: packages/tests/coverage
       - name: Build
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: pnpm build
       - name: Artifact - examples build
         uses: actions/upload-artifact@v3
