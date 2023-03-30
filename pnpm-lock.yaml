@@ -272,7 +272,7 @@ importers:
       url-loader: ^4.1.1
       webpack: ^5.61.0
       webpack-bundle-analyzer: ^4.4.2
-      webpack-cli: ^4.9.1
+      webpack-cli: ^4.10.0
       webpack-dev-server: ^4.4.0
     dependencies:
       '@ant-design/icons': 4.8.0_sfoxds7t5ydpegc3knd667wn6m
