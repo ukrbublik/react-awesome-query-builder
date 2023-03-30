@@ -58,7 +58,6 @@
   ],
   "scripts": {
     "build": "pnpm run build-libs && pnpm run build-examples",
-    "build:ci": "pnpm run build-libs && pnpm run --sequential build-examples",
     "build-libs": "pnpm --filter @react-awesome-query-builder/examples^... run build",
     "build-examples": "pnpm --filter !@react-awesome-query-builder/examples^... run build",
     "test": "pnpm --filter @react-awesome-query-builder/tests run test",
