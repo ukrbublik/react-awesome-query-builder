@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Select } from "antd";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
@@ -8,7 +8,7 @@ import { Utils } from "@react-awesome-query-builder/ui";
 const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 
-export default class MultiSelectWidget extends PureComponent {
+export default class MultiSelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
@@ -29,8 +29,8 @@ export default class MultiSelectWidget extends PureComponent {
     this.onPropsChanged(props);
   }
 
-  onPropsChanged (props) {
-    const {listValues} = props;
+  onPropsChanged(nextProps) {
+    const {listValues} = nextProps;
 
     let optionsMaxWidth = 0;
     mapListValues(listValues, ({title, value}) => {

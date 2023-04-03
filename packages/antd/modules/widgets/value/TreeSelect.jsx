@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { TreeSelect } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
@@ -8,7 +8,7 @@ import { Utils } from "@react-awesome-query-builder/ui";
 const { getTitleInListValues, mapListValues } = Utils.ListUtils;
 
 
-export default class TreeSelectWidget extends PureComponent {
+export default class TreeSelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
@@ -29,8 +29,8 @@ export default class TreeSelectWidget extends PureComponent {
     this.onPropsChanged(props);  
   }
 
-  onPropsChanged(props) {
-    const { listValues, treeMultiple } = props;
+  onPropsChanged(nextProps) {
+    const { listValues, treeMultiple } = nextProps;
 
     let optionsMaxWidth = 0;
     const initialOffset = (treeMultiple ? (24 + 22) : 24); // arrow + checkbox for leftmost item
