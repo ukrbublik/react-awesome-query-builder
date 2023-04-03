@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import { Select } from "antd";
 import omit from "lodash/omit";
 import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 

@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { TreeSelect } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
 import { defaultTreeDataMap } from "../../utils/stuff";
-import { useOnPropsChanged } from "../../utils/reactUtils";
 import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 const { getTitleInListValues, mapListValues } = Utils.ListUtils;
 
 

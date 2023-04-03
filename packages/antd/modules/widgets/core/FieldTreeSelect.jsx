@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Tooltip, TreeSelect } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import PropTypes from "prop-types";
-
+import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 
 export default class FieldTreeSelect extends Component {
   static propTypes = {
