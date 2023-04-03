@@ -43,9 +43,9 @@ export default class QueryContainer extends Component {
     const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree);
     const store = createStore(reducer);
 
+    this.config = config;
     this.state = {
-      store,
-      config
+      store
     };
   }
 
@@ -55,7 +55,7 @@ export default class QueryContainer extends Component {
 
   onPropsChanged(nextProps) {
     // compare configs
-    const oldConfig = this.state.config;
+    const oldConfig = this.config;
     const nextConfig = this.getMemoizedConfig(nextProps);
     const isConfigChanged = oldConfig !== nextConfig;
 
@@ -65,7 +65,7 @@ export default class QueryContainer extends Component {
     const currentTree = isTreeChanged ? nextProps.value || defaultRoot(nextProps) : storeValue;
 
     if (isConfigChanged) {
-      this.setState({config: nextConfig});
+      this.config = nextConfig;
     }
     
     if (isTreeChanged || isConfigChanged) {
@@ -81,7 +81,8 @@ export default class QueryContainer extends Component {
   render() {
     // `get_children` is deprecated!
     const {renderBuilder, get_children, onChange, settings} = this.props;
-    const {config, store} = this.state;
+    const {store} = this.state;
+    const config = this.config;
     const {renderProvider: QueryWrapper} = settings;
 
     return (
