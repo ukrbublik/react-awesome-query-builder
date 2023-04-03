@@ -12,12 +12,10 @@ import {
 const rootElement = window.document.getElementById("root");
 
 ReactDOM.render((
-  <React.StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route path="/switch" element={<React.Suspense fallback={<>...</>}><DemoSwitch /></React.Suspense>} />
-        <Route path="*" element={<React.Suspense fallback={<>...</>}><Demo /></React.Suspense>} />
-      </Routes>
-    </HashRouter>
-  </React.StrictMode>
+  <HashRouter>
+    <Routes>
+      <Route path="/switch" element={<React.Suspense fallback={<>...</>}><DemoSwitch /></React.Suspense>} />
+      <Route path="*" element={<React.Suspense fallback={<>...</>}><Demo /></React.Suspense>} />
+    </Routes>
+  </HashRouter>
 ), rootElement);
