@@ -95,6 +95,7 @@ function validateRule (item, path, itemId, meta, c) {
   let id = item.get("id");
   let properties = item.get("properties");
   let field = properties.get("field") || null;
+  let fieldSrc = properties.get("fieldSrc") || null;
   let operator = properties.get("operator") || null;
   let operatorOptions = properties.get("operatorOptions");
   let valueSrc = properties.get("valueSrc");
@@ -117,7 +118,7 @@ function validateRule (item, path, itemId, meta, c) {
   }
 
   //validate field
-  const fieldDefinition = field ? getFieldConfig(config, field) : null;
+  const fieldDefinition = field ? getFieldConfig(config, field, fieldSrc) : null;
   if (field && !fieldDefinition) {
     logger.warn(`No config for field ${field}`);
     field = null;
@@ -134,12 +135,12 @@ function validateRule (item, path, itemId, meta, c) {
     console.info(`Fixed operator ${properties.get("operator")} to ${operator}`);
     properties = properties.set("operator", operator);
   }
-  const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
+  const operatorDefinition = operator ? getOperatorConfig(config, operator, field, fieldSrc) : null;
   if (operator && !operatorDefinition) {
     console.warn(`No config for operator ${operator}`);
     operator = null;
   }
-  const availOps = field ? getOperatorsForField(config, field) : [];
+  const availOps = field ? getOperatorsForField(config, field, fieldSrc) : [];
   if (!availOps) {
     console.warn(`Type of field ${field} is not supported`);
     operator = null;
@@ -214,7 +215,7 @@ function validateRule (item, path, itemId, meta, c) {
  * @param {bool} isRawValue false is used only internally from validateFuncValue
  * @return {array} [validError, fixedValue] - if validError === null and canFix == true, fixedValue can differ from value if was fixed
  */
-export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false, isRawValue = true) => {
+export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false, isRawValue = true, fieldSrc) => {
   let validError = null;
   let fixedValue = value;
 
@@ -224,14 +225,14 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
     } else if (valueSrc == "func") {
       [validError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "value" || !valueSrc) {
-      [validError, fixedValue] = validateNormalValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
+      [validError, fixedValue] = validateNormalValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix, fieldSrc);
     }
 
     if (!validError) {
-      const fieldConfig = getFieldConfig(config, field);
-      const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
-      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
+      const fieldConfig = getFieldConfig(config, field, fieldSrc);
+      const w = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
+      const operatorDefinition = operator ? getOperatorConfig(config, operator, field, fieldSrc) : null;
+      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc, fieldSrc), ["factory"]);
       const rightFieldDefinition = (valueSrc == "field" ? getFieldConfig(config, value) : null);
       const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
 
@@ -297,10 +298,10 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
 /**
 * 
 */
-const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
+const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false, fieldSrc) => {
   if (field) {
-    const fieldConfig = getFieldConfig(config, field);
-    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldConfig = getFieldConfig(config, field, fieldSrc);
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
     const wConfig = config.widgets[w];
     const wType = wConfig.type;
     const jsType = wConfig.jsType;

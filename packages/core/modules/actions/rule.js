@@ -16,6 +16,18 @@ export const setField = (config, path, field) => ({
 /**
  * @param {object} config
  * @param {Immutable.List} path
+ * @param {*} srcKey
+ */
+export const setFieldSrc = (config, path, srcKey) => ({
+  type: constants.SET_FIELD_SRC,
+  path: toImmutableList(path),
+  srcKey: srcKey,
+  config: config,
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
  * @param {string} operator
  */
 export const setOperator = (config, path, operator) => ({

@@ -17,7 +17,8 @@ export default class ValueField extends PureComponent {
     groupId: PropTypes.string,
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
     value: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
@@ -36,8 +37,8 @@ export default class ValueField extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "operator", "isFuncArg", "parentField"];
-    const keysForMeta = ["config", "field", "operator", "value", "placeholder", "isFuncArg", "parentField"];
+    const keysForItems = ["config", "field", "fieldSrc", "operator", "isFuncArg", "parentField"];
+    const keysForMeta = ["config", "field", "fieldSrc", "operator", "value", "placeholder", "isFuncArg", "parentField"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -49,25 +50,25 @@ export default class ValueField extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentField, isFuncArg, fieldDefinition}) {
+  getItems({config, field, fieldSrc, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
     const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
 
-  getMeta({config, field, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
+  getMeta({config, field, fieldSrc, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(config, field);
-    const leftFieldWidgetField = leftFieldConfig.widgets.field;
+    const leftFieldConfig = field ? getFieldConfig(config, field, fieldSrc) : {};
+    const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     const placeholder = isFieldSelected ? null 
       : (isFuncArg && customPlaceholder || leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder);
@@ -89,12 +90,12 @@ export default class ValueField extends PureComponent {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value", fieldSrc);
     const widgetConfig = config.widgets[widget];
     let expectedType;
     if (isFuncArg && fieldDefinition) {
@@ -102,7 +103,7 @@ export default class ValueField extends PureComponent {
     } else if (_relyOnWidgetType && widgetConfig) {
       expectedType = widgetConfig.type;
     } else {
-      expectedType = leftFieldConfig.type;
+      expectedType = leftFieldConfig.type ?? leftFieldConfig.returnType;
     }
     
     function _filter(list, path) {

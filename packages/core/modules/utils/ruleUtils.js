@@ -26,6 +26,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   if (!oldConfig)
     oldConfig = config;
   const currentField = current.get("field");
+  const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
@@ -36,11 +37,11 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
 
   //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
-  const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
+  const newOperatorConfig = getOperatorConfig(config, newOperator, newField, currentFieldSrc);
   //const currentOperatorCardinality = currentOperator ? defaultValue(currentOperatorConfig.cardinality, 1) : null;
   const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
-  const currentFieldConfig = getFieldConfig(oldConfig, currentField);
-  const newFieldConfig = getFieldConfig(config, newField);
+  const currentFieldConfig = getFieldConfig(oldConfig, currentField, currentFieldSrc);
+  const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
 
   let canReuseValue = currentField && currentOperator && newOperator && currentValue != undefined
     && (!changedProp 
@@ -55,12 +56,12 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   // compare old & new widgets
   for (let i = 0 ; i < operatorCardinality ; i++) {
     const vs = currentValueSrc.get(i) || null;
-    const currentWidget = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
-    const newWidget = getWidgetForFieldOp(config, newField, newOperator, vs);
+    const currentWidget = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs, currentFieldSrc);
+    const newWidget = getWidgetForFieldOp(config, newField, newOperator, vs, currentFieldSrc);
     // need to also check value widgets if we changed operator and current value source was 'field'
     // cause for select type op '=' requires single value and op 'in' requires array value
-    const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value");
-    const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value");
+    const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value", currentFieldSrc);
+    const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value", currentFieldSrc);
 
     const canReuseWidget = newValueWidget == currentValueWidget || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
     if (!canReuseWidget)
@@ -70,8 +71,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   if (currentOperator != newOperator && [currentOperator, newOperator].includes("proximity"))
     canReuseValue = false;
 
-  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
-  const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
+  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first(), currentFieldSrc);
+  const valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null, null, currentFieldSrc);
   
   let valueFixes = {};
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
@@ -85,7 +86,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const asyncListValues = currentAsyncListValues;
       const [validateError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, true, currentFieldSrc
       );
       const isValid = !validateError;
       // Allow bad value with error message
@@ -192,8 +193,8 @@ export const getFirstField = (config, parentRuleGroupPath = null) => {
   return (parentPathArr || []).concat(keysPath).join(fieldSeparator);
 };
 
-export const getOperatorsForField = (config, field) => {
-  const fieldConfig = getFieldConfig(config, field);
+export const getOperatorsForField = (config, field, fieldSrc) => {
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const fieldOps = fieldConfig ? fieldConfig.operators : [];
   return fieldOps;
 };
@@ -220,11 +221,11 @@ export const getFuncPathLabels = (field, config, parentField = null) => {
   return getFieldPathLabels(field, config, parentField, "funcs", "subfields");
 };
 
-export const getFieldPathLabels = (field, config, parentField = null, fieldsKey = "fields", subfieldsKey = "subfields") => {
+export const getFieldPathLabels = (field, config, parentField = null, fieldsKey = "fields", subfieldsKey = "subfields", fieldSrc = null) => {
   if (!field)
     return null;
   const fieldSeparator = config.settings.fieldSeparator;
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const parts = fieldSrc === "func" ? [field] : (Array.isArray(field) ? field : field.split(fieldSeparator));
   const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
   return parts
     .slice(parentParts.length)
@@ -261,12 +262,12 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
     });
 };
 
-export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
+export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false, fieldSrc = null) => {
   const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
   const {showLabels} = config.settings;
-  const fieldConfig = getFieldConfig(config, field);
-  const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
-  const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
+  const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc, fieldSrc) || {};
+  const mergedOpConfig = getOperatorConfig(config, operator, field, fieldSrc) || {};
     
   const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
   let ret = null;
@@ -301,13 +302,13 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
   return ret;
 };
 
-function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc = null) {
+function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc = null, fieldSrc = null) {
   let widgets = [];
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
   const isFuncArg = typeof field == "object" && (!!field.func && !!field.arg || field._isFuncArg);
-  const fieldConfig = getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const opConfig = operator ? config.operators[operator] : null;
   
   if (fieldConfig && fieldConfig.widgets) {
@@ -367,26 +368,27 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   return {widgets, valueSrcs};
 }
 
-export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {
-  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
+export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null, fieldSrc = null) => {
+  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc, fieldSrc);
   return widgets;
 };
 
 export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
   if (!fieldDefinition)
     return valueSrcs;
+  const fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
   return valueSrcs.filter(vs => {
     let canAdd = true;
     if (vs == "field") {
       if (config._fieldsCntByType) {
         // tip: LHS field can be used as arg in RHS function
         const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
-        canAdd = canAdd && config._fieldsCntByType[fieldDefinition.type] > minCnt;
+        canAdd = canAdd && config._fieldsCntByType[fieldType] > minCnt;
       }
     }
     if (vs == "func") {
       if (config._funcsCntByType)
-        canAdd = canAdd && !!config._funcsCntByType[fieldDefinition.type];
+        canAdd = canAdd && !!config._funcsCntByType[fieldType];
       if (fieldDefinition.funcs)
         canAdd = canAdd && fieldDefinition.funcs.length > 0;
     }
@@ -394,14 +396,14 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
   });
 };
 
-export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null, leftFieldForFunc = null) => {
-  const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
+export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null, leftFieldForFunc = null, fieldSrc = null) => {
+  const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null, fieldSrc);
   const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition);
   return filteredValueSrcs;
 };
 
-export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
-  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
+export const getWidgetForFieldOp = (config, field, operator, valueSrc = null, fieldSrc = null) => {
+  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc, fieldSrc);
   let widget = null;
   if (widgets.length)
     widget = widgets[0];

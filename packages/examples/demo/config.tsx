@@ -263,7 +263,7 @@ export default (skin: string) => {
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
     customFieldSelectProps: {
-      showSearch: true
+      showSearch: false
     },
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,

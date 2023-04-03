@@ -98,40 +98,10 @@ const DemoQueryBuilder: React.FC = () => {
     initValue = _initValue;
   };
 
-  const switchShowLock = () => {
-    const newConfig: Config = clone(state.config);
-    newConfig.settings.showLock = !newConfig.settings.showLock;
-    setState({...state, config: newConfig});
-  };
-
   const resetValue = () => {
     setState({
       ...state,
       tree: initTree, 
-    });
-  };
-
-  const validate = () => {
-    setState({
-      ...state,
-      tree: checkTree(state.tree, state.config)
-    });
-  };
-
-  const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const spelStr = e.target.value;
-    setState({
-      ...state,
-      spelStr
-    });
-  };
-
-  const importFromSpel = () => {
-    const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
-    setState({
-      ...state, 
-      tree: tree ? checkTree(tree, state.config) : state.tree,
-      spelErrors
     });
   };
 
@@ -177,174 +147,21 @@ const DemoQueryBuilder: React.FC = () => {
     setState(prevState => ({...prevState, tree: memo.current.immutableTree, config: memo.current.config}));
   }, 100);
 
-  // Demonstrates how actions can be called programmatically
-  const runActions = () => {
-    const rootPath = [ state.tree.get("id") as string ];
-    const isEmptyTree = !state.tree.get("children1");
-    const firstPath = [
-      state.tree.get("id"), 
-      ((state.tree.get("children1") as ImmOMap)?.first() as ImmOMap)?.get("id")
-    ];
-    const lastPath = [
-      state.tree.get("id"), 
-      ((state.tree.get("children1") as ImmOMap)?.last() as ImmOMap)?.get("id")
-    ];
-
-    // Change root group to NOT OR
-    memo.current._actions.setNot(rootPath, true);
-    memo.current._actions.setConjunction(rootPath, "OR");
-
-    // Move first item
-    if (!isEmptyTree) {
-      memo.current._actions.moveItem(firstPath, lastPath, "before");
-    }
-
-    // Remove last rule
-    if (!isEmptyTree) {
-      memo.current._actions.removeRule(lastPath);
-    }
-
-    // Change first rule to `num between 2 and 4`
-    if (!isEmptyTree) {
-      memo.current._actions.setField(firstPath, "num");
-      memo.current._actions.setOperator(firstPath, "between");
-      memo.current._actions.setValueSrc(firstPath, 0, "value");
-      memo.current._actions.setValue(firstPath, 0, 2, "number");
-      memo.current._actions.setValue(firstPath, 1, 4, "number");
-    }
-
-    // Add rule `login == "denis"`
-    memo.current._actions.addRule(
-      rootPath,
-      {
-        field: "user.login",
-        operator: "equal",
-        value: ["denis"],
-        valueSrc: ["value"],
-        valueType: ["text"]
-      },
-    );
-
-    // Add rule `login == firstName`
-    memo.current._actions.addRule(
-      rootPath,
-      {
-        field: "user.login",
-        operator: "equal",
-        value: ["user.firstName"],
-        valueSrc: ["field"]
-      },
-    );
-
-    // Add rule-group `cars` with `year == 2021`
-    memo.current._actions.addRule(
-      rootPath,
-      {
-        field: "cars",
-        mode: "array",
-        operator: "all",
-      },
-      "rule_group",
-      [
-        {
-          type: "rule",
-          properties: {
-            field: "cars.year",
-            operator: "equal",
-            value: [2021]
-          }
-        }
-      ]
-    );
-
-    // Add group with `slider == 40` and subgroup `slider < 20`
-    memo.current._actions.addGroup(
-      rootPath,
-      {
-        conjunction: "AND"
-      },
-      [
-        {
-          type: "rule",
-          properties: {
-            field: "slider",
-            operator: "equal",
-            value: [40]
-          }
-        },
-        {
-          type: "group",
-          properties: {
-            conjunction: "AND"
-          },
-          children1: [
-            {
-              type: "rule",
-              properties: {
-                field: "slider",
-                operator: "less",
-                value: [20]
-              }
-            },
-          ]
-        }
-      ]
-    );
-  };
-
   const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
     const isValid = isValidTree(immutableTree);
     const treeJs = getTree(immutableTree);
     const {logic, data: logicData, errors: logicErrors} = jsonLogicFormat(immutableTree, config);
-    const [spel, spelErrors] = _spelFormat(immutableTree, config);
-    const queryStr = queryString(immutableTree, config);
-    const humanQueryStr = queryString(immutableTree, config, true);
-    const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
-    const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
-    const elasticSearch = elasticSearchFormat(immutableTree, config);
+    // const [spel, spelErrors] = _spelFormat(immutableTree, config);
+    // const queryStr = queryString(immutableTree, config);
+    // const humanQueryStr = queryString(immutableTree, config, true);
+    // const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
+    // const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
+    // const elasticSearch = elasticSearchFormat(immutableTree, config);
 
     return (
       <div>
         {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
         <br />
-        <div>
-        spelFormat: 
-          { spelErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(spelErrors, undefined, 2)}
-            </pre> 
-          }
-          <pre style={preStyle}>
-            {stringify(spel, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-        stringFormat: 
-          <pre style={preStyle}>
-            {stringify(queryStr, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-        humanStringFormat: 
-          <pre style={preStyle}>
-            {stringify(humanQueryStr, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-        sqlFormat: 
-          { sqlErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(sqlErrors, undefined, 2)}
-            </pre> 
-          }
-          <pre style={preStyle}>
-            {stringify(sql, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
           { logicErrors.length > 0 
@@ -362,25 +179,6 @@ const DemoQueryBuilder: React.FC = () => {
               {stringify(logicData, undefined, 2)}
             </pre>
           }
-        </div>
-        <hr/>
-        <div>
-        mongodbFormat: 
-          { mongoErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(mongoErrors, undefined, 2)}
-            </pre> 
-          }
-          <pre style={preStyle}>
-            {stringify(mongo, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-        elasticSearchFormat: 
-          <pre style={preStyle}>
-            {stringify(elasticSearch, undefined, 2)}
-          </pre>
         </div>
         <hr/>
         <div>
@@ -413,9 +211,6 @@ const DemoQueryBuilder: React.FC = () => {
         </select>
         <button onClick={resetValue}>reset</button>
         <button onClick={clearValue}>clear</button>
-        <button onClick={runActions}>run actions</button>
-        <button onClick={validate}>validate</button>
-        <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
       </div>
 
       <ImportSkinStyles skin={state.skin} />
@@ -426,19 +221,6 @@ const DemoQueryBuilder: React.FC = () => {
         onChange={onChange}
         renderBuilder={renderBuilder}
       />
-
-      <div className="query-import-spel">
-        SpEL:
-        <input type="text" size={150} value={state.spelStr} onChange={onChangeSpelStr} />
-        <button onClick={importFromSpel}>import</button>
-        <br />
-        { state.spelErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(state.spelErrors, undefined, 2)}
-            </pre> 
-        }
-      </div>
-
       <div className="query-builder-result">
         {renderResult(state)}
       </div>

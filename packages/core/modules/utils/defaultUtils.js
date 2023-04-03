@@ -24,8 +24,8 @@ export const defaultOperator = (config, field, canGetFirst = true) => {
 };
 
 //used for complex operators like proximity
-export const defaultOperatorOptions = (config, operator, field) => {
-  let operatorConfig = operator ? getOperatorConfig(config, operator, field) : null;
+export const defaultOperatorOptions = (config, operator, field, fieldSrc) => {
+  let operatorConfig = operator ? getOperatorConfig(config, operator, field, fieldSrc) : null;
   if (!operatorConfig)
     return null; //new Immutable.Map();
   return operatorConfig.options ? new Immutable.Map(

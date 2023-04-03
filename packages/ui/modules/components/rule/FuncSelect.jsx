@@ -16,7 +16,8 @@ export default class FuncSelect extends PureComponent {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.string,
@@ -36,8 +37,8 @@ export default class FuncSelect extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "operator", "isFuncArg"];
-    const keysForMeta = ["config", "field", "value"];
+    const keysForItems = ["config", "field", "fieldSrc", "operator", "isFuncArg"];
+    const keysForMeta = ["config", "field", "fieldSrc", "value"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -49,20 +50,20 @@ export default class FuncSelect extends PureComponent {
     }
   }
 
-  getItems({config, field, operator, parentFuncs, fieldDefinition, isFuncArg}) {
+  getItems({config, field, fieldSrc, operator, parentFuncs, fieldDefinition, isFuncArg}) {
     const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
+    const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldSrc, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
     const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
 
-  getMeta({config, field, value}) {
+  getMeta({config, field, fieldSrc, value}) {
     const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(config, field);
-    const leftFieldWidgetField = leftFieldConfig.widgets.field;
+    const leftFieldConfig = getFieldConfig(config, field, fieldSrc);
+    const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     const placeholder = !isFuncSelected ? funcPlaceholder : null;
 
@@ -83,13 +84,13 @@ export default class FuncSelect extends PureComponent {
     };
   }
 
-  filterFuncs(config, funcs, leftFieldFullkey, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
+  filterFuncs(config, funcs, leftFieldFullkey, fieldSrc, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
     let expectedType;
     let targetDefinition = leftFieldConfig;
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value", fieldSrc);
     if (isFuncArg && fieldDefinition) {
       targetDefinition = fieldDefinition;
       expectedType = fieldDefinition.type;
@@ -99,7 +100,7 @@ export default class FuncSelect extends PureComponent {
       //expectedType = leftFieldConfig.type;
       expectedType = widgetType;
     } else {
-      expectedType = leftFieldConfig.type;
+      expectedType = leftFieldConfig?.type;
     }
 
     function _filter(list, path) {
@@ -112,8 +113,8 @@ export default class FuncSelect extends PureComponent {
           if(_filter(subfields, subpath) == 0)
             delete list[funcKey];
         } else {
-          let canUse = funcConfig.returnType == expectedType;
-          if (targetDefinition.funcs)
+          let canUse = !expectedType || funcConfig.returnType == expectedType;
+          if (targetDefinition?.funcs)
             canUse = canUse && targetDefinition.funcs.includes(funcFullkey);
           if (canUseFuncForField)
             canUse = canUse && canUseFuncForField(leftFieldFullkey, leftFieldConfig, funcFullkey, funcConfig, operator);

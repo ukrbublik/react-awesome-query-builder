@@ -1,9 +1,10 @@
 import uuid from "../utils/uuid";
 import {defaultValue, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
-import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
+import {getFieldConfig, extendConfig, normalizeField, getFuncConfig} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
+import { setFunc } from "../utils/funcUtils";
 
 import moment from "moment";
 
@@ -92,6 +93,53 @@ const buildConv = (config) => {
   };
 };
 
+const convertFuncFromLogic = (
+  op,
+  vals,
+  field,
+  conv,
+  config,
+  meta,
+  parentField
+) => {
+  field = setFunc(null, conv.funcs[op][0], config);
+  Object.entries(config.funcs[conv.funcs[op]].args).forEach((entry, idx) => {
+    const subK = Object.keys(vals[idx])[0];
+    const subV = Object.values(vals[idx])[0];
+    if (
+      Object.keys(conv.funcs).includes(subK) &&
+      typeof Object.values(subV) === "object" &&
+      Array.isArray(Object.values(subV))
+    ) {
+      const argVal = convertFuncFromLogic(
+        subK,
+        subV,
+        null,
+        conv,
+        config,
+        meta,
+        parentField
+      );
+      field = field.setIn(["args", entry[0], "valueSrc"], "func");
+      field = field.setIn(["args", entry[0], "value"], argVal);
+    } else {
+      let argVal = convertFromLogic(
+        vals[idx],
+        conv,
+        config,
+        "val",
+        meta,
+        false,
+        entry[1],
+        null,
+        parentField
+      );
+      field = field.setIn(["args", entry[0], "valueSrc"], argVal.valueSrc);
+      field = field.setIn(["args", entry[0], "value"], argVal.value);
+    }
+  });
+  return field;
+};
 
 const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
   let op, vals;
@@ -241,15 +289,16 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
   }
 
   const fk = (jsonLogicIsMethod ? "#" : "") + func;
+  const returnType = fieldConfig.type ?? fieldConfig.returnType;
   const funcKeys = (conv.funcs[fk] || []).filter(k => 
-    (fieldConfig ? config.funcs[k].returnType == fieldConfig.type : true)
+    (fieldConfig ? config.funcs[k].returnType == returnType : true)
   );
   if (funcKeys.length) {
     funcKey = funcKeys[0];
   } else {
     const v = {[op]: vals};
     for (const [f, fc] of Object.entries(config.funcs || {})) {
-      if (fc.jsonLogicImport && fc.returnType == fieldConfig.type) {
+      if (fc.jsonLogicImport && fc.returnType == returnType) {
         let parsed;
         try {
           parsed = fc.jsonLogicImport(v);
@@ -376,6 +425,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
                   conjunction: conjKey,
                   not: false,
                   field: gf,
+                  fieldSrc: gf,
                   mode: gfc.mode,
                 }
               };
@@ -443,8 +493,8 @@ const wrapInDefaultConj = (rule, config, not = false) => {
 
 const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   let errors = [];
-  let res = _parseRule(op, arity, vals, parentField, conv, config, errors, false) 
-         || _parseRule(op, arity, vals, parentField, conv, config, errors, true) ;
+  let res = _parseRule(op, arity, vals, parentField, conv, config, errors, false, meta) 
+         || _parseRule(op, arity, vals, parentField, conv, config, errors, true, meta) ;
 
   if (!res) {
     meta.errors.push(errors.join("; ") || `Unknown op ${op}/${arity}`);
@@ -454,7 +504,7 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
   return res;
 };
 
-const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArgs) => {
+const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArgs, meta) => {
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" or "some-in" for multiselect
   const isAllOrSomeInForMultiselect = (op == "all" || op == "some") && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
@@ -470,7 +520,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   }
 
   const opk = op + "/" + cardinality;
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator, fieldSources} = config.settings;
   let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
   if (!opKeys)
     return;
@@ -494,9 +544,17 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   let k = Object.keys(jlField)[0];
   let v = Object.values(jlField)[0];
   
-  let field, having, isGroup;
+  let field, fieldSrc, having, isGroup;
   if (conv.varKeys.includes(k) && typeof v == "string") {
     field = v;
+    fieldSrc = "field";
+  } else if (
+    Object.keys(conv.funcs).includes(k) &&
+    typeof v === "object" &&
+    Array.isArray(v)
+  ) {
+    fieldSrc = "func";
+    field = convertFuncFromLogic(k, v, field, conv, config, meta, parentField);
   }
   if (isGroup0) {
     isGroup = true;
@@ -518,9 +576,24 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
             field = v;
             having = filter;
             isGroup = true;
+          } else if (
+            Object.keys(conv.funcs).includes(k) &&
+            typeof v === "object" &&
+            Array.isArray(v)
+          ) {
+            field = v;
+            having = filter;
+            isGroup = true;
           }
         }
       } else if (conv.varKeys.includes(k) && typeof v == "string") {
+        field = v;
+        isGroup = true;
+      } else if (
+        Object.keys(conv.funcs).includes(k) &&
+        typeof v === "object" &&
+        Array.isArray(v)
+      ) {
         field = v;
         isGroup = true;
       }
@@ -535,7 +608,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
     field = [parentField, field].join(fieldSeparator);
   field = normalizeField(config, field);
 
-  const fieldConfig = getFieldConfig(config, field);
+  const fieldConfig = getFieldConfig(config, field, fieldSrc);
   if (!fieldConfig) {
     errors.push(`No config for field ${field}`);
     return;
@@ -554,7 +627,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   }
   
   return {
-    field, fieldConfig, opKey, args, having
+    field, fieldSrc, fieldConfig, opKey, args, having
   };
 };
 
@@ -576,7 +649,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   const parseRes = parseRule(op, arity, vals, parentField, conv, config, meta);
   if (!parseRes) return undefined;
-  let {field, fieldConfig, opKey, args, having} = parseRes;
+  let {field, fieldSrc, fieldConfig, opKey, args, having} = parseRes;
   let opConfig = config.operators[opKey];
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
@@ -615,7 +688,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     opConfig = config.operators[opKey];
   }
 
-  const widget = getWidgetForFieldOp(config, field, opKey);
+  const widget = getWidgetForFieldOp(config, field, opKey, null, fieldSrc);
 
   const convertedArgs = args
     .map(v => convertFromLogic(v, conv, config, "val", meta, false, fieldConfig, widget, parentField));
@@ -684,6 +757,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
       id: uuid(),
       properties: {
         field: field,
+        fieldSrc: fieldSrc,
         operator: opKey,
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),

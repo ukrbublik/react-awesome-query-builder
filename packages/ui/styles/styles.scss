@@ -503,7 +503,7 @@ $rule-group-actions-offset-left: 10px !default;
   margin-right: $drag-offset-right;
 }
 
-$rule_items: ".rule--field", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
+$rule_items: ".rule--field", ".rule--fieldsrc", ".group--field", ".rule--operator", ".rule--value", ".rule--operator-options", ".rule--widget", 
  ".widget--widget", ".widget--valuesrc", ".widget--sep", ".operator--options--sep",
  ".rule--before-widget", ".rule--after-widget";
  
@@ -519,6 +519,10 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
   margin-bottom: $seps-offset-bottom;
 }
 
+.rule--fieldsrc {
+  vertical-align: top;
+  margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to field
+}
 .operator--options {
   display: flex;
 }
@@ -530,7 +534,7 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
   flex-wrap: wrap;
 }
 
-.rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
+.rule--field, .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
   margin-left: $rule-parts-distance;
 }
 .widget--valuesrc {
@@ -683,7 +687,7 @@ $rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".
 $group_actions: (".group--drag-handler", ".group--actions") !default;
 $inactive_conjs: false !default;
 $active_conjs: false !default;
-$rule_actions: (".widget--valuesrc", ".rule--drag-handler", ".rule--header") !default;
+$rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", ".rule--header") !default;
 
 
 .qb-lite {

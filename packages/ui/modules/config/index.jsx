@@ -146,6 +146,7 @@ const types = {
 const settings = {
   ...CoreConfig.settings,
 
+  renderFieldSources: (props) => <VanillaValueSources {...props} />,
   renderField: (props) => <VanillaFieldSelect {...props} />,
   renderOperator: (props) => <VanillaFieldSelect {...props} />,
   renderFunc: (props) => <VanillaFieldSelect {...props} />,

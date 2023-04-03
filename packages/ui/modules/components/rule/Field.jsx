@@ -14,12 +14,14 @@ export default class Field extends PureComponent {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.any,
     parentField: PropTypes.string,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
     //actions
     setField: PropTypes.func.isRequired,
+    setFieldSrc: PropTypes.func,
   };
 
   constructor(props) {
@@ -31,7 +33,7 @@ export default class Field extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["selectedField", "config", "parentField"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "config", "parentField"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -39,7 +41,7 @@ export default class Field extends PureComponent {
     }
   }
 
-  getMeta({selectedField, config, parentField}) {
+  getMeta({selectedField, selectedFieldSrc, config, parentField}) {
     const selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;
@@ -125,7 +127,7 @@ export default class Field extends PureComponent {
   }
 
   render() {
-    const {config, customProps, setField, readonly, id, groupId} = this.props;
+    const {config, customProps, setField, setFieldSrc, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
       id,
@@ -134,6 +136,7 @@ export default class Field extends PureComponent {
       customProps, 
       readonly,
       setField,
+      setFieldSrc,
       ...this.meta
     };
     return renderField(renderProps);

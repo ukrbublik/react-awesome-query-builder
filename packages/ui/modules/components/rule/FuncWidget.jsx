@@ -14,7 +14,8 @@ export default class FuncWidget extends PureComponent {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
@@ -74,12 +75,12 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderFuncSelect = () => {
-    const {config, field, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
+    const {config, field, fieldSrc, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
     const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
-      config, field, operator, customProps, readonly, parentFuncs, 
+      config, field, fieldSrc, operator, customProps, readonly, parentFuncs, 
       isFuncArg, fieldDefinition,
       id, groupId,
     };
@@ -123,7 +124,7 @@ export default class FuncWidget extends PureComponent {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, operator, value, readonly, parentFuncs, id, groupId} = this.props;
+    const {config, field, fieldSrc, operator, value, readonly, parentFuncs, id, groupId} = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
@@ -134,6 +135,7 @@ export default class FuncWidget extends PureComponent {
       fieldFunc: funcKey,
       fieldArg: argKey,
       leftField: field,
+      fieldSrc,
       operator: null,
       value: argVal,
       valueSrc: argValSrc,

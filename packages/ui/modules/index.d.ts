@@ -134,6 +134,7 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
+  renderFieldSources?: Factory<ValueSourcesProps>,
   renderField?: Factory<FieldProps>,
   renderOperator?: Factory<FieldProps>,
   renderFunc?: Factory<FieldProps>,

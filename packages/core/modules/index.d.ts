@@ -66,6 +66,7 @@ interface BasicItemProperties {
 
 interface RuleProperties extends BasicItemProperties {
   field: string | Empty,
+  fieldSrc?: ValueSource,
   operator: string | Empty,
   value: Array<RuleValue>,
   valueSrc?: Array<ValueSource>,
@@ -267,6 +268,7 @@ export interface Actions {
   setLock(path: IdPath, lock: boolean): undefined;
   setConjunction(path: IdPath, conjunction: string): undefined;
   setField(path: IdPath, field: string): undefined;
+  setFieldSrc(path: IdPath, fieldSrc: ValueSource): undefined;
   setOperator(path: IdPath, operator: string): undefined;
   setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
   setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
@@ -300,6 +302,7 @@ export interface TreeActions {
   },
   rule: {
     setField(config: Config, path: IdPath, field: string): InputAction;
+    setFieldSrc(config: Config, path: IdPath, fieldSrc: ValueSource): InputAction;
     setOperator(config: Config, path: IdPath, operator: string): InputAction;
     setValue(config: Config, path: IdPath, delta: number, value: RuleValue, valueType: string): InputAction;
     setValueSrc(config: Config, path: IdPath, delta: number, valueSrc: ValueSource): InputAction;
@@ -318,6 +321,7 @@ interface BaseWidgetProps {
   setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
+  fieldSrc: string,
   parentField?: string,
   operator: string,
   fieldDefinition: Field,
@@ -362,6 +366,7 @@ type FieldItems = FieldItem[];
 
 export interface FieldProps {
   items: FieldItems,
+  selectedFieldSrc?: string,
   setField(fieldPath: string): void,
   selectedKey: string | Empty,
   selectedKeys?: Array<string> | Empty,
@@ -783,6 +788,7 @@ export interface LocaleSettings {
 
 
 export interface BehaviourSettings {
+  fieldSources?: Array<ValueSource>,
   valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField,
   canReorder?: boolean,
@@ -867,6 +873,7 @@ export interface Func {
   renderSeps?: Array<ReactElement | string>,
   spelFormatFunc?: SpelFormatFunc,
   allowSelfNesting?: boolean,
+  valueSources?: Array<ValueSource>,
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,

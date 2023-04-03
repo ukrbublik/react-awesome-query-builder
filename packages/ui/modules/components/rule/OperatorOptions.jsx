@@ -8,6 +8,7 @@ export default class OperatorOptions extends PureComponent {
     config: PropTypes.object.isRequired,
     operatorOptions: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
     selectedField: PropTypes.string.isRequired,
+    selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string.isRequired,
     readonly: PropTypes.bool,
     //actions
@@ -17,7 +18,7 @@ export default class OperatorOptions extends PureComponent {
   render() {
     if (!this.props.selectedOperator)
       return null;
-    const operatorDefinitions = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
+    const operatorDefinitions = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField, this.props.selectedFieldSrc);
     if (typeof operatorDefinitions.options === "undefined") {
       return null;
     }
@@ -26,6 +27,7 @@ export default class OperatorOptions extends PureComponent {
     const optionsProps = Object.assign({}, basicOptionsProps, {
       config: this.props.config,
       field: this.props.selectedField,
+      fieldSrc: this.props.selectedFieldSrc,
       operator: this.props.selectedOperator,
       options: this.props.operatorOptions,
       setOption: this.props.setOperatorOption,

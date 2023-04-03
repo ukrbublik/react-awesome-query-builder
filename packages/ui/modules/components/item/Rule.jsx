@@ -18,7 +18,8 @@ class Rule extends PureComponent {
   static propTypes = {
     id: PropTypes.string.isRequired,
     groupId: PropTypes.string,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.any,
     selectedOperator: PropTypes.string,
     operatorOptions: PropTypes.object,
     config: PropTypes.object.isRequired,
@@ -35,6 +36,7 @@ class Rule extends PureComponent {
     //actions
     handleDraggerMouseDown: PropTypes.func,
     setField: PropTypes.func,
+    setFieldSrc: PropTypes.func,
     setOperator: PropTypes.func,
     setOperatorOption: PropTypes.func,
     setLock: PropTypes.func,
@@ -55,7 +57,7 @@ class Rule extends PureComponent {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -63,14 +65,14 @@ class Rule extends PureComponent {
     }
   }
 
-  getMeta({selectedField, selectedOperator, config, reordableNodesCnt, isLocked}) {
-    const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
-    const selectedFieldConfig = getFieldConfig(config, selectedField);
+  getMeta({selectedField, selectedFieldSrc, selectedOperator, config, reordableNodesCnt, isLocked}) {
+    const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config, null, "fields", "subfields", selectedFieldSrc);
+    const selectedFieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
     const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
     const isFieldAndOpSelected = selectedField && selectedOperator && !isSelectedGroup;
-    const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField);
+    const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField, selectedFieldSrc);
     const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
-    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
+    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator, null, null, selectedFieldSrc) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
     const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
@@ -123,7 +125,9 @@ class Rule extends PureComponent {
       classname={"rule--field"}
       config={config}
       selectedField={this.props.selectedField}
+      selectedFieldSrc={this.props.selectedFieldSrc}
       setField={!immutableFieldsMode ? this.props.setField : dummyFn}
+      setFieldSrc={!immutableFieldsMode ? this.props.setFieldSrc : dummyFn}
       parentField={this.props.parentField}
       readonly={immutableFieldsMode || isLocked}
       id={this.props.id}
@@ -142,6 +146,7 @@ class Rule extends PureComponent {
       key="operator"
       config={config}
       selectedField={this.props.selectedField}
+      selectedFieldSrc={this.props.selectedFieldSrc}
       selectedOperator={this.props.selectedOperator}
       setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
       selectedFieldPartsLabels={selectedFieldPartsLabels}
@@ -163,6 +168,7 @@ class Rule extends PureComponent {
     const widget = <Widget
       key="values"
       field={this.props.selectedField}
+      fieldSrc={this.props.selectedFieldSrc}
       parentField={this.props.parentField}
       operator={this.props.selectedOperator}
       value={this.props.value}

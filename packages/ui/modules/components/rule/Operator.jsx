@@ -13,7 +13,8 @@ export default class Operator extends PureComponent {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
     readonly: PropTypes.bool,
     //actions
@@ -37,8 +38,8 @@ export default class Operator extends PureComponent {
     }
   }
 
-  getMeta({config, selectedField, selectedOperator}) {
-    const fieldConfig = getFieldConfig(config, selectedField);
+  getMeta({config, selectedField, selectedFieldSrc, selectedOperator}) {
+    const fieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
     const operators = fieldConfig?.operators;
     const operatorOptions 
       = mapValues(
@@ -46,7 +47,7 @@ export default class Operator extends PureComponent {
           config.operators, 
           (item, key) => operators?.indexOf(key) !== -1
         ), 
-        (_opts, op) => getOperatorConfig(config, op, selectedField)
+        (_opts, op) => getOperatorConfig(config, op, selectedField, selectedFieldSrc)
       );
       
     const items = this.buildOptions(config, operatorOptions, operators);

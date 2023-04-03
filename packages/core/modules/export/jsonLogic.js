@@ -26,12 +26,13 @@ export const jsonLogicFormat = (item, config) => {
   const {fieldSeparator} = config.settings;
   let data = {};
   for (let ff of usedFields) {
-    const def = getFieldConfig(config, ff) || {};
-    const parts = ff.split(fieldSeparator);
+    const fieldSrc = typeof ff === "string" ? "field" : "func";
+    const parts = fieldSrc === "func" ? [ff.get("func")] : ff.split(fieldSeparator);
+    const def = getFieldConfig(config, ff, fieldSrc) || {};
     let tmp = data;
     for (let i = 0 ; i < parts.length ; i++) {
       const p = parts[i];
-      const pdef = getFieldConfig(config, parts.slice(0, i+1)) || {};
+      const pdef = getFieldConfig(config, parts.slice(0, i + 1), fieldSrc) || {};
       if (i != parts.length - 1) {
         if (pdef.type == "!group" && pdef.mode != "struct") {
           if (!tmp[p])
@@ -165,6 +166,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
 const formatRule = (item, config, meta, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
 
   let operator = properties.get("operator");
   let operatorOptions = properties.get("operatorOptions");
@@ -175,10 +177,10 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (field == null || operator == null)
     return undefined;
 
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  let operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const fieldDefinition = getFieldConfig(config, field, fieldSrc) || {};
+  let operatorDefinition = getOperatorConfig(config, operator, field, fieldSrc) || {};
   let reversedOp = operatorDefinition.reversedOp;
-  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
+  let revOperatorDefinition = getOperatorConfig(config, reversedOp, field, fieldSrc) || {};
 
   // check op
   let isRev = false;
@@ -192,22 +194,25 @@ const formatRule = (item, config, meta, parentField = null) => {
     [operatorDefinition, revOperatorDefinition] = [revOperatorDefinition, operatorDefinition];
   }
 
-  const formattedValue = formatItemValue(config, properties, meta, operator, parentField);
+  const formattedValue = formatItemValue(config, properties, meta, operator, parentField, fieldSrc);
   if (formattedValue === undefined)
     return undefined;
 
-  const formattedField = formatField(meta, config, field, parentField);
+  const formattedField =
+    fieldSrc === "func"
+      ? formatFunc(meta, config, field, parentField)
+      : formatField(meta, config, field, parentField);
 
   return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
 };
 
 
-const formatItemValue = (config, properties, meta, operator, parentField) => {
+const formatItemValue = (config, properties, meta, operator, parentField, fieldSrc) => {
   const field = properties.get("field");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
-  const fieldDefinition = getFieldConfig(config, field) || {};
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const fieldDefinition = getFieldConfig(config, field, fieldSrc) || {};
+  const operatorDefinition = getOperatorConfig(config, operator, field, fieldSrc) || {};
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
@@ -221,8 +226,8 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
     const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
     const valueType = iValueType ? iValueType.get(ind) : null;
     const cValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+    const widget = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
+    const fieldWidgetDef = omit( getFieldWidgetConfig(config, field, operator, widget, valueSrc, fieldSrc), ["factory"] );
     const fv = formatValue(
       meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField, asyncListValues
     );
@@ -385,7 +390,8 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
 
 const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
-  const operatorDefinition = getOperatorConfig(config, operator, field) || {};
+  const fieldSrc = properties.get("fieldSrc");
+  const operatorDefinition = getOperatorConfig(config, operator, field, fieldSrc) || {};
   let fn = typeof operatorDefinition.jsonLogic == "function" 
     ? operatorDefinition.jsonLogic 
     : buildFnToFormatOp(operator, operatorDefinition, formattedField, formattedValue);

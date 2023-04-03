@@ -13,8 +13,10 @@ class RuleGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
     selectedField: PropTypes.string,
+    fieldSrc: PropTypes.any,
     parentField: PropTypes.string,
     setField: PropTypes.func,
+    setFieldSrc: PropTypes.func,
   };
 
   constructor(props) {
@@ -54,14 +56,17 @@ class RuleGroup extends BasicGroup {
   }
 
   renderField() {
-    const { config, selectedField, setField, parentField, id, groupId, isLocked } = this.props;
+    // todo: fieldSrc -> selectedFieldSrc
+    const { config, selectedField, fieldSrc, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
     const { immutableFieldsMode } = config.settings;
     return <FieldWrapper
       key="field"
       classname={"group--field"}
       config={config}
       selectedField={selectedField}
+      fieldSrc={fieldSrc}
       setField={setField}
+      setFieldSrc={setFieldSrc}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
       id={id}

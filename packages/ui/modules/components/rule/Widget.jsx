@@ -7,7 +7,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
 import {Col} from "../utils";
-const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig} = Utils.ConfigUtils;
 const {getValueSourcesForFieldOp, getWidgetsForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
 const { createListFromArray } = Utils.DefaultUtils;
 
@@ -19,7 +19,8 @@ export default class Widget extends PureComponent {
     value: PropTypes.any, //instanceOf(Immutable.List)
     valueSrc: PropTypes.any, //instanceOf(Immutable.List)
     valueError: PropTypes.any,
-    field: PropTypes.string,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
     operator: PropTypes.string,
     readonly: PropTypes.bool,
     asyncListValues: PropTypes.array,
@@ -32,9 +33,9 @@ export default class Widget extends PureComponent {
     isFuncArg: PropTypes.bool,
     fieldFunc: PropTypes.string,
     fieldArg: PropTypes.string,
-    leftField: PropTypes.string,
+    leftField: PropTypes.any,
     // for RuleGroupExt
-    isForRuleGruop: PropTypes.bool,
+    isForRuleGroup: PropTypes.bool,
     parentField: PropTypes.string,
     // for func in func
     parentFuncs: PropTypes.array,
@@ -52,7 +53,7 @@ export default class Widget extends PureComponent {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForMeta = [
-      "config", "field", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues"
+      "config", "field", "fieldSrc", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues"
     ];
     const needUpdateMeta = !this.meta 
           || keysForMeta
@@ -85,21 +86,26 @@ export default class Widget extends PureComponent {
   };
 
   getMeta({
-    config, field: simpleField, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values, 
-    isForRuleGruop, isCaseValue, isFuncArg, leftField, asyncListValues
+    config, field: simpleField, fieldSrc, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
+    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues
   }) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     let iValueSrcs = valueSrcs;
     let iValues = values;
-    if (isFuncArg || isForRuleGruop || isCaseValue) {
+    if (isFuncArg || isForRuleGroup || isCaseValue) {
       iValueSrcs = createListFromArray([valueSrcs]);
       iValues = createListFromArray([values]);
     }
 
-    const fieldDefinition = getFieldConfig(config, field);
-    const defaultWidget = getWidgetForFieldOp(config, field, operator);
-    const _widgets = getWidgetsForFieldOp(config, field, operator);
-    const operatorDefinition = isFuncArg ? funcArgDummyOpDef : getOperatorConfig(config, operator, field);
+    const fieldDefinition = isFuncArg
+      ? getFieldConfig(config, field)
+      : getFieldConfig(config, field, fieldSrc);
+    const defaultWidget = isFuncArg
+      ? getWidgetForFieldOp(config, field, operator)
+      : getWidgetForFieldOp(config, field, operator, null, fieldSrc);
+    const operatorDefinition = isFuncArg
+      ? funcArgDummyOpDef
+      : getOperatorConfig(config, operator, field, fieldSrc);
     if ((fieldDefinition == null || operatorDefinition == null) && !isCaseValue) {
       return null;
     }
@@ -111,19 +117,29 @@ export default class Widget extends PureComponent {
       return null;
     }
 
-    const valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition, isFuncArg ? leftField : null);
+    const valueSources = isFuncArg
+      ? getValueSourcesForFieldOp(config, field, operator, fieldDefinition, leftField)
+      : getValueSourcesForFieldOp(config, field, operator, fieldDefinition, null, fieldSrc);
 
     const widgets = range(0, cardinality).map(delta => {
       const valueSrc = iValueSrcs.get(delta) || null;
-      let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      let widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
+      let widget = isFuncArg
+        ? getWidgetForFieldOp(config, field, operator, valueSrc)
+        : getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
+      let widgetDefinition = isFuncArg
+        ? getFieldWidgetConfig(config, field, operator, widget, valueSrc)
+        : getFieldWidgetConfig(config, field, operator, widget, valueSrc, fieldSrc);
       if (isSpecialRangeForSrcField) {
         widget = widgetDefinition.singleWidget;
         widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
       }
       const widgetType = widgetDefinition?.type;
-      const valueLabel = getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange);
-      const widgetValueLabel = getValueLabel(config, field, operator, delta, null, isTrueSpecialRange);
+      const valueLabel = isFuncArg
+        ? getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange)
+        : getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange, fieldSrc);
+      const widgetValueLabel = isFuncArg
+        ? getValueLabel(config, field, operator, delta, null, isTrueSpecialRange)
+        : getValueLabel(config, field, operator, delta, null, isTrueSpecialRange, fieldSrc);
       const sepText = operatorDefinition?.textSeparators ? operatorDefinition?.textSeparators[delta] : null;
       const setValueSrcHandler = this._onChangeValueSrc.bind(this, delta);
 
@@ -172,7 +188,7 @@ export default class Widget extends PureComponent {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId} = props;
+    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId, fieldSrc} = props;
     const {settings} = config;
     const { widgets, iValues, aField } = meta;
     const value = isFuncArg ? iValues : values;
@@ -198,6 +214,7 @@ export default class Widget extends PureComponent {
           {...pick(widgets[delta], ["widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler"])}
           config={config}
           field={field}
+          fieldSrc={fieldSrc}
           parentField={parentField}
           parentFuncs={parentFuncs}
           operator={operator}

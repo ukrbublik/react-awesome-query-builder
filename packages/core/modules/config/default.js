@@ -9,6 +9,7 @@ export const settings = {
   },
 
 
+  fieldSources: ["field", "func"],
   valueSourcesInfo: {
     value: {},
   },

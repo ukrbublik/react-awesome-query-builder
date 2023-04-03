@@ -39,6 +39,9 @@ const settings = {
   renderField: (props) => props?.customProps?.showSearch 
     ? <MuiFieldAutocomplete {...props} /> 
     : <MuiFieldSelect {...props} />,
+  renderFieldSources: (props) => {
+    return <MuiValueSources {...props} />;
+  },
   renderOperator: (props) => <MuiFieldSelect {...props} />,
   renderFunc: (props) => <MuiFieldSelect {...props} />,
   renderConjs: (props) => <MuiConjs {...props} />,
