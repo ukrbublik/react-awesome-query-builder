@@ -73,9 +73,25 @@ const canUseUnsafe = () => {
 
 export const useOnPropsChanged = (obj) => {
   if (canUseUnsafe) {
-    obj.UNSAFE_componentWillReceiveProps = (nextProps) => {
-      obj.onPropsChanged(nextProps);
+    // 1. `shouldComponentUpdate` should be called after `componentWillReceiveProps`
+    // 2. `shouldComponentUpdate` should not be used for PureComponent
+    if (!obj.shouldComponentUpdate) {
+      obj.shouldComponentUpdate = pureShouldComponentUpdate(obj);
+    }
+    const origShouldComponentUpdate = obj.shouldComponentUpdate;
+    const newShouldComponentUpdate = function(nextProps, nextState) {
+      const shouldNotify = !shallowEqual(obj.props, nextProps);
+      if (shouldNotify) {
+        obj.onPropsChanged(nextProps);
+      }
+      const shouldUpdate = origShouldComponentUpdate.call(obj, nextProps, nextState);
+      return shouldUpdate;
     };
+    obj.shouldComponentUpdate = newShouldComponentUpdate.bind(obj);
+
+    // obj.UNSAFE_componentWillReceiveProps = (nextProps) => {
+    //   obj.onPropsChanged(nextProps);
+    // };
   } else {
     obj.componentWillReceiveProps = (nextProps) => {
       obj.onPropsChanged(nextProps);
