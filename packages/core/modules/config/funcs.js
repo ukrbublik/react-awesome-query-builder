@@ -112,7 +112,7 @@ const LOWER = {
   returnType: "text",
   args: {
     str: {
-      label: "ARGUMENT",
+      label: "String",
       type: "text",
       valueSources: ["value", "field", "func"],
     },
@@ -133,7 +133,7 @@ const UPPER = {
   returnType: "text",
   args: {
     str: {
-      label: "ARGUMENT",
+      label: "String",
       type: "text",
       valueSources: ["value", "field", "func"],
     },

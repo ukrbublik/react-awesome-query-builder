@@ -52,7 +52,7 @@ export default class FieldWrapper extends PureComponent {
         {field}
       </div>
     );
-  }
+  };
 
   renderFieldSources = () => {
     const { config, readonly, selectedFieldSrc, setFieldSrc, id } = this.props;
