@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { useOnPropsChanged } = Utils.ReactUtils;
+const { useOnPropsChanged, pureShouldComponentUpdate } = Utils.ReactUtils;
 const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends Component {
@@ -53,11 +53,15 @@ export default class SliderWidget extends Component {
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
-  UNSAFE_componentWillUpdate(nextProps, nextState) {
-    // RHL fix
-    if (this.props.cacheBusterProp && __isInternal) {
-      nextState.internalValue = this.state.internalValue;
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const should = pureShouldComponentUpdate(this)(nextProps, nextState);
+    if (should) {
+      // RHL fix
+      if (this.props.cacheBusterProp && __isInternal) {
+        nextState.internalValue = this.state.internalValue;
+      }
     }
+    return should;
   }
 
   render() {
