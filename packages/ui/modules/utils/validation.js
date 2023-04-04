@@ -7,7 +7,7 @@ export const createValidationMemo = () => {
   let validatedTree;
   let configId;
 
-  return (config, tree, oldConfig) => {
+  return (config, tree, oldConfig = undefined, sanitizeTree = true) => {
     if (!tree) {
       return null;
     }
@@ -16,7 +16,11 @@ export const createValidationMemo = () => {
     } else {
       configId = config.__configId;
       originalTree = tree;
-      validatedTree = validateAndFixTree(tree, null, config, oldConfig || config);
+      if (sanitizeTree === false) {
+        validatedTree = validateAndFixTree(tree, null, config, oldConfig || config, false, false);
+      } else {
+        validatedTree = validateAndFixTree(tree, null, config, oldConfig || config);
+      }
       return validatedTree;
     }
   };
