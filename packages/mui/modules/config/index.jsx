@@ -36,7 +36,7 @@ const {
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => props?.customProps?.showSearch 
+  renderField: (props) => props?.customProps?.showSearch && false
     ? <MuiFieldAutocomplete {...props} /> 
     : <MuiFieldSelect {...props} />,
   renderOperator: (props) => <MuiFieldSelect {...props} />,

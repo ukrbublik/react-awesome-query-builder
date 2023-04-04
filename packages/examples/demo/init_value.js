@@ -33,16 +33,16 @@ export default
     "98a8a9ba-0123-4456-b89a-b16e721c8cd0": {
       "type": "rule",
       "properties": {
-        "field": "stock",
+        "field": "user.login",
         "operator": "equal",
         "value": [
-          false
+          null
         ],
         "valueSrc": [
-          "value"
+          "field"
         ],
         "valueType": [
-          "boolean"
+          null
         ],
         "valueError": [
           null
