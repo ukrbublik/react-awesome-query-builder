@@ -66,7 +66,7 @@ export const pureShouldComponentUpdate = (self) => function(nextProps, nextState
   );
 };
 
-const canUseUnsafe = () => {
+const canUseOldComponentWillReceiveProps = () => {
   const v = React.version.split(".").map(parseInt.bind(null, 10));
   return v[0] == 16 && v[1] < 3 || v[0] < 16;
 };
@@ -75,17 +75,18 @@ export const useOnPropsChanged = (obj) => {
   // 1. `shouldComponentUpdate` should be called after `componentWillReceiveProps`
   // 2. `shouldComponentUpdate` should not be used for PureComponent
 
-  if (canUseUnsafe) {
+  // Because `useOnPropsChanged` can only be applied to `Component` not `PureComponent`, make it pure now
+  if (!obj.shouldComponentUpdate) {
+    obj.shouldComponentUpdate = pureShouldComponentUpdate(obj);
+  }
+
+  if (canUseOldComponentWillReceiveProps()) {
+    // Use old method
     obj.componentWillReceiveProps = (nextProps) => {
       obj.onPropsChanged(nextProps);
     };
-    if (!obj.shouldComponentUpdate) {
-      obj.shouldComponentUpdate = pureShouldComponentUpdate(obj);
-    }
   } else {
-    if (!obj.shouldComponentUpdate) {
-      obj.shouldComponentUpdate = pureShouldComponentUpdate(obj);
-    }
+    // Simulate `componentWillReceiveProps` with `shouldComponentUpdate`
     const origShouldComponentUpdate = obj.shouldComponentUpdate;
     const newShouldComponentUpdate = function(nextProps, nextState) {
       const shouldNotify = !shallowEqual(obj.props, nextProps);

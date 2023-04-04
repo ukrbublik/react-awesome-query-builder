@@ -20,6 +20,20 @@ describe("library", () => {
 
 describe("basic query", () => {
 
+  describe("strict mode", () => {
+    it("should not produce warnings", async () => {
+      await with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper, _onChange, _tasks, consoleData) => {
+        expect(qb.find(".query-builder")).to.have.length(1);
+        const consoleErrors = consoleData.error.join("\n");
+        const consoleWarns = consoleData.warn.join("\n");
+        expect(consoleErrors).to.not.contain("componentWillReceiveProps");
+        expect(consoleWarns).to.not.contain("componentWillReceiveProps");
+      }, {
+        strict: true
+      });
+    });
+  });
+
   describe("import", () => {
     it("should work with empty value", async () => {
       await with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper) => {
