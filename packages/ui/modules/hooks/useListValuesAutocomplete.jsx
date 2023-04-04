@@ -29,7 +29,7 @@ const useListValuesAutocomplete = ({
 
   // ref
   const asyncFectchCnt = React.useRef(0);
-  const componentIsMounted = React.useRef(true);
+  const componentIsMounted = React.useRef(0);
   const isSelectedLoadMore = React.useRef(false);
 
   // compute
@@ -112,20 +112,18 @@ const useListValuesAutocomplete = ({
   };
   const loadListValuesDebounced = React.useCallback(debounce(loadListValues, debounceTimeout), []);
 
-  // Unmount
   React.useEffect(() => {
-    return () => {
-      componentIsMounted.current = false;
-    };
-  }, []);
-
-  // Initial loading
-  React.useEffect(() => {
+    componentIsMounted.current++;
+    // Initial loading
     if (canInitialLoad && loadingCnt == 0 && asyncFectchCnt.current == 0) {
       (async () => {
         await loadListValues();
       })();
     }
+    // Unmount
+    return () => {
+      componentIsMounted.current--;
+    };
   }, [canInitialLoad]);
 
   // Event handlers

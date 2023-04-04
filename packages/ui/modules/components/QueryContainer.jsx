@@ -40,7 +40,7 @@ export default class QueryContainer extends Component {
     const tree = props.value;
     const validatedTree = this.getMemoizedTree(config, tree);
 
-    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree);
+    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree);
     const store = createStore(reducer);
 
     this.config = config;
@@ -48,6 +48,13 @@ export default class QueryContainer extends Component {
       store
     };
   }
+
+  setLastTree = (lastTree) => {
+    if (this.prevTree) {
+      this.prevprevTree = this.prevTree;
+    }
+    this.prevTree = lastTree;
+  };
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
     value: (nextValue, prevValue, state) => { return false; }
@@ -63,18 +70,20 @@ export default class QueryContainer extends Component {
     const storeValue = this.state.store.getState().tree;
     const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
     const currentTree = isTreeChanged ? nextProps.value || defaultRoot(nextProps) : storeValue;
+    const isTreeTrulyChanged = isTreeChanged && !immutableEqual(nextProps.value, this.prevTree) && !immutableEqual(nextProps.value, this.prevprevTree);
+    const sanitizeTree = isTreeTrulyChanged || isConfigChanged;
 
     if (isConfigChanged) {
       this.config = nextConfig;
     }
     
     if (isTreeChanged || isConfigChanged) {
-      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig);
-      return Promise.resolve().then(() => {
-        this.state.store.dispatch(
-          actions.tree.setTree(nextConfig, validatedTree)
-        );
-      });
+      const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig, sanitizeTree);
+      //return Promise.resolve().then(() => {
+      this.state.store.dispatch(
+        actions.tree.setTree(nextConfig, validatedTree)
+      );
+      //});
     }
   }
 
