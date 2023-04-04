@@ -34,6 +34,7 @@ export default class SliderWidget extends Component {
 
   constructor(props) {
     super(props);
+    this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
     useOnPropsChanged(this);
 
     this.state.internalValue = props.value;
@@ -54,7 +55,7 @@ export default class SliderWidget extends Component {
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    const should = pureShouldComponentUpdate(this)(nextProps, nextState);
+    const should = this.pureShouldComponentUpdate(nextProps, nextState);
     if (should) {
       // RHL fix
       if (this.props.cacheBusterProp && __isInternal) {
