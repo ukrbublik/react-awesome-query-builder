@@ -1,11 +1,11 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Tooltip, TreeSelect } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import PropTypes from "prop-types";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 
-
-export default class FieldTreeSelect extends PureComponent {
+export default class FieldTreeSelect extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
@@ -29,8 +29,8 @@ export default class FieldTreeSelect extends PureComponent {
     this.onPropsChanged(props);  
   }
 
-  onPropsChanged(props) {
-    const { items, config: {settings: {fieldSeparator}}} = props;
+  onPropsChanged(nextProps) {
+    const { items, config: {settings: {fieldSeparator}}} = nextProps;
 
     let optionsMaxWidth = 0;
     const initialOffset = 24; // arrow + checkbox for leftmost item

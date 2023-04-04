@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import range from "lodash/range";
@@ -13,7 +13,7 @@ const { createListFromArray } = Utils.DefaultUtils;
 
 const funcArgDummyOpDef = {cardinality: 1};
 
-export default class Widget extends PureComponent {
+export default class Widget extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     value: PropTypes.any, //instanceOf(Immutable.List)

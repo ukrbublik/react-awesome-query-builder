@@ -13,7 +13,8 @@ import {
   TypedValueSourceMap,
   ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
-  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps
+  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps,
+  Utils as CoreUtils
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -210,6 +211,17 @@ interface VanillaWidgets {
   FuncWidget: ElementType<WidgetProps>,
 }
 
+/////////////////
+// extend Utils
+/////////////////
+
+export interface Utils extends CoreUtils {
+  // ReactUtils: {
+  //   useOnPropsChanged(obj: ReactElement): void;
+  // },
+}
+
+export declare const Utils: Utils;
 
 /////////////////
 

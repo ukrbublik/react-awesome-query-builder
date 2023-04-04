@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import keys from "lodash/keys";
@@ -8,7 +8,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 const {getFieldConfig, getOperatorConfig} = Utils.ConfigUtils;
 
 
-export default class Operator extends PureComponent {
+export default class Operator extends Component {
   static propTypes = {
     id: PropTypes.string,
     groupId: PropTypes.string,

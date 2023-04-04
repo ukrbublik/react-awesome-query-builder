@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import Slider from "@mui/material/Slider";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
@@ -7,9 +7,9 @@ export default (props) => {
   const {config, placeholder, customProps, value, setValue, min, max, step, marks, readonly} = props;
   const {defaultSliderWidth} = config.settings;
 
-  const handleSliderChange = (_e, newValue) => {
+  const handleSliderChange = useCallback((_e, newValue) => {
     setValue(newValue);
-  };
+  }, []);
 
   const handleInputChange = (e) => {
     let val = e.target.value;
@@ -40,10 +40,10 @@ export default (props) => {
   const sliderValue = typeof value === "number" ? value : null;
 
   // marks example: { 0: "0%", 100: React.createElement('strong', null, "100%") }
-  const muiMarks = marks ? Object.keys(marks).map(v => ({
+  const muiMarks = useMemo(() => marks ? Object.keys(marks).map(v => ({
     value: Number(v),
     label: typeof marks[v] === "object" || typeof marks[v] === "undefined" ? marks[v] : <p>{marks[v]}</p>
-  })) : false;
+  })) : false, [marks]);
 
   const InputCmp = (
     <TextField 

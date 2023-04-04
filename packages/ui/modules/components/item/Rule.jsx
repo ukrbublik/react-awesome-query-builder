@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import RuleContainer from "../containers/RuleContainer";
@@ -14,7 +14,7 @@ const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUt
 const {getFieldPathLabels} = Utils.RuleUtils;
 
 
-class Rule extends PureComponent {
+class Rule extends Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     groupId: PropTypes.string,

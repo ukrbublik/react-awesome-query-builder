@@ -1,14 +1,14 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import { Select } from "antd";
 import omit from "lodash/omit";
 import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 
-export default class SelectWidget extends PureComponent {
+export default class SelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
@@ -27,8 +27,8 @@ export default class SelectWidget extends PureComponent {
     this.onPropsChanged(props);
   }
 
-  onPropsChanged (props) {
-    const {listValues} = props;
+  onPropsChanged(nextProps) {
+    const {listValues} = nextProps;
 
     let optionsMaxWidth = 0;
     mapListValues(listValues, ({title, value}) => {
