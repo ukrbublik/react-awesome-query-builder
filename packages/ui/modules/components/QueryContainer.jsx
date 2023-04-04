@@ -79,11 +79,11 @@ export default class QueryContainer extends Component {
     
     if (isTreeChanged || isConfigChanged) {
       const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig, sanitizeTree);
-      return Promise.resolve().then(() => {
+      //return Promise.resolve().then(() => {
         this.state.store.dispatch(
           actions.tree.setTree(nextConfig, validatedTree)
         );
-      });
+      //});
     }
   }
 
