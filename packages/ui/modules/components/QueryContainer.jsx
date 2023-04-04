@@ -54,7 +54,7 @@ export default class QueryContainer extends Component {
       this.prevprevTree = this.prevTree;
     }
     this.prevTree = lastTree;
-  }
+  };
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
     value: (nextValue, prevValue, state) => { return false; }
@@ -80,9 +80,9 @@ export default class QueryContainer extends Component {
     if (isTreeChanged || isConfigChanged) {
       const validatedTree = this.getMemoizedTree(nextConfig, currentTree, oldConfig, sanitizeTree);
       //return Promise.resolve().then(() => {
-        this.state.store.dispatch(
-          actions.tree.setTree(nextConfig, validatedTree)
-        );
+      this.state.store.dispatch(
+        actions.tree.setTree(nextConfig, validatedTree)
+      );
       //});
     }
   }

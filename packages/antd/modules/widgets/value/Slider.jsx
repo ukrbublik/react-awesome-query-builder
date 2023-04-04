@@ -63,7 +63,7 @@ export default class SliderWidget extends Component {
       }
     }
     return should;
-  }
+  };
 
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
