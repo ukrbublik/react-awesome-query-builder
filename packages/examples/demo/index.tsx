@@ -11,7 +11,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 import ImportSkinStyles from "../skins";
 import throttle from "lodash/throttle";
-import loadConfig from "./configold";
+import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 import Immutable from "immutable";
@@ -28,8 +28,8 @@ const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
-initTree = checkTree(loadTree(initValue), loadedConfig);
-//initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+//initTree = checkTree(loadTree(initValue), loadedConfig);
+initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
 
 
 // Trick to hot-load new config when you edit `config.tsx`
@@ -166,8 +166,8 @@ const DemoQueryBuilder: React.FC = () => {
   }, []);
   
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
-    // if (actionMeta)
-    //   console.info(actionMeta);
+    if (actionMeta)
+      console.info(actionMeta);
     memo.current.immutableTree = immutableTree;
     memo.current.config = config;
     updateResult();

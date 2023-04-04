@@ -2,7 +2,7 @@
 import React, {Component} from "react";
 import ReactDOM from "react-dom";
 import * as ReactDOMClient from 'react-dom/client';
-const Demo = React.lazy(() => import("./demo/indexold"));
+const Demo = React.lazy(() => import("./demo"));
 const DemoSwitch = React.lazy(() => import("./demo_switch"));
 import {
   HashRouter,

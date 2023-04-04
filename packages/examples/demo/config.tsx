@@ -57,7 +57,7 @@ export default (skin: string) => {
     { title: "I", value: "i" },
     { title: "J", value: "j" },
   ];
-  const simulatedAsyncFetch = simulateAsyncFetch(demoListValues, 3, 5000);
+  const simulatedAsyncFetch = simulateAsyncFetch(demoListValues, 3);
 
   const conjunctions: Conjunctions = {
     ...InitialConfig.conjunctions,
@@ -402,14 +402,14 @@ export default (skin: string) => {
       valueSources: ["value", "field"],
       fieldSettings: {
         min: 0,
-        max: 10000,
+        max: 100,
         step: 1,
         marks: {
           0: <strong>0%</strong>,
-          10000: <strong>100%</strong>
+          100: <strong>100%</strong>
         },
         validateValue: (val, fieldSettings) => {
-          return (val > 0 ? null : "Invalid slider value, see validateValue()");
+          return (val < 50 ? null : "Invalid slider value, see validateValue()");
         },
       },
       //overrides
