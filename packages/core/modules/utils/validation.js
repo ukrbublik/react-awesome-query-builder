@@ -25,8 +25,8 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
-export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
-  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig);
+export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
   tree = fixPathsInTree(tree);
   return tree;
 };

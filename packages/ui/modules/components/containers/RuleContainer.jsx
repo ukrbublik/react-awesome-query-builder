@@ -35,6 +35,7 @@ const createRuleContainer = (Rule) =>
 
     constructor(props) {
       super(props);
+      this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
       
       this.dummyFn.isDummyFn = true;
     }
@@ -73,7 +74,7 @@ const createRuleContainer = (Rule) =>
       let prevProps = this.props;
       let prevState = this.state;
 
-      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
           const draggingId = (nextProps.dragging.id || prevProps.dragging.id);

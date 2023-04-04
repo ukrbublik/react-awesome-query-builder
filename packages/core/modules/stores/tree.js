@@ -706,7 +706,7 @@ const getActionMeta = (action, state) => {
  * @param {Immutable.Map} state
  * @param {object} action
  */
-export default (config, tree, getMemoizedTree) => {
+export default (config, tree, getMemoizedTree, setLastTree) => {
   const emptyTree = defaultRoot(config);
   const initTree = tree || emptyTree;
   const emptyState = {
@@ -826,6 +826,10 @@ export default (config, tree, getMemoizedTree) => {
 
     if (actionMeta) {
       set.__lastAction = actionMeta;
+    }
+
+    if (setLastTree && set.tree && state.tree) {
+      setLastTree(state.tree);
     }
     
     return {...state, ...unset, ...set};

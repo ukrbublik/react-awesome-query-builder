@@ -22,6 +22,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
     constructor(props) {
       super(props);
+      this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
       useOnPropsChanged(this);
 
       this.onPropsChanged(props);
@@ -35,7 +36,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       let prevProps = this.props;
       let prevState = this.state;
 
-      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
           let chs = [];
