@@ -102,9 +102,9 @@
     "pnpm": ">=7"
   },
   "resolutions": {
-    "@types/react": "^17"
+    "@types/react": "^18"
   },
   "overrides": {
-    "@types/react": "^17"
+    "@types/react": "^18"
   }
 }
