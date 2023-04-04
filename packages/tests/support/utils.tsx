@@ -25,11 +25,15 @@ import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 
 
+type ConsoleData = {
+  error: string[],
+  warn: string[],
+};
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | [ConfigFn];
-type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks) => Promise<void> | void;
+type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, consoleData: ConsoleData) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
@@ -47,6 +51,7 @@ interface Tasks {
 }
 interface DoOptions {
   attach?: boolean;
+  strict?: boolean;
 }
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
@@ -138,19 +143,57 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
     mountOptions.attachTo = qbWrapper;
   }
 
+  const query = () => {
+    let cmp = (
+      <Query
+        {...config}
+        value={tree as ImmutableTree}
+        renderBuilder={render_builder}
+        onChange={onChange}
+      />
+    );
+    if (options?.strict) {
+      cmp = (
+        <React.StrictMode>
+          {cmp}
+        </React.StrictMode>
+      );
+    }
+    return cmp;
+  };
+
+  // mock console
+  const origConsole = console;
+  const consoleData: ConsoleData = {
+    error: [],
+    warn: [],
+  };
+  const mockedConsole = {
+    ...console,
+    error: (...args: any[]) => {
+      consoleData.error.push(args.filter(a => typeof a === "string").join("\n"));
+      origConsole.error.apply(null, args);
+    },
+    warn: (...args: any[]) => {
+      consoleData.warn.push(args.filter(a => typeof a === "string").join("\n"));
+      origConsole.warn.apply(null, args);
+    },
+  };
+  // eslint-disable-next-line no-global-assign
+  console = mockedConsole;
+
   //await act(async () => {
   const qb = mount(
-    <Query
-      {...config}
-      value={tree as ImmutableTree}
-      renderBuilder={render_builder}
-      onChange={onChange}
-    />, 
+    query(), 
     mountOptions
   ) as ReactWrapper;
-  
+
+  // restore console
+  // eslint-disable-next-line no-global-assign
+  console = origConsole;
+
   // @ts-ignore
-  await checks(qb, onChange, tasks);
+  await checks(qb, onChange, tasks, consoleData);
   //});
 
   if (options?.attach) {

@@ -12,15 +12,15 @@ jobs:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: 8
       - uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
           # no cache
       - name: Clean
         run: rm -f ./pnpm-lock.yaml && pnpm clean
       - name: Install packages
-        run: rm -f ./pnpm-lock.yaml && pnpm i
+        run: pnpm i
       - name: Setup
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       - name: Lint

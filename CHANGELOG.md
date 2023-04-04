@@ -8,6 +8,8 @@
   - Export utils (like `mongoFormatOp1`, `mongoFormatOp2`) in `CoreConfig.ctx.utils` (PR #866) (issue #890)
 - 6.1.3
   - Fix isNull roundtrip (PR #887) (issue #886)
+  - Fix `BootstrapFieldSelect` for fields with 2+ level nesting (PR #898) (issue #868)
+  - Fix `UNSAFE_componentWillReceiveProps` (PR #901) (issue #390)
 - 6.1.2
   - Fix typings for `children1`: tuple -> array (PR #885) (issue #881)
   - Fix compare fields for case when type != widget.type (PR #875) (issue #758)

@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import startsWith from "lodash/startsWith";
 import GroupContainer from "../containers/GroupContainer";
@@ -11,7 +11,7 @@ import {WithConfirmFn, DragIcon, dummyFn} from "../utils";
 const defaultPosition = "topRight";
 
 
-export class BasicGroup extends PureComponent {
+export class BasicGroup extends Component {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     reordableNodesCnt: PropTypes.number,
