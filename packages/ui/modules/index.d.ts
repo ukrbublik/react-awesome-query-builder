@@ -14,7 +14,12 @@ import {
   ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
   TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps,
-  Utils as CoreUtils
+  Utils as CoreUtils,
+
+  BaseWidget,
+  BaseWidgetProps,
+  RangeWidgetProps,
+  FieldSettings,
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -172,7 +177,7 @@ export interface Settings extends CoreSettings, RenderSettings {
 // Config
 /////////////////
 
-export interface BasicConfig extends CoreConfig {
+export interface BasicConfig extends CoreConfig<BasicConfig> {
   settings: Settings,
 }
 
@@ -222,6 +227,17 @@ export interface Utils extends CoreUtils {
 }
 
 export declare const Utils: Utils;
+
+/////////////////
+// extend types with BasicConfig
+/////////////////
+
+export type BaseWidgetProps<C = BasicConfig> = BaseWidgetProps<C>;
+export type RangeWidgetProps<C = BasicConfig> = RangeWidgetProps<C>;
+export type TextWidgetProps<C = BasicConfig> = TextWidgetProps<C>;
+export type WidgetProps<C = BasicConfig> = WidgetProps<C>;
+export type BaseWidget<C = BasicConfig> = BaseWidget<C>;
+export type Widgets<C = BasicConfig> = Widgets<C>;
 
 /////////////////
 
