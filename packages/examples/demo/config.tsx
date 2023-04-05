@@ -3,14 +3,17 @@ import merge from "lodash/merge";
 import {
   BasicFuncs, Utils,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
+  Operators, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
   //DateTimeFieldSettings,
 } from "@react-awesome-query-builder/core";
 import {
   BasicConfig,
   // types:
   Settings,
-  DateTimeFieldSettings
+  DateTimeFieldSettings,
+  TextWidgetProps,
+  WidgetProps,
+  Widgets
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
@@ -38,6 +41,7 @@ const skinToConfig: Record<string, Config> = {
   bootstrap: BootstrapConfig,
   fluent: FluentUIConfig
 };
+
 
 export default (skin: string) => {
   const InitialConfig = skinToConfig[skin] as BasicConfig;
@@ -109,7 +113,20 @@ export default (skin: string) => {
     ...InitialConfig.widgets,
     // examples of  overriding
     text: {
-      ...InitialConfig.widgets.text
+      ...InitialConfig.widgets.text,
+      factory: (props) => {
+        const sss = props.config.settings.renderSize;
+        const ppp: TextWidgetProps = {
+         value: '',
+         setValue: (v => {}),
+          field: '',
+          operator: '',
+          config: props.config as BasicConfig,
+          placeholder: '',
+          fieldDefinition: fields.user,
+        };
+        return null;
+      }
     },
     textarea: {
       ...InitialConfig.widgets.textarea,
