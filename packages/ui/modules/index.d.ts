@@ -2,7 +2,7 @@
 
 import {ElementType, ReactElement, Factory} from "react";
 import {
-  Config, Conjunctions, Operators, Widgets, Types, Fields, Funcs, Settings as CoreSettings, CoreConfig,
+  Config as CoreConfigType, Conjunctions, Operators, Widgets, Types, Fields, Funcs, Settings as CoreSettings, CoreConfig,
   InputAction,
   ImmutableTree,
   Actions,
@@ -14,7 +14,10 @@ import {
   ConjsProps, FieldProps,
   WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
   TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps,
-  Utils as CoreUtils
+  Utils as CoreUtils,
+
+  Widget,
+  TextWidget,
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -224,8 +227,28 @@ export interface Utils extends CoreUtils {
 export declare const Utils: Utils;
 
 /////////////////
+// extend config
+/////////////////
+
+export type Widgets<C = NewConfig> = TypedMap<Widget<C>>;
+export type TextWidget<C = NewConfig> = TextWidget<C>;
+export type TextWidgetProps<C = NewConfig> = TextWidgetProps<C>;
+
+export interface NewConfig extends CoreConfigType {
+  conjunctions: Conjunctions,
+  operators: Operators,
+  widgets: Widgets,
+  types: Types,
+  settings: Settings,
+  fields: Fields,
+  funcs?: Funcs,
+  settings: Settings,
+}
+
+//////////////////
 
 export declare const Query: Query;
 export declare const Builder: Builder;
 export declare const BasicConfig: BasicConfig;
 export declare const VanillaWidgets: VanillaWidgets;
+

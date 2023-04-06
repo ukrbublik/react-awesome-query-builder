@@ -313,7 +313,7 @@ export interface TreeActions {
 // @ui
 /////////////////
 
-interface BaseWidgetProps {
+interface BaseWidgetProps<C = Config> {
   value: RuleValue,
   setValue(val: RuleValue, asyncListValues?: Array<any>): void,
   placeholder: string,
@@ -321,27 +321,27 @@ interface BaseWidgetProps {
   parentField?: string,
   operator: string,
   fieldDefinition: Field,
-  config: Config,
+  config: C,
   delta?: number,
   customProps?: AnyObject,
   readonly?: boolean,
   id?: string, // id of rule
   groupId?: string, // id of parent group
 }
-interface RangeWidgetProps extends BaseWidgetProps {
+interface RangeWidgetProps<C = Config> extends BaseWidgetProps<C> {
   placeholders: Array<string>,
   textSeparators: Array<string>,
 }
-export type WidgetProps = (BaseWidgetProps | RangeWidgetProps) & FieldSettings;
+export type WidgetProps<C = Config> = (BaseWidgetProps<C> | RangeWidgetProps<C>) & FieldSettings;
 
-export type TextWidgetProps = BaseWidgetProps & TextFieldSettings;
-export type DateTimeWidgetProps = BaseWidgetProps & DateTimeFieldSettings;
-export type BooleanWidgetProps = BaseWidgetProps & BooleanFieldSettings;
-export type NumberWidgetProps = BaseWidgetProps & NumberFieldSettings;
-export type SelectWidgetProps = BaseWidgetProps & SelectFieldSettings;
-export type TreeSelectWidgetProps = BaseWidgetProps & TreeSelectFieldSettings;
-export type RangeSliderWidgetProps = RangeWidgetProps & NumberFieldSettings;
-export type CaseValueWidgetProps = BaseWidgetProps & CaseValueFieldSettings;
+export type TextWidgetProps<C = Config> = BaseWidgetProps<C> & TextFieldSettings;
+export type DateTimeWidgetProps<C = Config> = BaseWidgetProps<C> & DateTimeFieldSettings;
+export type BooleanWidgetProps<C = Config> = BaseWidgetProps<C> & BooleanFieldSettings;
+export type NumberWidgetProps<C = Config> = BaseWidgetProps<C> & NumberFieldSettings;
+export type SelectWidgetProps<C = Config> = BaseWidgetProps<C> & SelectFieldSettings;
+export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C> & TreeSelectFieldSettings;
+export type RangeSliderWidgetProps<C = Config> = RangeWidgetProps<C> & NumberFieldSettings;
+export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
 
 /////////////////
 // FieldProps
@@ -393,7 +393,7 @@ type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings, op: s
 type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 
-export interface BaseWidget {
+export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   type: string;
   jsType?: string;
   valueSrc?: ValueSource;
@@ -411,10 +411,10 @@ export interface BaseWidget {
   //obsolete:
   validateValue?: ValidateValue;
   //@ui
-  factory: Factory<WidgetProps>;
+  factory: Factory<WP>;
   customProps?: AnyObject;
 }
-export interface RangeableWidget extends BaseWidget {
+export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
   singleWidget?: string,
   valueLabels?: Array<string | {label: string, placeholder: string}>,
 }
@@ -431,16 +431,26 @@ export interface FieldWidget {
   customProps?: AnyObject,
 }
 
-export type TextWidget = BaseWidget & TextFieldSettings;
-export type DateTimeWidget = RangeableWidget & DateTimeFieldSettings;
-export type BooleanWidget = BaseWidget & BooleanFieldSettings;
-export type NumberWidget = RangeableWidget & NumberFieldSettings;
-export type SelectWidget = BaseWidget & SelectFieldSettings;
-export type TreeSelectWidget = BaseWidget & TreeSelectFieldSettings;
-export type CaseValueWidget = BaseWidget & CaseValueFieldSettings;
+export type TextWidget<C = Config, WP = TextWidgetProps<C>> = BaseWidget<C, WP> & TextFieldSettings;
+export type DateTimeWidget<C = Config, WP = DateTimeWidgetProps<C>> = RangeableWidget<C, WP> & DateTimeFieldSettings;
+export type BooleanWidget<C = Config, WP = BooleanWidgetProps<C>> = BaseWidget<C, WP> & BooleanFieldSettings;
+export type NumberWidget<C = Config, WP = NumberWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
+export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, WP> & SelectFieldSettings;
+export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
+export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
-export type Widget = FieldWidget |  TextWidget | DateTimeWidget | BooleanWidget | NumberWidget | SelectWidget | TreeSelectWidget  | RangeableWidget | BaseWidget;
-export type Widgets = TypedMap<Widget>;
+export type Widget<C = Config> = 
+  FieldWidget
+  | TextWidget<C, WidgetProps<C>>
+  | DateTimeWidget<C, WidgetProps<C>>
+  | BooleanWidget<C, WidgetProps<C>>
+  | NumberWidget<C, WidgetProps<C>>
+  | SelectWidget<C, WidgetProps<C>>
+  | TreeSelectWidget<C, WidgetProps<C>>
+  | CaseValueWidget<C, WidgetProps<C>>
+  | RangeableWidget<C, WidgetProps<C>>
+  | BaseWidget<C, WidgetProps<C>>;
+export type Widgets<C = Config> = TypedMap<Widget<C>>;
 
 
 /////////////////
