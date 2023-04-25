@@ -343,6 +343,7 @@ export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C> & TreeSelectF
 export type RangeSliderWidgetProps<C = Config> = RangeWidgetProps<C> & NumberFieldSettings;
 export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
 
+
 /////////////////
 // FieldProps
 // @ui
@@ -393,8 +394,8 @@ type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings, op: s
 type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 
-export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
-  type: string;
+export interface BaseWidget<C = Config, WP = WidgetProps<C>, T = string> {
+  type: T;
   jsType?: string;
   valueSrc?: ValueSource;
   valuePlaceholder?: string;
@@ -414,11 +415,11 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   factory: Factory<WP>;
   customProps?: AnyObject;
 }
-export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
+export interface RangeableWidget<C = Config, WP = WidgetProps<C>, T = string> extends BaseWidget<C, WP, T> {
   singleWidget?: string,
   valueLabels?: Array<string | {label: string, placeholder: string}>,
 }
-export interface FieldWidget {
+export interface FieldWidget<C = Config, WP = WidgetProps<C>> {
   valueSrc: "field",
   valuePlaceholder?: string,
   valueLabel?: string,
@@ -429,27 +430,36 @@ export interface FieldWidget {
   validateValue?: ValidateValue,
   //@ui
   customProps?: AnyObject,
+  factory?: Factory<WP>,
+}
+export interface FuncWidget<C = Config, WP = WidgetProps<C>> extends FieldWidget<C, WP> {
+  valueSrc: "func",
 }
 
-export type TextWidget<C = Config, WP = TextWidgetProps<C>> = BaseWidget<C, WP> & TextFieldSettings;
+export type TextWidget<C = Config, WP = TextWidgetProps<C>, T = "text"> = BaseWidget<C, WP, T> & TextFieldSettings;
 export type DateTimeWidget<C = Config, WP = DateTimeWidgetProps<C>> = RangeableWidget<C, WP> & DateTimeFieldSettings;
 export type BooleanWidget<C = Config, WP = BooleanWidgetProps<C>> = BaseWidget<C, WP> & BooleanFieldSettings;
 export type NumberWidget<C = Config, WP = NumberWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
-export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, WP> & SelectFieldSettings;
-export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
+export type SelectWidget<C = Config, WP = SelectWidgetProps<C>, T = "select"|"multiselect"> = BaseWidget<C, WP, T> & SelectFieldSettings;
+export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>, T = "treeselect"|"treemultiselect"> = BaseWidget<C, WP, T> & TreeSelectFieldSettings;
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
-export type Widget<C = Config> = 
-  FieldWidget
-  | TextWidget<C, WidgetProps<C>>
+// tip: use generic WidgetProps here, TS can't determine correct factory
+export type TypedWidget<C = Config> = 
+  TextWidget<C, WidgetProps<C>>
   | DateTimeWidget<C, WidgetProps<C>>
   | BooleanWidget<C, WidgetProps<C>>
   | NumberWidget<C, WidgetProps<C>>
   | SelectWidget<C, WidgetProps<C>>
   | TreeSelectWidget<C, WidgetProps<C>>
-  | CaseValueWidget<C, WidgetProps<C>>
-  | RangeableWidget<C, WidgetProps<C>>
-  | BaseWidget<C, WidgetProps<C>>;
+  | CaseValueWidget<C, WidgetProps<C>>;
+
+export type Widget<C = Config> = 
+  FieldWidget<C>
+  | FuncWidget<C>
+  | TypedWidget<C>
+  | RangeableWidget<C>
+  | BaseWidget<C>;
 export type Widgets<C = Config> = TypedMap<Widget<C>>;
 
 
@@ -662,7 +672,14 @@ export interface BooleanFieldSettings extends BasicFieldSettings {
 }
 export interface CaseValueFieldSettings extends BasicFieldSettings {
 }
-export type FieldSettings = NumberFieldSettings | DateTimeFieldSettings | SelectFieldSettings | TreeSelectFieldSettings | BooleanFieldSettings | TextFieldSettings | BasicFieldSettings;
+export type FieldSettings =
+  NumberFieldSettings
+  | DateTimeFieldSettings
+  | SelectFieldSettings
+  | TreeSelectFieldSettings
+  | BooleanFieldSettings
+  | TextFieldSettings
+  | BasicFieldSettings;
 
 interface BaseField {
   type: FieldType,
@@ -936,7 +953,7 @@ export interface CoreConfig extends Config {
     datetime: DateTimeWidget,
     boolean: BooleanWidget,
     field: FieldWidget,
-    func: FieldWidget,
+    func: FuncWidget,
     case_value: CaseValueWidget,
   },
   types: {

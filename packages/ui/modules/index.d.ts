@@ -17,7 +17,13 @@ import {
   Utils as CoreUtils,
 
   Widget,
-  TextWidget,
+
+  TextWidget as CoreTextWidget,
+  NumberWidget as CoreNumberWidget,
+  DateTimeWidget as CoreDateTimeWidget,
+  TreeSelectWidget as CoreTreeSelectWidget,
+  SelectWidget as CoreSelectWidget,
+  //todo
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -172,11 +178,57 @@ export interface Settings extends CoreSettings, RenderSettings {
 }
 
 /////////////////
+// extend config
+/////////////////
+
+export type Widgets<C = NewConfigType> = TypedMap<Widget<C>>;
+
+export type TextWidget<C = NewConfigType> = CoreTextWidget<C>;
+export type NumberWidget<C = NewConfigType> = CoreNumberWidget<C>;
+export type DateTimeWidget<C = NewConfigType> = CoreDateTimeWidget<C>;
+export type TreeSelectWidget<C = NewConfigType> = CoreTreeSelectWidget<C>;
+export type SelectWidget<C = NewConfigType> = CoreSelectWidget<C>;
+//todo BooleanWidget FieldWidget FuncWidget CaseValueWidget
+
+export type TextWidgetProps<C = NewConfigType> = TextWidgetProps<C>;
+//todo
+
+export interface NewConfigType extends CoreConfigType {
+  conjunctions: Conjunctions,
+  operators: Operators,
+  widgets: Widgets,
+  types: Types,
+  settings: Settings,
+  fields: Fields,
+  funcs?: Funcs,
+  settings: Settings,
+}
+
+/////////////////
 // Config
 /////////////////
 
 export interface BasicConfig extends CoreConfig {
   settings: Settings,
+
+  widgets: {
+    text: TextWidget,
+    textarea: TextWidget,
+    number: NumberWidget,
+    slider: NumberWidget,
+    rangeslider: NumberWidget,
+    select: SelectWidget,
+    multiselect: SelectWidget,
+    treeselect: TreeSelectWidget,
+    treemultiselect: TreeSelectWidget,
+    date: DateTimeWidget,
+    time: DateTimeWidget,
+    datetime: DateTimeWidget,
+    boolean: BooleanWidget,
+    field: FieldWidget,
+    func: FuncWidget,
+    case_value: CaseValueWidget,
+  },
 }
 
 
@@ -226,24 +278,7 @@ export interface Utils extends CoreUtils {
 
 export declare const Utils: Utils;
 
-/////////////////
-// extend config
-/////////////////
 
-export type Widgets<C = NewConfig> = TypedMap<Widget<C>>;
-export type TextWidget<C = NewConfig> = TextWidget<C>;
-export type TextWidgetProps<C = NewConfig> = TextWidgetProps<C>;
-
-export interface NewConfig extends CoreConfigType {
-  conjunctions: Conjunctions,
-  operators: Operators,
-  widgets: Widgets,
-  types: Types,
-  settings: Settings,
-  fields: Fields,
-  funcs?: Funcs,
-  settings: Settings,
-}
 
 //////////////////
 
