@@ -186,7 +186,7 @@ const fields: Fields = {
     fieldSettings: {
       treeExpandAll: true,
       // * deep format (will be auto converted to flat format):
-      // listValues: [
+      // treeValues: [
       //     { value: "1", title: "Warm colors", children: [
       //         { value: "2", title: "Red" }, 
       //         { value: "3", title: "Orange" }
@@ -201,7 +201,7 @@ const fields: Fields = {
       //     ] }
       // ],
       // * flat format:
-      listValues: [
+      treeValues: [
         { value: "1", title: "Warm colors" },
         { value: "2", title: "Red", parent: "1" },
         { value: "3", title: "Orange", parent: "1" },
@@ -218,7 +218,7 @@ const fields: Fields = {
     type: "treemultiselect",
     fieldSettings: {
       treeExpandAll: true,
-      listValues: [
+      treeValues: [
         {
           value: "1", title: "Warm colors", children: [
             { value: "2", title: "Red" },

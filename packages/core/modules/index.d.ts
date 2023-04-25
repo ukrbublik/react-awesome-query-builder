@@ -652,7 +652,7 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   forceAsyncSearch?: boolean,
 }
 export interface TreeSelectFieldSettings extends BasicFieldSettings {
-  listValues?: TreeData,
+  treeValues?: TreeData,
   treeExpandAll?: boolean,
   treeSelectOnlyLeafs?: boolean,
 }

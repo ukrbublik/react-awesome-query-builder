@@ -699,7 +699,7 @@ const widgets = {
     valueLabel: "Value",
     valuePlaceholder: "Select value",
     formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      let valLabel = getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
+      let valLabel = getTitleInListValues(fieldDef.fieldSettings.treeValues || fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
       return isForDisplay ? stringifyForDisplay(valLabel) : JSON.stringify(val);
     },
     sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
@@ -716,7 +716,7 @@ const widgets = {
     valueLabel: "Values",
     valuePlaceholder: "Select values",
     formatValue: (vals, fieldDef, wgtDef, isForDisplay) => {
-      let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
+      let valsLabels = vals.map(v => getTitleInListValues(fieldDef.fieldSettings.treeValues || fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
       return isForDisplay ? valsLabels.map(stringifyForDisplay) : vals.map(JSON.stringify);
     },
     sqlFormatValue: (vals, fieldDef, wgtDef, op, opDef) => {

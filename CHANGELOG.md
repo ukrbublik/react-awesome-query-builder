@@ -1,4 +1,6 @@
 # Changelog
+- 6.2.0
+  - Breaking: `listValues` renamed to `treeValues` for tree select widgets (AntDesign)
 - 6.1.3
   - Fix isNull roundtrip (PR #887) (issue #886)
   - Fix `BootstrapFieldSelect` for fields with 2+ level nesting (PR #898) (issue #868)
