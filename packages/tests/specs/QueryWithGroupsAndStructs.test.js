@@ -317,7 +317,7 @@ describe("query with nested !group", () => {
             "some": [
               { "var": "results" },
               { "some": [
-                { "var": "user" }, 
+                { "var": "user" },
                 {
                   "==": [ { "var": "name" },  "aaa" ]
                 }
@@ -700,30 +700,31 @@ describe("query with !group mode array", () => {
           "$gt": [
             {
               "$size": {
-                "$filter": {
-                  "input": "$cars",
-                  "as": "el",
-                  "cond": {
-                    "$and": [
-                      {
-                        "$expr": {
-                          "$eq": [
-                            "$$el.vendor",
-                            "Toyota"
-                          ]
-                        }
-                      },
-                      {
-                        "$expr": {
-                          "$gte": [
-                            "$$el.year",
-                            2010
-                          ]
-                        }
+                "$ifNull": [
+                  {
+                    "$filter": {
+                      "input": "$cars",
+                      "as": "el",
+                      "cond": {
+                        "$and": [
+                          {
+                            "$eq": [
+                              "$$el.vendor",
+                              "Toyota"
+                            ]
+                          },
+                          {
+                            "$gte": [
+                              "$$el.year",
+                              2010
+                            ]
+                          }
+                        ]
                       }
-                    ]
-                  }
-                }
+                    }
+                  },
+                  []
+                ]
               }
             },
             2
