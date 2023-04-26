@@ -47,7 +47,27 @@ describe("query with conjunction", () => {
                 "login": "ukrbublik"
               }
             }
-          ] 
+          ]
+        }
+      },
+      elasticSearch7: {
+        "bool": {
+          "should": [
+            {
+              "range": {
+                "num": {
+                  "lt": "2"
+                }
+              }
+            },
+            {
+              "term": {
+                "login": {
+                  "value": "ukrbublik"
+                }
+              }
+            }
+          ]
         }
       },
     });

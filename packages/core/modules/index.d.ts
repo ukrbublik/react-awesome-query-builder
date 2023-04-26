@@ -172,7 +172,7 @@ export interface Utils {
   _spelFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
   _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
-  elasticSearchFormat(tree: ImmutableTree, config: Config): Object | undefined;
+  elasticSearchFormat(tree: ImmutableTree, config: Config, syntax?: "ES_6_SYNTAX" | "ES_7_SYNTAX"): Object | undefined;
   // load, save
   getTree(tree: ImmutableTree, light?: boolean, children1AsArray?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
