@@ -61,6 +61,7 @@ export interface QueryProps {
   settings: Settings;
   fields: Fields;
   funcs?: Funcs;
+  ctx: ConfigContext;
   value: ImmutableTree;
   onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
   renderBuilder(props: BuilderProps): ReactElement;
