@@ -40,7 +40,6 @@ const skinToConfig: Record<string, Config> = {
   fluent: FluentUIConfig
 };
 
-
 export default (skin: string) => {
   const InitialConfig = skinToConfig[skin] as BasicConfig;
 
@@ -109,9 +108,9 @@ export default (skin: string) => {
 
   const widgets: Widgets = {
     ...InitialConfig.widgets,
-    // examples of  overriding
+    // examples of overriding
     text: {
-      ...InitialConfig.widgets.text,
+      ...InitialConfig.widgets.text
     },
     textarea: {
       ...InitialConfig.widgets.textarea,
