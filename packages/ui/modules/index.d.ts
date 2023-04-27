@@ -2,7 +2,7 @@
 
 import {ElementType, ReactElement, Factory} from "react";
 import {
-  Config as CoreConfigType, Conjunctions, Operators, Widgets, Types, Fields, Funcs, Settings as CoreSettings, CoreConfig,
+  Conjunctions, Types, Fields, Funcs, CoreConfig,
   InputAction,
   ImmutableTree,
   Actions,
@@ -11,23 +11,110 @@ import {
   ItemProperties,
   ValueSource,
   TypedValueSourceMap,
-  ConjsProps, FieldProps,
-  WidgetProps, TextWidgetProps, DateTimeWidgetProps, BooleanWidgetProps, NumberWidgetProps, SelectWidgetProps, 
-  TreeSelectWidgetProps, RangeSliderWidgetProps, CaseValueWidgetProps,
+  ConjsProps,
+
+  // to extend
+  Config as CoreConfigType,
+  Settings as CoreSettings,
   Utils as CoreUtils,
-
-  Widget,
-
-  TextWidget as CoreTextWidget,
-  NumberWidget as CoreNumberWidget,
-  DateTimeWidget as CoreDateTimeWidget,
-  TreeSelectWidget as CoreTreeSelectWidget,
-  SelectWidget as CoreSelectWidget,
-  //todo
+  // to override <C>
+  OperatorProximity as _OperatorProximity,
+  Operator as _Operator,
+  Operators as _Operators,
+  FieldProps as _FieldProps,
+  Widget as _Widget,
+  Widgets as _Widgets,
+  BaseWidget as _BaseWidget,
+  RangeableWidget as _RangeableWidget,
+  TypedWidget as _TypedWidget,
+  TextWidget as _TextWidget,
+  NumberWidget as _NumberWidget,
+  DateTimeWidget as _DateTimeWidget,
+  TreeSelectWidget as _TreeSelectWidget,
+  TreeMultiSelectWidget as _TreeMultiSelectWidget,
+  SelectWidget as _SelectWidget,
+  MultiSelectWidget as _MultiSelectWidget,
+  BooleanWidget as _BooleanWidget,
+  FieldWidget as _FieldWidget,
+  FuncWidget as _FuncWidget,
+  CaseValueWidget as _CaseValueWidget,
+  ProximityProps as _ProximityProps,
+  ProximityOptions as _ProximityOptions,
+  WidgetProps as _WidgetProps,
+  TextWidgetProps as _TextWidgetProps,
+  DateTimeWidgetProps as _DateTimeWidgetProps,
+  BooleanWidgetProps as _BooleanWidgetProps,
+  NumberWidgetProps as _NumberWidgetProps,
+  SelectWidgetProps as _SelectWidgetProps,
+  MultiSelectWidgetProps as _MultiSelectWidgetProps,
+  TreeSelectWidgetProps as _TreeSelectWidgetProps,
+  TreeMultiSelectWidgetProps as _TreeMultiSelectWidgetProps,
+  CaseValueWidgetProps as _CaseValueWidgetProps,
+  CoreOperators as _CoreOperators,
+  CoreWidgets as _CoreWidgets,
 } from "@react-awesome-query-builder/core";
 
 // re-export
 export * from "@react-awesome-query-builder/core";
+
+/////////////////
+// override <C> in types
+/////////////////
+
+export type OperatorProximity<C = Config> = _OperatorProximity<C>;
+export type Operator<C = Config> = _Operator<C>;
+export type Operators<C = Config> = _Operators<C>;
+export type FieldProps<C = Config> = _FieldProps<C>;
+export type Widget<C = Config> = _Widget<C>;
+export type Widgets<C = Config> = _Widgets<C>;
+export type BaseWidget<C = Config> = _BaseWidget<C>;
+export type RangeableWidget<C = Config> = _RangeableWidget<C>;
+export type TypedWidget<C = Config> = _TypedWidget<C>;
+export type TextWidget<C = Config> = _TextWidget<C>;
+export type NumberWidget<C = Config> = _NumberWidget<C>;
+export type DateTimeWidget<C = Config> = _DateTimeWidget<C>;
+export type TreeSelectWidget<C = Config> = _TreeSelectWidget<C>;
+export type TreeMultiSelectWidget<C = Config> = _TreeMultiSelectWidget<C>;
+export type SelectWidget<C = Config> = _SelectWidget<C>;
+export type MultiSelectWidget<C = Config> = _MultiSelectWidget<C>;
+export type BooleanWidget<C = Config> = _BooleanWidget<C>;
+export type FieldWidget<C = Config> = _FieldWidget<C>;
+export type FuncWidget<C = Config> = _FuncWidget<C>;
+export type CaseValueWidget<C = Config> = _CaseValueWidget<C>;
+export type ProximityProps<C = Config> = _ProximityProps<C>;
+export type ProximityOptions<C = Config> = _ProximityOptions<C>;
+export type WidgetProps<C = Config> = _WidgetProps<C>;
+export type TextWidgetProps<C = Config> = _TextWidgetProps<C>;
+export type DateTimeWidgetProps<C = Config> = _DateTimeWidgetProps<C>;
+export type BooleanWidgetProps<C = Config> = _BooleanWidgetProps<C>;
+export type NumberWidgetProps<C = Config> = _NumberWidgetProps<C>;
+export type SelectWidgetProps<C = Config> = _SelectWidgetProps<C>;
+export type MultiSelectWidgetProps<C = Config> = _MultiSelectWidgetProps<C>;
+export type TreeSelectWidgetProps<C = Config> = _TreeSelectWidgetProps<C>;
+export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps<C>;
+export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
+export type CoreOperators<C = Config> = _CoreOperators<C>;
+export type CoreWidgets<C = Config> = _CoreWidgets<C>;
+
+/////////////////
+// extend config
+/////////////////
+
+export interface Config extends CoreConfigType {
+  conjunctions: Conjunctions,
+  operators: Operators,
+  widgets: Widgets,
+  types: Types,
+  settings: Settings,
+  fields: Fields,
+  funcs?: Funcs,
+  settings: Settings,
+}
+
+export interface BasicConfig<C = Config> extends CoreConfig<C> {
+  settings: Settings,
+}
+
 
 ////////////////
 // common
@@ -178,61 +265,6 @@ export interface Settings extends CoreSettings, RenderSettings {
 }
 
 /////////////////
-// extend config
-/////////////////
-
-export type Widgets<C = NewConfigType> = TypedMap<Widget<C>>;
-
-export type TextWidget<C = NewConfigType> = CoreTextWidget<C>;
-export type NumberWidget<C = NewConfigType> = CoreNumberWidget<C>;
-export type DateTimeWidget<C = NewConfigType> = CoreDateTimeWidget<C>;
-export type TreeSelectWidget<C = NewConfigType> = CoreTreeSelectWidget<C>;
-export type SelectWidget<C = NewConfigType> = CoreSelectWidget<C>;
-//todo BooleanWidget FieldWidget FuncWidget CaseValueWidget
-
-export type TextWidgetProps<C = NewConfigType> = TextWidgetProps<C>;
-//todo
-
-export interface NewConfigType extends CoreConfigType {
-  conjunctions: Conjunctions,
-  operators: Operators,
-  widgets: Widgets,
-  types: Types,
-  settings: Settings,
-  fields: Fields,
-  funcs?: Funcs,
-  settings: Settings,
-}
-
-/////////////////
-// Config
-/////////////////
-
-export interface BasicConfig extends CoreConfig {
-  settings: Settings,
-
-  widgets: {
-    text: TextWidget,
-    textarea: TextWidget,
-    number: NumberWidget,
-    slider: NumberWidget,
-    rangeslider: NumberWidget,
-    select: SelectWidget,
-    multiselect: SelectWidget,
-    treeselect: TreeSelectWidget,
-    treemultiselect: TreeSelectWidget,
-    date: DateTimeWidget,
-    time: DateTimeWidget,
-    datetime: DateTimeWidget,
-    boolean: BooleanWidget,
-    field: FieldWidget,
-    func: FuncWidget,
-    case_value: CaseValueWidget,
-  },
-}
-
-
-/////////////////
 // ReadyWidgets
 /////////////////
 
@@ -277,7 +309,6 @@ export interface Utils extends CoreUtils {
 }
 
 export declare const Utils: Utils;
-
 
 
 //////////////////

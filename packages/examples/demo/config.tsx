@@ -1,19 +1,17 @@
 import React, { Component } from "react";
 import merge from "lodash/merge";
 import {
-  BasicFuncs, Utils,
+  BasicFuncs, Utils, BasicConfig,
   // types:
-  Operators, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
-  //DateTimeFieldSettings,
-} from "@react-awesome-query-builder/core";
-import {
-  BasicConfig,
-  // types:
+  Operators, Fields, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
   Settings,
   DateTimeFieldSettings,
   TextWidgetProps,
   WidgetProps,
-  Widgets
+  Widgets,
+  TextWidget,
+  TreeSelectWidget,
+  Config,
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
