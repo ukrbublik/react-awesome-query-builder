@@ -163,7 +163,7 @@ const fields: Fields = {
     type: "treeselect",
     fieldSettings: {
       treeExpandAll: true,
-      listValues: [
+      treeValues: [
         {
           value: "1", title: "Warm colors", children: [
             { value: "2", title: "Red" },
@@ -192,7 +192,7 @@ const fields: Fields = {
     type: "treemultiselect",
     fieldSettings: {
       treeExpandAll: true,
-      listValues: [
+      treeValues: [
         {
           value: "1", title: "Warm colors", children: [
             { value: "2", title: "Red" },

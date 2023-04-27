@@ -129,7 +129,7 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
   const typeConfig = config.types[fieldConfig.type];
   const excludeOperatorsForField = fieldConfig.excludeOperators || [];
   if (fieldConfig.type != "!struct" && fieldConfig.type != "!group") {
-    const keysToPutInFieldSettings = ["listValues", "allowCustomValues", "validateValue"];
+    const keysToPutInFieldSettings = ["listValues", "treeValues", "allowCustomValues", "validateValue"];
     if (!fieldConfig.fieldSettings)
       fieldConfig.fieldSettings = {};
     for (const k of keysToPutInFieldSettings) {
@@ -139,10 +139,19 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
       }
     }
 
+    // normalize listValues
     if (fieldConfig.fieldSettings.listValues) {
       if (config.settings.normalizeListValues) {
         fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues(
           fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings
+        );
+      }
+    }
+    // same for treeValues
+    if (fieldConfig.fieldSettings.treeValues) {
+      if (config.settings.normalizeListValues) {
+        fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues(
+          fieldConfig.fieldSettings.treeValues, fieldConfig.type, fieldConfig.fieldSettings
         );
       }
     }

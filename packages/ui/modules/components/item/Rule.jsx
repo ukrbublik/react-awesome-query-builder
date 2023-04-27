@@ -42,6 +42,8 @@ class Rule extends Component {
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
     reordableNodesCnt: PropTypes.number,
+    totalRulesCnt: PropTypes.number,
+    parentReordableNodesCnt: PropTypes.number,
   };
 
   constructor(props) {
