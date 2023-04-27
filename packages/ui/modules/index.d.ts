@@ -2,7 +2,7 @@
 
 import {ElementType, ReactElement, Factory} from "react";
 import {
-  Conjunctions, Types, Fields, Funcs, CoreConfig,
+  Conjunctions, Types, Fields, Funcs, CoreConfig, RuleValue,
   InputAction,
   ImmutableTree,
   Actions,
@@ -12,6 +12,8 @@ import {
   ValueSource,
   TypedValueSourceMap,
   ConjsProps,
+
+  ImmutableList, ImmutableMap, ImmutableOMap,
 
   // to extend
   Config as CoreConfigType,
@@ -124,6 +126,7 @@ type AnyObject = object;
 type TypedMap<T> = {
   [key: string]: T;
 }
+type Empty = null | undefined;
 
 
 ////////////////
@@ -220,6 +223,39 @@ export interface RuleErrorProps {
   error: string,
 }
 
+export interface RuleProps {
+  config: Config,
+  id: string, // id of rule
+  groupId: string | Empty, // id of parent group
+  parentField: string | Empty, //from RuleGroup
+  selectedField: string | Empty,
+  selectedOperator: string | Empty,
+  operatorOptions: AnyObject | Empty,
+  value: ImmutableList<RuleValue>, //depends on widget
+  valueError: ImmutableList<string>,
+  valueSrc: ImmutableList<ValueSource>,
+  asyncListValues: Array<any> | Empty,
+
+  isDraggingMe: boolean | Empty,
+  isDraggingTempo: boolean | Empty,
+  isLocked: boolean | Empty,
+  isTrueLocked: boolean | Empty,
+  reordableNodesCnt: number | Empty,
+  totalRulesCnt: number | Empty,
+  parentReordableNodesCnt: number | Empty,
+  onDragStart: Function | Empty,
+  handleDraggerMouseDown: Function | Empty,
+  removeSelf: Function | Empty,
+  confirmFn: Function | Empty,
+
+  //actions
+  setField(field: string): undefined;
+  setOperator(operator: string): undefined;
+  setOperatorOption(name: string, value: RuleValue): undefined;
+  setLock(lock: boolean): undefined;
+  setValue(delta: number, value: RuleValue, valueType: string, asyncListValues?: Array<any>): undefined;
+  setValueSrc(delta: number, valueSrc: ValueSource): undefined;
+}
 
 /////////////////
 // Settings
@@ -249,10 +285,10 @@ export interface RenderSettings {
   showLabels?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: Factory<FieldProps>,
-  renderAfterWidget?: Factory<FieldProps>,
-  renderBeforeActions?: Factory<FieldProps>,
-  renderAfterActions?: Factory<FieldProps>,
+  renderBeforeWidget?: Factory<RuleProps>,
+  renderAfterWidget?: Factory<RuleProps>,
+  renderBeforeActions?: Factory<RuleProps>,
+  renderAfterActions?: Factory<RuleProps>,
   renderRuleError?: Factory<RuleErrorProps>,
   renderSwitchPrefix?: Factory<AnyObject>,
   defaultSliderWidth?: string,

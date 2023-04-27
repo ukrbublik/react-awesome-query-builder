@@ -5,6 +5,9 @@ import {ElementType, ReactElement, Factory} from "react";
 import type { Moment as MomentType } from "moment";
 
 export type Moment = MomentType;
+export type ImmutableList = ImmutableList;
+export type ImmutableMap = ImmutableMap;
+export type ImmutableOMap = ImmutableOMap;
 
 ////////////////
 // common
@@ -49,7 +52,7 @@ type JsonLogicField = { "var": string };
 // query value
 /////////////////
 
-type RuleValue = boolean | number | string | Date | Array<string> | any;
+export type RuleValue = boolean | number | string | Date | Array<string> | any;
 
 export type ValueSource = "value" | "field" | "func" | "const";
 export type RuleGroupMode = "struct" | "some" | "array";
@@ -314,8 +317,8 @@ export interface TreeActions {
 /////////////////
 
 interface BaseWidgetProps<C = Config, V = RuleValue> {
-  value: V | undefined | null,
-  setValue(val: V | undefined | null, asyncListValues?: Array<any>): void,
+  value: V | Empty,
+  setValue(val: V | Empty, asyncListValues?: Array<any>): void,
   placeholder: string,
   field: string,
   parentField?: string,
@@ -329,15 +332,15 @@ interface BaseWidgetProps<C = Config, V = RuleValue> {
   groupId?: string, // id of parent group
 }
 interface RangeWidgetProps<C = Config, V = RuleValue> extends BaseWidgetProps<C, V> {
-  value: Array<V | undefined | null>,
-  setValue(val: Array<V | undefined | null>, asyncListValues?: Array<any>): void,
+  value: Array<V | Empty>,
+  setValue(val: Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders: Array<string>,
   textSeparators: Array<string>,
 }
 // BaseWidgetProps | RangeWidgetProps
 interface RangeableWidgetProps<C = Config, V = RuleValue> extends BaseWidgetProps<C, V> {
-  value: Array<V | undefined | null> | V | undefined | null,
-  setValue(val: Array<V | undefined | null> | V | undefined | null, asyncListValues?: Array<any>): void,
+  value: Array<V | Empty> | V | Empty,
+  setValue(val: Array<V | Empty> | V | Empty, asyncListValues?: Array<any>): void,
   placeholders?: Array<string>,
   textSeparators?: Array<string>,
 }
