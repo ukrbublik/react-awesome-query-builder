@@ -112,19 +112,6 @@ export default (skin: string) => {
     // examples of  overriding
     text: {
       ...InitialConfig.widgets.text,
-      factory: (props) => {
-        const sss = props.config.settings.renderSize;
-        const ppp: TextWidgetProps = {
-         value: '',
-         setValue: (v => {}),
-          field: '',
-          operator: '',
-          config: props.config as BasicConfig,
-          placeholder: '',
-          fieldDefinition: fields.user,
-        };
-        return null;
-      }
     },
     textarea: {
       ...InitialConfig.widgets.textarea,
