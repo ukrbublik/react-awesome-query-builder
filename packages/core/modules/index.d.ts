@@ -1,13 +1,13 @@
 /* eslint-disable no-extra-semi */
 
-import {List as ImmutableList, Map as ImmutableMap, OrderedMap as ImmutableOMap} from "immutable";
+import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 import type { Moment as MomentType } from "moment";
 
 export type Moment = MomentType;
-export type ImmutableList = ImmutableList;
-export type ImmutableMap = ImmutableMap;
-export type ImmutableOMap = ImmutableOMap;
+export type ImmutableList<T> = ImmList<T>;
+export type ImmutableMap<K, V> = ImmMap<K, V>;
+export type ImmutableOMap<K, V> = ImmOMap<K, V>;
 
 ////////////////
 // common
@@ -316,9 +316,7 @@ export interface TreeActions {
 // @ui
 /////////////////
 
-interface BaseWidgetProps<C = Config, V = RuleValue> {
-  value: V | Empty,
-  setValue(val: V | Empty, asyncListValues?: Array<any>): void,
+interface AbstractWidgetProps<C = Config> {
   placeholder: string,
   field: string,
   parentField?: string,
@@ -331,16 +329,20 @@ interface BaseWidgetProps<C = Config, V = RuleValue> {
   id?: string, // id of rule
   groupId?: string, // id of parent group
 }
-interface RangeWidgetProps<C = Config, V = RuleValue> extends BaseWidgetProps<C, V> {
+interface BaseWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
+  value: V | Empty,
+  setValue(val: V | Empty, asyncListValues?: Array<any>): void,
+}
+interface RangeWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
   value: Array<V | Empty>,
   setValue(val: Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders: Array<string>,
   textSeparators: Array<string>,
 }
 // BaseWidgetProps | RangeWidgetProps
-interface RangeableWidgetProps<C = Config, V = RuleValue> extends BaseWidgetProps<C, V> {
-  value: Array<V | Empty> | V | Empty,
-  setValue(val: Array<V | Empty> | V | Empty, asyncListValues?: Array<any>): void,
+interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
+  value: V | Empty | Array<V | Empty>,
+  setValue(val: V | Empty | Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders?: Array<string>,
   textSeparators?: Array<string>,
 }
@@ -350,10 +352,11 @@ export type TextWidgetProps<C = Config> = BaseWidgetProps<C, string> & TextField
 export type DateTimeWidgetProps<C = Config> = RangeableWidgetProps<C, string> & DateTimeFieldSettings;
 export type BooleanWidgetProps<C = Config> = BaseWidgetProps<C, boolean> & BooleanFieldSettings;
 export type NumberWidgetProps<C = Config> = RangeableWidgetProps<C, number> & NumberFieldSettings;
+export type RangeSliderWidgetProps<C = Config> = RangeableWidgetProps<C, number> & NumberFieldSettings;
 export type SelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & SelectFieldSettings;
-export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & SelectFieldSettings;
+export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & MultiSelectFieldSettings;
 export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & TreeSelectFieldSettings;
-export type TreeMultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & TreeSelectFieldSettings;
+export type TreeMultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & TreeMultiSelectFieldSettings;
 export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
 
 
@@ -398,13 +401,13 @@ export interface FieldProps<C = Config> {
 
 type SpelImportValue = (val: any) => [any, string[]];
 
-type FormatValue =          (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type SqlFormatValue =       (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type SpelFormatValue =      (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
-type MongoFormatValue =     (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
-type JsonLogicFormatValue = (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
-type ValidateValue =        (val: RuleValue, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
-type ElasticSearchFormatValue = (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
+type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type SpelFormatValue =              (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type MongoFormatValue =             (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
+type JsonLogicFormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
+type ValidateValue<V = RuleValue> = (val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
+type ElasticSearchFormatValue =     (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
 
 
 export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
@@ -432,8 +435,7 @@ export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWi
   singleWidget?: string,
   valueLabels?: Array<string | {label: string, placeholder: string}>,
 }
-export interface FieldWidget<C = Config, WP = WidgetProps<C>> {
-  valueSrc: "field",
+interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   valuePlaceholder?: string,
   valueLabel?: string,
   formatValue: FormatValue, // with rightFieldDef
@@ -445,7 +447,10 @@ export interface FieldWidget<C = Config, WP = WidgetProps<C>> {
   customProps?: AnyObject,
   factory?: Factory<WP>,
 }
-export interface FuncWidget<C = Config, WP = WidgetProps<C>> extends FieldWidget<C, WP> {
+export interface FieldWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
+  valueSrc: "field",
+}
+export interface FuncWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
   valueSrc: "func",
 }
 
@@ -453,10 +458,11 @@ export type TextWidget<C = Config, WP = TextWidgetProps<C>> = BaseWidget<C, WP> 
 export type DateTimeWidget<C = Config, WP = DateTimeWidgetProps<C>> = RangeableWidget<C, WP> & DateTimeFieldSettings;
 export type BooleanWidget<C = Config, WP = BooleanWidgetProps<C>> = BaseWidget<C, WP> & BooleanFieldSettings;
 export type NumberWidget<C = Config, WP = NumberWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
+export type RangeSliderWidget<C = Config, WP = RangeSliderWidgetProps<C>> = RangeableWidget<C, WP> & NumberFieldSettings;
 export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, WP> & SelectFieldSettings;
-export type MultiSelectWidget<C = Config, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, WP> & SelectFieldSettings;
+export type MultiSelectWidget<C = Config, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, WP> & MultiSelectFieldSettings;
 export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
-export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
+export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeMultiSelectFieldSettings;
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
 // tip: use generic WidgetProps here, TS can't determine correct factory
@@ -465,6 +471,7 @@ export type TypedWidget<C = Config> =
   | DateTimeWidget<C, WidgetProps<C>>
   | BooleanWidget<C, WidgetProps<C>>
   | NumberWidget<C, WidgetProps<C>>
+  | RangeSliderWidget<C, WidgetProps<C>>
   | SelectWidget<C, WidgetProps<C>>
   | MultiSelectWidget<C, WidgetProps<C>>
   | TreeSelectWidget<C, WidgetProps<C>>
@@ -649,27 +656,27 @@ interface AsyncFetchListValuesResult {
 type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
 
 
-export interface BasicFieldSettings {
-  validateValue?: ValidateValue,
+export interface BasicFieldSettings<V = RuleValue> {
+  validateValue?: ValidateValue<V>,
 }
-export interface TextFieldSettings extends BasicFieldSettings {
+export interface TextFieldSettings<V = string> extends BasicFieldSettings<V> {
   maxLength?: number,
   maxRows?: number,
 }
-export interface NumberFieldSettings extends BasicFieldSettings {
+export interface NumberFieldSettings<V = number> extends BasicFieldSettings<V> {
   min?: number,
   max?: number,
   step?: number,
   marks?: {[mark: number]: ReactElement | string}
 }
-export interface DateTimeFieldSettings extends BasicFieldSettings {
+export interface DateTimeFieldSettings<V = string> extends BasicFieldSettings<V> {
   timeFormat?: string,
   dateFormat?: string,
   valueFormat?: string,
   use12Hours?: boolean,
   useKeyboard?: boolean,
 }
-export interface SelectFieldSettings extends BasicFieldSettings {
+export interface SelectFieldSettings<V = string | number> extends BasicFieldSettings<V> {
   listValues?: ListValues,
   allowCustomValues?: boolean,
   showSearch?: boolean,
@@ -679,25 +686,32 @@ export interface SelectFieldSettings extends BasicFieldSettings {
   useAsyncSearch?: boolean,
   forceAsyncSearch?: boolean,
 }
-export interface TreeSelectFieldSettings extends BasicFieldSettings {
+export interface MultiSelectFieldSettings<V = string[] | number[]> extends SelectFieldSettings<V> {
+}
+export interface TreeSelectFieldSettings<V = string | number> extends BasicFieldSettings<V> {
   treeValues?: TreeData,
   treeExpandAll?: boolean,
   treeSelectOnlyLeafs?: boolean,
 }
-export interface BooleanFieldSettings extends BasicFieldSettings {
+export interface TreeMultiSelectFieldSettings<V = string[] | number[]> extends TreeSelectFieldSettings<V> {
+}
+export interface BooleanFieldSettings<V = boolean> extends BasicFieldSettings<V> {
   labelYes?: ReactElement | string,
   labelNo?: ReactElement | string,
 }
-export interface CaseValueFieldSettings extends BasicFieldSettings {
+export interface CaseValueFieldSettings<V = any> extends BasicFieldSettings<V> {
 }
+// tip: use RuleValue here, TS can't determine correct types in `validateValue`
 export type FieldSettings =
-  NumberFieldSettings
-  | DateTimeFieldSettings
-  | SelectFieldSettings
-  | TreeSelectFieldSettings
-  | BooleanFieldSettings
-  | TextFieldSettings
-  | BasicFieldSettings;
+  NumberFieldSettings<RuleValue>
+  | DateTimeFieldSettings<RuleValue>
+  | SelectFieldSettings<RuleValue>
+  | MultiSelectFieldSettings<RuleValue>
+  | TreeSelectFieldSettings<RuleValue>
+  | TreeMultiSelectFieldSettings<RuleValue>
+  | BooleanFieldSettings<RuleValue>
+  | TextFieldSettings<RuleValue>
+  | BasicFieldSettings<RuleValue>;
 
 interface BaseField {
   type: FieldType,
@@ -962,7 +976,7 @@ export interface CoreWidgets<C = Config> extends Widgets<C> {
   textarea: TextWidget<C>,
   number: NumberWidget<C>,
   slider: NumberWidget<C>,
-  rangeslider: NumberWidget<C>,
+  rangeslider: RangeSliderWidget<C>,
   select: SelectWidget<C>,
   multiselect: MultiSelectWidget<C>,
   treeselect: TreeSelectWidget<C>,
@@ -990,10 +1004,10 @@ export interface CoreTypes extends Types {
   case_value: Type,
 }
 
-export interface CoreConfig<C = Config> extends Config {
+export interface CoreConfig extends Config {
   conjunctions: CoreConjunctions,
-  operators: CoreOperators<C>,
-  widgets: CoreWidgets<C>,
+  operators: CoreOperators,
+  widgets: CoreWidgets,
   types: CoreTypes,
   settings: Settings,
 }

@@ -31,6 +31,7 @@ import {
   TypedWidget as _TypedWidget,
   TextWidget as _TextWidget,
   NumberWidget as _NumberWidget,
+  RangeSliderWidget as _RangeSliderWidget,
   DateTimeWidget as _DateTimeWidget,
   TreeSelectWidget as _TreeSelectWidget,
   TreeMultiSelectWidget as _TreeMultiSelectWidget,
@@ -47,6 +48,7 @@ import {
   DateTimeWidgetProps as _DateTimeWidgetProps,
   BooleanWidgetProps as _BooleanWidgetProps,
   NumberWidgetProps as _NumberWidgetProps,
+  RangeSliderWidgetProps as _RangeSliderWidgetProps,
   SelectWidgetProps as _SelectWidgetProps,
   MultiSelectWidgetProps as _MultiSelectWidgetProps,
   TreeSelectWidgetProps as _TreeSelectWidgetProps,
@@ -74,6 +76,7 @@ export type RangeableWidget<C = Config> = _RangeableWidget<C>;
 export type TypedWidget<C = Config> = _TypedWidget<C>;
 export type TextWidget<C = Config> = _TextWidget<C>;
 export type NumberWidget<C = Config> = _NumberWidget<C>;
+export type RangeSliderWidget<C = Config> = _RangeSliderWidget<C>;
 export type DateTimeWidget<C = Config> = _DateTimeWidget<C>;
 export type TreeSelectWidget<C = Config> = _TreeSelectWidget<C>;
 export type TreeMultiSelectWidget<C = Config> = _TreeMultiSelectWidget<C>;
@@ -90,6 +93,7 @@ export type TextWidgetProps<C = Config> = _TextWidgetProps<C>;
 export type DateTimeWidgetProps<C = Config> = _DateTimeWidgetProps<C>;
 export type BooleanWidgetProps<C = Config> = _BooleanWidgetProps<C>;
 export type NumberWidgetProps<C = Config> = _NumberWidgetProps<C>;
+export type RangeSliderWidgetProps<C = Config> = _RangeSliderWidgetProps<C>;
 export type SelectWidgetProps<C = Config> = _SelectWidgetProps<C>;
 export type MultiSelectWidgetProps<C = Config> = _MultiSelectWidgetProps<C>;
 export type TreeSelectWidgetProps<C = Config> = _TreeSelectWidgetProps<C>;
@@ -107,14 +111,15 @@ export interface Config extends CoreConfigType {
   operators: Operators,
   widgets: Widgets,
   types: Types,
-  settings: Settings,
   fields: Fields,
   funcs?: Funcs,
   settings: Settings,
 }
 
-export interface BasicConfig<C = Config> extends CoreConfig<C> {
+export interface BasicConfig extends CoreConfig {
   settings: Settings,
+  operators: CoreOperators<Config>,
+  widgets: CoreWidgets<Config>,
 }
 
 

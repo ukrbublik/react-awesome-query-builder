@@ -5,7 +5,7 @@ import {
   // types:
   Operators, Fields, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
   Settings,
-  DateTimeFieldSettings,
+  DateTimeFieldSettings, TextFieldSettings, SelectFieldSettings, MultiSelectFieldSettings, NumberFieldSettings,
   TextWidgetProps,
   WidgetProps,
   Widgets,
@@ -284,10 +284,10 @@ export default (skin: string) => {
           label2: "Username", //only for menu's toggler
           type: "text",
           fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
+            validateValue: (val, fieldSettings) => {
               return (val.length < 10);
             },
-          },
+          } as TextFieldSettings,
           mainWidgetProps: {
             valueLabel: "Name",
             valuePlaceholder: "Enter name",
@@ -297,10 +297,10 @@ export default (skin: string) => {
           type: "text",
           tableName: "t1", // legacy: PR #18, PR #20
           fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
+            validateValue: (val, fieldSettings) => {
               return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
             },
-          },
+          } as TextFieldSettings,
           mainWidgetProps: {
             valueLabel: "Login",
             valuePlaceholder: "Enter login",
@@ -324,7 +324,7 @@ export default (skin: string) => {
           type: "select",
           fieldSettings: {
             listValues: ["abc", "def", "xyz"],
-          },
+          } as SelectFieldSettings,
           valueSources: ["value"],
         },
         score: {
@@ -367,7 +367,7 @@ export default (skin: string) => {
           type: "select",
           fieldSettings: {
             listValues: ["Ford", "Toyota", "Tesla"],
-          },
+          } as MultiSelectFieldSettings,
           valueSources: ["value"],
         },
         year: {
@@ -412,7 +412,7 @@ export default (skin: string) => {
         validateValue: (val, fieldSettings) => {
           return (val < 50 ? null : "Invalid slider value, see validateValue()");
         },
-      },
+      } as NumberFieldSettings,
       //overrides
       widgets: {
         slider: {
@@ -436,12 +436,12 @@ export default (skin: string) => {
       valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
-        validateValue: (val: string, fieldSettings: DateTimeFieldSettings) => {
+        validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
           // example of date validation
           const dateVal = moment(val, fieldSettings.valueFormat);
           return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
         },
-      },
+      } as DateTimeFieldSettings,
     },
     time: {
       label: "Time",
@@ -576,7 +576,7 @@ export default (skin: string) => {
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
-      },
+      } as SelectFieldSettings,
     },
     autocompleteMultiple: {
       label: "AutocompleteMultiple",
@@ -588,7 +588,7 @@ export default (skin: string) => {
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
-      },
+      } as SelectFieldSettings,
     },
     stock: {
       label: "In stock",
