@@ -1,8 +1,11 @@
 # Changelog
 - 6.2.0
-  - Fixed type `Config`: should have render settings (PR #909) (issue #879)
-  - Fixed type for `renderBeforeWidget` (PR #909) (issue #879)
-  - Breaking chnage in types: `listValues` renamed to `treeValues` for tree select widgets (AntDesign) (PR #909)
+  - Fixed type `Config`: should have render settings like `renderSize` (PR #909) (issue #879)
+  - Fixed type for `renderBeforeWidget`: `RuleProps` instead of wrong `FieldProps` (PR #909) (issue #879)
+  - Breaking change in types: `listValues` renamed to `treeValues` in `TreeSelectFieldSettings`
+    But old `listValues` is still supported in JS (PR #909)
+  - Add support for ElasticSearch 7 term syntax (PR #906) (issue #904)
+  - Fix mongodbFormat to work with mode = array (PR #908) (issue #907)
 - 6.1.3
   - Fix isNull roundtrip (PR #887) (issue #886)
   - Fix `BootstrapFieldSelect` for fields with 2+ level nesting (PR #898) (issue #868)
