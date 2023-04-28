@@ -759,7 +759,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 [[configctx]]
 === config.ctx
 
-Required starting from version 6.2.0
+Required starting from version 6.3.0
 
 It is a collection of functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules. 
 The purpose of `ctx` is to isolate non-serializable part of config. 
@@ -807,7 +807,7 @@ const ctx = {
   RCE: React.createElement,
   W: {
     VanillaButton,
-    // ... other widgets proviede with the lib
+    // ... other widgets provieded with the lib
   },
   utils: {
     moment, // used in `formatValue`

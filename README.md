@@ -45,6 +45,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [ctx](#ctx)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 6.3.0](#migration-to-630)
   * [Migration to 6.2.0](#migration-to-620)
   * [Migration to 6.0.0](#migration-to-600)
   * [Migration to 5.2.0](#migration-to-520)
@@ -82,6 +83,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
 - TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
+- Query value and config can be saved/loaded from server
 
 
 ## Getting started
@@ -465,18 +467,20 @@ See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
 ## SSR
-You can save and load config from server with help of [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig) and [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config).  
+You can save and load config from server with help of utils:
+- [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig)
+- [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config)
 You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
 Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
 
 To put it simple:
-- `ZipConfig` is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
+- `ZipConfig` type is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
 - `Utils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
 
 See [sandbox_next demo app](/packages/sandbox_next) that demonstrates server-side features. 
 
 ### ctx
-Config context is an obligatory part of config starting from version 6.2.0  
+Config context is an obligatory part of config starting from version 6.3.0  
 It is a collection of functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules.  
 The purpose of `ctx` is to isolate non-serializable part of config.  
 See [config.ctx](/CONFIG.adoc#configctx).  
@@ -502,12 +506,12 @@ It's recommended to update your version to 6.x. You just need to change your imp
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
 
-### Migration to 6.2.0
+### Migration to 6.3.0
 
 Now config has new [`ctx`](#ctx) property. Make sure you add it to your config.
 
 Typically you just need to copy it from basic config.
-So if you create config like this, you are fine:
+So if you create config like this, you don't need to make any chnages:
 ```js
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 export default {
@@ -523,7 +527,7 @@ But if you create config without destructuring of basic config, please add `ctx`
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 
 const config = {
-  ctx: MuiConfig.ctx, // needs to be added
+  ctx: MuiConfig.ctx, // needs to be added for 6.3.0+
   conjunctions,
   operators,
   widgets,
@@ -534,6 +538,10 @@ const config = {
 };
 export default config;
 ```
+
+### Migration to 6.2.0
+
+If you use `treeselect` or `treemultiselect` type (for AntDesign), please rename `listValues` to `treeValues`
 
 ### Migration to 6.0.0
 
