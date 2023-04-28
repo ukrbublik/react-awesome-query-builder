@@ -10,23 +10,23 @@ import {defaultConjunction} from "../utils/defaultUtils";
  * @returns {{top_left: {lon: number, lat: number}, bottom_right: {lon: number, lat: number}}} - ES geoPoint formatted object
  * @private
  */
-function buildEsGeoPoint(geoPointString) {
-  if (geoPointString == null) {
-    return null;
-  }
+// function buildEsGeoPoint(geoPointString) {
+//   if (geoPointString == null) {
+//     return null;
+//   }
 
-  const coordsNumberArray = geoPointString.split(",").map(Number);
-  return {
-    top_left: {
-      lat: coordsNumberArray[0],
-      lon: coordsNumberArray[1]
-    },
-    bottom_right: {
-      lat: coordsNumberArray[2],
-      lon: coordsNumberArray[3]
-    }
-  };
-}
+//   const coordsNumberArray = geoPointString.split(",").map(Number);
+//   return {
+//     top_left: {
+//       lat: coordsNumberArray[0],
+//       lon: coordsNumberArray[1]
+//     },
+//     bottom_right: {
+//       lat: coordsNumberArray[2],
+//       lon: coordsNumberArray[3]
+//     }
+//   };
+// }
 
 /**
  * Converts a dateTime string from the query builder to a ES range formatted object
@@ -137,26 +137,26 @@ function determineOccurrence(combinator, not) {
  * @private
  */
 //todo: not used
-function determineQueryField(fieldDataType, fullFieldName, queryType) {
-  if (fieldDataType === "boolean") {
-    return fullFieldName;
-  }
+// function determineQueryField(fieldDataType, fullFieldName, queryType) {
+//   if (fieldDataType === "boolean") {
+//     return fullFieldName;
+//   }
 
-  switch (queryType) {
-  case "term":
-  case "wildcard":
-    return "".concat(fullFieldName, ".keyword");
+//   switch (queryType) {
+//   case "term":
+//   case "wildcard":
+//     return "".concat(fullFieldName, ".keyword");
 
-  case "geo_bounding_box":
-  case "range":
-  case "match":
-    return fullFieldName;
+//   case "geo_bounding_box":
+//   case "range":
+//   case "match":
+//     return fullFieldName;
 
-  default:
-    console.error("Can't determine query field for query type ".concat(queryType));
-    return null;
-  }
-}
+//   default:
+//     console.error("Can't determine query field for query type ".concat(queryType));
+//     return null;
+//   }
+// }
 
 function buildRegexpParameters(value) {
   return {
@@ -193,8 +193,8 @@ function buildParameters(queryType, value, operator, fieldName, config, syntax) 
 
   //todo: not used
   // need to add geo type into RAQB or remove this code
-  case "geo_bounding_box":
-    return { [fieldName]: buildEsGeoPoint(value[0]) };
+  // case "geo_bounding_box":
+  //   return { [fieldName]: buildEsGeoPoint(value[0]) };
 
   case "range":
     return { [fieldName]: buildEsRangeParameters(value, operator) };

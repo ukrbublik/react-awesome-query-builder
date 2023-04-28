@@ -78,6 +78,96 @@ describe("query with ops", () => {
             }
           }
         ]
+      },
+      "elasticSearch": {
+        "bool": {
+          "must": [
+            {
+              "term": {
+                "text": "Long\nText"
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "term": {
+                    "num": 2
+                  }
+                }
+              }
+            },
+            {
+              "regexp": {
+                "str": {
+                  "value": "abc"
+                }
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "regexp": {
+                    "str": {
+                      "value": "xyz"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "range": {
+                "num": {
+                  "gte": "1",
+                  "lte": "2"
+                }
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "range": {
+                    "num": {
+                      "gte": "3",
+                      "lte": "4"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "exists": {
+                    "field": "num"
+                  }
+                }
+              }
+            },
+            {
+              "term": {
+                "color": "yellow"
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "term": {
+                    "color": "green"
+                  }
+                }
+              }
+            },
+            {
+              "bool": {
+                "must_not": {
+                  "term": {
+                    "multicolor": "yellow"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     });
   });

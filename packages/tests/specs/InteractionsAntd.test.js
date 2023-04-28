@@ -18,15 +18,17 @@ describe("interactions on antd", () => {
     it("find B", async () => {
       await with_qb_ant(configs.with_autocomplete, inits.with_autocomplete_a, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
         let ac = qb.find("Select").filterWhere(s => s.props()?.placeholder == "Select value");
+        expect(ac.prop("value")).to.eq("a");
 
-        expect(stringifyOptions(ac)).to.eq("a");
+        ac.prop("onDropdownVisibleChange")(true);
+        qb.update();
+        expect(stringifyOptions(qb)).to.eq("a");
         
         ac.prop("onSearch")("b");
         await sleep(200); // should be > 50ms delay
         qb.update();
         ac = qb.find("Select").filterWhere(s => s.props()?.placeholder == "Select value");
-
-        expect(stringifyOptions(ac)).to.eq("a;b");
+        expect(stringifyOptions(qb)).to.eq("a;b");
       });
     });
   });

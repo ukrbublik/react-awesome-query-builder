@@ -1029,3 +1029,27 @@ export const with_groupVarKey = (BasicConfig) => ({
     }
   }
 });
+
+export const with_cases = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      label: "Number",
+      type: "number",
+    },
+    datetime: {
+      label: "Datetime",
+      type: "datetime",
+    },
+    str: {
+      label: "String",
+      type: "text",
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    maxNumberOfCases: 3,
+    canRegroupCases: true,
+    canLeaveEmptyCase: false,
+  }
+});

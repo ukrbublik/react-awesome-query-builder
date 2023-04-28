@@ -965,3 +965,5 @@ export const spel_with_number = "num == 2";
 export const spel_with_not = "!(num == 2)";
 
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
+
+export const spel_with_cases = "(str == '222' ? is_string : (num == 222 ? is_number : unknown))";

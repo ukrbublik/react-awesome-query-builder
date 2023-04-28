@@ -314,6 +314,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
       spel: spelFormat(tree, config),
       mongo: mongodbFormat(tree, config),
       logic: logic,
+      elasticSearch: elasticSearchFormat(tree, config),
     };
     console.log(stringify(correct, undefined, 2));
   }
