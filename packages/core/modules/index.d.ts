@@ -250,8 +250,6 @@ export interface Config {
   ctx: ConfigContext,
 }
 
-export type StrConfig = string;
-
 export type ZipConfig = Omit<Config, "ctx">;
 
 export interface ConfigMixin<C = Config, S = Settings> {
@@ -467,7 +465,7 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction;
   //@ui
-  factory: Factory<WP> | SerializedFunction;
+  factory: FactoryWithContext<WP> | SerializedFunction;
   customProps?: AnyObject;
 }
 export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
@@ -484,7 +482,7 @@ interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   validateValue?: ValidateValue | SerializedFunction,
   //@ui
   customProps?: AnyObject,
-  factory?: Factory<WP>,
+  factory?: FactoryWithContext<WP>,
 }
 export interface FieldWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
   valueSrc: "field",
@@ -604,7 +602,7 @@ export interface ProximityProps<C = Config> extends ProximityConfig {
 }
 export interface ProximityOptions<C = Config, PP = ProximityProps<C>> extends ProximityConfig {
   //@ui
-  factory: Factory<PP> | SerializedFunction,
+  factory: FactoryWithContext<PP> | SerializedFunction,
 }
 
 export interface BaseOperator {

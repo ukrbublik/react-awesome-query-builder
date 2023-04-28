@@ -1,5 +1,7 @@
 //import { customJsonLogicOperations } from "../utils/jsonLogic";
 
+// Tip: search for `customJsonLogicOperations` in codebase to see custom JL funcs we use in `jsonLogicCustomOps`
+
 const NOW = {
   label: "Now",
   returnType: "datetime",
