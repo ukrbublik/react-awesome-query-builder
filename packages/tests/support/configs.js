@@ -576,7 +576,7 @@ export const with_all_types = (BasicConfig) => ({
       type: "treeselect",
       fieldSettings: {
         treeExpandAll: true,
-        listValues: [
+        treeValues: [
           { value: "1", title: "Warm colors" },
           { value: "2", title: "Red", parent: "1" },
           { value: "3", title: "Orange", parent: "1" },
@@ -593,7 +593,7 @@ export const with_all_types = (BasicConfig) => ({
       type: "treemultiselect",
       fieldSettings: {
         treeExpandAll: true,
-        listValues: [
+        treeValues: [
           { value: "1", title: "Warm colors", children: [
             { value: "2", title: "Red" },
             { value: "3", title: "Orange" }

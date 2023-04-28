@@ -41,6 +41,7 @@ interface ExtectedExports {
   spel?: string;
   mongo?: Object;
   elasticSearch?: Object;
+  elasticSearch7?: Object;
   logic?: JsonLogicTree;
 }
 interface Tasks {
@@ -266,7 +267,14 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
         expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["elasticSearch"]));
       });
     }
-  
+
+    if (expects["elasticSearch7"] !== undefined) {
+      doIt("should work with elasticSearch", () => {
+        const res = elasticSearchFormat(tree, config, "ES_7_SYNTAX");
+        expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["elasticSearch7"]));
+      });
+    }
+
     if (expects["logic"] !== undefined) {
       doIt("should work to JsonLogic", () => {
         const {logic, data, errors} = jsonLogicFormat(tree, config);

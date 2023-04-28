@@ -201,10 +201,11 @@ Example:
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`. +
   Available settings for text widget: `maxLength`, `maxRows`.
-|fieldSettings.listValues |+ for (multi)select, tree (multi)select | |List of values for (multi)select widget. +
-  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
-   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
-  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
+|fieldSettings.listValues |+ for (multi)select | |List of values for (multi)select widget. +
+  Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
+   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`)
+|fieldSettings.treeValues |+ for tree (multi)select | |List of values for tree (multi)select widget. +
+  Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
 |fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
   `(mixed val, Object fieldSettings) => boolean \| string \| null`
@@ -740,10 +741,11 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |args.<arg>.valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`, `'const'`. +
   `const` requires `defaultValue`
 |args.<arg>.defaultValue | | |Default value
-|args.<arg>.listValues |+ for (multi)select, tree (multi)select widgets | |List of values for Select widget. +
-  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` +
-  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]`
 |args.<arg>.fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}`
+|args.<arg>.fieldSettings.listValues |+ for (multi)select widgets | |List of values for Select widget. +
+  Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]`
+|args.<arg>.fieldSettings.treeValues |+ for tree (multi)select widgets | |List of values for TreeSelect widget. +
+  Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]`
 |args.<arg>.isOptional | |false |Last args can be optional
 |renderBrackets | |`['(', ')']` |Can render custom function brackets in UI (or not render).
 |renderSeps | |`[', ']` |Can render custom arguments separators in UI (other than `,`).

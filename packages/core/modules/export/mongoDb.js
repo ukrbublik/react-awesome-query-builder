@@ -71,7 +71,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children
     .map((currentChild) => formatItem(
-      [...parents, item], currentChild, config, meta, not, true, mode == "array" ? (f => `$$el.${f}`) : undefined)
+      [...parents, item], currentChild, config, meta, not, mode != "array", mode == "array" ? (f => `$$el.${f}`) : undefined)
     )
     .filter((currentChild) => typeof currentChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size)
@@ -135,11 +135,16 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
       };
       const filterQuery = resultQuery ? {
         "$size": {
-          "$filter": {
-            input: "$" + groupFieldName,
-            as: "el",
-            cond: resultQuery
-          }
+          "$ifNull": [
+            {
+              "$filter": {
+                input: "$" + groupFieldName,
+                as: "el",
+                cond: resultQuery
+              }
+            },
+            []
+          ]
         }
       } : totalQuery;
       resultQuery = formatItem(
@@ -217,7 +222,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   if (fvalue.size < cardinality || hasUndefinedValues)
     return undefined;
   const formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
-  
+
   //build rule
   const fn = operatorDefinition.mongoFormatOp;
   if (!fn) {
@@ -249,7 +254,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
 const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidgetDef, fieldDef, parentPath, operator, operatorDef, asyncListValues) => {
   if (currentValue === undefined)
     return [undefined, false];
-  
+
   let ret;
   let useExpr = false;
 

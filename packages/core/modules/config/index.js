@@ -1394,7 +1394,8 @@ const mixinWidgetTreeselect = (config, addMixin = true) => {
       valueLabel: "Value",
       valuePlaceholder: "Select value",
       formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-        let valLabel = this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, val);
+        const treeData = fieldDef.fieldSettings.treeValues || fieldDef.fieldSettings.listValues || fieldDef.asyncListValues;
+        let valLabel = this.utils.getTitleInListValues(treeData, val);
         return isForDisplay ? this.utils.stringifyForDisplay(valLabel) : JSON.stringify(val);
       },
       sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
@@ -1458,7 +1459,8 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
-        let valsLabels = vals.map(v => this.utils.getTitleInListValues(fieldDef.fieldSettings.listValues || fieldDef.asyncListValues, v));
+        const treeData = fieldDef.fieldSettings.treeValues || fieldDef.fieldSettings.listValues || fieldDef.asyncListValues;
+        let valsLabels = vals.map(v => this.utils.getTitleInListValues(treeData, v));
         return isForDisplay ? valsLabels.map(this.utils.stringifyForDisplay) : vals.map(JSON.stringify);
       },
       sqlFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {

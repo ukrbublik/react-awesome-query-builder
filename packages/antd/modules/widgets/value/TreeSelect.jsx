@@ -20,7 +20,8 @@ export default class TreeSelectWidget extends Component {
     readonly: PropTypes.bool,
     treeMultiple: PropTypes.bool,
     // from fieldSettings:
-    listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+    listValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]), // obsolete
+    treeValues: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   };
 
   constructor(props) {
@@ -30,13 +31,14 @@ export default class TreeSelectWidget extends Component {
   }
 
   onPropsChanged(nextProps) {
-    const { listValues, treeMultiple } = nextProps;
+    const { listValues, treeValues, treeMultiple } = nextProps;
+    const treeData = treeValues || listValues;
 
     let optionsMaxWidth = 0;
     const initialOffset = (treeMultiple ? (24 + 22) : 24); // arrow + checkbox for leftmost item
     const offset = 20;
     const padding = 5 * 2;
-    mapListValues(listValues, ({title, value, path}) => {
+    mapListValues(treeData, ({title, value, path}) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, 
         calcTextWidth(title, null) + padding + (path ? path.length : 0) * offset + initialOffset
       );
@@ -76,16 +78,18 @@ export default class TreeSelectWidget extends Component {
       value,
       treeMultiple,
       listValues,
+      treeValues,
       treeExpandAll,
       readonly
     } = this.props;
+    const treeData = treeValues || listValues;
     const treeCheckStrictly = customProps.treeCheckStrictly || false;
     const { renderSize } = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
     let aValue = value != undefined ? value : undefined;
     if (treeCheckStrictly && aValue !== undefined) {
       if (treeMultiple) {
-        aValue = aValue.map(v => ({value: v, label: getTitleInListValues(listValues, v)}));
+        aValue = aValue.map(v => ({value: v, label: getTitleInListValues(treeData, v)}));
       }
     }
     const width = aValue || !placeholderWidth ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT + 6;
@@ -111,7 +115,7 @@ export default class TreeSelectWidget extends Component {
         dropdownMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
-        treeData={listValues}
+        treeData={treeData}
         treeDataSimpleMode={defaultTreeDataMap}
         filterTreeNode={this.filterTreeNode}
         value={aValue}
