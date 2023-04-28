@@ -510,6 +510,8 @@ export const with_treeselect = {
 export const with_ops = {
   "and": [
     {
+      "==": [ { "var": "text" },  "Long\nText" ]
+    }, {
       "!=": [ { "var": "num" },  2 ]
     }, {
       "in": [ "abc",  { "var": "str" } ]
@@ -648,7 +650,7 @@ export const with_func_tolower_from_field = {
   ]
 };
 
-export const with_func_linear_regression = {
+export const with_func_linear_regression_tree = {
   type: "group",
   id: uuid(),
   children1: {
@@ -677,6 +679,27 @@ export const with_func_linear_regression = {
     conjunction: "AND",
     not: false
   }
+};
+
+
+export const with_func_linear_regression = {
+  "and": [
+    {
+      "==": [
+        { "var": "num" },
+        { "+": [ { "*": [ 2, 3 ] }, 0 ] }
+      ]
+    }
+  ]
+};
+
+export const with_func_relative_datetime = {
+  "and": [ {
+    "==": [
+      { "var": "datetime" },
+      { "date_add": [ { "now": [] }, 2, "day" ] }
+    ]
+  } ]
 };
 
 export const with_prox = {

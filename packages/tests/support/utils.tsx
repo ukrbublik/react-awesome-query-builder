@@ -4,10 +4,13 @@ import { act } from "react-dom/test-utils";
 import sinon, {spy} from "sinon";
 import { expect } from "chai";
 const stringify = JSON.stringify;
+import serializeJs from "serialize-javascript";
+import mergeWith from "lodash/mergeWith";
+import omit from "lodash/omit";
 
 import {
   Utils,
-  JsonLogicTree, JsonTree, Config, ImmutableTree
+  JsonLogicTree, JsonTree, Config, ImmutableTree, ConfigContext
 } from "@react-awesome-query-builder/core";
 import {
   Query, Builder, BasicConfig,
@@ -299,7 +302,6 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
             onChange={emptyOnChange}
           />
         );
-  
         qb.unmount();
       });
     }
@@ -317,7 +319,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
   }
 };
 
-export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = []) => {
+export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
   const config = config_fn(BasicConfig);
   let tree, errors: string[] = [];
   try {
@@ -334,14 +336,14 @@ export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat
         expect(errors.join("; ")).to.equal(expectedErrors.join("; "));
       });
 
-      do_export_checks(config, tree as ImmutableTree, expects, true);
+      do_export_checks(config, tree as ImmutableTree, expects, with_render);
     } else {
       it("should load tree without errors", () => {
         throw new Error(errors.join("; "));
       });
     }
   } else {
-    do_export_checks(config, tree as ImmutableTree, expects, true);
+    do_export_checks(config, tree as ImmutableTree, expects, with_render);
   }
 };
 
@@ -403,3 +405,27 @@ export function sleep(delay: number) {
     setTimeout(resolve, delay);
   });
 }
+
+const mergeCustomizerCleanJSX = (_objValue: any, srcValue: any) => {
+  const { isDirtyJSX, cleanJSX } = Utils.ConfigUtils as any;
+  if (isDirtyJSX(srcValue)) {
+    return cleanJSX(srcValue);
+  }
+};
+
+export const UNSAFE_serializeConfig = (config: Config): string => {
+  const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX);
+  const strConfig: string = serializeJs(sanitizedConfig, {
+    space: 2,
+    unsafe: true,
+  });
+  //remove coverage instructions
+  const sanitizedStrConfig = strConfig.replace(/cov_\w+\(\)\.\w+(\[\d+\])+\+\+(;|,)/gm, '');
+  return sanitizedStrConfig;
+};
+
+export const UNSAFE_deserializeConfig = (strConfig: string, ctx: ConfigContext): Config => {
+  let config = eval("("+strConfig+")");
+  config.ctx = ctx;
+  return config;
+};

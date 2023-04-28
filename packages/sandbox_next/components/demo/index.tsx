@@ -90,6 +90,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   stringifyConfig = () => {
     const strConfig = UNSAFE_serializeConfig(this.state.config) as string;
     const config = UNSAFE_deserializeConfig(strConfig, ctx) as Config;
+    console.log("Deserialized config (click to view):", config.conjunctions.AND.formatConj);
     const spel = Utils.spelFormat(this.state.tree, config);
     const jl = Utils.jsonLogicFormat(this.state.tree, config);
     const mongo = Utils.mongodbFormat(this.state.tree, config);
@@ -98,8 +99,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
       jl,
       mongo,
     };
-    console.log("Deserialized config (click to view):", config.conjunctions.AND.formatConj);
-    console.log("Convert result:", res);
+    console.log("Format result:", res);
     // this.setState({
     //   tree: checkTree(this.state.tree, config),
     //   config,

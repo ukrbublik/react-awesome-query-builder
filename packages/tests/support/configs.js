@@ -521,6 +521,11 @@ export const with_all_types = (BasicConfig) => ({
       label: "String",
       type: "text",
     },
+    text: {
+      label: "Textarea",
+      type: "text",
+      preferWidgets: ["textarea"],
+    },
     date: {
       label: "Date",
       type: "date",
@@ -657,6 +662,10 @@ export const with_funcs = (BasicConfig) => ({
     num: {
       label: "Number",
       type: "number",
+    },
+    datetime: {
+      label: "Datetime",
+      type: "datetime",
     },
     str: {
       label: "String",
