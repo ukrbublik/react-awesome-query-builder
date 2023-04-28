@@ -254,14 +254,14 @@ export type StrConfig = string;
 
 export type ZipConfig = Omit<Config, "ctx">;
 
-export interface ConfigMixin {
+export interface ConfigMixin<C = Config, S = Settings> {
   conjunctions?: Record<string, Partial<Conjunction>>,
-  operators?: Record<string, Partial<Operator>>,
-  widgets?: Record<string, Partial<Widget>>,
+  operators?: Record<string, Partial<Operator<C>>>,
+  widgets?: Record<string, Partial<Widget<C>>>,
   types?: Record<string, Partial<Type>>,
-  settings?: Partial<Settings>,
-  fields?: Record<string, Partial<Field>>,
-  funcs?: Record<string, Partial<Funcs>>,
+  settings?: Partial<S>,
+  fields?: Record<string, Partial<FieldOrGroup>>,
+  funcs?: Record<string, Partial<FuncOrGroup>>,
   ctx?: Partial<ConfigContext>,
 }
 
@@ -971,7 +971,8 @@ export interface FuncArg extends ValueField {
   isOptional?: boolean,
   showPrefix?: boolean,
 }
-export type Funcs = TypedMap<Func | FuncGroup>;
+export type FuncOrGroup = Func | FuncGroup;
+export type Funcs = TypedMap<FuncOrGroup>;
 
 
 /////////////////
@@ -1050,6 +1051,7 @@ export interface CoreConfig extends Config {
   widgets: CoreWidgets,
   types: CoreTypes,
   settings: Settings,
+  ctx: ConfigContext,
 }
 
 

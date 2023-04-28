@@ -159,7 +159,8 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     // same for treeValues
     if (fieldConfig.fieldSettings.treeValues) {
       if (config.settings.normalizeListValues) {
-        fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues(
+        fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues.call(
+          config.ctx,
           fieldConfig.fieldSettings.treeValues, fieldConfig.type, fieldConfig.fieldSettings
         );
       }

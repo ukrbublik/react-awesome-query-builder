@@ -57,6 +57,7 @@ import {
   CaseValueWidgetProps as _CaseValueWidgetProps,
   CoreOperators as _CoreOperators,
   CoreWidgets as _CoreWidgets,
+  ConfigMixin as _ConfigMixin,
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -102,19 +103,16 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
 export type CoreOperators<C = Config> = _CoreOperators<C>;
 export type CoreWidgets<C = Config> = _CoreWidgets<C>;
+export type ConfigMixin<C = Config, S = Settings> = _ConfigMixin<C, S>;
 
 /////////////////
 // extend config
 /////////////////
 
 export interface Config extends CoreConfigType {
-  conjunctions: Conjunctions,
+  settings: Settings,
   operators: Operators,
   widgets: Widgets,
-  types: Types,
-  fields: Fields,
-  funcs?: Funcs,
-  settings: Settings,
 }
 
 export interface BasicConfig extends CoreConfig {
