@@ -1,9 +1,10 @@
 import React from "react";
 import {
-  Config, Fields, 
+  Config, Fields, Funcs, BasicFuncs, Func,
   SelectField, AsyncFetchListValuesFn, SelectFieldSettings, NumberFieldSettings,
 } from "@react-awesome-query-builder/ui";
 import sinon from "sinon";
+import omit from "lodash/omit";
 
 export const SliderMark: React.FC<{ pct: number }> = ({ pct }) => {
   return <strong><span key="val">{pct}</span><span key="pct">%</span></strong>;
@@ -88,6 +89,42 @@ const fields: Fields = {
   },
 };
 
+const funcs: Funcs = {
+  numeric: {
+    type: "!struct",
+    label: "Numeric",
+    subfields: {
+      LINEAR_REGRESSION: omit({
+        ...BasicFuncs.LINEAR_REGRESSION,
+        sqlFormatFunc: null, // modify
+        myFormat: null, // add
+        args: omit({
+          ...(BasicFuncs.LINEAR_REGRESSION as Func).args,
+          // modify
+          coef: {
+            ...(BasicFuncs.LINEAR_REGRESSION as Func).args.coef,
+            newKey: "new_arg", // add
+            defaultValue: 10, // override
+          },
+          // add
+          newArg: {
+            type: "string",
+            label: "New arg"
+          },
+          // omit bias
+        }, "bias"),
+        // omit spel*
+      }, ["spelFormatFunc", "spelFunc"]) as Func,
+    }
+  },
+  LOWER: omit({
+    ...BasicFuncs.LOWER,
+    sqlFormatFunc: null, // modify
+    myFormat: null, // add
+    // omit spel*
+  }, ["spelFormatFunc", "spelFunc"]) as Func,
+};
+
 export const makeCtx = (BaseConfig: Config) => {
   return {
     ...BaseConfig.ctx,
@@ -116,6 +153,7 @@ export const zipInits = {
 
 export const configMixin = {
   fields,
+  funcs,
   settings: {
     useConfigCompress: true
   }

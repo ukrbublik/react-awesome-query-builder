@@ -50,6 +50,8 @@ describe("Compressed config", () => {
         const zipConfig = ConfigUtils.compressConfig(config, BaseConfig);
         const decConfig = ConfigUtils.decompressConfig(zipConfig, BaseConfig);
         export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], configKey !== "CoreConfig");
+
+        // todo: check funcs
       });
     });
   }

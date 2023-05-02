@@ -5,6 +5,7 @@ import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
 import { BasicFuncs } from "..";
+import { getFuncConfig } from "./configUtils";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
@@ -189,10 +190,20 @@ export const compressConfig = (config, baseConfig) => {
 
   const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
-  const _clean = (target, base, path) => {
+  const _clean = (target, base, path, meta) => {
     if (isObject(target)) {
       if (isDirtyJSX(target)) {
         target = cleanJSX(target);
+      }
+      if (path[0] === "funcs" && !base) {
+        const funcKey = path[path.length - 1];
+        // todo: if there will be change in `BasicFuncs` when funcs can be nested, need to chnage code to find `base`
+        base = getFuncConfig({
+          funcs: meta.BasicFuncs
+        }, funcKey) || undefined;
+        if (base) {
+          target["$$key"] = funcKey;
+        }
       }
       if (base !== undefined) {
         for (let k in base) {
@@ -200,7 +211,7 @@ export const compressConfig = (config, baseConfig) => {
             // deleted in target
             target[k] = "$$deleted";
           } else {
-            target[k] = _clean(target[k], base[k], [...path, k]);
+            target[k] = _clean(target[k], base[k], [...path, k], meta);
             if (target[k] === undefined) {
               delete target[k];
             }
@@ -210,7 +221,7 @@ export const compressConfig = (config, baseConfig) => {
       for (let k in target) {
         if (!base || !Object.keys(base).includes(k)) {
           // new in target
-          target[k] = _clean(target[k], base?.[k], [...path, k]);
+          target[k] = _clean(target[k], base?.[k], [...path, k], meta);
         }
         if (target[k] === undefined) {
           delete target[k];
@@ -222,7 +233,7 @@ export const compressConfig = (config, baseConfig) => {
     } else if (Array.isArray(target)) {
       // don't deep compare arrays, but allow clean JSX inside array
       target.forEach((val, ind) => {
-        target[ind] = _clean(target[ind], undefined, [...path, ind]);
+        target[ind] = _clean(target[ind], undefined, [...path, ind], meta);
       });
     }
 
@@ -248,7 +259,9 @@ export const compressConfig = (config, baseConfig) => {
       // leave only diff for every used func
       zipConfig[rootKey] = clone(zipConfig[rootKey] || {});
       for (let k in zipConfig[rootKey]) {
-        _clean(zipConfig[rootKey][k], BasicFuncs[k], [rootKey, k]);
+        _clean(zipConfig[rootKey][k], null, [rootKey, k], {
+          BasicFuncs
+        });
       }
     } else {
       // leave only diff
@@ -269,7 +282,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
 
   const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
-  const _mergeDeep = (target, mixin, path) => {
+  const _mergeDeep = (target, mixin, path, meta) => {
     if (isObject(mixin)) {
       if (!isObject(target)) {
         target = {};
@@ -278,7 +291,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
         if (mixin[k] === "$$deleted") {
           delete target[k];
         } else {
-          target[k] = _mergeDeep(target[k], mixin[k], [...path, k]);
+          target[k] = _mergeDeep(target[k], mixin[k], [...path, k], meta);
         }
       }
     } else if (Array.isArray(mixin)) {
@@ -291,14 +304,59 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
     return target;
   };
 
+  const _mergeFuncs = (target, orig, path, meta) => {
+    if (!orig && target?.["$$key"]) {
+      orig = getFuncConfig({
+        funcs: meta.BasicFuncs
+      }, target["$$key"]);
+    }
+
+    // copy from orig to target
+    if (isObject(orig)) {
+      if (!isObject(target)) {
+        target = {};
+      }
+      for (let k in orig) {
+        if (!Object.keys(target).includes(k)) {
+          target[k] = _mergeFuncs(target[k], orig[k], [...path, k], meta);
+        }
+      }
+    }
+
+    if (isObject(target)) {
+      if (target["$$key"] && orig) {
+        delete target["$$key"];
+      }
+      // loop through target and find origs
+      for (let k in target) {
+        if (target[k] === "$$deleted") {
+          delete target[k];
+        } else {
+          target[k] = _mergeFuncs(target[k], orig?.[k], [...path, k], meta);
+        }
+      }
+    }
+
+    if (Array.isArray(orig) && !target) {
+      target = orig;
+      // don't merge arrays, just replace
+    } else if (orig != undefined && target == undefined) {
+      target = orig;
+    }
+
+    return target;
+  };
+
   for (const rootKey of configKeys) {
     if (rootKey === "ctx") {
       // simple deep merge
       unzipConfig[rootKey] = merge({}, baseConfig.ctx || {}, ctx || {});
     } else if (rootKey === "funcs") {
-      // first pick only used funcs, then merge
-      unzipConfig[rootKey] = clone( pick( BasicFuncs, Object.keys(zipConfig[rootKey] || {}) ) );
-      _mergeDeep(unzipConfig[rootKey], zipConfig[rootKey] || {}, [rootKey]);
+      // use $$key to pick funcs from BasicFuncs
+      unzipConfig[rootKey] = clone(zipConfig[rootKey] || {});
+      _mergeFuncs(unzipConfig[rootKey], {}, [rootKey], {
+        BasicFuncs
+      });
     } else if (rootKey === "fields") {
       // just copy
       unzipConfig[rootKey] = clone(zipConfig[rootKey] || {});

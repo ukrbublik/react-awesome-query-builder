@@ -44,6 +44,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   componentDidMount = () => {
     console.log("zipConfig:", this.props.zipConfig);
     console.log("ctx:", ctx);
+    console.log("decompressed config:", this.state.config);
     this._updateResult({ saveTree: false });
   };
 

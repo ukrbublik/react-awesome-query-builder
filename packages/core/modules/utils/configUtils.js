@@ -247,7 +247,7 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
       }
     };
   }
-  const fieldSeparator = config.settings.fieldSeparator;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
   //field = normalizeField(config, field);
   const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
   const targetFields = config[fieldsKey];

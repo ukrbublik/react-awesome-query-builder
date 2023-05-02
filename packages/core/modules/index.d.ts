@@ -951,9 +951,9 @@ type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup {
-  type?: "!struct",
+  type: "!struct",
   label?: string,
-  subfields: TypedMap<Func>,
+  subfields: TypedMap<FuncOrGroup>,
 }
 
 export interface Func {
