@@ -1,7 +1,7 @@
 import JL from "json-logic-js";
 import moment from "moment";
 
-function applyJsonLogic(logic, data) {
+export function applyJsonLogic(logic, data) {
   return JL.apply(logic, data);
 }
 

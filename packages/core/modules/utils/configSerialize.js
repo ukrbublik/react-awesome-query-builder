@@ -3,15 +3,15 @@ import pick from "lodash/pick";
 import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
 import clone from "clone";
 import JL from "json-logic-js";
-import { addRequiredJsonLogicOperations } from "./jsonLogic";
+import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
 import { BasicFuncs } from "..";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
 
-export { isJSX, isDirtyJSX, cleanJSX };
+export { isJSX, isDirtyJSX, cleanJSX, applyJsonLogic };
 
-function applyJsonLogic(logic, data, path) {
+function applyJsonLogicWithPath(logic, data, path) {
   let ret;
   try {
     ret = JL.apply(logic, data);
@@ -409,7 +409,7 @@ function compileJsonLogicReact(jl, opts, path, ignore = undefined) {
       const data = {
         props, ctx,
       };
-      let re = applyJsonLogic(jl, data, path);
+      let re = applyJsonLogicWithPath(jl, data, path);
       if (typeof re === "string") {
         re = {
           type: re,
@@ -446,7 +446,7 @@ function compileJsonLogic(jl, opts, path, argNames, ignore = undefined) {
       const data = (argNames || []).reduce((acc, k, i) => ({...acc, [k]: args[i]}), {
         args, ctx
       });
-      const ret = applyJsonLogic(jl, data, path);
+      const ret = applyJsonLogicWithPath(jl, data, path);
       return ret;
     }.bind(opts?.ctx);
   } else if (typeof jl === "string" && ignore !== "string") {

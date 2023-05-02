@@ -227,6 +227,7 @@ export interface Utils {
     isJSX(jsx: any): boolean;
     isDirtyJSX(jsx: any): boolean;
     cleanJSX(jsx: any): Object;
+    applyJsonLogic(logic: any, data?: any): any;
   };
   ExportUtils: {
     spelEscape(val: any): string;
