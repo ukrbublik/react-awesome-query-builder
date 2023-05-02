@@ -25,7 +25,7 @@ describe("interactions on antd", () => {
         expect(stringifyOptions(qb)).to.eq("a");
         
         ac.prop("onSearch")("b");
-        await sleep(200); // should be > 50ms delay
+        await sleep(400); // should be > 50ms delay
         qb.update();
         ac = qb.find("Select").filterWhere(s => s.props()?.placeholder == "Select value");
         expect(stringifyOptions(qb)).to.eq("a;b");

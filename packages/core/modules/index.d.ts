@@ -223,6 +223,10 @@ export interface Utils {
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
     getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
     getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+    isJsonLogic(value: any): boolean;
+    isJSX(jsx: any): boolean;
+    isDirtyJSX(jsx: any): boolean;
+    cleanJSX(jsx: any): Object;
   };
   ExportUtils: {
     spelEscape(val: any): string;
@@ -755,7 +759,7 @@ interface BaseField {
   label?: string,
   tooltip?: string,
 }
-interface ValueField extends BaseField {
+interface ValueField<FS = FieldSettings> extends BaseField {
   type: string,
   preferWidgets?: Array<string>,
   valueSources?: Array<ValueSource>,
@@ -763,7 +767,7 @@ interface ValueField extends BaseField {
   tableName?: string, // legacy: PR #18, PR #20
   fieldName?: string,
   jsonLogicVar?: string,
-  fieldSettings?: FieldSettings,
+  fieldSettings?: FS,
   defaultValue?: RuleValue,
   widgets?: TypedMap<WidgetConfigForType>,
   mainWidgetProps?: Optional<Widget>,
@@ -774,7 +778,7 @@ interface ValueField extends BaseField {
   allowCustomValues?: boolean,
   isSpelVariable?: boolean,
 }
-interface SimpleField extends ValueField {
+interface SimpleField<FS = FieldSettings> extends ValueField<FS> {
   label2?: string,
   operators?: Array<string>,
   defaultOperator?: string,
@@ -809,6 +813,14 @@ export type Field = SimpleField;
 export type FieldOrGroup = FieldStruct | FieldGroup | FieldGroupExt | Field;
 export type Fields = TypedMap<FieldOrGroup>;
 
+export type NumberField = SimpleField<NumberFieldSettings>;
+export type DateTimeField = SimpleField<DateTimeFieldSettings>;
+export type SelectField = SimpleField<SelectFieldSettings>;
+export type MultiSelectField = SimpleField<MultiSelectFieldSettings>;
+export type TreeSelectField = SimpleField<TreeSelectFieldSettings>;
+export type TreeMultiSelectField = SimpleField<TreeMultiSelectFieldSettings>;
+export type BooleanField = SimpleField<BooleanFieldSettings>;
+export type TextField = SimpleField<TextFieldSettings>;
 
 
 /////////////////

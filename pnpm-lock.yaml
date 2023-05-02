@@ -681,9 +681,11 @@ importers:
       '@types/chai': ^4.2.18
       '@types/enzyme': ^3.10.8
       '@types/estree': ^1.0.0
+      '@types/lodash': ^4.14.170
       '@types/mocha': ^9.0.0
       '@types/react': ^17
       '@types/react-dom': ^17.0.18
+      '@types/serialize-javascript': ^5.0.2
       '@types/sinon': ^10.0.2
       '@wojtekmaj/enzyme-adapter-react-17': ^0.6.3
       antd: ^5.1.2
@@ -764,9 +766,11 @@ importers:
       '@types/chai': 4.3.4
       '@types/enzyme': 3.10.12
       '@types/estree': 1.0.0
+      '@types/lodash': 4.14.191
       '@types/mocha': 9.1.1
       '@types/react': 17.0.52
       '@types/react-dom': 17.0.18
+      '@types/serialize-javascript': 5.0.2
       '@types/sinon': 10.0.13
       '@wojtekmaj/enzyme-adapter-react-17': 0.6.7_7ltvq4e2railvf5uya4ffxpe2a
       babel-loader: 8.3.0_lkd654lvpl423ugsqn5olungie
@@ -4897,6 +4901,10 @@ packages:
 
   /@types/semver/7.3.13:
     resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==}
+    dev: true
+
+  /@types/serialize-javascript/5.0.2:
+    resolution: {integrity: sha512-BRLlwZzRoZukGaBtcUxkLsZsQfWZpvog6MZk3PWQO9Q6pXmXFzjU5iGzZ+943evp6tkkbN98N1Z31KT0UG1yRw==}
     dev: true
 
   /@types/serve-index/1.9.1:

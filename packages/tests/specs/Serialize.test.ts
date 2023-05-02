@@ -27,22 +27,21 @@ describe("Serialized config", () => {
     const config = makeConfig(BaseConfig);
 
     describe(configKey, () => {
-      it("should not contain refs to webpack", async () => {
+      it("should not contain refs to webpack", () => {
         const strConfig = UNSAFE_serializeConfig(config);
         expect(strConfig).to.not.contain("__WEBPACK_IMPORTED_MODULE_");
       });
 
-      it("should be deserialized correctly", async () => {
+      it("should be deserialized correctly", () => {
         const strConfig = UNSAFE_serializeConfig(config);
         const deserConfig = UNSAFE_deserializeConfig(strConfig, BaseConfig.ctx);
         expect(deserConfig).to.satisfy((c: Config) => !!c.ctx, "Should contain ctx");
       });
 
-      describe("should be deserialized and used without errors", async () => {
+      describe("should be deserialized and used without errors", () => {
         const strConfig = UNSAFE_serializeConfig(config);
         const deserConfig = UNSAFE_deserializeConfig(strConfig, BaseConfig.ctx);
         export_checks(() => deserConfig, inits.with_ops, "JsonLogic", {}, [], configKey !== "CoreConfig");
-
       });
     });
   }

@@ -159,6 +159,7 @@ const operators = {
     ],
   },
 };
+delete operators.proximity;
 
 const widgets = {
   ...InitialConfig.widgets,

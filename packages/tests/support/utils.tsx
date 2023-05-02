@@ -408,25 +408,26 @@ export function sleep(delay: number) {
 }
 
 const mergeCustomizerCleanJSX = (_objValue: any, srcValue: any) => {
-  const { isDirtyJSX, cleanJSX } = Utils.ConfigUtils as any;
+  const { isDirtyJSX, cleanJSX } = Utils.ConfigUtils;
   if (isDirtyJSX(srcValue)) {
     return cleanJSX(srcValue);
   }
+  return undefined;
 };
 
 export const UNSAFE_serializeConfig = (config: Config): string => {
-  const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX);
-  const strConfig: string = serializeJs(sanitizedConfig, {
+  const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX) as Config;
+  const strConfig = serializeJs(sanitizedConfig, {
     space: 2,
     unsafe: true,
   });
   //remove coverage instructions
-  const sanitizedStrConfig = strConfig.replace(/cov_\w+\(\)\.\w+(\[\d+\])+\+\+(;|,)/gm, '');
+  const sanitizedStrConfig = strConfig.replace(/cov_\w+\(\)\.\w+(\[\d+\])+\+\+(;|,)/gm, "");
   return sanitizedStrConfig;
 };
 
 export const UNSAFE_deserializeConfig = (strConfig: string, ctx: ConfigContext): Config => {
-  let config = eval("("+strConfig+")");
+  const config = eval("("+strConfig+")") as Config;
   config.ctx = ctx;
   return config;
 };

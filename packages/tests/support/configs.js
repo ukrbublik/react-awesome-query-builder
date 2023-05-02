@@ -138,7 +138,26 @@ export const with_theme_material = (BasicConfig) => ({
     },
   }
 });
-  
+
+export const with_theme_mui = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    theme: {
+      mui: {
+        palette: {
+          primary: {
+            main: "#5e00d7",
+          },
+          secondary: {
+            main: "#edf2ff",
+          },
+        },
+      }
+    },
+  }
+});
+
 export const with_select = (BasicConfig) => ({
   ...BasicConfig,
   fields: {

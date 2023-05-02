@@ -448,7 +448,7 @@ function compileJsonLogic(jl, opts, path, argNames, ignore = undefined) {
       });
       const ret = applyJsonLogic(jl, data, path);
       return ret;
-    };
+    }.bind(opts?.ctx);
   } else if (typeof jl === "string" && ignore !== "string") {
     return function(...args) {
       const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
@@ -458,7 +458,7 @@ function compileJsonLogic(jl, opts, path, argNames, ignore = undefined) {
       } else {
         throw new Error(`${path.join(".")} :: Function ${jl} is not found in ctx`);
       }
-    };
+    }.bind(opts?.ctx);
   }
   return jl;
 }
