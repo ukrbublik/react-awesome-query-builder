@@ -36,7 +36,6 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@material-ui/pickers": "^3.3.10",
     "@mui/icons-material": "^5.10.3",
-    "@mui/lab": "^5.0.0-alpha.98",
     "@mui/material": "^5.10.4",
     "@mui/system": "^5.10.4",
     "@mui/x-date-pickers": "^5.0.0",
