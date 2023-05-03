@@ -1,15 +1,19 @@
 import React from "react";
 import {
-  Config, Fields, Funcs, BasicFuncs, Func, Types, Type, Operator,
+  Config, Fields, Funcs, BasicFuncs, Func, Types, Type, Operator, Operators, Settings,
   SelectField, AsyncFetchListValuesFn, SelectFieldSettings, NumberFieldSettings,
+  FieldProps, ConfigContext, VanillaWidgets,
 } from "@react-awesome-query-builder/ui";
 import sinon from "sinon";
 import omit from "lodash/omit";
+import merge from "lodash/merge";
+const { VanillaFieldSelect } = VanillaWidgets;
 
 export const SliderMark: React.FC<{ pct: number }> = ({ pct }) => {
   return <strong><span key="val">{pct}</span><span key="pct">%</span></strong>;
 };
 const SliderMark_NotExists: React.FC<{ pct: number }> = () => null;
+const MyLabel: React.FC = () => null;
 
 const fields: Fields = {
   num: {
@@ -87,6 +91,13 @@ const fields: Fields = {
       },
     } as NumberFieldSettings,
   },
+  in_stock: {
+    type: "boolean",
+    mainWidgetProps: {
+      labelYes: <MyLabel>Yes</MyLabel>,
+      labelNo: "No",
+    }
+  },
 };
 
 const operators: Record<string, Partial<Operator>> = {
@@ -101,6 +112,10 @@ const operators: Record<string, Partial<Operator>> = {
       <strong key="from">from</strong>,
       <strong key="to">to</strong>,
     ],
+    // modify, change type from primitive to object
+    jsonLogic: { aaa: 1 },
+    // delete
+    labelForFormat: undefined,
   },
 };
 
@@ -109,15 +124,19 @@ const types: Record<string, Partial<Type>> = {
     widgets: {
       boolean: {
         widgetProps: {
+          // add
           hideOperator: true,
           operatorInlineLabel: "is",
           valueLabels: []
         },
+        // modify, change type from object to primitive
+        opProps: 111 as any
       },
     },
   }
 };
 
+// tip: LINEAR_REGRESSION and LOWER are heavily modified for tests, don't use in query value
 const funcs: Funcs = {
   numeric: {
     type: "!struct",
@@ -159,12 +178,24 @@ const funcs: Funcs = {
   }, ["spelFormatFunc", "spelFunc"]) as Func,
 };
 
+const settings: Partial<Settings> = {
+  renderField: "myRenderField",
+  renderButton: "button", // missing in ctx, so will try to render <button>
+  renderOperator: { JSX: ["VanillaFieldSelect", {var: "props"}] },
+  renderConfirm: { CALL: [ {var: "ctx.W.vanillaConfirm"}, null, {var: "props"} ] },
+  renderConjs: { "if": [ { var: "props.someFlag" }, "VanillaConjs", "VanillaConjs" ] }
+};
+
 export const makeCtx = (BaseConfig: Config) => {
   return {
     ...BaseConfig.ctx,
     autocompleteFetch: sinon.spy(),
+    myRenderField: (props: FieldProps, _ctx: ConfigContext) => {
+      return <VanillaFieldSelect {...props}/>;
+    },
     components: {
       SliderMark,
+      MyLabel,
       // SliderMark_NotExists,
     }
   }
@@ -185,14 +216,21 @@ export const zipInits = {
   withSlider,
 };
 
-export const configMixin = {
-  fields,
-  funcs,
-  operators,
-  types,
-  settings: {
-    useConfigCompress: true
-  }
+export const configMixin = (BasicConfig: Config): Config => {
+  const c = {
+    ...BasicConfig,
+    fields,
+    operators: merge({}, BasicConfig.operators, operators),
+    funcs: merge({}, BasicConfig.funcs, funcs),
+    types: merge({}, BasicConfig.types, types),
+    settings: {
+      ...BasicConfig.settings,
+      ...settings,
+      useConfigCompress: true
+    },
+  };
+  c.operators.between.labelForFormat = undefined; // manually set to undefined, cause of issue with merge()
+  return c;
 };
 
 
@@ -248,7 +286,9 @@ export const expectedZipConfig = {
             "children": "to"
           }
         }
-      ]
+      ],
+      "jsonLogic": { "aaa": 1 },
+      "labelForFormat": "$$deleted"
     }
   },
   types: {
@@ -259,7 +299,8 @@ export const expectedZipConfig = {
             "hideOperator": true,
             "operatorInlineLabel": "is",
             "valueLabels": []
-          }
+          },
+          "opProps": 111
         }
       }
     }

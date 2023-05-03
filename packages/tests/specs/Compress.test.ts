@@ -55,6 +55,21 @@ describe("Compressed config", () => {
         export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], configKey !== "CoreConfig");
       });
     });
+
+    it("should throw if contains functions", () => {
+      const badConfig = merge({}, makeConfig(BaseConfig), {
+        fields: {
+          str: {
+            fieldSettings: {
+              validateValue: (val: string) => {
+                return (val.length < 10);
+              },
+            },
+          },
+        },
+      });
+      expect(() => ConfigUtils.compressConfig(badConfig, BaseConfig)).to.throw();
+    });
   }
 });
 
@@ -68,7 +83,7 @@ describe("settings.useConfigCompress", () => {
   });
 
   it("extendConfig() should compile functions", async () => {
-    const config: Config = merge({}, BaseConfig, configMixin);
+    const config: Config = configMixin(BaseConfig);
     const ctx = makeCtx(BaseConfig);
 
     // compress and decompress
@@ -114,11 +129,21 @@ describe("settings.useConfigCompress", () => {
     expect(decConfig.funcs).to.have.nested.property("LOWER.mongoFunc.lower", 12);
     expect(decConfig.funcs).to.have.nested.property("LOWER.jsonLogic", "ToLowerCase");
     
+    // check operators
+    expect(decConfig.operators).to.have.deep.nested.property("between.jsonLogic", {aaa: 1});
+    expect(decConfig.operators).to.have.nested.property("between.reversedOp", "not_between");
+    expect(decConfig.operators).to.not.have.nested.property("between.labelForFormat");
+
+    // check types
+    expect(decConfig.types).to.have.nested.property("boolean.widgets.boolean.opProps", 111);
+
+    // can't compress extended config
+    expect(() => ConfigUtils.compressConfig(extConfig, BaseConfig)).to.throw();
   });
 
   it("extendConfig() should compile React components", async () => {
     BaseConfig = MuiConfig;
-    const config: Config = merge({}, BaseConfig, configMixin);
+    const config: Config = configMixin(BaseConfig);
     const ctx = makeCtx(BaseConfig);
 
     // compress and decompress
