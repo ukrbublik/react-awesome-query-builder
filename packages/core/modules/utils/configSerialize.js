@@ -205,9 +205,9 @@ export const compressConfig = (config, baseConfig) => {
           target["$$key"] = funcKey;
         }
       }
-      if (base !== undefined) {
+      if (base !== undefined && isObject(base)) {
         for (let k in base) {
-          if (!Object.keys(target).includes(k)) {
+          if (!Object.keys(target).includes(k) || target[k] === undefined && base[k] !== undefined) {
             // deleted in target
             target[k] = "$$deleted";
           } else {
@@ -282,7 +282,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
 
   const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
-  const _mergeDeep = (target, mixin, path, meta) => {
+  const _mergeDeep = (target, mixin, path) => {
     if (isObject(mixin)) {
       if (!isObject(target)) {
         target = {};
@@ -291,11 +291,11 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
         if (mixin[k] === "$$deleted") {
           delete target[k];
         } else {
-          target[k] = _mergeDeep(target[k], mixin[k], [...path, k], meta);
+          target[k] = _mergeDeep(target[k], mixin[k], [...path, k]);
         }
       }
     } else if (Array.isArray(mixin)) {
-      target = mixin;
+      target = clone(mixin);
       // don't merge arrays, just replace
     } else {
       target = mixin;
@@ -313,12 +313,14 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
 
     // copy from orig to target
     if (isObject(orig)) {
-      if (!isObject(target)) {
+      if (target === undefined) {
         target = {};
       }
-      for (let k in orig) {
-        if (!Object.keys(target).includes(k)) {
-          target[k] = _mergeFuncs(target[k], orig[k], [...path, k], meta);
+      if (isObject(target)) {
+        for (let k in orig) {
+          if (!Object.keys(target).includes(k)) {
+            target[k] = _mergeFuncs(target[k], orig[k], [...path, k], meta);
+          }
         }
       }
     }
@@ -337,11 +339,8 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
       }
     }
 
-    if (Array.isArray(orig) && !target) {
-      target = orig;
-      // don't merge arrays, just replace
-    } else if (orig != undefined && target == undefined) {
-      target = orig;
+    if (orig !== undefined && !isObject(orig) && target === undefined) {
+      target = clone(orig);
     }
 
     return target;

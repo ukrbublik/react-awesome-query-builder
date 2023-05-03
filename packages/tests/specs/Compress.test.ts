@@ -11,11 +11,14 @@ import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { export_checks, with_qb } from "../support/utils";
-import { SliderMark, configMixin, makeCtx, zipInits } from "../support/zipConfigs";
-import { expect } from "chai";
+import { SliderMark, configMixin, makeCtx, zipInits, expectedZipConfig } from "../support/zipConfigs";
+import chai from "chai";
 import sinon from "sinon";
+import deepEqualInAnyOrder from "deep-equal-in-any-order";
 import merge from "lodash/merge";
 const { ConfigUtils } = Utils;
+chai.use(deepEqualInAnyOrder);
+const { expect } = chai;
 
 const BaseConfigs: Record<string, Config> = {
   CoreConfig,
@@ -50,8 +53,6 @@ describe("Compressed config", () => {
         const zipConfig = ConfigUtils.compressConfig(config, BaseConfig);
         const decConfig = ConfigUtils.decompressConfig(zipConfig, BaseConfig);
         export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], configKey !== "CoreConfig");
-
-        // todo: check funcs
       });
     });
   }
@@ -85,6 +86,34 @@ describe("settings.useConfigCompress", () => {
     expect(() =>
       ((extConfig.fields.autocomplete3 as SelectField).fieldSettings!.asyncFetch as AsyncFetchListValuesFn)("cc", 0)
     ).to.throw();
+
+    // check funcs
+    expect(zipConfig.funcs, "zipConfig.funcs").to.deep.equalInAnyOrder(expectedZipConfig.funcs);
+    expect(zipConfig.operators, "zipConfig.operators").to.deep.equalInAnyOrder(expectedZipConfig.operators);
+    expect(zipConfig.types, "zipConfig.operators").to.deep.equalInAnyOrder(expectedZipConfig.types);
+
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.sqlFormatFunc", null);
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.myFormat", null);
+    expect(decConfig.funcs).to.not.have.nested.property("numeric.subfields.LINEAR_REGRESSION.spelFormatFunc");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.returnType", "number");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.renderBrackets[0]", "");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.renderBrackets[1]", "");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.renderSeps[0]", "*");
+    expect(decConfig.funcs).to.not.have.nested.property("numeric.subfields.LINEAR_REGRESSION.renderSeps[1]");
+    expect(decConfig.funcs).to.not.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.bias");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.coef.type", "number");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.coef.newKey", "new_arg");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.coef.defaultValue", 10);
+    expect(decConfig.funcs).to.not.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.coef.label");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.newArg.type", "string");
+    expect(decConfig.funcs).to.have.nested.property("numeric.subfields.LINEAR_REGRESSION.args.newArg.label", "New arg");
+    expect(decConfig.funcs).to.not.have.nested.property("LOWER.spelFunc");
+    expect(decConfig.funcs).to.not.have.nested.property("LOWER.label");
+    expect(decConfig.funcs).to.have.nested.property("LOWER.myFormat", 123);
+    expect(decConfig.funcs).to.have.nested.property("LOWER.jsonLogicCustomOps", 1);
+    expect(decConfig.funcs).to.have.nested.property("LOWER.mongoFunc.lower", 12);
+    expect(decConfig.funcs).to.have.nested.property("LOWER.jsonLogic", "ToLowerCase");
+    
   });
 
   it("extendConfig() should compile React components", async () => {

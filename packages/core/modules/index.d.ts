@@ -466,6 +466,7 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   mongoFormatValue?: MongoFormatValue | SerializedFunction;
   elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
   hideOperator?: boolean;
+  operatorInlineLabel?: string;
   jsonLogic?: JsonLogicFormatValue | SerializedFunction;
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction;

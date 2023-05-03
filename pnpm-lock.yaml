@@ -686,6 +686,7 @@ importers:
       chai: ^4.3.2
       codecov: ^3.8.2
       css-loader: ^6.2.0
+      deep-equal-in-any-order: ^2.0.6
       enzyme: ^3.11.0
       karma: ^6.3.4
       karma-babel-preprocessor: ^8.0.2
@@ -768,6 +769,7 @@ importers:
       chai: 4.3.7
       codecov: 3.8.3
       css-loader: 6.7.3_webpack@5.75.0
+      deep-equal-in-any-order: 2.0.6
       enzyme: 3.11.0
       karma: 6.4.1
       karma-babel-preprocessor: 8.0.2_@babel+core@7.20.7
@@ -6712,6 +6714,13 @@ packages:
       type-detect: 4.0.8
     dev: true
 
+  /deep-equal-in-any-order/2.0.6:
+    resolution: {integrity: sha512-RfnWHQzph10YrUjvWwhd15Dne8ciSJcZ3U6OD7owPwiVwsdE5IFSoZGg8rlwJD11ES+9H5y8j3fCofviRHOqLQ==}
+    dependencies:
+      lodash.mapvalues: 4.6.0
+      sort-any: 2.0.0
+    dev: true
+
   /deep-is/0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
     dev: true
@@ -9547,6 +9556,10 @@ packages:
 
   /lodash.ismatch/4.4.0:
     resolution: {integrity: sha512-fPMfXjGQEV9Xsq/8MTSgUf255gawYRbjwMyDbcvDhXgV7enSZA0hynz6vMPnpAb5iONEzBHBPsT+0zes5Z301g==}
+    dev: true
+
+  /lodash.mapvalues/4.6.0:
+    resolution: {integrity: sha512-JPFqXFeZQ7BfS00H58kClY7SPVeHertPE0lNuCyZ26/XlN8TvakYD7b9bGyNmXbT/D3BbtPAAmq90gPWqLkxlQ==}
     dev: true
 
   /lodash.merge/4.6.2:
@@ -12540,6 +12553,12 @@ packages:
     dependencies:
       ip: 2.0.0
       smart-buffer: 4.2.0
+    dev: true
+
+  /sort-any/2.0.0:
+    resolution: {integrity: sha512-T9JoiDewQEmWcnmPn/s9h/PH9t3d/LSWi0RgVmXSuDYeZXTZOZ1/wrK2PHaptuR1VXe3clLLt0pD6sgVOwjNEA==}
+    dependencies:
+      lodash: 4.17.21
     dev: true
 
   /sort-keys/2.0.0:

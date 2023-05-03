@@ -74,6 +74,7 @@
     "chai": "^4.3.2",
     "codecov": "^3.8.2",
     "css-loader": "^6.2.0",
+    "deep-equal-in-any-order": "^2.0.6",
     "enzyme": "^3.11.0",
     "karma": "^6.3.4",
     "karma-babel-preprocessor": "^8.0.2",
