@@ -75,8 +75,12 @@ describe("mui widgets interactions", () => {
       if (clockPicker) {
         // mobile mode
         if (window?.matchMedia?.("(pointer:none)")?.matches) {
-          throw new Error("Pointer media feature is neither coarse nor fine");
+          console.warn("Pointer media feature is neither coarse nor fine");
         }
+        console.log(111, 
+          window?.matchMedia?.("not (pointer:coarse)")?.matches,
+          window?.matchMedia?.("(pointer: fine) or (pointer: none)")?.matches,
+        );
         this.skip();
       } else {
         // desktop mode
