@@ -4,7 +4,7 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
 
-describe("material-ui theming", () => {
+describe("mui theming", () => {
   it("applies secondary color", async () => {
     await with_qb_mui(configs.with_theme_mui, inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
@@ -19,7 +19,7 @@ describe("material-ui theming", () => {
   });
 });
 
-describe("material-ui widgets interactions", () => {
+describe("mui widgets interactions", () => {
 
   it("change date", async () => {
     await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
