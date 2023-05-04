@@ -26,9 +26,13 @@ export default (props) => {
       {...params}
     />;
 
+  // const desktopModeMediaQuery = "@media (pointer: fine) or (pointer: none)";
+  const desktopModeMediaQuery = "@media not (pointer: coarse)";
+
   return (
     <FormControl>
       <TimePicker
+        {...(desktopModeMediaQuery && {desktopModeMediaQuery})}
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}

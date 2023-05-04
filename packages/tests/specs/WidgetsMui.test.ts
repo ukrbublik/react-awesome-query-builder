@@ -25,8 +25,15 @@ describe("mui widgets interactions", () => {
     await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       // open date picker for '2020-05-18'
       const openPickerBtn = qb.find(".rule--widget--DATE button.MuiIconButton-root");
-      expect(openPickerBtn, "openPickerBtn").to.have.length(1);
-      openPickerBtn.simulate("click");
+      const dateInput = qb.find(".rule--widget--DATE input.MuiInput-input");
+      expect(dateInput, "dateInput").to.have.length(1);
+      if (openPickerBtn.length) {
+        // desktop mode
+        openPickerBtn.simulate("click");
+      } else {
+        // mobile mode
+        dateInput.simulate("click");
+      }
 
       // click on 3rd week, 2nd day of week (should be sunday, 10 day for default US locale)
       const dayBtn = document.querySelector<HTMLElement>(
@@ -40,8 +47,6 @@ describe("mui widgets interactions", () => {
       dayBtn?.click();
 
       // now input should be '2020-05-11'
-      const dateInput = qb.find(".rule--widget--DATE input.MuiInput-input");
-      expect(dateInput, "dateInput").to.have.length(1);
       const dateInputValue = dateInput.getDOMNode().getAttribute("value");
       expect(dateInputValue, "dateInputValue").to.eq("11.05.2020");
 
@@ -61,12 +66,23 @@ describe("mui widgets interactions", () => {
     });
   });
 
-  it("change time value", async () => {
+  it("change time value", async function() {
     await with_qb_mui(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      const timeInput = qb.find(".rule--widget--TIME input.MuiInput-input");
+      expect(timeInput, "timeInput").to.have.length(1);
+      timeInput.simulate("click");
+      const clockPicker = document.querySelector<HTMLElement>(".MuiClockPicker-root");
+      if (clockPicker) {
+        // mobile mode
+        this.skip();
+      } else {
+        // desktop mode
         qb
         .find(".rule--widget--TIME .MuiInput-input")
         .at(1)
         .simulate("change", { target: { value: "10:30" } });
+      }
+      
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
       ]);

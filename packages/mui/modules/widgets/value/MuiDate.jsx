@@ -21,9 +21,12 @@ export default (props) => {
       {...params}
     />;
 
+  const desktopModeMediaQuery = "@media not (pointer: coarse)";
+
   return (
     <FormControl>
       <DatePicker
+        {...(desktopModeMediaQuery && {desktopModeMediaQuery})}
         readOnly={readonly}
         disabled={readonly}
         toolbarPlaceholder={!readonly ? placeholder : ""}
