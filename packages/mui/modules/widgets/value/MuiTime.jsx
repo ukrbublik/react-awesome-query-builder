@@ -3,8 +3,6 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
-import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 const { moment } = Utils;
 
 export default (props) => {
@@ -28,14 +26,13 @@ export default (props) => {
       {...params}
     />;
 
-  const useKeyboard = window.matchMedia ?
-    window.matchMedia?.("(pointer:fine)").matches || window.matchMedia?.("(pointer:none)").matches
-    : props.useKeyboard;
-  const Picker = typeof useKeyboard === "boolean" ? (useKeyboard ? DesktopTimePicker : MobileTimePicker) : TimePicker;
+  const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
+  const Picker = TimePicker;
 
   return (
     <FormControl>
       <Picker
+        {...(desktopModeMediaQuery && {desktopModeMediaQuery})}
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}
