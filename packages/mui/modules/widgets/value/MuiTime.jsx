@@ -1,14 +1,14 @@
 import React from "react";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import { DesktopTimePicker } from "@mui/x-date-pickers/DesktopTimePicker";
 const { moment } = Utils;
 
 export default (props) => {
-  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps, useKeyboard} = props;
+  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps} = props;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -28,16 +28,19 @@ export default (props) => {
       {...params}
     />;
 
-  const desktopModeMediaQuery = "not (pointer: coarse)";
-  //if (typeof useKeyboard !== "boolean") {
-    useKeyboard = window?.matchMedia?.(desktopModeMediaQuery)?.matches;
-  //}
-  //const TimePicker = useKeyboard ? DesktopTimePicker : MobileTimePicker;
+  let desktopModeMediaQuery = "not (pointer: coarse)";
+  const useKeyboard = window.matchMedia ? window.matchMedia?.(desktopModeMediaQuery).matches : props.useKeyboard;
+  const Picker = typeof useKeyboard === "boolean" ? (useKeyboard ? DesktopTimePicker : MobileTimePicker) : TimePicker;
+  if (Picker === TimePicker) {
+    desktopModeMediaQuery = `@media ${desktopModeMediaQuery}`;
+  } else {
+    desktopModeMediaQuery = undefined;
+  }
 
   return (
     <FormControl>
-      <TimePicker
-        {...(desktopModeMediaQuery && {desktopModeMediaQuery: `@media ${desktopModeMediaQuery}`})}
+      <Picker
+        //{...(desktopModeMediaQuery && {desktopModeMediaQuery})}
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}
