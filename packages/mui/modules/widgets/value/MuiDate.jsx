@@ -1,7 +1,5 @@
 import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
-import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 
@@ -23,14 +21,12 @@ export default (props) => {
       {...params}
     />;
 
-  const useKeyboard = window.matchMedia ?
-    window.matchMedia?.("(pointer:fine)").matches || window.matchMedia?.("(pointer:none)").matches
-    : props.useKeyboard;
-  const Picker = typeof useKeyboard === "boolean" ? (useKeyboard ? DesktopDatePicker : MobileDatePicker) : DatePicker;
+  const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
 
   return (
     <FormControl>
-      <Picker
+      <DatePicker
+        desktopModeMediaQuery={desktopModeMediaQuery}
         readOnly={readonly}
         disabled={readonly}
         toolbarPlaceholder={!readonly ? placeholder : ""}

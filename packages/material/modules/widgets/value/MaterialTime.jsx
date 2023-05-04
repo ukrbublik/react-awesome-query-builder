@@ -4,7 +4,7 @@ import moment from "moment";
 import FormControl from "@material-ui/core/FormControl";
 
 export default (props) => {
-  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps, useKeyboard} = props;
+  const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps} = props;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -14,6 +14,9 @@ export default (props) => {
     setValue(formatSingleValue(value));
   };
 
+  const useKeyboard = window?.matchMedia ?
+    window.matchMedia?.("(pointer:fine), (pointer:none)").matches
+    : props.useKeyboard;
   const Picker = useKeyboard ? KeyboardTimePicker : TimePicker;
   const hasSeconds = timeFormat.indexOf(":ss") != -1;
   const timeValue = value ? moment(value, timeFormat) : null;

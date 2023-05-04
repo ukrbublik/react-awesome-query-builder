@@ -32,6 +32,7 @@ describe("mui widgets interactions", () => {
         openPickerBtn.simulate("click");
       } else {
         // mobile mode
+        // should not happen, see `desktopModeMediaQuery`
         dateInput.simulate("click");
       }
 
@@ -72,18 +73,9 @@ describe("mui widgets interactions", () => {
       expect(timeInput, "timeInput").to.have.length(1);
       timeInput.simulate("click");
       const clockPicker = document.querySelector<HTMLElement>(".MuiClockPicker-root");
-
-
-      console.log(111, 
-        window?.matchMedia?.("(pointer:coarse)")?.matches,
-        window?.matchMedia?.("(pointer:fine)")?.matches,
-        window?.matchMedia?.("(pointer:none)")?.matches,
-        window?.matchMedia?.("(pointer: fine), (pointer: none)")?.matches,
-      );
-
-
       if (clockPicker) {
         // mobile mode
+        // should not happen, see `desktopModeMediaQuery`
         if (window?.matchMedia?.("(pointer:none)")?.matches) {
           throw new Error("Pointer media feature is neither coarse nor fine");
         }

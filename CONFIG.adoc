@@ -627,7 +627,6 @@ const {
 |maxRows | | |Option for `<TextAreaWidget>`
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
 |use12Hours | |`false` |Option for `<TimeWidget>`
-|useKeyboard | |`true` |Option for Material-UI date/time pickers, `false` disables input with keyboard, only picker use is allowed
 |dateFormat | |`YYYY-MM-DD` |Option for `<DateWidget>`, `<DateTimeWidget>` to display date in widget. Example: `YYYY-MM-DD`
 |valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to prepare string representation of value to be stored. Example: `YYYY-MM-DD HH:mm`
 |labelYes, labelNo | | |Option for `<BooleanWidget>`

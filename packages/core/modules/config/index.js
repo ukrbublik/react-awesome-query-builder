@@ -694,7 +694,6 @@ const widgets = {
     valueSrc: "value",
     dateFormat: "DD.MM.YYYY",
     valueFormat: "YYYY-MM-DD",
-    useKeyboard: true,
     valueLabel: "Date",
     valuePlaceholder: "Enter date",
     valueLabels: [
@@ -732,7 +731,6 @@ const widgets = {
     timeFormat: "HH:mm",
     valueFormat: "HH:mm:ss",
     use12Hours: false,
-    useKeyboard: true,
     valueLabel: "Time",
     valuePlaceholder: "Enter time",
     valueLabels: [
@@ -789,7 +787,6 @@ const widgets = {
     dateFormat: "DD.MM.YYYY",
     valueFormat: "YYYY-MM-DD HH:mm:ss",
     use12Hours: false,
-    useKeyboard: true,
     valueLabel: "Datetime",
     valuePlaceholder: "Enter datetime",
     valueLabels: [

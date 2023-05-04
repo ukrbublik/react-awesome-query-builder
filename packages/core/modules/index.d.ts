@@ -717,7 +717,7 @@ export interface DateTimeFieldSettings<V = string> extends BasicFieldSettings<V>
   dateFormat?: string,
   valueFormat?: string,
   use12Hours?: boolean,
-  useKeyboard?: boolean,
+  useKeyboard?: boolean, // obsolete
 }
 export interface SelectFieldSettings<V = string | number> extends BasicFieldSettings<V> {
   listValues?: ListValues,
