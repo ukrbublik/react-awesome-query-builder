@@ -28,19 +28,14 @@ export default (props) => {
       {...params}
     />;
 
-  let desktopModeMediaQuery = "not (pointer: coarse)";
-  const useKeyboard = window.matchMedia ? window.matchMedia?.(desktopModeMediaQuery).matches : props.useKeyboard;
+  const useKeyboard = window.matchMedia ?
+    window.matchMedia?.("(pointer:fine)").matches || window.matchMedia?.("(pointer:none)").matches
+    : props.useKeyboard;
   const Picker = typeof useKeyboard === "boolean" ? (useKeyboard ? DesktopTimePicker : MobileTimePicker) : TimePicker;
-  if (Picker === TimePicker) {
-    desktopModeMediaQuery = `@media ${desktopModeMediaQuery}`;
-  } else {
-    desktopModeMediaQuery = undefined;
-  }
 
   return (
     <FormControl>
       <Picker
-        //{...(desktopModeMediaQuery && {desktopModeMediaQuery})}
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}
