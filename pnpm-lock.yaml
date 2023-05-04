@@ -670,6 +670,7 @@ importers:
       '@react-awesome-query-builder/mui': workspace:^
       '@react-awesome-query-builder/ui': workspace:^
       '@types/chai': ^4.2.18
+      '@types/deep-equal-in-any-order': ^1.0.1
       '@types/enzyme': ^3.10.8
       '@types/estree': ^1.0.0
       '@types/lodash': ^4.14.170
@@ -755,6 +756,7 @@ importers:
       '@babel/runtime': 7.20.7
       '@jsdevtools/coverage-istanbul-loader': 3.0.5
       '@types/chai': 4.3.4
+      '@types/deep-equal-in-any-order': 1.0.1
       '@types/enzyme': 3.10.12
       '@types/estree': 1.0.0
       '@types/lodash': 4.14.191
@@ -4668,6 +4670,10 @@ packages:
     resolution: {integrity: sha512-RG8AStHlUiV5ysZQKq97copd2UmVYw3/pRMLefISZ3S1hK104Cwm7iLQ3fTKx+lsUH2CE8FlLaYeEA2LSeqYUA==}
     dependencies:
       '@types/node': 18.15.11
+    dev: true
+
+  /@types/deep-equal-in-any-order/1.0.1:
+    resolution: {integrity: sha512-hUWUUE53WjKfcCncSmWmNXVNNT+0Iz7gYFnov3zdCXrX3Thxp1Cnmfd5LwWOeCVUV5LhpiFgS05vaAG72doo9w==}
     dev: true
 
   /@types/enzyme/3.10.12:

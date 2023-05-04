@@ -32,21 +32,21 @@ describe("interactions on MUI", () => {
         { "and": [{ "<=": [ 19, { "var": "slider" }, 42 ] }] }
       ], 0);
 
-      qb.find(TextField).filter({placeholder: 'Enter number from'}).prop("onChange")({target: {value: 20}});
+      qb.find(TextField).filter({placeholder: "Enter number from"}).prop("onChange")({target: {value: 20}});
       qb.update();
       expect_jlogic([null,
         { "and": [{ "<=": [ 20, { "var": "slider" }, 42 ] }] }
       ], 1);
 
-      qb.find(TextField).filter({placeholder: 'Enter number to'}).prop("onChange")({target: {value: 40}});
+      qb.find(TextField).filter({placeholder: "Enter number to"}).prop("onChange")({target: {value: 40}});
       qb.update();
       expect_jlogic([null,
         { "and": [{ "<=": [ 20, { "var": "slider" }, 40 ] }] }
       ], 2);
 
-      qb.find(TextField).filter({placeholder: 'Enter number from'}).prop("onChange")({target: {value: null}});
+      qb.find(TextField).filter({placeholder: "Enter number from"}).prop("onChange")({target: {value: null}});
       qb.update();
-      qb.find(TextField).filter({placeholder: 'Enter number to'}).prop("onChange")({target: {value: null}});
+      qb.find(TextField).filter({placeholder: "Enter number to"}).prop("onChange")({target: {value: null}});
       qb.update();
       expect_jlogic([null, undefined], 3);
 

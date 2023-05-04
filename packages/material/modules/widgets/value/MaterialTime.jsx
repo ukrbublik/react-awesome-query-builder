@@ -14,8 +14,8 @@ export default (props) => {
     setValue(formatSingleValue(value));
   };
 
-  const useKeyboard = window?.matchMedia ?
-    window.matchMedia?.("(pointer:fine), (pointer:none)").matches
+  const useKeyboard = window?.matchMedia
+    ? window.matchMedia?.("(pointer:fine), (pointer:none)").matches
     : props.useKeyboard;
   const Picker = useKeyboard ? KeyboardTimePicker : TimePicker;
   const hasSeconds = timeFormat.indexOf(":ss") != -1;

@@ -130,6 +130,7 @@ const types: Record<string, Partial<Type>> = {
           valueLabels: []
         },
         // modify, change type from object to primitive
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         opProps: 111 as any
       },
     },
@@ -198,7 +199,7 @@ export const makeCtx = (BaseConfig: Config) => {
       MyLabel,
       // SliderMark_NotExists,
     }
-  }
+  };
 };
 
 const withSlider = {

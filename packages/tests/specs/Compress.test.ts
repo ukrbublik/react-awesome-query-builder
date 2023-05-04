@@ -1,6 +1,6 @@
 import { CoreConfig, Utils } from "@react-awesome-query-builder/core";
 import {
-  Config, BasicConfig, Fields, 
+  Config, BasicConfig, Fields, Field,
   SelectField, AsyncFetchListValuesFn, SelectFieldSettings, NumberFieldSettings,
 } from "@react-awesome-query-builder/ui";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -94,13 +94,15 @@ describe("settings.useConfigCompress", () => {
     // extend manually
     const extConfig = ConfigUtils.extendConfig(decConfig) as BasicConfig;
     // check autocomplete
-    await ((extConfig.fields.autocomplete as SelectField).fieldSettings!.asyncFetch as AsyncFetchListValuesFn)("aa", 0);
+    let asyncFetch: AsyncFetchListValuesFn;
+    asyncFetch = ((extConfig.fields.autocomplete as Field).fieldSettings as SelectFieldSettings).asyncFetch as AsyncFetchListValuesFn;
+    await asyncFetch("aa", 0);
     expect(ctx.autocompleteFetch.callCount).to.equal(1);
-    await ((extConfig.fields.autocomplete2 as SelectField).fieldSettings!.asyncFetch as AsyncFetchListValuesFn)("bb", 0);
+    asyncFetch = ((extConfig.fields.autocomplete2 as Field).fieldSettings as SelectFieldSettings).asyncFetch as AsyncFetchListValuesFn;
+    await asyncFetch("bb", 0);
     expect(ctx.autocompleteFetch.callCount).to.equal(2);
-    expect(() =>
-      ((extConfig.fields.autocomplete3 as SelectField).fieldSettings!.asyncFetch as AsyncFetchListValuesFn)("cc", 0)
-    ).to.throw();
+    asyncFetch = ((extConfig.fields.autocomplete3 as Field).fieldSettings as SelectFieldSettings).asyncFetch as AsyncFetchListValuesFn;
+    expect(() => asyncFetch("cc", 0)).to.throw();
 
     // check funcs
     expect(zipConfig.funcs, "zipConfig.funcs").to.deep.equalInAnyOrder(expectedZipConfig.funcs);
@@ -156,8 +158,8 @@ describe("settings.useConfigCompress", () => {
       const rule0 = qb.find(".rule").at(0);
       const slider0 = rule0.find(".rule--value .widget--widget .MuiSlider-root").at(0);
       const marks0 = slider0.find(".MuiSlider-markLabel");
-      const mark00 = marks0.filterWhere(m => m.prop('data-index') == 0).at(0);
-      const mark01 = marks0.filterWhere(m => m.prop('data-index') == 1).at(0);
+      const mark00 = marks0.filterWhere(m => m.prop("data-index") == 0).at(0);
+      const mark01 = marks0.filterWhere(m => m.prop("data-index") == 1).at(0);
       expect(mark00.html()).to.contain("<strong><span>0</span><span>%</span></strong>");
       expect(mark01.html()).to.contain("<strong><span>50</span><span>%</span></strong>");
 

@@ -83,9 +83,9 @@ describe("mui widgets interactions", () => {
       } else {
         // desktop mode
         qb
-        .find(".rule--widget--TIME .MuiInput-input")
-        .at(1)
-        .simulate("change", { target: { value: "10:30" } });
+          .find(".rule--widget--TIME .MuiInput-input")
+          .at(1)
+          .simulate("change", { target: { value: "10:30" } });
       }
       
       expect_jlogic([null,
