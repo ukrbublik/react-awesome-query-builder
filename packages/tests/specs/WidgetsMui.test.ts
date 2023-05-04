@@ -72,6 +72,16 @@ describe("mui widgets interactions", () => {
       expect(timeInput, "timeInput").to.have.length(1);
       timeInput.simulate("click");
       const clockPicker = document.querySelector<HTMLElement>(".MuiClockPicker-root");
+
+
+      console.log(111, 
+        window?.matchMedia?.("(pointer:coarse)")?.matches,
+        window?.matchMedia?.("(pointer:fine)")?.matches,
+        window?.matchMedia?.("(pointer:none)")?.matches,
+        window?.matchMedia?.("(pointer: fine), (pointer: none)")?.matches,
+      );
+
+
       if (clockPicker) {
         // mobile mode
         if (window?.matchMedia?.("(pointer:none)")?.matches) {
