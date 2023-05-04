@@ -74,6 +74,9 @@ describe("mui widgets interactions", () => {
       const clockPicker = document.querySelector<HTMLElement>(".MuiClockPicker-root");
       if (clockPicker) {
         // mobile mode
+        if (window?.matchMedia?.("(pointer:none)")?.matches) {
+          throw new Error("Pointer media feature is neither coarse nor fine");
+        }
         this.skip();
       } else {
         // desktop mode
