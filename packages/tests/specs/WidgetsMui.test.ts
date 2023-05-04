@@ -78,6 +78,9 @@ describe("mui widgets interactions", () => {
           console.warn("Pointer media feature is neither coarse nor fine");
         }
         console.log(111, 
+          window?.matchMedia?.("(pointer:coarse)")?.matches,
+          window?.matchMedia?.("(pointer:fine)")?.matches,
+          window?.matchMedia?.("(pointer:none)")?.matches,
           window?.matchMedia?.("not (pointer:coarse)")?.matches,
           window?.matchMedia?.("(pointer: fine) or (pointer: none)")?.matches,
         );
