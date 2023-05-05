@@ -173,7 +173,11 @@ describe("query with !group", () => {
       "mongo": {
         "$expr": {
           "$eq": [
-            { "$size": "cars" },
+            {
+              "$size": {
+                "$ifNull": ["$cars", []]
+              }
+            },
             2
           ]
         }
