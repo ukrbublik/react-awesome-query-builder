@@ -396,20 +396,7 @@ const formatField = (meta, config, field, parentField = null) => {
   const _fieldKeys = getFieldPath(field, config, parentField);
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
   const formatFieldFn = config.settings.formatSpelField;
-  let fieldName = formatFieldName(field, config, meta);
-  if (parentField) {
-    const parentFieldDef = getFieldConfig(config, parentField) || {};
-    let parentFieldName = parentField;
-    if (parentFieldDef.fieldName) {
-      parentFieldName = parentFieldDef.fieldName;
-    }
-    if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
-      fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
-      // fieldName = "#this." + fieldName;
-    } else {
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-    }
-  }
+  const fieldName = formatFieldName(field, config, meta, parentField);
   const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
     let parent;
     if (parentCnf) {

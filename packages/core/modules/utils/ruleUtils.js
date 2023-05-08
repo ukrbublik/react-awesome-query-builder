@@ -408,13 +408,13 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
   return widget;
 };
 
-export const formatFieldName = (field, config, meta, parentField = null) => {
+export const formatFieldName = (field, config, meta, parentField = null, options = {}) => {
   if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  if (fieldDef.tableName) { // legacy
+  if (options?.useTableName && fieldDef.tableName) { // legacy
     const fieldPartsCopy = [...fieldParts];
     fieldPartsCopy[0] = fieldDef.tableName;
     fieldName = fieldPartsCopy.join(fieldSeparator);
@@ -430,6 +430,7 @@ export const formatFieldName = (field, config, meta, parentField = null) => {
     }
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
+      // fieldName = "#this." + fieldName; // ? for spel
     } else {
       meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
     }

@@ -240,7 +240,7 @@ const formatField = (meta, config, field) => {
   const fieldPartsLabels = getFieldPathLabels(field, config);
   const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
   const formatFieldFn = config.settings.formatField;
-  const fieldName = formatFieldName(field, config, meta);
+  const fieldName = formatFieldName(field, config, meta, null, {useTableName: true});
   const formattedField = formatFieldFn(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
   return formattedField;
 };

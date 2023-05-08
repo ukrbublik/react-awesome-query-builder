@@ -121,7 +121,7 @@ const compileMetaSettings = {
   spelFormatReverse: { type: "f", args: ["q"] },
   formatField: { type: "f", args: ["field", "parts", "label2", "fieldDefinition", "config", "isForDisplay"] },
   formatSpelField: { type: "f", args: ["field", "parentField", "parts", "partsExt", "fieldDefinition", "config"] },
-  formarAggr: { type: "f", args: ["whereStr", "aggrField", "operator", "value", "valueSrc", "valueType", "opDef", "operatorOptions", "isForDisplay", "aggrFieldDef"] },
+  formatAggr: { type: "f", args: ["whereStr", "aggrField", "operator", "value", "valueSrc", "valueType", "opDef", "operatorOptions", "isForDisplay", "aggrFieldDef"] },
   
   normalizeListValues: { type: "f", args: ["listValues", "type", "fieldSettings"] },
 
@@ -207,24 +207,28 @@ export const compressConfig = (config, baseConfig) => {
       }
       if (base !== undefined && isObject(base)) {
         for (let k in base) {
-          if (!Object.keys(target).includes(k) || target[k] === undefined && base[k] !== undefined) {
-            // deleted in target
-            target[k] = "$$deleted";
-          } else {
-            target[k] = _clean(target[k], base[k], [...path, k], meta);
-            if (target[k] === undefined) {
-              delete target[k];
+          if (base.hasOwnProperty(k)) {
+            if (!Object.keys(target).includes(k) || target[k] === undefined && base[k] !== undefined) {
+              // deleted in target
+              target[k] = "$$deleted";
+            } else {
+              target[k] = _clean(target[k], base[k], [...path, k], meta);
+              if (target[k] === undefined) {
+                delete target[k];
+              }
             }
           }
         }
       }
       for (let k in target) {
-        if (!base || !Object.keys(base).includes(k)) {
-          // new in target
-          target[k] = _clean(target[k], base?.[k], [...path, k], meta);
-        }
-        if (target[k] === undefined) {
-          delete target[k];
+        if (target.hasOwnProperty(k)) {
+          if (!base || !Object.keys(base).includes(k)) {
+            // new in target
+            target[k] = _clean(target[k], base?.[k], [...path, k], meta);
+          }
+          if (target[k] === undefined) {
+            delete target[k];
+          }
         }
       }
       if (Object.keys(target).length === 0) {
@@ -288,15 +292,17 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
         target = {};
       }
       for (let k in mixin) {
-        if (mixin[k] === "$$deleted") {
-          delete target[k];
-        } else {
-          target[k] = _mergeDeep(target[k], mixin[k], [...path, k]);
+        if (mixin.hasOwnProperty(k)) {
+          if (mixin[k] === "$$deleted") {
+            delete target[k];
+          } else {
+            target[k] = _mergeDeep(target[k], mixin[k], [...path, k]);
+          }
         }
       }
     } else if (Array.isArray(mixin)) {
-      target = clone(mixin);
       // don't merge arrays, just replace
+      target = clone(mixin);
     } else {
       target = mixin;
     }
@@ -304,43 +310,37 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
     return target;
   };
 
-  const _mergeFuncs = (target, orig, path, meta) => {
-    if (!orig && target?.["$$key"]) {
-      orig = getFuncConfig({
+  const _resolveAndMergeDeep = (target, path, meta) => {
+    // try to resolve by $$key and merge
+    let resolved = false;
+    if (isObject(target) && target.hasOwnProperty("$$key") && target["$$key"]) {
+      const func = getFuncConfig({
         funcs: meta.BasicFuncs
       }, target["$$key"]);
+      if (func) {
+        // deep merge func <- zip
+        delete target["$$key"];
+        target = _mergeDeep(clone(func), target, path);
+        resolved = true;
+      } else {
+        throw new Error(`decompressConfig: basic function not found by key ${target["$$key"]} at ${path.join(".")}`);
+      }
     }
 
-    // copy from orig to target
-    if (isObject(orig)) {
-      if (target === undefined) {
-        target = {};
-      }
+    if (!resolved) {
       if (isObject(target)) {
-        for (let k in orig) {
-          if (!Object.keys(target).includes(k)) {
-            target[k] = _mergeFuncs(target[k], orig[k], [...path, k], meta);
+        // loop through object to find refs ($$key)
+        for (let k in target) {
+          if (target.hasOwnProperty(k)) {
+            target[k] = _resolveAndMergeDeep(target[k], [...path, k], meta);
           }
         }
-      }
-    }
-
-    if (isObject(target)) {
-      if (target["$$key"] && orig) {
-        delete target["$$key"];
-      }
-      // loop through target and find origs
-      for (let k in target) {
-        if (target[k] === "$$deleted") {
-          delete target[k];
-        } else {
-          target[k] = _mergeFuncs(target[k], orig?.[k], [...path, k], meta);
+      } else if (Array.isArray(target)) {
+        // also loop through array to find refs ($$key)
+        for (const k of target) {
+          target[k] = _resolveAndMergeDeep(target[k], [...path, k], meta);
         }
       }
-    }
-
-    if (orig !== undefined && !isObject(orig) && target === undefined) {
-      target = clone(orig);
     }
 
     return target;
@@ -353,14 +353,14 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
     } else if (rootKey === "funcs") {
       // use $$key to pick funcs from BasicFuncs
       unzipConfig[rootKey] = clone(zipConfig[rootKey] || {});
-      _mergeFuncs(unzipConfig[rootKey], {}, [rootKey], {
+      _resolveAndMergeDeep(unzipConfig[rootKey], [rootKey], {
         BasicFuncs
       });
     } else if (rootKey === "fields") {
       // just copy
       unzipConfig[rootKey] = clone(zipConfig[rootKey] || {});
     } else {
-      // deep merge base with zip
+      // deep merge base <- zip
       unzipConfig[rootKey] = clone(baseConfig[rootKey] || {});
       _mergeDeep(unzipConfig[rootKey], zipConfig[rootKey] || {}, [rootKey]);
     }

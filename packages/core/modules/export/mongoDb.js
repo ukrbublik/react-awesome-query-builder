@@ -2,7 +2,7 @@ import {defaultValue} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
-import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
 import omit from "lodash/omit";
@@ -287,37 +287,6 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   return [ret, useExpr];
 };
 
-
-
-const formatFieldName = (field, config, meta, parentPath) => {
-  if (!field) return;
-  const fieldDef = getFieldConfig(config, field) || {};
-  const {fieldSeparator} = config.settings;
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  // if (fieldDef.tableName) { // legacy
-  //     const fieldPartsCopy = [...fieldParts];
-  //     fieldPartsCopy[0] = fieldDef.tableName;
-  //     fieldName = fieldPartsCopy.join(fieldSeparator);
-  // }
-  if (fieldDef.fieldName) {
-    fieldName = fieldDef.fieldName;
-  }
-
-  if (parentPath) {
-    const parentFieldDef = getFieldConfig(config, parentPath) || {};
-    let parentFieldName = parentPath;
-    if (parentFieldDef.fieldName) {
-      parentFieldName = parentFieldDef.fieldName;
-    }
-    if (fieldName.indexOf(parentFieldName+".") == 0) {
-      fieldName = fieldName.slice((parentFieldName+".").length);
-    } else {
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-    }
-  }
-  return fieldName;
-};
 
 const formatRightField = (meta, config, rightField, parentPath) => {
   const {fieldSeparator} = config.settings;

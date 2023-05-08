@@ -273,7 +273,7 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
     const formatFieldFn = config.settings.formatField;
-    const fieldName = formatFieldName(field, config, meta, cutParentField ? parentField : null);
+    const fieldName = formatFieldName(field, config, meta, cutParentField ? parentField : null, {useTableName: true});
     ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
   }
   return ret;

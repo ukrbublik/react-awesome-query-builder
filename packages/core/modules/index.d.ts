@@ -933,7 +933,7 @@ export interface OtherSettings {
   spelFormatReverse?: SpelFormatReverse | SerializedFunction,
   formatField?: FormatField | SerializedFunction,
   formatSpelField?: FormatSpelField | SerializedFunction,
-  formarAggr?: FormatAggr | SerializedFunction,
+  formatAggr?: FormatAggr | SerializedFunction,
 }
 
 export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettings {

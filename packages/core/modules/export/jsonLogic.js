@@ -2,7 +2,7 @@ import {defaultValue} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
-import {getWidgetForFieldOp} from "../utils/ruleUtils";
+import {getWidgetForFieldOp, formatFieldName} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {completeValue} from "../utils/funcUtils";
 import {List, Map} from "immutable";
@@ -334,22 +334,8 @@ const formatField = (meta, config, field, parentField = null) => {
     if (Array.isArray(field))
       field = field.join(fieldSeparator);
     const fieldDef = getFieldConfig(config, field) || {};
-    let fieldName = field;
-    if (fieldDef.fieldName) {
-      fieldName = fieldDef.fieldName;
-    }
-    if (parentField) {
-      const parentFieldDef = getFieldConfig(config, parentField) || {};
-      let parentFieldName = parentField;
-      if (parentFieldDef.fieldName) {
-        parentFieldName = parentFieldDef.fieldName;
-      }
-      if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
-        fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
-      } else {
-        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-      }
-    }
+    const fieldName = formatFieldName(field, config, meta, parentField);
+
     let varName = fieldDef.jsonLogicVar || (fieldDef.type == "!group" ? jsonLogic.groupVarKey : "var");
     ret = { [varName] : fieldName };
     if (meta.usedFields.indexOf(field) == -1)
