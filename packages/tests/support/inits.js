@@ -89,7 +89,7 @@ export const with_number_not_in_group = {
     { "var": "num" },  2
   ]
 };
-  
+
 export const with_number_and_string = {
   "or": [{
     "<": [
@@ -101,7 +101,7 @@ export const with_number_and_string = {
     ]
   }]
 };
-  
+
 export const with_not_number_and_string = {
   "!": {
     "or": [{
@@ -113,7 +113,11 @@ export const with_not_number_and_string = {
     }]
   }
 };
-  
+
+export const with_less = {
+  "<": [ { "var": "num" }, 2 ]
+};
+
 export const with_date_and_time = {
   "or": [{
     "==": [ { "var": "datetime" }, "2020-05-18T21:50:01.000Z" ]

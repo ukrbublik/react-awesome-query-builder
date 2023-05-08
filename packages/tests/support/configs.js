@@ -72,7 +72,28 @@ export const simple_with_numbers_and_str = (BasicConfig) => ({
     },
   },
 });
-  
+
+export const without_less_format = (BasicConfig) => ({
+  ...BasicConfig,
+  operators: {
+    ...BasicConfig.operators,
+    less: {
+      ...BasicConfig.operators.less,
+      sqlOp: null,
+      spelOp: null,
+      spelOps: null,
+      formatOp: null,
+    },
+    greater_or_equal: {
+      ...BasicConfig.operators.greater_or_equal,
+      formatOp: (field, op, values, _valueSrc, _valueType, opDef) => {
+        const fop = opDef.labelForFormat || op;
+        return `${field} ${fop} ${values}`;
+      },
+    },
+  }
+});
+
 export const with_number_and_string = (BasicConfig) => ({
   ...BasicConfig,
   fields: {

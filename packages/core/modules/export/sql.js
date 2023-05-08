@@ -127,7 +127,7 @@ const formatRule = (item, config, meta) => {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
   }
-  if (!canFormatRevOp && canFormatRevOp) {
+  if (!canFormatOp && canFormatRevOp) {
     isRev = true;
     [operator, reversedOp] = [reversedOp, operator];
     [opDef, revOpDef] = [revOpDef, opDef];

@@ -10,10 +10,8 @@ import omit from "lodash/omit";
 
 import {
   Utils,
-  JsonLogicTree, JsonTree, Config, ImmutableTree, ConfigContext
-} from "@react-awesome-query-builder/core";
-import {
-  Query, Builder, BasicConfig,
+  JsonLogicTree, JsonTree, ImmutableTree, ConfigContext,
+  Query, Builder, BasicConfig, Config,
   BuilderProps
 } from "@react-awesome-query-builder/ui";
 const {
@@ -35,7 +33,7 @@ type ConsoleData = {
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
-type ConfigFns = ConfigFn | [ConfigFn];
+type ConfigFns = ConfigFn | ConfigFn[];
 type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, consoleData: ConsoleData) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
@@ -115,7 +113,7 @@ export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, val
 };
   
 const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as [ConfigFn];
+  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig);
   // normally config should be saved at state in `onChange`, see README
   const extendedConfig = ConfigUtils.extendConfig(config);
@@ -320,8 +318,10 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
   }
 };
 
-export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
-  const config = config_fn(BasicConfig);
+export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
+  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
+  const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+
   let tree, errors: string[] = [];
   try {
     ({tree, errors} = load_tree(value, config, valueFormat));
