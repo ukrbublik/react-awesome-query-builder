@@ -49,7 +49,7 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
 
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
-  const groupField = isRuleGroup && mode != "struct" ? properties.get("field") : null;
+  const groupField = isRuleGroup && mode == "array" ? properties.get("field") : null;
   const canHaveEmptyChildren = isRuleGroup && mode == "array";
   const not = properties.get("not");
   const list = children
@@ -63,7 +63,7 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay, groupField) : null;
+  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay) : null;
   
   let ret;
   if (groupField) {
@@ -192,6 +192,8 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   const [formattedValue, valueSrc, valueType] = formatItemValue(
     config, properties, meta, operator, isForDisplay, parentField
   );
+  if (formattedValue === undefined)
+    return undefined;
 
   const args = [
     formattedField,
@@ -209,9 +211,6 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
   if (returnArgs) {
     return args;
   } else {
-    if (formattedValue === undefined)
-      return undefined;
-
     //format expr
     let ret = fn.call(config.ctx, ...args);
 
@@ -275,7 +274,7 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
     const formatFieldFn = config.settings.formatField;
     const fieldName = formatFieldName(field, config, meta, cutParentField ? parentField : null, {useTableName: true});
-    ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay, parentField);
+    ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
   }
   return ret;
 };
