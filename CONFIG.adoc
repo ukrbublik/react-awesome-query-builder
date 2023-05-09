@@ -925,7 +925,7 @@ const zipConfig = Utils.compressConfig(config, BasicConfig);
 const config2 = Utils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as `config`
 ----
 
-CAUTION: `settings.useConfigCompress` should be `true` if you use `Utils.decompressConfig()`
+NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.decompressConfig()`
 
 
 {nbsp} +
