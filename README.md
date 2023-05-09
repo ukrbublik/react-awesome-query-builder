@@ -130,10 +130,10 @@ See [API](#api) and [config](#config-format) for documentation.
 
 ## Demo apps
 
-- [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
+- [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage, uses all supported UI frameworks.
 - [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses MUI widgets.
-- [`pnpm sandbox-js`](/packages/sandbox_simple) - simple demo app, built with Vite, not uses TS, uses vanilla widgets.
-- [`pnpm sandbox-next`](/packages/sandbox_next) - simple demo app with SSR, built with Next.js, uses TS, uses MUI widgets.
+- [`pnpm sandbox-js`](/packages/sandbox_simple) - simplest demo app, built with Vite, not uses TS, uses vanilla widgets.
+- [`pnpm sandbox-next`](/packages/sandbox_next) - advanced demo app with server side, built with Next.js, uses TS, uses MUI widgets, has API to save/load query value and query config from storage.
 
 
 ## Usage
@@ -448,11 +448,11 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   #### compressConfig(config, baseConfig) -> ZipConfig
   Returns compressed config that can be serialized to JSON and saved on server.  
   `ZipConfig` is a special format that contains only changes agains `baseConfig`.  
-  `baseConfig` is a config you used as a base for constructing `config`, like `BasicConfig` in examples above.  
+  `baseConfig` is a config you used as a base for constructing `config`, like `InitialConfig` in examples above.  
   It depends on UI framework you choose - eg. if you use `@react-awesome-query-builder/mui`, please provide `MuiConfig` to `baseConfig`. 
   #### decompressConfig(zipConfig, baseConfig, ctx?) -> Config
   Converts `zipConfig` (compressed config you receive from server) to a full config that can be passed to `<Query />`.  
-  `baseConfig` is a config to be used as a base for constructing your config, like `BasicConfig` in examples above.  
+  `baseConfig` is a config to be used as a base for constructing your config, like `InitialConfig` in examples above.  
   [`ctx`](#ctx) is optional and can contain your custom functions and custom React components used in your config.  
   If `ctx` is provided in 3rd argument, it will inject it to result config, otherwise will copy from basic config in 2nd argument.  
   See [SSR](#ssr) for more info.  
@@ -470,6 +470,7 @@ See [`CONFIG`](/CONFIG.adoc) for full documentation.
 You can save and load config from server with help of utils:
 - [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig)
 - [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config)
+
 You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
 Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
 
@@ -511,10 +512,10 @@ See [`CHANGELOG`](/CHANGELOG.md)
 Now config has new [`ctx`](#ctx) property. Make sure you add it to your config.
 
 Typically you just need to copy it from basic config.
-So if you create config like this, you don't need to make any chnages:
+So if you create config like this, you don't need to make any changes:
 ```js
 import { MuiConfig } from "@react-awesome-query-builder/mui";
-export default {
+const config = {
   ...MuiConfig,
   fields: {
     // your fields
