@@ -2,7 +2,7 @@ import React from "react";
 import {
   Utils as QbUtils, 
   Widgets, Fields, Config, Settings, SpelConcatPart, WidgetProps
-} from "@react-awesome-query-builder/core";
+} from "@react-awesome-query-builder/ui";
 import { MaterialConfig } from "@react-awesome-query-builder/material";
 import ReactSelect from "./select";
 

@@ -1,12 +1,10 @@
 import React, { useState, useCallback } from "react";
 import {
+  Query, Builder, BuilderProps,
   Utils as QbUtils,
   JsonSwitchGroup,
   Config,
   ImmutableTree
-} from "@react-awesome-query-builder/core";
-import {
-  Query, Builder, BuilderProps
 } from "@react-awesome-query-builder/ui";
 import { LazyStyleModule } from "../utils";
 // @ts-ignore

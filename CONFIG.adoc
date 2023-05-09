@@ -760,12 +760,12 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 
 Required starting from version 6.3.0
 
-It is a collection of functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules. 
+It is a collection of JS functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules. 
 The purpose of `ctx` is to isolate non-serializable part of config. 
 
 Typically you just need to copy it from basic config - `AntdConfig.ctx` for AntDesign, `MuiConfig.ctx` for MUI, `BasicConfig.ctx` for vanilla UI etc.
 
-But if you use server-side config, you may need to add your custom functions (eg. `validateValue`) to `ctx` and refer to them in other config sections with name.
+But if you use advanced server-side config, you may need to add your custom functions (eg. `validateValue`) to `ctx` and refer to them in other config sections by name.
 
 [source,javascript]
 ----
@@ -775,6 +775,7 @@ const fields = {
   firstName: {
     type: "text",
     fieldSettings: {
+      // use function `validateFirstName` from `ctx` by name
       validateValue: "validateFirstName",
     }
   },
@@ -787,16 +788,20 @@ const ctx = {
   },
 };
 
-// zipConfig can be passed to backend
+// `zipConfig` can be passed to backend as JSON
 const zipConfig = {
-  fields
+  fields,
+  settings: {
+    useConfigCompress: true, // this is required
+  },
+  // you can add here other sections like `widgets` or `types`, but don't add `ctx`
 };
 
-// and loaded from backend with providing ctx
+// Config can be loaded from backend with providing `ctx`
 const config = Utils.decompressConfig(zipConfig, BasicConfig, ctx);
 ----
 
-You can't just pass function to `validateValue` in `fieldSettings` because config with functions can't be serialized to JSON and then used in SSR. 
+You can't just pass JS function to `validateValue` in `fieldSettings` because functions can't be serialized to JSON. 
 
 The shape of `ctx`:
 [source,javascript]
@@ -813,7 +818,7 @@ const ctx = {
     SqlString, // used in `sqlFormatValue`
     // ... other utils
   },
-  // your extensions:
+  // your custom extensions:
   components: {
     MyLabel, // used in `labelYes` and `labelNo` below
     // ... other custom components used in JSXs in your config
@@ -828,7 +833,7 @@ const ctx = {
       return <MuiFieldSelect {...props}/>;
     }
   },
-  autocompleteFetch, // see implementation in `packages/sandbox_next/components/demo/config_ctx.tsx`
+  autocompleteFetch, // see implementation in `/packages/sandbox_next/components/demo/config_ctx.tsx`
 }
 ----
 
@@ -860,7 +865,67 @@ const zipConfig = {
   settings: {
     renderField: "myRenderField",
     renderButton: "W.VanillaButton",
+    useConfigCompress: true, // this is required
   },
 };
 ----
 
+
+{nbsp} +
+{nbsp} +
+[[configserialize]]
+=== Serialize entire config to string
+
+Section link:#configctx[config.ctx] demonstrates the concept of `zipConfig` which is a special config format that contains only changes against base full config and can be serialized to JSON. 
+Base config provided by this library (`BasicConfig`, `AntdConfig` etc.) still has JS functions (at least for the moment of writing, in version 6.3.0). 
+If you want to serialize the entire config (not only changes), you can't do it to JSON as it contains JS functions. But you can do it to string with a help of https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and deserialize back with `eval()`. Yes, it's unsecure, but can be used for some purposes. 
+
+To achieve this ability, JS functions in config (like `factory`, `formatValue`, `validateValue` etc.) should be pure functions, they should not use imported modules like this:
+[source,javascript]
+----
+import { VanillaWidgets } from '@react-awesome-query-builder/ui';
+const { VanillaButton } = VanillaWidgets;
+import moment from "moment";
+
+const config = {
+  settings: {
+    renderButton: (props) => <VanillaButton {...props} />,
+  },
+  widgets: {
+    date: {
+      jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
+    },
+  },
+};
+----
+If you try to serialize this config and deserialize back with `eval()`, you will get
+`ReferenceError: react__WEBPACK_IMPORTED_MODULE_0___default is not defined`.
+
+Instead of this all imported modules should be included in `config.ctx`. All render functions in config have `ctx` as 2nd argument. In format functions you can refer to `ctx` via `this`.
+[source,javascript]
+----
+const config = {
+  settings: {
+    renderButton: (props, {RCE, W: {VanillaButton}}) => RCE(VanillaButton, props),
+  },
+  widgets: {
+    date: {
+      jsonLogic: function (val, fieldDef, wgtDef) {
+        return this.utils.moment(val, wgtDef.valueFormat).toDate();
+      },
+    },
+  },
+
+  ctx: {
+    RCE: React.createElement,
+    W: {
+      VanillaButton,
+    },
+    utils: {
+      moment,
+    },
+  }
+};
+----
+Now entire config (without `ctx`) can be serialized to a string with https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and then deserialized back with `eval()` and appending `ctx`.
+See /packages/sandbox_next/lib/config_ser.js[example]. +

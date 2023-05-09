@@ -86,18 +86,3 @@ On `onChange` callback it calls `POST /api/tree` to update tree on backend and a
 On click on button `update config` it modifies config in state with [`config_update`](lib/config_update.ts), compresses it and sends to `POST /api/config` to save `zipConfig` on backend.  
 On click on button `stringify config` it runs a test to show ability to serialize an entire config to string with [serialize-javascript](https://www.npmjs.com/package/serialize-javascript) package and deserialize back with `eval`, see [`config_ser`](lib/config_ser.js).
 
-
-### Serialize entire config to string and `ctx`
-Functions used in [`config`](/CONFIG.adoc) (like `factory`, `formatValue`, `validateValue` etc.) should be pure functions, they should not use imported modules.  
-If this condition is met for all functions, then entire config can be serialized to a string with [serialize-javascript](https://www.npmjs.com/package/serialize-javascript) and deserialized with `eval()`. Yes, it's unsecure, but can be used for some purposes.  
-
-To achieve this ability functions in config should not use imported modules lke this:
-```js
-  renderButton: (props) => <VanillaButton {...props} />,
-```
-Or you will get `ReferenceError: react__WEBPACK_IMPORTED_MODULE_0___default is not defined` when trying to `eval()`.  
-But instead all imported modules can be put in `config.ctx`, and `ctx` will be passed to render functions as 2nd argument like this:
-```js
-  renderButton: (props, {RCE, W: {VanillaButton}}) => RCE(VanillaButton, props),
-```
-`ctx.RCE` is `React.renderElement`, `ctx.W` contains all widgets.
