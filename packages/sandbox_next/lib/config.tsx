@@ -6,14 +6,14 @@ import merge from "lodash/merge";
 import pureServerConfig from "./config_base";
 
 // Adds UI mixins to config created in `./config_base` - adds `asyncFetch`, custom React components, `factory` overrides.
-// Exported config is used to generate initial compressed config for SSR.
+// Exported config is used to generate initial zip config on server-side (see `serverConfig` in `pages/api/config`).
 // On browser it can be decompressed to a full-featured config with a proper `ctx`.
 // `ctx` should contain used funcs (like `autocompleteFetch`), React components (like `SliderMark`) - see `components/demo/config_ctx`
 //
 //   ! Important !
 //   Don't add JS functions to config, since it can't be used with SSR.
 //   Instead add functions to `ctx` and reference them with name in other sections of config (see `autocompleteFetch` or `myRenderField`).
-//   Use JsonLogic functions instead, see `factory`.
+//   Or use JsonLogic functions instead, see `factory` (advanced usage, but doesn't change `ctx`).
 //   Add custom React components (like `SliderMark`) to `ctx.components`
 
 
@@ -36,8 +36,6 @@ const fieldsMixin: Record<string, Partial<FieldOrGroup>> = {
     fieldSettings: {
       // Real implementation of `autocompleteFetch` should be in `ctx`
       asyncFetch: "autocompleteFetch",
-      // same as:
-      // asyncFetch: { CALL: [ {var: "ctx.autocompleteFetch"}, null, {var: "search"}, {var: "offset"} ] },
     },
   },
   autocompleteMultiple: {
@@ -47,7 +45,7 @@ const fieldsMixin: Record<string, Partial<FieldOrGroup>> = {
   },
 };
 
-// Demostrates how you can use JsonLogic function to customize `factory` with some logic
+// (Advanced) Demostrates how you can use JsonLogic function to customize `factory` with some logic
 const widgetsMixin: Record<string, Partial<Widget>> = {
   multiselect: {
     factory: {
@@ -87,8 +85,8 @@ const operatorsMixin: Record<string, Partial<Operator>> = {
 
 const renderSettings: Partial<Settings> = {
   renderField: "myRenderField",
-  renderConfirm: "W.MuiConfirm", // or  { CALL: [ {var: "ctx.W.MuiConfirm"}, null, {var: "props"} ] },
-  useConfirm: "W.MuiUseConfirm", // or  { CALL: [ {var: "ctx.W.MuiUseConfirm"} ] },
+  renderConfirm: "W.MuiConfirm",
+  useConfirm: "W.MuiUseConfirm",
 };
 
 

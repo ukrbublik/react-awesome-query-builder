@@ -12,7 +12,7 @@ import {
 //   ! Important !
 //   Don't use JS functions in config, since it can't be used with SSR.
 //   Instead add function to `ctx` and refer to it with a name, see `validateFirstName`.
-//   Or use JsonLogic functions, see `validateValue` for `login` field.
+//   Or use JsonLogic functions, see `validateValue` for `login` field (advanced usage, but doesn't change `ctx`).
 
 function createConfig(InitialConfig: CoreConfig): Config {
 
@@ -23,7 +23,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
       type: "!struct",
       subfields: {
         firstName: {
-          label2: "Username", //only for menu's toggler
+          label2: "Username",
           type: "text",
           excludeOperators: ["proximity"],
           mainWidgetProps: {

@@ -207,7 +207,7 @@ export const compressConfig = (config, baseConfig) => {
       }
       if (base !== undefined && isObject(base)) {
         for (let k in base) {
-          if (base.hasOwnProperty(k)) {
+          if (Object.prototype.hasOwnProperty.call(base, k)) {
             if (!Object.keys(target).includes(k) || target[k] === undefined && base[k] !== undefined) {
               // deleted in target
               target[k] = "$$deleted";
@@ -221,7 +221,7 @@ export const compressConfig = (config, baseConfig) => {
         }
       }
       for (let k in target) {
-        if (target.hasOwnProperty(k)) {
+        if (Object.prototype.hasOwnProperty.call(target, k)) {
           if (!base || !Object.keys(base).includes(k)) {
             // new in target
             target[k] = _clean(target[k], base?.[k], [...path, k], meta);
@@ -292,7 +292,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
         target = {};
       }
       for (let k in mixin) {
-        if (mixin.hasOwnProperty(k)) {
+        if (Object.prototype.hasOwnProperty.call(mixin, k)) {
           if (mixin[k] === "$$deleted") {
             delete target[k];
           } else {
@@ -313,7 +313,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
   const _resolveAndMergeDeep = (target, path, meta) => {
     // try to resolve by $$key and merge
     let resolved = false;
-    if (isObject(target) && target.hasOwnProperty("$$key") && target["$$key"]) {
+    if (isObject(target) && Object.prototype.hasOwnProperty.call(target, "$$key") && target["$$key"]) {
       const func = getFuncConfig({
         funcs: meta.BasicFuncs
       }, target["$$key"]);
@@ -331,7 +331,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
       if (isObject(target)) {
         // loop through object to find refs ($$key)
         for (let k in target) {
-          if (target.hasOwnProperty(k)) {
+          if (Object.prototype.hasOwnProperty.call(target, k)) {
             target[k] = _resolveAndMergeDeep(target[k], [...path, k], meta);
           }
         }

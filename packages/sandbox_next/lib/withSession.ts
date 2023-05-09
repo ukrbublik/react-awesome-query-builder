@@ -14,8 +14,7 @@ import { Redis } from "@upstash/redis";
 import jsonfile from "jsonfile";
 import { existsSync } from "node:fs";
 
-// API to manage session data.
-// Wrappers to enable session for routes and SSR
+// API to manage session data + wrappers to enable session for routes and SSR
 
 export type SessionData = {
   jsonTree?: JsonTree;

@@ -10,12 +10,13 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string
+:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay\--false---string
 :config1:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx
 :config2:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx
 :config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx
 :funcs:        https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js
 :renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
+:config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
 
 = Config format
 
@@ -933,11 +934,11 @@ NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.decompress
 [[configserialize]]
 === Serialize entire config to string
 
-CAUTION: Using `eval()` is not secure
-
 Section link:#configctx[config.ctx] demonstrates the concept of `zipConfig` which is a special config format that contains _only changes_ against full config and can be serialized to JSON. 
 Base configs provided by this library (`BasicConfig`, `AntdConfig` etc.) still has JS functions (at least for the moment of writing, in version 6.3.0). 
 If you want to serialize the _entire_ config (not only changes), you can't do it to JSON as it contains JS functions. But you can do it to string with a help of https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and deserialize back with `eval()`. Yes, it's *unsecure*, but can be used for some purposes. 
+
+CAUTION: Using `eval()` is not secure
 
 To achieve this ability, JS functions in config (like `factory`, `formatValue`, `validateValue` etc.) should be pure functions, they should not use imported modules like this:
 [source,javascript]
@@ -958,7 +959,7 @@ const config = {
 };
 ----
 If you try to serialize this config and deserialize back with `eval()`, you will get
-``ReferenceError: react__WEBPACK_IMPORTED_MODULE_0___default is not defined``.
+`ReferenceError: react\__WEBPACK_IMPORTED_MODULE_0___default is not defined`.
 
 Instead of this all imported modules should be included in `config.ctx`. All render functions in config have `ctx` as 2nd argument. In format functions you can refer to `ctx` via `this`.
 [source,javascript]
@@ -987,4 +988,4 @@ const config = {
 };
 ----
 Now entire config (without `ctx`) can be serialized to a string with https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and then deserialized back with `eval()` and appending `ctx`.
-See /packages/sandbox_next/lib/config_ser.js[example]. +
+See {config_ser}[example]. +

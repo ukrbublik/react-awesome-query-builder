@@ -89,7 +89,7 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
   const { jsonTree } = JSON.parse(req.body as string) as PostTreeBody;
   const doSaveTree = (req.query as PostTreeQuery).saveTree === "true";
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  const config = await decompressSavedConfig(req); // serverConfig
+  const config = await decompressSavedConfig(req);
   const convertResult = convertTree(immutableTree, config);
   const result: PostTreeResult = convertResult;
   if (doSaveTree) {
@@ -101,7 +101,7 @@ async function post(req: NextApiRequest, res: NextApiResponse<PostTreeResult>) {
 async function get(req: NextApiRequest, res: NextApiResponse<GetTreeResult>) {
   const jsonTree: JsonTree = (req.query as GetTreeQuery).initial ? getInitialTree() : await getSavedTree(req);
   const immutableTree: ImmutableTree = loadTree(jsonTree);
-  const config = await decompressSavedConfig(req); // serverConfig
+  const config = await decompressSavedConfig(req);
   const convertResult = convertTree(immutableTree, config);
   const result: GetTreeResult = {
     jsonTree,

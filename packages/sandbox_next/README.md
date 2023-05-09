@@ -4,7 +4,7 @@
 
 Demo app built with [Next.js](https://nextjs.org/).  
 Uses MUI widgets by default.  
-Enbaled SSR with saving and loading query value and query config from session.  
+Enabled SSR with saving and loading query value and query config from session.  
 
 
 ### Run locally
@@ -74,8 +74,11 @@ Initial `zipConfig` (if missing in session data) is generated on server-side as 
 - compressed with [`Utils.compressConfig()`](/README.md#compressconfigconfig-baseconfig---zipconfig)
 
 See [getInitialZipConfig()](pages/api/config.ts).  
-With `POST /api/config` compressed config can be saved to session data, and loaded from session with `GET /api/config`.  
-Note that you can just put compressed config (response of `http://localhost:3002/api/config?initial=true`) to JSON file in `data`, same as done with initial `jsonTree`, if you want.  
+
+Response of `GET /api/config?initial=true` shows initial zip config.  
+Response of `GET /api/config` shows current zip config in session.  
+With `POST /api/config` compressed config can be saved to session data.  
+
 
 #### DemoQueryBuilder
 `DemoQueryBuilder` component can use server-side props:
