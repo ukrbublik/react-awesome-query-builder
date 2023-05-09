@@ -958,7 +958,7 @@ const config = {
 };
 ----
 If you try to serialize this config and deserialize back with `eval()`, you will get
-`ReferenceError: react__WEBPACK_IMPORTED_MODULE_0___default is not defined`.
+``ReferenceError: react__WEBPACK_IMPORTED_MODULE_0___default is not defined``.
 
 Instead of this all imported modules should be included in `config.ctx`. All render functions in config have `ctx` as 2nd argument. In format functions you can refer to `ctx` via `this`.
 [source,javascript]
