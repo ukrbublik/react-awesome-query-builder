@@ -9,9 +9,12 @@ export class RuleGroupActions extends PureComponent {
     } = this.props;
     const {
       immutableGroupsMode, addRuleLabel, delGroupLabel,
-      renderButton: Btn, renderSwitch: Switch, renderButtonGroup: BtnGrp,
+      renderButton, renderSwitch, renderButtonGroup,
       lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
+    const Btn = (pr) => renderButton(pr, config.ctx);
+    const Switch = (pr) => renderSwitch(pr, config.ctx);
+    const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
 
     const setLockSwitch = showLock && !(isLocked && !isTrueLocked) && <Switch 
       type="lock" id={id} value={isLocked} setValue={setLock} label={lockLabel} checkedLabel={lockedLabel} hideLabel={true} config={config}

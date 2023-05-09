@@ -338,6 +338,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
             hovRect = hovEl.getBoundingClientRect();
             const hovHeight = hovRect.bottom - hovRect.top;
             const hovII = this.tree.items[hovNodeId];
+            if (!hovII) {
+              throw new Error("There is an issue with rendering. If you use Next.js, please check getServerSideProps() method.");
+            }
             let trgRect = null,
               trgEl = null,
               trgII = null,

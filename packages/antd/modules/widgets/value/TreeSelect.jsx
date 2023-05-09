@@ -43,7 +43,9 @@ export default class TreeSelectWidget extends Component {
         calcTextWidth(title, null) + padding + (path ? path.length : 0) * offset + initialOffset
       );
     });
-    this.optionsMaxWidth = optionsMaxWidth;
+    if (!isNaN(optionsMaxWidth) && optionsMaxWidth) {
+      this.optionsMaxWidth = optionsMaxWidth;
+    }
   }
 
   handleChange = (val) => {
@@ -83,17 +85,17 @@ export default class TreeSelectWidget extends Component {
     const treeData = treeValues || listValues;
     const treeCheckStrictly = customProps.treeCheckStrictly || false;
     const { renderSize } = config.settings;
-    const placeholderWidth = calcTextWidth(placeholder) + 6;
+    const placeholderWidth = calcTextWidth(placeholder);
     let aValue = value != undefined ? value : undefined;
     if (treeCheckStrictly && aValue !== undefined) {
       if (treeMultiple) {
         aValue = aValue.map(v => ({value: v, label: getTitleInListValues(treeData, v)}));
       }
     }
-    const width = aValue ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const width = aValue || !placeholderWidth ? null : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT + 6;
     const dropdownMinWidth = 100;
     const dropdownMaxWidth = 800;
-    const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
+    const useAutoWidth = true || !this.optionsMaxWidth; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
     return (      

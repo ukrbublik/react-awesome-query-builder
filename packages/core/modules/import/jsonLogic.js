@@ -22,7 +22,7 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   let meta = {
     errors: []
   };
-  const extendedConfig = extendConfig(config);
+  const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
   let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
   if (jsTree && jsTree.type != "group") {
@@ -344,8 +344,8 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
         children1[k] = v;
       } else {
         const field = v?.properties?.field;
-        const groupAncestors = complexFieldsGroupAncestors[field];
-        const groupField = groupAncestors?.at(-1);
+        const groupAncestors = complexFieldsGroupAncestors[field] || [];
+        const groupField = groupAncestors[groupAncestors.length - 1];
         if (!groupField) {
           // not in rule_group (can be simple field or in struct) - put as-is
           children1[k] = v;
@@ -688,7 +688,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
         valueType: convertedArgs.map(v => v.valueType),
-        asyncListValues,
+        ...(asyncListValues ? {asyncListValues} : {}),
       }
     };
     if (not) {

@@ -1,4 +1,5 @@
 import Immutable, { Map } from "immutable";
+import omit from "lodash/omit";
 
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
@@ -121,14 +122,64 @@ export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
 };
 
+export const cleanJSX = (jsx) => {
+  const jsxKeys = ["$$typeof", "_owner", "_store", "ref", "key"];
 
+  const getName = (val) => {
+    if (typeof val === "string") {
+      return val;
+    } else if (typeof val === "function") {
+      return val.name;
+    }
+    return val;
+  };
 
-export const isJsonLogic = (logic) => (
-  typeof logic === "object" // An object
-  && logic !== null // but not null
-  && !Array.isArray(logic) // and not an array
-  && Object.keys(logic).length === 1 // with exactly one key
+  if (jsx instanceof Array) {
+    return jsx.map((el, _i) => cleanJSX(el));
+  } else if (typeof jsx === "object" && jsx !== null) {
+    if (isDirtyJSX(jsx)) {
+      const cleaned = omit(jsx, jsxKeys);
+      if (cleaned.type) {
+        cleaned.type = getName(cleaned.type);
+      }
+      if (cleaned?.props?.children) {
+        cleaned.props.children = cleanJSX(cleaned.props.children);
+      }
+      return cleaned;
+    }
+  }
+  return jsx;
+};
+
+export const isDirtyJSX = (jsx) => {
+  return typeof jsx === "object"
+    && jsx !== null
+    && !Array.isArray(jsx)
+    && Object.keys(jsx).includes("type")
+    && Object.keys(jsx).includes("props") // even if {}
+    && Object.keys(jsx).includes("key") // even if null
+    && Object.keys(jsx).includes("ref") // even if null
+    && Object.keys(jsx).includes("$$typeof"); // Symbol(react.element)
+};
+
+export const isJSX = (jsx) => (
+  typeof jsx === "object"
+  && jsx !== null
+  && !Array.isArray(jsx)
+  && typeof jsx["type"] === "string"
+  && Object.keys(jsx).includes("props")
 );
+
+export const isJsonLogic = (logic) => {
+  let isJL = typeof logic === "object" // An object
+    && logic !== null // but not null
+    && !Array.isArray(logic) // and not an array
+    && Object.keys(logic).length === 1; // with exactly one key
+  if (isJL) {
+    // additional checks ?
+  }
+  return isJL;
+};
 
 export function sleep(delay) {
   return new Promise((resolve) => {

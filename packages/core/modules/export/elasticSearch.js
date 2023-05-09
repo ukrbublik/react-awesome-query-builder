@@ -137,26 +137,26 @@ function determineOccurrence(combinator, not) {
  * @private
  */
 //todo: not used
-function determineQueryField(fieldDataType, fullFieldName, queryType) {
-  if (fieldDataType === "boolean") {
-    return fullFieldName;
-  }
+// function determineQueryField(fieldDataType, fullFieldName, queryType) {
+//   if (fieldDataType === "boolean") {
+//     return fullFieldName;
+//   }
 
-  switch (queryType) {
-  case "term":
-  case "wildcard":
-    return "".concat(fullFieldName, ".keyword");
+//   switch (queryType) {
+//   case "term":
+//   case "wildcard":
+//     return "".concat(fullFieldName, ".keyword");
 
-  case "geo_bounding_box":
-  case "range":
-  case "match":
-    return fullFieldName;
+//   case "geo_bounding_box":
+//   case "range":
+//   case "match":
+//     return fullFieldName;
 
-  default:
-    console.error("Can't determine query field for query type ".concat(queryType));
-    return null;
-  }
-}
+//   default:
+//     console.error("Can't determine query field for query type ".concat(queryType));
+//     return null;
+//   }
+// }
 
 function buildRegexpParameters(value) {
   return {

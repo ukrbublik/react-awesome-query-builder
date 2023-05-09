@@ -11,6 +11,7 @@ import {
   ItemProperties,
   ValueSource,
   TypedValueSourceMap,
+  ConfigContext, FactoryWithContext, RenderedReactElement, SerializedFunction,
   ConjsProps,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
@@ -56,6 +57,7 @@ import {
   CaseValueWidgetProps as _CaseValueWidgetProps,
   CoreOperators as _CoreOperators,
   CoreWidgets as _CoreWidgets,
+  ConfigMixin as _ConfigMixin,
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -101,19 +103,16 @@ export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
 export type CoreOperators<C = Config> = _CoreOperators<C>;
 export type CoreWidgets<C = Config> = _CoreWidgets<C>;
+export type ConfigMixin<C = Config, S = Settings> = _ConfigMixin<C, S>;
 
 /////////////////
 // extend config
 /////////////////
 
 export interface Config extends CoreConfigType {
-  conjunctions: Conjunctions,
+  settings: Settings,
   operators: Operators,
   widgets: Widgets,
-  types: Types,
-  fields: Fields,
-  funcs?: Funcs,
-  settings: Settings,
 }
 
 export interface BasicConfig extends CoreConfig {
@@ -126,6 +125,7 @@ export interface BasicConfig extends CoreConfig {
 ////////////////
 // common
 /////////////////
+
 
 type AnyObject = object;
 type TypedMap<T> = {
@@ -163,6 +163,7 @@ export interface QueryProps {
   settings: Settings;
   fields: Fields;
   funcs?: Funcs;
+  ctx: ConfigContext;
   value: ImmutableTree;
   onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
   renderBuilder(props: BuilderProps): ReactElement;
@@ -272,30 +273,30 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
-  renderField?: Factory<FieldProps>,
-  renderOperator?: Factory<FieldProps>,
-  renderFunc?: Factory<FieldProps>,
-  renderConjs?: Factory<ConjsProps>,
-  renderButton?: Factory<ButtonProps>,
-  renderButtonGroup?: Factory<ButtonGroupProps>,
-  renderSwitch?: Factory<SwitchProps>,
-  renderProvider?: Factory<ProviderProps>,
-  renderValueSources?: Factory<ValueSourcesProps>,
-  renderConfirm?: ConfirmFunc,
-  useConfirm?: () => Function,
+  renderField?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction,
+  renderButton?: FactoryWithContext<ButtonProps> | SerializedFunction,
+  renderButtonGroup?: FactoryWithContext<ButtonGroupProps> | SerializedFunction,
+  renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction,
+  renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,
+  renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
+  renderConfirm?: ConfirmFunc | SerializedFunction,
+  useConfirm?: (() => Function) | SerializedFunction,
   renderSize?: AntdSize,
-  renderItem?: Factory<ItemBuilderProps>,
+  renderItem?: FactoryWithContext<ItemBuilderProps> | SerializedFunction,
   dropdownPlacement?: AntdPosition,
   groupActionsPosition?: AntdPosition,
   showLabels?: boolean,
   maxLabelsLength?: number,
   customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: Factory<RuleProps>,
-  renderAfterWidget?: Factory<RuleProps>,
-  renderBeforeActions?: Factory<RuleProps>,
-  renderAfterActions?: Factory<RuleProps>,
-  renderRuleError?: Factory<RuleErrorProps>,
-  renderSwitchPrefix?: Factory<AnyObject>,
+  renderBeforeWidget?: FactoryWithContext<RuleProps> | SerializedFunction,
+  renderAfterWidget?: FactoryWithContext<RuleProps> | SerializedFunction,
+  renderBeforeActions?: FactoryWithContext<RuleProps> | SerializedFunction,
+  renderAfterActions?: FactoryWithContext<RuleProps> | SerializedFunction,
+  renderRuleError?: FactoryWithContext<RuleErrorProps> | SerializedFunction,
+  renderSwitchPrefix?: RenderedReactElement | SerializedFunction,
   defaultSliderWidth?: string,
   defaultSelectWidth?: string,
   defaultSearchWidth?: string,

@@ -54,7 +54,8 @@
     "packages/tests",
     "packages/examples",
     "packages/sandbox",
-    "packages/sandbox_simple"
+    "packages/sandbox_simple",
+    "packages/sandbox_next"
   ],
   "scripts": {
     "build": "pnpm run build-libs && pnpm run build-examples",
@@ -68,6 +69,7 @@
     "examples": "pnpm --filter @react-awesome-query-builder/examples run start",
     "sandbox-js": "pnpm --filter @react-awesome-query-builder/sandbox-simple run start",
     "sandbox-ts": "pnpm --filter @react-awesome-query-builder/sandbox run start",
+    "sandbox-next": "pnpm --filter @react-awesome-query-builder/sandbox-next run start",
     "sandbox": "pnpm run sandbox-ts",
     "start": "pnpm run examples",
     "resmoke": "pnpm run clean && pnpm i && pnpm run smoke",

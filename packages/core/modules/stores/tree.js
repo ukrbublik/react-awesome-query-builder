@@ -518,7 +518,9 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
         
     if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
       const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
-      const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS ? values.map(v => fieldWidgetDefinition.toJS(v, fieldWidgetDefinition)) : values;
+      const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS
+        ? values.map(v => fieldWidgetDefinition.toJS.call(config.ctx, v, fieldWidgetDefinition))
+        : values;
       const rangeValidateError = operatorConfig.validateValues(jsValues);
 
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);

@@ -1,53 +1,25 @@
-import MaterialWidgets from "../widgets";
-import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
 import React from "react";
-const { SqlString, spelEscape, stringifyForDisplay } = Utils.ExportUtils;
-
-
-const {
-  MaterialBooleanWidget,
-  MaterialTextWidget,
-  MaterialTextAreaWidget,
-  MaterialDateWidget,
-  MaterialTimeWidget,
-  MaterialDateTimeWidget,
-  MaterialMultiSelectWidget,
-  MaterialSelectWidget,
-  MaterialNumberWidget,
-  MaterialSliderWidget,
-  MaterialRangeWidget,
-  MaterialAutocompleteWidget,
-
-  MaterialFieldSelect,
-  MaterialFieldAutocomplete,
-  MaterialConjs,
-  MaterialSwitch,
-  MaterialButton,
-  MaterialButtonGroup,
-  MaterialValueSources,
-
-  MaterialProvider,
-  MaterialConfirm,
-  MaterialUseConfirm,
-} = MaterialWidgets;
+import MaterialWidgets from "../widgets";
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => props?.customProps?.showSearch 
-    ? <MaterialFieldAutocomplete {...props} /> 
-    : <MaterialFieldSelect {...props} />,
-  renderOperator: (props) => <MaterialFieldSelect {...props} />,
-  renderFunc: (props) => <MaterialFieldSelect {...props} />,
-  renderConjs: (props) => <MaterialConjs {...props} />,
-  renderSwitch: (props) => <MaterialSwitch {...props} />,
-  renderButton: (props) => <MaterialButton {...props} />,
-  renderButtonGroup: (props) => <MaterialButtonGroup {...props} />,
-  renderValueSources: (props) => <MaterialValueSources {...props} />,
-  renderProvider: (props) => <MaterialProvider {...props} />,
-  renderConfirm: MaterialConfirm,
-  useConfirm: MaterialUseConfirm,
+  renderField: (props, {RCE, W: {MaterialFieldAutocomplete, MaterialFieldSelect}}) => props?.customProps?.showSearch 
+    ? RCE(MaterialFieldAutocomplete, props)
+    : RCE(MaterialFieldSelect, props),
+  renderOperator: (props, {RCE, W: {MaterialFieldSelect}}) => RCE(MaterialFieldSelect, props),
+
+  renderFunc: (props, {RCE, W: {MaterialFieldSelect}}) => RCE(MaterialFieldSelect, props),
+  renderConjs: (props, {RCE, W: {MaterialConjs}}) => RCE(MaterialConjs, props),
+  renderSwitch: (props, {RCE, W: {MaterialSwitch}}) => RCE(MaterialSwitch, props),
+  renderButton: (props, {RCE, W: {MaterialButton}}) => RCE(MaterialButton, props),
+  renderButtonGroup: (props, {RCE, W: {MaterialButtonGroup}}) => RCE(MaterialButtonGroup, props),
+  renderValueSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),
+  renderProvider: (props, {RCE, W: {MaterialProvider}}) => RCE(MaterialProvider, props),
+  renderConfirm: (props, {W: {MaterialConfirm}}) => MaterialConfirm(props),
+  useConfirm: ({W: {MaterialUseConfirm}}) => MaterialUseConfirm(),
 };
 
 
@@ -55,106 +27,81 @@ const widgets = {
   ...BasicConfig.widgets,
   text: {
     ...BasicConfig.widgets.text,
-    factory: (props) => <MaterialTextWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialTextWidget}}) => RCE(MaterialTextWidget, props),
   },
   textarea: {
     ...BasicConfig.widgets.textarea,
-    factory: (props) => <MaterialTextAreaWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialTextAreaWidget}}) => RCE(MaterialTextAreaWidget, props),
   },
   number: {
     ...BasicConfig.widgets.number,
-    factory: (props) => <MaterialNumberWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialNumberWidget}}) => RCE(MaterialNumberWidget, props),
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props) => {
+    factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialMultiSelectWidget}}) => {
       return (props.asyncFetch || props.showSearch) 
-        ? <MaterialAutocompleteWidget multiple {...props} /> 
-        : <MaterialMultiSelectWidget {...props} />;
+        ? RCE(MaterialAutocompleteWidget, {...props, multiple: true}) 
+        : RCE(MaterialMultiSelectWidget, props);
     },
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => {
+    factory: (props, {RCE, W: {MaterialAutocompleteWidget, MaterialSelectWidget}}) => {
       return (props.asyncFetch || props.showSearch) 
-        ? <MaterialAutocompleteWidget {...props} /> 
-        : <MaterialSelectWidget {...props} />;
+        ? RCE(MaterialAutocompleteWidget, props) 
+        : RCE(MaterialSelectWidget, props);
     },
   },
   slider: {
     ...BasicConfig.widgets.slider,
-    factory: (props) => <MaterialSliderWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialSliderWidget}}) => RCE(MaterialSliderWidget, props),
   },
   boolean: {
     ...BasicConfig.widgets.boolean,
-    factory: (props) => <MaterialBooleanWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialBooleanWidget}}) => RCE(MaterialBooleanWidget, props),
   },
   date: {
     ...BasicConfig.widgets.date,
-    factory: (props) => <MaterialDateWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialDateWidget}}) => RCE(MaterialDateWidget, props),
   },
   time: {
     ...BasicConfig.widgets.time,
-    factory: (props) => <MaterialTimeWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialTimeWidget}}) => RCE(MaterialTimeWidget, props),
   },
   datetime: {
     ...BasicConfig.widgets.datetime,
-    factory: (props) => <MaterialDateTimeWidget {...props} />,
+    factory: (props, {RCE, W: {MaterialDateTimeWidget}}) => RCE(MaterialDateTimeWidget, props),
   },
 
   rangeslider: {
-    type: "number",
-    jsType: "number",
-    valueSrc: "value",
-    factory: (props) => <MaterialRangeWidget {...props} />,
-    valueLabel: "Range",
-    valuePlaceholder: "Select range",
-    valueLabels: [
-      { label: "Number from", placeholder: "Enter number from" },
-      { label: "Number to", placeholder: "Enter number to" },
-    ],
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
-    },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
-    },
-    spelFormatValue: (val) => spelEscape(val),
-    singleWidget: "slider",
-    toJS: (val, fieldSettings) => (val),
+    ...BasicConfig.widgets.rangeslider,
+    factory: (props, {RCE, W: {MaterialRangeWidget}}) => RCE(MaterialRangeWidget, props),
   },
 };
 
 
 const types = {
   ...BasicConfig.types,
-  number: {
-    ...BasicConfig.types.number,
-    widgets: {
-      ...BasicConfig.types.number.widgets,
-      rangeslider: {
-        opProps: {
-          between: {
-            isSpecialRange: true,
-          },
-          not_between: {
-            isSpecialRange: true,
-          }
-        },
-        operators: [
-          "between",
-          "not_between",
-          "is_null",
-          "is_not_null",
-        ],
-      }
-    },
+};
+
+const ctx = {
+  ...BasicConfig.ctx,
+  W: {
+    ...BasicConfig.ctx.W,
+    ...MaterialWidgets,
   },
 };
 
-export default {
+let config = {
   ...BasicConfig,
+  ctx,
   types,
   widgets,
   settings,
 };
+config = Utils.ConfigMixins.addMixins(config, [
+  "rangeslider",
+]);
+
+export default config;

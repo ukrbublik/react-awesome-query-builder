@@ -74,7 +74,7 @@ describe("material-ui widgets interactions", () => {
       const {onChange: onChangeDate} = qb
         .find("KeyboardDateInput")
         .props();
-      // @ts-ignore  
+      // @ts-ignore
       onChangeDate(moment("0001-01-01 10:30"));
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }

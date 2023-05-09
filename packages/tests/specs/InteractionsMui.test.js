@@ -1,41 +1,55 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb_material, sleep } from "../support/utils";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import { with_qb_mui, sleep } from "../support/utils";
+import Slider from "@mui/material/Slider";
+import TextField from "@mui/material/TextField";
 import { expect } from "chai";
 
-const stringifyOptions = (options) => {
-  return options.map(({title, value}) => `${value}_${title}`).join(";");
-};
 
 describe("interactions on MUI", () => {
-
-  describe("autocomplete", () => {
-    it("find B", async () => {
-      await with_qb_material(configs.with_autocomplete, inits.with_autocomplete_a, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
-        let ac = qb.find(Autocomplete).filter({label: "Select value"});
-        expect(stringifyOptions(ac.prop("options"))).to.eq("a_a");
-        
-        ac.prop("onInputChange")(null, "b");
-        await sleep(200); // should be > 50ms delay
-        qb.update();
-        ac = qb.find(Autocomplete).filter({label: "Select value"});
-
-        expect(stringifyOptions(ac.prop("options"))).to.eq("a_a;b_B");
+  it("change range slider value", async () => {
+    await with_qb_mui(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      expect_checks({
+        "query": "slider >= 18 && slider <= 42",
+        "queryHuman": "Slider BETWEEN 18 AND 42",
+        "sql": "slider BETWEEN 18 AND 42",
+        "mongo": {
+          "slider": {
+            "$gte": 18,
+            "$lte": 42
+          }
+        },
+        "logic": {
+          "and": [
+            { "<=": [ 18, { "var": "slider" }, 42 ] }
+          ]
+        }
       });
+
+      qb.find(Slider).prop("onChange")(null, [19, 42]);
+      qb.update();
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 19, { "var": "slider" }, 42 ] }] }
+      ], 0);
+
+      qb.find(TextField).filter({placeholder: "Enter number from"}).prop("onChange")({target: {value: 20}});
+      qb.update();
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 20, { "var": "slider" }, 42 ] }] }
+      ], 1);
+
+      qb.find(TextField).filter({placeholder: "Enter number to"}).prop("onChange")({target: {value: 40}});
+      qb.update();
+      expect_jlogic([null,
+        { "and": [{ "<=": [ 20, { "var": "slider" }, 40 ] }] }
+      ], 2);
+
+      qb.find(TextField).filter({placeholder: "Enter number from"}).prop("onChange")({target: {value: null}});
+      qb.update();
+      qb.find(TextField).filter({placeholder: "Enter number to"}).prop("onChange")({target: {value: null}});
+      qb.update();
+      expect_jlogic([null, undefined], 3);
+
     });
   });
-
-  it("should render labels with showLabels=true", async () => {
-    await with_qb_material([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
-      //todo
-    });
-  });
-
-  it("should render admin mode with showLock=true", async () => {
-    await with_qb_material([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
-      //todo
-    });
-  });
-
 });

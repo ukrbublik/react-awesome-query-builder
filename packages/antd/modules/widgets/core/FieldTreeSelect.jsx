@@ -41,7 +41,9 @@ export default class FieldTreeSelect extends Component {
         calcTextWidth(label, null) + padding + (path.split(fieldSeparator).length - 1) * offset + initialOffset
       );
     });
-    this.optionsMaxWidth = optionsMaxWidth;
+    if (!isNaN(optionsMaxWidth) && optionsMaxWidth) {
+      this.optionsMaxWidth = optionsMaxWidth;
+    }
   }
 
   getTreeData(fields, fn = null) {
@@ -105,13 +107,13 @@ export default class FieldTreeSelect extends Component {
       ? selectedPath.slice(0, -1).map((_key, i) => (selectedPath.slice(0, i+1).join(fieldSeparator))) 
       : null;
       
-    const placeholderWidth = calcTextWidth(placeholder) + 6;
+    const placeholderWidth = calcTextWidth(placeholder);
     const isFieldSelected = !!selectedKey;
 
-    const minWidth = placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const minWidth = placeholderWidth ? placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT + 6 : null;
     const dropdownMinWidth = 100;
     const dropdownMaxWidth = 800;
-    const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
+    const useAutoWidth = true || !this.optionsMaxWidth; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
     let res = (

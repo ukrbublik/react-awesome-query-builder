@@ -4,13 +4,14 @@ import { act } from "react-dom/test-utils";
 import sinon, {spy} from "sinon";
 import { expect } from "chai";
 const stringify = JSON.stringify;
+import serializeJs from "serialize-javascript";
+import mergeWith from "lodash/mergeWith";
+import omit from "lodash/omit";
 
 import {
   Utils,
-  JsonLogicTree, JsonTree, Config, ImmutableTree
-} from "@react-awesome-query-builder/core";
-import {
-  Query, Builder, BasicConfig,
+  JsonLogicTree, JsonTree, ImmutableTree, ConfigContext,
+  Query, Builder, BasicConfig, Config,
   BuilderProps
 } from "@react-awesome-query-builder/ui";
 const {
@@ -32,7 +33,7 @@ type ConsoleData = {
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
-type ConfigFns = ConfigFn | [ConfigFn];
+type ConfigFns = ConfigFn | ConfigFn[];
 type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, consoleData: ConsoleData) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
@@ -112,7 +113,7 @@ export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, val
 };
   
 const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as [ConfigFn];
+  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig);
   // normally config should be saved at state in `onChange`, see README
   const extendedConfig = ConfigUtils.extendConfig(config);
@@ -299,7 +300,6 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
             onChange={emptyOnChange}
           />
         );
-  
         qb.unmount();
       });
     }
@@ -312,13 +312,16 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
       spel: spelFormat(tree, config),
       mongo: mongodbFormat(tree, config),
       logic: logic,
+      elasticSearch: elasticSearchFormat(tree, config),
     };
     console.log(stringify(correct, undefined, 2));
   }
 };
 
-export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = []) => {
-  const config = config_fn(BasicConfig);
+export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
+  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
+  const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+
   let tree, errors: string[] = [];
   try {
     ({tree, errors} = load_tree(value, config, valueFormat));
@@ -334,14 +337,14 @@ export const export_checks = (config_fn: ConfigFn, value: TreeValue, valueFormat
         expect(errors.join("; ")).to.equal(expectedErrors.join("; "));
       });
 
-      do_export_checks(config, tree as ImmutableTree, expects, true);
+      do_export_checks(config, tree as ImmutableTree, expects, with_render);
     } else {
       it("should load tree without errors", () => {
         throw new Error(errors.join("; "));
       });
     }
   } else {
-    do_export_checks(config, tree as ImmutableTree, expects, true);
+    do_export_checks(config, tree as ImmutableTree, expects, with_render);
   }
 };
 
@@ -403,3 +406,28 @@ export function sleep(delay: number) {
     setTimeout(resolve, delay);
   });
 }
+
+const mergeCustomizerCleanJSX = (_objValue: any, srcValue: any) => {
+  const { isDirtyJSX, cleanJSX } = Utils.ConfigUtils;
+  if (isDirtyJSX(srcValue)) {
+    return cleanJSX(srcValue);
+  }
+  return undefined;
+};
+
+export const UNSAFE_serializeConfig = (config: Config): string => {
+  const sanitizedConfig = mergeWith({}, omit(config, ["ctx"]), mergeCustomizerCleanJSX) as Config;
+  const strConfig = serializeJs(sanitizedConfig, {
+    space: 2,
+    unsafe: true,
+  });
+  //remove coverage instructions
+  const sanitizedStrConfig = strConfig.replace(/cov_\w+\(\)\.\w+(\[\d+\])+\+\+(;|,)/gm, "");
+  return sanitizedStrConfig;
+};
+
+export const UNSAFE_deserializeConfig = (strConfig: string, ctx: ConfigContext): Config => {
+  const config = eval("("+strConfig+")") as Config;
+  config.ctx = ctx;
+  return config;
+};

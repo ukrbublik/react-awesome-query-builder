@@ -38,17 +38,21 @@ export const BUILT_IN_PLACEMENTS = {
 };
 
 export const calcTextWidth = function(str, fontFamily = DEFAULT_FONT_FAMILY, fontSize = DEFAULT_FONT_SIZE) {
-  var div = document.createElement("div");
-  div.innerHTML = str;
-  var css = {
-    "position": "absolute", "float": "left", "white-space": "nowrap", "visibility": "hidden", 
-    "font-size": fontSize, "font-family": fontFamily
-  };
-  for (let k in css) {
-    div.style[k] = css[k];
+  if (typeof document !== "undefined") {
+    var div = document.createElement("div");
+    div.innerHTML = str;
+    var css = {
+      "position": "absolute", "float": "left", "white-space": "nowrap", "visibility": "hidden", 
+      "font-size": fontSize, "font-family": fontFamily
+    };
+    for (let k in css) {
+      div.style[k] = css[k];
+    }
+    div = document.body.appendChild(div);
+    var w = div.offsetWidth;
+    document.body.removeChild(div);
+    return w;
+  } else {
+    return undefined;
   }
-  div = document.body.appendChild(div);
-  var w = div.offsetWidth;
-  document.body.removeChild(div);
-  return w;
 };

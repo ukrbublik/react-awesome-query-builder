@@ -6,6 +6,7 @@ coverage/
 junit/
 /package/
 *.log
+.next/
 
 package-lock.json
 yarn.lock

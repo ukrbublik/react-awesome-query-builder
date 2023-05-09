@@ -201,7 +201,7 @@ export default class ValueField extends Component {
       groupId,
       ...this.meta
     };
-    return renderField(renderProps);
+    return renderField(renderProps, config.ctx);
   }
 
 }

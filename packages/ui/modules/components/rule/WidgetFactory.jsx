@@ -66,5 +66,5 @@ export default ({
     return ""+defaultValue;
   }
     
-  return widgetFactory(widgetProps);
+  return widgetFactory(widgetProps, config.ctx);
 };

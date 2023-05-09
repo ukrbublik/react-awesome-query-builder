@@ -136,7 +136,7 @@ export default class Field extends Component {
       setField,
       ...this.meta
     };
-    return renderField(renderProps);
+    return renderField(renderProps, config.ctx);
   }
 
 }

@@ -1,6 +1,4 @@
 import React from "react";
-import { Utils } from "@react-awesome-query-builder/core";
-const { uuid } = Utils;
 
 export default (props) => {
   const {value, setValue, config, labelYes, labelNo, readonly, customProps = {}} = props;
@@ -9,7 +7,6 @@ export default (props) => {
 
   const onCheckboxChange = e => setValue(e.target.checked);
   const onRadioChange = e => setValue(e.target.value == "true");
-  const id = uuid(), id2 = uuid();
 
   // return <>
   //     <input key={id}  type="checkbox" id={id} checked={!!value} disabled={readonly} onChange={onCheckboxChange} />
@@ -17,10 +14,8 @@ export default (props) => {
   // </>;
 
   return <>
-    <input key={id}  type="radio" id={id} value={true} checked={!!value} disabled={readonly} onChange={onRadioChange} { ...customRadioYesProps }/>
-    <label style={{display: "inline"}} key={id+"label"}  htmlFor={id}>{labelYes}</label>
-    <input key={id2}  type="radio" id={id2} value={false} checked={!value} disabled={readonly} onChange={onRadioChange} { ...customRadioNoProps } />
-    <label style={{display: "inline"}} key={id2+"label"}  htmlFor={id2}>{labelNo}</label>
+    <input type="radio" value={true} checked={!!value} disabled={readonly} onChange={onRadioChange} { ...customRadioYesProps }/> {labelYes}
+    <input type="radio" value={false} checked={!value} disabled={readonly} onChange={onRadioChange} { ...customRadioNoProps } /> {labelNo}
   </>;
 
 };

@@ -8,7 +8,7 @@ This packages provides [MUI](https://mui.com/) widgets
 
 Peer dependencies that needs to be installed:
 ```
-npm i @mui/material @emotion/react @emotion/styled @mui/lab @mui/icons-material @mui/x-date-pickers --save
+npm i @mui/material @emotion/react @emotion/styled @mui/icons-material @mui/x-date-pickers --save
 ```
 
 Install:

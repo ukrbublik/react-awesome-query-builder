@@ -1,8 +1,8 @@
 import React from "react";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 const { moment } = Utils;
 
 export default (props) => {
@@ -26,9 +26,12 @@ export default (props) => {
       {...params}
     />;
 
+  const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
+
   return (
     <FormControl>
       <TimePicker
+        desktopModeMediaQuery={desktopModeMediaQuery}
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}

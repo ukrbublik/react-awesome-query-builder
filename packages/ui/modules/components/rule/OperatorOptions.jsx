@@ -31,7 +31,7 @@ export default class OperatorOptions extends PureComponent {
       setOption: this.props.setOperatorOption,
       readonly: this.props.readonly,
     });
-    const optionsCmp = optionsFactory(optionsProps);
+    const optionsCmp = optionsFactory(optionsProps, this.props.config.ctx);
     const name = this.props.selectedOperator;
 
     return (

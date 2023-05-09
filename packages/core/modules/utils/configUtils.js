@@ -7,13 +7,21 @@ import {mergeArraysSmart} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 
+import { compileConfig } from "./configSerialize";
+export * from "./configSerialize";
 
-export const extendConfig = (config, configId) => {
+/////////////
+
+export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
   if (config.__configId) {
     return config;
+  }
+
+  if (canCompile && config.settings.useConfigCompress) {
+    config = compileConfig(config);
   }
   
   config = {...config};
@@ -142,7 +150,8 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     // normalize listValues
     if (fieldConfig.fieldSettings.listValues) {
       if (config.settings.normalizeListValues) {
-        fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues(
+        fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues.call(
+          config.ctx,
           fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings
         );
       }
@@ -150,7 +159,8 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     // same for treeValues
     if (fieldConfig.fieldSettings.treeValues) {
       if (config.settings.normalizeListValues) {
-        fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues(
+        fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues.call(
+          config.ctx,
           fieldConfig.fieldSettings.treeValues, fieldConfig.type, fieldConfig.fieldSettings
         );
       }
@@ -217,6 +227,14 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
   }
 }
 
+/////////////
+
+const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _stack) => {
+  if (Array.isArray(objValue)) {
+    return srcValue;
+  }
+};
+
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
@@ -229,7 +247,7 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
       }
     };
   }
-  const fieldSeparator = config.settings.fieldSeparator;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
   //field = normalizeField(config, field);
   const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
   const targetFields = config[fieldsKey];
@@ -300,11 +318,7 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
 
   //merge, but don't merge operators (rewrite instead)
   const typeConfig = config.types[argConfig.type] || {};
-  let ret = mergeWith({}, typeConfig, argConfig || {}, (objValue, srcValue, _key, _object, _source, _stack) => {
-    if (Array.isArray(objValue)) {
-      return srcValue;
-    }
-  });
+  let ret = mergeWith({}, typeConfig, argConfig || {}, mergeCustomizerNoArrays);
 
   return ret;
 };
@@ -322,11 +336,7 @@ export const getFieldConfig = (config, field) => {
 
   //merge, but don't merge operators (rewrite instead)
   const typeConfig = config.types[fieldConfig.type] || {};
-  let ret = mergeWith({}, typeConfig, fieldConfig || {}, (objValue, srcValue, _key, _object, _source, _stack) => {
-    if (Array.isArray(objValue)) {
-      return srcValue;
-    }
-  });
+  let ret = mergeWith({}, typeConfig, fieldConfig || {}, mergeCustomizerNoArrays);
 
   return ret;
 };

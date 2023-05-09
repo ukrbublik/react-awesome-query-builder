@@ -90,11 +90,12 @@ describe("query with func", () => {
     });
   });
 
-  describe("loads tree with func LINEAR_REGRESSION", () => {
-    export_checks(configs.with_funcs, inits.with_func_linear_regression, "default", {
+  describe("loads tree in tree format with func LINEAR_REGRESSION", () => {
+    export_checks(configs.with_funcs, inits.with_func_linear_regression_tree, "default", {
       "query": "num == (2 * 3 + 0)",
       "queryHuman": "Number = (2 * 3 + 0)",
       "sql": "num = (2 * 3 + 0)",
+      "spel": "num == (2 * 3 + 0)",
       "mongo": {
         "$expr": {
           "$eq": [
@@ -111,6 +112,60 @@ describe("query with func", () => {
             "==": [
               { "var": "num" },
               { "+": [ { "*": [ 2, 3 ] }, 0 ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("loads tree in JsonLogic format with func LINEAR_REGRESSION", () => {
+    export_checks(configs.with_funcs, inits.with_func_linear_regression, "JsonLogic", {
+      "query": "num == (2 * 3 + 0)",
+      "queryHuman": "Number = (2 * 3 + 0)",
+      "sql": "num = (2 * 3 + 0)",
+      "spel": "num == (2 * 3 + 0)",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            "$num",
+            { "$sum": [
+              { "$multiply": [ 2, 3 ] },  0
+            ] }
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              { "var": "num" },
+              { "+": [ { "*": [ 2, 3 ] }, 0 ] }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("loads tree with func RELATIVE_DATETIME", () => {
+    export_checks(configs.with_funcs, inits.with_func_relative_datetime, "JsonLogic", {
+      "query": "datetime == NOW + 2 day",
+      "queryHuman": "Datetime = NOW + 2 day",
+      "sql": "datetime = DATE_ADD(NOW(), INTERVAL 2 day)",
+      "spel": "datetime == RELATIVE_DATETIME(new java.util.Date()(), 'plus', 2, 'day')",
+      "logic": {
+        "and": [
+          {
+            "==": [
+              { "var": "datetime" },
+              {
+                "date_add": [
+                  { "now": [] },
+                  2,
+                  "day"
+                ]
+              }
             ]
           }
         ]

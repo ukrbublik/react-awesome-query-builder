@@ -193,7 +193,7 @@ export default class FuncSelect extends Component {
       groupId,
       ...this.meta
     };
-    return renderFunc(renderProps);
+    return renderFunc(renderProps, config.ctx);
   }
 
 }

@@ -1,8 +1,6 @@
 import pick from "lodash/pick";
 import { Utils } from "@react-awesome-query-builder/core";
-const { extendConfig } = Utils.ConfigUtils;
-
-const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs"];
+const { extendConfig, configKeys } = Utils.ConfigUtils;
 
 const pickConfig = (props) => {
   return pick(props, configKeys);
@@ -20,6 +18,17 @@ export const createConfigMemo = () => {
     }
     configStore.set(config, extendedConfig);
     return extendedConfig;
+  };
+
+  const findBasic = (findConfig) => {
+    for (const basicConfig of configStore.keys()) {
+      const extConfig = configStore.get(basicConfig);
+      const found = configKeys.map(k => extConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      if (found) {
+        return basicConfig;
+      }
+    }
+    return findConfig;
   };
 
   const findExtended = (findConfig) => {
@@ -47,5 +56,8 @@ export const createConfigMemo = () => {
     return findExtended(config) || extendAndStore(config);
   };
   
-  return (props) => findOrExtend(pickConfig(props));
+  return {
+    getExtended: (props) => findOrExtend(pickConfig(props)),
+    getBasic: findBasic
+  };
 };

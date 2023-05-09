@@ -2,7 +2,7 @@ import {sleep} from "./stuff";
 import {listValuesToArray, mapListValues} from "./listValues";
 
 export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (search, offset, meta) => {
-  const pageSize = meta.pageSize != undefined ? meta.pageSize : cPageSize;
+  const pageSize = meta?.pageSize != undefined ? meta.pageSize : cPageSize;
   const filtered = listValuesToArray(all)
     .filter(({title}) => search == null ? true : title.toUpperCase().indexOf(search.toUpperCase()) != -1);
   const pages = pageSize ? Math.ceil(filtered.length / pageSize) : 0;
@@ -11,10 +11,12 @@ export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (s
   const values = pageSize ? filtered.slice(currentOffset, currentOffset + pageSize) : filtered;
   const newOffset = pageSize ? currentOffset + values.length : null;
   const hasMore = pageSize ? (newOffset < filtered.length) : false;
-  console.debug("simulateAsyncFetch", {
-    search, offset, values, hasMore, filtered
-  });
-  await sleep(delay);
+  if (delay) {
+    console.debug("simulateAsyncFetch", {
+      search, offset, values, hasMore, filtered
+    });
+    await sleep(delay);
+  }
   return {
     values,
     hasMore

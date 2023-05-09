@@ -29,7 +29,7 @@ export const loadTree = (serTree) => {
 
 export const checkTree = (tree, config) => {
   if (!tree) return undefined;
-  const extendedConfig = extendConfig(config);
+  const extendedConfig = extendConfig(config, undefined, true);
   return validateTree(tree, null, extendedConfig, extendedConfig);
 };
 

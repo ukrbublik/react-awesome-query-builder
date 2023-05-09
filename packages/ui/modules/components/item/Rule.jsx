@@ -8,7 +8,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, DragIcon, dummyFn, ConfirmFn} from "../utils";
+import {Col, DragIcon, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getFieldPathLabels} = Utils.RuleUtils;
@@ -92,17 +92,17 @@ class Rule extends Component {
   }
 
   removeSelf() {
-    const {confirmFn} = this.props;
-    const {renderConfirm, removeRuleConfirmOptions: confirmOptions} = this.props.config.settings;
+    const {confirmFn, config} = this.props;
+    const {renderConfirm, removeRuleConfirmOptions: confirmOptions} = config.settings;
     const doRemove = () => {
       this.props.removeSelf();
     };
     if (confirmOptions && !this.isEmptyCurrentRule()) {
-      renderConfirm({...confirmOptions,
+      renderConfirm.call(config.ctx, {...confirmOptions,
         onOk: doRemove,
         onCancel: null,
         confirmFn: confirmFn
-      });
+      }, config.ctx);
     } else {
       doRemove();
     }
@@ -214,7 +214,7 @@ class Rule extends Component {
     const { renderBeforeWidget } = config.settings;
     return renderBeforeWidget 
         && <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
-          {typeof renderBeforeWidget === "function" ? renderBeforeWidget(this.props) : renderBeforeWidget}
+          {typeof renderBeforeWidget === "function" ? renderBeforeWidget(this.props, config.ctx) : renderBeforeWidget}
         </Col>;
   }
 
@@ -223,7 +223,7 @@ class Rule extends Component {
     const { renderAfterWidget } = config.settings;
     return renderAfterWidget 
         && <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
-          {typeof renderAfterWidget === "function" ? renderAfterWidget(this.props) : renderAfterWidget}
+          {typeof renderAfterWidget === "function" ? renderAfterWidget(this.props, config.ctx) : renderAfterWidget}
         </Col>;
   }
 
@@ -233,7 +233,7 @@ class Rule extends Component {
     const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
     return showErrorMessage && oneValueError 
         && <div className="rule--error">
-          {renderRuleError ? renderRuleError({error: oneValueError}) : oneValueError}
+          {renderRuleError ? renderRuleError({error: oneValueError}, config.ctx) : oneValueError}
         </div>;
   }
 
@@ -253,9 +253,10 @@ class Rule extends Component {
     const {
       deleteLabel, 
       immutableGroupsMode, 
-      renderButton: Btn,
+      renderButton,
       canDeleteLocked
     } = config.settings;
+    const Btn = (pr) => renderButton(pr, config.ctx);
 
     return !immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && (
       <Btn 
@@ -268,8 +269,9 @@ class Rule extends Component {
     const {config, isLocked, isTrueLocked, id} = this.props;
     const {
       lockLabel, lockedLabel, showLock,
-      renderSwitch: Switch
+      renderSwitch
     } = config.settings;
+    const Switch = (pr) => renderSwitch(pr, config.ctx);
       
     return showLock && !(isLocked && !isTrueLocked) && (
       <Switch 
@@ -282,7 +284,8 @@ class Rule extends Component {
     const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
     const { valueSrc, value, config } = this.props;
     const canShrinkValue = valueSrc.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
-    const { renderButtonGroup: BtnGrp } = config.settings;
+    const { renderButtonGroup } = config.settings;
+    const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
 
     const parts = [
       this.renderField(),
@@ -318,4 +321,4 @@ class Rule extends Component {
 }
 
 
-export default RuleContainer(Draggable("rule")(ConfirmFn(Rule)));
+export default RuleContainer(Draggable("rule")(WithConfirmFn(Rule)));

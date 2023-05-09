@@ -73,6 +73,15 @@ describe("query with conjunction", () => {
     });
   });
 
+  describe("can use reversed op", () => {
+    export_checks([configs.with_number_and_string, configs.without_less_format], inits.with_less, "JsonLogic", {
+      "query": "!(num >= 2)",
+      "queryHuman": "NOT (Number >= 2)",
+      "sql": "NOT(num >= 2)",
+      "spel": "!(num >= 2)",
+    });
+  });
+
   describe("should handle OR with 2 rules with NOT", () => {
     export_checks(configs.with_number_and_string, inits.with_not_number_and_string, "JsonLogic", {
       "query": "NOT (num < 2 || login == \"ukrbublik\")",

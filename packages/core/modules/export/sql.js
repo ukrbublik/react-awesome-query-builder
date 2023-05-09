@@ -127,7 +127,7 @@ const formatRule = (item, config, meta) => {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
   }
-  if (!canFormatRevOp && canFormatRevOp) {
+  if (!canFormatOp && canFormatRevOp) {
     isRev = true;
     [operator, reversedOp] = [reversedOp, operator];
     [opDef, revOpDef] = [revOpDef, opDef];
@@ -179,7 +179,7 @@ const formatRule = (item, config, meta) => {
   ];
 
   let ret;
-  ret = fn(...args);
+  ret = fn.call(config.ctx, ...args);
   if (isRev) {
     ret = config.settings.sqlFormatReverse(ret);
   }
@@ -219,7 +219,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
         args.push(valFieldDefinition);
       }
-      ret = fn(...args);
+      ret = fn.call(config.ctx, ...args);
     } else {
       if (Array.isArray(currentValue)) {
         ret = currentValue.map(v => SqlString.escape(v));
@@ -240,7 +240,7 @@ const formatField = (meta, config, field) => {
   const fieldPartsLabels = getFieldPathLabels(field, config);
   const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
   const formatFieldFn = config.settings.formatField;
-  const fieldName = formatFieldName(field, config, meta);
+  const fieldName = formatFieldName(field, config, meta, null, {useTableName: true});
   const formattedField = formatFieldFn(fieldName, fieldParts, fieldFullLabel, fieldDefinition, config);
   return formattedField;
 };
@@ -278,7 +278,7 @@ const formatFunc = (meta, config, currentValue) => {
     const args = [
       formattedArgs
     ];
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else {
     const argsStr = Object.entries(formattedArgs)
       .map(([k, v]) => v)
