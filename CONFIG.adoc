@@ -10,7 +10,12 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-
+:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string
+:config1:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx
+:config2:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx
+:config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx
+:funcs:        https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js
+:renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
 
 = Config format
 
@@ -27,15 +32,15 @@ Usually it's enough to just reuse link:#basic-config[basic config], provide your
 Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).
 
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
-They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
+They have common param `isForDisplay` - false by default, true will be used for {queryString}[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
-TIP: Example 1: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx[`config for sandbox_simple`]
+TIP: Example 1: {config1}[`config for sandbox_simple`]
 
-TIP: Example 2: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx[`config for sandbox`]
+TIP: Example 2: {config2}[`config for sandbox`]
 
 {nbsp} +
 
@@ -223,7 +228,7 @@ Example:
 |fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
 |fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
 |defaultValue | | |Default value
-|preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
+|preferWidgets | | |See usecase at {config3}[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
@@ -355,7 +360,7 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
-|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54[example])
+|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework ({renderSwitch}[example])
 |renderItem | |Render Item +
   Able to Customize Render behavior for rule/group items.
 |showLabels |false |Show labels above all fields?
@@ -541,7 +546,7 @@ There is also special `proximity` operator, its options are rendered with `<Prox
 import {CustomOperators: {ProximityOperator}} from '@react-awesome-query-builder/ui';
 ----
 
-See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`]
+See {config3}[`examples/demo`]
 ====
 
 
@@ -685,7 +690,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at {config3}[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
@@ -757,7 +762,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |===
 
 
-See the collection of https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js[basic funcstions].
+See the collection of {funcs}[basic funcstions].
 You can copy them to `config.funcs`:
 [source,javascript]
 ----
@@ -924,7 +929,7 @@ const config2 = Utils.decompressConfig(zipConfig, BasicConfig, ctx); // should b
 [[configserialize]]
 === Serialize entire config to string
 
-Section link:#configctx[config.ctx] demonstrates the concept of `zipConfig` which is a special config format that contains only changes against base full config and can be serialized to JSON. 
+Section link:#configctx[config.ctx] demonstrates the concept of `zipConfig` which is a special config format that contains only changes against full config and can be serialized to JSON. 
 Base config provided by this library (`BasicConfig`, `AntdConfig` etc.) still has JS functions (at least for the moment of writing, in version 6.3.0). 
 If you want to serialize the entire config (not only changes), you can't do it to JSON as it contains JS functions. But you can do it to string with a help of https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and deserialize back with `eval()`. Yes, it's unsecure, but can be used for some purposes. 
 
