@@ -1,9 +1,37 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb_ant } from "../support/utils";
+import { with_qb_ant, sleep } from "../support/utils";
 
+const stringifyOptions = (ac) => {
+  return ac
+    .find("Popup") // in portal
+    .find("OptionList")
+    .find("Item")
+    .getElements()
+    .map(el => el.key)
+    .join(";");
+};
 
 describe("interactions on antd", () => {
+
+  describe("autocomplete", () => {
+    it("find B", async () => {
+      await with_qb_ant(configs.with_autocomplete, inits.with_autocomplete_a, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+        let ac = qb.find("Select").filterWhere(s => s.props()?.placeholder == "Select value");
+        expect(ac.prop("value")).to.eq("a");
+
+        ac.prop("onDropdownVisibleChange")(true);
+        qb.update();
+        expect(stringifyOptions(qb)).to.eq("a");
+        
+        ac.prop("onSearch")("b");
+        await sleep(400); // should be > 50ms delay
+        qb.update();
+        ac = qb.find("Select").filterWhere(s => s.props()?.placeholder == "Select value");
+        expect(stringifyOptions(qb)).to.eq("a;b");
+      });
+    });
+  });
 
   it("set not", async () => {
     await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {

@@ -1,13 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
-  Utils, 
+  Query, Builder, Utils, 
   //types:
-  ImmutableTree, Config, JsonTree, JsonLogicTree, ActionMeta, Actions
-} from "@react-awesome-query-builder/core";
-import {
-  Query, Builder, 
-  //types:
-  BuilderProps
+  BuilderProps, ImmutableTree, Config, JsonTree, JsonLogicTree, ActionMeta, Actions
 } from "@react-awesome-query-builder/ui";
 import ImportSkinStyles from "../skins";
 import throttle from "lodash/throttle";

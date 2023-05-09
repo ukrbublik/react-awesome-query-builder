@@ -1,14 +1,14 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import {calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT} from "../../utils/domUtils";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import { Select } from "antd";
 import omit from "lodash/omit";
 import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 
-export default class SelectWidget extends PureComponent {
+export default class SelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
@@ -27,14 +27,16 @@ export default class SelectWidget extends PureComponent {
     this.onPropsChanged(props);
   }
 
-  onPropsChanged (props) {
-    const {listValues} = props;
+  onPropsChanged(nextProps) {
+    const {listValues} = nextProps;
 
     let optionsMaxWidth = 0;
     mapListValues(listValues, ({title, value}) => {
       optionsMaxWidth = Math.max(optionsMaxWidth, calcTextWidth(title, null));
     });
-    this.optionsMaxWidth = optionsMaxWidth;
+    if (!isNaN(optionsMaxWidth) && optionsMaxWidth) {
+      this.optionsMaxWidth = optionsMaxWidth;
+    }
 
     this.options = mapListValues(listValues, ({title, value}) => {
       return (<Option key={value+""} value={value+""}>{title}</Option>);
@@ -54,8 +56,9 @@ export default class SelectWidget extends PureComponent {
     const {config, placeholder, customProps, value, readonly} = this.props;
     const {renderSize} = config.settings;
     const placeholderWidth = calcTextWidth(placeholder);
-    const dropdownWidth = this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    const width = value ? dropdownWidth : placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const dropdownWidth = this.optionsMaxWidth ? this.optionsMaxWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
+    const dropdownEmptyWidth = placeholderWidth ? placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT : null;
+    const width = value ? dropdownWidth : dropdownEmptyWidth;
     const aValue = value != undefined ? value+"" : undefined;
     const customSelectProps = omit(customProps, [""]);
 

@@ -1,7 +1,24 @@
 # Changelog
+- 6.3.0
+  - Allow saving and loading config from server (PR #866) (issue #817)
+    - New utils: `compressConfig()`, `decompressConfig()`
+    - New `settings.useConfigCompress`
+    - Config now has `ctx` property
+    - Added new test app `sandbox_next` to demonstrate new server-side features
+  - Export utils (like `mongoFormatOp1`, `mongoFormatOp2`) in `CoreConfig.ctx.utils` (PR #866) (issue #890)
+  - 2nd parameter of `onChange` callback now equals original config, not extended config (PR #866) (issue #364)
+- 6.2.0
+  - Fixed type `Config`: should have render settings like `renderSize` (PR #909) (issue #879)
+  - Fixed type for `renderBeforeWidget`: `RuleProps` instead of wrong `FieldProps` (PR #909) (issue #879)
+  - Breaking change in types: `listValues` renamed to `treeValues` in `TreeSelectFieldSettings`
+    But old `listValues` is still supported in JS (PR #909)
+  - Add support for ElasticSearch 7 term syntax (PR #906) (issue #904)
+  - Fix mongodbFormat to work with mode = array (PR #908) (issue #907)
 - 6.1.3
   - Fix isNull roundtrip (PR #887) (issue #886)
   - Fix `BootstrapFieldSelect` for fields with 2+ level nesting (PR #898) (issue #868)
+  - Fix `UNSAFE_componentWillReceiveProps` (PR #901) (issue #390)
+  - Fix bugs with `React.StrictMode` (PR #902) (issue #789)
 - 6.1.2
   - Fix typings for `children1`: tuple -> array (PR #885) (issue #881)
   - Fix compare fields for case when type != widget.type (PR #875) (issue #758)

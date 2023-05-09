@@ -47,9 +47,38 @@ describe("query with conjunction", () => {
                 "login": "ukrbublik"
               }
             }
-          ] 
+          ]
         }
       },
+      elasticSearch7: {
+        "bool": {
+          "should": [
+            {
+              "range": {
+                "num": {
+                  "lt": "2"
+                }
+              }
+            },
+            {
+              "term": {
+                "login": {
+                  "value": "ukrbublik"
+                }
+              }
+            }
+          ]
+        }
+      },
+    });
+  });
+
+  describe("can use reversed op", () => {
+    export_checks([configs.with_number_and_string, configs.without_less_format], inits.with_less, "JsonLogic", {
+      "query": "!(num >= 2)",
+      "queryHuman": "NOT (Number >= 2)",
+      "sql": "NOT(num >= 2)",
+      "spel": "!(num >= 2)",
     });
   });
 

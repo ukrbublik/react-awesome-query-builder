@@ -1,16 +1,17 @@
 import React, { Component } from "react";
 import merge from "lodash/merge";
 import {
-  BasicFuncs, Utils,
+  BasicFuncs, Utils, BasicConfig,
   // types:
-  Operators, Widgets, Fields, Config, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs,
-  //DateTimeFieldSettings,
-} from "@react-awesome-query-builder/core";
-import {
-  BasicConfig,
-  // types:
+  Operators, Fields, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
   Settings,
-  DateTimeFieldSettings
+  DateTimeFieldSettings, TextFieldSettings, SelectFieldSettings, MultiSelectFieldSettings, NumberFieldSettings,
+  TextWidgetProps,
+  WidgetProps,
+  Widgets,
+  TextWidget,
+  TreeSelectWidget,
+  Config,
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
@@ -107,7 +108,7 @@ export default (skin: string) => {
 
   const widgets: Widgets = {
     ...InitialConfig.widgets,
-    // examples of  overriding
+    // examples of overriding
     text: {
       ...InitialConfig.widgets.text
     },
@@ -172,7 +173,7 @@ export default (skin: string) => {
       ...InitialConfig.types.text,
       excludeOperators: ["proximity"],
     },
-    boolean: merge(InitialConfig.types.boolean, {
+    boolean: merge({}, InitialConfig.types.boolean, {
       widgets: {
         boolean: {
           widgetProps: {
@@ -283,10 +284,10 @@ export default (skin: string) => {
           label2: "Username", //only for menu's toggler
           type: "text",
           fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
+            validateValue: (val, fieldSettings) => {
               return (val.length < 10);
             },
-          },
+          } as TextFieldSettings,
           mainWidgetProps: {
             valueLabel: "Name",
             valuePlaceholder: "Enter name",
@@ -296,10 +297,10 @@ export default (skin: string) => {
           type: "text",
           tableName: "t1", // legacy: PR #18, PR #20
           fieldSettings: {
-            validateValue: (val: string, fieldSettings) => {
+            validateValue: (val, fieldSettings) => {
               return (val.length < 10 && (val === "" || val.match(/^[A-Za-z0-9_-]+$/) !== null));
             },
-          },
+          } as TextFieldSettings,
           mainWidgetProps: {
             valueLabel: "Login",
             valuePlaceholder: "Enter login",
@@ -323,7 +324,7 @@ export default (skin: string) => {
           type: "select",
           fieldSettings: {
             listValues: ["abc", "def", "xyz"],
-          },
+          } as SelectFieldSettings,
           valueSources: ["value"],
         },
         score: {
@@ -366,7 +367,7 @@ export default (skin: string) => {
           type: "select",
           fieldSettings: {
             listValues: ["Ford", "Toyota", "Tesla"],
-          },
+          } as MultiSelectFieldSettings,
           valueSources: ["value"],
         },
         year: {
@@ -411,7 +412,7 @@ export default (skin: string) => {
         validateValue: (val, fieldSettings) => {
           return (val < 50 ? null : "Invalid slider value, see validateValue()");
         },
-      },
+      } as NumberFieldSettings,
       //overrides
       widgets: {
         slider: {
@@ -435,12 +436,12 @@ export default (skin: string) => {
       valueSources: ["value"],
       fieldSettings: {
         dateFormat: "DD-MM-YYYY",
-        validateValue: (val: string, fieldSettings: DateTimeFieldSettings) => {
+        validateValue: (val, fieldSettings: DateTimeFieldSettings) => {
           // example of date validation
           const dateVal = moment(val, fieldSettings.valueFormat);
           return dateVal.year() != (new Date().getFullYear()) ? "Please use current year" : null;
         },
-      },
+      } as DateTimeFieldSettings,
     },
     time: {
       label: "Time",
@@ -509,7 +510,7 @@ export default (skin: string) => {
       fieldSettings: {
         treeExpandAll: true,
         // * deep format (will be auto converted to flat format):
-        // listValues: [
+        // treeValues: [
         //     { value: "1", title: "Warm colors", children: [
         //         { value: "2", title: "Red" },
         //         { value: "3", title: "Orange" }
@@ -524,7 +525,7 @@ export default (skin: string) => {
         //     ] }
         // ],
         // * flat format:
-        listValues: [
+        treeValues: [
           { value: "1", title: "Warm colors" },
           { value: "2", title: "Red", parent: "1" },
           { value: "3", title: "Orange", parent: "1" },
@@ -541,7 +542,7 @@ export default (skin: string) => {
       type: "treemultiselect",
       fieldSettings: {
         treeExpandAll: true,
-        listValues: [
+        treeValues: [
           {
             value: "1", title: "Warm colors", children: [
               { value: "2", title: "Red" },
@@ -575,7 +576,7 @@ export default (skin: string) => {
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
-      },
+      } as SelectFieldSettings,
     },
     autocompleteMultiple: {
       label: "AutocompleteMultiple",
@@ -587,7 +588,7 @@ export default (skin: string) => {
         useLoadMore: true,
         forceAsyncSearch: false,
         allowCustomValues: false
-      },
+      } as SelectFieldSettings,
     },
     stock: {
       label: "In stock",
@@ -606,8 +607,10 @@ export default (skin: string) => {
     ...BasicFuncs
   };
 
+  const ctx = InitialConfig.ctx;
 
   const config: Config = {
+    ctx,
     conjunctions,
     operators,
     widgets,

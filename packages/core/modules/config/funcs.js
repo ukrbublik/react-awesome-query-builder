@@ -1,13 +1,13 @@
-import moment from "moment";
+//import { customJsonLogicOperations } from "../utils/jsonLogic";
+
+// Tip: search for `customJsonLogicOperations` in codebase to see custom JL funcs we use in `jsonLogicCustomOps`
 
 const NOW = {
   label: "Now",
   returnType: "datetime",
   jsonLogic: "now",
-  //todo: document option `jsonLogicCustomOps`
-  //todo: add util to return all used custom ops to be added by user with `jsonLogic.add_operation`
   jsonLogicCustomOps: {
-    now: () => new Date(),
+    now: {},
   },
   spelFunc: "new java.util.Date()",
   sqlFormatFunc: () => "NOW()",
@@ -35,7 +35,7 @@ const RELATIVE_DATETIME = {
     return [date, op, val, dim];
   },
   jsonLogicCustomOps: {
-    date_add: (date, val, dim) => moment(date).add(val, dim).toDate()
+    date_add: {},
   },
   // MySQL
   //todo: other SQL dialects?
@@ -107,7 +107,7 @@ const LOWER = {
   spelFunc: ".toLowerCase",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
-    toLowerCase: (str) => str.toLowerCase(),
+    toLowerCase: {}
   },
   returnType: "text",
   args: {
@@ -128,7 +128,7 @@ const UPPER = {
   spelFunc: ".toUpperCase",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
-    toUpperCase: (str) => str.toUpperCase(),
+    toUpperCase: {},
   },
   returnType: "text",
   args: {

@@ -1,43 +1,20 @@
 import React from "react";
 import FluentUIWidgets from "../widgets";
-import { BasicConfig } from "@react-awesome-query-builder/ui";
-
-
-const {
-  FluentUIBooleanWidget,
-  FluentUITextWidget,
-  FluentUITextAreaWidget, 
-  FluentUIDateWidget,
-  FluentUITimeWidget,
-  FluentUIDateTimeWidget,
-  FluentUIMultiSelectWidget,
-  FluentUISelectWidget,
-  FluentUINumberWidget,
-  FluentUISliderWidget,
-
-  FluentUIFieldSelect,
-  FluentUIConjs,
-  FluentUIButton,
-  FluentUIButtonGroup,
-  FluentUIValueSources,
-
-  FluentUIProvider,
-  FluentUIConfirm,
-} = FluentUIWidgets;
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => <FluentUIFieldSelect {...props} />,
-  renderOperator: (props) => <FluentUIFieldSelect {...props} />,
-  renderFunc: (props) => <FluentUIFieldSelect {...props} />,
-  renderConjs: (props) => <FluentUIConjs {...props} />,
-  renderButton: (props) => <FluentUIButton {...props} />,
-  renderButtonGroup: (props) => <FluentUIButtonGroup {...props} />,
-  renderValueSources: (props) => <FluentUIValueSources {...props} />,
-  renderProvider: (props) => <FluentUIProvider {...props} />,
-  renderConfirm: FluentUIConfirm,
+  renderField: (props, {RCE, W: {FluentUIFieldSelect}}) => RCE(FluentUIFieldSelect, props),
+  renderOperator: (props, {RCE, W: {FluentUIFieldSelect}}) => RCE(FluentUIFieldSelect, props),
+  renderFunc: (props, {RCE, W: {FluentUIFieldSelect}}) => RCE(FluentUIFieldSelect, props),
+  renderConjs: (props, {RCE, W: {FluentUIConjs}}) => RCE(FluentUIConjs, props),
+  renderButton: (props, {RCE, W: {FluentUIButton}}) => RCE(FluentUIButton, props),
+  renderButtonGroup: (props, {RCE, W: {FluentUIButtonGroup}}) => RCE(FluentUIButtonGroup, props),
+  renderValueSources: (props, {RCE, W: {FluentUIValueSources}}) => RCE(FluentUIValueSources, props),
+  renderProvider: (props, {RCE, W: {FluentUIProvider}}) => RCE(FluentUIProvider, props),
+  renderConfirm: (props, {W: {FluentUIConfirm}}) => FluentUIConfirm(props),
 };
 
 
@@ -45,43 +22,43 @@ const widgets = {
   ...BasicConfig.widgets,
   text: {
     ...BasicConfig.widgets.text,
-    factory: (props) => <FluentUITextWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUITextWidget}}) => RCE(FluentUITextWidget, props),
   },
   textarea: {
     ...BasicConfig.widgets.textarea,
-    factory: (props) => <FluentUITextAreaWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUITextAreaWidget}}) => RCE(FluentUITextAreaWidget, props),
   },
   number: {
     ...BasicConfig.widgets.number,
-    factory: (props) => <FluentUINumberWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUINumberWidget}}) => RCE(FluentUINumberWidget, props),
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props) => <FluentUIMultiSelectWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUIMultiSelectWidget}}) => RCE(FluentUIMultiSelectWidget, props),
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => <FluentUISelectWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUISelectWidget}}) => RCE(FluentUISelectWidget, props),
   },
   slider: {
     ...BasicConfig.widgets.slider,
-    factory: (props) => <FluentUISliderWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUISliderWidget}}) => RCE(FluentUISliderWidget, props),
   },
   boolean: {
     ...BasicConfig.widgets.boolean,
-    factory: (props) => <FluentUIBooleanWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUIBooleanWidget}}) => RCE(FluentUIBooleanWidget, props),
   },
   date: {
     ...BasicConfig.widgets.date,
-    factory: (props) => <FluentUIDateWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUIDateWidget}}) => RCE(FluentUIDateWidget, props),
   },
   time: {
     ...BasicConfig.widgets.time,
-    factory: (props) => <FluentUITimeWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUITimeWidget}}) => RCE(FluentUITimeWidget, props),
   },
   datetime: {
     ...BasicConfig.widgets.datetime,
-    factory: (props) => <FluentUIDateTimeWidget {...props} />,
+    factory: (props, {RCE, W: {FluentUIDateTimeWidget}}) => RCE(FluentUIDateTimeWidget, props),
   },
 };
 
@@ -90,9 +67,21 @@ const types = {
   ...BasicConfig.types,
 };
 
-export default {
+const ctx = {
+  ...BasicConfig.ctx,
+  W: {
+    ...BasicConfig.ctx.W,
+    ...FluentUIWidgets,
+  },
+};
+
+
+let config = {
   ...BasicConfig,
+  ctx,
   types,
   widgets,
   settings,
 };
+export default config;
+

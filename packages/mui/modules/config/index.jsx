@@ -1,163 +1,105 @@
 import React from "react";
 import MuiWidgets from "../widgets";
-import { Utils, BasicConfig } from "@react-awesome-query-builder/ui";
-
-const { SqlString, stringifyForDisplay } = Utils.ExportUtils;
-
-
-const {
-  MuiBooleanWidget,
-  MuiTextWidget,
-  MuiTextAreaWidget,
-  MuiDateWidget,
-  MuiTimeWidget,
-  MuiDateTimeWidget,
-  MuiMultiSelectWidget,
-  MuiSelectWidget,
-  MuiNumberWidget,
-  MuiSliderWidget,
-  MuiRangeWidget,
-  MuiAutocompleteWidget,
-
-  MuiFieldSelect,
-  MuiFieldAutocomplete,
-  MuiConjs,
-  MuiSwitch,
-  MuiButton,
-  MuiButtonGroup,
-  MuiValueSources,
-
-  MuiProvider,
-  MuiConfirm,
-  MuiUseConfirm,
-} = MuiWidgets;
+import { BasicConfig, Utils } from "@react-awesome-query-builder/ui";
 
 
 const settings = {
   ...BasicConfig.settings,
 
-  renderField: (props) => props?.customProps?.showSearch 
-    ? <MuiFieldAutocomplete {...props} /> 
-    : <MuiFieldSelect {...props} />,
-  renderFieldSources: (props) => {
-    return <MuiValueSources {...props} />;
-  },
-  renderOperator: (props) => <MuiFieldSelect {...props} />,
-  renderFunc: (props) => <MuiFieldSelect {...props} />,
-  renderConjs: (props) => <MuiConjs {...props} />,
-  renderSwitch: (props) => <MuiSwitch {...props} />,
-  renderButton: (props) => <MuiButton {...props} />,
-  renderButtonGroup: (props) => <MuiButtonGroup {...props} />,
-  renderValueSources: (props) => <MuiValueSources {...props} />,
-  renderProvider: (props) => <MuiProvider {...props} />,
-  renderConfirm: MuiConfirm,
-  useConfirm: MuiUseConfirm,
+  renderField: (props, {RCE, W: {MuiFieldAutocomplete, MuiFieldSelect}}) => props?.customProps?.showSearch 
+    ? RCE(MuiFieldAutocomplete, props)
+    : RCE(MuiFieldSelect, props),
+  renderOperator: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
+  renderFunc: (props, {RCE, W: {MuiFieldSelect}}) => RCE(MuiFieldSelect, props),
+  renderConjs: (props, {RCE, W: {MuiConjs}}) => RCE(MuiConjs, props),
+  renderSwitch: (props, {RCE, W: {MuiSwitch}}) => RCE(MuiSwitch, props),
+  renderButton: (props, {RCE, W: {MuiButton}}) => RCE(MuiButton, props),
+  renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
+  renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
+  renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
+  renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
+  useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
+  renderFieldSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
 };
-
 
 const widgets = {
   ...BasicConfig.widgets,
   text: {
     ...BasicConfig.widgets.text,
-    factory: (props) => <MuiTextWidget {...props} />,
+    factory: (props, {RCE, W: {MuiTextWidget}}) => RCE(MuiTextWidget, props),
   },
   textarea: {
     ...BasicConfig.widgets.textarea,
-    factory: (props) => <MuiTextAreaWidget {...props} />,
+    factory: (props, {RCE, W: {MuiTextAreaWidget}}) => RCE(MuiTextAreaWidget, props),
   },
   number: {
     ...BasicConfig.widgets.number,
-    factory: (props) => <MuiNumberWidget {...props} />,
+    factory: (props, {RCE, W: {MuiNumberWidget}}) => RCE(MuiNumberWidget, props),
   },
   multiselect: {
     ...BasicConfig.widgets.multiselect,
-    factory: (props) => {
+    factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiMultiSelectWidget}}) => {
       return (props.asyncFetch || props.showSearch) 
-        ? <MuiAutocompleteWidget multiple {...props} /> 
-        : <MuiMultiSelectWidget {...props} />;
+        ? RCE(MuiAutocompleteWidget, {...props, multiple: true}) 
+        : RCE(MuiMultiSelectWidget, props);
     },
   },
   select: {
     ...BasicConfig.widgets.select,
-    factory: (props) => {
+    factory: (props, {RCE, W: {MuiAutocompleteWidget, MuiSelectWidget}}) => {
       return (props.asyncFetch || props.showSearch) 
-        ? <MuiAutocompleteWidget {...props} /> 
-        : <MuiSelectWidget {...props} />;
+        ? RCE(MuiAutocompleteWidget, props) 
+        : RCE(MuiSelectWidget, props);
     },
   },
   slider: {
     ...BasicConfig.widgets.slider,
-    factory: (props) => <MuiSliderWidget {...props} />,
+    factory: (props, {RCE, W: {MuiSliderWidget}}) => RCE(MuiSliderWidget, props),
   },
   boolean: {
     ...BasicConfig.widgets.boolean,
-    factory: (props) => <MuiBooleanWidget {...props} />,
+    factory: (props, {RCE, W: {MuiBooleanWidget}}) => RCE(MuiBooleanWidget, props),
   },
   date: {
     ...BasicConfig.widgets.date,
-    factory: (props) => <MuiDateWidget {...props} />,
+    factory: (props, {RCE, W: {MuiDateWidget}}) => RCE(MuiDateWidget, props),
   },
   time: {
     ...BasicConfig.widgets.time,
-    factory: (props) => <MuiTimeWidget {...props} />,
+    factory: (props, {RCE, W: {MuiTimeWidget}}) => RCE(MuiTimeWidget, props),
   },
   datetime: {
     ...BasicConfig.widgets.datetime,
-    factory: (props) => <MuiDateTimeWidget {...props} />,
+    factory: (props, {RCE, W: {MuiDateTimeWidget}}) => RCE(MuiDateTimeWidget, props),
   },
-
   rangeslider: {
-    type: "number",
-    jsType: "number",
-    valueSrc: "value",
-    factory: (props) => <MuiRangeWidget {...props} />,
-    valueLabel: "Range",
-    valuePlaceholder: "Select range",
-    valueLabels: [
-      { label: "Number from", placeholder: "Enter number from" },
-      { label: "Number to", placeholder: "Enter number to" },
-    ],
-    formatValue: (val, fieldDef, wgtDef, isForDisplay) => {
-      return isForDisplay ? stringifyForDisplay(val) : JSON.stringify(val);
-    },
-    sqlFormatValue: (val, fieldDef, wgtDef, op, opDef) => {
-      return SqlString.escape(val);
-    },
-    singleWidget: "slider",
-    toJS: (val, fieldSettings) => (val),
+    ...BasicConfig.widgets.rangeslider,
+    factory: (props, {RCE, W: {MuiRangeWidget}}) => RCE(MuiRangeWidget, props),
   },
 };
-
 
 const types = {
   ...BasicConfig.types,
-  number: {
-    ...BasicConfig.types.number,
-    widgets: {
-      ...BasicConfig.types.number.widgets,
-      rangeslider: {
-        opProps: {
-          between: {
-            isSpecialRange: true,
-          },
-          not_between: {
-            isSpecialRange: true,
-          }
-        },
-        operators: [
-          "between",
-          "not_between",
-          "is_empty",
-          "is_not_empty",
-        ],
-      }
-    },
+};
+
+const ctx = {
+  ...BasicConfig.ctx,
+  W: {
+    ...BasicConfig.ctx.W,
+    ...MuiWidgets,
   },
 };
 
-export default {
+
+let config = {
   ...BasicConfig,
+  ctx,
   types,
   widgets,
   settings,
 };
+config = Utils.ConfigMixins.addMixins(config, [
+  "rangeslider",
+]);
+
+export default config;

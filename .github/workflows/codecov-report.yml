@@ -2,7 +2,9 @@ name: CodeCov Report
 
 on:
   release:
-    types: [published]
+    types: [ published ]
+  pull_request:
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:

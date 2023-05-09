@@ -148,7 +148,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     if (newOperatorConfig && newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
       // last element in `valueError` list is for range validation error
       const jsValues = firstWidgetConfig && firstWidgetConfig.toJS 
-        ? newValue.toJS().map(v => firstWidgetConfig.toJS(v, firstWidgetConfig)) 
+        ? newValue.toJS().map(v => firstWidgetConfig.toJS.call(config.ctx, v, firstWidgetConfig)) 
         : newValue.toJS();
       const rangeValidateError = newOperatorConfig.validateValues(jsValues);
       if (showErrorMessage) {
@@ -233,7 +233,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
     .map((parts) => [...parentParts, ...parts].join(fieldSeparator))
     .map(part => {
       const cnf = getFieldRawConfig(config, part, fieldsKey, subfieldsKey);
-      return cnf && cnf.label || cnf && last(part.split(fieldSeparator));
+      return cnf && cnf.label || last(part.split(fieldSeparator));
     })
     .filter(label => label != null);
 };
@@ -314,9 +314,9 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   if (fieldConfig && fieldConfig.widgets) {
     for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
-      // if (!config.widgets[widget]) {
-      //   continue;
-      // }
+      if (!config.widgets[widget]) {
+        continue;
+      }
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
       if (widget == "field") {
@@ -410,13 +410,13 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null, fi
   return widget;
 };
 
-export const formatFieldName = (field, config, meta, parentField = null) => {
+export const formatFieldName = (field, config, meta, parentField = null, options = {}) => {
   if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
   const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  if (fieldDef.tableName) { // legacy
+  if (options?.useTableName && fieldDef.tableName) { // legacy
     const fieldPartsCopy = [...fieldParts];
     fieldPartsCopy[0] = fieldDef.tableName;
     fieldName = fieldPartsCopy.join(fieldSeparator);
@@ -432,6 +432,7 @@ export const formatFieldName = (field, config, meta, parentField = null) => {
     }
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
+      // fieldName = "#this." + fieldName; // ? for spel
     } else {
       meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
     }

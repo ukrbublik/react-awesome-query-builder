@@ -10,15 +10,21 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-
+:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay\--false---string
+:config1:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx
+:config2:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx
+:config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx
+:funcs:        https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js
+:renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
+:config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
 
 = Config format
 
-Has 7 sections:
+Has 8 sections:
 
 [source,javascript]
 ----
-{conjunctions, operators, widgets, types, funcs, settings, fields}
+{conjunctions, operators, widgets, types, funcs, settings, fields, ctx}
 ----
 
 Each section is described below.
@@ -27,17 +33,19 @@ Usually it's enough to just reuse link:#basic-config[basic config], provide your
 Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).
 
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
-They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
+They have common param `isForDisplay` - false by default, true will be used for {queryString}[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
-TIP: Example: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`demo config`]
+TIP: Example 1: {config1}[`config for sandbox_simple`]
 
+TIP: Example 2: {config2}[`config for sandbox`]
 
 {nbsp} +
 
+[[basicconfig]]
 == Basic config
 
 - Use `BasicConfig` for simple vanilla UI
@@ -73,67 +81,68 @@ What is in basic config?
 [source,javascript]
 ----
 const {
-    conjunctions: {
-        AND, 
-        OR
-    },
-    operators: {
-        equal,
-        not_equal,
-        less,
-        less_or_equal,
-        greater,
-        greater_or_equal,
-        like,
-        not_like,
-        starts_with,
-        ends_with,
-        between,
-        not_between,
-        is_null,
-        is_not_null,
-        is_empty,
-        is_not_empty,
-        select_equals, // like `equal`, but for select
-        select_not_equals,
-        select_any_in,
-        select_not_any_in,
-        multiselect_contains,
-        multiselect_not_contains,
-        multiselect_equals, // like `equal`, but for multiselect
-        multiselect_not_equals,
-        proximity, // complex operator with options
-    },
-    widgets: {
-      text,
-      textarea,
-      number,
-      slider,
-      rangeslider, // missing in `BasicConfig`, `BootstrapConfig`, `FluentUIConfig`
-      select,
-      multiselect,
-      treeselect, // present only in `AntdConfig`
-      treemultiselect, // present only in `AntdConfig`
-      date,
-      time,
-      datetime,
-      boolean,
-      field, // to compare field with another field of same type
-      func, // to compare field with result of function
-    },
-    types: {
-      text,
-      number,
-      date,
-      time,
-      datetime,
-      select,
-      multiselect,
-      treeselect,
-      treemultiselect,
-      boolean,
-    },
-    settings
+  conjunctions: {
+    AND, 
+    OR
+  },
+  operators: {
+    equal,
+    not_equal,
+    less,
+    less_or_equal,
+    greater,
+    greater_or_equal,
+    like,
+    not_like,
+    starts_with,
+    ends_with,
+    between,
+    not_between,
+    is_null,
+    is_not_null,
+    is_empty,
+    is_not_empty,
+    select_equals, // like `equal`, but for select
+    select_not_equals,
+    select_any_in,
+    select_not_any_in,
+    multiselect_contains,
+    multiselect_not_contains,
+    multiselect_equals, // like `equal`, but for multiselect
+    multiselect_not_equals,
+    proximity, // complex operator with options
+  },
+  widgets: {
+    text,
+    textarea,
+    number,
+    slider,
+    rangeslider, // missing in `BasicConfig`, `BootstrapConfig`, `FluentUIConfig`
+    select,
+    multiselect,
+    treeselect, // present only in `AntdConfig`
+    treemultiselect, // present only in `AntdConfig`
+    date,
+    time,
+    datetime,
+    boolean,
+    field, // to compare field with another field of same type
+    func, // to compare field with result of function
+  },
+  types: {
+    text,
+    number,
+    date,
+    time,
+    datetime,
+    select,
+    multiselect,
+    treeselect,
+    treemultiselect,
+    boolean,
+  },
+  settings,
+  ctx,
 } = AntdConfig;
 ----
 
@@ -195,15 +204,17 @@ Example:
   By default, if nested field is selected (eg. `name` of `user` in example above), `<FieldDropdown>` component will show `name`. +
   Just `name` can be confusing, so can be overriden by setting `label2` to something like `User name`. +
   As alternative, you can use `<FieldCascader>` component which handles nested fields right. See `renderField` in link:#configsettings[settings].
+|fieldName | | |By default field name for export is constructed from current feild key and ancestors keys joined by `settings.fieldSeparator`. You can override this by specifying `fieldName`
 |tooltip | | |Optional tooltip to be displayed in field list by hovering on item
 |fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}` +
   Available settings for Number and Slider widgets: `min`, `max`, `step`. Slider also supports `marks` (example: `{ 0: "0%", 100: "100%" }`). +
   Available settings for date/time widgets: `timeFormat`, `dateFormat`, `valueFormat`, `use12Hours`, `useKeyboard`. +
   Available settings for text widget: `maxLength`, `maxRows`.
-|fieldSettings.listValues |+ for (multi)select, tree (multi)select | |List of values for (multi)select widget. +
-  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
-   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
-  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
+|fieldSettings.listValues |+ for (multi)select | |List of values for (multi)select widget. +
+  Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
+   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`)
+|fieldSettings.treeValues |+ for tree (multi)select | |List of values for tree (multi)select widget. +
+  Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
 |fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
   `(mixed val, Object fieldSettings) => boolean \| string \| null`
@@ -218,7 +229,7 @@ Example:
 |fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
 |fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.
 |defaultValue | | |Default value
-|preferWidgets | | |See usecase at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`] for `slider` field. +
+|preferWidgets | | |See usecase at {config3}[`examples/demo`] for `slider` field. +
   Its type is `number`. There are 3 widgets defined for number type: `number`, `slider`, `rangeslider`. +
   So setting `preferWidgets: ['slider', 'rangeslider']` will force rendering slider, and setting `preferWidgets: ['number']` will render number input.
 |operators, defaultOperator, widgets, valueSources | | |You can override config of corresponding type (see below at section link:#configtypes[config.types])
@@ -323,6 +334,7 @@ Behaviour settings:
 |removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.checkTree()`?
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
+|useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
 |===
 
 TIP: For fully read-only mode use these settings:
@@ -349,7 +361,7 @@ Render settings:
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
 |renderFunc |`(props) => <FieldSelect {...props} />` |Render functions list +
   Available widgets for AntDesign: `FieldSelect`, `FieldDropdown`
-|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework (https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54[example])
+|renderConjs, renderButton, renderButtonGroup, renderSwitch, renderProvider, renderValueSources, renderConfirm, useConfirm, renderRuleError | |Other internal render functions you can override if using another UI framework ({renderSwitch}[example])
 |renderItem | |Render Item +
   Able to Customize Render behavior for rule/group items.
 |showLabels |false |Show labels above all fields?
@@ -535,7 +547,7 @@ There is also special `proximity` operator, its options are rendered with `<Prox
 import {CustomOperators: {ProximityOperator}} from '@react-awesome-query-builder/ui';
 ----
 
-See https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`]
+See {config3}[`examples/demo`]
 ====
 
 
@@ -624,7 +636,6 @@ const {
 |maxRows | | |Option for `<TextAreaWidget>`
 |timeFormat | |`HH:mm:ss` |Option for `<TimeWidget>`, `<DateTimeWidget>` to display time in widget. Example: `'HH:mm'`
 |use12Hours | |`false` |Option for `<TimeWidget>`
-|useKeyboard | |`true` |Option for Material-UI date/time pickers, `false` disables input with keyboard, only picker use is allowed
 |dateFormat | |`YYYY-MM-DD` |Option for `<DateWidget>`, `<DateTimeWidget>` to display date in widget. Example: `YYYY-MM-DD`
 |valueFormat | | |Option for `<TimeWidget>`, `<DateWidget>`, `<DateTimeWidget>` to prepare string representation of value to be stored. Example: `YYYY-MM-DD HH:mm`
 |labelYes, labelNo | | |Option for `<BooleanWidget>`
@@ -680,7 +691,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`. If `'value'` is included, you can compare field with values. If `'field'` is included, you can compare field with another field of same type. If `'func'` is included, you can compare field with result of function (see link:#configfuncs[config.funcs]).
 |defaultOperator | | |If specified, it will be auto selected when user selects field
 |widgets.* |+ | |Available widgets for current type and their config. +
-  Normally there is only 1 widget per type. But see type `number` at https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
+  Normally there is only 1 widget per type. But see type `number` at {config3}[`examples/demo`] - it has 3 widgets `number`, `slider`, `rangeslider`. +
   Or see type `select` - it has widget `select` for operator `=` and widget `multiselect` for operator `IN`.
 |widgets.<widget>.operators | | |List of operators for widget, described in link:#configoperators[config.operators]
 |widgets.<widget>.widgetProps | | |Can be used to override config of corresponding widget specified in link:#configwidgets[config.widgets]. Example: `{timeFormat: 'h:mm:ss A'}` for time field with AM/PM.
@@ -693,6 +704,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 {nbsp} +
 [[configfuncs]]
 === config.funcs
+
 
 [source,javascript]
 ----
@@ -712,6 +724,7 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
   ..
 }
 ----
+
 
 [cols="1m,1,1,5a",options="header",]
 |===
@@ -738,12 +751,241 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 |args.<arg>.valueSources | |keys of `valueSourcesInfo` at link:#configsettings[config.settings] |Array with values `'value'`, `'field'`, `'func'`, `'const'`. +
   `const` requires `defaultValue`
 |args.<arg>.defaultValue | | |Default value
-|args.<arg>.listValues |+ for (multi)select, tree (multi)select widgets | |List of values for Select widget. +
-  Example for select/multiselect: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` +
-  Example for treeselect/treemultiselect: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]`
 |args.<arg>.fieldSettings | | |Settings for widgets, will be passed as props. Example: `{min: 1, max: 10}`
+|args.<arg>.fieldSettings.listValues |+ for (multi)select widgets | |List of values for Select widget. +
+  Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]`
+|args.<arg>.fieldSettings.treeValues |+ for tree (multi)select widgets | |List of values for TreeSelect widget. +
+  Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]`
 |args.<arg>.isOptional | |false |Last args can be optional
 |renderBrackets | |`['(', ')']` |Can render custom function brackets in UI (or not render).
 |renderSeps | |`[', ']` |Can render custom arguments separators in UI (other than `,`).
 |allowSelfNesting | |false |Allows the function to be used within its own arguments.
 |===
+
+
+See the collection of {funcs}[basic funcstions].
+You can copy them to `config.funcs`:
+[source,javascript]
+----
+import { BasicFuncs } from '@react-awesome-query-builder/ui';
+const config = {
+  //...
+  funcs: {
+    LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
+    LOWER: BasicFuncs.LOWER,
+  }
+};
+----
+
+
+{nbsp} +
+{nbsp} +
+[[configctx]]
+=== config.ctx
+
+Required starting from version 6.3.0
+
+It is a collection of JS functions and React components to be used in other sections of config by reference to `ctx` rather than by reference to imported modules. 
+
+TIP: The purpose of `ctx` is to isolate non-serializable part of config. 
+
+Typically you just need to copy it from link:#basicconfig[basic config] - `AntdConfig.ctx` for AntDesign, `MuiConfig.ctx` for MUI, `BasicConfig.ctx` for vanilla UI etc.
+
+But if you use advanced server-side config, you may need to add your custom functions (eg. `validateValue`) to `ctx` and refer to them in other config sections by name.
+
+[source,javascript]
+----
+import {BasicConfig} from '@react-awesome-query-builder/ui';
+
+const fields = {
+  firstName: {
+    type: "text",
+    fieldSettings: {
+      // use function `validateFirstName` from `ctx` by name
+      validateValue: "validateFirstName",
+    }
+  },
+};
+
+const ctx = {
+  ...BasicConfig.ctx,
+  validateFirstName: (val: string) => {
+    return (val.length < 10);
+  },
+};
+
+// `zipConfig` can be passed to backend as JSON
+const zipConfig = {
+  fields,
+  settings: {
+    useConfigCompress: true, // this is required to use Utils.decompressConfig()
+  },
+  // you can add here other sections like `widgets` or `types`, but don't add `ctx`
+};
+
+// Config can be loaded from backend with providing `ctx`
+const config = Utils.decompressConfig(zipConfig, BasicConfig, ctx);
+----
+
+You _can't_ just pass JS function to `validateValue` in `fieldSettings` because functions can't be serialized to JSON. 
+
+{nbsp} +
+The shape of `ctx`:
+[source,javascript]
+----
+const ctx = {
+  // provided in BasicConfig:
+  RCE: React.createElement,
+  W: {
+    VanillaButton,
+    // ... other widgets provieded with the lib
+  },
+  utils: {
+    moment, // used in `formatValue`
+    SqlString, // used in `sqlFormatValue`
+    // ... other utils
+  },
+  // your custom extensions:
+  components: {
+    MyLabel, // used in `labelYes` and `labelNo` below
+    // ... other custom components used in JSXs in your config
+  },
+  validateFirstName: (val: string) => {
+    return (val.length < 10);
+  },
+  myRenderField: (props: FieldProps, _ctx: ConfigContext) => {
+    if (props?.customProps["showSearch"]) {
+      return <MuiFieldAutocomplete {...props}/>;
+    } else {
+      return <MuiFieldSelect {...props}/>;
+    }
+  },
+  autocompleteFetch, // see implementation in `/packages/sandbox_next/components/demo/config_ctx.tsx`
+}
+----
+
+Referring to `ctx` in `zipConfig`:
+[source,javascript]
+----
+const zipConfig = {
+  fields: {
+    firstName: {
+      type: "text",
+      fieldSettings: {
+        validateValue: "validateFirstName",
+      }
+    },
+    in_stock: {
+      type: "boolean",
+      mainWidgetProps: {
+        labelYes: <MyLabel>Yes</MyLabel>,
+        labelNo: <MyLabel>No</MyLabel>,
+      }
+    },
+    autocomplete: {
+      type: "select",
+      fieldSettings: {
+        asyncFetch: "autocompleteFetch",
+      },
+    },
+  },
+  settings: {
+    renderField: "myRenderField",
+    renderButton: "W.VanillaButton",
+    useConfigCompress: true, // this is required
+  },
+};
+----
+
+To build zip config from full config you can use this util:
+[source,javascript]
+----
+const zipConfig = Utils.compressConfig(config, BasicConfig);
+----
+In order to generate zip config corretly (to JSON-serializable object), you should put your custom functions to `ctx` and refer to them by names as in examples above.
+[source,javascript]
+----
+import merge from "lodash/merge";
+const ctx = {
+  validateFirstName: (val) => {
+    return (val.length < 10);
+  },
+};
+const config = merge({}, BasicConfig, {
+  fields: {
+    firstName: {
+      type: "text",
+      fieldSettings: {
+        validateValue: "validateFirstName",
+      }
+    },
+  },
+  ctx,
+});
+const zipConfig = Utils.compressConfig(config, BasicConfig);
+const config2 = Utils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as `config`
+----
+
+NOTE: `settings.useConfigCompress` should be `true` if you use `Utils.decompressConfig()`
+
+
+{nbsp} +
+{nbsp} +
+[[configserialize]]
+=== Serialize entire config to string
+
+Section link:#configctx[config.ctx] demonstrates the concept of `zipConfig` which is a special config format that contains _only changes_ against full config and can be serialized to JSON. 
+Base configs provided by this library (`BasicConfig`, `AntdConfig` etc.) still has JS functions (at least for the moment of writing, in version 6.3.0). 
+If you want to serialize the _entire_ config (not only changes), you can't do it to JSON as it contains JS functions. But you can do it to string with a help of https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and deserialize back with `eval()`. Yes, it's *unsecure*, but can be used for some purposes. 
+
+CAUTION: Using `eval()` is not secure
+
+To achieve this ability, JS functions in config (like `factory`, `formatValue`, `validateValue` etc.) should be pure functions, they should not use imported modules like this:
+[source,javascript]
+----
+import { VanillaWidgets } from '@react-awesome-query-builder/ui';
+const { VanillaButton } = VanillaWidgets;
+import moment from "moment";
+
+const config = {
+  settings: {
+    renderButton: (props) => <VanillaButton {...props} />,
+  },
+  widgets: {
+    date: {
+      jsonLogic: (val, fieldDef, wgtDef) => moment(val, wgtDef.valueFormat).toDate(),
+    },
+  },
+};
+----
+If you try to serialize this config and deserialize back with `eval()`, you will get
+`ReferenceError: react\__WEBPACK_IMPORTED_MODULE_0___default is not defined`.
+
+Instead of this all imported modules should be included in `config.ctx`. All render functions in config have `ctx` as 2nd argument. In format functions you can refer to `ctx` via `this`.
+[source,javascript]
+----
+const config = {
+  settings: {
+    renderButton: (props, {RCE, W: {VanillaButton}}) => RCE(VanillaButton, props),
+  },
+  widgets: {
+    date: {
+      jsonLogic: function (val, fieldDef, wgtDef) {
+        return this.utils.moment(val, wgtDef.valueFormat).toDate();
+      },
+    },
+  },
+
+  ctx: {
+    RCE: React.createElement,
+    W: {
+      VanillaButton,
+    },
+    utils: {
+      moment,
+    },
+  }
+};
+----
+Now entire config (without `ctx`) can be serialized to a string with https://www.npmjs.com/package/serialize-javascript[serialize-javascript] and then deserialized back with `eval()` and appending `ctx`.
+See {config_ser}[example]. +

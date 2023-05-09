@@ -25,8 +25,8 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
-export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig) => {
-  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig);
+export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
   tree = fixPathsInTree(tree);
   return tree;
 };
@@ -246,7 +246,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
         ];
         if (valueSrc == "field")
           args.push(rightFieldDefinition);
-        const validResult = fn(...args);
+        const validResult = fn.call(config.ctx, ...args);
         if (typeof validResult == "boolean") {
           if (validResult == false)
             validError = "Invalid value";
@@ -306,17 +306,18 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     const wType = wConfig.type;
     const jsType = wConfig.jsType;
     const fieldSettings = fieldConfig.fieldSettings;
+    const listValues = fieldSettings.treeValues || fieldSettings.listValues;
 
     if (valueType && valueType != wType)
       return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
-    if (jsType && !isTypeOf(value, jsType) && !fieldSettings.listValues) { //tip: can skip tye check for listValues
+    if (jsType && !isTypeOf(value, jsType) && !listValues) { //tip: can skip type check for listValues
       return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
     }
 
     if (fieldSettings) {
-      const listValues = asyncListValues || fieldSettings.listValues;
-      if (listValues && !fieldSettings.allowCustomValues) {
-        return validateValueInList(value, listValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad);
+      const realListValues = asyncListValues || listValues;
+      if (realListValues && !fieldSettings.allowCustomValues) {
+        return validateValueInList(value, realListValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad);
       }
       if (fieldSettings.min != null && value < fieldSettings.min) {
         return [`Value ${value} < min ${fieldSettings.min}`, canFix ? fieldSettings.min : value];

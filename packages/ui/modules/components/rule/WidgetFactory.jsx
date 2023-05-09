@@ -55,16 +55,17 @@ export default ({
   }
 
   if (isConst && defaultValue) {
+    const listValues = fieldSettings.treeValues || fieldSettings.listValues;
     if (typeof defaultValue == "boolean") {
       return defaultValue ? (widgetProps.labelYes || "YES") : (widgetProps.labelNo || "NO");
-    } else if (fieldSettings.listValues) {
+    } else if (listValues) {
       if (Array.isArray(defaultValue))
-        return defaultValue.map(v => getTitleInListValues(fieldSettings.listValues, v) || v).join(", ");
+        return defaultValue.map(v => getTitleInListValues(listValues, v) || v).join(", ");
       else
-        return (getTitleInListValues(fieldSettings.listValues, defaultValue) || defaultValue);  
+        return (getTitleInListValues(listValues, defaultValue) || defaultValue);  
     }
     return ""+defaultValue;
   }
     
-  return widgetFactory(widgetProps);
+  return widgetFactory(widgetProps, config.ctx);
 };

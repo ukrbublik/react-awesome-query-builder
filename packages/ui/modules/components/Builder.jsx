@@ -17,7 +17,7 @@ class Builder extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const prevProps = this.props;
-    let should = pureShouldComponentUpdate(this)(nextProps, nextState);
+    let should = this.pureShouldComponentUpdate(nextProps, nextState);
     if (should) {
       let chs = [];
       for (let k in nextProps) {
@@ -37,6 +37,7 @@ class Builder extends Component {
 
   constructor(props) {
     super(props);
+    this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
 
     this._updPath(props);
   }

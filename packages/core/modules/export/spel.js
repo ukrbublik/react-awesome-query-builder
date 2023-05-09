@@ -240,7 +240,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
     fieldDef,
   ];
   let ret;
-  ret = fn(...args);
+  ret = fn.call(config.ctx, ...args);
 
   //rev
   if (isRev) {
@@ -380,7 +380,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         const valFieldDefinition = getFieldConfig(config, currentValue) || {}; 
         args.push(valFieldDefinition);
       }
-      ret = fn(...args);
+      ret = fn.call(config.ctx, ...args);
     } else {
       ret = spelEscape(currentValue);
     }
@@ -396,20 +396,7 @@ const formatField = (meta, config, field, parentField = null) => {
   const _fieldKeys = getFieldPath(field, config, parentField);
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
   const formatFieldFn = config.settings.formatSpelField;
-  let fieldName = formatFieldName(field, config, meta);
-  if (parentField) {
-    const parentFieldDef = getFieldConfig(config, parentField) || {};
-    let parentFieldName = parentField;
-    if (parentFieldDef.fieldName) {
-      parentFieldName = parentFieldDef.fieldName;
-    }
-    if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
-      fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
-      // fieldName = "#this." + fieldName;
-    } else {
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
-    }
-  }
+  const fieldName = formatFieldName(field, config, meta, parentField);
   const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
     let parent;
     if (parentCnf) {
@@ -427,7 +414,7 @@ const formatField = (meta, config, field, parentField = null) => {
       isSpelVariable
     };
   });
-  const formattedField = formatFieldFn(fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);
+  const formattedField = formatFieldFn.call(config.ctx, fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);
   return formattedField;
 };
 
@@ -464,7 +451,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const args = [
       formattedArgs
     ];
-    ret = fn(...args);
+    ret = fn.call(config.ctx, ...args);
   } else {
     const args = Object.entries(formattedArgs).map(([k, v]) => v);
     if (funcName[0] == "." && args.length) {

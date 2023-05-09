@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import startsWith from "lodash/startsWith";
 import GroupContainer from "../containers/GroupContainer";
@@ -6,12 +6,12 @@ import Draggable from "../containers/Draggable";
 import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
-import {ConfirmFn, DragIcon, dummyFn} from "../utils";
+import {WithConfirmFn, DragIcon, dummyFn} from "../utils";
 
 const defaultPosition = "topRight";
 
 
-export class BasicGroup extends PureComponent {
+export class BasicGroup extends Component {
   static propTypes = {
     //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     reordableNodesCnt: PropTypes.number,
@@ -58,17 +58,17 @@ export class BasicGroup extends PureComponent {
   }
 
   removeSelf() {
-    const {confirmFn} = this.props;
-    const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = this.props.config.settings;
+    const {confirmFn, config} = this.props;
+    const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = config.settings;
     const doRemove = () => {
       this.props.removeSelf();
     };
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
-      renderConfirm({...confirmOptions,
+      renderConfirm.call(config.ctx, {...confirmOptions,
         onOk: doRemove,
         onCancel: null,
         confirmFn: confirmFn
-      });
+      }, config.ctx);
     } else {
       doRemove();
     }
@@ -181,7 +181,7 @@ export class BasicGroup extends PureComponent {
     if (BeforeActions == undefined)
       return null;
 
-    return typeof BeforeActions === "function" ? <BeforeActions {...this.props}/> : BeforeActions;
+    return typeof BeforeActions === "function" ? BeforeActions(this.props, this.props.config.ctx) : BeforeActions;
   };
 
   renderAfterActions = () => {
@@ -189,7 +189,7 @@ export class BasicGroup extends PureComponent {
     if (AfterActions == undefined)
       return null;
 
-    return typeof AfterActions === "function" ? <AfterActions {...this.props}/> : AfterActions;
+    return typeof AfterActions === "function" ? AfterActions(this.props, this.props.config.ctx) : AfterActions;
   };
 
   renderActions() {
@@ -308,7 +308,7 @@ export class BasicGroup extends PureComponent {
       selectedConjunction, setConjunction, not, setNot, isLocked
     } = this.props;
 
-    const {immutableGroupsMode, renderConjs: Conjs, showNot: _showNot, notLabel} = config.settings;
+    const {immutableGroupsMode, renderConjs, showNot: _showNot, notLabel} = config.settings;
     const conjunctionOptions = this.conjunctionOptions();
     if (!this.showConjs())
       return null;
@@ -329,7 +329,7 @@ export class BasicGroup extends PureComponent {
       showNot: this.showNot(),
       isLocked: isLocked
     };
-    return <Conjs {...renderProps} />;
+    return renderConjs(renderProps, config.ctx);
   }
 
   renderHeader() {
@@ -342,4 +342,4 @@ export class BasicGroup extends PureComponent {
   }
 }
 
-export default GroupContainer(Draggable("group")(ConfirmFn(BasicGroup)));
+export default GroupContainer(Draggable("group")(WithConfirmFn(BasicGroup)));

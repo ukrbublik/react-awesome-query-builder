@@ -35,12 +35,13 @@ export default class Proximity extends PureComponent {
       defaults, options, config, optionLabel, optionPlaceholder, customProps, 
       minProximity, maxProximity, optionTextBefore, readonly
     } = this.props;
-    const {settings, widgets} = config;
+    const {settings, widgets, ctx} = config;
     const defaultProximity = defaults ? defaults.proximity : undefined;
     const {showLabels} = settings;
     const selectedProximity = options.get("proximity", defaultProximity);
     const proxValues = range(minProximity, maxProximity + 1).map((item) => ({title: item, value: item}));
-    const Select = widgets.select.factory;
+    const factory = widgets.select.factory;
+    const Select = (props) => factory(props, ctx);
 
     return (
       <div className="operator--PROXIMITY">

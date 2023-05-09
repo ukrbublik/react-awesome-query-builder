@@ -9,15 +9,14 @@
 
 [![npm](https://img.shields.io/npm/v/@react-awesome-query-builder/ui.svg)](https://www.npmjs.com/package/@react-awesome-query-builder/ui)
 [![Smoke](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml/badge.svg?text=Test)](https://github.com/ukrbublik/react-awesome-query-builder/actions/workflows/smoke.yml?query=branch%3Amaster)
-[![travis](https://travis-ci.org/ukrbublik/react-awesome-query-builder.svg?branch=master)](https://travis-ci.com/github/ukrbublik/react-awesome-query-builder) 
 [![codecov](https://codecov.io/gh/ukrbublik/react-awesome-query-builder/branch/master/graph/badge.svg?date=20201002)](https://codecov.io/gh/ukrbublik/react-awesome-query-builder)
 [![antd](https://img.shields.io/badge/skin-Ant%20Design-blue?logo=Ant%20Design)](https://ant.design)
 [![mui](https://img.shields.io/badge/skin-Material%20UI-blue?logo=MUI)](https://mui.com)
 [![bootstrap](https://img.shields.io/badge/skin-Bootstrap-blue?logo=Bootstrap)](https://reactstrap.github.io/)
 [![fluent](https://img.shields.io/badge/skin-Fluent%20UI-blue?logo=Microsoft%20Office)](https://developer.microsoft.com/en-us/fluentui)
 [![demo](https://img.shields.io/badge/demo-blue)](https://ukrbublik.github.io/react-awesome-query-builder/)
-[![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox?file=/src/demo/config_simple.tsx)
-[![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple?file=/src/demo/config_simple.js)
+[![sandbox TS](https://img.shields.io/badge/sandbox-TS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox?file=/src/demo/config.tsx)
+[![sandbox JS](https://img.shields.io/badge/sandbox-JS-blue)](https://codesandbox.io/s/github/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple?file=/src/demo/config.jsx)
 
 
 User-friendly React component to build queries (filters).
@@ -38,9 +37,16 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Minimal JavaScript example with class component](#minimal-javascript-example-with-class-component)
   * [Minimal TypeScript example with function component](#minimal-typescript-example-with-function-component)
 * [API](#api)
+  * [<Query>](#query-)
+  * [<Builder>](#builder-)
+  * [Utils](#utils)
   * [Config format](#config-format)
+* [SSR](#ssr)
+  * [ctx](#ctx)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 6.3.0](#migration-to-630)
+  * [Migration to 6.2.0](#migration-to-620)
   * [Migration to 6.0.0](#migration-to-600)
   * [Migration to 5.2.0](#migration-to-520)
   * [Migration to 4.9.0](#migration-to-490)
@@ -77,6 +83,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
 - Export to MongoDb, SQL, [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html), ElasticSearch or your custom format
 - Import from [JsonLogic](http://jsonlogic.com), [SpEL](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)
 - TypeScript support (see [types](/packages/core/modules/index.d.ts) and [demo in TS](/packages/examples))
+- Query value and config can be saved/loaded from server
 
 
 ## Getting started
@@ -123,9 +130,10 @@ See [API](#api) and [config](#config-format) for documentation.
 
 ## Demo apps
 
-- [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage.
-- [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses AntDesign widgets.
-- [`pnpm sandbox-js`](/packages/sandbox_simple) - simple demo app, built with Vite, not uses TS, uses vanilla widgets.
+- [`pnpm start`](/packages/examples) - demo app with hot reload of demo code and local library code, uses TS, uses complex config to demonstrate anvanced usage, uses all supported UI frameworks.
+- [`pnpm sandbox-ts`](/packages/sandbox) - simple demo app, built with Vite, uses TS, uses MUI widgets.
+- [`pnpm sandbox-js`](/packages/sandbox_simple) - simplest demo app, built with Vite, not uses TS, uses vanilla widgets.
+- [`pnpm sandbox-next`](/packages/sandbox_next) - advanced demo app with server side, built with Next.js, uses TS, uses MUI widgets, has API to save/load query value and query config from storage.
 
 
 ## Usage
@@ -407,7 +415,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Convert query value from internal Immutable format to JS object. 
   You can use it to save value on backend in `onChange` callback of `<Query>`.  
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
-  #### loadTree (jsValue, config) -> Immutable
+  #### loadTree (jsValue) -> Immutable
   Convert query value from JS format to internal Immutable format. 
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
   #### checkTree (immutableValue, config) -> Immutable
@@ -436,7 +444,19 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   #### _loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]
   #### loadFromSpel (string, config) -> [Immutable, errors]
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
-
+- Save/load config from server:
+  #### compressConfig(config, baseConfig) -> ZipConfig
+  Returns compressed config that can be serialized to JSON and saved on server.  
+  `ZipConfig` is a special format that contains only changes agains `baseConfig`.  
+  `baseConfig` is a config you used as a base for constructing `config`, like `InitialConfig` in examples above.  
+  It depends on UI framework you choose - eg. if you use `@react-awesome-query-builder/mui`, please provide `MuiConfig` to `baseConfig`. 
+  #### decompressConfig(zipConfig, baseConfig, ctx?) -> Config
+  Converts `zipConfig` (compressed config you receive from server) to a full config that can be passed to `<Query />`.  
+  `baseConfig` is a config to be used as a base for constructing your config, like `InitialConfig` in examples above.  
+  [`ctx`](#ctx) is optional and can contain your custom functions and custom React components used in your config.  
+  If `ctx` is provided in 3rd argument, it will inject it to result config, otherwise will copy from basic config in 2nd argument.  
+  See [SSR](#ssr) for more info.  
+  Note that you should set `config.settings.useConfigCompress = true` in order for this function to work. 
 
 
 ### Config format
@@ -445,6 +465,26 @@ Config defines what value types, operators are supported, how they are rendered,
 At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
 See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
+
+## SSR
+You can save and load config from server with help of utils:
+- [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig)
+- [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config)
+
+You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
+Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  
+
+To put it simple:
+- `ZipConfig` type is a JSON that contains only changes against basic config (differences). At minimum it contains your `fields`. It does not contain [`ctx`](#ctx).
+- `Utils.decompressConfig()` will merge `ZipConfig` to basic config (and add `ctx` if passed). 
+
+See [sandbox_next demo app](/packages/sandbox_next) that demonstrates server-side features. 
+
+### ctx
+Config context is an obligatory part of config starting from version 6.3.0  
+It is a collection of functions and React components to be used in other parts of config by reference to `ctx` rather than by reference to imported modules.  
+The purpose of `ctx` is to isolate non-serializable part of config.  
+See [config.ctx](/CONFIG.adoc#configctx).  
 
 
 ## Versions
@@ -466,6 +506,43 @@ It's recommended to update your version to 6.x. You just need to change your imp
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 6.3.0
+
+Now config has new [`ctx`](#ctx) property. Make sure you add it to your config.
+
+Typically you just need to copy it from basic config.
+So if you create config like this, you don't need to make any changes:
+```js
+import { MuiConfig } from "@react-awesome-query-builder/mui";
+const config = {
+  ...MuiConfig,
+  fields: {
+    // your fields
+  },
+};
+```
+
+But if you create config without destructuring of basic config, please add `ctx`:
+```js
+import { MuiConfig } from "@react-awesome-query-builder/mui";
+
+const config = {
+  ctx: MuiConfig.ctx, // needs to be added for 6.3.0+
+  conjunctions,
+  operators,
+  widgets,
+  types,
+  settings,
+  fields,
+  funcs
+};
+export default config;
+```
+
+### Migration to 6.2.0
+
+If you use `treeselect` or `treemultiselect` type (for AntDesign), please rename `listValues` to `treeValues`
 
 ### Migration to 6.0.0
 

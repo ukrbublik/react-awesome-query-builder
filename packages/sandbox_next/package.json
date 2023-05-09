@@ -1,0 +1,71 @@
+{
+  "name": "@react-awesome-query-builder/sandbox-next",
+  "version": "6.1.1",
+  "description": "Demo for @react-awesome-query-builder",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ukrbublik/react-awesome-query-builder.git",
+    "directory": "packages/sandbox_next"
+  },
+  "license": "MIT",
+  "author": "Denis Oblogin <ukrbublik@gmail.com> (https://github.com/ukrbublik)",
+  "main": "pages/index.tsx",
+  "scripts": {
+    "build": "tsc && next build",
+    "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./pages/ ./components/ ./lib/",
+    "lint": "npm run eslint && npm run tsc && next lint",
+    "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./pages/ ./components/ ./lib/",
+    "tsc": "tsc -p . --noEmit",
+    "preinstall": "node ./scripts/patch-versions.js",
+    "start": "PORT=3002 next dev",
+    "preview": "PORT=3002 next start"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.12.3",
+    "@mui/system": "^5.12.3",
+    "@mui/x-date-pickers": "^5.0.20",
+    "@react-awesome-query-builder/core": "workspace:^",
+    "@react-awesome-query-builder/mui": "workspace:^",
+    "lodash": "^4.17.21",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "@babel/preset-typescript": "^7.14.5",
+    "@types/jsonfile": "^6.1.1",
+    "@types/lodash": "^4.14.170",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.18",
+    "@upstash/redis": "^1.20.1",
+    "babel-loader": "^8.2.2",
+    "babel-plugin-import": "^1.13.3",
+    "next": "^12.3.2",
+    "@next/eslint-plugin-next": "^13.1.2",
+    "iron-session": "^6.3.1",
+    "nanoid": "^4.0.1",
+    "sass": "^1.35.0",
+    "serialize-javascript": "^6.0.1",
+    "typescript": "~4.9.4",
+    "webpack": "^5.61.0",
+    "jsonfile": "^6.1.0"
+  },
+  "readme": "README.md"
+}

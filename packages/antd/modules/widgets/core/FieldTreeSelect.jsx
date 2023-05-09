@@ -1,11 +1,11 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Tooltip, TreeSelect } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import PropTypes from "prop-types";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 
-
-export default class FieldTreeSelect extends PureComponent {
+export default class FieldTreeSelect extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
@@ -29,8 +29,8 @@ export default class FieldTreeSelect extends PureComponent {
     this.onPropsChanged(props);  
   }
 
-  onPropsChanged(props) {
-    const { items, config: {settings: {fieldSeparator}}} = props;
+  onPropsChanged(nextProps) {
+    const { items, config: {settings: {fieldSeparator}}} = nextProps;
 
     let optionsMaxWidth = 0;
     const initialOffset = 24; // arrow + checkbox for leftmost item
@@ -41,7 +41,9 @@ export default class FieldTreeSelect extends PureComponent {
         calcTextWidth(label, null) + padding + (path.split(fieldSeparator).length - 1) * offset + initialOffset
       );
     });
-    this.optionsMaxWidth = optionsMaxWidth;
+    if (!isNaN(optionsMaxWidth) && optionsMaxWidth) {
+      this.optionsMaxWidth = optionsMaxWidth;
+    }
   }
 
   getTreeData(fields, fn = null) {
@@ -105,13 +107,13 @@ export default class FieldTreeSelect extends PureComponent {
       ? selectedPath.slice(0, -1).map((_key, i) => (selectedPath.slice(0, i+1).join(fieldSeparator))) 
       : null;
       
-    const placeholderWidth = calcTextWidth(placeholder) + 6;
+    const placeholderWidth = calcTextWidth(placeholder);
     const isFieldSelected = !!selectedKey;
 
-    const minWidth = placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT;
+    const minWidth = placeholderWidth ? placeholderWidth + SELECT_WIDTH_OFFSET_RIGHT + 6 : null;
     const dropdownMinWidth = 100;
     const dropdownMaxWidth = 800;
-    const useAutoWidth = true; //tip: "auto" is good, but width will jump on expand/collapse
+    const useAutoWidth = true || !this.optionsMaxWidth; //tip: "auto" is good, but width will jump on expand/collapse
     const dropdownWidth = Math.max(dropdownMinWidth, Math.min(dropdownMaxWidth, this.optionsMaxWidth));
 
     let res = (

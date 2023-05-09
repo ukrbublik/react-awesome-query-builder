@@ -1,10 +1,11 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
-import {useOnPropsChanged} from "../../utils/reactUtils";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged, pureShouldComponentUpdate } = Utils.ReactUtils;
 const __isInternal = true; //true to optimize render
 
-export default class SliderWidget extends PureComponent {
+export default class SliderWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
@@ -33,6 +34,7 @@ export default class SliderWidget extends PureComponent {
 
   constructor(props) {
     super(props);
+    this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
     useOnPropsChanged(this);
 
     this.state.internalValue = props.value;
@@ -52,12 +54,16 @@ export default class SliderWidget extends PureComponent {
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
-  UNSAFE_componentWillUpdate(nextProps, nextState) {
-    // RHL fix
-    if (this.props.cacheBusterProp && __isInternal) {
-      nextState.internalValue = this.state.internalValue;
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const should = this.pureShouldComponentUpdate(nextProps, nextState);
+    if (should) {
+      // RHL fix
+      if (this.props.cacheBusterProp && __isInternal) {
+        nextState.internalValue = this.state.internalValue;
+      }
     }
-  }
+    return should;
+  };
 
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;

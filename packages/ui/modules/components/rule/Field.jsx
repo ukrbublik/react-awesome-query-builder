@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import {truncateString} from "../../utils/stuff";
@@ -9,7 +9,7 @@ const {getFieldPath, getFieldPathLabels} = Utils.RuleUtils;
 const {getFieldConfig} = Utils.ConfigUtils;
 
 
-export default class Field extends PureComponent {
+export default class Field extends Component {
   static propTypes = {
     id: PropTypes.string,
     groupId: PropTypes.string,
@@ -139,7 +139,7 @@ export default class Field extends PureComponent {
       setFieldSrc,
       ...this.meta
     };
-    return renderField(renderProps);
+    return renderField(renderProps, config.ctx);
   }
 
 }

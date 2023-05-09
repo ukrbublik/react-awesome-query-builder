@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import {truncateString} from "../../utils/stuff";
@@ -11,7 +11,7 @@ const {getFieldPath, getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
-export default class FuncSelect extends PureComponent {
+export default class FuncSelect extends Component {
   static propTypes = {
     id: PropTypes.string,
     groupId: PropTypes.string,
@@ -194,7 +194,7 @@ export default class FuncSelect extends PureComponent {
       groupId,
       ...this.meta
     };
-    return renderFunc(renderProps);
+    return renderFunc(renderProps, config.ctx);
   }
 
 }

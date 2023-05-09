@@ -23,9 +23,12 @@ export default (props) => {
       {...params}
     />;
 
+  const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
+
   return (
     <FormControl>
       <DateTimePicker
+        desktopModeMediaQuery={desktopModeMediaQuery}
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}

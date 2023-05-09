@@ -162,7 +162,7 @@ class Item extends PureComponent {
     const renderItem = props.config.settings.renderItem;
     let Cmp = typeMap[type + postfix];
     if (renderItem) {
-      return renderItem({...props, type, itemComponent: Cmp});
+      return renderItem({...props, type, itemComponent: Cmp}, props.config.ctx);
     }
     if (!Cmp) return null;
     return Cmp(props);

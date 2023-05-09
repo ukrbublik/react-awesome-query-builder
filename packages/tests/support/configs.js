@@ -72,7 +72,28 @@ export const simple_with_numbers_and_str = (BasicConfig) => ({
     },
   },
 });
-  
+
+export const without_less_format = (BasicConfig) => ({
+  ...BasicConfig,
+  operators: {
+    ...BasicConfig.operators,
+    less: {
+      ...BasicConfig.operators.less,
+      sqlOp: null,
+      spelOp: null,
+      spelOps: null,
+      formatOp: null,
+    },
+    greater_or_equal: {
+      ...BasicConfig.operators.greater_or_equal,
+      formatOp: (field, op, values, _valueSrc, _valueType, opDef) => {
+        const fop = opDef.labelForFormat || op;
+        return `${field} ${fop} ${values}`;
+      },
+    },
+  }
+});
+
 export const with_number_and_string = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -138,7 +159,26 @@ export const with_theme_material = (BasicConfig) => ({
     },
   }
 });
-  
+
+export const with_theme_mui = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    theme: {
+      mui: {
+        palette: {
+          primary: {
+            main: "#5e00d7",
+          },
+          secondary: {
+            main: "#edf2ff",
+          },
+        },
+      }
+    },
+  }
+});
+
 export const with_select = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -521,6 +561,11 @@ export const with_all_types = (BasicConfig) => ({
       label: "String",
       type: "text",
     },
+    text: {
+      label: "Textarea",
+      type: "text",
+      preferWidgets: ["textarea"],
+    },
     date: {
       label: "Date",
       type: "date",
@@ -576,7 +621,7 @@ export const with_all_types = (BasicConfig) => ({
       type: "treeselect",
       fieldSettings: {
         treeExpandAll: true,
-        listValues: [
+        treeValues: [
           { value: "1", title: "Warm colors" },
           { value: "2", title: "Red", parent: "1" },
           { value: "3", title: "Orange", parent: "1" },
@@ -593,7 +638,7 @@ export const with_all_types = (BasicConfig) => ({
       type: "treemultiselect",
       fieldSettings: {
         treeExpandAll: true,
-        listValues: [
+        treeValues: [
           { value: "1", title: "Warm colors", children: [
             { value: "2", title: "Red" },
             { value: "3", title: "Orange" }
@@ -657,6 +702,10 @@ export const with_funcs = (BasicConfig) => ({
     num: {
       label: "Number",
       type: "number",
+    },
+    datetime: {
+      label: "Datetime",
+      type: "datetime",
     },
     str: {
       label: "String",
@@ -1018,5 +1067,29 @@ export const with_groupVarKey = (BasicConfig) => ({
       groupVarKey: "varValues",
       altVarKey: "shortcut",
     }
+  }
+});
+
+export const with_cases = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    num: {
+      label: "Number",
+      type: "number",
+    },
+    datetime: {
+      label: "Datetime",
+      type: "datetime",
+    },
+    str: {
+      label: "String",
+      type: "text",
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    maxNumberOfCases: 3,
+    canRegroupCases: true,
+    canLeaveEmptyCase: false,
   }
 });

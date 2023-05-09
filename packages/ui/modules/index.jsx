@@ -6,8 +6,11 @@ import * as Hooks from "./hooks";
 import * as VanillaWidgets from "./components/widgets/index";
 import * as CustomOperators from "./components/operators";
 
+// extend
+import Utils from "./utils";
+
 // re-export
 export * from "@react-awesome-query-builder/core";
 
-export {Query, Builder, BasicConfig, VanillaWidgets, CustomOperators, Hooks};
+export {Query, Builder, BasicConfig, VanillaWidgets, CustomOperators, Hooks, Utils};
 

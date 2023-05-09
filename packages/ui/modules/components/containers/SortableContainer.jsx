@@ -22,6 +22,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
     constructor(props) {
       super(props);
+      this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
       useOnPropsChanged(this);
 
       this.onPropsChanged(props);
@@ -35,7 +36,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       let prevProps = this.props;
       let prevState = this.state;
 
-      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
           let chs = [];
@@ -337,6 +338,9 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
             hovRect = hovEl.getBoundingClientRect();
             const hovHeight = hovRect.bottom - hovRect.top;
             const hovII = this.tree.items[hovNodeId];
+            if (!hovII) {
+              throw new Error("There is an issue with rendering. If you use Next.js, please check getServerSideProps() method.");
+            }
             let trgRect = null,
               trgEl = null,
               trgII = null,

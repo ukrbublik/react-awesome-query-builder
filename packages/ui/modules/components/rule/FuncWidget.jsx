@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component, PureComponent } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import FuncSelect from "./FuncSelect";
@@ -9,7 +9,7 @@ const {getFuncConfig} = Utils.ConfigUtils;
 const {setFunc, setArgValue, setArgValueSrc} = Utils.FuncUtils;
 
 
-export default class FuncWidget extends PureComponent {
+export default class FuncWidget extends Component {
   static propTypes = {
     id: PropTypes.string,
     groupId: PropTypes.string,

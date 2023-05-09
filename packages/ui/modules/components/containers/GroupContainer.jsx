@@ -33,6 +33,7 @@ const createGroupContainer = (Group) =>
 
     constructor(props) {
       super(props);
+      this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
       useOnPropsChanged(this);
 
       this.selectedConjunction = this._selectedConjunction(props);
@@ -44,7 +45,7 @@ const createGroupContainer = (Group) =>
       let prevProps = this.props;
       let prevState = this.state;
 
-      let should = pureShouldComponentUpdate(this)(nextProps, nextState);
+      let should = this.pureShouldComponentUpdate(nextProps, nextState);
       if (should) {
         if (prevState == nextState && prevProps != nextProps) {
           const draggingId = (nextProps.dragging.id || prevProps.dragging.id);

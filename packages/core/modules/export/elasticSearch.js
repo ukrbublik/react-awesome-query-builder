@@ -137,26 +137,26 @@ function determineOccurrence(combinator, not) {
  * @private
  */
 //todo: not used
-function determineQueryField(fieldDataType, fullFieldName, queryType) {
-  if (fieldDataType === "boolean") {
-    return fullFieldName;
-  }
+// function determineQueryField(fieldDataType, fullFieldName, queryType) {
+//   if (fieldDataType === "boolean") {
+//     return fullFieldName;
+//   }
 
-  switch (queryType) {
-  case "term":
-  case "wildcard":
-    return "".concat(fullFieldName, ".keyword");
+//   switch (queryType) {
+//   case "term":
+//   case "wildcard":
+//     return "".concat(fullFieldName, ".keyword");
 
-  case "geo_bounding_box":
-  case "range":
-  case "match":
-    return fullFieldName;
+//   case "geo_bounding_box":
+//   case "range":
+//   case "match":
+//     return fullFieldName;
 
-  default:
-    console.error("Can't determine query field for query type ".concat(queryType));
-    return null;
-  }
-}
+//   default:
+//     console.error("Can't determine query field for query type ".concat(queryType));
+//     return null;
+//   }
+// }
 
 function buildRegexpParameters(value) {
   return {
@@ -170,7 +170,7 @@ function determineField(fieldName, config) {
   return fieldName;
 }
 
-function buildParameters(queryType, value, operator, fieldName, config) {
+function buildParameters(queryType, value, operator, fieldName, config, syntax) {
   const textField = determineField(fieldName, config);
   switch (queryType) {
   case "filter":
@@ -186,7 +186,10 @@ function buildParameters(queryType, value, operator, fieldName, config) {
     return { [textField]: value[0] };
 
   case "term":
-    return { [fieldName]: value[0] };
+    return syntax === ES_7_SYNTAX
+      ? { [fieldName]: {
+        value: value[0]
+      }} : { [fieldName]: value[0] };
 
   //todo: not used
   // need to add geo type into RAQB or remove this code
@@ -213,10 +216,11 @@ function buildParameters(queryType, value, operator, fieldName, config) {
  * @param {string} fieldDataType - The type of data this field holds
  * @param {string} value - The value of this rule
  * @param {string} operator - The condition on how the value is matched
+ * @param {string} syntax - The version of ElasticSearch syntax to generate
  * @returns {object} - The ES rule
  * @private
  */
-function buildEsRule(fieldName, value, operator, config, valueSrc) {
+function buildEsRule(fieldName, value, operator, config, valueSrc, syntax) {
   if (!fieldName || !operator || value == undefined)
     return undefined; // rule is not fully entered
   let op = operator;
@@ -261,7 +265,7 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
   if (typeof elasticSearchFormatValue === "function") {
     parameters = elasticSearchFormatValue(queryType, value, op, fieldName, config);
   } else {
-    parameters = buildParameters(queryType, value, op, fieldName, config);
+    parameters = buildParameters(queryType, value, op, fieldName, config, syntax);
   }
 
   if (not) {
@@ -289,12 +293,12 @@ function buildEsRule(fieldName, value, operator, config, valueSrc) {
  * @private
  * @returns {object} - The ES group
  */
-function buildEsGroup(children, conjunction, not, recursiveFxn, config) {
+function buildEsGroup(children, conjunction, not, recursiveFxn, config, syntax) {
   if (!children || !children.size)
     return undefined;
   const childrenArray = children.valueSeq().toArray();
   const occurrence = determineOccurrence(conjunction, not);
-  const result = childrenArray.map((c) => recursiveFxn(c, config)).filter(v => v !== undefined);
+  const result = childrenArray.map((c) => recursiveFxn(c, config, syntax)).filter(v => v !== undefined);
   if (!result.length)
     return undefined;
   const resultFlat = result.flat(Infinity);
@@ -305,7 +309,10 @@ function buildEsGroup(children, conjunction, not, recursiveFxn, config) {
   };
 }
 
-export function elasticSearchFormat(tree, config) {
+export const ES_7_SYNTAX = "ES_7_SYNTAX";
+export const ES_6_SYNTAX = "ES_6_SYNTAX";
+
+export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
   // -- format the es dsl here
   if (!tree) return undefined;
   const type = tree.get("type");
@@ -326,11 +333,11 @@ export function elasticSearchFormat(tree, config) {
 
     if (value && Array.isArray(value[0])) {
       //TODO : Handle case where the value has multiple values such as in the case of a list
-      return value[0].map((val) => 
-        buildEsRule(field, [val], operator, config, valueSrc)
+      return value[0].map((val) =>
+        buildEsRule(field, [val], operator, config, valueSrc, syntax)
       );
     } else {
-      return buildEsRule(field, value, operator, config, valueSrc);
+      return buildEsRule(field, value, operator, config, valueSrc, syntax);
     }
   }
 
@@ -340,6 +347,6 @@ export function elasticSearchFormat(tree, config) {
     if (!conjunction)
       conjunction = defaultConjunction(config);
     const children = tree.get("children1");
-    return buildEsGroup(children, conjunction, not, elasticSearchFormat, config);
+    return buildEsGroup(children, conjunction, not, elasticSearchFormat, config, syntax);
   }
 }
