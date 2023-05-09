@@ -129,6 +129,7 @@ const compileMetaSettings = {
   useConfirm: { type: "f", args: [] },
 
   renderField: { type: "rf" },
+  renderFieldSources: { type: "rf" },
   renderOperator: { type: "rf" },
   renderFunc: { type: "rf" },
   renderConjs: { type: "rf" },

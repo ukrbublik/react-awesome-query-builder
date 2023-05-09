@@ -273,21 +273,8 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
-<<<<<<< HEAD
-  renderFieldSources?: Factory<ValueSourcesProps>,
-  renderField?: Factory<FieldProps>,
-  renderOperator?: Factory<FieldProps>,
-  renderFunc?: Factory<FieldProps>,
-  renderConjs?: Factory<ConjsProps>,
-  renderButton?: Factory<ButtonProps>,
-  renderButtonGroup?: Factory<ButtonGroupProps>,
-  renderSwitch?: Factory<SwitchProps>,
-  renderProvider?: Factory<ProviderProps>,
-  renderValueSources?: Factory<ValueSourcesProps>,
-  renderConfirm?: ConfirmFunc,
-  useConfirm?: () => Function,
-=======
   renderField?: FactoryWithContext<FieldProps> | SerializedFunction,
+  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
   renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction,
   renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction,
   renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction,
@@ -298,7 +285,6 @@ export interface RenderSettings {
   renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
   renderConfirm?: ConfirmFunc | SerializedFunction,
   useConfirm?: (() => Function) | SerializedFunction,
->>>>>>> master
   renderSize?: AntdSize,
   renderItem?: FactoryWithContext<ItemBuilderProps> | SerializedFunction,
   dropdownPlacement?: AntdPosition,
