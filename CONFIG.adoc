@@ -27,13 +27,14 @@ Usually it's enough to just reuse link:#basic-config[basic config], provide your
 Optionally you can override some options in basic config or add your own types/widgets/operators (or even conjunctions like XOR or NOR).
 
 There are functions for building query string: `formatConj`, `formatValue`, `formatOp`, `formatField`, `formatFunc` which are used for `QbUtils.queryString()`. +
-They have common param `isForDisplay` - false by default, true will be used for https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
+They have common param `isForDisplay` - false by default, true will be used for (https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay--false---string)[`QbUtils.queryString(immutableTree, config, true)`] (see 3rd param true). +
 Also there are similar `mongoConj`, `mongoFormatOp`, `mongoFormatValue`, `mongoFunc`, `mongoFormatFunc`, `mongoArgsAsObject` for building MongoDb query with `QbUtils.mongodbFormat()`. +
 And `sqlFormatConj`, `sqlOp`, `sqlFormatOp`, `sqlFormatValue`, `sqlFormatReverse`, `formatSpelField`, `sqlFunc`, `sqlFormatFunc` for building SQL where query with `QbUtils.sqlFormat()`. +
 And `spelFormatConj`, `spelOp`, `spelFormatOp`, `spelFormatValue`, `spelFormatReverse`, `spelFunc`, `spelFormatFunc` for building query in (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html)[Spring Expression Language (SpEL)] with `QbUtils.spelFormat()`. +
 And `jsonLogic` for building http://jsonlogic.com[JsonLogic] with `QbUtils.jsonLogicFormat()`. +
 
 TIP: Example 1: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx[`config for sandbox_simple`]
+
 TIP: Example 2: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx[`config for sandbox`]
 
 {nbsp} +
@@ -718,19 +719,6 @@ To enable this feature set `valueSources` of type to `['value', 'func']` (see be
 }
 ----
 
-See the collection of basic funcstions: https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js[`BasicFuncs`].
-You can copy them to `config.funcs`:
-[source,javascript]
-----
-import { BasicFuncs } from '@react-awesome-query-builder/ui';
-const config = {
-  //...
-  funcs: {
-    LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
-    LOWER: BasicFuncs.LOWER,
-  }
-};
-----
 
 [cols="1m,1,1,5a",options="header",]
 |===
@@ -768,6 +756,20 @@ const config = {
 |allowSelfNesting | |false |Allows the function to be used within its own arguments.
 |===
 
+
+See the collection of https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js[basic funcstions].
+You can copy them to `config.funcs`:
+[source,javascript]
+----
+import { BasicFuncs } from '@react-awesome-query-builder/ui';
+const config = {
+  //...
+  funcs: {
+    LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
+    LOWER: BasicFuncs.LOWER,
+  }
+};
+----
 
 
 {nbsp} +
@@ -885,6 +887,35 @@ const zipConfig = {
     useConfigCompress: true, // this is required
   },
 };
+----
+
+To build zip config from full config you can use this util:
+[source,javascript]
+----
+const zipConfig = Utils.compressConfig(config, BasicConfig);
+----
+In order to generate zip config corretly (to JSON-serializable object), you should put your custom functions to `ctx` and refer them by names as in examples above.
+[source,javascript]
+----
+import merge from "lodash/merge";
+const ctx = {
+  validateFirstName: (val) => {
+    return (val.length < 10);
+  },
+};
+const config = merge({}, BasicConfig, {
+  fields: {
+    firstName: {
+      type: "text",
+      fieldSettings: {
+        validateValue: "validateFirstName",
+      }
+    },
+  },
+  ctx,
+});
+const zipConfig = Utils.compressConfig(config, BasicConfig);
+const config2 = Utils.decompressConfig(zipConfig, BasicConfig, ctx); // should be same as config
 ----
 
 
