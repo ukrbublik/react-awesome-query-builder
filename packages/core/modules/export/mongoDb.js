@@ -131,7 +131,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   if (groupField) {
     if (mode == "array") {
       const totalQuery = {
-        "$size": groupFieldName
+        "$size": {
+          "$ifNull": [
+            "$" + groupFieldName,
+            []
+          ]
+        }
       };
       const filterQuery = resultQuery ? {
         "$size": {
