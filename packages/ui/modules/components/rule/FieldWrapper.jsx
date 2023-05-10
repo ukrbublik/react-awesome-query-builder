@@ -60,7 +60,7 @@ export default class FieldWrapper extends PureComponent {
     const {
       fieldSources,
       valueSourcesInfo,
-      renderValueSources: ValueSources,
+      renderValueSources,
     } = settings;
     const fieldSourcesOptions = fieldSources.map((srcKey) => [
       srcKey,
@@ -68,6 +68,7 @@ export default class FieldWrapper extends PureComponent {
         label: valueSourcesInfo[srcKey].label,
       },
     ]);
+    const ValueSources = (pr) => renderValueSources(pr, config.ctx);
 
     const sourceLabel = settings.showLabels ? (
       <label className="rule--label">&nbsp;</label>

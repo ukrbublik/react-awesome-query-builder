@@ -5,7 +5,7 @@ import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
 import { BasicFuncs } from "..";
-import { getFuncConfig } from "./configUtils";
+import { getFieldRawConfig } from "./configUtils";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
@@ -199,9 +199,9 @@ export const compressConfig = (config, baseConfig) => {
       if (path[0] === "funcs" && !base) {
         const funcKey = path[path.length - 1];
         // todo: if there will be change in `BasicFuncs` when funcs can be nested, need to chnage code to find `base`
-        base = getFuncConfig({
+        base = getFieldRawConfig({
           funcs: meta.BasicFuncs
-        }, funcKey) || undefined;
+        }, funcKey, "funcs", "subfields") || undefined;
         if (base) {
           target["$$key"] = funcKey;
         }
@@ -315,9 +315,9 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
     // try to resolve by $$key and merge
     let resolved = false;
     if (isObject(target) && Object.prototype.hasOwnProperty.call(target, "$$key") && target["$$key"]) {
-      const func = getFuncConfig({
+      const func = getFieldRawConfig({
         funcs: meta.BasicFuncs
-      }, target["$$key"]);
+      }, target["$$key"], "funcs", "subfields");
       if (func) {
         // deep merge func <- zip
         delete target["$$key"];

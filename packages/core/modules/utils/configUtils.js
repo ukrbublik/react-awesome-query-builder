@@ -305,7 +305,8 @@ export const getFuncConfig = (config, func) => {
   const funcConfig = getFieldRawConfig(config, func, "funcs", "subfields");
   if (!funcConfig)
     return null; //throw new Error("Can't find func " + func + ", please check your config");
-  return { ...config.types[funcConfig.returnType], ...funcConfig };
+  const typeConfig = config.types[funcConfig.returnType] || {};
+  return { ...typeConfig, ...funcConfig };
 };
 
 export const getFuncArgConfig = (config, funcKey, argKey) => {
