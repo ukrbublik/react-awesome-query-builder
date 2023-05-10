@@ -460,9 +460,9 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
 
 ### Config format
-This library uses configarion driven aproach. 
+This library uses config-driven aproach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
-At minimum, you need to provide your own set of fields as in [basic usage](#usage). 
+At minimum, you need to provide your own set of fields as in [basic usage](#usage).  
 See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
