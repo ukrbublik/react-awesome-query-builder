@@ -984,7 +984,6 @@ export interface Func {
   renderSeps?: Array<RenderedReactElement>,
   spelFormatFunc?: SpelFormatFunc | SerializedFunction,
   allowSelfNesting?: boolean,
-  valueSources?: Array<ValueSource>,
 }
 export interface FuncArg extends ValueField {
   isOptional?: boolean,
