@@ -274,7 +274,6 @@ type AntdSize = "small" | "large" | "medium";
 
 export interface RenderSettings {
   renderField?: FactoryWithContext<FieldProps> | SerializedFunction,
-  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
   renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction,
   renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction,
   renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction,
@@ -283,6 +282,7 @@ export interface RenderSettings {
   renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction,
   renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,
   renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
+  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
   renderConfirm?: ConfirmFunc | SerializedFunction,
   useConfirm?: (() => Function) | SerializedFunction,
   renderSize?: AntdSize,

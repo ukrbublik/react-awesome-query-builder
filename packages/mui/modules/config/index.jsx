@@ -16,10 +16,10 @@ const settings = {
   renderButton: (props, {RCE, W: {MuiButton}}) => RCE(MuiButton, props),
   renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
+  renderFieldSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
   renderProvider: (props, {RCE, W: {MuiProvider}}) => RCE(MuiProvider, props),
   renderConfirm: (props, {W: {MuiConfirm}}) => MuiConfirm(props),
   useConfirm: ({W: {MuiUseConfirm}}) => MuiUseConfirm(),
-  renderFieldSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
 };
 
 const widgets = {

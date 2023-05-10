@@ -113,7 +113,6 @@ const types = {
 const settings = {
   ...CoreConfig.settings,
 
-  renderFieldSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderField: (props, {RCE, W: {VanillaFieldSelect}}) => RCE(VanillaFieldSelect, props),
   renderOperator: (props, {RCE, W: {VanillaFieldSelect}}) => RCE(VanillaFieldSelect, props),
   renderFunc: (props, {RCE, W: {VanillaFieldSelect}}) => RCE(VanillaFieldSelect, props),
@@ -123,6 +122,7 @@ const settings = {
   renderButtonGroup: (props, {RCE, W: {VanillaButtonGroup}}) => RCE(VanillaButtonGroup, props),
   renderProvider: (props, {RCE, W: {VanillaProvider}}) => RCE(VanillaProvider, props),
   renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
+  renderFieldSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderConfirm: (props, {W: {vanillaConfirm}}) => vanillaConfirm(props),
   renderSwitchPrefix: "Conditions",
 

@@ -23,6 +23,7 @@ const settings = {
   renderButton: (props, {RCE, W: {Button}}) => RCE(Button, props),
   renderButtonGroup: (props, {RCE, W: {ButtonGroup}}) => RCE(ButtonGroup, props),
   renderValueSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
+  renderFieldSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
   renderProvider: (props, {RCE, W: {Provider}}) => RCE(Provider, props),
   renderConfirm: (props, {W: {confirm}}) => confirm(props),
 

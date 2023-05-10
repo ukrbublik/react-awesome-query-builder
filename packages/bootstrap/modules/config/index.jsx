@@ -13,6 +13,7 @@ const settings = {
   renderButton: (props, {RCE, W: {BootstrapButton}}) => RCE(BootstrapButton, props),
   renderButtonGroup: (props, {RCE, W: {BootstrapButtonGroup}}) => RCE(BootstrapButtonGroup, props),
   renderValueSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
+  renderFieldSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
   renderProvider: (props, {RCE, W: {BootstrapProvider}}) => RCE(BootstrapProvider, props),
   renderConfirm: (props, {W: {BootstrapConfirm}}) => BootstrapConfirm(props),
 };
