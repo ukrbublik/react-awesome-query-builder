@@ -61,14 +61,18 @@ function jsTreeToImmutable(tree) {
           outValue = outValue.setIn(["value", i], undefined);
         }
       }
-    } else if (key == "value" && value.get(0) && value.get(0).toJS !== undefined) {
-      const valueJs = value.get(0).toJS();
-      if (valueJs.func) {
-        outValue = value.toOrderedMap();
-      } else {
-        // only for raw values keep JS representation
-        outValue = Immutable.List.of(valueJs);
-      }
+    } else if (key == "value" && Immutable.Iterable.isIndexed(value)) {
+      outValue = value.map(v => {
+        const vJs = v?.toJS?.();
+        if (vJs?.func) {
+          return v.toOrderedMap();
+        } else if(v?.toJS) {
+          // for values of multiselect use Array instead of List
+          return vJs;
+        } else {
+          return v;
+        }
+      }).toList();
     } else if (key == "asyncListValues") {
       // keep in JS format
       outValue = value.toJS();
