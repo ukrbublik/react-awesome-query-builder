@@ -41,12 +41,23 @@ describe("mui widgets interactions", () => {
       }
 
       // click on 3rd week, 2nd day of week (should be sunday, 10 day for default US locale)
-      const dayBtn = document.querySelector<HTMLElement>(
-        ".MuiCalendarPicker-root" 
-        + " .MuiDayPicker-monthContainer"
-        + " .MuiDayPicker-weekContainer:nth-child(3)" 
+      let dayBtn;
+      // v6
+      dayBtn = document.querySelector<HTMLElement>(
+        ".MuiDateCalendar-root" 
+        + " .MuiDayCalendar-monthContainer"
+        + " .MuiDayCalendar-weekContainer:nth-child(3)" 
         + " > .MuiPickersDay-root:nth-child(2)" 
       );
+      // v5
+      if (!dayBtn) {
+        dayBtn = document.querySelector<HTMLElement>(
+          ".MuiCalendarPicker-root" 
+          + " .MuiDayPicker-monthContainer"
+          + " .MuiDayPicker-weekContainer:nth-child(3)" 
+          + " > .MuiPickersDay-root:nth-child(2)" 
+        );
+      }
       expect(dayBtn, "dayBtn").to.exist;
       expect(dayBtn?.innerText, "dayBtn").to.eq("11");
       dayBtn?.click();
@@ -79,15 +90,54 @@ describe("mui widgets interactions", () => {
       expect(timeInput, "timeInput").to.have.length(1);
       timeInput.simulate("click");
       const clockPicker = document.querySelector<HTMLElement>(".MuiClockPicker-root");
+      const clockBtn = qb.find(".rule--widget--TIME .MuiInputAdornment-root .MuiButtonBase-root");
+      let changeIndex = 0;
       if (clockPicker) {
-        // mobile mode
+        // v5 mobile mode
         // should not happen, see `desktopModeMediaQuery`
         if (window?.matchMedia?.("(pointer:none)")?.matches) {
           throw new Error("Pointer media feature is neither coarse nor fine");
         }
         this.skip();
+      } else if (clockBtn.length) {
+        // v6 desktop mode
+        clockBtn.at(0).simulate("click");
+        const dclockPicker = document.querySelector<HTMLElement>(".MuiMultiSectionDigitalClock-root");
+        expect(dclockPicker, "dclockPicker").to.exist;
+
+        const hourBtn = document.querySelector<HTMLElement>(
+          ".MuiMultiSectionDigitalClock-root" 
+          + " > .MuiMultiSectionDigitalClock-root:nth-child(1)" 
+          + " > .MuiMenuItem-root:nth-child(11)" 
+        );
+        expect(hourBtn, "hourBtn").to.exist;
+        expect(hourBtn?.innerText, "hourBtn").to.eq("10");
+        hourBtn?.click();
+
+        const minBtn = document.querySelector<HTMLElement>(
+          ".MuiMultiSectionDigitalClock-root" 
+          + " > .MuiMultiSectionDigitalClock-root:nth-child(2)" 
+          + " > .MuiMenuItem-root:nth-child(7)" 
+        );
+        expect(minBtn, "minBtn").to.exist;
+        expect(minBtn?.innerText, "minBtn").to.eq("30");
+        minBtn?.click();
+
+        const okBtn = document.querySelector<HTMLElement>(
+          ".MuiPickersLayout-root"
+          + " .MuiDialogActions-root" 
+          + " .MuiButton-root" 
+        );
+        expect(okBtn, "okBtn").to.exist;
+        okBtn?.click();
+
+        const timeInputValue = timeInput.getDOMNode().getAttribute("value");
+        expect(timeInputValue, "timeInputValue").to.eq("10:30");
+
+        // for v6 onChange is fired 2 times: on hour change and on time change
+        changeIndex = 1;
       } else {
-        // desktop mode
+        // v5 desktop mode
         qb
           .find(".rule--widget--TIME .MuiInput-input")
           .at(1)
@@ -96,7 +146,7 @@ describe("mui widgets interactions", () => {
       
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
-      ]);
+      ], changeIndex);
     }, {
       ignoreLog: ignoreLogDatePicker,
     });
