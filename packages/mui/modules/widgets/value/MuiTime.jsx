@@ -8,6 +8,8 @@ const { moment } = Utils;
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, timeFormat, valueFormat, customProps} = props;
 
+  const isV6 = !!TimePicker?.propTypes?.format;
+
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
   };
@@ -28,6 +30,23 @@ export default (props) => {
 
   const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
 
+  const pickerProps = isV6 ? {
+    format: timeFormat,
+    slotProps: {
+      textField: {
+        size: 'small',
+        variant: 'standard'
+      },
+      toolbar: {
+        toolbarPlaceholder: !readonly ? placeholder : "",
+      },
+    },
+  } : {
+    inputFormat: timeFormat,
+    renderInput,
+    toolbarPlaceholder: !readonly ? placeholder : "",
+  };
+
   return (
     <FormControl>
       <TimePicker
@@ -35,12 +54,10 @@ export default (props) => {
         readOnly={readonly}
         disabled={readonly}
         ampm={!!use12Hours}
-        toolbarPlaceholder={!readonly ? placeholder : ""}
-        inputFormat={timeFormat}
-        value={timeValue || null}
+        value={timeValue}
         onChange={handleChange}
         views={hasSeconds ? ["hours", "minutes", "seconds"] : ["hours", "minutes"]}
-        renderInput={renderInput}
+        {...pickerProps}
         {...customProps}
       />
     </FormControl>
