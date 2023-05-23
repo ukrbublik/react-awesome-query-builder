@@ -15,7 +15,8 @@ export default class Field extends Component {
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.any,
-    selectedFieldSrc: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
+    selectedFieldType: PropTypes.string,
     parentField: PropTypes.string,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
@@ -33,7 +34,7 @@ export default class Field extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["selectedField", "selectedFieldSrc", "config", "parentField"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "config", "parentField"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -41,7 +42,7 @@ export default class Field extends Component {
     }
   }
 
-  getMeta({selectedField, selectedFieldSrc, config, parentField}) {
+  getMeta({selectedField, selectedFieldSrc, selectedFieldType, config, parentField}) {
     const selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;
@@ -63,9 +64,13 @@ export default class Field extends Component {
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
     const items = this.buildOptions(parentFieldPath, config, sourceFields, parentFieldPath);
 
+    // Field source has been chnaged, no new field selected, but op & value remains
+    const errorText = !isFieldSelected && selectedFieldType ? "Please select field" : null;
+
     return {
       placeholder, items, parentField,
       selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+      errorText,
     };
   }
 

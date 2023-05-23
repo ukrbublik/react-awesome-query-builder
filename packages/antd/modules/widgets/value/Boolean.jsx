@@ -7,7 +7,7 @@ export default class BooleanWidget extends PureComponent {
     setValue: PropTypes.func.isRequired,
     value: PropTypes.bool,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
     // from fieldSettings:

@@ -6,23 +6,34 @@ import FuncWidget from "./FuncWidget";
 
 export default class FieldWrapper extends PureComponent {
   render() {
-    const {classname} = this.props;
-    const fieldSources = this.renderFieldSources();
+    const {classname, canSelectFieldSource} = this.props;
+    const fieldSources = canSelectFieldSource && this.renderFieldSources();
     const field = this.renderField();
-    return (
-      <Col className={"rule--field-wrapper"}>
-        {fieldSources}
-        {field}
-      </Col>
-    );
+    if (!canSelectFieldSource) {
+      return field;
+    } else {
+      return (
+        <Col className={"rule--field-wrapper"}>
+          {fieldSources}
+          {field}
+        </Col>
+      );
+    }
   }
 
   renderField = () => {
-    const {config, classname, selectedField, selectedFieldSrc, setField, parentField, readonly, id, groupId} = this.props;
+    const {config, classname, selectedField, selectedFieldSrc, selectedFieldType, setField, parentField, readonly, id, groupId} = this.props;
+    const supportedFieldSrcs = ["func", "field"];
+    if (!supportedFieldSrcs.includes(selectedFieldSrc)) {
+      return "?";
+    }
     const field = selectedFieldSrc === "func" ? (
       <FuncWidget
+        isLHS={true}
         config={config}
         value={selectedField}
+        fieldSrc={selectedFieldSrc}
+        fieldType={selectedFieldType}
         parentField={parentField}
         setValue={setField}
         readonly={readonly}
@@ -35,6 +46,7 @@ export default class FieldWrapper extends PureComponent {
         config={config}
         selectedField={selectedField}
         selectedFieldSrc={selectedFieldSrc}
+        selectedFieldType={selectedFieldType}
         parentField={parentField}
         setField={setField}
         customProps={config.settings.customFieldSelectProps}
@@ -45,7 +57,7 @@ export default class FieldWrapper extends PureComponent {
       />
     );
     const fieldLabel = selectedFieldSrc === "func" ? config.settings.funcLabel : config.settings.fieldLabel;
-    const label = config.settings.showLabels && <label className="rule--label">{fieldLabel}</label>;
+    const label = config.settings.showLabels && selectedFieldSrc !== "func" && <label className="rule--label">{fieldLabel}</label>;
     return (
       <div key={selectedFieldSrc} className={classname}>
         {label}

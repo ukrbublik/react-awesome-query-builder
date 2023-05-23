@@ -10,7 +10,7 @@ export default class DateWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]) , //in valueFormat
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
     config: PropTypes.object.isRequired,
     placeholder: PropTypes.string,
     placeholders: PropTypes.arrayOf(PropTypes.string),

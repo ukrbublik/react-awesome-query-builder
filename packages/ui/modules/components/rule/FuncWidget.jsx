@@ -16,6 +16,7 @@ export default class FuncWidget extends Component {
     config: PropTypes.object.isRequired,
     field: PropTypes.any,
     fieldSrc: PropTypes.string,
+    fieldType: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
@@ -24,6 +25,7 @@ export default class FuncWidget extends Component {
     parentFuncs: PropTypes.array,
     fieldDefinition: PropTypes.object,
     isFuncArg: PropTypes.bool,
+    isLHS: PropTypes.bool,
   };
 
   constructor(props) {
@@ -35,7 +37,7 @@ export default class FuncWidget extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["config", "field", "operator", "value"];
+    const keysForMeta = ["config", "field", "operator", "value", "fieldSrc", "fieldType", "isLHS"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -75,12 +77,12 @@ export default class FuncWidget extends Component {
   };
 
   renderFuncSelect = () => {
-    const {config, field, fieldSrc, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
+    const {config, field, fieldType, fieldSrc, isLHS, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
     const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
-      config, field, fieldSrc, operator, customProps, readonly, parentFuncs, 
+      config, field, fieldType, fieldSrc, isLHS, operator, customProps, readonly, parentFuncs, 
       isFuncArg, fieldDefinition,
       id, groupId,
     };
@@ -124,7 +126,7 @@ export default class FuncWidget extends Component {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, fieldSrc, operator, value, readonly, parentFuncs, id, groupId} = this.props;
+    const {config, field, fieldType, fieldSrc, isLHS, operator, value, readonly, parentFuncs, id, groupId} = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
@@ -135,7 +137,9 @@ export default class FuncWidget extends Component {
       fieldFunc: funcKey,
       fieldArg: argKey,
       leftField: field,
-      fieldSrc,
+      fieldType, // type of leftField
+      fieldSrc, // src of leftField
+      isLHS,
       operator: null,
       value: argVal,
       valueSrc: argValSrc,
@@ -225,6 +229,7 @@ class ArgWidget extends PureComponent {
     setValue: PropTypes.func.isRequired,
     setValueSrc: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
+    isLHS: PropTypes.bool,
     parentFuncs: PropTypes.array,
     id: PropTypes.string,
     groupId: PropTypes.string,
@@ -244,9 +249,9 @@ class ArgWidget extends PureComponent {
     const {funcKey, argKey, parentFuncs} = this.props;
     return (
       <Widget
-        {...this.props} 
-        setValue={this.setValue} 
-        setValueSrc={this.setValueSrc} 
+        {...this.props}
+        setValue={this.setValue}
+        setValueSrc={this.setValueSrc}
         isFuncArg={true}
         parentFuncs={[...(parentFuncs || []), [funcKey, argKey]]}
       />

@@ -6,7 +6,7 @@ import {
   DropdownItem,
 } from "reactstrap";
 
-export default ({ items, setField, selectedKey, readonly, placeholder }) => {
+export default ({ items, setField, selectedKey, readonly, placeholder, errorText }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const stylesDropdownWrapper = {
@@ -64,6 +64,14 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
 
   const hasValue = selectedKey != null;
 
+  const renderNotSelected = () => {
+    const text = placeholder || errorText || "&nbsp;";
+    if (errorText) {
+      return (<span style={{color: "red"}}>{text}</span>);
+    }
+    return (<span>{text}</span>);
+  };
+
   const renderSelected = (allItems, selectedKey) => {
     if (!readonly && !selectedKey) return placeholder;
     
@@ -97,7 +105,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {hasValue ? renderSelected(items, selectedKey) : <span>&nbsp;</span>}
+        {hasValue ? renderSelected(items, selectedKey) : renderNotSelected()}
       </DropdownToggle>
       <DropdownMenu 
         container="body" 

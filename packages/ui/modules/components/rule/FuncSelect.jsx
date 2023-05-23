@@ -17,6 +17,7 @@ export default class FuncSelect extends Component {
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     field: PropTypes.any,
+    fieldType: PropTypes.string,
     fieldSrc: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
@@ -26,6 +27,7 @@ export default class FuncSelect extends Component {
     parentFuncs: PropTypes.array,
     fieldDefinition: PropTypes.object,
     isFuncArg: PropTypes.bool,
+    isLHS: PropTypes.bool,
   };
 
   constructor(props) {
@@ -37,8 +39,8 @@ export default class FuncSelect extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "fieldSrc", "operator", "isFuncArg"];
-    const keysForMeta = ["config", "field", "fieldSrc", "value"];
+    const keysForItems = ["config", "field", "fieldType", "fieldSrc", "operator", "isFuncArg", "isLHS"];
+    const keysForMeta = ["config", "field", "fieldType", "fieldSrc", "value", "isLHS"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -50,14 +52,14 @@ export default class FuncSelect extends Component {
     }
   }
 
-  getItems({config, field, fieldSrc, operator, parentFuncs, fieldDefinition, isFuncArg}) {
+  getItems({config, field, fieldType, fieldSrc, isLHS, operator, parentFuncs, fieldDefinition, isFuncArg}) {
     const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldSrc, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
+    const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldType, fieldSrc, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
     const items = this.buildOptions(config, filteredFuncs);
     return items;
   }
 
-  getMeta({config, field, fieldSrc, value}) {
+  getMeta({config, field, fieldType, fieldSrc, value, isLHS, isFuncArg}) {
     const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
@@ -77,30 +79,37 @@ export default class FuncSelect extends Component {
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel)
       selectedFullLabel = null;
-    
+
+    const isRootFuncAtLHS = isLHS && !isFuncArg;
+    // Field source has been chnaged, no new func selected, but op & value remains
+    const errorText = isRootFuncAtLHS && !isFuncSelected && fieldType ? "Please select function" : null;
+  
     return {
       placeholder,
       selectedKey: selectedFuncKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedFullLabel,
+      errorText,
     };
   }
 
-  filterFuncs(config, funcs, leftFieldFullkey, fieldSrc, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
+  filterFuncs(config, funcs, leftFieldFullkey, fieldType, fieldSrc, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
+    const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     let expectedType;
     let targetDefinition = leftFieldConfig;
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value", fieldSrc);
-    if (isFuncArg && fieldDefinition) {
+    const widgetConfig = widget && config.widgets[widget];
+    if (isFuncArg) {
       targetDefinition = fieldDefinition;
-      expectedType = fieldDefinition.type;
-    } else if (widget) {
-      let widgetConfig = config.widgets[widget];
-      let widgetType = widgetConfig.type;
-      //expectedType = leftFieldConfig.type;
-      expectedType = widgetType;
-    } else {
-      expectedType = leftFieldConfig?.type;
+      expectedType = fieldDefinition?.type;
+    } else if (_relyOnWidgetType && widgetConfig) {
+      expectedType = widgetConfig.type;
+    } else if (leftFieldConfig) {
+      expectedType = leftFieldConfig.type;
+    } else if (!isLHS) {
+      // no field at LHS, but can use type from "memory effect"
+      expectedType = fieldType;
     }
 
     function _filter(list, path) {

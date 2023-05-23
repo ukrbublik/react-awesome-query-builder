@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import startsWith from "lodash/startsWith";
 import GroupContainer from "../containers/GroupContainer";
@@ -7,13 +8,13 @@ import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
 import {WithConfirmFn, DragIcon, dummyFn} from "../utils";
+const {isEmptyGroupChildren} = Utils.RuleUtils;
 
 const defaultPosition = "topRight";
 
 
 export class BasicGroup extends Component {
   static propTypes = {
-    //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     reordableNodesCnt: PropTypes.number,
     conjunctionOptions: PropTypes.object.isRequired,
     allowFurtherNesting: PropTypes.bool.isRequired,
@@ -75,29 +76,8 @@ export class BasicGroup extends Component {
   }
 
   isEmptyCurrentGroup() {
-    const children = this.props.children1;
-    return !children || children.size == 0
-      || children.size == 1 && this.isEmpty(children.first());
-  }
-
-  isEmpty(item) {
-    const isGroup = (item.get("type") == "group" || item.get("type") == "rule_group");
-    return isGroup ? this.isEmptyGroup(item) : this.isEmptyRule(item);
-  }
-
-  isEmptyGroup(group) {
-    const children = group.get("children1");
-    return !children || children.size == 0
-      || children.size == 1 && this.isEmpty(children.first());
-  }
-
-  isEmptyRule(rule) {
-    const properties = rule.get("properties");
-    return !(
-      properties.get("field") !== null
-          && properties.get("operator") !== null
-          && properties.get("value").filter((val) => val !== undefined).size > 0
-    );
+    const {children1, config} = this.props;
+    return isEmptyGroupChildren(children1, config);
   }
 
   render() {
@@ -249,7 +229,6 @@ export class BasicGroup extends Component {
         config={config}
         actions={actions}
         children1={item.get("children1")}
-        //tree={props.tree}
         reordableNodesCnt={this.reordableNodesCntForItem(item)}
         totalRulesCnt={this.totalRulesCntForItem(item)}
         parentReordableNodesCnt={this.reordableNodesCnt()}

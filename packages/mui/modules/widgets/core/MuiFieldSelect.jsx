@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import ListSubheader from "@mui/material/ListSubheader";
 import FormControl from "@mui/material/FormControl";
 
-export default ({items, setField, selectedKey, readonly, placeholder}) => {
+export default ({items, setField, selectedKey, readonly, placeholder, errorText}) => {
   const renderOptions = (fields, level = 0) => (
     Object.keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
@@ -55,6 +55,7 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
   return (
     <FormControl>
       <Select
+        error={!!errorText}
         variant="standard"
         autoWidth
         displayEmpty

@@ -9,6 +9,7 @@ export default class FieldSelect extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
+    errorText: PropTypes.string,
     items: PropTypes.array.isRequired,
     placeholder: PropTypes.string,
     selectedKey: PropTypes.string,
@@ -39,7 +40,7 @@ export default class FieldSelect extends PureComponent {
   render() {
     const {
       config, customProps, items, placeholder,
-      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
+      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
     } = this.props;
     const {showSearch} = customProps || {};
 
@@ -67,6 +68,7 @@ export default class FieldSelect extends PureComponent {
         optionLabelProp={"label"}
         filterOption={this.filterOption}
         disabled={readonly}
+        status={errorText && "error"}
         {...customProps}
       >{fieldSelectItems}</Select>
     );

@@ -7,7 +7,7 @@ export default class OperatorOptions extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     operatorOptions: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
-    selectedField: PropTypes.string.isRequired,
+    selectedField: PropTypes.any,
     selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string.isRequired,
     readonly: PropTypes.bool,

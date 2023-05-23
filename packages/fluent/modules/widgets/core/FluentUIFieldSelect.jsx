@@ -5,7 +5,8 @@ const FluentUIFieldSelect = (props) => {
   var items = props.items,
     setField = props.setField,
     selectedKey = props.selectedKey,
-    placeholder = props.placeholder;
+    placeholder = props.placeholder,
+    errorText = props.errorText;
 
   var onChange = function onChange(_, option) {
     if (option.key === undefined) return;
@@ -68,6 +69,11 @@ const FluentUIFieldSelect = (props) => {
       onChange={onChange}
       onRenderTitle={onRenderTitle}
       dropdownWidth={"auto"}
+      styles={{
+        title : {
+          color: errorText ? "red" : null,
+        }
+      }}
     />
   );
 };

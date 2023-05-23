@@ -9,7 +9,7 @@ export default class TextAreaWidget extends PureComponent {
     placeholder: PropTypes.string,
     config: PropTypes.object.isRequired,
     value: PropTypes.string,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
     readonly: PropTypes.bool,
     customProps: PropTypes.object,
     maxLength: PropTypes.number,

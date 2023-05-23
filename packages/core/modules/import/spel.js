@@ -1,6 +1,6 @@
 import { SpelExpressionEvaluator } from "spel2js";
 import uuid from "../utils/uuid";
-import {getFieldConfig, extendConfig, normalizeField} from "../utils/configUtils";
+import {getFieldConfig, extendConfig, normalizeField, iterateFuncs} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
@@ -277,8 +277,7 @@ const buildConv = (config) => {
   }
 
   let funcs = {};
-  for (let funcKey in config.funcs) {
-    const funcConfig = config.funcs[funcKey];
+  for (const [funcPath, funcConfig] of iterateFuncs(config)) {
     let fk;
     if (typeof funcConfig.spelFunc == "string") {
       fk = funcConfig.spelFunc;
@@ -286,7 +285,7 @@ const buildConv = (config) => {
     if (fk) {
       if (!funcs[fk])
         funcs[fk] = [];
-      funcs[fk].push(funcKey);
+      funcs[fk].push(funcPath);
     }
   }
 

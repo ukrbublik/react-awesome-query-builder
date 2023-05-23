@@ -1,6 +1,6 @@
 import React from "react";
 
-export default ({items, setField, selectedKey, readonly}) => {
+export default ({items, setField, selectedKey, readonly, errorText}) => {
   const renderOptions = (fields) => (
     fields.map(field => {
       const {items, path, label, disabled} = field;
@@ -20,6 +20,7 @@ export default ({items, setField, selectedKey, readonly}) => {
       onChange={onChange}
       value={hasValue ? selectedKey : ""}
       disabled={readonly}
+      style={{ color: errorText ? "red" : null }}
     >
       {!hasValue && <option disabled value={""}></option>}
       {renderOptions(items)}

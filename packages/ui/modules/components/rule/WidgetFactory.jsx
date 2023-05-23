@@ -1,5 +1,6 @@
 import React from "react";
 import { Utils } from "@react-awesome-query-builder/core";
+import omit from "lodash/omit";
 const { getTitleInListValues } = Utils.ListUtils;
 
 export default ({
@@ -7,7 +8,7 @@ export default ({
   value: immValue, valueError: immValueError, asyncListValues,
   isSpecialRange, fieldDefinition,
   widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
-  config, field, fieldSrc, operator, readonly, parentField, parentFuncs, id, groupId
+  config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId
 }) => {
   const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
   const isConst = isFuncArg && fieldDefinition.valueSources && fieldDefinition.valueSources.length == 1 && fieldDefinition.valueSources[0] == "const";
@@ -27,10 +28,14 @@ export default ({
   if (isSpecialRange && value[0] === undefined && value[1] === undefined)
     value = undefined;
   const {fieldSettings} = fieldDefinition || {};
-  const widgetProps = Object.assign({}, fieldWidgetProps, fieldSettings, {
+  const widgetProps = omit({
+    ...fieldWidgetProps, 
+    ...fieldSettings,
     config: config,
     field: field,
     fieldSrc: fieldSrc,
+    fieldType: fieldType,
+    isLHS: isLHS,
     parentField: parentField,
     parentFuncs: parentFuncs,
     fieldDefinition: fieldDefinition,
@@ -48,14 +53,16 @@ export default ({
     readonly: readonly,
     asyncListValues: asyncListValues,
     id, groupId
-  });
-    
+  }, [
+    "formatValue", "mongoFormatValue", "spelFormatValue", "sqlFormatValue", "toJS"
+  ]);
+
   if (widget == "field") {
     //
   }
 
   if (isConst && defaultValue) {
-    const listValues = fieldSettings.treeValues || fieldSettings.listValues;
+    const listValues = fieldSettings?.treeValues || fieldSettings?.listValues;
     if (typeof defaultValue == "boolean") {
       return defaultValue ? (widgetProps.labelYes || "YES") : (widgetProps.labelNo || "NO");
     } else if (listValues) {

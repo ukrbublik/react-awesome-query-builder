@@ -25,7 +25,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
   }
   
   config = {...config};
-  config.settings = merge({}, defaultSettings, config.settings);
+  config.settings = mergeWith({}, defaultSettings, config.settings, mergeCustomizerNoArrays);
   config._fieldsCntByType = {};
   config._funcsCntByType = {};
 
@@ -235,6 +235,29 @@ const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _st
   }
 };
 
+export function* iterateFuncs(config) {
+  yield* _iterateFields(config, config.funcs || {}, []);
+}
+
+export function* iterateFields(config) {
+  yield* _iterateFields(config, config.fields || {}, []);
+}
+
+function* _iterateFields(config, subfields, path, subfieldsKey = "subfields") {
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
+  for (const fieldKey in subfields) {
+    const fieldConfig = subfields[fieldKey];
+    if (fieldConfig[subfieldsKey]) {
+      yield* _iterateFields(config, fieldConfig[subfieldsKey], [...path, fieldKey], subfieldsKey);
+    } else {
+      yield [
+        [...path, fieldKey].join(fieldSeparator),
+        fieldConfig
+      ];
+    }
+  }
+};
+
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
@@ -306,7 +329,7 @@ export const getFuncConfig = (config, func) => {
   if (!funcConfig)
     return null; //throw new Error("Can't find func " + func + ", please check your config");
   const typeConfig = config.types[funcConfig.returnType] || {};
-  return { ...typeConfig, ...funcConfig };
+  return { ...typeConfig, ...funcConfig, type: funcConfig.returnType || funcConfig.type};
 };
 
 export const getFuncArgConfig = (config, funcKey, argKey) => {
@@ -327,12 +350,33 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
 export const getFieldConfig = (config, field, fieldSrc) => {
   if (!field)
     return null;
-  if (typeof field == "object" && !field.func && !!field.type)
-    return field;
-  if (typeof field == "object" && field.func && field.arg)
-    return getFuncArgConfig(config, field.func, field.arg);
-  if (fieldSrc === "func")
+  if (typeof field == "object") {
+    if (!field.func && !!field.type) {
+      // it's already a config
+      return field;
+    }
+    if (field.func && field.arg) {
+      // it's func arg
+      return getFuncArgConfig(config, field.func, field.arg);
+    }
+    if (field.func && field.args) {
+      // it's field value func
+      return getFuncConfig(config, field.func);
+    }
+  }
+  if (field?.get?.("func")) { // immutable
+    if (field?.get("arg")) {
+      // it's func arg
+      return getFuncArgConfig(config, field.get("func"), field.get("arg"));
+    }
+    if (field?.get("args")) {
+      // it's field value func
+      return getFuncConfig(config, field.get("func"));
+    }
+  }
+  if (fieldSrc === "func") {
     return getFuncConfig(config, field?.get("func"));
+  }
   const fieldConfig = getFieldRawConfig(config, field);
   if (!fieldConfig)
     return null; //throw new Error("Can't find field " + field + ", please check your config");

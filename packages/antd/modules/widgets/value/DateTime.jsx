@@ -10,7 +10,7 @@ export default class DateTimeWidget extends PureComponent {
     setValue: PropTypes.func.isRequired,
     value: PropTypes.string, //in valueFormat
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
     placeholder: PropTypes.string,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,

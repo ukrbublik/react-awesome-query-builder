@@ -12,13 +12,14 @@ import {Col, dummyFn, WithConfirmFn} from "../utils";
 import Widget from "../rule/Widget";
 import classNames from "classnames";
 const {getFieldConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
+const {isEmptyRuleGroupExtPropertiesAndChildren} = Utils.RuleUtils;
 
 
 class RuleGroupExt extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
-    selectedField: PropTypes.string,
-    fieldSrc: PropTypes.any,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
     value: PropTypes.any,
     parentField: PropTypes.string,
@@ -101,15 +102,17 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderField() {
-    // todo: fieldSrc -> selectedFieldSrc
-    const { config, selectedField, fieldSrc, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
+    const { config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
     const { immutableFieldsMode } = config.settings;
+    
     return <FieldWrapper
       key="field"
       classname={"rule--field"}
       config={config}
+      canSelectFieldSource={false}
       selectedField={selectedField}
-      fieldSrc={fieldSrc}
+      selectedFieldSrc={selectedFieldSrc}
+      selectedFieldType={selectedFieldType}
       setField={setField}
       setFieldSrc={setFieldSrc}
       parentField={parentField}
@@ -120,8 +123,7 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderOperator() {
-    // todo: fieldSrc -> selectedFieldSrc, remove setFieldSrc
-    const {config, selectedField, fieldSrc, selectedOperator, setField, setFieldSrc, setOperator, isLocked} = this.props;
+    const {config, selectedField, selectedFieldSrc, selectedOperator, setField, setOperator, isLocked} = this.props;
     const { immutableFieldsMode } = config.settings;
     const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
@@ -133,10 +135,8 @@ class RuleGroupExt extends BasicGroup {
       classname={"group--operator"}
       config={config}
       selectedField={selectedField}
-      fieldSrc={fieldSrc}
+      selectedFieldSrc={selectedFieldSrc}
       selectedOperator={selectedOperator}
-      setField={setField}
-      setFieldSrc={setFieldSrc}
       setOperator={setOperator}
       selectedFieldPartsLabels={["group"]}
       showOperator={showOperator}
@@ -146,6 +146,33 @@ class RuleGroupExt extends BasicGroup {
       id={this.props.id}
       groupId={this.props.groupId}
     />;
+  }
+
+  isEmptyCurrentGroup() {
+    const {children1, config} = this.props;
+    const ruleData = this._buildWidgetProps(this.props);
+    return isEmptyRuleGroupExtPropertiesAndChildren(ruleData, children1, config);
+  }
+
+  _buildWidgetProps({
+    selectedField, selectedFieldSrc, selectedFieldType,
+    selectedOperator, operatorOptions,
+    value, valueType, valueSrc, asyncListValues, valueError,
+    parentField,
+  }) {
+    return {
+      field: selectedField,
+      fieldSrc: selectedFieldSrc,
+      fieldType: selectedFieldType,
+      operator: selectedOperator,
+      operatorOptions,
+      value,
+      valueType, // "number"
+      valueSrc: "value",
+      //asyncListValues,
+      valueError : null,
+      parentField,
+    };
   }
 
   renderWidget() {
@@ -158,11 +185,7 @@ class RuleGroupExt extends BasicGroup {
     const widget = <Widget
       key="values"
       isForRuleGroup={true}
-      field={this.props.selectedField}
-      operator={this.props.selectedOperator}
-      value={this.props.value}
-      valueSrc={"value"}
-      valueError={null}
+      {...this._buildWidgetProps(this.props)}
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={dummyFn}

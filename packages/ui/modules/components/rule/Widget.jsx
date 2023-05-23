@@ -21,6 +21,7 @@ export default class Widget extends Component {
     valueError: PropTypes.any,
     field: PropTypes.any,
     fieldSrc: PropTypes.string,
+    fieldType: PropTypes.string,
     operator: PropTypes.string,
     readonly: PropTypes.bool,
     asyncListValues: PropTypes.array,
@@ -39,6 +40,7 @@ export default class Widget extends Component {
     parentField: PropTypes.string,
     // for func in func
     parentFuncs: PropTypes.array,
+    isLHS: PropTypes.bool,
     // for case_value
     isCaseValue: PropTypes.bool,
   };
@@ -53,7 +55,7 @@ export default class Widget extends Component {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForMeta = [
-      "config", "field", "fieldSrc", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues"
+      "config", "field", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues", "isLHS"
     ];
     const needUpdateMeta = !this.meta 
           || keysForMeta
@@ -86,10 +88,11 @@ export default class Widget extends Component {
   };
 
   getMeta({
-    config, field: simpleField, fieldSrc, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
+    config, field: simpleField, fieldSrc, fieldType, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
     isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues
   }) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
+    const isOkWithoutField = !simpleField && fieldType;
     let iValueSrcs = valueSrcs;
     let iValues = values;
     if (isFuncArg || isForRuleGroup || isCaseValue) {
@@ -97,12 +100,18 @@ export default class Widget extends Component {
       iValues = createListFromArray([values]);
     }
 
-    const fieldDefinition = isFuncArg
+    let fieldDefinition = isFuncArg
       ? getFieldConfig(config, field)
       : getFieldConfig(config, field, fieldSrc);
-    const defaultWidget = isFuncArg
+    if (!fieldDefinition && isOkWithoutField) {
+      fieldDefinition = config.types[fieldType];
+    }
+    let defaultWidget = isFuncArg
       ? getWidgetForFieldOp(config, field, operator)
       : getWidgetForFieldOp(config, field, operator, null, fieldSrc);
+    if (!defaultWidget && isOkWithoutField) {
+      defaultWidget = config.types[fieldType]?.mainWidget;
+    }
     const operatorDefinition = isFuncArg
       ? funcArgDummyOpDef
       : getOperatorConfig(config, operator, field, fieldSrc);
@@ -117,10 +126,12 @@ export default class Widget extends Component {
       return null;
     }
 
-    const valueSources = isFuncArg
+    let valueSources = isFuncArg
       ? getValueSourcesForFieldOp(config, field, operator, fieldDefinition, leftField)
       : getValueSourcesForFieldOp(config, field, operator, fieldDefinition, null, fieldSrc);
-
+    if (!field) {
+      valueSources = Object.keys(config.settings.valueSourcesInfo);
+    }
     const widgets = range(0, cardinality).map(delta => {
       const valueSrc = iValueSrcs.get(delta) || null;
       let widget = isFuncArg
@@ -132,6 +143,10 @@ export default class Widget extends Component {
       if (isSpecialRangeForSrcField) {
         widget = widgetDefinition.singleWidget;
         widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
+      }
+      if (!widgetDefinition && isOkWithoutField) {
+        widget = ["func", "field"].includes(valueSrc) ? valueSrc : defaultWidget;
+        widgetDefinition = config.widgets[widget];
       }
       const widgetType = widgetDefinition?.type;
       const valueLabel = isFuncArg
@@ -188,7 +203,7 @@ export default class Widget extends Component {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId, fieldSrc} = props;
+    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS} = props;
     const {settings} = config;
     const { widgets, iValues, aField } = meta;
     const value = isFuncArg ? iValues : values;
@@ -210,11 +225,13 @@ export default class Widget extends Component {
           value={value}
           valueError={valueError}
           isFuncArg={isFuncArg}
+          isLHS={isLHS}
           {...pick(meta, ["isSpecialRange", "fieldDefinition", "asyncListValues"])}
           {...pick(widgets[delta], ["widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler"])}
           config={config}
           field={field}
           fieldSrc={fieldSrc}
+          fieldType={fieldType}
           parentField={parentField}
           parentFuncs={parentFuncs}
           operator={operator}

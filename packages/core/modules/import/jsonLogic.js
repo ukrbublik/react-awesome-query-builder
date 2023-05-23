@@ -1,6 +1,6 @@
 import uuid from "../utils/uuid";
 import {defaultValue, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
-import {getFieldConfig, extendConfig, normalizeField, getFuncConfig} from "../utils/configUtils";
+import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
@@ -68,8 +68,7 @@ const buildConv = (config) => {
   }
 
   let funcs = {};
-  for (let funcKey in config.funcs) {
-    const funcConfig = config.funcs[funcKey];
+  for (const [funcPath, funcConfig] of iterateFuncs(config)) {
     let fk;
     if (funcConfig.jsonLogicIsMethod) {
       fk = "#" + funcConfig.jsonLogic;
@@ -79,7 +78,7 @@ const buildConv = (config) => {
     if (fk) {
       if (!funcs[fk])
         funcs[fk] = [];
-      funcs[fk].push(funcKey);
+      funcs[fk].push(funcPath);
     }
   }
 
@@ -94,7 +93,7 @@ const buildConv = (config) => {
 };
 
 const convertFuncFromLogic = (
-  op,
+  jlFunc,
   vals,
   field,
   conv,
@@ -102,8 +101,14 @@ const convertFuncFromLogic = (
   meta,
   parentField
 ) => {
-  field = setFunc(null, conv.funcs[op][0], config);
-  Object.entries(config.funcs[conv.funcs[op]].args).forEach((entry, idx) => {
+  const funcKeys = conv.funcs[jlFunc];
+  const funcKey = funcKeys[0];
+  const funcConfig = getFuncConfig(config, funcKey);
+
+  field = setFunc(null, funcKey, config);
+  Object.entries(funcConfig.args).forEach((entry, idx) => {
+    const argKey = entry[0];
+    const argConfig = entry[1];
     const subK = Object.keys(vals[idx])[0];
     const subV = Object.values(vals[idx])[0];
     if (
@@ -120,8 +125,8 @@ const convertFuncFromLogic = (
         meta,
         parentField
       );
-      field = field.setIn(["args", entry[0], "valueSrc"], "func");
-      field = field.setIn(["args", entry[0], "value"], argVal);
+      field = field.setIn(["args", argKey, "valueSrc"], "func");
+      field = field.setIn(["args", argKey, "value"], argVal);
     } else {
       let argVal = convertFromLogic(
         vals[idx],
@@ -130,12 +135,12 @@ const convertFuncFromLogic = (
         "val",
         meta,
         false,
-        entry[1],
+        argConfig,
         null,
         parentField
       );
-      field = field.setIn(["args", entry[0], "valueSrc"], argVal.valueSrc);
-      field = field.setIn(["args", entry[0], "value"], argVal.value);
+      field = field.setIn(["args", argKey, "valueSrc"], argVal.valueSrc);
+      field = field.setIn(["args", argKey, "value"], argVal.value);
     }
   });
   return field;
@@ -188,9 +193,10 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
 const convertVal = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined) return undefined;
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
+  const fieldType = fieldConfig.type;
 
   if (!widgetConfig) {
-    meta.errors.push(`No widget for type ${fieldConfig.type}`);
+    meta.errors.push(`No widget for type ${fieldType}`);
     return undefined;
   }
 
@@ -200,7 +206,7 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   }
 
   // number of seconds -> time string
-  if (fieldConfig && fieldConfig.type == "time" && typeof val == "number") {
+  if (fieldType == "time" && typeof val == "number") {
     const [h, m, s] = [Math.floor(val / 60 / 60) % 24, Math.floor(val / 60) % 60, val % 60];
     const valueFormat = widgetConfig.valueFormat;
     if (valueFormat) {
@@ -216,7 +222,7 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   }
 
   // "2020-01-08T22:00:00.000Z" -> Date object
-  if (fieldConfig && ["date", "datetime"].includes(fieldConfig.type) && val && !(val instanceof Date)) {
+  if (["date", "datetime"].includes(fieldType) && val && !(val instanceof Date)) {
     try {
       const dateVal = new Date(val);
       if (dateVal instanceof Date && dateVal.toISOString() === val) {
@@ -237,7 +243,7 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   }
 
   let asyncListValues;
-  if (val && fieldConfig.fieldSettings && fieldConfig.fieldSettings.asyncFetch) {
+  if (val && fieldConfig?.fieldSettings?.asyncFetch) {
     const vals = Array.isArray(val) ? val : [val];
     asyncListValues = vals;
   }
@@ -291,13 +297,14 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
   const fk = (jsonLogicIsMethod ? "#" : "") + func;
   const returnType = fieldConfig.type ?? fieldConfig.returnType;
   const funcKeys = (conv.funcs[fk] || []).filter(k => 
-    (fieldConfig ? config.funcs[k].returnType == returnType : true)
+    (fieldConfig ? getFuncConfig(config, k).returnType == returnType : true)
   );
   if (funcKeys.length) {
     funcKey = funcKeys[0];
   } else {
     const v = {[op]: vals};
-    for (const [f, fc] of Object.entries(config.funcs || {})) {
+
+    for (const [f, fc] of iterateFuncs(config)) {
       if (fc.jsonLogicImport && fc.returnType == returnType) {
         let parsed;
         try {
@@ -316,7 +323,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
     return undefined;
 
   if (funcKey) {
-    const funcConfig = config.funcs[funcKey];
+    const funcConfig = getFuncConfig(config, funcKey);
     const argKeys = Object.keys(funcConfig.args || {});
     let args = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
@@ -425,7 +432,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
                   conjunction: conjKey,
                   not: false,
                   field: gf,
-                  fieldSrc: gf,
+                  fieldSrc: "field",
                   mode: gfc.mode,
                 }
               };
@@ -698,6 +705,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   }
 
   let res;
+
+  let fieldType = fieldConfig.type;
+  if (fieldType === "!group" || fieldType === "!struct") {
+    fieldType = null;
+  }
 
   if (fieldConfig.type == "!group" && having) {
     if (conv.conjunctions[conj] !== undefined) {

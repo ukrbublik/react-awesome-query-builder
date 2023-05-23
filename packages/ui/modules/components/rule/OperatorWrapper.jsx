@@ -6,7 +6,7 @@ import {Col} from "../utils";
 export default class OperatorWrapper extends PureComponent {
   render() {
     const {
-      config, selectedField, selectedFieldSrc, selectedOperator, setOperator, 
+      config, selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, setOperator, 
       selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly, id, groupId
     } = this.props;
     const operator = showOperator
@@ -19,6 +19,7 @@ export default class OperatorWrapper extends PureComponent {
                 config={config}
                 selectedField={selectedField}
                 selectedFieldSrc={selectedFieldSrc}
+                selectedFieldType={selectedFieldType}
                 selectedOperator={selectedOperator}
                 setOperator={setOperator}
                 readonly={readonly}

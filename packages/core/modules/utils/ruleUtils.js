@@ -25,7 +25,9 @@ const selectTypes = [
 export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true, isEndValue = false) {
   if (!oldConfig)
     oldConfig = config;
+  const {keepInputOnChangeFieldSrc} = config.settings;
   const currentField = current.get("field");
+  const currentFieldType = current.get("fieldType");
   const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
   const currentValue = current.get("value");
@@ -42,13 +44,18 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
   const currentFieldConfig = getFieldConfig(oldConfig, currentField, currentFieldSrc);
   const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
+  const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
+  const currentType = currentFieldConfig?.type || currentFieldType;
+  const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
 
-  let canReuseValue = currentField && currentOperator && newOperator && currentValue != undefined
-    && (!changedProp 
+  let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
+  canReuseValue = canReuseValue &&
+    (!changedProp 
       || changedProp == "field" && !clearValueOnChangeField 
-      || changedProp == "operator" && !clearValueOnChangeOp)
-    && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
-  if (canReuseValue && selectTypes.includes(currentFieldConfig.type) && changedProp == "field") {
+      || changedProp == "operator" && !clearValueOnChangeOp);
+  canReuseValue = canReuseValue &&
+    (currentType && newType && currentType == newType);
+  if (canReuseValue && selectTypes.includes(currentFieldConfig?.type) && changedProp == "field") {
     // different fields of select types has different listValues
     canReuseValue = false;
   }
@@ -64,16 +71,20 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value", currentFieldSrc);
 
     const canReuseWidget = newValueWidget == currentValueWidget || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
-    if (!canReuseWidget)
+    if (!canReuseWidget && !isOkWithoutField) {
       canReuseValue = false;
+    }
   }
 
   if (currentOperator != newOperator && [currentOperator, newOperator].includes("proximity"))
     canReuseValue = false;
 
   const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first(), currentFieldSrc);
-  const valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null, null, currentFieldSrc);
-  
+  let valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null, null, currentFieldSrc);
+  if (!newField && isOkWithoutField) {
+    valueSources = Object.keys(config.settings.valueSourcesInfo);
+  }
+
   let valueFixes = {};
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
   if (canReuseValue) {
@@ -193,14 +204,18 @@ export const getFirstField = (config, parentRuleGroupPath = null) => {
   return (parentPathArr || []).concat(keysPath).join(fieldSeparator);
 };
 
+export const getOperatorsForType = (config, fieldType) => {
+  return config.types[fieldType]?.operators || null;
+};
+
 export const getOperatorsForField = (config, field, fieldSrc) => {
   const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const fieldOps = fieldConfig ? fieldConfig.operators : [];
   return fieldOps;
 };
 
-export const getFirstOperator = (config, field) => {
-  const fieldOps = getOperatorsForField(config, field);
+export const getFirstOperator = (config, field, fieldSrc) => {
+  const fieldOps = getOperatorsForField(config, field, fieldSrc);
   return fieldOps ? fieldOps[0] : null;
 };
 
@@ -440,3 +455,64 @@ export const formatFieldName = (field, config, meta, parentField = null, options
   return fieldName;
 };
 
+
+const isEmptyItem = (item, config, liteCheck = false) => {
+  const type = item.get("type");
+  const mode = item.getIn(["properties", "mode"]);
+  if (type == "rule_group" && mode == "array") {
+    return isEmptyRuleGroupExt(item, config, liteCheck);
+  } else if (type == "group" || type == "rule_group") {
+    return isEmptyGroup(item, config, liteCheck);
+  } else {
+    return isEmptyRule(item, config, liteCheck);
+  }
+};
+
+const isEmptyRuleGroupExt = (item, config, liteCheck = false) => {
+  const children = item.get("children1");
+  const properties = item.get("properties");
+  return isEmptyRuleGroupExtPropertiesAndChildren(properties.toObject(), children, config, liteCheck);
+};
+
+export const isEmptyRuleGroupExtPropertiesAndChildren = (properties, children, config, liteCheck = false) => {
+  const operator = properties.operator;
+  const cardinality = config.operators[operator]?.cardinality ?? 1;
+  const filledParts = [
+    !isEmptyRuleProperties(properties, config, false),
+    cardinality > 0 ? true : !isEmptyGroupChildren(children, config, liteCheck),
+  ];
+  const filledCnt = filledParts.filter(f => !!f).length;
+  const isFilled = filledCnt == 2;
+  return !isFilled;
+};
+
+const isEmptyGroup = (group, config, liteCheck = false) => {
+  const children = group.get("children1");
+  return isEmptyGroupChildren(children, config, liteCheck);
+};
+
+export const isEmptyGroupChildren = (children, config, liteCheck = false) => {
+  return !children || children.size == 0
+    || children.size > 0 && children.filter(ch => !isEmptyItem(ch, config, liteCheck)).size == 0
+};
+
+export const isEmptyRuleProperties = ({
+  field, fieldSrc, fieldType,
+  operator,
+  value, valuesrc, valueType,
+}, config, liteCheck = false) => {
+  const cardinality = config.operators[operator]?.cardinality ?? 1;
+  const filledParts = [
+    liteCheck ? (field !== null || fieldType != null) : field !== null,
+    operator !== null,
+    value.filter((val) => val !== undefined).size >= cardinality
+  ];
+  const filledCnt = filledParts.filter(f => !!f).length;
+  const isFilled = liteCheck ? filledCnt >= 2 : filledCnt == 3;
+  return !isFilled;
+};
+
+const isEmptyRule = (rule, config, liteCheck = false) => {
+  const properties = rule.get("properties");
+  return isEmptyRuleProperties(properties.toObject(), config, liteCheck);
+};

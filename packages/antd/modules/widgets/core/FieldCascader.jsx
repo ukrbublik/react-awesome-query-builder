@@ -8,6 +8,7 @@ export default class FieldCascader extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
+    errorText: PropTypes.string,
     items: PropTypes.array.isRequired,
     placeholder: PropTypes.string,
     selectedKey: PropTypes.string,
@@ -38,7 +39,7 @@ export default class FieldCascader extends PureComponent {
 
   render() {
     const {
-      config, customProps, items, placeholder,
+      config, customProps, items, placeholder, errorText,
       selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, selectedField, parentField, 
     } = this.props;
     let customProps2 = {...customProps};
@@ -53,6 +54,7 @@ export default class FieldCascader extends PureComponent {
     const value = removePrefixPath(selectedPath, parentFieldPath);
     let res = (
       <Cascader
+        status={errorText && "error"}
         fieldNames={{ label: "label", value: "key", children: "items" }}
         options={items}
         value={value}

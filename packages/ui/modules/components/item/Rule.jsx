@@ -11,7 +11,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
-const {getFieldPathLabels} = Utils.RuleUtils;
+const {getFieldPathLabels, isEmptyRuleProperties} = Utils.RuleUtils;
 
 
 class Rule extends Component {
@@ -19,12 +19,14 @@ class Rule extends Component {
     id: PropTypes.string.isRequired,
     groupId: PropTypes.string,
     selectedField: PropTypes.any,
-    selectedFieldSrc: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
+    selectedFieldType: PropTypes.string,
     selectedOperator: PropTypes.string,
     operatorOptions: PropTypes.object,
     config: PropTypes.object.isRequired,
     value: PropTypes.any, //depends on widget
     valueSrc: PropTypes.any,
+    valueType: PropTypes.any,
     asyncListValues: PropTypes.array,
     isDraggingMe: PropTypes.bool,
     isDraggingTempo: PropTypes.bool,
@@ -59,7 +61,7 @@ class Rule extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -67,20 +69,23 @@ class Rule extends Component {
     }
   }
 
-  getMeta({selectedField, selectedFieldSrc, selectedOperator, config, reordableNodesCnt, isLocked}) {
+  getMeta({selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked} = props) {
+    const {keepInputOnChangeFieldSrc} = config.settings;
     const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config, null, "fields", "subfields", selectedFieldSrc);
     const selectedFieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
     const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
-    const isFieldAndOpSelected = selectedField && selectedOperator && !isSelectedGroup;
+    const isOkWithoutField = keepInputOnChangeFieldSrc && selectedFieldType;
+    const isFieldSelected = !!selectedField || isOkWithoutField;
+    const isFieldAndOpSelected = isFieldSelected && selectedOperator;
     const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField, selectedFieldSrc);
     const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
     const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator, null, null, selectedFieldSrc) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
     const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
-    const showOperator = selectedField && !hideOperator;
-    const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
-    const showWidget = isFieldAndOpSelected;
+    const showOperator = isFieldSelected && !hideOperator;
+    const showOperatorLabel = isFieldSelected && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
+    const showWidget = isFieldAndOpSelected && !isSelectedGroup;
     const showOperatorOptions = isFieldAndOpSelected && selectedOperatorHasOptions;
 
     return {
@@ -110,24 +115,46 @@ class Rule extends Component {
     }
   }
 
+  _buildWidgetProps({
+    selectedField, selectedFieldSrc, selectedFieldType,
+    selectedOperator, operatorOptions,
+    value, valueType, valueSrc, asyncListValues, valueError,
+    parentField,
+  }) {
+    return {
+      field: selectedField,
+      fieldSrc: selectedFieldSrc,
+      fieldType: selectedFieldType,
+      operator: selectedOperator,
+      operatorOptions,
+      value,
+      valueType,
+      valueSrc,
+      asyncListValues,
+      valueError,
+      parentField,
+    };
+  }
+
   isEmptyCurrentRule() {
-    return !(
-      this.props.selectedField !== null
-            && this.props.selectedOperator !== null
-            && this.props.value.filter((val) => val !== undefined).size > 0
-    );
+    const {config} = this.props;
+    const ruleData = this._buildWidgetProps(this.props);
+    return isEmptyRuleProperties(ruleData, config);
   }
 
   renderField() {
-    const {config, isLocked} = this.props;
+    const {config, isLocked, parentField} = this.props;
     const { immutableFieldsMode } = config.settings;
+    // tip: don't allow function inside !group (yet)
 
     return <FieldWrapper
       key="field"
       classname={"rule--field"}
       config={config}
+      canSelectFieldSource={!parentField}
       selectedField={this.props.selectedField}
       selectedFieldSrc={this.props.selectedFieldSrc}
+      selectedFieldType={this.props.selectedFieldType}
       setField={!immutableFieldsMode ? this.props.setField : dummyFn}
       setFieldSrc={!immutableFieldsMode ? this.props.setFieldSrc : dummyFn}
       parentField={this.props.parentField}
@@ -143,12 +170,13 @@ class Rule extends Component {
       selectedFieldPartsLabels, selectedFieldWidgetConfig, showOperator, showOperatorLabel
     } = this.meta;
     const { immutableOpsMode } = config.settings;
-
+    
     return <OperatorWrapper
       key="operator"
       config={config}
       selectedField={this.props.selectedField}
       selectedFieldSrc={this.props.selectedFieldSrc}
+      selectedFieldType={this.props.selectedFieldType}
       selectedOperator={this.props.selectedOperator}
       setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
       selectedFieldPartsLabels={selectedFieldPartsLabels}
@@ -162,21 +190,14 @@ class Rule extends Component {
   }
 
   renderWidget() {
-    const {config, valueError, isLocked} = this.props;
+    const {config, isLocked} = this.props;
     const { showWidget } = this.meta;
     const { immutableValuesMode } = config.settings;
     if (!showWidget) return null;
 
     const widget = <Widget
       key="values"
-      field={this.props.selectedField}
-      fieldSrc={this.props.selectedFieldSrc}
-      parentField={this.props.parentField}
-      operator={this.props.selectedOperator}
-      value={this.props.value}
-      valueSrc={this.props.valueSrc}
-      asyncListValues={this.props.asyncListValues}
-      valueError={valueError}
+      {...this._buildWidgetProps(this.props)}
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}

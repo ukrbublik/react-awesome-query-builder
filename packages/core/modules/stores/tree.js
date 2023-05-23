@@ -13,7 +13,7 @@ import {
   getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig
 } from "../utils/configUtils";
 import {
-  getOperatorsForField, getFirstOperator, getWidgetForFieldOp,
+  getOperatorsForField, getOperatorsForType, getFirstOperator, getWidgetForFieldOp,
   getNewValueForFieldOp
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
@@ -320,10 +320,32 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {*} srcKey
  */
 const setFieldSrc = (state, path, srcKey, config) => {
-  state = state.setIn(
-    expandTreePath(path, "properties"),
-    defaultRuleProperties(config)
-  );
+  const {keepInputOnChangeFieldSrc} = config.settings;
+
+  // get fieldType for "memory effect"
+  const currentType = state.getIn(expandTreePath(path, "type"));
+  const currentProperties = state.getIn(expandTreePath(path, "properties"));
+  const currentField = currentProperties.get("field");
+  const currentFieldSrc = currentProperties.get("fieldSrc");
+  const currentFielType = currentProperties.get("fieldType");
+  const currentFieldConfig = getFieldConfig(config, currentField, currentFieldSrc);
+  let fieldType = currentFieldConfig?.type || currentFielType;
+  if (!fieldType || fieldType === "!group" || fieldType === "!struct") {
+    fieldType = null;
+  }
+
+  if (!keepInputOnChangeFieldSrc) {
+    // clear ALL properties
+    state = state.setIn(
+      expandTreePath(path, "properties"),
+      defaultRuleProperties(config)
+    );
+  } else {
+    // clear non-relevant properties
+    state = state.setIn(expandTreePath(path, "properties", "field"), null);
+    // set fieldType for "memory effect"
+    state = state.setIn(expandTreePath(path, "properties", "fieldType"), fieldType);
+  }
 
   // set fieldSrc
   state = state.setIn(expandTreePath(path, "properties", "fieldSrc"), srcKey);
@@ -340,7 +362,7 @@ const setField = (state, path, newField, config) => {
   if (!newField)
     return removeItem(state, path);
 
-  const {fieldSeparator, setOpOnChangeField, showErrorMessage} = config.settings;
+  const {fieldSeparator, setOpOnChangeField, showErrorMessage, keepInputOnChangeFieldSrc} = config.settings;
   if (Array.isArray(newField))
     newField = newField.join(fieldSeparator);
 
@@ -349,22 +371,29 @@ const setField = (state, path, newField, config) => {
   const wasRuleGroup = currentType == "rule_group";
   const currentFieldSrc = currentProperties.get("fieldSrc");
   const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
-  const isRuleGroup = newFieldConfig.type == "!group";
-  const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
-  const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
+  let fieldType = newFieldConfig.type;
+  if (fieldType === "!group" || fieldType === "!struct") {
+    fieldType = null;
+  }
   
   const currentOperator = currentProperties.get("operator");
   const currentOperatorOptions = currentProperties.get("operatorOptions");
-  const _currentField = currentProperties.get("field");
-  const _currentValue = currentProperties.get("value");
+  const currentField = currentProperties.get("field");
+  const currentValue = currentProperties.get("value");
   const _currentValueSrc = currentProperties.get("valueSrc", new Immutable.List());
   const _currentValueType = currentProperties.get("valueType", new Immutable.List());
+
+  const isRuleGroup = newFieldConfig.type == "!group";
+  const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
+  const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
+  const wasOkWithoutField = !currentField && currentFieldSrc && currentOperator;
 
   // If the newly selected field supports the same operator the rule currently
   // uses, keep it selected.
   const lastOp = newFieldConfig && newFieldConfig.operators?.indexOf(currentOperator) !== -1 ? currentOperator : null;
   let newOperator = null;
-  const availOps = currentFieldSrc === "func" ? ["equal"]: 
+  const availOps = currentFieldSrc === "func" ? 
+    getOperatorsForType(config, fieldType) :
     getOperatorsForField(config, newField);
   if (availOps && availOps.length == 1)
     newOperator = availOps[0];
@@ -373,9 +402,9 @@ const setField = (state, path, newField, config) => {
       if (strategy == "keep" && !isChangeToAnotherType)
         newOperator = lastOp;
       else if (strategy == "default")
-        newOperator = defaultOperator(config, newField, false);
+        newOperator = defaultOperator(config, newField, currentFieldSrc, false);
       else if (strategy == "first")
-        newOperator = getFirstOperator(config, newField);
+        newOperator = getFirstOperator(config, newField, currentFieldSrc);
       if (newOperator) //found op for strategy
         break;
     }
@@ -399,6 +428,7 @@ const setField = (state, path, newField, config) => {
     );
     let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
+      fieldSrc: "field",
       mode: newFieldConfig.mode,
     });
     if (isRuleGroupExt) {
@@ -433,6 +463,8 @@ const setField = (state, path, newField, config) => {
 
     return current
       .set("field", newField)
+      .delete("fieldType") // remove "memory effect"
+      .set("fieldSrc", currentFieldSrc)
       .set("operator", newOperator)
       .set("operatorOptions", newOperatorOptions)
       .set("value", newValue)
@@ -455,7 +487,7 @@ const setOperator = (state, path, newOperator, config) => {
   const currentField = properties.get("field");
   const currentFieldSrc = properties.get("fieldSrc");
   const fieldConfig = getFieldConfig(config, currentField, currentFieldSrc);
-  const isRuleGroup = fieldConfig.type == "!group";
+  const isRuleGroup = fieldConfig?.type == "!group";
   const operatorConfig = getOperatorConfig(config, newOperator, currentField, currentFieldSrc);
   const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
 

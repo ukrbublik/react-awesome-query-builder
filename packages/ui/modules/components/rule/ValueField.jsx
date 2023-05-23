@@ -19,6 +19,7 @@ export default class ValueField extends Component {
     config: PropTypes.object.isRequired,
     field: PropTypes.any,
     fieldSrc: PropTypes.string,
+    fieldType: PropTypes.string,
     value: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
@@ -37,8 +38,8 @@ export default class ValueField extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "fieldSrc", "operator", "isFuncArg", "parentField"];
-    const keysForMeta = ["config", "field", "fieldSrc", "operator", "value", "placeholder", "isFuncArg", "parentField"];
+    const keysForItems = ["config", "field", "fieldSrc", "fieldType", "operator", "isFuncArg", "parentField"];
+    const keysForMeta = ["config", "field", "fieldSrc", "fieldType", "operator", "value", "placeholder", "isFuncArg", "parentField"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -50,26 +51,26 @@ export default class ValueField extends Component {
     }
   }
 
-  getItems({config, field, fieldSrc, operator, parentField, isFuncArg, fieldDefinition}) {
+  getItems({config, field, fieldSrc, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
     const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
-    const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
+    const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc, fieldType);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
 
-  getMeta({config, field, fieldSrc, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
+  getMeta({config, field, fieldSrc, fieldType, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
 
     const leftFieldConfig = field ? getFieldConfig(config, field, fieldSrc) : {};
     const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    const leftFieldWidgetFieldProps = leftFieldWidgetField?.widgetProps || {};
     const placeholder = isFieldSelected ? null 
       : (isFuncArg && customPlaceholder || leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder);
     const currField = isFieldSelected ? getFieldConfig(config, selectedKey) : null;
@@ -90,7 +91,7 @@ export default class ValueField extends Component {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc, fieldType) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
@@ -98,12 +99,15 @@ export default class ValueField extends Component {
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value", fieldSrc);
     const widgetConfig = config.widgets[widget];
     let expectedType;
-    if (isFuncArg && fieldDefinition) {
-      expectedType = fieldDefinition.type;
+    if (isFuncArg) {
+      expectedType = fieldDefinition?.type;
     } else if (_relyOnWidgetType && widgetConfig) {
       expectedType = widgetConfig.type;
+    } else if (leftFieldConfig) {
+      expectedType = leftFieldConfig.type;
     } else {
-      expectedType = leftFieldConfig.type ?? leftFieldConfig.returnType;
+      // no field at LHS, but can use type from "memory effect"
+      expectedType = fieldType;
     }
     
     function _filter(list, path) {
@@ -115,11 +119,12 @@ export default class ValueField extends Component {
         if (!rightFieldConfig) {
           delete list[rightFieldKey];
         } else if (rightFieldConfig.type == "!struct" || rightFieldConfig.type == "!group") {
-          if(_filter(subfields, subpath) == 0)
+          if (_filter(subfields, subpath) == 0)
             delete list[rightFieldKey];
         } else {
           // tip: LHS field can be used as arg in RHS function
-          let canUse = rightFieldConfig.type == expectedType && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
+          let canUse = (!expectedType || rightFieldConfig.type == expectedType)
+            && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);

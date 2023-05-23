@@ -306,7 +306,7 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     const wType = wConfig.type;
     const jsType = wConfig.jsType;
     const fieldSettings = fieldConfig.fieldSettings;
-    const listValues = fieldSettings.treeValues || fieldSettings.listValues;
+    const listValues = fieldSettings?.treeValues || fieldSettings?.listValues;
 
     if (valueType && valueType != wType)
       return [`Value should have type ${wType}, but got value of type ${valueType}`, value];

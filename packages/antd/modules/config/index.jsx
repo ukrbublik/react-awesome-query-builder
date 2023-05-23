@@ -10,9 +10,9 @@ const settings = {
   ...BasicConfig.settings,
 
   renderField: (props, {RCE, W: {FieldSelect}}) => RCE(FieldSelect, props),
-  // renderField: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldSelect, props),
-  // renderField: (props, {RCE, W: {FieldCascader}}) => RCE(FieldSelect, props),
-  // renderField: (props, {RCE, W: {FieldTreeSelect}}) => RCE(FieldSelect, props),
+  // renderField: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldDropdown, props),
+  // renderField: (props, {RCE, W: {FieldCascader}}) => RCE(FieldCascader, props),
+  // renderField: (props, {RCE, W: {FieldTreeSelect}}) => RCE(FieldTreeSelect, props),
 
   renderOperator: (props, {RCE, W: {FieldSelect}}) => RCE(FieldSelect, props),
   // renderOperator: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldDropdown, props),

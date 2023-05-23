@@ -70,8 +70,11 @@ export type ConfigContext = {
 /////////////////
 
 export type RuleValue = boolean | number | string | Date | Array<string> | any;
+export type FieldPath = string;
+export type FieldValue = FieldPath; // todo: or immutable func, args
 
 export type ValueSource = "value" | "field" | "func" | "const";
+export type FieldSource = "field" | "func";
 export type RuleGroupMode = "struct" | "some" | "array";
 export type ItemType = "group" | "rule_group" | "rule";
 export type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
@@ -85,8 +88,8 @@ interface BasicItemProperties {
 }
 
 interface RuleProperties extends BasicItemProperties {
-  field: string | Empty,
-  fieldSrc?: ValueSource,
+  field: FieldValue | Empty,
+  fieldSrc?: FieldSource,
   operator: string | Empty,
   value: Array<RuleValue>,
   valueSrc?: Array<ValueSource>,
@@ -100,7 +103,7 @@ interface RuleGroupExtProperties extends RuleProperties {
 }
 
 interface RuleGroupProperties extends BasicItemProperties {
-  field: string | Empty,
+  field: FieldPath | Empty,
   mode?: RuleGroupMode,
 }
 
@@ -219,11 +222,11 @@ export interface Utils {
     decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
     compileConfig(config: Config): Config;
     extendConfig(config: Config): Config;
-    getFieldConfig(config: Config, field: string): Field | null;
+    getFieldConfig(config: Config, field: FieldPath): Field | null;
     getFuncConfig(config: Config, func: string): Func | null;
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
     getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
-    getFieldWidgetConfig(config: Config, field: string, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+    getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource, fieldSrc?: FieldSource): Widget | null;
     isJsonLogic(value: any): boolean;
     isJSX(jsx: any): boolean;
     isDirtyJSX(jsx: any): boolean;
@@ -312,8 +315,8 @@ export interface Actions {
   setNot(path: IdPath, not: boolean): undefined;
   setLock(path: IdPath, lock: boolean): undefined;
   setConjunction(path: IdPath, conjunction: string): undefined;
-  setField(path: IdPath, field: string): undefined;
-  setFieldSrc(path: IdPath, fieldSrc: ValueSource): undefined;
+  setField(path: IdPath, field: FieldValue): undefined;
+  setFieldSrc(path: IdPath, fieldSrc: FieldSource): undefined;
   setOperator(path: IdPath, operator: string): undefined;
   setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
   setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
@@ -346,8 +349,8 @@ export interface TreeActions {
     setLock(config: Config, path: IdPath, lock: boolean): InputAction;
   },
   rule: {
-    setField(config: Config, path: IdPath, field: string): InputAction;
-    setFieldSrc(config: Config, path: IdPath, fieldSrc: ValueSource): InputAction;
+    setField(config: Config, path: IdPath, field: FieldValue): InputAction;
+    setFieldSrc(config: Config, path: IdPath, fieldSrc: FieldSource): InputAction;
     setOperator(config: Config, path: IdPath, operator: string): InputAction;
     setValue(config: Config, path: IdPath, delta: number, value: RuleValue, valueType: string): InputAction;
     setValueSrc(config: Config, path: IdPath, delta: number, valueSrc: ValueSource): InputAction;
@@ -363,8 +366,8 @@ export interface TreeActions {
 
 interface AbstractWidgetProps<C = Config> {
   placeholder: string,
-  field: string,
-  fieldSrc: string,
+  field: FieldValue,
+  fieldSrc: FieldSource,
   parentField?: string,
   operator: string,
   fieldDefinition: Field,
@@ -425,8 +428,9 @@ type FieldItems = FieldItem[];
 
 export interface FieldProps<C = Config> {
   items: FieldItems,
-  selectedFieldSrc?: string,
-  setField(fieldPath: string): void,
+  selectedFieldSrc?: FieldSource,
+  setField(field: FieldValue): void,
+  errorText?: string,
   selectedKey: string | Empty,
   selectedKeys?: Array<string> | Empty,
   selectedPath?: Array<string> | Empty,
@@ -454,7 +458,7 @@ type SpelFormatValue =              (val: RuleValue, fieldDef: Field, wgtDef: Wi
 type MongoFormatValue =             (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
 type ValidateValue<V = RuleValue> = (val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
-type ElasticSearchFormatValue =     (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: string, config: Config) => AnyObject | null;
+type ElasticSearchFormatValue =     (queryType: ElasticSearchQueryType, val: RuleValue, op: string, field: FieldPath, config: Config) => AnyObject | null;
 
 
 export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
@@ -588,10 +592,10 @@ export interface ConjsProps {
 // Operators
 /////////////////
 
-type FormatOperator = (field: string, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
-type MongoFormatOperator = (field: string, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
-type SqlFormatOperator = (field: string, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
-type SpelFormatOperator = (field: string, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type FormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
+type MongoFormatOperator = (field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
+type SqlFormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type SpelFormatOperator = (field: FieldPath, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
@@ -766,7 +770,7 @@ interface BaseField {
   label?: string,
   tooltip?: string,
 }
-interface ValueField<FS = FieldSettings> extends BaseField {
+interface BaseSimpleField<FS = FieldSettings> extends BaseField {
   type: string,
   preferWidgets?: Array<string>,
   valueSources?: Array<ValueSource>,
@@ -785,7 +789,7 @@ interface ValueField<FS = FieldSettings> extends BaseField {
   allowCustomValues?: boolean,
   isSpelVariable?: boolean,
 }
-interface SimpleField<FS = FieldSettings> extends ValueField<FS> {
+interface SimpleField<FS = FieldSettings> extends BaseSimpleField<FS> {
   label2?: string,
   operators?: Array<string>,
   defaultOperator?: string,
@@ -846,10 +850,10 @@ type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
 type SqlFormatReverse = (q: string) => string;
 type SpelFormatReverse = (q: string) => string;
-type FormatField = (field: string, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
-type FormatSpelField = (field: string, parentField: string | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
-type CanCompareFieldWithField = (leftField: string, leftFieldConfig: Field, rightField: string, rightFieldConfig: Field, op: string) => boolean;
-type FormatAggr = (whereStr: string, aggrField: string, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
+type FormatField = (field: FieldPath, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
+type FormatSpelField = (field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
+type CanCompareFieldWithField = (leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
+type FormatAggr = (whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {
@@ -898,7 +902,7 @@ export interface LocaleSettings {
 
 
 export interface BehaviourSettings {
-  fieldSources?: Array<ValueSource>,
+  fieldSources?: Array<FieldSource>,
   valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction,
   canReorder?: boolean,
@@ -929,6 +933,7 @@ export interface BehaviourSettings {
   removeInvalidMultiSelectValuesOnLoad?: boolean,
   groupOperators?: Array<string>,
   useConfigCompress?: boolean,
+  keepInputOnChangeFieldSrc?: boolean,
 }
 
 export interface OtherSettings {
@@ -985,7 +990,7 @@ export interface Func {
   spelFormatFunc?: SpelFormatFunc | SerializedFunction,
   allowSelfNesting?: boolean,
 }
-export interface FuncArg extends ValueField {
+export interface FuncArg extends BaseSimpleField {
   isOptional?: boolean,
   showPrefix?: boolean,
 }

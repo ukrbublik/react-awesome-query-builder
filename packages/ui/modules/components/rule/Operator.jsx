@@ -14,6 +14,7 @@ export default class Operator extends Component {
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.any,
+    selectedFieldType: PropTypes.string,
     selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
     readonly: PropTypes.bool,
@@ -30,7 +31,7 @@ export default class Operator extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["config", "selectedField", "selectedOperator"];
+    const keysForMeta = ["config", "selectedField", "selectedFieldType", "selectedOperator"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -38,9 +39,9 @@ export default class Operator extends Component {
     }
   }
 
-  getMeta({config, selectedField, selectedFieldSrc, selectedOperator}) {
+  getMeta({config, selectedField, selectedFieldSrc, selectedFieldType, selectedOperator}) {
     const fieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
-    const operators = fieldConfig?.operators;
+    const operators = fieldConfig?.operators || config.types[selectedFieldType]?.operators;
     const operatorOptions 
       = mapValues(
         pickBy(
