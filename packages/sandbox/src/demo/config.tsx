@@ -395,6 +395,7 @@ export function createConfig(InitialConfig: BasicConfig): Config {
     addSubRuleLabel: "Add sub rule",
     delGroupLabel: null,
     notLabel: "Not",
+    fieldSourcesPopupTitle: "Select source",
     valueSourcesPopupTitle: "Select value source",
     removeRuleConfirmOptions: {
       title: "Are you sure delete this rule?",

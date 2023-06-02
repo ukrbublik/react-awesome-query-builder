@@ -887,6 +887,7 @@ export interface LocaleSettings {
   addSubRuleLabel?: string,
   delGroupLabel?: string,
   notLabel?: string,
+  fieldSourcesPopupTitle?: string,
   valueSourcesPopupTitle?: string,
   removeRuleConfirmOptions?: {
     title?: string,

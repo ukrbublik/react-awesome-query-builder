@@ -431,6 +431,7 @@ Localization:
 |addRuleLabel |Add rule
 |addSubRuleLabel |Add sub rule
 |notLabel |Not
+|fieldSourcesPopupTitle |Select source
 |valueSourcesPopupTitle |Select value source
 |removeRuleConfirmOptions |If you want to ask confirmation of removing non-empty rule/group, add these options. +
   List of all valid properties is https://ant.design/components/modal/#API[here]

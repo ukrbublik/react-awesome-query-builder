@@ -97,7 +97,7 @@ export default class FieldWrapper extends PureComponent {
             config={config}
             setValueSrc={setFieldSrc}
             readonly={readonly}
-            title={settings.valueSourcesPopupTitle}
+            title={settings.fieldSourcesPopupTitle}
           />
         </div>
       )
