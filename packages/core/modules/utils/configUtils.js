@@ -1,9 +1,10 @@
 import merge from "lodash/merge";
+import pick from "lodash/pick";
 import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart} from "./stuff";
+import {mergeArraysSmart, logger} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 
@@ -99,9 +100,11 @@ function _extendFieldsConfig(subconfig, config, path = []) {
   }
 }
 
-function _extendFuncArgsConfig(subconfig, config) {
+function _extendFuncArgsConfig(subconfig, config, path = []) {
   if (!subconfig) return;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
   for (let funcKey in subconfig) {
+    const funcPath = [...path, funcKey].join(fieldSeparator);
     const funcDef = subconfig[funcKey];
     if (funcDef.returnType) {
       if (!config._funcsCntByType[funcDef.returnType])
@@ -119,6 +122,7 @@ function _extendFuncArgsConfig(subconfig, config) {
       for (const argKey of argKeys.reverse()) {
         const argDef = funcDef.args[argKey];
         if (!tmpIsOptional && argDef.isOptional) {
+          logger.info(`Arg ${argKey} for func ${funcPath} can't be optional`);
           delete argDef.isOptional;
         }
         if (!argDef.isOptional)
@@ -127,7 +131,7 @@ function _extendFuncArgsConfig(subconfig, config) {
     }
 
     if (funcDef.subfields) {
-      _extendFuncArgsConfig(funcDef.subfields, config);
+      _extendFuncArgsConfig(funcDef.subfields, config, [...path, funcKey]);
     }
   }
 }
@@ -320,6 +324,34 @@ export const normalizeField = (config, field) => {
     return config.__fieldNames[fieldStr].join(fieldSeparator);
   }
   return fieldStr;
+};
+
+export const getFuncSignature = (config, func) => {
+  if (!func)
+    return null;
+  const funcConfig = getFieldRawConfig(config, func, "funcs", "subfields");
+  if (!funcConfig)
+    return null;
+  const {
+    returnType,
+    args,
+  } = funcConfig;
+  const argsSignature = Object.fromEntries(Object.entries(args || {}).map(([k, v]) => {
+    const argSignature = pick(v, [
+      "type",
+      "valueSources",
+      "defaultValue",
+      "fieldSettings",
+      // "asyncListValues", // not supported
+      "isOptional",
+    ]);
+    return [k, argSignature];
+  }));
+  const signature = {
+    returnType,
+    args: argsSignature,
+  };
+  return signature;
 };
 
 export const getFuncConfig = (config, func) => {

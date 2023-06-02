@@ -1,12 +1,13 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig
 } from "./configUtils";
 import {defaultValue, getFirstDefined} from "../utils/stuff";
 import Immutable from "immutable";
 import {validateValue} from "../utils/validation";
 import last from "lodash/last";
+import {completeFuncValue} from "./funcUtils";
 
-const selectTypes = [
+export const selectTypes = [
   "select",
   "multiselect",
   "treeselect",
@@ -55,9 +56,15 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       || changedProp == "operator" && !clearValueOnChangeOp);
   canReuseValue = canReuseValue &&
     (currentType && newType && currentType == newType);
-  if (canReuseValue && selectTypes.includes(currentFieldConfig?.type) && changedProp == "field") {
-    // different fields of select types has different listValues
-    canReuseValue = false;
+  if (canReuseValue && selectTypes.includes(newType) && changedProp == "field") {
+    const newListValuesType = newFieldConfig?.listValuesType;
+    const currentListValuesType = currentFieldConfig?.listValuesType;
+    if (newListValuesType && newListValuesType === currentListValuesType) {
+      // ok
+    } else {
+      // different fields of select types has different listValues
+      canReuseValue = false;
+    }
   }
 
   // compare old & new widgets
@@ -326,7 +333,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   const fieldConfig = getFieldConfig(config, field, fieldSrc);
   const opConfig = operator ? config.operators[operator] : null;
   
-  if (fieldConfig && fieldConfig.widgets) {
+  if (fieldConfig?.widgets) {
     for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
       if (!config.widgets[widget]) {
@@ -352,8 +359,8 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
         canAdd = false;
       if (canAdd) {
         widgets.push(widget);
-        let canAddValueSrc = fieldConfig.valueSources && fieldConfig.valueSources.indexOf(widgetValueSrc) != -1;
-        if (opConfig && opConfig.valueSources && opConfig.valueSources.indexOf(widgetValueSrc) == -1)
+        let canAddValueSrc = fieldConfig.valueSources?.indexOf(widgetValueSrc) != -1;
+        if (opConfig?.valueSources?.indexOf(widgetValueSrc) == -1)
           canAddValueSrc = false;
         if (canAddValueSrc && !valueSrcs.find(v => v == widgetValueSrc))
           valueSrcs.push(widgetValueSrc);
@@ -392,6 +399,8 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
   if (!fieldDefinition)
     return valueSrcs;
   const fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
+  if (!valueSrcs)
+    valueSrcs = Object.keys(config.settings.valueSourcesInfo);
   return valueSrcs.filter(vs => {
     let canAdd = true;
     if (vs == "field") {
@@ -456,7 +465,7 @@ export const formatFieldName = (field, config, meta, parentField = null, options
 };
 
 
-const isEmptyItem = (item, config, liteCheck = false) => {
+export const isEmptyItem = (item, config, liteCheck = false) => {
   const type = item.get("type");
   const mode = item.getIn(["properties", "mode"]);
   if (type == "rule_group" && mode == "array") {
@@ -499,20 +508,63 @@ export const isEmptyGroupChildren = (children, config, liteCheck = false) => {
 export const isEmptyRuleProperties = ({
   field, fieldSrc, fieldType,
   operator,
-  value, valuesrc, valueType,
+  value, valueSrc, valueType,
 }, config, liteCheck = false) => {
   const cardinality = config.operators[operator]?.cardinality ?? 1;
   const filledParts = [
-    liteCheck ? (field !== null || fieldType != null) : field !== null,
-    operator !== null,
-    value.filter((val) => val !== undefined).size >= cardinality
+    liteCheck ? (field !== null || fieldType != null) : isCompletedValue(field, fieldSrc, config, liteCheck),
+    !!operator,
+    value.filter((val, delta) => isCompletedValue(val, valueSrc.get(delta), config, liteCheck)).size >= cardinality
   ];
   const filledCnt = filledParts.filter(f => !!f).length;
-  const isFilled = liteCheck ? filledCnt >= 2 : filledCnt == 3;
+  const isFilled = filledCnt == 3;
   return !isFilled;
 };
 
 const isEmptyRule = (rule, config, liteCheck = false) => {
   const properties = rule.get("properties");
   return isEmptyRuleProperties(properties.toObject(), config, liteCheck);
+};
+
+export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => {
+  if (!liteCheck && valueSrc == "func" && value) {
+    const funcKey = value.get("func");
+    const funcConfig = getFuncConfig(config, funcKey);
+    if (funcConfig) {
+      const args = value.get("args");
+      for (const argKey in funcConfig.args) {
+        const argConfig = funcConfig.args[argKey];
+        const argVal = args ? args.get(argKey) : undefined;
+        // const argDef = getFieldConfig(config, argConfig);
+        const argValue = argVal ? argVal.get("value") : undefined;
+        const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+        if (argValue == undefined && argConfig.defaultValue === undefined && !argConfig.isOptional) {
+          // arg is not completed
+          return false;
+        }
+        if (argValue != undefined) {
+          if (!isCompletedValue(argValue, argValueSrc, config, liteCheck)) {
+            // arg is complex and is not completed
+            return false;
+          }
+        }
+      }
+      // all args are completed
+      return true;
+    }
+  }
+  return value != undefined;
+};
+
+/**
+ * @param {*} value
+ * @param {string} valueSrc - 'value' | 'field' | 'func'
+ * @param {object} config
+ * @return {* | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
+ */
+export const completeValue = (value, valueSrc, config) => {
+  if (valueSrc == "func")
+    return completeFuncValue(value, config);
+  else
+    return value;
 };

@@ -2,9 +2,8 @@ import {defaultValue} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
-import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName} from "../utils/ruleUtils";
+import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {completeValue} from "../utils/funcUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";

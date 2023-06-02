@@ -189,7 +189,7 @@ export default class ValueField extends Component {
     let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
     let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-    let label = fieldOpts.label || last(fieldParts);
+    let label = fieldOpts?.label || last(fieldParts);
     label = truncateString(label, maxLabelsLength);
     return label;
   }

@@ -2,7 +2,6 @@ import {defaultValue} from "../utils/stuff";
 import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {formatFieldName} from "../utils/ruleUtils";
-import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 
 /*

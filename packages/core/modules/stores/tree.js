@@ -14,7 +14,7 @@ import {
 } from "../utils/configUtils";
 import {
   getOperatorsForField, getOperatorsForType, getFirstOperator, getWidgetForFieldOp,
-  getNewValueForFieldOp
+  getNewValueForFieldOp, isEmptyItem, selectTypes
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
 import {validateValue} from "../utils/validation";
@@ -323,8 +323,9 @@ const setFieldSrc = (state, path, srcKey, config) => {
   const {keepInputOnChangeFieldSrc} = config.settings;
 
   // get fieldType for "memory effect"
-  const currentType = state.getIn(expandTreePath(path, "type"));
-  const currentProperties = state.getIn(expandTreePath(path, "properties"));
+  const currentRule = state.getIn(expandTreePath(path));
+  const currentType = currentRule.get("type");
+  const currentProperties = currentRule.get("properties");
   const currentField = currentProperties.get("field");
   const currentFieldSrc = currentProperties.get("fieldSrc");
   const currentFielType = currentProperties.get("fieldType");
@@ -333,8 +334,10 @@ const setFieldSrc = (state, path, srcKey, config) => {
   if (!fieldType || fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
   }
+  const canReuseValue = !selectTypes.includes(fieldType);
+  const keepInput = keepInputOnChangeFieldSrc && !isEmptyItem(currentRule, config, true) && canReuseValue;
 
-  if (!keepInputOnChangeFieldSrc) {
+  if (!keepInput) {
     // clear ALL properties
     state = state.setIn(
       expandTreePath(path, "properties"),
