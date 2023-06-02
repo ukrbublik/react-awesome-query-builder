@@ -164,13 +164,14 @@ export const setArgValue = (value, argKey, argVal, argConfig, config) => {
     value = value.setIn(["args", argKey, "value"], argVal);
 
     // set default arg value source
+    const valueSrc = value.getIn(["args", argKey, "value"]);
     const {valueSources} = argConfig;
     const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
     let argDefaultValueSrc = filteredValueSources.length == 1 ? filteredValueSources[0] : undefined;
     if (!argDefaultValueSrc && filteredValueSources.includes("value")) {
       argDefaultValueSrc = "value";
     }
-    if (argDefaultValueSrc) {
+    if (!valueSrc && argDefaultValueSrc) {
       value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
     }
   }
