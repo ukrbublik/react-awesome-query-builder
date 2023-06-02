@@ -1,5 +1,6 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
+import omit from "lodash/omit";
 import { Menu, Dropdown, Tooltip, Button } from "antd";
 const SubMenu = Menu.SubMenu;
 const MenuItem = Menu.Item;
@@ -31,9 +32,10 @@ export default class FieldDropdown extends PureComponent {
 
   renderMenuItems(fields) {
     return fields.map(field => {
-      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled, matchesType} = field;
       const pathKey = path || key;
-      const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
+      const optionText = matchesType ? <b>{label}</b> : label;
+      const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
 
       if (items) {
         return <SubMenu
@@ -89,7 +91,7 @@ export default class FieldDropdown extends PureComponent {
         //size={config.settings.renderSize}
         selectedKeys={selectedKeys}
         onClick={this.onChange}
-        {...customProps}
+        {...omit(customProps, ["showSearch"])}
       >{fieldMenuItems}</Menu>
     );
     const togglerLabel = selectedAltLabel || selectedLabel || placeholder;

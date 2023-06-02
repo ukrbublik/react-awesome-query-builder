@@ -48,14 +48,14 @@ export default class FuncSelect extends Component {
       this.meta = this.getMeta(nextProps);
     }
     if (needUpdateItems) {
-      this.items = this.getItems(nextProps);
+      this.items = this.getItems(nextProps, this.meta);
     }
   }
 
-  getItems({config, field, fieldType, fieldSrc, isLHS, operator, parentFuncs, fieldDefinition, isFuncArg}) {
+  getItems({config, field, fieldType, fieldSrc, isLHS, operator, parentFuncs, fieldDefinition, isFuncArg}, {lookingForFieldType}) {
     const {canUseFuncForField} = config.settings;
     const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldType, fieldSrc, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
-    const items = this.buildOptions(config, filteredFuncs);
+    const items = this.buildOptions(config, filteredFuncs, lookingForFieldType);
     return items;
   }
 
@@ -81,13 +81,15 @@ export default class FuncSelect extends Component {
       selectedFullLabel = null;
 
     const isRootFuncAtLHS = isLHS && !isFuncArg;
+    const lookingForFieldType = isRootFuncAtLHS && !isFuncSelected && fieldType;
     // Field source has been chnaged, no new func selected, but op & value remains
-    const errorText = isRootFuncAtLHS && !isFuncSelected && fieldType ? "Please select function" : null;
+    const errorText = lookingForFieldType ? "Please select function" : null;
   
     return {
       placeholder,
       selectedKey: selectedFuncKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedFullLabel,
       errorText,
+      lookingForFieldType,
     };
   }
 
@@ -142,11 +144,22 @@ export default class FuncSelect extends Component {
     return funcs;
   }
 
-  buildOptions(config, funcs, path = null, optGroupLabel = null) {
+  buildOptions(config, funcs, fieldType = undefined, path = null, optGroupLabel = null) {
     if (!funcs)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+
+    const countFieldsMatchesType = (fields) => {
+      return Object.keys(fields).reduce((acc, fieldKey) => {
+        const field = fields[fieldKey];
+        if (field.type === "!struct") {
+          return acc + countFieldsMatchesType(field.subfields);
+        } else {
+          return acc + (field.type === fieldType ? 1 : 0);
+        }
+      }, 0);
+    };
 
     return keys(funcs).map(funcKey => {
       const func = funcs[funcKey];
@@ -159,22 +172,27 @@ export default class FuncSelect extends Component {
       const subpath = (path ? path : []).concat(funcKey);
 
       if (func.type == "!struct") {
+        const items = this.buildOptions(config, func.subfields, fieldType, subpath, label);
+        const hasItemsMatchesType = countFieldsMatchesType(func.subfields) > 0;
         return {
           key: funcKey,
           path: prefix+funcKey,
           label,
           fullLabel,
           tooltip,
-          items: this.buildOptions(config, func.subfields, subpath, label)
+          items,
+          matchesType: hasItemsMatchesType,
         };
       } else {
+        const matchesType = fieldType !== undefined ? func.returnType === fieldType : undefined;
         return {
           key: funcKey,
           path: prefix+funcKey,
           label,
           fullLabel,
           tooltip,
-          grouplabel: optGroupLabel
+          grouplabel: optGroupLabel,
+          matchesType,
         };
       }
     });

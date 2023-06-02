@@ -3,11 +3,12 @@ import React from "react";
 export default ({items, setField, selectedKey, readonly, errorText}) => {
   const renderOptions = (fields) => (
     fields.map(field => {
-      const {items, path, label, disabled} = field;
+      const {items, path, label, disabled, matchesType} = field;
       if (items) {
         return <optgroup disabled={disabled} key={path} label={label}>{renderOptions(items)}</optgroup>;
       } else {
-        return <option disabled={disabled} key={path} value={path}>{label}</option>;
+        const style = matchesType ? { fontWeight: "bold" } : {};
+        return <option disabled={disabled} key={path} value={path} style={style}>{label}</option>;
       }
     })
   );

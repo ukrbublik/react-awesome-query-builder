@@ -29,7 +29,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder, errorText
   const renderOptions = (fields, isGroupItem = false, level = 0) =>
     Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
-      const { items, path, label, disabled } = field;
+      const { items, path, label, disabled, matchesType } = field;
       const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
       const prefix = level > 1 ? "\u00A0\u00A0".repeat(level-1) : "";
       if (items) {
@@ -47,6 +47,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder, errorText
           </div>
         );
       } else {
+        const itemText = matchesType ? <b>{prefix+label}</b> : prefix+label;
         return (
           <DropdownItem
             disabled={disabled}
@@ -56,7 +57,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder, errorText
             className={isGroupItem ? "px-4" : undefined}
             active={selectedKey == path}
           >
-            {prefix+label}
+            {itemText}
           </DropdownItem>
         );
       }

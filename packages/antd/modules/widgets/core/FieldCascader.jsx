@@ -1,10 +1,12 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Cascader, Tooltip } from "antd";
 import {removePrefixPath} from "../../utils/stuff";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
 
 
-export default class FieldCascader extends PureComponent {
+export default class FieldCascader extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
@@ -22,6 +24,36 @@ export default class FieldCascader extends PureComponent {
     //actions
     setField: PropTypes.func.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
+  }
+
+  onPropsChanged(nextProps) {
+    const { items } = nextProps;
+    this.items = this.getItems(items);
+  }
+
+  getItems(items) {
+    return items.map(item => {
+      const {items, matchesType, label} = item;
+
+      if (items) {
+        return {
+          ...item,
+          items: this.getItems(items),
+          label: matchesType ? <b>{label}</b> : label,
+        };
+      } else {
+        return {
+          ...item,
+          label: matchesType ? <b>{label}</b> : label,
+        };
+      }
+    });
+  }
 
   onChange = (keys) => {
     const { parentField } = this.props;
@@ -56,7 +88,7 @@ export default class FieldCascader extends PureComponent {
       <Cascader
         status={errorText && "error"}
         fieldNames={{ label: "label", value: "key", children: "items" }}
-        options={items}
+        options={this.items}
         value={value}
         onChange={this.onChange}
         allowClear={false}

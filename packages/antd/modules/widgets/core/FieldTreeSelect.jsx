@@ -27,7 +27,7 @@ export default class FieldTreeSelect extends Component {
   constructor(props) {
     super(props);
     useOnPropsChanged(this);
-    this.onPropsChanged(props);  
+    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
@@ -49,11 +49,12 @@ export default class FieldTreeSelect extends Component {
 
   getTreeData(fields, fn = null) {
     return fields.map(field => {
-      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled, matchesType} = field;
       if (fn)
         fn(field);
       const pathKey = path || key;
-      const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
+      const optionText = matchesType ? <b>{label}</b> : label;
+      const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
 
       if (items) {
         return {

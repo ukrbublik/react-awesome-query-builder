@@ -3,14 +3,14 @@ import MuiAutocomplete from "../value/MuiAutocomplete";
 
 const itemsToListValues = (items, level = 0) => (
   items.map(item => {
-    const {items, path, label, disabled, grouplabel} = item;
+    const {items, path, label, disabled, grouplabel, matchesType} = item;
     const prefix = "\u00A0\u00A0".repeat(level);
     if (items) {
       return itemsToListValues(items, level+1);
     } else {
       return {
         title: label,
-        renderTitle: prefix+label,
+        renderTitle: matchesType ? <b>{prefix+label}</b> : prefix+label,
         value: path,
         disabled,
         groupTitle: level > 0 ? prefix+grouplabel : null,

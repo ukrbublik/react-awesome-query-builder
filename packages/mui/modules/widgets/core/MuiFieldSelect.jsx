@@ -8,7 +8,7 @@ export default ({items, setField, selectedKey, readonly, placeholder, errorText}
   const renderOptions = (fields, level = 0) => (
     Object.keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
-      const {items, path, label, disabled} = field;
+      const {items, path, label, disabled, matchesType} = field;
       const prefix = "\u00A0\u00A0".repeat(level);
       if (items) {
         return [
@@ -21,7 +21,7 @@ export default ({items, setField, selectedKey, readonly, placeholder, errorText}
       } else {
         return <MenuItem disabled={disabled} key={path} value={path}>
           {prefix && <span>{prefix}</span>}
-          {label}
+          {matchesType ? <b>{label}</b> : label}
         </MenuItem>;
       }
     })

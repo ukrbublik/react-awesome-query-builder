@@ -51,9 +51,10 @@ const FluentUIFieldSelect = (props) => {
         });
         divKey +=1;
       } else {
+        const optText = field.matchesType ? <b>{prefix + label}</b> : prefix + label;
         opt.key = path;
         opt.title = label;
-        opt.text = prefix + label;
+        opt.text = optText;
         opt.disabled = disabled;
         options.push(opt);
       }

@@ -62,10 +62,11 @@ export default class Field extends Component {
     const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
-    const items = this.buildOptions(parentFieldPath, config, sourceFields, parentFieldPath);
+    const lookingForFieldType = !isFieldSelected && selectedFieldType;
+    const items = this.buildOptions(parentFieldPath, config, sourceFields, lookingForFieldType, parentFieldPath);
 
     // Field source has been chnaged, no new field selected, but op & value remains
-    const errorText = !isFieldSelected && selectedFieldType ? "Please select field" : null;
+    const errorText = lookingForFieldType ? "Please select field" : null;
 
     return {
       placeholder, items, parentField,
@@ -84,11 +85,22 @@ export default class Field extends Component {
     return label;
   }
 
-  buildOptions(parentFieldPath, config, fields, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, fieldType = undefined, path = null, optGroupLabel = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+
+    const countFieldsMatchesType = (fields) => {
+      return Object.keys(fields).reduce((acc, fieldKey) => {
+        const field = fields[fieldKey];
+        if (field.type === "!struct") {
+          return acc + countFieldsMatchesType(field.subfields);
+        } else {
+          return acc + (field.type === fieldType ? 1 : 0);
+        }
+      }, 0);
+    };
 
     return keys(fields).map(fieldKey => {
       const field = fields[fieldKey];
@@ -106,6 +118,8 @@ export default class Field extends Component {
         return undefined;
 
       if (field.type == "!struct") {
+        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, subpath, label);
+        const hasItemsMatchesType = countFieldsMatchesType(field.subfields) > 0;
         return {
           disabled,
           key: fieldKey,
@@ -114,9 +128,11 @@ export default class Field extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(parentFieldPath, config, field.subfields, subpath, label)
+          items,
+          matchesType: hasItemsMatchesType,
         };
       } else {
+        const matchesType = fieldType !== undefined ? field.type === fieldType : undefined;
         return {
           disabled,
           key: fieldKey,
@@ -125,7 +141,8 @@ export default class Field extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          grouplabel: optGroupLabel
+          grouplabel: optGroupLabel,
+          matchesType,
         };
       }
     }).filter(o => !!o);

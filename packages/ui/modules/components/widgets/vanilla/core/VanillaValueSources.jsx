@@ -12,7 +12,7 @@ export default ({config, valueSources, valueSrc, title, setValueSrc, readonly}) 
   return (
     <select 
       onChange={onChange}
-      value={valueSrc}
+      value={valueSrc || ""}
       disabled={readonly}
     >
       {renderOptions(valueSources)}

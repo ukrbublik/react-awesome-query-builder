@@ -423,6 +423,8 @@ export type FieldItem = {
   altLabel?: string, 
   tooltip?: string,
   disabled?: boolean,
+  grouplabel?: string,
+  matchesType?: boolean,
 }
 type FieldItems = FieldItem[];
 
