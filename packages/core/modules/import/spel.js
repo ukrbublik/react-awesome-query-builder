@@ -328,6 +328,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       return undefined;
     }
     const fullParts = [...groupFieldParts, ...parts];
+    // todo: normalizeField
     const isVariable = spel.children?.[0]?.type == "variable";
     return {
       valueSrc: "field",
@@ -338,6 +339,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   } else if (spel.type == "variable" || spel.type == "property") {
     // normal field
     const fullParts = [...groupFieldParts, spel.val];
+    // todo: normalizeField
     const isVariable = spel.type == "variable";
     return {
       valueSrc: "field",

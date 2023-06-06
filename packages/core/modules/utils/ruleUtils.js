@@ -458,7 +458,11 @@ export const formatFieldName = (field, config, meta, parentField = null, options
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
       // fieldName = "#this." + fieldName; // ? for spel
     } else {
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      if (fieldDef.fieldName) {
+        // ignore
+      } else {
+        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      }
     }
   }
   return fieldName;

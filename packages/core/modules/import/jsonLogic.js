@@ -107,10 +107,11 @@ const convertFuncFromLogic = (
 
   field = setFunc(null, funcKey, config);
   Object.entries(funcConfig.args).forEach((entry, idx) => {
+    const argRawVal = vals[idx];
     const argKey = entry[0];
     const argConfig = entry[1];
-    const subK = Object.keys(vals[idx])[0];
-    const subV = Object.values(vals[idx])[0];
+    const subK = isJsonLogic(argRawVal) ? Object.keys(argRawVal)[0] : null;
+    const subV = isJsonLogic(argRawVal) ? Object.values(argRawVal)[0] : null;
     if (
       Object.keys(conv.funcs).includes(subK) &&
       typeof Object.values(subV) === "object" &&
@@ -129,7 +130,7 @@ const convertFuncFromLogic = (
       field = field.setIn(["args", argKey, "value"], argVal);
     } else {
       let argVal = convertFromLogic(
-        vals[idx],
+        argRawVal,
         conv,
         config,
         "val",
@@ -191,6 +192,8 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
 
 
 const convertVal = (val, fieldConfig, widget, config, meta) => {
+  if (val === undefined)
+    val = fieldConfig.defaultValue;
   if (val === undefined) return undefined;
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const fieldType = fieldConfig.type;
@@ -256,14 +259,22 @@ const convertVal = (val, fieldConfig, widget, config, meta) => {
   };
 };
 
+const convertFieldName = (origField, parentField, config) => {
+  const {fieldSeparator} = config.settings;
+  let field = origField;
+  field = normalizeField(config, field);
+  if (parentField) {
+    // tip: don't add prefix if normalized
+    if (field === origField) {
+      field = [parentField, field].join(fieldSeparator);
+    }
+  }
+  return field;
+};
 
 const convertField = (op, vals, conv, config, not, meta, parentField = null) => {
-  const {fieldSeparator} = config.settings;
   if (conv.varKeys.includes(op) && typeof vals[0] == "string") {
-    let field = vals[0];
-    if (parentField)
-      field = [parentField, field].join(fieldSeparator);
-    field = normalizeField(config, field);
+    const field = convertFieldName(vals[0], config);
     const fieldConfig = getFieldConfig(config, field);
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);
@@ -527,7 +538,6 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   }
 
   const opk = op + "/" + cardinality;
-  const {fieldSeparator, fieldSources} = config.settings;
   let opKeys = conv.operators[(isRevArgs ? "#" : "") + opk];
   if (!opKeys)
     return;
@@ -611,10 +621,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
     errors.push(`Unknown field ${JSON.stringify(jlField)}`);
     return;
   }
-  if (parentField)
-    field = [parentField, field].join(fieldSeparator);
-  field = normalizeField(config, field);
-
+  field = convertFieldName(field, parentField, config);
   const fieldConfig = getFieldConfig(config, field, fieldSrc);
   if (!fieldConfig) {
     errors.push(`No config for field ${field}`);
