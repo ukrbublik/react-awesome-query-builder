@@ -4,7 +4,6 @@ import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFunc
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
-import { setFunc } from "../utils/funcUtils";
 
 import moment from "moment";
 
@@ -14,15 +13,19 @@ import moment from "moment";
 const arrayUniq = (arr) => Array.from(new Set(arr));
 const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
 
+const createMeta = () => {
+  return {
+    errors: []
+  };
+};
+
 export const loadFromJsonLogic = (logicTree, config) => {
   return _loadFromJsonLogic(logicTree, config, false);
 };
 
 export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   //meta is mutable
-  let meta = {
-    errors: []
-  };
+  let meta = createMeta();
   const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
   let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
@@ -92,61 +95,6 @@ const buildConv = (config) => {
   };
 };
 
-const convertFuncFromLogic = (
-  jlFunc,
-  vals,
-  field,
-  conv,
-  config,
-  meta,
-  parentField
-) => {
-  const funcKeys = conv.funcs[jlFunc];
-  const funcKey = funcKeys[0];
-  const funcConfig = getFuncConfig(config, funcKey);
-
-  field = setFunc(null, funcKey, config);
-  Object.entries(funcConfig.args).forEach((entry, idx) => {
-    const argRawVal = vals[idx];
-    const argKey = entry[0];
-    const argConfig = entry[1];
-    const subK = isJsonLogic(argRawVal) ? Object.keys(argRawVal)[0] : null;
-    const subV = isJsonLogic(argRawVal) ? Object.values(argRawVal)[0] : null;
-    if (
-      Object.keys(conv.funcs).includes(subK) &&
-      typeof Object.values(subV) === "object" &&
-      Array.isArray(Object.values(subV))
-    ) {
-      const argVal = convertFuncFromLogic(
-        subK,
-        subV,
-        null,
-        conv,
-        config,
-        meta,
-        parentField
-      );
-      field = field.setIn(["args", argKey, "valueSrc"], "func");
-      field = field.setIn(["args", argKey, "value"], argVal);
-    } else {
-      let argVal = convertFromLogic(
-        argRawVal,
-        conv,
-        config,
-        "val",
-        meta,
-        false,
-        argConfig,
-        null,
-        parentField
-      );
-      field = field.setIn(["args", argKey, "valueSrc"], argVal.valueSrc);
-      field = field.setIn(["args", argKey, "value"], argVal.value);
-    }
-  });
-  return field;
-};
-
 const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
   let op, vals;
   if (isJsonLogic(logic)) {
@@ -157,7 +105,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   }
   
   let ret;
-  let beforeErrorsCnt = meta.errors.length;
+  const beforeErrorsCnt = meta.errors.length;
 
   const {lockedOp} = config.settings.jsonLogic;
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
@@ -170,15 +118,15 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
     ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
   } else if(expectedType == "val") {
     // not is not used here
-    ret = convertField(op, vals, conv, config, not, meta, parentField) 
-      || convertFunc(op, vals, conv, config, not, fieldConfig, meta, parentField) 
-      || convertVal(logic, fieldConfig, widget, config, meta);
+    ret = convertFieldRhs(op, vals, conv, config, not, meta, parentField) 
+      || convertFuncRhs(op, vals, conv, config, not, fieldConfig, meta, parentField) 
+      || convertValRhs(logic, fieldConfig, widget, config, meta);
   } else if(expectedType == "rule") {
     ret = convertConj(op, vals, conv, config, not, meta, parentField, false) 
     || convertOp(op, vals, conv, config, not, meta, parentField);
   }
 
-  let afterErrorsCnt = meta.errors.length;
+  const afterErrorsCnt = meta.errors.length;
   if (op != "!" && ret === undefined && afterErrorsCnt == beforeErrorsCnt) {
     meta.errors.push(`Can't parse logic ${JSON.stringify(logic)}`);
   }
@@ -191,7 +139,7 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
 };
 
 
-const convertVal = (val, fieldConfig, widget, config, meta) => {
+const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined)
     val = fieldConfig.defaultValue;
   if (val === undefined) return undefined;
@@ -272,9 +220,9 @@ const convertFieldName = (origField, parentField, config) => {
   return field;
 };
 
-const convertField = (op, vals, conv, config, not, meta, parentField = null) => {
+const convertFieldRhs = (op, vals, conv, config, not, meta, parentField = null) => {
   if (conv.varKeys.includes(op) && typeof vals[0] == "string") {
-    const field = convertFieldName(vals[0], config);
+    const field = convertFieldName(vals[0], parentField, config);
     const fieldConfig = getFieldConfig(config, field);
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);
@@ -291,8 +239,93 @@ const convertField = (op, vals, conv, config, not, meta, parentField = null) => 
   return undefined;
 };
 
+const convertLhs = (isGroup0, jlField, args, conv, config, not = null, fieldConfig = null, meta, parentField = null) => {
+  let k = Object.keys(jlField)[0];
+  let v = Object.values(jlField)[0];
 
-const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField = null) => {
+  const _parse = (k, v) => {
+    return convertFieldLhs(k, v, conv, config, not, meta, parentField)
+    || convertFuncLhs(k, v, conv, config, not, fieldConfig, meta, parentField);
+  };
+
+  const beforeErrorsCnt = meta.errors.length;
+  let field, fieldSrc, having, isGroup;
+  const parsed = _parse(k, v);
+  if (parsed) {
+    field = parsed.field;
+    fieldSrc = parsed.fieldSrc;
+  }
+  if (isGroup0) {
+    isGroup = true;
+    having = args[0];
+    args = [];
+  }
+  // reduce/filter for group ext
+  if (k == "reduce" && Array.isArray(v) && v.length == 3) {
+    let [filter, acc, init] = v;
+    if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
+      k = Object.keys(filter)[0];
+      v = Object.values(filter)[0];
+      if (k == "filter") {
+        let [group, filter] = v;
+        if (isJsonLogic(group)) {
+          k = Object.keys(group)[0];
+          v = Object.values(group)[0];
+          const parsedGroup = _parse(k, v);
+          if (parsedGroup) {
+            field = parsedGroup.field;
+            fieldSrc = parsedGroup.fieldSrc;
+            having = filter;
+            isGroup = true;
+          }
+        }
+      } else {
+        const parsedGroup = _parse(k, v);
+        if (parsedGroup) {
+          field = parsedGroup.field;
+          fieldSrc = parsedGroup.fieldSrc;
+          isGroup = true;
+        }
+      }
+    }
+  }
+  const afterErrorsCnt = meta.errors.length;
+
+  if (!field && afterErrorsCnt == beforeErrorsCnt) {
+    meta.errors.push(`Unknown LHS ${JSON.stringify(jlField)}`);
+  }
+  if (!field) return;
+
+  return {
+    field, fieldSrc, having, isGroup, args
+  };
+};
+
+const convertFieldLhs = (op, vals, conv, config, not, meta, parentField = null) => {
+  if (!Array.isArray(vals))
+    vals = [ vals ];
+  const parsed = convertFieldRhs(op, vals, conv, config, not, meta, parentField);
+  if (parsed) {
+    return {
+      fieldSrc: "field",
+      field: parsed.value,
+    };
+  }
+  return undefined;
+};
+
+const convertFuncLhs = (op, vals, conv, config, not, fieldConfig = null, meta, parentField = null) => {
+  const parsed = convertFuncRhs(op, vals, conv, config, not, fieldConfig, meta, parentField);
+  if (parsed) {
+    return {
+      fieldSrc: "func",
+      field: parsed.value,
+    };
+  }
+  return undefined;
+};
+
+const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, parentField = null) => {
   if (!op) return undefined;
   let func, argsArr, funcKey;
   const jsonLogicIsMethod = (op == "method");
@@ -306,7 +339,7 @@ const convertFunc = (op, vals, conv, config, not, fieldConfig, meta, parentField
   }
 
   const fk = (jsonLogicIsMethod ? "#" : "") + func;
-  const returnType = fieldConfig.type ?? fieldConfig.returnType;
+  const returnType = fieldConfig?.type ?? fieldConfig?.returnType;
   const funcKeys = (conv.funcs[fk] || []).filter(k => 
     (fieldConfig ? getFuncConfig(config, k).returnType == returnType : true)
   );
@@ -376,8 +409,8 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
     const complexFields = Object.values(children)
-      .map(v => v?.properties?.field)
-      .filter(f => f && f.includes(fieldSeparator));
+      .map(v => v?.properties?.fieldSrc == "field" && v?.properties?.field)
+      .filter(f => f?.includes?.(fieldSeparator));
     const complexFieldsGroupAncestors = Object.fromEntries(
       arrayUniq(complexFields).map(f => {
         const parts = f.split(fieldSeparator);
@@ -391,7 +424,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
       })
     );
     const childrenInRuleGroup = Object.values(children)
-      .map(v => v?.properties?.field)
+      .map(v => v?.properties?.fieldSrc == "field" && v?.properties?.field)
       .map(f => complexFieldsGroupAncestors[f])
       .filter(ancs => ancs && ancs.length);
     const usedRuleGroups = arrayUniq(Object.values(complexFieldsGroupAncestors).flat());
@@ -510,19 +543,21 @@ const wrapInDefaultConj = (rule, config, not = false) => {
 };
 
 const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
-  let errors = [];
-  let res = _parseRule(op, arity, vals, parentField, conv, config, errors, false, meta) 
-         || _parseRule(op, arity, vals, parentField, conv, config, errors, true, meta) ;
-
+  const submeta = createMeta();
+  let res = _parseRule(op, arity, vals, parentField, conv, config, false, submeta);
   if (!res) {
-    meta.errors.push(errors.join("; ") || `Unknown op ${op}/${arity}`);
+    // try reverse
+    res = _parseRule(op, arity, vals, parentField, conv, config, true, createMeta());
+  }
+  if (!res) {
+    meta.errors.push(submeta.errors.join("; ") || `Unknown op ${op}/${arity}`);
     return undefined;
   }
   
   return res;
 };
 
-const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArgs, meta) => {
+const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta) => {
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" or "some-in" for multiselect
   const isAllOrSomeInForMultiselect = (op == "all" || op == "some") && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
@@ -542,89 +577,31 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
   if (!opKeys)
     return;
   
-  let jlField, args = [];
+  let jlField, jlArgs = [];
   const rangeOps = ["<", "<=", ">", ">="];
   if (rangeOps.includes(op) && arity == 3) {
     jlField = vals[1];
-    args = [ vals[0], vals[2] ];
+    jlArgs = [ vals[0], vals[2] ];
   } else if (isRevArgs) {
     jlField = vals[1];
-    args = [ vals[0] ];
+    jlArgs = [ vals[0] ];
   } else {
-    [jlField, ...args] = vals;
+    [jlField, ...jlArgs] = vals;
   }
 
   if (!isJsonLogic(jlField)) {
-    errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
+    meta.errors.push(`Incorrect operands for ${op}: ${JSON.stringify(vals)}`);
     return;
   }
-  let k = Object.keys(jlField)[0];
-  let v = Object.values(jlField)[0];
-  
-  let field, fieldSrc, having, isGroup;
-  if (conv.varKeys.includes(k) && typeof v == "string") {
-    field = v;
-    fieldSrc = "field";
-  } else if (
-    Object.keys(conv.funcs).includes(k) &&
-    typeof v === "object" &&
-    Array.isArray(v)
-  ) {
-    fieldSrc = "func";
-    field = convertFuncFromLogic(k, v, field, conv, config, meta, parentField);
-  }
-  if (isGroup0) {
-    isGroup = true;
-    having = args[0];
-    args = [];
-  }
-  // reduce/filter for group ext
-  if (k == "reduce" && Array.isArray(v) && v.length == 3) {
-    let [filter, acc, init] = v;
-    if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
-      k = Object.keys(filter)[0];
-      v = Object.values(filter)[0];
-      if (k == "filter") {
-        let [group, filter] = v;
-        if (isJsonLogic(group)) {
-          k = Object.keys(group)[0];
-          v = Object.values(group)[0];
-          if (conv.varKeys.includes(k) && typeof v == "string") {
-            field = v;
-            having = filter;
-            isGroup = true;
-          } else if (
-            Object.keys(conv.funcs).includes(k) &&
-            typeof v === "object" &&
-            Array.isArray(v)
-          ) {
-            field = v;
-            having = filter;
-            isGroup = true;
-          }
-        }
-      } else if (conv.varKeys.includes(k) && typeof v == "string") {
-        field = v;
-        isGroup = true;
-      } else if (
-        Object.keys(conv.funcs).includes(k) &&
-        typeof v === "object" &&
-        Array.isArray(v)
-      ) {
-        field = v;
-        isGroup = true;
-      }
-    }
-  }
-  
-  if (!field) {
-    errors.push(`Unknown field ${JSON.stringify(jlField)}`);
-    return;
-  }
-  field = convertFieldName(field, parentField, config);
+
+  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, fieldConfig, meta, parentField);
+  if (!lhs) return;
+  const {
+    field, fieldSrc, having, isGroup, args
+  } = lhs;
   const fieldConfig = getFieldConfig(config, field, fieldSrc);
   if (!fieldConfig) {
-    errors.push(`No config for field ${field}`);
+    meta.errors.push(`No config for LHS ${field}`);
     return;
   }
 
@@ -634,7 +611,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, errors, isRevArg
     opKeys = opKeys
       .filter(k => fieldConfig.operators.includes(k));
     if (opKeys.length == 0) {
-      errors.push(`No corresponding ops for field ${field}`);
+      meta.errors.push(`No corresponding ops for LHS ${field}`);
       return;
     }
     opKey = opKeys[0];

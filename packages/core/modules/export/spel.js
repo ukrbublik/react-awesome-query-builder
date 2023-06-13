@@ -276,6 +276,7 @@ const checkOp = (config, operator, field) => {
 const formatRule = (item, config, meta, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   if (field == null || operator == null)
     return undefined;
@@ -296,13 +297,20 @@ const formatRule = (item, config, meta, parentField = null) => {
     return undefined;
       
   //format field
-  const formattedField = formatField(meta, config, field, parentField);
+  const formattedField = formatLhs(meta, config, field, fieldSrc, parentField);
   
   // format expression
   let res = formatExpression(
     meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType, isRev
   );
   return res;
+};
+
+const formatLhs = (meta, config, field, fieldSrc, parentField = null) => {
+  if (fieldSrc === "func")
+    return formatFunc(meta, config, field, parentField);
+  else
+    return formatField(meta, config, field, parentField);
 };
 
 const formatItemValue = (config, properties, meta, operator, parentField, expectedValueType = null) => {

@@ -407,7 +407,10 @@ export const getFieldConfig = (config, field, fieldSrc) => {
     }
   }
   if (fieldSrc === "func") {
-    return getFuncConfig(config, field?.get("func"));
+    if (field?.get?.("func"))
+      return getFuncConfig(config, field?.get?.("func"));
+    else
+      throw new Error(`Unknown func ${field}`);
   }
   const fieldConfig = getFieldRawConfig(config, field);
   if (!fieldConfig)

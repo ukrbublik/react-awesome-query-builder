@@ -1,6 +1,6 @@
 import { SpelExpressionEvaluator } from "spel2js";
 import uuid from "../utils/uuid";
-import {getFieldConfig, extendConfig, normalizeField, iterateFuncs} from "../utils/configUtils";
+import {getFieldConfig, getFuncConfig, extendConfig, normalizeField, iterateFuncs} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
@@ -468,8 +468,56 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
         value,
       };
     } else {
-      // todo: conv.funcs
-      meta.errors.push(`Unsupported method ${methodName}`);
+      let funcKey;
+      //todo: support not only methods, but funcs
+      const funcKeys = (conv.funcs["."+methodName] || []).filter(k => 
+        true
+      );
+      if (funcKeys.length) {
+        funcKey = funcKeys[0];
+      }
+      if (funcKey) {
+        const funcConfig = getFuncConfig(config, funcKey);
+        let convertedObj;
+        const argKeys = Object.keys(funcConfig.args || {});
+        const parts = convertPath(obj, meta);
+        if (parts) {
+          const fullParts = [...groupFieldParts, ...parts];
+          const field = fullParts.join(fieldSeparator);
+          convertedObj = {
+            value: field,
+            valueSrc: "field",
+          };
+        }
+        const fullArgs = [
+          convertedObj,
+          ...convertedArgs,
+        ];
+        const funcArgs = fullArgs.reduce((acc, val, ind) => {
+          const argKey = argKeys[ind];
+          const argConfig = funcConfig.args[argKey];
+          let argVal = val;
+          if (argVal === undefined) {
+            argVal = argConfig.defaultValue;
+            if (argVal === undefined) {
+              meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
+              return undefined;
+            }
+          }
+          return {...acc, [argKey]: argVal};
+        }, {});
+    
+        return {
+          valueSrc: "func",
+          value: {
+            func: funcKey,
+            args: funcArgs
+          },
+          valueType: funcConfig.returnType,
+        };
+      } else {
+        meta.errors.push(`Unsupported method ${methodName}`);
+      }
     }
   } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
     return buildCaseValueConcat(spel, conv, config, meta);
@@ -501,6 +549,7 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
     }
   }
 
+  const fieldSrc = field?.func ? "func" : "field";
   const widget = getWidgetForFieldOp(config, field, opKey);
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);
@@ -510,7 +559,8 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
     type: "rule",
     id: uuid(),
     properties: {
-      field: field,
+      field,
+      fieldSrc,
       operator: opKey,
       value: convertedArgs.map(v => v.value),
       valueSrc: convertedArgs.map(v => v.valueSrc),
@@ -723,8 +773,8 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
         res = buildRuleGroup(fieldObj, opKey, convertedArgs, config, meta);
       } else {
         // 2. not group
-        if (fieldObj.valueSrc != "field") {
-          meta.errors.push(`Expected field ${JSON.stringify(fieldObj)}`);
+        if (fieldObj.valueSrc != "field" && fieldObj.valueSrc != "func") {
+          meta.errors.push(`Expected field/func ${JSON.stringify(fieldObj)}`);
         }
         const field = fieldObj.value;
         res = buildRule(config, meta, field, opKey, convertedArgs);
