@@ -369,160 +369,167 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       value,
     };
   } else if (spel.type == "!func") {
-    const {obj, methodName, args, isVar} = spel;
-    
-    // todo: get from conv
-    const funcToOpMap = {
-      [".contains"]: "like",
-      [".startsWith"]: "starts_with",
-      [".endsWith"]: "ends_with",
-      ["$contains"]: "select_any_in",
-      [".equals"]: "multiselect_equals",
-      //[".containsAll"]: "multiselect_contains",
-      ["CollectionUtils.containsAny()"]: "multiselect_contains"
-    };
-
-    const convertedArgs = args.map(v => convertArg(v, conv, config, meta, {
-      ...spel,
-      _groupField: parentSpel?._groupField
-    }));
-    
-    //todo: make dynamic: use funcToOpMap and check obj type in basic config
-    if (methodName == "contains" && obj && obj[0].type == "list") {
-      const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
-      // {'yellow', 'green'}.?[true].contains(color)
-      if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
-        meta.errors.push(`Expected arg to method ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
-        return undefined;
-      }
-      const field = convertedArgs[0].value;
-      if (!( convertedObj.length == 1 && convertedObj[0].valueType == "multiselect" )) {
-        meta.errors.push(`Expected object of method ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
-        return undefined;
-      }
-      const opKey = funcToOpMap["$"+methodName];
-      const list = convertedObj[0];
-      return buildRule(config, meta, field, opKey, [list], spel);
-    } else if (obj && obj[0].type == "property" && funcToOpMap[obj[0].val + "." + methodName + "()"]) {
-      // CollectionUtils.containsAny(multicolor, {'yellow', 'green'})
-      const opKey = funcToOpMap[obj[0].val + "." + methodName + "()"];
-      const field = convertedArgs[0].value;
-      const args = convertedArgs.slice(1);
-      return buildRule(config, meta, field, opKey, args, spel);
-    } else if (funcToOpMap["."+methodName]) {
-      // user.login.startsWith('gg')
-      const opKey = funcToOpMap["."+methodName];
-      const parts = convertPath(obj, meta);
-      if (parts && convertedArgs.length == 1) {
-        const fullParts = [...groupFieldParts, ...parts];
-        const field = fullParts.join(fieldSeparator);
-        return buildRule(config, meta, field, opKey, convertedArgs, spel);
-      }
-    } else if (methodName == "parse" && obj && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
-      // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
-      const args = obj[0].args.map(v => convertArg(v, conv, config, meta, {
-        ...spel,
-        _groupField: parentSpel?._groupField
-      }));
-      if (!( args.length == 1 && args[0].valueType == "text" )) {
-        meta.errors.push(`Expected args of ${obj[0].cls.join(".")}.${methodName} to be 1 string but got: ${JSON.stringify(args)}`);
-        return undefined;
-      }
-      if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
-        meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
-        return undefined;
-      }
-      const dateFormat = args[0].value;
-      const dateString = convertedArgs[0].value;
-      const valueType = dateFormat.includes(" ") ? "datetime" : "date";
-      const field = null; // todo
-      const widget = valueType;
-      const fieldConfig = getFieldConfig(config, field);
-      const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
-      const valueFormat = widgetConfig.valueFormat;
-      const dateVal = moment(dateString, moment.ISO_8601);
-      const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
-      return {
-        valueSrc: "value",
-        valueType,
-        value,
-      };
-    } else if (methodName == "parse" && obj && obj[0].type == "!type" && obj[0].cls.at(-1) == "LocalTime") {
-      // time == T(java.time.LocalTime).parse('02:03:00')
-      if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
-        meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
-        return undefined;
-      }
-      const timeString = convertedArgs[0].value;
-      const valueType = "time";
-      const field = null; // todo
-      const widget = valueType;
-      const fieldConfig = getFieldConfig(config, field);
-      const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
-      const valueFormat = widgetConfig.valueFormat;
-      const dateVal = moment(timeString, "HH:mm:ss");
-      const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
-      return {
-        valueSrc: "value",
-        valueType,
-        value,
-      };
-    } else {
-      let funcKey;
-      //todo: support not only methods, but funcs
-      const funcKeys = (conv.funcs["."+methodName] || []).filter(k => 
-        true
-      );
-      if (funcKeys.length) {
-        funcKey = funcKeys[0];
-      }
-      if (funcKey) {
-        const funcConfig = getFuncConfig(config, funcKey);
-        let convertedObj;
-        const argKeys = Object.keys(funcConfig.args || {});
-        const parts = convertPath(obj, meta);
-        if (parts) {
-          const fullParts = [...groupFieldParts, ...parts];
-          const field = fullParts.join(fieldSeparator);
-          convertedObj = {
-            value: field,
-            valueSrc: "field",
-          };
-        }
-        const fullArgs = [
-          convertedObj,
-          ...convertedArgs,
-        ];
-        const funcArgs = fullArgs.reduce((acc, val, ind) => {
-          const argKey = argKeys[ind];
-          const argConfig = funcConfig.args[argKey];
-          let argVal = val;
-          if (argVal === undefined) {
-            argVal = argConfig.defaultValue;
-            if (argVal === undefined) {
-              meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
-              return undefined;
-            }
-          }
-          return {...acc, [argKey]: argVal};
-        }, {});
-    
-        return {
-          valueSrc: "func",
-          value: {
-            func: funcKey,
-            args: funcArgs
-          },
-          valueType: funcConfig.returnType,
-        };
-      } else {
-        meta.errors.push(`Unsupported method ${methodName}`);
-      }
-    }
+    return convertFunc(spel, conv, config, meta, parentSpel);
   } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
     return buildCaseValueConcat(spel, conv, config, meta);
   } else {
     meta.errors.push(`Can't convert arg of type ${spel.type}`);
+  }
+  return undefined;
+};
+
+const convertFunc = (spel, conv, config, meta, parentSpel) => {
+  const {fieldSeparator} = config.settings;
+  const groupFieldParts = parentSpel?._groupField ? [parentSpel?._groupField] : [];
+  const {obj, methodName, args, isVar} = spel;
+    
+  // todo: get from conv
+  const funcToOpMap = {
+    [".contains"]: "like",
+    [".startsWith"]: "starts_with",
+    [".endsWith"]: "ends_with",
+    ["$contains"]: "select_any_in",
+    [".equals"]: "multiselect_equals",
+    //[".containsAll"]: "multiselect_contains",
+    ["CollectionUtils.containsAny()"]: "multiselect_contains"
+  };
+
+  const convertedArgs = args.map(v => convertArg(v, conv, config, meta, {
+    ...spel,
+    _groupField: parentSpel?._groupField
+  }));
+  
+  //todo: make dynamic: use funcToOpMap and check obj type in basic config
+  if (methodName == "contains" && obj && obj[0].type == "list") {
+    const convertedObj = obj.map(v => convertArg(v, conv, config, meta, spel));
+    // {'yellow', 'green'}.?[true].contains(color)
+    if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
+      meta.errors.push(`Expected arg to method ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
+      return undefined;
+    }
+    const field = convertedArgs[0].value;
+    if (!( convertedObj.length == 1 && convertedObj[0].valueType == "multiselect" )) {
+      meta.errors.push(`Expected object of method ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
+      return undefined;
+    }
+    const opKey = funcToOpMap["$"+methodName];
+    const list = convertedObj[0];
+    return buildRule(config, meta, field, opKey, [list], spel);
+  } else if (obj && obj[0].type == "property" && funcToOpMap[obj[0].val + "." + methodName + "()"]) {
+    // CollectionUtils.containsAny(multicolor, {'yellow', 'green'})
+    const opKey = funcToOpMap[obj[0].val + "." + methodName + "()"];
+    const field = convertedArgs[0].value;
+    const args = convertedArgs.slice(1);
+    return buildRule(config, meta, field, opKey, args, spel);
+  } else if (funcToOpMap["."+methodName]) {
+    // user.login.startsWith('gg')
+    const opKey = funcToOpMap["."+methodName];
+    const parts = convertPath(obj, meta);
+    if (parts && convertedArgs.length == 1) {
+      const fullParts = [...groupFieldParts, ...parts];
+      const field = fullParts.join(fieldSeparator);
+      return buildRule(config, meta, field, opKey, convertedArgs, spel);
+    }
+  } else if (methodName == "parse" && obj && obj[0].type == "!new" && obj[0].cls.at(-1) == "SimpleDateFormat") {
+    // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
+    const args = obj[0].args.map(v => convertArg(v, conv, config, meta, {
+      ...spel,
+      _groupField: parentSpel?._groupField
+    }));
+    if (!( args.length == 1 && args[0].valueType == "text" )) {
+      meta.errors.push(`Expected args of ${obj[0].cls.join(".")}.${methodName} to be 1 string but got: ${JSON.stringify(args)}`);
+      return undefined;
+    }
+    if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
+      meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
+      return undefined;
+    }
+    const dateFormat = args[0].value;
+    const dateString = convertedArgs[0].value;
+    const valueType = dateFormat.includes(" ") ? "datetime" : "date";
+    const field = null; // todo
+    const widget = valueType;
+    const fieldConfig = getFieldConfig(config, field);
+    const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
+    const valueFormat = widgetConfig.valueFormat;
+    const dateVal = moment(dateString, moment.ISO_8601);
+    const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
+    return {
+      valueSrc: "value",
+      valueType,
+      value,
+    };
+  } else if (methodName == "parse" && obj && obj[0].type == "!type" && obj[0].cls.at(-1) == "LocalTime") {
+    // time == T(java.time.LocalTime).parse('02:03:00')
+    if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
+      meta.errors.push(`Expected args of ${obj[0].cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
+      return undefined;
+    }
+    const timeString = convertedArgs[0].value;
+    const valueType = "time";
+    const field = null; // todo
+    const widget = valueType;
+    const fieldConfig = getFieldConfig(config, field);
+    const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
+    const valueFormat = widgetConfig.valueFormat;
+    const dateVal = moment(timeString, "HH:mm:ss");
+    const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
+    return {
+      valueSrc: "value",
+      valueType,
+      value,
+    };
+  } else {
+    let funcKey;
+    //todo: support not only methods, but funcs
+    const funcKeys = (conv.funcs["."+methodName] || []).filter(k => 
+      true
+    );
+    if (funcKeys.length) {
+      funcKey = funcKeys[0];
+    }
+    if (funcKey) {
+      const funcConfig = getFuncConfig(config, funcKey);
+      let convertedObj;
+      const argKeys = Object.keys(funcConfig.args || {});
+      const parts = convertPath(obj, meta);
+      if (parts) {
+        const fullParts = [...groupFieldParts, ...parts];
+        const field = fullParts.join(fieldSeparator);
+        convertedObj = {
+          value: field,
+          valueSrc: "field",
+        };
+      }
+      const fullArgs = [
+        convertedObj,
+        ...convertedArgs,
+      ];
+      const funcArgs = fullArgs.reduce((acc, val, ind) => {
+        const argKey = argKeys[ind];
+        const argConfig = funcConfig.args[argKey];
+        let argVal = val;
+        if (argVal === undefined) {
+          argVal = argConfig.defaultValue;
+          if (argVal === undefined) {
+            meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
+            return undefined;
+          }
+        }
+        return {...acc, [argKey]: argVal};
+      }, {});
+  
+      return {
+        valueSrc: "func",
+        value: {
+          func: funcKey,
+          args: funcArgs
+        },
+        valueType: funcConfig.returnType,
+      };
+    } else {
+      meta.errors.push(`Unsupported method ${methodName}`);
+    }
   }
   return undefined;
 };
