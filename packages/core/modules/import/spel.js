@@ -319,8 +319,9 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     boolean: "boolean",
     null: "null" // should not be
   };
-  
+
   if (spel.type == "!new") {
+    // new java.util.Date()
     spel = {
       type: "!func",
       obj: [{
@@ -393,6 +394,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
   const {fieldSeparator} = config.settings;
   const groupFieldParts = parentSpel?._groupField ? [parentSpel?._groupField] : [];
   const {obj, methodName, args, isVar} = spel;
+  const ctorArgs = obj?.args || [];
     
   // todo: get from conv
   const funcToOpMap = {
@@ -406,6 +408,10 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
   };
 
   const convertedArgs = args.map(v => convertArg(v, conv, config, meta, {
+    ...spel,
+    _groupField: parentSpel?._groupField
+  }));
+  const convertedCtorArgs = ctorArgs.map(v => convertArg(v, conv, config, meta, {
     ...spel,
     _groupField: parentSpel?._groupField
   }));
@@ -492,12 +498,10 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
     };
   } else {
     let funcKey;
-    let hasObj = true;
     //todo: support not only methods, but funcs
     const funcSigns = [];
     funcSigns.push("."+methodName);
     if (obj && obj[0].type == "!new") {
-      hasObj = false;
       funcSigns.push(
         `new ${obj[0].cls.join(".")}${methodName ? "."+methodName : ""}`
       );
@@ -510,6 +514,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
     if (funcKey) {
       const funcConfig = getFuncConfig(config, funcKey);
       let convertedObj;
+      const hasObj = obj && obj[0].type != "!new"; // funcKey.startsWith(".")
       const argKeys = Object.keys(funcConfig.args || {});
       const parts = hasObj ? convertPath(obj, meta) : null;
       if (parts) {
@@ -522,6 +527,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
       }
       const fullArgs = [
         ...(convertedObj ? [convertedObj] : []),
+        ...convertedCtorArgs,
         ...convertedArgs,
       ];
       const funcArgs = fullArgs.reduce((acc, val, ind) => {
