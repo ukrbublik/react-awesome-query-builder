@@ -320,6 +320,17 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     null: "null" // should not be
   };
   
+  if (spel.type == "!new") {
+    spel = {
+      type: "!func",
+      obj: [{
+        ...spel,
+      }],
+      args: [],
+      methodName: null,
+    };
+  }
+
   const groupFieldParts = parentSpel?._groupField ? [parentSpel?._groupField] : [];
   if (spel.type == "compound") {
     // complex field
@@ -481,10 +492,18 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
     };
   } else {
     let funcKey;
+    let hasObj = true;
     //todo: support not only methods, but funcs
-    const funcKeys = (conv.funcs["."+methodName] || []).filter(k => 
-      true
-    );
+    const funcSigns = [];
+    funcSigns.push("."+methodName);
+    if (obj && obj[0].type == "!new") {
+      hasObj = false;
+      funcSigns.push(
+        `new ${obj[0].cls.join(".")}`
+      );
+    }
+
+    const funcKeys = funcSigns.reduce((arr, sign) => [...arr, ...(conv.funcs[sign] || [])], []);
     if (funcKeys.length) {
       funcKey = funcKeys[0];
     }
@@ -492,7 +511,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
       const funcConfig = getFuncConfig(config, funcKey);
       let convertedObj;
       const argKeys = Object.keys(funcConfig.args || {});
-      const parts = convertPath(obj, meta);
+      const parts = hasObj ? convertPath(obj, meta) : null;
       if (parts) {
         const fullParts = [...groupFieldParts, ...parts];
         const field = fullParts.join(fieldSeparator);
@@ -502,7 +521,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
         };
       }
       const fullArgs = [
-        convertedObj,
+        ...(convertedObj ? [convertedObj] : []),
         ...convertedArgs,
       ];
       const funcArgs = fullArgs.reduce((acc, val, ind) => {
