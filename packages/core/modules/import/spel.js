@@ -499,7 +499,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
     if (obj && obj[0].type == "!new") {
       hasObj = false;
       funcSigns.push(
-        `new ${obj[0].cls.join(".")}`
+        `new ${obj[0].cls.join(".")}${methodName ? "."+methodName : ""}`
       );
     }
 
@@ -526,16 +526,21 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
       ];
       const funcArgs = fullArgs.reduce((acc, val, ind) => {
         const argKey = argKeys[ind];
-        const argConfig = funcConfig.args[argKey];
-        let argVal = val;
-        if (argVal === undefined) {
-          argVal = argConfig.defaultValue;
+        if (argKey) {
+          const argConfig = funcConfig.args[argKey];
+          let argVal = val;
           if (argVal === undefined) {
-            meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
-            return undefined;
+            argVal = argConfig.defaultValue;
+            if (argVal === undefined) {
+              meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
+              return undefined;
+            }
           }
+          return {...acc, [argKey]: argVal};
+        } else {
+          // excess arg, ignore
+          return acc;
         }
-        return {...acc, [argKey]: argVal};
       }, {});
   
       return {
