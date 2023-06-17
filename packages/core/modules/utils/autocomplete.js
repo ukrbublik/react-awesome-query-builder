@@ -34,7 +34,7 @@ export const mergeListValues = (values, newValues, toStart = false) => {
 
 export const listValueToOption = (lv) => {
   if (lv == null) return null;
-  const {title, value, disabled, groupTitle, renderTitle} = lv;
+  const {title, label, value, disabled, groupTitle, renderTitle} = lv;
   let option = {title, value};
   if (disabled)
     option.disabled = disabled;
@@ -42,6 +42,8 @@ export const listValueToOption = (lv) => {
     option.groupTitle = groupTitle;
   if (renderTitle)
     option.renderTitle = renderTitle;
+  if (!title && label)
+    option.title = label
   return option;
 };
 
