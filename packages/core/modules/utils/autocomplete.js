@@ -44,7 +44,6 @@ export const listValueToOption = (lv) => {
     option.groupTitle = groupTitle;
   if (renderTitle)
     option.renderTitle = renderTitle;
-  
   return option;
 };
 
