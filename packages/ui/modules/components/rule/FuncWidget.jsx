@@ -190,7 +190,7 @@ export default class FuncWidget extends Component {
   renderFuncArgs = () => {
     const {funcDefinition, funcKey} = this.meta;
     if (!funcKey) return null;
-    const {args} = funcDefinition;
+    const {args} = funcDefinition || {};
     if (!args) return null;
 
     return (

@@ -349,7 +349,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
     const v = {[op]: vals};
 
     for (const [f, fc] of iterateFuncs(config)) {
-      if (fc.jsonLogicImport && fc.returnType == returnType) {
+      if (fc.jsonLogicImport && (fieldConfig ? fc.returnType == returnType : true)) {
         let parsed;
         try {
           parsed = fc.jsonLogicImport(v);

@@ -56,6 +56,16 @@ type JsonLogicFunction = Object;
 type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
+interface SpelRawValue {
+  type: string,
+  children?: SpelRawValue[],
+  val?: RuleValue,
+  methodName?: string,
+  args?: SpelRawValue[],
+  obj?: SpelRawValue[],
+  isVar?: boolean,
+  cls: string[],
+};
 
 export type ConfigContext = {
   utils: TypedMap<any>,
@@ -963,6 +973,7 @@ type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => st
 type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
+type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup {
@@ -985,6 +996,7 @@ export interface Func {
   // https://github.com/jwadhams/json-logic-js/issues/86
   jsonLogicIsMethod?: boolean,
   jsonLogicImport?: JsonLogicImportFunc | SerializedFunction,
+  spelImport?: SpelImportFunc | SerializedFunction,
   formatFunc?: FormatFunc | SerializedFunction,
   sqlFormatFunc?: SqlFormatFunc | SerializedFunction,
   mongoFormatFunc?: MongoFormatFunc | SerializedFunction,

@@ -203,7 +203,7 @@ export default class FuncSelect extends Component {
     let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
     let funcParts = Array.isArray(funcKey) ? funcKey : funcKey.split(fieldSeparator);
-    let label = funcOpts.label || last(funcParts);
+    let label = funcOpts?.label || last(funcParts);
     label = truncateString(label, maxLabelsLength);
     return label;
   }

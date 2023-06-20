@@ -11,6 +11,8 @@ import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";
 
+// https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
+
 export const spelFormat = (tree, config) => {
   return _spelFormat(tree, config, false);
 };
@@ -189,7 +191,11 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   const objectIsFirstArg = spelOp[0] == "$";
   const isMethod = spelOp[0] == "." || objectIsFirstArg;
   const isFunction = spelOp.substring(spelOp.length - 2) == "()";
-  const sop = isMethod ? spelOp.slice(1) : (isFunction ? spelOp.substring(0, spelOp.length - 2) : spelOp);
+  let sop = spelOp;
+  if (isMethod)
+    sop = sop.slice(1); // cut "." or "$"
+  if (isFunction)
+    sop = sop.substring(0, sop.length - 2); // cut "()"
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   if (cardinality == 0) {

@@ -10,6 +10,7 @@ const NOW = {
     now: {},
   },
   spelFunc: "new java.util.Date()",
+  //spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
   mongoFormatFunc: () => new Date(),
   formatFunc: () => "NOW",
@@ -103,7 +104,7 @@ const LOWER = {
   allowSelfNesting: true,
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
-  spelFunc: ".toLowerCase",
+  spelFunc: "${str}.toLowerCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
     toLowerCase: {}
@@ -123,7 +124,7 @@ const UPPER = {
   allowSelfNesting: true,
   mongoFunc: "$toUpper",
   jsonLogic: "toUpperCase",
-  spelFunc: ".toUpperCase",
+  spelFunc: "${str}.toUpperCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
     toUpperCase: {},
@@ -144,6 +145,16 @@ const LINEAR_REGRESSION = {
   formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
   sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
   spelFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
+  spelImport: (spel) => {
+    let coef, val, bias, a;
+    if (spel.type === "op-plus") {
+      [a, bias] = spel.children;
+      if (a.type === "op-multiply") {
+        [coef, val] = a.children;
+        return {coef, val, bias};
+      }
+    }
+  },
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
   jsonLogicImport: (v) => {
