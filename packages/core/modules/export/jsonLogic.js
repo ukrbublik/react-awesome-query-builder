@@ -1,4 +1,4 @@
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
 } from "../utils/configUtils";
@@ -262,7 +262,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         asyncListValues
       },
       //useful options: valueFormat for date/time
-      omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+      omit(fieldWidgetDef, widgetDefKeysToOmit),
     ];
     if (operator) {
       args.push(operator);
@@ -384,7 +384,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     formattedField,
     operator,
     formattedValue,
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(operatorDefinition, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
   ];

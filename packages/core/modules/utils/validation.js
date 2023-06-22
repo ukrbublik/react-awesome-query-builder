@@ -205,13 +205,26 @@ function validateRule (item, path, itemId, meta, c) {
   };
   const sanitized = !deepEqual(oldSerialized, newSerialized);
   //const isCompleted = !!operator && !isEmptyRuleProperties(properties.toObject(), config, false);
-  const isCompleted = isCompletedValue(field, fieldSrc, config)
-    && operator 
-    && value && value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
+  const isValueCompleted = value && 
+    value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
+  const isFieldCompleted = isCompletedValue(field, fieldSrc, config);
+  const isCompleted = isFieldCompleted && operator && isValueCompleted;
   if (sanitized)
     meta.sanitized = true;
-  if (!isCompleted && removeIncompleteRules)
+  if (!isCompleted && removeIncompleteRules) {
+    let reason = "Uncomplete rule";
+    if (!isFieldCompleted) {
+      reason = "Uncomplete LHS";
+    } else {
+      reason = "Uncomplete RHS";
+      if (newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
+        // eg. operator `starts_with` supports only valueSrc "value"
+        reason = `Bad value src ${newSerialized.valueSrc}`;
+      }
+    }
+    console.warn("[RAQB validate]", "Removing rule: ", oldSerialized, `Reason: ${reason}`);
     item = undefined;
+  }
   else if (sanitized)
     item = item.set("properties", properties);
 

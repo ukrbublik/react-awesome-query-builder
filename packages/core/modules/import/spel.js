@@ -23,6 +23,8 @@ const SpelPrimitiveClasses = {
 const ListValueType = "multiselect";
 const isFuncableProperty = (p) => ["length"].includes(p);
 
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
 export const loadFromSpel = (logicTree, config) => {
   return _loadFromSpel(logicTree, config, true);
 };
@@ -47,7 +49,7 @@ export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
   
   if (compiledExpression) {
     //logger.debug("compiledExpression:", compiledExpression);
-    convertedObj = convertCompiled(compiledExpression, meta);
+    convertedObj = postprocessCompiled(compiledExpression, meta);
     logger.debug("convertedObj:", convertedObj, meta);
 
     jsTree = convertToTree(convertedObj, conv, extendedConfig, meta);
@@ -68,9 +70,9 @@ export const _loadFromSpel = (spelStr, config, returnErrors = true) => {
   }
 };
 
-const convertCompiled = (expr, meta, parentExpr = null) => {
+const postprocessCompiled = (expr, meta, parentExpr = null) => {
   const type = expr.getType();
-  let children = expr.getChildren().map(child => convertCompiled(child, meta, expr));
+  let children = expr.getChildren().map(child => postprocessCompiled(child, meta, expr));
 
   // flatize OR/AND
   if (type == "op-or" || type == "op-and") {
@@ -204,12 +206,12 @@ const convertCompiled = (expr, meta, parentExpr = null) => {
   // convert method/function args
   if (typeof val === "object" && val !== null) {
     if (val.methodName || val.functionName) {
-      val.args = val.args.map(child => convertCompiled(child, meta, expr));
+      val.args = val.args.map(child => postprocessCompiled(child, meta, expr));
     }
   }
   // convert list
   if (type == "list") {
-    val = val.map(item => convertCompiled(item, meta, expr));
+    val = val.map(item => postprocessCompiled(item, meta, expr));
 
     // fix whole expression wrapped in `{}`
     if (!parentExpr && val.length == 1) {
@@ -311,14 +313,52 @@ const buildConv = (config) => {
 
   let funcs = {};
   for (const [funcPath, funcConfig] of iterateFuncs(config)) {
-    let fk;
-    if (typeof funcConfig.spelFunc == "string") {
-      fk = funcConfig.spelFunc.replace(/\${(\w+)}/g, (_, _k) => "?");
+    const fks = [];
+    const {spelFunc} = funcConfig;
+    if (typeof spelFunc == "string") {
+      const fk = spelFunc.replace(/\${(\w+)}/g, (_, _k) => "?");
+      fks.push(fk);
+      // todo: because of isOptional there can be 1+ keys
+      // eg. "${str}.toLowerCase(${aa}, ${bb?})" -> "?.toLowerCase(?, ?)" and "?.toLowerCase(?)"
     }
-    if (fk) {
+    for (const fk of fks) {
       if (!funcs[fk])
         funcs[fk] = [];
       funcs[fk].push(funcPath);
+    }
+  }
+
+  let valueFuncs = {};
+  for (let w in config.widgets) {
+    const widgetDef = config.widgets[w];
+    const {spelImportFuncs, type} = widgetDef;
+    if (spelImportFuncs) {
+      for (const fk of spelImportFuncs) {
+        const fs = fk.replace(/\${(\w+)}/g, (_, k) => "?");
+        const argsOrder = [...fk.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
+        if (!valueFuncs[fs])
+          valueFuncs[fs] = [];
+        valueFuncs[fs].push({
+          w,
+          argsOrder
+        });
+      }
+    }
+  }
+
+  let opFuncs = {};
+  for (let op in config.operators) {
+    const opDef = config.operators[op];
+    const {spelOp} = opDef;
+    if (spelOp?.includes("${0}")) {
+      const fs = spelOp.replace(/\${(\w+)}/g, (_, k) => "?");
+      const argsOrder = [...spelOp.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
+      if (!opFuncs[fs])
+        opFuncs[fs] = [];
+      opFuncs[fs].push({
+        op,
+        argsOrder
+      });
     }
   }
 
@@ -326,7 +366,73 @@ const buildConv = (config) => {
     operators,
     conjunctions,
     funcs,
+    valueFuncs,
+    opFuncs,
   };
+};
+
+const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
+  if (!spel) return undefined;
+
+  let res, canParseAsArg = true;
+  if (spel.type.indexOf("op-") === 0) {
+    res = convertOp(spel, conv, config, meta, parentSpel);
+  } else if (spel.type == "!aggr") {
+    const groupFieldValue = convertToTree(spel.source, conv, config, meta, {
+      ...spel, 
+      _groupField: parentSpel?._groupField
+    });
+    let groupFilter = convertToTree(spel.filter, conv, config, meta, {
+      ...spel, 
+      _groupField: groupFieldValue?.value
+    });
+    if (groupFilter?.type == "rule") {
+      groupFilter = wrapInDefaultConj(groupFilter, config, spel.filter.not);
+    }
+    res = {
+      groupFilter,
+      groupFieldValue
+    };
+    if (!parentSpel) {
+      // !aggr can't be in root, it should be compared with something
+      res = undefined;
+      meta.errors.push("Unexpected !aggr in root");
+      canParseAsArg = false;
+    }
+  } else if (spel.type == "ternary") {
+    const children1 = {};
+    spel.val.forEach(v => {
+      const [cond, val] = v;
+      const caseI = buildCase(cond, val, conv, config, meta, spel);
+      if (caseI) {
+        children1[caseI.id] = caseI;
+      }
+    });
+    res = {
+      type: "switch_group",
+      id: uuid(),
+      children1,
+      properties: {}
+    };
+  }
+
+  if (!res && canParseAsArg) {
+    res = convertArg(spel, conv, config, meta, parentSpel);
+  }
+
+  if (res && !res.type && !parentSpel) {
+    // res is not a rule, it's value at root
+    // try to parse whole `"1"` as ternary
+    const sw = buildSimpleSwitch(spel, conv, config, meta);
+    if (sw) {
+      res = sw;
+    } else {
+      res = undefined;
+      meta.errors.push(`Can't convert rule of type ${spel.type}, it looks like var/literal`);
+    }
+  }
+  
+  return res;
 };
 
 const convertOp = (spel, conv, config, meta, parentSpel = null) => {
@@ -416,15 +522,15 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
     let convertedArgs = vals.slice(1);
     const groupField = fieldObj?.groupFieldValue?.value;
     const opArg = convertedArgs?.[0];
-
     
     let opKey = opKeys[0];
     if (opKeys.length > 1) {
-      logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}`);
-
-      //todo: it's naive
+      const valueType = vals[0]?.valueType || vals[1]?.valueType;
+      //todo: it's naive, use valueType
       const field = fieldObj?.value;
       const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
+      logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}.`,
+        'widgets:', widgets, 'vals:', vals, 'valueType=', valueType);
       
       if (op == "eq" || op == "ne") {
         const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
@@ -498,69 +604,6 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   return res;
 };
 
-const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
-  if (!spel) return undefined;
-
-  let res, canParseAsArg = true;
-  if (spel.type.indexOf("op-") == 0) {
-    res = convertOp(spel, conv, config, meta, parentSpel);
-  } else if (spel.type == "!aggr") {
-    const groupFieldValue = convertToTree(spel.source, conv, config, meta, {
-      ...spel, 
-      _groupField: parentSpel?._groupField
-    });
-    let groupFilter = convertToTree(spel.filter, conv, config, meta, {
-      ...spel, 
-      _groupField: groupFieldValue?.value
-    });
-    if (groupFilter?.type == "rule") {
-      groupFilter = wrapInDefaultConj(groupFilter, config, spel.filter.not);
-    }
-    res = {
-      groupFilter,
-      groupFieldValue
-    };
-    if (!parentSpel) {
-      // !aggr can't be in root, it should be compared with something
-      res = undefined;
-      meta.errors.push("Unexpected !aggr in root");
-      canParseAsArg = false;
-    }
-  } else if (spel.type == "ternary") {
-    const children1 = {};
-    spel.val.forEach(v => {
-      const [cond, val] = v;
-      const caseI = buildCase(cond, val, conv, config, meta, spel);
-      if (caseI) {
-        children1[caseI.id] = caseI;
-      }
-    });
-    res = {
-      type: "switch_group",
-      id: uuid(),
-      children1,
-      properties: {}
-    };
-  }
-
-  if (!res && canParseAsArg) {
-    res = convertArg(spel, conv, config, meta, parentSpel);
-  }
-
-  if (res && !res.type && !parentSpel) {
-    // res is not a rule, it's value at root
-    // try to parse whole `"1"` as ternary
-    const sw = buildSimpleSwitch(spel, conv, config, meta);
-    if (sw) {
-      res = sw;
-    } else {
-      res = undefined;
-      meta.errors.push(`Can't convert rule of type ${spel.type}, it looks like var/literal`);
-    }
-  }
-  
-  return res;
-};
 
 const convertPath = (parts, meta = {}, expectingField = false) => {
   let isError = false;
@@ -581,31 +624,37 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   const {fieldSeparator} = config.settings;
 
   const groupFieldParts = parentSpel?._groupField ? [parentSpel?._groupField] : [];
-  if (spel.type == "compound") {
+  if (spel.type == "variable" || spel.type == "property") {
+    // normal field
+    const fullParts = [...groupFieldParts, spel.val];
+    let field = fullParts.join(fieldSeparator);
+    field = normalizeField(config, field);
+    const fieldConfig = getFieldConfig(config, field);
+    const isVariable = spel.type == "variable";
+    return {
+      valueSrc: "field",
+      valueType: fieldConfig?.type,
+      isVariable,
+      value: field,
+    };
+  } else if (spel.type == "compound") {
     // complex field
     const parts = convertPath(spel.children, meta);
     if (parts) {
       const fullParts = [...groupFieldParts, ...parts];
-      // todo: normalizeField
+      let field = fullParts.join(fieldSeparator);
+      field = normalizeField(config, field);
+      const fieldConfig = getFieldConfig(config, field);
       const isVariable = spel.children?.[0]?.type == "variable";
       return {
         valueSrc: "field",
-        //valueType: todo
+        valueType: fieldConfig?.type,
         isVariable,
-        value: fullParts.join(fieldSeparator),
+        value: field,
       };
+    } else {
+      // it's not complex field
     }
-  } else if (spel.type == "variable" || spel.type == "property") {
-    // normal field
-    const fullParts = [...groupFieldParts, spel.val];
-    // todo: normalizeField
-    const isVariable = spel.type == "variable";
-    return {
-      valueSrc: "field",
-      //valueType: todo
-      isVariable,
-      value: fullParts.join(fieldSeparator),
-    };
   } else if (SpelPrimitiveTypes[spel.type]) {
     let value = spel.val;
     const valueType = SpelPrimitiveTypes[spel.type];
@@ -654,7 +703,7 @@ const buildFuncSignatures = (spel) => {
     {s: "", params: [], objs: []}
   ];
   _buildFuncSignatures(spel, brns);
-  return brns.map(({s, params}) => ({s, params})).reverse();
+  return brns.map(({s, params}) => ({s, params})).reverse().filter(({s}) => s !== "" && s !== "?");
 }
 
 // a.toLower().toUpper()
@@ -733,26 +782,29 @@ const _buildFuncSignatures = (spel, brns) => {
 };
 
 const convertFunc = (spel, conv, config, meta, parentSpel) => {
-  let maybeValue = convertFuncToValue(spel, conv, config, meta, parentSpel);
-  if (maybeValue !== undefined)
-    return maybeValue;
-
-  let maybeOp = convertFuncToOp(spel, conv, config, meta, parentSpel);
-  if (maybeOp !== undefined)
-    return maybeOp;
-
+  // Build signatures
   const convertFuncArg = v => convertArg(v, conv, config, meta, {
     ...spel,
     _groupField: parentSpel?._groupField
   });
-
-  const {methodName} = spel;
+  const fsigns = buildFuncSignatures(spel);
+  const firstSign = fsigns?.[0]?.s;
+  if (fsigns.length)
+    logger.debug("Signatures for ", spel, ":", firstSign, fsigns);
+  
+  // 1. Try to parse as value
+  let maybeValue = convertFuncToValue(spel, conv, config, meta, parentSpel, fsigns, convertFuncArg);
+  if (maybeValue !== undefined)
+    return maybeValue;
+  
+  // 2. Try to parse as op
+  let maybeOp = convertFuncToOp(spel, conv, config, meta, parentSpel, fsigns, convertFuncArg);
+  if (maybeOp !== undefined)
+    return maybeOp;
+  
+  // 3. Try to parse as func
   let funcKey, funcConfig, argsObj;
   // try func signature matching
-  const fsigns = buildFuncSignatures(spel);
-  const firstSign = fsigns[0].s;
-  if (firstSign !== "?")
-    logger.debug("Signatures for ", spel, fsigns, firstSign);
   for (const {s, params} of fsigns) {
     const funcKeys = conv.funcs[s];
     if (funcKeys) {
@@ -821,134 +873,85 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
     };
   }
 
+  const {methodName} = spel;
   if (methodName)
-    meta.errors.push(`Unsupported method ${methodName}, signature ${firstSign}`);
+    meta.errors.push(`Signature ${firstSign} - failed to convert`);
   
   return undefined;
 };
 
 
-const convertFuncToValue = (spel, conv, config, meta, parentSpel) => {
-  const {obj, methodName, args, isVar} = spel;
-  const ctorArgs = obj?.args;
-  
-  const convertFuncArg = v => convertArg(v, conv, config, meta, {
-    ...spel,
-    _groupField: parentSpel?._groupField
-  });
-  const convertArgs = () => args?.map(convertFuncArg);
-  const convertCtorArgs = () => ctorArgs?.map(convertFuncArg);
+const convertFuncToValue = (spel, conv, config, meta, parentSpel, fsigns, convertFuncArg) => {
+  let errs, foundSign, foundWidget;
+  for (const {s, params} of fsigns) {
+    const found = conv.valueFuncs[s] || [];
+    for (const {w, argsOrder} of found) {
+      const argsArr = params.map(convertFuncArg);
+      foundWidget = w;
+      foundSign = s;
+      errs = [];
+      const widgetDef = config.widgets[w];
+      const {spelImportValue, type} = widgetDef;
+      const argsObj = Object.fromEntries(
+        argsOrder.map((argKey, i) => [argKey, argsArr[i]])
+      );
+      for (const k in argsObj) {
+        if (!["value"].includes(argsObj[k].valueSrc)) {
+          errs.push(`${k} has unsupported value src ${argsObj[k].valueSrc}`);
+        }
+      }
+      let value = argsObj.v.value;
+      if (spelImportValue && !errs.length) {
+        [value, errs] = spelImportValue.call(config.ctx, argsObj.v, widgetDef, argsObj);
+        if (errs && !Array.isArray(errs))
+          errs = [errs];
+      }
+      if (!errs.length) {
+        return {
+          valueSrc: "value",
+          valueType: type,
+          value,
+        };
+      }
+    }
+  }
 
-  if (methodName == "parse" && obj && obj.type == "!new" && obj.cls.at(-1) == "SimpleDateFormat") {
-    // new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')
-    const convertedArgs = convertArgs();
-    const convertedCtorArgs = convertCtorArgs();
-    if (!( convertedCtorArgs.length == 1 && convertedCtorArgs[0].valueType == "text" )) {
-      meta.errors.push(`Expected args of ${obj.cls.join(".")}.${methodName} to be 1 string but got: ${JSON.stringify(convertedCtorArgs)}`);
-      return undefined;
-    }
-    if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
-      meta.errors.push(`Expected args of ${obj.cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
-      return undefined;
-    }
-    const dateFormat = convertedCtorArgs[0].value;
-    const dateString = convertedArgs[0].value;
-    const valueType = dateFormat.includes(" ") ? "datetime" : "date";
-    const field = null; // todo
-    const widget = valueType;
-    const fieldConfig = getFieldConfig(config, field);
-    const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
-    const valueFormat = widgetConfig.valueFormat;
-    const dateVal = moment(dateString, moment.ISO_8601);
-    const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
-    return {
-      valueSrc: "value",
-      valueType,
-      value,
-    };
-  } else if (methodName == "parse" && obj && obj.type == "!type" && obj.cls.at(-1) == "LocalTime") {
-    // time == T(java.time.LocalTime).parse('02:03:00')
-    const convertedArgs = convertArgs();
-    if (!( convertedArgs.length == 1 && convertedArgs[0].valueType == "text" )) {
-      meta.errors.push(`Expected args of ${obj.cls.join(".")} to be 1 string but got: ${JSON.stringify(convertedArgs)}`);
-      return undefined;
-    }
-    const timeString = convertedArgs[0].value;
-    const valueType = "time";
-    const field = null; // todo
-    const widget = valueType;
-    const fieldConfig = getFieldConfig(config, field);
-    const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
-    const valueFormat = widgetConfig.valueFormat;
-    const dateVal = moment(timeString, "HH:mm:ss");
-    const value = dateVal.isValid() ? dateVal.format(valueFormat) : undefined;
-    return {
-      valueSrc: "value",
-      valueType,
-      value,
-    };
+  if (foundWidget && errs.length) {
+    meta.errors.push(`Signature ${foundSign} - looks like convertable to ${foundWidget}, but: ${errs.join("; ")}`);
   }
 
   return undefined;
 };
 
-const convertFuncToOp = (spel, conv, config, meta, parentSpel) => {
-  const {fieldSeparator} = config.settings;
-  const groupFieldParts = parentSpel?._groupField ? [parentSpel?._groupField] : [];
-  const {obj, methodName, args, isVar} = spel;
-    
-  // todo: get from conv
-  const funcToOpMap = {
-    [".contains"]: "like",
-    [".startsWith"]: "starts_with",
-    [".endsWith"]: "ends_with",
-    ["$contains"]: "select_any_in",
-    [".equals"]: "multiselect_equals",
-    //[".containsAll"]: "multiselect_contains",
-    ["CollectionUtils.containsAny()"]: "multiselect_contains"
-  };
+const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFuncArg) => {
+  let errs, opKey, foundSign;
+  for (const {s, params} of fsigns) {
+    const found = conv.opFuncs[s] || [];
+    for (const {op, argsOrder} of found) {
+      const argsArr = params.map(convertFuncArg);
+      opKey = op;
+      foundSign = s;
+      errs = [];
+      const opDef = config.operators[op];
+      const {spelOp, valueTypes} = opDef;
+      const argsObj = Object.fromEntries(
+        argsOrder.map((argKey, i) => [argKey, argsArr[i]])
+      );
+      const field = argsObj["0"];
+      const convertedArgs = Object.keys(argsObj).filter(k => parseInt(k) > 0).map(k => argsObj[k]);
+      
+      const valueType = argsArr.find(({valueSrc}) => valueSrc === "value")?.valueType;
+      if (valueTypes && valueType && !valueTypes.includes(valueType)) {
+        errs.push(`Op supports types ${valueTypes}, but got ${valueType}`);
+      }
+      if (!errs.length) {
+        return buildRule(config, meta, field, opKey, convertedArgs, spel);
+      }
+    }
+  }
 
-  const convertFuncArg = v => convertArg(v, conv, config, meta, {
-    ...spel,
-    _groupField: parentSpel?._groupField
-  });
-  const convertArgs = () => args?.map(convertFuncArg);
-
-  //todo: make dynamic: use funcToOpMap and check obj type in basic config
-  if (methodName == "contains" && obj && obj.type == "list") {
-    const convertedArgs = convertArgs();
-    const convertedObj = convertFuncArg(obj);
-    // {'yellow', 'green'}.?[true].contains(color)
-    if (!( convertedArgs.length == 1 && convertedArgs[0].valueSrc == "field" )) {
-      meta.errors.push(`Expected arg to method ${methodName} to be field but got: ${JSON.stringify(convertedArgs)}`);
-      return undefined;
-    }
-    const field = convertedArgs[0].value;
-    if (convertedObj?.valueType != ListValueType) {
-      meta.errors.push(`Expected object of method ${methodName} to be inline list but got: ${JSON.stringify(convertedObj)}`);
-      return undefined;
-    }
-    const opKey = funcToOpMap["$"+methodName];
-    return buildRule(config, meta, field, opKey, [convertedObj], spel);
-  } else if (obj && obj.type == "property" && funcToOpMap[obj.val + "." + methodName + "()"]) {
-    //todo: !!!!!! wrong
-    // CollectionUtils.containsAny(multicolor, {'yellow', 'green'})
-    const convertedArgs = convertArgs();
-    const opKey = funcToOpMap[obj.val + "." + methodName + "()"];
-    const field = convertedArgs[0].value;
-    const args = convertedArgs.slice(1);
-    return buildRule(config, meta, field, opKey, args, spel);
-  } else if (funcToOpMap["."+methodName]) {
-    // user.login.startsWith('gg')
-    //todo: use convertArg(obj) should return field
-    const convertedArgs = convertArgs();
-    const opKey = funcToOpMap["."+methodName];
-    const parts = convertPath(obj.children || [], meta);
-    if (parts && convertedArgs.length == 1) {
-      const fullParts = [...groupFieldParts, ...parts];
-      const field = fullParts.join(fieldSeparator);
-      return buildRule(config, meta, field, opKey, convertedArgs, spel);
-    }
+  if (opKey && errs.length) {
+    meta.errors.push(`Signature ${foundSign} - looks like convertable to ${opKey}, but: ${errs.join("; ")}`);
   }
 
   return undefined;
@@ -957,6 +960,12 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel) => {
 const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
   if (convertedArgs.filter(v => v === undefined).length) {
     return undefined;
+  }
+  let fieldSrc = field?.func ? "func" : "field";
+  if (isObject(field) && field.valueSrc) {
+    // if comed from convertFuncToOp()
+    field = field.value;
+    fieldSrc = field.valueSrc;
   }
   const fieldConfig = getFieldConfig(config, field);
   if (!fieldConfig) {
@@ -976,7 +985,6 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
     }
   }
 
-  const fieldSrc = field?.func ? "func" : "field";
   const widget = getWidgetForFieldOp(config, field, opKey);
   const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
   const asyncListValuesArr = convertedArgs.map(v => v.asyncListValues).filter(v => v != undefined);

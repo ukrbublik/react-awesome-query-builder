@@ -462,7 +462,7 @@ export interface FieldProps<C = Config> {
 // Widgets
 /////////////////
 
-type SpelImportValue = (val: any) => [any, string[]];
+type SpelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
 
 type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
@@ -483,6 +483,7 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   formatValue?: FormatValue | SerializedFunction;
   sqlFormatValue?: SqlFormatValue | SerializedFunction;
   spelFormatValue?: SpelFormatValue | SerializedFunction;
+  spelImportFuncs?: string[];
   spelImportValue?: SpelImportValue | SerializedFunction;
   mongoFormatValue?: MongoFormatValue | SerializedFunction;
   elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
@@ -649,6 +650,7 @@ export interface BaseOperator {
   _jsonLogicIsRevArgs?: boolean,
   elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction,
   valueSources?: Array<ValueSource>,
+  valueTypes?: Array<string>,
 }
 export interface UnaryOperator extends BaseOperator {
   //cardinality: 0,

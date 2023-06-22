@@ -2,6 +2,7 @@ import React from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import omit from "lodash/omit";
 const { getTitleInListValues } = Utils.ListUtils;
+const { _widgetDefKeysToOmit } = Utils.ConfigUtils;
 
 export default ({
   delta, isFuncArg, valueSrc,
@@ -54,7 +55,8 @@ export default ({
     asyncListValues: asyncListValues,
     id, groupId
   }, [
-    "formatValue", "mongoFormatValue", "spelFormatValue", "sqlFormatValue", "toJS"
+    ..._widgetDefKeysToOmit,
+    "toJS"
   ]);
 
   if (widget == "field") {

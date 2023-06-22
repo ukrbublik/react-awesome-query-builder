@@ -66,7 +66,7 @@ const compileMetaWidget = {
   formatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "isForDisplay", "op", "opDef", "rightFieldDef"] },
   sqlFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
   spelFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
-  spelImportValue: { type: "f", args: ["val"] },
+  spelImportValue: { type: "f", args: ["val", "wgtDef", "args"] },
   mongoFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
   elasticSearchFormatValue: { type: "f", args: ["queryType", "val", "op", "field", "config"] },
   jsonLogic: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },

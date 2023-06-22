@@ -147,7 +147,8 @@ const operators = {
     labelForFormat: "Contains",
     reversedOp: "not_like",
     sqlOp: "LIKE",
-    spelOp: ".contains",
+    spelOp: "${0}.contains(${1})",
+    valueTypes: ["text"],
     spelOps: ["matches", ".contains"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
     //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
@@ -169,7 +170,7 @@ const operators = {
     label: "Starts with",
     labelForFormat: "Starts with",
     sqlOp: "LIKE",
-    spelOp: ".startsWith",
+    spelOp: "${0}.startsWith(${1})",
     spelOps: ["matches", ".startsWith"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? "^" + this.utils.escapeRegExp(v) : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
@@ -179,7 +180,7 @@ const operators = {
     label: "Ends with",
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
-    spelOp: ".endsWith",
+    spelOp: "${0}.endsWith(${1})",
     spelOps: ["matches", ".endsWith"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) + "$" : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
@@ -377,7 +378,8 @@ const operators = {
         return `${field} IN (${values.join(", ")})`;
       } else return undefined; // not supported
     },
-    spelOp: "$contains", // tip: $ means first arg is object
+    valueTypes: ["multiselect"],
+    spelOp: "${1}.contains(${0})",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
     reversedOp: "select_not_any_in",
     jsonLogic: "in",
@@ -417,8 +419,8 @@ const operators = {
     jsonLogic: (field, op, vals) => ({
       "some": [ field, {"in": [{"var": ""}, vals]} ]
     }),
-    //spelOp: ".containsAll",
-    spelOp: "CollectionUtils.containsAny()",
+    //spelOp: "${0}.containsAll(${1})",
+    spelOp: "T(CollectionUtils).containsAny(${0}, ${1})",
     elasticSearchQueryType: "term",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$in", v => v, false, ...args); },
   },
@@ -452,7 +454,7 @@ const operators = {
       else
         return undefined; //not supported
     },
-    spelOp: ".equals",
+    spelOp: "${0}.equals(${1})",
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$eq", v => v, false, ...args); },
     reversedOp: "multiselect_not_equals",
     jsonLogic2: "all-in",
@@ -712,6 +714,21 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return `new java.text.SimpleDateFormat('yyyy-MM-dd').parse('${dateVal.format("YYYY-MM-DD")}')`;
     },
+    spelImportFuncs: [
+      "new java.text.SimpleDateFormat(${fmt}).parse(${v})"
+    ],
+    spelImportValue: function (val, wgtDef, args) {
+      if (!wgtDef)
+        return [undefined, "No widget def to get value format"];
+      if (args?.fmt?.value?.includes?.(" ") || args.fmt?.value?.toLowerCase?.().includes("hh:mm"))
+        return [undefined, `Invalid date format ${JSON.stringify(args.fmt)}`];
+      const dateVal = this.utils.moment(val.value, this.utils.moment.ISO_8601);
+      if (dateVal.isValid()) {
+        return [dateVal.format(wgtDef?.valueFormat), []];
+      } else {
+        return [undefined, "Invalid date"];
+      }
+    },
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();
     },
@@ -749,6 +766,22 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return `T(java.time.LocalTime).parse('${dateVal.format("HH:mm:ss")}')`;
       //return `new java.text.SimpleDateFormat('HH:mm:ss').parse('${dateVal.format("HH:mm:ss")}')`;
+    },
+    spelImportFuncs: [
+      "T(java.time.LocalTime).parse(${v})",
+      "new java.text.SimpleDateFormat(${fmt}).parse(${v})"
+    ],
+    spelImportValue: function (val, wgtDef, args) {
+      if (!wgtDef)
+        return [undefined, "No widget def to get value format"];
+      if (args?.fmt && (!args.fmt?.value?.toLowerCase?.().includes("hh:mm") || args.fmt?.value?.includes(" ")))
+        return [undefined, `Invalid time format ${JSON.stringify(args.fmt)}`];
+      const dateVal = this.utils.moment(val.value, "HH:mm:ss");
+      if (dateVal.isValid()) {
+        return [dateVal.format(wgtDef?.valueFormat), []];
+      } else {
+        return [undefined, "Invalid date"];
+      }
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
       // return seconds of day
@@ -804,6 +837,21 @@ const widgets = {
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return `new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').parse('${dateVal.format("YYYY-MM-DD HH:mm:ss")}')`;
+    },
+    spelImportFuncs: [
+      "new java.text.SimpleDateFormat(${fmt}).parse(${v})"
+    ],
+    spelImportValue: function (val, wgtDef, args) {
+      if (!wgtDef)
+        return [undefined, "No widget def to get value format"];
+      if (!args?.fmt?.value?.includes?.(" "))
+        return [undefined, `Invalid datetime format ${JSON.stringify(args.fmt)}`];
+      const dateVal = this.utils.moment(val.value, this.utils.moment.ISO_8601);
+      if (dateVal.isValid()) {
+        return [dateVal.format(wgtDef?.valueFormat), []];
+      } else {
+        return [undefined, "Invalid date"];
+      }
     },
     jsonLogic: function (val, fieldDef, wgtDef) {
       return this.utils.moment(val, wgtDef.valueFormat).toDate();

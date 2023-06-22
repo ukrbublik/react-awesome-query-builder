@@ -6,7 +6,7 @@ import {
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {SqlString} from "../utils/export";
@@ -172,7 +172,7 @@ const formatRule = (item, config, meta) => {
     formattedValue,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(opDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(opDef, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
   ];
@@ -208,7 +208,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
       ];
       if (operator) {
         args.push(operator);

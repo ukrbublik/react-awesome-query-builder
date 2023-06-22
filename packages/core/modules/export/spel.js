@@ -6,7 +6,7 @@ import {
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, logger} from "../utils/stuff";
+import {defaultValue, logger, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";
@@ -188,33 +188,22 @@ const formatGroup = (item, config, meta, parentField = null) => {
 const buildFnToFormatOp = (operator, operatorDefinition) => {
   const spelOp = operatorDefinition.spelOp;
   if (!spelOp) return undefined;
-  const objectIsFirstArg = spelOp[0] == "$";
-  const isMethod = spelOp[0] == "." || objectIsFirstArg;
-  const isFunction = spelOp.substring(spelOp.length - 2) == "()";
+  const isSign = spelOp.includes("${0}");
   let sop = spelOp;
-  if (isMethod)
-    sop = sop.slice(1); // cut "." or "$"
-  if (isFunction)
-    sop = sop.substring(0, sop.length - 2); // cut "()"
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  if (cardinality == 0) {
+  if (isSign) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (isMethod)
-        return `${field}.${sop}()`;
-      else
-        return `${field} ${sop}`;
+      return spelOp.replace(/\${(\w+)}/g, (_, k) => (k == 0 ? field : (cardinality > 1 ? values[k-1] : values)));
+    };
+  } else if (cardinality == 0) {
+    // should not be
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return `${field} ${sop}`;
     };
   } else if (cardinality == 1) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (objectIsFirstArg)
-        return `${values}.${sop}(${field})`;
-      else if (isFunction)
-        return `${sop}(${field}, ${values})`;
-      else if (isMethod)
-        return `${field}.${sop}(${values})`;
-      else
-        return `${field} ${sop} ${values}`;
+      return `${field} ${sop} ${values}`;
     };
   }
   return fn;
@@ -240,7 +229,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
     formattedValue,
     valueSrc,
     valueType,
-    omit(opDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(opDef, opDefKeysToOmit),
     operatorOptions,
     fieldDef,
   ];
@@ -383,7 +372,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
       ];
       if (operator) {
         args.push(operator);
@@ -436,7 +425,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.spelFunc || funcKey;
+  const spelFunc = funcConfig.spelFunc;
 
   let formattedArgs = {};
   for (const argKey in funcConfig.args) {
@@ -466,13 +455,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     ];
     ret = fn.call(config.ctx, ...args);
   } else {
-    const args = Object.entries(formattedArgs).map(([k, v]) => v);
-    if (funcName[0] == "." && args.length) {
-      const [obj, ...params] = args;
-      ret = `${obj}${funcName}(${params.join(", ")})`;
-    } else {
-      ret = `${funcName}(${args.join(", ")})`;
-    }
+    ret = spelFunc.replace(/\${(\w+)}/g, (_, argKey) => formattedArgs[argKey]);
   }
   return ret;
 };

@@ -4,7 +4,7 @@ import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart, logger} from "./stuff";
+import {mergeArraysSmart, logger, widgetDefKeysToOmit} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 
@@ -456,3 +456,5 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
   return mergedConfig;
 };
+
+export const _widgetDefKeysToOmit = widgetDefKeysToOmit;

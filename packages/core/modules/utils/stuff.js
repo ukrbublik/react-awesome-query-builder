@@ -1,6 +1,14 @@
 import Immutable, { Map } from "immutable";
 import omit from "lodash/omit";
 
+export const widgetDefKeysToOmit = [
+  "formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue", "spelImportFuncs", "spelImportValue"
+];
+
+export const opDefKeysToOmit = [
+  "formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"
+];
+
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 // };
