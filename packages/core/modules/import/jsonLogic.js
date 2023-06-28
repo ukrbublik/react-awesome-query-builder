@@ -141,10 +141,10 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
 
 const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined)
-    val = fieldConfig.defaultValue;
+    val = fieldConfig?.defaultValue;
   if (val === undefined) return undefined;
-  const widgetConfig = config.widgets[widget || fieldConfig.mainWidget];
-  const fieldType = fieldConfig.type;
+  const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
+  const fieldType = fieldConfig?.type;
 
   if (!widgetConfig) {
     meta.errors.push(`No widget for type ${fieldType}`);
@@ -378,7 +378,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
       const argConfig = funcConfig.args[argKey];
       let argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
       if (argVal === undefined) {
-        argVal = argConfig.defaultValue;
+        argVal = argConfig?.defaultValue;
         if (argVal === undefined) {
           meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
           return undefined;
@@ -456,7 +456,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
-          let parentFieldParts = getFieldParts(parentField, config) || [];
+          let parentFieldParts = getFieldParts(parentField, config);
           const groupPath = getFieldParts(groupField, config);
           const isInParent = shallowEqual(parentFieldParts, groupPath.slice(0, parentFieldParts.length));
           if (!isInParent)

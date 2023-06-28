@@ -153,7 +153,7 @@ describe("query with func", () => {
       "query": "datetime == NOW + 2 day",
       "queryHuman": "Datetime = NOW + 2 day",
       "sql": "datetime = DATE_ADD(NOW(), INTERVAL 2 day)",
-      "spel": "datetime == RELATIVE_DATETIME(new java.util.Date()(), 'plus', 2, 'day')",
+      "spel": "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(2)) == 0",
       "logic": {
         "and": [
           {

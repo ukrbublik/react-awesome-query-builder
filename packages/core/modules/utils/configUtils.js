@@ -381,7 +381,7 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
 
 export const getFieldParts = (field, config = null) => {
   if (!field)
-    return null;
+    return [];
   if (Array.isArray(field))
     return field;
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
@@ -391,7 +391,7 @@ export const getFieldParts = (field, config = null) => {
   if (field?.get?.("func")) { // immutable
     return field?.get?.("func").split(fieldSeparator);
   }
-  return field.split(fieldSeparator);
+  return field?.split?.(fieldSeparator) || [];
 };
 
 export const getFieldPath = (field, config, onlyKeys = false) => {
@@ -421,21 +421,21 @@ export const getFieldConfig = (config, field, fieldSrc) => {
       // }
       return field;
     }
-    if (field.func && field.arg) {
-      // it's func arg
-      return getFuncArgConfig(config, field.func, field.arg);
-    }
-    if (field.func && field.args) {
-      // it's field value func
-      return getFuncConfig(config, field.func);
+    if (field.func) {
+      if (field.func && field.arg) {
+        // it's func arg
+        return getFuncArgConfig(config, field.func, field.arg);
+      } else {
+        // it's field value func
+        return getFuncConfig(config, field.func);
+      }
     }
   }
   if (field?.get?.("func")) { // immutable
     if (field?.get("arg")) {
       // it's func arg
       return getFuncArgConfig(config, field.get("func"), field.get("arg"));
-    }
-    if (field?.get("args")) {
+    } else {
       // it's field value func
       return getFuncConfig(config, field.get("func"));
     }
@@ -444,7 +444,7 @@ export const getFieldConfig = (config, field, fieldSrc) => {
     if (field?.get?.("func"))
       return getFuncConfig(config, field?.get?.("func"));
     else
-      throw new Error(`Unknown func ${field}`);
+      throw new Error(`Unknown func ${field?.toJS?.() ?? JSON.stringify(field)}`);
   }
 
   const fieldConfig = getFieldRawConfig(config, field);

@@ -501,7 +501,7 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
         _groupField: parentSpel?._groupField
       })
     );
-    if (newChildren.length >= 2 && newChildren[0].type == "!compare") {
+    if (newChildren.length >= 2 && newChildren?.[0]?.type == "!compare") {
       newChildren = newChildren[0].children;
     }
     return newChildren;
@@ -865,7 +865,7 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
       const argConfig = funcConfig.args[argKey];
       let argVal = argsObj[argKey];
       if (argVal === undefined) {
-        argVal = argConfig.defaultValue;
+        argVal = argConfig?.defaultValue;
         if (argVal === undefined) {
           meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
           return undefined;
@@ -1003,7 +1003,7 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
       const field = argsObj["0"];
       const convertedArgs = Object.keys(argsObj).filter(k => parseInt(k) > 0).map(k => argsObj[k]);
       
-      const valueType = argsArr.find(({valueSrc}) => valueSrc === "value")?.valueType;
+      const valueType = argsArr.filter(a => !!a).find(({valueSrc}) => valueSrc === "value")?.valueType;
       if (valueTypes && valueType && !valueTypes.includes(valueType)) {
         errs.push(`Op supports types ${valueTypes}, but got ${valueType}`);
       }

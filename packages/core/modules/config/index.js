@@ -675,7 +675,7 @@ const widgets = {
       return vals.map(v => this.utils.SqlString.escape(v));
     },
     spelFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
-      const isCallable = opDef.spelOp && opDef.spelOp[0] == "$";
+      const isCallable = opDef.spelOp && opDef.spelOp.startsWith("${1}");
       let res = this.utils.spelEscape(vals); // inline list
       if (isCallable) {
         // `{1,2}.contains(1)` NOT works

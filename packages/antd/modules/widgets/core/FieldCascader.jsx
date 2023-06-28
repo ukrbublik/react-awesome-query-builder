@@ -83,7 +83,7 @@ export default class FieldCascader extends Component {
     }
 
     const {fieldSeparator} = config.settings;
-    const parentFieldPath = getFieldParts(parentField, config) || [];
+    const parentFieldPath = getFieldParts(parentField, config);
     const value = removePrefixPath(selectedPath, parentFieldPath);
     let res = (
       <Cascader

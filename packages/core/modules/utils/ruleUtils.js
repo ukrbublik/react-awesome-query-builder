@@ -235,7 +235,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
     return null;
   const fieldSeparator = config.settings.fieldSeparator;
   const parts = getFieldParts(field, config);
-  const parentParts = getFieldParts(parentField, config) || [];
+  const parentParts = getFieldParts(parentField, config);
   const res = parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
@@ -254,7 +254,7 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
   const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
   const fieldSeparator = config.settings.fieldSeparator;
   const parts = getFieldParts(field, config);
-  const parentParts = getFieldParts(parentField, config) || [];
+  const parentParts = getFieldParts(parentField, config);
   return parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
@@ -530,7 +530,7 @@ export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => 
         // const argDef = getFieldConfig(config, argConfig);
         const argValue = argVal ? argVal.get("value") : undefined;
         const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-        if (argValue == undefined && argConfig.defaultValue === undefined && !argConfig.isOptional) {
+        if (argValue == undefined && argConfig?.defaultValue === undefined && !argConfig?.isOptional) {
           // arg is not completed
           return false;
         }
