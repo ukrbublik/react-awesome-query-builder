@@ -752,8 +752,11 @@ const getActionMeta = (action, state) => {
   ];
   let meta = mapValues(omit(action, actionKeysToOmit), applyToJS);
   let affectedField = action.path && getField(state.tree, action.path) || action.field;
-  if (affectedField)
+  if (affectedField) {
+    if (affectedField?.toJS)
+      affectedField = affectedField.toJS();
     meta.affectedField = affectedField;
+  }
   if (actionTypesToIgnore.includes(action.type) || action.type.indexOf("@@redux") == 0)
     meta = null;
   return meta;

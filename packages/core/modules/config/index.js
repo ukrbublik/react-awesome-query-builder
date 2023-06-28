@@ -560,7 +560,7 @@ const widgets = {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      if (opDef.spelOp == "matches" && op != "regex") {
+      if (opDef?.spelOp == "matches" && op != "regex") {
         let regex;
         if (op == "starts_with") {
           regex = `(?s)^${this.utils.escapeRegExp(val)}.*`;
@@ -711,8 +711,8 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       const v = dateVal.format("YYYY-MM-DD");
       const fmt = "yyyy-MM-dd";
-      //return `new java.text.SimpleDateFormat("${fmt}"").parse("${v}")`;
-      return `T(java.time.LocalDate).parse("${v}", T(java.time.format.DateTimeFormatter).ofPattern("${fmt}"))`;
+      //return `new java.text.SimpleDateFormat('${fmt}').parse('${v}')`;
+      return `T(java.time.LocalDate).parse('${v}', T(java.time.format.DateTimeFormatter).ofPattern('${fmt}'))`;
     },
     spelImportFuncs: [
       //"new java.text.SimpleDateFormat(${fmt}).parse(${v})",
@@ -782,8 +782,10 @@ const widgets = {
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return `T(java.time.LocalTime).parse("${dateVal.format("HH:mm:ss")}")`;
-      //return `new java.text.SimpleDateFormat("HH:mm:ss").parse('${dateVal.format("HH:mm:ss")}')`;
+      const fmt = "HH:mm:ss";
+      const v = dateVal.format("HH:mm:ss");
+      return `T(java.time.LocalTime).parse('${v}')`;
+      //return `new java.text.SimpleDateFormat('${fmt}').parse('${v}')`;
     },
     spelImportFuncs: [
       "T(java.time.LocalTime).parse(${v})",
@@ -856,8 +858,8 @@ const widgets = {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       const v = dateVal.format("YYYY-MM-DD HH:mm:ss");
       const fmt = "yyyy-MM-dd HH:mm:ss";
-      //return `new java.text.SimpleDateFormat("${fmt}"").parse("${v}")`;
-      return `T(java.time.LocalDateTime).parse("${v}", T(java.time.format.DateTimeFormatter).ofPattern("${fmt}"))`;
+      //return `new java.text.SimpleDateFormat('${fmt}').parse('${v}')`;
+      return `T(java.time.LocalDateTime).parse('${v}', T(java.time.format.DateTimeFormatter).ofPattern('${fmt}'))`;
     },
     spelImportFuncs: [
       //"new java.text.SimpleDateFormat(${fmt}).parse(${v})",
