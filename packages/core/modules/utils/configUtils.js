@@ -276,7 +276,7 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
   }
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
   //field = normalizeField(config, field);
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const parts = getFieldParts(field, config);
   const targetFields = config[fieldsKey];
   if (!targetFields)
     return null;
@@ -379,6 +379,34 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
   return ret;
 };
 
+export const getFieldParts = (field, config = null) => {
+  if (!field)
+    return null;
+  if (Array.isArray(field))
+    return field;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
+  if (field?.func) {
+    return Array.isArray(field.func) ? field.func : field.func.split(fieldSeparator);
+  }
+  if (field?.get?.("func")) { // immutable
+    return field?.get?.("func").split(fieldSeparator);
+  }
+  return field.split(fieldSeparator);
+};
+
+export const getFieldPath = (field, config, onlyKeys = false) => {
+  if (!field)
+    return null;
+  const fieldSeparator = config.settings.fieldSeparator;
+  const parts = getFieldParts(field, config);
+  if (onlyKeys)
+    return parts;
+  else
+    return parts
+      .map((_curr, ind, arr) => arr.slice(0, ind+1))
+      .map((parts) => parts.join(fieldSeparator));
+};
+
 export const getFieldConfig = (config, field, fieldSrc) => {
   if (!field)
     return null;
@@ -418,6 +446,7 @@ export const getFieldConfig = (config, field, fieldSrc) => {
     else
       throw new Error(`Unknown func ${field}`);
   }
+
   const fieldConfig = getFieldRawConfig(config, field);
   if (!fieldConfig)
     return null; //throw new Error("Can't find field " + field + ", please check your config");

@@ -1,6 +1,6 @@
 import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
 import {getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
@@ -27,7 +27,7 @@ export const jsonLogicFormat = (item, config) => {
   let data = {};
   for (let ff of usedFields) {
     const fieldSrc = typeof ff === "string" ? "field" : "func";
-    const parts = fieldSrc === "func" ? [ff.get("func")] : ff.split(fieldSeparator);
+    const parts = getFieldParts(ff, config);
     const def = getFieldConfig(extendedConfig, ff, fieldSrc) || {};
     let tmp = data;
     for (let i = 0 ; i < parts.length ; i++) {
@@ -281,7 +281,11 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  if (!funcConfig.jsonLogic) {
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  if (!funcConfig?.jsonLogic) {
     meta.errors.push(`Func ${funcKey} is not supported`);
     return undefined;
   }

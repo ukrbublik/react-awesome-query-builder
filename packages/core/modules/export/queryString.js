@@ -1,8 +1,8 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getFieldPath
 } from "../utils/configUtils";
 import {
-  getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
+  getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
@@ -266,7 +266,7 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
   let ret = null;
   if (field) {
     const fieldDefinition = getFieldConfig(config, field) || {};
-    const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+    const fieldParts = getFieldParts(field, config);
     const _fieldKeys = getFieldPath(field, config);
     const fieldPartsLabels = getFieldPathLabels(field, config, cutParentField ? parentField : null);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;

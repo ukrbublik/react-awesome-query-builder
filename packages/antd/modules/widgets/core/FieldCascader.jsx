@@ -4,6 +4,7 @@ import { Cascader, Tooltip } from "antd";
 import {removePrefixPath} from "../../utils/stuff";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { useOnPropsChanged } = Utils.ReactUtils;
+const { getFieldParts } = Utils.ConfigUtils;
 
 
 export default class FieldCascader extends Component {
@@ -82,7 +83,7 @@ export default class FieldCascader extends Component {
     }
 
     const {fieldSeparator} = config.settings;
-    const parentFieldPath = parentField ? parentField.split(fieldSeparator) : [];
+    const parentFieldPath = getFieldParts(parentField, config) || [];
     const value = removePrefixPath(selectedPath, parentFieldPath);
     let res = (
       <Cascader

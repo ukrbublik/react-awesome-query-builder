@@ -5,8 +5,8 @@ import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
-const {getFieldPath, getFieldPathLabels} = Utils.RuleUtils;
-const {getFieldConfig} = Utils.ConfigUtils;
+const {getFieldPathLabels} = Utils.RuleUtils;
+const {getFieldConfig, getFieldParts, getFieldPath} = Utils.ConfigUtils;
 
 
 export default class Field extends Component {
@@ -59,7 +59,7 @@ export default class Field extends Component {
       selectedFullLabel = null;
     const selectedAltLabel = selectedOpts.label2;
 
-    const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
+    const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
     const lookingForFieldType = !isFieldSelected && selectedFieldType;
@@ -77,9 +77,8 @@ export default class Field extends Component {
 
   getFieldLabel(fieldOpts, fieldKey, config) {
     if (!fieldKey) return null;
-    let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
-    let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+    let fieldParts = getFieldParts(fieldKey, config);
     let label = fieldOpts?.label || last(fieldParts);
     label = truncateString(label, maxLabelsLength);
     return label;
@@ -103,22 +102,22 @@ export default class Field extends Component {
     };
 
     return keys(fields).map(fieldKey => {
+      const fullFieldPath = (path ? path : []).concat(fieldKey);
       const field = fields[fieldKey];
-      const label = this.getFieldLabel(field, fieldKey, config);
-      const partsLabels = getFieldPathLabels(prefix+fieldKey, config);
+      const label = this.getFieldLabel(field, fullFieldPath, config);
+      const partsLabels = getFieldPathLabels(fullFieldPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
       if (fullLabel == label || parentFieldPath)
         fullLabel = null;
       const altLabel = field.label2;
       const tooltip = field.tooltip;
-      const subpath = (path ? path : []).concat(fieldKey);
       const disabled = field.disabled;
             
       if (field.hideForSelect)
         return undefined;
 
       if (field.type == "!struct") {
-        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, subpath, label);
+        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, fullFieldPath, label);
         const hasItemsMatchesType = countFieldsMatchesType(field.subfields) > 0;
         return {
           disabled,

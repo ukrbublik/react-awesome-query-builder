@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts
 } from "./configUtils";
 import {defaultValue, getFirstDefined} from "../utils/stuff";
 import Immutable from "immutable";
@@ -194,7 +194,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 
 export const getFirstField = (config, parentRuleGroupPath = null) => {
   const fieldSeparator = config.settings.fieldSeparator;
-  const parentPathArr = typeof parentRuleGroupPath == "string" ? parentRuleGroupPath.split(fieldSeparator) : parentRuleGroupPath;
+  const parentPathArr = getFieldParts(parentRuleGroupPath, config);
   const parentField = parentRuleGroupPath ? getFieldRawConfig(config, parentRuleGroupPath) : config;
 
   let firstField = parentField, key = null, keysPath = [];
@@ -226,30 +226,17 @@ export const getFirstOperator = (config, field, fieldSrc) => {
   return fieldOps ? fieldOps[0] : null;
 };
 
-export const getFieldPath = (field, config, onlyKeys = false) => {
-  if (!field)
-    return null;
-  const fieldSeparator = config.settings.fieldSeparator;
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  if (onlyKeys)
-    return parts;
-  else
-    return parts
-      .map((_curr, ind, arr) => arr.slice(0, ind+1))
-      .map((parts) => parts.join(fieldSeparator));
-};
-
 export const getFuncPathLabels = (field, config, parentField = null) => {
   return getFieldPathLabels(field, config, parentField, "funcs", "subfields");
 };
 
-export const getFieldPathLabels = (field, config, parentField = null, fieldsKey = "fields", subfieldsKey = "subfields", fieldSrc = null) => {
+export const getFieldPathLabels = (field, config, parentField = null, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
   const fieldSeparator = config.settings.fieldSeparator;
-  const parts = fieldSrc === "func" ? [field] : (Array.isArray(field) ? field : field.split(fieldSeparator));
-  const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
-  return parts
+  const parts = getFieldParts(field, config);
+  const parentParts = getFieldParts(parentField, config) || [];
+  const res = parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
     .map((parts) => [...parentParts, ...parts].join(fieldSeparator))
@@ -258,6 +245,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
       return cnf && cnf.label || last(part.split(fieldSeparator));
     })
     .filter(label => label != null);
+  return res;
 };
 
 export const getFieldPartsConfigs = (field, config, parentField = null) => {
@@ -265,8 +253,8 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
     return null;
   const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
   const fieldSeparator = config.settings.fieldSeparator;
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
+  const parts = getFieldParts(field, config);
+  const parentParts = getFieldParts(parentField, config) || [];
   return parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
@@ -438,7 +426,7 @@ export const formatFieldName = (field, config, meta, parentField = null, options
   if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const fieldParts = getFieldParts(field, config);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
   if (options?.useTableName && fieldDef.tableName) { // legacy
     const fieldPartsCopy = [...fieldParts];

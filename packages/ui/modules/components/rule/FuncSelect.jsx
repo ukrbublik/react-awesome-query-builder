@@ -6,8 +6,8 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const { clone } = Utils;
-const {getFieldConfig, getFuncConfig} = Utils.ConfigUtils;
-const {getFieldPath, getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {getFieldConfig, getFuncConfig, getFieldParts, getFieldPath} = Utils.ConfigUtils;
+const {getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -162,17 +162,17 @@ export default class FuncSelect extends Component {
     };
 
     return keys(funcs).map(funcKey => {
+      const fullFuncPath = (path ? path : []).concat(funcKey);
       const func = funcs[funcKey];
-      const label = this.getFuncLabel(func, funcKey, config);
-      const partsLabels = getFuncPathLabels(funcKey, config);
+      const label = this.getFuncLabel(func, fullFuncPath, config);
+      const partsLabels = getFuncPathLabels(fullFuncPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
       if (fullLabel == label)
         fullLabel = null;
       const tooltip = func.tooltip;
-      const subpath = (path ? path : []).concat(funcKey);
 
       if (func.type == "!struct") {
-        const items = this.buildOptions(config, func.subfields, fieldType, subpath, label);
+        const items = this.buildOptions(config, func.subfields, fieldType, fullFuncPath, label);
         const hasItemsMatchesType = countFieldsMatchesType(func.subfields) > 0;
         return {
           key: funcKey,
@@ -202,7 +202,7 @@ export default class FuncSelect extends Component {
     if (!funcKey) return null;
     let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
-    let funcParts = Array.isArray(funcKey) ? funcKey : funcKey.split(fieldSeparator);
+    let funcParts = getFieldParts(funcKey, config);
     let label = funcOpts?.label || last(funcParts);
     label = truncateString(label, maxLabelsLength);
     return label;

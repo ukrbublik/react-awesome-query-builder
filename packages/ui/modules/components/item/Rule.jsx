@@ -71,7 +71,8 @@ class Rule extends Component {
 
   getMeta({selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked} = props) {
     const {keepInputOnChangeFieldSrc} = config.settings;
-    const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config, null, "fields", "subfields", selectedFieldSrc);
+    const fieldsKey = selectedFieldSrc === "func" ? "funcs" : "fields";
+    const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config, null, fieldsKey, "subfields", selectedFieldSrc);
     const selectedFieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
     const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
     const isOkWithoutField = keepInputOnChangeFieldSrc && selectedFieldType;

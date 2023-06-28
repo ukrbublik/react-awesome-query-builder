@@ -1,6 +1,6 @@
 import uuid from "../utils/uuid";
 import {defaultValue, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
-import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs} from "../utils/configUtils";
+import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
@@ -263,7 +263,11 @@ const convertLhs = (isGroup0, jlField, args, conv, config, not = null, fieldConf
   // reduce/filter for group ext
   if (k == "reduce" && Array.isArray(v) && v.length == 3) {
     let [filter, acc, init] = v;
-    if (isJsonLogic(filter) && init == 0 && isJsonLogic(acc) && Array.isArray(acc["+"]) && acc["+"][0] == 1 && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator") {
+    if (isJsonLogic(filter) && init == 0
+      && isJsonLogic(acc)
+      && Array.isArray(acc["+"]) && acc["+"][0] == 1
+      && isJsonLogic(acc["+"][1]) && acc["+"][1]["var"] == "accumulator"
+    ) {
       k = Object.keys(filter)[0];
       v = Object.values(filter)[0];
       if (k == "filter") {
@@ -339,7 +343,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
   }
 
   const fk = (jsonLogicIsMethod ? "#" : "") + func;
-  const returnType = fieldConfig?.type ?? fieldConfig?.returnType;
+  const returnType = fieldConfig?.type || fieldConfig?.returnType;
   const funcKeys = (conv.funcs[fk] || []).filter(k => 
     (fieldConfig ? getFuncConfig(config, k).returnType == returnType : true)
   );
@@ -349,7 +353,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
     const v = {[op]: vals};
 
     for (const [f, fc] of iterateFuncs(config)) {
-      if (fc.jsonLogicImport && (fieldConfig ? fc.returnType == returnType : true)) {
+      if (fc.jsonLogicImport && (returnType ? fc.returnType == returnType : true)) {
         let parsed;
         try {
           parsed = fc.jsonLogicImport(v);
@@ -452,8 +456,9 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
-          let parentFieldParts = parentField ? parentField.split(fieldSeparator) : [];
-          const isInParent = shallowEqual(parentFieldParts, groupField.split(fieldSeparator).slice(0, parentFieldParts.length));
+          let parentFieldParts = getFieldParts(parentField, config) || [];
+          const groupPath = getFieldParts(groupField, config);
+          const isInParent = shallowEqual(parentFieldParts, groupPath.slice(0, parentFieldParts.length));
           if (!isInParent)
             parentFieldParts = []; // should not be
           const traverseGroupFields = groupField

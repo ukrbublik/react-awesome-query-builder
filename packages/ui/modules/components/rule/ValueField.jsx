@@ -6,8 +6,8 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const {clone} = Utils;
-const {getFieldConfig} = Utils.ConfigUtils;
-const {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {getFieldConfig, getFieldParts, getFieldPath} = Utils.ConfigUtils;
+const {getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -54,7 +54,7 @@ export default class ValueField extends Component {
   getItems({config, field, fieldSrc, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
     const fieldSeparator = config.settings.fieldSeparator;
-    const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
+    const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
 
@@ -147,15 +147,15 @@ export default class ValueField extends Component {
     const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
 
     return keys(fields).map(fieldKey => {
+      const fullFieldPath = (path ? path : []).concat(fieldKey);
       const field = fields[fieldKey];
-      const label = this.getFieldLabel(field, fieldKey, config);
-      const partsLabels = getFieldPathLabels(fieldKey, config);
+      const label = this.getFieldLabel(field, fullFieldPath, config);
+      const partsLabels = getFieldPathLabels(fullFieldPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
       if (fullLabel == label || parentFieldPath)
         fullLabel = null;
       const altLabel = field.label2;
       const tooltip = field.tooltip;
-      const subpath = (path ? path : []).concat(fieldKey);
 
       if (field.hideForCompare)
         return undefined;
@@ -168,7 +168,7 @@ export default class ValueField extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(parentFieldPath, config, field.subfields, subpath, label)
+          items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, label)
         };
       } else {
         return {
@@ -186,9 +186,8 @@ export default class ValueField extends Component {
 
   getFieldLabel(fieldOpts, fieldKey, config) {
     if (!fieldKey) return null;
-    let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
-    let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
+    let fieldParts = getFieldParts(fieldKey, config);
     let label = fieldOpts?.label || last(fieldParts);
     label = truncateString(label, maxLabelsLength);
     return label;

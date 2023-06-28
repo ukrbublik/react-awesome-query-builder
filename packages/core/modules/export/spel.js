@@ -1,8 +1,8 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts, getFieldPath
 } from "../utils/configUtils";
 import {
-  getFieldPath, getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
+  getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
@@ -411,7 +411,7 @@ const formatField = (meta, config, field, parentField = null) => {
   if (!field) return;
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const fieldParts = getFieldParts(field, config);
   const _fieldKeys = getFieldPath(field, config, parentField);
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
   const formatFieldFn = config.settings.formatSpelField;
@@ -442,7 +442,10 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const spelFunc = funcConfig.spelFunc;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
 
   let formattedArgs = {};
   for (const argKey in funcConfig.args) {
@@ -476,8 +479,10 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       formattedArgs
     ];
     ret = fn.call(config.ctx, ...args);
+  } else if (funcConfig.spelFunc) {
+    ret = funcConfig.spelFunc.replace(/\${(\w+)}/g, (_, argKey) => formattedArgs[argKey]);
   } else {
-    ret = spelFunc.replace(/\${(\w+)}/g, (_, argKey) => formattedArgs[argKey]);
+    meta.errors.push(`Func ${funcKey} is not supported`);
   }
   return ret;
 };
