@@ -1,6 +1,8 @@
 import Immutable, { Map } from "immutable";
 import omit from "lodash/omit";
 
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
 export const widgetDefKeysToOmit = [
   "formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue", "spelImportFuncs", "spelImportValue"
 ];
@@ -235,6 +237,36 @@ export function mergeArraysSmart(arr1, arr2) {
       return acc;
     }, arr1.slice());
 }
+
+export const isJsonCompatible = (tpl, obj, bag = {}, path = []) => {
+  if (isObject(tpl)) {
+    if (tpl.var) {
+      bag[tpl.var] = obj;
+      return true;
+    }
+    if (!isObject(obj))
+      return false;
+    for (const k in tpl) {
+      const tv = tpl[k];
+      const ov = obj[k];
+      if (!isJsonCompatible(tv, ov, bag, [...path, k]))
+        return false;
+    }
+    return true;
+  } else if (Array.isArray(tpl)) {
+    if (!Array.isArray(obj))
+      return false;
+    for (let i = 0 ; i < tpl.length ; i++) {
+      const tv = tpl[i];
+      const ov = obj[i];
+      if (!isJsonCompatible(tv, ov, bag, [...path, i]))
+        return false;
+    }
+    return true;
+  } else {
+    return tpl === obj;
+  }
+};
 
 const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");
 

@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig
 } from "../utils/configUtils";
 import {
   getFieldPath, getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
@@ -13,6 +13,13 @@ import {spelEscape} from "../utils/export";
 
 // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
 
+export const compareToSign = "${0}.compareTo(${1})";
+const TypesWithCompareTo = {
+  datetime: true,
+  time: true,
+  date: true,
+};
+
 export const spelFormat = (tree, config) => {
   return _spelFormat(tree, config, false);
 };
@@ -23,7 +30,8 @@ export const _spelFormat = (tree, config, returnErrors = true) => {
     errors: []
   };
 
-  const res = formatItem(tree, config, meta, null);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(tree, extendedConfig, meta, null);
 
   if (returnErrors) {
     return [res, meta.errors];
@@ -185,14 +193,23 @@ const formatGroup = (item, config, meta, parentField = null) => {
   return ret;
 };
 
-const buildFnToFormatOp = (operator, operatorDefinition) => {
+const buildFnToFormatOp = (operator, operatorDefinition, valueType) => {
   const spelOp = operatorDefinition.spelOp;
   if (!spelOp) return undefined;
   const isSign = spelOp.includes("${0}");
+  const isCompareTo = TypesWithCompareTo[valueType];
   let sop = spelOp;
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  if (isSign) {
+  if (isCompareTo) {
+    // date1.compareTo(date2) >= 0
+    //   instead of
+    // date1 >= date2
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      const compareRes = compareToSign.replace(/\${(\w+)}/g, (_, k) => (k == 0 ? field : (cardinality > 1 ? values[k-1] : values)));
+      return `${compareRes} ${sop} 0`;
+    };
+  } else if (isSign) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
       return spelOp.replace(/\${(\w+)}/g, (_, k) => (k == 0 ? field : (cardinality > 1 ? values[k-1] : values)));
     };
@@ -216,7 +233,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
   const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef);
+  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -435,15 +452,20 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
+    const doEscape = argConfig.spelEscapeForFormat ?? true;
+    const operator = null;
+    const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
+
     const formattedArgVal = formatValue(
-      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
     if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
+      formattedArgs[argKey] = doEscape ? formattedArgVal : argValue;
     }
   }
 

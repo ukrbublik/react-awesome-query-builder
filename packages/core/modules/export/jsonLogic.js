@@ -1,6 +1,6 @@
 import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig
 } from "../utils/configUtils";
 import {getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
@@ -18,20 +18,21 @@ export const jsonLogicFormat = (item, config) => {
     errors: []
   };
   
-  const logic = formatItem(item, config, meta, true);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const logic = formatItem(item, extendedConfig, meta, true);
   
   // build empty data
   const {errors, usedFields} = meta;
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator} = extendedConfig.settings;
   let data = {};
   for (let ff of usedFields) {
     const fieldSrc = typeof ff === "string" ? "field" : "func";
     const parts = fieldSrc === "func" ? [ff.get("func")] : ff.split(fieldSeparator);
-    const def = getFieldConfig(config, ff, fieldSrc) || {};
+    const def = getFieldConfig(extendedConfig, ff, fieldSrc) || {};
     let tmp = data;
     for (let i = 0 ; i < parts.length ; i++) {
       const p = parts[i];
-      const pdef = getFieldConfig(config, parts.slice(0, i + 1), fieldSrc) || {};
+      const pdef = getFieldConfig(extendedConfig, parts.slice(0, i + 1), fieldSrc) || {};
       if (i != parts.length - 1) {
         if (pdef.type == "!group" && pdef.mode != "struct") {
           if (!tmp[p])
@@ -292,8 +293,11 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const operator = null;
+    const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
+    const fieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"] );
     const formattedArgVal = formatValue(
-      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField
+      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);

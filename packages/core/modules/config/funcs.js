@@ -9,8 +9,8 @@ const NOW = {
   jsonLogicCustomOps: {
     now: {},
   },
-  spelFunc: "new java.util.Date()",
-  //spelFunc: "T(java.time.LocalDateTime).now()",
+  //spelFunc: "new java.util.Date()",
+  spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
   mongoFormatFunc: () => new Date(),
   formatFunc: () => "NOW",
@@ -21,6 +21,28 @@ const RELATIVE_DATETIME = {
   returnType: "datetime",
   renderBrackets: ["", ""],
   renderSeps: ["", "", ""],
+  spelFormatFunc: ({date, op, val, dim}) => {
+    const dimPlural = dim.charAt(0).toUpperCase() + dim.slice(1) + "s";
+    const method = op + dimPlural;
+    return `${date}.${method}(${val})`;
+  },
+  spelImport: (spel) => {
+    let date, op, val, dim;
+    const matchRes = spel.methodName?.match(/^(minus|plus)(\w+)s$/);
+    if (matchRes) {
+      dim = matchRes[2].toLowerCase();
+      op = matchRes[1];
+      if (["minus", "plus"].includes(op)) {
+        if (["day", "week", "month", "year"].includes(dim)) {
+          op = {type: "string", val: op};
+          dim = {type: "string", val: dim};
+          val = spel.args[0];
+          date = spel.obj;
+          return {date, op, val, dim};
+        }
+      }
+    }
+  },
   jsonLogic: ({date, op, val, dim}) => ({
     "date_add": [
       date,
@@ -42,14 +64,14 @@ const RELATIVE_DATETIME = {
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
   mongoFormatFunc: null, //todo: support?
-  //todo: spel
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {
       label: "Date",
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
-      valueSources: ["func", "field"],
+      valueSources: ["func", "field", "value"],
+      spelEscapeForFormat: true,
     },
     op: {
       label: "Op",
@@ -66,7 +88,8 @@ const RELATIVE_DATETIME = {
           plus: "+",
           minus: "-",
         },
-      }
+      },
+      spelEscapeForFormat: false,
     },
     val: {
       label: "Value",
@@ -76,6 +99,7 @@ const RELATIVE_DATETIME = {
       },
       defaultValue: 0,
       valueSources: ["value"],
+      spelEscapeForFormat: false,
     },
     dim: {
       label: "Dimension",
@@ -94,7 +118,8 @@ const RELATIVE_DATETIME = {
           month: "month",
           year: "year",
         },
-      }
+      },
+      spelEscapeForFormat: false,
     },
   }
 };

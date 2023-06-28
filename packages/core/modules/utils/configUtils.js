@@ -385,6 +385,12 @@ export const getFieldConfig = (config, field, fieldSrc) => {
   if (typeof field == "object") {
     if (!field.func && !!field.type) {
       // it's already a config
+      // if (!field.defaultOperator) {
+      //   // if not complete config..
+      //   // merge, but don't merge operators (rewrite instead)
+      //   const typeConfig = config.types[field.type] || {};
+      //   return mergeWith({}, typeConfig, field, mergeCustomizerNoArrays);
+      // }
       return field;
     }
     if (field.func && field.arg) {

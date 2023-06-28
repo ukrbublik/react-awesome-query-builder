@@ -4,8 +4,9 @@ import {getFieldConfig, getFuncConfig, extendConfig, normalizeField, iterateFunc
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
-import {logger} from "../utils/stuff";
+import {logger, isJsonCompatible} from "../utils/stuff";
 import moment from "moment";
+import {compareToSign} from "../export/spel";
 
 // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
 
@@ -334,14 +335,16 @@ const buildConv = (config) => {
     const {spelImportFuncs, type} = widgetDef;
     if (spelImportFuncs) {
       for (const fk of spelImportFuncs) {
-        const fs = fk.replace(/\${(\w+)}/g, (_, k) => "?");
-        const argsOrder = [...fk.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
-        if (!valueFuncs[fs])
-          valueFuncs[fs] = [];
-        valueFuncs[fs].push({
-          w,
-          argsOrder
-        });
+        if (typeof fk === "string") {
+          const fs = fk.replace(/\${(\w+)}/g, (_, k) => "?");
+          const argsOrder = [...fk.matchAll(/\${(\w+)}/g)].map(([_, k]) => k);
+          if (!valueFuncs[fs])
+            valueFuncs[fs] = [];
+          valueFuncs[fs].push({
+            w,
+            argsOrder
+          });
+        }
       }
     }
   }
@@ -361,6 +364,12 @@ const buildConv = (config) => {
       });
     }
   }
+  // Special .compareTo()
+  const compareToSS = compareToSign.replace(/\${(\w+)}/g, (_, k) => "?");
+  opFuncs[compareToSS] = [{
+    op: "!compare",
+    argsOrder: ["0", "1"]
+  }];
 
   return {
     operators,
@@ -454,9 +463,8 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   if (isBetween) {
     const [left, from] = spel.children[0].children;
     const [right, to] = spel.children[1].children;
-    const isNumbers = from.type == "number" && to.type == "number";
     const isSameSource = compareArgs(left, right,  spel, conv, config, meta, parentSpel);
-    if (isNumbers && isSameSource) {
+    if (isSameSource) {
       const _fromValue = from.val;
       const _toValue = to.val;
       const oneSpel = {
@@ -486,13 +494,19 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   }
 
   // convert children
-  const convertChildren = () => spel.children.map(child => 
-    convertToTree(child, conv, config, meta, {
-      ...spel,
-      _groupField: parentSpel?._groupField
-    })
-  );
-  
+  const convertChildren = () => {
+    let newChildren = spel.children.map(child => 
+      convertToTree(child, conv, config, meta, {
+        ...spel,
+        _groupField: parentSpel?._groupField
+      })
+    );
+    if (newChildren.length >= 2 && newChildren[0].type == "!compare") {
+      newChildren = newChildren[0].children;
+    }
+    return newChildren;
+  };
+
   if (op == "and" || op == "or") {
     const children1 = {};
     const vals = convertChildren();
@@ -716,6 +730,8 @@ const _buildFuncSignatures = (spel, brns) => {
   const lastChild = children?.[children.length-1];
   let currBrn = brns[brns.length-1];
   if (type === "!func") {
+    // T(DateTimeFormat).forPattern(?).parseDateTime(?)  --  ok
+    // T(LocalDateTime).parse(?, T(DateTimeFormatter).ofPattern(?))  --  will not work
     let o = obj;
     while (o) {
       const [s1, params1] = _buildFuncSignatures({...o, obj: null}, [{}]);
@@ -880,39 +896,71 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
   return undefined;
 };
 
-
 const convertFuncToValue = (spel, conv, config, meta, parentSpel, fsigns, convertFuncArg) => {
   let errs, foundSign, foundWidget;
+  const candidates = [];
+
+  for (let w in config.widgets) {
+    const widgetDef = config.widgets[w];
+    const {spelImportFuncs} = widgetDef;
+    if (spelImportFuncs) {
+      for (let i = 0 ; i < spelImportFuncs.length ; i++) {
+        const fj = spelImportFuncs[i];
+        if (isObject(fj)) {
+          const bag = {};
+          if (isJsonCompatible(fj, spel, bag)) {
+            for (const k in bag) {
+              bag[k] = convertFuncArg(bag[k]);
+            }
+            candidates.push({
+              s: `widgets.${w}.spelImportFuncs[${i}]`,
+              w,
+              argsObj: bag,
+            });
+          }
+        }
+      }
+    }
+  }
+
   for (const {s, params} of fsigns) {
     const found = conv.valueFuncs[s] || [];
     for (const {w, argsOrder} of found) {
       const argsArr = params.map(convertFuncArg);
-      foundWidget = w;
-      foundSign = s;
-      errs = [];
-      const widgetDef = config.widgets[w];
-      const {spelImportValue, type} = widgetDef;
       const argsObj = Object.fromEntries(
         argsOrder.map((argKey, i) => [argKey, argsArr[i]])
       );
-      for (const k in argsObj) {
-        if (!["value"].includes(argsObj[k].valueSrc)) {
-          errs.push(`${k} has unsupported value src ${argsObj[k].valueSrc}`);
-        }
+      candidates.push({
+        s,
+        w,
+        argsObj,
+      });
+    }
+  }
+
+  for (const {s, w, argsObj} of candidates) {
+    const widgetDef = config.widgets[w];
+    const {spelImportValue, type} = widgetDef;
+    foundWidget = w;
+    foundSign = s;
+    errs = [];
+    for (const k in argsObj) {
+      if (!["value"].includes(argsObj[k].valueSrc)) {
+        errs.push(`${k} has unsupported value src ${argsObj[k].valueSrc}`);
       }
-      let value = argsObj.v.value;
-      if (spelImportValue && !errs.length) {
-        [value, errs] = spelImportValue.call(config.ctx, argsObj.v, widgetDef, argsObj);
-        if (errs && !Array.isArray(errs))
-          errs = [errs];
-      }
-      if (!errs.length) {
-        return {
-          valueSrc: "value",
-          valueType: type,
-          value,
-        };
-      }
+    }
+    let value = argsObj.v.value;
+    if (spelImportValue && !errs.length) {
+      [value, errs] = spelImportValue.call(config.ctx, argsObj.v, widgetDef, argsObj);
+      if (errs && !Array.isArray(errs))
+        errs = [errs];
+    }
+    if (!errs.length) {
+      return {
+        valueSrc: "value",
+        valueType: type,
+        value,
+      };
     }
   }
 
@@ -930,9 +978,24 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
     for (const {op, argsOrder} of found) {
       const argsArr = params.map(convertFuncArg);
       opKey = op;
+      if (op === "!compare") {
+        if (
+          parentSpel.type.startsWith("op-")
+          && parentSpel.children.length == 2
+          && parentSpel.children[1].type == "number"
+          && parentSpel.children[1].val === 0
+        ) {
+          return {
+            type: "!compare",
+            children: argsArr,
+          };
+        } else {
+          errs.push(`Result of compareTo() should be compared to 0`);
+        }
+      }
       foundSign = s;
       errs = [];
-      const opDef = config.operators[op];
+      const opDef = config.operators[opKey];
       const {spelOp, valueTypes} = opDef;
       const argsObj = Object.fromEntries(
         argsOrder.map((argKey, i) => [argKey, argsArr[i]])

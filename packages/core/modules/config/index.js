@@ -149,7 +149,6 @@ const operators = {
     sqlOp: "LIKE",
     spelOp: "${0}.contains(${1})",
     valueTypes: ["text"],
-    spelOps: ["matches", ".contains"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) : undefined), false, ...args); },
     //jsonLogic: (field, op, val) => ({ "in": [val, field] }),
     jsonLogic: "in",
@@ -171,7 +170,6 @@ const operators = {
     labelForFormat: "Starts with",
     sqlOp: "LIKE",
     spelOp: "${0}.startsWith(${1})",
-    spelOps: ["matches", ".startsWith"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? "^" + this.utils.escapeRegExp(v) : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
@@ -181,7 +179,6 @@ const operators = {
     labelForFormat: "Ends with",
     sqlOp: "LIKE",
     spelOp: "${0}.endsWith(${1})",
-    spelOps: ["matches", ".endsWith"],
     mongoFormatOp: function(...args) { return this.utils.mongoFormatOp1("$regex", v => (typeof v == "string" ? this.utils.escapeRegExp(v) + "$" : undefined), false, ...args); },
     jsonLogic: undefined, // not supported
     valueSources: ["value"],
@@ -712,10 +709,31 @@ const widgets = {
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return `new java.text.SimpleDateFormat('yyyy-MM-dd').parse('${dateVal.format("YYYY-MM-DD")}')`;
+      const v = dateVal.format("YYYY-MM-DD");
+      const fmt = "yyyy-MM-dd";
+      //return `new java.text.SimpleDateFormat("${fmt}"").parse("${v}")`;
+      return `T(java.time.LocalDate).parse("${v}", T(java.time.format.DateTimeFormatter).ofPattern("${fmt}"))`;
     },
     spelImportFuncs: [
-      "new java.text.SimpleDateFormat(${fmt}).parse(${v})"
+      //"new java.text.SimpleDateFormat(${fmt}).parse(${v})",
+      {
+        obj: {
+          cls: ["java", "time", "LocalDate"],
+        },
+        methodName: "parse",
+        args: [
+          {var: "v"},
+          {
+            obj: {
+              cls: ["java", "time", "format", "DateTimeFormatter"],
+            },
+            methodName: "ofPattern",
+            args: [
+              {var: "fmt"}
+            ]
+          },
+        ],
+      }
     ],
     spelImportValue: function (val, wgtDef, args) {
       if (!wgtDef)
@@ -764,12 +782,12 @@ const widgets = {
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return `T(java.time.LocalTime).parse('${dateVal.format("HH:mm:ss")}')`;
-      //return `new java.text.SimpleDateFormat('HH:mm:ss').parse('${dateVal.format("HH:mm:ss")}')`;
+      return `T(java.time.LocalTime).parse("${dateVal.format("HH:mm:ss")}")`;
+      //return `new java.text.SimpleDateFormat("HH:mm:ss").parse('${dateVal.format("HH:mm:ss")}')`;
     },
     spelImportFuncs: [
       "T(java.time.LocalTime).parse(${v})",
-      "new java.text.SimpleDateFormat(${fmt}).parse(${v})"
+      //"new java.text.SimpleDateFormat(${fmt}).parse(${v})"
     ],
     spelImportValue: function (val, wgtDef, args) {
       if (!wgtDef)
@@ -836,10 +854,31 @@ const widgets = {
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
-      return `new java.text.SimpleDateFormat('yyyy-MM-dd HH:mm:ss').parse('${dateVal.format("YYYY-MM-DD HH:mm:ss")}')`;
+      const v = dateVal.format("YYYY-MM-DD HH:mm:ss");
+      const fmt = "yyyy-MM-dd HH:mm:ss";
+      //return `new java.text.SimpleDateFormat("${fmt}"").parse("${v}")`;
+      return `T(java.time.LocalDateTime).parse("${v}", T(java.time.format.DateTimeFormatter).ofPattern("${fmt}"))`;
     },
     spelImportFuncs: [
-      "new java.text.SimpleDateFormat(${fmt}).parse(${v})"
+      //"new java.text.SimpleDateFormat(${fmt}).parse(${v})",
+      {
+        obj: {
+          cls: ["java", "time", "LocalDateTime"],
+        },
+        methodName: "parse",
+        args: [
+          {var: "v"},
+          {
+            obj: {
+              cls: ["java", "time", "format", "DateTimeFormatter"],
+            },
+            methodName: "ofPattern",
+            args: [
+              {var: "fmt"}
+            ]
+          },
+        ],
+      }
     ],
     spelImportValue: function (val, wgtDef, args) {
       if (!wgtDef)
