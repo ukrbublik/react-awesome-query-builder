@@ -322,11 +322,12 @@ export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
     // -- field is null when a new blank rule is added
     const operator = properties.get("operator");
     const field = properties.get("field");
+    const fieldSrc = properties.get("fieldSrc");
     const value = properties.get("value").toJS();
     const _valueType = properties.get("valueType")?.get(0);
     const valueSrc = properties.get("valueSrc")?.get(0);
 
-    if (valueSrc === "func") {
+    if (valueSrc === "func" || fieldSrc == "func") {
       // -- elastic search doesn't support functions (that is post processing)
       return;
     }

@@ -156,6 +156,7 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
 const formatRule = (item, config, meta, isForDisplay = false, parentField = null, returnArgs = false) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   let operatorOptions = properties.get("operatorOptions");
   if (field == null || operator == null)
@@ -185,7 +186,9 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     return undefined;
 
   //format field
-  const formattedField = formatField(config, meta, field, isForDisplay, parentField);
+  const formattedField = fieldSrc === "func"
+    ? formatFunc(config, meta, field, isForDisplay, parentField)
+    : formatField(config, meta, field, isForDisplay, parentField);
 
   //format value
   const [formattedValue, valueSrc, valueType] = formatItemValue(
@@ -283,7 +286,13 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
   const funcKey = funcValue.get("func");
   const args = funcValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = isForDisplay && funcConfig.label || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  const funcName = isForDisplay && funcConfig.label || funcLastKey;
 
   let formattedArgs = {};
   let formattedArgsWithNames = {};

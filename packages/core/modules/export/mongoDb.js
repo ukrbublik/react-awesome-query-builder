@@ -34,21 +34,21 @@ export const _mongodbFormat = (tree, config, returnErrors = true) => {
 };
 
 
-const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   if (!item) return undefined;
 
   const type = item.get("type");
 
   if ((type === "group" || type === "rule_group")) {
-    return formatGroup(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
+    return formatGroup(parents, item, config, meta, _not, _canWrapExpr, _formatFieldName, _value);
   } else if (type === "rule") {
-    return formatRule(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
+    return formatRule(parents, item, config, meta, _not, _canWrapExpr, _formatFieldName, _value);
   }
   return undefined;
 };
 
 
-const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const children = item.get("children1") || new List();
@@ -158,7 +158,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 };
 
 
-const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const properties = item.get("properties") || new Map();
 
   const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
@@ -171,6 +171,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   const iValue = properties.get("value");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
@@ -192,12 +193,23 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     not = false;
   }
 
-  const fieldName = formatFieldName(field, config, meta, realParentPath);
+  let formattedField;
+  let useExpr = false;
+  if (fieldSrc == "func") {
+    [formattedField, useExpr] = formatFunc(meta, config, field, realParentPath);
+    if (formattedField == undefined)
+      return undefined;
+  } else {
+    formattedField = formatFieldName(field, config, meta, realParentPath);
+    if (_formatFieldName) {
+      useExpr = true;
+      formattedField = _formatFieldName(formattedField);
+    }
+  }
 
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  let useExpr = false;
   const fvalue = iValue.map((currentValue, ind) => {
     const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
     const valueType = iValueType ? iValueType.get(ind) : null;
@@ -214,8 +226,6 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     }
     return fv;
   });
-  if (_fieldName)
-    useExpr = true;
   const wrapExpr = useExpr && _canWrapExpr;
   const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
   if (fvalue.size < cardinality || hasUndefinedValues)
@@ -229,7 +239,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     return undefined;
   }
   const args = [
-    _fieldName ? _fieldName(fieldName) : fieldName,
+    formattedField,
     operator,
     _value !== undefined && formattedValue == null ? _value : formattedValue,
     useExpr,
@@ -315,7 +325,13 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.mongoFunc || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return [undefined, false];
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  const funcName = funcConfig.mongoFunc || funcLastKey;
   const mongoArgsAsObject = funcConfig.mongoArgsAsObject;
 
   let formattedArgs = {};

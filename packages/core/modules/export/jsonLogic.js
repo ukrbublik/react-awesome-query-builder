@@ -281,6 +281,8 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
   if (!funcConfig) {
     meta.errors.push(`Func ${funcKey} is not defined in config`);
     return undefined;
@@ -321,7 +323,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     ];
     ret = fn.call(config.ctx, ...args);
   } else {
-    const funcName = funcConfig.jsonLogic || funcKey;
+    const funcName = funcConfig.jsonLogic || funcLastKey;
     const isMethod = !!funcConfig.jsonLogicIsMethod;
     if (isMethod) {
       const [obj, ...params] = formattedArgsArr;

@@ -103,6 +103,7 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
 const formatRule = (item, config, meta) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
   const iValueSrc = properties.get("valueSrc");
@@ -163,7 +164,9 @@ const formatRule = (item, config, meta) => {
   }
       
   //format field
-  const formattedField = formatField(meta, config, field);
+  const formattedField = fieldSrc == "func"
+    ? formatFunc(meta, config, field)
+    : formatField(meta, config, field);
       
   //format expr
   const args = [
@@ -249,7 +252,13 @@ const formatFunc = (meta, config, currentValue) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.sqlFunc || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  const funcName = funcConfig.sqlFunc || funcLastKey;
 
   let formattedArgs = {};
   for (const argKey in funcConfig.args) {
