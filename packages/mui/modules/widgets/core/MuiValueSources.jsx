@@ -3,11 +3,11 @@ import IconButton from "@mui/material/IconButton";
 import ExpandMoreSharpIcon from "@mui/icons-material/ExpandMoreSharp";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Check from '@mui/icons-material/Check';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Check from "@mui/icons-material/Check";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 
 export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);

@@ -260,7 +260,7 @@ function* _iterateFields(config, subfields, path, subfieldsKey = "subfields") {
       ];
     }
   }
-};
+}
 
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)

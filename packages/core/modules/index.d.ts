@@ -65,7 +65,7 @@ interface SpelRawValue {
   obj?: SpelRawValue[],
   isVar?: boolean,
   cls: string[],
-};
+}
 
 export type ConfigContext = {
   utils: TypedMap<any>,

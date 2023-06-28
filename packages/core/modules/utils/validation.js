@@ -205,8 +205,8 @@ function validateRule (item, path, itemId, meta, c) {
   };
   const sanitized = !deepEqual(oldSerialized, newSerialized);
   //const isCompleted = !!operator && !isEmptyRuleProperties(properties.toObject(), config, false);
-  const isValueCompleted = value && 
-    value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
+  const isValueCompleted = value 
+    && value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
   const isFieldCompleted = isCompletedValue(field, fieldSrc, config);
   const isCompleted = isFieldCompleted && operator && isValueCompleted;
   if (sanitized)

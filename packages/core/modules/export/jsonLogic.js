@@ -198,8 +198,8 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (formattedValue === undefined)
     return undefined;
 
-  const formattedField =
-    fieldSrc === "func"
+  const formattedField
+    = fieldSrc === "func"
       ? formatFunc(meta, config, field, parentField)
       : formatField(meta, config, field, parentField);
 

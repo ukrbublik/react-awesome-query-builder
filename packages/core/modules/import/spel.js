@@ -544,7 +544,7 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
       const field = fieldObj?.value;
       const widgets = opKeys.map(op => ({op, widget: getWidgetForFieldOp(config, field, op)}));
       logger.warn(`[spel] Spel operator ${op} can be mapped to ${opKeys}.`,
-        'widgets:', widgets, 'vals:', vals, 'valueType=', valueType);
+        "widgets:", widgets, "vals:", vals, "valueType=", valueType);
       
       if (op == "eq" || op == "ne") {
         const ws = widgets.find(({ op, widget }) => (widget && widget != "field"));
@@ -718,7 +718,7 @@ const buildFuncSignatures = (spel) => {
   ];
   _buildFuncSignatures(spel, brns);
   return brns.map(({s, params}) => ({s, params})).reverse().filter(({s}) => s !== "" && s !== "?");
-}
+};
 
 // a.toLower().toUpper()
 // ->
@@ -990,7 +990,7 @@ const convertFuncToOp = (spel, conv, config, meta, parentSpel, fsigns, convertFu
             children: argsArr,
           };
         } else {
-          errs.push(`Result of compareTo() should be compared to 0`);
+          errs.push("Result of compareTo() should be compared to 0");
         }
       }
       foundSign = s;

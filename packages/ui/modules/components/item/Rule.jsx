@@ -69,7 +69,7 @@ class Rule extends Component {
     }
   }
 
-  getMeta({selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked} = props) {
+  getMeta({selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
     const {keepInputOnChangeFieldSrc} = config.settings;
     const fieldsKey = selectedFieldSrc === "func" ? "funcs" : "fields";
     const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config, null, fieldsKey, "subfields", selectedFieldSrc);

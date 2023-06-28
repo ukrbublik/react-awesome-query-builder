@@ -395,9 +395,9 @@ const setField = (state, path, newField, config) => {
   // uses, keep it selected.
   const lastOp = newFieldConfig && newFieldConfig.operators?.indexOf(currentOperator) !== -1 ? currentOperator : null;
   let newOperator = null;
-  const availOps = currentFieldSrc === "func" ? 
-    getOperatorsForType(config, fieldType) :
-    getOperatorsForField(config, newField);
+  const availOps = currentFieldSrc === "func" 
+    ? getOperatorsForType(config, fieldType)
+    : getOperatorsForField(config, newField);
   if (availOps && availOps.length == 1)
     newOperator = availOps[0];
   else if (availOps && availOps.length > 1) {

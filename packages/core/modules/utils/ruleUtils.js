@@ -50,12 +50,12 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
 
   let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
-  canReuseValue = canReuseValue &&
-    (!changedProp 
+  canReuseValue = canReuseValue
+    && (!changedProp 
       || changedProp == "field" && !clearValueOnChangeField 
       || changedProp == "operator" && !clearValueOnChangeOp);
-  canReuseValue = canReuseValue &&
-    (currentType && newType && currentType == newType);
+  canReuseValue = canReuseValue
+    && (currentType && newType && currentType == newType);
   if (canReuseValue && selectTypes.includes(newType) && changedProp == "field") {
     const newListValuesType = newFieldConfig?.listValuesType;
     const currentListValuesType = currentFieldConfig?.listValuesType;
@@ -494,7 +494,7 @@ const isEmptyGroup = (group, config, liteCheck = false) => {
 
 export const isEmptyGroupChildren = (children, config, liteCheck = false) => {
   return !children || children.size == 0
-    || children.size > 0 && children.filter(ch => !isEmptyItem(ch, config, liteCheck)).size == 0
+    || children.size > 0 && children.filter(ch => !isEmptyItem(ch, config, liteCheck)).size == 0;
 };
 
 export const isEmptyRuleProperties = ({
