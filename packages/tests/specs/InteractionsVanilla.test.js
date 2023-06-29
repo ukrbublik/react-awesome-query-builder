@@ -277,4 +277,21 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("change group operator", async () => {
+    await with_qb(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".rule_group_ext .group--field--count--rule .rule--value .widget--widget input")
+        .simulate("change", { target: { value: 4 } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1); 
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal("cars");
+      expect(child.properties.operator).to.equal("greater");
+      expect(child.properties.conjunction).to.equal("AND");
+      expect(child.properties.value).to.eql([4]);
+    });
+  });
+
 });
+
