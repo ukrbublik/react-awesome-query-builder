@@ -148,7 +148,7 @@ export default class FuncSelect extends Component {
     if (!funcs)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
-    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+    const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
       return Object.keys(fields).reduce((acc, fieldKey) => {
@@ -162,7 +162,7 @@ export default class FuncSelect extends Component {
     };
 
     return keys(funcs).map(funcKey => {
-      const fullFuncPath = (path ? path : []).concat(funcKey);
+      const fullFuncPath = [...(path ?? []), funcKey];
       const func = funcs[funcKey];
       const label = this.getFuncLabel(func, fullFuncPath, config);
       const partsLabels = getFuncPathLabels(fullFuncPath, config);

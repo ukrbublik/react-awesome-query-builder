@@ -126,7 +126,6 @@ const RELATIVE_DATETIME = {
 
 const LOWER = {
   label: "Lowercase",
-  allowSelfNesting: true,
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
   spelFunc: "${str}.toLowerCase()",
@@ -146,7 +145,6 @@ const LOWER = {
 
 const UPPER = {
   label: "Uppercase",
-  allowSelfNesting: true,
   mongoFunc: "$toUpper",
   jsonLogic: "toUpperCase",
   spelFunc: "${str}.toUpperCase()",

@@ -88,7 +88,7 @@ export default class Field extends Component {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
-    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+    const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
       return Object.keys(fields).reduce((acc, fieldKey) => {
@@ -102,7 +102,7 @@ export default class Field extends Component {
     };
 
     return keys(fields).map(fieldKey => {
-      const fullFieldPath = (path ? path : []).concat(fieldKey);
+      const fullFieldPath = [...(path ?? []), fieldKey];
       const field = fields[fieldKey];
       const label = this.getFieldLabel(field, fullFieldPath, config);
       const partsLabels = getFieldPathLabels(fullFieldPath, config);

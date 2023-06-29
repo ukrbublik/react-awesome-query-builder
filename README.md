@@ -45,6 +45,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [ctx](#ctx)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 6.4.0](#migration-to-640)
   * [Migration to 6.3.0](#migration-to-630)
   * [Migration to 6.2.0](#migration-to-620)
   * [Migration to 6.0.0](#migration-to-600)
@@ -68,10 +69,11 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   - unary (is empty, is null)
   - 'between' (for numbers, dates, times)
   - complex operators like 'proximity'
-- Values of fields can be compared with:
+- RHS can be:
   - values
   - another fields (of same type)
-  - function (arguments also can be values/fields/funcs)
+  - functions (arguments also can be values/fields/funcs)
+- LHS can be field or function
 - Reordering (drag-n-drop) support for rules and groups of rules
 - Themes:
   - [Ant Design](https://ant.design/)
@@ -506,6 +508,13 @@ It's recommended to update your version to 6.x. You just need to change your imp
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 6.4.0
+
+If you want to enable functions in LHS, please add to `config.settings`:
+```js
+fieldSources: ["field", "func"],
+```
 
 ### Migration to 6.3.0
 

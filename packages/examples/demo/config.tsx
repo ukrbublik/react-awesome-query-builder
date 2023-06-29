@@ -255,6 +255,8 @@ export default (skin: string) => {
         widget: "func",
       }
     },
+    fieldSources: ["field", "func"],
+    keepInputOnChangeFieldSrc: true,
     // canReorder: true,
     // canRegroup: true,
     // showLock: true,
@@ -265,7 +267,7 @@ export default (skin: string) => {
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
     customFieldSelectProps: {
-      showSearch: false
+      showSearch: true
     },
     // renderField: (props) => <FieldCascader {...props} />,
     // renderOperator: (props) => <FieldDropdown {...props} />,
@@ -395,7 +397,7 @@ export default (skin: string) => {
         min: -1,
         max: 5
       },
-      funcs: ["LINEAR_REGRESSION"],
+      funcs: ["number.LINEAR_REGRESSION"],
     },
     slider: {
       label: "Slider",
@@ -605,7 +607,36 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const funcs: Funcs = {
-    ...BasicFuncs
+    //...BasicFuncs
+    string: {
+      type: "!struct",
+      label: "String",
+      subfields: {
+        LOWER: BasicFuncs.LOWER,
+        UPPER: BasicFuncs.UPPER,
+      }
+    },
+    date: {
+      type: "!struct",
+      label: "Date",
+      subfields: {
+        NOW: BasicFuncs.NOW,
+        RELATIVE_DATETIME: merge({}, BasicFuncs.RELATIVE_DATETIME, {
+          args: {
+            date: {
+              defaultValue: {func: "date.NOW", args: []},
+            }
+          }
+        }),
+      }
+    },
+    number: {
+      type: "!struct",
+      label: "Number",
+      subfields: {
+        LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
+      }
+    }
   };
 
   const ctx = InitialConfig.ctx;

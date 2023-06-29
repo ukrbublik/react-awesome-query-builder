@@ -1,4 +1,7 @@
 # Changelog
+- 6.4.0
+  - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings` (PR #900, #896) (issues #287, #250, #344, #336)
+  - Support import/export of functions for SpEL (PR #900) (issue #754)
 - 6.3.0
   - Allow saving and loading config from server (PR #866) (issue #817)
     - New utils: `compressConfig()`, `decompressConfig()`

@@ -274,6 +274,7 @@ const { FieldCascader, FieldDropdown, FieldTreeSelect } = AntdWidgets;
         widget: "func",
     }
   },
+  fieldSources: ["field", "func"],
   locale: {
       moment: 'ru',
       antd: ru_RU,
@@ -304,6 +305,8 @@ Behaviour settings:
 |valueSourcesInfo |`{value: {}}` |By default fields can be compared with values. +
   If you want to enable comparing with another fields, add `field` like in example above. +
   If you want to enable comparing with result of function, add `func` like in example above.
+|fieldSources |`["field"]` |To enable functions in LHS, set to `["field", "func"]`
+|keepInputOnChangeFieldSrc |true |Keep value entered in RHS after changing source of LHS? 
 |showErrorMessage |false |Show error message in QueryBuilder if validateValue() in field config returns false
 |canReorder |true |Activate reordering support for rules and groups of rules?
 |canRegroup |true |Allow move rules (or groups) in/out groups during reorder? +

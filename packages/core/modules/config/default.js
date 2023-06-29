@@ -9,7 +9,8 @@ export const settings = {
   },
 
 
-  fieldSources: ["field", "func"],
+  fieldSources: ["field"],
+  keepInputOnChangeFieldSrc: true,
   valueSourcesInfo: {
     value: {},
   },

@@ -144,10 +144,10 @@ export default class ValueField extends Component {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
-    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+    const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     return keys(fields).map(fieldKey => {
-      const fullFieldPath = (path ? path : []).concat(fieldKey);
+      const fullFieldPath = [...(path ?? []), fieldKey];
       const field = fields[fieldKey];
       const label = this.getFieldLabel(field, fullFieldPath, config);
       const partsLabels = getFieldPathLabels(fullFieldPath, config);
