@@ -9,6 +9,7 @@
   - 2nd parameter of `onChange` callback now equals original config, not extended config (PR #866) (issue #364)
   - Fix totalQuery structure in mongodb (PR #916) (issue #915)
   - Fixed bug in `loadTree()` (PR #917) (issue #356)
+  - Fixed bug on change group value (issue #923)
 - 6.2.0
   - Fixed type `Config`: should have render settings like `renderSize` (PR #909) (issue #879)
   - Fixed type for `renderBeforeWidget`: `RuleProps` instead of wrong `FieldProps` (PR #909) (issue #879)
