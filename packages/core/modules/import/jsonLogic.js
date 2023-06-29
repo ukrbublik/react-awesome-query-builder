@@ -207,7 +207,7 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   };
 };
 
-const convertFieldName = (origField, parentField, config) => {
+const convertFieldName = (config, origField, parentField) => {
   const {fieldSeparator} = config.settings;
   let field = origField;
   field = normalizeField(config, field);
@@ -222,7 +222,7 @@ const convertFieldName = (origField, parentField, config) => {
 
 const convertFieldRhs = (op, vals, conv, config, not, meta, parentField = null) => {
   if (conv.varKeys.includes(op) && typeof vals[0] == "string") {
-    const field = convertFieldName(vals[0], parentField, config);
+    const field = convertFieldName(config, vals[0], parentField);
     const fieldConfig = getFieldConfig(config, field);
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);

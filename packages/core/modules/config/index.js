@@ -1264,6 +1264,9 @@ const settings = {
           return `.${key}`;
       }
     }).join("");
+    if (fieldDefinition.fieldName) {
+      fieldName = field;
+    }
     if (fieldDefinition.isSpelVariable) {
       fieldName = "#" + fieldName;
     }

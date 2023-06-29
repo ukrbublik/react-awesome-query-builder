@@ -618,6 +618,18 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   return res;
 };
 
+const convertFieldName = (config, origField, parentField) => {
+  const {fieldSeparator} = config.settings;
+  let field = origField;
+  field = normalizeField(config, field);
+  if (parentField) {
+    // tip: don't add prefix if normalized
+    if (field === origField) {
+      field = [parentField, field].join(fieldSeparator);
+    }
+  }
+  return field;
+};
 
 const convertPath = (parts, meta = {}, expectingField = false) => {
   let isError = false;
@@ -642,7 +654,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     // normal field
     const fullParts = [...groupFieldParts, spel.val];
     let field = fullParts.join(fieldSeparator);
-    field = normalizeField(config, field);
+    field = convertFieldName(config, spel.val, parentSpel?._groupField);
     const fieldConfig = getFieldConfig(config, field);
     const isVariable = spel.type == "variable";
     return {
@@ -657,7 +669,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
     if (parts) {
       const fullParts = [...groupFieldParts, ...parts];
       let field = fullParts.join(fieldSeparator);
-      field = normalizeField(config, field);
+      field = convertFieldName(config, parts, parentSpel?._groupField);
       const fieldConfig = getFieldConfig(config, field);
       const isVariable = spel.children?.[0]?.type == "variable";
       return {

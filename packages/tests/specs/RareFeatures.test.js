@@ -32,6 +32,7 @@ describe("rare features", () => {
 
   describe("import uses fieldName", () => {
     export_checks(configs.with_fieldName, inits.with_fieldName, "JsonLogic", {
+      "spel": "state.input.num == 2",
       "query": "state.input.num == 2",
       "queryHuman": "Number = 2",
       "sql": "state.input.num = 2",
@@ -50,6 +51,48 @@ describe("rare features", () => {
           }
         ]
       }
+    });
+  });
+
+  describe("import from SpEL uses fieldName", () => {
+    export_checks(configs.with_fieldName, inits.spel_with_fieldName, "SpEL", {
+      "spel": "state.input.num == 2",
+    });
+  });
+
+  describe("import uses fieldName in group", () => {
+    export_checks(configs.with_fieldName, inits.with_fieldName_in_group, "JsonLogic", {
+      "spel": "results.?[outcome == 3].size() > 0",
+      "query": "outcome == 3",
+      "queryHuman": "Results.Score = 3",
+      "mongo": {
+        "results": {
+          "$elemMatch": {
+            "outcome": 3
+          }
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "some": [
+              { "var": "results" },
+              {
+                "==": [
+                  { "var": "outcome" },
+                  3
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("import from SpEL uses fieldName in group", () => {
+    export_checks(configs.with_fieldName, inits.spel_with_fieldName_in_group, "SpEL", {
+      "spel": "results.?[outcome == 3].size() > 0",
     });
   });
 

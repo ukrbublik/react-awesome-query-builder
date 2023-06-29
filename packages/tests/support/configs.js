@@ -1033,6 +1033,18 @@ export const with_different_groups = (BasicConfig) => ({
 export const with_fieldName = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        score: {
+          label: "Score",
+          type: "number",
+          fieldName: "outcome"
+        },
+      }
+    },
     num: {
       fieldName: "state.input.num",
       label: "Number",

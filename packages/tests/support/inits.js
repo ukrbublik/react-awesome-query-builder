@@ -950,6 +950,26 @@ export const with_fieldName = {
   }]
 };
 
+export const spel_with_fieldName = "state.input.num == 2";
+
+export const with_fieldName_in_group = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        {
+          "==": [
+            { "var": "outcome" },
+            3
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const spel_with_fieldName_in_group = "results.?[outcome == 3].size() > 0";
+
 // rare
 export const with_groupVarKey = {
   "and": [
