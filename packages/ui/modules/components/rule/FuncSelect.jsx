@@ -6,7 +6,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const { clone } = Utils;
-const {getFieldConfig, getFuncConfig, getFieldParts, getFieldPath} = Utils.ConfigUtils;
+const {getFieldConfig, getFuncConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
 const {getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
@@ -72,8 +72,8 @@ export default class FuncSelect extends Component {
     const currFunc = isFuncSelected ? getFuncConfig(config, selectedFuncKey) : null;
     const selectedOpts = currFunc || {};
 
-    const selectedKeys = getFieldPath(selectedFuncKey, config);
-    const selectedPath = getFieldPath(selectedFuncKey, config, true);
+    const selectedKeys = getFieldPathParts(selectedFuncKey, config);
+    const selectedPath = getFieldPathParts(selectedFuncKey, config, true);
     const selectedLabel = this.getFuncLabel(currFunc, selectedFuncKey, config);
     const partsLabels = getFuncPathLabels(selectedFuncKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;

@@ -4,7 +4,7 @@ import uuid from "../utils/uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart, logger, widgetDefKeysToOmit} from "./stuff";
+import {mergeArraysSmart, logger, widgetDefKeysToOmit, deepFreeze} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 import clone from "clone";
 
@@ -21,32 +21,41 @@ export const extendConfig = (config, configId, canCompile = true) => {
     return config;
   }
 
+  // Clone (and compile if need)
   if (canCompile && config.settings.useConfigCompress) {
-    config = compileConfig(config);
+    if (config.__compliled) {
+      // already compiled
+      config = clone(config);
+    } else {
+      // will be cloned and compiled
+      config = compileConfig(config);
+    }
+  } else {
+    config = clone(config);
   }
-  
-  config = {...config};
+
   config.settings = mergeWith({}, defaultSettings, config.settings, mergeCustomizerNoArrays);
-  config._fieldsCntByType = {};
-  config._funcsCntByType = {};
 
-  config.types = clone(config.types);
-  _extendTypesConfig(config.types, config);
-
-  config.fields = clone(config.fields);
+  config.__fieldsCntByType = {};
+  config.__funcsCntByType = {};
   config.__fieldNames = {};
-  _extendFieldsConfig(config.fields, config);
 
-  config.funcs = clone(config.funcs);
+  _extendTypesConfig(config.types, config);
+  _extendFieldsConfig(config.fields, config);
   _extendFuncArgsConfig(config.funcs, config);
 
-  moment.locale(config.settings.locale.moment);
+  const momentLocale = config.settings.locale.moment;
+  if (momentLocale) {
+    moment.locale(momentLocale);
+  }
 
   Object.defineProperty(config, "__configId", {
     enumerable: false,
     writable: false,
     value: configId || uuid()
   });
+
+  deepFreeze(config);
 
   return config;
 };
@@ -107,9 +116,9 @@ function _extendFuncArgsConfig(subconfig, config, path = []) {
     const funcPath = [...path, funcKey].join(fieldSeparator);
     const funcDef = subconfig[funcKey];
     if (funcDef.returnType) {
-      if (!config._funcsCntByType[funcDef.returnType])
-        config._funcsCntByType[funcDef.returnType] = 0;
-      config._funcsCntByType[funcDef.returnType]++;
+      if (!config.__funcsCntByType[funcDef.returnType])
+        config.__funcsCntByType[funcDef.returnType] = 0;
+      config.__funcsCntByType[funcDef.returnType]++;
     }
     for (let argKey in funcDef.args) {
       _extendFieldConfig(funcDef.args[argKey], config, null, true);
@@ -176,9 +185,9 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
       return;
     }
     if (!isFuncArg) {
-      if (!config._fieldsCntByType[fieldConfig.type])
-        config._fieldsCntByType[fieldConfig.type] = 0;
-      config._fieldsCntByType[fieldConfig.type]++;
+      if (!config.__fieldsCntByType[fieldConfig.type])
+        config.__fieldsCntByType[fieldConfig.type] = 0;
+      config.__fieldsCntByType[fieldConfig.type]++;
     }
 
     if (!fieldConfig.widgets)
@@ -379,6 +388,21 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
   return ret;
 };
 
+export const isFieldDescendantOfField = (field, parentField, config = null) => {
+  if (!parentField) return false;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
+  const path = getFieldPath(field, config);
+  const parentPath = getFieldPath(parentField, config);
+  return path.startsWith(parentPath + fieldSeparator);
+};
+
+export const getFieldPath = (field, config = null) => {
+  if (typeof field === "string")
+    return field;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
+  return getFieldParts(field, config).join(fieldSeparator);
+};
+
 export const getFieldParts = (field, config = null) => {
   if (!field)
     return [];
@@ -394,7 +418,7 @@ export const getFieldParts = (field, config = null) => {
   return field?.split?.(fieldSeparator) || [];
 };
 
-export const getFieldPath = (field, config, onlyKeys = false) => {
+export const getFieldPathParts = (field, config, onlyKeys = false) => {
   if (!field)
     return null;
   const fieldSeparator = config.settings.fieldSeparator;

@@ -1,5 +1,6 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
+  isFieldDescendantOfField
 } from "./configUtils";
 import {defaultValue, getFirstDefined} from "../utils/stuff";
 import Immutable from "immutable";
@@ -254,7 +255,8 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
   const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
   const fieldSeparator = config.settings.fieldSeparator;
   const parts = getFieldParts(field, config);
-  const parentParts = getFieldParts(parentField, config);
+  const isDescendant = isFieldDescendantOfField(field, parentField, config)
+  const parentParts = !isDescendant ? [] : getFieldParts(parentField, config);
   return parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
@@ -392,15 +394,15 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
   return valueSrcs.filter(vs => {
     let canAdd = true;
     if (vs == "field") {
-      if (config._fieldsCntByType) {
+      if (config.__fieldsCntByType) {
         // tip: LHS field can be used as arg in RHS function
         const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
-        canAdd = canAdd && config._fieldsCntByType[fieldType] > minCnt;
+        canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
       }
     }
     if (vs == "func") {
-      if (config._funcsCntByType)
-        canAdd = canAdd && !!config._funcsCntByType[fieldType];
+      if (config.__funcsCntByType)
+        canAdd = canAdd && !!config.__funcsCntByType[fieldType];
       if (fieldDefinition.funcs)
         canAdd = canAdd && fieldDefinition.funcs.length > 0;
     }

@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getFieldPath
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts
 } from "../utils/configUtils";
 import {
   getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
@@ -270,7 +270,6 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
   if (field) {
     const fieldDefinition = getFieldConfig(config, field) || {};
     const fieldParts = getFieldParts(field, config);
-    const _fieldKeys = getFieldPath(field, config);
     const fieldPartsLabels = getFieldPathLabels(field, config, cutParentField ? parentField : null);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;

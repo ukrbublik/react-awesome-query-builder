@@ -1,6 +1,6 @@
 import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, getFieldPath
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts
 } from "../utils/configUtils";
 import {getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
@@ -305,7 +305,6 @@ const formatRightField = (meta, config, rightField, parentPath) => {
   if (rightField) {
     const rightFieldDefinition = getFieldConfig(config, rightField) || {};
     const fieldParts = getFieldParts(rightField, config);
-    const _fieldKeys = getFieldPath(rightField, config);
     const fieldPartsLabels = getFieldPathLabels(rightField, config);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
     const formatFieldFn = config.settings.formatField;

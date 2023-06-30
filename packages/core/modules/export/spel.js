@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts, getFieldPath
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
 import {
   getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
@@ -412,7 +412,6 @@ const formatField = (meta, config, field, parentField = null) => {
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
   const fieldParts = getFieldParts(field, config);
-  const _fieldKeys = getFieldPath(field, config, parentField);
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
   const formatFieldFn = config.settings.formatSpelField;
   const fieldName = formatFieldName(field, config, meta, parentField);

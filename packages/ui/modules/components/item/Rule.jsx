@@ -10,8 +10,8 @@ import OperatorOptions from "../rule/OperatorOptions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
-const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
-const {getFieldPathLabels, isEmptyRuleProperties} = Utils.RuleUtils;
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldParts} = Utils.ConfigUtils;
+const {isEmptyRuleProperties} = Utils.RuleUtils;
 
 
 class Rule extends Component {
@@ -71,8 +71,7 @@ class Rule extends Component {
 
   getMeta({selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
     const {keepInputOnChangeFieldSrc} = config.settings;
-    const fieldsKey = selectedFieldSrc === "func" ? "funcs" : "fields";
-    const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config, null, fieldsKey, "subfields", selectedFieldSrc);
+    const selectedFieldParts = getFieldParts(selectedField, config);
     const selectedFieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
     const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
     const isOkWithoutField = keepInputOnChangeFieldSrc && selectedFieldType;
@@ -90,7 +89,7 @@ class Rule extends Component {
     const showOperatorOptions = isFieldAndOpSelected && selectedOperatorHasOptions;
 
     return {
-      selectedFieldPartsLabels, selectedFieldWidgetConfig,
+      selectedFieldParts, selectedFieldWidgetConfig,
       showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
     };
   }
@@ -168,7 +167,7 @@ class Rule extends Component {
   renderOperator () {
     const {config, isLocked} = this.props;
     const {
-      selectedFieldPartsLabels, selectedFieldWidgetConfig, showOperator, showOperatorLabel
+      selectedFieldParts, selectedFieldWidgetConfig, showOperator, showOperatorLabel
     } = this.meta;
     const { immutableOpsMode } = config.settings;
     
@@ -180,7 +179,7 @@ class Rule extends Component {
       selectedFieldType={this.props.selectedFieldType}
       selectedOperator={this.props.selectedOperator}
       setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
-      selectedFieldPartsLabels={selectedFieldPartsLabels}
+      selectedFieldParts={selectedFieldParts}
       showOperator={showOperator}
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}

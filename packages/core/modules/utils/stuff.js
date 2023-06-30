@@ -238,6 +238,15 @@ export function mergeArraysSmart(arr1, arr2) {
     }, arr1.slice());
 }
 
+export const deepFreeze = obj => {
+  if (typeof obj === "object" && obj !== null) {
+    Object.keys(obj).forEach(prop => {
+      deepFreeze(obj[prop]);
+    });
+    Object.freeze(obj);
+  }
+};
+
 export const isJsonCompatible = (tpl, obj, bag = {}, path = []) => {
   if (isObject(tpl)) {
     if (tpl.var) {

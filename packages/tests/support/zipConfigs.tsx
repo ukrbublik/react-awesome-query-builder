@@ -169,9 +169,9 @@ const funcs: Funcs = {
     }
   },
   LOWER: omit({
-    ...BasicFuncs.LOWER,
+    ...(BasicFuncs.LOWER as Func),
     label: undefined, // modify, delete
-    mongoFunc: { lower: 12 }, // modify, change type from primitive to obj
+    mongoFunc: { lower: 12 } as unknown, // modify, change type from primitive to obj
     myFormat: 123, // add
     jsonLogicCustomOps: 1, // modify, change type from obj to primitive
     jsonLogic: "ToLowerCase", // modify
@@ -242,7 +242,7 @@ export const expectedZipConfig = {
       "label": "Numeric",
       "subfields": {
         "LINEAR_REGRESSION": {
-          "sqlFormatFunc": null,
+          "sqlFormatFunc": null as unknown,
           "renderSeps": ["*"],
           "args": {
             "coef": {
@@ -256,7 +256,7 @@ export const expectedZipConfig = {
             },
             "bias": "$$deleted"
           },
-          "myFormat": null,
+          "myFormat": null as unknown,
           "$$key": "LINEAR_REGRESSION",
           "spelFormatFunc": "$$deleted"
         }
@@ -299,7 +299,7 @@ export const expectedZipConfig = {
           "widgetProps": {
             "hideOperator": true,
             "operatorInlineLabel": "is",
-            "valueLabels": []
+            "valueLabels": [] as unknown
           },
           "opProps": 111
         }

@@ -181,6 +181,8 @@ const compileMeta = {
   settings: compileMetaSettings,
 };
 
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
 /////////////
 
 export const compressConfig = (config, baseConfig) => {
@@ -189,8 +191,6 @@ export const compressConfig = (config, baseConfig) => {
   }
   let zipConfig = pick(config, configKeys);
   delete zipConfig.ctx;
-
-  const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
   const _clean = (target, base, path, meta) => {
     if (isObject(target)) {
@@ -286,8 +286,6 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
   }
   let unzipConfig = {};
 
-  const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
-
   const _mergeDeep = (target, mixin, path) => {
     if (isObject(mixin)) {
       if (!isObject(target)) {
@@ -378,7 +376,7 @@ export const compileConfig = (config) => {
     return config;
   }
 
-  config = {...config};
+  config = clone(config);
 
   const opts = {
     ctx: config.ctx,
@@ -403,10 +401,10 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
   for (const k in meta) {
     const submeta = meta[k];
     let newPath = k === "x" ? path : [...path, k];
-    if (isRoot) {
-      //logs.push(`Cloned ${newPath.join(".")}`);
-      config[k] = clone(config[k]);
-    }
+    // if (isRoot) {
+    //   //logs.push(`Cloned ${newPath.join(".")}`);
+    //   config[k] = clone(config[k]);
+    // }
     if (submeta.type === "r") {
       const targetObj = subconfig;
       const val = targetObj[k];

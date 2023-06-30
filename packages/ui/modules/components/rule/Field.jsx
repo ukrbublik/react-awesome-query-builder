@@ -6,7 +6,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const {getFieldPathLabels} = Utils.RuleUtils;
-const {getFieldConfig, getFieldParts, getFieldPath} = Utils.ConfigUtils;
+const {getFieldConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
 
 
 export default class Field extends Component {
@@ -50,8 +50,8 @@ export default class Field extends Component {
     const currField = isFieldSelected ? getFieldConfig(config, selectedKey) : null;
     const selectedOpts = currField || {};
 
-    const selectedKeys = getFieldPath(selectedKey, config);
-    const selectedPath = getFieldPath(selectedKey, config, true);
+    const selectedKeys = getFieldPathParts(selectedKey, config);
+    const selectedPath = getFieldPathParts(selectedKey, config, true);
     const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
     const partsLabels = getFieldPathLabels(selectedKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
