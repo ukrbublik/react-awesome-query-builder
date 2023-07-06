@@ -255,7 +255,7 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
   const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
   const fieldSeparator = config.settings.fieldSeparator;
   const parts = getFieldParts(field, config);
-  const isDescendant = isFieldDescendantOfField(field, parentField, config)
+  const isDescendant = isFieldDescendantOfField(field, parentField, config);
   const parentParts = !isDescendant ? [] : getFieldParts(parentField, config);
   return parts
     .slice(parentParts.length)

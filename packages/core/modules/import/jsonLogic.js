@@ -599,7 +599,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
     return;
   }
 
-  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, fieldConfig, meta, parentField);
+  const lhs = convertLhs(isGroup0, jlField, jlArgs, conv, config, null, null, meta, parentField);
   if (!lhs) return;
   const {
     field, fieldSrc, having, isGroup, args

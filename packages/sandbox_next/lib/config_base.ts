@@ -356,6 +356,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
         widget: "func",
       }
     },
+    fieldSources: ["field", "func"],
     // canReorder: false,
     // canRegroup: false,
     // showNot: false,
