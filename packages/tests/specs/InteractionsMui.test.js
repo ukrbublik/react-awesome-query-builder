@@ -1,12 +1,30 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb_mui, sleep } from "../support/utils";
+import { with_qb_mui } from "../support/utils";
 import Slider from "@mui/material/Slider";
 import TextField from "@mui/material/TextField";
 import { expect } from "chai";
+import { autocompleteTestsFor } from "./Autocomplete";
 
 
 describe("interactions on MUI", () => {
+  describe("autocomplete", () => {
+    const {
+      testsSingleStrict,
+      testsMultipleStrict,
+    } = autocompleteTestsFor("mui", 5, it, with_qb_mui);
+
+    describe("single-strict", () => {
+      testsSingleStrict();
+    });
+
+    describe("multiple-strict", () => {
+      testsMultipleStrict();
+    });
+  });
+
+  //-------
+
   it("change range slider value", async () => {
     await with_qb_mui(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
       expect_checks({

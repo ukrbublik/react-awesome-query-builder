@@ -9,6 +9,7 @@ process.env.TZ = "Etc/UTC";
 process.env.BABEL_ENV = "test"; // Set the proper environment for babel
 
 const isCI = !!process.env.CI;
+const isDebug = !!process.env.TEST_DEBUG;
 
 module.exports = function(config) {
   config.set({
@@ -42,7 +43,7 @@ module.exports = function(config) {
       stats: "errors-only"
     },
 
-    reporters: isCI ? ["mocha", "junit", "coverage"] : ["progress", "coverage"],
+    reporters: isCI ? ["mocha", "junit", "coverage"] : isDebug ? ["progress"] : ["progress", "coverage"],
 
     junitReporter: {
       outputDir: "junit",
@@ -67,14 +68,29 @@ module.exports = function(config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: false,
-    browsers: ["ChromeHeadlessNoSandbox"],
+    browsers: isDebug ? ["ChromeWithDebugging"] : ["ChromeHeadlessNoSandbox"],
     customLaunchers: {
+      ChromeWithDebugging: {
+        base: 'Chrome',
+        flags: [
+          "--no-sandbox", 
+          "--remote-debugging-port=9333"
+        ],
+        debug: true,
+      },
       ChromeHeadlessNoSandbox: {
         base: "ChromeHeadless",
-        flags: ["--no-sandbox", "--disable-setuid-sandbox"]
+        flags: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox"
+        ],
       }
     },
     singleRun: true,
-    concurrency: 1
+    concurrency: 1,
+    // captureTimeout: 60000,
+    browserDisconnectTimeout : isDebug ? 1000*60*10 : 1000*20,
+    browserDisconnectTolerance : isDebug ? 1 : 0,
+    browserNoActivityTimeout : isDebug ? 1000*60 : 1000*30,
   });
 };

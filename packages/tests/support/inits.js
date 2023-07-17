@@ -899,11 +899,24 @@ export const with_group_array_custom_operator = {
   ]
 };
 
-export const with_autocomplete_a = {
+export const with_autocomplete_strict_a = {
   "and": [{
     "==": [
-      { "var": "autocomplete" },
+      { "var": "autocompleteStrict" },
       "a"
+    ]
+  }]
+};
+
+export const with_autocomplete_multi_strict_a = {
+  "and": [{
+    "all": [
+      { "var": "autocompleteMultipleStrict" },
+      { "in": [{ "var": "" },
+        [
+          "a"
+        ]
+      ]}
     ]
   }]
 };

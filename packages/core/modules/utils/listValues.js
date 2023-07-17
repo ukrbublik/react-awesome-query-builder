@@ -1,18 +1,42 @@
 
-const isObject = (v) => (typeof v == "object" && v !== null); // object or array
-const listValue = (v, title) => (isObject(v) ? v : {value: v, title: (title !== undefined ? title : v)});
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
+export const toListValue = (v, title) => {
+  if (v == null || v == "") {
+    return undefined;
+  } else if (isObject(v)) {
+    return v;
+  } else {
+    return {
+      value: v,
+      title: (title !== undefined ? title : v)
+    };
+  }
+};
+
+export const makeCustomListValue = (v) => {
+  const lv = toListValue(v);
+  if (isObject(lv)) {
+    return {
+      ...toListValue(v),
+      isCustom: true,
+    };
+  } else {
+    return lv;
+  }
+};
 
 // convert {<value>: <title>, ..} or [value, ..] to normal [{value, title}, ..]
 export const listValuesToArray = (listValuesObj) => {
+  if (Array.isArray(listValuesObj))
+    return listValuesObj.map(v => toListValue(v));
   if (!isObject(listValuesObj))
     return listValuesObj;
-  if (Array.isArray(listValuesObj))
-    return listValuesObj.map(v => listValue(v));
   
   let listValuesArr = [];
   for (let v in listValuesObj) {
     const title = listValuesObj[v];
-    listValuesArr.push(listValue(v, title));
+    listValuesArr.push(toListValue(v, title));
   }
   return listValuesArr;
 };
@@ -20,10 +44,10 @@ export const listValuesToArray = (listValuesObj) => {
 // listValues can be {<value>: <title>, ..} or [{value, title}, ..] or [value, ..]
 export const getItemInListValues = (listValues, value) => {
   if (Array.isArray(listValues)) {
-    const values = listValues.map(v => listValue(v));
-    return values.find(v => (v.value === value)) || values.find(v => (`${v.value}` === value));
+    const values = listValues.map(v => toListValue(v));
+    return values.find(v => (""+v.value === ""+value));
   } else {
-    return listValues[value] !== undefined ? listValue(value, listValues[value]) : undefined;
+    return listValues[value] !== undefined ? toListValue(value, listValues[value]) : undefined;
   }
 };
 
@@ -45,16 +69,31 @@ export const mapListValues = (listValues, mapFn) => {
   let ret = [];
   if (Array.isArray(listValues)) {
     for (let v of listValues) {
-      const lv = mapFn(listValue(v));
+      const lv = mapFn(toListValue(v));
       if (lv != null)
         ret.push(lv);
     }
   } else {
     for (let value in listValues) {
-      const lv = mapFn(listValue(value, listValues[value]));
+      const lv = mapFn(toListValue(value, listValues[value]));
       if (lv != null)
         ret.push(lv);
     }
   }
   return ret;
 };
+
+export const searchListValue = (search, listValues) => 
+  mapListValues(listValues, (lv) => (
+    `${lv.value}`.indexOf(search) != -1 || lv.title.indexOf(search) != -1
+      ? lv : null
+  ))
+    .filter(v => v !== null)
+    .shift();
+
+export const getListValue = (selectedValue, listValues) => 
+  mapListValues(listValues, 
+    (lv) => (""+lv.value === ""+selectedValue ? lv : null)
+  )
+    .filter(v => v !== null)
+    .shift();

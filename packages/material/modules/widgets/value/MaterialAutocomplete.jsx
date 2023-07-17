@@ -5,15 +5,15 @@ import FormControl from "@material-ui/core/FormControl";
 import Autocomplete, { createFilterOptions } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Chip from "@material-ui/core/Chip";
-import Checkbox from "@material-ui/core/Checkbox";
+import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import { Hooks } from "@react-awesome-query-builder/ui";
 const { useListValuesAutocomplete } = Hooks;
 
-const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
+const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" style={{ marginRight: 10, marginTop: 4 }} />;
+const checkedIcon = <CheckBoxIcon fontSize="small" style={{ marginRight: 10, marginTop: 4 }} />;
 const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
@@ -39,15 +39,18 @@ export default (props) => {
     extendOptions,
     getOptionSelected,
     getOptionDisabled,
+    getOptionIsCustom,
     getOptionLabel,
+    selectedListValue,
   } = useListValuesAutocomplete(props, {
     debounceTimeout: 100,
-    multiple
+    multiple,
+    uif: "mui"
   });
 
   // setings
   const {defaultSelectWidth, defaultSearchWidth} = config.settings;
-  const {width, showCheckboxes, ...rest} = customProps || {};
+  const {width, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
   const inputWidth = customInputProps.width || defaultSearchWidth;
   customInputProps = omit(customInputProps, ["width"]);
@@ -94,9 +97,18 @@ export default (props) => {
 
   // render
   const renderInput = (params) => {
+    // parity with Antd
+    const shouldRenderSelected = !multiple && !open;
+    const selectedTitle = selectedListValue?.title ?? "";
+    const shouldHide = multiple && !open;
+    const value = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? "");
     return (
       <TextField 
-        {...params} 
+        {...params}
+        inputProps={{
+          ...params.inputProps,
+          value,
+        }}
         InputProps={{
           ...params.InputProps,
           readOnly: readonly,
@@ -116,29 +128,53 @@ export default (props) => {
   };
 
   const renderTags = (value, getTagProps) => value.map((option, index) => {
+    const className = getOptionIsCustom(option) ? "customSelectOption" : undefined;
+    const titleSpan = (
+      <span className={className}>
+        {getOptionLabel(option)}
+      </span>
+    );
     return <Chip
-      key={index}
+      key={option.value}
       classes={classesChip}
-      label={getOptionLabel(option)}
+      label={titleSpan}
+      size={"small"}
+      //variant={getOptionIsCustom(option) ? "outlined" : undefined}
       {...getTagProps({ index })}
     />;
   });
 
   const renderOption = (option, { selected }) => {
-    if (option.specialValue) {
-      return <React.Fragment>{option.renderTitle || option.title}</React.Fragment>;
-    } else if (multiple && showCheckboxes != false) {
-      return <React.Fragment>
-        <Checkbox
-          icon={nonCheckedIcon}
-          checkedIcon={checkedIcon}
-          style={{ marginRight: 8 }}
-          checked={selected}
-        />
-        {option.title}
-      </React.Fragment>;
+    const { title, renderTitle, value, specialValue, isHidden } = option;
+    const isSelected = selected;
+    //const isSelected = multiple ? (selectedValue || []).includes(value) : selectedValue == value;
+    const className = getOptionIsCustom(option) ? "customSelectOption" : undefined;
+    const titleSpan = (
+      <span className={className}>
+        {renderTitle || title}
+      </span>
+    );
+    if (isHidden)
+      return null;
+    if (multiple) {
+      if (specialValue)
+        return (
+          <Box>
+            {renderTitle || title}
+          </Box>
+        );
+      else
+        return (
+          <Box>
+            {selected ? checkedIcon : nonCheckedIcon}
+            {titleSpan}
+          </Box>
+        );
     } else {
-      return <React.Fragment>{option.renderTitle || option.title}</React.Fragment>;
+      if (specialValue)
+        return <React.Fragment>{renderTitle || title}</React.Fragment>;
+      else
+        return <React.Fragment>{titleSpan}</React.Fragment>;
     }
   };
 
