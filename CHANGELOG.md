@@ -13,6 +13,7 @@
   - Fixed render of option titles in Autocomplete AntDesign (PR #947) (issues #930, #942)
   - Implemented `allowCustomValues` for MUI (PR #947) (issue #327)
   - Improved autocomplete for MUI and AntD. Mark custom values with coral color (PR #947)
+  - Type fixes for `strictNullChecks` (PR #948) (issue #945)
 - 6.2.0
   - Fixed type `Config`: should have render settings like `renderSize` (PR #909) (issue #879)
   - Fixed type for `renderBeforeWidget`: `RuleProps` instead of wrong `FieldProps` (PR #909) (issue #879)
