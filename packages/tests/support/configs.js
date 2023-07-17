@@ -966,6 +966,30 @@ export const with_group_array_custom_operator = (BasicConfig) => ({
 export const with_autocomplete = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
+    autocompleteStrict: {
+      label: "AutocompleteStrict",
+      type: "select",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
+    },
+    autocompleteMultipleStrict: {
+      label: "AutocompleteMultipleStrict",
+      type: "multiselect",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: false
+      },
+    },
     autocomplete: {
       label: "Autocomplete",
       type: "select",
@@ -975,7 +999,19 @@ export const with_autocomplete = (BasicConfig) => ({
         useAsyncSearch: true,
         useLoadMore: true,
         forceAsyncSearch: false,
-        allowCustomValues: false
+        allowCustomValues: true
+      },
+    },
+    autocompleteMultiple: {
+      label: "AutocompleteMultiple",
+      type: "multiselect",
+      valueSources: ["value"],
+      fieldSettings: {
+        asyncFetch: simulatedAsyncFetch,
+        useAsyncSearch: true,
+        useLoadMore: true,
+        forceAsyncSearch: false,
+        allowCustomValues: true
       },
     },
   },

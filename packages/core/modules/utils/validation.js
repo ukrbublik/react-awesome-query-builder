@@ -306,10 +306,13 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     const jsType = wConfig.jsType;
     const fieldSettings = fieldConfig.fieldSettings;
     const listValues = fieldSettings?.treeValues || fieldSettings?.listValues;
+    const isAsyncListValues = !!fieldSettings?.asyncFetch;
+    // todo: for select/multiselect value can be string or number
+    const canSkipCheck = listValues || isAsyncListValues; 
 
     if (valueType && valueType != wType)
       return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
-    if (jsType && !isTypeOf(value, jsType) && !listValues) { //tip: can skip type check for listValues
+    if (jsType && !isTypeOf(value, jsType) && !canSkipCheck) {
       return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
     }
 
