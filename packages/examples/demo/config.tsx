@@ -211,11 +211,11 @@ export default (skin: string) => {
     operatorPlaceholder: "Select operator",
     lockLabel: "Lock",
     lockedLabel: "Locked",
-    deleteLabel: null,
+    deleteLabel: undefined,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
-    delGroupLabel: null,
+    delGroupLabel: undefined,
     notLabel: "Not",
     valueSourcesPopupTitle: "Select value source",
     removeRuleConfirmOptions: {
