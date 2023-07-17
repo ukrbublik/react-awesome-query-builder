@@ -31,8 +31,8 @@ interface DemoQueryBuilderState {
 }
 
 export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
-  private immutableTree: ImmutableTree;
-  private config: Config;
+  private immutableTree: ImmutableTree | undefined;
+  private config: Config | undefined;
     
   state = {
     tree: initTree,
@@ -89,7 +89,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
   };
 
   updateResult = throttle(() => {
-    this.setState({tree: this.immutableTree, config: this.config});
+    this.setState({tree: this.immutableTree!, config: this.config!});
   }, 100);
 
   renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
@@ -127,7 +127,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
-          { errors.length > 0 
+          { (errors?.length || 0) > 0 
               && <pre style={preErrorStyle}>
                 {stringify(errors, undefined, 2)}
               </pre> 

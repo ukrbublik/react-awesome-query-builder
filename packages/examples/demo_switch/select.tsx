@@ -66,7 +66,7 @@ const MltSelector: FC<Iprops> = ({
       key={k}
       isMulti
       options={options}
-      value={initMltSelectValueHandler(options, value)}
+      value={initMltSelectValueHandler(options, value!)}
       getOptionValue={(option: OptionItem) => option.id}
       getOptionLabel={(option: OptionItem) => option.label}
       onChange={(values, actionMeta) => {

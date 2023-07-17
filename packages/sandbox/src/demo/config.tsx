@@ -389,11 +389,11 @@ export function createConfig(InitialConfig: BasicConfig): Config {
     operatorLabel: "Operator",
     fieldPlaceholder: "Select field",
     operatorPlaceholder: "Select operator",
-    deleteLabel: null,
+    deleteLabel: undefined,
     addGroupLabel: "Add group",
     addRuleLabel: "Add rule",
     addSubRuleLabel: "Add sub rule",
-    delGroupLabel: null,
+    delGroupLabel: undefined,
     notLabel: "Not",
     valueSourcesPopupTitle: "Select value source",
     removeRuleConfirmOptions: {
