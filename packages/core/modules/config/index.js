@@ -560,19 +560,7 @@ const widgets = {
       return isForDisplay ? this.utils.stringifyForDisplay(val) : JSON.stringify(val);
     },
     spelFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      if (opDef?.spelOp == "matches" && op != "regex") {
-        let regex;
-        if (op == "starts_with") {
-          regex = `(?s)^${this.utils.escapeRegExp(val)}.*`;
-        } else if (op == "ends_with") {
-          regex = `(?s).*${this.utils.escapeRegExp(val)}$`;
-        } else { // op == 'like'
-          regex = `(?s).*${this.utils.escapeRegExp(val)}.*`; //tip: can use (?sui) for case-insensitive
-        }
-        return this.utils.spelEscape(regex);
-      } else {
-        return this.utils.spelEscape(val);
-      }
+      return this.utils.spelEscape(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {

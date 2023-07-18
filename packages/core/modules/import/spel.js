@@ -384,7 +384,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
   if (!spel) return undefined;
 
   let res, canParseAsArg = true;
-  if (spel.type.indexOf("op-") === 0) {
+  if (spel.type.indexOf("op-") === 0 || spel.type === "matches") {
     res = convertOp(spel, conv, config, meta, parentSpel);
   } else if (spel.type == "!aggr") {
     const groupFieldValue = convertToTree(spel.source, conv, config, meta, {
@@ -447,7 +447,7 @@ const convertToTree = (spel, conv, config, meta, parentSpel = null) => {
 const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   let res;
 
-  let op = spel.type.slice("op-".length);
+  let op = spel.type.startsWith("op-") ? spel.type.slice("op-".length) : spel.type;
 
   // unary
   const isUnary = (op == "minus" || op == "plus") && spel.children.length == 1;
@@ -1039,8 +1039,8 @@ const buildRule = (config, meta, field, opKey, convertedArgs, spel) => {
   let fieldSrc = field?.func ? "func" : "field";
   if (isObject(field) && field.valueSrc) {
     // if comed from convertFuncToOp()
-    field = field.value;
     fieldSrc = field.valueSrc;
+    field = field.value;
   }
   const fieldConfig = getFieldConfig(config, field);
   if (!fieldConfig) {
