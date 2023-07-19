@@ -968,6 +968,18 @@ export const with_fieldName_in_group = {
   ]
 };
 
+export const with_fieldName_in_struct = {
+  "and": [
+    {
+      ">=": [ { "var": "person.age" }, 18 ]
+    }, {
+      "==": [ { "var": "userName" }, "Denys" ]
+    }, {
+      "==": [ { "var": "account.id" }, "123" ]
+    }
+  ]
+};
+
 export const spel_with_fieldName_in_group = "results.?[outcome == 3].size() > 0";
 
 // rare

@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
 import {
   getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
@@ -17,7 +17,8 @@ export const queryString = (item, config, isForDisplay = false) => {
     errors: []
   };
 
-  const res = formatItem(item, config, meta, isForDisplay, null);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(item, extendedConfig, meta, isForDisplay, null);
 
   if (meta.errors.length)
     console.warn("Errors while exporting to string:", meta.errors);

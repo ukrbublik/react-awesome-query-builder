@@ -90,6 +90,73 @@ describe("rare features", () => {
     });
   });
 
+  describe("import uses fieldName in struct", () => {
+    export_checks(configs.with_fieldName, inits.with_fieldName_in_struct, "JsonLogic", {
+      "query": "(person.age >= 18 && userName == \"Denys\" && account.id == \"123\")",
+      "queryHuman": "(user.age >= 18 AND user.name = Denys AND user.id = 123)",
+      "sql": "(person.age >= 18 AND userName = 'Denys' AND account.id = '123')",
+      "spel": "(person.age >= 18 && userName == 'Denys' && account.id == '123')",
+      "mongo": {
+        "person.age": {
+          "$gte": 18
+        },
+        "userName": "Denys",
+        "account.id": "123"
+      },
+      "logic": {
+        "and": [
+          {
+            ">=": [
+              {
+                "var": "person.age"
+              },
+              18
+            ]
+          },
+          {
+            "==": [
+              {
+                "var": "userName"
+              },
+              "Denys"
+            ]
+          },
+          {
+            "==": [
+              {
+                "var": "account.id"
+              },
+              "123"
+            ]
+          }
+        ]
+      },
+      // "elasticSearch": {
+      //   "bool": {
+      //     "must": [
+      //       {
+      //         "range": {
+      //           "user.age": {
+      //             "gte": "18"
+      //           }
+      //         }
+      //       },
+      //       {
+      //         "term": {
+      //           "user.name": "Denys"
+      //         }
+      //       },
+      //       {
+      //         "term": {
+      //           "user.id": "123"
+      //         }
+      //       }
+      //     ]
+      //   }
+      // }
+    });
+  });
+
   describe("import from SpEL uses fieldName in group", () => {
     export_checks(configs.with_fieldName, inits.spel_with_fieldName_in_group, "SpEL", {
       "spel": "results.?[outcome == 3].size() > 0",

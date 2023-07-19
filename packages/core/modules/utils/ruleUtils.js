@@ -424,6 +424,8 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null, fi
   return widget;
 };
 
+// can use alias (fieldName)
+// even if `parentField` is provided, `field` is still a full path
 export const formatFieldName = (field, config, meta, parentField = null, options = {}) => {
   if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
@@ -441,9 +443,6 @@ export const formatFieldName = (field, config, meta, parentField = null, options
   if (parentField) {
     const parentFieldDef = getFieldConfig(config, parentField) || {};
     let parentFieldName = parentField;
-    if (parentFieldDef.fieldName) {
-      parentFieldName = parentFieldDef.fieldName;
-    }
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
       // fieldName = "#this." + fieldName; // ? for spel

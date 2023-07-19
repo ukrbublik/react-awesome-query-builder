@@ -1050,6 +1050,23 @@ export const with_fieldName = (BasicConfig) => ({
       label: "Number",
       type: "number",
     },
+    user: {
+      type: "!struct",
+      fieldName: "account",
+      subfields: {
+        id: {
+          type: "text",
+        },
+        name: {
+          type: "text",
+          fieldName: "userName",
+        },
+        age: {
+          type: "number",
+          fieldName: "person.age",
+        }
+      }
+    },
   },
 });
 

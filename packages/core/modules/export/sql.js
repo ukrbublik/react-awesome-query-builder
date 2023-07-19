@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
 import {
   getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
@@ -21,7 +21,8 @@ export const _sqlFormat = (tree, config, returnErrors = true) => {
     errors: []
   };
 
-  const res = formatItem(tree, config, meta);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(tree, extendedConfig, meta);
 
   if (returnErrors) {
     return [res, meta.errors];

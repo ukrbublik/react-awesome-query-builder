@@ -230,13 +230,12 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     }
   }
 
-  const computedFieldName = computeFieldName(config, path);
-  if (computedFieldName) {
-    fieldConfig.fieldName = computedFieldName;
-  }
-
-  if (path && fieldConfig.fieldName) {
-    config.__fieldNames[fieldConfig.fieldName] = path;
+  const { fieldName, inGroup } = computeFieldName(config, path);
+  if (fieldName) {
+    fieldConfig.fieldName = fieldName;
+    if (!config.__fieldNames[fieldName])
+      config.__fieldNames[fieldName] = [];
+    config.__fieldNames[fieldName].push({fullPath: path, inGroup});
   }
 }
 
@@ -284,7 +283,6 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
     };
   }
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
-  //field = normalizeField(config, field);
   const parts = getFieldParts(field, config);
   const targetFields = config[fieldsKey];
   if (!targetFields)
@@ -313,26 +311,45 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
 
 const computeFieldName = (config, path) => {
   if (!path)
-    return null;
+    return {};
   const fieldSeparator = config.settings.fieldSeparator;
-  let l = [...path], r = [], f, fConfig;
-  while ((f = l.pop()) !== undefined && l.length > 0) {
-    r.unshift(f);
-    fConfig = getFieldRawConfig(config, l);
-    if (fConfig.fieldName) {
-      return [fConfig.fieldName, ...r].join(fieldSeparator);
+  const {computedPath, computed, inGroup} = [...path].reduce(({computedPath, computed, inGroup}, f, i, arr) => {
+    const fullPath = [...arr.slice(0, i), f];
+    const fConfig = getFieldRawConfig(config, fullPath);
+    if (fConfig?.type === "!group" && i < arr.length-1) {
+      // don't include group in final field name
+      inGroup = fullPath.join(fieldSeparator);
+      computedPath = [];
+    } else if (fConfig?.fieldName) {
+      // tip: fieldName overrides path !
+      computed = true;
+      computedPath = [fConfig.fieldName];
+    } else {
+      computedPath = [...computedPath, f];
     }
-  }
-  return null;
+    return {computedPath, computed, inGroup};
+  }, {computedPath: [], computed: false, inGroup: undefined});
+  return computed ? {
+    fieldName: computedPath.join(fieldSeparator),
+    inGroup,
+  } : {};
 };
 
-export const normalizeField = (config, field) => {
+// if `field` is alias (fieldName), convert to original full path
+export const normalizeField = (config, field, parentField = null) => {
+  // tip: if parentField is present, field is not full path
   const fieldSeparator = config.settings.fieldSeparator;
-  const fieldStr = Array.isArray(field) ? field.join(fieldSeparator) : field;
-  if (config.__fieldNames[fieldStr]) {
-    return config.__fieldNames[fieldStr].join(fieldSeparator);
-  }
-  return fieldStr;
+  const path = [
+    parentField,
+    ...field.split(fieldSeparator)
+  ].filter(f => f != null);
+  const findStr = field;
+  const normalizedPath = config.__fieldNames[findStr]?.find?.(({inGroup}) => {
+    if (inGroup)
+      return parentField?.startsWith(inGroup);
+    return true;
+  })?.fullPath;
+  return (normalizedPath || path).join(fieldSeparator);
 };
 
 export const getFuncSignature = (config, func) => {

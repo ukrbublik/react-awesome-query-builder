@@ -500,6 +500,7 @@ const operators = {
       return `${field} ${val1} NEAR/${prox} ${val2}`;
     },
     sqlFormatOp: function (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) {
+      // https://learn.microsoft.com/en-us/sql/relational-databases/search/search-for-words-close-to-another-word-with-near?view=sql-server-ver16#example-1
       const val1 = values.first();
       const val2 = values.get(1);
       const aVal1 = this.utils.SqlString.trim(val1);

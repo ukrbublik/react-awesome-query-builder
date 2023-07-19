@@ -207,22 +207,9 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   };
 };
 
-const convertFieldName = (config, origField, parentField) => {
-  const {fieldSeparator} = config.settings;
-  let field = origField;
-  field = normalizeField(config, field);
-  if (parentField) {
-    // tip: don't add prefix if normalized
-    if (field === origField) {
-      field = [parentField, field].join(fieldSeparator);
-    }
-  }
-  return field;
-};
-
 const convertFieldRhs = (op, vals, conv, config, not, meta, parentField = null) => {
   if (conv.varKeys.includes(op) && typeof vals[0] == "string") {
-    const field = convertFieldName(config, vals[0], parentField);
+    const field = normalizeField(config, vals[0], parentField);
     const fieldConfig = getFieldConfig(config, field);
     if (!fieldConfig) {
       meta.errors.push(`No config for field ${field}`);
@@ -404,8 +391,8 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
 const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRuleGroup = false) => {
   const conjKey = conv.conjunctions[op];
   const {fieldSeparator} = config.settings;
-  const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
-  const isParentGroup = parentFieldConfig?.type == "!group";
+  // const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
+  // const isParentGroup = parentFieldConfig?.type == "!group";
   if (conjKey) {
     let type = "group";
     const children = vals
@@ -427,12 +414,12 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
         return [f, Object.keys(ancs)];
       })
     );
-    const childrenInRuleGroup = Object.values(children)
-      .map(v => v?.properties?.fieldSrc == "field" && v?.properties?.field)
-      .map(f => complexFieldsGroupAncestors[f])
-      .filter(ancs => ancs && ancs.length);
-    const usedRuleGroups = arrayUniq(Object.values(complexFieldsGroupAncestors).flat());
-    const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
+    // const childrenInRuleGroup = Object.values(children)
+    //   .map(v => v?.properties?.fieldSrc == "field" && v?.properties?.field)
+    //   .map(f => complexFieldsGroupAncestors[f])
+    //   .filter(ancs => ancs && ancs.length);
+    // const usedRuleGroups = arrayUniq(Object.values(complexFieldsGroupAncestors).flat());
+    // const usedTopRuleGroups = topLevelFieldsFilter(usedRuleGroups);
     
     let properties = {
       conjunction: conjKey,
@@ -465,7 +452,6 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
             .split(fieldSeparator)
             .slice(parentFieldParts.length)
             .map((f, i, parts) => [...parentFieldParts, ...parts.slice(0, i), f].join(fieldSeparator))
-            .map(f => normalizeField(config, f))
             .map((f) => ({f, fc: getFieldConfig(config, f) || {}}))
             .filter(({fc}) => (fc.type != "!struct"));
           traverseGroupFields.map(({f: gf, fc: gfc}, i) => {
