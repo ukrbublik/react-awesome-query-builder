@@ -1,9 +1,14 @@
 import React from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import debounce from "lodash/debounce";
-const { mergeListValues, listValueToOption, getListValue } = Utils.Autocomplete;
-const { mapListValues, listValuesToArray } = Utils.ListUtils;
+const { mergeListValues, listValueToOption, optionToListValue, optionsToListValues } = Utils.Autocomplete;
+const { mapListValues, listValuesToArray, getListValue, makeCustomListValue, searchListValue, getItemInListValues } = Utils.ListUtils;
 
+function sleep(delay) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, delay);
+  });
+}
 
 const useListValuesAutocomplete = ({
   asyncFetch, useLoadMore, useAsyncSearch, forceAsyncSearch,
@@ -13,7 +18,8 @@ const useListValuesAutocomplete = ({
   config
 }, {
   debounceTimeout,
-  multiple
+  multiple,
+  uif
 }) => {
   const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
   const loadMoreTitle = "Load more...";
@@ -36,8 +42,25 @@ const useListValuesAutocomplete = ({
   // compute
   const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
   const listValues = asyncFetch
-    ? (!allowCustomValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
+    ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
     : staticListValues;
+  let listValuesToDisplay = asyncFetch
+    ? asyncListValues
+    : staticListValues;
+  if (allowCustomValues && inputValue && !searchListValue(inputValue, asyncListValues)) {
+    listValuesToDisplay = mergeListValues(listValuesToDisplay, [makeCustomListValue(inputValue)], true);
+  }
+  if (asyncFetch && !asyncListValues && selectedAsyncListValues && !inputValue && !open && uif === "antd") {
+    // for initial loading, to resolve "a" -> "A"
+    listValuesToDisplay = listValues;
+  }
+  if (asyncFetch && !allowCustomValues && selectedAsyncListValues && uif === "mui") {
+    // to prevent warning, when select A, search E -> A is missing in options
+    //  MUI: The value provided to Autocomplete is invalid.
+    //  None of the options match with `"a"`.
+    //  You can use the `isOptionEqualToValue` prop to customize the equality test.
+    listValuesToDisplay = mergeListValues(listValuesToDisplay, nSelectedAsyncListValues, true, true);
+  }
   //const isDirtyInitialListValues = asyncListValues == undefined && selectedAsyncListValues && selectedAsyncListValues.length && typeof selectedAsyncListValues[0] != "object";
   const isLoading = loadingCnt > 0;
   const canInitialLoad = open && asyncFetch
@@ -47,10 +70,10 @@ const useListValuesAutocomplete = ({
   const canLoadMore = !isInitialLoading && listValues && listValues.length > 0
     && asyncFetchMeta && asyncFetchMeta.hasMore && (asyncFetchMeta.filter || "") === inputValue;
   const canShowLoadMore = !isLoading && canLoadMore;
-  const options = mapListValues(listValues, listValueToOption);
+  const options = mapListValues(listValuesToDisplay, listValueToOption);
   const hasValue = selectedValue != null;
-  // const selectedListValue = hasValue ? getListValue(selectedValue, listValues) : null;
-  // const selectedOption = listValueToOption(selectedListValue);
+  const selectedListValue = !multiple && hasValue ? getListValue(selectedValue, listValues) : null;
+  // const selectedListValues = multiple && hasValue ? selectedValue.map(v => getItemInListValues(listValues, v)) : [];
 
   // fetch
   const fetchListValues = async (filter = null, isLoadMore = false) => {
@@ -132,14 +155,22 @@ const useListValuesAutocomplete = ({
     setOpen(true);
   };
 
-  const onClose = (_e) => {
-    if (isSelectedLoadMore.current) {
+  const onClose = async (_e) => {
+    const isLoadMoreClick = isSelectedLoadMore.current;
+    if (isLoadMoreClick) {
       isSelectedLoadMore.current = false;
       if (multiple) {
+        // required for MUI
         setOpen(false);
       }
     } else {
       setOpen(false);
+    }
+
+    if (uif === "mui" && !isLoadMoreClick) {
+      // parity with Antd
+      const resetValue = "";
+      await onInputChange(null, resetValue, "my-reset");
     }
   };
 
@@ -156,70 +187,91 @@ const useListValuesAutocomplete = ({
     return knownSpecialValues.includes(specialValue);
   };
 
-  const onChange = async (_e, option) => {
-    let specialValue = option?.specialValue || option?.value 
-      || multiple && option.map(opt => opt?.specialValue || opt?.value).find(v => !!v);
+  const onChange = async (e, val, option) => {
+    // todo: don't rely on 3rd param. check MUI 6
+    const isClearingAll = multiple && uif === "mui" && option === "clear";
+    // if user removes all chars in search, don't clear selected value
+    const isClearingInput = !multiple && uif === "mui" && option === "clear" && e?.type === "change";
+    if (uif === "mui") {
+      option = val;
+      if (multiple) {
+        val = option.map(o => (o?.value ?? o));
+      } else {
+        val = option?.value ?? option;
+      }
+    }
+    const specialValue = multiple && Array.isArray(option) && option.map(opt => opt?.specialValue).find(v => !!v)
+      || option?.specialValue;
+    if (multiple && val && !Array.isArray(val)) {
+      val = [...(selectedValue || []), val];
+      option = null;
+    }
+    // if there are tags AND input and select is opened, clear input first
+    const shouldIgnore = isClearingAll && val.length === 0 && inputValue && open
+      || isClearingInput;
+    if (shouldIgnore) {
+      return;
+    }
+    const isAddingCustomOptionFromSearch 
+      = multiple
+      && val.length && val.length > (selectedValue || []).length
+      && val[val.length-1] == inputValue
+      && !getListValue(inputValue, asyncListValues);
+
     if (specialValue == "LOAD_MORE") {
+      setInputValue(inputValue);
       isSelectedLoadMore.current = true;
       await loadListValues(inputValue, true);
     } else if (specialValue == "LOADING_MORE") {
       isSelectedLoadMore.current = true;
     } else {
       if (multiple) {
-        const options = option;
-        let newSelectedListValues = options.map((o, i) => {
-          const item = o.value != null ? o : getListValue(o, listValues);
-          // AntDesign puts array of labels in `_e` (`option` is array of objects, but custom option is always `{}`)
-          // MUI puts array of labels in `option`
-          const customItem = allowCustomValues && !item ? (Array.isArray(_e) ? _e[i] : o) : null;
-          return item || customItem;
-        });
-        let newSelectedValues = newSelectedListValues
-          .filter(o => o !== undefined)
-          .map(o => (o.value !== undefined ? o.value : o));
-        if (!newSelectedValues.length)
-          newSelectedValues = undefined; //not allow []
-        setValue(newSelectedValues, newSelectedListValues);
+        const [newSelectedValues, newSelectedListValues] = optionsToListValues(val, listValues, allowCustomValues);
+        setValue(newSelectedValues, asyncFetch ? newSelectedListValues : undefined);
+        
+        if (isAddingCustomOptionFromSearch) {
+          await sleep(0);
+          await onInputChange(null, "", "my-reset");
+        }
       } else {
-        const v = option == null ? undefined : option.value;
-        setValue(v, [option]);
+        const [v, lvs] = optionToListValue(val, listValues, allowCustomValues);
+        setValue(v, asyncFetch ? lvs : undefined);
       }
     }
   };
 
-  const onInputChange = async (_e, newInputValue) => {
+  const onInputChange = async (e, newInputValue, eventType) => {
+    // eventType=reset used by MUI on:
+    // - (single) initial set, select option - e = null, newInputValue = selected  (+1 call before with e != null)
+    // - (single/multi, -ACV) blur - e != null, newInputValue = ''
+    // - (multiple v5, -ACV) blur - e = null, newInputValue = '' # unwanted
+    // - (multiple) select option - e != null, newInputValue = ''
+    // - (multiple v4) delete tag while searching - e = null, newInputValue = ''  # unwanted
+    // - (multiple v4) select option while searching - e = null, newInputValue = ''  # unwanted
+
+    const shouldIgnore = uif === "mui" && eventType === "reset"
+    // && (
+    //   e != null
+    //   // for MUI 4 if search "A" and select any option -> should NOT reset search
+    //   // for MUI 5 if search "A" and close -> let's hold search but hide, as it's done in antd
+    //   || e === null && inputValue && multiple
+    // )
+    ;
     const val = newInputValue;
-    //const isTypeToSearch = e.type == 'change';
-
-    if (val === loadMoreTitle || val === loadingMoreTitle) {
+    if (val === loadMoreTitle || val === loadingMoreTitle || shouldIgnore) {
       return;
     }
 
-    setInputValue(val);
+    if (newInputValue != inputValue) {
+      setInputValue(val);
 
-    if (allowCustomValues) {
-      if (multiple) {
-        //todo
-      } else {
-        setValue(val, [val]);
+      const canSearchAsync = useAsyncSearch && (forceAsyncSearch ? !!val : true);
+      if (canSearchAsync) {
+        await loadListValuesDebounced(val);
+      } else if (useAsyncSearch && forceAsyncSearch) {
+        setAsyncListValues([]);
       }
     }
-
-    const canSearchAsync = useAsyncSearch && (forceAsyncSearch ? !!val : true);
-    if (canSearchAsync) {
-      await loadListValuesDebounced(val);
-    } else if (useAsyncSearch && forceAsyncSearch) {
-      setAsyncListValues([]);
-    }
-  };
-
-  // to keep compatibility with antD
-  const onSearch = async (newInputValue) => {
-    if (newInputValue === "" && !open) {
-      return;
-    }
-
-    await onInputChange(null, newInputValue);
   };
 
   // Options
@@ -253,6 +305,14 @@ const useListValuesAutocomplete = ({
     return valueOrOption && valueOrOption.disabled;
   };
 
+  const getOptionIsCustom = (valueOrOption) => {
+    if (valueOrOption?.isCustom)
+      return true;
+    const val = valueOrOption?.value ?? valueOrOption;
+    const lv = getListValue(val, listValues);
+    return lv?.isCustom || false;
+  };
+
   const getOptionLabel = (valueOrOption) => {
     if (valueOrOption == null)
       return null;
@@ -270,13 +330,14 @@ const useListValuesAutocomplete = ({
       // weird
       return valueOrOption;
     }
-    return option.title;
+    return option.title || option.label;
   };
 
   return {
     options,
     listValues,
     hasValue,
+    selectedListValue,
 
     open,
     onOpen,
@@ -286,7 +347,6 @@ const useListValuesAutocomplete = ({
     
     inputValue,
     onInputChange,
-    onSearch,
     canShowLoadMore,
     isInitialLoading,
     isLoading,
@@ -296,11 +356,8 @@ const useListValuesAutocomplete = ({
     extendOptions,
     getOptionSelected,
     getOptionDisabled,
+    getOptionIsCustom,
     getOptionLabel,
-
-    // unused
-    //selectedListValue,
-    //selectedOption,
     aPlaceholder,
   };
 };

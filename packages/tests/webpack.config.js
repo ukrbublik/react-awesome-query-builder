@@ -10,10 +10,13 @@ const BOOTSTRAP = path.resolve(__dirname, "../bootstrap/modules");
 const FLUENT = path.resolve(__dirname, "../fluent/modules");
 const TESTS = path.resolve(__dirname);
 
+const isDebug = !!process.env.TEST_DEBUG;
 
 module.exports = {
     mode: "development",
-    devtool: 'source-map', // required for adequate coverage data
+    // source-map is needed for adequate coverage data
+    // inline-source-map is needed for debugging tests
+    devtool: isDebug ? 'inline-source-map' : 'source-map',
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {

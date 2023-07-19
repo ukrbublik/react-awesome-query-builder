@@ -19,7 +19,7 @@ export default (): Config => {
         <ReactSelect 
           value={value as Array<SpelConcatPart>}
           setValue={setValue}
-          k={id}
+          k={id!}
         />
     }
   };

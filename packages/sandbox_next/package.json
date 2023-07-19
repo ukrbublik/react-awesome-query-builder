@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox-next",
-  "version": "6.1.1",
+  "version": "6.3.0",
   "description": "Demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -50,6 +50,7 @@
     "@babel/preset-env": "^7.14.5",
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.14.5",
+    "@next/eslint-plugin-next": "^13.1.2",
     "@types/jsonfile": "^6.1.1",
     "@types/lodash": "^4.14.170",
     "@types/react": "^17.0.39",
@@ -57,15 +58,14 @@
     "@upstash/redis": "^1.20.1",
     "babel-loader": "^8.2.2",
     "babel-plugin-import": "^1.13.3",
-    "next": "^12.3.2",
-    "@next/eslint-plugin-next": "^13.1.2",
     "iron-session": "^6.3.1",
+    "jsonfile": "^6.1.0",
     "nanoid": "^4.0.1",
+    "next": "^12.3.2",
     "sass": "^1.35.0",
     "serialize-javascript": "^6.0.1",
     "typescript": "~4.9.4",
-    "webpack": "^5.61.0",
-    "jsonfile": "^6.1.0"
+    "webpack": "^5.61.0"
   },
   "readme": "README.md"
 }

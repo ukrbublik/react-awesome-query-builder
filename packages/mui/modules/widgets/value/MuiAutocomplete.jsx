@@ -5,14 +5,12 @@ import FormControl from "@mui/material/FormControl";
 import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
-import Checkbox from "@mui/material/Checkbox";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import MenuItem from "@mui/material/MenuItem";
+import Check from "@mui/icons-material/Check";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 import { Hooks } from "@react-awesome-query-builder/ui";
 const { useListValuesAutocomplete } = Hooks;
-
-const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
@@ -39,15 +37,18 @@ export default (props) => {
     extendOptions,
     getOptionSelected,
     getOptionDisabled,
+    getOptionIsCustom,
     getOptionLabel,
+    selectedListValue,
   } = useListValuesAutocomplete(props, {
     debounceTimeout: 100,
-    multiple
+    multiple,
+    uif: "mui"
   });
 
   // setings
   const {defaultSelectWidth, defaultSearchWidth} = config.settings;
-  const {width, showCheckboxes, ...rest} = customProps || {};
+  const {width, ...rest} = customProps || {};
   let customInputProps = rest.input || {};
   const inputWidth = customInputProps.width || defaultSearchWidth; // todo: use as min-width for Autocomplete comp
   customInputProps = omit(customInputProps, ["width"]);
@@ -72,10 +73,19 @@ export default (props) => {
 
   // render
   const renderInput = (params) => {
+    // parity with Antd
+    const shouldRenderSelected = !multiple && !open;
+    const selectedTitle = selectedListValue?.title ?? "";
+    const shouldHide = multiple && !open;
+    const value = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? "");
     return (
       <TextField 
         variant="standard"
-        {...params} 
+        {...params}
+        inputProps={{
+          ...params.inputProps,
+          value,
+        }}
         InputProps={{
           ...params.InputProps,
           readOnly: readonly,
@@ -97,8 +107,10 @@ export default (props) => {
 
   const renderTags = (value, getTagProps) => value.map((option, index) => {
     return <Chip
-      key={index}
+      key={option.value}
       label={getOptionLabel(option)}
+      size={"small"}
+      variant={getOptionIsCustom(option) ? "outlined" : "filled"}
       {...getTagProps({ index })}
     />;
   });
@@ -108,22 +120,31 @@ export default (props) => {
   };
 
   const renderOption = (props, option) => {
-    const { title, renderTitle, value } = option;
-    const selected = (selectedValue || []).includes(value);
+    const { title, renderTitle, value, isHidden } = option;
+    const isSelected = multiple ? (selectedValue || []).includes(value) : selectedValue == value;
+    const className = getOptionIsCustom(option) ? "customSelectOption" : undefined;
+    const titleSpan = (
+      <span className={className}>
+        {renderTitle || title}
+      </span>
+    );
+    if (isHidden)
+      return null;
     if (option.specialValue) {
       return <div {...props}>{renderTitle || title}</div>;
-    } else if (multiple && showCheckboxes != false) {
-      return <div {...props}>
-        <Checkbox
-          icon={nonCheckedIcon}
-          checkedIcon={checkedIcon}
-          style={{ marginRight: 8 }}
-          checked={selected}
-        />
-        {title}
-      </div>;
+    } else if (multiple) {
+      return (
+        <MenuItem
+          {...props}
+          size={"small"}
+          selected={isSelected}
+        >
+          {!isSelected && <ListItemText inset>{titleSpan}</ListItemText>}
+          {isSelected && <><ListItemIcon><Check /></ListItemIcon>{titleSpan}</>}
+        </MenuItem>
+      );
     } else {
-      return <div {...props}>{renderTitle || title}</div>;
+      return <div {...props}>{titleSpan}</div>;
     }
   };
 
@@ -151,7 +172,7 @@ export default (props) => {
         getOptionLabel={getOptionLabel}
         getOptionDisabled={getOptionDisabled}
         renderInput={renderInput}
-        //renderTags={renderTags}
+        renderTags={renderTags}
         renderOption={renderOption}
         filterOptions={filterOptions}
         isOptionEqualToValue={isOptionEqualToValue}

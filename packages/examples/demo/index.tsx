@@ -21,10 +21,10 @@ const initialSkin = window._initialSkin || "mui";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
-const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
+const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
 //initTree = checkTree(loadTree(initValue), loadedConfig);
-initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig); // <- this will work same  
+initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig); // <- this will work same  
 
 
 // Trick to hot-load new config when you edit `config.tsx`
@@ -169,7 +169,7 @@ const DemoQueryBuilder: React.FC = () => {
   }, []);
 
   const updateResult = throttle(() => {
-    setState(prevState => ({...prevState, tree: memo.current.immutableTree, config: memo.current.config}));
+    setState(prevState => ({...prevState, tree: memo.current.immutableTree!, config: memo.current.config!}));
   }, 100);
 
   // Demonstrates how actions can be called programmatically
@@ -186,30 +186,30 @@ const DemoQueryBuilder: React.FC = () => {
     ];
 
     // Change root group to NOT OR
-    memo.current._actions.setNot(rootPath, true);
-    memo.current._actions.setConjunction(rootPath, "OR");
+    memo.current._actions!.setNot(rootPath, true);
+    memo.current._actions!.setConjunction(rootPath, "OR");
 
     // Move first item
     if (!isEmptyTree) {
-      memo.current._actions.moveItem(firstPath, lastPath, "before");
+      memo.current._actions!.moveItem(firstPath, lastPath, "before");
     }
 
     // Remove last rule
     if (!isEmptyTree) {
-      memo.current._actions.removeRule(lastPath);
+      memo.current._actions!.removeRule(lastPath);
     }
 
     // Change first rule to `num between 2 and 4`
     if (!isEmptyTree) {
-      memo.current._actions.setField(firstPath, "num");
-      memo.current._actions.setOperator(firstPath, "between");
-      memo.current._actions.setValueSrc(firstPath, 0, "value");
-      memo.current._actions.setValue(firstPath, 0, 2, "number");
-      memo.current._actions.setValue(firstPath, 1, 4, "number");
+      memo.current._actions!.setField(firstPath, "num");
+      memo.current._actions!.setOperator(firstPath, "between");
+      memo.current._actions!.setValueSrc(firstPath, 0, "value");
+      memo.current._actions!.setValue(firstPath, 0, 2, "number");
+      memo.current._actions!.setValue(firstPath, 1, 4, "number");
     }
 
     // Add rule `login == "denis"`
-    memo.current._actions.addRule(
+    memo.current._actions!.addRule(
       rootPath,
       {
         field: "user.login",
@@ -221,7 +221,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add rule `login == firstName`
-    memo.current._actions.addRule(
+    memo.current._actions!.addRule(
       rootPath,
       {
         field: "user.login",
@@ -232,7 +232,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add rule-group `cars` with `year == 2021`
-    memo.current._actions.addRule(
+    memo.current._actions!.addRule(
       rootPath,
       {
         field: "cars",
@@ -253,7 +253,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add group with `slider == 40` and subgroup `slider < 20`
-    memo.current._actions.addGroup(
+    memo.current._actions!.addGroup(
       rootPath,
       {
         conjunction: "AND"
@@ -342,7 +342,7 @@ const DemoQueryBuilder: React.FC = () => {
         <hr/>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
-          { logicErrors.length > 0 
+          { (logicErrors?.length || 0) > 0 
             && <pre style={preErrorStyle}>
               {stringify(logicErrors, undefined, 2)}
             </pre> 

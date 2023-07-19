@@ -62,6 +62,7 @@
     "build-libs": "pnpm --filter @react-awesome-query-builder/examples^... run build",
     "build-examples": "pnpm --filter !@react-awesome-query-builder/examples^... run build",
     "test": "pnpm --filter @react-awesome-query-builder/tests run test",
+    "test-debug": "pnpm --filter @react-awesome-query-builder/tests run test-debug",
     "check-hot": "pnpm -r --parallel --aggregate-output --reporter=append-only check-hot",
     "clean": "sh ./scripts/clean.sh",
     "lint": "pnpm -r --parallel --aggregate-output --reporter=append-only run lint",

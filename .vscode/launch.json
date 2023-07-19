@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Karma tests with debugger",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test-debug",
+    },
+    {
+      "name": "Attach to Karma",
+      "type": "chrome",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9333,
+      "restart": true,
+      "timeout": 600000,
+      "sourceMaps": true,
+      "webRoot": "${workspaceFolder}/packages/tests",
+    }
+  ]
+}

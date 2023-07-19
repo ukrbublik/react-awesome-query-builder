@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/tests",
-  "version": "6.2.0",
+  "version": "6.3.0",
   "private": true,
   "description": "Tests for @react-awesome-query-builder",
   "repository": {
@@ -17,6 +17,7 @@
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./specs/ ./support/",
     "test": "karma start ./karma.conf.js",
+    "test-debug": "TEST_DEBUG=1 karma start ./karma.conf.js --debug",
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {

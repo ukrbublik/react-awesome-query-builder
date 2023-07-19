@@ -14,7 +14,7 @@
 
     "strict": true,
     "alwaysStrict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitReturns": true,
 
     "esModuleInterop": true,
