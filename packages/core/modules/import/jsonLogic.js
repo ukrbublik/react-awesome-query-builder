@@ -360,25 +360,43 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
   if (funcKey) {
     const funcConfig = getFuncConfig(config, funcKey);
     const argKeys = Object.keys(funcConfig.args || {});
-    let args = argsArr.reduce((acc, val, ind) => {
+    let argsObj = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
       const argConfig = funcConfig.args[argKey];
-      let argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
+      const argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
+      return argVal !== undefined ? {...acc, [argKey]: argVal} : acc;
+    }, {});
+
+    for (let argKey in funcConfig.args) {
+      const argConfig = funcConfig.args[argKey];
+      let argVal = argsObj[argKey];
       if (argVal === undefined) {
         argVal = argConfig?.defaultValue;
+        if (argVal !== undefined) {
+          argVal = {
+            value: argVal,
+            valueSrc: argVal?.func ? "func" : "value",
+            valueType: argConfig.type,
+          };
+        }
         if (argVal === undefined) {
-          meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
-          return undefined;
+          if (argConfig?.isOptional) {
+            //ignore
+          } else {
+            meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
+            return undefined;
+          }
+        } else {
+          argsObj[argKey] = argVal;
         }
       }
-      return {...acc, [argKey]: argVal};
-    }, {});
+    }
 
     return {
       valueSrc: "func",
       value: {
         func: funcKey,
-        args: args
+        args: argsObj
       },
       valueType: funcConfig.returnType,
     };

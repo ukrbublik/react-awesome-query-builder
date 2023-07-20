@@ -168,7 +168,9 @@ const formatRule = (item, config, meta) => {
   const formattedField = fieldSrc == "func"
     ? formatFunc(meta, config, field)
     : formatField(meta, config, field);
-      
+  if (formattedField == undefined)
+    return undefined;
+
   //format expr
   const args = [
     formattedField,
@@ -261,9 +263,13 @@ const formatFunc = (meta, config, currentValue) => {
   const funcName = funcConfig.sqlFunc || funcLastKey;
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -275,9 +281,35 @@ const formatFunc = (meta, config, currentValue) => {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      formattedDefaultVal = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues
+      );
+      if (formattedDefaultVal === undefined) {
+        meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
     }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of argKey) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
+    }
+  }
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
   }
 
   let ret;

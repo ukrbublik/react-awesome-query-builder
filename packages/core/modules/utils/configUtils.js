@@ -467,7 +467,7 @@ export const getFieldConfig = (config, field, fieldSrc) => {
         // it's func arg
         return getFuncArgConfig(config, field.func, field.arg);
       } else {
-        // it's field value func
+        // it's field func
         return getFuncConfig(config, field.func);
       }
     }

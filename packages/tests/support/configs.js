@@ -703,9 +703,17 @@ export const with_funcs = (BasicConfig) => ({
       label: "Number",
       type: "number",
     },
+    date: {
+      label: "Date",
+      type: "date",
+    },
     datetime: {
       label: "Datetime",
       type: "datetime",
+    },
+    time: {
+      label: "Time",
+      type: "time",
     },
     str: {
       label: "String",
@@ -1156,5 +1164,13 @@ export const with_cases = (BasicConfig) => ({
     maxNumberOfCases: 3,
     canRegroupCases: true,
     canLeaveEmptyCase: false,
+  }
+});
+
+export const with_fieldSources = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    fieldSources: ["field", "func"],
   }
 });

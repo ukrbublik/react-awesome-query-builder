@@ -310,6 +310,8 @@ const formatRule = (item, config, meta, parentField = null) => {
       
   //format field
   const formattedField = formatLhs(meta, config, field, fieldSrc, parentField);
+  if (formattedField === undefined)
+    return undefined;
   
   // format expression
   let res = formatExpression(
@@ -447,9 +449,13 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   }
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -466,11 +472,39 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = doEscape ? formattedArgVal : argValue;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
+      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      formattedDefaultVal = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
+      );
+      if (formattedDefaultVal === undefined) {
+        meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
+    }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of gaps) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = doEscape ? finalFormattedVal : (argValue ?? defaultValue);
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
     }
   }
-
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
+  }
+  
   let ret;
   if (typeof funcConfig.spelFormatFunc === "function") {
     const fn = funcConfig.spelFormatFunc;
@@ -479,7 +513,22 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     ];
     ret = fn.call(config.ctx, ...args);
   } else if (funcConfig.spelFunc) {
-    ret = funcConfig.spelFunc.replace(/\${(\w+)}/g, (_, argKey) => formattedArgs[argKey]);
+    // fill arg values
+    ret = funcConfig.spelFunc
+      .replace(/\${(\w+)}/g, (found, argKey) => {
+        return formattedArgs[argKey] ?? found;
+      });
+    // remove optional args (from end only)
+    const optionalArgs = Object.keys(funcConfig.args || {})
+      .reverse()
+      .filter(argKey => !!funcConfig.args[argKey].isOptional);
+    for (const argKey of optionalArgs) {
+      if (formattedArgs[argKey] != undefined)
+        break;
+      ret = ret.replace(new RegExp("(, )?" + "\\${" + argKey + "}", "g"), "");
+    }
+    // missing required arg vals
+    ret = ret.replace(/\${(\w+)}/g, "null");
   } else {
     meta.errors.push(`Func ${funcKey} is not supported`);
   }

@@ -203,8 +203,6 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let useExpr = false;
   if (fieldSrc == "func") {
     [formattedField, useExpr] = formatFunc(meta, config, field, realParentPath);
-    if (formattedField == undefined)
-      return undefined;
   } else {
     formattedField = formatFieldName(field, config, meta, realParentPath);
     if (_formatFieldName) {
@@ -212,6 +210,8 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
       formattedField = _formatFieldName(formattedField);
     }
   }
+  if (formattedField == undefined)
+    return undefined;
 
   //format value
   let valueSrcs = [];
@@ -342,15 +342,21 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   let formattedArgs = {};
   let argsCnt = 0;
   let lastArg = undefined;
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
+    argsCnt++;
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
-    const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
+    const operator = null;
+    const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
     const [formattedArgVal, _argUseExpr] = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
     );
@@ -358,11 +364,39 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return [undefined, false];
     }
-    argsCnt++;
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
-      lastArg = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
+      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      let _;
+      ([formattedDefaultVal, _] = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
+      ));
+      if (formattedDefaultVal === undefined) {
+        meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return [undefined, false];
+      }
     }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of gaps) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+      lastArg = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
+    }
+  }
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return [undefined, false]; // uncomplete
   }
 
   if (typeof funcConfig.mongoFormatFunc === "function") {

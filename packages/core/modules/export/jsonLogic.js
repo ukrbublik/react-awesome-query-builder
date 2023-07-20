@@ -202,6 +202,8 @@ const formatRule = (item, config, meta, parentField = null) => {
     = fieldSrc === "func"
       ? formatFunc(meta, config, field, parentField)
       : formatField(meta, config, field, parentField);
+  if (formattedField === undefined)
+    return undefined;
 
   return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
 };
@@ -293,9 +295,13 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   }
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -309,12 +315,40 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
+      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      formattedDefaultVal = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField
+      );
+      if (formattedDefaultVal === undefined) {
+        meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
+    }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of gaps) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
     }
   }
-  const formattedArgsArr = Object.values(formattedArgs);
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
+  }
 
+  const formattedArgsArr = Object.values(formattedArgs);
   let ret;
   if (typeof funcConfig.jsonLogic === "function") {
     const fn = funcConfig.jsonLogic;

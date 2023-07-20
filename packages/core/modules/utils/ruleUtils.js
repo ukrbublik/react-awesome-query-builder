@@ -78,8 +78,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value", currentFieldSrc);
     const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value", currentFieldSrc);
 
-    const canReuseWidget = newValueWidget == currentValueWidget || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
-    if (!canReuseWidget && !isOkWithoutField) {
+    const canReuseWidget = newValueWidget == currentValueWidget
+      || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget)
+      || !currentValueWidget && isOkWithoutField;
+    if (!canReuseWidget) {
       canReuseValue = false;
     }
   }

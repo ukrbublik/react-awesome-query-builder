@@ -223,7 +223,7 @@ export const empty_value = {id: uuid(), type: "group"};
 
 // ----------- export checks
 
-const do_export_checks = (config: Config, tree: ImmutableTree, expects: ExtectedExports, with_render = false, inside_it = false) => {
+const do_export_checks = (config: Config, tree: ImmutableTree, expects?: ExtectedExports, with_render = false, inside_it = false) => {
   const doIt = inside_it ? ((name: string, func: Function) => { func(); }) : it;
 
   if (expects) {
@@ -318,7 +318,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects: Extected
   }
 };
 
-export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
+export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects?: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
 

@@ -314,13 +314,35 @@ const buildConv = (config) => {
 
   let funcs = {};
   for (const [funcPath, funcConfig] of iterateFuncs(config)) {
-    const fks = [];
+    let fks = [];
     const {spelFunc} = funcConfig;
-    if (typeof spelFunc == "string") {
-      const fk = spelFunc.replace(/\${(\w+)}/g, (_, _k) => "?");
-      fks.push(fk);
-      // todo: because of isOptional there can be 1+ keys
-      // eg. "${str}.toLowerCase(${aa}, ${bb?})" -> "?.toLowerCase(?, ?)" and "?.toLowerCase(?)"
+    if (typeof spelFunc === "string") {
+      const optionalArgs = Object.keys(funcConfig.args || {})
+        .reverse()
+        .filter(argKey => !!funcConfig.args[argKey].isOptional || funcConfig.args[argKey].defaultValue != undefined);
+      const funcSignMain = spelFunc
+        .replace(/\${(\w+)}/g, (_, _k) => "?");
+      const funcSignsOptional = optionalArgs
+        .reduce((acc, argKey) => (
+          [
+            ...acc,
+            [
+              argKey,
+              ...(acc[acc.length-1] || []),
+            ]
+          ]
+        ), [])
+        .map(optionalArgKeys => (
+          spelFunc
+            .replace(/(?:, )?\${(\w+)}/g, (found, a) => (
+              optionalArgKeys.includes(a) ? "" : found
+            ))
+            .replace(/\${(\w+)}/g, (_, _k) => "?")
+        ));
+      fks = [
+        funcSignMain,
+        ...funcSignsOptional,
+      ];
     }
     for (const fk of fks) {
       if (!funcs[fk])
@@ -861,16 +883,22 @@ const convertFunc = (spel, conv, config, meta, parentSpel) => {
       if (argVal === undefined) {
         argVal = argConfig?.defaultValue;
         if (argVal === undefined) {
-          meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
-          return undefined;
+          if (argConfig?.isOptional) {
+            //ignore
+          } else {
+            meta.errors.push(`No value for arg ${argKey} of func ${funcKey}`);
+            return undefined;
+          }
+        } else {
+          argVal = {
+            value: argVal,
+            valueSrc: argVal?.func ? "func" : "value",
+            valueType: argConfig.type,
+          };
         }
-        argVal = {
-          value: argVal,
-          valueSrc: argVal?.func ? "func" : "value",
-          valueType: argConfig.valueType,
-        };
       }
-      funcArgs[argKey] = argVal;
+      if (argVal)
+        funcArgs[argKey] = argVal;
     }
 
     return {
