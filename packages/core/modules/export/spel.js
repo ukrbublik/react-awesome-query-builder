@@ -469,7 +469,8 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+        meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
     let formattedDefaultVal;
@@ -480,7 +481,8 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
-        meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+          meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
         return undefined;
       }
     }
