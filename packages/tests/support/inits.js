@@ -1026,3 +1026,38 @@ export const spel_with_new_String = "str == new String('hello world').toUpperCas
 export const spel_with_lhs_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
 export const spel_with_lhs_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
 export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+
+export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
+export const tree_with_lhs_toLowerCase2 = {
+  "type": "group",
+  "id": uuid(),
+  "children1": [
+    {
+      "type": "rule",
+      "id": uuid(),
+      "properties": {
+        //"fieldSrc": "func", //should be determined
+        "field": {
+          "func": "custom.LOWER2",
+          "args": {
+            "str": {
+              "valueSrc": "field",
+              "value": "str"
+            }
+          }
+        },
+        "operator": "equal",
+        "value": [
+          "aaa"
+        ],
+        "valueSrc": [
+          "value"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "conjunction": "AND",
+    "not": false
+  }
+};

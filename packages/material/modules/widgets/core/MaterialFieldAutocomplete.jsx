@@ -19,6 +19,21 @@ const itemsToListValues = (items, level = 0) => (
   }).flat(Infinity)
 );
 
+const groupBy = (option) => option.groupTitle;
+
+const fixGroupBy = (listValues) => {
+  let newValues = [];
+  for (const lv of listValues) {
+    const i = newValues.findLastIndex(lv1 => groupBy(lv1) === groupBy(lv));
+    if (i != -1) {
+      newValues.splice(i+1, 0, lv);
+    } else {
+      newValues.push(lv);
+    }
+  }
+  return newValues;
+};
+
 const filterOptionsConfig = {
   stringify: (option) => {
     const keysForFilter = ["title", "value", "grouplabel", "label"];
@@ -31,7 +46,7 @@ const filterOptionsConfig = {
 
 const fieldAdapter = ({items, selectedKey, setField, ...rest}) => {
   const listValues = itemsToListValues(items);
-  const groupBy = (option) => option.groupTitle;
+  const fixedListValues = fixGroupBy(listValues);
   const value = selectedKey;
   const setValue = (value, _asyncValues) => {
     if (!value) return undefined;
@@ -40,7 +55,7 @@ const fieldAdapter = ({items, selectedKey, setField, ...rest}) => {
 
   return {
     ...rest,
-    listValues,
+    listValues: fixedListValues,
     setValue,
     groupBy,
     filterOptionsConfig,

@@ -61,33 +61,33 @@ export const completeFuncValue = (value, config) => {
  * @param {Immutable.Map} value 
  * @return {array} - [usedFields, badFields]
  */
-const getUsedFieldsInFuncValue = (value, config) => {
-  let usedFields = [];
-  let badFields = [];
+// const getUsedFieldsInFuncValue = (value, config) => {
+//   let usedFields = [];
+//   let badFields = [];
 
-  const _traverse = (value) => {
-    const args = value && value.get("args");
-    if (!args) return;
-    for (const arg of args.values()) {
-      if (arg.get("valueSrc") == "field") {
-        const rightField = arg.get("value");
-        if (rightField) {
-          const rightFieldDefinition = config ? getFieldConfig(config, rightField) : undefined;
-          if (config && !rightFieldDefinition)
-            badFields.push(rightField);
-          else
-            usedFields.push(rightField);
-        }
-      } else if (arg.get("valueSrc") == "func") {
-        _traverse(arg.get("value"));
-      }
-    }
-  };
+//   const _traverse = (value) => {
+//     const args = value && value.get("args");
+//     if (!args) return;
+//     for (const arg of args.values()) {
+//       if (arg.get("valueSrc") == "field") {
+//         const rightField = arg.get("value");
+//         if (rightField) {
+//           const rightFieldDefinition = config ? getFieldConfig(config, rightField) : undefined;
+//           if (config && !rightFieldDefinition)
+//             badFields.push(rightField);
+//           else
+//             usedFields.push(rightField);
+//         }
+//       } else if (arg.get("valueSrc") == "func") {
+//         _traverse(arg.get("value"));
+//       }
+//     }
+//   };
 
-  _traverse(value);
+//   _traverse(value);
 
-  return [usedFields, badFields];
-};
+//   return [usedFields, badFields];
+// };
 
 
 /**

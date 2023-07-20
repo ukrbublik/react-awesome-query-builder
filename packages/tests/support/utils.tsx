@@ -26,6 +26,7 @@ import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 
 
+type ConsoleIgnoreFn = (errText: string) => boolean;
 type ConsoleData = {
   error: string[],
   warn: string[],
@@ -54,10 +55,15 @@ interface Tasks {
 interface DoOptions {
   attach?: boolean;
   strict?: boolean;
+  ignoreLog?: ConsoleIgnoreFn;
 }
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
+const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
+  return false;
+  // return errText.includes("The anchor element should be part of the document layout.") // test issue with DatePicker
+};
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {
   if (!valueFormat) {
@@ -173,12 +179,16 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
   const mockedConsole = {
     ...console,
     error: (...args: any[]) => {
-      consoleData.error.push(args.filter(a => typeof a === "string").join("\n"));
-      origConsole.error.apply(null, args);
+      const errText = args.filter(a => typeof a === "string").join("\n");
+      consoleData.error.push(errText);
+      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
+        origConsole.error.apply(null, args);
     },
     warn: (...args: any[]) => {
-      consoleData.warn.push(args.filter(a => typeof a === "string").join("\n"));
-      origConsole.warn.apply(null, args);
+      const errText = args.filter(a => typeof a === "string").join("\n");
+      consoleData.warn.push(errText);
+      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
+        origConsole.warn.apply(null, args);
     },
   };
   // eslint-disable-next-line no-global-assign
@@ -190,13 +200,13 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
     mountOptions
   ) as ReactWrapper;
 
-  // restore console
-  // eslint-disable-next-line no-global-assign
-  console = origConsole;
-
   // @ts-ignore
   await checks(qb, onChange, tasks, consoleData);
   //});
+
+  // restore console
+  // eslint-disable-next-line no-global-assign
+  console = origConsole;
 
   if (options?.attach) {
     // @ts-ignore

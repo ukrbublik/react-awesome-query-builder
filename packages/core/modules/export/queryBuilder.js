@@ -130,7 +130,7 @@ const formatRule = (item, config, meta) => {
     meta.usedFields.push(field);
   value = value.toArray();
   valueSrc = valueSrc.toArray();
-  valueType = valueType.toArray();
+  valueType = valueType?.toArray() || [];
   let values = [];
   for (let i = 0 ; i < value.length ; i++) {
     const val = {

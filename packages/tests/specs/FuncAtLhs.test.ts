@@ -11,6 +11,7 @@ describe("load forom SpEL", () => {
       "queryHuman": "Lowercase(String: String) Starts with aaa",
       "sql": "LOWER(str) LIKE 'aaa%'",
       "spel": "str.toLowerCase().startsWith('aaa')",
+      // todo: Operator starts_with is not supported
       "mongo": {
         "$expr": {
           "$regex": [
@@ -168,6 +169,82 @@ describe("load forom SpEL", () => {
                   "day"
                 ]
               }
+            ]
+          }
+        ]
+      }
+    });
+  });
+});
+
+describe("defaultValue, isOptional", () => {
+  describe("fills defaultValue when loading from SpeL", () => {
+    export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_toLowerCase2, "SpEL", {
+      "spel": "str.toLowerCase2(11) == 'aaa'",
+      "query": "LOWER2(str, 11) == \"aaa\"",
+      "queryHuman": "Lowercase2(String: String, def: 11) = aaa",
+      "sql": "LOWER2(str, 11) = 'aaa'",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            {
+              "$toLower2": [
+                "$str",
+                11
+              ]
+            },
+            "aaa"
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              {
+                "toLowerCase2": [
+                  { "var": "str" },
+                  11
+                ]
+              },
+              "aaa"
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("uses defaultValue on export", () => {
+    export_checks([configs.with_fieldSources, configs.with_funcs], inits.tree_with_lhs_toLowerCase2, "default", {
+      "spel": "str.toLowerCase2(11) == 'aaa'",
+      "query": "LOWER2(str, 11) == \"aaa\"",
+      "queryHuman": "Lowercase2(String: String, def: 11) = aaa",
+      "sql": "LOWER2(str, 11) = 'aaa'",
+      "mongo": {
+        "$expr": {
+          "$eq": [
+            {
+              "$toLower2": [
+                "$str",
+                11
+              ]
+            },
+            "aaa"
+          ]
+        }
+      },
+      "logic": {
+        "and": [
+          {
+            "==": [
+              {
+                "toLowerCase2": [
+                  { "var": "str" },
+                  11
+                ]
+              },
+              "aaa"
             ]
           }
         ]

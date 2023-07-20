@@ -12,6 +12,7 @@ const {
 import { BasicFuncs } from "@react-awesome-query-builder/core";
 import { simulatedAsyncFetch } from "./autocomplete";
 import sinon from "sinon";
+import merge from "lodash/merge";
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -697,6 +698,30 @@ export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   funcs: {
     ...BasicFuncs,
+    custom: {
+      type: "!struct",
+      label: "Custom",
+      subfields: {
+        LOWER2: merge({}, BasicFuncs.LOWER, {
+          label: "Lowercase2",
+          mongoFunc: "$toLower2",
+          jsonLogic: "toLowerCase2",
+          spelFunc: "${str}.toLowerCase2(${def}, ${opt})",
+          allowSelfNesting: true,
+          args: {
+            ...BasicFuncs.LOWER.args,
+            def: {
+              type: "number",
+              defaultValue: 11,
+            },
+            opt: {
+              type: "number",
+              isOptional: true,
+            },
+          },
+        }),
+      },
+    },
   },
   fields: {
     num: {

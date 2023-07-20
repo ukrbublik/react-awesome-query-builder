@@ -4,6 +4,10 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
 
+const ignoreLogDatePicker = (errText: string) => {
+  return errText.includes("The `anchorEl` prop provided to the component is invalid");
+};
+
 describe("mui theming", () => {
   it("applies secondary color", async () => {
     await with_qb_mui(configs.with_theme_mui, inits.with_bool, "JsonLogic", (qb) => {
@@ -64,6 +68,8 @@ describe("mui widgets interactions", () => {
           }]
         }
       ]);
+    }, {
+      ignoreLog: ignoreLogDatePicker,
     });
   });
 
@@ -91,6 +97,8 @@ describe("mui widgets interactions", () => {
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
       ]);
+    }, {
+      ignoreLog: ignoreLogDatePicker,
     });
   });
 

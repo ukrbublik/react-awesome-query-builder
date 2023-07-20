@@ -15,9 +15,9 @@ export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (s
   const newOffset = pageSize ? currentOffset + values.length : null;
   const hasMore = pageSize ? (newOffset < filtered.length) : false;
   if (delay) {
-    console.debug("simulateAsyncFetch", {
-      search, offset, values, hasMore, filtered
-    });
+    // console.debug("simulateAsyncFetch", {
+    //   search, offset, values, hasMore, filtered
+    // });
     await sleep(delay);
   }
   return {

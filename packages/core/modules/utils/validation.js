@@ -1,5 +1,5 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldSrc,
 } from "./configUtils";
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp, isCompletedValue, isEmptyRuleProperties} from "../utils/ruleUtils";
 import {defaultValue, deepEqual, logger} from "../utils/stuff";
@@ -127,6 +127,10 @@ function validateRule (item, path, itemId, meta, c) {
   if (field == null) {
     properties = ["operator", "operatorOptions", "valueSrc", "value", "valueError"].reduce((map, key) => map.delete(key), properties);
     operator = null;
+  }
+  if (!fieldSrc) {
+    fieldSrc = getFieldSrc(field);
+    properties = properties.set("fieldSrc", fieldSrc);
   }
 
   //validate operator

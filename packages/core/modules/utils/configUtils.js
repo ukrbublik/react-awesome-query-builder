@@ -448,6 +448,36 @@ export const getFieldPathParts = (field, config, onlyKeys = false) => {
       .map((parts) => parts.join(fieldSeparator));
 };
 
+export const getFieldSrc = (field) => {
+  if (!field)
+    return null;
+  if (typeof field == "object") {
+    if (!field.func && !!field.type) {
+      // it's already a config
+      return "field";
+    }
+    if (field.func) {
+      if (field.func && field.arg) {
+        // it's func arg
+        return null;
+      } else {
+        // it's field func
+        return "func";
+      }
+    }
+  }
+  if (field?.get?.("func")) { // immutable
+    if (field?.get("arg")) {
+      // it's func arg
+      return null;
+    } else {
+      // it's field func
+      return "func";
+    }
+  }
+  return "field";
+};
+
 export const getFieldConfig = (config, field) => {
   if (!field)
     return null;
