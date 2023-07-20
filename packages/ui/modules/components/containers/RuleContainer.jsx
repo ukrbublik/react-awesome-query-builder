@@ -52,8 +52,8 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setLock(this.props.path, lock);
     };
 
-    setField = (field) => {
-      this.props.actions.setField(this.props.path, field);
+    setField = (field, asyncListValues, __isInternal) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
     };
 
     setFieldSrc = (srcKey) => {

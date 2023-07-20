@@ -128,8 +128,8 @@ const createGroupContainer = (Group) =>
     };
 
     // for RuleGroup
-    setField = (field) => {
-      this.props.actions.setField(this.props.path, field);
+    setField = (field, asyncListValues, __isInternal) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
     };
 
     // for RuleGroupExt

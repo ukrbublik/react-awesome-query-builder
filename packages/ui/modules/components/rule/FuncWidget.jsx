@@ -58,13 +58,17 @@ export default class FuncWidget extends Component {
     this.props.setValue( setFunc(this.props.value, funcKey, this.props.config) );
   };
 
-  setArgValue = (argKey, argVal) => {
+  setArgValue = (argKey, argVal, asyncListValues, __isInternal) => {
     const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition, config) );
+    this.props.setValue(
+      setArgValue(this.props.value, argKey, argVal, argDefinition, config),
+      asyncListValues,
+      __isInternal
+    );
   };
 
   setArgValueSrc = (argKey, argValSrc) => {
@@ -73,7 +77,9 @@ export default class FuncWidget extends Component {
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config) );
+    this.props.setValue(
+      setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
+    );
   };
 
   renderFuncSelect = () => {
@@ -222,7 +228,7 @@ export default class FuncWidget extends Component {
 }
 
 
-class ArgWidget extends PureComponent {
+class ArgWidget extends Component {
   static propTypes = {
     funcKey: PropTypes.string.isRequired,
     argKey: PropTypes.string.isRequired,
@@ -235,9 +241,34 @@ class ArgWidget extends PureComponent {
     groupId: PropTypes.string,
   };
 
-  setValue = (_delta, value, _widgetType) => {
+  constructor(props) {
+    super(props);
+    useOnPropsChanged(this);
+
+    this.onPropsChanged(props);
+  }
+
+  onPropsChanged(nextProps) {
+    const prevProps = this.props;
+    const keysForMeta = ["parentFuncs", "funcKey", "argKey"];
+    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+
+    if (needUpdateMeta) {
+      this.meta = this.getMeta(nextProps);
+    }
+  }
+
+  getMeta({parentFuncs, funcKey, argKey}) {
+    const newParentFuncs = [...(parentFuncs || []), [funcKey, argKey]];
+
+    return {
+      parentFuncs: newParentFuncs
+    };
+  }
+
+  setValue = (_delta, value, _widgetType, asyncListValues, __isInternal) => {
     const {setValue, argKey} = this.props;
-    setValue(argKey, value);
+    setValue(argKey, value, asyncListValues, __isInternal);
   };
 
   setValueSrc = (_delta, valueSrc, _widgetType) => {
@@ -246,14 +277,14 @@ class ArgWidget extends PureComponent {
   };
 
   render() {
-    const {funcKey, argKey, parentFuncs} = this.props;
+    const {parentFuncs} = this.meta;
     return (
       <Widget
         {...this.props}
         setValue={this.setValue}
         setValueSrc={this.setValueSrc}
         isFuncArg={true}
-        parentFuncs={[...(parentFuncs || []), [funcKey, argKey]]}
+        parentFuncs={parentFuncs}
       />
     );
   }

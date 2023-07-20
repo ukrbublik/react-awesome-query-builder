@@ -361,9 +361,10 @@ const setFieldSrc = (state, path, srcKey, config) => {
  * @param {Immutable.List} path
  * @param {string} field
  */
-const setField = (state, path, newField, config) => {
+const setField = (state, path, newField, config, asyncListValues, __isInternal) => {
+  let isInternalValueChange;
   if (!newField)
-    return removeItem(state, path);
+    return {tree: removeItem(state, path), isInternalValueChange};
 
   const {fieldSeparator, setOpOnChangeField, showErrorMessage, keepInputOnChangeFieldSrc} = config.settings;
   if (Array.isArray(newField))
@@ -415,7 +416,7 @@ const setField = (state, path, newField, config) => {
 
   if (!isRuleGroup && !newFieldConfig.operators) {
     console.warn(`Type ${newFieldConfig.type} is not supported`);
-    return state;
+    return {tree: state, isInternalValueChange};
   }
 
   if (wasRuleGroup && !isRuleGroup) {
@@ -450,31 +451,32 @@ const setField = (state, path, newField, config) => {
       state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
     }
     state = fixPathsInTree(state);
-
-    return state;
+  } else {
+    state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
+      const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+        config, config, current, newField, newOperator, "field", true
+      );
+      if (showErrorMessage) {
+        current = current
+          .set("valueError", newValueError);
+      }
+      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField, currentFieldSrc);
+      isInternalValueChange = __isInternal; //todo: filter edge cases?
+      return current
+        .set("field", newField)
+        .delete("fieldType") // remove "memory effect"
+        .set("fieldSrc", currentFieldSrc)
+        .set("operator", newOperator)
+        .set("operatorOptions", newOperatorOptions)
+        .set("value", newValue)
+        .set("valueSrc", newValueSrc)
+        .set("valueType", newValueType)
+        .delete("asyncListValues");
+    }));
   }
 
-  return state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
-    const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-      config, config, current, newField, newOperator, "field", true
-    );
-    if (showErrorMessage) {
-      current = current
-        .set("valueError", newValueError);
-    }
-    const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField, currentFieldSrc);
+  return {tree: state, isInternalValueChange};
 
-    return current
-      .set("field", newField)
-      .delete("fieldType") // remove "memory effect"
-      .set("fieldSrc", currentFieldSrc)
-      .set("operator", newOperator)
-      .set("operatorOptions", newOperatorOptions)
-      .set("value", newValue)
-      .set("valueSrc", newValueSrc)
-      .set("valueType", newValueType)
-      .delete("asyncListValues");
-  }));
 };
 
 /**
@@ -822,7 +824,12 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_FIELD: {
-      set.tree = setField(state.tree, action.path, action.field, action.config);
+      const {tree, isInternalValueChange} = setField(
+        state.tree, action.path, action.field, action.config,
+        action.asyncListValues, action.__isInternal
+      );
+      set.__isInternalValueChange = isInternalValueChange;
+      set.tree = tree;
       break;
     }
 
