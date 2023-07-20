@@ -104,7 +104,7 @@ const createRuleContainer = (Rule) =>
 
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
-      const fieldConfig = getFieldConfig(this.props.config, this.props.field, this.props.fieldSrc);
+      const fieldConfig = getFieldConfig(this.props.config, this.props.field);
       const fieldType = this.props.fieldType || fieldConfig?.type || null;
       const {showErrorMessage} = this.props.config.settings;
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";

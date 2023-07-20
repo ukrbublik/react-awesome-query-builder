@@ -363,7 +363,10 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
     let argsObj = argsArr.reduce((acc, val, ind) => {
       const argKey = argKeys[ind];
       const argConfig = funcConfig.args[argKey];
-      const argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
+      let argVal;
+      if (argConfig) {
+        argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
+      }
       return argVal !== undefined ? {...acc, [argKey]: argVal} : acc;
     }, {});
 
@@ -608,7 +611,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
   const {
     field, fieldSrc, having, isGroup, args
   } = lhs;
-  const fieldConfig = getFieldConfig(config, field, fieldSrc);
+  const fieldConfig = getFieldConfig(config, field);
   if (!fieldConfig) {
     meta.errors.push(`No config for LHS ${field}`);
     return;
@@ -688,7 +691,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     opConfig = config.operators[opKey];
   }
 
-  const widget = getWidgetForFieldOp(config, field, opKey, null, fieldSrc);
+  const widget = getWidgetForFieldOp(config, field, opKey, null);
 
   const convertedArgs = args
     .map(v => convertFromLogic(v, conv, config, "val", meta, false, fieldConfig, widget, parentField));

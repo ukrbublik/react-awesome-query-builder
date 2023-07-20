@@ -8,7 +8,7 @@ import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
 import {Col} from "../utils";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig} = Utils.ConfigUtils;
-const {getValueSourcesForFieldOp, getWidgetsForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
+const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
 const { createListFromArray } = Utils.DefaultUtils;
 
 const funcArgDummyOpDef = {cardinality: 1};
@@ -100,21 +100,17 @@ export default class Widget extends Component {
       iValues = createListFromArray([values]);
     }
 
-    let fieldDefinition = isFuncArg
-      ? getFieldConfig(config, field)
-      : getFieldConfig(config, field, fieldSrc);
+    let fieldDefinition = getFieldConfig(config, field);
     if (!fieldDefinition && isOkWithoutField) {
       fieldDefinition = config.types[fieldType];
     }
-    let defaultWidget = isFuncArg
-      ? getWidgetForFieldOp(config, field, operator)
-      : getWidgetForFieldOp(config, field, operator, null, fieldSrc);
+    let defaultWidget = getWidgetForFieldOp(config, field, operator);
     if (!defaultWidget && isOkWithoutField) {
       defaultWidget = config.types[fieldType]?.mainWidget;
     }
     const operatorDefinition = isFuncArg
       ? funcArgDummyOpDef
-      : getOperatorConfig(config, operator, field, fieldSrc);
+      : getOperatorConfig(config, operator, field);
     if ((fieldDefinition == null || operatorDefinition == null) && !isCaseValue) {
       return null;
     }
@@ -126,20 +122,14 @@ export default class Widget extends Component {
       return null;
     }
 
-    let valueSources = isFuncArg
-      ? getValueSourcesForFieldOp(config, field, operator, fieldDefinition, leftField)
-      : getValueSourcesForFieldOp(config, field, operator, fieldDefinition, null, fieldSrc);
+    let valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition);
     if (!field) {
       valueSources = Object.keys(config.settings.valueSourcesInfo);
     }
     const widgets = range(0, cardinality).map(delta => {
       const valueSrc = iValueSrcs.get(delta) || null;
-      let widget = isFuncArg
-        ? getWidgetForFieldOp(config, field, operator, valueSrc)
-        : getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
-      let widgetDefinition = isFuncArg
-        ? getFieldWidgetConfig(config, field, operator, widget, valueSrc)
-        : getFieldWidgetConfig(config, field, operator, widget, valueSrc, fieldSrc);
+      let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+      let widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
       if (isSpecialRangeForSrcField) {
         widget = widgetDefinition.singleWidget;
         widgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc);
@@ -149,12 +139,8 @@ export default class Widget extends Component {
         widgetDefinition = config.widgets[widget];
       }
       const widgetType = widgetDefinition?.type;
-      const valueLabel = isFuncArg
-        ? getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange)
-        : getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange, fieldSrc);
-      const widgetValueLabel = isFuncArg
-        ? getValueLabel(config, field, operator, delta, null, isTrueSpecialRange)
-        : getValueLabel(config, field, operator, delta, null, isTrueSpecialRange, fieldSrc);
+      const valueLabel = getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange);
+      const widgetValueLabel = getValueLabel(config, field, operator, delta, null, isTrueSpecialRange);
       const sepText = operatorDefinition?.textSeparators ? operatorDefinition?.textSeparators[delta] : null;
       const setValueSrcHandler = this._onChangeValueSrc.bind(this, delta);
 

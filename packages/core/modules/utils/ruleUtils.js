@@ -30,7 +30,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const {keepInputOnChangeFieldSrc} = config.settings;
   const currentField = current.get("field");
   const currentFieldType = current.get("fieldType");
-  const currentFieldSrc = current.get("fieldSrc");
+  //const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
@@ -40,12 +40,12 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   //const isValidatingTree = (changedProp === null);
   const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
 
-  //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
-  const newOperatorConfig = getOperatorConfig(config, newOperator, newField, currentFieldSrc);
+  //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
+  const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
   //const currentOperatorCardinality = currentOperator ? defaultValue(currentOperatorConfig.cardinality, 1) : null;
   const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
-  const currentFieldConfig = getFieldConfig(oldConfig, currentField, currentFieldSrc);
-  const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
+  const currentFieldConfig = getFieldConfig(oldConfig, currentField);
+  const newFieldConfig = getFieldConfig(config, newField);
   const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
   const currentType = currentFieldConfig?.type || currentFieldType;
   const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
@@ -71,12 +71,12 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   // compare old & new widgets
   for (let i = 0 ; i < operatorCardinality ; i++) {
     const vs = currentValueSrc.get(i) || null;
-    const currentWidget = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs, currentFieldSrc);
-    const newWidget = getWidgetForFieldOp(config, newField, newOperator, vs, currentFieldSrc);
+    const currentWidget = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
+    const newWidget = getWidgetForFieldOp(config, newField, newOperator, vs);
     // need to also check value widgets if we changed operator and current value source was 'field'
     // cause for select type op '=' requires single value and op 'in' requires array value
-    const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value", currentFieldSrc);
-    const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value", currentFieldSrc);
+    const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value");
+    const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value");
 
     const canReuseWidget = newValueWidget == currentValueWidget
       || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget)
@@ -89,8 +89,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   if (currentOperator != newOperator && [currentOperator, newOperator].includes("proximity"))
     canReuseValue = false;
 
-  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first(), currentFieldSrc);
-  let valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null, null, currentFieldSrc);
+  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
+  let valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null);
   if (!newField && isOkWithoutField) {
     valueSources = Object.keys(config.settings.valueSourcesInfo);
   }
@@ -107,7 +107,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const asyncListValues = currentAsyncListValues;
       const [validateError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, true, currentFieldSrc
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, true
       );
       const isValid = !validateError;
       // Allow bad value with error message
@@ -218,14 +218,14 @@ export const getOperatorsForType = (config, fieldType) => {
   return config.types[fieldType]?.operators || null;
 };
 
-export const getOperatorsForField = (config, field, fieldSrc) => {
-  const fieldConfig = getFieldConfig(config, field, fieldSrc);
+export const getOperatorsForField = (config, field) => {
+  const fieldConfig = getFieldConfig(config, field);
   const fieldOps = fieldConfig ? fieldConfig.operators : [];
   return fieldOps;
 };
 
-export const getFirstOperator = (config, field, fieldSrc) => {
-  const fieldOps = getOperatorsForField(config, field, fieldSrc);
+export const getFirstOperator = (config, field) => {
+  const fieldOps = getOperatorsForField(config, field);
   return fieldOps ? fieldOps[0] : null;
 };
 
@@ -276,12 +276,12 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
     });
 };
 
-export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false, fieldSrc = null) => {
+export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
   const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
   const {showLabels} = config.settings;
-  const fieldConfig = getFieldConfig(config, field, fieldSrc);
-  const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc, fieldSrc) || {};
-  const mergedOpConfig = getOperatorConfig(config, operator, field, fieldSrc) || {};
+  const fieldConfig = getFieldConfig(config, field);
+  const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
+  const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
     
   const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
   let ret = null;
@@ -316,13 +316,13 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
   return ret;
 };
 
-function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc = null, fieldSrc = null) {
+function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc = null) {
   let widgets = [];
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
   const isFuncArg = typeof field == "object" && (!!field.func && !!field.arg || field._isFuncArg);
-  const fieldConfig = getFieldConfig(config, field, fieldSrc);
+  const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
   
   if (fieldConfig?.widgets) {
@@ -382,8 +382,8 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   return {widgets, valueSrcs};
 }
 
-export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null, fieldSrc = null) => {
-  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc, fieldSrc);
+export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {
+  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
   return widgets;
 };
 
@@ -412,14 +412,14 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
   });
 };
 
-export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null, leftFieldForFunc = null, fieldSrc = null) => {
-  const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null, fieldSrc);
+export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null) => {
+  const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
   const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition);
   return filteredValueSrcs;
 };
 
-export const getWidgetForFieldOp = (config, field, operator, valueSrc = null, fieldSrc = null) => {
-  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc, fieldSrc);
+export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) => {
+  const {widgets} = _getWidgetsAndSrcsForFieldOp(config, field, operator, valueSrc);
   let widget = null;
   if (widgets.length)
     widget = widgets[0];

@@ -39,8 +39,8 @@ export default class Operator extends Component {
     }
   }
 
-  getMeta({config, selectedField, selectedFieldSrc, selectedFieldType, selectedOperator}) {
-    const fieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
+  getMeta({config, selectedField, selectedFieldType, selectedOperator}) {
+    const fieldConfig = getFieldConfig(config, selectedField);
     let operators = [...(fieldConfig?.operators || config.types[selectedFieldType]?.operators || [])];
     if (!selectedField && !operators.includes(selectedOperator)) {
       // eg. `prox` field was selected, then `fieldSrc` changed to `func`
@@ -54,7 +54,7 @@ export default class Operator extends Component {
           config.operators, 
           (item, key) => operators?.indexOf(key) !== -1
         ), 
-        (_opts, op) => getOperatorConfig(config, op, selectedField, selectedFieldSrc)
+        (_opts, op) => getOperatorConfig(config, op, selectedField)
       );
       
     const items = this.buildOptions(config, operatorsOptions, operators);

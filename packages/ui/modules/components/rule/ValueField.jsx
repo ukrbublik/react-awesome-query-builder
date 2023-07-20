@@ -51,24 +51,24 @@ export default class ValueField extends Component {
     }
   }
 
-  getItems({config, field, fieldSrc, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
+  getItems({config, field, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
     const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc, fieldType);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
 
-  getMeta({config, field, fieldSrc, fieldType, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
+  getMeta({config, field, fieldType, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
 
-    const leftFieldConfig = field ? getFieldConfig(config, field, fieldSrc) : {};
+    const leftFieldConfig = field ? getFieldConfig(config, field) : {};
     const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField?.widgetProps || {};
     const placeholder = isFieldSelected ? null 
@@ -91,12 +91,12 @@ export default class ValueField extends Component {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldSrc, fieldType) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value", fieldSrc);
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     const widgetConfig = config.widgets[widget];
     let expectedType;
     if (isFuncArg) {

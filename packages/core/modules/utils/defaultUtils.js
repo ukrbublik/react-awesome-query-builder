@@ -16,22 +16,22 @@ export const defaultFieldSrc = (config, canGetFirst = true) => {
   return canGetFirst && config.settings.fieldSources?.[0] || "field";
 };
 
-export const defaultOperator = (config, field, fieldSrc, canGetFirst = true) => {
-  let fieldConfig = getFieldConfig(config, field, fieldSrc);
+export const defaultOperator = (config, field, canGetFirst = true) => {
+  let fieldConfig = getFieldConfig(config, field);
   let fieldOperators = fieldConfig && fieldConfig.operators || [];
   let fieldDefaultOperator = fieldConfig && fieldConfig.defaultOperator;
   if (!fieldOperators.includes(fieldDefaultOperator))
     fieldDefaultOperator = null;
   if (!fieldDefaultOperator && canGetFirst)
-    fieldDefaultOperator = getFirstOperator(config, field, fieldSrc);
+    fieldDefaultOperator = getFirstOperator(config, field);
   let op = typeof config.settings.defaultOperator === "function"
-    ? config.settings.defaultOperator(field, fieldConfig, fieldSrc) : fieldDefaultOperator;
+    ? config.settings.defaultOperator(field, fieldConfig) : fieldDefaultOperator;
   return op;
 };
 
 //used for complex operators like proximity
-export const defaultOperatorOptions = (config, operator, field, fieldSrc) => {
-  let operatorConfig = operator ? getOperatorConfig(config, operator, field, fieldSrc) : null;
+export const defaultOperatorOptions = (config, operator, field) => {
+  let operatorConfig = operator ? getOperatorConfig(config, operator, field) : null;
   if (!operatorConfig)
     return null; //new Immutable.Map();
   return operatorConfig.options ? new Immutable.Map(

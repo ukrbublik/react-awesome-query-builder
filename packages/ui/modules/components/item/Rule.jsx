@@ -69,17 +69,17 @@ class Rule extends Component {
     }
   }
 
-  getMeta({selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
+  getMeta({selectedField, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
     const {keepInputOnChangeFieldSrc} = config.settings;
     const selectedFieldParts = getFieldParts(selectedField, config);
-    const selectedFieldConfig = getFieldConfig(config, selectedField, selectedFieldSrc);
+    const selectedFieldConfig = getFieldConfig(config, selectedField);
     const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
     const isOkWithoutField = keepInputOnChangeFieldSrc && selectedFieldType;
     const isFieldSelected = !!selectedField || isOkWithoutField;
     const isFieldAndOpSelected = isFieldSelected && selectedOperator;
-    const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField, selectedFieldSrc);
+    const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField);
     const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
-    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator, null, null, selectedFieldSrc) || {};
+    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator, null, null) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
     const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;

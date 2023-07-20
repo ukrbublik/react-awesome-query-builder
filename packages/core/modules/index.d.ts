@@ -236,7 +236,7 @@ export interface Utils {
     getFuncConfig(config: Config, func: string): Func | null;
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
     getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
-    getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource, fieldSrc?: FieldSource): Widget | null;
+    getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
     isJsonLogic(value: any): boolean;
     isJSX(jsx: any): boolean;
     isDirtyJSX(jsx: any): boolean;

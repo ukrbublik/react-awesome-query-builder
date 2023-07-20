@@ -327,9 +327,9 @@ const setFieldSrc = (state, path, srcKey, config) => {
   const currentType = currentRule.get("type");
   const currentProperties = currentRule.get("properties");
   const currentField = currentProperties.get("field");
-  const currentFieldSrc = currentProperties.get("fieldSrc");
+  //const currentFieldSrc = currentProperties.get("fieldSrc");
   const currentFielType = currentProperties.get("fieldType");
-  const currentFieldConfig = getFieldConfig(config, currentField, currentFieldSrc);
+  const currentFieldConfig = getFieldConfig(config, currentField);
   let fieldType = currentFieldConfig?.type || currentFielType;
   if (!fieldType || fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
@@ -374,7 +374,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
   const currentFieldSrc = currentProperties.get("fieldSrc");
-  const newFieldConfig = getFieldConfig(config, newField, currentFieldSrc);
+  const newFieldConfig = getFieldConfig(config, newField);
   let fieldType = newFieldConfig.type;
   if (fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
@@ -406,9 +406,9 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
       if (strategy == "keep" && !isChangeToAnotherType)
         newOperator = lastOp;
       else if (strategy == "default")
-        newOperator = defaultOperator(config, newField, currentFieldSrc, false);
+        newOperator = defaultOperator(config, newField, false);
       else if (strategy == "first")
-        newOperator = getFirstOperator(config, newField, currentFieldSrc);
+        newOperator = getFirstOperator(config, newField);
       if (newOperator) //found op for strategy
         break;
     }
@@ -460,7 +460,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
         current = current
           .set("valueError", newValueError);
       }
-      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField, currentFieldSrc);
+      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
       isInternalValueChange = __isInternal; //todo: filter edge cases?
       return current
         .set("field", newField)
@@ -491,9 +491,9 @@ const setOperator = (state, path, newOperator, config) => {
   const children = state.getIn(expandTreePath(path, "children1"));
   const currentField = properties.get("field");
   const currentFieldSrc = properties.get("fieldSrc");
-  const fieldConfig = getFieldConfig(config, currentField, currentFieldSrc);
+  const fieldConfig = getFieldConfig(config, currentField);
   const isRuleGroup = fieldConfig?.type == "!group";
-  const operatorConfig = getOperatorConfig(config, newOperator, currentField, currentFieldSrc);
+  const operatorConfig = getOperatorConfig(config, newOperator, currentField);
   const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
 
   state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
@@ -510,7 +510,7 @@ const setOperator = (state, path, newOperator, config) => {
       current = current
         .set("valueError", newValueError);
     }
-    const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField, currentFieldSrc);
+    const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, currentField);
 
     if (!canReuseValue) {
       current = current
@@ -551,16 +551,16 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     value = value.join(fieldSeparator);
 
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
-  const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
+  //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
-  const operatorConfig = getOperatorConfig(config, operator, field, fieldSrc);
+  const operatorConfig = getOperatorConfig(config, operator, field);
   const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
   const isEndValue = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = false;
   const [validateError, fixedValue] = validateValue(
-    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, true, fieldSrc
+    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, true
   );
   const isValid = !validateError;
   if (fixedValue !== value) {
@@ -570,8 +570,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 
   // Additional validation for range values
   if (showErrorMessage) {
-    const w = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
-    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc, fieldSrc);
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
     const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
         
     if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
@@ -645,7 +645,7 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), null);
 
     // if current operator is range, clear possible range error
-    const operatorConfig = getOperatorConfig(config, operator, field, fieldSrc);
+    const operatorConfig = getOperatorConfig(config, operator, field);
     const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
     if (operatorConfig.validateValues) {
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), null);

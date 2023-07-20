@@ -42,7 +42,7 @@ export default class Field extends Component {
     }
   }
 
-  getMeta({selectedField, selectedFieldSrc, selectedFieldType, config, parentField}) {
+  getMeta({selectedField, selectedFieldType, config, parentField}) {
     const selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;

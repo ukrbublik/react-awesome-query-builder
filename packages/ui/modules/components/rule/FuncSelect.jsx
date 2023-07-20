@@ -52,19 +52,19 @@ export default class FuncSelect extends Component {
     }
   }
 
-  getItems({config, field, fieldType, fieldSrc, isLHS, operator, parentFuncs, fieldDefinition, isFuncArg}, {lookingForFieldType}) {
+  getItems({config, field, fieldType, isLHS, operator, parentFuncs, fieldDefinition, isFuncArg}, {lookingForFieldType}) {
     const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldType, fieldSrc, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
+    const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldType, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
     const items = this.buildOptions(config, filteredFuncs, lookingForFieldType);
     return items;
   }
 
-  getMeta({config, field, fieldType, fieldSrc, value, isLHS, isFuncArg}) {
+  getMeta({config, field, fieldType, value, isLHS, isFuncArg}) {
     const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(config, field, fieldSrc);
+    const leftFieldConfig = getFieldConfig(config, field);
     const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
     const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     const placeholder = !isFuncSelected ? funcPlaceholder : null;
@@ -93,14 +93,14 @@ export default class FuncSelect extends Component {
     };
   }
 
-  filterFuncs(config, funcs, leftFieldFullkey, fieldType, fieldSrc, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
+  filterFuncs(config, funcs, leftFieldFullkey, fieldType, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition) {
     funcs = clone(funcs);
     const fieldSeparator = config.settings.fieldSeparator;
-    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey, fieldSrc);
+    const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
     const _relyOnWidgetType = false; //TODO: remove this, see issue #758
     let expectedType;
     let targetDefinition = leftFieldConfig;
-    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value", fieldSrc);
+    const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     const widgetConfig = widget && config.widgets[widget];
     if (isFuncArg) {
       targetDefinition = fieldDefinition;

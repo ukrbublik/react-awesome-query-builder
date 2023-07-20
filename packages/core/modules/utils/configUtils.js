@@ -448,7 +448,7 @@ export const getFieldPathParts = (field, config, onlyKeys = false) => {
       .map((parts) => parts.join(fieldSeparator));
 };
 
-export const getFieldConfig = (config, field, fieldSrc) => {
+export const getFieldConfig = (config, field) => {
   if (!field)
     return null;
   if (typeof field == "object") {
@@ -477,15 +477,9 @@ export const getFieldConfig = (config, field, fieldSrc) => {
       // it's func arg
       return getFuncArgConfig(config, field.get("func"), field.get("arg"));
     } else {
-      // it's field value func
+      // it's field func
       return getFuncConfig(config, field.get("func"));
     }
-  }
-  if (fieldSrc === "func") {
-    if (field?.get?.("func"))
-      return getFuncConfig(config, field?.get?.("func"));
-    else
-      throw new Error(`Unknown func ${field?.toJS?.() ?? JSON.stringify(field)}`);
   }
 
   const fieldConfig = getFieldRawConfig(config, field);
@@ -499,13 +493,13 @@ export const getFieldConfig = (config, field, fieldSrc) => {
   return ret;
 };
 
-export const getOperatorConfig = (config, operator, field = null, fieldSrc) => {
+export const getOperatorConfig = (config, operator, field = null) => {
   if (!operator)
     return null;
   const opConfig = config.operators[operator];
   if (field) {
-    const fieldConfig = getFieldConfig(config, field, fieldSrc);
-    const widget = getWidgetForFieldOp(config, field, operator, null, fieldSrc);
+    const fieldConfig = getFieldConfig(config, field);
+    const widget = getWidgetForFieldOp(config, field, operator, null);
     const widgetConfig = config.widgets[widget] || {};
     const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
     const widgetOpProps = (widgetConfig.opProps || {})[operator];
@@ -517,14 +511,14 @@ export const getOperatorConfig = (config, operator, field = null, fieldSrc) => {
   }
 };
 
-export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null, fieldSrc = null) => {
+export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
   if (!field)
     return null;
   if (!(operator || widget) && valueSrc != "const" && field != "!case_value")
     return null;
-  const fieldConfig = getFieldConfig(config, field, fieldSrc);
+  const fieldConfig = getFieldConfig(config, field);
   if (!widget)
-    widget = getWidgetForFieldOp(config, field, operator, valueSrc, fieldSrc);
+    widget = getWidgetForFieldOp(config, field, operator, valueSrc);
   const widgetConfig = config.widgets[widget] || {};
   const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
   const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});

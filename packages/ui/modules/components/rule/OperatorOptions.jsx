@@ -18,7 +18,7 @@ export default class OperatorOptions extends PureComponent {
   render() {
     if (!this.props.selectedOperator)
       return null;
-    const operatorDefinitions = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField, this.props.selectedFieldSrc);
+    const operatorDefinitions = getOperatorConfig(this.props.config, this.props.selectedOperator, this.props.selectedField);
     if (typeof operatorDefinitions.options === "undefined") {
       return null;
     }
