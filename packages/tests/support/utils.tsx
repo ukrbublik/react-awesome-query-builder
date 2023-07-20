@@ -47,7 +47,7 @@ interface ExtectedExports {
   logic?: JsonLogicTree;
 }
 interface Tasks {
-  expect_jlogic: (jlogics: Array<null | JsonLogicTree>, changeIndex?: number) => void;
+  expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
   expect_queries: (queries: Array<string>) => void;
   expect_checks: (expects: ExtectedExports) => void;
   config: Config;
@@ -380,7 +380,7 @@ const expect_queries_before_and_after = (config: Config, tree: ImmutableTree, on
   expect(changedTreeString).to.equal(queries[1]);
 };
 
-const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onChange: sinon.SinonSpy, jlogics: Array<null | JsonLogicTree>, changeIndex = 0) => {
+const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onChange: sinon.SinonSpy, jlogics: Array<null | undefined | JsonLogicTree>, changeIndex = 0) => {
   const {logic: initTreeJl} = jsonLogicFormat(tree, config);
   if (jlogics[0] !== null) {
     expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));

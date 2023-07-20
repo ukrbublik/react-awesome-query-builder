@@ -4,15 +4,19 @@ import { MuiWidgets } from "@react-awesome-query-builder/mui";
 import { MaterialWidgets } from "@react-awesome-query-builder/material";
 import { BootstrapWidgets } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIWidgets } from "@react-awesome-query-builder/fluent";
+import { BasicFuncs, Utils } from "@react-awesome-query-builder/core";
+import { simulatedAsyncFetch } from "./autocomplete";
+import sinon from "sinon";
+import merge from "lodash/merge";
+
 const {
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import { BasicFuncs } from "@react-awesome-query-builder/core";
-import { simulatedAsyncFetch } from "./autocomplete";
-import sinon from "sinon";
-import merge from "lodash/merge";
+const {
+  ExportUtils
+} = Utils;
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -1192,10 +1196,30 @@ export const with_cases = (BasicConfig) => ({
   }
 });
 
+export const with_concat_case_value = (BasicConfig) => ({
+  ...BasicConfig,
+  widgets: {
+    ...BasicConfig.widgets,
+    case_value: {
+      ...BasicConfig.widgets.case_value,
+      spelFormatValue: ExportUtils.spelFormatConcat,
+      spelImportValue: ExportUtils.spelImportConcat,
+    },
+  },
+});
+
 export const with_fieldSources = (BasicConfig) => ({
   ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     fieldSources: ["field", "func"],
+  }
+});
+
+export const with_keepInputOnChangeFieldSrc = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    keepInputOnChangeFieldSrc: true,
   }
 });

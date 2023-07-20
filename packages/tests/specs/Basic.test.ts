@@ -76,6 +76,23 @@ describe("basic query", () => {
       });
     });
 
+    describe("should work with between op in SpEL format", () => {
+      export_checks(configs.simple_with_number, inits.spel_with_between, "SpEL", {
+        logic: {
+          "and": [
+            {
+              "<=": [
+                1,
+                { "var": "num" },
+                2
+              ]
+            }
+          ]
+        },
+        spel: "num >= 1 && num <= 2"
+      });
+    });
+
     describe("should work with simple value in JsonLogic format not in group", () => {
       export_checks(configs.simple_with_number, inits.with_number_not_in_group, "JsonLogic", {
         query: "num == 2",

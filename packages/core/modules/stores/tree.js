@@ -375,6 +375,10 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   const wasRuleGroup = currentType == "rule_group";
   const currentFieldSrc = currentProperties.get("fieldSrc");
   const newFieldConfig = getFieldConfig(config, newField);
+  if (!newFieldConfig) {
+    console.warn(`No config for LHS ${newField}`);
+    return {tree: state, isInternalValueChange};
+  }
   let fieldType = newFieldConfig.type;
   if (fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
