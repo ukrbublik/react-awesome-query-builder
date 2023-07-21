@@ -24,7 +24,7 @@ const groupBy = (option) => option.groupTitle;
 const fixGroupBy = (listValues) => {
   let newValues = [];
   for (const lv of listValues) {
-    const i = newValues.findLastIndex(lv1 => groupBy(lv1) === groupBy(lv));
+    const i = newValues.reverse().findIndex(lv1 => groupBy(lv1) === groupBy(lv));
     if (i != -1) {
       newValues.splice(i+1, 0, lv);
     } else {

@@ -61,8 +61,8 @@ interface DoOptions {
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
 const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
-  return false;
-  // return errText.includes("The anchor element should be part of the document layout.") // test issue with DatePicker
+  // todo: issue after updating antd
+  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.")
 };
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {
@@ -204,10 +204,6 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
   await checks(qb, onChange, tasks, consoleData);
   //});
 
-  // restore console
-  // eslint-disable-next-line no-global-assign
-  console = origConsole;
-
   if (options?.attach) {
     // @ts-ignore
     qb.detach();
@@ -217,6 +213,10 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
     // @ts-ignore
     qb.unmount();
   }
+
+  // restore console
+  // eslint-disable-next-line no-global-assign
+  console = origConsole;
   
   onChange.resetHistory();
 };

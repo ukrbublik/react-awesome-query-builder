@@ -1,5 +1,4 @@
 {
-  "useWorkspaces": true,
   "npmClient": "pnpm",
   "workspaces": [
     "./packages/*"

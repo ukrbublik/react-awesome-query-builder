@@ -53,14 +53,14 @@ ul.ant-select-selection__rendered {
 
 
 .widget--valuesrc {
-  margin-left: calc($rule-parts-distance / 2);
-  margin-right: calc($rule-parts-distance / 4);
+  margin-left: 3px;
+  margin-right: 3px;
 }
 .rule--value .rule--widget .widget--valuesrc {
   margin-top: 2px;
 }
 .rule--fieldsrc {
-  margin-left: calc($rule-parts-distance / 2);
-  margin-right: calc($rule-parts-distance / 3);
+  margin-left: 3px;
+  margin-right: 3px;
   margin-bottom: 4px;
 }
