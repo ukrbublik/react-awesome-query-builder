@@ -146,7 +146,7 @@ export const with_struct_and_group = {
     {
       "and": [
         { "==": [ { "var": "results.slider" }, 22 ] },
-        { "<=": [ 13, { "var": "results.slider" }, 36 ] },
+        { "<=": [ 13, { "var": "results.slider" }, 36 ] }, // tip: invalid
         { "==": [ { "var": "results.stock" }, true ] }
       ]
     },

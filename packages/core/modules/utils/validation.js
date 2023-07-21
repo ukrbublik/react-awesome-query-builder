@@ -221,7 +221,7 @@ function validateRule (item, path, itemId, meta, c) {
       reason = "Uncomplete LHS";
     } else {
       reason = "Uncomplete RHS";
-      if (newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
+      if (newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
         // eg. operator `starts_with` supports only valueSrc "value"
         reason = `Bad value src ${newSerialized.valueSrc}`;
       }
