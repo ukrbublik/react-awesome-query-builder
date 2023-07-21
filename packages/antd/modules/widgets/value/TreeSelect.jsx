@@ -112,7 +112,7 @@ export default class TreeSelectWidget extends Component {
         multiple={treeMultiple}
         treeCheckable={treeMultiple}
         key={"widget-treeselect"}
-        dropdownMatchSelectWidth={false}
+        popupMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
         treeData={treeData}

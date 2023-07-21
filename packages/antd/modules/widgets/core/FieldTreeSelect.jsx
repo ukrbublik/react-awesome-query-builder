@@ -139,7 +139,7 @@ export default class FieldTreeSelect extends Component {
         placeholder={placeholder}
         filterTreeNode={this.filterTreeNode}
         treeDefaultExpandedKeys={treeDefaultExpandedKeys}
-        dropdownMatchSelectWidth={false}
+        popupMatchSelectWidth={false}
         disabled={readonly}
         {...customProps}
       />
