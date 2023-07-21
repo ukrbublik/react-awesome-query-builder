@@ -513,38 +513,65 @@ $seps: ".widget--sep", ".operator--options--sep", ".rule--func--bracket-before",
   display: inline-block;
 }
 
+// seps
 #{$seps} {
   vertical-align: bottom;
   align-self: flex-end;
   margin-bottom: $seps-offset-bottom;
 }
-
-.rule--fieldsrc {
-  vertical-align: top;
-  margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to field
+.rule--func--arg-sep {
+  margin-bottom: calc($seps-offset-bottom - 5px);
 }
-.operator--options {
-  display: flex;
-}
-.rule--value {
-  display: flex;
-}
-.rule--widget {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.rule--field, .rule--operator, .widget--widget, .widget--valuesrc, .widget--sep {
+.widget--sep {
   margin-left: $rule-parts-distance;
+  margin-right: $rule-parts-distance;
 }
-.widget--valuesrc {
-  vertical-align: top;
-  margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+.widget--sep.widget--sep-first {
+  margin-right: $rule-parts-distance;
+  margin-left: 0;
 }
-
+.rule--operator {
+  // more distinction between LHS and RHS
+  margin-left: calc($rule-parts-distance * 2);
+  margin-right: calc($rule-parts-distance * 2);
+}
 .operator--options--sep {
   margin-right: $rule-parts-distance;
 }
+.rule--func--arg-sep {
+  margin-left: 3px;
+  margin-right: 6px;
+}
+.rule--func--bracket-after {
+  margin-left: calc($rule-parts-distance / 2);
+  margin-right: 2px; // small
+}
+.rule--func--bracket-before {
+  margin-left: calc($rule-parts-distance / 2);
+  margin-right: calc($rule-parts-distance / 2);
+}
+
+
+// .rule--func--arg-label-sep {
+//   margin-left: 1px;
+//   margin-right: 6px;
+// }
+
+// valuesrc
+.widget--valuesrc {
+  //margin-left: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+  //margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+  vertical-align: top;
+}
+.rule--fieldsrc {
+  // margin-right: calc(-1 * $rule-parts-distance + 2px); // be closer to widget
+  vertical-align: top;
+}
+
+.operator--options {
+  display: flex;
+}
+
 
 .rule--operator-wrapper {
   display: flex;
@@ -561,12 +588,11 @@ div.tooltip-inner {
   max-width: 500px;
 }
 
-.rule--field, .group--field, .rule--operator, .widget--widget {
-  label {
-    display: block;
-    font-weight: bold;
-  }
+.rule--label {
+  display: block;
+  font-weight: bold;
 }
+
 
 
 /******************************************************************************/
@@ -593,25 +619,29 @@ $rule_func_items: ".rule--func--wrapper", ".rule--func", ".rule--func--args", ".
   display: flex;
 }
 
-.rule--func--bracket-before, .rule--func--bracket-after {
-  margin-left: 3px;
-  margin-right: 3px;
-}
-.rule--func--bracket-before {
-  margin-left: 5px;
-}
-.rule--func--arg-value > .rule--widget {
-  margin-left: calc(-1 * $rule-parts-distance);
-}
-.rule--func--arg-sep {
-  margin-left: 3px;
-  margin-right: 6px;
-}
-.rule--func--arg-label-sep {
-  margin-left: 1px;
-  margin-right: 6px;
+
+
+
+
+// containers
+.rule--field-wrapper,
+.rule--field--func, 
+.rule--func--wrapper, 
+.rule--func--args, 
+.rule--func--arg, 
+.rule--func--arg-value, 
+.rule--func--arg-value > .rule--widget,
+.widget--func {
+  display: contents;
 }
 
+// multiline distance
+.rule--func, .widget--widget {
+  margin-bottom: 2px;
+}
+.rule--body--wrapper {
+  margin-bottom: -2px;
+}
 
 /******************************************************************************/
 /** Minimalism ****************************************************************/
@@ -723,3 +753,4 @@ $rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", "
     }
   }
 }
+

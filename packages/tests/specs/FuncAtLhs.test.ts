@@ -259,7 +259,7 @@ describe("LHS func", () => {
   describe("interactions on vanilla", () => {
     const getLhsOptions = (qb: ReactWrapper, fieldSrc: string) => {
       const select = fieldSrc == "func"
-        ? qb.find(".rule .rule--field .rule--func select")
+        ? qb.find(".rule .rule--field--func .rule--func select")
         : qb.find(".rule .rule--field select").at(0)
       const fieldOptions = Object.fromEntries(select
         .find("option")
@@ -290,13 +290,13 @@ describe("LHS func", () => {
 
     const selectFieldFunc = (qb: ReactWrapper, val: string) => {
       qb
-        .find(".rule .rule--field .rule--func select")
+        .find(".rule .rule--field--func .rule--func select")
         .simulate("change", { target: { value: val } });
     };
 
     const setFieldFuncArgValue = (qb: ReactWrapper, ind: number, val: string) => {
       qb
-        .find(".rule .rule--field .rule--func--args .rule--func--arg")
+        .find(".rule .rule--field--func .rule--func--args .rule--func--arg")
         .at(ind)
         .find(".rule--func--arg-value .rule--widget .widget--widget input")
         .simulate("change", { target: { value: val } });

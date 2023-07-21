@@ -47,10 +47,10 @@ describe("query with func", () => {
         .find(".rule .rule--value .widget--valuesrc select")
         .simulate("change", { target: { value: "func" } });
       qb
-        .find(".rule .rule--value .widget--widget .rule--func select")
+        .find(".rule .rule--value .widget--func .rule--func select")
         .simulate("change", { target: { value: "LINEAR_REGRESSION" } });
       qb
-        .find(".rule .rule--value .widget--widget .rule--func--args .rule--func--arg")
+        .find(".rule .rule--value .widget--func .rule--func--args .rule--func--arg")
         .at(2)
         .find("input")
         .simulate("change", { target: { value: "4" } });

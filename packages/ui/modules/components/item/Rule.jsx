@@ -143,24 +143,29 @@ class Rule extends Component {
   }
 
   renderField() {
-    const {config, isLocked, parentField} = this.props;
+    const {
+      config, isLocked, parentField, groupId, id,
+      selectedFieldSrc, selectedField, selectedFieldType, setField, setFieldSrc,
+    } = this.props;
     const { immutableFieldsMode } = config.settings;
     // tip: don't allow function inside !group (yet)
 
     return <FieldWrapper
       key="field"
-      classname={"rule--field"}
+      classname={classNames(
+        selectedFieldSrc == "func" ? "rule--field--func" : "rule--field",
+      )}
       config={config}
       canSelectFieldSource={!parentField}
-      selectedField={this.props.selectedField}
-      selectedFieldSrc={this.props.selectedFieldSrc}
-      selectedFieldType={this.props.selectedFieldType}
-      setField={!immutableFieldsMode ? this.props.setField : dummyFn}
-      setFieldSrc={!immutableFieldsMode ? this.props.setFieldSrc : dummyFn}
-      parentField={this.props.parentField}
+      selectedField={selectedField}
+      selectedFieldSrc={selectedFieldSrc}
+      selectedFieldType={selectedFieldType}
+      setField={!immutableFieldsMode ? setField : dummyFn}
+      setFieldSrc={!immutableFieldsMode ? setFieldSrc : dummyFn}
+      parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
-      id={this.props.id}
-      groupId={this.props.groupId}
+      id={id}
+      groupId={groupId}
     />;
   }
 
