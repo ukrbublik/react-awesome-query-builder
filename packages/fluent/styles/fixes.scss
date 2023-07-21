@@ -1,11 +1,8 @@
-// fixes space at bottom after multiselect
-.widget--widget > .ms-Dropdown-container {
-  display: flex;
-}
 
 // fixes switch vertical center
 .widget--widget > .ms-Toggle {
-  margin-bottom: 0px;
+  margin-top: 5px;
+  margin-bottom: 0;
 }
 
 // fixes switch vertical center
