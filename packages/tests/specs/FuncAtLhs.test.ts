@@ -260,14 +260,14 @@ describe("LHS func", () => {
     const getLhsOptions = (qb: ReactWrapper, fieldSrc: string) => {
       const select = fieldSrc == "func"
         ? qb.find(".rule .rule--field--func .rule--func select")
-        : qb.find(".rule .rule--field select").at(0)
+        : qb.find(".rule .rule--field select").at(0);
       const fieldOptions = Object.fromEntries(select
         .find("option")
         .map((o, i) => ([
           o.getDOMNode().getAttribute("value"),
           o.getDOMNode().getAttribute("style"),
         ]))
-        .filter(([v, _s]) => !!v));
+        .filter(([v, _s]) => !!v)) as Record<string, string | undefined>;
       const allOptions = Object.keys(fieldOptions);
       const boldOptions = Object.keys(fieldOptions).filter(k => fieldOptions[k]?.includes("bold"));
       return [allOptions, boldOptions];
