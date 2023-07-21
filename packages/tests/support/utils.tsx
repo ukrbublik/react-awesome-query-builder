@@ -62,7 +62,7 @@ const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
 const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
   // todo: issue after updating antd
-  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.")
+  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.");
 };
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {

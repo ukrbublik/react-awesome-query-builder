@@ -1,6 +1,16 @@
 import React from "react";
 import MuiAutocomplete from "../value/MuiAutocomplete";
 
+// simple polyfill for Next
+const findLastIndex = (arr, fn) => {
+  if (arr.findLastIndex) {
+    return arr.findLastIndex(fn);
+  } else {
+    const ind = arr.reverse().findIndex(fn);
+    return ind == -1 ? -1 : (arr.length-1 - ind);
+  }
+};
+
 const itemsToListValues = (items, level = 0) => (
   items.map(item => {
     const {items, path, label, disabled, grouplabel, matchesType} = item;
@@ -24,7 +34,7 @@ const groupBy = (option) => option?.groupTitle;
 const fixGroupBy = (listValues) => {
   let newValues = [];
   for (const lv of listValues) {
-    const i = newValues.reverse().findIndex(lv1 => groupBy(lv1) === groupBy(lv));
+    const i = findLastIndex(newValues, lv1 => groupBy(lv1) === groupBy(lv));
     if (i != -1) {
       newValues.splice(i+1, 0, lv);
     } else {
