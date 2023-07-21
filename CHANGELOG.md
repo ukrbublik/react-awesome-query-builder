@@ -4,6 +4,7 @@
     Thanks @rhallerman1 (PR #900, #896) (issues #287, #250, #344, #336)
   - Support import/export of functions for SpEL (PR #900) (issue #754)
   - Fix issue with `fieldName` (PR #900) (issues #929, #609)
+  - Support `@mui/x-date-pickers` v6 (PR #951) (issue #910)
 - 6.3.0
   - Allow saving and loading config from server (PR #866) (issue #817)
     - New utils: `compressConfig()`, `decompressConfig()`

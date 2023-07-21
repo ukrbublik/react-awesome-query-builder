@@ -3,7 +3,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"; // to determine version
 
+const isV6 = !!DatePicker?.propTypes?.format;
 
 // value widgets
 import MuiTextWidget from "./value/MuiText";
@@ -35,6 +37,7 @@ import MuiConfirm from "./core/MuiConfirm";
 const MuiProvider = ({config, children}) => {
   const settingsTheme = config.settings.theme || {};
   const settingsLocale = config.settings.locale || {};
+  const momentLocale = settingsLocale.moment;
   const themeConfig = settingsTheme.mui;
   const locale = settingsLocale.mui;
   const theme = createTheme(themeConfig, locale, { 
@@ -46,9 +49,15 @@ const MuiProvider = ({config, children}) => {
     }
   });
 
+  const locProviderProps = isV6 ? {
+    locale: momentLocale,
+  } : {
+    adapterLocale: momentLocale,
+  };
+
   const base = (<div className="mui">{children}</div>);
   const withProviders = (
-    <LocalizationProvider dateAdapter={AdapterMoment} >
+    <LocalizationProvider dateAdapter={AdapterMoment} {...locProviderProps} >
       <ConfirmProvider>
         {base}
       </ConfirmProvider>
