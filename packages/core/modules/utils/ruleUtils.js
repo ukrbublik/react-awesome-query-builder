@@ -509,7 +509,9 @@ export const isEmptyRuleProperties = ({
   const filledParts = [
     liteCheck ? (field !== null || fieldType != null) : isCompletedValue(field, fieldSrc, config, liteCheck),
     !!operator,
-    value.filter((val, delta) => isCompletedValue(val, valueSrc.get(delta), config, liteCheck)).size >= cardinality
+    value.filter((val, delta) => 
+      isCompletedValue(val, valueSrc?.get?.(delta) || valueSrc?.[delta], config, liteCheck)
+    ).size >= cardinality
   ];
   const filledCnt = filledParts.filter(f => !!f).length;
   const isFilled = filledCnt == 3;

@@ -167,8 +167,8 @@ class RuleGroupExt extends BasicGroup {
       operator: selectedOperator,
       operatorOptions,
       value,
-      valueType, // "number"
-      valueSrc: "value",
+      valueType, // new Immutable.List(["number"])
+      valueSrc: ["value"], //new Immutable.List(["value"]), // should be fixed in isEmptyRuleGroupExtPropertiesAndChildren
       //asyncListValues,
       valueError : null,
       parentField,
