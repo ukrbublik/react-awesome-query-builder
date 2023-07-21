@@ -25,7 +25,7 @@ export default (props) => {
     setValue(formatSingleValue(value));
   };
 
-  const timeValue = value ? moment(value, valueFormat) : null;
+  const timeValue = value ? moment(value, valueFormat).toDate() : null;
 
   const stylesOptionsContainer = {
     optionsContainerWrapper: {
@@ -40,7 +40,7 @@ export default (props) => {
       disabled={readonly}
       allowFreeform={true}
       showSeconds={hasSeconds}
-      value={value}
+      value={timeValue}
       useComboBoxAsMenuWidth
       {...customProps}
     />
