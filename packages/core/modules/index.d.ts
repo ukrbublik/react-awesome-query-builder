@@ -81,7 +81,8 @@ export type ConfigContext = {
 
 export type RuleValue = boolean | number | string | Date | Array<string> | any;
 export type FieldPath = string;
-export type FieldValue = FieldPath; // todo: or immutable func, args
+export type FieldFuncValue = ImmutableMap<"func" | "args", any>;
+export type FieldValue = FieldPath | FieldFuncValue;
 
 export type ValueSource = "value" | "field" | "func" | "const";
 export type FieldSource = "field" | "func";
@@ -232,10 +233,10 @@ export interface Utils {
     decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
     compileConfig(config: Config): Config;
     extendConfig(config: Config): Config;
-    getFieldConfig(config: Config, field: FieldPath): Field | null;
+    getFieldConfig(config: Config, field: FieldValue): Field | Func | null;
     getFuncConfig(config: Config, func: string): Func | null;
     getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
-    getOperatorConfig(config: Config, operator: string, field?: string): Operator | null;
+    getOperatorConfig(config: Config, operator: string, field?: FieldValue): Operator | null;
     getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
     isJsonLogic(value: any): boolean;
     isJSX(jsx: any): boolean;

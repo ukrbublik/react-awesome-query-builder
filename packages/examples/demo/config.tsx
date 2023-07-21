@@ -612,8 +612,12 @@ export default (skin: string) => {
       type: "!struct",
       label: "String",
       subfields: {
-        LOWER: BasicFuncs.LOWER,
-        UPPER: BasicFuncs.UPPER,
+        LOWER: merge({}, BasicFuncs.LOWER, {
+          allowSelfNesting: true,
+        }),
+        UPPER: merge({}, BasicFuncs.UPPER, {
+          allowSelfNesting: true,
+        }),
       }
     },
     date: {

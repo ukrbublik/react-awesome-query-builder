@@ -8,7 +8,7 @@ import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
 import classNames from "classnames";
 import {Col} from "../utils";
-const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig} = Utils.ConfigUtils;
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
 const { createListFromArray } = Utils.DefaultUtils;
 
