@@ -178,13 +178,13 @@ const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: Co
   };
   const mockedConsole = {
     ...console,
-    error: (...args: any[]) => {
+    error: (...args: string[]) => {
       const errText = args.filter(a => typeof a === "string").join("\n");
       consoleData.error.push(errText);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
         origConsole.error.apply(null, [...args, `(${configName})`]);
     },
-    warn: (...args: any[]) => {
+    warn: (...args: string[]) => {
       const errText = args.filter(a => typeof a === "string").join("\n");
       consoleData.warn.push(errText);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
