@@ -12,9 +12,11 @@ import {WithConfirmFn} from "../utils";
 class RuleGroup extends BasicGroup {
   static propTypes = {
     ...BasicGroup.propTypes,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
     parentField: PropTypes.string,
     setField: PropTypes.func,
+    setFieldSrc: PropTypes.func,
   };
 
   constructor(props) {
@@ -54,14 +56,19 @@ class RuleGroup extends BasicGroup {
   }
 
   renderField() {
-    const { config, selectedField, setField, parentField, id, groupId, isLocked } = this.props;
+    const { config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
     const { immutableFieldsMode } = config.settings;
+    
     return <FieldWrapper
       key="field"
       classname={"group--field"}
       config={config}
+      canSelectFieldSource={false}
       selectedField={selectedField}
+      selectedFieldSrc={selectedFieldSrc}
+      selectedFieldType={selectedFieldType}
       setField={setField}
+      setFieldSrc={setFieldSrc}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
       id={id}

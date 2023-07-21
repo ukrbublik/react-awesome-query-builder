@@ -11,9 +11,8 @@ const {defaultGroupConjunction} = Utils.DefaultUtils;
 const createGroupContainer = (Group) => 
   class GroupContainer extends Component {
     static propTypes = {
-      //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
       config: PropTypes.object.isRequired,
-      actions: PropTypes.object.isRequired, //{setConjunction: Funciton, removeGroup, addGroup, addRule, ...}
+      actions: PropTypes.object.isRequired, //{setConjunction: Function, removeGroup, addGroup, addRule, ...}
       path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
       id: PropTypes.string.isRequired,
       groupId: PropTypes.string,
@@ -22,7 +21,9 @@ const createGroupContainer = (Group) =>
       children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
       onDragStart: PropTypes.func,
       reordableNodesCnt: PropTypes.number,
-      field: PropTypes.string, // for RuleGroup
+      field: PropTypes.any, // for RuleGroup
+      fieldSrc: PropTypes.string, // for RuleGroup
+      fieldType: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
       isLocked: PropTypes.bool,
       isTrueLocked: PropTypes.bool,
@@ -127,8 +128,8 @@ const createGroupContainer = (Group) =>
     };
 
     // for RuleGroup
-    setField = (field) => {
-      this.props.actions.setField(this.props.path, field);
+    setField = (field, asyncListValues, __isInternal) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
     };
 
     // for RuleGroupExt
@@ -145,6 +146,7 @@ const createGroupContainer = (Group) =>
       const currentNesting = this.props.path.size;
       const maxNesting = this.props.config.settings.maxNesting;
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
+      const fieldType = this.props.fieldType || null;
 
       // Don't allow nesting further than the maximum configured depth and don't
       // allow removal of the root group.
@@ -183,10 +185,11 @@ const createGroupContainer = (Group) =>
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
-              //tree={this.props.tree}
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
               selectedField={this.props.field || null}
+              selectedFieldSrc={this.props.fieldSrc || "field"}
+              selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}
@@ -221,10 +224,11 @@ const createGroupContainer = (Group) =>
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
-              //tree={this.props.tree}
               reordableNodesCnt={this.props.reordableNodesCnt}
               totalRulesCnt={this.props.totalRulesCnt}
               selectedField={this.props.field || null}
+              selectedFieldSrc={this.props.fieldSrc || "field"}
+              selectedFieldType={fieldType}
               parentField={this.props.parentField || null}
               selectedOperator={this.props.operator || null}
               isLocked={this.props.isLocked}

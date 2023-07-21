@@ -4,10 +4,16 @@ import {getFieldConfig, getOperatorConfig} from "./configUtils";
 import {getNewValueForFieldOp, getFirstField, getFirstOperator} from "../utils/ruleUtils";
 
 
-export const defaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
+export const defaultField = (config, canGetFirst = true, parentRuleGroupPath = null, fieldSrc = "field") => {
+  if (fieldSrc !== "field")
+    return null; // don't return default function (yet)
   return typeof config.settings.defaultField === "function"
     ? config.settings.defaultField(parentRuleGroupPath) 
     : (config.settings.defaultField || (canGetFirst ? getFirstField(config, parentRuleGroupPath) : null));
+};
+
+export const defaultFieldSrc = (config, canGetFirst = true) => {
+  return canGetFirst && config.settings.fieldSources?.[0] || "field";
 };
 
 export const defaultOperator = (config, field, canGetFirst = true) => {
@@ -35,16 +41,22 @@ export const defaultOperatorOptions = (config, operator, field) => {
 };
 
 export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null) => {
-  let field = null, operator = null;
+  // tip: setDefaultFieldAndOp not documented
+  let field = null, operator = null, fieldSrc = null;
   const {setDefaultFieldAndOp, showErrorMessage} = config.settings;
   if (item) {
+    fieldSrc = item?.properties?.fieldSrc;
     field = item?.properties?.field;
     operator = item?.properties?.operator;
   } else if (setDefaultFieldAndOp) {
-    field = defaultField(config, true, parentRuleGroupPath);
-    operator = defaultOperator(config, field);
+    fieldSrc = defaultFieldSrc(config);
+    field = defaultField(config, true, parentRuleGroupPath, fieldSrc);
+    operator = defaultOperator(config, field, fieldSrc);
+  } else {
+    fieldSrc = defaultFieldSrc(config);
   }
   let current = new Immutable.Map({
+    fieldSrc: fieldSrc,
     field: field,
     operator: operator,
     value: new Immutable.List(),

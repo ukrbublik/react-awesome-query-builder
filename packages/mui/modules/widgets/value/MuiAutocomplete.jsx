@@ -18,7 +18,7 @@ const emptyArray = [];
 export default (props) => {
   const {
     allowCustomValues, multiple,
-    value: selectedValue, customProps, readonly, config, groupBy, filterOptionsConfig
+    value: selectedValue, customProps, readonly, config, groupBy, filterOptionsConfig, errorText,
   } = props;
   const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
 
@@ -54,7 +54,7 @@ export default (props) => {
   customInputProps = omit(customInputProps, ["width"]);
   const customAutocompleteProps = omit(rest, ["showSearch", "showCheckboxes"]);
 
-  const fullWidth = true;
+  const fullWidth = false;
   const minWidth = width || defaultSelectWidth;
   const style = {
     width: (multiple ? undefined : minWidth),
@@ -98,6 +98,7 @@ export default (props) => {
         }}
         disabled={readonly}
         placeholder={placeholder}
+        error={!!errorText}
         //onChange={onInputChange}
         {...customInputProps}
       />

@@ -217,6 +217,7 @@ export default (skin: string) => {
     addSubRuleLabel: "Add sub rule",
     delGroupLabel: undefined,
     notLabel: "Not",
+    fieldSourcesPopupTitle: "Select source",
     valueSourcesPopupTitle: "Select value source",
     removeRuleConfirmOptions: {
       title: "Are you sure delete this rule?",
@@ -254,6 +255,8 @@ export default (skin: string) => {
         widget: "func",
       }
     },
+    fieldSources: ["field", "func"],
+    keepInputOnChangeFieldSrc: true,
     // canReorder: true,
     // canRegroup: true,
     // showLock: true,
@@ -394,7 +397,7 @@ export default (skin: string) => {
         min: -1,
         max: 5
       },
-      funcs: ["LINEAR_REGRESSION"],
+      funcs: ["number.LINEAR_REGRESSION"],
     },
     slider: {
       label: "Slider",
@@ -604,7 +607,40 @@ export default (skin: string) => {
   //////////////////////////////////////////////////////////////////////
 
   const funcs: Funcs = {
-    ...BasicFuncs
+    //...BasicFuncs
+    string: {
+      type: "!struct",
+      label: "String",
+      subfields: {
+        LOWER: merge({}, BasicFuncs.LOWER, {
+          allowSelfNesting: true,
+        }),
+        UPPER: merge({}, BasicFuncs.UPPER, {
+          allowSelfNesting: true,
+        }),
+      }
+    },
+    date: {
+      type: "!struct",
+      label: "Date",
+      subfields: {
+        NOW: BasicFuncs.NOW,
+        RELATIVE_DATETIME: merge({}, BasicFuncs.RELATIVE_DATETIME, {
+          args: {
+            date: {
+              defaultValue: {func: "date.NOW", args: []},
+            }
+          }
+        }),
+      }
+    },
+    number: {
+      type: "!struct",
+      label: "Number",
+      subfields: {
+        LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
+      }
+    }
   };
 
   const ctx = InitialConfig.ctx;

@@ -47,10 +47,10 @@ describe("query with func", () => {
         .find(".rule .rule--value .widget--valuesrc select")
         .simulate("change", { target: { value: "func" } });
       qb
-        .find(".rule .rule--value .widget--widget .rule--func select")
+        .find(".rule .rule--value .widget--func .rule--func select")
         .simulate("change", { target: { value: "LINEAR_REGRESSION" } });
       qb
-        .find(".rule .rule--value .widget--widget .rule--func--args .rule--func--arg")
+        .find(".rule .rule--value .widget--func .rule--func--args .rule--func--arg")
         .at(2)
         .find("input")
         .simulate("change", { target: { value: "4" } });
@@ -153,7 +153,7 @@ describe("query with func", () => {
       "query": "datetime == NOW + 2 day",
       "queryHuman": "Datetime = NOW + 2 day",
       "sql": "datetime = DATE_ADD(NOW(), INTERVAL 2 day)",
-      "spel": "datetime == RELATIVE_DATETIME(new java.util.Date()(), 'plus', 2, 'day')",
+      "spel": "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(2)) == 0",
       "logic": {
         "and": [
           {

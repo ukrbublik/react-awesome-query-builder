@@ -89,7 +89,7 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
   };
 
   updateResult = throttle(() => {
-    this.setState({tree: this.immutableTree!, config: this.config!});
+    this.setState({tree: this.immutableTree as ImmutableTree, config: this.config as Config});
   }, 100);
 
   renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {

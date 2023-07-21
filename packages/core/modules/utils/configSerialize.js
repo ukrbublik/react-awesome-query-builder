@@ -5,7 +5,7 @@ import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
 import { BasicFuncs } from "..";
-import { getFuncConfig } from "./configUtils";
+import { getFieldRawConfig } from "./configUtils";
 
 // Add new operations for JsonLogic
 addRequiredJsonLogicOperations();
@@ -66,7 +66,7 @@ const compileMetaWidget = {
   formatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "isForDisplay", "op", "opDef", "rightFieldDef"] },
   sqlFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
   spelFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
-  spelImportValue: { type: "f", args: ["val"] },
+  spelImportValue: { type: "f", args: ["val", "wgtDef", "args"] },
   mongoFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
   elasticSearchFormatValue: { type: "f", args: ["queryType", "val", "op", "field", "config"] },
   jsonLogic: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
@@ -104,6 +104,7 @@ const compileMetaFunc = {
 
   jsonLogic: { type: "f", ignore: "string", args: ["formattedArgs"] },
   jsonLogicImport: { type: "f", args: ["val"] },
+  spelImport: { type: "f", args: ["spel"] },
   formatFunc: { type: "f", args: ["formattedArgs", "isForDisplay"] },
   sqlFormatFunc: { type: "f", args: ["formattedArgs"] },
   mongoFormatFunc: { type: "f", args: ["formattedArgs"] },
@@ -135,6 +136,7 @@ const compileMetaSettings = {
   renderButton: { type: "rf" },
   renderButtonGroup: { type: "rf" },
   renderValueSources: { type: "rf" },
+  renderFieldSources: { type: "rf" },
   renderProvider: { type: "rf" },
   renderSwitch: { type: "rf" },
   renderSwitchPrefix: { type: "r" },
@@ -179,6 +181,8 @@ const compileMeta = {
   settings: compileMetaSettings,
 };
 
+const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
 /////////////
 
 export const compressConfig = (config, baseConfig) => {
@@ -188,8 +192,6 @@ export const compressConfig = (config, baseConfig) => {
   let zipConfig = pick(config, configKeys);
   delete zipConfig.ctx;
 
-  const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
-
   const _clean = (target, base, path, meta) => {
     if (isObject(target)) {
       if (isDirtyJSX(target)) {
@@ -198,9 +200,9 @@ export const compressConfig = (config, baseConfig) => {
       if (path[0] === "funcs" && !base) {
         const funcKey = path[path.length - 1];
         // todo: if there will be change in `BasicFuncs` when funcs can be nested, need to chnage code to find `base`
-        base = getFuncConfig({
+        base = getFieldRawConfig({
           funcs: meta.BasicFuncs
-        }, funcKey) || undefined;
+        }, funcKey, "funcs", "subfields") || undefined;
         if (base) {
           target["$$key"] = funcKey;
         }
@@ -284,8 +286,6 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
   }
   let unzipConfig = {};
 
-  const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
-
   const _mergeDeep = (target, mixin, path) => {
     if (isObject(mixin)) {
       if (!isObject(target)) {
@@ -314,9 +314,9 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
     // try to resolve by $$key and merge
     let resolved = false;
     if (isObject(target) && Object.prototype.hasOwnProperty.call(target, "$$key") && target["$$key"]) {
-      const func = getFuncConfig({
+      const func = getFieldRawConfig({
         funcs: meta.BasicFuncs
-      }, target["$$key"]);
+      }, target["$$key"], "funcs", "subfields");
       if (func) {
         // deep merge func <- zip
         delete target["$$key"];
@@ -376,7 +376,7 @@ export const compileConfig = (config) => {
     return config;
   }
 
-  config = {...config};
+  config = clone(config);
 
   const opts = {
     ctx: config.ctx,
@@ -401,10 +401,10 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
   for (const k in meta) {
     const submeta = meta[k];
     let newPath = k === "x" ? path : [...path, k];
-    if (isRoot) {
-      //logs.push(`Cloned ${newPath.join(".")}`);
-      config[k] = clone(config[k]);
-    }
+    // if (isRoot) {
+    //   //logs.push(`Cloned ${newPath.join(".")}`);
+    //   config[k] = clone(config[k]);
+    // }
     if (submeta.type === "r") {
       const targetObj = subconfig;
       const val = targetObj[k];

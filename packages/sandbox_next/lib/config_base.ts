@@ -324,6 +324,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
     addSubRuleLabel: "Add sub rule",
     delGroupLabel: null,
     notLabel: "Not",
+    fieldSourcesPopupTitle: "Select source",
     valueSourcesPopupTitle: "Select value source",
     removeRuleConfirmOptions: {
       title: "Are you sure delete this rule?",
@@ -355,6 +356,7 @@ function createConfig(InitialConfig: CoreConfig): Config {
         widget: "func",
       }
     },
+    fieldSources: ["field", "func"],
     // canReorder: false,
     // canRegroup: false,
     // showNot: false,

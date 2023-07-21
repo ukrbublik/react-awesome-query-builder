@@ -52,7 +52,6 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -70,7 +69,6 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -88,7 +86,6 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -106,7 +103,6 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -124,7 +120,6 @@ const typeMap = {
       path={props.path}
       actions={props.actions}
       config={props.config}
-      //tree={props.tree}
       reordableNodesCnt={props.reordableNodesCnt}
       totalRulesCnt={props.totalRulesCnt}
       onDragStart={props.onDragStart}
@@ -139,7 +134,6 @@ const typeMap = {
 
 class Item extends PureComponent {
   static propTypes = {
-    //tree: PropTypes.instanceOf(Immutable.Map).isRequired,
     config: PropTypes.object.isRequired,
     id: PropTypes.string.isRequired,
     groupId: PropTypes.string,

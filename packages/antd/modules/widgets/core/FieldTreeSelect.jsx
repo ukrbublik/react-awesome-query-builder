@@ -9,6 +9,7 @@ export default class FieldTreeSelect extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
+    errorText: PropTypes.string,
     items: PropTypes.array.isRequired,
     placeholder: PropTypes.string,
     selectedKey: PropTypes.string,
@@ -26,7 +27,7 @@ export default class FieldTreeSelect extends Component {
   constructor(props) {
     super(props);
     useOnPropsChanged(this);
-    this.onPropsChanged(props);  
+    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
@@ -48,11 +49,12 @@ export default class FieldTreeSelect extends Component {
 
   getTreeData(fields, fn = null) {
     return fields.map(field => {
-      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled, matchesType} = field;
       if (fn)
         fn(field);
       const pathKey = path || key;
-      const option = tooltip ? <Tooltip title={tooltip}>{label}</Tooltip> : label;
+      const optionText = matchesType ? <b>{label}</b> : label;
+      const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
 
       if (items) {
         return {
@@ -94,7 +96,7 @@ export default class FieldTreeSelect extends Component {
 
   render() {
     const {
-      config, customProps = {}, placeholder,
+      config, customProps = {}, placeholder, errorText,
       selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
     } = this.props;
     const { renderSize, fieldSeparator } = config.settings;
@@ -118,6 +120,7 @@ export default class FieldTreeSelect extends Component {
 
     let res = (
       <TreeSelect
+        status={errorText && "error"}
         onChange={this.onChange}
         value={selectedKey || undefined}
         style={{

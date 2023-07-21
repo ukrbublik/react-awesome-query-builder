@@ -10,7 +10,7 @@ export default class RangeWidget extends PureComponent {
     placeholders: PropTypes.array,
     textSeparators: PropTypes.array,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
     value: PropTypes.array,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,

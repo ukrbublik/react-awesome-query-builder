@@ -17,6 +17,7 @@ const settings = {
   renderButton: (props, {RCE, W: {MaterialButton}}) => RCE(MaterialButton, props),
   renderButtonGroup: (props, {RCE, W: {MaterialButtonGroup}}) => RCE(MaterialButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),
+  renderFieldSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),
   renderProvider: (props, {RCE, W: {MaterialProvider}}) => RCE(MaterialProvider, props),
   renderConfirm: (props, {W: {MaterialConfirm}}) => MaterialConfirm(props),
   useConfirm: ({W: {MaterialUseConfirm}}) => MaterialUseConfirm(),

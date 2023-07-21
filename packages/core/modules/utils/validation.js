@@ -1,7 +1,7 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig,
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldSrc,
 } from "./configUtils";
-import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp} from "../utils/ruleUtils";
+import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp, isCompletedValue, isEmptyRuleProperties} from "../utils/ruleUtils";
 import {defaultValue, deepEqual, logger} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
@@ -95,13 +95,15 @@ function validateRule (item, path, itemId, meta, c) {
   let id = item.get("id");
   let properties = item.get("properties");
   let field = properties.get("field") || null;
+  let fieldSrc = properties.get("fieldSrc") || null;
   let operator = properties.get("operator") || null;
   let operatorOptions = properties.get("operatorOptions");
   let valueSrc = properties.get("valueSrc");
   let value = properties.get("value");
   let valueError = properties.get("valueError");
   const oldSerialized = {
-    field,
+    field: field?.toJS?.() || field,
+    fieldSrc,
     operator,
     operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
     valueSrc: valueSrc ? valueSrc.toJS() : null,
@@ -123,8 +125,12 @@ function validateRule (item, path, itemId, meta, c) {
     field = null;
   }
   if (field == null) {
-    properties = ["operator", "operatorOptions", "valueSrc", "value"].reduce((map, key) => map.delete(key), properties);
+    properties = ["operator", "operatorOptions", "valueSrc", "value", "valueError"].reduce((map, key) => map.delete(key), properties);
     operator = null;
+  }
+  if (!fieldSrc) {
+    fieldSrc = getFieldSrc(field);
+    properties = properties.set("fieldSrc", fieldSrc);
   }
 
   //validate operator
@@ -140,24 +146,28 @@ function validateRule (item, path, itemId, meta, c) {
     operator = null;
   }
   const availOps = field ? getOperatorsForField(config, field) : [];
-  if (!availOps) {
-    console.warn(`Type of field ${field} is not supported`);
-    operator = null;
-  } else if (operator && availOps.indexOf(operator) == -1) {
-    if (operator == "is_empty" || operator == "is_not_empty") {
-      // Backward compatibility: is_empty #494
-      operator = operator == "is_empty" ? "is_null" : "is_not_null";
-      console.info(`Fixed operator ${properties.get("operator")} to ${operator} for ${field}`);
-      properties = properties.set("operator", operator);
-    } else {
-      console.warn(`Operator ${operator} is not supported for field ${field}`);
+  if (field) {
+    if (!availOps?.length) {
+      console.warn(`Type of field ${field} is not supported`);
       operator = null;
+    } else if (operator && availOps.indexOf(operator) == -1) {
+      if (operator == "is_empty" || operator == "is_not_empty") {
+        // Backward compatibility: is_empty #494
+        operator = operator == "is_empty" ? "is_null" : "is_not_null";
+        console.info(`Fixed operator ${properties.get("operator")} to ${operator} for ${field}`);
+        properties = properties.set("operator", operator);
+      } else {
+        console.warn(`Operator ${operator} is not supported for field ${field}`);
+        operator = null;
+      }
     }
   }
   if (operator == null) {
+    // do not unset operator ?
     properties = properties.delete("operatorOptions");
     properties = properties.delete("valueSrc");
     properties = properties.delete("value");
+    properties = properties.delete("valueError");
   }
 
   //validate operator options
@@ -184,10 +194,13 @@ function validateRule (item, path, itemId, meta, c) {
   properties = properties.set("valueSrc", valueSrc);
   if (showErrorMessage) {
     properties = properties.set("valueError", valueError);
+  } else {
+    properties = properties.delete("valueError");
   }
 
   const newSerialized = {
-    field,
+    field: field?.toJS?.() || field,
+    fieldSrc,
     operator,
     operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
     valueSrc: valueSrc ? valueSrc.toJS() : null,
@@ -195,11 +208,27 @@ function validateRule (item, path, itemId, meta, c) {
     valueError: valueError ? valueError.toJS() : null,
   };
   const sanitized = !deepEqual(oldSerialized, newSerialized);
-  const isComplete = field && operator && value && !value.includes(undefined);
+  //const isCompleted = !!operator && !isEmptyRuleProperties(properties.toObject(), config, false);
+  const isValueCompleted = value 
+    && value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
+  const isFieldCompleted = isCompletedValue(field, fieldSrc, config);
+  const isCompleted = isFieldCompleted && operator && isValueCompleted;
   if (sanitized)
     meta.sanitized = true;
-  if (!isComplete && removeIncompleteRules)
+  if (!isCompleted && removeIncompleteRules) {
+    let reason = "Uncomplete rule";
+    if (!isFieldCompleted) {
+      reason = "Uncomplete LHS";
+    } else {
+      reason = "Uncomplete RHS";
+      if (newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
+        // eg. operator `starts_with` supports only valueSrc "value"
+        reason = `Bad value src ${newSerialized.valueSrc}`;
+      }
+    }
+    console.warn("[RAQB validate]", "Removing rule: ", oldSerialized, `Reason: ${reason}`);
     item = undefined;
+  }
   else if (sanitized)
     item = item.set("properties", properties);
 
@@ -302,15 +331,15 @@ const validateNormalValue = (leftField, field, value, valueSrc, valueType, async
     const fieldConfig = getFieldConfig(config, field);
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
     const wConfig = config.widgets[w];
-    const wType = wConfig.type;
-    const jsType = wConfig.jsType;
+    const wType = wConfig?.type;
+    const jsType = wConfig?.jsType;
     const fieldSettings = fieldConfig.fieldSettings;
     const listValues = fieldSettings?.treeValues || fieldSettings?.listValues;
     const isAsyncListValues = !!fieldSettings?.asyncFetch;
     // todo: for select/multiselect value can be string or number
     const canSkipCheck = listValues || isAsyncListValues; 
 
-    if (valueType && valueType != wType)
+    if (valueType && wType && valueType != wType)
       return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
     if (jsType && !isTypeOf(value, jsType) && !canSkipCheck) {
       return [`Value should have JS type ${jsType}, but got value of type ${typeof value}`, value];
@@ -369,12 +398,12 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
           const argConfig = funcConfig.args[argKey];
           const args = fixedValue.get("args");
           const argVal = args ? args.get(argKey) : undefined;
-          const fieldDef = getFieldConfig(config, argConfig);
+          const argDef = getFieldConfig(config, argConfig);
           const argValue = argVal ? argVal.get("value") : undefined;
           const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
           if (argValue !== undefined) {
             const [argValidError, fixedArgVal] = validateValue(
-              config, leftField, fieldDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, false
+              config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, false
             );
             if (argValidError !== null) {
               if (canFix) {
@@ -389,7 +418,7 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
             } else if (fixedArgVal !== argValue) {
               fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
             }
-          } else if (isEndValue && argConfig.defaultValue === undefined && !canFix) {
+          } else if (isEndValue && argConfig.defaultValue === undefined && !canFix && !argConfig.isOptional) {
             return [`Value of arg ${argKey} for func ${funcKey} is required`, value];
           }
         }

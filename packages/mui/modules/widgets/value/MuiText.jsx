@@ -1,18 +1,30 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
+const __isInternal = true; //true to optimize render
 
 export default (props) => {
-  const {value, setValue, config, readonly, placeholder, customProps, maxLength} = props;
+  const {value, setValue, config, readonly, placeholder, customProps, maxLength, valueError} = props;
+  const [internalValue, setInternalValue] = useState(value);
+  
+  useEffect(() => {
+    if (value !== internalValue)
+      setInternalValue(value);
+  }, [value]);
 
   const onChange = e => {
     let val = e.target.value;
     if (val === "")
       val = undefined; // don't allow empty value
-    setValue(val);
+
+    if (__isInternal)
+      setInternalValue(val);
+    setValue(val, undefined, __isInternal);
   };
 
-  const textValue = value || "";
+  const {showErrorMessage} = config.settings;
+  const canUseInternal = showErrorMessage ? true : !valueError;
+  let textValue = (__isInternal && canUseInternal ? internalValue : value) || "";
 
   return (
     <FormControl>

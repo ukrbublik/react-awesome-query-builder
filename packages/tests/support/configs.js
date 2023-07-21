@@ -4,14 +4,19 @@ import { MuiWidgets } from "@react-awesome-query-builder/mui";
 import { MaterialWidgets } from "@react-awesome-query-builder/material";
 import { BootstrapWidgets } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIWidgets } from "@react-awesome-query-builder/fluent";
+import { BasicFuncs, Utils } from "@react-awesome-query-builder/core";
+import { simulatedAsyncFetch } from "./autocomplete";
+import sinon from "sinon";
+import merge from "lodash/merge";
+
 const {
   FieldDropdown,
   FieldCascader,
   FieldTreeSelect,
 } = AntdWidgets;
-import { BasicFuncs } from "@react-awesome-query-builder/core";
-import { simulatedAsyncFetch } from "./autocomplete";
-import sinon from "sinon";
+const {
+  ExportUtils
+} = Utils;
 
 export const simple_with_number = (BasicConfig) => ({
   ...BasicConfig,
@@ -697,15 +702,47 @@ export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   funcs: {
     ...BasicFuncs,
+    custom: {
+      type: "!struct",
+      label: "Custom",
+      subfields: {
+        LOWER2: merge({}, BasicFuncs.LOWER, {
+          label: "Lowercase2",
+          mongoFunc: "$toLower2",
+          jsonLogic: "toLowerCase2",
+          spelFunc: "${str}.toLowerCase2(${def}, ${opt})",
+          allowSelfNesting: true,
+          args: {
+            ...BasicFuncs.LOWER.args,
+            def: {
+              type: "number",
+              defaultValue: 11,
+            },
+            opt: {
+              type: "number",
+              isOptional: true,
+            },
+          },
+        }),
+      },
+    },
   },
   fields: {
     num: {
       label: "Number",
       type: "number",
     },
+    date: {
+      label: "Date",
+      type: "date",
+    },
     datetime: {
       label: "Datetime",
       type: "datetime",
+    },
+    time: {
+      label: "Time",
+      type: "time",
     },
     str: {
       label: "String",
@@ -1069,10 +1106,39 @@ export const with_different_groups = (BasicConfig) => ({
 export const with_fieldName = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
+    results: {
+      label: "Results",
+      type: "!group",
+      mode: "some",
+      subfields: {
+        score: {
+          label: "Score",
+          type: "number",
+          fieldName: "outcome"
+        },
+      }
+    },
     num: {
       fieldName: "state.input.num",
       label: "Number",
       type: "number",
+    },
+    user: {
+      type: "!struct",
+      fieldName: "account",
+      subfields: {
+        id: {
+          type: "text",
+        },
+        name: {
+          type: "text",
+          fieldName: "userName",
+        },
+        age: {
+          type: "number",
+          fieldName: "person.age",
+        }
+      }
     },
   },
 });
@@ -1127,5 +1193,33 @@ export const with_cases = (BasicConfig) => ({
     maxNumberOfCases: 3,
     canRegroupCases: true,
     canLeaveEmptyCase: false,
+  }
+});
+
+export const with_concat_case_value = (BasicConfig) => ({
+  ...BasicConfig,
+  widgets: {
+    ...BasicConfig.widgets,
+    case_value: {
+      ...BasicConfig.widgets.case_value,
+      spelFormatValue: ExportUtils.spelFormatConcat,
+      spelImportValue: ExportUtils.spelImportConcat,
+    },
+  },
+});
+
+export const with_fieldSources = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    fieldSources: ["field", "func"],
+  }
+});
+
+export const with_keepInputOnChangeFieldSrc = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    keepInputOnChangeFieldSrc: true,
   }
 });

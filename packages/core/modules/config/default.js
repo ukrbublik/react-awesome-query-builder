@@ -9,6 +9,8 @@ export const settings = {
   },
 
 
+  fieldSources: ["field"],
+  keepInputOnChangeFieldSrc: true,
   valueSourcesInfo: {
     value: {},
   },
@@ -51,6 +53,7 @@ export const settings = {
   addSubRuleLabel: "Add sub rule",
   delGroupLabel: "",
   notLabel: "Not",
+  fieldSourcesPopupTitle: "Select source",
   valueSourcesPopupTitle: "Select value source",
   removeRuleConfirmOptions: null,
   removeGroupConfirmOptions: null,

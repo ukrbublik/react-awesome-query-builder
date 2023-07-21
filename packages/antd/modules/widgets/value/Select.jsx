@@ -12,7 +12,7 @@ export default class SelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string,
+    field: PropTypes.any,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), //key in listValues
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,

@@ -5,7 +5,8 @@ const FluentUIFieldSelect = (props) => {
   var items = props.items,
     setField = props.setField,
     selectedKey = props.selectedKey,
-    placeholder = props.placeholder;
+    placeholder = props.placeholder,
+    errorText = props.errorText;
 
   var onChange = function onChange(_, option) {
     if (option.key === undefined) return;
@@ -50,9 +51,10 @@ const FluentUIFieldSelect = (props) => {
         });
         divKey +=1;
       } else {
+        const optText = field.matchesType ? <b>{prefix + label}</b> : prefix + label;
         opt.key = path;
         opt.title = label;
-        opt.text = prefix + label;
+        opt.text = optText;
         opt.disabled = disabled;
         options.push(opt);
       }
@@ -68,6 +70,11 @@ const FluentUIFieldSelect = (props) => {
       onChange={onChange}
       onRenderTitle={onRenderTitle}
       dropdownWidth={"auto"}
+      styles={{
+        title : {
+          color: errorText ? "red" : null,
+        }
+      }}
     />
   );
 };

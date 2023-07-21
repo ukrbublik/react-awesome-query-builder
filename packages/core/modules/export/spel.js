@@ -1,16 +1,24 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
 import {
-  getFieldPath, getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs
+  getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, logger} from "../utils/stuff";
+import {defaultValue, logger, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {completeValue} from "../utils/funcUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";
+
+// https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
+
+export const compareToSign = "${0}.compareTo(${1})";
+const TypesWithCompareTo = {
+  datetime: true,
+  time: true,
+  date: true,
+};
 
 export const spelFormat = (tree, config) => {
   return _spelFormat(tree, config, false);
@@ -22,7 +30,8 @@ export const _spelFormat = (tree, config, returnErrors = true) => {
     errors: []
   };
 
-  const res = formatItem(tree, config, meta, null);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(tree, extendedConfig, meta, null);
 
   if (returnErrors) {
     return [res, meta.errors];
@@ -184,32 +193,34 @@ const formatGroup = (item, config, meta, parentField = null) => {
   return ret;
 };
 
-const buildFnToFormatOp = (operator, operatorDefinition) => {
+const buildFnToFormatOp = (operator, operatorDefinition, valueType) => {
   const spelOp = operatorDefinition.spelOp;
   if (!spelOp) return undefined;
-  const objectIsFirstArg = spelOp[0] == "$";
-  const isMethod = spelOp[0] == "." || objectIsFirstArg;
-  const isFunction = spelOp.substring(spelOp.length - 2) == "()";
-  const sop = isMethod ? spelOp.slice(1) : (isFunction ? spelOp.substring(0, spelOp.length - 2) : spelOp);
+  const isSign = spelOp.includes("${0}");
+  const isCompareTo = TypesWithCompareTo[valueType];
+  let sop = spelOp;
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  if (cardinality == 0) {
+  if (isCompareTo) {
+    // date1.compareTo(date2) >= 0
+    //   instead of
+    // date1 >= date2
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (isMethod)
-        return `${field}.${sop}()`;
-      else
-        return `${field} ${sop}`;
+      const compareRes = compareToSign.replace(/\${(\w+)}/g, (_, k) => (k == 0 ? field : (cardinality > 1 ? values[k-1] : values)));
+      return `${compareRes} ${sop} 0`;
+    };
+  } else if (isSign) {
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return spelOp.replace(/\${(\w+)}/g, (_, k) => (k == 0 ? field : (cardinality > 1 ? values[k-1] : values)));
+    };
+  } else if (cardinality == 0) {
+    // should not be
+    fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
+      return `${field} ${sop}`;
     };
   } else if (cardinality == 1) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      if (objectIsFirstArg)
-        return `${values}.${sop}(${field})`;
-      else if (isFunction)
-        return `${sop}(${field}, ${values})`;
-      else if (isMethod)
-        return `${field}.${sop}(${values})`;
-      else
-        return `${field} ${sop} ${values}`;
+      return `${field} ${sop} ${values}`;
     };
   }
   return fn;
@@ -222,7 +233,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
   const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef);
+  const fn = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -235,7 +246,7 @@ const formatExpression = (meta, config, properties, formattedField, formattedVal
     formattedValue,
     valueSrc,
     valueType,
-    omit(opDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(opDef, opDefKeysToOmit),
     operatorOptions,
     fieldDef,
   ];
@@ -277,6 +288,7 @@ const checkOp = (config, operator, field) => {
 const formatRule = (item, config, meta, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   if (field == null || operator == null)
     return undefined;
@@ -297,13 +309,22 @@ const formatRule = (item, config, meta, parentField = null) => {
     return undefined;
       
   //format field
-  const formattedField = formatField(meta, config, field, parentField);
+  const formattedField = formatLhs(meta, config, field, fieldSrc, parentField);
+  if (formattedField === undefined)
+    return undefined;
   
   // format expression
   let res = formatExpression(
     meta, config, properties, formattedField, formattedValue, realOp, valueSrc, valueType, isRev
   );
   return res;
+};
+
+const formatLhs = (meta, config, field, fieldSrc, parentField = null) => {
+  if (fieldSrc === "func")
+    return formatFunc(meta, config, field, parentField);
+  else
+    return formatField(meta, config, field, parentField);
 };
 
 const formatItemValue = (config, properties, meta, operator, parentField, expectedValueType = null) => {
@@ -370,7 +391,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
       ];
       if (operator) {
         args.push(operator);
@@ -392,8 +413,7 @@ const formatField = (meta, config, field, parentField = null) => {
   if (!field) return;
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  const _fieldKeys = getFieldPath(field, config, parentField);
+  const fieldParts = getFieldParts(field, config);
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
   const formatFieldFn = config.settings.formatSpelField;
   const fieldName = formatFieldName(field, config, meta, parentField);
@@ -423,28 +443,70 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.spelFunc || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
+    const doEscape = argConfig.spelEscapeForFormat ?? true;
+    const operator = null;
+    const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
+
     const formattedArgVal = formatValue(
-      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+        meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
+      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      formattedDefaultVal = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
+      );
+      if (formattedDefaultVal === undefined) {
+        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+          meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
+    }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of gaps) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = doEscape ? finalFormattedVal : (argValue ?? defaultValue);
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
     }
   }
-
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
+  }
+  
   let ret;
   if (typeof funcConfig.spelFormatFunc === "function") {
     const fn = funcConfig.spelFormatFunc;
@@ -452,14 +514,25 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       formattedArgs
     ];
     ret = fn.call(config.ctx, ...args);
-  } else {
-    const args = Object.entries(formattedArgs).map(([k, v]) => v);
-    if (funcName[0] == "." && args.length) {
-      const [obj, ...params] = args;
-      ret = `${obj}${funcName}(${params.join(", ")})`;
-    } else {
-      ret = `${funcName}(${args.join(", ")})`;
+  } else if (funcConfig.spelFunc) {
+    // fill arg values
+    ret = funcConfig.spelFunc
+      .replace(/\${(\w+)}/g, (found, argKey) => {
+        return formattedArgs[argKey] ?? found;
+      });
+    // remove optional args (from end only)
+    const optionalArgs = Object.keys(funcConfig.args || {})
+      .reverse()
+      .filter(argKey => !!funcConfig.args[argKey].isOptional);
+    for (const argKey of optionalArgs) {
+      if (formattedArgs[argKey] != undefined)
+        break;
+      ret = ret.replace(new RegExp("(, )?" + "\\${" + argKey + "}", "g"), "");
     }
+    // missing required arg vals
+    ret = ret.replace(/\${(\w+)}/g, "null");
+  } else {
+    meta.errors.push(`Func ${funcKey} is not supported`);
   }
   return ret;
 };

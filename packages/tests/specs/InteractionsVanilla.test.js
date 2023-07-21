@@ -67,7 +67,7 @@ describe("interactions on vanilla", () => {
       expect(JSON.stringify(subchild)).to.eql(JSON.stringify({
         type: "rule", 
         id: subchild.id,
-        properties: {field: null, operator: null, value: [], valueSrc: []},
+        properties: {fieldSrc: "field", field: null, operator: null, value: [], valueSrc: []},
       }));
     });
   });

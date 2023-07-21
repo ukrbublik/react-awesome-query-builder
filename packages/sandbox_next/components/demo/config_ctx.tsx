@@ -32,7 +32,7 @@ export default merge(
     },
     autocompleteFetch,
     myRenderField: (props: FieldProps, _ctx: ConfigContext) => {
-      if (props?.customProps["showSearch"]) {
+      if (props?.customProps?.["showSearch"]) {
         return <MuiFieldAutocomplete {...props}/>;
       } else {
         return <MuiFieldSelect {...props}/>;

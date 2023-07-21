@@ -13,7 +13,9 @@ export default class Operator extends Component {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldType: PropTypes.string,
+    selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
     readonly: PropTypes.bool,
     //actions
@@ -29,7 +31,7 @@ export default class Operator extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["config", "selectedField", "selectedOperator"];
+    const keysForMeta = ["config", "selectedField", "selectedFieldSrc", "selectedFieldType", "selectedOperator"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -37,10 +39,16 @@ export default class Operator extends Component {
     }
   }
 
-  getMeta({config, selectedField, selectedOperator}) {
+  getMeta({config, selectedField, selectedFieldType, selectedOperator}) {
     const fieldConfig = getFieldConfig(config, selectedField);
-    const operators = fieldConfig?.operators;
-    const operatorOptions 
+    let operators = [...(fieldConfig?.operators || config.types[selectedFieldType]?.operators || [])];
+    if (!selectedField && !operators.includes(selectedOperator)) {
+      // eg. `prox` field was selected, then `fieldSrc` changed to `func`
+      // But `text` type excludes `proximity` operator in config, so add manually
+      operators.push(selectedOperator);
+    }
+    
+    const operatorsOptions 
       = mapValues(
         pickBy(
           config.operators, 
@@ -49,14 +57,12 @@ export default class Operator extends Component {
         (_opts, op) => getOperatorConfig(config, op, selectedField)
       );
       
-    const items = this.buildOptions(config, operatorOptions, operators);
+    const items = this.buildOptions(config, operatorsOptions, operators);
 
-    const isOpSelected = !!selectedOperator;
-    const currOp = isOpSelected ? operatorOptions[selectedOperator] : null;
-    const selectedOpts = currOp || {};
+    const selectedOpts = operatorsOptions[selectedOperator] || {};
     const placeholder = this.props.config.settings.operatorPlaceholder;
     const selectedKey = selectedOperator;
-    const selectedKeys = isOpSelected ? [selectedKey] : null;
+    const selectedKeys = selectedKey ? [selectedKey] : null;
     const selectedPath = selectedKeys;
     const selectedLabel = selectedOpts.label;
     

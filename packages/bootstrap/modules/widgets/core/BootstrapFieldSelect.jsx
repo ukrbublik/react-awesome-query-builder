@@ -6,7 +6,7 @@ import {
   DropdownItem,
 } from "reactstrap";
 
-export default ({ items, setField, selectedKey, readonly, placeholder }) => {
+export default ({ items, setField, selectedKey, readonly, placeholder, errorText }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const stylesDropdownWrapper = {
@@ -29,7 +29,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
   const renderOptions = (fields, isGroupItem = false, level = 0) =>
     Object.keys(fields).map((fieldKey) => {
       const field = fields[fieldKey];
-      const { items, path, label, disabled } = field;
+      const { items, path, label, disabled, matchesType } = field;
       const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
       const prefix = level > 1 ? "\u00A0\u00A0".repeat(level-1) : "";
       if (items) {
@@ -47,6 +47,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
           </div>
         );
       } else {
+        const itemText = matchesType ? <b>{prefix+label}</b> : prefix+label;
         return (
           <DropdownItem
             disabled={disabled}
@@ -56,13 +57,21 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
             className={isGroupItem ? "px-4" : undefined}
             active={selectedKey == path}
           >
-            {prefix+label}
+            {itemText}
           </DropdownItem>
         );
       }
     });
 
   const hasValue = selectedKey != null;
+
+  const renderNotSelected = () => {
+    const text = placeholder || errorText || "&nbsp;";
+    if (errorText) {
+      return (<span style={{color: "red"}}>{text}</span>);
+    }
+    return (<span>{text}</span>);
+  };
 
   const renderSelected = (allItems, selectedKey) => {
     if (!readonly && !selectedKey) return placeholder;
@@ -97,7 +106,7 @@ export default ({ items, setField, selectedKey, readonly, placeholder }) => {
         style={stylesDropdownWrapper}
         color={"transparent"}
       >
-        {hasValue ? renderSelected(items, selectedKey) : <span>&nbsp;</span>}
+        {hasValue ? renderSelected(items, selectedKey) : renderNotSelected()}
       </DropdownToggle>
       <DropdownMenu 
         container="body" 

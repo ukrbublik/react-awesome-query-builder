@@ -168,6 +168,12 @@ describe("settings.useConfigCompress", () => {
       const mark10 = slider1.find(".MuiSlider-markLabel").at(0);
       expect(mark10.html()).to.contain("<slidermark_notexists");
 
+    }, {
+      ignoreLog: (errText) => {
+        return errText.includes("The tag <%s> is unrecognized in this browser") && errText.includes("slidermark_notexists")
+          || errText.includes("Invalid DOM property `%s`") && errText.includes("readonly")
+        ;
+      }
     });
   });
 });

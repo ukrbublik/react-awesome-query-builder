@@ -5,8 +5,8 @@ import {truncateString} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
-const {getFieldPath, getFieldPathLabels} = Utils.RuleUtils;
-const {getFieldConfig} = Utils.ConfigUtils;
+const {getFieldPathLabels} = Utils.RuleUtils;
+const {getFieldConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
 
 
 export default class Field extends Component {
@@ -14,12 +14,15 @@ export default class Field extends Component {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
+    selectedFieldType: PropTypes.string,
     parentField: PropTypes.string,
     customProps: PropTypes.object,
     readonly: PropTypes.bool,
     //actions
     setField: PropTypes.func.isRequired,
+    setFieldSrc: PropTypes.func,
   };
 
   constructor(props) {
@@ -31,7 +34,7 @@ export default class Field extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["selectedField", "config", "parentField"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "config", "parentField"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -39,7 +42,7 @@ export default class Field extends Component {
     }
   }
 
-  getMeta({selectedField, config, parentField}) {
+  getMeta({selectedField, selectedFieldType, config, parentField}) {
     const selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;
@@ -47,8 +50,8 @@ export default class Field extends Component {
     const currField = isFieldSelected ? getFieldConfig(config, selectedKey) : null;
     const selectedOpts = currField || {};
 
-    const selectedKeys = getFieldPath(selectedKey, config);
-    const selectedPath = getFieldPath(selectedKey, config, true);
+    const selectedKeys = getFieldPathParts(selectedKey, config);
+    const selectedPath = getFieldPathParts(selectedKey, config, true);
     const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
     const partsLabels = getFieldPathLabels(selectedKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
@@ -56,49 +59,66 @@ export default class Field extends Component {
       selectedFullLabel = null;
     const selectedAltLabel = selectedOpts.label2;
 
-    const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
+    const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
-    const items = this.buildOptions(parentFieldPath, config, sourceFields, parentFieldPath);
+    const lookingForFieldType = !isFieldSelected && selectedFieldType;
+    const items = this.buildOptions(parentFieldPath, config, sourceFields, lookingForFieldType, parentFieldPath);
+
+    // Field source has been chnaged, no new field selected, but op & value remains
+    const errorText = lookingForFieldType ? "Please select field" : null;
 
     return {
       placeholder, items, parentField,
       selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+      errorText,
     };
   }
 
   getFieldLabel(fieldOpts, fieldKey, config) {
     if (!fieldKey) return null;
-    let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
-    let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-    let label = fieldOpts && fieldOpts.label || last(fieldParts);
+    let fieldParts = getFieldParts(fieldKey, config);
+    let label = fieldOpts?.label || last(fieldParts);
     label = truncateString(label, maxLabelsLength);
     return label;
   }
 
-  buildOptions(parentFieldPath, config, fields, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, fieldType = undefined, path = null, optGroupLabel = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
-    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+    const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
+
+    const countFieldsMatchesType = (fields) => {
+      return Object.keys(fields).reduce((acc, fieldKey) => {
+        const field = fields[fieldKey];
+        if (field.type === "!struct") {
+          return acc + countFieldsMatchesType(field.subfields);
+        } else {
+          return acc + (field.type === fieldType ? 1 : 0);
+        }
+      }, 0);
+    };
 
     return keys(fields).map(fieldKey => {
+      const fullFieldPath = [...(path ?? []), fieldKey];
       const field = fields[fieldKey];
-      const label = this.getFieldLabel(field, fieldKey, config);
-      const partsLabels = getFieldPathLabels(prefix+fieldKey, config);
+      const label = this.getFieldLabel(field, fullFieldPath, config);
+      const partsLabels = getFieldPathLabels(fullFieldPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
       if (fullLabel == label || parentFieldPath)
         fullLabel = null;
       const altLabel = field.label2;
       const tooltip = field.tooltip;
-      const subpath = (path ? path : []).concat(fieldKey);
       const disabled = field.disabled;
             
       if (field.hideForSelect)
         return undefined;
 
       if (field.type == "!struct") {
+        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, fullFieldPath, label);
+        const hasItemsMatchesType = countFieldsMatchesType(field.subfields) > 0;
         return {
           disabled,
           key: fieldKey,
@@ -107,9 +127,11 @@ export default class Field extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(parentFieldPath, config, field.subfields, subpath, label)
+          items,
+          matchesType: hasItemsMatchesType,
         };
       } else {
+        const matchesType = fieldType !== undefined ? field.type === fieldType : undefined;
         return {
           disabled,
           key: fieldKey,
@@ -118,14 +140,15 @@ export default class Field extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          grouplabel: optGroupLabel
+          grouplabel: optGroupLabel,
+          matchesType,
         };
       }
     }).filter(o => !!o);
   }
 
   render() {
-    const {config, customProps, setField, readonly, id, groupId} = this.props;
+    const {config, customProps, setField, setFieldSrc, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
       id,
@@ -134,6 +157,7 @@ export default class Field extends Component {
       customProps, 
       readonly,
       setField,
+      setFieldSrc,
       ...this.meta
     };
     return renderField(renderProps, config.ctx);

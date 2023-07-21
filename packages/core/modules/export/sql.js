@@ -1,14 +1,13 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
 import {
-  getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName
+  getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {completeValue} from "../utils/funcUtils";
 import {List, Map} from "immutable";
 import {SqlString} from "../utils/export";
 
@@ -22,7 +21,8 @@ export const _sqlFormat = (tree, config, returnErrors = true) => {
     errors: []
   };
 
-  const res = formatItem(tree, config, meta);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(tree, extendedConfig, meta);
 
   if (returnErrors) {
     return [res, meta.errors];
@@ -104,6 +104,7 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
 const formatRule = (item, config, meta) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
   const iValueSrc = properties.get("valueSrc");
@@ -164,8 +165,12 @@ const formatRule = (item, config, meta) => {
   }
       
   //format field
-  const formattedField = formatField(meta, config, field);
-      
+  const formattedField = fieldSrc == "func"
+    ? formatFunc(meta, config, field)
+    : formatField(meta, config, field);
+  if (formattedField == undefined)
+    return undefined;
+
   //format expr
   const args = [
     formattedField,
@@ -173,7 +178,7 @@ const formatRule = (item, config, meta) => {
     formattedValue,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(opDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(opDef, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
   ];
@@ -209,7 +214,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
       ];
       if (operator) {
         args.push(operator);
@@ -235,8 +240,7 @@ const formatField = (meta, config, field) => {
   if (!field) return;
   const {fieldSeparator} = config.settings;
   const fieldDefinition = getFieldConfig(config, field) || {};
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  const _fieldKeys = getFieldPath(field, config);
+  const fieldParts = getFieldParts(field, config);
   const fieldPartsLabels = getFieldPathLabels(field, config);
   const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
   const formatFieldFn = config.settings.formatField;
@@ -250,12 +254,22 @@ const formatFunc = (meta, config, currentValue) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.sqlFunc || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  const funcName = funcConfig.sqlFunc || funcLastKey;
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -264,12 +278,40 @@ const formatFunc = (meta, config, currentValue) => {
       meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+        meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      formattedDefaultVal = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues
+      );
+      if (formattedDefaultVal === undefined) {
+        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+          meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
     }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of argKey) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
+    }
+  }
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
   }
 
   let ret;

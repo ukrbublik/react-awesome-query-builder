@@ -282,6 +282,7 @@ export interface RenderSettings {
   renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction,
   renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,
   renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
+  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
   renderConfirm?: ConfirmFunc | SerializedFunction,
   useConfirm?: (() => Function) | SerializedFunction,
   renderSize?: AntdSize,

@@ -1,13 +1,17 @@
-import React, { PureComponent } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Cascader, Tooltip } from "antd";
 import {removePrefixPath} from "../../utils/stuff";
+import { Utils } from "@react-awesome-query-builder/ui";
+const { useOnPropsChanged } = Utils.ReactUtils;
+const { getFieldParts } = Utils.ConfigUtils;
 
 
-export default class FieldCascader extends PureComponent {
+export default class FieldCascader extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
+    errorText: PropTypes.string,
     items: PropTypes.array.isRequired,
     placeholder: PropTypes.string,
     selectedKey: PropTypes.string,
@@ -21,6 +25,36 @@ export default class FieldCascader extends PureComponent {
     //actions
     setField: PropTypes.func.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
+  }
+
+  onPropsChanged(nextProps) {
+    const { items } = nextProps;
+    this.items = this.getItems(items);
+  }
+
+  getItems(items) {
+    return items.map(item => {
+      const {items, matchesType, label} = item;
+
+      if (items) {
+        return {
+          ...item,
+          items: this.getItems(items),
+          label: matchesType ? <b>{label}</b> : label,
+        };
+      } else {
+        return {
+          ...item,
+          label: matchesType ? <b>{label}</b> : label,
+        };
+      }
+    });
+  }
 
   onChange = (keys) => {
     const { parentField } = this.props;
@@ -38,7 +72,7 @@ export default class FieldCascader extends PureComponent {
 
   render() {
     const {
-      config, customProps, items, placeholder,
+      config, customProps, items, placeholder, errorText,
       selectedPath, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, selectedField, parentField, 
     } = this.props;
     let customProps2 = {...customProps};
@@ -49,12 +83,13 @@ export default class FieldCascader extends PureComponent {
     }
 
     const {fieldSeparator} = config.settings;
-    const parentFieldPath = parentField ? parentField.split(fieldSeparator) : [];
+    const parentFieldPath = getFieldParts(parentField, config);
     const value = removePrefixPath(selectedPath, parentFieldPath);
     let res = (
       <Cascader
+        status={errorText && "error"}
         fieldNames={{ label: "label", value: "key", children: "items" }}
-        options={items}
+        options={this.items}
         value={value}
         onChange={this.onChange}
         allowClear={false}

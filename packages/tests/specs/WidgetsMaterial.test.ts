@@ -4,6 +4,10 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_material, hexToRgbString } from "../support/utils";
 
+const ignoreLogDatePicker = (errText: string) => {
+  return errText.includes("The `anchorEl` prop provided to the component is invalid");
+};
+
 describe("material-ui theming", () => {
   it("applies secondary color", async () => {
     await with_qb_material(configs.with_theme_material, inits.with_bool, "JsonLogic", (qb) => {
@@ -66,6 +70,8 @@ describe("material-ui widgets interactions", () => {
           }]
         }
       ]);
+    }, {
+      ignoreLog: ignoreLogDatePicker,
     });
   });
 
@@ -79,6 +85,8 @@ describe("material-ui widgets interactions", () => {
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "time" }, 60*60*10+60*30 ] }] }
       ]);
+    }, {
+      ignoreLog: ignoreLogDatePicker,
     });
   });
 

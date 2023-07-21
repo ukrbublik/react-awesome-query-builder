@@ -1,14 +1,13 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
 import {
-  getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName
+  getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {completeValue} from "../utils/funcUtils";
 import {List, Map} from "immutable";
 
 
@@ -18,7 +17,8 @@ export const queryString = (item, config, isForDisplay = false) => {
     errors: []
   };
 
-  const res = formatItem(item, config, meta, isForDisplay, null);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem(item, extendedConfig, meta, isForDisplay, null);
 
   if (meta.errors.length)
     console.warn("Errors while exporting to string:", meta.errors);
@@ -157,6 +157,7 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
 const formatRule = (item, config, meta, isForDisplay = false, parentField = null, returnArgs = false) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   let operatorOptions = properties.get("operatorOptions");
   if (field == null || operator == null)
@@ -186,7 +187,11 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     return undefined;
 
   //format field
-  const formattedField = formatField(config, meta, field, isForDisplay, parentField);
+  const formattedField = fieldSrc === "func"
+    ? formatFunc(config, meta, field, isForDisplay, parentField)
+    : formatField(config, meta, field, isForDisplay, parentField);
+  if (formattedField == undefined)
+    return undefined;
 
   //format value
   const [formattedValue, valueSrc, valueType] = formatItemValue(
@@ -201,7 +206,7 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
     formattedValue,
     valueSrc,
     valueType,
-    omit(operatorDef, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(operatorDef, opDefKeysToOmit),
     operatorOptions,
     isForDisplay,
     fieldDef,
@@ -242,7 +247,7 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
         isForDisplay
       ];
       if (operator) {
@@ -267,8 +272,7 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
   let ret = null;
   if (field) {
     const fieldDefinition = getFieldConfig(config, field) || {};
-    const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
-    const _fieldKeys = getFieldPath(field, config);
+    const fieldParts = getFieldParts(field, config);
     const fieldPartsLabels = getFieldPathLabels(field, config, cutParentField ? parentField : null);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparatorDisplay) : null;
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
@@ -284,25 +288,69 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
   const funcKey = funcValue.get("func");
   const args = funcValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = isForDisplay && funcConfig.label || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  const funcName = isForDisplay && funcConfig.label || funcLastKey;
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   let formattedArgsWithNames = {};
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
+    const argName = isForDisplay && argConfig.label || argKey;
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
-    const formattedArgVal = formatValue.call(config.ctx,
+    const formattedArgVal = formatValue(
       config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues
     );
-    const argName = isForDisplay && argConfig.label || argKey;
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
-      formattedArgsWithNames[argName] = formattedArgVal;
+    if (argValue != undefined && formattedArgVal === undefined) {
+      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+        meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      return undefined;
     }
+
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      formattedDefaultVal = formatValue(
+        config, meta, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues
+      );
+      if (formattedDefaultVal === undefined) {
+        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+          meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
+    }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const [missedArgKey, missedArgName] of argKey) {
+          formattedArgs[missedArgKey] = undefined;
+          //formattedArgsWithNames[missedArgName] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+      formattedArgsWithNames[argName] = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push([argKey, argName]);
+    }
+  }
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
   }
 
   let ret = null;
@@ -314,7 +362,7 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
     ];
     ret = fn.call(config.ctx, ...args);
   } else {
-    const argsStr = Object.entries(formattedArgsWithNames)
+    const argsStr = Object.entries(isForDisplay ? formattedArgsWithNames : formattedArgs)
       .map(([k, v]) => (isForDisplay ? `${k}: ${v}` : `${v}`))
       .join(", ");
     ret = `${funcName}(${argsStr})`;

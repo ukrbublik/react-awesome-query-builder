@@ -1,10 +1,9 @@
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
-import {getFieldPath, getFieldPathLabels, getWidgetForFieldOp, formatFieldName} from "../utils/ruleUtils";
+import {getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {completeValue} from "../utils/funcUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";
@@ -23,7 +22,8 @@ export const _mongodbFormat = (tree, config, returnErrors = true) => {
     errors: []
   };
 
-  const res = formatItem([], tree, config, meta);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const res = formatItem([], tree, extendedConfig, meta);
 
   if (returnErrors) {
     return [res, meta.errors];
@@ -35,21 +35,21 @@ export const _mongodbFormat = (tree, config, returnErrors = true) => {
 };
 
 
-const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatItem = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   if (!item) return undefined;
 
   const type = item.get("type");
 
   if ((type === "group" || type === "rule_group")) {
-    return formatGroup(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
+    return formatGroup(parents, item, config, meta, _not, _canWrapExpr, _formatFieldName, _value);
   } else if (type === "rule") {
-    return formatRule(parents, item, config, meta, _not, _canWrapExpr, _fieldName, _value);
+    return formatRule(parents, item, config, meta, _not, _canWrapExpr, _formatFieldName, _value);
   }
   return undefined;
 };
 
 
-const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const children = item.get("children1") || new List();
@@ -164,7 +164,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
 };
 
 
-const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _fieldName = undefined, _value = undefined) => {
+const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = true, _formatFieldName = undefined, _value = undefined) => {
   const properties = item.get("properties") || new Map();
 
   const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
@@ -177,6 +177,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let operator = properties.get("operator");
   const operatorOptions = properties.get("operatorOptions");
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
   const iValue = properties.get("value");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
@@ -198,12 +199,23 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     not = false;
   }
 
-  const fieldName = formatFieldName(field, config, meta, realParentPath);
+  let formattedField;
+  let useExpr = false;
+  if (fieldSrc == "func") {
+    [formattedField, useExpr] = formatFunc(meta, config, field, realParentPath);
+  } else {
+    formattedField = formatFieldName(field, config, meta, realParentPath);
+    if (_formatFieldName) {
+      useExpr = true;
+      formattedField = _formatFieldName(formattedField);
+    }
+  }
+  if (formattedField == undefined)
+    return undefined;
 
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  let useExpr = false;
   const fvalue = iValue.map((currentValue, ind) => {
     const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
     const valueType = iValueType ? iValueType.get(ind) : null;
@@ -220,8 +232,6 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     }
     return fv;
   });
-  if (_fieldName)
-    useExpr = true;
   const wrapExpr = useExpr && _canWrapExpr;
   const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
   if (fvalue.size < cardinality || hasUndefinedValues)
@@ -235,13 +245,13 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
     return undefined;
   }
   const args = [
-    _fieldName ? _fieldName(fieldName) : fieldName,
+    formattedField,
     operator,
     _value !== undefined && formattedValue == null ? _value : formattedValue,
     useExpr,
     (valueSrcs.length > 1 ? valueSrcs : valueSrcs[0]),
     (valueTypes.length > 1 ? valueTypes : valueTypes[0]),
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(operatorDefinition, opDefKeysToOmit),
     operatorOptions,
     fieldDef,
   ];
@@ -277,7 +287,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
           asyncListValues
         },
         //useful options: valueFormat for date/time
-        omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+        omit(fieldWidgetDef, widgetDefKeysToOmit),
       ];
       if (operator) {
         args.push(operator);
@@ -300,8 +310,7 @@ const formatRightField = (meta, config, rightField, parentPath) => {
 
   if (rightField) {
     const rightFieldDefinition = getFieldConfig(config, rightField) || {};
-    const fieldParts = Array.isArray(rightField) ? rightField : rightField.split(fieldSeparator);
-    const _fieldKeys = getFieldPath(rightField, config);
+    const fieldParts = getFieldParts(rightField, config);
     const fieldPartsLabels = getFieldPathLabels(rightField, config);
     const fieldFullLabel = fieldPartsLabels ? fieldPartsLabels.join(fieldSeparator) : null;
     const formatFieldFn = config.settings.formatField;
@@ -321,33 +330,75 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  const funcName = funcConfig.mongoFunc || funcKey;
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return [undefined, false];
+  }
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  const funcName = funcConfig.mongoFunc || funcLastKey;
   const mongoArgsAsObject = funcConfig.mongoArgsAsObject;
 
   let formattedArgs = {};
   let argsCnt = 0;
   let lastArg = undefined;
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
+    argsCnt++;
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
-    const widget = getWidgetForFieldOp(config, fieldDef, null, argValueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, fieldDef, null, widget, argValueSrc), ["factory"]);
+    const operator = null;
+    const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
+    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
     const [formattedArgVal, _argUseExpr] = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+        meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return [undefined, false];
     }
-    argsCnt++;
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
-      lastArg = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
+      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      let _;
+      ([formattedDefaultVal, _] = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
+      ));
+      if (formattedDefaultVal === undefined) {
+        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+          meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return [undefined, false];
+      }
     }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of gaps) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+      lastArg = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
+    }
+  }
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return [undefined, false]; // uncomplete
   }
 
   if (typeof funcConfig.mongoFormatFunc === "function") {

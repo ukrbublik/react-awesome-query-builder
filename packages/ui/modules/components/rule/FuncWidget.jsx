@@ -14,7 +14,9 @@ export default class FuncWidget extends Component {
     id: PropTypes.string,
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
+    fieldType: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
@@ -23,6 +25,7 @@ export default class FuncWidget extends Component {
     parentFuncs: PropTypes.array,
     fieldDefinition: PropTypes.object,
     isFuncArg: PropTypes.bool,
+    isLHS: PropTypes.bool,
   };
 
   constructor(props) {
@@ -34,7 +37,7 @@ export default class FuncWidget extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["config", "field", "operator", "value"];
+    const keysForMeta = ["config", "field", "operator", "value", "fieldSrc", "fieldType", "isLHS"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -55,13 +58,17 @@ export default class FuncWidget extends Component {
     this.props.setValue( setFunc(this.props.value, funcKey, this.props.config) );
   };
 
-  setArgValue = (argKey, argVal) => {
+  setArgValue = (argKey, argVal, asyncListValues, __isInternal) => {
     const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValue(this.props.value, argKey, argVal, argDefinition, config) );
+    this.props.setValue(
+      setArgValue(this.props.value, argKey, argVal, argDefinition, config),
+      asyncListValues,
+      __isInternal
+    );
   };
 
   setArgValueSrc = (argKey, argValSrc) => {
@@ -70,16 +77,18 @@ export default class FuncWidget extends Component {
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
-    this.props.setValue( setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config) );
+    this.props.setValue(
+      setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
+    );
   };
 
   renderFuncSelect = () => {
-    const {config, field, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
+    const {config, field, fieldType, fieldSrc, isLHS, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
     const funcKey = value ? value.get("func") : null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,
-      config, field, operator, customProps, readonly, parentFuncs, 
+      config, field, fieldType, fieldSrc, isLHS, operator, customProps, readonly, parentFuncs, 
       isFuncArg, fieldDefinition,
       id, groupId,
     };
@@ -123,7 +132,7 @@ export default class FuncWidget extends Component {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, operator, value, readonly, parentFuncs, id, groupId} = this.props;
+    const {config, field, fieldType, fieldSrc, isLHS, operator, value, readonly, parentFuncs, id, groupId} = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
@@ -134,6 +143,9 @@ export default class FuncWidget extends Component {
       fieldFunc: funcKey,
       fieldArg: argKey,
       leftField: field,
+      fieldType, // type of leftField
+      fieldSrc, // src of leftField
+      isLHS,
       operator: null,
       value: argVal,
       valueSrc: argValSrc,
@@ -184,7 +196,7 @@ export default class FuncWidget extends Component {
   renderFuncArgs = () => {
     const {funcDefinition, funcKey} = this.meta;
     if (!funcKey) return null;
-    const {args} = funcDefinition;
+    const {args} = funcDefinition || {};
     if (!args) return null;
 
     return (
@@ -216,21 +228,47 @@ export default class FuncWidget extends Component {
 }
 
 
-class ArgWidget extends PureComponent {
+class ArgWidget extends Component {
   static propTypes = {
     funcKey: PropTypes.string.isRequired,
     argKey: PropTypes.string.isRequired,
     setValue: PropTypes.func.isRequired,
     setValueSrc: PropTypes.func.isRequired,
     readonly: PropTypes.bool,
+    isLHS: PropTypes.bool,
     parentFuncs: PropTypes.array,
     id: PropTypes.string,
     groupId: PropTypes.string,
   };
 
-  setValue = (_delta, value, _widgetType) => {
+  constructor(props) {
+    super(props);
+    useOnPropsChanged(this);
+
+    this.onPropsChanged(props);
+  }
+
+  onPropsChanged(nextProps) {
+    const prevProps = this.props;
+    const keysForMeta = ["parentFuncs", "funcKey", "argKey"];
+    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+
+    if (needUpdateMeta) {
+      this.meta = this.getMeta(nextProps);
+    }
+  }
+
+  getMeta({parentFuncs, funcKey, argKey}) {
+    const newParentFuncs = [...(parentFuncs || []), [funcKey, argKey]];
+
+    return {
+      parentFuncs: newParentFuncs
+    };
+  }
+
+  setValue = (_delta, value, _widgetType, asyncListValues, __isInternal) => {
     const {setValue, argKey} = this.props;
-    setValue(argKey, value);
+    setValue(argKey, value, asyncListValues, __isInternal);
   };
 
   setValueSrc = (_delta, valueSrc, _widgetType) => {
@@ -239,14 +277,14 @@ class ArgWidget extends PureComponent {
   };
 
   render() {
-    const {funcKey, argKey, parentFuncs} = this.props;
+    const {parentFuncs} = this.meta;
     return (
       <Widget
-        {...this.props} 
-        setValue={this.setValue} 
-        setValueSrc={this.setValueSrc} 
+        {...this.props}
+        setValue={this.setValue}
+        setValueSrc={this.setValueSrc}
         isFuncArg={true}
-        parentFuncs={[...(parentFuncs || []), [funcKey, argKey]]}
+        parentFuncs={parentFuncs}
       />
     );
   }

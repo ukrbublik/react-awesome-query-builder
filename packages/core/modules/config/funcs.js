@@ -9,7 +9,8 @@ const NOW = {
   jsonLogicCustomOps: {
     now: {},
   },
-  spelFunc: "new java.util.Date()",
+  //spelFunc: "new java.util.Date()",
+  spelFunc: "T(java.time.LocalDateTime).now()",
   sqlFormatFunc: () => "NOW()",
   mongoFormatFunc: () => new Date(),
   formatFunc: () => "NOW",
@@ -20,6 +21,28 @@ const RELATIVE_DATETIME = {
   returnType: "datetime",
   renderBrackets: ["", ""],
   renderSeps: ["", "", ""],
+  spelFormatFunc: ({date, op, val, dim}) => {
+    const dimPlural = dim.charAt(0).toUpperCase() + dim.slice(1) + "s";
+    const method = op + dimPlural;
+    return `${date}.${method}(${val})`;
+  },
+  spelImport: (spel) => {
+    let date, op, val, dim;
+    const matchRes = spel.methodName?.match(/^(minus|plus)(\w+)s$/);
+    if (matchRes) {
+      dim = matchRes[2].toLowerCase();
+      op = matchRes[1];
+      if (["minus", "plus"].includes(op)) {
+        if (["day", "week", "month", "year"].includes(dim)) {
+          op = {type: "string", val: op};
+          dim = {type: "string", val: dim};
+          val = spel.args[0];
+          date = spel.obj;
+          return {date, op, val, dim};
+        }
+      }
+    }
+  },
   jsonLogic: ({date, op, val, dim}) => ({
     "date_add": [
       date,
@@ -41,14 +64,14 @@ const RELATIVE_DATETIME = {
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
   mongoFormatFunc: null, //todo: support?
-  //todo: spel
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {
       label: "Date",
       type: "datetime",
       defaultValue: {func: "NOW", args: []},
-      valueSources: ["func", "field"],
+      valueSources: ["func", "field", "value"],
+      spelEscapeForFormat: true,
     },
     op: {
       label: "Op",
@@ -65,7 +88,8 @@ const RELATIVE_DATETIME = {
           plus: "+",
           minus: "-",
         },
-      }
+      },
+      spelEscapeForFormat: false,
     },
     val: {
       label: "Value",
@@ -75,6 +99,7 @@ const RELATIVE_DATETIME = {
       },
       defaultValue: 0,
       valueSources: ["value"],
+      spelEscapeForFormat: false,
     },
     dim: {
       label: "Dimension",
@@ -93,7 +118,8 @@ const RELATIVE_DATETIME = {
           month: "month",
           year: "year",
         },
-      }
+      },
+      spelEscapeForFormat: false,
     },
   }
 };
@@ -102,7 +128,7 @@ const LOWER = {
   label: "Lowercase",
   mongoFunc: "$toLower",
   jsonLogic: "toLowerCase",
-  spelFunc: ".toLowerCase",
+  spelFunc: "${str}.toLowerCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
     toLowerCase: {}
@@ -112,7 +138,7 @@ const LOWER = {
     str: {
       label: "String",
       type: "text",
-      valueSources: ["value", "field"],
+      valueSources: ["value", "field", "func"],
     },
   }
 };
@@ -121,7 +147,7 @@ const UPPER = {
   label: "Uppercase",
   mongoFunc: "$toUpper",
   jsonLogic: "toUpperCase",
-  spelFunc: ".toUpperCase",
+  spelFunc: "${str}.toUpperCase()",
   //jsonLogicIsMethod: true, // Removed in JsonLogic 2.x due to Prototype Pollution
   jsonLogicCustomOps: {
     toUpperCase: {},
@@ -131,7 +157,7 @@ const UPPER = {
     str: {
       label: "String",
       type: "text",
-      valueSources: ["value", "field"],
+      valueSources: ["value", "field", "func"],
     },
   }
 };
@@ -142,6 +168,16 @@ const LINEAR_REGRESSION = {
   formatFunc: ({coef, bias, val}, _) => `(${coef} * ${val} + ${bias})`,
   sqlFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
   spelFormatFunc: ({coef, bias, val}) => `(${coef} * ${val} + ${bias})`,
+  spelImport: (spel) => {
+    let coef, val, bias, a;
+    if (spel.type === "op-plus") {
+      [a, bias] = spel.children;
+      if (a.type === "op-multiply") {
+        [coef, val] = a.children;
+        return {coef, val, bias};
+      }
+    }
+  },
   mongoFormatFunc: ({coef, bias, val}) => ({"$sum": [{"$multiply": [coef, val]}, bias]}),
   jsonLogic: ({coef, bias, val}) => ({ "+": [ {"*": [coef, val]}, bias ] }),
   jsonLogicImport: (v) => {

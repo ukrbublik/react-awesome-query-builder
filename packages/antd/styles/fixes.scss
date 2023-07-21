@@ -35,18 +35,32 @@ ul.ant-select-selection__rendered {
 }
 
 
-.widget--valuesrc {
+.widget--valuesrc, .rule--fieldsrc {
   .anticon {
     height: 100%;
     svg {
       height: 100%;
     }
   }
-}
-.widget--valuesrc span .anticon-ellipsis {
-  transform: rotate(90deg);
+  span .anticon-ellipsis {
+    transform: rotate(90deg);
+  }
 }
 
 .customSelectOption {
   color: lightcoral;
+}
+
+
+.widget--valuesrc {
+  margin-left: calc($rule-parts-distance / 2);
+  margin-right: calc($rule-parts-distance / 4);
+}
+.rule--value .rule--widget .widget--valuesrc {
+  margin-top: 2px;
+}
+.rule--fieldsrc {
+  margin-left: calc($rule-parts-distance / 2);
+  margin-right: calc($rule-parts-distance / 3);
+  margin-bottom: 4px;
 }

@@ -6,8 +6,8 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import last from "lodash/last";
 import keys from "lodash/keys";
 const {clone} = Utils;
-const {getFieldConfig} = Utils.ConfigUtils;
-const {getFieldPath, getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {getFieldConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
+const {getFieldPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -17,7 +17,9 @@ export default class ValueField extends Component {
     groupId: PropTypes.string,
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
+    fieldSrc: PropTypes.string,
+    fieldType: PropTypes.string,
     value: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
@@ -36,8 +38,8 @@ export default class ValueField extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "operator", "isFuncArg", "parentField"];
-    const keysForMeta = ["config", "field", "operator", "value", "placeholder", "isFuncArg", "parentField"];
+    const keysForItems = ["config", "field", "fieldSrc", "fieldType", "operator", "isFuncArg", "parentField"];
+    const keysForMeta = ["config", "field", "fieldSrc", "fieldType", "operator", "value", "placeholder", "isFuncArg", "parentField"];
     const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
@@ -49,33 +51,33 @@ export default class ValueField extends Component {
     }
   }
 
-  getItems({config, field, operator, parentField, isFuncArg, fieldDefinition}) {
+  getItems({config, field, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
     const fieldSeparator = config.settings.fieldSeparator;
-    const parentFieldPath = typeof parentField == "string" ? parentField.split(fieldSeparator) : parentField;
+    const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
-    const sourceFields = parentField ? parentFieldConfig && parentFieldConfig.subfields : config.fields;
+    const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;
 
-    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition);
+    const filteredFields = this.filterFields(config, sourceFields, field, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType);
     const items = this.buildOptions(parentFieldPath, config, filteredFields, parentFieldPath);
     return items;
   }
 
-  getMeta({config, field, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
+  getMeta({config, field, fieldType, operator, value, placeholder: customPlaceholder, isFuncArg, parentField}) {
     const {fieldPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedKey = value;
     const isFieldSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(config, field);
-    const leftFieldWidgetField = leftFieldConfig.widgets.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    const leftFieldConfig = field ? getFieldConfig(config, field) : {};
+    const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
+    const leftFieldWidgetFieldProps = leftFieldWidgetField?.widgetProps || {};
     const placeholder = isFieldSelected ? null 
       : (isFuncArg && customPlaceholder || leftFieldWidgetFieldProps.valuePlaceholder || fieldPlaceholder);
     const currField = isFieldSelected ? getFieldConfig(config, selectedKey) : null;
     const selectedOpts = currField || {};
 
-    const selectedKeys = getFieldPath(selectedKey, config);
-    const selectedPath = getFieldPath(selectedKey, config, true);
+    const selectedKeys = getFieldPathParts(selectedKey, config);
+    const selectedPath = getFieldPathParts(selectedKey, config, true);
     const selectedLabel = this.getFieldLabel(currField, selectedKey, config);
     const partsLabels = getFieldPathLabels(selectedKey, config);
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
@@ -89,7 +91,7 @@ export default class ValueField extends Component {
     };
   }
 
-  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition) {
+  filterFields(config, fields, leftFieldFullkey, parentField, parentFieldPath, operator, canCompareFieldWithField, isFuncArg, fieldDefinition, fieldType) {
     fields = clone(fields);
     const fieldSeparator = config.settings.fieldSeparator;
     const leftFieldConfig = getFieldConfig(config, leftFieldFullkey);
@@ -97,12 +99,15 @@ export default class ValueField extends Component {
     const widget = getWidgetForFieldOp(config, leftFieldFullkey, operator, "value");
     const widgetConfig = config.widgets[widget];
     let expectedType;
-    if (isFuncArg && fieldDefinition) {
-      expectedType = fieldDefinition.type;
+    if (isFuncArg) {
+      expectedType = fieldDefinition?.type;
     } else if (_relyOnWidgetType && widgetConfig) {
       expectedType = widgetConfig.type;
-    } else {
+    } else if (leftFieldConfig) {
       expectedType = leftFieldConfig.type;
+    } else {
+      // no field at LHS, but can use type from "memory effect"
+      expectedType = fieldType;
     }
     
     function _filter(list, path) {
@@ -114,11 +119,12 @@ export default class ValueField extends Component {
         if (!rightFieldConfig) {
           delete list[rightFieldKey];
         } else if (rightFieldConfig.type == "!struct" || rightFieldConfig.type == "!group") {
-          if(_filter(subfields, subpath) == 0)
+          if (_filter(subfields, subpath) == 0)
             delete list[rightFieldKey];
         } else {
           // tip: LHS field can be used as arg in RHS function
-          let canUse = rightFieldConfig.type == expectedType && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
+          let canUse = (!expectedType || rightFieldConfig.type == expectedType)
+            && (isFuncArg ? true : rightFieldFullkey != leftFieldFullkey);
           let fn = canCompareFieldWithField || config.settings.canCompareFieldWithField;
           if (fn)
             canUse = canUse && fn(leftFieldFullkey, leftFieldConfig, rightFieldFullkey, rightFieldConfig, operator);
@@ -138,18 +144,18 @@ export default class ValueField extends Component {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
-    const prefix = path ? path.join(fieldSeparator) + fieldSeparator : "";
+    const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     return keys(fields).map(fieldKey => {
+      const fullFieldPath = [...(path ?? []), fieldKey];
       const field = fields[fieldKey];
-      const label = this.getFieldLabel(field, fieldKey, config);
-      const partsLabels = getFieldPathLabels(fieldKey, config);
+      const label = this.getFieldLabel(field, fullFieldPath, config);
+      const partsLabels = getFieldPathLabels(fullFieldPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
       if (fullLabel == label || parentFieldPath)
         fullLabel = null;
       const altLabel = field.label2;
       const tooltip = field.tooltip;
-      const subpath = (path ? path : []).concat(fieldKey);
 
       if (field.hideForCompare)
         return undefined;
@@ -162,7 +168,7 @@ export default class ValueField extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(parentFieldPath, config, field.subfields, subpath, label)
+          items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, label)
         };
       } else {
         return {
@@ -180,10 +186,9 @@ export default class ValueField extends Component {
 
   getFieldLabel(fieldOpts, fieldKey, config) {
     if (!fieldKey) return null;
-    let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
-    let fieldParts = Array.isArray(fieldKey) ? fieldKey : fieldKey.split(fieldSeparator);
-    let label = fieldOpts.label || last(fieldParts);
+    let fieldParts = getFieldParts(fieldKey, config);
+    let label = fieldOpts?.label || last(fieldParts);
     label = truncateString(label, maxLabelsLength);
     return label;
   }

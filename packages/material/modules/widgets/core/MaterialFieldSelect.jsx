@@ -4,10 +4,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import FormControl from "@material-ui/core/FormControl";
 
-export default ({items, setField, selectedKey, readonly, placeholder}) => {
+export default ({items, setField, selectedKey, readonly, placeholder, errorText}) => {
   const renderOptions = (fields, level = 0) => (
     fields.map(field => {
-      const {items, path, label, disabled} = field;
+      const {items, path, label, disabled, matchesType} = field;
       const prefix = "\u00A0\u00A0".repeat(level);
       if (items) {
         return [
@@ -20,7 +20,7 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
       } else {
         return <MenuItem disabled={disabled} key={path} value={path}>
           {prefix && <span>{prefix}</span>}
-          {label}
+          {matchesType ? <b>{label}</b> : label}
         </MenuItem>;
       }
     })
@@ -54,6 +54,7 @@ export default ({items, setField, selectedKey, readonly, placeholder}) => {
   return (
     <FormControl>
       <Select
+        error={!!errorText}
         autoWidth
         displayEmpty
         label={placeholder}

@@ -6,11 +6,11 @@ import {Col} from "../utils";
 export default class OperatorWrapper extends PureComponent {
   render() {
     const {
-      config, selectedField, selectedOperator, setOperator, 
-      selectedFieldPartsLabels, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly, id, groupId
+      config, selectedField, selectedFieldSrc, selectedFieldType, selectedOperator, setOperator, 
+      selectedFieldParts, showOperator, showOperatorLabel, selectedFieldWidgetConfig, readonly, id, groupId
     } = this.props;
     const operator = showOperator
-            && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+            && <Col key={"operators-for-"+(selectedFieldParts || []).join("_")} className="rule--operator">
               { config.settings.showLabels
                     && <label className="rule--label">{config.settings.operatorLabel}</label>
               }
@@ -18,6 +18,8 @@ export default class OperatorWrapper extends PureComponent {
                 key="operator"
                 config={config}
                 selectedField={selectedField}
+                selectedFieldSrc={selectedFieldSrc}
+                selectedFieldType={selectedFieldType}
                 selectedOperator={selectedOperator}
                 setOperator={setOperator}
                 readonly={readonly}
@@ -26,7 +28,7 @@ export default class OperatorWrapper extends PureComponent {
               />
             </Col>;
     const hiddenOperator = showOperatorLabel
-            && <Col key={"operators-for-"+(selectedFieldPartsLabels || []).join("_")} className="rule--operator">
+            && <Col key={"operators-for-"+(selectedFieldParts || []).join("_")} className="rule--operator">
               <div className="rule--operator-wrapper">
                 {config.settings.showLabels
                   ? <label className="rule--label">&nbsp;</label>

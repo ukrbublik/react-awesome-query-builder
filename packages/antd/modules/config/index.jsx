@@ -10,9 +10,9 @@ const settings = {
   ...BasicConfig.settings,
 
   renderField: (props, {RCE, W: {FieldSelect}}) => RCE(FieldSelect, props),
-  // renderField: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldSelect, props),
-  // renderField: (props, {RCE, W: {FieldCascader}}) => RCE(FieldSelect, props),
-  // renderField: (props, {RCE, W: {FieldTreeSelect}}) => RCE(FieldSelect, props),
+  // renderField: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldDropdown, props),
+  // renderField: (props, {RCE, W: {FieldCascader}}) => RCE(FieldCascader, props),
+  // renderField: (props, {RCE, W: {FieldTreeSelect}}) => RCE(FieldTreeSelect, props),
 
   renderOperator: (props, {RCE, W: {FieldSelect}}) => RCE(FieldSelect, props),
   // renderOperator: (props, {RCE, W: {FieldDropdown}}) => RCE(FieldDropdown, props),
@@ -23,6 +23,7 @@ const settings = {
   renderButton: (props, {RCE, W: {Button}}) => RCE(Button, props),
   renderButtonGroup: (props, {RCE, W: {ButtonGroup}}) => RCE(ButtonGroup, props),
   renderValueSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
+  renderFieldSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
   renderProvider: (props, {RCE, W: {Provider}}) => RCE(Provider, props),
   renderConfirm: (props, {W: {confirm}}) => confirm(props),
 

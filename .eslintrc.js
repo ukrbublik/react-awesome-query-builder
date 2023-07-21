@@ -194,8 +194,8 @@ module.exports = {
             "@typescript-eslint/prefer-regexp-exec": 0,
             "@typescript-eslint/no-empty-function": 0,
             "@typescript-eslint/ban-ts-comment": 0,
-            "@typescript-eslint/no-floating-promises": 0
-
+            "@typescript-eslint/no-floating-promises": 0,
+            "@typescript-eslint/no-non-null-assertion": 0,
         }
       },
     ],

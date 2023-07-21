@@ -2,7 +2,6 @@ import {defaultValue} from "../utils/stuff";
 import {getFieldConfig, getOperatorConfig} from "../utils/configUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {formatFieldName} from "../utils/ruleUtils";
-import {completeValue} from "../utils/funcUtils";
 import {Map} from "immutable";
 
 /*
@@ -131,7 +130,7 @@ const formatRule = (item, config, meta) => {
     meta.usedFields.push(field);
   value = value.toArray();
   valueSrc = valueSrc.toArray();
-  valueType = valueType.toArray();
+  valueType = valueType?.toArray() || [];
   let values = [];
   for (let i = 0 ; i < value.length ; i++) {
     const val = {

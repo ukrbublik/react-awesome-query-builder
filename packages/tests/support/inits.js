@@ -963,6 +963,38 @@ export const with_fieldName = {
   }]
 };
 
+export const spel_with_fieldName = "state.input.num == 2";
+
+export const with_fieldName_in_group = {
+  "and": [
+    {
+      "some": [
+        { "var": "results" },
+        {
+          "==": [
+            { "var": "outcome" },
+            3
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const with_fieldName_in_struct = {
+  "and": [
+    {
+      ">=": [ { "var": "person.age" }, 18 ]
+    }, {
+      "==": [ { "var": "userName" }, "Denys" ]
+    }, {
+      "==": [ { "var": "account.id" }, "123" ]
+    }
+  ]
+};
+
+export const spel_with_fieldName_in_group = "results.?[outcome == 3].size() > 0";
+
 // rare
 export const with_groupVarKey = {
   "and": [
@@ -978,9 +1010,53 @@ export const with_groupVarKey = {
 };
 
 export const spel_with_number = "num == 2";
-
+export const spel_with_between = "num >= 1 && num <= 2";
 export const spel_with_not = "!(num == 2)";
-
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
-
 export const spel_with_cases = "(str == '222' ? is_string : (num == 222 ? is_number : unknown))";
+export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
+
+export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
+export const spel_with_lhs_toLowerCase_toUpperCase = "str.toLowerCase().toUpperCase() == str.toUpperCase()";
+//export const spel_with_new_Date = "datetime == new java.util.Date()";
+//export const spel_with_SimpleDateFormat = "datetime == new java.text.SimpleDateFormat('yyyy-MM-dd').parse('2022-01-15')";
+export const spel_with_LocalTime = "time == T(java.time.LocalTime).parse('02:03:00')";
+export const spel_with_new_String = "str == new String('hello world').toUpperCase()";
+export const spel_with_lhs_compareTo = "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0";
+export const spel_with_lhs_compareTo_parse = "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0";
+export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0";
+
+export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
+export const tree_with_lhs_toLowerCase2 = {
+  "type": "group",
+  "id": uuid(),
+  "children1": [
+    {
+      "type": "rule",
+      "id": uuid(),
+      "properties": {
+        //"fieldSrc": "func", //should be determined
+        "field": {
+          "func": "custom.LOWER2",
+          "args": {
+            "str": {
+              "valueSrc": "field",
+              "value": "str"
+            }
+          }
+        },
+        "operator": "equal",
+        "value": [
+          "aaa"
+        ],
+        "valueSrc": [
+          "value"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "conjunction": "AND",
+    "not": false
+  }
+};

@@ -6,11 +6,25 @@ import {toImmutableList} from "../utils/stuff";
  * @param {Immutable.List} path
  * @param {string} field
  */
-export const setField = (config, path, field) => ({
+export const setField = (config, path, field, asyncListValues, __isInternal) => ({
   type: constants.SET_FIELD,
   path: toImmutableList(path),
   field: field,
-  config: config
+  config: config,
+  asyncListValues,
+  __isInternal,
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {*} srcKey
+ */
+export const setFieldSrc = (config, path, srcKey) => ({
+  type: constants.SET_FIELD_SRC,
+  path: toImmutableList(path),
+  srcKey: srcKey,
+  config: config,
 });
 
 /**

@@ -10,20 +10,23 @@ import OperatorOptions from "../rule/OperatorOptions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, DragIcon, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
-const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
-const {getFieldPathLabels} = Utils.RuleUtils;
+const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldParts} = Utils.ConfigUtils;
+const {isEmptyRuleProperties} = Utils.RuleUtils;
 
 
 class Rule extends Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     groupId: PropTypes.string,
-    selectedField: PropTypes.string,
+    selectedField: PropTypes.any,
+    selectedFieldSrc: PropTypes.string,
+    selectedFieldType: PropTypes.string,
     selectedOperator: PropTypes.string,
     operatorOptions: PropTypes.object,
     config: PropTypes.object.isRequired,
     value: PropTypes.any, //depends on widget
     valueSrc: PropTypes.any,
+    valueType: PropTypes.any,
     asyncListValues: PropTypes.array,
     isDraggingMe: PropTypes.bool,
     isDraggingTempo: PropTypes.bool,
@@ -35,6 +38,7 @@ class Rule extends Component {
     //actions
     handleDraggerMouseDown: PropTypes.func,
     setField: PropTypes.func,
+    setFieldSrc: PropTypes.func,
     setOperator: PropTypes.func,
     setOperatorOption: PropTypes.func,
     setLock: PropTypes.func,
@@ -57,7 +61,7 @@ class Rule extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForMeta = ["selectedField", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
+    const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -65,24 +69,27 @@ class Rule extends Component {
     }
   }
 
-  getMeta({selectedField, selectedOperator, config, reordableNodesCnt, isLocked}) {
-    const selectedFieldPartsLabels = getFieldPathLabels(selectedField, config);
+  getMeta({selectedField, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
+    const {keepInputOnChangeFieldSrc} = config.settings;
+    const selectedFieldParts = getFieldParts(selectedField, config);
     const selectedFieldConfig = getFieldConfig(config, selectedField);
     const isSelectedGroup = selectedFieldConfig && selectedFieldConfig.type == "!struct";
-    const isFieldAndOpSelected = selectedField && selectedOperator && !isSelectedGroup;
+    const isOkWithoutField = keepInputOnChangeFieldSrc && selectedFieldType;
+    const isFieldSelected = !!selectedField || isOkWithoutField;
+    const isFieldAndOpSelected = isFieldSelected && selectedOperator;
     const selectedOperatorConfig = getOperatorConfig(config, selectedOperator, selectedField);
     const selectedOperatorHasOptions = selectedOperatorConfig && selectedOperatorConfig.options != null;
-    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator) || {};
+    const selectedFieldWidgetConfig = getFieldWidgetConfig(config, selectedField, selectedOperator, null, null) || {};
     const hideOperator = selectedFieldWidgetConfig.hideOperator;
 
     const showDragIcon = config.settings.canReorder && reordableNodesCnt > 1 && !isLocked;
-    const showOperator = selectedField && !hideOperator;
-    const showOperatorLabel = selectedField && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
-    const showWidget = isFieldAndOpSelected;
+    const showOperator = isFieldSelected && !hideOperator;
+    const showOperatorLabel = isFieldSelected && hideOperator && selectedFieldWidgetConfig.operatorInlineLabel;
+    const showWidget = isFieldAndOpSelected && !isSelectedGroup;
     const showOperatorOptions = isFieldAndOpSelected && selectedOperatorHasOptions;
 
     return {
-      selectedFieldPartsLabels, selectedFieldWidgetConfig,
+      selectedFieldParts, selectedFieldWidgetConfig,
       showDragIcon, showOperator, showOperatorLabel, showWidget, showOperatorOptions
     };
   }
@@ -108,45 +115,76 @@ class Rule extends Component {
     }
   }
 
+  _buildWidgetProps({
+    selectedField, selectedFieldSrc, selectedFieldType,
+    selectedOperator, operatorOptions,
+    value, valueType, valueSrc, asyncListValues, valueError,
+    parentField,
+  }) {
+    return {
+      field: selectedField,
+      fieldSrc: selectedFieldSrc,
+      fieldType: selectedFieldType,
+      operator: selectedOperator,
+      operatorOptions,
+      value,
+      valueType,
+      valueSrc,
+      asyncListValues,
+      valueError,
+      parentField,
+    };
+  }
+
   isEmptyCurrentRule() {
-    return !(
-      this.props.selectedField !== null
-            && this.props.selectedOperator !== null
-            && this.props.value.filter((val) => val !== undefined).size > 0
-    );
+    const {config} = this.props;
+    const ruleData = this._buildWidgetProps(this.props);
+    return isEmptyRuleProperties(ruleData, config);
   }
 
   renderField() {
-    const {config, isLocked} = this.props;
+    const {
+      config, isLocked, parentField, groupId, id,
+      selectedFieldSrc, selectedField, selectedFieldType, setField, setFieldSrc,
+    } = this.props;
     const { immutableFieldsMode } = config.settings;
+    // tip: don't allow function inside !group (yet)
 
     return <FieldWrapper
       key="field"
-      classname={"rule--field"}
+      classname={classNames(
+        selectedFieldSrc == "func" ? "rule--field--func" : "rule--field",
+      )}
       config={config}
-      selectedField={this.props.selectedField}
-      setField={!immutableFieldsMode ? this.props.setField : dummyFn}
-      parentField={this.props.parentField}
+      canSelectFieldSource={!parentField}
+      selectedField={selectedField}
+      selectedFieldSrc={selectedFieldSrc}
+      selectedFieldType={selectedFieldType}
+      setField={!immutableFieldsMode ? setField : dummyFn}
+      setFieldSrc={!immutableFieldsMode ? setFieldSrc : dummyFn}
+      parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
-      id={this.props.id}
-      groupId={this.props.groupId}
+      id={id}
+      groupId={groupId}
     />;
   }
 
   renderOperator () {
     const {config, isLocked} = this.props;
     const {
-      selectedFieldPartsLabels, selectedFieldWidgetConfig, showOperator, showOperatorLabel
+      selectedFieldParts, selectedFieldWidgetConfig, showOperator, showOperatorLabel
     } = this.meta;
     const { immutableOpsMode } = config.settings;
-
+    
     return <OperatorWrapper
       key="operator"
       config={config}
       selectedField={this.props.selectedField}
+      selectedFieldSrc={this.props.selectedFieldSrc}
+      selectedFieldType={this.props.selectedFieldType}
       selectedOperator={this.props.selectedOperator}
       setOperator={!immutableOpsMode ? this.props.setOperator : dummyFn}
-      selectedFieldPartsLabels={selectedFieldPartsLabels}
+      selectedFieldParts={selectedFieldParts}
       showOperator={showOperator}
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}
@@ -157,20 +195,14 @@ class Rule extends Component {
   }
 
   renderWidget() {
-    const {config, valueError, isLocked} = this.props;
+    const {config, isLocked} = this.props;
     const { showWidget } = this.meta;
     const { immutableValuesMode } = config.settings;
     if (!showWidget) return null;
 
     const widget = <Widget
       key="values"
-      field={this.props.selectedField}
-      parentField={this.props.parentField}
-      operator={this.props.selectedOperator}
-      value={this.props.value}
-      valueSrc={this.props.valueSrc}
-      asyncListValues={this.props.asyncListValues}
-      valueError={valueError}
+      {...this._buildWidgetProps(this.props)}
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}

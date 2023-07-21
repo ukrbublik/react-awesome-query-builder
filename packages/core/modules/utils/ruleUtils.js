@@ -1,12 +1,14 @@
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
+  isFieldDescendantOfField
 } from "./configUtils";
 import {defaultValue, getFirstDefined} from "../utils/stuff";
 import Immutable from "immutable";
 import {validateValue} from "../utils/validation";
 import last from "lodash/last";
+import {completeFuncValue} from "./funcUtils";
 
-const selectTypes = [
+export const selectTypes = [
   "select",
   "multiselect",
   "treeselect",
@@ -25,7 +27,10 @@ const selectTypes = [
 export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true, isEndValue = false) {
   if (!oldConfig)
     oldConfig = config;
+  const {keepInputOnChangeFieldSrc} = config.settings;
   const currentField = current.get("field");
+  const currentFieldType = current.get("fieldType");
+  //const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
@@ -35,21 +40,32 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   //const isValidatingTree = (changedProp === null);
   const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
 
-  //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator, currentField);
+  //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
   const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
   //const currentOperatorCardinality = currentOperator ? defaultValue(currentOperatorConfig.cardinality, 1) : null;
   const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
   const currentFieldConfig = getFieldConfig(oldConfig, currentField);
   const newFieldConfig = getFieldConfig(config, newField);
+  const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
+  const currentType = currentFieldConfig?.type || currentFieldType;
+  const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
 
-  let canReuseValue = currentField && currentOperator && newOperator && currentValue != undefined
+  let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
+  canReuseValue = canReuseValue
     && (!changedProp 
       || changedProp == "field" && !clearValueOnChangeField 
-      || changedProp == "operator" && !clearValueOnChangeOp)
-    && (currentFieldConfig && newFieldConfig && currentFieldConfig.type == newFieldConfig.type);
-  if (canReuseValue && selectTypes.includes(currentFieldConfig.type) && changedProp == "field") {
-    // different fields of select types has different listValues
-    canReuseValue = false;
+      || changedProp == "operator" && !clearValueOnChangeOp);
+  canReuseValue = canReuseValue
+    && (currentType && newType && currentType == newType);
+  if (canReuseValue && selectTypes.includes(newType) && changedProp == "field") {
+    const newListValuesType = newFieldConfig?.listValuesType;
+    const currentListValuesType = currentFieldConfig?.listValuesType;
+    if (newListValuesType && newListValuesType === currentListValuesType) {
+      // ok
+    } else {
+      // different fields of select types has different listValues
+      canReuseValue = false;
+    }
   }
 
   // compare old & new widgets
@@ -62,17 +78,23 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value");
     const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value");
 
-    const canReuseWidget = newValueWidget == currentValueWidget || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget);
-    if (!canReuseWidget)
+    const canReuseWidget = newValueWidget == currentValueWidget
+      || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget)
+      || !currentValueWidget && isOkWithoutField;
+    if (!canReuseWidget) {
       canReuseValue = false;
+    }
   }
 
   if (currentOperator != newOperator && [currentOperator, newOperator].includes("proximity"))
     canReuseValue = false;
 
   const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
-  const valueSources = getValueSourcesForFieldOp(config, newField, newOperator);
-  
+  let valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null);
+  if (!newField && isOkWithoutField) {
+    valueSources = Object.keys(config.settings.valueSourcesInfo);
+  }
+
   let valueFixes = {};
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
   if (canReuseValue) {
@@ -85,7 +107,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const asyncListValues = currentAsyncListValues;
       const [validateError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, true
       );
       const isValid = !validateError;
       // Allow bad value with error message
@@ -175,7 +197,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 
 export const getFirstField = (config, parentRuleGroupPath = null) => {
   const fieldSeparator = config.settings.fieldSeparator;
-  const parentPathArr = typeof parentRuleGroupPath == "string" ? parentRuleGroupPath.split(fieldSeparator) : parentRuleGroupPath;
+  const parentPathArr = getFieldParts(parentRuleGroupPath, config);
   const parentField = parentRuleGroupPath ? getFieldRawConfig(config, parentRuleGroupPath) : config;
 
   let firstField = parentField, key = null, keysPath = [];
@@ -192,6 +214,10 @@ export const getFirstField = (config, parentRuleGroupPath = null) => {
   return (parentPathArr || []).concat(keysPath).join(fieldSeparator);
 };
 
+export const getOperatorsForType = (config, fieldType) => {
+  return config.types[fieldType]?.operators || null;
+};
+
 export const getOperatorsForField = (config, field) => {
   const fieldConfig = getFieldConfig(config, field);
   const fieldOps = fieldConfig ? fieldConfig.operators : [];
@@ -203,19 +229,6 @@ export const getFirstOperator = (config, field) => {
   return fieldOps ? fieldOps[0] : null;
 };
 
-export const getFieldPath = (field, config, onlyKeys = false) => {
-  if (!field)
-    return null;
-  const fieldSeparator = config.settings.fieldSeparator;
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  if (onlyKeys)
-    return parts;
-  else
-    return parts
-      .map((_curr, ind, arr) => arr.slice(0, ind+1))
-      .map((parts) => parts.join(fieldSeparator));
-};
-
 export const getFuncPathLabels = (field, config, parentField = null) => {
   return getFieldPathLabels(field, config, parentField, "funcs", "subfields");
 };
@@ -224,9 +237,9 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
   if (!field)
     return null;
   const fieldSeparator = config.settings.fieldSeparator;
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
-  return parts
+  const parts = getFieldParts(field, config);
+  const parentParts = getFieldParts(parentField, config);
+  const res = parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
     .map((parts) => [...parentParts, ...parts].join(fieldSeparator))
@@ -235,6 +248,7 @@ export const getFieldPathLabels = (field, config, parentField = null, fieldsKey 
       return cnf && cnf.label || last(part.split(fieldSeparator));
     })
     .filter(label => label != null);
+  return res;
 };
 
 export const getFieldPartsConfigs = (field, config, parentField = null) => {
@@ -242,8 +256,9 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
     return null;
   const parentFieldDef = parentField && getFieldRawConfig(config, parentField) || null;
   const fieldSeparator = config.settings.fieldSeparator;
-  const parts = Array.isArray(field) ? field : field.split(fieldSeparator);
-  const parentParts = parentField ? (Array.isArray(parentField) ? parentField : parentField.split(fieldSeparator)) : [];
+  const parts = getFieldParts(field, config);
+  const isDescendant = isFieldDescendantOfField(field, parentField, config);
+  const parentParts = !isDescendant ? [] : getFieldParts(parentField, config);
   return parts
     .slice(parentParts.length)
     .map((_curr, ind, arr) => arr.slice(0, ind+1))
@@ -310,7 +325,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
   
-  if (fieldConfig && fieldConfig.widgets) {
+  if (fieldConfig?.widgets) {
     for (const widget in fieldConfig.widgets) {
       const widgetConfig = fieldConfig.widgets[widget];
       if (!config.widgets[widget]) {
@@ -336,8 +351,8 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
         canAdd = false;
       if (canAdd) {
         widgets.push(widget);
-        let canAddValueSrc = fieldConfig.valueSources && fieldConfig.valueSources.indexOf(widgetValueSrc) != -1;
-        if (opConfig && opConfig.valueSources && opConfig.valueSources.indexOf(widgetValueSrc) == -1)
+        let canAddValueSrc = fieldConfig.valueSources?.indexOf(widgetValueSrc) != -1;
+        if (opConfig?.valueSources?.indexOf(widgetValueSrc) == -1)
           canAddValueSrc = false;
         if (canAddValueSrc && !valueSrcs.find(v => v == widgetValueSrc))
           valueSrcs.push(widgetValueSrc);
@@ -375,18 +390,21 @@ export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) =
 export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
   if (!fieldDefinition)
     return valueSrcs;
+  const fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
+  if (!valueSrcs)
+    valueSrcs = Object.keys(config.settings.valueSourcesInfo);
   return valueSrcs.filter(vs => {
     let canAdd = true;
     if (vs == "field") {
-      if (config._fieldsCntByType) {
+      if (config.__fieldsCntByType) {
         // tip: LHS field can be used as arg in RHS function
         const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
-        canAdd = canAdd && config._fieldsCntByType[fieldDefinition.type] > minCnt;
+        canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
       }
     }
     if (vs == "func") {
-      if (config._funcsCntByType)
-        canAdd = canAdd && !!config._funcsCntByType[fieldDefinition.type];
+      if (config.__funcsCntByType)
+        canAdd = canAdd && !!config.__funcsCntByType[fieldType];
       if (fieldDefinition.funcs)
         canAdd = canAdd && fieldDefinition.funcs.length > 0;
     }
@@ -394,7 +412,7 @@ export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) =
   });
 };
 
-export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null, leftFieldForFunc = null) => {
+export const getValueSourcesForFieldOp = (config, field, operator, fieldDefinition = null) => {
   const {valueSrcs} = _getWidgetsAndSrcsForFieldOp(config, field, operator, null);
   const filteredValueSrcs = filterValueSourcesForField(config, valueSrcs, fieldDefinition);
   return filteredValueSrcs;
@@ -408,11 +426,13 @@ export const getWidgetForFieldOp = (config, field, operator, valueSrc = null) =>
   return widget;
 };
 
+// can use alias (fieldName)
+// even if `parentField` is provided, `field` is still a full path
 export const formatFieldName = (field, config, meta, parentField = null, options = {}) => {
   if (!field) return;
   const fieldDef = getFieldConfig(config, field) || {};
   const {fieldSeparator} = config.settings;
-  const fieldParts = Array.isArray(field) ? field : field.split(fieldSeparator);
+  const fieldParts = getFieldParts(field, config);
   let fieldName = Array.isArray(field) ? field.join(fieldSeparator) : field;
   if (options?.useTableName && fieldDef.tableName) { // legacy
     const fieldPartsCopy = [...fieldParts];
@@ -425,16 +445,123 @@ export const formatFieldName = (field, config, meta, parentField = null, options
   if (parentField) {
     const parentFieldDef = getFieldConfig(config, parentField) || {};
     let parentFieldName = parentField;
-    if (parentFieldDef.fieldName) {
-      parentFieldName = parentFieldDef.fieldName;
-    }
     if (fieldName.indexOf(parentFieldName + fieldSeparator) == 0) {
       fieldName = fieldName.slice((parentFieldName + fieldSeparator).length);
       // fieldName = "#this." + fieldName; // ? for spel
     } else {
-      meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      if (fieldDef.fieldName) {
+        // ignore
+      } else {
+        meta.errors.push(`Can't cut group ${parentFieldName} from field ${fieldName}`);
+      }
     }
   }
   return fieldName;
 };
 
+
+export const isEmptyItem = (item, config, liteCheck = false) => {
+  const type = item.get("type");
+  const mode = item.getIn(["properties", "mode"]);
+  if (type == "rule_group" && mode == "array") {
+    return isEmptyRuleGroupExt(item, config, liteCheck);
+  } else if (type == "group" || type == "rule_group") {
+    return isEmptyGroup(item, config, liteCheck);
+  } else {
+    return isEmptyRule(item, config, liteCheck);
+  }
+};
+
+const isEmptyRuleGroupExt = (item, config, liteCheck = false) => {
+  const children = item.get("children1");
+  const properties = item.get("properties");
+  return isEmptyRuleGroupExtPropertiesAndChildren(properties.toObject(), children, config, liteCheck);
+};
+
+export const isEmptyRuleGroupExtPropertiesAndChildren = (properties, children, config, liteCheck = false) => {
+  const operator = properties.operator;
+  const cardinality = config.operators[operator]?.cardinality ?? 1;
+  const filledParts = [
+    !isEmptyRuleProperties(properties, config, false),
+    cardinality > 0 ? true : !isEmptyGroupChildren(children, config, liteCheck),
+  ];
+  const filledCnt = filledParts.filter(f => !!f).length;
+  const isFilled = filledCnt == 2;
+  return !isFilled;
+};
+
+const isEmptyGroup = (group, config, liteCheck = false) => {
+  const children = group.get("children1");
+  return isEmptyGroupChildren(children, config, liteCheck);
+};
+
+export const isEmptyGroupChildren = (children, config, liteCheck = false) => {
+  return !children || children.size == 0
+    || children.size > 0 && children.filter(ch => !isEmptyItem(ch, config, liteCheck)).size == 0;
+};
+
+export const isEmptyRuleProperties = ({
+  field, fieldSrc, fieldType,
+  operator,
+  value, valueSrc, valueType,
+}, config, liteCheck = false) => {
+  const cardinality = config.operators[operator]?.cardinality ?? 1;
+  const filledParts = [
+    liteCheck ? (field !== null || fieldType != null) : isCompletedValue(field, fieldSrc, config, liteCheck),
+    !!operator,
+    value.filter((val, delta) => 
+      isCompletedValue(val, valueSrc?.get?.(delta) || valueSrc?.[delta], config, liteCheck)
+    ).size >= cardinality
+  ];
+  const filledCnt = filledParts.filter(f => !!f).length;
+  const isFilled = filledCnt == 3;
+  return !isFilled;
+};
+
+const isEmptyRule = (rule, config, liteCheck = false) => {
+  const properties = rule.get("properties");
+  return isEmptyRuleProperties(properties.toObject(), config, liteCheck);
+};
+
+export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => {
+  if (!liteCheck && valueSrc == "func" && value) {
+    const funcKey = value.get("func");
+    const funcConfig = getFuncConfig(config, funcKey);
+    if (funcConfig) {
+      const args = value.get("args");
+      for (const argKey in funcConfig.args) {
+        const argConfig = funcConfig.args[argKey];
+        const argVal = args ? args.get(argKey) : undefined;
+        // const argDef = getFieldConfig(config, argConfig);
+        const argValue = argVal ? argVal.get("value") : undefined;
+        const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+        if (argValue == undefined && argConfig?.defaultValue === undefined && !argConfig?.isOptional) {
+          // arg is not completed
+          return false;
+        }
+        if (argValue != undefined) {
+          if (!isCompletedValue(argValue, argValueSrc, config, liteCheck)) {
+            // arg is complex and is not completed
+            return false;
+          }
+        }
+      }
+      // all args are completed
+      return true;
+    }
+  }
+  return value != undefined;
+};
+
+/**
+ * @param {*} value
+ * @param {string} valueSrc - 'value' | 'field' | 'func'
+ * @param {object} config
+ * @return {* | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
+ */
+export const completeValue = (value, valueSrc, config) => {
+  if (valueSrc == "func")
+    return completeFuncValue(value, config);
+  else
+    return value;
+};

@@ -9,6 +9,7 @@ export default class FieldSelect extends PureComponent {
   static propTypes = {
     config: PropTypes.object.isRequired,
     customProps: PropTypes.object,
+    errorText: PropTypes.string,
     items: PropTypes.array.isRequired,
     placeholder: PropTypes.string,
     selectedKey: PropTypes.string,
@@ -39,7 +40,7 @@ export default class FieldSelect extends PureComponent {
   render() {
     const {
       config, customProps, items, placeholder,
-      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
+      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
     } = this.props;
     const {showSearch} = customProps || {};
 
@@ -67,6 +68,7 @@ export default class FieldSelect extends PureComponent {
         optionLabelProp={"label"}
         filterOption={this.filterOption}
         disabled={readonly}
+        status={errorText && "error"}
         {...customProps}
       >{fieldSelectItems}</Select>
     );
@@ -80,7 +82,7 @@ export default class FieldSelect extends PureComponent {
 
   renderSelectItems(fields, level = 0) {
     return fields.map(field => {
-      const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled, matchesType} = field;
       const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
       const prefix = level > 1 ? "\u00A0\u00A0".repeat(level-1) : "";
       const pathKey = path || key;
@@ -96,7 +98,9 @@ export default class FieldSelect extends PureComponent {
         const list = complexItems.length ? this.renderSelectItems(complexItems, level+1) : [];
         return [...gr, ...list];
       } else {
-        const option = tooltip ? <Tooltip title={tooltip}>{prefix+label}</Tooltip> : prefix+label;
+        const optionText = matchesType ? <b>{prefix+label}</b> : prefix+label;
+        const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
+        
         return <Option
           key={pathKey}
           value={pathKey}

@@ -1,10 +1,9 @@
-import {defaultValue} from "../utils/stuff";
+import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
-  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig
+  getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
-import {getWidgetForFieldOp, formatFieldName} from "../utils/ruleUtils";
+import {getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
-import {completeValue} from "../utils/funcUtils";
 import {List, Map} from "immutable";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
@@ -19,19 +18,21 @@ export const jsonLogicFormat = (item, config) => {
     errors: []
   };
   
-  const logic = formatItem(item, config, meta, true);
+  const extendedConfig = extendConfig(config, undefined, false);
+  const logic = formatItem(item, extendedConfig, meta, true);
   
   // build empty data
   const {errors, usedFields} = meta;
-  const {fieldSeparator} = config.settings;
+  const {fieldSeparator} = extendedConfig.settings;
   let data = {};
   for (let ff of usedFields) {
-    const def = getFieldConfig(config, ff) || {};
-    const parts = ff.split(fieldSeparator);
+    //const fieldSrc = typeof ff === "string" ? "field" : "func";
+    const parts = getFieldParts(ff, config);
+    const def = getFieldConfig(extendedConfig, ff) || {};
     let tmp = data;
     for (let i = 0 ; i < parts.length ; i++) {
       const p = parts[i];
-      const pdef = getFieldConfig(config, parts.slice(0, i+1)) || {};
+      const pdef = getFieldConfig(extendedConfig, parts.slice(0, i + 1)) || {};
       if (i != parts.length - 1) {
         if (pdef.type == "!group" && pdef.mode != "struct") {
           if (!tmp[p])
@@ -165,6 +166,7 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
 const formatRule = (item, config, meta, parentField = null) => {
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
+  const fieldSrc = properties.get("fieldSrc");
 
   let operator = properties.get("operator");
   let operatorOptions = properties.get("operatorOptions");
@@ -196,7 +198,12 @@ const formatRule = (item, config, meta, parentField = null) => {
   if (formattedValue === undefined)
     return undefined;
 
-  const formattedField = formatField(meta, config, field, parentField);
+  const formattedField
+    = fieldSrc === "func"
+      ? formatFunc(meta, config, field, parentField)
+      : formatField(meta, config, field, parentField);
+  if (formattedField === undefined)
+    return undefined;
 
   return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
 };
@@ -222,7 +229,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
     const valueType = iValueType ? iValueType.get(ind) : null;
     const cValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+    const fieldWidgetDef = omit( getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"] );
     const fv = formatValue(
       meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField, asyncListValues
     );
@@ -258,7 +265,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
         asyncListValues
       },
       //useful options: valueFormat for date/time
-      omit(fieldWidgetDef, ["formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue"]),
+      omit(fieldWidgetDef, widgetDefKeysToOmit),
     ];
     if (operator) {
       args.push(operator);
@@ -276,31 +283,74 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   const funcKey = currentValue.get("func");
   const args = currentValue.get("args");
   const funcConfig = getFuncConfig(config, funcKey);
-  if (!funcConfig.jsonLogic) {
+  const funcParts = getFieldParts(funcKey, config);
+  const funcLastKey = funcParts[funcParts.length-1];
+  if (!funcConfig) {
+    meta.errors.push(`Func ${funcKey} is not defined in config`);
+    return undefined;
+  }
+  if (!funcConfig?.jsonLogic) {
     meta.errors.push(`Func ${funcKey} is not supported`);
     return undefined;
   }
 
   let formattedArgs = {};
+  let gaps = [];
+  let missingArgKeys = [];
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
+    const {defaultValue, isOptional} = argConfig;
+    const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    const operator = null;
+    const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
+    const fieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"] );
     const formattedArgVal = formatValue(
-      meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField
+      meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
+      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+        meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
-    if (formattedArgVal !== undefined) { // skip optional in the end
-      formattedArgs[argKey] = formattedArgVal;
+    let formattedDefaultVal;
+    if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
+      const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
+      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      formattedDefaultVal = formatValue(
+        meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField
+      );
+      if (formattedDefaultVal === undefined) {
+        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+          meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
+        return undefined;
+      }
+    }
+
+    const finalFormattedVal = formattedArgVal ?? formattedDefaultVal;
+    if (finalFormattedVal !== undefined) {
+      if (gaps.length) {
+        for (const missedArgKey of gaps) {
+          formattedArgs[missedArgKey] = undefined;
+        }
+        gaps = [];
+      }
+      formattedArgs[argKey] = finalFormattedVal;
+    } else {
+      if (!isOptional)
+        missingArgKeys.push(argKey);
+      gaps.push(argKey);
     }
   }
-  const formattedArgsArr = Object.values(formattedArgs);
+  if (missingArgKeys.length) {
+    //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
+    return undefined; // uncomplete
+  }
 
+  const formattedArgsArr = Object.values(formattedArgs);
   let ret;
   if (typeof funcConfig.jsonLogic === "function") {
     const fn = funcConfig.jsonLogic;
@@ -309,7 +359,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     ];
     ret = fn.call(config.ctx, ...args);
   } else {
-    const funcName = funcConfig.jsonLogic || funcKey;
+    const funcName = funcConfig.jsonLogic || funcLastKey;
     const isMethod = !!funcConfig.jsonLogicIsMethod;
     if (isMethod) {
       const [obj, ...params] = formattedArgsArr;
@@ -371,6 +421,7 @@ const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formatt
 
 const formatLogic = (config, properties, formattedField, formattedValue, operator, operatorOptions = null, fieldDefinition = null, isRev = false) => {
   const field = properties.get("field");
+  //const fieldSrc = properties.get("fieldSrc");
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
   let fn = typeof operatorDefinition.jsonLogic == "function" 
     ? operatorDefinition.jsonLogic 
@@ -379,7 +430,7 @@ const formatLogic = (config, properties, formattedField, formattedValue, operato
     formattedField,
     operator,
     formattedValue,
-    omit(operatorDefinition, ["formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"]),
+    omit(operatorDefinition, opDefKeysToOmit),
     operatorOptions,
     fieldDefinition,
   ];

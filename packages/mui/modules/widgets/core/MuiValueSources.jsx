@@ -1,12 +1,13 @@
 import React from "react";
 import IconButton from "@mui/material/IconButton";
 import ExpandMoreSharpIcon from "@mui/icons-material/ExpandMoreSharp";
-import Popover from "@mui/material/Popover";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Check from "@mui/icons-material/Check";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 
 export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -23,23 +24,27 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
     anchorEl ? handleClose() : handleOpen(event);
   };
 
-  const handleChange = e => {
-    if (e.target.value === undefined)
-      return;
-    setValueSrc(e.target.value);
+  const handleChange = (_e, srcKey) => {
+    setValueSrc(srcKey);
     handleClose();
   };
 
   const renderOptions = (valueSources) => (
-    valueSources.map(([srcKey, info]) => (
-      <FormControlLabel 
-        key={srcKey} 
-        value={srcKey} 
-        checked={valueSrc == srcKey || !valueSrc && srcKey == "value"} 
-        control={<Radio />} 
-        label={info.label}
-      />
-    ))
+    valueSources.map(([srcKey, info]) => {
+      const isSelected = valueSrc == srcKey || !valueSrc && srcKey == "value";
+      const onClick = (e) => handleChange(e, srcKey);
+      return (
+        <MenuItem
+          key={srcKey}
+          value={srcKey}
+          selected={isSelected}
+          onClick={onClick}
+        >
+          {!isSelected && <ListItemText inset>{info.label}</ListItemText>}
+          {isSelected && <><ListItemIcon><Check /></ListItemIcon>{info.label}</>}
+        </MenuItem>
+      );
+    })
   );
 
   const open = Boolean(anchorEl);
@@ -49,31 +54,17 @@ export default ({ valueSources, valueSrc, title, setValueSrc, readonly}) => {
       <IconButton size="small" onClick={toggleOpenClose}>
         <ExpandMoreSharpIcon />
       </IconButton>
-    
-      <Popover    
-        open={open}
+
+      <Menu
         anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
+        open={open}
         onClose={handleClose}
-        sx={{
-          padding: theme => theme.spacing(1)
-        }}
-        disablePortal
       >
-        <FormControl component="fieldset" sx={{ p: 2 }}>
-          <FormLabel component="legend">{title}</FormLabel>
-          <RadioGroup value={valueSrc || "value"} onChange={handleChange}>
-            {renderOptions(valueSources)}
-          </RadioGroup>
+        <FormControl component="fieldset" sx={{ p: 0 }}>
+          <FormLabel component="legend" sx={{ p: 2, pt: 0, pb: 1 }}>{title}</FormLabel>
+          {renderOptions(valueSources)}
         </FormControl>
-      </Popover>
+      </Menu>
     </div>
   );
 };

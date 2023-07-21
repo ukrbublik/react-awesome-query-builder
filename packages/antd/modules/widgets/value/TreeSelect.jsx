@@ -13,7 +13,7 @@ export default class TreeSelectWidget extends Component {
     setValue: PropTypes.func.isRequired,
     config: PropTypes.object.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-    field: PropTypes.string.isRequired,
+    field: PropTypes.any,
     placeholder: PropTypes.string,
     customProps: PropTypes.object,
     fieldDefinition: PropTypes.object,
