@@ -26,7 +26,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@fluentui/font-icons-mdl2": "^8.2.0",
-    "@fluentui/react": "^8.78.0",
+    "@fluentui/react": "^8.110.10",
     "@fluentui/react-icons": "^2.0.175",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
