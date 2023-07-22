@@ -9,7 +9,7 @@ export const toListValue = (v, title) => {
   } else {
     return {
       value: v,
-      title: (title !== undefined ? title : v)
+      title: (title !== undefined ? title : ""+v)
     };
   }
 };
@@ -21,7 +21,7 @@ export const makeCustomListValue = (v) => {
       ...toListValue(v),
       isCustom: true,
     };
-  } else {
+  } else { // only if undefined
     return lv;
   }
 };
@@ -42,6 +42,7 @@ export const listValuesToArray = (listValuesObj) => {
 };
 
 // listValues can be {<value>: <title>, ..} or [{value, title}, ..] or [value, ..]
+// todo: same as getListValue() (but args are switched)
 export const getItemInListValues = (listValues, value) => {
   if (Array.isArray(listValues)) {
     const values = listValues.map(v => toListValue(v));

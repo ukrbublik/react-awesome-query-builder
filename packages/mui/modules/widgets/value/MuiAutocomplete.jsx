@@ -18,7 +18,7 @@ const emptyArray = [];
 export default (props) => {
   const {
     allowCustomValues, multiple,
-    value: selectedValue, customProps, readonly, config, groupBy, filterOptionsConfig, errorText,
+    value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText,
   } = props;
   const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
 
@@ -64,12 +64,14 @@ export default (props) => {
   const hasValue = selectedValue != null;
   // should be simple value to prevent re-render!s
   const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
-  
+
   const filterOptions = (options, params) => {
     const filtered = filterOptionsFn(options, params);
     const extended = extendOptions(filtered);
     return extended;
   };
+
+  const groupBy = (option) => option?.groupTitle;
 
   // render
   const renderInput = (params) => {
