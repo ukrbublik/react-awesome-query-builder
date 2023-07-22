@@ -1,13 +1,14 @@
 import React, { useMemo, useCallback } from "react";
 import { Select, Spin, Divider } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
-import { Hooks } from "@react-awesome-query-builder/ui";
+import { Hooks , Utils } from "@react-awesome-query-builder/ui";
+const { fixListValuesGroupOrder } = Utils.Autocomplete;
 const { useListValuesAutocomplete } = Hooks;
 const Option = Select.Option;
 
+
 export default (props) => {
   const { config, placeholder, allowCustomValues, customProps, value, readonly, multiple, useAsyncSearch } = props;
-
 
   // hook
   const {
@@ -60,18 +61,50 @@ export default (props) => {
   const mode = !multiple ? undefined : (allowCustomValues ? "multiple" : "multiple");
   const dynamicPlaceholder = !readonly ? aPlaceholder : "";
 
+  const nestByGroup = (opts, fix = false) => {
+    let newOpts = opts;
+    if (fix) {
+      newOpts = fixListValuesGroupOrder(newOpts);
+    }
+
+    let nestedOpts = [];
+    for (const o of newOpts) {
+      const groupTitle = o.groupTitle;
+      delete o.groupTitle;
+      if (groupTitle) {
+        let targetGroup;
+        const lastO = nestedOpts[nestedOpts.length-1];
+        if (lastO?.options && lastO.label === groupTitle) {
+          targetGroup = lastO;
+        } else {
+          targetGroup = {
+            label: groupTitle,
+            options: []
+          };
+          nestedOpts.push(targetGroup);
+        }
+        targetGroup.options.push(o);
+      } else {
+        nestedOpts.push(o);
+      }
+    }
+
+    return nestedOpts;
+  };
+
   // rendering special 'Load more' option has side effect: on change rc-select will save its title as internal value in own state
-  const renderedOptions = filteredOptions?.filter(option => !option.specialValue).map((option) => (
-    <Option 
-      key={option.value} 
-      value={option.value}
-      disabled={getOptionDisabled(option)}
-    >
-      <span className={getOptionIsCustom(option) ? "customSelectOption" : undefined}>
-        {getOptionLabel(option)}
-      </span>
-    </Option>
-  ));
+  const optionsToRender = nestByGroup(
+    filteredOptions
+      ?.filter(option => !option.specialValue)
+      .map((option) => ({
+        label: getOptionIsCustom(option)
+          ? <span className={"customSelectOption"}>{getOptionLabel(option)}</span>
+          : getOptionLabel(option),
+        value: option.value,
+        groupTitle: option.groupTitle,
+        disabled: getOptionDisabled(option)
+      }))
+  );
 
   const onSpecialClick = (specialValue) => () => {
     const option = filteredOptions.find(opt => opt.specialValue == specialValue);
@@ -190,9 +223,9 @@ export default (props) => {
       value={aValue}
       searchValue={inputValue}
       open={open}
+      options={optionsToRender}
       {...customProps}
     >
-      {renderedOptions}
     </Select>
   );
 };

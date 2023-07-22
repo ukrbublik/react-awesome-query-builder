@@ -1,6 +1,16 @@
 import {sleep} from "./stuff";
 import {listValuesToArray, getListValue, makeCustomListValue} from "./listValues";
 
+// simple polyfill for Next
+const findLastIndex = (arr, fn) => {
+  if (arr.findLastIndex) {
+    return arr.findLastIndex(fn);
+  } else {
+    const ind = [...arr].reverse().findIndex(fn);
+    return ind == -1 ? -1 : (arr.length-1 - ind);
+  }
+};
+
 export const simulateAsyncFetch = (all, cPageSize = 0, delay = 1000) => async (search, offset, meta) => {
   const pageSize = meta?.pageSize != undefined ? meta.pageSize : cPageSize;
   const filtered = listValuesToArray(all)
@@ -70,15 +80,39 @@ export const listValueToOption = (lv) => {
   };
   if (disabled)
     option.disabled = disabled;
-  if (groupTitle)
-    option.groupTitle = groupTitle;
-  if (renderTitle)
-    option.renderTitle = renderTitle;
   if (isCustom)
     option.isCustom = isCustom;
   if (isHidden)
     option.isHidden = isHidden;
+  // group
+  if (groupTitle)
+    option.groupTitle = groupTitle;
+  // used only for MUI field autocomplete (if matchesType, render as bold)
+  if (renderTitle)
+    option.renderTitle = renderTitle;
   return option;
 };
+
+export const fixListValuesGroupOrder = (listValues) => {
+  let newValues = [];
+  for (let lv of listValues) {
+    const i = findLastIndex(newValues, lv1 => {
+      return (lv1.groupTitle ?? "") == (lv.groupTitle ?? "");
+    });
+    if (!lv.groupTitle) {
+      lv = {...lv, groupTitle: ""};
+    }
+    if (i != -1) {
+      newValues.splice(i+1, 0, lv);
+    } else {
+      if (lv.groupTitle)
+        newValues.push(lv);
+      else
+        newValues.unshift(lv);
+    }
+  }
+  return newValues;
+};
+
 
 export { getListValue };

@@ -8,6 +8,8 @@
   - Updated antd to 5.7.2 (PR #952) (issue #946)
   - Updated dev dependencies. Now `pnpm i` requires Node 16+
   - Updated `@fluentui/react`. Fixed date/time widgets
+  - Autocomplete items now support `groupTitle` (PR #953) (issue #600)
+  - Add more types in `Utils.Autocomplete` (PR #953) (issue #934)
 - 6.3.0
   - Allow saving and loading config from server (PR #866) (issue #817)
     - New utils: `compressConfig()`, `decompressConfig()`

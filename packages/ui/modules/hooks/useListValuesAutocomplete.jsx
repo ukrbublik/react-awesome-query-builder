@@ -1,7 +1,7 @@
 import React from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import debounce from "lodash/debounce";
-const { mergeListValues, listValueToOption, optionToListValue, optionsToListValues } = Utils.Autocomplete;
+const { mergeListValues, listValueToOption, optionToListValue, optionsToListValues, fixListValuesGroupOrder } = Utils.Autocomplete;
 const { mapListValues, listValuesToArray, getListValue, makeCustomListValue, searchListValue, getItemInListValues } = Utils.ListUtils;
 
 function sleep(delay) {
@@ -92,7 +92,10 @@ const useListValuesAutocomplete = ({
       return null;
     }
 
-    const { values, hasMore, meta: newMeta } = res && res.values ? res : { values: res };
+    const { values, hasMore, meta: newMeta } = res?.values
+      ? res
+      : { values: res } // fallback, if response contains just array, not object
+    ;
     const nValues = listValuesToArray(values);
     let assumeHasMore;
     let newValues;
@@ -333,8 +336,10 @@ const useListValuesAutocomplete = ({
     return option.title || option.label;
   };
 
+  const fixedOptions = uif === "mui" ? fixListValuesGroupOrder(options) : options;
+
   return {
-    options,
+    options: fixedOptions,
     listValues,
     hasValue,
     selectedListValue,

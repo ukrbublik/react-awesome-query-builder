@@ -9,7 +9,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import { Hooks } from "@react-awesome-query-builder/ui";
+import { Hooks, Utils } from "@react-awesome-query-builder/ui";
 const { useListValuesAutocomplete } = Hooks;
 
 const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" style={{ marginRight: 10, marginTop: 4 }} />;
@@ -17,10 +17,11 @@ const checkedIcon = <CheckBoxIcon fontSize="small" style={{ marginRight: 10, mar
 const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
+
 export default (props) => {
   const {
     allowCustomValues, multiple,
-    value: selectedValue, customProps, readonly, config, groupBy, filterOptionsConfig, errorText
+    value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText
   } = props;
   const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
 
@@ -66,12 +67,14 @@ export default (props) => {
   const hasValue = selectedValue != null;
   // should be simple value to prevent re-render!s
   const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
-  
+
   const filterOptions = (options, params) => {
     const filtered = filterOptionsFn(options, params);
     const extended = extendOptions(filtered);
     return extended;
   };
+
+  const groupBy = (option) => option?.groupTitle;
 
   // styles
   const useStyles = makeStyles((theme) => ({

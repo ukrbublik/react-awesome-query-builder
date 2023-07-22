@@ -226,7 +226,11 @@ export interface Utils {
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
 
   Autocomplete: {
-    simulateAsyncFetch(all: AsyncFetchListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
+    simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
+    getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+    // internal
+    mergeListValues(oldValues: ListItems, newValues: ListItems, toStart = false): ListItems;
+    listValueToOption(listItem: ListItem): ListOptionUi;
   };
   ConfigUtils: {
     compressConfig(config: Config, baseConfig: Config): ZipConfig;
@@ -250,7 +254,12 @@ export interface Utils {
     spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>],
   },
   ListUtils: {
-    getTitleInListValues(listValues: ListValues, val: any): string;
+    getTitleInListValues(listValues: ListValues, value: string | number): string;
+    getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+    searchListValue(search: string, listValues: ListValues): ListItem; // search by value and title
+    listValuesToArray(listValues: ListValues): ListItems; // normalize
+    toListValue(value: string | number | ListItem, title?: string): ListItem; // create
+    makeCustomListValue(value: string | number): ListItem; // create
   }
 }
 
@@ -699,11 +708,20 @@ export type Types = TypedMap<Type>;
 
 type FieldType = string | "!struct" | "!group";
 
-interface ListItem {
-  value: any,
+export interface ListItem {
+  value: string | number,
   title?: string,
+  disabled?: boolean,
+  isCustom?: boolean,
+  isHidden?: boolean,
+  groupTitle?: string,
+  renderTitle?: string, // internal for MUI
 }
-interface TreeItem extends ListItem {
+export interface ListOptionUi extends ListItem {
+  specialValue?: string,
+}
+export type ListItems = Array<ListItem>;
+export interface TreeItem extends ListItem {
   children?: Array<TreeItem>,
   parent?: any,
   disabled?: boolean,
@@ -712,15 +730,14 @@ interface TreeItem extends ListItem {
   checkable?: boolean,
   path?: Array<string>
 }
-type TreeData = Array<TreeItem>;
-type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
+export type TreeData = Array<TreeItem>;
+export type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
-export type AsyncFetchListValues = ListValues;
 export interface AsyncFetchListValuesResult {
-  values: AsyncFetchListValues,
+  values: ListItems,
   hasMore?: boolean,
 }
-type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
+export type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
 
 
 export interface BasicFieldSettings<V = RuleValue> {
