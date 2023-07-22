@@ -78,7 +78,7 @@ export default class MultiSelectWidget extends Component {
           width: dropdownWidth,
         }}
         key={"widget-multiselect"}
-        dropdownMatchSelectWidth={false}
+        popupMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
         value={aValue}

@@ -67,7 +67,7 @@ export default class SelectWidget extends Component {
         disabled={readonly}
         style={{ width }}
         key={"widget-select"}
-        dropdownMatchSelectWidth={false}
+        popupMatchSelectWidth={false}
         placeholder={placeholder}
         size={renderSize}
         value={aValue}

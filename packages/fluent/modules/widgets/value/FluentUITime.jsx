@@ -14,24 +14,25 @@ export default (props) => {
     customProps,
   } = props;
 
-  const formatSingleValue = ( value) => {
-    return value ? moment(value, valueFormat).format(valueFormat) : undefined;
+  const momentValue = value ? moment(value, valueFormat) : undefined;
+  const timeValue = momentValue ? momentValue.toDate() : undefined;
+
+  const onChange = (_e, date) => {
+    // clear if invalid date
+    if (date == "" || date instanceof Date && isNaN(date))
+      date = undefined;
+    const newValue = date ? moment(date).format(valueFormat) : undefined;
+    setValue(newValue);
   };
 
   const hasSeconds = valueFormat.indexOf(":ss") != -1;
-
-  const onChange = (e, value) => {
-    if (value == "") value = undefined;
-    setValue(formatSingleValue(value));
-  };
-
-  const timeValue = value ? moment(value, valueFormat) : null;
 
   const stylesOptionsContainer = {
     optionsContainerWrapper: {
       height: "500px",
     }
   };
+  
   return (
     <TimePicker
       styles={stylesOptionsContainer}
@@ -40,7 +41,7 @@ export default (props) => {
       disabled={readonly}
       allowFreeform={true}
       showSeconds={hasSeconds}
-      value={value}
+      value={timeValue}
       useComboBoxAsMenuWidth
       {...customProps}
     />

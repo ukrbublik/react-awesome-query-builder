@@ -34,8 +34,8 @@ export default (props) => {
     format: timeFormat,
     slotProps: {
       textField: {
-        size: 'small',
-        variant: 'standard'
+        size: "small",
+        variant: "standard"
       },
       toolbar: {
         toolbarPlaceholder: !readonly ? placeholder : "",

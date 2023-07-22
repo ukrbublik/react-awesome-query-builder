@@ -61,8 +61,8 @@ interface DoOptions {
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
 const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
-  return false;
-  // return errText.includes("The anchor element should be part of the document layout.") // test issue with DatePicker
+  // todo: issue after updating antd
+  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.");
 };
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {
@@ -86,39 +86,39 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
 };
 
 export  const with_qb = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("vanilla", BasicConfig, config_fn, value, valueFormat, checks, options);
 };
 
 export  const with_qb_ant = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("antd", AntdConfig, config_fn, value, valueFormat, checks, options);
 };
 
 export  const with_qb_material = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("material", MaterialConfig, config_fn, value, valueFormat, checks, options);
 };
 
 export  const with_qb_mui = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(MuiConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("mui", MuiConfig, config_fn, value, valueFormat, checks, options);
 };
   
 export  const with_qb_bootstrap = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(BootstrapConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("bootstrap", BootstrapConfig, config_fn, value, valueFormat, checks, options);
 };
   
 export  const with_qb_fluent = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(FluentUIConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("fluent", FluentUIConfig, config_fn, value, valueFormat, checks, options);
 };
 
 export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
-  await do_with_qb(BasicConfig, config_fn, value, valueFormat, checks, options);
-  await do_with_qb(AntdConfig, config_fn, value, valueFormat, checks, options);
-  await do_with_qb(MaterialConfig, config_fn, value, valueFormat, checks, options);
-  await do_with_qb(MuiConfig, config_fn, value, valueFormat, checks, options);
-  await do_with_qb(BootstrapConfig, config_fn, value, valueFormat, checks, options);
-  await do_with_qb(FluentUIConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("vanilla", BasicConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("antd", AntdConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("material", MaterialConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("mui", MuiConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("bootstrap", BootstrapConfig, config_fn, value, valueFormat, checks, options);
+  await do_with_qb("fluent", FluentUIConfig, config_fn, value, valueFormat, checks, options);
 };
   
-const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig);
   // normally config should be saved at state in `onChange`, see README
@@ -178,17 +178,17 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
   };
   const mockedConsole = {
     ...console,
-    error: (...args: any[]) => {
+    error: (...args: string[]) => {
       const errText = args.filter(a => typeof a === "string").join("\n");
       consoleData.error.push(errText);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.error.apply(null, args);
+        origConsole.error.apply(null, [...args, `(${configName})`]);
     },
-    warn: (...args: any[]) => {
+    warn: (...args: string[]) => {
       const errText = args.filter(a => typeof a === "string").join("\n");
       consoleData.warn.push(errText);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.warn.apply(null, args);
+        origConsole.warn.apply(null, [...args, `(${configName})`]);
     },
   };
   // eslint-disable-next-line no-global-assign
@@ -204,10 +204,6 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
   await checks(qb, onChange, tasks, consoleData);
   //});
 
-  // restore console
-  // eslint-disable-next-line no-global-assign
-  console = origConsole;
-
   if (options?.attach) {
     // @ts-ignore
     qb.detach();
@@ -217,6 +213,10 @@ const do_with_qb = async (BasicConfig: Config, config_fn: ConfigFns, value: Tree
     // @ts-ignore
     qb.unmount();
   }
+
+  // restore console
+  // eslint-disable-next-line no-global-assign
+  console = origConsole;
   
   onChange.resetHistory();
 };

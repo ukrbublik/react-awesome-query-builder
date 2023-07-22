@@ -59,7 +59,7 @@ export default class FieldSelect extends PureComponent {
     let res = (
       <Select
         dropdownAlign={dropdownAlign}
-        dropdownMatchSelectWidth={false}
+        popupMatchSelectWidth={false}
         style={{ width }}
         placeholder={placeholder}
         size={config.settings.renderSize}

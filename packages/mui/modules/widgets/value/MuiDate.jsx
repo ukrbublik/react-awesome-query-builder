@@ -31,8 +31,8 @@ export default (props) => {
     format: dateFormat,
     slotProps: {
       textField: {
-        size: 'small',
-        variant: 'standard'
+        size: "small",
+        variant: "standard"
       },
       toolbar: {
         toolbarPlaceholder: !readonly ? placeholder : "",

@@ -66,7 +66,8 @@ export const getAutocompleteUtils = (uif, uifv) => {
     } else {
       ac = qb
         .find("Select")
-        .filterWhere(s => s.props()?.placeholder == targetPlaceholder);
+        .filterWhere(s => s.props()?.placeholder == targetPlaceholder)
+        .last();
     }
     ctx.ac = ac;
   };

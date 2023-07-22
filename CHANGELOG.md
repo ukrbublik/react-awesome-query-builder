@@ -5,6 +5,9 @@
   - Support import/export of functions for SpEL (PR #900) (issue #754)
   - Fix issue with `fieldName` (PR #900) (issues #929, #609)
   - Support `@mui/x-date-pickers` v6 (PR #951) (issue #910)
+  - Updated antd to 5.7.2 (PR #952) (issue #946)
+  - Updated dev dependencies. Now `pnpm i` requires Node 16+
+  - Updated `@fluentui/react`. Fixed date/time widgets
 - 6.3.0
   - Allow saving and loading config from server (PR #866) (issue #817)
     - New utils: `compressConfig()`, `decompressConfig()`

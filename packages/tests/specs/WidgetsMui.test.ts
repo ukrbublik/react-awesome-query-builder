@@ -101,7 +101,7 @@ describe("mui widgets interactions", () => {
         this.skip();
       } else if (clockBtn.length) {
         // v6 desktop mode
-        clockBtn.at(0).simulate("click");
+        clockBtn.last().simulate("click");
         const dclockPicker = document.querySelector<HTMLElement>(".MuiMultiSectionDigitalClock-root");
         expect(dclockPicker, "dclockPicker").to.exist;
 
