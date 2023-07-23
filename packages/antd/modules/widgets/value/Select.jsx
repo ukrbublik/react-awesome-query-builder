@@ -55,6 +55,7 @@ export default class SelectWidget extends Component {
   };
 
   filterOption = (input, option) => {
+    const {config} = this.props;
     const keysForFilter = config.settings.listKeysForSearch
       .map(k => mapListItemToOptionKeys[k]);
     const valueForFilter = keysForFilter
