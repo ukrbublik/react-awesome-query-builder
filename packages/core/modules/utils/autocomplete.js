@@ -95,20 +95,26 @@ export const listValueToOption = (lv) => {
 
 export const fixListValuesGroupOrder = (listValues) => {
   let newValues = [];
+  let groupTitles = [];
   for (let lv of listValues) {
     const i = findLastIndex(newValues, lv1 => {
       return (lv1.groupTitle ?? "") == (lv.groupTitle ?? "");
     });
-    if (!lv.groupTitle) {
+    if (lv.groupTitle != undefined && !groupTitles.includes(lv.groupTitle)) {
+      groupTitles.push(lv.groupTitle);
+      if (groupTitles.length === 1) {
+        // fix empty groupTitles
+        newValues = newValues.map(nv => ({...nv, groupTitle: ""}));
+      }
+    }
+    if (lv.groupTitle == undefined && groupTitles.length) {
+      // fix empty groupTitle
       lv = {...lv, groupTitle: ""};
     }
     if (i != -1) {
       newValues.splice(i+1, 0, lv);
     } else {
-      if (lv.groupTitle)
-        newValues.push(lv);
-      else
-        newValues.unshift(lv);
+      newValues.push(lv);
     }
   }
   return newValues;
