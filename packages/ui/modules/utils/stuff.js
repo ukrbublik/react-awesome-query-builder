@@ -97,16 +97,6 @@ function shallowEqualObjects(objA, objB, deep = false) {
 }
 
 
-const isImmutable = (v) => {
-  return typeof v === "object" && v !== null && typeof v.toJS === "function";
-};
-
-
-// export function toImmutableList(v) {
-//   return (isImmutable(v) ? v : new Immutable.List(v));
-// }
-
-
 const isDev = () => (typeof process !== "undefined" && process.env && process.env.NODE_ENV == "development");
 
 export const getLogger = (devMode = false) => {
