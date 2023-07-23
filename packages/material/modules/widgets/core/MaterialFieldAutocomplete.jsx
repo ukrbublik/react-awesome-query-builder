@@ -30,11 +30,11 @@ const filterOptionsConfig = {
   }
 };
 
-const fieldAdapter = ({items, selectedKey, setField, ...rest}) => {
+const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}) => {
   const listValues = itemsToListValues(items);
   const value = selectedKey;
   const setValue = (value, _asyncValues) => {
-    if (!value) return undefined;
+    if (!value && !isValueField) return undefined;
     return setField(value);
   };
 
@@ -45,6 +45,7 @@ const fieldAdapter = ({items, selectedKey, setField, ...rest}) => {
     filterOptionsConfig,
     allowCustomValues: false,
     multiple: false,
+    disableClearable: !isValueField,
     value,
   };
 };

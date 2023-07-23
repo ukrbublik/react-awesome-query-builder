@@ -197,6 +197,7 @@ export default class ValueField extends Component {
     const {config, customProps, setValue, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
+      isValueField: true,
       config,
       customProps,
       setField: setValue,

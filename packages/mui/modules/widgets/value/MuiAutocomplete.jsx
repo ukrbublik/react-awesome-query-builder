@@ -17,7 +17,7 @@ const emptyArray = [];
 
 export default (props) => {
   const {
-    allowCustomValues, multiple,
+    allowCustomValues, multiple, disableClearable,
     value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText,
   } = props;
   const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
@@ -153,6 +153,7 @@ export default (props) => {
   return (
     <FormControl fullWidth={fullWidth}>
       <Autocomplete
+        disableClearable={disableClearable}
         disableCloseOnSelect={multiple}
         fullWidth={fullWidth}
         multiple={multiple}
