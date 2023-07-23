@@ -1022,6 +1022,7 @@ export interface LocaleSettings {
 
 export interface BehaviourSettings {
   defaultField?: FieldPath | FieldFuncValue | FieldFuncValueI,
+  defaultOperator?: string;
   fieldSources?: Array<FieldSource>,
   valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction,

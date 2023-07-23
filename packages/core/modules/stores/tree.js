@@ -341,7 +341,7 @@ const setFieldSrc = (state, path, srcKey, config) => {
     // clear ALL properties
     state = state.setIn(
       expandTreePath(path, "properties"),
-      defaultRuleProperties(config)
+      defaultRuleProperties(config, null, null, false)
     );
   } else {
     // clear non-relevant properties
@@ -410,7 +410,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
       if (strategy == "keep" && !isChangeToAnotherType)
         newOperator = lastOp;
       else if (strategy == "default")
-        newOperator = defaultOperator(config, newField, false);
+        newOperator = getDefaultOperator(config, newField, false);
       else if (strategy == "first")
         newOperator = getFirstOperator(config, newField);
       if (newOperator) //found op for strategy
