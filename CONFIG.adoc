@@ -339,8 +339,8 @@ Behaviour settings:
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
 |useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
-|fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key" | "path" | "label" | "altLabel" (label2) | "tooltip" | "grouplabel" (label of parent group, for subfields of complex fields)
-|listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title" | "value" | "groupTitle"
+|fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)
+|listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title", "value", "groupTitle"
 |===
 
 TIP: For fully read-only mode use these settings:
