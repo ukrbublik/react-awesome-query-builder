@@ -107,7 +107,7 @@ export default class Field extends Component {
       const label = this.getFieldLabel(field, fullFieldPath, config);
       const partsLabels = getFieldPathLabels(fullFieldPath, config);
       let fullLabel = partsLabels.join(fieldSeparatorDisplay);
-      if (fullLabel == label || parentFieldPath)
+      if (fullLabel == label || parentFieldPath?.length)
         fullLabel = null;
       const altLabel = field.label2;
       const tooltip = field.tooltip;

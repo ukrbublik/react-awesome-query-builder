@@ -4,6 +4,16 @@ import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../
 import PropTypes from "prop-types";
 const { Option, OptGroup } = Select;
 
+// see type FieldItemSearchableKeys
+const mapFieldItemToOptionKeys = {
+  key: "_value2",
+  path: "value",
+  label: "label",
+  altLabel: "title",
+  tooltip: "_tooltip",
+  grouplabel: "grouplabel",
+  fullLabel: "_fullLabel",
+};
 
 export default class FieldSelect extends PureComponent {
   static propTypes = {
@@ -29,12 +39,14 @@ export default class FieldSelect extends PureComponent {
   };
 
   filterOption = (input, option) => {
-    const dataForFilter = option;
-    const keysForFilter = ["title", "value", "grouplabel", "label"];
+    const { config } = this.props;
+    const keysForFilter = config.settings.fieldItemKeysForSearch
+      .map(k => mapFieldItemToOptionKeys[k]);
     const valueForFilter = keysForFilter
-      .map(k => (typeof dataForFilter[k] == "string" ? dataForFilter[k] : ""))
+      .map(k => (typeof option[k] == "string" ? option[k] : ""))
       .join("\0");
-    return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    return matches;
   };
 
   render() {
@@ -108,6 +120,9 @@ export default class FieldSelect extends PureComponent {
           grouplabel={grouplabel}
           label={label}
           disabled={disabled}
+          _fullLabel={fullLabel}
+          _tooltip={tooltip}
+          _value2={key}
         >
           {option}
         </Option>;

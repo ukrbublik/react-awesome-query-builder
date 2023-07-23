@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import omit from "lodash/omit";
 import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
@@ -14,16 +14,25 @@ const { useListValuesAutocomplete } = Hooks;
 
 const nonCheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" style={{ marginRight: 10, marginTop: 4 }} />;
 const checkedIcon = <CheckBoxIcon fontSize="small" style={{ marginRight: 10, marginTop: 4 }} />;
-const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
 
 export default (props) => {
   const {
-    allowCustomValues, multiple,
+    allowCustomValues, multiple, disableClearable,
     value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText
   } = props;
-  const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
+  const stringifyOption = useCallback((option) => {
+    const keysForFilter = config.settings.listKeysForSearch;
+    const valueForFilter = keysForFilter
+      .map(k => (typeof option[k] == "string" ? option[k] : ""))
+      .join("\0");
+    return valueForFilter;
+  }, [config]);
+  const defaultFilterOptionsConfig = {
+    stringify: stringifyOption
+  };
+  const filterOptionsFn = createFilterOptions(filterOptionsConfig || defaultFilterOptionsConfig);
 
   // hook
   const {
@@ -185,6 +194,7 @@ export default (props) => {
   return (
     <FormControl fullWidth={fullWidth}>
       <Autocomplete
+        disableClearable={disableClearable}
         disableCloseOnSelect={multiple}
         fullWidth={fullWidth}
         multiple={multiple}

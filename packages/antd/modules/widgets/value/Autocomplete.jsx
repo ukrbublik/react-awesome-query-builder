@@ -6,6 +6,12 @@ const { fixListValuesGroupOrder } = Utils.Autocomplete;
 const { useListValuesAutocomplete } = Hooks;
 const Option = Select.Option;
 
+// see type ListItem
+const mapListItemToOptionKeys = {
+  value: "value",
+  title: "label",
+  groupTitle: "grouplabel",
+};
 
 export default (props) => {
   const { config, placeholder, allowCustomValues, customProps, value, readonly, multiple, useAsyncSearch } = props;
@@ -72,6 +78,7 @@ export default (props) => {
       const groupTitle = o.groupTitle;
       delete o.groupTitle;
       if (groupTitle) {
+        o.grouplabel = groupTitle;
         let targetGroup;
         const lastO = nestedOpts[nestedOpts.length-1];
         if (lastO?.options && lastO.label === groupTitle) {
@@ -198,9 +205,19 @@ export default (props) => {
     </div>
   ), [filteredOptions]);
 
+  const filterOption = useCallback((input, option) => {
+    const keysForFilter = config.settings.listKeysForSearch
+      .map(k => mapListItemToOptionKeys[k]);
+    const valueForFilter = keysForFilter
+      .map(k => (typeof option[k] == "string" ? option[k] : ""))
+      .join("\0");
+    const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    return matches;
+  }, [config]);
+
   return (
     <Select
-      filterOption={useAsyncSearch ? false : true}
+      filterOption={useAsyncSearch ? false : filterOption}
       dropdownRender={dropdownRender}
       allowClear={true}
       notFoundContent={isLoading ? "Loading..." : "Not found"}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import omit from "lodash/omit";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
@@ -11,16 +11,25 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { Hooks } from "@react-awesome-query-builder/ui";
 const { useListValuesAutocomplete } = Hooks;
-const defaultFilterOptions = createFilterOptions();
 const emptyArray = [];
 
 
 export default (props) => {
   const {
-    allowCustomValues, multiple,
+    allowCustomValues, multiple, disableClearable,
     value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText,
   } = props;
-  const filterOptionsFn = filterOptionsConfig ? createFilterOptions(filterOptionsConfig) : defaultFilterOptions;
+  const stringifyOption = useCallback((option) => {
+    const keysForFilter = config.settings.listKeysForSearch;
+    const valueForFilter = keysForFilter
+      .map(k => (typeof option[k] == "string" ? option[k] : ""))
+      .join("\0");
+    return valueForFilter;
+  }, [config]);
+  const defaultFilterOptionsConfig = {
+    stringify: stringifyOption
+  };
+  const filterOptionsFn = createFilterOptions(filterOptionsConfig || defaultFilterOptionsConfig);
 
   // hook
   const {
@@ -153,6 +162,7 @@ export default (props) => {
   return (
     <FormControl fullWidth={fullWidth}>
       <Autocomplete
+        disableClearable={disableClearable}
         disableCloseOnSelect={multiple}
         fullWidth={fullWidth}
         multiple={multiple}

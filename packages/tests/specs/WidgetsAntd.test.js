@@ -290,8 +290,8 @@ describe("antdesign widgets interactions", () => {
         w.onChange(["user", "login"]);
 
         // search
-        expect(w.filterOption("re", [{label: "Red"}])).to.equal(true);
-        expect(w.filterOption("wh", [{label: "Red"}])).to.equal(false);
+        expect(w.filterOption("re", [{_label: "Red"}])).to.equal(true);
+        expect(w.filterOption("wh", [{_label: "Red"}])).to.equal(false);
       });
     });
 
@@ -302,8 +302,8 @@ describe("antdesign widgets interactions", () => {
         w.onChange("user.login");
 
         // search
-        expect(w.filterOption("re", {title: "Red"})).to.equal(true);
-        expect(w.filterOption("wh", {title: "Red"})).to.equal(false);
+        expect(w.filterOption("re", {label: "Red"})).to.equal(true);
+        expect(w.filterOption("wh", {label: "Red"})).to.equal(false);
       });
     });
 
@@ -322,8 +322,8 @@ describe("antdesign widgets interactions", () => {
         w.onChange("user.login");
 
         // search
-        expect(w.filterTreeNode("re", {title: "Red"})).to.equal(true);
-        expect(w.filterTreeNode("wh", {title: "Red"})).to.equal(false);
+        expect(w.filterTreeNode("re", {label: "Red"})).to.equal(true);
+        expect(w.filterTreeNode("wh", {label: "Red"})).to.equal(false);
       });
     });
 

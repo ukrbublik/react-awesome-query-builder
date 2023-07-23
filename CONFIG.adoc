@@ -17,6 +17,7 @@ endif::[]
 :funcs:        https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js
 :renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
 :config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
+:d_ts:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/core/modules/index.d.ts
 
 = Config format
 
@@ -338,6 +339,8 @@ Behaviour settings:
 |removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
 |useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
+|fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)
+|listKeysForSearch |`["title", "value"]` |Keys in list item (see {d_ts}[type] `ListItem`) available for search. Available keys: "title", "value", "groupTitle"
 |===
 
 TIP: For fully read-only mode use these settings:
