@@ -11,6 +11,8 @@ export const settings = {
 
   fieldSources: ["field"],
   keepInputOnChangeFieldSrc: true,
+  fieldItemKeysForSearch: ["label", "path", "altLabel", "grouplabel"],
+  listKeysForSearch: ["title", "value"],
   valueSourcesInfo: {
     value: {},
   },

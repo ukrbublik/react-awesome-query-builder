@@ -73,7 +73,10 @@ export const optionsToListValues = (vals, listValues, allowCustomValues) => {
 
 export const listValueToOption = (lv) => {
   if (lv == null) return null;
-  const {title, value, disabled, groupTitle, renderTitle, children, label, isCustom, isHidden} = lv;
+  const {
+    title, value, disabled, groupTitle, grouplabel, renderTitle, children, label, isCustom, isHidden,
+    ...rest
+  } = lv;
   let option = {
     value,
     title: title || label || children, // fix issue #930 for AntD
@@ -85,11 +88,15 @@ export const listValueToOption = (lv) => {
   if (isHidden)
     option.isHidden = isHidden;
   // group
-  if (groupTitle)
-    option.groupTitle = groupTitle;
+  if (groupTitle || grouplabel)
+    option.groupTitle = groupTitle || grouplabel;
   // used only for MUI field autocomplete (if matchesType, render as bold)
   if (renderTitle)
     option.renderTitle = renderTitle;
+  option = {
+    ...option,
+    ...rest,
+  };
   return option;
 };
 

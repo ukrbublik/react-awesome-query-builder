@@ -5,6 +5,16 @@ import PropTypes from "prop-types";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { useOnPropsChanged } = Utils.ReactUtils;
 
+const mapFieldItemToOptionKeys = {
+  key: "_value2",
+  path: "value",
+  label: "label",
+  altLabel: "altLabel",
+  tooltip: "_tooltip",
+  grouplabel: "_grouplabel",
+  fullLabel: "fullLabel",
+};
+
 export default class FieldTreeSelect extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -49,7 +59,7 @@ export default class FieldTreeSelect extends Component {
 
   getTreeData(fields, fn = null) {
     return fields.map(field => {
-      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled, matchesType} = field;
+      const {items, key, path, label, fullLabel, altLabel, tooltip, disabled, grouplabel, matchesType} = field;
       if (fn)
         fn(field);
       const pathKey = path || key;
@@ -66,6 +76,9 @@ export default class FieldTreeSelect extends Component {
           fullLabel: fullLabel,
           label: label,
           disabled: disabled,
+          _value2: key,
+          _tooltip: tooltip,
+          _grouplabel: grouplabel,
         };
       } else {
         return {
@@ -75,6 +88,9 @@ export default class FieldTreeSelect extends Component {
           fullLabel: fullLabel,
           label: label,
           disabled: disabled,
+          _value2: key,
+          _tooltip: tooltip,
+          _grouplabel: grouplabel,
         };
       }
     });
@@ -85,13 +101,14 @@ export default class FieldTreeSelect extends Component {
   };
 
   filterTreeNode = (input, option) => {
-    const dataForFilter = option;
-    const keysForFilter = ["title", "value", "label", "altLabel", "fullLabel"];
-    const valueForFilter 
-      = keysForFilter
-        .map(k => (typeof dataForFilter[k] == "string" ? dataForFilter[k] : ""))
-        .join("\0");
-    return valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const { config } = this.props;
+    const keysForFilter = config.settings.fieldItemKeysForSearch
+      .map(k => mapFieldItemToOptionKeys[k]);
+    const valueForFilter = keysForFilter
+      .map(k => (typeof option[k] == "string" ? option[k] : ""))
+      .join("\0");
+    const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    return matches;
   };
 
   render() {

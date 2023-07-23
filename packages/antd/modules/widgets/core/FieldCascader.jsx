@@ -6,6 +6,17 @@ import { Utils } from "@react-awesome-query-builder/ui";
 const { useOnPropsChanged } = Utils.ReactUtils;
 const { getFieldParts } = Utils.ConfigUtils;
 
+// see type FieldItemSearchableKeys
+const mapFieldItemToOptionKeys = {
+  key: "_value2",
+  path: "path",
+  label: "_label",
+  altLabel: "altLabel",
+  tooltip: "tooltip",
+  grouplabel: "grouplabel",
+  fullLabel: "fullLabel",
+};
+const searchInPath = false; // true - search in all path, false - only in last path item
 
 export default class FieldCascader extends Component {
   static propTypes = {
@@ -39,18 +50,24 @@ export default class FieldCascader extends Component {
 
   getItems(items) {
     return items.map(item => {
-      const {items, matchesType, label} = item;
+      const {items, matchesType, label, key, path} = item;
 
       if (items) {
         return {
           ...item,
+          key: path,
+          _value2: key,
           items: this.getItems(items),
           label: matchesType ? <b>{label}</b> : label,
+          _label: label,
         };
       } else {
         return {
           ...item,
+          key: path,
+          _value2: key,
           label: matchesType ? <b>{label}</b> : label,
+          _label: label,
         };
       }
     });
@@ -63,11 +80,18 @@ export default class FieldCascader extends Component {
     this.props.setField([...parentPath, ...keys]);
   };
 
-  filterOption = (inputValue, path) => {
-    const keysForFilter = ["label", "key", "altLabel"];
-    return path.some(option => (
-      keysForFilter.map(k => option[k]).join("\0").toLowerCase().indexOf(inputValue.toLowerCase()) > -1
-    ));
+  filterOption = (input, path) => {
+    const { config } = this.props;
+    const keysForFilter = config.settings.fieldItemKeysForSearch
+      .map(k => mapFieldItemToOptionKeys[k]);
+    const filterOneOption = (option => {
+      const valueForFilter = keysForFilter
+        .map(k => (typeof option[k] == "string" ? option[k] : ""))
+        .join("\0");
+      const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+      return matches;
+    });
+    return searchInPath ? path.some(filterOneOption) : filterOneOption(path[path.length-1]);
   };
 
   render() {

@@ -434,13 +434,15 @@ export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFie
 // @ui
 /////////////////
 
+type FieldItemSearchableKey = "key" | "path" | "label" | "altLabel" | "tooltip" | "grouplabel";
+
 export type FieldItem = {
   items?: FieldItems, 
   key: string, 
   path?: string, // field path with separator
   label: string, 
   fullLabel?: string, 
-  altLabel?: string, 
+  altLabel?: string, // label2
   tooltip?: string,
   disabled?: boolean,
   grouplabel?: string,
@@ -717,6 +719,7 @@ export interface ListItem {
   groupTitle?: string,
   renderTitle?: string, // internal for MUI
 }
+type ListItemSearchableKey = "title" | "value" | "groupTitle";
 export interface ListOptionUi extends ListItem {
   specialValue?: string,
 }
@@ -967,6 +970,8 @@ export interface BehaviourSettings {
   groupOperators?: Array<string>,
   useConfigCompress?: boolean,
   keepInputOnChangeFieldSrc?: boolean,
+  fieldItemKeysForSearch?: FieldItemSearchableKey[];
+  listKeysForSearch?: ListItemSearchableKey[];
 }
 
 export interface OtherSettings {

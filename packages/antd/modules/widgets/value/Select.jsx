@@ -8,6 +8,13 @@ const { useOnPropsChanged } = Utils.ReactUtils;
 const { mapListValues } = Utils.ListUtils;
 const Option = Select.Option;
 
+// see type ListItem
+const mapListItemToOptionKeys = {
+  value: "value",
+  title: "children",
+  groupTitle: "grouplabel", // not supported
+};
+
 export default class SelectWidget extends Component {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
@@ -48,8 +55,13 @@ export default class SelectWidget extends Component {
   };
 
   filterOption = (input, option) => {
-    const dataForFilter = option.children || option.value;
-    return dataForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    const keysForFilter = config.settings.listKeysForSearch
+      .map(k => mapListItemToOptionKeys[k]);
+    const valueForFilter = keysForFilter
+      .map(k => (typeof option[k] == "string" ? option[k] : ""))
+      .join("\0");
+    const matches = valueForFilter.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+    return matches;
   };
 
   render() {
