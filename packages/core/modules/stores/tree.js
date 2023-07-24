@@ -66,8 +66,14 @@ const removeGroup = (state, path, config) => {
     state = fixEmptyGroupsInTree(state);
     
     if (isEmptyTree(state) && !canLeaveEmptyGroup) {
-      // if whole query is empty, add one empty rule to root
-      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+      // if whole query is empty, add one empty(!) rule to root
+      const canUseDefaultFieldAndOp = false;
+      const canGetFirst = false;
+      state = addItem(
+        state, new Immutable.List(), "rule", uuid(), 
+        defaultRuleProperties(config, undefined, undefined, canUseDefaultFieldAndOp, canGetFirst), 
+        config
+      );
     }
   }
   state = fixPathsInTree(state);
@@ -108,8 +114,14 @@ const removeRule = (state, path, config) => {
     state = fixEmptyGroupsInTree(state);
 
     if (isEmptyTree(state) && !canLeaveEmptyGroup) {
-      // if whole query is empty, add one empty rule to root
-      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+      // if whole query is empty, add one empty(!) rule to root
+      const canUseDefaultFieldAndOp = false;
+      const canGetFirst = false;
+      state = addItem(
+        state, new Immutable.List(), "rule", uuid(), 
+        defaultRuleProperties(config, undefined, undefined, canUseDefaultFieldAndOp, canGetFirst), 
+        config
+      );
     }
   }
   state = fixPathsInTree(state);

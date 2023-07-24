@@ -3,11 +3,14 @@ const { getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb } from "../support/utils";
-
+import chai from "chai";
+import deepEqualInAnyOrder from "deep-equal-in-any-order";
+chai.use(deepEqualInAnyOrder);
+const { expect } = chai;
 
 describe("interactions on vanilla", () => {
   it("click on remove single rule will leave empty rule if canLeaveEmptyGroup=false", async () => {
-    await with_qb(configs.dont_leave_empty_group, inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb([configs.dont_leave_empty_group, configs.with_default_field_and_operator], inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--header button")
         .first()
@@ -50,6 +53,47 @@ describe("interactions on vanilla", () => {
     });
   });
 
+  it("click on add rule will add default rule if defaultField/defaultOperator is present", async () => {
+    await with_qb([configs.simple_with_numbers_and_str, configs.with_default_field_and_operator], inits.empty, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".group--actions button")
+        .first()
+        .simulate("click");
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal("str");
+      expect(child.properties.operator).to.equal("like");
+      expect(child.properties.value).to.eql([undefined]);
+    });
+  });
+
+  it("click on add rule will add default rule with func at LHS if defaultField is present", async () => {
+    await with_qb([configs.simple_with_numbers_and_str, configs.with_default_func_field, configs.with_funcs], inits.empty, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".group--actions button")
+        .first()
+        .simulate("click");
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.fieldSrc).to.equal("func");
+      expect(child.properties.field).to.deep.equalInAnyOrder({
+        func: "LOWER",
+        args: {
+          str: {
+            valueSrc: "field",
+            value: "str"
+          }
+        }
+      });
+      expect(child.properties.operator).to.equal("like");
+      expect(child.properties.value).to.eql([undefined]);
+    });
+  });
+
   it("click on add group will add new group with one empty rule if shouldCreateEmptyGroup=false", async () => {
     await with_qb(configs.dont_leave_empty_group, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
@@ -68,6 +112,35 @@ describe("interactions on vanilla", () => {
         type: "rule", 
         id: subchild.id,
         properties: {fieldSrc: "field", field: null, operator: null, value: [], valueSrc: []},
+      }));
+    });
+  });
+
+  it("click on add group will add new group with one default rule if shouldCreateEmptyGroup=false AND defaultField is present", async () => {
+    await with_qb([configs.dont_leave_empty_group, configs.with_default_field_and_operator], inits.with_number, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".group--actions button")
+        .at(1)
+        .simulate("click");
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(2);
+      const child = changedTree.children1[childKeys[1]];
+      expect(child.type).to.equal("group");
+      expect(child.properties.conjunction).to.equal("AND"); //default
+      const subchildKeys = Object.keys(child.children1);
+      const subchild = child.children1[subchildKeys[0]];
+      expect(JSON.stringify(subchild)).to.eql(JSON.stringify({
+        type: "rule", 
+        id: subchild.id,
+        properties: {
+          fieldSrc: "field", 
+          field: "str", 
+          operator: "like", 
+          value: [undefined], 
+          valueSrc: ["value"], 
+          valueType: ["text"]
+        },
       }));
     });
   });

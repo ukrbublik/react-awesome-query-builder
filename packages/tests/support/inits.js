@@ -38,6 +38,10 @@ export const tree_with_number = {
   }
 };
 
+export const empty = {
+  "and": []
+};
+
 export const with_number = {
   "and": [{
     "==": [
