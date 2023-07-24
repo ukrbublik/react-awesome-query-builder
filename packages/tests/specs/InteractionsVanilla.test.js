@@ -221,7 +221,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from simple to group_ext", async () => {
-    await with_qb(configs.with_group_array_cars, inits.with_text, "JsonLogic", (qb, onChange) => {
+    await with_qb([configs.with_group_array_cars, , configs.with_default_field_and_operator], inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });
@@ -233,6 +233,31 @@ describe("interactions on vanilla", () => {
       expect(child.properties.operator).to.equal("some");
       expect(child.properties.conjunction).to.equal("AND");
       expect(child.properties.value).to.eql([]);
+      const subchildKeys = Object.keys(child.children1 || {}); 
+      expect(subchildKeys.length).to.equal(0);
+    });
+  });
+
+  it("change field from simple to group_ext, will add default subfield if defaultField is set in group", async () => {
+    await with_qb([configs.with_group_array_cars, configs.with_default_field_in_cars], inits.with_text, "JsonLogic", (qb, onChange) => {
+      qb
+        .find(".rule .rule--field select")
+        .simulate("change", { target: { value: "cars" } });
+      const changedTree = getTree(onChange.getCall(0).args[0]);
+      const childKeys = Object.keys(changedTree.children1);
+      expect(childKeys.length).to.equal(1);
+      const child = changedTree.children1[childKeys[0]];
+      expect(child.properties.field).to.equal("cars");
+      expect(child.properties.operator).to.equal("some");
+      expect(child.properties.conjunction).to.equal("AND");
+      expect(child.properties.value).to.eql([]);
+      const subchildKeys = Object.keys(child.children1); 
+      expect(subchildKeys.length).to.equal(1);
+      const subchild = child.children1[subchildKeys[0]];
+      expect(subchild.properties.field).to.equal("cars.year");
+      expect(subchild.properties.operator).to.equal("equal");
+      expect(subchild.properties.value).to.eql([undefined]);
+      expect(subchild.properties.valueSrc).to.eql(["value"]);
     });
   });
 

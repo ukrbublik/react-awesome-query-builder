@@ -916,6 +916,13 @@ export const with_settings_show_lock = (BasicConfig) => ({
   }
 });
 
+export const with_default_field_in_cars = (BasicConfig) => merge({}, BasicConfig, {
+  fields: {
+    cars: {
+      defaultField: "year"
+    }
+  }
+});
 
 export const with_group_array_cars = (BasicConfig) => ({
   ...BasicConfig,
