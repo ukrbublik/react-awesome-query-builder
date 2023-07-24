@@ -220,8 +220,8 @@ describe("interactions on vanilla", () => {
     });
   });
 
-  it("change field from simple to group_ext", async () => {
-    await with_qb([configs.with_group_array_cars, , configs.with_default_field_and_operator], inits.with_text, "JsonLogic", (qb, onChange) => {
+  it("change field from simple to group_ext, will add empty subfield", async () => {
+    await with_qb([configs.with_group_array_cars, configs.with_default_field_and_operator], inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });
@@ -234,7 +234,11 @@ describe("interactions on vanilla", () => {
       expect(child.properties.conjunction).to.equal("AND");
       expect(child.properties.value).to.eql([]);
       const subchildKeys = Object.keys(child.children1 || {}); 
-      expect(subchildKeys.length).to.equal(0);
+      expect(subchildKeys.length).to.equal(1);
+      const subchild = child.children1[subchildKeys[0]];
+      expect(subchild.properties.field).to.equal(null);
+      expect(subchild.properties.operator).to.equal(null);
+      expect(subchild.properties.value).to.eql([]);
     });
   });
 
