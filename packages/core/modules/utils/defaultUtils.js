@@ -61,12 +61,12 @@ export const defaultOperatorOptions = (config, operator, field) => {
 
 export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null, canUseDefaultFieldAndOp = true, canGetFirst = false) => {
   let field = null, operator = null, fieldSrc = null;
-  const {showErrorMessage, defaultField} = config.settings;
+  const {showErrorMessage} = config.settings;
   if (item) {
     fieldSrc = item?.properties?.fieldSrc;
     field = item?.properties?.field;
     operator = item?.properties?.operator;
-  } else if (defaultField && canUseDefaultFieldAndOp) {
+  } else if (canUseDefaultFieldAndOp) {
     field = getDefaultField(config, canGetFirst, parentRuleGroupPath);
     if (field) {
       fieldSrc = isImmutable(field) ? "func" : "field";
