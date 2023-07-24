@@ -17,13 +17,13 @@ export const loadTree = (serTree) => {
   if (isImmutableTree(serTree)) {
     return serTree;
   } else if (isTree(serTree)) {
-    return jsTreeToImmutable(serTree);
+    return jsToImmutable(serTree);
   } else if (typeof serTree == "string" && serTree.startsWith('["~#iM"')) {
     //tip: old versions of RAQB were saving tree with `transit.toJSON()`
     // https://github.com/ukrbublik/react-awesome-query-builder/issues/69
     throw "You are trying to load query in obsolete serialization format (Immutable string) which is not supported in versions starting from 2.1.17";
   } else if (typeof serTree == "string") {
-    return jsTreeToImmutable(JSON.parse(serTree));
+    return jsToImmutable(JSON.parse(serTree));
   } else throw "Can't load tree!";
 };
 
@@ -47,8 +47,8 @@ export const isTree = (tree) => {
 
 export {isJsonLogic};
 
-function jsTreeToImmutable(tree) {
-  return fromJS(tree, function (key, value) {
+export function jsToImmutable(tree) {
+  const imm = fromJS(tree, function (key, value) {
     let outValue;
     if (key == "properties") {
       outValue = value.toOrderedMap();
@@ -83,5 +83,6 @@ function jsTreeToImmutable(tree) {
     }
     return outValue;
   });
+  return imm;
 }
 

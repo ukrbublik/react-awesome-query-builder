@@ -100,4 +100,4 @@ class RuleGroup extends BasicGroup {
 }
 
 
-export default GroupContainer(Draggable("group rule_group")(WithConfirmFn(RuleGroup)));
+export default GroupContainer(Draggable("group rule_group")(WithConfirmFn(RuleGroup)), "rule_group");

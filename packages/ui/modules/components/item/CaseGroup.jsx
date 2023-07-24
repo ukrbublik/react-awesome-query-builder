@@ -181,5 +181,5 @@ class CaseGroup extends BasicGroup {
 
 }
 
-export default GroupContainer(Draggable("group case_group")(WithConfirmFn(CaseGroup)));
+export default GroupContainer(Draggable("group case_group")(WithConfirmFn(CaseGroup)), "case_group");
 

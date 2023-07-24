@@ -10,5 +10,6 @@ export * as TreeUtils from "./treeUtils";
 export * as ExportUtils from "./export";
 export * as ListUtils from "./listValues";
 export * as Autocomplete from "./autocomplete";
+export * as OtherUtils from "./stuff";
 export {getSwitchValues} from "./treeUtils";
 export {compressConfig, decompressConfig} from "./configSerialize";

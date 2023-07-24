@@ -8,6 +8,7 @@ export type Moment = MomentType;
 export type ImmutableList<T> = ImmList<T>;
 export type ImmutableMap<K, V> = ImmMap<K, V>;
 export type ImmutableOMap<K, V> = ImmOMap<K, V>;
+export type AnyImmutable = ImmutableList<any> | ImmutableMap<string, any> | ImmutableOMap<string, any>;
 
 ////////////////
 // common
@@ -27,7 +28,8 @@ type AnyObject = {
 };
 type Empty = null | undefined;
 
-type IdPath = Array<string> | ImmutableList<string>;
+type ImmutablePath = ImmutableList<string>;
+type IdPath = Array<string> | ImmutablePath;
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
@@ -75,19 +77,50 @@ export type ConfigContext = {
   [key: string]: any;
 };
 
+export type FlatItem = {
+  type: ItemType;
+  parent: string | null;
+  parentType: ItemType;
+  caseId: string;
+  isDefaultCase: boolean;
+  path: string[];
+  lev: number;
+  leaf: boolean;
+  index: number;
+  id: string;
+  children: string[];
+  leafsCount: number;
+  _top: number;
+  _height: number;
+  top: number;
+  height: number;
+  bottom: number;
+  collapsed: boolean;
+  node: ImmutableItem;
+  isLocked: boolean;
+};
+export type FlatTree = {
+  flat: string[];
+  items: TypedMap<FlatItem>;
+};
+
 ////////////////
 // query value
 /////////////////
 
 export type RuleValue = boolean | number | string | Date | Array<string> | any;
 export type FieldPath = string;
-export type FieldFuncValue = ImmutableMap<"func" | "args", any>;
-export type FieldValue = FieldPath | FieldFuncValue;
+export type FieldFuncValueI = ImmutableMap<"func" | "args", any>;
+export interface FieldFuncValue {
+  func: string,
+  args: Record<string, any>
+}
+export type FieldValue = FieldPath | FieldFuncValueI;
 
 export type ValueSource = "value" | "field" | "func" | "const";
 export type FieldSource = "field" | "func";
 export type RuleGroupMode = "struct" | "some" | "array";
-export type ItemType = "group" | "rule_group" | "rule";
+export type ItemType = "group" | "rule_group" | "rule" | "case_group" | "switch_group";
 export type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
 
 export type TypedValueSourceMap<T> = {
@@ -172,7 +205,7 @@ type JsonRule = {
 export type JsonTree = JsonGroup|JsonSwitchGroup;
 
 export type ImmutableTree = ImmutableOMap<string, any>;
-
+export type ImmutableItem = ImmutableOMap<string, any>;
 
 ////////////////
 // Utils
@@ -195,8 +228,23 @@ interface SpelConcatNormalValue {
 }
 type SpelConcatValue = SpelConcatNormalValue | SpelConcatCaseValue;
 
-export interface Utils {
-  // export
+interface Import {
+  // tree
+  getTree(tree: ImmutableTree, light?: boolean, children1AsArray?: boolean): JsonTree;
+  loadTree(jsonTree: JsonTree): ImmutableTree;
+  checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  isValidTree(tree: ImmutableTree): boolean;
+  isImmutableTree(tree: any): boolean;
+  isTree(tree: any): boolean; // is JsonTree ?
+  isJsonLogic(value: any): boolean;
+  jsToImmutable(value: any): AnyImmutable;
+  // jsonlogic
+  loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree | undefined;
+  _loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): [ImmutableTree | undefined, Array<string>];
+  // spel
+  loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
+}
+interface Export {
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   // @deprecated
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
@@ -208,59 +256,94 @@ export interface Utils {
   mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
   _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
   elasticSearchFormat(tree: ImmutableTree, config: Config, syntax?: "ES_6_SYNTAX" | "ES_7_SYNTAX"): Object | undefined;
-  // load, save
-  getTree(tree: ImmutableTree, light?: boolean, children1AsArray?: boolean): JsonTree;
-  loadTree(jsonTree: JsonTree): ImmutableTree;
-  checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
-  isValidTree(tree: ImmutableTree): boolean;
-  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
-  // import
-  loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): ImmutableTree | undefined;
-  _loadFromJsonLogic(logicTree: JsonLogicTree | undefined, config: Config): [ImmutableTree | undefined, Array<string>];
-  loadFromSpel(spelStr: string, config: Config): [ImmutableTree | undefined, Array<string>];
+}
+interface Autocomplete {
+  simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
+  getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+  // internal
+  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart = false): ListItems;
+  listValueToOption(listItem: ListItem): ListOptionUi;
+}
+interface ConfigUtils {
+  compressConfig(config: Config, baseConfig: Config): ZipConfig;
+  decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
+  compileConfig(config: Config): Config;
+  extendConfig(config: Config): Config;
+  getFieldConfig(config: Config, field: FieldValue): Field | Func | null;
+  getFuncConfig(config: Config, func: string): Func | null;
+  getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
+  getOperatorConfig(config: Config, operator: string, field?: FieldValue): Operator | null;
+  getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  isJSX(jsx: any): boolean;
+  isDirtyJSX(jsx: any): boolean;
+  cleanJSX(jsx: any): Object;
+  applyJsonLogic(logic: any, data?: any): any;
+}
+interface ExportUtils {
+  spelEscape(val: any): string;
+  spelFormatConcat(parts: SpelConcatParts): string;
+  spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
+}
+interface ListUtils {
+  getTitleInListValues(listValues: ListValues, value: string | number): string;
+  getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
+  searchListValue(search: string, listValues: ListValues): ListItem; // search by value and title
+  listValuesToArray(listValues: ListValues): ListItems; // normalize
+  toListValue(value: string | number | ListItem, title?: string): ListItem; // create
+  makeCustomListValue(value: string | number): ListItem; // create
+}
+interface TreeUtils {
+  jsToImmutable(value: any): AnyImmutable;
+  immutableToJs(imm: AnyImmutable): any;
+  isImmutable(value: any): boolean;
+  toImmutableList(path: string[]): ImmutablePath;
+  getItemByPath(tree: ImmutableTree, path: IdPath): ImmutableItem;
+  expandTreePath(path: ImmutablePath, ...suffix: string[]): ImmutablePath;
+  expandTreeSubpath(path: ImmutablePath, ...suffix: string[]): ImmutablePath;
+  fixEmptyGroupsInTree(tree: ImmutableTree): ImmutableTree;
+  fixPathsInTree(tree: ImmutableTree): ImmutableTree;
+  getFlatTree(tree: ImmutableTree): FlatTree;
+  getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
+  getTotalRulesCountInTree(tree: ImmutableTree): number;
+  getTreeBadFields(tree: ImmutableTree): Array<FieldValue>;
+  isEmptyTree(tree: ImmutableTree): boolean;
+}
+interface OtherUtils {
+  uuid(): string;
+  deepEqual(a: any, b: any): boolean;
+  shallowEqual(a: any, b: any, deep = false): boolean;
+  mergeArraysSmart(a: string[], b: string[]): string[];
+  isJsonCompatible(tpl: object, target: object, bag: Record<string, any>): boolean; // mutates bag
   isJsonLogic(value: any): boolean;
+  isJSX(jsx: any): boolean;
+  isDirtyJSX(jsx: any): boolean;
+  cleanJSX(jsx: any): Object;
+  escapeRegExp(str: string): string;
+  //applyToJS(imm: any): any; // same as immutableToJs
+  isImmutable(value: any): boolean;
+  toImmutableList(path: string[]): ImmutablePath;
+}
+
+export interface Utils extends Import, Export {
+  // case mode
+  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
   // other
   uuid(): string;
   // ssr
   compressConfig(config: Config, baseConfig: Config): ZipConfig;
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
+  // validation
+  validateTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): ImmutableTree;
+  validateAndFixTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): ImmutableTree;
 
-  Autocomplete: {
-    simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
-    getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
-    // internal
-    mergeListValues(oldValues: ListItems, newValues: ListItems, toStart = false): ListItems;
-    listValueToOption(listItem: ListItem): ListOptionUi;
-  };
-  ConfigUtils: {
-    compressConfig(config: Config, baseConfig: Config): ZipConfig;
-    decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
-    compileConfig(config: Config): Config;
-    extendConfig(config: Config): Config;
-    getFieldConfig(config: Config, field: FieldValue): Field | Func | null;
-    getFuncConfig(config: Config, func: string): Func | null;
-    getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
-    getOperatorConfig(config: Config, operator: string, field?: FieldValue): Operator | null;
-    getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
-    isJsonLogic(value: any): boolean;
-    isJSX(jsx: any): boolean;
-    isDirtyJSX(jsx: any): boolean;
-    cleanJSX(jsx: any): Object;
-    applyJsonLogic(logic: any, data?: any): any;
-  };
-  ExportUtils: {
-    spelEscape(val: any): string;
-    spelFormatConcat(parts: SpelConcatParts): string;
-    spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>],
-  },
-  ListUtils: {
-    getTitleInListValues(listValues: ListValues, value: string | number): string;
-    getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
-    searchListValue(search: string, listValues: ListValues): ListItem; // search by value and title
-    listValuesToArray(listValues: ListValues): ListItems; // normalize
-    toListValue(value: string | number | ListItem, title?: string): ListItem; // create
-    makeCustomListValue(value: string | number): ListItem; // create
-  }
+  Import: Import;
+  Export: Export;
+  Autocomplete: Autocomplete;
+  ConfigUtils: ConfigUtils;
+  ExportUtils: ExportUtils;
+  ListUtils: ListUtils;
+  TreeUtils: TreeUtils;
+  OtherUtils: OtherUtils;
 }
 
 
@@ -841,6 +924,7 @@ interface FieldGroup extends BaseField {
   mode: RuleGroupMode,
   isSpelArray?: boolean,
   isSpelItemMap?: boolean,
+  defaultField?: FieldPath,
 }
 interface FieldGroupExt extends BaseField {
   type: "!group",
@@ -848,6 +932,7 @@ interface FieldGroupExt extends BaseField {
   mode: "array",
   operators?: Array<string>,
   defaultOperator?: string,
+  defaultField?: FieldPath,
   initialEmptyWhere?: boolean,
   showNot?: boolean,
   conjunctions?: Array<string>,
@@ -938,6 +1023,8 @@ export interface LocaleSettings {
 
 
 export interface BehaviourSettings {
+  defaultField?: FieldPath | FieldFuncValue | FieldFuncValueI,
+  defaultOperator?: string;
   fieldSources?: Array<FieldSource>,
   valueSourcesInfo?: ValueSourcesInfo,
   canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction,

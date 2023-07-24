@@ -202,7 +202,7 @@ export const getFirstField = (config, parentRuleGroupPath = null) => {
 
   let firstField = parentField, key = null, keysPath = [];
   do {
-    const subfields = firstField === config ? config.fields : firstField.subfields;
+    const subfields = firstField === config ? config.fields : firstField?.subfields;
     if (!subfields || !Object.keys(subfields).length) {
       firstField = key = null;
       break;
@@ -226,7 +226,7 @@ export const getOperatorsForField = (config, field) => {
 
 export const getFirstOperator = (config, field) => {
   const fieldOps = getOperatorsForField(config, field);
-  return fieldOps ? fieldOps[0] : null;
+  return fieldOps?.[0] ?? null;
 };
 
 export const getFuncPathLabels = (field, config, parentField = null) => {

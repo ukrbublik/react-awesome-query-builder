@@ -232,5 +232,5 @@ class RuleGroupExt extends BasicGroup {
 }
 
 
-export default GroupContainer(Draggable("group rule_group_ext")(WithConfirmFn(RuleGroupExt)));
+export default GroupContainer(Draggable("group rule_group_ext")(WithConfirmFn(RuleGroupExt)), "rule_group");
 

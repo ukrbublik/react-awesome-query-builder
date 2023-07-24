@@ -1,7 +1,10 @@
 import Immutable, { Map } from "immutable";
 import omit from "lodash/omit";
+import {default as uuid} from "./uuid";
 
 const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+
+export {uuid};
 
 export const widgetDefKeysToOmit = [
   "formatValue", "mongoFormatValue", "sqlFormatValue", "jsonLogic", "elasticSearchFormatValue", "spelFormatValue", "spelImportFuncs", "spelImportValue"
@@ -116,7 +119,7 @@ function shallowEqualObjects(objA, objB, deep = false) {
   return true;
 }
 
-const isImmutable = (v) => {
+export const isImmutable = (v) => {
   return typeof v === "object" && v !== null && typeof v.toJS === "function";
 };
 

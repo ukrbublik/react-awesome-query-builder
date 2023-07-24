@@ -1,4 +1,8 @@
 import Immutable  from "immutable";
+import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
+import {jsToImmutable} from "../import/tree";
+
+export {toImmutableList, jsToImmutable, immutableToJs, isImmutable};
 
 /**
  * @param {Immutable.List} path
@@ -26,7 +30,7 @@ export const expandTreeSubpath = (path, ...suffix) =>
 
 
 /**
- * @param {Immutable.Map} path
+ * @param {Immutable.Map} tree
  * @param {Immutable.List} path
  * @return {Immutable.Map}
  */
@@ -46,27 +50,27 @@ export const getItemByPath = (tree, path) => {
  * @param {Immutable.Map} tree
  * @return {Immutable.Map} tree
  */
-export const removePathsInTree = (tree) => {
-  let newTree = tree;
+// export const removePathsInTree = (tree) => {
+//   let newTree = tree;
 
-  function _processNode (item, path) {
-    const itemPath = path.push(item.get("id"));
-    if (item.get("path")) {
-      newTree = newTree.removeIn(expandTreePath(itemPath, "path"));
-    }
+//   function _processNode (item, path) {
+//     const itemPath = path.push(item.get("id"));
+//     if (item.get("path")) {
+//       newTree = newTree.removeIn(expandTreePath(itemPath, "path"));
+//     }
 
-    const children = item.get("children1");
-    if (children) {
-      children.map((child, _childId) => {
-        _processNode(child, itemPath);
-      });
-    }
-  }
+//     const children = item.get("children1");
+//     if (children) {
+//       children.map((child, _childId) => {
+//         _processNode(child, itemPath);
+//       });
+//     }
+//   }
 
-  _processNode(tree, new Immutable.List());
+//   _processNode(tree, new Immutable.List());
 
-  return newTree;
-};
+//   return newTree;
+// };
 
 
 /**
@@ -122,7 +126,7 @@ export const fixPathsInTree = (tree) => {
     const children = item.get("children1");
     if (children) {
       if (children.constructor.name == "Map") {
-        // protect: should me OrderedMap, not Map (issue #501)
+        // protect: should be OrderedMap, not Map (issue #501)
         newTree = newTree.setIn(
           expandTreePath(itemPath, "children1"), 
           new Immutable.OrderedMap(children)

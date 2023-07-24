@@ -4,7 +4,7 @@ import {
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
-  defaultRuleProperties, defaultGroupProperties, defaultOperator, 
+  defaultRuleProperties, defaultGroupProperties, getDefaultOperator, 
   defaultOperatorOptions, defaultRoot, defaultItemProperties
 } from "../utils/defaultUtils";
 import * as constants from "./constants";
@@ -66,8 +66,14 @@ const removeGroup = (state, path, config) => {
     state = fixEmptyGroupsInTree(state);
     
     if (isEmptyTree(state) && !canLeaveEmptyGroup) {
-      // if whole query is empty, add one empty rule to root
-      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+      // if whole query is empty, add one empty(!) rule to root
+      const canUseDefaultFieldAndOp = false;
+      const canGetFirst = false;
+      state = addItem(
+        state, new Immutable.List(), "rule", uuid(), 
+        defaultRuleProperties(config, undefined, undefined, canUseDefaultFieldAndOp, canGetFirst), 
+        config
+      );
     }
   }
   state = fixPathsInTree(state);
@@ -108,8 +114,14 @@ const removeRule = (state, path, config) => {
     state = fixEmptyGroupsInTree(state);
 
     if (isEmptyTree(state) && !canLeaveEmptyGroup) {
-      // if whole query is empty, add one empty rule to root
-      state = addItem(state, new Immutable.List(), "rule", uuid(), defaultRuleProperties(config), config);
+      // if whole query is empty, add one empty(!) rule to root
+      const canUseDefaultFieldAndOp = false;
+      const canGetFirst = false;
+      state = addItem(
+        state, new Immutable.List(), "rule", uuid(), 
+        defaultRuleProperties(config, undefined, undefined, canUseDefaultFieldAndOp, canGetFirst), 
+        config
+      );
     }
   }
   state = fixPathsInTree(state);
@@ -341,7 +353,7 @@ const setFieldSrc = (state, path, srcKey, config) => {
     // clear ALL properties
     state = state.setIn(
       expandTreePath(path, "properties"),
-      defaultRuleProperties(config)
+      defaultRuleProperties(config, null, null, false)
     );
   } else {
     // clear non-relevant properties
@@ -410,7 +422,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
       if (strategy == "keep" && !isChangeToAnotherType)
         newOperator = lastOp;
       else if (strategy == "default")
-        newOperator = defaultOperator(config, newField, false);
+        newOperator = getDefaultOperator(config, newField, false);
       else if (strategy == "first")
         newOperator = getFirstOperator(config, newField);
       if (newOperator) //found op for strategy

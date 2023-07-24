@@ -738,15 +738,12 @@ $rule_actions: (".rule--fieldsrc", ".widget--valuesrc", ".rule--drag-handler", "
 /******************************************************************************/
 
 .rule--body.can--shrink--value {
-  align-items: center;
+  //align-items: center;
   .rule--value {
     flex: 1;
     & > .rule--widget {
-      flex: 1;
-      & > .widget--valuesrc {
-        display: flex;
-        align-items: center;
-      }
+      width: 100%;
+      display: flex;
       & .widget--widget {
         flex: 1;
       }

@@ -11,6 +11,7 @@
   - Autocomplete items now support `groupTitle` (PR #953) (issue #600)
   - Add more types in `Utils.Autocomplete` (PR #953) (issue #934)
   - Add settings `fieldItemKeysForSearch` and `listKeysForSearch` (PR #954) (issue #931)
+  - Add settings `defaultField` and `defaultOperator` (PR #956) (issue #763)
 - 6.3.0
   - Allow saving and loading config from server (PR #866) (issue #817)
     - New utils: `compressConfig()`, `decompressConfig()`

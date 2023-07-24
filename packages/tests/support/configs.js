@@ -49,6 +49,32 @@ export const simple_with_2_numbers = (BasicConfig) => ({
   },
 });
 
+export const with_default_field_and_operator = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    defaultField: "str",
+    defaultOperator: "like",
+  }
+});
+
+export const with_default_func_field = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    defaultField: {
+      func: "LOWER",
+      args: {
+        str: {
+          valueSrc: "field",
+          value: "str"
+        }
+      }
+    },
+    defaultOperator: "like",
+  }
+});
+
 export const simple_with_numbers_and_str = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
@@ -890,6 +916,13 @@ export const with_settings_show_lock = (BasicConfig) => ({
   }
 });
 
+export const with_default_field_in_cars = (BasicConfig) => merge({}, BasicConfig, {
+  fields: {
+    cars: {
+      defaultField: "year"
+    }
+  }
+});
 
 export const with_group_array_cars = (BasicConfig) => ({
   ...BasicConfig,
