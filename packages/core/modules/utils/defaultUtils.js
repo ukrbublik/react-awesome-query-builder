@@ -8,7 +8,7 @@ import { jsToImmutable } from "../import";
 
 export const getDefaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
   const {defaultField} = config.settings;
-  let f = !parentRuleGroupPath ? defaultField : getDefaultSubField(config, parentRuleGroupPath)
+  let f = (!parentRuleGroupPath ? defaultField : getDefaultSubField(config, parentRuleGroupPath))
     || canGetFirst && getFirstField(config, parentRuleGroupPath)
     || null;
   // if default LHS is func, convert to Immutable
@@ -41,6 +41,8 @@ export const getDefaultOperator = (config, field, canGetFirst = true) => {
   if (defaultOperator && !fieldOperators.includes(defaultOperator))
     defaultOperator = null;
   let fieldDefaultOperator = fieldConfig?.defaultOperator;
+  if (fieldDefaultOperator && !fieldOperators.includes(fieldDefaultOperator))
+    fieldDefaultOperator = null;
   if (!fieldDefaultOperator && canGetFirst)
     fieldDefaultOperator = getFirstOperator(config, field);
   const fieldHasExplicitDefOp = fieldConfig?._origDefaultOperator;

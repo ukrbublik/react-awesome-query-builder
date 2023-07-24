@@ -226,7 +226,7 @@ export const getOperatorsForField = (config, field) => {
 
 export const getFirstOperator = (config, field) => {
   const fieldOps = getOperatorsForField(config, field);
-  return fieldOps ? fieldOps[0] : null;
+  return fieldOps?.[0] ?? null;
 };
 
 export const getFuncPathLabels = (field, config, parentField = null) => {
