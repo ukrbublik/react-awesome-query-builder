@@ -1,31 +1,50 @@
 import Immutable from "immutable";
 import uuid from "./uuid";
-import {getFieldConfig, getOperatorConfig} from "./configUtils";
+import {getFieldConfig, getOperatorConfig, getFieldParts} from "./configUtils";
 import {getNewValueForFieldOp, getFirstField, getFirstOperator} from "../utils/ruleUtils";
+import { isImmutable } from "./stuff";
+import { jsToImmutable } from "../import";
 
 
-export const defaultField = (config, canGetFirst = true, parentRuleGroupPath = null, fieldSrc = "field") => {
-  if (fieldSrc !== "field")
-    return null; // don't return default function (yet)
-  return typeof config.settings.defaultField === "function"
-    ? config.settings.defaultField(parentRuleGroupPath) 
-    : (config.settings.defaultField || (canGetFirst ? getFirstField(config, parentRuleGroupPath) : null));
+export const getDefaultField = (config, canGetFirst = true, parentRuleGroupPath = null) => {
+  const {defaultField} = config.settings;
+  let f = !parentRuleGroupPath ? defaultField : getDefaultSubField(config, parentRuleGroupPath)
+    || canGetFirst && getFirstField(config, parentRuleGroupPath)
+    || null;
+  // if default LHS is func, convert to Immutable
+  if (f != null && typeof f !== "string" && !isImmutable(f)) {
+    f = jsToImmutable(f);
+  }
+  return f;
 };
 
-export const defaultFieldSrc = (config, canGetFirst = true) => {
+export const getDefaultSubField = (config, parentRuleGroupPath = null) => {
+  if (!parentRuleGroupPath)
+    return null;
+  const fieldSeparator = config?.settings?.fieldSeparator || ".";
+  const parentRuleGroupConfig = getFieldConfig(config, parentRuleGroupPath);
+  let f = parentRuleGroupConfig?.defaultField;
+  if (f) {
+    f = [...getFieldParts(parentRuleGroupPath), f].join(fieldSeparator);
+  }
+  return f;
+};
+
+export const getDefaultFieldSrc = (config, canGetFirst = true) => {
   return canGetFirst && config.settings.fieldSources?.[0] || "field";
 };
 
-export const defaultOperator = (config, field, canGetFirst = true) => {
-  let fieldConfig = getFieldConfig(config, field);
-  let fieldOperators = fieldConfig && fieldConfig.operators || [];
-  let fieldDefaultOperator = fieldConfig && fieldConfig.defaultOperator;
-  if (!fieldOperators.includes(fieldDefaultOperator))
-    fieldDefaultOperator = null;
+export const getDefaultOperator = (config, field, canGetFirst = true) => {
+  let {defaultOperator} = config.settings;
+  const fieldConfig = getFieldConfig(config, field);
+  const fieldOperators = fieldConfig?.operators || [];
+  if (defaultOperator && !fieldOperators.includes(defaultOperator))
+    defaultOperator = null;
+  let fieldDefaultOperator = fieldConfig?.defaultOperator;
   if (!fieldDefaultOperator && canGetFirst)
     fieldDefaultOperator = getFirstOperator(config, field);
-  let op = typeof config.settings.defaultOperator === "function"
-    ? config.settings.defaultOperator(field, fieldConfig) : fieldDefaultOperator;
+  const fieldHasExplicitDefOp = fieldConfig?._origDefaultOperator;
+  const op = fieldHasExplicitDefOp && fieldDefaultOperator || defaultOperator || fieldDefaultOperator;
   return op;
 };
 
@@ -40,20 +59,23 @@ export const defaultOperatorOptions = (config, operator, field) => {
   ) : null;
 };
 
-export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null) => {
-  // tip: setDefaultFieldAndOp not documented
+export const defaultRuleProperties = (config, parentRuleGroupPath = null, item = null, canUseDefaultFieldAndOp = true, canGetFirst = false) => {
   let field = null, operator = null, fieldSrc = null;
-  const {setDefaultFieldAndOp, showErrorMessage} = config.settings;
+  const {showErrorMessage, defaultField} = config.settings;
   if (item) {
     fieldSrc = item?.properties?.fieldSrc;
     field = item?.properties?.field;
     operator = item?.properties?.operator;
-  } else if (setDefaultFieldAndOp) {
-    fieldSrc = defaultFieldSrc(config);
-    field = defaultField(config, true, parentRuleGroupPath, fieldSrc);
-    operator = defaultOperator(config, field, fieldSrc);
+  } else if (defaultField && canUseDefaultFieldAndOp) {
+    field = getDefaultField(config, canGetFirst, parentRuleGroupPath);
+    if (field) {
+      fieldSrc = isImmutable(field) ? "func" : "field";
+    } else {
+      fieldSrc = getDefaultFieldSrc(config);
+    }
+    operator = getDefaultOperator(config, field, true);
   } else {
-    fieldSrc = defaultFieldSrc(config);
+    fieldSrc = getDefaultFieldSrc(config);
   }
   let current = new Immutable.Map({
     fieldSrc: fieldSrc,

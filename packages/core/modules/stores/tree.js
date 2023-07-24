@@ -4,7 +4,7 @@ import {
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
 } from "../utils/treeUtils";
 import {
-  defaultRuleProperties, defaultGroupProperties, defaultOperator, 
+  defaultRuleProperties, defaultGroupProperties, getDefaultOperator, 
   defaultOperatorOptions, defaultRoot, defaultItemProperties
 } from "../utils/defaultUtils";
 import * as constants from "./constants";

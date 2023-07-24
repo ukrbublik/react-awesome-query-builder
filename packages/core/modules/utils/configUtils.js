@@ -225,6 +225,7 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
     if (!isFuncArg) {
       if (!fieldConfig.operators && operators)
         fieldConfig.operators = Array.from(new Set(operators));
+      fieldConfig._origDefaultOperator = fieldConfig.defaultOperator;
       if (!fieldConfig.defaultOperator && defaultOperator)
         fieldConfig.defaultOperator = defaultOperator;
     }

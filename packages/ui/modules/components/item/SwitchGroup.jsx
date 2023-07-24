@@ -130,4 +130,4 @@ class SwitchGroup extends BasicGroup {
 }
 
 
-export default GroupContainer(Draggable("group switch_group")(WithConfirmFn(SwitchGroup)));
+export default GroupContainer(Draggable("group switch_group")(WithConfirmFn(SwitchGroup)), "switch_group");

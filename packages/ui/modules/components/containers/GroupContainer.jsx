@@ -8,7 +8,7 @@ import {connect} from "react-redux";
 const {defaultGroupConjunction} = Utils.DefaultUtils;
 
 
-const createGroupContainer = (Group) => 
+const createGroupContainer = (Group, itemType) => 
   class GroupContainer extends Component {
     static propTypes = {
       config: PropTypes.object.isRequired,
@@ -124,7 +124,8 @@ const createGroupContainer = (Group) =>
     };
 
     addRule = () => {
-      this.props.actions.addRule(this.props.path);
+      const parentRuleGroupPath = itemType == "rule_group" ? this.props.field : null;
+      this.props.actions.addRule(this.props.path, undefined, undefined, undefined, parentRuleGroupPath);
     };
 
     // for RuleGroup
@@ -243,7 +244,7 @@ const createGroupContainer = (Group) =>
   };
 
 
-export default (Group) => {
+export default (Group, itemType) => {
   const ConnectedGroupContainer = connect(
     (state) => {
       return {
@@ -255,7 +256,7 @@ export default (Group) => {
     {
       context
     }
-  )(createGroupContainer(Group));
+  )(createGroupContainer(Group, itemType));
   ConnectedGroupContainer.displayName = "ConnectedGroupContainer";
 
   return ConnectedGroupContainer;

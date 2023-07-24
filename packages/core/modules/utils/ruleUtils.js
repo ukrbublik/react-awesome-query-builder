@@ -202,7 +202,7 @@ export const getFirstField = (config, parentRuleGroupPath = null) => {
 
   let firstField = parentField, key = null, keysPath = [];
   do {
-    const subfields = firstField === config ? config.fields : firstField.subfields;
+    const subfields = firstField === config ? config.fields : firstField?.subfields;
     if (!subfields || !Object.keys(subfields).length) {
       firstField = key = null;
       break;

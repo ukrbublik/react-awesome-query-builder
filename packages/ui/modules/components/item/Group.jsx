@@ -321,4 +321,4 @@ export class BasicGroup extends Component {
   }
 }
 
-export default GroupContainer(Draggable("group")(WithConfirmFn(BasicGroup)));
+export default GroupContainer(Draggable("group")(WithConfirmFn(BasicGroup)), "group");

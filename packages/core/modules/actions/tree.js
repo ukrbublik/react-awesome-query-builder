@@ -20,13 +20,13 @@ export const setTree = (config, tree) => ({
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-export const addRule = (config, path, properties, ruleType = "rule", children = null) => ({
+export const addRule = (config, path, properties, ruleType = "rule", children = null, parentRuleGroupPath = null) => ({
   type: constants.ADD_RULE,
   ruleType: ruleType,
   children: children,
   path: toImmutableList(path),
   id: uuid(),
-  properties: defaultRuleProperties(config).merge(properties || {}),
+  properties: defaultRuleProperties(config, parentRuleGroupPath).merge(properties || {}),
   config: config
 });
 
