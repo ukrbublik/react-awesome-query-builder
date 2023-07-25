@@ -131,7 +131,7 @@ interface BasicItemProperties {
   isLocked?: boolean,
 }
 
-interface RuleProperties extends BasicItemProperties {
+export interface RuleProperties extends BasicItemProperties {
   field: FieldValue | Empty,
   fieldSrc?: FieldSource,
   operator: string | Empty,
@@ -142,70 +142,140 @@ interface RuleProperties extends BasicItemProperties {
   operatorOptions?: AnyObject,
 }
 
-interface RuleGroupExtProperties extends RuleProperties {
+export interface RuleGroupExtProperties extends RuleProperties {
   mode: RuleGroupMode,
 }
 
-interface RuleGroupProperties extends BasicItemProperties {
+export interface RuleGroupProperties extends BasicItemProperties {
   field: FieldPath | Empty,
   mode?: RuleGroupMode,
 }
 
-interface GroupProperties extends BasicItemProperties {
+export interface GroupProperties extends BasicItemProperties {
   conjunction: string,
   not?: boolean,
 }
 
-interface SwitchGroupProperties extends BasicItemProperties {
+export interface SwitchGroupProperties extends BasicItemProperties {
 
 }
 
-interface CaseGroupProperties extends BasicItemProperties {
+export interface CaseGroupProperties extends BasicItemProperties {
 
 }
 
-type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
-type JsonItem = JsonGroup|JsonAnyRule;
-type JsonSwitchGroup = {
-  type: "switch_group",
+//////
+
+interface _RulePropertiesI extends RuleProperties {
+  value: ImmutableList<RuleValue>,
+  valueSrc?: ImmutableList<ValueSource>,
+  valueType?: ImmutableList<string>,
+  valueError?: ImmutableList<string>,
+  operatorOptions?: ImmMap,
+};
+interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtProperties {};
+
+interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
+  get<K extends keyof P>(name: K): P[K];
+}
+
+export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {};
+export interface ImmutableRuleProperties<P = _RulePropertiesI> extends BasicItemPropertiesI<P> {};
+export interface ImmutableRuleGroupExtProperties<P = _RuleGroupExtProperties> extends ImmutableRuleProperties<P> {};
+export interface ImmutableRuleGroupProperties<P = RuleGroupProperties> extends BasicItemPropertiesI<P> {};
+export interface ImmutableGroupProperties<P = GroupProperties> extends BasicItemPropertiesI<P> {};
+export interface ImmutableSwitchGroupProperties<P = SwitchGroupProperties> extends BasicItemPropertiesI<P> {};
+export interface ImmutableCaseGroupProperties<P = CaseGroupProperties> extends BasicItemPropertiesI<P> {};
+
+export type ImmutableItemProperties = ImmutableRuleProperties | ImmutableRuleGroupProperties | ImmutableRuleGroupExtProperties | ImmutableGroupProperties;
+
+
+//////
+
+export type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
+export type JsonItem = JsonGroup|JsonAnyRule;
+export interface JsonBasicItem {
+  type: ItemType,
   id?: string,
+}
+export interface JsonSwitchGroup extends JsonBasicItem {
+  type: "switch_group",
   children1?: {[id: string]: JsonCaseGroup} | JsonCaseGroup[],
   properties?: SwitchGroupProperties
 };
-type JsonCaseGroup = {
+export interface JsonCaseGroup extends JsonBasicItem {
   type: "case_group",
-  id?: string,
   children1?: {[id: string]: JsonGroup} | JsonGroup[],
   properties?: CaseGroupProperties
 };
-type JsonGroup = {
+export interface JsonGroup extends JsonBasicItem {
   type: "group",
-  id?: string,
   // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
   children1?: {[id: string]: JsonItem} | JsonItem[],
   properties?: GroupProperties
 }
-type JsonRuleGroup = {
+export interface JsonRuleGroup extends JsonBasicItem {
   type: "rule_group",
-  id?: string,
   children1?: {[id: string]: JsonRule} | JsonRule[],
   properties?: RuleGroupProperties
 }
-type JsonRuleGroupExt = {
+export interface JsonRuleGroupExt extends JsonBasicItem {
   type: "rule_group",
-  id?: string,
   children1?: {[id: string]: JsonRule} | JsonRule[],
   properties?: RuleGroupExtProperties
 }
-type JsonRule = {
+export interface JsonRule extends JsonBasicItem {
   type: "rule",
-  id?: string,
   properties: RuleProperties,
 }
 export type JsonTree = JsonGroup|JsonSwitchGroup;
 
-export type ImmutableTree = ImmutableOMap<string, any>;
-export type ImmutableItem = ImmutableOMap<string, any>;
+////
+
+interface _BasicItemI {
+  type: ItemType,
+  id: string,
+};
+interface _RuleI extends _BasicItemI {
+  type: "rule",
+  properties: ImmutableRuleProperties,
+};
+interface _GroupI extends _BasicItemI {
+  type: "group",
+  children1?: ImmOMap<string, ImmutableItem>,
+  properties: ImmutableGroupProperties,
+};
+interface _RuleGroupI extends _BasicItemI {
+  type: "rule_group",
+  children1?: ImmOMap<string, ImmutableRule>,
+  properties: ImmutableRuleGroupProperties,
+};
+interface _RuleGroupExtI extends _BasicItemI {
+  type: "rule_group",
+  children1?: ImmOMap<string, ImmutableRule>,
+  properties: ImmutableRuleGroupExtProperties,
+};
+interface _SwitchGroupI extends _BasicItemI {
+  type: "switch_group",
+  children1?: ImmOMap<string, ImmutableSwitchGroup>,
+  properties: ImmutableSwitchGroupProperties,
+};
+interface _CaseGroupI extends _BasicItemI {
+  type: "case_group",
+  children1?: ImmOMap<string, ImmutableGroup>,
+  properties: ImmutableCaseGroupProperties,
+};
+export interface ImmutableBasicItem<P = _BasicItemI> extends ObjectToImmOMap<P> {};
+export interface ImmutableRule<P = _RuleI> extends ImmutableBasicItem<P> {};
+export interface ImmutableGroup<P = _GroupI> extends ImmutableBasicItem<P> {};
+export interface ImmutableRuleGroup<P = _RuleGroupI> extends ImmutableBasicItem<P> {};
+export interface ImmutableRuleGroupExt<P = _RuleGroupExtI> extends ImmutableBasicItem<P> {};
+export interface ImmutableSwitchGroup<P = _SwitchGroupI> extends ImmutableBasicItem<P> {};
+export interface ImmutableCaseGroup<P = _CaseGroupI> extends ImmutableBasicItem<P> {};
+export type ImmutableAnyRule = ImmutableRule|ImmutableRuleGroup|ImmutableRuleGroupExt;
+export type ImmutableItem = ImmutableGroup|ImmutableAnyRule;
+
+export type ImmutableTree = ImmutableGroup|ImmutableSwitchGroup;
 
 ////////////////
 // Utils

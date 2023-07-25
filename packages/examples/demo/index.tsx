@@ -174,7 +174,7 @@ const DemoQueryBuilder: React.FC = () => {
 
   // Demonstrates how actions can be called programmatically
   const runActions = () => {
-    const rootPath = [ state.tree.get("id") as string ];
+    const rootPath = [ state.tree.get("id") ];
     const isEmptyTree = !state.tree.get("children1");
     const firstPath = [
       state.tree.get("id"), 

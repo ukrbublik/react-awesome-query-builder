@@ -15,6 +15,9 @@ import {
   ConjsProps,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
+  IdPath,
+  ImmutablePath,
+  ImmutableItemProperties,
 
   // to extend
   Config as CoreConfigType,
@@ -58,6 +61,7 @@ import {
   CoreOperators as _CoreOperators,
   CoreWidgets as _CoreWidgets,
   ConfigMixin as _ConfigMixin,
+  ImmutableItem,
 } from "@react-awesome-query-builder/core";
 
 // re-export
@@ -147,12 +151,26 @@ export interface BuilderProps {
   dispatch: Dispatch,
 }
 
-export interface ItemBuilderProps {
+export interface ItemProps {
   config: Config;
   actions: Actions;
-  properties: TypedMap<any>;
+  properties: ImmutableItemProperties;
   type: ItemType;
-  itemComponent: Factory<ItemProperties>;
+  id: string;
+  groupId?: string;
+  parentField?: string;
+  path: ImmutablePath;
+  children1?: ImmutableOMap<string, ImmutableItem>;
+  // additional:
+  totalRulesCnt?: number;
+  reordableNodesCnt?: number;
+  parentReordableNodesCnt?: number;
+  onDragStart?: Function;
+  isParentLocked?: boolean;
+  isDraggingTempo?: boolean;
+}
+export interface ItemBuilderProps extends ItemProps {
+  itemComponent: Factory<ItemProps>;
 }
 
 export interface QueryProps {
