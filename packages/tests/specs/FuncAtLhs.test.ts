@@ -371,6 +371,10 @@ describe("LHS func", () => {
         expect_jlogic([null,
           { "and": [{ "==": [ { "var": "datetime" }, "2020-05-05T00:00:00.000Z" ] }] }
         ], 7);
+      }, {
+        ignoreLog: (errText) => {
+          return errText.includes("No config for LHS Map { \"func\": \"UNKNOWN!\"");
+        }
       });
     });
   });

@@ -41,7 +41,9 @@ describe("Serialized config", () => {
       describe("should be deserialized and used without errors", () => {
         const strConfig = UNSAFE_serializeConfig(config);
         const deserConfig = UNSAFE_deserializeConfig(strConfig, BaseConfig.ctx);
-        export_checks(() => deserConfig, inits.with_ops, "JsonLogic", {}, [], configKey !== "CoreConfig");
+        export_checks(() => deserConfig, inits.with_ops, "JsonLogic", {}, [], {
+          withRender: configKey !== "CoreConfig"
+        });
       });
     });
   }

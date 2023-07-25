@@ -172,20 +172,20 @@ interface _RulePropertiesI extends RuleProperties {
   valueType?: ImmutableList<string>,
   valueError?: ImmutableList<string>,
   operatorOptions?: ImmMap,
-};
-interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtProperties {};
+}
+interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtProperties {}
 
 interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
   get<K extends keyof P>(name: K): P[K];
 }
 
-export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {};
-export interface ImmutableRuleProperties<P = _RulePropertiesI> extends BasicItemPropertiesI<P> {};
-export interface ImmutableRuleGroupExtProperties<P = _RuleGroupExtProperties> extends ImmutableRuleProperties<P> {};
-export interface ImmutableRuleGroupProperties<P = RuleGroupProperties> extends BasicItemPropertiesI<P> {};
-export interface ImmutableGroupProperties<P = GroupProperties> extends BasicItemPropertiesI<P> {};
-export interface ImmutableSwitchGroupProperties<P = SwitchGroupProperties> extends BasicItemPropertiesI<P> {};
-export interface ImmutableCaseGroupProperties<P = CaseGroupProperties> extends BasicItemPropertiesI<P> {};
+export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {}
+export interface ImmutableRuleProperties<P = _RulePropertiesI> extends BasicItemPropertiesI<P> {}
+export interface ImmutableRuleGroupExtProperties<P = _RuleGroupExtProperties> extends ImmutableRuleProperties<P> {}
+export interface ImmutableRuleGroupProperties<P = RuleGroupProperties> extends BasicItemPropertiesI<P> {}
+export interface ImmutableGroupProperties<P = GroupProperties> extends BasicItemPropertiesI<P> {}
+export interface ImmutableSwitchGroupProperties<P = SwitchGroupProperties> extends BasicItemPropertiesI<P> {}
+export interface ImmutableCaseGroupProperties<P = CaseGroupProperties> extends BasicItemPropertiesI<P> {}
 
 export type ImmutableItemProperties = ImmutableRuleProperties | ImmutableRuleGroupProperties | ImmutableRuleGroupExtProperties | ImmutableGroupProperties;
 
@@ -202,12 +202,12 @@ export interface JsonSwitchGroup extends JsonBasicItem {
   type: "switch_group",
   children1?: {[id: string]: JsonCaseGroup} | JsonCaseGroup[],
   properties?: SwitchGroupProperties
-};
+}
 export interface JsonCaseGroup extends JsonBasicItem {
   type: "case_group",
   children1?: {[id: string]: JsonGroup} | JsonGroup[],
   properties?: CaseGroupProperties
-};
+}
 export interface JsonGroup extends JsonBasicItem {
   type: "group",
   // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
@@ -235,43 +235,43 @@ export type JsonTree = JsonGroup|JsonSwitchGroup;
 interface _BasicItemI {
   type: ItemType,
   id: string,
-};
+}
 interface _RuleI extends _BasicItemI {
   type: "rule",
   properties: ImmutableRuleProperties,
-};
+}
 interface _GroupI extends _BasicItemI {
   type: "group",
   children1?: ImmOMap<string, ImmutableItem>,
   properties: ImmutableGroupProperties,
-};
+}
 interface _RuleGroupI extends _BasicItemI {
   type: "rule_group",
   children1?: ImmOMap<string, ImmutableRule>,
   properties: ImmutableRuleGroupProperties,
-};
+}
 interface _RuleGroupExtI extends _BasicItemI {
   type: "rule_group",
   children1?: ImmOMap<string, ImmutableRule>,
   properties: ImmutableRuleGroupExtProperties,
-};
+}
 interface _SwitchGroupI extends _BasicItemI {
   type: "switch_group",
   children1?: ImmOMap<string, ImmutableSwitchGroup>,
   properties: ImmutableSwitchGroupProperties,
-};
+}
 interface _CaseGroupI extends _BasicItemI {
   type: "case_group",
   children1?: ImmOMap<string, ImmutableGroup>,
   properties: ImmutableCaseGroupProperties,
-};
-export interface ImmutableBasicItem<P = _BasicItemI> extends ObjectToImmOMap<P> {};
-export interface ImmutableRule<P = _RuleI> extends ImmutableBasicItem<P> {};
-export interface ImmutableGroup<P = _GroupI> extends ImmutableBasicItem<P> {};
-export interface ImmutableRuleGroup<P = _RuleGroupI> extends ImmutableBasicItem<P> {};
-export interface ImmutableRuleGroupExt<P = _RuleGroupExtI> extends ImmutableBasicItem<P> {};
-export interface ImmutableSwitchGroup<P = _SwitchGroupI> extends ImmutableBasicItem<P> {};
-export interface ImmutableCaseGroup<P = _CaseGroupI> extends ImmutableBasicItem<P> {};
+}
+export interface ImmutableBasicItem<P = _BasicItemI> extends ObjectToImmOMap<P> {}
+export interface ImmutableRule<P = _RuleI> extends ImmutableBasicItem<P> {}
+export interface ImmutableGroup<P = _GroupI> extends ImmutableBasicItem<P> {}
+export interface ImmutableRuleGroup<P = _RuleGroupI> extends ImmutableBasicItem<P> {}
+export interface ImmutableRuleGroupExt<P = _RuleGroupExtI> extends ImmutableBasicItem<P> {}
+export interface ImmutableSwitchGroup<P = _SwitchGroupI> extends ImmutableBasicItem<P> {}
+export interface ImmutableCaseGroup<P = _CaseGroupI> extends ImmutableBasicItem<P> {}
 export type ImmutableAnyRule = ImmutableRule|ImmutableRuleGroup|ImmutableRuleGroupExt;
 export type ImmutableItem = ImmutableGroup|ImmutableAnyRule;
 

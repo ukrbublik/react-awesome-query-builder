@@ -32,6 +32,11 @@ describe("antdesign widgets render", () => {
     await with_qb_ant(configs.with_dropdown, inits.with_nested, "JsonLogic", (qb) => {
       expect(qb.find(".query-builder")).to.have.length(1);
       expect(qb.find(".ant-dropdown-trigger span").at(0).text().trim()).to.equal("firstName");
+    }, {
+      ignoreLog: (errText) => {
+        //todo
+        return errText.includes("`overlay` is deprecated. Please use `menu` instead");
+      }
     });
   });
 
@@ -274,6 +279,11 @@ describe("antdesign widgets interactions", () => {
     it("load bad date range", async () => {
       await with_qb_ant(configs.with_all_types, inits.with_range_bad_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
         expect_checks({});
+      }, {
+        ignoreLog: (errText) => {
+          return errText.includes("Can't convert value 2020-05-10TTTT as Date")
+            || errText.includes("Removing rule:") && errText.includes(`"field":"date"`);
+        }
       });
     });
 

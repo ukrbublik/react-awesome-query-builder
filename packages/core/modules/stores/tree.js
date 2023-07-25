@@ -5,7 +5,7 @@ import {
 } from "../utils/treeUtils";
 import {
   defaultRuleProperties, defaultGroupProperties, getDefaultOperator, 
-  defaultOperatorOptions, defaultRoot, defaultItemProperties
+  defaultOperatorOptions, defaultItemProperties
 } from "../utils/defaultUtils";
 import * as constants from "./constants";
 import uuid from "../utils/uuid";
@@ -785,8 +785,7 @@ const getActionMeta = (action, state) => {
  * @param {object} action
  */
 export default (config, tree, getMemoizedTree, setLastTree) => {
-  const emptyTree = defaultRoot(config);
-  const initTree = tree || emptyTree;
+  const initTree = tree;
   const emptyState = {
     tree: initTree, 
     ...emptyDrag

@@ -356,6 +356,11 @@ describe("interactions on vanilla", () => {
   it("should not render not with showNot=false", async () => {
     await with_qb(configs.with_settings_not_show_not, inits.with_numbers_and_group, "JsonLogic", (qb) => {
       expect(qb.find(".group--conjunctions input[type='checkbox']")).to.have.length(0);
+    }, {
+      ignoreLog: (errText) => {
+        // OR conjection is removed from config, so can't load operator `or` from JL
+        return errText.includes("Unknown op or/3");
+      }
     });
   });
 

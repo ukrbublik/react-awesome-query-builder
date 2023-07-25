@@ -7,7 +7,11 @@ import { with_qb, with_qb_ant, load_tree } from "../support/utils";
 describe("change props", () => {
   it("change tree via props triggers onChange", async () => {
     await with_qb(configs.simple_with_2_numbers, inits.with_num_and_num2, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
-      const {tree, errors} = load_tree(inits.with_number, configs.simple_with_2_numbers(BasicConfig), "JsonLogic");
+      const {tree, errors} = load_tree(
+        inits.with_number, configs.simple_with_2_numbers(BasicConfig), "JsonLogic", {
+          //ignoreLog
+        }
+      );
       await qb.setProps({
         value: tree
       });
@@ -24,6 +28,11 @@ describe("change props", () => {
       });
       expect_jlogic([null, inits.with_number]);
       expect(onChange.getCall(1)).to.equal(null);
+    }, {
+      ignoreLog: (errText) => {
+        return errText.includes("No config for field num2")
+          || errText.includes("Removing rule:") && errText.includes(`"field":"num2"`) && errText.includes("Reason: Uncomplete LHS");
+      }
     });
   });
 
@@ -33,6 +42,11 @@ describe("change props", () => {
       await qb.setProps({
         ...config_vanilla,
       });
+    }, {
+      ignoreLog: (errText) => {
+        return errText.includes("Type of field selecttree is not supported")
+          || errText.includes("Removing rule:") && errText.includes(`"field":"selecttree"`) && errText.includes("Reason: Uncomplete RHS");
+      }
     });
   });
 
@@ -41,6 +55,10 @@ describe("change props", () => {
       expect_checks({
         logic: inits.with_number
       });
+    }, {
+      ignoreLog: (errText) => {
+        return errText.includes("No config for field num2");
+      }
     });
   });
 });
