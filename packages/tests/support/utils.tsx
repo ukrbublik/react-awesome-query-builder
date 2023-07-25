@@ -49,12 +49,12 @@ type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, conso
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
-  sql?: string;
+  sql?: string | [string, string[]];
   spel?: string;
   mongo?: Object;
   elasticSearch?: Object;
   elasticSearch7?: Object;
-  logic?: JsonLogicTree;
+  logic?: JsonLogicTree | [JsonLogicTree, string[]];
 }
 interface Tasks {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
@@ -78,7 +78,7 @@ const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
     || errText.includes("Fixed operator is_empty to is_null for num");
 };
 
-const mockConsole = (options?: DoOptions, configName?: string) => {
+const mockConsole = (options?: DoOptions, _configName?: string) => {
   const origConsole = console;
   const consoleData: ConsoleData = {
     error: [],
@@ -91,18 +91,18 @@ const mockConsole = (options?: DoOptions, configName?: string) => {
       const errText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
       consoleData.error.push(errText);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.error.apply(null, [...args, "@", getCurrentTest(), `(${configName})`]);
+        origConsole.error.apply(null, [...args, "@", getCurrentTest()]);
     },
     warn: (...args: string[]) => {
       const errText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
       consoleData.warn.push(errText);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.warn.apply(null, [...args, "@", getCurrentTest(), `(${configName})`]);
+        origConsole.warn.apply(null, [...args, "@", getCurrentTest()]);
     },
     info: (...args: string[]) => {
       const infoText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
       if (!options?.ignoreLog?.(infoText) && !globalIgnoreFn(infoText))
-        origConsole.info.apply(null, [...args, "@", getCurrentTest(), `(${configName})`]);
+        origConsole.info.apply(null, [...args, "@", getCurrentTest()]);
     },
   };
   return {mockedConsole, consoleData, origConsole};
@@ -181,7 +181,7 @@ const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: Co
   const onChange = spy();
   const {tree, errors} = load_tree(value, config, valueFormat, options);
   if (errors?.length) {
-    const errText = `Error while loading as ${valueFormat} with ${configName}: ` + errors.join("; ") + "\n" + JSON.stringify(value);
+    const errText = `Error while loading as ${valueFormat || "?"} with ${configName}: ` + errors.join("; ") + "\n" + JSON.stringify(value);
     if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
       console.error(errText);
     }
@@ -296,7 +296,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
   
     if (expects["sql"] !== undefined) {
       doIt("should work to SQL", () => {
-        let [expectedRes, expectedErrors] = Array.isArray(expects["sql"])
+        const [expectedRes, expectedErrors] = Array.isArray(expects["sql"])
           ? expects["sql"]
           : [expects["sql"], []];
         const [res, errors] = _sqlFormat(tree, config);
@@ -335,9 +335,9 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
 
     if (expects["logic"] !== undefined) {
       doIt("should work to JsonLogic", () => {
-        let [expectedLogic, expectedErrors] = Array.isArray(expects["logic"])
+        const [expectedLogic, expectedErrors] = (Array.isArray(expects["logic"])
           ? expects["logic"]
-          : [expects["logic"], []];
+          : [expects["logic"], []]) as [JsonLogicTree, string[]];
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
         expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expectedLogic));

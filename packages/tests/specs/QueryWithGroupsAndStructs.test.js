@@ -11,7 +11,7 @@ describe("query with !struct and !group", () => {
         expect(qb.find(".query-builder")).to.have.length(1);
       }, {
         ignoreLog: (errText) => {
-          return errText.includes("Removing rule:") && errText.includes(`"value":[13,36]`) && errText.includes("Reason: Uncomplete RHS")
+          return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Uncomplete RHS")
             || errText.includes("Operator between is not supported for field results.slider");
         }
       });
@@ -79,7 +79,7 @@ describe("query with !struct and !group", () => {
       }
     }, [], {
       ignoreLog: (errText) => {
-        return errText.includes("Removing rule:") && errText.includes(`"value":[13,36]`) && errText.includes("Reason: Uncomplete RHS")
+        return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Uncomplete RHS")
           || errText.includes("Operator between is not supported for field results.slider");
       }
     });

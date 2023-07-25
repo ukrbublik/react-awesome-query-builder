@@ -282,7 +282,7 @@ describe("antdesign widgets interactions", () => {
       }, {
         ignoreLog: (errText) => {
           return errText.includes("Can't convert value 2020-05-10TTTT as Date")
-            || errText.includes("Removing rule:") && errText.includes(`"field":"date"`);
+            || errText.includes("Removing rule:") && errText.includes("\"field\":\"date\"");
         }
       });
     });

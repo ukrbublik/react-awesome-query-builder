@@ -119,7 +119,7 @@ describe("basic query", () => {
         "Unexpected logic in value: {\"+\":[1,2]}"
       ], {
         ignoreLog: (errText) => {
-          return errText.includes("Removing rule:") && errText.includes(`"field":null`) && errText.includes("Reason: Uncomplete LHS");
+          return errText.includes("Removing rule:") && errText.includes("\"field\":null") && errText.includes("Reason: Uncomplete LHS");
         }
       });
     });
