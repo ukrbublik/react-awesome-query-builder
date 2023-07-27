@@ -90,10 +90,6 @@ const formatGroup = (item, config, meta, isRoot, parentField = null) => {
   const conjunctionDefinition = config.conjunctions[conjunction];
   const conj = conjunctionDefinition.jsonLogicConj || conjunction.toLowerCase();
   const not = properties.get("not");
-  if (conj != "and" && conj != "or") {
-    meta.errors.push(`Conjunction ${conj} is not supported`);
-    return undefined;
-  }
 
   const isRuleGroup = (type === "rule_group" && !isRoot);
   const groupField = isRuleGroup && mode != "struct" ? field : parentField;
