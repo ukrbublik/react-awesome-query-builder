@@ -568,6 +568,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
 
       const { canRegroup, canRegroupCases, maxNesting, maxNumberOfRules, canLeaveEmptyCase } = this.props.config.settings;
       const newLev = toParentII ? toParentII.lev + 1 : toII.lev;
+      const newDepthLev = newLev + (fromII.depth || 0);
       const isBeforeAfter = placement == constants.PLACEMENT_BEFORE || placement == constants.PLACEMENT_AFTER;
       const isPend = placement == constants.PLACEMENT_PREPEND || placement == constants.PLACEMENT_APPEND;
       const isLev1 = isBeforeAfter && toII.lev == 1 || isPend && toII.lev == 0;
@@ -583,8 +584,8 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
         // can't move rule/group to another case
         || !canRegroupCases && fromII.caseId != toII.caseId;
       const isLockedChange = toII.isLocked || fromII.isLocked || toParentII && toParentII.isLocked;
-
-      if (maxNesting && newLev > maxNesting)
+      
+      if (maxNesting && newDepthLev > maxNesting)
         return false;
       
       if (isStructChange && (!canRegroup || isForbiddenStructChange || isLockedChange))

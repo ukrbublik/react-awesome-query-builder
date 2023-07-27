@@ -279,7 +279,7 @@ export const empty_value = {id: uuid(), type: "group"};
 const do_export_checks = (config: Config, tree: ImmutableTree, expects?: ExtectedExports, options?: DoOptions) => {
   const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
 
-  if (!expects || Object.keys(expects).some(t => (expects as any)[t] === "?")) {
+  if (!expects || Object.values(expects).some(e => e === "?")) {
     const {logic, data, errors} = jsonLogicFormat(tree, config);
     const correct = {
       query: queryString(tree, config),
