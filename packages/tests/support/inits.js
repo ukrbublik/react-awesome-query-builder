@@ -158,7 +158,7 @@ export const with_struct_and_group = {
     { "!!": { "var": "user.login" } }
   ]
 };
-  
+
 export const with_struct_and_group_mixed_obsolete = {
   "and": [
     { "==": [ { "var": "results.slider" }, 22 ] },
@@ -1068,3 +1068,11 @@ export const tree_with_lhs_toLowerCase2 = {
     "not": false
   }
 };
+
+export const with_dot_in_field = {
+  "and": [
+    { "==": [ { "var": "number.one" }, 11 ] },
+  ]
+};
+
+export const spel_with_dot_in_field = "number.one == 11";

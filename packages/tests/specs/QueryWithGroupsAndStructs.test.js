@@ -822,3 +822,25 @@ describe("query with !group mode array", () => {
   });
 
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+describe("query with dot but without !struct", () => {
+
+  describe("should handle dot notation when importing from JsonLogic", () => {
+    export_checks(configs.with_dot_in_field, inits.with_dot_in_field, "JsonLogic", {
+      "logic": inits.with_dot_in_field,
+      "spel": inits.spel_with_dot_in_field,
+    });
+  });
+
+  describe("should handle dot notation when importing from SpEL", () => {
+    export_checks(configs.with_dot_in_field, inits.spel_with_dot_in_field, "SpEL", {
+      "logic": inits.with_dot_in_field,
+      "spel": inits.spel_with_dot_in_field,
+    });
+  });
+
+});
+
+//////////////////////////////////////////////////////////////////////////////////////////

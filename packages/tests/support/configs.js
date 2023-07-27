@@ -1256,3 +1256,14 @@ export const with_keepInputOnChangeFieldSrc = (BasicConfig) => ({
     keepInputOnChangeFieldSrc: true,
   }
 });
+
+export const with_dot_in_field = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    "number.one": {
+      label: "Number",
+      type: "number",
+      preferWidgets: ["number"],
+    },
+  },
+});
