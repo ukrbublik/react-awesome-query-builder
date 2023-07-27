@@ -1,4 +1,7 @@
 # Changelog
+- 6.5.0
+  - Fixed import of rule_group in rule_group from SpEL
+  - Updated type `ItemBuilderProps`
 - 6.4.0
   - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`
     Thanks @rhallerman1 (PR #900, #896) (issues #287, #250, #344, #336)
