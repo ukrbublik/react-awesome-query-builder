@@ -4,7 +4,6 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb, empty_value, export_checks } from "../support/utils";
 import { expect } from "chai";
-import { ReactWrapper } from "enzyme";
 // warning: don't put `export_checks` inside `it`
 
 
@@ -22,7 +21,7 @@ describe("basic query", () => {
 
   describe("strict mode", () => {
     it("should not produce warnings", async () => {
-      await with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper, _onChange, _tasks, consoleData) => {
+      await with_qb(configs.simple_with_number, empty_value, "default", (qb, _onChange, _tasks, consoleData) => {
         expect(qb.find(".query-builder")).to.have.length(1);
         const consoleErrors = consoleData.error.join("\n");
         const consoleWarns = consoleData.warn.join("\n");
@@ -36,31 +35,33 @@ describe("basic query", () => {
 
   describe("import", () => {
     it("should work with empty value", async () => {
-      await with_qb(configs.simple_with_number, empty_value, "default", (qb: ReactWrapper) => {
+      await with_qb(configs.simple_with_number, empty_value, "default", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
     it("should work with empty JsonLogic tree", async () => {
-      await with_qb(configs.simple_with_number, undefined, "JsonLogic", (qb: ReactWrapper) => {
+      await with_qb(configs.simple_with_number, undefined, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
+      }, {
+        //ignoreLog
       });
     });
 
     it("should work with empty group", async () => {
-      await with_qb(configs.simple_with_number, inits.tree_with_empty_group, "default", (qb: ReactWrapper) => {
+      await with_qb(configs.simple_with_number, inits.tree_with_empty_group, "default", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
     it("should work with simple value", async () => {
-      await with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb: ReactWrapper) => {
+      await with_qb(configs.simple_with_number, inits.tree_with_number, "default", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
 
     it("should work with simple value in JsonLogic format", async () => {
-      await with_qb(configs.simple_with_number, inits.with_number, "JsonLogic", (qb: ReactWrapper) => {
+      await with_qb(configs.simple_with_number, inits.with_number, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       });
     });
@@ -73,7 +74,7 @@ describe("basic query", () => {
           ]
         },
         spel: "num == 2"
-      });
+      }, []);
     });
 
     describe("should work with between op in SpEL format", () => {
@@ -90,7 +91,7 @@ describe("basic query", () => {
           ]
         },
         spel: "num >= 1 && num <= 2"
-      });
+      }, []);
     });
 
     describe("should work with simple value in JsonLogic format not in group", () => {
@@ -104,7 +105,7 @@ describe("basic query", () => {
             { "==": [{ "var": "num" }, 2] }
           ]
         },
-      });
+      }, []);
     });
 
     describe("should handle undefined value in JsonLogic format", () => {
@@ -116,7 +117,11 @@ describe("basic query", () => {
     describe("should handle unexpected json logic value in JsonLogic format", () => {
       export_checks(configs.simple_with_number, inits.with_jl_value, "JsonLogic", {}, [
         "Unexpected logic in value: {\"+\":[1,2]}"
-      ]);
+      ], {
+        ignoreLog: (errText) => {
+          return errText.includes("Removing rule:") && errText.includes("\"field\":null") && errText.includes("Reason: Uncomplete LHS");
+        }
+      });
     });
 
     describe("should handle unknown field", () => {

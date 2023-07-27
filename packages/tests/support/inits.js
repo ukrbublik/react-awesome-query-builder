@@ -234,6 +234,8 @@ export const with_nested_group = {
   ]
 };
 
+export const spel_with_nested_group = "results.?[score > 15 && user.?[name == 'denis'].size() > 0].size() > 0";
+
 export const two_rules_with_nested_group = {
   "and": [
     {
@@ -253,6 +255,8 @@ export const two_rules_with_nested_group = {
     }
   ]
 };
+
+export const spel_two_rules_with_nested_group = "(results.?[user.?[name == 'aaa'].size() > 0].size() > 0 && results.?[score == 11].size() > 0)";
 
 export const with_struct_inside_group = {
   "and": [

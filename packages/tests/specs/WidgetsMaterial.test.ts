@@ -5,7 +5,8 @@ import * as inits from "../support/inits";
 import { with_qb_material, hexToRgbString } from "../support/utils";
 
 const ignoreLogDatePicker = (errText: string) => {
-  return errText.includes("The `anchorEl` prop provided to the component is invalid");
+  return errText.includes("The `anchorEl` prop provided to the component is invalid")
+    || errText.includes("The `fade` color utility was renamed to `alpha` to better describe its functionality");
 };
 
 describe("material-ui theming", () => {

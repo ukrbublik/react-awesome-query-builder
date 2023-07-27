@@ -186,10 +186,11 @@ export const getFlatTree = (tree) => {
     const id = item.get("id");
     const children = item.get("children1");
     const isLocked = item.getIn(["properties", "isLocked"]);
-    const childrenIds = children ? children.map((_child, childId) => childId) : null;
+    const childrenIds = children ? children.map((_child, childId) => childId).toArray() : null;
     const isRuleGroup = type == "rule_group";
     // tip: count rule_group as 1 rule
     const isLeaf = !insideRuleGroup && (!children || isRuleGroup);
+    const hasChildren = childrenIds?.length > 0;
 
     const itemsBefore = flat.length;
     const top = realHeight;
@@ -221,6 +222,7 @@ export const getFlatTree = (tree) => {
       isLocked: isLocked || insideLocked,
     };
 
+    let depth;
     if (children) {
       let subinfo = {};
       children.map((child, _childId) => {
@@ -232,6 +234,9 @@ export const getFlatTree = (tree) => {
       });
       if (!collapsed) {
         info.height = (info.height || 0) + (subinfo.height || 0);
+        if (hasChildren && !isRuleGroup) { // tip: don't count children of rule_group
+          depth = (subinfo.depth || 0) + 1;
+        }
       }
     }
     
@@ -248,6 +253,12 @@ export const getFlatTree = (tree) => {
       height: height,
       bottom: (insideCollapsed ? null : top) + height,
     });
+    if (depth != undefined) {
+      Object.assign(items[id], {
+        depth: depth,
+      });
+      info.depth = Math.max(info.depth || 0, depth);
+    }
   }
 
   _flatizeTree(tree, [], false, false, false, 0, {}, null, null);

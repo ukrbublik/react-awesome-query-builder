@@ -52,7 +52,9 @@ describe("Compressed config", () => {
       describe("should be decompressed and used without errors", () => {
         const zipConfig = ConfigUtils.compressConfig(config, BaseConfig);
         const decConfig = ConfigUtils.decompressConfig(zipConfig, BaseConfig);
-        export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], configKey !== "CoreConfig");
+        export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], {
+          withRender: configKey !== "CoreConfig"
+        });
       });
     });
 

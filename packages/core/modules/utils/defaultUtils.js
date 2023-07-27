@@ -139,11 +139,11 @@ export const defaultRule = (id, config) => ({
   })
 });
 
-export const defaultRoot = (config) => {
+export const defaultRoot = (config, canAddDefaultRule = true) => {
   return new Immutable.Map({
     type: "group",
     id: uuid(),
-    children1: new Immutable.OrderedMap({ ...defaultRule(uuid(), config) }),
+    children1: new Immutable.OrderedMap(canAddDefaultRule ? { ...defaultRule(uuid(), config) } : {}),
     properties: defaultGroupProperties(config)
   });
 };

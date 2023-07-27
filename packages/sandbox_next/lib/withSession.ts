@@ -78,7 +78,7 @@ export const saveSessionData = async (req: IncomingMessage, newData: SessionData
       await redis.json.set(`sessions.${sid}`, "$", data);
     }
     if (newData.jsonTree) {
-      await redis.json.set(`sessions.${sid}`, "$.jsonTree", newData.jsonTree);
+      await redis.json.set(`sessions.${sid}`, "$.jsonTree", newData.jsonTree as any as Record<string, unknown>);
     }
     if (newData.zipConfig) {
       await redis.json.set(`sessions.${sid}`, "$.zipConfig", newData.zipConfig);

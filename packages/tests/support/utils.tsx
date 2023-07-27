@@ -17,7 +17,7 @@ import {
 const {
   uuid, 
   checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
+  queryString, sqlFormat, _sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -26,10 +26,20 @@ import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 
 
+let currentTest: string;
+export const setCurrentTest = (testName: string) => {
+  currentTest = testName;
+};
+export const getCurrentTest = () => {
+  return currentTest;
+};
+
+
 type ConsoleIgnoreFn = (errText: string) => boolean;
 type ConsoleData = {
   error: string[],
   warn: string[],
+  info: string[],
 };
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
@@ -39,12 +49,12 @@ type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, conso
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
-  sql?: string;
+  sql?: string | [string, string[]];
   spel?: string;
   mongo?: Object;
   elasticSearch?: Object;
   elasticSearch7?: Object;
-  logic?: JsonLogicTree;
+  logic?: JsonLogicTree | [JsonLogicTree, string[]];
 }
 interface Tasks {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
@@ -56,16 +66,50 @@ interface DoOptions {
   attach?: boolean;
   strict?: boolean;
   ignoreLog?: ConsoleIgnoreFn;
+  withRender?: boolean;
+  insideIt?: boolean;
 }
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
 
 const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
   // todo: issue after updating antd
-  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.");
+  return errText.includes("The node you're attempting to unmount was rendered by another copy of React.")
+    || errText.includes("Fixed operator is_empty to is_null for num");
 };
 
-export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null) => {
+const mockConsole = (options?: DoOptions, _configName?: string) => {
+  const origConsole = console;
+  const consoleData: ConsoleData = {
+    error: [],
+    warn: [],
+    info: [],
+  };
+  const mockedConsole = {
+    ...origConsole,
+    error: (...args: string[]) => {
+      const errText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
+      consoleData.error.push(errText);
+      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
+        origConsole.error.apply(null, [...args, "@", getCurrentTest()]);
+    },
+    warn: (...args: string[]) => {
+      const errText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
+      consoleData.warn.push(errText);
+      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
+        origConsole.warn.apply(null, [...args, "@", getCurrentTest()]);
+    },
+    info: (...args: string[]) => {
+      const infoText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
+      if (!options?.ignoreLog?.(infoText) && !globalIgnoreFn(infoText))
+        origConsole.info.apply(null, [...args, "@", getCurrentTest()]);
+    },
+  };
+  return {mockedConsole, consoleData, origConsole};
+};
+
+
+export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null, options?: DoOptions) => {
   if (!valueFormat) {
     if (isJsonLogic(value))
       valueFormat = "JsonLogic";
@@ -73,6 +117,12 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
       valueFormat = "default";
   }
   let errors: string[] = [];
+
+  // mock console
+  const {mockedConsole, origConsole} = mockConsole(options);
+  // eslint-disable-next-line no-global-assign
+  console = mockedConsole;
+
   let tree: ImmutableTree | undefined;
   if (valueFormat == "JsonLogic") {
     [tree, errors] = _loadFromJsonLogic(value, config);
@@ -82,6 +132,11 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     tree = loadTree(value as JsonTree);
   }
   tree = tree ? checkTree(tree, config) : undefined;
+
+  // restore console
+  // eslint-disable-next-line no-global-assign
+  console = origConsole;
+
   return {tree, errors};
 };
 
@@ -124,9 +179,12 @@ const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: Co
   // normally config should be saved at state in `onChange`, see README
   const extendedConfig = ConfigUtils.extendConfig(config);
   const onChange = spy();
-  const {tree, errors} = load_tree(value, config, valueFormat);
+  const {tree, errors} = load_tree(value, config, valueFormat, options);
   if (errors?.length) {
-    console.error("Error while loading: " + errors.join("; "));
+    const errText = `Error while loading as ${valueFormat || "?"} with ${configName}: ` + errors.join("; ") + "\n" + JSON.stringify(value);
+    if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
+      console.error(errText);
+    }
   }
 
   const tasks: Tasks = {
@@ -137,7 +195,11 @@ const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: Co
       expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
     },
     expect_checks: (expects) => {
-      do_export_checks(extendedConfig, tree as ImmutableTree, expects, false, true);
+      do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
+        ...options,
+        withRender: false, 
+        insideIt: true,
+      });
     },
     config: config,
   };
@@ -171,26 +233,7 @@ const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: Co
   };
 
   // mock console
-  const origConsole = console;
-  const consoleData: ConsoleData = {
-    error: [],
-    warn: [],
-  };
-  const mockedConsole = {
-    ...console,
-    error: (...args: string[]) => {
-      const errText = args.filter(a => typeof a === "string").join("\n");
-      consoleData.error.push(errText);
-      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.error.apply(null, [...args, `(${configName})`]);
-    },
-    warn: (...args: string[]) => {
-      const errText = args.filter(a => typeof a === "string").join("\n");
-      consoleData.warn.push(errText);
-      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.warn.apply(null, [...args, `(${configName})`]);
-    },
-  };
+  const {mockedConsole, origConsole, consoleData} = mockConsole(options, configName);
   // eslint-disable-next-line no-global-assign
   console = mockedConsole;
 
@@ -233,10 +276,22 @@ export const empty_value = {id: uuid(), type: "group"};
 
 // ----------- export checks
 
-const do_export_checks = (config: Config, tree: ImmutableTree, expects?: ExtectedExports, with_render = false, inside_it = false) => {
-  const doIt = inside_it ? ((name: string, func: Function) => { func(); }) : it;
+const do_export_checks = (config: Config, tree: ImmutableTree, expects?: ExtectedExports, options?: DoOptions) => {
+  const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
 
-  if (expects) {
+  if (!expects || Object.values(expects).some(e => e === "?")) {
+    const {logic, data, errors} = jsonLogicFormat(tree, config);
+    const correct = {
+      query: queryString(tree, config),
+      queryHuman: queryString(tree, config, true),
+      sql: sqlFormat(tree, config),
+      spel: spelFormat(tree, config),
+      mongo: mongodbFormat(tree, config),
+      logic: logic,
+      elasticSearch: elasticSearchFormat(tree, config),
+    };
+    console.log(getCurrentTest(), stringify(correct, undefined, 2));
+  } else {
     if (expects["query"] !== undefined) {
       doIt("should work to query string", () => {
         const res = queryString(tree, config);
@@ -253,8 +308,12 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
   
     if (expects["sql"] !== undefined) {
       doIt("should work to SQL", () => {
-        const res = sqlFormat(tree, config);
-        expect(res).to.equal(expects["sql"]);
+        const [expectedRes, expectedErrors] = Array.isArray(expects["sql"])
+          ? expects["sql"]
+          : [expects["sql"], []];
+        const [res, errors] = _sqlFormat(tree, config);
+        expect(res).to.equal(expectedRes);
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedErrors || []));
       });
     }
   
@@ -288,20 +347,28 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
 
     if (expects["logic"] !== undefined) {
       doIt("should work to JsonLogic", () => {
+        const [expectedLogic, expectedErrors] = (Array.isArray(expects["logic"])
+          ? expects["logic"]
+          : [expects["logic"], []]) as [JsonLogicTree, string[]];
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
-        expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expects["logic"]));
-        if (expects["logic"])
-          expect(errors).to.eql([]);
+        expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expectedLogic));
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedErrors || []));
       });
     }
   
     doIt("should work to QueryBuilder", () => {
-      const res = queryBuilderFormat(tree, config);
+      const _res = queryBuilderFormat(tree, config);
     });
 
-    if (with_render) {
+    if (options?.withRender) {
+
       act(() => {
+        // mock console
+        const {mockedConsole, origConsole} = mockConsole(options);
+        // eslint-disable-next-line no-global-assign
+        console = mockedConsole;
+
         const qb = mount(
           <Query
             {...config}
@@ -311,30 +378,22 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
           />
         );
         qb.unmount();
+
+        // restore console
+        // eslint-disable-next-line no-global-assign
+        console = origConsole;
       });
     }
-  } else {
-    const {logic, data, errors} = jsonLogicFormat(tree, config);
-    const correct = {
-      query: queryString(tree, config),
-      queryHuman: queryString(tree, config, true),
-      sql: sqlFormat(tree, config),
-      spel: spelFormat(tree, config),
-      mongo: mongodbFormat(tree, config),
-      logic: logic,
-      elasticSearch: elasticSearchFormat(tree, config),
-    };
-    console.log(stringify(correct, undefined, 2));
   }
 };
 
-export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects?: ExtectedExports, expectedErrors: Array<string> = [], with_render = true) => {
+export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects?: ExtectedExports, expectedErrors: Array<string> = [], options: DoOptions = {}) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
 
   let tree, errors: string[] = [];
   try {
-    ({tree, errors} = load_tree(value, config, valueFormat));
+    ({tree, errors} = load_tree(value, config, valueFormat, options));
   } catch(e) {
     it("should load tree", () => {
       throw e;
@@ -347,24 +406,34 @@ export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueForma
         expect(errors.join("; ")).to.equal(expectedErrors.join("; "));
       });
 
-      do_export_checks(config, tree as ImmutableTree, expects, with_render);
+      do_export_checks(config, tree as ImmutableTree, expects, {
+        ...options,
+        withRender: options?.withRender ?? true,
+      });
     } else {
       it("should load tree without errors", () => {
         throw new Error(errors.join("; "));
       });
     }
   } else {
-    do_export_checks(config, tree as ImmutableTree, expects, with_render);
+    do_export_checks(config, tree as ImmutableTree, expects, {
+      ...options,
+      withRender: options?.withRender ?? true,
+    });
   }
 };
 
-export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports) => {
+export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, options?: DoOptions) => {
   const config = config_fn(BasicConfig);
   const {tree, errors} = load_tree(value, config, valueFormat);
   if (errors?.length) {
     throw new Error(errors.join("; "));
   } else {
-    do_export_checks(config, tree as ImmutableTree, expects, true, true);
+    do_export_checks(config, tree as ImmutableTree, expects, {
+      ...options,
+      withRender: true,
+      insideIt: true,
+    });
   }
 };
 

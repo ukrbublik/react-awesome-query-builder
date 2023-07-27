@@ -517,7 +517,7 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
 
   // convert children
   const convertChildren = () => {
-    let newChildren = spel.children.map(child => 
+    let newChildren = spel.children.map(child =>
       convertToTree(child, conv, config, meta, {
         ...spel,
         _groupField: parentSpel?._groupField
@@ -1113,15 +1113,40 @@ const buildRuleGroup = ({groupFilter, groupFieldValue}, opKey, convertedArgs, co
     return undefined;
   const fieldConfig = getFieldConfig(config, groupField);
   const mode = fieldConfig?.mode;
-  let res = {
-    ...(groupFilter || {}),
-    type: "rule_group",
-    properties: {
-      ...groupOpRule.properties,
-      ...(groupFilter?.properties || {}),
-      mode
-    }
-  };
+  let res;
+
+  if (groupFilter?.type === "group") {
+    res = {
+      ...(groupFilter || {}),
+      type: "rule_group",
+      properties: {
+        ...groupOpRule.properties,
+        ...(groupFilter?.properties || {}),
+        mode
+      }
+    };
+  } else if (groupFilter) {
+    // rule_group in rule_group
+    res = {
+      ...(groupOpRule || {}),
+      type: "rule_group",
+      children1: [ groupFilter ],
+      properties: {
+        ...groupOpRule.properties,
+        mode
+      }
+    };
+  } else {
+    res = {
+      ...(groupOpRule || {}),
+      type: "rule_group",
+      properties: {
+        ...groupOpRule.properties,
+        mode
+      }
+    };
+  }
+
   if (!res.id)
     res.id = uuid();
   return res;

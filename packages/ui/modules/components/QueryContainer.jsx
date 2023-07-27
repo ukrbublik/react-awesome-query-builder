@@ -40,8 +40,12 @@ export default class QueryContainer extends Component {
     this.getMemoizedTree = createValidationMemo();
     
     const config = this.getMemoizedConfig(props);
-    const tree = props.value;
-    const validatedTree = this.getMemoizedTree(config, tree);
+    const {shouldCreateEmptyGroup} = config.settings;
+    const canAddDefaultRule = !shouldCreateEmptyGroup; // if prop `value` is not provided, can add default/empty rule?
+    const emptyTree = defaultRoot(config, canAddDefaultRule);
+    const sanitizeTree = !!props.value;
+    const tree = props.value || emptyTree;
+    const validatedTree = this.getMemoizedTree(config, tree, undefined, sanitizeTree);
 
     const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree);
     const store = createStore(reducer);
@@ -74,7 +78,7 @@ export default class QueryContainer extends Component {
     // compare trees
     const storeValue = this.state.store.getState().tree;
     const isTreeChanged = !immutableEqual(nextProps.value, this.props.value) && !immutableEqual(nextProps.value, storeValue);
-    const currentTree = isTreeChanged ? nextProps.value || defaultRoot(nextProps) : storeValue;
+    const currentTree = isTreeChanged ? (nextProps.value || defaultRoot(nextProps)) : storeValue;
     const isTreeTrulyChanged = isTreeChanged && !immutableEqual(nextProps.value, this.prevTree) && !immutableEqual(nextProps.value, this.prevprevTree);
     this.sanitizeTree = isTreeTrulyChanged || isConfigChanged;
 

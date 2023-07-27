@@ -9,6 +9,11 @@ describe("query with !struct and !group", () => {
     it("should work with value of JsonLogic format", async () => {
       await with_qb_skins(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
+      }, {
+        ignoreLog: (errText) => {
+          return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Uncomplete RHS")
+            || errText.includes("Operator between is not supported for field results.slider");
+        }
       });
     });
     it("should handle custom operator in !group arrays", async () => {
@@ -33,6 +38,8 @@ describe("query with !struct and !group", () => {
             ]
           }
         });
+      }, {
+        //ignoreLog
       });
     });
   });
@@ -70,6 +77,11 @@ describe("query with !struct and !group", () => {
           }
         ]
       }
+    }, [], {
+      ignoreLog: (errText) => {
+        return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Uncomplete RHS")
+          || errText.includes("Operator between is not supported for field results.slider");
+      }
     });
   });
 
@@ -95,6 +107,8 @@ describe("query with !struct and !group", () => {
           }
         ]
       }
+    }, [], {
+      // ignoreLog
     });
   });
 
@@ -280,7 +294,14 @@ describe("query with nested !group", () => {
             ]
           }
         ]
-      }
+      },
+      "spel": "results.?[score > 15 && user.?[name == 'denis'].size() > 0].size() > 0"
+    });
+  });
+
+  describe("with one group rule, imported from spel", () => {
+    export_checks(configs.with_nested_group, inits.spel_with_nested_group, "SpEL", {
+      "spel": "results.?[score > 15 && user.?[name == 'denis'].size() > 0].size() > 0"
     });
   });
 
@@ -330,7 +351,14 @@ describe("query with nested !group", () => {
             ]
           }
         ]
-      }
+      },
+      "spel": "(results.?[score == 11].size() > 0 && results.?[user.?[name == 'aaa'].size() > 0].size() > 0)"
+    });
+  });
+
+  describe("with two separate group rules, imported from spel", () => {
+    export_checks(configs.with_nested_group, inits.spel_two_rules_with_nested_group, "SpEL", {
+      "spel": "(results.?[user.?[name == 'aaa'].size() > 0].size() > 0 && results.?[score == 11].size() > 0)"
     });
   });
 
@@ -699,7 +727,12 @@ describe("query with !group mode array", () => {
     export_checks(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", {
       "query": "COUNT OF cars WHERE (vendor == \"Toyota\" && year >= 2010) > 2",
       "queryHuman": "COUNT OF Cars WHERE (vendor = Toyota AND year >= 2010) > 2",
-      "sql": "(cars.vendor = 'Toyota' AND cars.year >= 2010)",
+      "sql": [
+        "(cars.vendor = 'Toyota' AND cars.year >= 2010)",
+        [
+          "Aggregation is not supported for cars"
+        ]
+      ],
       "mongo": {
         "$expr": {
           "$gt": [
