@@ -140,6 +140,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const groupField = isRuleGroupArray ? field : parentField;
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const isSpelArray = groupFieldDef.isSpelArray;
+  const {fieldSeparator} = config.settings;
   
   // check op for reverse
   let groupOperator = properties.get("operator");
@@ -177,7 +178,8 @@ const formatGroup = (item, config, meta, parentField = null) => {
   let ret;
   if (isRuleGroupArray) {
     const formattedField = formatField(meta, config, field, parentField);
-    const getSize = isSpelArray ? ".length" : ".size()";
+    const sep = fieldSeparator || ".";
+    const getSize = sep + (isSpelArray ? "length" : "size()");
     const fullSize = `${formattedField}${getSize}`;
     // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-collection-selection
     const filteredSize = filter ? `${formattedField}.?[${filter}]${getSize}` : fullSize;
@@ -431,7 +433,8 @@ const formatField = (meta, config, field, parentField = null) => {
     return {
       key,
       parent,
-      isSpelVariable
+      isSpelVariable,
+      fieldSeparator
     };
   });
   const formattedField = formatFieldFn.call(config.ctx, fieldName, parentField, fieldParts, fieldPartsMeta, fieldDefinition, config);

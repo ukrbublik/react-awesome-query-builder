@@ -430,7 +430,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
           parts.slice(0, -1)
             .map((f, i, parts) => [...parts.slice(0, i), f])
             .map(fp => [fp.join(fieldSeparator), getFieldConfig(config, fp)])
-            .filter(([_f, fc]) => fc.type == "!group")
+            .filter(([_f, fc]) => fc?.type == "!group")
         );
         return [f, Object.keys(ancs)];
       })
@@ -451,7 +451,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
     let children1 = {};
     let groupToId = {};
     Object.entries(children).map(([k, v]) => {
-      if (v.type == "group" || v.type == "rule_group") {
+      if (v?.type == "group" || v?.type == "rule_group") {
         // put as-is
         children1[k] = v;
       } else {
@@ -460,7 +460,9 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
         const groupField = groupAncestors[groupAncestors.length - 1];
         if (!groupField) {
           // not in rule_group (can be simple field or in struct) - put as-is
-          children1[k] = v;
+          if (v) {
+            children1[k] = v;
+          }
         } else {
           // wrap field in rule_group (with creating hierarchy if need)
           let ch = children1;
@@ -514,19 +516,19 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
 };
 
 
-const topLevelFieldsFilter = (fields) => {
-  let arr = [...fields].sort((a, b) => (a.length - b.length));
-  for (let i = 0 ; i < arr.length ; i++) {
-    for (let j = i + 1 ; j < arr.length ; j++) {
-      if (arr[j].indexOf(arr[i]) == 0) {
-        // arr[j] is inside arr[i] (eg. "a.b" inside "a")
-        arr.splice(j, 1);
-        j--;
-      }
-    }
-  }
-  return arr;
-};
+// const topLevelFieldsFilter = (fields) => {
+//   let arr = [...fields].sort((a, b) => (a.length - b.length));
+//   for (let i = 0 ; i < arr.length ; i++) {
+//     for (let j = i + 1 ; j < arr.length ; j++) {
+//       if (arr[j].indexOf(arr[i]) == 0) {
+//         // arr[j] is inside arr[i] (eg. "a.b" inside "a")
+//         arr.splice(j, 1);
+//         j--;
+//       }
+//     }
+//   }
+//   return arr;
+// };
 
 const wrapInDefaultConjRuleGroup = (rule, parentField, parentFieldConfig, config, conj) => {
   if (!rule) return undefined;

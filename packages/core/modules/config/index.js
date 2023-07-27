@@ -1236,7 +1236,7 @@ const settings = {
   },
 
   formatSpelField: function (field, parentField, parts, partsExt, fieldDefinition, config) {
-    let fieldName = partsExt.map(({key, parent}, ind) => {
+    let fieldName = partsExt.map(({key, parent, fieldSeparator: sep}, ind) => {
       if (ind == 0) {
         if (parent == "[map]")
           return `#this[${this.utils.spelEscape(key)}]`;
@@ -1248,9 +1248,9 @@ const settings = {
         if (parent == "map" || parent == "[map]")
           return `[${this.utils.spelEscape(key)}]`;
         else if (parent == "class" || parent == "[class]")
-          return `.${key}`;
+          return `${sep}${key}`;
         else
-          return `.${key}`;
+          return `${sep}${key}`;
       }
     }).join("");
     if (fieldDefinition.fieldName) {
