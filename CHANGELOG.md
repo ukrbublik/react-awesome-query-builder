@@ -4,7 +4,8 @@
   - Updated type `ItemBuilderProps` (PR #959)
   - Fixed drag-n-drop to respect `maxNesting` when moving group into group (PR #959)
   - Fix: allow custom conjuction in JsonLogic (issue #317) (PR #959)
-  - Fixed import of fields with dot from JsonLogic (issue #786) (PR #xxx)
+  - Fixed import of fields with dot from JsonLogic (issue #786) (PR #960)
+  - Fixes export to SpEL to respect `fieldSeparator` (issue #958) (PR #960)
 - 6.4.0
   - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`
     Thanks @rhallerman1 (PR #900, #896) (issues #287, #250, #344, #336)

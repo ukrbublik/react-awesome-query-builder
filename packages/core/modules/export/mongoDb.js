@@ -53,7 +53,8 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const children = item.get("children1") || new List();
-  const {canShortMongoQuery} = config.settings;
+  const {canShortMongoQuery, fieldSeparator} = config.settings;
+  const sep = fieldSeparator;
 
   const hasParentRuleGroup = parents.filter(it => it.get("type") == "rule_group").length > 0;
   const parentPath = parents
@@ -71,7 +72,7 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children
     .map((currentChild) => formatItem(
-      [...parents, item], currentChild, config, meta, not, mode != "array", mode == "array" ? (f => `$$el.${f}`) : undefined)
+      [...parents, item], currentChild, config, meta, not, mode != "array", mode == "array" ? (f => `$$el${sep}${f}`) : undefined)
     )
     .filter((currentChild) => typeof currentChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size)
