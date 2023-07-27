@@ -1,8 +1,8 @@
 # Changelog
 - 6.4.1
-  - Fixed import of rule_group in rule_group from SpEL
-  - Updated type `ItemBuilderProps`
-  - Fixed drag-n-drop to respect `maxNesting` when moving group into group
+  - Fixed import of rule_group in rule_group from SpEL (PR #959)
+  - Updated type `ItemBuilderProps` (PR #959)
+  - Fixed drag-n-drop to respect `maxNesting` when moving group into group (PR #959)
 - 6.4.0
   - Functions can be used in LHS with `fieldSources: ["field", "func"]` in `settings`
     Thanks @rhallerman1 (PR #900, #896) (issues #287, #250, #344, #336)
