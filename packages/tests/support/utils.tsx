@@ -279,7 +279,19 @@ export const empty_value = {id: uuid(), type: "group"};
 const do_export_checks = (config: Config, tree: ImmutableTree, expects?: ExtectedExports, options?: DoOptions) => {
   const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
 
-  if (expects) {
+  if (!expects || Object.keys(expects).some(t => (expects as any)[t] === "?")) {
+    const {logic, data, errors} = jsonLogicFormat(tree, config);
+    const correct = {
+      query: queryString(tree, config),
+      queryHuman: queryString(tree, config, true),
+      sql: sqlFormat(tree, config),
+      spel: spelFormat(tree, config),
+      mongo: mongodbFormat(tree, config),
+      logic: logic,
+      elasticSearch: elasticSearchFormat(tree, config),
+    };
+    console.log(getCurrentTest(), stringify(correct, undefined, 2));
+  } else {
     if (expects["query"] !== undefined) {
       doIt("should work to query string", () => {
         const res = queryString(tree, config);
@@ -346,7 +358,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
     }
   
     doIt("should work to QueryBuilder", () => {
-      const res = queryBuilderFormat(tree, config);
+      const _res = queryBuilderFormat(tree, config);
     });
 
     if (options?.withRender) {
@@ -372,18 +384,6 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
         console = origConsole;
       });
     }
-  } else {
-    const {logic, data, errors} = jsonLogicFormat(tree, config);
-    const correct = {
-      query: queryString(tree, config),
-      queryHuman: queryString(tree, config, true),
-      sql: sqlFormat(tree, config),
-      spel: spelFormat(tree, config),
-      mongo: mongodbFormat(tree, config),
-      logic: logic,
-      elasticSearch: elasticSearchFormat(tree, config),
-    };
-    console.log(stringify(correct, undefined, 2));
   }
 };
 

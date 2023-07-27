@@ -294,7 +294,14 @@ describe("query with nested !group", () => {
             ]
           }
         ]
-      }
+      },
+      "spel": "results.?[score > 15 && user.?[name == 'denis'].size() > 0].size() > 0"
+    });
+  });
+
+  describe("with one group rule, imported from spel", () => {
+    export_checks(configs.with_nested_group, inits.spel_with_nested_group, "SpEL", {
+      "spel": "results.?[score > 15 && user.?[name == 'denis'].size() > 0].size() > 0"
     });
   });
 
@@ -344,8 +351,15 @@ describe("query with nested !group", () => {
             ]
           }
         ]
-      }
+      },
+      "spel": "(results.?[score == 11].size() > 0 && results.?[user.?[name == 'aaa'].size() > 0].size() > 0)"
     });
+  });
+
+  describe("with two separate group rules, imported from spel", () => {
+    export_checks(configs.with_nested_group, inits.spel_two_rules_with_nested_group, "SpEL", {
+      "spel": "(results.?[user.?[name == 'aaa'].size() > 0].size() > 0 && results.?[score == 11].size() > 0)"
+    })
   });
 
   describe("with two nested groups - import with old format, export to new format", () => {
