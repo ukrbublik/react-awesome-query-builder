@@ -119,6 +119,7 @@ const settings = {
   renderConjs: (props, {RCE, W: {VanillaConjs}}) => RCE(VanillaConjs, props),
   renderSwitch: (props, {RCE, W: {VanillaSwitch}}) => RCE(VanillaSwitch, props),
   renderButton: (props, {RCE, W: {VanillaButton}}) => RCE(VanillaButton, props),
+  renderIcon: (props, {RCE, W: {VanillaIcon}}) => RCE(VanillaIcon, props),
   renderButtonGroup: (props, {RCE, W: {VanillaButtonGroup}}) => RCE(VanillaButtonGroup, props),
   renderProvider: (props, {RCE, W: {VanillaProvider}}) => RCE(VanillaProvider, props),
   renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),

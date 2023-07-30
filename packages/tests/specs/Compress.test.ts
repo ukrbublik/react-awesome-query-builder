@@ -174,6 +174,7 @@ describe("settings.useConfigCompress", () => {
       ignoreLog: (errText) => {
         return errText.includes("The tag <%s> is unrecognized in this browser") && errText.includes("slidermark_notexists")
           || errText.includes("Invalid DOM property `%s`") && errText.includes("readonly")
+          || errText.includes("React does not recognize the `%s` prop") && errText.includes("renderIcon")
         ;
       }
     });

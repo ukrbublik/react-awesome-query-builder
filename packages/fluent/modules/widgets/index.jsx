@@ -17,6 +17,7 @@ import FluentUIMultiSelectWidget from "./value/FluentUIMultiSelect";
 import FluentUIFieldSelect from "./core/FluentUIFieldSelect";
 
 // core components
+import FluentUIIcon from "./core/FluentUIIcon";
 import FluentUIButton from "./core/FluentUIButton";
 import FluentUIButtonGroup from "./core/FluentUIButtonGroup";
 import FluentUIConjs from "./core/FluentUIConjs";
@@ -41,6 +42,7 @@ export default {
 
   FluentUIFieldSelect,
 
+  FluentUIIcon,
   FluentUIButton,
   FluentUIButtonGroup,
   FluentUIConjs,

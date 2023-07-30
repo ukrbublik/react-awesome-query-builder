@@ -8,7 +8,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, DragIcon, dummyFn, WithConfirmFn} from "../utils";
+import {Col, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldParts} = Utils.ConfigUtils;
 const {isEmptyRuleProperties} = Utils.RuleUtils;
@@ -270,14 +270,19 @@ class Rule extends Component {
   }
 
   renderDrag() {
+    const { handleDraggerMouseDown } = this.props;
+    const { config } = this.props;
     const { showDragIcon } = this.meta;
-
-    return showDragIcon
-        && <span
-          key="rule-drag-icon"
-          className={"qb-drag-handler rule--drag-handler"}
-          onMouseDown={this.props.handleDraggerMouseDown}
-        ><DragIcon /> </span>;
+    const { renderIcon } = config.settings;
+    const Icon = (pr) => renderIcon?.(pr, config.ctx);
+    const icon = <Icon
+      type="drag"
+    />;
+    return showDragIcon && (<div 
+      key="rule-drag-icon"
+      onMouseDown={handleDraggerMouseDown}
+      className={"qb-drag-handler rule--drag-handler"}
+    >{icon}</div>);
   }
 
   renderDel() {
@@ -286,13 +291,15 @@ class Rule extends Component {
       deleteLabel, 
       immutableGroupsMode, 
       renderButton,
+      renderIcon,
       canDeleteLocked
     } = config.settings;
+    const Icon = (pr) => renderIcon(pr, config.ctx);
     const Btn = (pr) => renderButton(pr, config.ctx);
 
     return !immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && (
       <Btn 
-        type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config}
+        type="delRule" onClick={this.removeSelf} label={deleteLabel} config={config} renderIcon={Icon}
       />
     );
   }

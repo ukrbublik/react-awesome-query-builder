@@ -1,4 +1,6 @@
 # Changelog
+- 6.4.2
+  - Allow override icons with `renderIcon` (issues #319, #872) (PR #xxx)
 - 6.4.1
   - Fixed import of rule_group in rule_group from SpEL (PR #959)
   - Updated type `ItemBuilderProps` (PR #959)

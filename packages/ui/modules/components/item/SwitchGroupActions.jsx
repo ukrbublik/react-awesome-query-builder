@@ -19,9 +19,10 @@ export class SwitchGroupActions extends PureComponent {
     } = this.props;
     const {
       immutableGroupsMode, addCaseLabel, addDefaultCaseLabel, groupActionsPosition, 
-      renderButton, renderSwitch, renderButtonGroup,
+      renderButton, renderIcon, renderSwitch, renderButtonGroup,
       lockLabel, lockedLabel, showLock,
     } = config.settings;
+    const Icon = (pr) => renderIcon(pr, config.ctx);
     const Btn = (pr) => renderButton(pr, config.ctx);
     const Switch = (pr) => renderSwitch(pr, config.ctx);
     const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
@@ -32,11 +33,11 @@ export class SwitchGroupActions extends PureComponent {
     />;
 
     const addCaseGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
-      type="addCaseGroup" onClick={addCaseGroup} label={addCaseLabel} readonly={isLocked} config={config}
+      type="addCaseGroup" onClick={addCaseGroup} label={addCaseLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
 
     const addDefaultCaseGroupBtn = !immutableGroupsMode && canAddDefault && !isLocked && <Btn
-      type="addDefaultCaseGroup" onClick={addDefaultCaseGroup} label={addDefaultCaseLabel} readonly={isLocked} config={config}
+      type="addDefaultCaseGroup" onClick={addDefaultCaseGroup} label={addDefaultCaseLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
 
     return (

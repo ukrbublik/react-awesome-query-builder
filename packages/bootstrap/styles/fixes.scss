@@ -1,3 +1,9 @@
 .svg-inline--fa {
   pointer-events: none;
 }
+.btn > .svg-inline--fa {
+  margin-right: 4px;
+}
+.rule--drag-handler .svg-inline--fa {
+  margin-left: 6px;
+}

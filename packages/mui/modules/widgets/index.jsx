@@ -26,6 +26,7 @@ import MuiFieldSelect from "./core/MuiFieldSelect";
 import MuiFieldAutocomplete from "./core/MuiFieldAutocomplete";
 
 // core components
+import MuiIcon from "./core/MuiIcon";
 import MuiButton from "./core/MuiButton";
 import MuiButtonGroup from "./core/MuiButtonGroup";
 import MuiConjs from "./core/MuiConjs";
@@ -90,6 +91,7 @@ export default {
   MuiFieldSelect,
   MuiFieldAutocomplete,
 
+  MuiIcon,
   MuiButton,
   MuiButtonGroup,
   MuiConjs,

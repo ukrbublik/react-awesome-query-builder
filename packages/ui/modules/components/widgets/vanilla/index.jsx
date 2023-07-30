@@ -18,6 +18,7 @@ export {default as VanillaFieldSelect} from "./core/VanillaFieldSelect";
 // core components
 export {default as VanillaConjs} from "./core/VanillaConjs";
 export {default as VanillaButton} from "./core/VanillaButton";
+export {default as VanillaIcon} from "./core/VanillaIcon";
 export {default as VanillaButtonGroup} from "./core/VanillaButtonGroup";
 export {default as VanillaValueSources} from "./core/VanillaValueSources";
 export {default as VanillaSwitch} from "./core/VanillaSwitch";

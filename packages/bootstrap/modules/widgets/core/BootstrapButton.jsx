@@ -1,34 +1,37 @@
 import React from "react";
 import { Button } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
-export default ({ type, label, onClick, config }) => {
-  const hideLabelsFor = {
-    "addRuleGroup": true
+const hideLabelsFor = {
+  "addRuleGroup": true,
+  "delRuleGroup": true,
+  "delRule": true,
+};
+
+const typeToColor = {
+  addRule: "primary",
+  addGroup: "primary",
+  delGroup: "danger",
+  delRuleGroup: "danger",
+  delRule: "danger",
+};
+
+export default (props) => {
+  const { type, label, onClick, renderIcon, readonly } = props;
+  const iconProps = {
+    type,
+    readonly,
   };
-  const typeToIcon = {
-    delGroup: faTrashAlt,
-    delRuleGroup: faTrashAlt,
-    delRule: faTrashAlt,
-    addRuleGroup: faPlus,
-    addRuleGroupExt: faPlus,
-    addRule: faPlus,
-    addGroup: faPlus,
-  };
-  const typeToColor = {
-    addRule: "primary",
-    addGroup: "primary",
-    delGroup: "danger",
-    delRuleGroup: "danger",
-    delRule: "danger",
-  };
+  const Icon = renderIcon?.(iconProps) || null;
 
   let isOnlyIcon = hideLabelsFor[type] || !label;
 
-  return (
-    <Button size="sm" color={typeToColor[type]} onClick={onClick}>
-      <FontAwesomeIcon icon={typeToIcon[type]} /> {!isOnlyIcon && label}
-    </Button>
-  );
+  if (!onClick) {
+    return Icon;
+  } else {
+    return (
+      <Button size="sm" color={typeToColor[type]} onClick={onClick}>
+        {Icon}{!isOnlyIcon && label}
+      </Button>
+    );
+  }
 };

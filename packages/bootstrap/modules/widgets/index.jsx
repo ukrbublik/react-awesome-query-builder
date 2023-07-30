@@ -14,6 +14,7 @@ import BootstrapMultiSelectWidget from "./value/BootstrapMultiSelect";
 import BootstrapFieldSelect from "./core/BootstrapFieldSelect";
 
 // core components
+import BootstrapIcon from "./core/BootstrapIcon";
 import BootstrapButton from "./core/BootstrapButton";
 import BootstrapButtonGroup from "./core/BootstrapButtonGroup";
 import BootstrapConjs from "./core/BootstrapConjs";
@@ -37,6 +38,7 @@ export default {
 
   BootstrapFieldSelect,
 
+  BootstrapIcon,
   BootstrapButton,
   BootstrapButtonGroup,
   BootstrapConjs,

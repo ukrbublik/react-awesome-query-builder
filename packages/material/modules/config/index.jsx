@@ -15,6 +15,7 @@ const settings = {
   renderConjs: (props, {RCE, W: {MaterialConjs}}) => RCE(MaterialConjs, props),
   renderSwitch: (props, {RCE, W: {MaterialSwitch}}) => RCE(MaterialSwitch, props),
   renderButton: (props, {RCE, W: {MaterialButton}}) => RCE(MaterialButton, props),
+  renderIcon: (props, {RCE, W: {MaterialIcon}}) => RCE(MaterialIcon, props),
   renderButtonGroup: (props, {RCE, W: {MaterialButtonGroup}}) => RCE(MaterialButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),
   renderFieldSources: (props, {RCE, W: {MaterialValueSources}}) => RCE(MaterialValueSources, props),

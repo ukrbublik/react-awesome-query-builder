@@ -1,3 +1,4 @@
 import { Utils } from "@react-awesome-query-builder/core";
 import * as ReactUtils from "./reactUtils";
-export default { ...Utils, ReactUtils };
+import { DragIcon } from "../components/utils";
+export default { ...Utils, ReactUtils, DragIcon };
