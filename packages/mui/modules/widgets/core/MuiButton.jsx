@@ -1,30 +1,31 @@
 import React from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
-export default ({type, label, onClick, readonly, config}) => {
-  const hideLabelsFor = {
-    "addRuleGroup": true,
-    "addRuleGroupExt": true,
+const hideLabelsFor = {
+  "addRuleGroup": true,
+  "addRuleGroupExt": true,
+  "delGroup": true,
+  "delRuleGroup": true,
+  "delRule": true,
+};
+
+const typeToColor = {
+  "addRule": "neutral",
+  "addGroup": "primary",
+  "delGroup": "secondary",
+  "delRuleGroup": "secondary",
+  "delRule": "secondary",
+};
+
+export default (props) => {
+  const {type, label, onClick, readonly, renderIcon} = props;
+  const iconProps = {
+    type,
+    readonly,
   };
-  const typeToIcon = {
-    "delGroup": <DeleteIcon />,
-    "delRuleGroup": <DeleteIcon />,
-    "delRule": <DeleteIcon />,
-    "addRule": <AddIcon />,
-    "addGroup": <AddIcon />,
-    "addRuleGroupExt": <AddIcon />,
-    "addRuleGroup": <AddIcon />,
-  };
-  const typeToColor = {
-    "addRule": "neutral",
-    "addGroup": "primary",
-    "delGroup": "secondary",
-    "delRuleGroup": "secondary",
-    "delRule": "secondary",
-  };
+  const icon = renderIcon?.(iconProps);
+
   if (!label || hideLabelsFor[type]) {
     return (
       <IconButton
@@ -32,7 +33,7 @@ export default ({type, label, onClick, readonly, config}) => {
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]}
-      >{typeToIcon[type]}</IconButton>
+      >{icon}</IconButton>
     );
   } else {
     return (
@@ -41,7 +42,7 @@ export default ({type, label, onClick, readonly, config}) => {
         disabled={readonly} 
         onClick={onClick} 
         color={typeToColor[type]} 
-        startIcon={typeToIcon[type]}
+        startIcon={icon}
       >{label}</Button>
     );
   }

@@ -24,6 +24,7 @@ import MaterialFieldSelect from "./core/MaterialFieldSelect";
 import MaterialFieldAutocomplete from "./core/MaterialFieldAutocomplete";
 
 // core components
+import MaterialIcon from "./core/MaterialIcon";
 import MaterialButton from "./core/MaterialButton";
 import MaterialButtonGroup from "./core/MaterialButtonGroup";
 import MaterialConjs from "./core/MaterialConjs";
@@ -75,6 +76,7 @@ export default {
   MaterialFieldSelect,
   MaterialFieldAutocomplete,
 
+  MaterialIcon,
   MaterialButton,
   MaterialButtonGroup,
   MaterialConjs,

@@ -14,6 +14,7 @@ const settings = {
   renderConjs: (props, {RCE, W: {MuiConjs}}) => RCE(MuiConjs, props),
   renderSwitch: (props, {RCE, W: {MuiSwitch}}) => RCE(MuiSwitch, props),
   renderButton: (props, {RCE, W: {MuiButton}}) => RCE(MuiButton, props),
+  renderIcon: (props, {RCE, W: {MuiIcon}}) => RCE(MuiIcon, props),
   renderButtonGroup: (props, {RCE, W: {MuiButtonGroup}}) => RCE(MuiButtonGroup, props),
   renderValueSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
   renderFieldSources: (props, {RCE, W: {MuiValueSources}}) => RCE(MuiValueSources, props),
