@@ -7,7 +7,7 @@ import Draggable from "../containers/Draggable";
 import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
-import {WithConfirmFn, DragIcon, dummyFn} from "../utils";
+import {WithConfirmFn, dummyFn} from "../utils";
 const {isEmptyGroupChildren} = Utils.RuleUtils;
 
 const defaultPosition = "topRight";
@@ -267,13 +267,17 @@ export class BasicGroup extends Component {
 
   renderDrag() {
     const { handleDraggerMouseDown } = this.props;
-    const drag = this.showDragIcon()
-      && <span
-        key="group-drag-icon"
-        className={"qb-drag-handler group--drag-handler"}
-        onMouseDown={handleDraggerMouseDown}
-      ><DragIcon /> </span>;
-    return drag;
+    const { config } = this.props;
+    const { renderIcon } = config.settings;
+    const Icon = (pr) => renderIcon?.(pr, config.ctx);
+    const icon = <Icon
+      type="drag"
+    />;
+    return this.showDragIcon() && (<div 
+      key="group-drag-icon"
+      onMouseDown={handleDraggerMouseDown}
+      className={"qb-drag-handler group--drag-handler"}
+    >{icon}</div>);
   }
 
   conjunctionOptions() {

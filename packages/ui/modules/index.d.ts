@@ -195,10 +195,20 @@ export type Query = ElementType<QueryProps>;
 // Props for render* in RenderSettings
 /////////////////
 
+type IconType = "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup" | "drag";
+
 export interface ButtonProps {
-  type: "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRuleGroup" | "delRuleGroup", 
-  onClick(): void, 
+  type: IconType & {
+    renderIcon: FactoryWithContext<IconProps>
+  },
+  onClick(): void,
   label: string,
+  config?: Config,
+  readonly?: boolean,
+}
+
+export interface IconProps {
+  type: IconType;
   config?: Config,
   readonly?: boolean,
 }
@@ -296,6 +306,7 @@ export interface RenderSettings {
   renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction,
   renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction,
   renderButton?: FactoryWithContext<ButtonProps> | SerializedFunction,
+  renderIcon?: FactoryWithContext<IconProps> | SerializedFunction,
   renderButtonGroup?: FactoryWithContext<ButtonGroupProps> | SerializedFunction,
   renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction,
   renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,

@@ -9,9 +9,10 @@ export class RuleGroupExtActions extends PureComponent {
     } = this.props;
     const {
       immutableGroupsMode, addSubRuleLabel, delGroupLabel,
-      renderButton, renderSwitch, renderButtonGroup,
+      renderButton, renderIcon, renderSwitch, renderButtonGroup,
       lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
+    const Icon = (pr) => renderIcon(pr, config.ctx);
     const Btn = (pr) => renderButton(pr, config.ctx);
     const Switch = (pr) => renderSwitch(pr, config.ctx);
     const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
@@ -21,11 +22,11 @@ export class RuleGroupExtActions extends PureComponent {
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn 
-      type="addRuleGroupExt" onClick={addRule} label={addSubRuleLabel} readonly={isLocked} config={config}
+      type="addRuleGroupExt" onClick={addRule} label={addSubRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
 
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn 
-      type="delRuleGroup" onClick={removeSelf} label={delGroupLabel} config={config}
+      type="delRuleGroup" onClick={removeSelf} label={delGroupLabel} config={config} renderIcon={Icon}
     />;
 
     return (

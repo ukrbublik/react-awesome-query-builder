@@ -20,9 +20,10 @@ export class GroupActions extends PureComponent {
     } = this.props;
     const {
       immutableGroupsMode, addRuleLabel, addGroupLabel, delGroupLabel, groupActionsPosition, 
-      renderButton, renderSwitch, renderButtonGroup,
+      renderButton, renderIcon, renderSwitch, renderButtonGroup,
       lockLabel, lockedLabel, showLock, canDeleteLocked,
     } = config.settings;
+    const Icon = (pr) => renderIcon(pr, config.ctx);
     const Btn = (pr) => renderButton(pr, config.ctx);
     const Switch = (pr) => renderSwitch(pr, config.ctx);
     const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
@@ -33,13 +34,13 @@ export class GroupActions extends PureComponent {
     />;
 
     const addRuleBtn = !immutableGroupsMode && canAddRule && !isLocked && <Btn
-      type="addRule" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config}
+      type="addRule" onClick={addRule} label={addRuleLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
     const addGroupBtn = !immutableGroupsMode && canAddGroup && !isLocked && <Btn
-      type="addGroup" onClick={addGroup} label={addGroupLabel} readonly={isLocked} config={config}
+      type="addGroup" onClick={addGroup} label={addGroupLabel} readonly={isLocked} config={config} renderIcon={Icon}
     />;
     const delGroupBtn = !immutableGroupsMode && canDeleteGroup && (!isLocked || isLocked && canDeleteLocked) && <Btn
-      type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config}
+      type="delGroup" onClick={removeSelf} label={delGroupLabel} config={config} renderIcon={Icon}
     />;
 
     return (

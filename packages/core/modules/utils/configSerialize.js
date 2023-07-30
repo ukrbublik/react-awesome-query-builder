@@ -134,6 +134,7 @@ const compileMetaSettings = {
   renderFunc: { type: "rf" },
   renderConjs: { type: "rf" },
   renderButton: { type: "rf" },
+  renderIcon: { type: "rf" },
   renderButtonGroup: { type: "rf" },
   renderValueSources: { type: "rf" },
   renderFieldSources: { type: "rf" },
