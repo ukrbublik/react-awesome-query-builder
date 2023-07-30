@@ -1,20 +1,14 @@
 import React from "react";
 import { Button } from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
-export default ({ type, label, onClick, config }) => {
+export default (props) => {
+  const { type, label, onClick, renderIcon } = props;
+  const Icon = renderIcon?.(props) || null;
+
   const hideLabelsFor = {
-    "addRuleGroup": true
-  };
-  const typeToIcon = {
-    delGroup: faTrashAlt,
-    delRuleGroup: faTrashAlt,
-    delRule: faTrashAlt,
-    addRuleGroup: faPlus,
-    addRuleGroupExt: faPlus,
-    addRule: faPlus,
-    addGroup: faPlus,
+    "addRuleGroup": true,
+    "delRuleGroup": true,
+    "delRule": true,
   };
   const typeToColor = {
     addRule: "primary",
@@ -26,9 +20,13 @@ export default ({ type, label, onClick, config }) => {
 
   let isOnlyIcon = hideLabelsFor[type] || !label;
 
-  return (
-    <Button size="sm" color={typeToColor[type]} onClick={onClick}>
-      <FontAwesomeIcon icon={typeToIcon[type]} /> {!isOnlyIcon && label}
-    </Button>
-  );
+  if (!onClick) {
+    return Icon;
+  } else {
+    return (
+      <Button size="sm" color={typeToColor[type]} onClick={onClick}>
+        {Icon}{!isOnlyIcon && label}
+      </Button>
+    );
+  }
 };

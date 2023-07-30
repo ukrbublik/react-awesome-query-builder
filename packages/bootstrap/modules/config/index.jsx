@@ -11,6 +11,7 @@ const settings = {
   renderFunc: (props, {RCE, W: {BootstrapFieldSelect}}) => RCE(BootstrapFieldSelect, props),
   renderConjs: (props, {RCE, W: {BootstrapConjs}}) => RCE(BootstrapConjs, props),
   renderButton: (props, {RCE, W: {BootstrapButton}}) => RCE(BootstrapButton, props),
+  renderIcon: (props, {RCE, W: {BootstrapIcon}}) => RCE(BootstrapIcon, props),
   renderButtonGroup: (props, {RCE, W: {BootstrapButtonGroup}}) => RCE(BootstrapButtonGroup, props),
   renderValueSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
   renderFieldSources: (props, {RCE, W: {BootstrapValueSources}}) => RCE(BootstrapValueSources, props),
