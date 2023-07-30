@@ -8,7 +8,7 @@ const typeToLabel = {
   "delRule": "x",
 };
 
-export default ({type, label, onClick, readonly, config}) => {
+export default ({type, label, onClick, readonly}) => {
   const btnLabel = label || typeToLabel[type];
   return <button onClick={onClick} type="button" disabled={readonly}>{btnLabel}</button>;
 };

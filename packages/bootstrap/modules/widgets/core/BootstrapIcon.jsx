@@ -16,8 +16,8 @@ const typeToIcon = {
 };
 
 export default ({ type }) => {
-  let icon = typeToIcon[type] && 
-    <FontAwesomeIcon
+  let icon = typeToIcon[type] 
+    && <FontAwesomeIcon
       icon={typeToIcon[type]}
     />;
   if (!icon && type === "drag") {
