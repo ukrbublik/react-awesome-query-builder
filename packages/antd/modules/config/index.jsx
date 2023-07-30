@@ -21,6 +21,7 @@ const settings = {
   renderConjs: (props, {RCE, W: {Conjs}}) => RCE(Conjs, props),
   renderSwitch: (props, {RCE, W: {Switch}}) => RCE(Switch, props),
   renderButton: (props, {RCE, W: {Button}}) => RCE(Button, props),
+  renderIcon: (props, {RCE, W: {Icon}}) => RCE(Icon, props),
   renderButtonGroup: (props, {RCE, W: {ButtonGroup}}) => RCE(ButtonGroup, props),
   renderValueSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),
   renderFieldSources: (props, {RCE, W: {ValueSources}}) => RCE(ValueSources, props),

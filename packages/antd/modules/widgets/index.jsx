@@ -22,6 +22,7 @@ import FieldCascader from "./core/FieldCascader";
 import FieldTreeSelect from "./core/FieldTreeSelect";
 
 // core components
+import Icon from "./core/Icon";
 import Button from "./core/Button";
 import ButtonGroup from "./core/ButtonGroup";
 import Conjs from "./core/Conjs";
@@ -52,6 +53,7 @@ export default {
   FieldCascader,
   FieldTreeSelect,
 
+  Icon,
   Button,
   ButtonGroup,
   Conjs,
