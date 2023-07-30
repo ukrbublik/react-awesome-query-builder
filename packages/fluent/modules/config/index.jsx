@@ -11,6 +11,7 @@ const settings = {
   renderFunc: (props, {RCE, W: {FluentUIFieldSelect}}) => RCE(FluentUIFieldSelect, props),
   renderConjs: (props, {RCE, W: {FluentUIConjs}}) => RCE(FluentUIConjs, props),
   renderButton: (props, {RCE, W: {FluentUIButton}}) => RCE(FluentUIButton, props),
+  renderIcon: (props, {RCE, W: {FluentUIIcon}}) => RCE(FluentUIIcon, props),
   renderButtonGroup: (props, {RCE, W: {FluentUIButtonGroup}}) => RCE(FluentUIButtonGroup, props),
   renderValueSources: (props, {RCE, W: {FluentUIValueSources}}) => RCE(FluentUIValueSources, props),
   renderFieldSources: (props, {RCE, W: {FluentUIValueSources}}) => RCE(FluentUIValueSources, props),

@@ -1,53 +1,46 @@
 import React from "react";
-import { IconButton, ActionButton, CommandBarButton } from "@fluentui/react";
+import { IconButton, ActionButton, CommandBarButton, DefaultButton } from "@fluentui/react";
+
+const hideLabelsFor = {
+  "addRuleGroup": true,
+  "delRuleGroup": true,
+  "delRule": true,  
+  // "addRuleGroupExt": true,
+  // "delGroup": true,
+};
+const useAction = {
+  "addRuleGroup": true,
+};
 
 const FluentUIButton = (props) => {
-  var type = props.type,
-    label = props.label,
-    onClick = props.onClick,
-    readonly = props.readonly;
+  const { type, label, onClick, readonly, renderIcon } = props;
 
-  const hideLabelsFor = {
-    "addRuleGroup": true,
-  };
-  var typeToIcon = {
-    addRuleGroup: "CirclePlus",
-  };
-  var typeToCommandIcon = {
-    addRuleGroupExt: "Add",
-    addRule: "Add",
-    addGroup: "CirclePlus",
-    delGroup: "Delete",
-    delRuleGroup: "Delete",
-    delRule: "Delete",
-  };
-
+  let renderBtn;
   if (!label || hideLabelsFor[type]) {
-    return (
+    renderBtn = (bprops) => (
       <IconButton
         key={type}
         onClick={onClick}
         disabled={readonly}
-        iconProps={{ iconName: typeToIcon[type] || typeToCommandIcon[type]  }}
         color="primary"
+        {...bprops}
       />
     );
-  } else if (typeToIcon[type]) {
-    return (
+  } else if (useAction[type]) {
+    renderBtn = (bprops) => (
       <ActionButton
         key={type}
         onClick={onClick}
-        iconProps={{ iconName: typeToIcon[type] }}
         disabled={readonly}
         text={label}
+        {...bprops}
       />
     );
-  } else if (typeToCommandIcon[type]) {
-    return (
+  } else {
+    renderBtn = (bprops) => (
       <CommandBarButton
         key={type}
         onClick={onClick}
-        iconProps={{ iconName: typeToCommandIcon[type] }}
         disabled={readonly}
         text={label}
         color="primary"
@@ -56,9 +49,30 @@ const FluentUIButton = (props) => {
             backgroundColor: "transparent"
           }
         }}
+        {...bprops}
       />
     );
   }
+
+  const renderDefaultButton = (bprops) => (
+    <DefaultButton
+      key={type}
+      onClick={onClick}
+      disabled={readonly}
+      text={label}
+      color="primary"
+      {...bprops}
+    />
+  );
+
+  const buttonIcon = renderIcon?.({
+    type,
+    readonly,
+    renderBtn,
+    renderDefaultButton,
+  });
+  return buttonIcon;
+
 };
 
 export default FluentUIButton;
