@@ -17,7 +17,11 @@ const typeToColor = {
 
 export default (props) => {
   const { type, label, onClick, renderIcon } = props;
-  const Icon = renderIcon?.(props) || null;
+  const iconProps = {
+    type,
+    readonly,
+  };
+  const Icon = renderIcon?.(iconProps) || null;
 
   let isOnlyIcon = hideLabelsFor[type] || !label;
 

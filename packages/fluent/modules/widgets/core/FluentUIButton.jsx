@@ -65,12 +65,13 @@ const FluentUIButton = (props) => {
     />
   );
 
-  const buttonIcon = renderIcon?.({
+  const iconProps = {
     type,
     readonly,
     renderBtn,
     renderDefaultButton,
-  });
+  };
+  const buttonIcon = renderIcon?.(iconProps);
   return buttonIcon;
 
 };
