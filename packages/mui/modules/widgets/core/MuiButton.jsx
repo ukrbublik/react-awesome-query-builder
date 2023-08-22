@@ -11,7 +11,7 @@ const hideLabelsFor = {
 };
 
 const typeToColor = {
-  "addRule": "neutral",
+  "addRule": "primary",
   "addGroup": "primary",
   "delGroup": "secondary",
   "delRuleGroup": "secondary",

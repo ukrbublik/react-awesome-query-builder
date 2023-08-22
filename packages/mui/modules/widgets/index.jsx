@@ -43,10 +43,10 @@ const MuiProvider = ({config, children}) => {
   const locale = settingsLocale.mui;
   const theme = createTheme(themeConfig, locale, { 
     palette: {
-      neutral: {
-        main: "#64748B",
-        contrastText: "#fff"
-      },
+      // neutral: {
+      //   main: "#64748B",
+      //   contrastText: "#fff"
+      // },
     }
   });
 

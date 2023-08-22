@@ -18,12 +18,12 @@ const typeToIcon = {
 };
 
 const typeToColor = {
-  // "addRule": "default",
+  // "addRule": "primary",
   // "addGroup": "primary",
   // "delGroup": "secondary",
   // "delRuleGroup": "secondary",
   // "delRule": "secondary",
-  "drag": "default",
+  "drag": "primary",
 };
 
 export default ({type, readonly}) => {

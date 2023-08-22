@@ -140,7 +140,7 @@ export default class ValueField extends Component {
     return fields;
   }
 
-  buildOptions(parentFieldPath, config, fields, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, path = null, optGroup = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
@@ -168,7 +168,10 @@ export default class ValueField extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, label)
+          items: this.buildOptions(parentFieldPath, config, field.subfields, fullFieldPath, {
+            label,
+            tooltip,
+          })
         };
       } else {
         return {
@@ -178,7 +181,8 @@ export default class ValueField extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          grouplabel: optGroupLabel
+          grouplabel: optGroup?.label,
+          group: optGroup,
         };
       }
     }).filter(o => !!o);

@@ -13,7 +13,7 @@ const mapFieldItemToOptionKeys = {
 
 const itemsToListValues = (items, level = 0) => (
   items.map(item => {
-    const {items, path, key, label, altLabel, disabled, grouplabel, matchesType, tooltip} = item;
+    const {items, path, key, label, altLabel, disabled, grouplabel, group, matchesType, tooltip} = item;
     const prefix = "\u00A0\u00A0".repeat(level);
     if (items) {
       return itemsToListValues(items, level+1);
@@ -24,6 +24,7 @@ const itemsToListValues = (items, level = 0) => (
         value: path,
         disabled,
         groupTitle: level > 0 ? prefix+grouplabel : null,
+        group: group,
         tooltip: tooltip,
         _value2: key,
         _altLabel: altLabel,
@@ -32,7 +33,14 @@ const itemsToListValues = (items, level = 0) => (
   }).flat(Infinity)
 );
 
-const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}, config) => {
+const fieldAdapter = ({
+  items, selectedKey, setField, isValueField,
+  selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel,
+  ...rest
+}, config) => {
+  let tooltipText = selectedAltLabel || selectedFullLabel;
+  if (tooltipText == selectedLabel)
+    tooltipText = null;
   const listValues = itemsToListValues(items);
   const value = selectedKey;
   const setValue = (value, _asyncValues) => {
@@ -52,6 +60,7 @@ const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}, con
 
   return {
     ...rest,
+    tooltipText,
     listValues,
     setValue,
     filterOptionsConfig,
