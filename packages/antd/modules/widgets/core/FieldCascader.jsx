@@ -8,8 +8,8 @@ const { getFieldParts } = Utils.ConfigUtils;
 
 // see type FieldItemSearchableKeys
 const mapFieldItemToOptionKeys = {
-  key: "_value2",
-  path: "path",
+  key: "key",
+  path: "_path",
   label: "_label",
   altLabel: "altLabel",
   tooltip: "tooltip",
@@ -55,8 +55,8 @@ export default class FieldCascader extends Component {
       if (items) {
         return {
           ...item,
-          key: path,
-          _value2: key,
+          key: key,
+          _path: path,
           items: this.getItems(items),
           label: matchesType ? <b>{label}</b> : label,
           _label: label,
@@ -64,8 +64,8 @@ export default class FieldCascader extends Component {
       } else {
         return {
           ...item,
-          key: path,
-          _value2: key,
+          key: key,
+          _path: path,
           label: matchesType ? <b>{label}</b> : label,
           _label: label,
         };
