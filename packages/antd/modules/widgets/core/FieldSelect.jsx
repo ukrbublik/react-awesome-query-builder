@@ -85,7 +85,7 @@ export default class FieldSelect extends PureComponent {
       >{fieldSelectItems}</Select>
     );
 
-    if (tooltipText && !selectedOpts.tooltip) {
+    if (tooltipText) {
       res = <Tooltip title={tooltipText}>{res}</Tooltip>;
     }
 

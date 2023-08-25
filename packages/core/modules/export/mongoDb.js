@@ -87,6 +87,8 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
     conjunction = reversedConj;
     conjunctionDefinition = config.conjunctions[conjunction];
   }
+  if (!conjunctionDefinition)
+    return undefined;
   const mongoConj = conjunctionDefinition.mongoConj;
 
   let resultQuery;
