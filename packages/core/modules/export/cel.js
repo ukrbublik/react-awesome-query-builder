@@ -22,22 +22,22 @@ import {
 } from "../utils/stuff";
 import { defaultConjunction } from "../utils/defaultUtils";
 import { List, Map } from "immutable";
-import { spelEscape } from "../utils/export";
+import { spelEscape as celEscape } from "../utils/export";
 
 // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions
 
-export const compareToSign = "${0}.compareTo(${1})";
-const TypesWithCompareTo = {
-  datetime: true,
-  time: true,
-  date: true,
+// export const compareToSign = "${0}.compareTo(${1})";
+// const TypesWithCompareTo = {
+//   datetime: true,
+//   time: true,
+//   date: true,
+// };
+
+export const celFormat = (tree, config) => {
+  return _celFormat(tree, config, false);
 };
 
-export const spelFormat = (tree, config) => {
-  return _spelFormat(tree, config, false);
-};
-
-export const _spelFormat = (tree, config, returnErrors = true) => {
+export const _celFormat = (tree, config, returnErrors = true) => {
   //meta is mutable
   let meta = {
     errors: [],
@@ -50,7 +50,7 @@ export const _spelFormat = (tree, config, returnErrors = true) => {
     return [res, meta.errors];
   } else {
     if (meta.errors.length)
-      console.warn("Errors while exporting to SpEL:", meta.errors);
+      console.warn("Errors while exporting to CEL:", meta.errors);
     return res;
   }
 };
@@ -154,7 +154,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const isRuleGroupArray = isRuleGroup && mode != "struct";
   const groupField = isRuleGroupArray ? field : parentField;
   const groupFieldDef = getFieldConfig(config, groupField) || {};
-  const isSpelArray = groupFieldDef.isSpelArray;
+  const isCelArray = groupFieldDef.isCelArray;
   const { fieldSeparator } = config.settings;
 
   // check op for reverse
@@ -195,7 +195,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
 
   const omitBrackets = isRuleGroup;
   const filter = list.size
-    ? conjunctionDefinition.spelFormatConj(list, conjunction, not, omitBrackets)
+    ? conjunctionDefinition.celFormatConj(list, conjunction, not, omitBrackets)
     : null;
 
   // build result
@@ -203,7 +203,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
   if (isRuleGroupArray) {
     const formattedField = formatField(meta, config, field, parentField);
     const sep = fieldSeparator || ".";
-    const getSize = sep + (isSpelArray ? "length" : "size()");
+    const getSize = sep + (isCelArray ? "length" : "size()");
     const fullSize = `${formattedField}${getSize}`;
     // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-collection-selection
     const filteredSize = filter
@@ -230,11 +230,11 @@ const formatGroup = (item, config, meta, parentField = null) => {
 };
 
 const buildFnToFormatOp = (operator, operatorDefinition, valueType) => {
-  const spelOp = operatorDefinition.spelOp;
-  if (!spelOp) return undefined;
-  const isSign = spelOp.includes("${0}");
+  const celOp = operatorDefinition.celOp;
+  if (!celOp) return undefined;
+  const isSign = celOp.includes("${0}");
   const isCompareTo = TypesWithCompareTo[valueType];
-  let sop = spelOp;
+  let sop = celOp;
   let fn;
   const cardinality = defaultValue(operatorDefinition.cardinality, 1);
   if (isCompareTo) {
@@ -267,7 +267,7 @@ const buildFnToFormatOp = (operator, operatorDefinition, valueType) => {
       operatorOptions,
       fieldDef
     ) => {
-      return spelOp.replace(/\${(\w+)}/g, (_, k) =>
+      return celOp.replace(/\${(\w+)}/g, (_, k) =>
         k == 0 ? field : cardinality > 1 ? values[k - 1] : values
       );
     };
@@ -319,8 +319,7 @@ const formatExpression = (
   const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  const fn =
-    opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
+  const fn = opDef.celFormatOp || buildFnToFormatOp(operator, opDef, valueType);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -342,7 +341,7 @@ const formatExpression = (
 
   //rev
   if (isRev) {
-    ret = config.settings.spelFormatReverse(ret);
+    ret = config.settings.celFormatReverse(ret);
   }
 
   if (ret === undefined) {
@@ -361,8 +360,8 @@ const checkOp = (config, operator, field) => {
   let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
 
   let isRev = false;
-  const canFormatOp = opDef.spelOp || opDef.spelFormatOp;
-  const canFormatRevOp = revOpDef.spelOp || revOpDef.spelFormatOp;
+  const canFormatOp = opDef.celOp || opDef.celFormatOp;
+  const canFormatRevOp = revOpDef.celOp || revOpDef.celFormatOp;
   if (!canFormatOp && !canFormatRevOp) {
     return undefined;
   }
@@ -518,8 +517,8 @@ const formatValue = (
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
   } else {
-    if (typeof fieldWidgetDef.spelFormatValue === "function") {
-      const fn = fieldWidgetDef.spelFormatValue;
+    if (typeof fieldWidgetDef.celFormatValue === "function") {
+      const fn = fieldWidgetDef.celFormatValue;
       const args = [
         currentValue,
         {
@@ -539,7 +538,7 @@ const formatValue = (
       }
       ret = fn.call(config.ctx, ...args);
     } else {
-      ret = spelEscape(currentValue);
+      ret = celEscape(currentValue);
     }
   }
   return ret;
@@ -551,7 +550,7 @@ const formatField = (meta, config, field, parentField = null) => {
   const fieldDefinition = getFieldConfig(config, field) || {};
   const fieldParts = getFieldParts(field, config);
   const fieldPartsConfigs = getFieldPartsConfigs(field, config, parentField);
-  const formatFieldFn = config.settings.formatSpelField;
+  const formatFieldFn = config.settings.formatCelField;
   const fieldName = formatFieldName(field, config, meta, parentField);
   const fieldPartsMeta = fieldPartsConfigs.map(([key, cnf, parentCnf]) => {
     let parent;
@@ -560,16 +559,16 @@ const formatField = (meta, config, field, parentField = null) => {
         parentCnf.type == "!struct" ||
         (parentCnf.type == "!group" && parentCnf.mode == "struct")
       )
-        parent = cnf.isSpelMap ? "map" : "class";
+        parent = cnf.isCelMap ? "map" : "class";
       else if (parentCnf.type == "!group")
-        parent = cnf.isSpelItemMap ? "[map]" : "[class]";
+        parent = cnf.isCelItemMap ? "[map]" : "[class]";
       else parent = "class";
     }
-    const isSpelVariable = cnf?.isSpelVariable;
+    const isCelVariable = cnf?.isCelVariable;
     return {
       key,
       parent,
-      isSpelVariable,
+      isCelVariable,
       fieldSeparator,
     };
   });
@@ -608,7 +607,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const argAsyncListValues = argVal
       ? argVal.get("asyncListValues")
       : undefined;
-    const doEscape = argConfig.spelEscapeForFormat ?? true;
+    const doEscape = argConfig.celEscapeForFormat ?? true;
     const operator = null;
     const widget = getWidgetForFieldOp(
       config,
@@ -709,13 +708,13 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   }
 
   let ret;
-  if (typeof funcConfig.spelFormatFunc === "function") {
-    const fn = funcConfig.spelFormatFunc;
+  if (typeof funcConfig.celFormatFunc === "function") {
+    const fn = funcConfig.celFormatFunc;
     const args = [formattedArgs];
     ret = fn.call(config.ctx, ...args);
-  } else if (funcConfig.spelFunc) {
+  } else if (funcConfig.celFunc) {
     // fill arg values
-    ret = funcConfig.spelFunc.replace(/\${(\w+)}/g, (found, argKey) => {
+    ret = funcConfig.celFunc.replace(/\${(\w+)}/g, (found, argKey) => {
       return formattedArgs[argKey] ?? found;
     });
     // remove optional args (from end only)

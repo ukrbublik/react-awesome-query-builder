@@ -1,48 +1,79 @@
 /*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
-import React, {Component} from "react";
+import React, { Component } from "react";
 import {
-  Utils, Query, Builder,
+  Utils,
+  Query,
+  Builder,
   //types:
-  BuilderProps, ImmutableTree, Config, JsonTree, JsonLogicTree
+  BuilderProps,
+  ImmutableTree,
+  Config,
+  JsonTree,
+  JsonLogicTree,
 } from "@react-awesome-query-builder/mui";
 import throttle from "lodash/throttle";
 import loadedConfig from "./config_mui"; // or ""./config_antd"
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic} = Utils;
-const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
-const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
+const {
+  queryBuilderFormat,
+  jsonLogicFormat,
+  queryString,
+  mongodbFormat,
+  cel,
+  sqlFormat,
+  getTree,
+  checkTree,
+  loadTree,
+  uuid,
+  loadFromJsonLogic,
+} = Utils;
+const preStyle = {
+  backgroundColor: "darkgrey",
+  margin: "10px",
+  padding: "10px",
+};
+const preErrorStyle = {
+  backgroundColor: "lightpink",
+  margin: "10px",
+  padding: "10px",
+};
 
-const emptyInitValue: JsonTree = {"id": uuid(), "type": "group"};
+const emptyInitValue: JsonTree = { id: uuid(), type: "group" };
 
 // get init value in JsonTree format:
-const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
+const initValue: JsonTree =
+  loadedInitValue && Object.keys(loadedInitValue).length > 0
+    ? (loadedInitValue as JsonTree)
+    : emptyInitValue;
 const initTree: ImmutableTree = checkTree(loadTree(initValue), loadedConfig);
 
 // -OR- alternativaly get init value in JsonLogic format:
 //const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
 //const initTree: ImmutableTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
 
-
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
 }
 
-export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
+export default class DemoQueryBuilder extends Component<
+  {},
+  DemoQueryBuilderState
+> {
   private immutableTree: ImmutableTree | undefined;
   private config: Config | undefined;
-    
+
   state = {
     tree: initTree,
-    config: loadedConfig
+    config: loadedConfig,
   };
 
   render = () => (
     <div>
-      <Query 
-        {...loadedConfig} 
+      <Query
+        {...loadedConfig}
         value={this.state.tree}
         onChange={this.onChange}
         renderBuilder={this.renderBuilder}
@@ -59,24 +90,24 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
 
   resetValue = () => {
     this.setState({
-      tree: initTree, 
+      tree: initTree,
     });
   };
 
   clearValue = () => {
     this.setState({
-      tree: loadTree(emptyInitValue), 
+      tree: loadTree(emptyInitValue),
     });
   };
 
   renderBuilder = (props: BuilderProps) => (
-    <div className="query-builder-container" style={{padding: "10px"}}>
+    <div className="query-builder-container" style={{ padding: "10px" }}>
       <div className="query-builder qb-lite">
         <Builder {...props} />
       </div>
     </div>
   );
-    
+
   onChange = (immutableTree: ImmutableTree, config: Config) => {
     this.immutableTree = immutableTree;
     this.config = config;
@@ -85,67 +116,88 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     // `jsonTree` or `logic` can be saved to backend
     // (and then loaded with `loadTree` or `loadFromJsonLogic` as seen above)
     const jsonTree = getTree(immutableTree);
-    const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+    const { logic, data, errors } = jsonLogicFormat(immutableTree, config);
   };
 
   updateResult = throttle(() => {
-    this.setState({tree: this.immutableTree as ImmutableTree, config: this.config as Config});
+    this.setState({
+      tree: this.immutableTree as ImmutableTree,
+      config: this.config as Config,
+    });
   }, 100);
 
-  renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
-    const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
+  renderResult = ({
+    tree: immutableTree,
+    config,
+  }: {
+    tree: ImmutableTree;
+    config: Config;
+  }) => {
+    const { logic, data, errors } = jsonLogicFormat(immutableTree, config);
     return (
       <div>
         <br />
         <div>
-          stringFormat: 
+          stringFormat:
           <pre style={preStyle}>
             {stringify(queryString(immutableTree, config), undefined, 2)}
           </pre>
         </div>
-        <hr/>
+        <hr />
         <div>
-          humanStringFormat: 
+          humanStringFormat:
           <pre style={preStyle}>
             {stringify(queryString(immutableTree, config, true), undefined, 2)}
           </pre>
         </div>
-        <hr/>
+        <hr />
         <div>
-          sqlFormat: 
+          celFormat:
+          <pre style={preStyle}>
+            {stringify(cel(immutableTree, config), undefined, 2)}
+          </pre>
+        </div>
+        <hr />
+        <div>
+          sqlFormat:
           <pre style={preStyle}>
             {stringify(sqlFormat(immutableTree, config), undefined, 2)}
           </pre>
         </div>
-        <hr/>
+        <hr />
         <div>
-          mongodbFormat: 
+          mongodbFormat:
           <pre style={preStyle}>
             {stringify(mongodbFormat(immutableTree, config), undefined, 2)}
           </pre>
         </div>
-        <hr/>
+        <hr />
         <div>
-          <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
-          { (errors?.length || 0) > 0 
-              && <pre style={preErrorStyle}>
-                {stringify(errors, undefined, 2)}
-              </pre> 
-          }
-          { !!logic
-              && <pre style={preStyle}>
-                {"// Rule"}:<br />
-                {stringify(logic, undefined, 2)}
-                <br />
-                <hr />
-                {"// Data"}:<br />
-                {stringify(data, undefined, 2)}
-              </pre>
-          }
+          <a
+            href="http://jsonlogic.com/play.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            jsonLogicFormat
+          </a>
+          :
+          {(errors?.length || 0) > 0 && (
+            <pre style={preErrorStyle}>{stringify(errors, undefined, 2)}</pre>
+          )}
+          {!!logic && (
+            <pre style={preStyle}>
+              {"// Rule"}:<br />
+              {stringify(logic, undefined, 2)}
+              <br />
+              <hr />
+              {"// Data"}:<br />
+              {stringify(data, undefined, 2)}
+            </pre>
+          )}
         </div>
-        <hr/>
+        <hr />
         <div>
-          Tree: 
+          Tree:
           <pre style={preStyle}>
             {stringify(getTree(immutableTree), undefined, 2)}
           </pre>
@@ -153,5 +205,4 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
       </div>
     );
   };
-
 }
