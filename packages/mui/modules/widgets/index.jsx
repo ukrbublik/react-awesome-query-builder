@@ -3,9 +3,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { ConfirmProvider, useConfirm } from "material-ui-confirm";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment"; // TODO: set moment to dayjs
-import { DatePicker } from "@mui/x-date-pickers/DatePicker"; // to determine version
+import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
 
-const isV6 = !!DatePicker?.propTypes?.format;
+const xdpVersion = xdpPackage?.version?.split(".")?.[0];
 
 // value widgets
 import MuiTextWidget from "./value/MuiText";
@@ -50,7 +50,7 @@ const MuiProvider = ({config, children}) => {
     }
   });
 
-  const locProviderProps = isV6 ? {
+  const locProviderProps = xdpVersion === "6" ? {
     locale: momentLocale,
   } : {
     adapterLocale: momentLocale,
