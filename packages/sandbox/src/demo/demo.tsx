@@ -42,8 +42,8 @@ const preErrorStyle = {
 const emptyInitValue: JsonTree = { id: uuid(), type: "group" };
 
 // get init value in JsonTree format:
-const initValue: JsonTree =
-  loadedInitValue && Object.keys(loadedInitValue).length > 0
+const initValue: JsonTree
+  = loadedInitValue && Object.keys(loadedInitValue).length > 0
     ? (loadedInitValue as JsonTree)
     : emptyInitValue;
 const initTree: ImmutableTree = checkTree(loadTree(initValue), loadedConfig);

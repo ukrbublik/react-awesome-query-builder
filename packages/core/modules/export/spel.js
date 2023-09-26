@@ -164,12 +164,12 @@ const formatGroup = (item, config, meta, parentField = null) => {
   }
   const realGroupOperator = checkOp(config, groupOperator, field);
   const isGroupOpRev = realGroupOperator != groupOperator;
-  const realGroupOperatorDefinition =
-    (groupOperator && getOperatorConfig(config, realGroupOperator, field)) ||
-    null;
-  const isGroup0 =
-    isRuleGroup &&
-    (!realGroupOperator || realGroupOperatorDefinition.cardinality == 0);
+  const realGroupOperatorDefinition
+    = (groupOperator && getOperatorConfig(config, realGroupOperator, field))
+    || null;
+  const isGroup0
+    = isRuleGroup
+    && (!realGroupOperator || realGroupOperatorDefinition.cardinality == 0);
 
   // build value for aggregation op
   const [formattedValue, valueSrc, valueType] = formatItemValue(
@@ -319,8 +319,8 @@ const formatExpression = (
   const operatorOptions = properties.get("operatorOptions");
 
   //find fn to format expr
-  const fn =
-    opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
+  const fn
+    = opDef.spelFormatOp || buildFnToFormatOp(operator, opDef, valueType);
   if (!fn) {
     meta.errors.push(`Operator ${operator} is not supported`);
     return undefined;
@@ -436,8 +436,8 @@ const formatItemValue = (
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
   if (
-    expectedValueType == "!case_value" ||
-    (iValueType && iValueType.get(0) == "case_value")
+    expectedValueType == "!case_value"
+    || (iValueType && iValueType.get(0) == "case_value")
   ) {
     field = "!case_value";
   }
@@ -482,12 +482,12 @@ const formatItemValue = (
     });
     const hasUndefinedValues = fvalue.filter((v) => v === undefined).size > 0;
     if (!(fvalue.size < cardinality || hasUndefinedValues)) {
-      formattedValue =
-        cardinality > 1
+      formattedValue
+        = cardinality > 1
           ? fvalue.toArray()
           : cardinality == 1
-          ? fvalue.first()
-          : null;
+            ? fvalue.first()
+            : null;
     }
   }
 
@@ -557,8 +557,8 @@ const formatField = (meta, config, field, parentField = null) => {
     let parent;
     if (parentCnf) {
       if (
-        parentCnf.type == "!struct" ||
-        (parentCnf.type == "!group" && parentCnf.mode == "struct")
+        parentCnf.type == "!struct"
+        || (parentCnf.type == "!group" && parentCnf.mode == "struct")
       )
         parent = cnf.isSpelMap ? "map" : "class";
       else if (parentCnf.type == "!group")
@@ -644,9 +644,9 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     }
     let formattedDefaultVal;
     if (
-      formattedArgVal === undefined &&
-      !isOptional &&
-      defaultValue != undefined
+      formattedArgVal === undefined
+      && !isOptional
+      && defaultValue != undefined
     ) {
       const defaultWidget = getWidgetForFieldOp(
         config,

@@ -210,8 +210,8 @@ const formatRule = (item, config, meta) => {
   }
 
   //format field
-  const formattedField =
-    fieldSrc == "func"
+  const formattedField
+    = fieldSrc == "func"
       ? formatFunc(meta, config, field)
       : formatField(meta, config, field);
   if (formattedField == undefined) return undefined;
@@ -365,9 +365,9 @@ const formatFunc = (meta, config, currentValue) => {
     }
     let formattedDefaultVal;
     if (
-      formattedArgVal === undefined &&
-      !isOptional &&
-      defaultValue != undefined
+      formattedArgVal === undefined
+      && !isOptional
+      && defaultValue != undefined
     ) {
       formattedDefaultVal = formatValue(
         meta,

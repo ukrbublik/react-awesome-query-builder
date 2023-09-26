@@ -68,8 +68,8 @@ const spelInlineList = (vals, toArray = false) => {
         javaType = jt;
       } else if (javaType != jt) {
         if (
-          numberJavaTypes.includes(javaType) &&
-          numberJavaTypes.includes(jt)
+          numberJavaTypes.includes(javaType)
+          && numberJavaTypes.includes(jt)
         ) {
           // found int and float in collecton - use float
           javaType = "float";
@@ -119,20 +119,20 @@ export const spelEscape = (
     return "null";
   }
   switch (typeof val) {
-    case "boolean":
-      return val ? "true" : "false";
-    case "number":
-      if (!Number.isFinite(val) || isNaN(val)) return undefined;
-      return val + (!Number.isInteger(val) || numberToFloat ? "f" : "");
-    case "object":
-      if (Array.isArray(val)) {
-        return spelInlineList(val, arrayToArray);
-      } else {
-        // see `spelFormatValue` for Date, LocalTime
-        throw new Error("spelEscape: Object is not supported");
-      }
-    default:
-      return spelEscapeString(val);
+  case "boolean":
+    return val ? "true" : "false";
+  case "number":
+    if (!Number.isFinite(val) || isNaN(val)) return undefined;
+    return val + (!Number.isInteger(val) || numberToFloat ? "f" : "");
+  case "object":
+    if (Array.isArray(val)) {
+      return spelInlineList(val, arrayToArray);
+    } else {
+      // see `spelFormatValue` for Date, LocalTime
+      throw new Error("spelEscape: Object is not supported");
+    }
+  default:
+    return spelEscapeString(val);
   }
 };
 
