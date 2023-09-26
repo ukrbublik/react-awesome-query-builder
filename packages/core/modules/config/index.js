@@ -1007,7 +1007,7 @@ const widgets = {
       return this.utils.spelEscape(val);
     },
     celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.utils.spelEscape(val);
+      return this.utils.celEscape(val);
     },
     sqlFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
       if (opDef.sqlOp == "LIKE" || opDef.sqlOp == "NOT LIKE") {
@@ -1049,7 +1049,7 @@ const widgets = {
       return this.utils.spelEscape(val);
     },
     celFormatValue: function (val) {
-      return this.utils.spelEscape(val);
+      return this.utils.celEscape(val);
     },
     toJS: (val, fieldSettings) => val,
     mongoFormatValue: (val, fieldDef, wgtDef) => val,
@@ -1079,7 +1079,7 @@ const widgets = {
     },
     celFormatValue: function (val, fieldDef, wgtDef) {
       const isFloat = wgtDef.step && !Number.isInteger(wgtDef.step);
-      return this.utils.spelEscape(val, isFloat);
+      return this.utils.celEscape(val, isFloat);
     },
     toJS: (val, fieldSettings) => val,
     mongoFormatValue: (val, fieldDef, wgtDef) => val,
@@ -1102,7 +1102,7 @@ const widgets = {
       return this.utils.spelEscape(val);
     },
     celFormatValue: function (val) {
-      return this.utils.spelEscape(val);
+      return this.utils.celEscape(val);
     },
     toJS: (val, fieldSettings) => val,
     mongoFormatValue: (val, fieldDef, wgtDef) => val,
@@ -1129,7 +1129,7 @@ const widgets = {
       return this.utils.spelEscape(val);
     },
     celFormatValue: function (val) {
-      return this.utils.spelEscape(val);
+      return this.utils.celEscape(val);
     },
     toJS: (val, fieldSettings) => val,
     mongoFormatValue: (val, fieldDef, wgtDef) => val,
@@ -1166,7 +1166,7 @@ const widgets = {
     },
     celFormatValue: function (vals, fieldDef, wgtDef, op, opDef) {
       const isCallable = opDef.spelOp && opDef.spelOp.startsWith("${1}");
-      let res = this.utils.spelEscape(vals); // inline list
+      let res = this.utils.celEscape(vals); // inline list
       return res;
     },
     toJS: (val, fieldSettings) => val,
@@ -1541,7 +1541,7 @@ const widgets = {
       return this.utils.spelEscape(val);
     },
     celFormatValue: function (val, fieldDef, wgtDef, op, opDef) {
-      return this.utils.spelEscape(val);
+      return this.utils.celEscape(val);
     },
     defaultValue: false,
     toJS: (val, fieldSettings) => val,
@@ -1587,7 +1587,7 @@ const widgets = {
       return [val.value, []];
     },
     celFormatValue: function (val) {
-      return this.utils.spelEscape(val === "" ? null : val);
+      return this.utils.celEscape(val === "" ? null : val);
     },
     celImportValue: (val) => {
       return [val.value, []];
@@ -2102,7 +2102,7 @@ const mixinWidgetRangeslider = (config, addMixin = true) => {
         return this.utils.SqlString.escape(val);
       },
       celFormatValue: function (val) {
-        return this.utils.spelEscape(val);
+        return this.utils.celEscape(val);
       },
       spelFormatValue: function (val) {
         return this.utils.spelEscape(val);
@@ -2258,7 +2258,7 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
         return this.utils.spelEscape(val);
       },
       celFormatValue: function (val) {
-        return this.utils.spelEscape(val);
+        return this.utils.celEscape(val);
       },
       toJS: (val, fieldSettings) => val,
       ...widgets.treemultiselect,
