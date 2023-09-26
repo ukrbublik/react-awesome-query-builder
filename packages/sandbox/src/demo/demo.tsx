@@ -21,7 +21,6 @@ const {
   jsonLogicFormat,
   queryString,
   mongodbFormat,
-  cel,
   sqlFormat,
   getTree,
   checkTree,
@@ -148,13 +147,6 @@ export default class DemoQueryBuilder extends Component<
           humanStringFormat:
           <pre style={preStyle}>
             {stringify(queryString(immutableTree, config, true), undefined, 2)}
-          </pre>
-        </div>
-        <hr />
-        <div>
-          celFormat:
-          <pre style={preStyle}>
-            {stringify(cel(immutableTree, config), undefined, 2)}
           </pre>
         </div>
         <hr />

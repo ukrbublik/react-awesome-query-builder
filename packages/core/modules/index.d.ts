@@ -377,7 +377,6 @@ interface Export {
     config: Config
   ): [string | undefined, Array<string>];
   spelFormat(tree: ImmutableTree, config: Config): string | undefined;
-  cel(tree: ImmutableTree, config: Config): string | undefined;
   _spelFormat(
     tree: ImmutableTree,
     config: Config
@@ -392,6 +391,11 @@ interface Export {
     config: Config,
     syntax?: "ES_6_SYNTAX" | "ES_7_SYNTAX"
   ): Object | undefined;
+  celFormat(tree: ImmutableTree, config: Config): string | undefined;
+  _celFormat(
+    tree: ImmutableTree,
+    config: Config
+  ): [string | undefined, Array<string>];
 }
 interface Autocomplete {
   simulateAsyncFetch(
@@ -859,6 +863,12 @@ type SpelImportValue = (
   args?: TypedMap<any>
 ) => [any, string[] | string | undefined];
 
+type CelImportValue = (
+  val: any,
+  wgtDef?: Widget,
+  args?: TypedMap<any>
+) => [any, string[] | string | undefined];
+
 type FormatValue = (
   val: RuleValue,
   fieldDef: Field,
@@ -877,6 +887,14 @@ type SqlFormatValue = (
   rightFieldDef?: Field
 ) => string;
 type SpelFormatValue = (
+  val: RuleValue,
+  fieldDef: Field,
+  wgtDef: Widget,
+  op: string,
+  opDef: Operator,
+  rightFieldDef?: Field
+) => string;
+type CelFormatValue = (
   val: RuleValue,
   fieldDef: Field,
   wgtDef: Widget,
@@ -925,6 +943,9 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   spelFormatValue?: SpelFormatValue | SerializedFunction;
   spelImportFuncs?: Array<string | object>;
   spelImportValue?: SpelImportValue | SerializedFunction;
+  celFormatValue?: CelFormatValue | SerializedFunction;
+  celImportFuncs?: Array<string | object>;
+  celImportValue?: CelImportValue | SerializedFunction;
   mongoFormatValue?: MongoFormatValue | SerializedFunction;
   elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
   hideOperator?: boolean;
@@ -947,6 +968,7 @@ interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   formatValue: FormatValue | SerializedFunction; // with rightFieldDef
   sqlFormatValue?: SqlFormatValue | SerializedFunction; // with rightFieldDef
   spelFormatValue?: SpelFormatValue | SerializedFunction; // with rightFieldDef
+  celFormatValue?: CelFormatValue | SerializedFunction; // with rightFieldDef
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction;
   //@ui
@@ -1049,16 +1071,25 @@ type SpelFormatConj = (
   omitBrackets?: boolean
 ) => string;
 
+type CelFormatConj = (
+  children: ImmutableList<string>,
+  conj: string,
+  not: boolean,
+  omitBrackets?: boolean
+) => string;
+
 export interface Conjunction {
   label: string;
   formatConj: FormatConj | SerializedFunction;
   sqlFormatConj: SqlFormatConj | SerializedFunction;
   spelFormatConj: SpelFormatConj | SerializedFunction;
+  celFormatConj: CelFormatConj | SerializedFunction;
   mongoConj: string;
   jsonLogicConj?: string;
   sqlConj?: string;
   spelConj?: string;
   spelConjs?: string[];
+  celConj?: string;
   reversedConj?: string;
 }
 export type Conjunctions = TypedMap<Conjunction>;
@@ -1135,6 +1166,16 @@ type SpelFormatOperator = (
   operatorOptions?: AnyObject,
   fieldDef?: Field
 ) => string;
+type CelFormatOperator = (
+  field: FieldPath,
+  op: string,
+  vals: string | Array<string>,
+  valueSrc?: ValueSource,
+  valueType?: string,
+  opDef?: Operator,
+  operatorOptions?: AnyObject,
+  fieldDef?: Field
+) => string;
 type JsonLogicFormatOperator = (
   field: JsonLogicField,
   op: string,
@@ -1182,6 +1223,8 @@ export interface BaseOperator {
   spelOp?: string;
   spelOps?: string[];
   spelFormatOp?: SpelFormatOperator | SerializedFunction;
+  celOp?: string;
+  celFormatOp?: CelFormatOperator | SerializedFunction;
   jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
   _jsonLogicIsRevArgs?: boolean;
   elasticSearchQueryType?:

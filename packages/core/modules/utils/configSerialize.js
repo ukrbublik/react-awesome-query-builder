@@ -1,6 +1,12 @@
 import merge from "lodash/merge";
 import pick from "lodash/pick";
-import {isJsonLogic, isJSX, isDirtyJSX, cleanJSX, shallowEqual} from "./stuff";
+import {
+  isJsonLogic,
+  isJSX,
+  isDirtyJSX,
+  cleanJSX,
+  shallowEqual,
+} from "./stuff";
 import clone from "clone";
 import JL from "json-logic-js";
 import { addRequiredJsonLogicOperations, applyJsonLogic } from "./jsonLogic";
@@ -34,9 +40,18 @@ function callContextFn(_this, fn, args, path) {
   return ret;
 }
 
-export const configKeys = ["conjunctions", "fields", "types", "operators", "widgets", "settings", "funcs", "ctx"];
+export const configKeys = [
+  "conjunctions",
+  "fields",
+  "types",
+  "operators",
+  "widgets",
+  "settings",
+  "funcs",
+  "ctx",
+];
 
-// type: 
+// type:
 //  x - iterate (with nesting `subfields`)
 //  "r" - RenderedReactElement
 //    Will be compiled with renderReactElement() into React element rendered with `React.createElement` (`ctx.RCE`)
@@ -48,7 +63,7 @@ export const configKeys = ["conjunctions", "fields", "types", "operators", "widg
 //    Will be compiled with compileJsonLogicReact() into function with args (props, ctx) that will return renderReactElement()
 //  "f" - JsonLogicFunction/string
 //    JL data is { args, ctx } plus named args defined in `args` inside `compileMeta`
-//    Can use { CALL: [ {var: "ctx.someFunc"}, null, {var: "args[0]" }] } 
+//    Can use { CALL: [ {var: "ctx.someFunc"}, null, {var: "args[0]" }] }
 //    If string is passed, it's a path to function in ctx (with dot notation)
 //    Will be compiled with compileJsonLogic() into function with any args and `this` should be `ctx`
 
@@ -57,32 +72,116 @@ const compileMetaFieldSettings = {
   labelYes: { type: "r" },
   labelNo: { type: "r" },
   marks: { type: "r", isArr: true },
-  validateValue: { type: "f", args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"] },
+  validateValue: {
+    type: "f",
+    args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"],
+  },
 };
 
 const compileMetaWidget = {
   ...compileMetaFieldSettings,
   factory: { type: "rf" },
-  formatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "isForDisplay", "op", "opDef", "rightFieldDef"] },
-  sqlFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
-  spelFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"] },
+  formatValue: {
+    type: "f",
+    args: [
+      "val",
+      "fieldDef",
+      "wgtDef",
+      "isForDisplay",
+      "op",
+      "opDef",
+      "rightFieldDef",
+    ],
+  },
+  sqlFormatValue: {
+    type: "f",
+    args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"],
+  },
+  spelFormatValue: {
+    type: "f",
+    args: ["val", "fieldDef", "wgtDef", "op", "opDef", "rightFieldDef"],
+  },
   spelImportValue: { type: "f", args: ["val", "wgtDef", "args"] },
-  mongoFormatValue: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
-  elasticSearchFormatValue: { type: "f", args: ["queryType", "val", "op", "field", "config"] },
+  mongoFormatValue: {
+    type: "f",
+    args: ["val", "fieldDef", "wgtDef", "op", "opDef"],
+  },
+  elasticSearchFormatValue: {
+    type: "f",
+    args: ["queryType", "val", "op", "field", "config"],
+  },
   jsonLogic: { type: "f", args: ["val", "fieldDef", "wgtDef", "op", "opDef"] },
-  validateValue: { type: "f", args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"] }, // obsolete
+  validateValue: {
+    type: "f",
+    args: ["val", "fieldSettings", "op", "opDef", "rightFieldDef"],
+  }, // obsolete
   toJS: { type: "f", args: ["val"] },
 };
 
 const compileMetaOperator = {
-  options: { // proximity
+  options: {
+    // proximity
     factory: { type: "rf" },
   },
-  formatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "isForDisplay", "fieldDef"] },
-  mongoFormatOp: { type: "f", args: ["field", "op", "vals", "useExpr", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
-  sqlFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
-  spelFormatOp: { type: "f", args: ["field", "op", "vals", "valueSrc", "valueType", "opDef", "operatorOptions", "fieldDef"] },
-  jsonLogic: { type: "f", ignore: "string", args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"] },
+  formatOp: {
+    type: "f",
+    args: [
+      "field",
+      "op",
+      "vals",
+      "valueSrc",
+      "valueType",
+      "opDef",
+      "operatorOptions",
+      "isForDisplay",
+      "fieldDef",
+    ],
+  },
+  mongoFormatOp: {
+    type: "f",
+    args: [
+      "field",
+      "op",
+      "vals",
+      "useExpr",
+      "valueSrc",
+      "valueType",
+      "opDef",
+      "operatorOptions",
+      "fieldDef",
+    ],
+  },
+  sqlFormatOp: {
+    type: "f",
+    args: [
+      "field",
+      "op",
+      "vals",
+      "valueSrc",
+      "valueType",
+      "opDef",
+      "operatorOptions",
+      "fieldDef",
+    ],
+  },
+  spelFormatOp: {
+    type: "f",
+    args: [
+      "field",
+      "op",
+      "vals",
+      "valueSrc",
+      "valueType",
+      "opDef",
+      "operatorOptions",
+      "fieldDef",
+    ],
+  },
+  jsonLogic: {
+    type: "f",
+    ignore: "string",
+    args: ["field", "op", "vals", "opDef", "operatorOptions", "fieldDef"],
+  },
   elasticSearchQueryType: { type: "f", ignore: "string", args: ["valueType"] },
   textSeparators: { type: "r", isArr: true },
 };
@@ -90,12 +189,15 @@ const compileMetaOperator = {
 const compileMetaConjunction = {
   formatConj: { type: "f", args: ["children", "conj", "not", "isForDisplay"] },
   sqlFormatConj: { type: "f", args: ["children", "conj", "not"] },
-  spelFormatConj: { type: "f", args: ["children", "conj", "not", "omitBrackets"] },
+  spelFormatConj: {
+    type: "f",
+    args: ["children", "conj", "not", "omitBrackets"],
+  },
 };
 
 const compileMetaWidgetForType = {
   widgetProps: compileMetaWidget,
-  opProps: compileMetaOperator
+  opProps: compileMetaOperator,
 };
 
 const compileMetaFunc = {
@@ -116,15 +218,72 @@ const compileMetaSettings = {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
 
-  canCompareFieldWithField: { type: "f", args: ["leftField", "leftFieldConfig", "rightField", "rightFieldConfig", "op"] },
-  formatReverse: { type: "f", args: ["q", "op", "reversedOp", "operatorDefinition", "revOperatorDefinition", "isForDisplay"] },
+  canCompareFieldWithField: {
+    type: "f",
+    args: [
+      "leftField",
+      "leftFieldConfig",
+      "rightField",
+      "rightFieldConfig",
+      "op",
+    ],
+  },
+  formatReverse: {
+    type: "f",
+    args: [
+      "q",
+      "op",
+      "reversedOp",
+      "operatorDefinition",
+      "revOperatorDefinition",
+      "isForDisplay",
+    ],
+  },
   sqlFormatReverse: { type: "f", args: ["q"] },
   spelFormatReverse: { type: "f", args: ["q"] },
-  formatField: { type: "f", args: ["field", "parts", "label2", "fieldDefinition", "config", "isForDisplay"] },
-  formatSpelField: { type: "f", args: ["field", "parentField", "parts", "partsExt", "fieldDefinition", "config"] },
-  formatAggr: { type: "f", args: ["whereStr", "aggrField", "operator", "value", "valueSrc", "valueType", "opDef", "operatorOptions", "isForDisplay", "aggrFieldDef"] },
-  
-  normalizeListValues: { type: "f", args: ["listValues", "type", "fieldSettings"] },
+  celFormatReverse: { type: "f", args: ["q"] },
+  formatField: {
+    type: "f",
+    args: [
+      "field",
+      "parts",
+      "label2",
+      "fieldDefinition",
+      "config",
+      "isForDisplay",
+    ],
+  },
+  formatSpelField: {
+    type: "f",
+    args: [
+      "field",
+      "parentField",
+      "parts",
+      "partsExt",
+      "fieldDefinition",
+      "config",
+    ],
+  },
+  formatAggr: {
+    type: "f",
+    args: [
+      "whereStr",
+      "aggrField",
+      "operator",
+      "value",
+      "valueSrc",
+      "valueType",
+      "opDef",
+      "operatorOptions",
+      "isForDisplay",
+      "aggrFieldDef",
+    ],
+  },
+
+  normalizeListValues: {
+    type: "f",
+    args: ["listValues", "type", "fieldSettings"],
+  },
 
   renderConfirm: { type: "f", args: ["props"] },
   useConfirm: { type: "f", args: [] },
@@ -155,34 +314,34 @@ const compileMeta = {
     x: {
       fieldSettings: compileMetaFieldSettings,
       widgets: {
-        x: compileMetaWidgetForType
+        x: compileMetaWidgetForType,
       },
-      mainWidgetProps: compileMetaWidget
+      mainWidgetProps: compileMetaWidget,
     },
   },
   widgets: {
-    x: compileMetaWidget
+    x: compileMetaWidget,
   },
   conjunctions: {
-    x: compileMetaConjunction
+    x: compileMetaConjunction,
   },
   operators: {
-    x: compileMetaOperator
+    x: compileMetaOperator,
   },
   types: {
     x: {
       widgets: {
-        x: compileMetaWidgetForType
-      }
-    }
+        x: compileMetaWidgetForType,
+      },
+    },
   },
   funcs: {
-    x: compileMetaFunc
+    x: compileMetaFunc,
   },
   settings: compileMetaSettings,
 };
 
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
+const isObject = (v) => typeof v == "object" && v !== null && !Array.isArray(v);
 
 /////////////
 
@@ -201,9 +360,15 @@ export const compressConfig = (config, baseConfig) => {
       if (path[0] === "funcs" && !base) {
         const funcKey = path[path.length - 1];
         // todo: if there will be change in `BasicFuncs` when funcs can be nested, need to chnage code to find `base`
-        base = getFieldRawConfig({
-          funcs: meta.BasicFuncs
-        }, funcKey, "funcs", "subfields") || undefined;
+        base =
+          getFieldRawConfig(
+            {
+              funcs: meta.BasicFuncs,
+            },
+            funcKey,
+            "funcs",
+            "subfields"
+          ) || undefined;
         if (base) {
           target["$$key"] = funcKey;
         }
@@ -211,7 +376,10 @@ export const compressConfig = (config, baseConfig) => {
       if (base !== undefined && isObject(base)) {
         for (let k in base) {
           if (Object.prototype.hasOwnProperty.call(base, k)) {
-            if (!Object.keys(target).includes(k) || target[k] === undefined && base[k] !== undefined) {
+            if (
+              !Object.keys(target).includes(k) ||
+              (target[k] === undefined && base[k] !== undefined)
+            ) {
               // deleted in target
               target[k] = "$$deleted";
             } else {
@@ -249,7 +417,11 @@ export const compressConfig = (config, baseConfig) => {
     }
 
     if (typeof target === "function") {
-      throw new Error(`compressConfig: function at ${path.join(".")} should be converted to JsonLogic`);
+      throw new Error(
+        `compressConfig: function at ${path.join(
+          "."
+        )} should be converted to JsonLogic`
+      );
     }
 
     return target;
@@ -267,7 +439,7 @@ export const compressConfig = (config, baseConfig) => {
       zipConfig[rootKey] = clone(zipConfig[rootKey] || {});
       for (let k in zipConfig[rootKey]) {
         _clean(zipConfig[rootKey][k], null, [rootKey, k], {
-          BasicFuncs
+          BasicFuncs,
         });
       }
     } else {
@@ -280,10 +452,11 @@ export const compressConfig = (config, baseConfig) => {
   return zipConfig;
 };
 
-
 export const decompressConfig = (zipConfig, baseConfig, ctx) => {
   if (!zipConfig.settings.useConfigCompress) {
-    throw new Error("Please enable `useConfigCompress` in config settings to use decompressConfig()");
+    throw new Error(
+      "Please enable `useConfigCompress` in config settings to use decompressConfig()"
+    );
   }
   let unzipConfig = {};
 
@@ -314,17 +487,30 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
   const _resolveAndMergeDeep = (target, path, meta) => {
     // try to resolve by $$key and merge
     let resolved = false;
-    if (isObject(target) && Object.prototype.hasOwnProperty.call(target, "$$key") && target["$$key"]) {
-      const func = getFieldRawConfig({
-        funcs: meta.BasicFuncs
-      }, target["$$key"], "funcs", "subfields");
+    if (
+      isObject(target) &&
+      Object.prototype.hasOwnProperty.call(target, "$$key") &&
+      target["$$key"]
+    ) {
+      const func = getFieldRawConfig(
+        {
+          funcs: meta.BasicFuncs,
+        },
+        target["$$key"],
+        "funcs",
+        "subfields"
+      );
       if (func) {
         // deep merge func <- zip
         delete target["$$key"];
         target = _mergeDeep(clone(func), target, path);
         resolved = true;
       } else {
-        throw new Error(`decompressConfig: basic function not found by key ${target["$$key"]} at ${path.join(".")}`);
+        throw new Error(
+          `decompressConfig: basic function not found by key ${
+            target["$$key"]
+          } at ${path.join(".")}`
+        );
       }
     }
 
@@ -355,7 +541,7 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
       // use $$key to pick funcs from BasicFuncs
       unzipConfig[rootKey] = clone(zipConfig[rootKey] || {});
       _resolveAndMergeDeep(unzipConfig[rootKey], [rootKey], {
-        BasicFuncs
+        BasicFuncs,
       });
     } else if (rootKey === "fields") {
       // just copy
@@ -390,7 +576,7 @@ export const compileConfig = (config) => {
   Object.defineProperty(config, "__compliled", {
     enumerable: false,
     writable: false,
-    value: true
+    value: true,
   });
 
   return config;
@@ -435,7 +621,13 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
     } else if (submeta.type === "f") {
       const targetObj = subconfig;
       const val = targetObj[k];
-      let newVal = compileJsonLogic(val, opts, newPath, submeta.args, submeta.ignore);
+      let newVal = compileJsonLogic(
+        val,
+        opts,
+        newPath,
+        submeta.args,
+        submeta.ignore
+      );
       if (submeta.invokeWith && newVal && typeof newVal === "function") {
         newVal = newVal.call(null, ...submeta.invokeWith);
       }
@@ -462,24 +654,25 @@ function _compileConfigParts(config, subconfig, opts, meta, logs, path = []) {
 
 function compileJsonLogicReact(jl, opts, path, ignore = undefined) {
   if (isJsonLogic(jl)) {
-    return function(props, ctx) {
+    return function (props, ctx) {
       ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
       const data = {
-        props, ctx,
+        props,
+        ctx,
       };
       let re = applyJsonLogicWithPath(jl, data, path);
       if (typeof re === "string") {
         re = {
           type: re,
-          props
+          props,
         };
       }
-      
-      const ret = renderReactElement(re, {ctx}, path);
+
+      const ret = renderReactElement(re, { ctx }, path);
       return ret;
     };
   } else if (typeof jl === "string") {
-    return function(props, ctx) {
+    return function (props, ctx) {
       ctx = ctx || opts?.ctx; // can use context compile-time if not passed at runtime
       const fn = jl.split(".").reduce((o, k) => o?.[k], ctx);
       if (fn) {
@@ -487,9 +680,9 @@ function compileJsonLogicReact(jl, opts, path, ignore = undefined) {
       } else {
         const re = {
           type: jl,
-          props
+          props,
         };
-        const ret = renderReactElement(re, {ctx}, path);
+        const ret = renderReactElement(re, { ctx }, path);
         return ret;
       }
     };
@@ -499,29 +692,33 @@ function compileJsonLogicReact(jl, opts, path, ignore = undefined) {
 
 function compileJsonLogic(jl, opts, path, argNames, ignore = undefined) {
   if (isJsonLogic(jl) && ignore !== "jl") {
-    return function(...args) {
+    return function (...args) {
       const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
-      const data = (argNames || []).reduce((acc, k, i) => ({...acc, [k]: args[i]}), {
-        args, ctx
-      });
+      const data = (argNames || []).reduce(
+        (acc, k, i) => ({ ...acc, [k]: args[i] }),
+        {
+          args,
+          ctx,
+        }
+      );
       const ret = applyJsonLogicWithPath(jl, data, path);
       return ret;
     }.bind(opts?.ctx);
   } else if (typeof jl === "string" && ignore !== "string") {
-    return function(...args) {
+    return function (...args) {
       const ctx = this || opts?.ctx; // can use context compile-time if not passed at runtime
       const fn = jl.split(".").reduce((o, k) => o?.[k], ctx);
       if (fn) {
         return callContextFn(this, fn, args, path);
       } else {
-        throw new Error(`${path.join(".")} :: Function ${jl} is not found in ctx`);
+        throw new Error(
+          `${path.join(".")} :: Function ${jl} is not found in ctx`
+        );
       }
     }.bind(opts?.ctx);
   }
   return jl;
 }
-
-
 
 function getReactComponentFromCtx(name, ctx) {
   return ctx?.components?.[name] || ctx.W[name] || ctx.O[name];
@@ -531,7 +728,9 @@ function renderReactElement(jsx, opts, path, key = undefined) {
   if (isJSX(jsx)) {
     let { type, props } = jsx;
     if (typeof type !== "string") {
-      throw new Error(`renderReactElement for ${path.join(".")}: type should be string`);
+      throw new Error(
+        `renderReactElement for ${path.join(".")}: type should be string`
+      );
     }
     const Cmp = getReactComponentFromCtx(type, opts.ctx) || type.toLowerCase();
     let children;
@@ -545,7 +744,7 @@ function renderReactElement(jsx, opts, path, key = undefined) {
     const res = opts.ctx.RCE(Cmp, props);
     return res;
   } else if (jsx instanceof Array) {
-    return jsx.map((el, i) => renderReactElement(el, opts, path, ""+i));
+    return jsx.map((el, i) => renderReactElement(el, opts, path, "" + i));
   }
   return jsx;
 }
