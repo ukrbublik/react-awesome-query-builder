@@ -21,7 +21,7 @@ import {
 } from "../utils/stuff";
 import { defaultConjunction } from "../utils/defaultUtils";
 import { List, Map } from "immutable";
-import { spelEscape } from "../utils/export";
+import { celEscape } from "../utils/export";
 
 export const celFormat = (tree, config) => {
   return _celFormat(tree, config, false);
@@ -210,8 +210,8 @@ const formatRule = (item, config, meta) => {
   }
 
   //format field
-  const formattedField
-    = fieldSrc == "func"
+  const formattedField =
+    fieldSrc == "func"
       ? formatFunc(meta, config, field)
       : formatField(meta, config, field);
   if (formattedField == undefined) return undefined;
@@ -285,9 +285,9 @@ const formatValue = (
       ret = fn.call(config.ctx, ...args);
     } else {
       if (Array.isArray(currentValue)) {
-        ret = currentValue.map((v) => spelEscape(v));
+        ret = currentValue.map((v) => celEscape(v));
       } else {
-        ret = spelEscape(currentValue);
+        ret = celEscape(currentValue);
       }
     }
   }
@@ -365,9 +365,9 @@ const formatFunc = (meta, config, currentValue) => {
     }
     let formattedDefaultVal;
     if (
-      formattedArgVal === undefined
-      && !isOptional
-      && defaultValue != undefined
+      formattedArgVal === undefined &&
+      !isOptional &&
+      defaultValue != undefined
     ) {
       formattedDefaultVal = formatValue(
         meta,
