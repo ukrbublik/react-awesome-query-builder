@@ -19,8 +19,8 @@ const autocompleteFetch = async (
   offset: number
 ): Promise<AsyncFetchListValuesResult> => {
   const response = await fetch(
-    "/api/autocomplete?" +
-      new URLSearchParams({
+    "/api/autocomplete?"
+      + new URLSearchParams({
         search: search || "",
         offset: offset ? String(offset) : "",
       }).toString()

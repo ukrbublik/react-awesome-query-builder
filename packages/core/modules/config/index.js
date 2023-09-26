@@ -15,10 +15,10 @@ const conjunctions = {
     reversedConj: "OR",
     formatConj: (children, conj, not, isForDisplay) => {
       return children.size > 1
-        ? (not ? "NOT " : "") +
-            "(" +
-            children.join(" " + (isForDisplay ? "AND" : "&&") + " ") +
-            ")"
+        ? (not ? "NOT " : "")
+            + "("
+            + children.join(" " + (isForDisplay ? "AND" : "&&") + " ")
+            + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
     sqlFormatConj: (children, conj, not) => {
@@ -29,10 +29,10 @@ const conjunctions = {
     spelFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
       return children.size > 1
-        ? (not ? "!" : "") +
-            (omitBrackets ? "" : "(") +
-            children.join(" " + "&&" + " ") +
-            (omitBrackets ? "" : ")")
+        ? (not ? "!" : "")
+            + (omitBrackets ? "" : "(")
+            + children.join(" " + "&&" + " ")
+            + (omitBrackets ? "" : ")")
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
     celFormatConj: (children, conj, not, omitBrackets) => {
@@ -53,10 +53,10 @@ const conjunctions = {
     reversedConj: "AND",
     formatConj: (children, conj, not, isForDisplay) => {
       return children.size > 1
-        ? (not ? "NOT " : "") +
-            "(" +
-            children.join(" " + (isForDisplay ? "OR" : "||") + " ") +
-            ")"
+        ? (not ? "NOT " : "")
+            + "("
+            + children.join(" " + (isForDisplay ? "OR" : "||") + " ")
+            + ")"
         : (not ? "NOT (" : "") + children.first() + (not ? ")" : "");
     },
     sqlFormatConj: (children, conj, not) => {
@@ -67,10 +67,10 @@ const conjunctions = {
     spelFormatConj: (children, conj, not, omitBrackets) => {
       if (not) omitBrackets = false;
       return children.size > 1
-        ? (not ? "!" : "") +
-            (omitBrackets ? "" : "(") +
-            children.join(" " + "||" + " ") +
-            (omitBrackets ? "" : ")")
+        ? (not ? "!" : "")
+            + (omitBrackets ? "" : "(")
+            + children.join(" " + "||" + " ")
+            + (omitBrackets ? "" : ")")
         : (not ? "!(" : "") + children.first() + (not ? ")" : "");
     },
     celFormatConj: (children, conj, not, omitBrackets) => {
@@ -1223,8 +1223,8 @@ const widgets = {
     spelImportValue: function (val, wgtDef, args) {
       if (!wgtDef) return [undefined, "No widget def to get value format"];
       if (
-        args?.fmt?.value?.includes?.(" ") ||
-        args.fmt?.value?.toLowerCase?.().includes("hh:mm")
+        args?.fmt?.value?.includes?.(" ")
+        || args.fmt?.value?.toLowerCase?.().includes("hh:mm")
       )
         return [undefined, `Invalid date format ${JSON.stringify(args.fmt)}`];
       const dateVal = this.utils.moment(val.value, this.utils.moment.ISO_8601);
@@ -1263,8 +1263,8 @@ const widgets = {
     celImportValue: function (val, wgtDef, args) {
       if (!wgtDef) return [undefined, "No widget def to get value format"];
       if (
-        args?.fmt?.value?.includes?.(" ") ||
-        args.fmt?.value?.toLowerCase?.().includes("hh:mm")
+        args?.fmt?.value?.includes?.(" ")
+        || args.fmt?.value?.toLowerCase?.().includes("hh:mm")
       )
         return [undefined, `Invalid date format ${JSON.stringify(args.fmt)}`];
       const dateVal = this.utils.moment(val.value, this.utils.moment.ISO_8601);
@@ -1323,9 +1323,9 @@ const widgets = {
     spelImportValue: function (val, wgtDef, args) {
       if (!wgtDef) return [undefined, "No widget def to get value format"];
       if (
-        args?.fmt &&
-        (!args.fmt?.value?.toLowerCase?.().includes("hh:mm") ||
-          args.fmt?.value?.includes(" "))
+        args?.fmt
+        && (!args.fmt?.value?.toLowerCase?.().includes("hh:mm")
+          || args.fmt?.value?.includes(" "))
       )
         return [undefined, `Invalid time format ${JSON.stringify(args.fmt)}`];
       const dateVal = this.utils.moment(val.value, "HH:mm:ss");
@@ -1349,9 +1349,9 @@ const widgets = {
     celImportValue: function (val, wgtDef, args) {
       if (!wgtDef) return [undefined, "No widget def to get value format"];
       if (
-        args?.fmt &&
-        (!args.fmt?.value?.toLowerCase?.().includes("hh:mm") ||
-          args.fmt?.value?.includes(" "))
+        args?.fmt
+        && (!args.fmt?.value?.toLowerCase?.().includes("hh:mm")
+          || args.fmt?.value?.includes(" "))
       )
         return [undefined, `Invalid time format ${JSON.stringify(args.fmt)}`];
       const dateVal = this.utils.moment(val.value, "HH:mm:ss");
@@ -1365,27 +1365,27 @@ const widgets = {
       // return seconds of day
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return (
-        dateVal.get("hour") * 60 * 60 +
-        dateVal.get("minute") * 60 +
-        dateVal.get("second")
+        dateVal.get("hour") * 60 * 60
+        + dateVal.get("minute") * 60
+        + dateVal.get("second")
       );
     },
     toJS: function (val, fieldSettings) {
       // return seconds of day
       const dateVal = this.utils.moment(val, fieldSettings.valueFormat);
       return dateVal.isValid()
-        ? dateVal.get("hour") * 60 * 60 +
-            dateVal.get("minute") * 60 +
-            dateVal.get("second")
+        ? dateVal.get("hour") * 60 * 60
+            + dateVal.get("minute") * 60
+            + dateVal.get("second")
         : undefined;
     },
     mongoFormatValue: function (val, fieldDef, wgtDef) {
       // return seconds of day
       const dateVal = this.utils.moment(val, wgtDef.valueFormat);
       return (
-        dateVal.get("hour") * 60 * 60 +
-        dateVal.get("minute") * 60 +
-        dateVal.get("second")
+        dateVal.get("hour") * 60 * 60
+        + dateVal.get("minute") * 60
+        + dateVal.get("second")
       );
     },
     elasticSearchFormatValue: function elasticSearchFormatValue(
@@ -2036,44 +2036,44 @@ const removeMixins = (config, mixins) => {
   return _addMixins(config, mixins, false);
 };
 
-const mixinRangeableWidget =
-  (type, widget) =>
-  (config, addMixin = true) => {
-    let { types } = config;
+const mixinRangeableWidget
+  = (type, widget) =>
+    (config, addMixin = true) => {
+      let { types } = config;
 
-    types = {
-      ...types,
-      [type]: {
-        ...types[type],
-        widgets: {
-          ...types[type].widgets,
-        },
-      },
-    };
-
-    if (addMixin) {
-      types[type].widgets[widget] = {
-        opProps: {
-          between: {
-            isSpecialRange: true,
-            textSeparators: [null, null],
-          },
-          not_between: {
-            isSpecialRange: true,
-            textSeparators: [null, null],
+      types = {
+        ...types,
+        [type]: {
+          ...types[type],
+          widgets: {
+            ...types[type].widgets,
           },
         },
-        ...types[type].widgets[widget],
       };
-    } else {
-      delete types[type].widgets[widget];
-    }
 
-    return {
-      ...config,
-      types,
+      if (addMixin) {
+        types[type].widgets[widget] = {
+          opProps: {
+            between: {
+              isSpecialRange: true,
+              textSeparators: [null, null],
+            },
+            not_between: {
+              isSpecialRange: true,
+              textSeparators: [null, null],
+            },
+          },
+          ...types[type].widgets[widget],
+        };
+      } else {
+        delete types[type].widgets[widget];
+      }
+
+      return {
+        ...config,
+        types,
+      };
     };
-  };
 
 const mixinWidgetRangeslider = (config, addMixin = true) => {
   let { widgets, types } = config;
@@ -2171,10 +2171,10 @@ const mixinWidgetTreeselect = (config, addMixin = true) => {
       valueLabel: "Value",
       valuePlaceholder: "Select value",
       formatValue: function (val, fieldDef, wgtDef, isForDisplay) {
-        const treeData =
-          fieldDef.fieldSettings.treeValues ||
-          fieldDef.fieldSettings.listValues ||
-          fieldDef.asyncListValues;
+        const treeData
+          = fieldDef.fieldSettings.treeValues
+          || fieldDef.fieldSettings.listValues
+          || fieldDef.asyncListValues;
         let valLabel = this.utils.getTitleInListValues(treeData, val);
         return isForDisplay
           ? this.utils.stringifyForDisplay(valLabel)
@@ -2240,10 +2240,10 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
       valueLabel: "Values",
       valuePlaceholder: "Select values",
       formatValue: function (vals, fieldDef, wgtDef, isForDisplay) {
-        const treeData =
-          fieldDef.fieldSettings.treeValues ||
-          fieldDef.fieldSettings.listValues ||
-          fieldDef.asyncListValues;
+        const treeData
+          = fieldDef.fieldSettings.treeValues
+          || fieldDef.fieldSettings.listValues
+          || fieldDef.asyncListValues;
         let valsLabels = vals.map((v) =>
           this.utils.getTitleInListValues(treeData, v)
         );
@@ -2258,7 +2258,7 @@ const mixinWidgetTreemultiselect = (config, addMixin = true) => {
         return this.utils.spelEscape(val);
       },
       celFormatValue: function (val) {
-        return vals.map((v) => this.utils.SqlString.escape(v));
+        return this.utils.spelEscape(val);
       },
       toJS: (val, fieldSettings) => val,
       ...widgets.treemultiselect,

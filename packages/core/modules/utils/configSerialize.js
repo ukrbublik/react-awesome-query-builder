@@ -360,8 +360,8 @@ export const compressConfig = (config, baseConfig) => {
       if (path[0] === "funcs" && !base) {
         const funcKey = path[path.length - 1];
         // todo: if there will be change in `BasicFuncs` when funcs can be nested, need to chnage code to find `base`
-        base =
-          getFieldRawConfig(
+        base
+          = getFieldRawConfig(
             {
               funcs: meta.BasicFuncs,
             },
@@ -377,8 +377,8 @@ export const compressConfig = (config, baseConfig) => {
         for (let k in base) {
           if (Object.prototype.hasOwnProperty.call(base, k)) {
             if (
-              !Object.keys(target).includes(k) ||
-              (target[k] === undefined && base[k] !== undefined)
+              !Object.keys(target).includes(k)
+              || (target[k] === undefined && base[k] !== undefined)
             ) {
               // deleted in target
               target[k] = "$$deleted";
@@ -488,9 +488,9 @@ export const decompressConfig = (zipConfig, baseConfig, ctx) => {
     // try to resolve by $$key and merge
     let resolved = false;
     if (
-      isObject(target) &&
-      Object.prototype.hasOwnProperty.call(target, "$$key") &&
-      target["$$key"]
+      isObject(target)
+      && Object.prototype.hasOwnProperty.call(target, "$$key")
+      && target["$$key"]
     ) {
       const func = getFieldRawConfig(
         {

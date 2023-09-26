@@ -53,12 +53,12 @@ const preErrorStyle = {
 const initialSkin = window._initialSkin || "mui";
 const emptyInitValue: JsonTree = { id: uuid(), type: "group" };
 const loadedConfig = loadConfig(initialSkin);
-let initValue: JsonTree =
-  loadedInitValue && Object.keys(loadedInitValue).length > 0
+let initValue: JsonTree
+  = loadedInitValue && Object.keys(loadedInitValue).length > 0
     ? (loadedInitValue as JsonTree)
     : emptyInitValue;
-const initLogic: JsonLogicTree | undefined =
-  loadedInitLogic && Object.keys(loadedInitLogic).length > 0
+const initLogic: JsonLogicTree | undefined
+  = loadedInitLogic && Object.keys(loadedInitLogic).length > 0
     ? (loadedInitLogic as JsonLogicTree)
     : undefined;
 let initTree: ImmutableTree;
