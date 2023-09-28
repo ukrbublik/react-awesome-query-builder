@@ -64,6 +64,7 @@ const RELATIVE_DATETIME = {
   //todo: other SQL dialects?
   sqlFormatFunc: ({date, op, val, dim}) => `DATE_ADD(${date}, INTERVAL ${parseInt(val) * (op == "minus" ? -1 : +1)} ${dim.replace(/^'|'$/g, "")})`,
   mongoFormatFunc: null, //todo: support?
+  celFormatFunc: null,
   formatFunc: ({date, op, val, dim}) => (!val ? date : `${date} ${op == "minus" ? "-" : "+"} ${val} ${dim}`),
   args: {
     date: {

@@ -323,6 +323,8 @@ interface Export {
   _sqlFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   spelFormat(tree: ImmutableTree, config: Config): string | undefined;
   _spelFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
+  celFormat(tree: ImmutableTree, config: Config): string | undefined;
+  _celFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   mongodbFormat(tree: ImmutableTree, config: Config): Object | undefined;
   _mongodbFormat(tree: ImmutableTree, config: Config): [Object | undefined, Array<string>];
   elasticSearchFormat(tree: ImmutableTree, config: Config, syntax?: "ES_6_SYNTAX" | "ES_7_SYNTAX"): Object | undefined;
@@ -632,6 +634,7 @@ type SpelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any
 type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SpelFormatValue =              (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
+type CelFormatValue =              (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type MongoFormatValue =             (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => MongoValue;
 type JsonLogicFormatValue =         (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator) => JsonLogicValue;
 type ValidateValue<V = RuleValue> = (val: V, fieldSettings: FieldSettings, op: string, opDef: Operator, rightFieldDef?: Field) => boolean | string | null;
@@ -650,6 +653,9 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   spelFormatValue?: SpelFormatValue | SerializedFunction;
   spelImportFuncs?: Array<string | object>;
   spelImportValue?: SpelImportValue | SerializedFunction;
+  celFormatValue?: CelFormatValue | SerializedFunction;
+  celImportFuncs?: Array<string | object>;
+  celImportValue?: CelImportValue | SerializedFunction;
   mongoFormatValue?: MongoFormatValue | SerializedFunction;
   elasticSearchFormatValue?: ElasticSearchFormatValue | SerializedFunction;
   hideOperator?: boolean;
@@ -671,6 +677,7 @@ interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
   formatValue: FormatValue | SerializedFunction, // with rightFieldDef
   sqlFormatValue?: SqlFormatValue | SerializedFunction, // with rightFieldDef
   spelFormatValue?: SpelFormatValue | SerializedFunction, // with rightFieldDef
+  celFormatValue?: CelFormatValue | SerializedFunction; // with rightFieldDef
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction,
   //@ui
@@ -724,12 +731,14 @@ export type Widgets<C = Config> = TypedMap<Widget<C>>;
 type FormatConj = (children: ImmutableList<string>, conj: string, not: boolean, isForDisplay?: boolean) => string;
 type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolean) => string;
 type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
+type CelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
 
 export interface Conjunction {
   label: string,
   formatConj: FormatConj | SerializedFunction,
   sqlFormatConj: SqlFormatConj | SerializedFunction,
   spelFormatConj: SpelFormatConj | SerializedFunction,
+  celFormatConj: CelFormatConj | SerializedFunction,
   mongoConj: string,
   jsonLogicConj?: string,
   sqlConj?: string,
@@ -773,6 +782,7 @@ export interface ConjsProps {
 type FormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
 type MongoFormatOperator = (field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
 type SqlFormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
+type CelFormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type SpelFormatOperator = (field: FieldPath, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
 type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
@@ -808,6 +818,8 @@ export interface BaseOperator {
   mongoFormatOp?: MongoFormatOperator | SerializedFunction,
   sqlOp?: string,
   sqlFormatOp?: SqlFormatOperator | SerializedFunction,
+  celOp?: string,
+  celFormatOp?: CelFormatOperator | SerializedFunction,
   spelOp?: string,
   spelOps?: string[],
   spelFormatOp?: SpelFormatOperator | SerializedFunction,
@@ -1039,6 +1051,7 @@ type AntdSize = "small" | "large" | "medium";
 type ChangeFieldStrategy = "default" | "keep" | "first" | "none";
 type FormatReverse = (q: string, op: string, reversedOp: string, operatorDefinition: Operator, revOperatorDefinition: Operator, isForDisplay: boolean) => string;
 type SqlFormatReverse = (q: string) => string;
+type CelFormatReverse = (q: string) => string;
 type SpelFormatReverse = (q: string) => string;
 type FormatField = (field: FieldPath, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type FormatSpelField = (field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
@@ -1136,6 +1149,7 @@ export interface OtherSettings {
   fieldSeparatorDisplay?: string,
   formatReverse?: FormatReverse | SerializedFunction,
   sqlFormatReverse?: SqlFormatReverse | SerializedFunction,
+  celFormatReverse?: SqlFormatReverse | SerializedFunction,
   spelFormatReverse?: SpelFormatReverse | SerializedFunction,
   formatField?: FormatField | SerializedFunction,
   formatSpelField?: FormatSpelField | SerializedFunction,
@@ -1157,6 +1171,7 @@ type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogi
 type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
+type CelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup {
   type: "!struct",
@@ -1181,6 +1196,7 @@ export interface Func {
   spelImport?: SpelImportFunc | SerializedFunction,
   formatFunc?: FormatFunc | SerializedFunction,
   sqlFormatFunc?: SqlFormatFunc | SerializedFunction,
+  celFormatFunc?: CelFormatFunc | SerializedFunction,
   mongoFormatFunc?: MongoFormatFunc | SerializedFunction,
   renderBrackets?: Array<RenderedReactElement>,
   renderSeps?: Array<RenderedReactElement>,

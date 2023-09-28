@@ -178,3 +178,79 @@ export const spelImportConcat = (val) => {
 };
 
 export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());
+
+
+const celInlineList = (vals, toArray = false) => {
+  // find java type of values
+  let javaType;
+  let jt;
+  const numberJavaTypes = ["int", "float"];
+  vals.map((v) => {
+    if (v !== undefined && v !== null) {
+      if (typeof v === "string") {
+        jt = "String";
+      } else if (typeof v === "number") {
+        jt = Number.isInteger(v) ? "int" : "float";
+      } else throw new Error(`celEscape: Can't use value ${v} in array`);
+
+      if (!javaType) {
+        javaType = jt;
+      } else if (javaType != jt) {
+        if (
+          numberJavaTypes.includes(javaType)
+          && numberJavaTypes.includes(jt)
+        ) {
+          // found int and float in collecton - use float
+          javaType = "float";
+        } else
+          throw new Error(
+            `celEscape: Can't use different types in array: found ${javaType} and ${jt}`
+          );
+      }
+    }
+  });
+  if (!javaType) {
+    javaType = "String"; //default if empty array
+  }
+
+  // for floats we should add 'f' to all items
+  let escapedVals;
+  if (javaType == "float") {
+    escapedVals = vals.map((v) => celEscape(v, true));
+  } else {
+    escapedVals = vals.map((v) => celEscape(v));
+  }
+
+  // build inline list or array
+  let res;
+  if (toArray) {
+    res = `new ${javaType}[][${escapedVals.join(", ")}]`;
+  } else {
+    res = `[${escapedVals.join(", ")}]`;
+  }
+
+  return res;
+};
+
+export const celEscape = (val, numberToFloat = false, arrayToArray = false) => {
+  // https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html#expressions-ref-literal
+  if (val === undefined || val === null) {
+    return "null";
+  }
+  switch (typeof val) {
+  case "boolean":
+    return val ? "true" : "false";
+  case "number":
+    if (!Number.isFinite(val) || isNaN(val)) return undefined;
+    return val + (!Number.isInteger(val) || numberToFloat ? "f" : "");
+  case "object":
+    if (Array.isArray(val)) {
+      return celInlineList(val, arrayToArray);
+    } else {
+      // see `spelFormatValue` for Date, LocalTime
+      throw new Error("celEscape: Object is not supported");
+    }
+  default:
+    return spelEscapeString(val);
+  }
+};
