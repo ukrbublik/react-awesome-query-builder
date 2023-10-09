@@ -72,7 +72,7 @@ export default (props) => {
   const placeholder = !readonly ? aPlaceholder : "";
   const hasValue = selectedValue != null;
   // should be simple value to prevent re-render!s
-  const value = hasValue ? selectedValue : (multiple ? emptyArray : null);
+  const value = hasValue ? Array.from(selectedValue) : (multiple ? emptyArray : null);
 
   const filterOptions = (options, params) => {
     const filtered = filterOptionsFn(options, params);
