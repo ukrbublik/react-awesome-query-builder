@@ -130,10 +130,12 @@ export default (props) => {
     let group = {
       label: groupMaybeJson,
     };
-    if (typeof groupMaybeJson === 'string' && groupMaybeJson[0] === '{') {
+    if (typeof groupMaybeJson === "string" && groupMaybeJson[0] === "{") {
       try {
         group = JSON.parse(groupMaybeJson);
-      } catch (_) { }
+      } catch (_) {
+        // ignore
+      }
     }
     let groupLabel = group.label;
     if (groupLabel && group.tooltip) {
@@ -143,9 +145,9 @@ export default (props) => {
     }
     let res = (
       <div style={{
-        position: 'sticky',
-        top: '-8px',
-        padding: '4px 10px',
+        position: "sticky",
+        top: "-8px",
+        padding: "4px 10px",
         color: theme.palette.primary.main,
         backgroundColor: theme.palette.background.default,
       }}>
@@ -161,10 +163,10 @@ export default (props) => {
 
   const renderGroup = (params) => {
     let res = (
-      <li key={params.key}>
+      <div key={params.key}>
         <GroupHeader groupMaybeJson={params.group} />
         <GroupItems>{params.children}</GroupItems>
-      </li>
+      </div>
     );
     return res;
   };
@@ -257,7 +259,7 @@ export default (props) => {
   );
   if (tooltipText) {
     res = (
-      <Tooltip title={tooltipText} placement="top-start">{res}</Tooltip>
+      <Tooltip title={!open ? tooltipText : null} placement="top-start">{res}</Tooltip>
     );
   }
   res = (

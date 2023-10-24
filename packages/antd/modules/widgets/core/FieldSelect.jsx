@@ -14,7 +14,7 @@ const mapFieldItemToOptionKeys = {
   fullLabel: "_fullLabel",
 };
 
-export default (props) => {
+const FieldSelect = (props) => {
   const {
     setField, config, customProps, items, placeholder,
     selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
@@ -121,3 +121,7 @@ export default (props) => {
 
   return res;
 };
+
+FieldSelect.displayName = 'FieldSelect';
+export default FieldSelect;
+

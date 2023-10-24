@@ -44,7 +44,7 @@ export default (props) => {
     toolbarPlaceholder: !readonly ? placeholder : "",
   };
 
-  const aValue = value ? (isV6 && typeof value === "string" ? moment(value, valueFormat) : value) : null;
+  const aValue = value ? (xdpVersion === "6" && typeof value === "string" ? moment(value, valueFormat) : value) : null;
 
   return (
     <FormControl>

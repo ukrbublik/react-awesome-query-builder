@@ -24,7 +24,10 @@ const itemsToListValues = (items, level = 0) => (
         value: path,
         disabled,
         groupTitle: level > 0 ? prefix+grouplabel : null,
-        group: group,
+        group: level > 0 ? {
+          ...group,
+          label: prefix+group.label,
+        } : null,
         tooltip: tooltip,
         _value2: key,
         _altLabel: altLabel,

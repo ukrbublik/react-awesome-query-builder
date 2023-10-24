@@ -102,9 +102,9 @@ export default ({
       {renderOptions(items)}
     </Select>
   );
-  if (tooltipText && !open) {
+  if (tooltipText) {
     res = (
-      <Tooltip title={tooltipText}>{res}</Tooltip>
+      <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>
     );
   }
   res = <FormControl>{res}</FormControl>;
