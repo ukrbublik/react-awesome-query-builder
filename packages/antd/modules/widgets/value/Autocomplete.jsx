@@ -1,10 +1,9 @@
 import React, { useMemo, useCallback } from "react";
-import { Select, Spin, Divider } from "antd";
+import { Select, Divider, Tooltip } from "antd";
 import { calcTextWidth, SELECT_WIDTH_OFFSET_RIGHT } from "../../utils/domUtils";
 import { Hooks , Utils } from "@react-awesome-query-builder/ui";
 const { fixListValuesGroupOrder } = Utils.Autocomplete;
 const { useListValuesAutocomplete } = Hooks;
-const Option = Select.Option;
 
 // see type ListItem
 const mapListItemToOptionKeys = {
@@ -99,6 +98,15 @@ export default (props) => {
     return nestedOpts;
   };
 
+  const renderOptionLabel = (option) => {
+    const { tooltip } = option;
+    let label = getOptionLabel(option);
+    if (tooltip) {
+      label = <Tooltip title={tooltip}>{label}</Tooltip>;
+    }
+    return label;
+  };
+
   // rendering special 'Load more' option has side effect: on change rc-select will save its title as internal value in own state
   const optionsToRender = nestByGroup(
     filteredOptions
@@ -106,7 +114,7 @@ export default (props) => {
       .map((option) => ({
         label: getOptionIsCustom(option)
           ? <span className={"customSelectOption"}>{getOptionLabel(option)}</span>
-          : getOptionLabel(option),
+          : renderOptionLabel(option),
         value: option.value,
         groupTitle: option.groupTitle,
         disabled: getOptionDisabled(option)
@@ -233,7 +241,6 @@ export default (props) => {
       onClear={aOnClear}
       onSelect={aOnSelect}
       onSearch={aOnSearch}
-      showArrow
       showSearch
       size={renderSize}
       loading={isLoading}

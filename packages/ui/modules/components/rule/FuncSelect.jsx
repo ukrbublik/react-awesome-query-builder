@@ -151,7 +151,7 @@ export default class FuncSelect extends Component {
     const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
-      return Object.keys(fields).reduce((acc, fieldKey) => {
+      return Object.keys(fields || {}).reduce((acc, fieldKey) => {
         const field = fields[fieldKey];
         if (field.type === "!struct") {
           return acc + countFieldsMatchesType(field.subfields);

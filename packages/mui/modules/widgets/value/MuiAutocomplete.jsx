@@ -16,12 +16,15 @@ import { useTheme } from "@mui/material/styles";
 const { useListValuesAutocomplete } = Hooks;
 const emptyArray = [];
 
+// tip: option can contain `group: {label, title}` intead of `groupTitle`
+// but it's internal format, made for field autocomplete
+// see `JSON.stringify(option.group)` and `JSON.parse(groupMaybeJson)`
 
 export default (props) => {
   const {
     allowCustomValues, multiple, disableClearable,
     value: selectedValue, customProps, readonly, config, filterOptionsConfig, errorText,
-    tooltipText,
+    tooltipText, isFieldAutocomplete,
   } = props;
   const stringifyOption = useCallback((option) => {
     const keysForFilter = config.settings.listKeysForSearch;
@@ -86,6 +89,8 @@ export default (props) => {
 
   const groupBy = (option) => option?.group ? JSON.stringify(option.group) : option?.groupTitle;
 
+  const theme = useTheme();
+
   // render
   const renderInput = (params) => {
     // parity with Antd
@@ -121,15 +126,20 @@ export default (props) => {
   };
 
   const GroupHeader = ({groupMaybeJson}) => {
-    const theme = useTheme();
     if (!groupMaybeJson) return null;
-    let group;
-    try {
-      group = JSON.parse(groupMaybeJson);
-    } catch (_) {
-      group = {
-        label: groupMaybeJson,
-      };
+    let group = {
+      label: groupMaybeJson,
+    };
+    if (typeof groupMaybeJson === 'string' && groupMaybeJson[0] === '{') {
+      try {
+        group = JSON.parse(groupMaybeJson);
+      } catch (_) { }
+    }
+    let groupLabel = group.label;
+    if (groupLabel && group.tooltip) {
+      groupLabel = (
+        <Tooltip title={group.tooltip} placement="left-start"><span>{groupLabel}</span></Tooltip>
+      );
     }
     let res = (
       <div style={{
@@ -139,14 +149,9 @@ export default (props) => {
         color: theme.palette.primary.main,
         backgroundColor: theme.palette.background.default,
       }}>
-        {group.label}
+        {groupLabel}
       </div>
     );
-    if (group.tooltip) {
-      res = (
-        <Tooltip title={group.tooltip} placement="left-start">{res}</Tooltip>
-      );
-    }
     return res;
   };
 
@@ -179,12 +184,15 @@ export default (props) => {
   };
 
   const renderOption = (props, option) => {
-    const { title, renderTitle, value, isHidden, tooltip } = option;
+    const { title, renderTitle, value, isHidden, tooltip, group, groupTitle } = option;
+    const isGrouped = groupTitle || group;
     const isSelected = multiple ? (selectedValue || []).includes(value) : selectedValue == value;
     const className = getOptionIsCustom(option) ? "customSelectOption" : undefined;
+    const prefix = !isFieldAutocomplete && isGrouped ? "\u00A0\u00A0" : "";
+    const finalTitle = prefix + (renderTitle || title);
     let titleSpan = (
       <span className={className}>
-        {renderTitle || title}
+        {finalTitle}
       </span>
     );
     if (tooltip) {
@@ -195,7 +203,7 @@ export default (props) => {
     if (isHidden)
       return null;
     if (option.specialValue) {
-      return <div {...props}>{renderTitle || title}</div>;
+      return <div {...props}>{finalTitle}</div>;
     } else if (multiple) {
       const itemContent = isSelected ? (
         <><ListItemIcon><Check /></ListItemIcon>{titleSpan}</>

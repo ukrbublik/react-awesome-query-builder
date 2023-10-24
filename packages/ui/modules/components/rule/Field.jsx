@@ -91,7 +91,7 @@ export default class Field extends Component {
     const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
-      return Object.keys(fields).reduce((acc, fieldKey) => {
+      return Object.keys(fields || {}).reduce((acc, fieldKey) => {
         const field = fields[fieldKey];
         if (field.type === "!struct") {
           return acc + countFieldsMatchesType(field.subfields);
@@ -112,7 +112,7 @@ export default class Field extends Component {
       const altLabel = field.label2;
       const tooltip = field.tooltip;
       const disabled = field.disabled;
-            
+
       if (field.hideForSelect)
         return undefined;
 

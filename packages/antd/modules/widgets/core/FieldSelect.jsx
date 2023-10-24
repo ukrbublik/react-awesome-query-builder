@@ -1,7 +1,6 @@
-import React, { PureComponent } from "react";
+import React, { useState } from "react";
 import { Tooltip, Select } from "antd";
 import {BUILT_IN_PLACEMENTS, SELECT_WIDTH_OFFSET_RIGHT, calcTextWidth} from "../../utils/domUtils";
-import PropTypes from "prop-types";
 const { Option, OptGroup } = Select;
 
 // see type FieldItemSearchableKeys
@@ -15,31 +14,30 @@ const mapFieldItemToOptionKeys = {
   fullLabel: "_fullLabel",
 };
 
-export default class FieldSelect extends PureComponent {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    customProps: PropTypes.object,
-    errorText: PropTypes.string,
-    items: PropTypes.array.isRequired,
-    placeholder: PropTypes.string,
-    selectedKey: PropTypes.string,
-    selectedKeys: PropTypes.array,
-    selectedPath: PropTypes.array,
-    selectedLabel: PropTypes.string,
-    selectedAltLabel: PropTypes.string,
-    selectedFullLabel: PropTypes.string,
-    selectedOpts: PropTypes.object,
-    readonly: PropTypes.bool,
-    //actions
-    setField: PropTypes.func.isRequired,
+export default (props) => {
+  const {
+    setField, config, customProps, items, placeholder,
+    selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
+  } = props;
+  const {showSearch} = customProps || {};
+
+  const [open, setOpen] = useState(false);
+
+  const selectText = selectedLabel || placeholder;
+  const selectWidth = calcTextWidth(selectText);
+  const isFieldSelected = !!selectedKey;
+  const dropdownPlacement = config.settings.dropdownPlacement;
+  const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
+  const width = isFieldSelected && !showSearch || !selectWidth ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
+  let tooltipText = selectedAltLabel || selectedFullLabel;
+  if (tooltipText == selectedLabel)
+    tooltipText = null;
+
+  const onChange = (key) => {
+    setField(key);
   };
 
-  onChange = (key) => {
-    this.props.setField(key);
-  };
-
-  filterOption = (input, option) => {
-    const { config } = this.props;
+  const filterOption = (input, option) => {
     const keysForFilter = config.settings.fieldItemKeysForSearch
       .map(k => mapFieldItemToOptionKeys[k]);
     const valueForFilter = keysForFilter
@@ -49,50 +47,7 @@ export default class FieldSelect extends PureComponent {
     return matches;
   };
 
-  render() {
-    const {
-      config, customProps, items, placeholder,
-      selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly, errorText,
-    } = this.props;
-    const {showSearch} = customProps || {};
-
-    const selectText = selectedLabel || placeholder;
-    const selectWidth = calcTextWidth(selectText);
-    const isFieldSelected = !!selectedKey;
-    const dropdownPlacement = config.settings.dropdownPlacement;
-    const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
-    const width = isFieldSelected && !showSearch || !selectWidth ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
-    let tooltipText = selectedAltLabel || selectedFullLabel;
-    if (tooltipText == selectedLabel)
-      tooltipText = null;
-
-    const fieldSelectItems = this.renderSelectItems(items);
-
-    let res = (
-      <Select
-        dropdownAlign={dropdownAlign}
-        popupMatchSelectWidth={false}
-        style={{ width }}
-        placeholder={placeholder}
-        size={config.settings.renderSize}
-        onChange={this.onChange}
-        value={selectedKey || undefined}
-        optionLabelProp={"label"}
-        filterOption={this.filterOption}
-        disabled={readonly}
-        status={errorText && "error"}
-        {...customProps}
-      >{fieldSelectItems}</Select>
-    );
-
-    if (tooltipText) {
-      res = <Tooltip title={tooltipText}>{res}</Tooltip>;
-    }
-
-    return res;
-  }
-
-  renderSelectItems(fields, level = 0) {
+  const renderSelectItems = (fields, level = 0) => {
     return fields.map(field => {
       const {items, key, path, label, fullLabel, altLabel, tooltip, grouplabel, disabled, matchesType} = field;
       const groupPrefix = level > 0 ? "\u00A0\u00A0".repeat(level) : "";
@@ -101,14 +56,23 @@ export default class FieldSelect extends PureComponent {
       if (items) {
         const simpleItems = items.filter(it => !it.items);
         const complexItems = items.filter(it => !!it.items);
-        const gr = simpleItems.length
-          ? [<OptGroup
-            key={pathKey}
-            label={groupPrefix+label}
-          >{this.renderSelectItems(simpleItems, level+1)}</OptGroup>]
-          : [];
-        const list = complexItems.length ? this.renderSelectItems(complexItems, level+1) : [];
-        return [...gr, ...list];
+        let gr;
+        if (simpleItems.length) {
+          let groupLabel = groupPrefix+label;
+          if (tooltip) {
+            groupLabel = <Tooltip title={tooltip}>{groupLabel}</Tooltip>;
+          }
+          gr = (
+            <OptGroup
+              key={pathKey}
+              label={groupLabel}
+            >
+              {renderSelectItems(simpleItems, level+1)}
+            </OptGroup>
+          );
+        }
+        const list = complexItems.length ? renderSelectItems(complexItems, level+1) : [];
+        return [...(gr ? [gr] : []), ...list];
       } else {
         const optionText = matchesType ? <b>{prefix+label}</b> : prefix+label;
         const option = tooltip ? <Tooltip title={tooltip}>{optionText}</Tooltip> : optionText;
@@ -128,6 +92,32 @@ export default class FieldSelect extends PureComponent {
         </Option>;
       }
     }).flat(Infinity);
+  };
+
+  const fieldSelectItems = renderSelectItems(items);
+
+  let res = (
+    <Select
+      open={open}
+      onDropdownVisibleChange={setOpen}
+      dropdownAlign={dropdownAlign}
+      popupMatchSelectWidth={false}
+      style={{ width }}
+      placeholder={placeholder}
+      size={config.settings.renderSize}
+      onChange={onChange}
+      value={selectedKey || undefined}
+      optionLabelProp={"label"}
+      filterOption={filterOption}
+      disabled={readonly}
+      status={errorText && "error"}
+      {...customProps}
+    >{fieldSelectItems}</Select>
+  );
+
+  if (tooltipText) {
+    res = <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>;
   }
 
-}
+  return res;
+};

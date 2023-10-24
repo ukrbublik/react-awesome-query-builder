@@ -60,6 +60,7 @@ const fieldAdapter = ({items, selectedKey, setField, isValueField, ...rest}, con
     multiple: false,
     disableClearable: !isValueField,
     value,
+    isFieldAutocomplete: true,
   };
 };
 

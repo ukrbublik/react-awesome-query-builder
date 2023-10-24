@@ -68,6 +68,7 @@ const fieldAdapter = ({
     multiple: false,
     disableClearable: !isValueField,
     value,
+    isFieldAutocomplete: true,
   };
 };
 
