@@ -2,6 +2,7 @@ import moment from "moment";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_ant } from "../support/utils";
+import { getAutocompleteUtils } from "../support/autocomplete";
 
 
 describe("antdesign widgets render", () => {
@@ -306,14 +307,30 @@ describe("antdesign widgets interactions", () => {
     });
 
     it("change field via select", async () => {
-      await with_qb_ant(configs.with_struct, inits.with_nested, "JsonLogic", (qb) => {
-        const w = qb.find("FieldSelect").first().instance();
-
-        w.onChange("user.login");
-
-        // search
-        expect(w.filterOption("re", {label: "Red"})).to.equal(true);
-        expect(w.filterOption("wh", {label: "Red"})).to.equal(false);
+      await with_qb_ant(configs.with_struct, inits.with_nested, "JsonLogic", async (qb) => {
+        const {
+          createCtx,
+          setStep,
+          expectInput,
+          expectOptions,
+          selectOption,
+          openSelect,
+          enterSearch,
+          expectOpened,
+        } = getAutocompleteUtils("antd");
+        createCtx({qb, selectType: "field"});
+        expectInput("firstName");
+        await openSelect();
+        expectOptions("User;login;  info;  firstName", {withValues: false});
+        await selectOption("  firstName");
+        expectInput("firstName");
+        await selectOption("login");
+        expectInput("login");
+        await openSelect();
+        await enterSearch("first");
+        expectInput("first");
+        expectOpened(true);
+        expectOptions("  info;  firstName", {withValues: false});
       });
     });
 

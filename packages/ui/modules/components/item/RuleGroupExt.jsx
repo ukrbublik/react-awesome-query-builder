@@ -94,7 +94,10 @@ class RuleGroupExt extends BasicGroup {
     if (selectedFieldConfig.conjunctions) {
       let filtered = {};
       for (let k of selectedFieldConfig.conjunctions) {
-        filtered[k] = conjunctionOptions[k];
+        const options = conjunctionOptions[k];
+        if (options) {
+          filtered[k] = options;
+        }
       }
       conjunctionOptions = filtered;
     }

@@ -1,6 +1,10 @@
 # Changelog
 - 6.4.2
-  - Allow override icons with `renderIcon` (issues #319, #872) (PR #xxx)
+  - Allow override icons with `renderIcon` (issues #319, #872) (PR #962)
+  - Support tooltips for MUI (issues #965, #684) (PR #973)
+  - Fixed issue with `FieldCascader` (issue #969) (PR #973)
+  - Fixed issue with date/time pickers for MUI 6 (issue #986) (PR #973)
+  - Allow use of antd icons 5 (issue #992) (PR #973)
 - 6.4.1
   - Fixed import of rule_group in rule_group from SpEL (PR #959)
   - Updated type `ItemBuilderProps` (PR #959)

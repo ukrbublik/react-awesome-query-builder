@@ -1,14 +1,14 @@
 import React from "react";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { moment } = Utils;
+const xdpVersion = xdpPackage?.version?.split(".")?.[0];
 
 export default (props) => {
   const {value, setValue, use12Hours, readonly, placeholder, dateFormat, timeFormat, valueFormat, customProps} = props;
-
-  const isV6 = !!DateTimePicker?.propTypes?.format;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -29,7 +29,7 @@ export default (props) => {
 
   const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
 
-  const pickerProps = isV6 ? {
+  const pickerProps = xdpVersion === "6" ? {
     format: dateTimeFormat,
     slotProps: {
       textField: {
@@ -46,7 +46,7 @@ export default (props) => {
     toolbarPlaceholder: !readonly ? placeholder : "",
   };
 
-  const aValue = value ? (isV6 && typeof value === "string" ? moment(value, valueFormat) : value) : null;
+  const aValue = value ? (xdpVersion === "6" && typeof value === "string" ? moment(value, valueFormat) : value) : null;
 
   return (
     <FormControl>

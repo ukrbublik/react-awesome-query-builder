@@ -15,10 +15,10 @@ const typeToIcon = {
 };
 
 export default ({type}) => {
-  let icon = typeToIcon[type];
+  let icon = typeToIcon[type] || null;
   if (!icon && type === "drag") {
     icon = <DragIcon />;
   }
 
-  return icon || null;
+  return icon;
 };

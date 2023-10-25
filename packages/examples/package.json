@@ -22,7 +22,7 @@
     "preinstall": "node ./scripts/patch-versions.js"
   },
   "dependencies": {
-    "@ant-design/icons": "^4.7.0",
+    "@ant-design/icons": "^5.2.6",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@fluentui/font-icons-mdl2": "^8.2.0",

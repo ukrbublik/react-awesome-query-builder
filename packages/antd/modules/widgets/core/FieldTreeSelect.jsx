@@ -38,6 +38,9 @@ export default class FieldTreeSelect extends Component {
     super(props);
     useOnPropsChanged(this);
     this.onPropsChanged(props);
+    this.state = {
+      open: false
+    };
   }
 
   onPropsChanged(nextProps) {
@@ -56,6 +59,12 @@ export default class FieldTreeSelect extends Component {
       this.optionsMaxWidth = optionsMaxWidth;
     }
   }
+
+  setOpen = (newOpen) => {
+    this.setState({
+      open: newOpen
+    });
+  };
 
   getTreeData(fields, fn = null) {
     return fields.map(field => {
@@ -116,6 +125,7 @@ export default class FieldTreeSelect extends Component {
       config, customProps = {}, placeholder, errorText,
       selectedKey, selectedLabel, selectedOpts, selectedAltLabel, selectedFullLabel, readonly,
     } = this.props;
+    const { open } = this.state;
     const { renderSize, fieldSeparator } = config.settings;
       
     let tooltipText = selectedAltLabel || selectedFullLabel;
@@ -137,6 +147,8 @@ export default class FieldTreeSelect extends Component {
 
     let res = (
       <TreeSelect
+        open={open}
+        onDropdownVisibleChange={this.setOpen}
         status={errorText && "error"}
         onChange={this.onChange}
         value={selectedKey || undefined}
@@ -163,7 +175,7 @@ export default class FieldTreeSelect extends Component {
     );
 
     if (tooltipText && !selectedOpts.tooltip) {
-      res = <Tooltip title={tooltipText}>{res}</Tooltip>;
+      res = <Tooltip title={!open ? tooltipText : null}>{res}</Tooltip>;
     }
 
     return res;

@@ -36,18 +36,37 @@ export const getAutocompleteUtils = (uif, uifv) => {
     multiple: undefined,
     strict: undefined,
     step: undefined,
+    ruleNo: undefined,
+    selectType: undefined,
   };
 
-  const createCtx = ({qb, multiple, strict}) => {
+  const createCtx = (opts) => {
+    const {qb, multiple, strict, ruleNo, selectType} = opts;
     ctx = {
       qb,
       multiple,
       strict,
       ac: undefined,
       step: "init",
+      ruleNo,
+      selectType: selectType || "value", // or "field"
     };
     updateSelect();
     return ctx;
+  };
+
+  const gotoWidget = () => {
+    const {qb, ruleNo, selectType} = ctx;
+    let res = qb;
+    if (ruleNo !== undefined) {
+      res = res.find(".rule").at(ruleNo);
+    }
+    if (selectType === "value") {
+      res = res.find(".rule--widget");
+    } else {
+      res = res.find(".rule--field-wrapper .rule--field");
+    }
+    return res;
   };
 
   const setStep = (step) => {
@@ -55,20 +74,27 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const updateSelect = () => {
-    const {qb, multiple} = ctx;
+    const {multiple, selectType} = ctx;
     let ac;
-    const targetPlaceholder = multiple ? "Select values" : "Select value";
+
     if (uif === "mui") {
       const Autocomplete = uifv === 4 ? MaterialAutocomplete : MuiAutocomplete;
-      ac = qb
-        .find(Autocomplete)
-        .filter({label: targetPlaceholder});
+      ac = gotoWidget().find(Autocomplete);
     } else {
-      ac = qb
-        .find("Select")
-        .filterWhere(s => s.props()?.placeholder == targetPlaceholder)
-        .last();
+      ac = gotoWidget().find("Select");
     }
+
+    if (selectType === "value") {
+      const valuePlaceholder = multiple ? "Select values" : "Select value";
+      if (uif === "mui") {
+        ac = ac.filter({label: valuePlaceholder});
+      } else {
+        ac = ac.filterWhere(s => s.props()?.placeholder == valuePlaceholder).last();
+      }
+    } else {
+      ac = ac.last();
+    }
+
     ctx.ac = ac;
   };
 
@@ -83,18 +109,18 @@ export const getAutocompleteUtils = (uif, uifv) => {
     updateSelect();
   };
 
-  const stringifyOptions = () => {
-    const {qb, ac} = ctx;
+  const stringifyOptions = (withValues = true) => {
+    const {ac} = ctx;
     if (uif === "mui") {
       const options = ac.prop("options");
-      return options.map(({title, value}) => `${value}_${title}`).join(";");
+      return options.map(({title, value}) => withValues ? `${value}_${title}` : title).join(";");
     } else {
-      return stringifyVisibleOptions(true);
+      return stringifyVisibleOptions(withValues);
     }
   };
 
   const stringifyVisibleOptions = (withValues = false) => {
-    const {qb, ac, multiple} = ctx;
+    const {ac, multiple} = ctx;
     if (uif === "mui") {
       const targetType = !multiple && uifv == 5 ? "div" : "li";
       const options = ac
@@ -111,7 +137,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
       return items
         .getElements()
         .map((el, i) => 
-          withValues
+          withValues && el.key.indexOf("__RC_SELECT_") === -1
             ? `${el.key}_${items.at(i).text()}`
             : `${items.at(i).text()}`
         )
@@ -120,7 +146,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const stringifyTags = (withValues = false) => {
-    const {qb, ac} = ctx;
+    const {ac} = ctx;
     if (uif === "mui") {
       const chips = ac
         .find(".MuiChip-root")
@@ -152,11 +178,11 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const expectInput = (expectedValue) => {
-    const {qb, ac, step, multiple} = ctx;
+    const {ac, step, multiple} = ctx;
     let textInputValue;
     if (uif === "mui") {
-      const textInput = qb
-        .find(".rule--widget .MuiAutocomplete-root .MuiInput-root input");
+      const textInput = gotoWidget()
+        .find(".MuiAutocomplete-root .MuiInput-root input");
       textInputValue = textInput.getDOMNode().getAttribute("value");
     } else {
       const selector = ac.find("Selector");
@@ -169,11 +195,11 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const expectSelected = (expected) => {
-    const {qb, ac, step, multiple} = ctx;
+    const {ac, step, multiple} = ctx;
     let actualValue;
     if (uif === "mui") {
-      const textInput = qb
-        .find(".rule--widget .MuiAutocomplete-root .MuiInput-root input");
+      const textInput = gotoWidget()
+        .find(".MuiAutocomplete-root .MuiInput-root input");
       actualValue = textInput.getDOMNode().getAttribute("value");
     } else {
       const selector = ac.find("Selector");
@@ -183,7 +209,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const clickClear = async () => {
-    const {qb, ac, step} = ctx;
+    const {ac, step} = ctx;
     if (uif === "mui") {
       const targetType = "button";
       const clearCmp = ac
@@ -205,9 +231,9 @@ export const getAutocompleteUtils = (uif, uifv) => {
     await waitAndUpdate();
   };
 
-  const expectOptions = (expectedOptions) => {
+  const expectOptions = (expectedOptions, {withValues = true} = {}) => {
     const {step} = ctx;
-    expect(stringifyOptions(), `${step} - options`).to.eq(expectedOptions);
+    expect(stringifyOptions(withValues), `${step} - options`).to.eq(expectedOptions);
   };
 
   const expectTags = (expectedTags) => {
@@ -215,9 +241,9 @@ export const getAutocompleteUtils = (uif, uifv) => {
     expect(stringifyTags(), `${step} - tags`).to.eq(expectedTags);
   };
 
-  const expectVisibleOptions = (expectedOptions) => {
+  const expectVisibleOptions = (expectedOptions, {withValues = false} = {}) => {
     const {step} = ctx;
-    expect(stringifyVisibleOptions(), `${step} - visibleOptions`).to.eq(expectedOptions);
+    expect(stringifyVisibleOptions(withValues), `${step} - visibleOptions`).to.eq(expectedOptions);
   };
 
   const clickLoadMore = async () => {
@@ -233,7 +259,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const selectOption = async (targetTitle, expectedIsSelected = false) => {
-    const {qb, ac, step, multiple} = ctx;
+    const {ac, step, multiple} = ctx;
     if (uif === "antd") {
       const items = ac
         .find("Popup") // in portal
@@ -253,7 +279,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
           return o.getElement()?.type == targetType;
         });
       const targetOption = options.filterWhere(o => {
-        return o.text() == targetTitle;
+        return o.text().trim() == targetTitle.trim();
       });
       const isSelected = uifv == 5
         ? targetOption.last().getDOMNode().className.includes("Mui-selected")
@@ -270,7 +296,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const deleteTag = async (targetTitle) => {
-    const {qb, ac} = ctx;
+    const {ac} = ctx;
     if (uif == "mui") {
       const chips = ac
         .find(".MuiChip-root")
@@ -303,49 +329,49 @@ export const getAutocompleteUtils = (uif, uifv) => {
   };
 
   const openSelect = async () => {
-    const {qb, ac} = ctx;
+    const {ac} = ctx;
     if (uif == "mui") {
       ac.prop("onOpen")();
-      qb
-        .find(".rule--widget .MuiAutocomplete-root .MuiInput-root input")
+      gotoWidget()
+        .find(".MuiAutocomplete-root .MuiInput-root input")
         .simulate("click");
     } else {
       ac.prop("onDropdownVisibleChange")(true);
-      qb
-        .find(".rule--widget .ant-select-selection-search input")
+      gotoWidget()
+        .find(".ant-select-selection-search input")
         .simulate("click");
     }
     await waitAndUpdate();
   };
   
   const closeSelect = async (opts) => {
-    const {qb, ac} = ctx;
+    const {ac} = ctx;
     if (uif == "mui") {
       ac.prop("onClose")();
-      qb
-        .find(".rule--widget .MuiAutocomplete-root .MuiInput-root input")
+      gotoWidget()
+        .find(".MuiAutocomplete-root .MuiInput-root input")
         .simulate("blur");
     } else {
       ac.prop("onDropdownVisibleChange")(false);
-      qb
-        .find(".rule--widget .ant-select-selection-search input")
+      gotoWidget()
+        .find(".ant-select-selection-search input")
         .simulate("blur");
     }
     await waitAndUpdate(opts);
   };
 
   const expectOpened = (expectedOpen = true) => {
-    const {qb, ac, step} = ctx;
+    const {ac, step} = ctx;
     const open = ac.prop("open");
     expect(open, `${step} - open`).to.eq(expectedOpen);
   };
 
   const enterSearch = async (inputValue) => {
-    const {qb, ac} = ctx;
+    const {ac} = ctx;
     if (uif == "mui") {
       ac.prop("onInputChange")(null, inputValue);
-      // qb
-      //   .find(".rule--widget .MuiAutocomplete-root .MuiInput-root input")
+      // gotoWidget()
+      //   .find(".MuiAutocomplete-root .MuiInput-root input")
       //   .simulate("change", { target: { value: inputValue } });
     } else {
       ac.prop("onSearch")(inputValue);

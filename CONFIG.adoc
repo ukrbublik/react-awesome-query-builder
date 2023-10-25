@@ -213,7 +213,9 @@ Example:
   Available settings for text widget: `maxLength`, `maxRows`.
 |fieldSettings.listValues |+ for (multi)select | |List of values for (multi)select widget. +
   Example: `[{value: 'yellow', title: 'Yellow'}, {value: 'green', title: 'Green'}]` 
-   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`)
+   (or alternatively `{ yellow: 'Yellow', green: 'Green' }`) +
+  You can also use `groupTitle` to group values. 
+  Example: `[{value: 'red', groupTitle: 'Warm colors'}, {value: 'orange', groupTitle: 'Warm colors'} ...]`
 |fieldSettings.treeValues |+ for tree (multi)select | |List of values for tree (multi)select widget. +
   Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
@@ -225,7 +227,7 @@ Example:
 |fieldSettings.treeSelectOnlyLeafs |- for `treeselect` widget|true |Can select only leafs or any node?
 |fieldSettings.asyncFetch |- for `select` widget| |Async function to load list of options for `select` from server. +
   Function format: `async (string search, int offset) => { values: Array, hasMore: boolean }` +
-  `values` - list of `{title: string, value: mixed}` +
+  `values` - list of `{title: string, value: mixed, groupTitle?: string}` +
   For server-side select `listValues` will not be used. See also `useLoadMore`, `useAsyncSearch`.
 |fieldSettings.useAsyncSearch |- for `select` widget |false |If true, `asyncFetch` supports search.
 |fieldSettings.useLoadMore |- for `select` widget |false |If true, `asyncFetch` supports pagination.

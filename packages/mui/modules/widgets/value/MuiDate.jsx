@@ -1,14 +1,14 @@
 import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { moment } = Utils;
+const xdpVersion = xdpPackage?.version?.split(".")?.[0];
 
 export default (props) => {
   const {value, setValue, readonly, customProps, dateFormat, valueFormat, placeholder} = props;
-
-  const isV6 = !!DatePicker?.propTypes?.format;
 
   const formatSingleValue = (value) => {
     return value && value.isValid() ? value.format(valueFormat) : undefined;
@@ -27,7 +27,7 @@ export default (props) => {
 
   const desktopModeMediaQuery = "@media (pointer: fine), (pointer: none)";
 
-  const pickerProps = isV6 ? {
+  const pickerProps = xdpVersion === "6" ? {
     format: dateFormat,
     slotProps: {
       textField: {
@@ -44,7 +44,7 @@ export default (props) => {
     toolbarPlaceholder: !readonly ? placeholder : "",
   };
 
-  const aValue = value ? (isV6 && typeof value === "string" ? moment(value, valueFormat) : value) : null;
+  const aValue = value ? (xdpVersion === "6" && typeof value === "string" ? moment(value, valueFormat) : value) : null;
 
   return (
     <FormControl>

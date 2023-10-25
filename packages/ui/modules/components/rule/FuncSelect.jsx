@@ -144,14 +144,14 @@ export default class FuncSelect extends Component {
     return funcs;
   }
 
-  buildOptions(config, funcs, fieldType = undefined, path = null, optGroupLabel = null) {
+  buildOptions(config, funcs, fieldType = undefined, path = null, optGroup = null) {
     if (!funcs)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
-      return Object.keys(fields).reduce((acc, fieldKey) => {
+      return Object.keys(fields || {}).reduce((acc, fieldKey) => {
         const field = fields[fieldKey];
         if (field.type === "!struct") {
           return acc + countFieldsMatchesType(field.subfields);
@@ -172,7 +172,10 @@ export default class FuncSelect extends Component {
       const tooltip = func.tooltip;
 
       if (func.type == "!struct") {
-        const items = this.buildOptions(config, func.subfields, fieldType, fullFuncPath, label);
+        const items = this.buildOptions(config, func.subfields, fieldType, fullFuncPath, {
+          label,
+          tooltip,
+        });
         const hasItemsMatchesType = countFieldsMatchesType(func.subfields) > 0;
         return {
           key: funcKey,
@@ -191,7 +194,8 @@ export default class FuncSelect extends Component {
           label,
           fullLabel,
           tooltip,
-          grouplabel: optGroupLabel,
+          grouplabel: optGroup?.label,
+          group: optGroup,
           matchesType,
         };
       }

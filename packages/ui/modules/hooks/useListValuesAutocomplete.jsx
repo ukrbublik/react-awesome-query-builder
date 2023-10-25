@@ -333,7 +333,7 @@ const useListValuesAutocomplete = ({
       // weird
       return valueOrOption;
     }
-    return option.title || option.label;
+    return option.title || option.label || option.value; // fallback to value
   };
 
   const fixedOptions = uif === "mui" ? fixListValuesGroupOrder(options) : options;

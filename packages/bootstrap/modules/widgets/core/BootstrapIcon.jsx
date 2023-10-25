@@ -19,7 +19,7 @@ export default ({ type }) => {
   let icon = typeToIcon[type] 
     && <FontAwesomeIcon
       icon={typeToIcon[type]}
-    />;
+    /> || null;
   if (!icon && type === "drag") {
     icon = <DragIcon />;
   }

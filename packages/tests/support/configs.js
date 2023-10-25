@@ -191,6 +191,27 @@ export const with_theme_material = (BasicConfig) => ({
   }
 });
 
+export const without_field_autocomplete = (BasicConfig) => ({
+  ...BasicConfig,
+  widgets: {
+    ...BasicConfig.widgets,
+    field: {
+      ...BasicConfig.widgets.field,
+      customProps: {
+        ...(BasicConfig.widgets?.field?.customProps || {}),
+        showSearch: false
+      }
+    },
+  },
+  settings: {
+    ...BasicConfig.settings,
+    customFieldSelectProps: {
+      ...(BasicConfig.settings?.customFieldSelectProps || {}),
+      showSearch: false
+    },
+  }
+});
+
 export const with_theme_mui = (BasicConfig) => ({
   ...with_all_types(BasicConfig),
   settings: {

@@ -20,7 +20,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
         <Button 
           key={id+postfix} 
           id={id+postfix} 
-          color={checked ? "primary" : "neutral"} 
+          color={checked ? "primary" : "inherit"} 
           value={key} 
           onClick={onClick.bind(null, key)} 
           disabled={readonly || disabled}
@@ -37,7 +37,7 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
       <Button 
         key={id}
         id={id + "__not"}
-        color={not ? "secondary" : "neutral"} 
+        color={not ? "error" : "inherit"} 
         onClick={onNotClick.bind(null, !not)} 
         disabled={readonly}
       >

@@ -84,14 +84,14 @@ export default class Field extends Component {
     return label;
   }
 
-  buildOptions(parentFieldPath, config, fields, fieldType = undefined, path = null, optGroupLabel = null) {
+  buildOptions(parentFieldPath, config, fields, fieldType = undefined, path = null, optGroup = null) {
     if (!fields)
       return null;
     const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
     const prefix = path?.length ? path.join(fieldSeparator) + fieldSeparator : "";
 
     const countFieldsMatchesType = (fields) => {
-      return Object.keys(fields).reduce((acc, fieldKey) => {
+      return Object.keys(fields || {}).reduce((acc, fieldKey) => {
         const field = fields[fieldKey];
         if (field.type === "!struct") {
           return acc + countFieldsMatchesType(field.subfields);
@@ -112,12 +112,15 @@ export default class Field extends Component {
       const altLabel = field.label2;
       const tooltip = field.tooltip;
       const disabled = field.disabled;
-            
+
       if (field.hideForSelect)
         return undefined;
 
       if (field.type == "!struct") {
-        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, fullFieldPath, label);
+        const items = this.buildOptions(parentFieldPath, config, field.subfields, fieldType, fullFieldPath, {
+          label,
+          tooltip,
+        });
         const hasItemsMatchesType = countFieldsMatchesType(field.subfields) > 0;
         return {
           disabled,
@@ -140,7 +143,8 @@ export default class Field extends Component {
           fullLabel,
           altLabel,
           tooltip,
-          grouplabel: optGroupLabel,
+          grouplabel: optGroup?.label,
+          group: optGroup,
           matchesType,
         };
       }
