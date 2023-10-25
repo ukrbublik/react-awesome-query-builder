@@ -22,7 +22,7 @@ const FieldSelect = (props) => {
   const {showSearch} = customProps || {};
 
   const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
 
   const selectText = selectedLabel || placeholder;
   const selectWidth = calcTextWidth(selectText);
@@ -130,6 +130,6 @@ const FieldSelect = (props) => {
   return res;
 };
 
-FieldSelect.displayName = 'FieldSelect';
+FieldSelect.displayName = "FieldSelect";
 export default FieldSelect;
 

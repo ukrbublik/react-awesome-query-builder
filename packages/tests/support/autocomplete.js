@@ -58,12 +58,12 @@ export const getAutocompleteUtils = (uif, uifv) => {
     const {qb, ruleNo, selectType} = ctx;
     let res = qb;
     if (ruleNo !== undefined) {
-      res = res.find('.rule').at(ruleNo);
+      res = res.find(".rule").at(ruleNo);
     }
     if (selectType === "value") {
-      res = res.find('.rule--widget');
+      res = res.find(".rule--widget");
     } else {
-      res = res.find('.rule--field-wrapper .rule--field');
+      res = res.find(".rule--field-wrapper .rule--field");
     }
     return res;
   };
@@ -78,7 +78,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
 
     if (uif === "mui") {
       const Autocomplete = uifv === 4 ? MaterialAutocomplete : MuiAutocomplete;
-      ac = gotoWidget().find(Autocomplete)
+      ac = gotoWidget().find(Autocomplete);
     } else {
       ac = gotoWidget().find("Select");
     }
@@ -136,7 +136,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
       return items
         .getElements()
         .map((el, i) => 
-          withValues && el.key.indexOf('__RC_SELECT_') === -1
+          withValues && el.key.indexOf("__RC_SELECT_") === -1
             ? `${el.key}_${items.at(i).text()}`
             : `${items.at(i).text()}`
         )
