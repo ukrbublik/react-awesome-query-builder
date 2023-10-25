@@ -5,7 +5,10 @@ export const toListValue = (v, title) => {
   if (v == null || v == "") {
     return undefined;
   } else if (isObject(v)) {
-    return v;
+    return {
+      ...v,
+      title: v.title || v.value, // fallback to value
+    };
   } else {
     return {
       value: v,
