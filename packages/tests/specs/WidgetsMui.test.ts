@@ -60,7 +60,7 @@ describe("mui core widgets", () => {
   });
 
   it("change field without autocomplete", async () => {
-    await with_qb_mui([configs.with_struct, configs.without_field_autocomplete], inits.with_nested, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+    await with_qb_mui([configs.with_struct, configs.without_field_autocomplete], inits.with_nested, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       const sel = qb.find(".rule--field").find(Select).last();
       sel.prop("onChange")?.({target: {value: "user.login"}} as SelectChangeEvent, null);
       qb.update();
