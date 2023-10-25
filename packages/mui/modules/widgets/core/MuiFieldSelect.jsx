@@ -24,29 +24,30 @@ export default ({
       const field = fields[fieldKey];
       const {items, path, label, disabled, matchesType, tooltip} = field;
       const prefix = "\u00A0\u00A0".repeat(level);
+      let finalLabel = (
+        <span>
+          {prefix && <span>{prefix}</span>}
+          {matchesType ? <b>{label}</b> : label}
+        </span>
+      );
+      if (tooltip) {
+        finalLabel = (
+          <Tooltip title={tooltip} placement="left-start">
+            {finalLabel}
+          </Tooltip>
+        );
+      }
       if (items) {
         return [
           <ListSubheader disabled={disabled} key={path} disableSticky={true}>
-            {prefix && <span>{prefix}</span>}
-            {label}
+            {finalLabel}
           </ListSubheader>,
           renderOptions(items, level+1),
         ];
       } else {
-        let res = (
-          <span>
-            {prefix && <span>{prefix}</span>}
-            {matchesType ? <b>{label}</b> : label}
-          </span>
-        );
-        if (tooltip) {
-          res = (
-            <Tooltip title={tooltip} placement="left-start">{res}</Tooltip>
-          );
-        }
         res = (
           <MenuItem disabled={disabled} key={path} value={path}>
-            {res}
+            {finalLabel}
           </MenuItem>
         );
         return res;
