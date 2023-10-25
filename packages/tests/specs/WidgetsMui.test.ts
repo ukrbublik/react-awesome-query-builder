@@ -3,6 +3,7 @@ import { expect } from "chai";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
+import { getAutocompleteUtils } from "../support/autocomplete";
 
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
@@ -19,6 +20,41 @@ describe("mui theming", () => {
       expect(boolSwitchStyle.getPropertyValue("color"), "boolSwitch color").to.eq(hexToRgbString("#5e00d7"));
     }, {
       attach: true
+    });
+  });
+});
+
+describe("mui core widgets", () => {
+  it("change field", async () => {
+    await with_qb_mui(configs.with_struct, inits.with_nested, "JsonLogic", async (qb) => {
+      const {
+        createCtx,
+        setStep,
+        expectInput,
+        expectOptions,
+        expectVisibleOptions,
+        selectOption,
+        openSelect,
+        enterSearch,
+        expectOpened,
+      } = getAutocompleteUtils("mui", 5);
+      createCtx({qb, selectType: "field"});
+      expectInput("firstName");
+      await openSelect();
+      expectOptions("login;firstName", {withValues: false});
+      expectVisibleOptions("  login;    firstName", {withValues: false});
+      await selectOption("firstName");
+      expectInput("firstName");
+      await openSelect();
+      await selectOption("login");
+      expectInput("login");
+      await openSelect();
+      await enterSearch("first");
+      expectInput("first");
+      expectOpened(true);
+      expectVisibleOptions("    firstName", {withValues: false});
+    }, {
+      ignoreLog: ignoreLogDatePicker,
     });
   });
 });
@@ -151,6 +187,5 @@ describe("mui widgets interactions", () => {
       ignoreLog: ignoreLogDatePicker,
     });
   });
-
 
 });

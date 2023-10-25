@@ -40,7 +40,8 @@ export const getAutocompleteUtils = (uif, uifv) => {
     selectType: undefined,
   };
 
-  const createCtx = ({qb, multiple, strict, ruleNo, selectType}) => {
+  const createCtx = (opts) => {
+    const {qb, multiple, strict, ruleNo, selectType} = opts;
     ctx = {
       qb,
       multiple,
@@ -278,7 +279,7 @@ export const getAutocompleteUtils = (uif, uifv) => {
           return o.getElement()?.type == targetType;
         });
       const targetOption = options.filterWhere(o => {
-        return o.text() == targetTitle;
+        return o.text().trim() == targetTitle.trim();
       });
       const isSelected = uifv == 5
         ? targetOption.last().getDOMNode().className.includes("Mui-selected")
