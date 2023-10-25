@@ -4,6 +4,7 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
 import { getAutocompleteUtils } from "../support/autocomplete";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
@@ -25,7 +26,7 @@ describe("mui theming", () => {
 });
 
 describe("mui core widgets", () => {
-  it("change field", async () => {
+  it("change field with autocomplete", async () => {
     await with_qb_mui(configs.with_struct, inits.with_nested, "JsonLogic", async (qb) => {
       const {
         createCtx,
@@ -53,6 +54,24 @@ describe("mui core widgets", () => {
       expectInput("first");
       expectOpened(true);
       expectVisibleOptions("    firstName", {withValues: false});
+    }, {
+      ignoreLog: ignoreLogDatePicker,
+    });
+  });
+
+  it("change field without autocomplete", async () => {
+    await with_qb_mui([configs.with_struct, configs.without_field_autocomplete], inits.with_nested, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+      const sel = qb.find(".rule--field").find(Select).last();
+      sel.prop("onChange")?.({target: {value: "user.login"}} as SelectChangeEvent, null);
+      qb.update();
+      
+      expect_jlogic([null,
+        {
+          "and": [
+            { "==": [ { "var": "user.login" }, "abc" ] },
+          ]
+        }
+      ]);
     }, {
       ignoreLog: ignoreLogDatePicker,
     });
