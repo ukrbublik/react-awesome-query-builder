@@ -240,9 +240,9 @@ export const getAutocompleteUtils = (uif, uifv) => {
     expect(stringifyTags(), `${step} - tags`).to.eq(expectedTags);
   };
 
-  const expectVisibleOptions = (expectedOptions) => {
+  const expectVisibleOptions = (expectedOptions, {withValues = false} = {}) => {
     const {step} = ctx;
-    expect(stringifyVisibleOptions(), `${step} - visibleOptions`).to.eq(expectedOptions);
+    expect(stringifyVisibleOptions(withValues), `${step} - visibleOptions`).to.eq(expectedOptions);
   };
 
   const clickLoadMore = async () => {
@@ -369,8 +369,8 @@ export const getAutocompleteUtils = (uif, uifv) => {
     const {ac} = ctx;
     if (uif == "mui") {
       ac.prop("onInputChange")(null, inputValue);
-      // qb
-      //   .find(".rule--widget .MuiAutocomplete-root .MuiInput-root input")
+      // gotoWidget()
+      //   .find(".MuiAutocomplete-root .MuiInput-root input")
       //   .simulate("change", { target: { value: inputValue } });
     } else {
       ac.prop("onSearch")(inputValue);

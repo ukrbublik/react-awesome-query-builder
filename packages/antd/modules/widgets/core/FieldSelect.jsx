@@ -22,6 +22,7 @@ const FieldSelect = (props) => {
   const {showSearch} = customProps || {};
 
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   const selectText = selectedLabel || placeholder;
   const selectWidth = calcTextWidth(selectText);
@@ -35,6 +36,10 @@ const FieldSelect = (props) => {
 
   const onChange = (key) => {
     setField(key);
+  };
+
+  const onSearch = (search) => {
+    setSearchValue(search);
   };
 
   const filterOption = (input, option) => {
@@ -111,6 +116,9 @@ const FieldSelect = (props) => {
       filterOption={filterOption}
       disabled={readonly}
       status={errorText && "error"}
+      showSearch={true}
+      searchValue={searchValue}
+      onSearch={onSearch}
       {...customProps}
     >{fieldSelectItems}</Select>
   );

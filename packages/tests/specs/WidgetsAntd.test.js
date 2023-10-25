@@ -315,16 +315,22 @@ describe("antdesign widgets interactions", () => {
           expectOptions,
           selectOption,
           openSelect,
+          enterSearch,
+          expectOpened,
         } = getAutocompleteUtils("antd");
         createCtx({qb, selectType: "field"});
         expectInput("firstName");
-        setStep("open");
         await openSelect();
         expectOptions("User;login;  info;  firstName", {withValues: false});
-        await selectOption("login");
-        expectInput("login");
         await selectOption("  firstName");
         expectInput("firstName");
+        await selectOption("login");
+        expectInput("login");
+        await openSelect();
+        await enterSearch("first");
+        expectInput("first");
+        expectOpened(true);
+        expectOptions("  info;  firstName", {withValues: false});
       });
     });
 
