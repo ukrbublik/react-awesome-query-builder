@@ -5,3 +5,4 @@ export * from "./sql";
 export * from "./spel";
 export * from "./queryString";
 export * from "./elasticSearch";
+export * from "./cel";

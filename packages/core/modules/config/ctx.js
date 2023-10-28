@@ -1,6 +1,6 @@
 import moment from "moment";
 import {
-  SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, spelFixList,
+  SqlString, sqlEmptyValue, mongoEmptyValue, spelEscape, celEscape, spelFixList,
   stringifyForDisplay
 } from "../utils/export";
 import {escapeRegExp} from "../utils/stuff";
@@ -59,6 +59,7 @@ const ctx = {
     sqlEmptyValue,
     stringifyForDisplay,
     getTitleInListValues,
+    celEscape,
     spelEscape,
     spelFixList,
   },
