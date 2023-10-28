@@ -186,7 +186,7 @@ export const getFlatTree = (tree) => {
     const id = item.get("id");
     const children = item.get("children1");
     const isLocked = item.getIn(["properties", "isLocked"]);
-    const childrenIds = children ? children.map((_child, childId) => childId).toArray() : null;
+    const childrenIds = children ? children.map((_child, childId) => childId).valueSeq().toArray() : null;
     const isRuleGroup = type == "rule_group";
     // tip: count rule_group as 1 rule
     const isLeaf = !insideRuleGroup && (!children || isRuleGroup);
@@ -430,3 +430,19 @@ export const getSwitchValues = (tree) => {
 export const isEmptyTree = (tree) => (!tree.get("children1") || tree.get("children1").size == 0);
 
 export const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
+
+
+export const _fixImmutableValue = (v) => {
+  if (v?.toJS) {
+    const vJs = v?.toJS?.();
+    if (vJs?.func) {
+      // `v` is a func arg, keep Immutable
+      return v.toOrderedMap();
+    } else {
+      // for values of multiselect use Array instead of List
+      return vJs;
+    }
+  } else {
+    return v;
+  }
+};

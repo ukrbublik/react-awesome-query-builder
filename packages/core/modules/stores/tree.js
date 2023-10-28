@@ -1,4 +1,4 @@
-import Immutable from "immutable";
+import Immutable, { fromJS } from "immutable";
 import {
   expandTreePath, expandTreeSubpath, getItemByPath, fixPathsInTree, 
   getTotalRulesCountInTree, fixEmptyGroupsInTree, isEmptyTree, hasChildren, removeIsLockedInTree
@@ -33,7 +33,7 @@ const addNewGroup = (state, path, type, groupUuid, properties, config, children 
   const isDefaultCase = !!meta?.isDefaultCase;
 
   const origState = state;
-  state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(properties || {}), config, children);
+  state = addItem(state, path, type, groupUuid, defaultGroupProperties(config).merge(fromJS(properties) || {}), config, children);
   if (state !== origState) {
     if (!children && !isDefaultCase) {
       state = state.setIn(expandTreePath(groupPath, "children1"), new Immutable.OrderedMap());
@@ -160,7 +160,7 @@ const _addChildren1 = (config, item, children) => {
         const id1 = uuid();
         const it1 = {
           ...it,
-          properties: defaultItemProperties(config, it).merge(it.properties || {}),
+          properties: defaultItemProperties(config, it).merge(fromJS(it.properties) || {}),
           id: id1
         };
         _addChildren1(config, it1, it1.children1);
@@ -306,7 +306,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
       }
     });
   } else if (placement == constants.PLACEMENT_APPEND) {
-    newTargetChildren = newTargetChildren.merge({[from.get("id")]: from});
+    newTargetChildren = newTargetChildren.merge(Immutable.OrderedMap({[from.get("id")]: from}));
   } else if (placement == constants.PLACEMENT_PREPEND) {
     newTargetChildren = Immutable.OrderedMap({[from.get("id")]: from}).merge(newTargetChildren);
   }

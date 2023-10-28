@@ -1,7 +1,7 @@
 import Immutable, { fromJS, Map } from "immutable";
 import {validateTree} from "../utils/validation";
 import {extendConfig} from "../utils/configUtils";
-import {getTreeBadFields, getLightTree} from "../utils/treeUtils";
+import {getTreeBadFields, getLightTree, _fixImmutableValue} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
 
 export const getTree = (immutableTree, light = true, children1AsArray = true) => {
@@ -48,7 +48,16 @@ export const isTree = (tree) => {
 export {isJsonLogic};
 
 export function jsToImmutable(tree) {
-  const imm = fromJS(tree, function (key, value) {
+  const imm = fromJS(tree, function (key, value, path) {
+    const isFuncArg = path
+      && path.length > 3
+      && path[path.length-1] === "value"
+      && path[path.length-3] === "args";
+    const isRuleValue = path
+      && path.length > 3
+      && path[path.length-1] === "value"
+      && path[path.length-2] === "properties";
+
     let outValue;
     if (key == "properties") {
       outValue = value.toOrderedMap();
@@ -61,18 +70,10 @@ export function jsToImmutable(tree) {
           outValue = outValue.setIn(["value", i], undefined);
         }
       }
-    } else if (key == "value" && Immutable.Iterable.isIndexed(value)) {
-      outValue = value.map(v => {
-        const vJs = v?.toJS?.();
-        if (vJs?.func) {
-          return v.toOrderedMap();
-        } else if(v?.toJS) {
-          // for values of multiselect use Array instead of List
-          return vJs;
-        } else {
-          return v;
-        }
-      }).toList();
+    } else if (isFuncArg) {
+      outValue = _fixImmutableValue(value);
+    } else if ((path ? isRuleValue : key == "value") && Immutable.Iterable.isIndexed(value)) {
+      outValue = value.map(_fixImmutableValue).toList();
     } else if (key == "asyncListValues") {
       // keep in JS format
       outValue = value.toJS();

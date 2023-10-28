@@ -169,7 +169,7 @@ importers:
       '@types/node': ^18.15.0
       '@types/react': ^17
       clone: ^2.1.2
-      immutable: ^3.8.2
+      immutable: ^4.3.4
       json-logic-js: ^2.0.2
       lodash: ^4.17.21
       moment: ^2.29.4
@@ -177,7 +177,7 @@ importers:
       sqlstring: ^2.3.3
     dependencies:
       clone: 2.1.2
-      immutable: 3.8.2
+      immutable: 4.3.4
       json-logic-js: 2.0.2
       lodash: 4.17.21
       moment: 2.29.4
@@ -253,7 +253,7 @@ importers:
       cross-env: ^7.0.3
       css-loader: ^6.2.0
       file-loader: ^6.2.0
-      immutable: ^3.8.2
+      immutable: ^4.3.4
       less: ^4.1.1
       less-loader: ^10.0.0
       lodash: ^4.17.21
@@ -306,7 +306,7 @@ importers:
       antd: 5.7.2_tonpzznxmdkdqlpcs7osdmovtq
       bootstrap: 5.2.3_@popperjs+core@2.11.6
       clone: 2.1.2
-      immutable: 3.8.2
+      immutable: 4.3.4
       lodash: 4.17.21
       moment: 2.29.4
       prop-types: 15.8.1
@@ -8387,14 +8387,13 @@ packages:
     dev: true
     optional: true
 
-  /immutable/3.8.2:
-    resolution: {integrity: sha512-15gZoQ38eYjEjxkorfbcgBKBL6R7T459OuK+CpcWt7O3KF4uPCx2tD0uFETlUDIyo+1789crbMhTvQBSR5yBMg==}
-    engines: {node: '>=0.10.0'}
-    dev: false
-
   /immutable/4.2.1:
     resolution: {integrity: sha512-7WYV7Q5BTs0nlQm7tl92rDYYoyELLKHoDMBKhrxEoiV4mrfVdRz8hzPiYOzH7yWjzoVEamxRuAqhxL2PLRwZYQ==}
     dev: true
+
+  /immutable/4.3.4:
+    resolution: {integrity: sha512-fsXeu4J4i6WNWSikpI88v/PcVflZz+6kMhUfIwc5SY+poQRPnaf5V7qds6SUyUN3cVxEzuCab7QIoLOQ+DQ1wA==}
+    dev: false
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}

@@ -390,39 +390,47 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
   if (value) {
     const funcKey = value.get("func");
     if (funcKey) {
-      const funcConfig = getFuncConfig(config, funcKey);
-      if (funcConfig) {
-        if (valueType && funcConfig.returnType != valueType)
-          return [`Function ${funcKey} should return value of type ${funcConfig.returnType}, but got ${valueType}`, value];
-        for (const argKey in funcConfig.args) {
-          const argConfig = funcConfig.args[argKey];
-          const args = fixedValue.get("args");
-          const argVal = args ? args.get(argKey) : undefined;
-          const argDef = getFieldConfig(config, argConfig);
-          const argValue = argVal ? argVal.get("value") : undefined;
-          const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-          if (argValue !== undefined) {
-            const [argValidError, fixedArgVal] = validateValue(
-              config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, false
-            );
-            if (argValidError !== null) {
-              if (canFix) {
-                fixedValue = fixedValue.deleteIn(["args", argKey]);
-                if (argConfig.defaultValue !== undefined) {
-                  fixedValue = fixedValue.setIn(["args", argKey, "value"], argConfig.defaultValue);
-                  fixedValue = fixedValue.setIn(["args", argKey, "valueSrc"], "value");
-                }
-              } else {
-                return [`Invalid value of arg ${argKey} for func ${funcKey}: ${argValidError}`, value];
-              }
-            } else if (fixedArgVal !== argValue) {
-              fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
-            }
-          } else if (isEndValue && argConfig.defaultValue === undefined && !canFix && !argConfig.isOptional) {
-            return [`Value of arg ${argKey} for func ${funcKey} is required`, value];
-          }
+      const fieldDef = getFieldConfig(config, field);
+      if (fieldDef?.funcs) {
+        if (!fieldDef.funcs.includes(funcKey)) {
+          return [`Unsupported function ${funcKey}`, value];
         }
-      } else return [`Unknown function ${funcKey}`, value];
+      }
+      if (fixedValue) {
+        const funcConfig = getFuncConfig(config, funcKey);
+        if (funcConfig) {
+          if (valueType && funcConfig.returnType != valueType)
+            return [`Function ${funcKey} should return value of type ${funcConfig.returnType}, but got ${valueType}`, value];
+          for (const argKey in funcConfig.args) {
+            const argConfig = funcConfig.args[argKey];
+            const args = fixedValue.get("args");
+            const argVal = args ? args.get(argKey) : undefined;
+            const argDef = getFieldConfig(config, argConfig);
+            const argValue = argVal ? argVal.get("value") : undefined;
+            const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+            if (argValue !== undefined) {
+              const [argValidError, fixedArgVal] = validateValue(
+                config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, false
+              );
+              if (argValidError !== null) {
+                if (canFix) {
+                  fixedValue = fixedValue.deleteIn(["args", argKey]);
+                  if (argConfig.defaultValue !== undefined) {
+                    fixedValue = fixedValue.setIn(["args", argKey, "value"], argConfig.defaultValue);
+                    fixedValue = fixedValue.setIn(["args", argKey, "valueSrc"], "value");
+                  }
+                } else {
+                  return [`Invalid value of arg ${argKey} for func ${funcKey}: ${argValidError}`, value];
+                }
+              } else if (fixedArgVal !== argValue) {
+                fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
+              }
+            } else if (isEndValue && argConfig.defaultValue === undefined && !canFix && !argConfig.isOptional) {
+              return [`Value of arg ${argKey} for func ${funcKey} is required`, value];
+            }
+          }
+        } else return [`Unknown function ${funcKey}`, value];
+      }
     } // else it's not function value
   } // empty value
 

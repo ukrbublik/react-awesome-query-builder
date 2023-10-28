@@ -207,7 +207,7 @@ export class BasicGroup extends Component {
 
   renderChildren() {
     const {children1} = this.props;
-    return children1 ? children1.map(this.renderItem).toList() : null;
+    return children1 ? children1.valueSeq().map(this.renderItem).toArray() : null;
   }
 
   renderItem(item) {

@@ -1,4 +1,4 @@
-import Immutable from "immutable";
+import Immutable, {fromJS} from "immutable";
 import {toImmutableList} from "../utils/stuff";
 import * as constants from "../stores/constants";
 import { defaultRuleProperties, defaultGroupProperties } from "../utils/defaultUtils";
@@ -26,7 +26,7 @@ export const addRule = (config, path, properties, ruleType = "rule", children = 
   children: children,
   path: toImmutableList(path),
   id: uuid(),
-  properties: defaultRuleProperties(config, parentRuleGroupPath).merge(properties || {}),
+  properties: defaultRuleProperties(config, parentRuleGroupPath).merge(fromJS(properties) || {}),
   config: config
 });
 
@@ -50,7 +50,7 @@ export const addDefaultCaseGroup = (config, path, properties, children = null) =
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(properties || {}),
+  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
   config: config,
   meta: {
     isDefaultCase: true
@@ -67,7 +67,7 @@ export const addCaseGroup = (config, path, properties, children = null) => ({
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(properties || {}),
+  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
   config: config
 });
 
@@ -81,7 +81,7 @@ export const addGroup = (config, path, properties, children = null) => ({
   path: toImmutableList(path),
   children: children,
   id: uuid(),
-  properties: defaultGroupProperties(config).merge(properties || {}),
+  properties: defaultGroupProperties(config).merge(fromJS(properties) || {}),
   config: config
 });
 
