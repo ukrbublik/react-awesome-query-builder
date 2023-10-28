@@ -173,4 +173,75 @@ describe("query with func", () => {
     });
   });
 
+  describe("loads tree with func SUM_OF_MULTISELECT", () => {
+    export_checks(configs.with_funcs, inits.with_func_sum_of_multiselect, "JsonLogic", {
+      "query": "num == SUM_OF_MULTISELECT(3,5)",
+      "queryHuman": "Number = Sum of multiselect(Value: 3,5)",
+      "sql": "num = SUM_OF_MULTISELECT(3,5)",
+      "spel": "num == {3, 5}.sumOfMultiselect()",
+      "logic": {
+        "and": [
+          {
+            "==": [
+              { "var": "num" },
+              {
+                "sumOfMultiselect": [
+                  [3, 5]
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("loads tree with func SUM_OF_MULTISELECT from SpEL", () => {
+    export_checks(configs.with_funcs, inits.with_func_sum_of_multiselect_spel, "SpEL", {
+      "query": "num == SUM_OF_MULTISELECT(5)",
+      "queryHuman": "Number = Sum of multiselect(Value: 5)",
+      "sql": "num = SUM_OF_MULTISELECT(5)",
+      "spel": "num == {5}.sumOfMultiselect()",
+      "logic": {
+        "and": [
+          {
+            "==": [
+              { "var": "num" },
+              {
+                "sumOfMultiselect": [
+                  [5]
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  });
+
+  describe("loads tree with func SUM_OF_MULTISELECT in LHS", () => {
+    export_checks(configs.with_funcs, inits.with_func_sum_of_multiselect_in_lhs, "JsonLogic", {
+      "query": "SUM_OF_MULTISELECT(3,4) >= SUM_OF_MULTISELECT(1,2) && SUM_OF_MULTISELECT(3,4) <= SUM_OF_MULTISELECT(5,6)",
+      "sql": "SUM_OF_MULTISELECT(3,4) BETWEEN SUM_OF_MULTISELECT(1,2) AND SUM_OF_MULTISELECT(5,6)",
+      "spel": "{3, 4}.sumOfMultiselect() >= {1, 2}.sumOfMultiselect() && {3, 4}.sumOfMultiselect() <= {5, 6}.sumOfMultiselect()",
+      "logic": {
+        "and": [
+          {
+            "<=": [
+              { "sumOfMultiselect": [
+                [ 1, 2]
+              ] },
+              { "sumOfMultiselect": [
+                [ 3, 4]
+              ] },
+              { "sumOfMultiselect": [
+                [ 5, 6]
+              ] },
+            ]
+          }
+        ]
+      }
+    });
+  });
+
 });

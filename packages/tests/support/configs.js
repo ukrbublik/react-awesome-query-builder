@@ -771,6 +771,36 @@ export const with_funcs = (BasicConfig) => ({
             },
           },
         }),
+        SUM_OF_MULTISELECT: {
+          label: "Sum of multiselect",
+          jsonLogic: ({ value }) => {
+            return { sumOfMultiselect: [value] };
+          },
+          jsonLogicImport: ({ sumOfMultiselect }) => {
+            return sumOfMultiselect;
+          },
+          spelFunc: "${value}.sumOfMultiselect()",
+          returnType: "number",
+          allowSelfNesting: false,
+          args: {
+            value: {
+              label: "Value",
+              type: "multiselect",
+              valueSources: ["value"],
+              fieldSettings: {
+                listValues: [
+                  { title: "A", value: 1 },
+                  { title: "B", value: 2 },
+                  { title: "C", value: 3 },
+                  { title: "D", value: 4 },
+                  { title: "E", value: 5 },
+                  { title: "F", value: 6 },
+                ],
+                showSearch: true
+              }
+            },
+          }
+        },
       },
     },
   },

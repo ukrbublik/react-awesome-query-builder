@@ -714,6 +714,37 @@ export const with_func_relative_datetime = {
   } ]
 };
 
+export const with_func_sum_of_multiselect = {
+  "and": [ {
+    "==": [
+      { "var": "num" },
+      { "sumOfMultiselect": [
+        [3, 5]
+      ] }
+    ]
+  } ]
+};
+
+export const with_func_sum_of_multiselect_spel = "num == {5}.sumOfMultiselect()";
+
+export const with_func_sum_of_multiselect_in_lhs = {
+  "and": [
+    {
+      "<=": [
+        { "sumOfMultiselect": [
+          [ 1, 2]
+        ] },
+        { "sumOfMultiselect": [
+          [ 3, 4]
+        ] },
+        { "sumOfMultiselect": [
+          [ 5, 6]
+        ] },
+      ]
+    }
+  ]
+};
+
 export const with_prox = {
   type: "group",
   id: uuid(),
