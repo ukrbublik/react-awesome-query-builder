@@ -12,7 +12,7 @@ import updateConfigWithSomeChanges from "../../lib/config_update";
 import { UNSAFE_serializeConfig, UNSAFE_deserializeConfig } from "../../lib/config_ser";
 import throttle from "lodash/throttle";
 const stringify = JSON.stringify;
-const {getTree, checkTree, loadTree, uuid} = Utils;
+const {getTree, sanitizeTree, loadTree, uuid} = Utils;
 
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
@@ -33,7 +33,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
   constructor(props: DemoQueryBuilderProps) {
     super(props);
     const config = Utils.decompressConfig(props.zipConfig, MuiConfig, ctx);
-    const tree = checkTree(loadTree(props.jsonTree), config);
+    const tree = sanitizeTree(loadTree(props.jsonTree), config);
     this.state = {
       tree,
       config,
@@ -102,7 +102,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
     };
     console.log("Format result:", res);
     // this.setState({
-    //   tree: checkTree(this.state.tree, config),
+    //   tree: sanitizeTree(this.state.tree, config),
     //   config,
     // });
   };
@@ -120,7 +120,7 @@ export default class DemoQueryBuilder extends Component<DemoQueryBuilderProps, D
       const _result = await response.json() as PostConfigResult;
 
       this.setState({
-        tree: checkTree(this.state.tree, config),
+        tree: sanitizeTree(this.state.tree, config),
         config,
       });
     })();

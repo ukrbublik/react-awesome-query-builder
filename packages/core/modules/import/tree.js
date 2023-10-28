@@ -1,6 +1,5 @@
 import Immutable, { fromJS, Map } from "immutable";
-import {validateTree} from "../utils/validation";
-import {extendConfig} from "../utils/configUtils";
+import {sanitizeTree} from "../utils/validation";
 import {getTreeBadFields, getLightTree, _fixImmutableValue} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
 
@@ -27,11 +26,8 @@ export const loadTree = (serTree) => {
   } else throw "Can't load tree!";
 };
 
-export const checkTree = (tree, config) => {
-  if (!tree) return undefined;
-  const extendedConfig = extendConfig(config, undefined, true);
-  return validateTree(tree, null, extendedConfig, extendedConfig);
-};
+// @deprecated
+export const checkTree = sanitizeTree;
 
 export const isValidTree = (tree) => {
   return getTreeBadFields(tree).length == 0;

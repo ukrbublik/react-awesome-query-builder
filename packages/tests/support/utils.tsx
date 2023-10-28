@@ -16,7 +16,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 const {
   uuid, 
-  checkTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
+  sanitizeTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
   queryString, sqlFormat, _sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
@@ -131,7 +131,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   } else {
     tree = loadTree(value as JsonTree);
   }
-  tree = tree ? checkTree(tree, config) : undefined;
+  tree = tree ? sanitizeTree(tree, config) : undefined;
 
   // restore console
   // eslint-disable-next-line no-global-assign

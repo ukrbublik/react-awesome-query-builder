@@ -336,9 +336,9 @@ Behaviour settings:
 |showLock |false |Show "Lock" switch for rules and groups to make them read-only ("admin mode") +
   NOTE: To preserve read-only state of rules in JsonLogic, please use `jsonLogic.add_operation("locked", v => v);` in your code
 |canDeleteLocked |false |Show "Delete" button for locked rule?
-|removeIncompleteRulesOnLoad |true |Remove incomplete rules (w/o value) during validation in `Utils.checkTree()`?
-|removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.checkTree()`?
-|removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
+|removeIncompleteRulesOnLoad |true |Remove incomplete rules (w/o value) during validation in `Utils.sanitizeTree()`?
+|removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.sanitizeTree()`?
+|removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.sanitizeTree()`? +
   By default `true`, but `false` for AntDesign as can be removed manually
 |useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
 |fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)

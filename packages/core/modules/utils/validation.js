@@ -6,6 +6,7 @@ import {defaultValue, deepEqual, logger} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree} from "../utils/treeUtils";
+import {extendConfig} from "../utils/configUtils";
 import omit from "lodash/omit";
 import { List } from "immutable";
 
@@ -25,13 +26,25 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
+export const validateTree = (tree, config) => {
+  if (!tree) return undefined;
+  const extendedConfig = extendConfig(config, undefined, true);
+  return _validateTree(tree, null, extendedConfig, extendedConfig, false, false);
+};
+
+export const sanitizeTree = (tree, config) => {
+  if (!tree) return undefined;
+  const extendedConfig = extendConfig(config, undefined, true);
+  return _validateTree(tree, null, extendedConfig, extendedConfig);
+};
+
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
-  let tree = validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
+  let tree = _validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
   tree = fixPathsInTree(tree);
   return tree;
 };
 
-export const validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+export const _validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
   if (removeEmptyGroups === undefined) {
     removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
   }

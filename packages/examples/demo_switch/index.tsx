@@ -22,7 +22,7 @@ const emptyJsonTree: JsonSwitchGroup = {
   id: QbUtils.uuid(),
   type: "switch_group",
 };
-const emptyTree: ImmutableTree = QbUtils.checkTree(QbUtils.loadTree(emptyJsonTree), config);
+const emptyTree: ImmutableTree = QbUtils.sanitizeTree(QbUtils.loadTree(emptyJsonTree), config);
 
 
 const Demo: React.FC = () => {
@@ -57,7 +57,7 @@ const Demo: React.FC = () => {
     const [tree, spelErrors] = QbUtils.loadFromSpel(state.spelStr, state.config);
     setState({
       ...state, 
-      tree: tree ? QbUtils.checkTree(tree, state.config) : state.tree,
+      tree: tree ? QbUtils.sanitizeTree(tree, state.config) : state.tree,
       spelErrors
     });
   };

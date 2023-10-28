@@ -13,7 +13,7 @@ import Immutable from "immutable";
 import clone from "clone";
 
 const stringify = JSON.stringify;
-const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree} = Utils;
+const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, sanitizeTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree, validateTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -23,8 +23,8 @@ const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
-//initTree = checkTree(loadTree(initValue), loadedConfig);
-initTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig); // <- this will work same  
+//initTree = sanitizeTree(loadTree(initValue), loadedConfig);
+initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig); // <- this will work same  
 
 
 // Trick to hot-load new config when you edit `config.tsx`
@@ -106,11 +106,16 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
-  const validate = () => {
+  const sanitize = () => {
     setState({
       ...state,
-      tree: checkTree(state.tree, state.config)
+      tree: sanitizeTree(state.tree, state.config)
     });
+  };
+
+  const validate = () => {
+    const validationErrors = validateTree(state.tree, state.config);
+    console.log('>>> validationErrors', validationErrors)
   };
 
   const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,7 +130,7 @@ const DemoQueryBuilder: React.FC = () => {
     const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
     setState({
       ...state, 
-      tree: tree ? checkTree(tree, state.config) : state.tree,
+      tree: tree ? sanitizeTree(tree, state.config) : state.tree,
       spelErrors
     });
   };
@@ -137,7 +142,7 @@ const DemoQueryBuilder: React.FC = () => {
       ...state,
       skin,
       config,
-      tree: checkTree(state.tree, config)
+      tree: sanitizeTree(state.tree, config)
     });
     window._initialSkin = skin;
   };
@@ -409,6 +414,7 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={resetValue}>reset</button>
         <button onClick={clearValue}>clear</button>
         <button onClick={runActions}>run actions</button>
+        <button onClick={sanitize}>sanitize</button>
         <button onClick={validate}>validate</button>
         <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
       </div>

@@ -298,10 +298,22 @@ interface SpelConcatNormalValue {
 }
 type SpelConcatValue = SpelConcatNormalValue | SpelConcatCaseValue;
 
+interface ValidationError {
+  //todo
+}
+
+interface Validation {
+  sanitizeTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  validateTree(tree: ImmutableTree, config: Config): ValidationError[];
+
+  _validateTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): ImmutableTree;
+}
+
 interface Import {
   // tree
   getTree(tree: ImmutableTree, light?: boolean, children1AsArray?: boolean): JsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
+  // @deprecated Use Utils.sanitizeTree() instead
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   isValidTree(tree: ImmutableTree): boolean;
   isImmutableTree(tree: any): boolean;
@@ -377,6 +389,8 @@ interface TreeUtils {
   getTotalRulesCountInTree(tree: ImmutableTree): number;
   getTreeBadFields(tree: ImmutableTree): Array<FieldValue>;
   isEmptyTree(tree: ImmutableTree): boolean;
+  // case mode
+  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
 }
 interface OtherUtils {
   uuid(): string;
@@ -394,18 +408,12 @@ interface OtherUtils {
   toImmutableList(path: string[]): ImmutablePath;
 }
 
-export interface Utils extends Import, Export {
-  // case mode
-  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
-  // other
-  uuid(): string;
-  // ssr
-  compressConfig(config: Config, baseConfig: Config): ZipConfig;
-  decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
-  // validation
-  validateTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): ImmutableTree;
-  validateAndFixTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): ImmutableTree;
-
+export interface Utils extends Import, Export, 
+  Pick<Validation, "sanitizeTree" | "validateTree">,
+  Pick(ConfigUtils, "compressConfig" | "decompressConfig"),
+  Pick(OtherUtils, "uuid"),
+  Pick(TreeUtils, "getSwitchValues")
+{
   Import: Import;
   Export: Export;
   Autocomplete: Autocomplete;

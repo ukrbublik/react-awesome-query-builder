@@ -205,7 +205,7 @@ const queryValue = {"id": QbUtils.uuid(), "type": "group"};
 
 class DemoQueryBuilder extends Component {
   state = {
-    tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
+    tree: QbUtils.sanitizeTree(QbUtils.loadTree(queryValue), config),
     config: config
   };
   
@@ -315,7 +315,7 @@ const queryValue: JsonGroup = { id: QbUtils.uuid(), type: "group" };
 
 const DemoQueryBuilder: React.FC = () => {
   const [state, setState] = useState({
-    tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
+    tree: QbUtils.sanitizeTree(QbUtils.loadTree(queryValue), config),
     config: config
   });
 
@@ -419,8 +419,9 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
   #### loadTree (jsValue) -> Immutable
   Convert query value from JS format to internal Immutable format. 
-  You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `checkTree()`).
-  #### checkTree (immutableValue, config) -> Immutable
+  You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `sanitizeTree()`).
+- Validation:
+  #### sanitizeTree (immutableValue, config) -> Immutable
   Validate query value corresponding to config. 
   Invalid parts of query (eg. if field was removed from config) will be always deleted. 
   Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
