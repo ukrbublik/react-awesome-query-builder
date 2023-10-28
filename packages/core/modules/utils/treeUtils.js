@@ -186,7 +186,7 @@ export const getFlatTree = (tree) => {
     const id = item.get("id");
     const children = item.get("children1");
     const isLocked = item.getIn(["properties", "isLocked"]);
-    const childrenIds = children ? children.map((_child, childId) => childId).toArray() : null;
+    const childrenIds = children ? children.map((_child, childId) => childId).valueSeq().toArray() : null;
     const isRuleGroup = type == "rule_group";
     // tip: count rule_group as 1 rule
     const isLeaf = !insideRuleGroup && (!children || isRuleGroup);

@@ -83,6 +83,7 @@ const formatSwitch = (item, config, meta, parentField = null) => {
   const cases = children
     .map((currentChild) => formatCase(currentChild, config, meta, null))
     .filter((currentChild) => typeof currentChild !== "undefined")
+    .valueSeq()
     .toArray();
   
   if (!cases.length) return undefined;
