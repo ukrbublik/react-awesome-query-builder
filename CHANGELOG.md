@@ -1,4 +1,9 @@
 # Changelog
+- 6.4.3
+  - Fixed the issue when using func with arg of type `multiselect` (PR #997)
+  - Updated `immutable` from v3 to v4 (PR #997)
+  - Fixed issue with "[object Object]" in MUI field autocomplete when item should be bold (PR #997)
+  - Respect `funcs` in field/arg config during validation of function value (PR #997)
 - 6.4.2
   - Allow override icons with `renderIcon` (issues #319, #872) (PR #962)
   - Support tooltips for MUI (issues #965, #684) (PR #973)
