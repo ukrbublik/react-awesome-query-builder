@@ -62,7 +62,7 @@
     "iron-session": "^6.3.1",
     "jsonfile": "^6.1.0",
     "nanoid": "^4.0.1",
-    "next": "^12.3.2",
+    "next": "^13.5.0",
     "sass": "^1.35.0",
     "serialize-javascript": "^6.0.1",
     "typescript": "~4.9.4",
