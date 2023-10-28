@@ -271,8 +271,12 @@ const formatFunc = (meta, config, currentValue) => {
     const {defaultValue, isOptional} = argConfig;
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
+    let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValueSrc !== "func" && argValue?.toJS) {
+      // value should not be Immutable
+      argValue = argValue.toJS();
+    }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, argAsyncListValues

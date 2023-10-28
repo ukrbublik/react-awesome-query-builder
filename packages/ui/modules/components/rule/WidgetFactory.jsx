@@ -3,6 +3,7 @@ import { Utils } from "@react-awesome-query-builder/core";
 import omit from "lodash/omit";
 const { getTitleInListValues } = Utils.ListUtils;
 const { _widgetDefKeysToOmit } = Utils.ConfigUtils;
+const { _fixImmutableValue } = Utils.TreeUtils;
 
 export default ({
   delta, isFuncArg, valueSrc,
@@ -18,10 +19,13 @@ export default ({
   if (!widgetFactory) {
     return "?";
   }
-    
+  
+  // Widget value (if it's not a func with args) should NOT be Immutable
+  // Eg. for multiselect value should be a JS Array, not Immutable List
+  const fixedImmValue = immValue ? immValue.map(v => _fixImmutableValue(v)) : undefined;
   let value = isSpecialRange 
-    ? [immValue.get(0), immValue.get(1)] 
-    : (immValue ? immValue.get(delta) : undefined);
+    ? [fixedImmValue?.get(0), fixedImmValue?.get(1)] 
+    : (fixedImmValue ? fixedImmValue.get(delta) : undefined);
   const valueError = immValueError && (isSpecialRange 
     ? [immValueError.get(0), immValueError.get(1)]
     : immValueError.get(delta)

@@ -307,8 +307,12 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argName = isForDisplay && argConfig.label || argKey;
     const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
+    let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValueSrc !== "func" && argValue?.toJS) {
+      // value should not be Immutable
+      argValue = argValue.toJS();
+    }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
       config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues

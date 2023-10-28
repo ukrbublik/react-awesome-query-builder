@@ -430,3 +430,19 @@ export const getSwitchValues = (tree) => {
 export const isEmptyTree = (tree) => (!tree.get("children1") || tree.get("children1").size == 0);
 
 export const hasChildren = (tree, path) => tree.getIn(expandTreePath(path, "children1")).size > 0;
+
+
+export const _fixImmutableValue = (v) => {
+  if (v?.toJS) {
+    const vJs = v?.toJS?.();
+    if (vJs?.func) {
+      // `v` is a func arg, keep Immutable
+      return v.toOrderedMap();
+    } else {
+      // for values of multiselect use Array instead of List
+      return vJs;
+    }
+  } else {
+    return v;
+  }
+};

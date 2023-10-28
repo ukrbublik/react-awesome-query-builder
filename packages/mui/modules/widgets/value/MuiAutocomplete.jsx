@@ -191,7 +191,7 @@ export default (props) => {
     const isSelected = multiple ? (selectedValue || []).includes(value) : selectedValue == value;
     const className = getOptionIsCustom(option) ? "customSelectOption" : undefined;
     const prefix = !isFieldAutocomplete && isGrouped ? "\u00A0\u00A0" : "";
-    const finalTitle = prefix + (renderTitle || title);
+    const finalTitle = (renderTitle || prefix + title);
     let titleSpan = (
       <span className={className}>
         {finalTitle}

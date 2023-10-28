@@ -299,8 +299,12 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const {defaultValue, isOptional} = argConfig;
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
     const argVal = args ? args.get(argKey) : undefined;
-    const argValue = argVal ? argVal.get("value") : undefined;
+    let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValueSrc !== "func" && argValue?.toJS) {
+      // value should not be Immutable
+      argValue = argValue.toJS();
+    }
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
     const fieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"] );
