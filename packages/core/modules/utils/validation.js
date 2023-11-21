@@ -105,10 +105,10 @@ function validateGroup (item, path, itemId, meta, c) {
   children = children
     ?.map( (currentChild, childId) => validateItem(currentChild, path.concat(id), childId, submeta, c) );
   const nonEmptyChildren = children?.filter((currentChild) => (currentChild != undefined));
-  const isEmptyChildren = !nonEmptyChildren?.size && path.length;
   if (removeEmptyGroups)
     children = nonEmptyChildren;
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
+  const isEmptyChildren = !nonEmptyChildren?.size && path.length;
   if (isEmptyChildren) {
     addError(meta, item, {
       str: "Empty group"
