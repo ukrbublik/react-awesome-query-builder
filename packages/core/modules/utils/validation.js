@@ -2,7 +2,7 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldSrc,
 } from "./configUtils";
 import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp, isCompletedValue, isEmptyRuleProperties} from "../utils/ruleUtils";
-import {defaultValue, deepEqual, logger} from "../utils/stuff";
+import {defaultValue, deepEqual} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree} from "../utils/treeUtils";
@@ -29,39 +29,55 @@ const isTypeOf = (v, type) => {
 export const validateTree = (tree, config) => {
   if (!tree) return undefined;
   const extendedConfig = extendConfig(config, undefined, true);
-  return _validateTree(tree, null, extendedConfig, extendedConfig, false, false);
+  const removeEmptyGroups = false;
+  const removeIncompleteRules = false;
+  return _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, true);
 };
 
 export const sanitizeTree = (tree, config) => {
   if (!tree) return undefined;
   const extendedConfig = extendConfig(config, undefined, true);
-  return _validateTree(tree, null, extendedConfig, extendedConfig);
+  const removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
+  const removeIncompleteRules = config.settings.removeIncompleteRulesOnLoad;
+  return _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, false);
 };
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
-  let tree = _validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
+  if (removeEmptyGroups === undefined) {
+    removeEmptyGroups = newConfig.settings.removeEmptyGroupsOnLoad;
+  }
+  if (removeIncompleteRules === undefined) {
+    removeIncompleteRules = newConfig.settings.removeIncompleteRulesOnLoad;
+  }
+  let tree = _validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules, false);
   tree = fixPathsInTree(tree);
   return tree;
 };
 
-export const _validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
-  if (removeEmptyGroups === undefined) {
-    removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
-  }
-  if (removeIncompleteRules === undefined) {
-    removeIncompleteRules = config.settings.removeIncompleteRulesOnLoad;
-  }
+export const _validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules, returnErrors) => {
   const c = {
-    config, oldConfig, removeEmptyGroups, removeIncompleteRules
+    config, oldConfig, removeEmptyGroups, removeIncompleteRules, returnErrors
   };
-  return validateItem(tree, [], null, {}, c);
+  const meta = {
+    errors: {},
+  };
+  const fixedTree = validateItem(tree, [], null, meta, c);
+  return returnErrors ? meta.errors : fixedTree;
 };
+
+function addError(meta, item, err) {
+  const id = item.get("id");
+  if (!meta.errors[id]) {
+    meta.errors[id] = [];
+  }
+  meta.errors[id].push(err);
+}
 
 function validateItem (item, path, itemId, meta, c) {
   const type = item.get("type");
   const children = item.get("children1");
 
-  if ((type === "group" || type === "rule_group" || type == "case_group" || type == "switch_group") && children && children.size) {
+  if ((type === "group" || type === "rule_group" || type == "case_group" || type == "switch_group")) {
     return validateGroup(item, path, itemId, meta, c);
   } else if (type === "rule") {
     return validateRule(item, path, itemId, meta, c);
@@ -83,21 +99,34 @@ function validateGroup (item, path, itemId, meta, c) {
   }
 
   //validate children
-  let submeta = {};
+  let submeta = {
+    errors: {}
+  };
   children = children
-    .map( (currentChild, childId) => validateItem(currentChild, path.concat(id), childId, submeta, c) );
+    ?.map( (currentChild, childId) => validateItem(currentChild, path.concat(id), childId, submeta, c) );
+  const nonEmptyChildren = children?.filter((currentChild) => (currentChild != undefined));
+  const isEmptyChildren = !nonEmptyChildren?.size && path.length;
   if (removeEmptyGroups)
-    children = children.filter((currentChild) => (currentChild != undefined));
-  let sanitized = submeta.sanitized || (oldChildren.size != children.size);
-  if (!children.size && removeEmptyGroups && path.length) {
-    sanitized = true;
-    item = undefined;
+    children = nonEmptyChildren;
+  let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
+  if (isEmptyChildren) {
+    addError(meta, item, {
+      str: "Empty group"
+    });
+    if (removeEmptyGroups) {
+      item = undefined;
+    }
   }
 
   if (sanitized)
     meta.sanitized = true;
   if (sanitized && item)
     item = item.set("children1", children);
+
+  meta.errors = {
+    ...meta.errors,
+    ...(submeta?.errors || {}),
+  };
   return item;
 }
 
@@ -105,6 +134,7 @@ function validateGroup (item, path, itemId, meta, c) {
 function validateRule (item, path, itemId, meta, c) {
   const {removeIncompleteRules, config, oldConfig} = c;
   const {showErrorMessage} = config.settings;
+  const origItem = item;
   let id = item.get("id");
   let properties = item.get("properties");
   let field = properties.get("field") || null;
@@ -114,15 +144,20 @@ function validateRule (item, path, itemId, meta, c) {
   let valueSrc = properties.get("valueSrc");
   let value = properties.get("value");
   let valueError = properties.get("valueError");
-  const oldSerialized = {
-    field: field?.toJS?.() || field,
-    fieldSrc,
-    operator,
-    operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
-    valueSrc: valueSrc ? valueSrc.toJS() : null,
-    value: value ? value.toJS() : null,
-    valueError: valueError ? valueError.toJS() : null,
+
+  const serializeRule = () => {
+    return {
+      field: field?.toJS?.() || field,
+      fieldSrc,
+      operator,
+      operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
+      valueSrc: valueSrc ? valueSrc.toJS() : null,
+      value: value ? value.toJS() : null,
+      valueError: valueError ? valueError.toJS() : null,
+    };
   };
+
+  const oldSerialized = serializeRule();
   let _wasValid = field && operator && value && !value.includes(undefined);
 
   if (!id && itemId) {
@@ -134,7 +169,9 @@ function validateRule (item, path, itemId, meta, c) {
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
   if (field && !fieldDefinition) {
-    logger.warn(`No config for field ${field}`);
+    addError(meta, item, {
+      str: `No config for field ${field}`,
+    });
     field = null;
   }
   if (field == null) {
@@ -150,27 +187,39 @@ function validateRule (item, path, itemId, meta, c) {
   // Backward compatibility: obsolete operator range_between
   if (operator == "range_between" || operator == "range_not_between") {
     operator = operator == "range_between" ? "between" : "not_between";
-    console.info(`Fixed operator ${properties.get("operator")} to ${operator}`);
+    addError(meta, item, {
+      str: `Fixed operator ${properties.get("operator")} to ${operator}`,
+      type: 'fix'
+    });
     properties = properties.set("operator", operator);
   }
   const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
   if (operator && !operatorDefinition) {
-    console.warn(`No config for operator ${operator}`);
+    addError(meta, item, {
+      str: `No config for operator ${operator}`
+    });
     operator = null;
   }
   const availOps = field ? getOperatorsForField(config, field) : [];
   if (field) {
     if (!availOps?.length) {
-      console.warn(`Type of field ${field} is not supported`);
+      addError(meta, item, {
+        str: `Type of field ${field} is not supported`
+      });
       operator = null;
     } else if (operator && availOps.indexOf(operator) == -1) {
       if (operator == "is_empty" || operator == "is_not_empty") {
         // Backward compatibility: is_empty #494
         operator = operator == "is_empty" ? "is_null" : "is_not_null";
-        console.info(`Fixed operator ${properties.get("operator")} to ${operator} for ${field}`);
+        addError(meta, item, {
+          str: `Fixed operator ${properties.get("operator")} to ${operator} for ${field}`,
+          type: 'fix'
+        });
         properties = properties.set("operator", operator);
       } else {
-        console.warn(`Operator ${operator} is not supported for field ${field}`);
+        addError(meta, item, {
+          str: `Operator ${operator} is not supported for field ${field}`
+        });
         operator = null;
       }
     }
@@ -199,7 +248,9 @@ function validateRule (item, path, itemId, meta, c) {
   value = properties.get("value");
   const canFix = !showErrorMessage;
   const isEndValue = true;
-  let {newValue, newValueSrc, newValueError} = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix, isEndValue);
+  let {
+    newValue, newValueSrc, newValueError, validationErrors
+  } = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix, isEndValue);
   value = newValue;
   valueSrc = newValueSrc;
   valueError = newValueError;
@@ -211,40 +262,42 @@ function validateRule (item, path, itemId, meta, c) {
     properties = properties.delete("valueError");
   }
 
-  const newSerialized = {
-    field: field?.toJS?.() || field,
-    fieldSrc,
-    operator,
-    operatorOptions: operatorOptions ? operatorOptions.toJS() : {},
-    valueSrc: valueSrc ? valueSrc.toJS() : null,
-    value: value ? value.toJS() : null,
-    valueError: valueError ? valueError.toJS() : null,
-  };
-  const sanitized = !deepEqual(oldSerialized, newSerialized);
+  const newSerialized = serializeRule();
+  const hasBeenSanitized = !deepEqual(oldSerialized, newSerialized);
   //const isCompleted = !!operator && !isEmptyRuleProperties(properties.toObject(), config, false);
   const isValueCompleted = value 
     && value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
   const isFieldCompleted = isCompletedValue(field, fieldSrc, config);
   const isCompleted = isFieldCompleted && operator && isValueCompleted;
-  if (sanitized)
+  if (hasBeenSanitized)
     meta.sanitized = true;
-  if (!isCompleted && removeIncompleteRules) {
-    let reason = "Uncomplete rule";
+  if (!isCompleted) {
+    let reason = "Incomplete rule";
     if (!isFieldCompleted) {
-      reason = "Uncomplete LHS";
+      reason = "Incomplete LHS";
     } else {
-      reason = "Uncomplete RHS";
+      reason = "Incomplete RHS";
       if (newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
         // eg. operator `starts_with` supports only valueSrc "value"
         reason = `Bad value src ${newSerialized.valueSrc}`;
       }
     }
-    console.warn("[RAQB validate]", "Removing rule: ", oldSerialized, `Reason: ${reason}`);
-    item = undefined;
+    addError(meta, item, {
+      str: reason,
+    });
+    if (removeIncompleteRules) {
+      item = undefined;
+    }
+  } else {
+    if (hasBeenSanitized) {
+      item = item.set("properties", properties);
+    }
+    if (validationErrors.length) {
+      addError(meta, origItem, {
+        str: validationErrors.map(({delta, str}) => str).join(". ")
+      });
+    }
   }
-  else if (sanitized)
-    item = item.set("properties", properties);
-
   return item;
 }
 
@@ -296,10 +349,6 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
         }
       }
     }
-  }
-
-  if (isRawValue && validError) {
-    console.warn("[RAQB validate]", `Field ${field}: ${validError}`);
   }
   
   return [validError, fixedValue];

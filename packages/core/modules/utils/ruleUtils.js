@@ -22,12 +22,15 @@ export const selectTypes = [
  * @param {string} newField
  * @param {string} newOperator
  * @param {string} changedProp
- * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError}
+ * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors}
  */
 export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true, isEndValue = false) {
   if (!oldConfig)
     oldConfig = config;
-  const {keepInputOnChangeFieldSrc} = config.settings;
+  const {
+    keepInputOnChangeFieldSrc,
+    convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage
+  } = config.settings;
   const currentField = current.get("field");
   const currentFieldType = current.get("fieldType");
   //const currentFieldSrc = current.get("fieldSrc");
@@ -38,7 +41,6 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const currentAsyncListValues = current.get("asyncListValues");
 
   //const isValidatingTree = (changedProp === null);
-  const {convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage} = config.settings;
 
   //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
   const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
@@ -97,6 +99,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
 
   let valueFixes = {};
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
+  let validationErrors = [];
   if (canReuseValue) {
     for (let i = 0 ; i < operatorCardinality ; i++) {
       const v = currentValue.get(i);
@@ -106,10 +109,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const asyncListValues = currentAsyncListValues;
-      const [validateError, fixedValue] = validateValue(
+      const [validationError, fixedValue] = validateValue(
         config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, true
       );
-      const isValid = !validateError;
+      const isValid = !validationError;
       // Allow bad value with error message
       // But not on field change - in that case just drop bad value that can't be reused
       // ? Maybe we should also drop bad value on op change?
@@ -117,9 +120,16 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       //  If we show error message, it will gone on next tree validation
       const fixValue = fixedValue !== v;
       const dropValue = !isValidSrc || !isValid && (changedProp == "field" || !showErrorMessage && !fixValue);
-      const showValueError = !!validateError && showErrorMessage && !dropValue && !fixValue;
+      const isTerminalError = !!validationError && !dropValue && !fixValue;
+      const showValueError = isTerminalError && showErrorMessage;
+      if (isTerminalError) {
+        validationErrors.push({
+          delta: i,
+          str: validationError
+        });
+      }
       if (showValueError) {
-        valueErrors[i] = validateError;
+        valueErrors[i] = validationError;
       }
       if (fixValue) {
         valueFixes[i] = fixedValue;
@@ -164,18 +174,26 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     }
     return vs;
   }));
+  const areNewValueSrcsPureValues = newValueSrc.toJS().filter(vs => vs == "value" || vs == null).length == operatorCardinality;
 
-  if (showErrorMessage) {
-    if (newOperatorConfig && newOperatorConfig.validateValues && newValueSrc.toJS().filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
-      // last element in `valueError` list is for range validation error
-      const jsValues = firstWidgetConfig && firstWidgetConfig.toJS 
-        ? newValue.toJS().map(v => firstWidgetConfig.toJS.call(config.ctx, v, firstWidgetConfig)) 
-        : newValue.toJS();
-      const rangeValidateError = newOperatorConfig.validateValues(jsValues);
+  // Validate range
+  if (!!newOperatorConfig?.validateValues && areNewValueSrcsPureValues) {
+    // last element in `valueError` list is for range validation error
+    const jsValues = firstWidgetConfig?.toJS 
+      ? newValue.toJS().map(v => firstWidgetConfig.toJS.call(config.ctx, v, firstWidgetConfig)) 
+      : newValue.toJS();
+    const rangeValidateError = newOperatorConfig.validateValues(jsValues);
+    if (rangeValidateError) {
       if (showErrorMessage) {
         valueErrors.push(rangeValidateError);
       }
+      validationErrors.push({
+        str: rangeValidateError
+      });
     }
+  }
+
+  if (showErrorMessage) {
     newValueError = new Immutable.List(valueErrors);
   }
 
@@ -192,7 +210,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     return vt;
   }));
 
-  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError, operatorCardinality};
+  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, operatorCardinality};
 };
 
 export const getFirstField = (config, parentRuleGroupPath = null) => {

@@ -1,4 +1,7 @@
 # Changelog
+- 6.5.0
+  - Breaking: `Utils.validateTree` returns array of errors
+  - `Utils.checkTree` is deprecated and renamed to `Utils.sanitizeTree`
 - 6.4.3
   - Fixed the issue when using func with arg of type `multiselect` (PR #997)
   - Updated `immutable` from v3 to v4 (PR #997)

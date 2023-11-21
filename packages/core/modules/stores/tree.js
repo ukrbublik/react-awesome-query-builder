@@ -575,10 +575,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const isEndValue = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = false;
-  const [validateError, fixedValue] = validateValue(
+  const [validationError, fixedValue] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, true
   );
-  const isValid = !validateError;
+  const isValid = !validationError;
   if (fixedValue !== value) {
     // eg, get exact value from listValues (not string)
     value = fixedValue;
@@ -629,10 +629,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     }
   }
   if (showErrorMessage) {
-    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
+    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
   }
   if (__isInternal && (isValid && isLastError || !isValid && !isLastError)) {
-    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
+    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
     isInternalValueChange = false;
   }
   
