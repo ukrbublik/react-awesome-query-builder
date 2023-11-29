@@ -30,9 +30,9 @@ const FieldSelect = (props) => {
   const dropdownPlacement = config.settings.dropdownPlacement;
   const dropdownAlign = dropdownPlacement ? BUILT_IN_PLACEMENTS[dropdownPlacement] : undefined;
   const width = isFieldSelected && !showSearch || !selectWidth ? null : selectWidth + SELECT_WIDTH_OFFSET_RIGHT;
-  let tooltipText = selectedAltLabel || selectedFullLabel;
+  let tooltipText = selectedAltLabel || selectedFullLabel || selectedLabel;
   if (tooltipText == selectedLabel)
-    tooltipText = null;
+    tooltipText = selectedKey;
 
   const onChange = (key) => {
     setField(key);
