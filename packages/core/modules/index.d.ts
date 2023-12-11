@@ -334,7 +334,7 @@ interface Autocomplete {
   simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
   // internal
-  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart: boolean): ListItems;
+  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart?: boolean): ListItems;
   listValueToOption(listItem: ListItem): ListOptionUi;
 }
 interface ConfigUtils {
@@ -384,7 +384,7 @@ interface TreeUtils {
 interface OtherUtils {
   uuid(): string;
   deepEqual(a: any, b: any): boolean;
-  shallowEqual(a: any, b: any, deep:boolean ): boolean;
+  shallowEqual(a: any, b: any, deep?: boolean): boolean;
   mergeArraysSmart(a: string[], b: string[]): string[];
   isJsonCompatible(tpl: object, target: object, bag: Record<string, any>): boolean; // mutates bag
   isJsonLogic(value: any): boolean;
