@@ -166,14 +166,17 @@ export interface CaseGroupProperties extends BasicItemProperties {
 
 //////
 
-interface _RulePropertiesI extends RuleProperties {
+type RulePropertiesOmitted = Omit<RuleProperties, "value" | "valueSrc" | "valueType" | "valueError" | "operatorOptions">
+interface _RulePropertiesI extends RulePropertiesOmitted {
   value: ImmutableList<RuleValue>,
   valueSrc?: ImmutableList<ValueSource>,
   valueType?: ImmutableList<string>,
   valueError?: ImmutableList<string>,
-  operatorOptions?: ImmMap,
+  operatorOptions?: ImmMap<string,unknown>,
 }
-interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtProperties {}
+
+type RuleGroupExtPropertiesOmitted = Omit<RuleGroupExtProperties, "value" | "valueSrc" | "valueType" | "valueError" | "operatorOptions">
+interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtPropertiesOmitted {}
 
 interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
   get<K extends keyof P>(name: K): P[K];
@@ -331,7 +334,7 @@ interface Autocomplete {
   simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
   // internal
-  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart = false): ListItems;
+  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart: boolean): ListItems;
   listValueToOption(listItem: ListItem): ListOptionUi;
 }
 interface ConfigUtils {
@@ -381,7 +384,7 @@ interface TreeUtils {
 interface OtherUtils {
   uuid(): string;
   deepEqual(a: any, b: any): boolean;
-  shallowEqual(a: any, b: any, deep = false): boolean;
+  shallowEqual(a: any, b: any, deep:boolean ): boolean;
   mergeArraysSmart(a: string[], b: string[]): string[];
   isJsonCompatible(tpl: object, target: object, bag: Record<string, any>): boolean; // mutates bag
   isJsonLogic(value: any): boolean;
@@ -590,11 +593,11 @@ export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFie
 type FieldItemSearchableKey = "key" | "path" | "label" | "altLabel" | "tooltip" | "grouplabel";
 
 export type FieldItem = {
-  items?: FieldItems, 
-  key: string, 
+  items?: FieldItems,
+  key: string,
   path?: string, // field path with separator
-  label: string, 
-  fullLabel?: string, 
+  label: string,
+  fullLabel?: string,
   altLabel?: string, // label2
   tooltip?: string,
   disabled?: boolean,
@@ -696,7 +699,7 @@ export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
 // tip: use generic WidgetProps here, TS can't determine correct factory
-export type TypedWidget<C = Config> = 
+export type TypedWidget<C = Config> =
   TextWidget<C, WidgetProps<C>>
   | DateTimeWidget<C, WidgetProps<C>>
   | BooleanWidget<C, WidgetProps<C>>
@@ -708,7 +711,7 @@ export type TypedWidget<C = Config> =
   | TreeMultiSelectWidget<C, WidgetProps<C>>
   | CaseValueWidget<C, WidgetProps<C>>;
 
-export type Widget<C = Config> = 
+export type Widget<C = Config> =
   FieldWidget<C>
   | FuncWidget<C>
   | TypedWidget<C>
@@ -1283,4 +1286,3 @@ export declare const CoreConfig: CoreConfig;
 export declare const BasicFuncs: Funcs;
 export declare const TreeStore: TreeStore;
 export declare const TreeActions: TreeActions;
-
