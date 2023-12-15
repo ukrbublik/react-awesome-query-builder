@@ -574,7 +574,11 @@ const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
 const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta) => {
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" or "some-in" for multiselect
-  const isAllOrSomeInForMultiselect = (op == "all" || op == "some") && isJsonLogic(vals[1]) && Object.keys(vals[1])[0] == "in";
+  const isAllOrSomeInForMultiselect =
+    (op == "all" || op == "some")
+    && isJsonLogic(vals[1])
+    && Object.keys(vals[1])[0] == "in"
+    && vals[1]["in"][0]?.["var"] === "";
   const isGroup0 = !isAllOrSomeInForMultiselect && config.settings.groupOperators.includes(op);
   const eqOps = ["==", "!="];
   let cardinality = isGroup0 ? 0 : arity - 1;
@@ -643,7 +647,8 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   if ((op == "all" || op == "some") && isJsonLogic(vals[1])) {
     // special case for "all-in" and "some-in"
     const op2 = Object.keys(vals[1])[0];
-    if (op2 == "in") {
+    const isEmptyVar = vals[1][op2][0]?.["var"] === "";
+    if (op2 == "in" && isEmptyVar) {
       vals = [
         vals[0],
         vals[1][op2][1]
