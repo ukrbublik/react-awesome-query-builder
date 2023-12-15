@@ -110,8 +110,8 @@ const createRuleContainer = (Rule) =>
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
 
-      const valueError = this.props.valueError;
-      const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+      const {valueError, fieldError} = this.props;
+      const oneValueError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
       const hasError = oneValueError != null && showErrorMessage;
 
       return (

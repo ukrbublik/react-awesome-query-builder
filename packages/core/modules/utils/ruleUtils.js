@@ -22,7 +22,7 @@ export const selectTypes = [
  * @param {string} newField
  * @param {string} newOperator
  * @param {string} changedProp
- * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors}
+ * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, newFieldError}
  */
 export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true, isEndValue = false) {
   if (!oldConfig)
@@ -33,12 +33,12 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   } = config.settings;
   const currentField = current.get("field");
   const currentFieldType = current.get("fieldType");
-  //const currentFieldSrc = current.get("fieldSrc");
+  const currentFieldSrc = current.get("fieldSrc");
   const currentOperator = current.get("operator");
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
   const currentValueType = current.get("valueType", new Immutable.List());
-  const currentAsyncListValues = current.get("asyncListValues");
+  const asyncListValues = current.get("asyncListValues");
 
   //const isValidatingTree = (changedProp === null);
 
@@ -51,6 +51,11 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
   const currentType = currentFieldConfig?.type || currentFieldType;
   const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
+
+  let valueFixes = {};
+  let valueErrors = Array.from({length: operatorCardinality}, () => null);
+  let validationErrors = [];
+  let newFieldError;
 
   let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
   canReuseValue = canReuseValue
@@ -67,6 +72,19 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     } else {
       // different fields of select types has different listValues
       canReuseValue = false;
+    }
+  }
+
+  // validate func LHS
+  if (currentFieldSrc === "func" && newField) {
+    const [fieldValidationError, _fixedField] = validateValue(
+      config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, false, isEndValue
+    );
+    if (fieldValidationError) {
+      validationErrors.push({
+        str: fieldValidationError
+      });
+      newFieldError = fieldValidationError;
     }
   }
 
@@ -97,9 +115,6 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     valueSources = Object.keys(config.settings.valueSourcesInfo);
   }
 
-  let valueFixes = {};
-  let valueErrors = Array.from({length: operatorCardinality}, () => null);
-  let validationErrors = [];
   if (canReuseValue) {
     for (let i = 0 ; i < operatorCardinality ; i++) {
       const v = currentValue.get(i);
@@ -108,9 +123,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       let isValidSrc = (valueSources.find(v => v == vSrc) != null);
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
-      const asyncListValues = currentAsyncListValues;
       const [validationError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, true
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
       );
       const isValid = !validationError;
       // Allow bad value with error message
@@ -184,18 +198,14 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       : newValue.toJS();
     const rangeValidateError = newOperatorConfig.validateValues(jsValues);
     if (rangeValidateError) {
-      if (showErrorMessage) {
-        valueErrors.push(rangeValidateError);
-      }
+      valueErrors.push(rangeValidateError);
       validationErrors.push({
         str: rangeValidateError
       });
     }
   }
 
-  if (showErrorMessage) {
-    newValueError = new Immutable.List(valueErrors);
-  }
+  newValueError = new Immutable.List(valueErrors);
 
   newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
     let vt = null;
@@ -210,7 +220,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     return vt;
   }));
 
-  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, operatorCardinality};
+  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, operatorCardinality, newFieldError};
 };
 
 export const getFirstField = (config, parentRuleGroupPath = null) => {

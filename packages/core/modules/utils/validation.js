@@ -144,6 +144,7 @@ function validateRule (item, path, itemId, meta, c) {
   let valueSrc = properties.get("valueSrc");
   let value = properties.get("value");
   let valueError = properties.get("valueError");
+  let fieldError = properties.get("fieldError");
 
   const serializeRule = () => {
     return {
@@ -154,6 +155,7 @@ function validateRule (item, path, itemId, meta, c) {
       valueSrc: valueSrc ? valueSrc.toJS() : null,
       value: value ? value.toJS() : null,
       valueError: valueError ? valueError.toJS() : null,
+      fieldError: fieldError ? fieldError : null,
     };
   };
 
@@ -175,7 +177,9 @@ function validateRule (item, path, itemId, meta, c) {
     field = null;
   }
   if (field == null) {
-    properties = ["operator", "operatorOptions", "valueSrc", "value", "valueError"].reduce((map, key) => map.delete(key), properties);
+    properties = [
+      "operator", "operatorOptions", "valueSrc", "value", "valueError", "fieldError"
+    ].reduce((map, key) => map.delete(key), properties);
     operator = null;
   }
   if (!fieldSrc) {
@@ -249,17 +253,22 @@ function validateRule (item, path, itemId, meta, c) {
   const canFix = !showErrorMessage;
   const isEndValue = true;
   let {
-    newValue, newValueSrc, newValueError, validationErrors
+    newValue, newValueSrc, newValueError, validationErrors, newFieldError,
   } = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix, isEndValue);
   value = newValue;
   valueSrc = newValueSrc;
   valueError = newValueError;
+  fieldError = newFieldError;
   properties = properties.set("value", value);
   properties = properties.set("valueSrc", valueSrc);
   if (showErrorMessage) {
-    properties = properties.set("valueError", valueError);
+    properties = properties
+      .set("valueError", valueError)
+      .set("fieldError", fieldError);
   } else {
-    properties = properties.delete("valueError");
+    properties = properties
+      .delete("valueError")
+      .delete("fieldError");
   }
 
   const newSerialized = serializeRule();
@@ -306,10 +315,9 @@ function validateRule (item, path, itemId, meta, c) {
  * 
  * @param {bool} canFix true is useful for func values to remove bad args
  * @param {bool} isEndValue false if value is in process of editing by user
- * @param {bool} isRawValue false is used only internally from validateFuncValue
  * @return {array} [validError, fixedValue] - if validError === null and canFix == true, fixedValue can differ from value if was fixed
  */
-export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false, isRawValue = true) => {
+export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false) => {
   let validError = null;
   let fixedValue = value;
 
@@ -319,10 +327,10 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
     } else if (valueSrc == "func") {
       [validError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "value" || !valueSrc) {
-      [validError, fixedValue] = validateNormalValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
+      [validError, fixedValue] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     }
 
-    if (!validError) {
+    if (!validError && field) {
       const fieldConfig = getFieldConfig(config, field);
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
       const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
@@ -388,7 +396,7 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
 /**
 * 
 */
-const validateNormalValue = (leftField, field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
+const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
   if (field) {
     const fieldConfig = getFieldConfig(config, field);
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -436,7 +444,7 @@ const validateFieldValue = (leftField, field, value, _valueSrc, valueType, async
   const rightFieldDefinition = getFieldConfig(config, value);
   if (!rightFieldDefinition)
     return [`Unknown field ${value}`, value];
-  if (rightFieldStr == leftFieldStr && !isFuncArg)
+  if (leftField && rightFieldStr == leftFieldStr && !isFuncArg)
     return [`Can't compare field ${leftField} with itself`, value];
   if (valueType && valueType != rightFieldDefinition.type)
     return [`Field ${value} is of type ${rightFieldDefinition.type}, but expected ${valueType}`, value];
@@ -472,7 +480,7 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
             const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
             if (argValue !== undefined) {
               const [argValidError, fixedArgVal] = validateValue(
-                config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, false
+                config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue
               );
               if (argValidError !== null) {
                 if (canFix) {

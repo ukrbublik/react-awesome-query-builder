@@ -5,6 +5,7 @@ const __isInternal = true; //true to optimize render
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, valueError} = props;
+  const {showErrorMessage} = config.settings;
   const [internalValue, setInternalValue] = useState(value);
   
   useEffect(() => {
@@ -19,12 +20,13 @@ export default (props) => {
 
     if (__isInternal)
       setInternalValue(val);
-    setValue(val, undefined, __isInternal);
+    const didEmptinessChanged = !!val !== !!internalValue;
+    const canUseSetInternal = __isInternal && !didEmptinessChanged;
+    setValue(val, undefined, canUseSetInternal);
   };
 
-  const {showErrorMessage} = config.settings;
-  const canUseInternal = showErrorMessage ? true : !valueError;
-  let textValue = (__isInternal && canUseInternal ? internalValue : value) || "";
+  const canUseInternal = __isInternal && (showErrorMessage ? true : !valueError);
+  const textValue = (canUseInternal ? internalValue : value) || "";
 
   return (
     <FormControl>

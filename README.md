@@ -425,7 +425,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Validate query value corresponding to config. 
   Invalid parts of query (eg. if field was removed from config) will be always deleted. 
   Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
-  #### isValidTree (immutableValue) -> Boolean
+  #### isValidTree (immutableValue, config) -> Boolean
   If `showErrorMessage` in config.settings is true, use this method to check is query has bad values.
 - Export:
   #### queryString (immutableValue, config, isForDisplay = false) -> String

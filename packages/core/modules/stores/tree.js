@@ -386,6 +386,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
   const currentFieldSrc = currentProperties.get("fieldSrc");
+  const currentFieldError = currentProperties.get("fieldError");
   const newFieldConfig = getFieldConfig(config, newField);
   if (!newFieldConfig) {
     console.warn(`No config for LHS ${newField}`);
@@ -411,14 +412,18 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   // If the newly selected field supports the same operator the rule currently
   // uses, keep it selected.
   const lastOp = newFieldConfig && newFieldConfig.operators?.indexOf(currentOperator) !== -1 ? currentOperator : null;
+  const isSameFunc = currentFieldSrc === "func" && currentField?.get?.("func") === newField?.get?.("func");
+  const forceKeepOp = isSameFunc && !!lastOp;
   let newOperator = null;
   const availOps = currentFieldSrc === "func" 
     ? getOperatorsForType(config, fieldType)
     : getOperatorsForField(config, newField);
   if (availOps && availOps.length == 1)
     newOperator = availOps[0];
+  else if (forceKeepOp)
+    newOperator = lastOp;
   else if (availOps && availOps.length > 1) {
-    for (let strategy of setOpOnChangeField || []) {
+    for (let strategy of setOpOnChangeField) {
       if (strategy == "keep" && !isChangeToAnotherType)
         newOperator = lastOp;
       else if (strategy == "default")
@@ -469,15 +474,17 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
     state = fixPathsInTree(state);
   } else {
     state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
-      const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+      const {canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError} = getNewValueForFieldOp(
         config, config, current, newField, newOperator, "field", true
       );
-      if (showErrorMessage) {
+      const didFieldErrorChanged = showErrorMessage ? currentFieldError != newFieldError : !!currentFieldError != !!newFieldError;
+      isInternalValueChange = __isInternal && !didFieldErrorChanged;
+      if (showErrorMessage || !isInternalValueChange) {
         current = current
-          .set("valueError", newValueError);
+          .set("valueError", newValueError)
+          .set("fieldError", newFieldError);
       }
       const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
-      isInternalValueChange = __isInternal; //todo: filter edge cases?
       return current
         .set("field", newField)
         .delete("fieldType") // remove "memory effect"
@@ -576,7 +583,7 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = false;
   const [validationError, fixedValue] = validateValue(
-    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, true
+    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
   );
   const isValid = !validationError;
   if (fixedValue !== value) {
@@ -584,7 +591,17 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     value = fixedValue;
   }
 
+  // init lists
+  const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
+  if (!lastValueArr) {
+    state = state
+      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
+      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
+  }
+
   // Additional validation for range values
+  //todo: move away?
   if (showErrorMessage) {
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
     const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
@@ -600,42 +617,37 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);
     }
   }
-  
-  const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
-  if (!lastValueArr) {
-    state = state
-      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
-  }
 
-  const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta + ""));
+  const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta));
   const lastError = state.getIn(expandTreePath(path, "properties", "valueError", delta));
-  const isLastEmpty = lastValue == undefined;
-  const isLastError = !!lastError;
+  const didErrorChanged = showErrorMessage ? lastError != validationError : !!lastError != !!validationError;
+  const didEmptinessChanged = !!lastValue != !!value;
   if (isValid || showErrorMessage) {
     state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
     // set only good value
     if (typeof value === "undefined") {
-      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
-      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
+      state = state.setIn(expandTreePath(path, "properties", "value", delta), undefined);
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta), null);
     } else {
       if (asyncListValues) {
         state = state.setIn(expandTreePath(path, "properties", "asyncListValues"), asyncListValues);
       }
-      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), value);
-      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), calculatedValueType);
-      isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
+      state = state.setIn(expandTreePath(path, "properties", "value", delta), value);
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta), calculatedValueType);
     }
   }
-  if (showErrorMessage) {
+  isInternalValueChange = __isInternal && !didEmptinessChanged && !didErrorChanged;
+  if (showErrorMessage || !isInternalValueChange) {
+    // check list
+    const lastValueErrorArr = state.getIn(expandTreePath(path, "properties", "valueError"));
+    if (!lastValueErrorArr) {
+      state = state
+        .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
+    }
+    // set error at delta
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
   }
-  if (__isInternal && (isValid && isLastError || !isValid && !isLastError)) {
-    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
-    isInternalValueChange = false;
-  }
-  
+
   return {tree: state, isInternalValueChange};
 };
 

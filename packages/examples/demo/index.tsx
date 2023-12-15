@@ -293,7 +293,7 @@ const DemoQueryBuilder: React.FC = () => {
   };
 
   const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
-    const isValid = isValidTree(immutableTree);
+    const isValid = isValidTree(immutableTree, config);
     const treeJs = getTree(immutableTree);
     const {logic, data: logicData, errors: logicErrors} = jsonLogicFormat(immutableTree, config);
     const [spel, spelErrors] = _spelFormat(immutableTree, config);

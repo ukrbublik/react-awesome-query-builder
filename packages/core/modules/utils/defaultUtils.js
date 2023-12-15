@@ -93,7 +93,7 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
   }
   
   if (field && operator) {
-    let {newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
+    let {newValue, newValueSrc, newValueType, newValueError, newFieldError} = getNewValueForFieldOp(
       config, config, current, field, operator, "operator", false
     );
     current = current
@@ -102,7 +102,8 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
       .set("valueType", newValueType);
     if (showErrorMessage) {
       current = current
-        .set("valueError", newValueError);
+        .set("valueError", newValueError)
+        .set("fieldError", newFieldError);
     }
   }
   return current; 

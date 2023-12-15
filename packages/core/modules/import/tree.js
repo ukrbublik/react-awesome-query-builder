@@ -29,8 +29,8 @@ export const loadTree = (serTree) => {
 // @deprecated
 export const checkTree = sanitizeTree;
 
-export const isValidTree = (tree) => {
-  return getTreeBadFields(tree).length == 0;
+export const isValidTree = (tree, config) => {
+  return getTreeBadFields(tree, config).length == 0;
 };
 
 export const isImmutableTree = (tree) => {

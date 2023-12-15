@@ -134,6 +134,7 @@ interface BasicItemProperties {
 export interface RuleProperties extends BasicItemProperties {
   field: FieldValue | Empty,
   fieldSrc?: FieldSource,
+  fieldError?: string,
   operator: string | Empty,
   value: Array<RuleValue>,
   valueSrc?: Array<ValueSource>,
@@ -315,7 +316,7 @@ interface Import {
   loadTree(jsonTree: JsonTree): ImmutableTree;
   // @deprecated Use Utils.sanitizeTree() instead
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
-  isValidTree(tree: ImmutableTree): boolean;
+  isValidTree(tree: ImmutableTree, config: Config): boolean;
   isImmutableTree(tree: any): boolean;
   isTree(tree: any): boolean; // is JsonTree ?
   isJsonLogic(value: any): boolean;
@@ -387,7 +388,7 @@ interface TreeUtils {
   getFlatTree(tree: ImmutableTree): FlatTree;
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
-  getTreeBadFields(tree: ImmutableTree): Array<FieldValue>;
+  getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldValue>;
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;

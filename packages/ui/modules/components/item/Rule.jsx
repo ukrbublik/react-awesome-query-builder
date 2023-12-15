@@ -260,9 +260,9 @@ class Rule extends Component {
   }
 
   renderError() {
-    const {config, valueError} = this.props;
+    const {config, valueError, fieldError} = this.props;
     const { renderRuleError, showErrorMessage } = config.settings;
-    const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
+    const oneValueError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
     return showErrorMessage && oneValueError 
         && <div className="rule--error">
           {renderRuleError ? renderRuleError({error: oneValueError}, config.ctx) : oneValueError}

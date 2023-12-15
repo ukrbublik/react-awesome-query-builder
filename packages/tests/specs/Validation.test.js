@@ -7,7 +7,8 @@ import { with_qb } from "../support/utils";
 
 describe("validation", () => {
   it("shows error when change number value to > max", async () => {
-    await with_qb(configs.with_all_types__show_error, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    const config = configs.with_all_types__show_error;
+    await with_qb(config, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "200" } });
@@ -15,7 +16,7 @@ describe("validation", () => {
         { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
       ]);
       const changedTree = onChange.getCall(0).args[0];
-      const isValid = isValidTree(changedTree);
+      const isValid = isValidTree(changedTree, config);
       expect(isValid).to.eq(false);
       
       const ruleError = qb.find(".rule--error");

@@ -48,7 +48,9 @@ class Builder extends Component {
   }
 
   render() {
-    const tree = this.props.tree;
+    const {
+      tree, config, actions, onDragStart,
+    } = this.props;
     const rootType = tree.get("type");
     const isTernary = rootType == "switch_group";
     const reordableNodesCnt = isTernary ? null : getTotalReordableNodesCountInTree(tree);
@@ -61,14 +63,13 @@ class Builder extends Component {
         path={this.path}
         type={rootType}
         properties={tree.get("properties") || emptyProperies()}
-        config={this.props.config}
-        actions={this.props.actions}
+        config={config}
+        actions={actions}
         children1={tree.get("children1") || emptyProperies()}
-        //tree={tree}
         reordableNodesCnt={reordableNodesCnt}
         totalRulesCnt={totalRulesCnt}
         parentReordableNodesCnt={0}
-        onDragStart={this.props.onDragStart}
+        onDragStart={onDragStart}
       />
     );
   }
