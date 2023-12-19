@@ -267,6 +267,7 @@ export interface RuleProps {
   operatorOptions: AnyObject | Empty,
   value: ImmutableList<RuleValue>, //depends on widget
   valueError: ImmutableList<string>,
+  fieldError: string | Empty,
   valueSrc: ImmutableList<ValueSource>,
   asyncListValues: Array<any> | Empty,
 

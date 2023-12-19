@@ -120,12 +120,13 @@ function _extendFuncArgsConfig(subconfig, config, path = []) {
         config.__funcsCntByType[funcDef.returnType] = 0;
       config.__funcsCntByType[funcDef.returnType]++;
     }
-    for (let argKey in funcDef.args) {
-      _extendFieldConfig(funcDef.args[argKey], config, null, true);
-    }
+    _extendFieldConfig(funcDef, config, null, false);
 
-    // isOptional can be only in the end
     if (funcDef.args) {
+      for (let argKey in funcDef.args) {
+        _extendFieldConfig(funcDef.args[argKey], config, null, true);
+      }
+      // isOptional can be only in the end
       const argKeys = Object.keys(funcDef.args);
       let tmpIsOptional = true;
       for (const argKey of argKeys.reverse()) {
@@ -147,7 +148,8 @@ function _extendFuncArgsConfig(subconfig, config, path = []) {
 
 function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
   let operators = null, defaultOperator = null;
-  const typeConfig = config.types[fieldConfig.type];
+  const typeConfig = config.types[fieldConfig.type || fieldConfig.returnType];
+  const isFunc = !!fieldConfig.returnType;
   const excludeOperatorsForField = fieldConfig.excludeOperators || [];
   if (fieldConfig.type != "!struct" && fieldConfig.type != "!group") {
     const keysToPutInFieldSettings = ["listValues", "treeValues", "allowCustomValues", "validateValue"];
@@ -184,43 +186,45 @@ function _extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false)
       fieldConfig.disabled = true;
       return;
     }
-    if (!isFuncArg) {
+    if (!isFuncArg && !isFunc) {
       if (!config.__fieldsCntByType[fieldConfig.type])
         config.__fieldsCntByType[fieldConfig.type] = 0;
       config.__fieldsCntByType[fieldConfig.type]++;
     }
 
-    if (!fieldConfig.widgets)
-      fieldConfig.widgets = {};
     if (isFuncArg)
       fieldConfig._isFuncArg = true;
-    fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
-    fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
-    const excludeOperatorsForType = typeConfig.excludeOperators || [];
-    for (let widget in typeConfig.widgets) {
-      let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
-      const typeWidgetConfig = typeConfig.widgets[widget] || {};
-      if (!isFuncArg) {
-        //todo: why I've excluded isFuncArg ?
-        const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
-        const shouldIncludeOperators = fieldConfig.preferWidgets
-          && (widget == "field" || fieldConfig.preferWidgets.includes(widget))
-          || excludeOperators.length > 0;
-        if (fieldWidgetConfig.operators) {
-          const addOperators = fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
-          operators = [...(operators || []), ...addOperators];
-        } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
-          const addOperators = typeWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
-          operators = [...(operators || []), ...addOperators];
-        }
-        if (fieldWidgetConfig.defaultOperator)
-          defaultOperator = fieldWidgetConfig.defaultOperator;
-      }
 
-      if (widget == fieldConfig.mainWidget) {
-        fieldWidgetConfig = merge({}, {widgetProps: fieldConfig.mainWidgetProps || {}}, fieldWidgetConfig);
+    if (!isFunc) { // tip: func always have its own widget
+      fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
+      fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
+      const excludeOperatorsForType = typeConfig.excludeOperators || [];
+      if (!fieldConfig.widgets)
+        fieldConfig.widgets = {};
+      for (let widget in typeConfig.widgets) {
+        let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
+        const typeWidgetConfig = typeConfig.widgets[widget] || {};
+        if (!isFuncArg) {
+          const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
+          const shouldIncludeOperators = fieldConfig.preferWidgets
+            && (widget == "field" || fieldConfig.preferWidgets.includes(widget))
+            || excludeOperators.length > 0;
+          if (fieldWidgetConfig.operators) {
+            const addOperators = fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
+            operators = [...(operators || []), ...addOperators];
+          } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
+            const addOperators = typeWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
+            operators = [...(operators || []), ...addOperators];
+          }
+          if (fieldWidgetConfig.defaultOperator)
+            defaultOperator = fieldWidgetConfig.defaultOperator;
+        }
+
+        if (widget == fieldConfig.mainWidget) {
+          fieldWidgetConfig = merge({}, {widgetProps: fieldConfig.mainWidgetProps || {}}, fieldWidgetConfig);
+        }
+        fieldConfig.widgets[widget] = fieldWidgetConfig;
       }
-      fieldConfig.widgets[widget] = fieldWidgetConfig;
     }
     if (!isFuncArg) {
       if (!fieldConfig.operators && operators)

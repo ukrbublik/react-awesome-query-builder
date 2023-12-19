@@ -160,7 +160,7 @@ class RuleGroupExt extends BasicGroup {
   _buildWidgetProps({
     selectedField, selectedFieldSrc, selectedFieldType,
     selectedOperator, operatorOptions,
-    value, valueType, valueSrc, asyncListValues, valueError,
+    value, valueType, valueSrc, asyncListValues, valueError, fieldError,
     parentField,
   }) {
     return {
@@ -174,6 +174,7 @@ class RuleGroupExt extends BasicGroup {
       valueSrc: ["value"], //new Immutable.List(["value"]), // should be fixed in isEmptyRuleGroupExtPropertiesAndChildren
       //asyncListValues,
       valueError : null,
+      fieldError: null,
       parentField,
     };
   }

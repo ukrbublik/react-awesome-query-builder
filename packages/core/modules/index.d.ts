@@ -173,6 +173,7 @@ interface _RulePropertiesI extends RuleProperties {
   valueType?: ImmutableList<string>,
   valueError?: ImmutableList<string>,
   operatorOptions?: ImmMap,
+  fieldError?: string,
 }
 interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtProperties {}
 
@@ -1167,16 +1168,15 @@ type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
 type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
-interface FuncGroup {
+interface FuncGroup extends BaseField {
   type: "!struct",
-  label?: string,
   subfields: TypedMap<FuncOrGroup>,
 }
 
-export interface Func {
+// todo: uses `returnType` instead of `type` for now, but should be revisited to use `type`
+export interface Func extends Omit<BaseSimpleField, "type"> {
   returnType: string,
   args: TypedMap<FuncArg>,
-  label?: string,
   sqlFunc?: string,
   spelFunc?: string,
   mongoFunc?: string,

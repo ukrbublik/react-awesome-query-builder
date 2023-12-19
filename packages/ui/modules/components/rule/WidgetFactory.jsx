@@ -7,7 +7,7 @@ const { _fixImmutableValue } = Utils.TreeUtils;
 
 export default ({
   delta, isFuncArg, valueSrc,
-  value: immValue, valueError: immValueError, asyncListValues,
+  value: immValue, valueError: immValueError, fieldError, asyncListValues,
   isSpecialRange, fieldDefinition,
   widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
   config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId
@@ -50,6 +50,7 @@ export default ({
     isFuncArg: isFuncArg,
     value: value,
     valueError: valueError,
+    fieldError: fieldError,
     label: widgetValueLabel.label,
     placeholder: widgetValueLabel.placeholder,
     placeholders: valueLabels ? valueLabels.placeholder : null,

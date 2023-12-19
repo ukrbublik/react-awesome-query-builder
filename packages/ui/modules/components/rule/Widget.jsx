@@ -20,6 +20,7 @@ export default class Widget extends Component {
     value: PropTypes.any, //instanceOf(Immutable.List)
     valueSrc: PropTypes.any, //instanceOf(Immutable.List)
     valueError: PropTypes.any,
+    fieldError: PropTypes.string,
     field: PropTypes.any,
     fieldSrc: PropTypes.string,
     fieldType: PropTypes.string,
@@ -190,7 +191,10 @@ export default class Widget extends Component {
   }
 
   renderWidget = (delta, meta, props) => {
-    const {config, isFuncArg, leftField, operator, value: values, valueError, readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS} = props;
+    const {
+      config, isFuncArg, leftField, operator, value: values, valueError, fieldError,
+      readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS,
+    } = props;
     const {settings} = config;
     const { widgets, iValues, aField, valueSources } = meta;
     const value = isFuncArg ? iValues : values;
@@ -214,6 +218,7 @@ export default class Widget extends Component {
           delta={delta}
           value={value}
           valueError={valueError}
+          fieldError={fieldError}
           isFuncArg={isFuncArg}
           isLHS={isLHS}
           {...pick(meta, ["isSpecialRange", "fieldDefinition", "asyncListValues"])}

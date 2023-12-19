@@ -32,6 +32,7 @@ class Rule extends Component {
     isDraggingTempo: PropTypes.bool,
     parentField: PropTypes.string, //from RuleGroup
     valueError: PropTypes.any,
+    fieldError: PropTypes.string,
     isLocked: PropTypes.bool,
     isTrueLocked: PropTypes.bool,
     //path: PropTypes.instanceOf(Immutable.List),
@@ -118,7 +119,7 @@ class Rule extends Component {
   _buildWidgetProps({
     selectedField, selectedFieldSrc, selectedFieldType,
     selectedOperator, operatorOptions,
-    value, valueType, valueSrc, asyncListValues, valueError,
+    value, valueType, valueSrc, asyncListValues, valueError, fieldError,
     parentField,
   }) {
     return {
@@ -132,6 +133,7 @@ class Rule extends Component {
       valueSrc,
       asyncListValues,
       valueError,
+      fieldError,
       parentField,
     };
   }

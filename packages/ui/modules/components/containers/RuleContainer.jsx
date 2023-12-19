@@ -25,6 +25,7 @@ const createRuleContainer = (Rule) =>
       valueSrc: PropTypes.any,
       asyncListValues: PropTypes.array,
       valueError: PropTypes.any,
+      fieldError: PropTypes.string,
       operatorOptions: PropTypes.object,
       reordableNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
@@ -144,6 +145,7 @@ const createRuleContainer = (Rule) =>
               valueSrc={this.props.valueSrc || null}
               valueType={this.props.valueType || null}
               valueError={this.props.valueError || null}
+              fieldError={this.props.fieldError || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
@@ -178,6 +180,7 @@ const createRuleContainer = (Rule) =>
               valueSrc={this.props.valueSrc || null}
               valueType={this.props.valueType || null}
               valueError={this.props.valueError || null}
+              fieldError={this.props.fieldError || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
