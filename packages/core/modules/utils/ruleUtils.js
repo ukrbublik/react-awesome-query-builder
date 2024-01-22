@@ -51,6 +51,11 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
   const currentType = currentFieldConfig?.type || currentFieldType;
   const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
+  const currentListValuesType = currentFieldConfig?.listValuesType;
+  const newListValuesType = newFieldConfig?.listValuesType;
+  const currentFieldSimpleValue = currentField?.get?.("func") || currentField;
+  const newFieldSimpleValue = newField?.get?.("func") || newField;
+  const hasFieldChanged = newFieldSimpleValue != currentFieldSimpleValue;
 
   let valueFixes = {};
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
@@ -58,15 +63,14 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   let newFieldError;
 
   let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
-  canReuseValue = canReuseValue
-    && (!changedProp 
-      || changedProp == "field" && !clearValueOnChangeField 
-      || changedProp == "operator" && !clearValueOnChangeOp);
-  canReuseValue = canReuseValue
-    && (currentType && newType && currentType == newType);
-  if (canReuseValue && selectTypes.includes(newType) && changedProp == "field") {
-    const newListValuesType = newFieldConfig?.listValuesType;
-    const currentListValuesType = currentFieldConfig?.listValuesType;
+  if (
+    !(currentType && newType && currentType == newType)
+    || changedProp === "field" && hasFieldChanged && clearValueOnChangeField
+    || changedProp === "operator" && clearValueOnChangeOp
+  ) {
+    canReuseValue = false;
+  }
+  if (hasFieldChanged && selectTypes.includes(newType)) {
     if (newListValuesType && newListValuesType === currentListValuesType) {
       // ok
     } else {
@@ -133,7 +137,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       // For bad multiselect value we have both error message + fixed value.
       //  If we show error message, it will gone on next tree validation
       const fixValue = fixedValue !== v;
-      const dropValue = !isValidSrc || !isValid && (changedProp == "field" || !showErrorMessage && !fixValue);
+      const dropValue = !isValidSrc || !isValid && (hasFieldChanged || !showErrorMessage && !fixValue);
       const isTerminalError = !!validationError && !dropValue && !fixValue;
       const showValueError = isTerminalError && showErrorMessage;
       if (isTerminalError) {

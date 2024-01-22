@@ -477,6 +477,9 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
       const {canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError} = getNewValueForFieldOp(
         config, config, current, newField, newOperator, "field", true
       );
+      if (!showErrorMessage && newFieldError) {
+        newField = currentField;
+      }
       const didFieldErrorChanged = showErrorMessage ? currentFieldError != newFieldError : !!currentFieldError != !!newFieldError;
       isInternalValueChange = __isInternal && !didFieldErrorChanged;
       if (showErrorMessage || !isInternalValueChange) {
@@ -485,7 +488,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
           .set("fieldError", newFieldError);
       }
       const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
-      return current
+      current = current
         .set("field", newField)
         .delete("fieldType") // remove "memory effect"
         .set("fieldSrc", currentFieldSrc)
@@ -493,8 +496,11 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
         .set("operatorOptions", newOperatorOptions)
         .set("value", newValue)
         .set("valueSrc", newValueSrc)
-        .set("valueType", newValueType)
-        .delete("asyncListValues");
+        .set("valueType", newValueType);
+      if (!canReuseValue) {
+        current = current.delete("asyncListValues");
+      }
+      return current;
     }));
   }
 

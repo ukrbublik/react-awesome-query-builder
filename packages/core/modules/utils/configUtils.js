@@ -392,7 +392,9 @@ export const getFuncConfig = (config, func) => {
   if (!funcConfig)
     return null; //throw new Error("Can't find func " + func + ", please check your config");
   const typeConfig = config.types[funcConfig.returnType] || {};
-  return { ...typeConfig, ...funcConfig, type: funcConfig.returnType || funcConfig.type};
+  const ret = mergeWith({}, typeConfig, funcConfig, mergeCustomizerNoArrays);
+  ret.type = funcConfig.returnType || funcConfig.type;
+  return ret;
 };
 
 export const getFuncArgConfig = (config, funcKey, argKey) => {
@@ -405,8 +407,7 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
 
   //merge, but don't merge operators (rewrite instead)
   const typeConfig = config.types[argConfig.type] || {};
-  let ret = mergeWith({}, typeConfig, argConfig || {}, mergeCustomizerNoArrays);
-
+  const ret = mergeWith({}, typeConfig, argConfig || {}, mergeCustomizerNoArrays);
   return ret;
 };
 
