@@ -27,7 +27,7 @@ export default ({
     ? [fixedImmValue?.get(0), fixedImmValue?.get(1)] 
     : (fixedImmValue ? fixedImmValue.get(delta) : undefined);
   const valueError = immValueError?.get && (isSpecialRange 
-    ? [immValueError.get(0), immValueError.get(1)]
+    ? [immValueError.get(0), immValueError.get(1), immValueError.get(2)]
     : immValueError.get(delta)
   ) || null;
   const errorMessage = isLHS ? fieldError : valueError;
