@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 const __isInternal = true; //true to optimize render
 
 export default (props) => {
-  const {value, setValue, config, readonly, placeholder, customProps, maxLength, valueError} = props;
+  const {value, setValue, config, readonly, placeholder, customProps, maxLength, errorMessage} = props;
   const {showErrorMessage} = config.settings;
   const [internalValue, setInternalValue] = useState(value);
   
@@ -24,8 +24,7 @@ export default (props) => {
     const canUseSetInternal = __isInternal && !didEmptinessChanged;
     setValue(val, undefined, canUseSetInternal);
   };
-
-  const canUseInternal = __isInternal && (showErrorMessage ? true : !valueError);
+  const canUseInternal = __isInternal && (showErrorMessage ? true : !errorMessage);
   const textValue = (canUseInternal ? internalValue : value) || "";
 
   return (

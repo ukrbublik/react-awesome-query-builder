@@ -19,7 +19,7 @@ export default class Widget extends Component {
     config: PropTypes.object.isRequired,
     value: PropTypes.any, //instanceOf(Immutable.List)
     valueSrc: PropTypes.any, //instanceOf(Immutable.List)
-    valueError: PropTypes.any,
+    valueError: PropTypes.any, //instanceOf(Immutable.List)
     fieldError: PropTypes.string,
     field: PropTypes.any,
     fieldSrc: PropTypes.string,

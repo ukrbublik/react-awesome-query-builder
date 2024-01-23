@@ -45,11 +45,14 @@ export default class SliderWidget extends Component {
   }
 
   handleChange = (val) => {
+    const {internalValue} = this.state;
     if (val === "")
       val = undefined;
     if (__isInternal)
       this.setState({internalValue: val});
-    this.props.setValue(val, undefined, __isInternal);
+    const didEmptinessChanged = !!val !== !!internalValue;
+    const canUseSetInternal = __isInternal && !didEmptinessChanged;
+    this.props.setValue(val, undefined, canUseSetInternal);
   };
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
@@ -66,14 +69,15 @@ export default class SliderWidget extends Component {
   };
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
+    const {config, placeholder, customProps, value,  min, max, step, marks, readonly, errorMessage} = this.props;
+    const {internalValue} = this.state;
     const {renderSize, showErrorMessage, defaultSliderWidth} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
 
-    const canUseInternal = showErrorMessage ? true : !valueError;
-    let aValue = __isInternal && canUseInternal ? this.state.internalValue : value;
+    const canUseInternal = __isInternal && (showErrorMessage ? true : !errorMessage);
+    let aValue = canUseInternal ? internalValue : value;
     if (aValue == undefined)
       aValue = null;
     const sliderValue = aValue == null && min ? min : aValue;

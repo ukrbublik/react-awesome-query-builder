@@ -378,7 +378,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   if (!newField)
     return {tree: removeItem(state, path), isInternalValueChange};
 
-  const {fieldSeparator, setOpOnChangeField, showErrorMessage, keepInputOnChangeFieldSrc} = config.settings;
+  const {fieldSeparator, setOpOnChangeField, showErrorMessage} = config.settings;
   if (Array.isArray(newField))
     newField = newField.join(fieldSeparator);
 

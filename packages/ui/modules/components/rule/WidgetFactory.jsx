@@ -26,13 +26,15 @@ export default ({
   let value = isSpecialRange 
     ? [fixedImmValue?.get(0), fixedImmValue?.get(1)] 
     : (fixedImmValue ? fixedImmValue.get(delta) : undefined);
-  const valueError = immValueError && (isSpecialRange 
+  const valueError = immValueError?.get && (isSpecialRange 
     ? [immValueError.get(0), immValueError.get(1)]
     : immValueError.get(delta)
   ) || null;
+  const errorMessage = isLHS ? fieldError : valueError;
   if (isSpecialRange && value[0] === undefined && value[1] === undefined)
     value = undefined;
   const {fieldSettings} = fieldDefinition || {};
+
   const widgetProps = omit({
     ...fieldWidgetProps, 
     ...fieldSettings,
@@ -49,8 +51,9 @@ export default ({
     isSpecialRange: isSpecialRange,
     isFuncArg: isFuncArg,
     value: value,
-    valueError: valueError,
-    fieldError: fieldError,
+    valueError,
+    fieldError,
+    errorMessage,
     label: widgetValueLabel.label,
     placeholder: widgetValueLabel.placeholder,
     placeholders: valueLabels ? valueLabels.placeholder : null,

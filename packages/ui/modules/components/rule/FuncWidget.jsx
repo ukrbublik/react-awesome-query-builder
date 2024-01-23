@@ -17,6 +17,7 @@ export default class FuncWidget extends Component {
     field: PropTypes.any,
     fieldSrc: PropTypes.string,
     fieldType: PropTypes.string,
+    fieldError: PropTypes.string,
     operator: PropTypes.string,
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
@@ -26,6 +27,7 @@ export default class FuncWidget extends Component {
     fieldDefinition: PropTypes.object,
     isFuncArg: PropTypes.bool,
     isLHS: PropTypes.bool,
+    valueError: PropTypes.string,
   };
 
   constructor(props) {
@@ -132,7 +134,10 @@ export default class FuncWidget extends Component {
   };
 
   renderArgVal = (funcKey, argKey, argDefinition) => {
-    const {config, field, fieldType, fieldSrc, isLHS, operator, value, readonly, parentFuncs, id, groupId} = this.props;
+    const {
+      config, field, fieldType, fieldSrc, isLHS, operator, value, readonly, parentFuncs, id, groupId,
+      fieldError, valueError,
+    } = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
     const defaultValueSource = argDefinition.valueSources.length == 1 ? argDefinition.valueSources[0] : undefined;
@@ -145,6 +150,8 @@ export default class FuncWidget extends Component {
       leftField: field,
       fieldType, // type of leftField
       fieldSrc, // src of leftField
+      fieldError, // error in LHS
+      valueError, // error in RHS
       isLHS,
       operator: null,
       value: argVal,

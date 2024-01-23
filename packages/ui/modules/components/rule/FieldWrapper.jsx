@@ -22,7 +22,10 @@ export default class FieldWrapper extends PureComponent {
   }
 
   renderField = () => {
-    const {config, classname, selectedField, selectedFieldSrc, selectedFieldType, setField, parentField, readonly, id, groupId} = this.props;
+    const {
+      config, classname, selectedField, selectedFieldSrc, selectedFieldType, setField, parentField, readonly, id, groupId,
+      fieldError, valueError,
+    } = this.props;
     const supportedFieldSrcs = ["func", "field"];
     if (!supportedFieldSrcs.includes(selectedFieldSrc)) {
       return "?";
@@ -34,6 +37,8 @@ export default class FieldWrapper extends PureComponent {
         value={selectedField}
         fieldSrc={selectedFieldSrc}
         fieldType={selectedFieldType}
+        fieldError={fieldError}
+        valueError={valueError}
         parentField={parentField}
         setValue={setField}
         readonly={readonly}

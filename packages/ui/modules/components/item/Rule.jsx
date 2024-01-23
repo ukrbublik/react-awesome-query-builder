@@ -147,7 +147,7 @@ class Rule extends Component {
   renderField() {
     const {
       config, isLocked, parentField, groupId, id,
-      selectedFieldSrc, selectedField, selectedFieldType, setField, setFieldSrc,
+      selectedFieldSrc, selectedField, selectedFieldType, setField, setFieldSrc, fieldError,
     } = this.props;
     const { immutableFieldsMode } = config.settings;
     // tip: don't allow function inside !group (yet)
@@ -162,6 +162,7 @@ class Rule extends Component {
       selectedField={selectedField}
       selectedFieldSrc={selectedFieldSrc}
       selectedFieldType={selectedFieldType}
+      fieldError={fieldError}
       setField={!immutableFieldsMode ? setField : dummyFn}
       setFieldSrc={!immutableFieldsMode ? setFieldSrc : dummyFn}
       parentField={parentField}

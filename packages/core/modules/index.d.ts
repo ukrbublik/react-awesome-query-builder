@@ -549,8 +549,11 @@ export interface TreeActions {
 
 interface AbstractWidgetProps<C = Config> {
   placeholder: string,
+  label?: string,
   field: FieldValue,
   fieldSrc: FieldSource,
+  fieldType?: FieldType,
+  fieldError?: string,
   parentField?: string,
   operator: string,
   fieldDefinition: Field,
@@ -560,16 +563,23 @@ interface AbstractWidgetProps<C = Config> {
   readonly?: boolean,
   id?: string, // id of rule
   groupId?: string, // id of parent group
+  isLHS: boolean,
+  isSpecialRange: boolean,
+  isFuncArg: boolean,
 }
 interface BaseWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
   value: V | Empty,
   setValue(val: V | Empty, asyncListValues?: Array<any>): void,
+  valueError?: string,
+  errorMessage?: string, // fieldError or valueError
 }
 interface RangeWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
   value: Array<V | Empty>,
   setValue(val: Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders: Array<string>,
   textSeparators: Array<string>,
+  valueError?: Array<string>,
+  errorMessage?: Array<string>, // same as valueError
 }
 // BaseWidgetProps | RangeWidgetProps
 interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
@@ -577,6 +587,8 @@ interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidget
   setValue(val: V | Empty | Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders?: Array<string>,
   textSeparators?: Array<string>,
+  valueError?: string | Array<string>,
+  errorMessage?: string | Array<string>, // fieldError or valueError
 }
 export type WidgetProps<C = Config> = RangeableWidgetProps<C> & FieldSettings;
 
