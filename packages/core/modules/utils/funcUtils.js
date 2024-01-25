@@ -120,27 +120,37 @@ export const setFunc = (value, funcKey, config) => {
   }
 
   // defaults
-  if (funcConfig) {
-    for (const argKey in funcConfig.args) {
-      const argConfig = funcConfig.args[argKey];
-      const {valueSources, defaultValue} = argConfig;
-      const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
-      const firstValueSrc = filteredValueSources.length ? filteredValueSources[0] : undefined;
-      const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
-      const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
-      const hasValue = value.getIn(["args", argKey]);
-      if (!hasValue) {
-        if (defaultValue !== undefined) {
-          value = value.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
-        }
-        if (argDefaultValueSrc) {
-          value = value.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
-        }
-      }
-    }
-  }
+  value = setFuncDefaultArgs(config, value, funcConfig);
 
   return value;
+};
+
+const setFuncDefaultArgs = (config, funcValue, funcConfig) => {
+  if (funcConfig) {
+    for (const argKey in funcConfig.args) {
+      funcValue = setFuncDefaultArg(config, funcValue, funcConfig, argKey);
+    }
+  }
+  return funcValue;
+};
+
+export const setFuncDefaultArg = (config, funcValue, funcConfig, argKey) => {
+  const argConfig = funcConfig.args[argKey];
+  const {valueSources, defaultValue} = argConfig;
+  const filteredValueSources = filterValueSourcesForField(config, valueSources, argConfig);
+  const firstValueSrc = filteredValueSources.length ? filteredValueSources[0] : undefined;
+  const defaultValueSrc = defaultValue ? (isObject(defaultValue) && !!defaultValue.func ? "func" : "value") : undefined;
+  const argDefaultValueSrc = defaultValueSrc || firstValueSrc;
+  const hasValue = funcValue.getIn(["args", argKey]);
+  if (!hasValue) {
+    if (defaultValue !== undefined) {
+      funcValue = funcValue.setIn(["args", argKey, "value"], getDefaultArgValue(argConfig));
+    }
+    if (argDefaultValueSrc) {
+      funcValue = funcValue.setIn(["args", argKey, "valueSrc"], argDefaultValueSrc);
+    }
+  }
+  return funcValue;
 };
 
 const getDefaultArgValue = ({defaultValue: value}) => {

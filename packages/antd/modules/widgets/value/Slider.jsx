@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { useOnPropsChanged, pureShouldComponentUpdate } = Utils.ReactUtils;
-const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends Component {
   static propTypes = {
@@ -46,18 +45,20 @@ export default class SliderWidget extends Component {
 
   handleChange = (val) => {
     const {internalValue} = this.state;
+    const {optimizeRender} = this.props.config.settings;
     if (val === "")
       val = undefined;
-    if (__isInternal)
+    if (optimizeRender)
       this.setState({internalValue: val});
     const didEmptinessChanged = !!val !== !!internalValue;
-    const canUseSetInternal = __isInternal && !didEmptinessChanged;
+    const canUseSetInternal = optimizeRender && !didEmptinessChanged;
     this.props.setValue(val, undefined, canUseSetInternal);
   };
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
   shouldComponentUpdate = (nextProps, nextState) => {
+    const {optimizeRender} = nextProps.config.settings;
     const should = this.pureShouldComponentUpdate(nextProps, nextState);
     if (should) {
       // RHL fix
@@ -71,12 +72,12 @@ export default class SliderWidget extends Component {
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, errorMessage} = this.props;
     const {internalValue} = this.state;
-    const {renderSize, showErrorMessage, defaultSliderWidth} = config.settings;
+    const {renderSize, showErrorMessage, defaultSliderWidth, optimizeRender} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
 
-    const canUseInternal = __isInternal && (showErrorMessage ? true : !errorMessage);
+    const canUseInternal = optimizeRender && (showErrorMessage ? true : !errorMessage);
     let aValue = canUseInternal ? internalValue : value;
     if (aValue == undefined)
       aValue = null;

@@ -4,7 +4,7 @@ import {
 } from "./configUtils";
 import {defaultValue, getFirstDefined} from "../utils/stuff";
 import Immutable from "immutable";
-import {validateValue} from "../utils/validation";
+import {validateValue, validateRange} from "../utils/validation";
 import last from "lodash/last";
 import {completeFuncValue} from "./funcUtils";
 
@@ -61,6 +61,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
   let validationErrors = [];
   let newFieldError;
+  let rangeValidationError;
 
   let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
   if (
@@ -113,7 +114,8 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   if (currentOperator != newOperator && [currentOperator, newOperator].includes("proximity"))
     canReuseValue = false;
 
-  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, currentValueSrc.first());
+  const firstValueSrc = currentValueSrc.first();
+  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, firstValueSrc);
   let valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null);
   if (!newField && isOkWithoutField) {
     valueSources = Object.keys(config.settings.valueSourcesInfo);
@@ -192,21 +194,15 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     }
     return vs;
   }));
-  const areNewValueSrcsPureValues = newValueSrc.toJS().filter(vs => vs == "value" || vs == null).length == operatorCardinality;
 
   // Validate range
-  if (!!newOperatorConfig?.validateValues && areNewValueSrcsPureValues) {
+  rangeValidationError = validateRange(config, newField, newOperator, newValue, newValueSrc);
+  if (rangeValidationError) {
     // last element in `valueError` list is for range validation error
-    const jsValues = firstWidgetConfig?.toJS 
-      ? newValue.toJS().map(v => firstWidgetConfig.toJS.call(config.ctx, v, firstWidgetConfig)) 
-      : newValue.toJS();
-    const rangeValidateError = newOperatorConfig.validateValues(jsValues);
-    if (rangeValidateError) {
-      valueErrors.push(rangeValidateError);
-      validationErrors.push({
-        str: rangeValidateError
-      });
-    }
+    valueErrors.push(rangeValidationError);
+    validationErrors.push({
+      str: rangeValidationError
+    });
   }
 
   newValueError = new Immutable.List(valueErrors);
@@ -224,7 +220,10 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
     return vt;
   }));
 
-  return {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, operatorCardinality, newFieldError};
+  return {
+    canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality,
+    newValueError, newFieldError, validationErrors, rangeValidationError,
+  };
 };
 
 export const getFirstField = (config, parentRuleGroupPath = null) => {

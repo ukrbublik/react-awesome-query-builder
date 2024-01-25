@@ -7,11 +7,11 @@ export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, errorMessage} = props;
   const {showErrorMessage} = config.settings;
   const [internalValue, setInternalValue] = useState(value);
-  
+
   useEffect(() => {
     if (value !== internalValue)
       setInternalValue(value);
-  }, [value]);
+  }, [value, errorMessage]);
 
   const onChange = e => {
     let val = e.target.value;

@@ -7,6 +7,7 @@ import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree} from "../utils/treeUtils";
 import {extendConfig} from "../utils/configUtils";
+import {setFuncDefaultArg} from "../utils/funcUtils";
 import omit from "lodash/omit";
 import { List } from "immutable";
 
@@ -160,7 +161,7 @@ function validateRule (item, path, itemId, meta, c) {
   };
 
   const oldSerialized = serializeRule();
-  let _wasValid = field && operator && value && !value.includes(undefined);
+  //const _wasValid = field && operator && value && !value.includes(undefined);
 
   if (!id && itemId) {
     id = itemId;
@@ -238,7 +239,7 @@ function validateRule (item, path, itemId, meta, c) {
 
   //validate operator options
   operatorOptions = properties.get("operatorOptions");
-  let _operatorCardinality = operator ? defaultValue(operatorDefinition.cardinality, 1) : null;
+  //const _operatorCardinality = operator ? defaultValue(operatorDefinition.cardinality, 1) : null;
   if (!operator || operatorOptions && !operatorDefinition.options) {
     operatorOptions = null;
     properties = properties.delete("operatorOptions");
@@ -315,23 +316,23 @@ function validateRule (item, path, itemId, meta, c) {
  * 
  * @param {bool} canFix true is useful for func values to remove bad args
  * @param {bool} isEndValue false if value is in process of editing by user
- * @return {array} [validError, fixedValue] - if validError === null and canFix == true, fixedValue can differ from value if was fixed
+ * @return {array} [validationError, fixedValue] - if validationError === null and canFix == true, fixedValue can differ from value if was fixed
  */
 export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false) => {
-  let validError = null;
+  let validationError = null;
   let fixedValue = value;
 
   if (value != null) {
     if (valueSrc == "field") {
-      [validError, fixedValue] = validateFieldValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
+      [validationError, fixedValue] = validateFieldValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "func") {
-      [validError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
+      [validationError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "value" || !valueSrc) {
-      [validError, fixedValue] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
+      [validationError, fixedValue] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     }
 
-    if (!validError && field) {
-      const fieldConfig = getFieldConfig(config, field);
+    if (!validationError && field) {
+      //const _fieldConfig = getFieldConfig(config, field);
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
       const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
@@ -349,17 +350,22 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
         if (valueSrc == "field")
           args.push(rightFieldDefinition);
         const validResult = fn.call(config.ctx, ...args);
-        if (typeof validResult == "boolean") {
+        if (typeof validResult === "object" && validResult !== null && !Array.isArray(validResult)) {
+          validationError = validResult.error;
+          if (validResult.fixedValue !== undefined) {
+            fixedValue = validResult.fixedValue;
+          }
+        } else if (typeof validResult === "boolean") {
           if (validResult == false)
-            validError = "Invalid value";
+            validationError = "Invalid value";
         } else {
-          validError = validResult;
+          validationError = validResult;
         }
       }
     }
   }
   
-  return [validError, fixedValue];
+  return [validationError, fixedValue];
 };
 
 const validateValueInList = (value, listValues, canFix, isEndValue, removeInvalidMultiSelectValuesOnLoad) => {
@@ -407,7 +413,7 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
     const listValues = fieldSettings?.treeValues || fieldSettings?.listValues;
     const isAsyncListValues = !!fieldSettings?.asyncFetch;
     // todo: for select/multiselect value can be string or number
-    const canSkipCheck = listValues || isAsyncListValues; 
+    const canSkipCheck = listValues || isAsyncListValues;
 
     if (valueType && wType && valueType != wType)
       return [`Value should have type ${wType}, but got value of type ${valueType}`, value];
@@ -479,24 +485,31 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
             const argValue = argVal ? argVal.get("value") : undefined;
             const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
             if (argValue !== undefined) {
-              const [argValidError, fixedArgVal] = validateValue(
+              const [argValidationError, fixedArgVal] = validateValue(
                 config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue
               );
-              if (argValidError !== null) {
-                if (canFix) {
-                  fixedValue = fixedValue.deleteIn(["args", argKey]);
-                  if (argConfig.defaultValue !== undefined) {
-                    fixedValue = fixedValue.setIn(["args", argKey, "value"], argConfig.defaultValue);
-                    fixedValue = fixedValue.setIn(["args", argKey, "valueSrc"], "value");
-                  }
-                } else {
-                  return [`Invalid value of arg ${argKey} for func ${funcKey}: ${argValidError}`, value];
-                }
-              } else if (fixedArgVal !== argValue) {
+              const willFix = fixedArgVal !== argValue;
+              const hasError = argValidationError !== null;
+              //tip: reset to default ONLY if isEndValue==true
+              const needDrop = hasError && !willFix && isEndValue && canFix && argConfig.defaultValue !== undefined;
+              if (willFix) {
                 fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
               }
-            } else if (isEndValue && argConfig.defaultValue === undefined && !canFix && !argConfig.isOptional) {
-              return [`Value of arg ${argKey} for func ${funcKey} is required`, value];
+              if (needDrop) {
+                // reset to default
+                fixedValue = fixedValue.deleteIn(["args", argKey]);
+                fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
+              }
+              if (hasError)
+                return [`Invalid value of arg ${argKey} for func ${funcKey}: ${argValidationError}`, fixedValue];
+            } else if (!argConfig.isOptional && isEndValue) {
+              if (canFix && argConfig.defaultValue !== undefined) {
+                // set default
+                fixedValue = fixedValue.deleteIn(["args", argKey]);
+                fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
+              } else {
+                return [`Value of arg ${argKey} for func ${funcKey} is required`, value];
+              }
             }
           }
         } else return [`Unknown function ${funcKey}`, value];
@@ -505,4 +518,25 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
   } // empty value
 
   return [null, fixedValue];
+};
+
+/**
+* 
+*/
+export const validateRange = (config, field, operator, values, valueSrcs) => {
+  const operatorConfig = getOperatorConfig(config, operator, field);
+  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const valueSrcsArr = (valueSrcs.toJS ? valueSrcs.toJS() : valueSrcs);
+  const areValueSrcsPureValues = valueSrcsArr.filter(vs => vs == "value" || vs == null).length == operatorCardinality;
+  let rangeValidationError;
+  if (operatorConfig?.validateValues && areValueSrcsPureValues) {
+    const valueSrc = valueSrcsArr[0];
+    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
+    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
+    const jsValues = fieldWidgetDefinition?.toJS
+      ? values.map(v => fieldWidgetDefinition.toJS.call(config.ctx, v, fieldWidgetDefinition))
+      : values;
+    rangeValidationError = operatorConfig.validateValues(jsValues);
+  }
+  return rangeValidationError;
 };

@@ -17,7 +17,7 @@ import {
   getNewValueForFieldOp, isEmptyItem, selectTypes
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
-import {validateValue} from "../utils/validation";
+import {validateValue, validateRange} from "../utils/validation";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
 
@@ -587,13 +587,14 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 
   const isEndValue = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-  const canFix = false;
+  const canFix = !showErrorMessage;
   const [validationError, fixedValue] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
   );
   const isValid = !validationError;
   if (fixedValue !== value) {
-    // eg, get exact value from listValues (not string)
+    // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
+    //  (get exact value from listValues, not string)
     value = fixedValue;
   }
 
@@ -697,8 +698,9 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
   if (srcKey) {
     const properties = state.getIn(expandTreePath(path, "properties"));
     // this call should return canReuseValue = false and provide default value
+    const canFix = true;
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-      config, config, properties, field, operator, "valueSrc", true
+      config, config, properties, field, operator, "valueSrc", canFix
     );
     if (!canReuseValue && newValueSrc.get(delta) == srcKey) {
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), newValue.get(delta));
