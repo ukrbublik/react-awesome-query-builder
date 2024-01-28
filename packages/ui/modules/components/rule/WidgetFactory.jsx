@@ -9,7 +9,7 @@ export default ({
   delta, isFuncArg, valueSrc,
   value: immValue, valueError: immValueError, fieldError, asyncListValues,
   isSpecialRange, fieldDefinition,
-  widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
+  widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler, setFuncValue,
   config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId, widgetId,
 }) => {
   const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
@@ -59,6 +59,7 @@ export default ({
     placeholders: valueLabels ? valueLabels.placeholder : null,
     textSeparators: textSeparators,
     setValue: setValueHandler,
+    setFuncValue,
     readonly: readonly,
     asyncListValues: asyncListValues,
     id, groupId, widgetId,

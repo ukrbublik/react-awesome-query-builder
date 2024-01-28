@@ -76,6 +76,29 @@ export const setValueSrc = (config, path, delta, srcKey, _meta) => ({
 /**
  * @param {object} config
  * @param {Immutable.List} path
+ * @param {integer} delta
+ * @param {Array} parentFuncs
+ * @param {string | null} argKey
+ * @param {*} value
+ * @param {string | "!valueSrc"} valueType
+ * @param {*} asyncListValues
+ */
+export const setFuncValue = (config, path, delta, parentFuncs, argKey, value, valueType, asyncListValues, _meta) => ({
+  type: constants.SET_FUNC_VALUE,
+  path: toImmutableList(path),
+  delta,
+  parentFuncs,
+  argKey,
+  value,
+  valueType,
+  asyncListValues,
+  config,
+  _meta,
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
  * @param {string} name
  * @param {*} value
  */

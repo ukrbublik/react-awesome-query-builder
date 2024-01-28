@@ -33,6 +33,7 @@ export default class Widget extends Component {
     //actions
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
+    setFuncValue: PropTypes.func,
     // for isFuncArg
     isFuncArg: PropTypes.bool,
     fieldFunc: PropTypes.string,
@@ -81,8 +82,7 @@ export default class Widget extends Component {
 
   _setValue = (
     isSpecialRange, delta, widgetType, widgetId, // bound!
-    value, asyncListValues,
-    _meta = {}
+    value, asyncListValues, _meta = {}
   ) => {
     if (!_meta.widgetId) {
       _meta.widgetId = widgetId;
@@ -181,7 +181,7 @@ export default class Widget extends Component {
       const widgetId = [
         id,
         isLHS ? "L" : "R",
-        delta,
+        isLHS ? -1 : (delta || 0),
         (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
       ].join(":");
       const vsId = widgetId + ":" + "VS";
@@ -221,7 +221,7 @@ export default class Widget extends Component {
   renderWidget = (delta, meta, props) => {
     const {
       config, isFuncArg, leftField, operator, value: values, valueError, fieldError,
-      readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS,
+      readonly, parentField, parentFuncs, id, groupId, fieldSrc, fieldType, isLHS, setFuncValue,
     } = props;
     const {settings} = config;
     const { widgets, iValues, aField, valueSources } = meta;
@@ -251,7 +251,10 @@ export default class Widget extends Component {
           isFuncArg={isFuncArg}
           isLHS={isLHS}
           {...pick(meta, ["isSpecialRange", "fieldDefinition", "asyncListValues"])}
-          {...pick(widgets[delta], ["widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler"])}
+          {...pick(widgets[delta], [
+            "widget", "widgetDefinition", "widgetValueLabel", "valueLabels", "textSeparators", "setValueHandler",
+          ])}
+          setFuncValue={setFuncValue}
           config={config}
           field={field}
           fieldSrc={fieldSrc}

@@ -142,6 +142,11 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
     };
 
+    // can be used for both LHS and LHS
+    setFuncValue = (delta, parentFuncs, argKey, value, type, asyncListValues, _meta) => {
+      this.props.actions.setFuncValue(this.props.path, delta, parentFuncs, argKey, value, type, asyncListValues, _meta);
+    };
+
     render() {
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const currentNesting = this.props.path.size;
@@ -180,6 +185,7 @@ const createGroupContainer = (Group, itemType) =>
               addDefaultCaseGroup={this.dummyFn}
               addRule={this.dummyFn}
               setField={this.dummyFn}
+              setFuncValue={this.dummyFn}
               setOperator={this.dummyFn}
               setValue={this.dummyFn}
               value={this.props.value || null}
@@ -219,6 +225,7 @@ const createGroupContainer = (Group, itemType) =>
               addDefaultCaseGroup={isInDraggingTempo ? this.dummyFn : this.addDefaultCaseGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
+              setFuncValue={isInDraggingTempo ? this.dummyFn : this.setFuncValue}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
               value={this.props.value || null}

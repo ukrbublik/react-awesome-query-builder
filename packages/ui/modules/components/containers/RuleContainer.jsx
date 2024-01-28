@@ -77,6 +77,11 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setValueSrc(this.props.path, delta, srcKey, _meta);
     };
 
+    // can be used for both LHS and LHS
+    setFuncValue = (delta, parentFuncs, argKey, value, type, asyncListValues, _meta) => {
+      this.props.actions.setFuncValue(this.props.path, delta, parentFuncs, argKey, value, type, asyncListValues, _meta);
+    };
+
     shouldComponentUpdate(nextProps, nextState) {
       let prevProps = this.props;
       let prevState = this.state;
@@ -130,6 +135,7 @@ const createRuleContainer = (Rule) =>
               dragging={this.props.dragging}
               setField={this.dummyFn}
               setFieldSrc={this.dummyFn}
+              setFuncValue={this.dummyFn}
               setOperator={this.dummyFn}
               setOperatorOption={this.dummyFn}
               setLock={this.dummyFn}
@@ -167,6 +173,7 @@ const createRuleContainer = (Rule) =>
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setFieldSrc={isInDraggingTempo ? this.dummyFn : this.setFieldSrc}
+              setFuncValue={isInDraggingTempo ? this.dummyFn : this.setFuncValue}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
               setOperatorOption={isInDraggingTempo ? this.dummyFn : this.setOperatorOption}
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}

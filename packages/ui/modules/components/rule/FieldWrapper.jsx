@@ -23,7 +23,8 @@ export default class FieldWrapper extends PureComponent {
 
   renderField = () => {
     const {
-      config, classname, selectedField, selectedFieldSrc, selectedFieldType, setField, parentField, readonly, id, groupId,
+      config, classname, selectedField, selectedFieldSrc, selectedFieldType, 
+      setField, setFuncValue, parentField, readonly, id, groupId,
       fieldError, valueError,
     } = this.props;
     const supportedFieldSrcs = ["func", "field"];
@@ -41,6 +42,7 @@ export default class FieldWrapper extends PureComponent {
         valueError={valueError}
         parentField={parentField}
         setValue={setField}
+        setFuncValue={setFuncValue}
         readonly={readonly}
         id={id}
         groupId={groupId}

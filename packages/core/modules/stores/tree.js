@@ -20,6 +20,7 @@ import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
 import {validateValue, validateRange} from "../utils/validation";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
+import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
 
 /**
  * @param {object} config
@@ -329,7 +330,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
  * @param {integer} delta
- * @param {*} srcKey
+ * @param {string} srcKey
  */
 const setFieldSrc = (state, path, srcKey, config) => {
   const {keepInputOnChangeFieldSrc} = config.settings;
@@ -371,7 +372,71 @@ const setFieldSrc = (state, path, srcKey, config) => {
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
- * @param {string} field
+ * @param {integer} delta
+ * @param {Array} parentFuncs
+ * @param {string | null} argKey
+ * @param {*} value
+ * @param {string | "!valueSrc"} valueType
+ * @param {*} asyncListValues
+ */
+const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue, valueType, asyncListValues, _meta) => {
+  const isLHS = delta === -1;
+
+  const currentProperties = state.getIn(expandTreePath(path, "properties"));
+  const currentField = currentProperties.get("field");
+  const currentValue = currentProperties.get("value");
+  const currentV = isLHS ? currentField : currentValue;
+
+  let funcsPath = [];
+  let parent = currentV;
+  let pars = [];
+  for (const [funcK, argK] of parentFuncs || []) {
+    funcsPath.push([funcK, argK]);
+    if (funcK !== parent.get("func")) {
+      const funcPath = funcsPath.map(([f, a]) => `${f}(${a})`).join("/") || "root";
+      throw new Error(`In ${isLHS ? "LHS" : "RHS"} for path ${funcPath} expected func key ${funcK} but got ${parent.get("func")}`);
+    }
+    pars.push(parent);
+    parent = parent.getIn(["args", argK, "value"]);
+  }
+
+  if (!argKey) {
+    parent = setFunc(parent, argValue, config);
+  } else {
+    const funcKey = parent.get("func");
+    const funcDefinition = getFuncConfig(config, funcKey);
+    const {args} = funcDefinition;
+    const argDefinition = args[argKey];
+
+    if (valueType === "!valueSrc") {
+      parent = setArgValueSrc(parent, argKey, argValue, argDefinition, config);
+    } else {
+      parent = setArgValue(parent, argKey, argValue, argDefinition, config);
+    }
+  }
+
+  while (funcsPath.length) {
+    const [funcK, argK] = funcsPath.pop();
+    let newParent = pars.pop();
+    const funcDefinition = getFuncConfig(config, funcK);
+    const {args} = funcDefinition;
+    const argDefinition = args[argK];
+    newParent = setArgValue(newParent, argK, parent, argDefinition, config);
+    parent = newParent;
+  }
+
+  if (isLHS) {
+    return setField(state, path, parent, config, asyncListValues, _meta);
+  } else {
+    debugger
+    return state;
+  }
+}
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
+ * @param {string | Immutable.OrderedMap} newField
  */
 const setField = (state, path, newField, config, asyncListValues, _meta = {}) => {
   const { __isInternal } = _meta;
@@ -894,6 +959,18 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
       const {optimizeRenderWithInternals} = action.config.settings;
       const {tree, isInternalValueChange} = setValue(
         state.tree, action.path, action.delta, action.value, action.valueType,  action.config,
+        action.asyncListValues, action._meta
+      );
+      set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
+      set.tree = tree;
+      break;
+    }
+
+    case constants.SET_FUNC_VALUE: {
+      const {optimizeRenderWithInternals} = action.config.settings;
+      const {tree, isInternalValueChange} = setFuncValue(
+        action.config, state.tree, action.path, action.delta, action.parentFuncs, 
+        action.argKey, action.value, action.valueType,
         action.asyncListValues, action._meta
       );
       set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;

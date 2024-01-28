@@ -23,6 +23,7 @@ export default class FuncWidget extends Component {
     customProps: PropTypes.object,
     value: PropTypes.object, //instanceOf(Immutable.Map) //with keys 'func' and `args`
     setValue: PropTypes.func.isRequired,
+    setFuncValue: PropTypes.func,
     readonly: PropTypes.bool,
     parentFuncs: PropTypes.array,
     fieldDefinition: PropTypes.object,
@@ -65,43 +66,59 @@ export default class FuncWidget extends Component {
       const widgetId = [
         id,
         isLHS ? "L" : "R",
-        delta || 0,
+        isLHS ? -1 : (delta || 0),
         (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
         "F",
       ].join(":");
       _meta.widgetId = widgetId;
     }
-    this.props.setValue(
-      setFunc(this.props.value, funcKey, this.props.config),
-      undefined,
-      _meta,
+
+    this.props.setFuncValue(
+      isLHS ? -1 : (delta || 0), parentFuncs, null, funcKey, "!func", undefined, _meta
     );
+
+    // old bubbling
+    // this.props.setValue(
+    //   setFunc(this.props.value, funcKey, this.props.config),
+    //   undefined,
+    //   _meta,
+    // );
   };
 
-  setArgValue = (argKey, argVal, asyncListValues, _meta) => {
-    const {config} = this.props;
-    const {funcDefinition} = this.meta;
-    const {args} = funcDefinition;
-    const argDefinition = args[argKey];
+  setArgValue = (argKey, argVal, widgetType, asyncListValues, _meta) => {
+    const {config, delta, isLHS, parentFuncs} = this.props;
 
-    this.props.setValue(
-      setArgValue(this.props.value, argKey, argVal, argDefinition, config),
-      asyncListValues,
-      _meta,
+    this.props.setFuncValue(
+      isLHS ? -1 : (delta || 0), parentFuncs, argKey, argVal, widgetType, asyncListValues, _meta
     );
+
+    // old bubbling
+    // const {funcDefinition} = this.meta;
+    // const {args} = funcDefinition;
+    // const argDefinition = args[argKey];
+    // this.props.setValue(
+    //   setArgValue(this.props.value, argKey, argVal, argDefinition, config),
+    //   asyncListValues,
+    //   _meta,
+    // );
   };
 
   setArgValueSrc = (argKey, argValSrc, _meta) => {
-    const {config} = this.props;
-    const {funcDefinition} = this.meta;
-    const {args} = funcDefinition;
-    const argDefinition = args[argKey];
+    const {config, delta, isLHS, parentFuncs} = this.props;
 
-    this.props.setValue(
-      setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
-      undefined,
-      _meta,
+    this.props.setFuncValue(
+      isLHS ? -1 : (delta || 0), parentFuncs, argKey, argValSrc, "!valueSrc", undefined, _meta
     );
+
+    // old bubbling
+    // const {funcDefinition} = this.meta;
+    // const {args} = funcDefinition;
+    // const argDefinition = args[argKey];
+    // this.props.setValue(
+    //   setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
+    //   undefined,
+    //   _meta,
+    // );
   };
 
   renderFuncSelect = () => {
@@ -156,7 +173,7 @@ export default class FuncWidget extends Component {
   renderArgVal = (funcKey, argKey, argDefinition) => {
     const {
       config, field, fieldType, fieldSrc, isLHS, operator, value, readonly, parentFuncs, id, groupId,
-      fieldError, valueError,
+      fieldError, valueError, setFuncValue,
     } = this.props;
     const arg = value ? value.getIn(["args", argKey]) : null;
     const argVal = arg ? arg.get("value") : undefined;
@@ -178,6 +195,7 @@ export default class FuncWidget extends Component {
       valueSrc: argValSrc,
       setValue: this.setArgValue,
       setValueSrc: this.setArgValueSrc,
+      setFuncValue,
       funcKey,
       argKey,
       argDefinition,
@@ -295,9 +313,9 @@ class ArgWidget extends Component {
     };
   }
 
-  setValue = (_delta, value, _widgetType, asyncListValues, _meta) => {
+  setValue = (_delta, value, widgetType, asyncListValues, _meta) => {
     const {setValue, argKey} = this.props;
-    setValue(argKey, value, asyncListValues, _meta);
+    setValue(argKey, value, widgetType, asyncListValues, _meta);
   };
 
   setValueSrc = (_delta, valueSrc, _meta) => {

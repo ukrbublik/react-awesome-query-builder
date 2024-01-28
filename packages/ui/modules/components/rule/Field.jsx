@@ -157,7 +157,7 @@ export default class Field extends Component {
       const widgetId = [
         id,
         "L",
-        0,
+        -1,
       ].join(":");
       _meta.widgetId = widgetId;
     }
