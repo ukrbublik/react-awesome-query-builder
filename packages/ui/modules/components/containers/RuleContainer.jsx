@@ -53,8 +53,8 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setLock(this.props.path, lock);
     };
 
-    setField = (field, asyncListValues, __isInternal) => {
-      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
+    setField = (field, asyncListValues, _meta) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, _meta);
     };
 
     setFieldSrc = (srcKey) => {
@@ -69,12 +69,12 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setOperatorOption(this.props.path, name, value);
     };
 
-    setValue = (delta, value, type, asyncListValues, __isInternal) => {
-      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, __isInternal);
+    setValue = (delta, value, type, asyncListValues, _meta) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
     };
 
-    setValueSrc = (delta, srcKey) => {
-      this.props.actions.setValueSrc(this.props.path, delta, srcKey);
+    setValueSrc = (delta, srcKey, _meta) => {
+      this.props.actions.setValueSrc(this.props.path, delta, srcKey, _meta);
     };
 
     shouldComponentUpdate(nextProps, nextState) {

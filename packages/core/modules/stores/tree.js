@@ -373,7 +373,8 @@ const setFieldSrc = (state, path, srcKey, config) => {
  * @param {Immutable.List} path
  * @param {string} field
  */
-const setField = (state, path, newField, config, asyncListValues, __isInternal) => {
+const setField = (state, path, newField, config, asyncListValues, _meta = {}) => {
+  const { __isInternal } = _meta;
   let isInternalValueChange;
   if (!newField)
     return {tree: removeItem(state, path), isInternalValueChange};
@@ -396,7 +397,7 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   if (fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
   }
-  
+
   const currentOperator = currentProperties.get("operator");
   const currentOperatorOptions = currentProperties.get("operatorOptions");
   const currentField = currentProperties.get("field");
@@ -446,11 +447,13 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
     state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
   }
 
+  const canFix = !showErrorMessage;
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
-      config, config, currentProperties, newField, newOperator, "field", true
+      config, config, currentProperties, newField, newOperator, "field", canFix
     );
+    //todo: validate group field?
     let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
       fieldSrc: "field",
@@ -505,7 +508,6 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   }
 
   return {tree: state, isInternalValueChange};
-
 };
 
 /**
@@ -570,9 +572,9 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {*} value
  * @param {string} valueType
  * @param {*} asyncListValues
- * @param {boolean} __isInternal
  */
-const setValue = (state, path, delta, value, valueType, config, asyncListValues, __isInternal) => {
+const setValue = (state, path, delta, value, valueType, config, asyncListValues, _meta = {}) => {
+  const { __isInternal } = _meta;
   const {fieldSeparator, showErrorMessage} = config.settings;
   let isInternalValueChange;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
@@ -653,6 +655,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     }
     // set error at delta
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
+    // set range error
+    if (rangeValidationError) {
+      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidationError);
+    }
   }
 
   return {tree: state, isInternalValueChange};
@@ -664,11 +670,11 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
  * @param {integer} delta
  * @param {*} srcKey
  */
-const setValueSrc = (state, path, delta, srcKey, config) => {
+const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
   const {showErrorMessage} = config.settings;
 
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
-  const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
+  //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
 
   state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
@@ -780,7 +786,7 @@ const getActionMeta = (action, state) => {
   if (!action || !action.type)
     return null;
   const actionKeysToOmit = [
-    "config", "asyncListValues", "__isInternal"
+    "config", "asyncListValues"
   ];
   const actionTypesToIgnore = [
     constants.SET_TREE,
@@ -859,11 +865,12 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_FIELD: {
+      const {optimizeRenderWithInternals} = action.config.settings;
       const {tree, isInternalValueChange} = setField(
         state.tree, action.path, action.field, action.config,
-        action.asyncListValues, action.__isInternal
+        action.asyncListValues, action._meta
       );
-      set.__isInternalValueChange = isInternalValueChange;
+      set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
       set.tree = tree;
       break;
     }
@@ -884,16 +891,18 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_VALUE: {
+      const {optimizeRenderWithInternals} = action.config.settings;
       const {tree, isInternalValueChange} = setValue(
-        state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.asyncListValues, action.__isInternal
+        state.tree, action.path, action.delta, action.value, action.valueType,  action.config,
+        action.asyncListValues, action._meta
       );
-      set.__isInternalValueChange = isInternalValueChange;
+      set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
       set.tree = tree;
       break;
     }
 
     case constants.SET_VALUE_SRC: {
-      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config);
+      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config, action._meta);
       break;
     }
 

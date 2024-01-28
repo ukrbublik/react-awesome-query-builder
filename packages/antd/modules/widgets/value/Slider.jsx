@@ -45,24 +45,24 @@ export default class SliderWidget extends Component {
 
   handleChange = (val) => {
     const {internalValue} = this.state;
-    const {optimizeRender} = this.props.config.settings;
+    const {optimizeRenderWithInternals} = this.props.config.settings;
     if (val === "")
       val = undefined;
-    if (optimizeRender)
+    if (optimizeRenderWithInternals)
       this.setState({internalValue: val});
     const didEmptinessChanged = !!val !== !!internalValue;
-    const canUseSetInternal = optimizeRender && !didEmptinessChanged;
-    this.props.setValue(val, undefined, canUseSetInternal);
+    const __isInternal = optimizeRenderWithInternals && !didEmptinessChanged;
+    this.props.setValue(val, undefined, { __isInternal });
   };
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    const {optimizeRender} = nextProps.config.settings;
+    const {optimizeRenderWithInternals} = nextProps.config.settings;
     const should = this.pureShouldComponentUpdate(nextProps, nextState);
     if (should) {
       // RHL fix
-      if (this.props.cacheBusterProp && __isInternal) {
+      if (this.props.cacheBusterProp && optimizeRenderWithInternals) {
         nextState.internalValue = this.state.internalValue;
       }
     }
@@ -72,12 +72,12 @@ export default class SliderWidget extends Component {
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, errorMessage} = this.props;
     const {internalValue} = this.state;
-    const {renderSize, showErrorMessage, defaultSliderWidth, optimizeRender} = config.settings;
+    const {renderSize, showErrorMessage, defaultSliderWidth, optimizeRenderWithInternals} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
 
-    const canUseInternal = optimizeRender && (showErrorMessage ? true : !errorMessage);
+    const canUseInternal = optimizeRenderWithInternals && (showErrorMessage ? true : !errorMessage);
     let aValue = canUseInternal ? internalValue : value;
     if (aValue == undefined)
       aValue = null;

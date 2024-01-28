@@ -129,8 +129,8 @@ const createGroupContainer = (Group, itemType) =>
     };
 
     // for RuleGroup
-    setField = (field, asyncListValues, __isInternal) => {
-      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
+    setField = (field, asyncListValues, _meta) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, _meta);
     };
 
     // for RuleGroupExt
@@ -138,8 +138,8 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.setOperator(this.props.path, operator);
     };
 
-    setValue = (delta, value, type) => {
-      this.props.actions.setValue(this.props.path, delta, value, type);
+    setValue = (delta, value, type, asyncListValues, _meta) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
     };
 
     render() {

@@ -11,6 +11,7 @@ import {Col} from "../utils";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
 const { createListFromArray } = Utils.DefaultUtils;
+const {shallowEqual} = Utils.OtherUtils;
 
 const funcArgDummyOpDef = {cardinality: 1};
 
@@ -57,15 +58,20 @@ export default class Widget extends Component {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForMeta = [
-      "config", "field", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "isFuncArg", "asyncListValues", "isLHS"
+      "config", "id", "parentFuncs",
+      "field", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "asyncListValues",
+      "isLHS", "isFuncArg", "isForRuleGroup", "isCaseValue",
     ];
     const needUpdateMeta = !this.meta 
           || keysForMeta
             .map(k => (
-              nextProps[k] !== prevProps[k] 
-                  //tip: for isFuncArg we need to wrap value in Imm list
-                  || k == "isFuncArg" && nextProps["isFuncArg"] && nextProps["value"] !== prevProps["value"])
-            )
+              k === "parentFuncs"
+              ? !shallowEqual(nextProps[k], prevProps[k], true)
+              //tip: for isFuncArg we need to wrap value in Imm list
+              : k === "isFuncArg"
+                ? nextProps[k] !== prevProps[k] || nextProps["isFuncArg"] && nextProps["value"] !== prevProps["value"]
+                : nextProps[k] !== prevProps[k]
+            ))
             .filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
@@ -73,25 +79,38 @@ export default class Widget extends Component {
     }
   }
 
-  _setValue = (isSpecialRange, delta, widgetType, value, asyncListValues, __isInternal) => {
+  _setValue = (
+    isSpecialRange, delta, widgetType, widgetId, // bound!
+    value, asyncListValues,
+    _meta = {}
+  ) => {
+    if (!_meta.widgetId) {
+      _meta.widgetId = widgetId;
+    }
     if (isSpecialRange && Array.isArray(value)) {
       const oldRange = [this.props.value.get(0), this.props.value.get(1)];
       if (oldRange[0] != value[0])
-        this.props.setValue(0, value[0], widgetType, asyncListValues, __isInternal);
+        this.props.setValue(0, value[0], widgetType, asyncListValues, _meta);
       if (oldRange[1] != value[1])
-        this.props.setValue(1, value[1], widgetType, asyncListValues, __isInternal);
+        this.props.setValue(1, value[1], widgetType, asyncListValues, _meta);
     } else {
-      this.props.setValue(delta, value, widgetType, asyncListValues, __isInternal);
+      this.props.setValue(delta, value, widgetType, asyncListValues, _meta);
     }
   };
 
-  _onChangeValueSrc = (delta, srcKey) => {
-    this.props.setValueSrc(delta, srcKey);
+  _setValueSrc = (
+    delta, widgetId, // bound!
+    srcKey
+  ) => {
+    const _meta = {
+      widgetId,
+    };
+    this.props.setValueSrc(delta, srcKey, _meta);
   };
 
   getMeta({
     config, field: simpleField, fieldSrc, fieldType, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
-    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues
+    isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues, parentFuncs, isLHS, id,
   }) {
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     const isOkWithoutField = !simpleField && fieldType;
@@ -144,7 +163,6 @@ export default class Widget extends Component {
       const valueLabel = getValueLabel(config, field, operator, delta, valueSrc, isTrueSpecialRange);
       const widgetValueLabel = getValueLabel(config, field, operator, delta, null, isTrueSpecialRange);
       const sepText = operatorDefinition?.textSeparators ? operatorDefinition?.textSeparators[delta] : null;
-      const setValueSrcHandler = this._onChangeValueSrc.bind(this, delta);
 
       let valueLabels = null;
       let textSeparators = null;
@@ -160,19 +178,29 @@ export default class Widget extends Component {
         textSeparators = operatorDefinition?.textSeparators;
       }
 
-      const setValueHandler = this._setValue.bind(this, isSpecialRange, delta, widgetType);
+      const widgetId = [
+        id,
+        isLHS ? "L" : "R",
+        delta,
+        (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
+      ].join(":");
+      const vsId = widgetId + ":" + "VS";
+
+      const setValueSrcHandler = this._setValueSrc.bind(this, delta, vsId);
+      const setValueHandler = this._setValue.bind(this, isSpecialRange, delta, widgetType, widgetId);
 
       return {
         valueSrc,
         valueLabel,
         widget,
         sepText,
-        setValueSrcHandler,
         widgetDefinition,
         widgetValueLabel,
         valueLabels,
         textSeparators,
-        setValueHandler
+        setValueSrcHandler,
+        setValueHandler,
+        widgetId,
       };
     });
       
@@ -199,7 +227,7 @@ export default class Widget extends Component {
     const { widgets, iValues, aField, valueSources } = meta;
     const value = isFuncArg ? iValues : values;
     const field = isFuncArg ? leftField : aField;
-    const {valueSrc, valueLabel} = widgets[delta];
+    const { valueSrc, valueLabel, widgetId } = widgets[delta];
     const hasValueSources = valueSources.length > 1 && !readonly;
     
     const widgetLabel = settings.showLabels
@@ -212,8 +240,9 @@ export default class Widget extends Component {
       )}>
         {valueSrc == "func" ? null : widgetLabel}
         <WidgetFactory
-          id={id}
+          id={id} // id of rule
           groupId={groupId}
+          widgetId={widgetId}
           valueSrc={valueSrc}
           delta={delta}
           value={value}

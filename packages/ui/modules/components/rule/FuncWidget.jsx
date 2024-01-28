@@ -7,6 +7,7 @@ import {Col} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 const {getFuncConfig} = Utils.ConfigUtils;
 const {setFunc, setArgValue, setArgValueSrc} = Utils.FuncUtils;
+const {shallowEqual} = Utils.OtherUtils;
 
 
 export default class FuncWidget extends Component {
@@ -40,7 +41,9 @@ export default class FuncWidget extends Component {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForMeta = ["config", "field", "operator", "value", "fieldSrc", "fieldType", "isLHS"];
-    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateMeta = !this.meta || keysForMeta.map(k =>
+      (k === "parentFuncs" ? !shallowEqual(nextProps[k], prevProps[k], true) : nextProps[k] !== prevProps[k])
+    ).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
@@ -56,11 +59,26 @@ export default class FuncWidget extends Component {
     };
   }
 
-  setFunc = (funcKey) => {
-    this.props.setValue( setFunc(this.props.value, funcKey, this.props.config) );
+  setFunc = (funcKey, _meta = {}) => {
+    const { isLHS, delta, parentFuncs, id } = this.props;
+    if (!_meta.widgetId) {
+      const widgetId = [
+        id,
+        isLHS ? "L" : "R",
+        delta || 0,
+        (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
+        "F",
+      ].join(":");
+      _meta.widgetId = widgetId;
+    }
+    this.props.setValue(
+      setFunc(this.props.value, funcKey, this.props.config),
+      undefined,
+      _meta,
+    );
   };
 
-  setArgValue = (argKey, argVal, asyncListValues, __isInternal) => {
+  setArgValue = (argKey, argVal, asyncListValues, _meta) => {
     const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
@@ -69,11 +87,11 @@ export default class FuncWidget extends Component {
     this.props.setValue(
       setArgValue(this.props.value, argKey, argVal, argDefinition, config),
       asyncListValues,
-      __isInternal
+      _meta,
     );
   };
 
-  setArgValueSrc = (argKey, argValSrc) => {
+  setArgValueSrc = (argKey, argValSrc, _meta) => {
     const {config} = this.props;
     const {funcDefinition} = this.meta;
     const {args} = funcDefinition;
@@ -81,6 +99,8 @@ export default class FuncWidget extends Component {
 
     this.props.setValue(
       setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
+      undefined,
+      _meta,
     );
   };
 
@@ -258,7 +278,9 @@ class ArgWidget extends Component {
   onPropsChanged(nextProps) {
     const prevProps = this.props;
     const keysForMeta = ["parentFuncs", "funcKey", "argKey"];
-    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateMeta = !this.meta || keysForMeta.map(k =>
+      (k === "parentFuncs" ? !shallowEqual(nextProps[k], prevProps[k], true) : nextProps[k] !== prevProps[k])
+    ).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
@@ -273,14 +295,14 @@ class ArgWidget extends Component {
     };
   }
 
-  setValue = (_delta, value, _widgetType, asyncListValues, __isInternal) => {
+  setValue = (_delta, value, _widgetType, asyncListValues, _meta) => {
     const {setValue, argKey} = this.props;
-    setValue(argKey, value, asyncListValues, __isInternal);
+    setValue(argKey, value, asyncListValues, _meta);
   };
 
-  setValueSrc = (_delta, valueSrc, _widgetType) => {
+  setValueSrc = (_delta, valueSrc, _meta) => {
     const {setValueSrc, argKey} = this.props;
-    setValueSrc(argKey, valueSrc);
+    setValueSrc(argKey, valueSrc, _meta);
   };
 
   render() {

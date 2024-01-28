@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
-const __isInternal = true; //true to optimize render
 
 export default (props) => {
   const {value, setValue, config, readonly, placeholder, customProps, maxLength, errorMessage} = props;
-  const {showErrorMessage} = config.settings;
+  const {showErrorMessage, optimizeRenderWithInternals} = config.settings;
   const [internalValue, setInternalValue] = useState(value);
 
   useEffect(() => {
@@ -18,13 +17,13 @@ export default (props) => {
     if (val === "")
       val = undefined; // don't allow empty value
 
-    if (__isInternal)
+    if (optimizeRenderWithInternals)
       setInternalValue(val);
     const didEmptinessChanged = !!val !== !!internalValue;
-    const canUseSetInternal = __isInternal && !didEmptinessChanged;
-    setValue(val, undefined, canUseSetInternal);
+    const __isInternal = optimizeRenderWithInternals && !didEmptinessChanged;
+    setValue(val, undefined, { __isInternal });
   };
-  const canUseInternal = __isInternal && (showErrorMessage ? true : !errorMessage);
+  const canUseInternal = optimizeRenderWithInternals && (showErrorMessage ? true : !errorMessage);
   const textValue = (canUseInternal ? internalValue : value) || "";
 
   return (

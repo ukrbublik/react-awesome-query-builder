@@ -563,6 +563,7 @@ interface AbstractWidgetProps<C = Config> {
   readonly?: boolean,
   id?: string, // id of rule
   groupId?: string, // id of parent group
+  widgetId?: string, // unique id of widget
   isLHS: boolean,
   isSpecialRange: boolean,
   isFuncArg: boolean,
@@ -1141,7 +1142,7 @@ export interface BehaviourSettings {
   maxNumberOfRules?: Number,
   maxNumberOfCases?: Number,
   showErrorMessage?: boolean,
-  optimizeRender?: boolean,
+  optimizeRenderWithInternals?: boolean,
   canShortMongoQuery?: boolean,
   convertableWidgets?: TypedMap<Array<string>>,
   removeEmptyGroupsOnLoad?: boolean,

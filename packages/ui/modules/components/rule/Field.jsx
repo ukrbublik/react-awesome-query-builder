@@ -151,8 +151,21 @@ export default class Field extends Component {
     }).filter(o => !!o);
   }
 
+  setField = (field, asyncListValues, _meta = {}) => {
+    const {id} = this.props;
+    if (!_meta.widgetId) {
+      const widgetId = [
+        id,
+        "L",
+        0,
+      ].join(":");
+      _meta.widgetId = widgetId;
+    }
+    this.props.setField(field, asyncListValues, _meta);
+  };
+
   render() {
-    const {config, customProps, setField, setFieldSrc, readonly, id, groupId} = this.props;
+    const {config, customProps, setFieldSrc, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
       id,
@@ -160,7 +173,7 @@ export default class Field extends Component {
       config, 
       customProps, 
       readonly,
-      setField,
+      setField: this.setField,
       setFieldSrc,
       ...this.meta
     };

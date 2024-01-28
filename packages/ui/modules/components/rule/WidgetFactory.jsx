@@ -10,7 +10,7 @@ export default ({
   value: immValue, valueError: immValueError, fieldError, asyncListValues,
   isSpecialRange, fieldDefinition,
   widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
-  config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId
+  config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId, widgetId,
 }) => {
   const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
   const isConst = isFuncArg && fieldDefinition.valueSources && fieldDefinition.valueSources.length == 1 && fieldDefinition.valueSources[0] == "const";
@@ -61,7 +61,7 @@ export default ({
     setValue: setValueHandler,
     readonly: readonly,
     asyncListValues: asyncListValues,
-    id, groupId
+    id, groupId, widgetId,
   }, [
     ..._widgetDefKeysToOmit,
     "toJS"

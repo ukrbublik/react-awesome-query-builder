@@ -27,7 +27,7 @@ export const settings = {
   removeEmptyGroupsOnLoad: true,
   removeIncompleteRulesOnLoad: true,
   removeInvalidMultiSelectValuesOnLoad: true,
-  optimizeRender: true,
+  optimizeRenderWithInternals: true,
   showErrorMessage: false,
   setOpOnChangeField: ["keep", "default"], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
   groupOperators: ["some", "all", "none"],
