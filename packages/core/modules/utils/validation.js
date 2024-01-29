@@ -318,7 +318,10 @@ function validateRule (item, path, itemId, meta, c) {
  * @param {bool} isEndValue false if value is in process of editing by user
  * @return {array} [validationError, fixedValue] - if validationError === null and canFix == true, fixedValue can differ from value if was fixed
  */
-export const validateValue = (config, leftField, field, operator, value, valueType, valueSrc, asyncListValues, canFix = false, isEndValue = false) => {
+export const validateValue = (
+  config, leftField, field, operator, value, valueType, valueSrc, asyncListValues,
+  canFix = false, isEndValue = false, canDrop = false
+) => {
   let validationError = null;
   let fixedValue = value;
 
@@ -326,7 +329,7 @@ export const validateValue = (config, leftField, field, operator, value, valueTy
     if (valueSrc == "field") {
       [validationError, fixedValue] = validateFieldValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     } else if (valueSrc == "func") {
-      [validationError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
+      [validationError, fixedValue] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix, canDrop);
     } else if (valueSrc == "value" || !valueSrc) {
       [validationError, fixedValue] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, isEndValue, canFix);
     }
@@ -460,7 +463,10 @@ const validateFieldValue = (leftField, field, value, _valueSrc, valueType, async
 /**
 * 
 */
-const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncListValues, config, operator = null, isEndValue = false, canFix = false) => {
+const validateFuncValue = (
+  leftField, field, value, _valueSrc, valueType, asyncListValues, config, operator = null,
+  isEndValue = false, canFix = false, canDrop = false
+) => {
   let fixedValue = value;
 
   if (value) {
@@ -486,12 +492,12 @@ const validateFuncValue = (leftField, field, value, _valueSrc, valueType, asyncL
             const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
             if (argValue !== undefined) {
               const [argValidationError, fixedArgVal] = validateValue(
-                config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue
+                config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, canDrop,
               );
               const willFix = fixedArgVal !== argValue;
               const hasError = argValidationError !== null;
               //tip: reset to default ONLY if isEndValue==true
-              const needDrop = hasError && !willFix && isEndValue && canFix && argConfig.defaultValue !== undefined;
+              const needDrop = hasError && !willFix && canFix && (isEndValue || canDrop);
               if (willFix) {
                 fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
               }

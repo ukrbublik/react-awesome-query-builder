@@ -379,9 +379,8 @@ const setFieldSrc = (state, path, srcKey, config) => {
  * @param {string | "!valueSrc"} valueType
  * @param {*} asyncListValues
  */
-const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue, valueType, asyncListValues, _meta) => {
+const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue, valueType, asyncListValues, _meta = {}) => {
   const isLHS = delta === -1;
-
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const currentField = currentProperties.get("field");
   const currentValue = currentProperties.get("value");
@@ -404,6 +403,8 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
   // modify
   if (!argKey) {
     targetFV = setFunc(targetFV, argValue, config);
+    // allow dropping invalid args
+    _meta.canDrop = true;
   } else {
     const funcKey = targetFV.get("func");
     const funcDefinition = getFuncConfig(config, funcKey);
@@ -440,7 +441,7 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
  * @param {string | Immutable.OrderedMap} newField
  */
 const setField = (state, path, newField, config, asyncListValues, _meta = {}) => {
-  const { __isInternal } = _meta;
+  const { __isInternal, isEndValue, canDrop } = _meta;
   let isInternalValueChange;
   if (!newField)
     return {tree: removeItem(state, path), isInternalValueChange};
@@ -517,7 +518,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
-      config, config, currentProperties, newField, newOperator, "field", canFix
+      config, config, currentProperties, newField, newOperator, "field", canFix, isEndValue, canDrop
     );
     //todo: validate group field?
     let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
@@ -536,7 +537,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
     state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
     state = state.setIn(expandTreePath(path, "properties"), groupProperties);
     if (newFieldConfig.initialEmptyWhere && operatorCardinality == 1) { // just `COUNT(grp) > 1` without `HAVING ..`
-      // no childeren
+      // no children
     } else {
       state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
     }
@@ -544,7 +545,7 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
   } else {
     state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
       const {canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError, fixedField} = getNewValueForFieldOp(
-        config, config, current, newField, newOperator, "field", canFix
+        config, config, current, newField, newOperator, "field", canFix, isEndValue, canDrop
       );
       let newFixedField = newField;
       if (fixedField !== newField) {
@@ -596,6 +597,7 @@ const setOperator = (state, path, newOperator, config) => {
   const isRuleGroup = fieldConfig?.type == "!group";
   const operatorConfig = getOperatorConfig(config, newOperator, currentField);
   const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const canFix = true;
 
   state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
     const currentField = current.get("field");
@@ -605,7 +607,7 @@ const setOperator = (state, path, newOperator, config) => {
     const _currentOperator = current.get("operator");
 
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-      config, config, current, currentField, newOperator, "operator", true
+      config, config, current, currentField, newOperator, "operator", canFix
     );
     if (showErrorMessage) {
       current = current
@@ -644,7 +646,7 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {*} asyncListValues
  */
 const setValue = (state, path, delta, value, valueType, config, asyncListValues, _meta = {}) => {
-  const { __isInternal } = _meta;
+  const { __isInternal, canDrop, isEndValue } = _meta;
   const {fieldSeparator, showErrorMessage} = config.settings;
   let isInternalValueChange;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
@@ -657,11 +659,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const operatorConfig = getOperatorConfig(config, operator, field);
   const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
 
-  const isEndValue = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = !showErrorMessage;
   const [validationError, fixedValue] = validateValue(
-    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
+    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, canDrop
   );
   // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
   //  (get exact value from listValues, not string)

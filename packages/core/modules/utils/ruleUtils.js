@@ -24,7 +24,10 @@ export const selectTypes = [
  * @param {string} changedProp
  * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, newFieldError}
  */
-export const getNewValueForFieldOp = function (config, oldConfig = null, current, newField, newOperator, changedProp = null, canFix = true, isEndValue = false) {
+export const getNewValueForFieldOp = function (
+  config, oldConfig = null, current, newField, newOperator, changedProp = null,
+  canFix = true, isEndValue = false, canDrop = false
+) {
   if (!oldConfig)
     oldConfig = config;
   const {
@@ -83,14 +86,14 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
   // validate func LHS
   if (currentFieldSrc === "func" && newField) {
     const [fieldValidationError, fixedField] = validateValue(
-      config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, canFix, isEndValue
+      config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, canFix, isEndValue, canDrop
     );
     const isValid = !fieldValidationError;
     const willFix = fixedField !== newField;
     const willRevert = !isValid && !willFix && canFix;
     const isTerminalError = !isValid && !willFix;
     const showFieldError = !isValid && !willFix && !willRevert && showErrorMessage;
-    console.log(111, { isValid, willFix, isTerminalError, showFieldError, f1: fixedField === newField, newField: newField.toJS() })
+    console.log(111, { isValid, willFix, isEndValue, canDrop, canFix, isTerminalError, showFieldError, f1: fixedField === newField, newField: newField.toJS() })
     if (willFix) {
       newField = fixedField;
     } else if (willRevert) {
@@ -146,7 +149,7 @@ export const getNewValueForFieldOp = function (config, oldConfig = null, current
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const [validationError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, canDrop
       );
       const isValid = !validationError;
       // Allow bad value with error message
