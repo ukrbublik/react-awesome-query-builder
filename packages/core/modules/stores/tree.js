@@ -385,51 +385,52 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const currentField = currentProperties.get("field");
   const currentValue = currentProperties.get("value");
-  const currentV = isLHS ? currentField : currentValue;
+  const currentV = isLHS ? currentField : currentValue.getIn([delta]);
 
+  // go inwards
   let funcsPath = [];
-  let parent = currentV;
-  let pars = [];
+  let targetFV = currentV;
   for (const [funcK, argK] of parentFuncs || []) {
-    funcsPath.push([funcK, argK]);
-    if (funcK !== parent.get("func")) {
+    funcsPath.push([funcK, argK, targetFV]);
+    if (funcK !== targetFV.get("func")) {
       const funcPath = funcsPath.map(([f, a]) => `${f}(${a})`).join("/") || "root";
-      throw new Error(`In ${isLHS ? "LHS" : "RHS"} for path ${funcPath} expected func key ${funcK} but got ${parent.get("func")}`);
+      throw new Error(
+        `In ${isLHS ? "LHS" : "RHS"} for path ${funcPath} expected func key ${funcK} but got ${parent.get("func")}`
+      );
     }
-    pars.push(parent);
-    parent = parent.getIn(["args", argK, "value"]);
+    targetFV = targetFV.getIn(["args", argK, "value"]);
   }
 
+  // modify
   if (!argKey) {
-    parent = setFunc(parent, argValue, config);
+    targetFV = setFunc(targetFV, argValue, config);
   } else {
-    const funcKey = parent.get("func");
+    const funcKey = targetFV.get("func");
     const funcDefinition = getFuncConfig(config, funcKey);
     const {args} = funcDefinition;
     const argDefinition = args[argKey];
 
     if (valueType === "!valueSrc") {
-      parent = setArgValueSrc(parent, argKey, argValue, argDefinition, config);
+      targetFV = setArgValueSrc(targetFV, argKey, argValue, argDefinition, config);
     } else {
-      parent = setArgValue(parent, argKey, argValue, argDefinition, config);
+      targetFV = setArgValue(targetFV, argKey, argValue, argDefinition, config);
     }
   }
 
+  // go outwards
+  let newV = targetFV;
   while (funcsPath.length) {
-    const [funcK, argK] = funcsPath.pop();
-    let newParent = pars.pop();
+    const [funcK, argK, parentFV] = funcsPath.pop();
     const funcDefinition = getFuncConfig(config, funcK);
     const {args} = funcDefinition;
     const argDefinition = args[argK];
-    newParent = setArgValue(newParent, argK, parent, argDefinition, config);
-    parent = newParent;
+    newV = setArgValue(parentFV, argK, newV, argDefinition, config);
   }
 
   if (isLHS) {
-    return setField(state, path, parent, config, asyncListValues, _meta);
+    return setField(state, path, newV, config, asyncListValues, _meta);
   } else {
-    debugger
-    return state;
+    return setValue(state, path, delta, newV, undefined, config, asyncListValues, _meta);
   }
 }
 
@@ -542,22 +543,26 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
     state = fixPathsInTree(state);
   } else {
     state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
-      const {canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError} = getNewValueForFieldOp(
-        config, config, current, newField, newOperator, "field", true
+      const {canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError, fixedField} = getNewValueForFieldOp(
+        config, config, current, newField, newOperator, "field", canFix
       );
-      if (!showErrorMessage && newFieldError) {
-        newField = currentField;
+      let newFixedField = newField;
+      if (fixedField !== newField) {
+        newFixedField = fixedField;
       }
       const didFieldErrorChanged = showErrorMessage ? currentFieldError != newFieldError : !!currentFieldError != !!newFieldError;
-      isInternalValueChange = __isInternal && !didFieldErrorChanged;
+      const didFieldChanged = newFixedField !== newField;
+      isInternalValueChange = !!__isInternal && !didFieldErrorChanged && !didFieldChanged;
+      console.log('setField', {isInternalValueChange, newFieldError, newValueError: newValueError.toJS(), fixedField: fixedField?.toJS?.()})
       if (showErrorMessage || !isInternalValueChange) {
-        current = current
-          .set("valueError", newValueError)
-          .set("fieldError", newFieldError);
+        current = current.set("fieldError", newFieldError);
+        if (newValue !== currentValue) {
+          current = current.set("valueError", newValueError);
+        }
       }
-      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
+      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newFixedField);
       current = current
-        .set("field", newField)
+        .set("field", newFixedField)
         .delete("fieldType") // remove "memory effect"
         .set("fieldSrc", currentFieldSrc)
         .set("operator", newOperator)
@@ -658,10 +663,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const [validationError, fixedValue] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue
   );
-  const isValid = !validationError;
-  if (fixedValue !== value) {
-    // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
-    //  (get exact value from listValues, not string)
+  // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
+  //  (get exact value from listValues, not string)
+  let willFix = fixedValue !== value;
+  if (willFix) {
     value = fixedValue;
   }
 
@@ -675,28 +680,22 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   }
 
   // Additional validation for range values
-  //todo: move away?
-  if (showErrorMessage) {
-    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
-    const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
-        
-    if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
-      const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
-      const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS
-        ? values.map(v => fieldWidgetDefinition.toJS.call(config.ctx, v, fieldWidgetDefinition))
-        : values;
-      const rangeValidateError = operatorConfig.validateValues(jsValues);
+  const values = Array.from({length: operatorCardinality}, (_, i) =>
+    (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
+  const valueSrcs = Array.from({length: operatorCardinality}, (_, i) =>
+    (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
+  const rangeValidationError = validateRange(config, field, operator, values, valueSrcs);
 
-      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);
-    }
-  }
-
+  const isValid = !validationError && !rangeValidationError;
   const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta));
   const lastError = state.getIn(expandTreePath(path, "properties", "valueError", delta));
-  const didErrorChanged = showErrorMessage ? lastError != validationError : !!lastError != !!validationError;
+  const lastRangeError = state.getIn(expandTreePath(path, "properties", "valueError", operatorCardinality));
+  const didDeltaErrorChanged = showErrorMessage ? lastError != validationError : !!lastError != !!validationError;
+  const didRangeErrorChanged = showErrorMessage ? lastRangeError != rangeValidationError : !!lastRangeError != !!rangeValidationError;
+  const didErrorChanged = didDeltaErrorChanged || didRangeErrorChanged;
   const didEmptinessChanged = !!lastValue != !!value;
-  if (isValid || showErrorMessage) {
+
+  if (isValid || showErrorMessage || willFix) {
     state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
     // set only good value
     if (typeof value === "undefined") {
@@ -706,11 +705,13 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
       if (asyncListValues) {
         state = state.setIn(expandTreePath(path, "properties", "asyncListValues"), asyncListValues);
       }
+      console.log('upd state  value=', value)
       state = state.setIn(expandTreePath(path, "properties", "value", delta), value);
       state = state.setIn(expandTreePath(path, "properties", "valueType", delta), calculatedValueType);
     }
   }
-  isInternalValueChange = __isInternal && !didEmptinessChanged && !didErrorChanged;
+  isInternalValueChange = !!__isInternal && !didEmptinessChanged && !didErrorChanged;
+  console.log('.....isInternalValueChange', isInternalValueChange, {isValid, willFix} )
   if (showErrorMessage || !isInternalValueChange) {
     // check list
     const lastValueErrorArr = state.getIn(expandTreePath(path, "properties", "valueError"));

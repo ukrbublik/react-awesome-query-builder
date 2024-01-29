@@ -210,6 +210,7 @@ class Rule extends Component {
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
+      setFuncValue={!immutableValuesMode ? this.props.setFuncValue : dummyFn}
       readonly={immutableValuesMode || isLocked}
       id={this.props.id}
       groupId={this.props.groupId}
