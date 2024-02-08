@@ -1,8 +1,8 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui } from "../support/utils";
-import Slider from "@mui/material/Slider";
-import TextField from "@mui/material/TextField";
+import Slider from "@material-ui/core/Slider";
+import TextField from "@material-ui/core/TextField";
 import { expect } from "chai";
 import { autocompleteTestsFor } from "./Autocomplete";
 
