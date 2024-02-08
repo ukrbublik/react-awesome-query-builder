@@ -5,13 +5,13 @@ import {
   MuiConfig,
 } from "@react-awesome-query-builder/mui";
 import { createConfig } from "./config";
-import { enUS } from "@material-ui/core/locale";
+import { ruRU } from "@mui/material/locale";
 import "@react-awesome-query-builder/mui/css/styles.scss";
 
 const configMixin = {
   settings: {
     locale: {
-      mui: enUS
+      mui: ruRU
     },
   } as Partial<Settings>
 };
