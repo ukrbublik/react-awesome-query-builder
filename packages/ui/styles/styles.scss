@@ -368,6 +368,10 @@ $rule-group-actions-offset-left: 10px !default;
 .group--conjunctions.hide--conj {
   opacity: 0.3;
 }
+.group--actions--tr {
+  opacity: 1 !important
+}
+
 
 .group--actions {
   margin-left: $group-actions-offset-left;
