@@ -1,6 +1,6 @@
 import React from "react";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
 
 const hideLabelsFor = {
   "addRuleGroup": true,

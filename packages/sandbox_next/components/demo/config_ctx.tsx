@@ -3,7 +3,7 @@ import {
   MuiConfig, MuiWidgets, AsyncFetchListValuesResult, ConfigContext, FieldProps
 } from "@react-awesome-query-builder/mui";
 import merge from "lodash/merge";
-import { ukUA } from "@mui/material/locale";
+import { ukUA } from "@material-ui/core/locale";
 //import { ukUA } from "@mui/x-date-pickers/locales"; // todo: throws "TypeError: date.clone is not a function"
 //import "moment/locale/ru";
 const { MuiFieldAutocomplete, MuiFieldSelect } = MuiWidgets;
