@@ -4,7 +4,7 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_mui, hexToRgbString } from "../support/utils";
 import { getAutocompleteUtils } from "../support/autocomplete";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@material-ui/core/Select";
 
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
