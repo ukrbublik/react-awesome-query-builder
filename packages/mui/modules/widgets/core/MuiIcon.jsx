@@ -1,8 +1,8 @@
 import React from "react";
-import DragHandle from "@material-ui/icons/DragHandle";
-import DeleteIcon from "@material-ui/icons/Delete";
-import AddIcon from "@material-ui/icons/Add";
-import Icon from "@material-ui/core/Icon";
+import DragHandle from "@mui/icons-material/DragHandle";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import Icon from "@mui/material/Icon";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { DragIcon } = Utils;
 
