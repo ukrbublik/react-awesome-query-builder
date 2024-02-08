@@ -1,8 +1,8 @@
 import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version
-import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
+import FormControl from "@material-ui/core/FormControl";
+import TextField from "@material-ui/core/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { moment } = Utils;
 const xdpVersion = xdpPackage?.version?.split(".")?.[0];
