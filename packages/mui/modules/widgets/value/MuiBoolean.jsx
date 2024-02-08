@@ -1,8 +1,8 @@
 import React from "react";
-import Switch from "@material-ui/core/Switch";
-import FormControl from "@material-ui/core/FormControl";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import Switch from "@mui/material/Switch";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 
 export default (props) => {
   const { customProps, value, setValue, labelYes, labelNo, readonly } = props;

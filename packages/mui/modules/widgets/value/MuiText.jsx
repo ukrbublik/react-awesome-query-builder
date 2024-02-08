@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
+import TextField from "@mui/material/TextField";
+import FormControl from "@mui/material/FormControl";
 const __isInternal = true; //true to optimize render
 
 export default (props) => {

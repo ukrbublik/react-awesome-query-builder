@@ -1,6 +1,6 @@
 import React from "react";
-import FormControl from "@material-ui/core/FormControl";
-import TextField from "@material-ui/core/TextField";
+import FormControl from "@mui/material/FormControl";
+import TextField from "@mui/material/TextField";
 import { Utils } from "@react-awesome-query-builder/ui";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import xdpPackage from "@mui/x-date-pickers/package.json"; // to determine version

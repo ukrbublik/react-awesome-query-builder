@@ -15,8 +15,8 @@ import {
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
-import { enUS } from "@material-ui/core/locale";
-import { enUS as muiEnUs } from "@material-ui/core/locale";
+import { ruRU } from "@material-ui/core/locale";
+import { ruRU as muiRuRU } from "@mui/material/locale";
 
 import { AntdConfig, AntdWidgets } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -198,8 +198,8 @@ export default (skin: string) => {
     locale: {
       moment: "ru",
       antd: ru_RU,
-      material: enUS,
-      mui: muiEnUs
+      material: ruRU,
+      mui: muiRuRU
     },
     valueLabel: "Value",
     valuePlaceholder: "Value",

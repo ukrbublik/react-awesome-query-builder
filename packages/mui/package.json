@@ -48,11 +48,6 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@material-ui/core": "4.12.4",
-    "@material-ui/icons": "4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.57",
-    "@material-ui/system": "4.12.2",
-    "@mui/x-date-pickers": "^6.3.1",
     "@react-awesome-query-builder/ui": "workspace:^",
     "lodash": "^4.17.21",
     "material-ui-confirm": "^3.0.5"
@@ -71,6 +66,11 @@
     "@babel/runtime": "^7.22.5",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "@mui/base": "^5.0.0-beta.0",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.12.3",
+    "@mui/system": "^5.12.3",
+    "@mui/x-date-pickers": "^6.3.1",
     "@types/react": "^17.0.39",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -79,6 +79,9 @@
   "peerDependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@mui/base": "^5.0.0-alpha.87",
+    "@mui/icons-material": "^5.2.4",
+    "@mui/material": "^5.2.4",
     "@mui/x-date-pickers": "^5.0.0-beta.2 || ^6.0.0",
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",
     "react-dom": "^16.8.4 || ^17.0.1 || ^18.0.0"
