@@ -412,9 +412,9 @@ interface OtherUtils {
 
 export interface Utils extends Import, Export, 
   Pick<Validation, "sanitizeTree" | "validateTree">,
-  Pick(ConfigUtils, "compressConfig" | "decompressConfig"),
-  Pick(OtherUtils, "uuid"),
-  Pick(TreeUtils, "getSwitchValues")
+  Pick<ConfigUtils, "compressConfig" | "decompressConfig">,
+  Pick<OtherUtils, "uuid">,
+  Pick<TreeUtils, "getSwitchValues">
 {
   Import: Import;
   Export: Export;

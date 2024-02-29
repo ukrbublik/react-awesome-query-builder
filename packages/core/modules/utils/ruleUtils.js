@@ -16,23 +16,21 @@ export const selectTypes = [
 ];
 
 /**
- * @param {object} config
- * @param {object} oldConfig
  * @param {Immutable.Map} current
- * @param {string} newField
- * @param {string} newOperator
  * @param {string} changedProp
- * @return {object} - {canReuseValue, newValue, newValueSrc, newValueType, newValueError, validationErrors, newFieldError}
+ * @param {boolean} canFix (default: false) true - eg. set value to max if it > max or revert or drop
+ * @param {boolean} isEndValue (default: false) true - if value is in process of editing by user
+ * @param {boolean} canDropArgs (default: false)
+ * @return {object} {canReuseValue, newValue, newValueSrc, newValueType, fixedField, operatorCardinality,  newValueError, newFieldError, validationErrors}
  */
 export const getNewValueForFieldOp = function (
   config, oldConfig = null, current, newField, newOperator, changedProp = null,
-  canFix = true, isEndValue = false, canDrop = false
+  canFix = false, isEndValue = false, canDropArgs = false
 ) {
   if (!oldConfig)
     oldConfig = config;
   const {
-    keepInputOnChangeFieldSrc,
-    convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp, showErrorMessage
+    keepInputOnChangeFieldSrc, convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp,
   } = config.settings;
   const currentField = current.get("field");
   const currentFieldType = current.get("fieldType");
@@ -60,7 +58,7 @@ export const getNewValueForFieldOp = function (
   const newFieldSimpleValue = newField?.get?.("func") || newField;
   const hasFieldChanged = newFieldSimpleValue != currentFieldSimpleValue;
 
-  let valueFixes = {};
+  let valueFixes = [];
   let valueErrors = Array.from({length: operatorCardinality}, () => null);
   let validationErrors = [];
   let newFieldError;
@@ -86,29 +84,24 @@ export const getNewValueForFieldOp = function (
   // validate func LHS
   if (currentFieldSrc === "func" && newField) {
     const [fieldValidationError, fixedField] = validateValue(
-      config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, canFix, isEndValue, canDrop
+      config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, canFix, isEndValue, canDropArgs
     );
     const isValid = !fieldValidationError;
     const willFix = fixedField !== newField;
     const willRevert = !isValid && !willFix && canFix;
-    const isTerminalError = !isValid && !willFix;
-    const showFieldError = !isValid && !willFix && !willRevert && showErrorMessage;
-    console.log(111, { isValid, willFix, isEndValue, canDrop, canFix, isTerminalError, showFieldError, f1: fixedField === newField, newField: newField.toJS() })
     if (willFix) {
       newField = fixedField;
     } else if (willRevert) {
       newField = currentField;
     }
-    if (isTerminalError) {
+    if (!isValid) {
+      newFieldError = fieldValidationError;
       // tip: even if we don't show errors, but revert LHS, put the reason of revert
       validationErrors.push({
         src: "lhs",
         str: fieldValidationError
       });
     }
-    //if (showFieldError) {
-      newFieldError = fieldValidationError;
-    //}
   }
 
   // compare old & new widgets
@@ -140,7 +133,6 @@ export const getNewValueForFieldOp = function (
   }
 
   if (canReuseValue) {
-    const oldValueErrors = [...valueErrors];
     for (let i = 0 ; i < operatorCardinality ; i++) {
       const v = currentValue.get(i);
       const vType = currentValueType.get(i) || null;
@@ -149,7 +141,7 @@ export const getNewValueForFieldOp = function (
       if (!isValidSrc && i > 0 && vSrc == null)
         isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
       const [validationError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, canDrop
+        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, canDropArgs
       );
       const isValid = !validationError;
       // Allow bad value with error message
@@ -158,10 +150,8 @@ export const getNewValueForFieldOp = function (
       // For bad multiselect value we have both error message + fixed value.
       //  If we show error message, it will gone on next tree validation
       const willFix = fixedValue !== v;
-      const needDrop = !isValidSrc || !isValid && (hasFieldChanged || !willFix && canFix);
-      const isTerminalError = !isValid && !willFix;
-      const showValueError = isTerminalError && showErrorMessage;
-      if (isTerminalError) {
+      const willDrop = !isValidSrc || !isValid && (hasFieldChanged || !willFix && canFix);
+      if (!isValid) {
         // tip: even if we don't show errors, but drop bad values, put the reason of removal
         validationErrors.push({
           src: "rhs",
@@ -169,13 +159,14 @@ export const getNewValueForFieldOp = function (
           str: validationError
         });
       }
-      if (needDrop) {
+      if (willDrop) {
         canReuseValue = false;
         // revert changes
-        valueErrors = oldValueErrors;
+        valueFixes = [];
+        valueErrors = Array.from({length: operatorCardinality}, () => null);
         break;
       }
-      if (validationError) {
+      if (!isValid) {
         valueErrors[i] = validationError;
       }
       if (willFix) {
@@ -246,9 +237,8 @@ export const getNewValueForFieldOp = function (
   }));
 
   return {
-    canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality,
-    newValueError, newFieldError, validationErrors, rangeValidationError,
-    fixedField: newField,
+    canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality, fixedField: newField,
+    newValueError, newFieldError, validationErrors,
   };
 };
 
@@ -593,9 +583,6 @@ export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => 
         const argValue = argVal ? argVal.get("value") : undefined;
         const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
         if (argValue == undefined && argConfig?.defaultValue === undefined && !argConfig?.isOptional) {
-          console.log(34, {
-            argValue, argConfig, argVal, argKey, args, argsJs: args.toJS()
-          })
           // arg is not completed
           return false;
         }

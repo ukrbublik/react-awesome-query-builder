@@ -67,11 +67,11 @@ export default class Widget extends Component {
           || keysForMeta
             .map(k => (
               k === "parentFuncs"
-              ? !shallowEqual(nextProps[k], prevProps[k], true)
-              //tip: for isFuncArg we need to wrap value in Imm list
-              : k === "isFuncArg"
-                ? nextProps[k] !== prevProps[k] || nextProps["isFuncArg"] && nextProps["value"] !== prevProps["value"]
-                : nextProps[k] !== prevProps[k]
+                ? !shallowEqual(nextProps[k], prevProps[k], true)
+                //tip: for isFuncArg we need to wrap value in Imm list
+                : k === "isFuncArg"
+                  ? nextProps[k] !== prevProps[k] || nextProps["isFuncArg"] && nextProps["value"] !== prevProps["value"]
+                  : nextProps[k] !== prevProps[k]
             ))
             .filter(ch => ch).length > 0;
 

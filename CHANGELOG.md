@@ -1,7 +1,12 @@
 # Changelog
 - 6.5.0
   - Breaking: `Utils.validateTree` returns array of errors
+  - `Utils.validateTree` now checks LHS and RHS are completed (issues #977, #781)
   - `Utils.checkTree` is deprecated and renamed to `Utils.sanitizeTree`
+  - Fixed import of `select_any_in` operator from JsonLogic (issue #1005)
+  - Fixed validation of date ranges (issue #374)
+  - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}` 
+  - Added `optimizeRenderWithInternals` to `settings`, default is `false`
 - 6.4.3
   - Fixed the issue when using func with arg of type `multiselect` (PR #997)
   - Updated `immutable` from v3 to v4 (PR #997)

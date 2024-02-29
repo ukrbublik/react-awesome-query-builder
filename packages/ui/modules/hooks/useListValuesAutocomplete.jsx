@@ -40,13 +40,25 @@ const useListValuesAutocomplete = ({
   const isSelectedLoadMore = React.useRef(false);
 
   // compute
-  const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
-  const listValues = asyncFetch
+  const nSelectedAsyncListValues = React.useMemo(() => (
+    listValuesToArray(selectedAsyncListValues)
+  ), [
+    selectedAsyncListValues,
+  ]);
+  const listValues = React.useMemo(() => (
+    asyncFetch
     ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
-    : staticListValues;
+    : listValuesToArray(staticListValues)
+  ), [
+    asyncFetch,
+    selectedAsyncListValues,
+    asyncListValues,
+    staticListValues,
+  ]);
+  // todo: useMemo for calcing listValuesToDisplay ?
   let listValuesToDisplay = asyncFetch
     ? asyncListValues
-    : staticListValues;
+    : listValuesToArray(staticListValues);
   if (allowCustomValues && inputValue && !searchListValue(inputValue, asyncListValues)) {
     listValuesToDisplay = mergeListValues(listValuesToDisplay, [makeCustomListValue(inputValue)], true);
   }

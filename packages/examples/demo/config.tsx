@@ -242,6 +242,29 @@ export default (skin: string) => {
     defaultSearchWidth: "100px",
     defaultMaxRows: 5,
 
+    // Example of how to correctly configure default LHS funtion with args:
+    // defaultField: {
+    //   func: "date.RELATIVE_DATETIME",
+    //   args: {
+    //     date: {
+    //       value: {func: "date.NOW", args: {}},
+    //       valueSrc: "func"
+    //     },
+    //     op: {
+    //       value: "plus",
+    //       valueSrc: "value"
+    //     },
+    //     dim: {
+    //       value: "day",
+    //       valueSrc: "value"
+    //     },
+    //     val: {
+    //       value: 1,
+    //       valueSrc: "value"
+    //     }
+    //   }
+    // },
+
     valueSourcesInfo: {
       value: {
         label: "Value"

@@ -115,7 +115,7 @@ const DemoQueryBuilder: React.FC = () => {
 
   const validate = () => {
     const validationErrors = validateTree(state.tree, state.config);
-    console.log('>>> validationErrors', validationErrors)
+    console.log(">>> validationErrors", validationErrors);
   };
 
   const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
