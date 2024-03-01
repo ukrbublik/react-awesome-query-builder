@@ -47,8 +47,8 @@ const useListValuesAutocomplete = ({
   ]);
   const listValues = React.useMemo(() => (
     asyncFetch
-    ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
-    : listValuesToArray(staticListValues)
+      ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
+      : listValuesToArray(staticListValues)
   ), [
     asyncFetch,
     selectedAsyncListValues,
