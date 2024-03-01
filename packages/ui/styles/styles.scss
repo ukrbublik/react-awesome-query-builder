@@ -8,6 +8,7 @@ $treeline-color: #ccc !default;
 $treeline-disabled-color: rgba(128, 128, 128, 0.1) !default;
 $group-background: rgba(250, 240, 210, 0.5) !default;
 $group-border-color: #DCC896 !default;
+$group-with-error-border-color: #e0a1a1 !default;
 $rule-background: white !default;
 $rule-border-color: transparent !default;
 $rule-with-error-border-color: #e0a1a1 !default;
@@ -88,6 +89,10 @@ $rule-group-actions-offset-left: 10px !default;
   border: 1px solid $rule-with-error-border-color;
 }
 
+.group-with-error > .group {
+  border: 1px solid $group-with-error-border-color;
+}
+
 .rule--body {
   display: flex;
   flex-wrap: wrap;
@@ -106,6 +111,13 @@ $rule-group-actions-offset-left: 10px !default;
   margin-top: 5px;
 }
 
+.rule_group--error {
+  color: $rule-error-color;
+  margin-bottom: -5px;
+  margin-top: 5px;
+  width: 100%;
+}
+
 .group-or-rule {
   border-radius: $item-radius;
   position: relative;
@@ -115,7 +127,6 @@ $rule-group-actions-offset-left: 10px !default;
   background: $rulegroup-background;
   border: $item-border solid $rulegroup-border-color;
 }
-
 
 .locked {
   border: $item-border dashed $locked-border-color;
@@ -370,6 +381,7 @@ $rule-group-actions-offset-left: 10px !default;
 }
 
 .group--actions {
+  align-self: center;
   margin-left: $group-actions-offset-left;
   flex: 1;
   display: flex;

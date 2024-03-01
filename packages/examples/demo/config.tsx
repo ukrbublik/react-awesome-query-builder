@@ -289,6 +289,7 @@ export default (skin: string) => {
     canLeaveEmptyGroup: true,
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
+    optimizeRenderWithInternals: true,
     customFieldSelectProps: {
       showSearch: true
     },
@@ -388,6 +389,12 @@ export default (skin: string) => {
       defaultOperator: "some",
       initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
+      fieldSettings: {
+        validateValue: (val: number, _fieldSettings, _op) => {
+          return (val < 10 ? null : {error: "Too many cars, see validateValue()", fixedValue: 9});
+        },
+      },
+
       subfields: {
         vendor: {
           type: "select",
@@ -436,7 +443,7 @@ export default (skin: string) => {
           100: <strong>100%</strong>
         },
         validateValue: (val, fieldSettings) => {
-          return (val < 50 ? null : "Invalid slider value, see validateValue()");
+          return (val < 50 ? null : {error: "Invalid slider value, see validateValue()", fixedValue: 49});
         },
       } as NumberFieldSettings,
       //overrides

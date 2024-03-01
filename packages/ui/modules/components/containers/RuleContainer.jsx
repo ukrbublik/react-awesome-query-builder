@@ -117,8 +117,8 @@ const createRuleContainer = (Rule) =>
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
 
       const {valueError, fieldError} = this.props;
-      const oneValueError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
-      const hasError = oneValueError != null && showErrorMessage;
+      const oneError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+      const hasError = oneError != null && showErrorMessage;
 
       return (
         <div

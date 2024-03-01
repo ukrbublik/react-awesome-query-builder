@@ -522,7 +522,6 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
       config, config, currentProperties, newField, newOperator, "field", canFix, isEndValue, canDropArgs
     );
-    //todo: validate group field?
     let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
       fieldSrc: "field",
