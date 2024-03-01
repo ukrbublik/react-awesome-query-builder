@@ -1,7 +1,7 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldSrc,
   extendConfig} from "./configUtils";
-import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp, isCompletedValue} from "../utils/ruleUtils";
+import {getOperatorsForField, getWidgetForFieldOp, getNewValueForFieldOp, whatRulePropertiesAreCompleted} from "../utils/ruleUtils";
 import {defaultValue, deepEqual} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
@@ -75,7 +75,6 @@ function addError(meta, item, err) {
 
 function validateItem (item, path, itemId, meta, c) {
   const type = item.get("type");
-  const children = item.get("children1");
 
   if ((type === "group" || type === "rule_group" || type == "case_group" || type == "switch_group")) {
     return validateGroup(item, path, itemId, meta, c);
@@ -87,15 +86,28 @@ function validateItem (item, path, itemId, meta, c) {
 }
 
 function validateGroup (item, path, itemId, meta, c) {
-  const {removeEmptyGroups} = c;
+  const {removeEmptyGroups, config} = c;
   let id = item.get("id");
   let children = item.get("children1");
   const oldChildren = children;
+  const type = item.get("type");
+  const mode = item.getIn(["properties", "mode"]);
+  const operator = item.getIn(["properties", "operator"]);
+  const isGroupExt = type === "rule_group" && mode === "array";
+  const isCase = type === "case_group";
+  const cardinality = operator ? config.operators[operator]?.cardinality ?? 1 : undefined;
+  // tip: for group operators some/none/all children ARE required, for group operator count children are NOT required
+  // tip: default case should contain only value
+  const childrenAreRequired = isCase ? false : (isGroupExt ? cardinality == 0 : true);
 
   if (!id && itemId) {
     id = itemId;
     item = item.set("id", id);
     meta.sanitized = true;
+  }
+
+  if (isGroupExt) {
+    item = validateRule(item, path, itemId, meta, c);
   }
 
   //validate children
@@ -109,7 +121,7 @@ function validateGroup (item, path, itemId, meta, c) {
     children = nonEmptyChildren;
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
   const isEmptyChildren = !nonEmptyChildren?.size && path.length;
-  if (isEmptyChildren) {
+  if (isEmptyChildren && childrenAreRequired) {
     addError(meta, item, {
       str: "Empty group"
     });
@@ -130,7 +142,10 @@ function validateGroup (item, path, itemId, meta, c) {
   return item;
 }
 
-
+/**
+ * @param {Immutable.Map} item
+ * @returns {Immutable.Map}
+ */
 function validateRule (item, path, itemId, meta, c) {
   const {removeIncompleteRules, config, oldConfig} = c;
   const {showErrorMessage} = config.settings;
@@ -178,7 +193,7 @@ function validateRule (item, path, itemId, meta, c) {
   }
   if (field == null) {
     properties = [
-      "operator", "operatorOptions", "valueSrc", "value", "valueError", "fieldError"
+      "operator", "operatorOptions", "valueSrc", "value", "valueError", "fieldError", "field"
     ].reduce((map, key) => map.delete(key), properties);
     operator = null;
   }
@@ -230,10 +245,9 @@ function validateRule (item, path, itemId, meta, c) {
   }
   if (operator == null) {
     // do not unset operator ?
-    properties = properties.delete("operatorOptions");
-    properties = properties.delete("valueSrc");
-    properties = properties.delete("value");
-    properties = properties.delete("valueError");
+    properties = [
+      "operatorOptions", "valueSrc", "value", "valueError"
+    ].reduce((map, key) => map.delete(key), properties);
   }
 
   //validate operator options
@@ -273,17 +287,14 @@ function validateRule (item, path, itemId, meta, c) {
 
   const newSerialized = serializeRule();
   const hasBeenSanitized = !deepEqual(oldSerialized, newSerialized);
-  const isValueCompleted = value 
-    && value.filter((v, delta) => !isCompletedValue(v, valueSrc.get(delta), config)).size == 0;
-  const isFieldCompleted = isCompletedValue(field, fieldSrc, config);
-  const isCompleted = isFieldCompleted && operator && isValueCompleted;
+  const compl = whatRulePropertiesAreCompleted(properties.toObject(), config);
   if (hasBeenSanitized)
     meta.sanitized = true;
-  if (!isCompleted) {
+  if (compl.score < 3) {
     let reason = "Incomplete rule";
-    if (!isFieldCompleted) {
+    if (!compl.parts.field) {
       reason = "Incomplete LHS";
-    } else {
+    } else if(!compl.parts.value) {
       reason = "Incomplete RHS";
       if (newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
         // eg. operator `starts_with` supports only valueSrc "value"

@@ -348,7 +348,7 @@ const setFieldSrc = (state, path, srcKey, config) => {
     fieldType = null;
   }
   const canReuseValue = !selectTypes.includes(fieldType);
-  const keepInput = keepInputOnChangeFieldSrc && !isEmptyItem(currentRule, config, true) && canReuseValue;
+  const keepInput = keepInputOnChangeFieldSrc && !isEmptyItem(currentRule, config) && canReuseValue;
 
   if (!keepInput) {
     // clear ALL properties
@@ -727,7 +727,9 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     // set error at delta
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
     // set range error
-    state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidationError);
+    if (operatorCardinality >= 2) {
+      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidationError);
+    }
   }
 
   return {tree: state, isInternalValueChange};

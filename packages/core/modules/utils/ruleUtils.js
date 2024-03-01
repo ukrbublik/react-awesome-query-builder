@@ -21,7 +21,7 @@ export const selectTypes = [
  * @param {boolean} canFix (default: false) true - eg. set value to max if it > max or revert or drop
  * @param {boolean} isEndValue (default: false) true - if value is in process of editing by user
  * @param {boolean} canDropArgs (default: false)
- * @return {object} {canReuseValue, newValue, newValueSrc, newValueType, fixedField, operatorCardinality,  newValueError, newFieldError, validationErrors}
+ * @return {{canReuseValue, newValue, newValueSrc, newValueType, fixedField, operatorCardinality,  newValueError, newFieldError, validationErrors}}
  */
 export const getNewValueForFieldOp = function (
   config, oldConfig = null, current, newField, newOperator, changedProp = null,
@@ -507,70 +507,121 @@ export const formatFieldName = (field, config, meta, parentField = null, options
 };
 
 
-export const isEmptyItem = (item, config, liteCheck = false) => {
+/**
+ * Used together with keepInputOnChangeFieldSrc
+ */
+export const isEmptyItem = (item, config) => {
   const type = item.get("type");
   const mode = item.getIn(["properties", "mode"]);
   if (type == "rule_group" && mode == "array") {
-    return isEmptyRuleGroupExt(item, config, liteCheck);
+    return isEmptyRuleGroupExt(item, config);
   } else if (type == "group" || type == "rule_group") {
-    return isEmptyGroup(item, config, liteCheck);
+    return isEmptyGroup(item, config);
   } else {
-    return isEmptyRule(item, config, liteCheck);
+    return isEmptyRule(item, config);
   }
 };
 
-const isEmptyRuleGroupExt = (item, config, liteCheck = false) => {
+const isEmptyRuleGroupExt = (item, config) => {
   const children = item.get("children1");
   const properties = item.get("properties");
-  return isEmptyRuleGroupExtPropertiesAndChildren(properties.toObject(), children, config, liteCheck);
+  return isEmptyRuleGroupExtPropertiesAndChildren(properties.toObject(), children, config);
 };
 
-export const isEmptyRuleGroupExtPropertiesAndChildren = (properties, children, config, liteCheck = false) => {
+/**
+ * Used to remove group ext without confirmation
+ * 
+ * If group operator is count, children can be empty.
+ * If group operator is some/none/all, there should be at least one non-empty (even incomplete) child.
+ */
+export const isEmptyRuleGroupExtPropertiesAndChildren = (properties, children, config) => {
   const operator = properties.operator;
   const cardinality = config.operators[operator]?.cardinality ?? 1;
-  const filledParts = [
-    !isEmptyRuleProperties(properties, config, false),
-    cardinality > 0 ? true : !isEmptyGroupChildren(children, config, liteCheck),
-  ];
-  const filledCnt = filledParts.filter(f => !!f).length;
-  const isFilled = filledCnt == 2;
-  return !isFilled;
+  const childrenAreRequired = cardinality == 0; // tip: for group operators some/none/all
+  const filledParts = {
+    group: !isEmptyRuleProperties(properties, config),
+    children: !isEmptyGroupChildren(children, config),
+  };
+  const hasEnough = filledParts.group && (childrenAreRequired ? filledParts.children : true);
+  return !hasEnough;
 };
 
-const isEmptyGroup = (group, config, liteCheck = false) => {
+const isEmptyGroup = (group, config) => {
   const children = group.get("children1");
-  return isEmptyGroupChildren(children, config, liteCheck);
+  return isEmptyGroupChildren(children, config);
 };
 
-export const isEmptyGroupChildren = (children, config, liteCheck = false) => {
-  return !children || children.size == 0
-    || children.size > 0 && children.filter(ch => !isEmptyItem(ch, config, liteCheck)).size == 0;
+/**
+ * Used to remove group without confirmation
+ * @returns {boolean} false if there is at least one (even incomplete) child
+ */
+export const isEmptyGroupChildren = (children, config) => {
+  const hasEnough = children?.size > 0 && children.filter(ch => !isEmptyItem(ch, config)).size > 0;
+  return !hasEnough;
 };
 
-export const isEmptyRuleProperties = ({
+const isEmptyRule = (rule, config) => {
+  const properties = rule.get("properties");
+  return isEmptyRuleProperties(properties.toObject(), config);
+};
+
+/**
+ * Used to remove rule without confirmation
+ * @param properties is an Object, but properties (like value) are Immutable
+ * @returns {boolean} true if there is no enough data in rule
+ */
+export const isEmptyRuleProperties = (properties, config) => {
+  const liteCheck = true;
+  const scoreThreshold = 3;
+  const compl = whatRulePropertiesAreCompleted(properties, config, liteCheck);
+  const hasEnough = compl.score >= scoreThreshold;
+  return !hasEnough;
+};
+
+/**
+ * Used to validate rule
+ * @param properties is an Object, but properties (like value) are Immutable
+ * @param liteCheck true can be used to check that rule has enough data to ask confirmation before delete
+ * @return {{parts: {field: boolean, operator: boolean, value: boolean}, score: number}}
+ */
+export const whatRulePropertiesAreCompleted = ({
   field, fieldSrc, fieldType,
   operator,
   value, valueSrc, valueType,
 }, config, liteCheck = false) => {
   const cardinality = config.operators[operator]?.cardinality ?? 1;
-  const filledParts = [
-    liteCheck ? (field !== null || fieldType != null) : isCompletedValue(field, fieldSrc, config, liteCheck),
-    !!operator,
-    value.filter((val, delta) => 
-      isCompletedValue(val, valueSrc?.get?.(delta) || valueSrc?.[delta], config, liteCheck)
-    ).size >= cardinality
-  ];
-  const filledCnt = filledParts.filter(f => !!f).length;
-  const isFilled = filledCnt == 3;
-  return !isFilled;
+  const valueSrcs = valueSrc?.get ? valueSrc.toJS() : valueSrc;
+
+  // tip: for liteCheck==true `score` should equal 3 if both LHS and RHS are at least partially filled
+  const res = { parts: {}, score: 0 };
+  res.parts.field = liteCheck ? (field != null) : isCompletedValue(field, fieldSrc, config);
+  res.parts.operator = !!operator;
+  res.parts.value = value.filter((val, delta) => 
+    isCompletedValue(val, valueSrcs?.[delta], config, liteCheck)
+  ).size >= (liteCheck ? Math.min(cardinality, 1) : cardinality);
+  res.score = Object.keys(res.parts).filter(k => !!res.parts[k]).length;
+
+  if (liteCheck && res.score < 3) {
+    // Boost score to confirm deletion:
+    // - if RHS is empty, but LHS is a completed function
+    // - if LHS is empty (only fieldType is set), but there is a completed function in RHS
+    const deepCheck = true;
+    if (!res.parts.value && fieldSrc === "func" && isCompletedValue(field, fieldSrc, config, false, deepCheck)) {
+      res.score++;
+    }
+    if (!res.parts.field) {
+      value.map((val, delta) => {
+        if (valueSrcs?.[delta] === "func" && isCompletedValue(val, valueSrcs?.[delta], config, false, deepCheck)) {
+          res.score++;
+        }
+      });
+    }
+  }
+
+  return res;
 };
 
-const isEmptyRule = (rule, config, liteCheck = false) => {
-  const properties = rule.get("properties");
-  return isEmptyRuleProperties(properties.toObject(), config, liteCheck);
-};
-
-export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => {
+const isCompletedValue = (value, valueSrc, config, liteCheck = false, deepCheck = true) => {
   if (!liteCheck && valueSrc == "func" && value) {
     const funcKey = value.get("func");
     const funcConfig = getFuncConfig(config, funcKey);
@@ -587,7 +638,7 @@ export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => 
           return false;
         }
         if (argValue != undefined) {
-          if (!isCompletedValue(argValue, argValueSrc, config, liteCheck)) {
+          if (!isCompletedValue(argValue, argValueSrc, config, deepCheck ? liteCheck : true)) {
             // arg is complex and is not completed
             return false;
           }
@@ -602,9 +653,9 @@ export const isCompletedValue = (value, valueSrc, config, liteCheck = false) => 
 
 /**
  * @param {*} value
- * @param {string} valueSrc - 'value' | 'field' | 'func'
+ * @param {'value'|'field'|'func'} valueSrc
  * @param {object} config
- * @return {* | undefined} - undefined if func value is not complete (missing required arg vals); can return completed value != value
+ * @return {* | undefined}  undefined if func value is not complete (missing required arg vals); can return completed value != value
  */
 export const completeValue = (value, valueSrc, config) => {
   if (valueSrc == "func")
