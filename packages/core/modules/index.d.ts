@@ -136,12 +136,12 @@ interface BasicItemProperties {
 export interface RuleProperties extends BasicItemProperties {
   field: FieldValue | Empty,
   fieldSrc?: FieldSource,
-  fieldError?: string,
+  fieldError?: string | Empty,
   operator: string | Empty,
   value: Array<RuleValue>,
   valueSrc?: Array<ValueSource>,
   valueType?: Array<string>,
-  valueError?: Array<string>,
+  valueError?: Array<string | Empty>,
   operatorOptions?: AnyObject,
 }
 
@@ -176,9 +176,8 @@ interface _RulePropertiesI extends RuleProperties {
   value: ImmutableList<RuleValue>,
   valueSrc?: ImmutableList<ValueSource>,
   valueType?: ImmutableList<string>,
-  valueError?: ImmutableList<string>,
+  valueError?: ImmutableList<string | Empty>,
   operatorOptions?: ImmMap,
-  fieldError?: string,
 }
 
 // correct unions
@@ -593,7 +592,7 @@ interface AbstractWidgetProps<C = Config> {
   field: FieldValue,
   fieldSrc: FieldSource,
   fieldType?: FieldType,
-  fieldError?: string,
+  fieldError?: string | Empty,
   parentField?: string,
   operator: string,
   fieldDefinition: Field,
@@ -604,23 +603,23 @@ interface AbstractWidgetProps<C = Config> {
   id?: string, // id of rule
   groupId?: string, // id of parent group
   widgetId?: string, // unique id of widget
-  isLHS: boolean,
-  isSpecialRange: boolean,
-  isFuncArg: boolean,
+  isLHS?: boolean,
+  isSpecialRange?: boolean,
+  isFuncArg?: boolean,
 }
 interface BaseWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
   value: V | Empty,
   setValue(val: V | Empty, asyncListValues?: Array<any>): void,
-  valueError?: string,
-  errorMessage?: string, // fieldError or valueError
+  valueError?: string | Empty,
+  errorMessage?: string | Empty, // fieldError or valueError
 }
 interface RangeWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
   value: Array<V | Empty>,
   setValue(val: Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders: Array<string>,
   textSeparators: Array<string>,
-  valueError?: Array<string>,
-  errorMessage?: Array<string>, // same as valueError
+  valueError?: Array<string | Empty>,
+  errorMessage?: Array<string | Empty>, // same as valueError
 }
 // BaseWidgetProps | RangeWidgetProps
 interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
@@ -628,8 +627,8 @@ interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidget
   setValue(val: V | Empty | Array<V | Empty>, asyncListValues?: Array<any>): void,
   placeholders?: Array<string>,
   textSeparators?: Array<string>,
-  valueError?: string | Array<string>,
-  errorMessage?: string | Array<string>, // fieldError or valueError
+  valueError?: string | Empty | Array<string | Empty>,
+  errorMessage?: string | Empty | Array<string | Empty>, // fieldError or valueError
 }
 export type WidgetProps<C = Config> = RangeableWidgetProps<C> & FieldSettings;
 
