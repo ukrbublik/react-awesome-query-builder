@@ -172,17 +172,16 @@ export interface CaseGroupProperties extends BasicItemProperties {
 
 //////
 
-interface _RulePropertiesI extends RuleProperties {
+interface _RulePropertiesI extends Omit<RuleProperties, "value" | "valueSrc" | "valueType" | "valueError" | "operatorOptions"> {
   value: ImmutableList<RuleValue>,
   valueSrc?: ImmutableList<ValueSource>,
   valueType?: ImmutableList<string>,
   valueError?: ImmutableList<string | Empty>,
-  operatorOptions?: ImmMap,
+  operatorOptions?: ImmMap<string, unknown>,
 }
 
 // correct unions
-// Note! Inheritance order is important. 1st interface in inheritance list is more important than 2nd (note "field" property)
-interface _RuleGroupExtPropertiesI extends Pick<RuleGroupExtProperties, "field" | "mode" | "conjunction" | "not">, _RulePropertiesI {}
+interface _RuleGroupExtPropertiesI extends Pick<RuleGroupExtProperties, "field" | "mode" | "conjunction" | "not">, Omit<_RulePropertiesI, "field"> {}
 interface _AnyRulePropertiesI extends Optional<_RulePropertiesI>, Optional<Pick<_RuleGroupExtPropertiesI, "mode" | "conjunction" | "not">> {}
 interface _ItemPropertiesI extends _AnyRulePropertiesI, Optional<Pick<GroupProperties, "conjunction" | "not">> {}
 interface _ItemOrCasePropertiesI extends _ItemPropertiesI, Optional<CaseGroupProperties> {}
@@ -283,26 +282,27 @@ interface _CaseGroupI extends _BasicItemI {
   properties: ImmutableCaseGroupProperties,
 }
 // Fix unions manially:
-// type _AnyRuleI = _RuleI | _RuleGroupI | _RuleGroupExtI;  // causes type issues
-interface _AnyRuleI extends _RuleI, _RuleGroupI, _RuleGroupExtI {
+type _OmitI<T> = Omit<T, "type" | "properties" | "children1">;
+// type _AnyRuleI = _RuleI | _RuleGroupI | _RuleGroupExtI;
+interface _AnyRuleI extends _OmitI<_RuleI> {
   type: "rule" | "rule_group",
   properties: ImmutableAnyRuleProperties,
-  //children1?: ImmOMap<string, ImmutableRule>,
+  children1?: ImmOMap<string, ImmutableRule>,
 }
-// type _ItemI = _GroupI | _AnyRuleI;  // causes type issues
-interface _ItemI extends _GroupI, _AnyRuleI {
+// type _ItemI = _GroupI | _AnyRuleI;
+interface _ItemI extends _OmitI<_GroupI>, _OmitI<_AnyRuleI> {
   type: "rule" | "rule_group" | "group",
   properties: ImmutableItemProperties,
   children1?: ImmOMap<string, ImmutableItem>,
 }
-// type _ItemOrCaseI = _ItemI | _CaseGroupI;  // causes type issues
-interface _ItemOrCaseI extends _ItemI, _CaseGroupI {
+// type _ItemOrCaseI = _ItemI | _CaseGroupI;
+interface _ItemOrCaseI extends _OmitI<_ItemI>, _OmitI<_CaseGroupI> {
   type: "rule" | "rule_group" | "group" | "case_group",
   properties: ImmutableItemOrCaseProperties,
   children1?: ImmOMap<string, ImmutableItem>,
 }
-// type _TreeI = _GroupI | _SwitchGroupI;  // causes type issues
-interface _TreeI extends _GroupI, _SwitchGroupI {
+// type _TreeI = _GroupI | _SwitchGroupI;
+interface _TreeI extends _OmitI<_GroupI>, _OmitI<_SwitchGroupI> {
   type: "group" | "switch_group",
   children1?: ImmOMap<string, ImmutableBasicItem<_ItemOrCaseI>>,
   properties: ImmutableGroupOrSwitchProperties,
@@ -384,7 +384,7 @@ interface Autocomplete {
   simulateAsyncFetch(all: ListValues, pageSize?: number, delay?: number): AsyncFetchListValuesFn;
   getListValue(value: string | number, listValues: ListValues): ListItem; // get by value
   // internal
-  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart = false): ListItems;
+  mergeListValues(oldValues: ListItems, newValues: ListItems, toStart?: boolean): ListItems;
   listValueToOption(listItem: ListItem): ListOptionUi;
 }
 interface ConfigUtils {
@@ -436,7 +436,7 @@ interface TreeUtils {
 interface OtherUtils {
   uuid(): string;
   deepEqual(a: any, b: any): boolean;
-  shallowEqual(a: any, b: any, deep = false): boolean;
+  shallowEqual(a: any, b: any, deep?: boolean): boolean;
   mergeArraysSmart(a: string[], b: string[]): string[];
   isJsonCompatible(tpl: object, target: object, bag: Record<string, any>): boolean; // mutates bag
   isJsonLogic(value: any): boolean;

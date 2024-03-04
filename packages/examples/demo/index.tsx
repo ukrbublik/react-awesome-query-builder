@@ -205,7 +205,7 @@ const DemoQueryBuilder: React.FC = () => {
     }
 
     // Change first rule to `num between 2 and 4`
-    if (!isEmptyTree && firstItem.get('type') === "rule") {
+    if (!isEmptyTree && firstItem.get("type") === "rule") {
       memo.current._actions!.setField(firstPath, "num");
       memo.current._actions!.setOperator(firstPath, "between");
       memo.current._actions!.setValueSrc(firstPath, 0, "value");
