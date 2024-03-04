@@ -541,6 +541,7 @@ export interface Actions {
   setFieldSrc(path: IdPath, fieldSrc: FieldSource): undefined;
   setOperator(path: IdPath, operator: string): undefined;
   setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
+  setFuncValue(path: IdPath, delta: number, parentFuncs: string[], argKey: string | null, value: RuleValue, type: string | "!valueSrc"): undefined;
   setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
   setOperatorOption(path: IdPath, name: string, value: RuleValue): undefined;
   moveItem(fromPath: IdPath, toPath: IdPath, placement: Placement): undefined;
@@ -577,8 +578,10 @@ export interface TreeActions {
     setValue(config: Config, path: IdPath, delta: number, value: RuleValue, valueType: string): InputAction;
     setValueSrc(config: Config, path: IdPath, delta: number, valueSrc: ValueSource): InputAction;
     setOperatorOption(config: Config, path: IdPath, name: string, value: RuleValue): InputAction;
+    setFuncValue(config: Config, path: IdPath, delta: number, parentFuncs: string[], value: RuleValue, valueType: string): InputAction;
   },
 }
+
 
 
 /////////////////

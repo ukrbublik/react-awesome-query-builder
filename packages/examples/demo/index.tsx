@@ -213,6 +213,16 @@ const DemoQueryBuilder: React.FC = () => {
       memo.current._actions!.setValue(firstPath, 1, 4, "number");
     }
 
+    // Change first rule to `lower(aaa) == lower(AAA)`
+    // if (!isEmptyTree && firstItem.get("type") === "rule") {
+    //   memo.current._actions!.setFieldSrc(firstPath, "func");
+    //   memo.current._actions!.setFuncValue(firstPath, -1, [], null, "string.LOWER", "string");
+    //   memo.current._actions!.setFuncValue(firstPath, -1, [], "str", "aaa", "string");
+    //   memo.current._actions!.setValueSrc(firstPath, 0, "func");
+    //   memo.current._actions!.setFuncValue(firstPath, 0, [], null, "string.LOWER", "string");
+    //   memo.current._actions!.setFuncValue(firstPath, 0, [], "str", "AAA", "string");
+    // }
+
     // Add rule `login == "denis"`
     memo.current._actions!.addRule(
       rootPath,
