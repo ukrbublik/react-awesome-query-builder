@@ -55,8 +55,6 @@ interface DemoQueryBuilderState {
   spelErrors: Array<string>;
 }
 
-type ImmOMap = Immutable.OrderedMap<string, any>;
-
 interface DemoQueryBuilderMemo {
   immutableTree?: ImmutableTree,
   config?: Config,
@@ -181,13 +179,15 @@ const DemoQueryBuilder: React.FC = () => {
   const runActions = () => {
     const rootPath = [ state.tree.get("id") ];
     const isEmptyTree = !state.tree.get("children1");
+    const firstItem = state.tree.get("children1")?.first()!;
+    const lastItem = state.tree.get("children1")?.last()!;
     const firstPath = [
       state.tree.get("id"), 
-      ((state.tree.get("children1") as ImmOMap)?.first() as ImmOMap)?.get("id")
+      firstItem.get("id")
     ];
     const lastPath = [
       state.tree.get("id"), 
-      ((state.tree.get("children1") as ImmOMap)?.last() as ImmOMap)?.get("id")
+      lastItem.get("id")
     ];
 
     // Change root group to NOT OR
@@ -205,7 +205,7 @@ const DemoQueryBuilder: React.FC = () => {
     }
 
     // Change first rule to `num between 2 and 4`
-    if (!isEmptyTree) {
+    if (!isEmptyTree && firstItem.get('type') === "rule") {
       memo.current._actions!.setField(firstPath, "num");
       memo.current._actions!.setOperator(firstPath, "between");
       memo.current._actions!.setValueSrc(firstPath, 0, "value");

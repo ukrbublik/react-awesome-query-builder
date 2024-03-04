@@ -35,6 +35,8 @@ type Optional<T> = {
   [P in keyof T]?: T[P];
 }
 
+type OptionalBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 type TypedMap<T> = Record<string, T>;
 
 // You can not use a union for types on a key, but can define overloaded accessors of different types.
@@ -144,11 +146,14 @@ export interface RuleProperties extends BasicItemProperties {
 }
 
 export interface RuleGroupExtProperties extends RuleProperties {
+  field: FieldPath | Empty, // tip: field can be only string, not func
   mode: RuleGroupMode,
+  conjunction?: string,
+  not?: boolean,
 }
 
 export interface RuleGroupProperties extends BasicItemProperties {
-  field: FieldPath | Empty,
+  field: FieldPath | Empty, // tip: field can be only string, not func
   mode?: RuleGroupMode,
 }
 
@@ -158,11 +163,11 @@ export interface GroupProperties extends BasicItemProperties {
 }
 
 export interface SwitchGroupProperties extends BasicItemProperties {
-
+ // todo: any properties here?
 }
 
 export interface CaseGroupProperties extends BasicItemProperties {
-
+  // todo: any properties here?
 }
 
 //////
@@ -175,21 +180,32 @@ interface _RulePropertiesI extends RuleProperties {
   operatorOptions?: ImmMap,
   fieldError?: string,
 }
-interface _RuleGroupExtProperties extends _RulePropertiesI, RuleGroupExtProperties {}
+
+// correct unions
+// Note! Inheritance order is important. 1st interface in inheritance list is more important than 2nd (note "field" property)
+interface _RuleGroupExtPropertiesI extends Pick<RuleGroupExtProperties, "field" | "mode" | "conjunction" | "not">, _RulePropertiesI {}
+interface _AnyRulePropertiesI extends Optional<_RulePropertiesI>, Optional<Pick<_RuleGroupExtPropertiesI, "mode" | "conjunction" | "not">> {}
+interface _ItemPropertiesI extends _AnyRulePropertiesI, Optional<Pick<GroupProperties, "conjunction" | "not">> {}
+interface _ItemOrCasePropertiesI extends _ItemPropertiesI, Optional<CaseGroupProperties> {}
+interface _GroupOrSwitchPropertiesI extends Optional<GroupProperties>, Optional<SwitchGroupProperties> {}
 
 interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
   get<K extends keyof P>(name: K): P[K];
+  get(name: string): any;
 }
 
 export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {}
 export interface ImmutableRuleProperties<P = _RulePropertiesI> extends BasicItemPropertiesI<P> {}
-export interface ImmutableRuleGroupExtProperties<P = _RuleGroupExtProperties> extends ImmutableRuleProperties<P> {}
 export interface ImmutableRuleGroupProperties<P = RuleGroupProperties> extends BasicItemPropertiesI<P> {}
+export interface ImmutableRuleGroupExtProperties<P = _RuleGroupExtPropertiesI> extends ImmutableRuleProperties<P> {}
 export interface ImmutableGroupProperties<P = GroupProperties> extends BasicItemPropertiesI<P> {}
 export interface ImmutableSwitchGroupProperties<P = SwitchGroupProperties> extends BasicItemPropertiesI<P> {}
 export interface ImmutableCaseGroupProperties<P = CaseGroupProperties> extends BasicItemPropertiesI<P> {}
-
-export type ImmutableItemProperties = ImmutableRuleProperties | ImmutableRuleGroupProperties | ImmutableRuleGroupExtProperties | ImmutableGroupProperties;
+// correct unions
+export interface ImmutableAnyRuleProperties<P = _AnyRulePropertiesI> extends BasicItemPropertiesI<P> {}
+export interface ImmutableItemProperties<P = _ItemPropertiesI> extends BasicItemPropertiesI<P> {}
+export interface ImmutableItemOrCaseProperties<P = _ItemOrCasePropertiesI> extends BasicItemPropertiesI<P> {}
+export interface ImmutableGroupOrSwitchProperties<P = _GroupOrSwitchPropertiesI> extends BasicItemPropertiesI<P> {}
 
 
 //////
@@ -259,13 +275,38 @@ interface _RuleGroupExtI extends _BasicItemI {
 }
 interface _SwitchGroupI extends _BasicItemI {
   type: "switch_group",
-  children1?: ImmOMap<string, ImmutableSwitchGroup>,
+  children1?: ImmOMap<string, ImmutableCaseGroup>,
   properties: ImmutableSwitchGroupProperties,
 }
 interface _CaseGroupI extends _BasicItemI {
   type: "case_group",
   children1?: ImmOMap<string, ImmutableGroup>,
   properties: ImmutableCaseGroupProperties,
+}
+// Fix unions manially:
+// type _AnyRuleI = _RuleI | _RuleGroupI | _RuleGroupExtI;  // causes type issues
+interface _AnyRuleI extends _RuleI, _RuleGroupI, _RuleGroupExtI {
+  type: "rule" | "rule_group",
+  properties: ImmutableAnyRuleProperties,
+  //children1?: ImmOMap<string, ImmutableRule>,
+}
+// type _ItemI = _GroupI | _AnyRuleI;  // causes type issues
+interface _ItemI extends _GroupI, _AnyRuleI {
+  type: "rule" | "rule_group" | "group",
+  properties: ImmutableItemProperties,
+  children1?: ImmOMap<string, ImmutableItem>,
+}
+// type _ItemOrCaseI = _ItemI | _CaseGroupI;  // causes type issues
+interface _ItemOrCaseI extends _ItemI, _CaseGroupI {
+  type: "rule" | "rule_group" | "group" | "case_group",
+  properties: ImmutableItemOrCaseProperties,
+  children1?: ImmOMap<string, ImmutableItem>,
+}
+// type _TreeI = _GroupI | _SwitchGroupI;  // causes type issues
+interface _TreeI extends _GroupI, _SwitchGroupI {
+  type: "group" | "switch_group",
+  children1?: ImmOMap<string, ImmutableBasicItem<_ItemOrCaseI>>,
+  properties: ImmutableGroupOrSwitchProperties,
 }
 export interface ImmutableBasicItem<P = _BasicItemI> extends ObjectToImmOMap<P> {}
 export interface ImmutableRule<P = _RuleI> extends ImmutableBasicItem<P> {}
@@ -274,10 +315,9 @@ export interface ImmutableRuleGroup<P = _RuleGroupI> extends ImmutableBasicItem<
 export interface ImmutableRuleGroupExt<P = _RuleGroupExtI> extends ImmutableBasicItem<P> {}
 export interface ImmutableSwitchGroup<P = _SwitchGroupI> extends ImmutableBasicItem<P> {}
 export interface ImmutableCaseGroup<P = _CaseGroupI> extends ImmutableBasicItem<P> {}
-export type ImmutableAnyRule = ImmutableRule|ImmutableRuleGroup|ImmutableRuleGroupExt;
-export type ImmutableItem = ImmutableGroup|ImmutableAnyRule;
-
-export type ImmutableTree = ImmutableGroup|ImmutableSwitchGroup;
+export interface ImmutableAnyRule<P = _AnyRuleI> extends ImmutableBasicItem<P> {}
+export interface ImmutableItem<P = _ItemI> extends ImmutableBasicItem<P> {}
+export interface ImmutableTree<P = _TreeI> extends ImmutableBasicItem<P> {}
 
 ////////////////
 // Utils

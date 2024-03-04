@@ -7,6 +7,7 @@
   - Fixed validation of date ranges (issue #374)
   - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}` 
   - Added `optimizeRenderWithInternals` to `settings`, default is `false`
+  - Updated type `RuleGroupExtProperties` (issue #1021)
 - 6.4.3
   - Fixed the issue when using func with arg of type `multiselect` (PR #997)
   - Updated `immutable` from v3 to v4 (PR #997)
