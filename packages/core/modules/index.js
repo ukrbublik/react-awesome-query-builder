@@ -6,6 +6,13 @@ import CoreConfig, { ConfigMixins } from "./config";
 import TreeStore from "./stores/tree";
 import * as TreeActions from "./actions";
 
-const Utils = {...BasicUtils, ...Export, ...Import, ConfigMixins};
+const Utils = {
+  ...BasicUtils,
+  Export, Import,
+  // intrenal
+  ConfigMixins,
+  // for backward compatibility
+  ...Export, ...Import
+};
 
-export {Utils, Export, Import, BasicFuncs, CoreConfig, TreeStore, TreeActions};
+export {Utils, BasicFuncs, CoreConfig, TreeStore, TreeActions};

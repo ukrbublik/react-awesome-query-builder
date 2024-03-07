@@ -466,6 +466,7 @@ export interface Utils extends Import, Export,
   Import: Import;
   Export: Export;
   Autocomplete: Autocomplete;
+  Validation: Validation;
   ConfigUtils: ConfigUtils;
   ExportUtils: ExportUtils;
   ListUtils: ListUtils;

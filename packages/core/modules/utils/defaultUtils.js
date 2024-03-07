@@ -1,7 +1,8 @@
 import Immutable from "immutable";
 import uuid from "./uuid";
-import {getFieldConfig, getOperatorConfig, getFieldParts} from "./configUtils";
-import {getNewValueForFieldOp, getFirstField, getFirstOperator} from "../utils/ruleUtils";
+import {getFieldConfig, getOperatorConfig, getFieldParts, getFirstField} from "./configUtils";
+import {getFirstOperator} from "../utils/ruleUtils";
+import {getNewValueForFieldOp} from "../utils/validation";
 import { isImmutable } from "./stuff";
 import { jsToImmutable } from "../import";
 

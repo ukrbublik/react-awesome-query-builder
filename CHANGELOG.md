@@ -10,6 +10,7 @@
   - Updated type `RuleGroupExtProperties` (issue #1021)
   - Fixed typedef errors (issue #1016)
   - Fixed issue with antd and date/time pickers (issue #1033)
+  - Added `onInit` prop to `<Query>`. Added 4th argument `actions` to `onInit` and `onChange`
 - 6.4.3
   - Fixed the issue when using func with arg of type `multiselect` (PR #997)
   - Updated `immutable` from v3 to v4 (PR #997)

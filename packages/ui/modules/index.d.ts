@@ -183,7 +183,8 @@ export interface QueryProps {
   funcs?: Funcs;
   ctx: ConfigContext;
   value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
+  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions): void;
+  onInit?(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions): void;
   renderBuilder(props: BuilderProps): ReactElement;
 }
 

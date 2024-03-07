@@ -72,30 +72,6 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
 };
 
 
-/**
- * 
- */
-export const calculateValueType = (value, valueSrc, config) => {
-  let calculatedValueType = null;
-  if (value) {
-    if (valueSrc === "field") {
-      const fieldConfig = getFieldConfig(config, value);
-      if (fieldConfig) {
-        calculatedValueType = fieldConfig.type;
-      }
-    } else if (valueSrc === "func") {
-      const funcKey = value.get("func");
-      if (funcKey) {
-        const funcConfig = getFuncConfig(config, funcKey);
-        if (funcConfig) {
-          calculatedValueType = funcConfig.returnType || funcConfig.type;
-        }
-      }
-    }
-  }
-  return calculatedValueType;
-};
-
 // if `field` is alias (fieldName), convert to original full path
 export const normalizeField = (config, field, parentField = null) => {
   // tip: if parentField is present, field is not full path
@@ -319,3 +295,21 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   return mergedConfig;
 };
 
+export const getFirstField = (config, parentRuleGroupPath = null) => {
+  const fieldSeparator = config.settings.fieldSeparator;
+  const parentPathArr = getFieldParts(parentRuleGroupPath, config);
+  const parentField = parentRuleGroupPath ? getFieldRawConfig(config, parentRuleGroupPath) : config;
+
+  let firstField = parentField, key = null, keysPath = [];
+  do {
+    const subfields = firstField === config ? config.fields : firstField?.subfields;
+    if (!subfields || !Object.keys(subfields).length) {
+      firstField = key = null;
+      break;
+    }
+    key = Object.keys(subfields)[0];
+    keysPath.push(key);
+    firstField = subfields[key];
+  } while (firstField.type == "!struct" || firstField.type == "!group");
+  return (parentPathArr || []).concat(keysPath).join(fieldSeparator);
+};

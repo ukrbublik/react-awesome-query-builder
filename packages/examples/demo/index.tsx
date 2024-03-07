@@ -28,12 +28,12 @@ initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfi
 
 
 // Trick to hot-load new config when you edit `config.tsx`
-const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
-  config: loadedConfig,
-  _initTree: initTree,
-  _initValue: initValue,
-} });
-window.dispatchEvent(updateEvent);
+// const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
+//   config: loadedConfig,
+//   _initTree: initTree,
+//   _initValue: initValue,
+// } });
+// window.dispatchEvent(updateEvent);
 
 declare global {
   interface Window {
@@ -41,11 +41,11 @@ declare global {
   }
 }
 
-interface CustomEventDetail {
-  config: Config;
-  _initTree: ImmutableTree;
-  _initValue: JsonTree;
-}
+// interface CustomEventDetail {
+//   config: Config;
+//   _initTree: ImmutableTree;
+//   _initValue: JsonTree;
+// }
 
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
@@ -58,7 +58,7 @@ interface DemoQueryBuilderState {
 interface DemoQueryBuilderMemo {
   immutableTree?: ImmutableTree,
   config?: Config,
-  _actions?: Actions,
+  actions?: Actions,
 }
 
 const DemoQueryBuilder: React.FC = () => {
@@ -72,24 +72,24 @@ const DemoQueryBuilder: React.FC = () => {
     spelErrors: [] as Array<string>
   });
 
-  useEffect(() => {
-    window.addEventListener("update", onConfigChanged);
-    return () => {
-      window.removeEventListener("update", onConfigChanged);
-    };
-  });
+  // useEffect(() => {
+  //   window.addEventListener("update", onConfigChanged);
+  //   return () => {
+  //     window.removeEventListener("update", onConfigChanged);
+  //   };
+  // });
 
 
-  const onConfigChanged = (e: Event) => {
-    const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
-    console.log("Updating config...");
-    setState({
-      ...state,
-      config,
-    });
-    initTree = _initTree;
-    initValue = _initValue;
-  };
+  // const onConfigChanged = (e: Event) => {
+  //   const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
+  //   console.log("Updating config...");
+  //   setState({
+  //     ...state,
+  //     config,
+  //   });
+  //   initTree = _initTree;
+  //   initValue = _initValue;
+  // };
 
   const switchShowLock = () => {
     const newConfig: Config = clone(state.config);
@@ -153,7 +153,7 @@ const DemoQueryBuilder: React.FC = () => {
   };
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
-    memo.current._actions = bprops.actions;
+    memo.current.actions = bprops.actions;
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
         <div className="query-builder qb-lite">
@@ -163,11 +163,12 @@ const DemoQueryBuilder: React.FC = () => {
     );
   }, []);
   
-  const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta) => {
+  const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions) => {
     if (actionMeta)
       console.info(actionMeta);
     memo.current.immutableTree = immutableTree;
     memo.current.config = config;
+    memo.current.actions = actions;
     updateResult();
   }, []);
 
@@ -191,26 +192,26 @@ const DemoQueryBuilder: React.FC = () => {
     ];
 
     // Change root group to NOT OR
-    memo.current._actions!.setNot(rootPath, true);
-    memo.current._actions!.setConjunction(rootPath, "OR");
+    memo.current.actions!.setNot(rootPath, true);
+    memo.current.actions!.setConjunction(rootPath, "OR");
 
     // Move first item
     if (childrenCount > 1) {
-      memo.current._actions!.moveItem(firstPath, lastPath, "before");
+      memo.current.actions!.moveItem(firstPath, lastPath, "before");
     }
 
     // Change first rule to `num between 2 and 4`
     if (childrenCount && firstItem.get("type") === "rule") {
-      memo.current._actions!.setField(firstPath, "num");
-      memo.current._actions!.setOperator(firstPath, "between");
-      memo.current._actions!.setValueSrc(firstPath, 0, "value");
-      memo.current._actions!.setValue(firstPath, 0, 2, "number");
-      memo.current._actions!.setValue(firstPath, 1, 4, "number");
+      memo.current.actions!.setField(firstPath, "num");
+      memo.current.actions!.setOperator(firstPath, "between");
+      memo.current.actions!.setValueSrc(firstPath, 0, "value");
+      memo.current.actions!.setValue(firstPath, 0, 2, "number");
+      memo.current.actions!.setValue(firstPath, 1, 4, "number");
     }
 
     // Remove last rule
     if (childrenCount > 1) {
-      memo.current._actions!.removeRule(lastPath);
+      memo.current.actions!.removeRule(lastPath);
     }
 
     // Add rule `lower(aaa) == lower(AAA)`
@@ -218,21 +219,21 @@ const DemoQueryBuilder: React.FC = () => {
       state.tree.get("id"), 
       Utils.uuid()
     ];
-    memo.current._actions!.addRule(rootPath, {
+    memo.current.actions!.addRule(rootPath, {
       id: newPath[1], // use pre-generated id
       field: null,
       operator: null,
       value: [],
     });
-    memo.current._actions!.setFieldSrc(newPath, "func");
-    memo.current._actions!.setFuncValue(newPath, -1, [], null, "string.LOWER", "string");
-    memo.current._actions!.setFuncValue(newPath, -1, [], "str", "aaa", "string");
-    memo.current._actions!.setValueSrc(newPath, 0, "func");
-    memo.current._actions!.setFuncValue(newPath, 0, [], null, "string.LOWER", "string");
-    memo.current._actions!.setFuncValue(newPath, 0, [], "str", "AAA", "string");
+    memo.current.actions!.setFieldSrc(newPath, "func");
+    memo.current.actions!.setFuncValue(newPath, -1, [], null, "string.LOWER", "string");
+    memo.current.actions!.setFuncValue(newPath, -1, [], "str", "aaa", "string");
+    memo.current.actions!.setValueSrc(newPath, 0, "func");
+    memo.current.actions!.setFuncValue(newPath, 0, [], null, "string.LOWER", "string");
+    memo.current.actions!.setFuncValue(newPath, 0, [], "str", "AAA", "string");
 
     // Add rule `login == "denis"`
-    memo.current._actions!.addRule(
+    memo.current.actions!.addRule(
       rootPath,
       {
         field: "user.login",
@@ -244,7 +245,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add rule `login == firstName`
-    memo.current._actions!.addRule(
+    memo.current.actions!.addRule(
       rootPath,
       {
         field: "user.login",
@@ -255,7 +256,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add rule-group `cars` with `year == 2021`
-    memo.current._actions!.addRule(
+    memo.current.actions!.addRule(
       rootPath,
       {
         field: "cars",
@@ -276,7 +277,7 @@ const DemoQueryBuilder: React.FC = () => {
     );
 
     // Add group with `slider == 40` and subgroup `slider < 20`
-    memo.current._actions!.addGroup(
+    memo.current.actions!.addGroup(
       rootPath,
       {
         conjunction: "AND"
@@ -442,6 +443,7 @@ const DemoQueryBuilder: React.FC = () => {
       <Query
         {...state.config}
         value={state.tree}
+        onInit={onChange}
         onChange={onChange}
         renderBuilder={renderBuilder}
       />

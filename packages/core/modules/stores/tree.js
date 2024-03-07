@@ -10,14 +10,14 @@ import {
 import * as constants from "./constants";
 import uuid from "../utils/uuid";
 import {
-  getFuncConfig, getFieldConfig, getOperatorConfig, calculateValueType
+  getFuncConfig, getFieldConfig, getOperatorConfig
 } from "../utils/configUtils";
 import {
   getOperatorsForField, getOperatorsForType, getFirstOperator,
-  getNewValueForFieldOp, isEmptyItem, selectTypes
+  isEmptyItem, selectTypes, calculateValueType
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
-import {validateValue, validateRange} from "../utils/validation";
+import {validateValue, validateRange, getNewValueForFieldOp} from "../utils/validation";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
 import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";

@@ -2,9 +2,6 @@ import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
   isFieldDescendantOfField
 } from "./configUtils";
-import {defaultValue, getFirstDefined} from "../utils/stuff";
-import Immutable from "immutable";
-import {validateValue, validateRange} from "../utils/validation";
 import last from "lodash/last";
 import {completeFuncValue} from "./funcUtils";
 
@@ -15,251 +12,6 @@ export const selectTypes = [
   "treemultiselect",
 ];
 
-/**
- * @param {Immutable.Map} current
- * @param {string} changedProp
- * @param {boolean} canFix (default: false) true - eg. set value to max if it > max or revert or drop
- * @param {boolean} isEndValue (default: false) true - if value is in process of editing by user
- * @param {boolean} canDropArgs (default: false)
- * @return {{canReuseValue, newValue, newValueSrc, newValueType, fixedField, operatorCardinality,  newValueError, newFieldError, validationErrors}}
- */
-export const getNewValueForFieldOp = function (
-  config, oldConfig = null, current, newField, newOperator, changedProp = null,
-  canFix = false, isEndValue = false, canDropArgs = false
-) {
-  if (!oldConfig)
-    oldConfig = config;
-  const {
-    keepInputOnChangeFieldSrc, convertableWidgets, clearValueOnChangeField, clearValueOnChangeOp,
-  } = config.settings;
-  const currentField = current.get("field");
-  const currentFieldType = current.get("fieldType");
-  const currentFieldSrc = current.get("fieldSrc");
-  const currentOperator = current.get("operator");
-  const currentValue = current.get("value");
-  const currentValueSrc = current.get("valueSrc", new Immutable.List());
-  const currentValueType = current.get("valueType", new Immutable.List());
-  const asyncListValues = current.get("asyncListValues");
-
-  //const isValidatingTree = (changedProp === null);
-
-  //const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
-  const newOperatorConfig = getOperatorConfig(config, newOperator, newField);
-  //const currentOperatorCardinality = currentOperator ? defaultValue(currentOperatorConfig.cardinality, 1) : null;
-  const operatorCardinality = newOperator ? defaultValue(newOperatorConfig.cardinality, 1) : null;
-  const currentFieldConfig = getFieldConfig(oldConfig, currentField);
-  const newFieldConfig = getFieldConfig(config, newField);
-  const isOkWithoutField = !currentField && currentFieldType && keepInputOnChangeFieldSrc;
-  const currentType = currentFieldConfig?.type || currentFieldType;
-  const newType = newFieldConfig?.type || !newField && isOkWithoutField && currentType;
-  const currentListValuesType = currentFieldConfig?.listValuesType;
-  const newListValuesType = newFieldConfig?.listValuesType;
-  const currentFieldSimpleValue = currentField?.get?.("func") || currentField;
-  const newFieldSimpleValue = newField?.get?.("func") || newField;
-  const hasFieldChanged = newFieldSimpleValue != currentFieldSimpleValue;
-
-  let valueFixes = [];
-  let valueErrors = Array.from({length: operatorCardinality}, () => null);
-  let validationErrors = [];
-  let newFieldError;
-  let rangeValidationError;
-
-  let canReuseValue = (currentField || isOkWithoutField) && currentOperator && newOperator && currentValue != undefined;
-  if (
-    !(currentType && newType && currentType == newType)
-    || changedProp === "field" && hasFieldChanged && clearValueOnChangeField
-    || changedProp === "operator" && clearValueOnChangeOp
-  ) {
-    canReuseValue = false;
-  }
-  if (hasFieldChanged && selectTypes.includes(newType)) {
-    if (newListValuesType && newListValuesType === currentListValuesType) {
-      // ok
-    } else {
-      // different fields of select types has different listValues
-      canReuseValue = false;
-    }
-  }
-
-  // validate func LHS
-  if (currentFieldSrc === "func" && newField) {
-    const [fieldValidationError, fixedField] = validateValue(
-      config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, canFix, isEndValue, canDropArgs
-    );
-    const isValid = !fieldValidationError;
-    const willFix = fixedField !== newField;
-    const willRevert = !isValid && !willFix && canFix;
-    if (willFix) {
-      newField = fixedField;
-    } else if (willRevert) {
-      newField = currentField;
-    }
-    if (!isValid) {
-      newFieldError = fieldValidationError;
-      // tip: even if we don't show errors, but revert LHS, put the reason of revert
-      validationErrors.push({
-        src: "lhs",
-        str: fieldValidationError
-      });
-    }
-  }
-
-  // compare old & new widgets
-  for (let i = 0 ; i < operatorCardinality ; i++) {
-    const vs = currentValueSrc.get(i) || null;
-    const currentWidget = getWidgetForFieldOp(oldConfig, currentField, currentOperator, vs);
-    const newWidget = getWidgetForFieldOp(config, newField, newOperator, vs);
-    // need to also check value widgets if we changed operator and current value source was 'field'
-    // cause for select type op '=' requires single value and op 'in' requires array value
-    const currentValueWidget = vs == "value" ? currentWidget : getWidgetForFieldOp(oldConfig, currentField, currentOperator, "value");
-    const newValueWidget = vs == "value" ? newWidget : getWidgetForFieldOp(config, newField, newOperator, "value");
-
-    const canReuseWidget = newValueWidget == currentValueWidget
-      || (convertableWidgets[currentValueWidget] || []).includes(newValueWidget)
-      || !currentValueWidget && isOkWithoutField;
-    if (!canReuseWidget) {
-      canReuseValue = false;
-    }
-  }
-
-  if (currentOperator != newOperator && [currentOperator, newOperator].includes("proximity"))
-    canReuseValue = false;
-
-  const firstValueSrc = currentValueSrc.first();
-  const firstWidgetConfig = getFieldWidgetConfig(config, newField, newOperator, null, firstValueSrc);
-  let valueSources = getValueSourcesForFieldOp(config, newField, newOperator, null);
-  if (!newField && isOkWithoutField) {
-    valueSources = Object.keys(config.settings.valueSourcesInfo);
-  }
-
-  if (canReuseValue) {
-    for (let i = 0 ; i < operatorCardinality ; i++) {
-      const v = currentValue.get(i);
-      const vType = currentValueType.get(i) || null;
-      const vSrc = currentValueSrc.get(i) || null;
-      let isValidSrc = (valueSources.find(v => v == vSrc) != null);
-      if (!isValidSrc && i > 0 && vSrc == null)
-        isValidSrc = true; // make exception for range widgets (when changing op from '==' to 'between')
-      const [validationError, fixedValue] = validateValue(
-        config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, canDropArgs
-      );
-      const isValid = !validationError;
-      // Allow bad value with error message
-      // But not on field change - in that case just drop bad value that can't be reused
-      // ? Maybe we should also drop bad value on op change?
-      // For bad multiselect value we have both error message + fixed value.
-      //  If we show error message, it will gone on next tree validation
-      const willFix = fixedValue !== v;
-      const willDrop = !isValidSrc || !isValid && (hasFieldChanged || !willFix && canFix);
-      if (!isValid) {
-        // tip: even if we don't show errors, but drop bad values, put the reason of removal
-        validationErrors.push({
-          src: "rhs",
-          delta: i,
-          str: validationError
-        });
-      }
-      if (willDrop) {
-        canReuseValue = false;
-        // revert changes
-        valueFixes = [];
-        valueErrors = Array.from({length: operatorCardinality}, () => null);
-        break;
-      }
-      if (!isValid) {
-        valueErrors[i] = validationError;
-      }
-      if (willFix) {
-        valueFixes[i] = fixedValue;
-      }
-    }
-  }
-
-  // reuse value OR get defaultValue (for cardinality 1 - it means default range values is not supported yet, todo)
-  let newValue = null, newValueSrc = null, newValueType = null, newValueError = null;
-  newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-    let v = undefined;
-    if (canReuseValue) {
-      if (i < currentValue.size) {
-        v = currentValue.get(i);
-        if (valueFixes[i] !== undefined) {
-          v = valueFixes[i];
-        }
-      }
-    } else if (operatorCardinality == 1) {
-      v = getFirstDefined([
-        newFieldConfig?.defaultValue,
-        newFieldConfig?.fieldSettings?.defaultValue,
-        firstWidgetConfig?.defaultValue
-      ]);
-    }
-    return v;
-  }));
-
-  newValueSrc = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-    let vs = null;
-    if (canReuseValue) {
-      if (i < currentValueSrc.size)
-        vs = currentValueSrc.get(i);
-    } else if (valueSources.length == 1) {
-      vs = valueSources[0];
-    } else if (valueSources.length > 1) {
-      vs = valueSources[0];
-    }
-    return vs;
-  }));
-
-  // Validate range
-  rangeValidationError = validateRange(config, newField, newOperator, newValue, newValueSrc);
-  if (rangeValidationError) {
-    // last element in `valueError` list is for range validation error
-    valueErrors.push(rangeValidationError);
-    validationErrors.push({
-      src: "rhs",
-      delta: -1,
-      str: rangeValidationError
-    });
-  }
-
-  newValueError = new Immutable.List(valueErrors);
-
-  newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-    let vt = null;
-    if (canReuseValue) {
-      if (i < currentValueType.size)
-        vt = currentValueType.get(i);
-    } else if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
-      vt = firstWidgetConfig.type;
-    } else if (operatorCardinality == 1 && newFieldConfig && newFieldConfig.type !== undefined) {
-      vt = newFieldConfig.type == "!group" ? "number" : newFieldConfig.type;
-    }
-    return vt;
-  }));
-
-  return {
-    canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality, fixedField: newField,
-    newValueError, newFieldError, validationErrors,
-  };
-};
-
-export const getFirstField = (config, parentRuleGroupPath = null) => {
-  const fieldSeparator = config.settings.fieldSeparator;
-  const parentPathArr = getFieldParts(parentRuleGroupPath, config);
-  const parentField = parentRuleGroupPath ? getFieldRawConfig(config, parentRuleGroupPath) : config;
-
-  let firstField = parentField, key = null, keysPath = [];
-  do {
-    const subfields = firstField === config ? config.fields : firstField?.subfields;
-    if (!subfields || !Object.keys(subfields).length) {
-      firstField = key = null;
-      break;
-    }
-    key = Object.keys(subfields)[0];
-    keysPath.push(key);
-    firstField = subfields[key];
-  } while (firstField.type == "!struct" || firstField.type == "!group");
-  return (parentPathArr || []).concat(keysPath).join(fieldSeparator);
-};
 
 export const getOperatorsForType = (config, fieldType) => {
   return config.types[fieldType]?.operators || null;
@@ -274,6 +26,27 @@ export const getOperatorsForField = (config, field) => {
 export const getFirstOperator = (config, field) => {
   const fieldOps = getOperatorsForField(config, field);
   return fieldOps?.[0] ?? null;
+};
+
+export const calculateValueType = (value, valueSrc, config) => {
+  let calculatedValueType = null;
+  if (value) {
+    if (valueSrc === "field") {
+      const fieldConfig = getFieldConfig(config, value);
+      if (fieldConfig) {
+        calculatedValueType = fieldConfig.type;
+      }
+    } else if (valueSrc === "func") {
+      const funcKey = value.get("func");
+      if (funcKey) {
+        const funcConfig = getFuncConfig(config, funcKey);
+        if (funcConfig) {
+          calculatedValueType = funcConfig.returnType || funcConfig.type;
+        }
+      }
+    }
+  }
+  return calculatedValueType;
 };
 
 export const getFuncPathLabels = (field, config, parentField = null) => {

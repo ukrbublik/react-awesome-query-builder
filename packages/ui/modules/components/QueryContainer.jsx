@@ -26,6 +26,7 @@ export default class QueryContainer extends Component {
     ctx: PropTypes.object.isRequired,
 
     onChange: PropTypes.func,
+    onInit: PropTypes.func,
     renderBuilder: PropTypes.func,
     value: PropTypes.any, //instanceOf(Immutable.Map)
   };
@@ -101,7 +102,7 @@ export default class QueryContainer extends Component {
 
   render() {
     // `get_children` is deprecated!
-    const {renderBuilder, get_children, onChange} = this.props;
+    const {renderBuilder, get_children, onChange, onInit} = this.props;
     const {store} = this.state;
     const config = this.config;
     const QueryWrapper = this.QueryWrapper;
@@ -115,6 +116,7 @@ export default class QueryContainer extends Component {
             getBasicConfig={this.getBasicConfig}
             sanitizeTree={this.sanitizeTree}
             onChange={onChange}
+            onInit={onInit}
             renderBuilder={renderBuilder || get_children}
           />
         </Provider>
