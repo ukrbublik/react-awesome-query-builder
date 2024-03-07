@@ -355,7 +355,7 @@ interface Validation {
   sanitizeTree(tree: ImmutableTree, config: Config): ImmutableTree;
   validateTree(tree: ImmutableTree, config: Config): ValidationError[];
 
-  _validateTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): ImmutableTree;
+  _validateTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): [ImmutableTree, ValidationError[]];
 }
 
 interface Import {

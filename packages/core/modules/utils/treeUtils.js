@@ -373,7 +373,7 @@ export const getTreeBadFields = (tree, config) => {
 
   if (tree)
     _processNode(tree, [], 0);
-    
+
   return Array.from(new Set(badFields));
 };
 
@@ -441,7 +441,7 @@ export const _fixImmutableValue = (v) => {
   if (v?.toJS) {
     const vJs = v?.toJS?.();
     if (vJs?.func) {
-      // `v` is a func arg, keep Immutable
+      // `v` is a func, keep Immutable
       return v.toOrderedMap();
     } else {
       // for values of multiselect use Array instead of List

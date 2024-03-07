@@ -10,10 +10,10 @@ import {
 import * as constants from "./constants";
 import uuid from "../utils/uuid";
 import {
-  getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig
+  getFuncConfig, getFieldConfig, getOperatorConfig, calculateValueType
 } from "../utils/configUtils";
 import {
-  getOperatorsForField, getOperatorsForType, getFirstOperator, getWidgetForFieldOp,
+  getOperatorsForField, getOperatorsForType, getFirstOperator,
   getNewValueForFieldOp, isEmptyItem, selectTypes
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
@@ -810,30 +810,6 @@ const checkEmptyGroups = (state, config) => {
   return state;
 };
 
-
-/**
- * 
- */
-const calculateValueType = (value, valueSrc, config) => {
-  let calculatedValueType = null;
-  if (value) {
-    if (valueSrc === "field") {
-      const fieldConfig = getFieldConfig(config, value);
-      if (fieldConfig) {
-        calculatedValueType = fieldConfig.type;
-      }
-    } else if (valueSrc === "func") {
-      const funcKey = value.get("func");
-      if (funcKey) {
-        const funcConfig = getFuncConfig(config, funcKey);
-        if (funcConfig) {
-          calculatedValueType = funcConfig.returnType;
-        }
-      }
-    }
-  }
-  return calculatedValueType;
-};
 
 const getField = (state, path) => {
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;

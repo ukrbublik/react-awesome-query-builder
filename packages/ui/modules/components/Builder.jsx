@@ -5,7 +5,7 @@ import { Item } from "./item/Item";
 import SortableContainer from "./containers/SortableContainer";
 import {pureShouldComponentUpdate} from "../utils/reactUtils";
 const { getTotalReordableNodesCountInTree, getTotalRulesCountInTree } = Utils.TreeUtils;
-const { createListFromArray, emptyProperies } = Utils.DefaultUtils;
+const { createListFromArray, emptyProperties } = Utils.DefaultUtils;
 
 class Builder extends Component {
   static propTypes = {
@@ -62,10 +62,10 @@ class Builder extends Component {
         id={id}
         path={this.path}
         type={rootType}
-        properties={tree.get("properties") || emptyProperies()}
+        properties={tree.get("properties") || emptyProperties()}
         config={config}
         actions={actions}
-        children1={tree.get("children1") || emptyProperies()}
+        children1={tree.get("children1") || emptyProperties()}
         reordableNodesCnt={reordableNodesCnt}
         totalRulesCnt={totalRulesCnt}
         parentReordableNodesCnt={0}

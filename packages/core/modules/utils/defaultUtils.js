@@ -154,4 +154,4 @@ export const createListFromArray = (ids) => {
   return new Immutable.List(ids);
 };
 
-export const emptyProperies = () => new Immutable.Map();
+export const emptyProperties = () => new Immutable.Map();

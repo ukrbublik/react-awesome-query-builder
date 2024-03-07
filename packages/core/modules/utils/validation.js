@@ -31,7 +31,8 @@ export const validateTree = (tree, config) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const removeEmptyGroups = false;
   const removeIncompleteRules = false;
-  return _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, true);
+  const [_, errors] = _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules);
+  return errors;
 };
 
 export const sanitizeTree = (tree, config) => {
@@ -39,7 +40,8 @@ export const sanitizeTree = (tree, config) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
   const removeIncompleteRules = config.settings.removeIncompleteRulesOnLoad;
-  return _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, false);
+  const [fixedTree, _] = _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules);
+  return fixedTree;
 };
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
@@ -49,20 +51,20 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
   if (removeIncompleteRules === undefined) {
     removeIncompleteRules = newConfig.settings.removeIncompleteRulesOnLoad;
   }
-  let tree = _validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules, false);
+  let [tree, _] = _validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
   tree = fixPathsInTree(tree);
   return tree;
 };
 
-export const _validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules, returnErrors) => {
+export const _validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
   const c = {
-    config, oldConfig, removeEmptyGroups, removeIncompleteRules, returnErrors
+    config, oldConfig, removeEmptyGroups, removeIncompleteRules
   };
   const meta = {
     errors: {},
   };
   const fixedTree = validateItem(tree, [], null, meta, c);
-  return returnErrors ? meta.errors : fixedTree;
+  return [fixedTree, meta.errors];
 };
 
 function addError(meta, item, err) {
