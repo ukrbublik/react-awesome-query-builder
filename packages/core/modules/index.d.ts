@@ -123,10 +123,18 @@ export type ValueSource = "value" | "field" | "func" | "const";
 export type FieldSource = "field" | "func";
 export type RuleGroupMode = "struct" | "some" | "array";
 export type ItemType = "group" | "rule_group" | "rule" | "case_group" | "switch_group";
-export type ItemProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties | GroupProperties;
+// note: these preperties types are used for actions
+export type AnyRuleProperties = RuleProperties | RuleGroupExtProperties | RuleGroupProperties;
+export type AnyGroupProperties = GroupProperties | SwitchGroupProperties | CaseGroupProperties;
+export type ItemProperties = AnyRuleProperties | GroupProperties;
 
 export type TypedValueSourceMap<T> = {
   [key in ValueSource]: T;
+}
+
+interface ExtraActionProperties {
+  // note: id can pre-generated for actions addRule, addGroup
+  id?: string,
 }
 
 interface BasicItemProperties {
@@ -530,9 +538,9 @@ export interface ActionMeta extends BaseAction {
 
 export interface Actions {
   // tip: children will be converted to immutable ordered map in `_addChildren1`
-  addRule(path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
+  addRule(path: IdPath, properties?: AnyRuleProperties & ExtraActionProperties, type?: ItemType, children?: Array<JsonAnyRule>): undefined;
   removeRule(path: IdPath): undefined;
-  addGroup(path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): undefined;
+  addGroup(path: IdPath, properties?: AnyGroupProperties & ExtraActionProperties, children?: Array<JsonItem>): undefined;
   removeGroup(path: IdPath): undefined;
   setNot(path: IdPath, not: boolean): undefined;
   setLock(path: IdPath, lock: boolean): undefined;
@@ -558,11 +566,11 @@ type TreeStore = (config: Config, tree?: ImmutableTree) => TreeReducer;
 export interface TreeActions {
   tree: {
     setTree(config: Config, tree: ImmutableTree): InputAction,
-    addRule(config: Config, path: IdPath, properties?: ItemProperties, type?: ItemType, children?: Array<JsonAnyRule>): InputAction,
+    addRule(config: Config, path: IdPath, properties?: AnyRuleProperties, type?: ItemType, children?: Array<JsonAnyRule>): InputAction,
     removeRule(config: Config, path: IdPath): InputAction,
-    addDefaultCaseGroup(config: Config, path: IdPath, properties?: ItemProperties, children?: Array<JsonAnyRule>): InputAction,
-    addCaseGroup(config: Config, path: IdPath, properties?: ItemProperties, children?: Array<JsonAnyRule>): InputAction,
-    addGroup(config: Config, path: IdPath, properties?: ItemProperties, children?: Array<JsonItem>): InputAction,
+    addDefaultCaseGroup(config: Config, path: IdPath, properties?: CaseGroupProperties, children?: Array<JsonAnyRule>): InputAction,
+    addCaseGroup(config: Config, path: IdPath, properties?: CaseGroupProperties, children?: Array<JsonAnyRule>): InputAction,
+    addGroup(config: Config, path: IdPath, properties?: GroupProperties, children?: Array<JsonItem>): InputAction,
     removeGroup(config: Config, path: IdPath): InputAction;
     moveItem(config: Config, fromPath: IdPath, toPath: IdPath, placement: Placement): InputAction;
   },

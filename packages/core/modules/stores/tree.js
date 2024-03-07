@@ -27,7 +27,8 @@ import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, type, groupUuid, properties, config, children = null, meta = {}) => {
+const addNewGroup = (state, path, type, generatedId, properties, config, children = null, meta = {}) => {
+  const groupUuid = properties?.get?.("id") || generatedId;
   const {shouldCreateEmptyGroup} = config.settings;
   const groupPath = path.push(groupUuid);
   const canAddNewRule = !shouldCreateEmptyGroup;
@@ -183,7 +184,8 @@ const _addChildren1 = (config, item, children) => {
  * @param {Immutable.OrderedMap} properties
  * @param {object} config
  */
-const addItem = (state, path, type, id, properties, config, children = null) => {
+const addItem = (state, path, type, generatedId, properties, config, children = null) => {
+  const id = properties?.get?.("id") || generatedId;
   if (type == "switch_group")
     throw new Error("Can't add switch_group programmatically");
   const { maxNumberOfCases, maxNumberOfRules, maxNesting } = config.settings;

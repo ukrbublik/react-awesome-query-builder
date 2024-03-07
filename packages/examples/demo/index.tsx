@@ -178,7 +178,7 @@ const DemoQueryBuilder: React.FC = () => {
   // Demonstrates how actions can be called programmatically
   const runActions = () => {
     const rootPath = [ state.tree.get("id") ];
-    const isEmptyTree = !state.tree.get("children1");
+    const childrenCount = state.tree.get("children1")?.size || 0;
     const firstItem = state.tree.get("children1")?.first()!;
     const lastItem = state.tree.get("children1")?.last()!;
     const firstPath = [
@@ -195,17 +195,12 @@ const DemoQueryBuilder: React.FC = () => {
     memo.current._actions!.setConjunction(rootPath, "OR");
 
     // Move first item
-    if (!isEmptyTree) {
+    if (childrenCount > 1) {
       memo.current._actions!.moveItem(firstPath, lastPath, "before");
     }
 
-    // Remove last rule
-    if (!isEmptyTree) {
-      memo.current._actions!.removeRule(lastPath);
-    }
-
     // Change first rule to `num between 2 and 4`
-    if (!isEmptyTree && firstItem.get("type") === "rule") {
+    if (childrenCount && firstItem.get("type") === "rule") {
       memo.current._actions!.setField(firstPath, "num");
       memo.current._actions!.setOperator(firstPath, "between");
       memo.current._actions!.setValueSrc(firstPath, 0, "value");
@@ -213,15 +208,28 @@ const DemoQueryBuilder: React.FC = () => {
       memo.current._actions!.setValue(firstPath, 1, 4, "number");
     }
 
-    // Change first rule to `lower(aaa) == lower(AAA)`
-    // if (!isEmptyTree && firstItem.get("type") === "rule") {
-    //   memo.current._actions!.setFieldSrc(firstPath, "func");
-    //   memo.current._actions!.setFuncValue(firstPath, -1, [], null, "string.LOWER", "string");
-    //   memo.current._actions!.setFuncValue(firstPath, -1, [], "str", "aaa", "string");
-    //   memo.current._actions!.setValueSrc(firstPath, 0, "func");
-    //   memo.current._actions!.setFuncValue(firstPath, 0, [], null, "string.LOWER", "string");
-    //   memo.current._actions!.setFuncValue(firstPath, 0, [], "str", "AAA", "string");
-    // }
+    // Remove last rule
+    if (childrenCount > 1) {
+      memo.current._actions!.removeRule(lastPath);
+    }
+
+    // Add rule `lower(aaa) == lower(AAA)`
+    const newPath = [
+      state.tree.get("id"), 
+      Utils.uuid()
+    ];
+    memo.current._actions!.addRule(rootPath, {
+      id: newPath[1], // use pre-generated id
+      field: null,
+      operator: null,
+      value: [],
+    });
+    memo.current._actions!.setFieldSrc(newPath, "func");
+    memo.current._actions!.setFuncValue(newPath, -1, [], null, "string.LOWER", "string");
+    memo.current._actions!.setFuncValue(newPath, -1, [], "str", "aaa", "string");
+    memo.current._actions!.setValueSrc(newPath, 0, "func");
+    memo.current._actions!.setFuncValue(newPath, 0, [], null, "string.LOWER", "string");
+    memo.current._actions!.setFuncValue(newPath, 0, [], "str", "AAA", "string");
 
     // Add rule `login == "denis"`
     memo.current._actions!.addRule(
