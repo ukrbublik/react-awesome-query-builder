@@ -231,7 +231,7 @@ export const getCompatibleArgsOnFuncChange = (s1, s2, argVals, config) => {
       if (arg2.valueSources && !arg2.valueSources.includes(argValueSrc))
         return false;
       const leftField = null, operator = null, argDef = arg2, asyncListValues = null, canFix = false, isEndValue = true;
-      const [argValidError, _fixedArgVal] = validateValue(
+      const [_fixedArgVal, argValidError] = validateValue(
         config, leftField, argDef, operator, argValue, argDef.type, argValueSrc, asyncListValues, canFix, isEndValue
       );
       if (argValidError)

@@ -17,10 +17,11 @@ import {
   isEmptyItem, selectTypes, calculateValueType
 } from "../utils/ruleUtils";
 import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
-import {validateValue, validateRange, getNewValueForFieldOp} from "../utils/validation";
+import {validateValue, validateRange, getNewValueForFieldOp, tr} from "../utils/validation";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
 import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
+
 
 /**
  * @param {object} config
@@ -668,9 +669,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = !showErrorMessage;
-  const [validationError, fixedValue] = validateValue(
+  const [fixedValue, errorKey, errorArgs] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, canDropArgs
   );
+  const validationError = errorKey ? tr(errorKey, errorArgs) : null;
   // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
   //  (get exact value from listValues, not string)
   let willFix = fixedValue !== value;

@@ -12,6 +12,7 @@ import {
   TextWidget,
   TreeSelectWidget,
   Config,
+  ValidateValue,
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
@@ -442,9 +443,14 @@ export default (skin: string) => {
           0: <strong>0%</strong>,
           100: <strong>100%</strong>
         },
-        validateValue: (val, fieldSettings) => {
-          return (val < 50 ? null : {error: "Invalid slider value, see validateValue()", fixedValue: 49});
-        },
+        validateValue: ((val, fieldSettings) => {
+          const ret: ReturnType<ValidateValue> = (val < 50 ? null : {
+            // error: "Invalid slider value, see validateValue()",
+            error: {key: "custom:INVALID_SLIDER_VALUE", args: {val}},
+            fixedValue: 49
+          });
+          return ret;
+        }),
       } as NumberFieldSettings,
       //overrides
       widgets: {

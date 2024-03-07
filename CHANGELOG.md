@@ -5,7 +5,7 @@
   - `Utils.checkTree` is deprecated and renamed to `Utils.sanitizeTree`
   - Fixed import of `select_any_in` operator from JsonLogic (issue #1005)
   - Fixed validation of date ranges (issue #374)
-  - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}` 
+  - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}`, error can be `{key, args}` for i18n
   - Added `optimizeRenderWithInternals` to `settings`, default is `false`
   - Updated type `RuleGroupExtProperties` (issue #1021)
   - Fixed typedef errors (issue #1016)
