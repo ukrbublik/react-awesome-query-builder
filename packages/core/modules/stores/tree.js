@@ -695,7 +695,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
   const valueSrcs = Array.from({length: operatorCardinality}, (_, i) =>
     (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
-  const rangeValidationError = validateRange(config, field, operator, values, valueSrcs);
+  const [rangeErrorKey, rangeErrorArgs] = validateRange(config, field, operator, values, valueSrcs);
+  const rangeValidationError = rangeErrorKey ? translateValidation(rangeErrorKey, rangeErrorArgs) : null;
 
   const isValid = !validationError && !rangeValidationError;
   const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta));

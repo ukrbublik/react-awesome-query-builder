@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { translations as validationTranslations, custom } from "./validation/translations";
+import { translations as validationTranslations } from "./validation/translations";
 
 export const NSV = "raqbvalidation";
 export const NSVP = `${NSV}:`;
