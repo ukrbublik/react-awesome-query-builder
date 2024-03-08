@@ -1,5 +1,6 @@
 export {default as clone} from "clone";
 export {default as moment} from "moment";
+export {default as i18n} from "../i18n";
 export * as ConfigUtils from "./configUtils";
 export * as RuleUtils from "./ruleUtils";
 export * as FuncUtils from "./funcUtils";

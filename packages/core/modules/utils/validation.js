@@ -12,29 +12,8 @@ import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
 import {fixPathsInTree} from "../utils/treeUtils";
 import {setFuncDefaultArg} from "../utils/funcUtils";
-
 import * as constants from "../i18n/validation/constains";
-import i18next from 'i18next';
-import { translations, custom, I18NS, I18NSP } from "../i18n/validation/translations";
-
-// todo
-i18next.init({
-});
-i18next.addResources("dev", I18NS, translations)
-i18next.addResources("dev", "custom", custom)
-
-export const tr = (key, args) => {
-  if (key?.key && key?.args) {
-    return tr(key, key, key.args);
-  }
-  if (args === null) {
-    return key;
-  }
-  return i18next.t(
-    key.includes(":") ? key : I18NSP+key,
-    args
-  );
-};
+import { translateValidation } from "../i18n";
 
 
 const typeOf = (v) => {
@@ -564,8 +543,11 @@ const validateFuncValue = (
                 fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
               }
               if (hasError) {
-                const argValidationError = tr(errorKey, errorArgs);
-                return [fixedValue, constants.INVALID_FUNC_ARG_VALUE, {funcKey, argKey, argValidationError}];
+                const argValidationError = translateValidation(errorKey, errorArgs);
+                return [fixedValue, constants.INVALID_FUNC_ARG_VALUE, {
+                  funcKey, argKey, argValidationError,
+                  i18n: {key: errorKey, args: errorArgs}
+                }];
               }
             } else if (!argConfig.isOptional && isEndValue) {
               const canDrop = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
@@ -696,7 +678,7 @@ export const getNewValueForFieldOp = function (
       newField = currentField;
     }
     if (!isValid) {
-      newFieldError = tr(errorKey, errorArgs);
+      newFieldError = translateValidation(errorKey, errorArgs);
       // tip: even if we don't show errors, but revert LHS, put the reason of revert
       validationErrors.push({
         src: "lhs",
@@ -770,7 +752,7 @@ export const getNewValueForFieldOp = function (
         break;
       }
       if (!isValid) {
-        valueErrors[i] = tr(errorKey, errorArgs);
+        valueErrors[i] = translateValidation(errorKey, errorArgs);
       }
       if (willFix) {
         valueFixes[i] = fixedValue;

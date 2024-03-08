@@ -61,6 +61,12 @@ interface DemoQueryBuilderMemo {
   actions?: Actions,
 }
 
+// Add translations
+Utils.i18n.addResources("en", "custom", {
+  "INVALID_SLIDER_VALUE": "Invalid slider value {{val}} translated with i18next",
+  "BAD_LEN": "bad len {{val}} translated with i18next"
+});
+
 const DemoQueryBuilder: React.FC = () => {
   const memo: React.MutableRefObject<DemoQueryBuilderMemo> = useRef({});
 

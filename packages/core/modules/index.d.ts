@@ -3,6 +3,7 @@
 import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";
 import type { Moment as MomentType } from "moment";
+import type { i18n } from "i18next";
 
 export type Moment = MomentType;
 export type ImmutableList<T> = ImmList<T>;
@@ -472,6 +473,9 @@ export interface Utils extends Import, Export,
   ListUtils: ListUtils;
   TreeUtils: TreeUtils;
   OtherUtils: OtherUtils;
+  // libs
+  i18n: i18n;
+  moment: Moment;
 }
 
 
