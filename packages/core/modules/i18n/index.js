@@ -11,7 +11,7 @@ i18n.init({
 i18n.addResources("en", NSV, validationTranslations);
 
 export const translateValidation = (key, args) => {
-  if (key?.key && key?.args) {
+  if (key?.key) {
     return translateValidation(key.key, key.args);
   }
   if (args === null) {

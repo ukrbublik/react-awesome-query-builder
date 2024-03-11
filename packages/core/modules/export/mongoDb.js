@@ -330,8 +330,8 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   const useExpr = true;
   let ret;
 
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   if (!funcConfig) {
     meta.errors.push(`Func ${funcKey} is not defined in config`);

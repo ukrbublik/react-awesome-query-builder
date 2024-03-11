@@ -11,14 +11,18 @@ import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 
 
-export const queryString = (item, config, isForDisplay = false) => {
+export const queryString = (item, config, isForDisplay = false, isDebugMode = false) => {
   //meta is mutable
   let meta = {
-    errors: []
+    errors: [],
+    settings: {
+      isForDisplay,
+      isDebugMode,
+    }
   };
 
   const extendedConfig = extendConfig(config, undefined, false);
-  const res = formatItem(item, extendedConfig, meta, isForDisplay, null);
+  const res = formatItem(item, extendedConfig, meta, null);
 
   if (meta.errors.length)
     console.warn("Errors while exporting to string:", meta.errors);
@@ -26,22 +30,23 @@ export const queryString = (item, config, isForDisplay = false) => {
 };
 
 
-const formatItem = (item, config, meta, isForDisplay = false, parentField = null) => {
+const formatItem = (item, config, meta, parentField = null) => {
   if (!item) return undefined;
   const type = item.get("type");
   const children = item.get("children1");
 
   if ((type === "group" || type === "rule_group") ) {
-    return formatGroup(item, config, meta, isForDisplay, parentField);
+    return formatGroup(item, config, meta, parentField);
   } else if (type === "rule") {
-    return formatRule(item, config, meta, isForDisplay, parentField);
+    return formatRule(item, config, meta, parentField);
   }
 
   return undefined;
 };
 
 
-const formatGroup = (item, config, meta, isForDisplay = false, parentField = null) => {
+const formatGroup = (item, config, meta, parentField = null) => {
+  const { isForDisplay } = meta.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
@@ -50,10 +55,10 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
   const groupField = isRuleGroup && mode == "array" ? properties.get("field") : null;
-  const canHaveEmptyChildren = isRuleGroup && mode == "array";
+  const canHaveEmptyChildren = isRuleGroup && mode === "array";
   const not = properties.get("not");
   const list = children
-    .map((currentChild) => formatItem(currentChild, config, meta, isForDisplay, groupField))
+    .map((currentChild) => formatItem(currentChild, config, meta, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
   if (!canHaveEmptyChildren && !list.size)
     return undefined;
@@ -67,7 +72,7 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
   
   let ret;
   if (groupField) {
-    const aggrArgs = formatRule(item, config, meta, isForDisplay, parentField, true);
+    const aggrArgs = formatRule(item, config, meta, parentField, true);
     if (aggrArgs) {
       const isRev = aggrArgs.pop();
       const args = [
@@ -87,7 +92,8 @@ const formatGroup = (item, config, meta, isForDisplay = false, parentField = nul
 };
 
 
-const formatItemValue = (config, properties, meta, _operator, isForDisplay, parentField) => {
+const formatItemValue = (config, properties, meta, _operator, parentField) => {
+  const { isForDisplay, isDebugMode } = meta.settings;
   const field = properties.get("field");
   const iValueSrc = properties.get("valueSrc");
   const iValueType = properties.get("valueType");
@@ -106,11 +112,11 @@ const formatItemValue = (config, properties, meta, _operator, isForDisplay, pare
     const fvalue = iValue.map((currentValue, ind) => {
       const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
       const valueType = iValueType ? iValueType.get(ind) : null;
-      const cValue = completeValue(currentValue, valueSrc, config);
+      const cValue = !isDebugMode ? completeValue(currentValue, valueSrc, config) : currentValue;
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
       const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
       let fv = formatValue(
-        config, meta, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, isForDisplay, parentField, asyncListValues
+        config, meta, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField, asyncListValues
       );
       if (fv !== undefined) {
         valueSrcs.push(valueSrc);
@@ -154,13 +160,14 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   return fn;
 };
 
-const formatRule = (item, config, meta, isForDisplay = false, parentField = null, returnArgs = false) => {
+const formatRule = (item, config, meta, parentField = null, returnArgs = false) => {
+  const { isForDisplay, isDebugMode } = meta.settings;
   const properties = item.get("properties") || new Map();
   const field = properties.get("field");
   const fieldSrc = properties.get("fieldSrc");
   let operator = properties.get("operator");
   let operatorOptions = properties.get("operatorOptions");
-  if (field == null || operator == null)
+  if ((field == null || operator == null) && !isDebugMode)
     return undefined;
   
   const fieldDef = getFieldConfig(config, field) || {};
@@ -188,14 +195,14 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
 
   //format field
   const formattedField = fieldSrc === "func"
-    ? formatFunc(config, meta, field, isForDisplay, parentField)
-    : formatField(config, meta, field, isForDisplay, parentField);
+    ? formatFunc(config, meta, field, parentField)
+    : formatField(config, meta, field, parentField);
   if (formattedField == undefined)
     return undefined;
 
   //format value
   const [formattedValue, valueSrc, valueType] = formatItemValue(
-    config, properties, meta, operator, isForDisplay, parentField
+    config, properties, meta, operator, parentField
   );
   if (formattedValue === undefined)
     return undefined;
@@ -229,14 +236,17 @@ const formatRule = (item, config, meta, isForDisplay = false, parentField = null
 };
 
 
-const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, opDef, isForDisplay, parentField = null, asyncListValues) => {
-  if (value === undefined)
-    return undefined;
+const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, opDef, parentField = null, asyncListValues) => {
+  const { isForDisplay, isDebugMode } = meta.settings;
+  if (value === undefined) {
+    if (!isDebugMode)
+      return undefined;
+  }
   let ret;
   if (valueSrc == "field") {
-    ret = formatField(config, meta, value, isForDisplay, parentField);
+    ret = formatField(config, meta, value, parentField);
   } else if (valueSrc == "func") {
-    ret = formatFunc(config, meta, value, isForDisplay, parentField);
+    ret = formatFunc(config, meta, value, parentField);
   } else {
     if (typeof fieldWidgetDef.formatValue === "function") {
       const fn = fieldWidgetDef.formatValue;
@@ -263,11 +273,15 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
       ret = value;
     }
   }
+  if (ret == undefined && isDebugMode) {
+    return "?";
+  }
   return ret;
 };
 
 
-const formatField = (config, meta, field, isForDisplay, parentField = null, cutParentField = true) => {
+const formatField = (config, meta, field, parentField = null, cutParentField = true) => {
+  const { isForDisplay, isDebugMode } = meta.settings;
   const {fieldSeparator, fieldSeparatorDisplay} = config.settings;
   let ret = null;
   if (field) {
@@ -279,18 +293,26 @@ const formatField = (config, meta, field, isForDisplay, parentField = null, cutP
     const formatFieldFn = config.settings.formatField;
     const fieldName = formatFieldName(field, config, meta, cutParentField ? parentField : null, {useTableName: true});
     ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
+  } else if(isDebugMode) {
+    ret = "?";
   }
   return ret;
 };
 
 
-const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) => {
-  const funcKey = funcValue.get("func");
-  const args = funcValue.get("args");
+const formatFunc = (config, meta, funcValue, parentField = null) => {
+  const { isForDisplay, isDebugMode } = meta.settings;
+  const funcKey = funcValue?.get?.("func");
+  if (!funcKey) {
+    return undefined;
+  }
+  const args = funcValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   if (!funcConfig) {
     meta.errors.push(`Func ${funcKey} is not defined in config`);
-    return undefined;
+    if (!isDebugMode) {
+      return undefined;
+    }
   }
   const funcParts = getFieldParts(funcKey, config);
   const funcLastKey = funcParts[funcParts.length-1];
@@ -315,18 +337,17 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
     }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
-      config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues
+      config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       if (argValueSrc != "func") // don't triger error if args value is another incomplete function
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
-      return undefined;
     }
 
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       formattedDefaultVal = formatValue(
-        config, meta, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, isForDisplay, parentField, argAsyncListValues
+        config, meta, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
         if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
@@ -354,7 +375,9 @@ const formatFunc = (config, meta, funcValue, isForDisplay, parentField = null) =
   }
   if (missingArgKeys.length) {
     //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
-    return undefined; // incomplete
+    if (!isDebugMode) {
+      return undefined; // incomplete
+    }
   }
 
   let ret = null;

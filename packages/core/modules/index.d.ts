@@ -348,15 +348,34 @@ interface SpelConcatNormalValue {
 }
 type SpelConcatValue = SpelConcatNormalValue | SpelConcatCaseValue;
 
-interface ValidationError {
-  //todo
+export interface Translatable {
+  key: string;
+  args?: null | Record<string, any>;
 }
+export interface ValidationError extends Translatable {
+  // translated message
+  str?: string;
+  side?: "lhs" | "rhs" | "op";
+  delta?: number; // 0, 1, -1 for range, undefined for "lhs"
+  fixed?: boolean;
+}
+export interface ValidationItemErrors {
+  path: Array<string>;
+  errors: ValidationError[];
+}
+export type ValidationResult = ValidationItemErrors[];
 
 interface Validation {
-  sanitizeTree(tree: ImmutableTree, config: Config): ImmutableTree;
-  validateTree(tree: ImmutableTree, config: Config): ValidationError[];
+  sanitizeTree(tree: ImmutableTree, config: Config, forceFix?: boolean): ImmutableTree;
+  validateTree(tree: ImmutableTree, config: Config): ValidationResult;
 
-  _validateTree(tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config, removeEmptyGroups?: boolean, removeIncompleteRules?: boolean): [ImmutableTree, ValidationError[]];
+  translateValidation(tr: Translatable): string;
+  translateValidation(key: Translatable["key"], args?: Translatable["args"]): string;
+
+  _validateTree(
+    tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config,
+    removeEmptyGroups?: boolean, removeIncompleteRules?: boolean, forceFix?: boolean,
+  ): [ImmutableTree, ValidationResult];
 }
 
 interface Import {
@@ -380,7 +399,7 @@ interface Export {
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
   // @deprecated
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
-  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean): string | undefined;
+  queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean, isDebugMode?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
   _sqlFormat(tree: ImmutableTree, config: Config): [string | undefined, Array<string>];
   spelFormat(tree: ImmutableTree, config: Config): string | undefined;

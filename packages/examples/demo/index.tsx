@@ -113,12 +113,24 @@ const DemoQueryBuilder: React.FC = () => {
   const sanitize = () => {
     setState({
       ...state,
-      tree: sanitizeTree(state.tree, state.config)
+      tree: sanitizeTree(state.tree, state.config, true)
     });
   };
 
   const validate = () => {
-    const validationErrors = validateTree(state.tree, state.config);
+    const validationErrors = validateTree(state.tree, state.config).map(({path, errors}) => {
+      const errorsTranslated = errors.map(e => ({
+        ...e,
+        str: Utils.Validation.translateValidation(e)
+      }));
+      const item = Utils.TreeUtils.getItemByPath(state.tree, path);
+      const itemStr = Utils.Export.queryString(item, state.config, false, true);
+      return {
+        path,
+        itemStr,
+        errorsTranslated,
+      };
+    });
     console.log(">>> validationErrors", validationErrors);
   };
 
@@ -208,6 +220,7 @@ const DemoQueryBuilder: React.FC = () => {
 
     // Change first rule to `num between 2 and 4`
     if (childrenCount && firstItem.get("type") === "rule") {
+      memo.current.actions!.setFieldSrc(firstPath, "field");
       memo.current.actions!.setField(firstPath, "num");
       memo.current.actions!.setOperator(firstPath, "between");
       memo.current.actions!.setValueSrc(firstPath, 0, "value");
@@ -327,6 +340,7 @@ const DemoQueryBuilder: React.FC = () => {
     const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
     const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
     const elasticSearch = elasticSearchFormat(immutableTree, config);
+    const validationRes = validateTree(immutableTree, config);
 
     return (
       <div>
@@ -413,6 +427,16 @@ const DemoQueryBuilder: React.FC = () => {
           <pre style={preStyle}>
             {stringify(treeJs, undefined, 2)}
           </pre>
+        </div>
+        <hr/>
+        <div>
+        Errors: 
+        { validationRes.length > 0
+          ? <pre style={preErrorStyle}>
+            {stringify(validationRes, undefined, 2)}
+          </pre>
+          : "no"
+        }
         </div>
         {/* <hr/>
       <div>

@@ -396,7 +396,7 @@ export const whatRulePropertiesAreCompleted = ({
 
 const isCompletedValue = (value, valueSrc, config, liteCheck = false, deepCheck = true) => {
   if (!liteCheck && valueSrc == "func" && value) {
-    const funcKey = value.get("func");
+    const funcKey = value.get?.("func");
     const funcConfig = getFuncConfig(config, funcKey);
     if (funcConfig) {
       const args = value.get("args");

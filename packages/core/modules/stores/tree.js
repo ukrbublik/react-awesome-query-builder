@@ -670,10 +670,10 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
 
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = !showErrorMessage;
-  const [fixedValue, errorKey, errorArgs] = validateValue(
+  const [fixedValue, allErrors] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, canDropArgs
   );
-  const validationError = errorKey ? translateValidation(errorKey, errorArgs) : null;
+  const validationError = allErrors?.length ? translateValidation(allErrors[0]) : null;
   // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
   //  (get exact value from listValues, not string)
   let willFix = fixedValue !== value;
@@ -695,8 +695,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
     (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
   const valueSrcs = Array.from({length: operatorCardinality}, (_, i) =>
     (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
-  const [rangeErrorKey, rangeErrorArgs] = validateRange(config, field, operator, values, valueSrcs);
-  const rangeValidationError = rangeErrorKey ? translateValidation(rangeErrorKey, rangeErrorArgs) : null;
+  const rangeErrorObj = validateRange(config, field, operator, values, valueSrcs);
+  const rangeValidationError = rangeErrorObj ? translateValidation(rangeErrorObj) : null;
 
   const isValid = !validationError && !rangeValidationError;
   const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta));

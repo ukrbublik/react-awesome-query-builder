@@ -10,11 +10,13 @@ import {
 import {defaultValue, getFirstDefined, deepEqual} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
-import {fixPathsInTree} from "../utils/treeUtils";
+import {fixPathsInTree, getItemByPath} from "../utils/treeUtils";
 import {setFuncDefaultArg} from "../utils/funcUtils";
+import {queryString} from "../export/queryString";
 import * as constants from "../i18n/validation/constains";
 import { translateValidation } from "../i18n";
 
+export { translateValidation };
 
 const typeOf = (v) => {
   if (typeof v == "object" && v !== null && Array.isArray(v))
@@ -36,52 +38,85 @@ export const validateTree = (tree, config) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const removeEmptyGroups = false;
   const removeIncompleteRules = false;
-  const [_t, errors, _s] = _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules);
-  for (let id in errors) {
-    //errors[id] = 
-    //todo: errors should be array!!!
-  }
-  return errors;
+  const forceFix = false;
+  const [_t, allErrros, _s] = _validateTree(
+    tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, forceFix
+  );
+  return allErrros;
 };
 
-export const sanitizeTree = (tree, config) => {
+export const sanitizeTree = (tree, config, forceFix = false) => {
   if (!tree) return undefined;
   const extendedConfig = extendConfig(config, undefined, true);
   const removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
   const removeIncompleteRules = config.settings.removeIncompleteRulesOnLoad;
-  const [fixedTree, _e, _s] = _validateTree(tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules);
+  const [fixedTree, _e, _s] = _validateTree(
+    tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, forceFix
+  );
   return fixedTree;
 };
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+  const forceFix = false;
   if (removeEmptyGroups === undefined) {
     removeEmptyGroups = newConfig.settings.removeEmptyGroupsOnLoad;
   }
   if (removeIncompleteRules === undefined) {
     removeIncompleteRules = newConfig.settings.removeIncompleteRulesOnLoad;
   }
-  let [fixedTree, _e, _s] = _validateTree(newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules);
+  let [fixedTree, allErrros, isSanitized] = _validateTree(
+    newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix
+  );
+  if (isSanitized && allErrros.length) {
+    console.warn("Tree validation errors: ", allErrros)
+  }
   fixedTree = fixPathsInTree(fixedTree);
   return fixedTree;
 };
 
-export const _validateTree = (tree, _oldTree, config, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+export const _validateTree = (
+  tree, _oldTree, config, oldConfig,
+  removeEmptyGroups, removeIncompleteRules, forceFix, translateErrors, stringifyRules,
+) => {
   const c = {
-    config, oldConfig, removeEmptyGroups, removeIncompleteRules
+    config, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix,
   };
   const meta = {
     errors: {},
   };
   const fixedTree = validateItem(tree, [], null, meta, c);
-  return [fixedTree, meta.errors, meta.sanitized];
+  const isSanitized = meta.sanitized;
+  const errorsArr = [];
+  for (const id in meta.errors) {
+    let {path, errors} = meta.errors[id];
+    if (translateErrors) {
+      errors = errors.map(e => {
+        return {
+          ...e,
+          str: translateValidation(e),
+        };
+      });
+    }
+    let errorItem = { path, errors };
+    if (stringifyRules) {
+      const item = getItemByPath(tree, path);
+      const itemStr = queryString(item, config, false, true);
+      errorItem.itemStr = itemStr;
+    }
+    errorsArr.push(errorItem);
+  }
+  return [fixedTree, errorsArr, isSanitized];
 };
 
-function addError(meta, item, err) {
+function addError(meta, item, path, err) {
   const id = item.get("id");
   if (!meta.errors[id]) {
-    meta.errors[id] = [];
+    meta.errors[id] = {
+      path: [...path, id],
+      errors: [],
+    };
   }
-  meta.errors[id].push(err);
+  meta.errors[id].errors.push(err);
 }
 
 function validateItem (item, path, itemId, meta, c) {
@@ -133,8 +168,9 @@ function validateGroup (item, path, itemId, meta, c) {
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
   const isEmptyChildren = !nonEmptyChildren?.size && path.length;
   if (isEmptyChildren && childrenAreRequired) {
-    addError(meta, item, {
+    addError(meta, item, path, {
       key: constants.EMPTY_GROUP,
+      fixed: removeEmptyGroups,
     });
     if (removeEmptyGroups) {
       item = undefined;
@@ -158,7 +194,7 @@ function validateGroup (item, path, itemId, meta, c) {
  * @returns {Immutable.Map}
  */
 function validateRule (item, path, itemId, meta, c) {
-  const {removeIncompleteRules, config, oldConfig} = c;
+  const {removeIncompleteRules, forceFix, config, oldConfig} = c;
   const {showErrorMessage} = config.settings;
   const origItem = item;
   let id = item.get("id");
@@ -197,9 +233,10 @@ function validateRule (item, path, itemId, meta, c) {
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
   if (field && !fieldDefinition) {
-    addError(meta, item, {
+    addError(meta, item, path, {
       key: constants.NO_CONFIG_FOR_FIELD,
       args: { field },
+      side: "lhs",
     });
     field = null;
   }
@@ -218,43 +255,46 @@ function validateRule (item, path, itemId, meta, c) {
   // Backward compatibility: obsolete operator range_between
   if (operator === "range_between" || operator === "range_not_between") {
     operator = operator === "range_between" ? "between" : "not_between";
-    addError(meta, item, {
-      type: "fix",
-      key: constants.FIXED_OPERATOR,
-      args: { from: properties.get("operator"), to: operator, field }
-    });
+    // addError(meta, item, path, {
+    //   type: "fix",
+    //   key: constants.FIXED_OPERATOR,
+    //   args: { from: properties.get("operator"), to: operator, field }
+    // });
     properties = properties.set("operator", operator);
   }
   const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
   if (operator && !operatorDefinition) {
-    addError(meta, item, {
+    addError(meta, item, path, {
       key: constants.NO_CONFIG_FOR_OPERATOR,
-      args: { operator }
+      args: { operator },
+      side: "op",
     });
     operator = null;
   }
   const availOps = field ? getOperatorsForField(config, field) : [];
   if (field) {
     if (!availOps?.length) {
-      addError(meta, item, {
+      addError(meta, item, path, {
         key: constants.UNSUPPORTED_FIELD_TYPE,
-        args: { field }
+        args: { field },
+        side: "lhs",
       });
       operator = null;
     } else if (operator && availOps.indexOf(operator) == -1) {
-      if (operator == "is_empty" || operator == "is_not_empty") {
+      if (operator === "is_empty" || operator === "is_not_empty") {
         // Backward compatibility: is_empty #494
-        operator = operator == "is_empty" ? "is_null" : "is_not_null";
-        addError(meta, item, {
-          type: "fix",
-          key: constants.FIXED_OPERATOR,
-          args: { from: properties.get("operator"), to: operator, field }
-        });
+        operator = operator === "is_empty" ? "is_null" : "is_not_null";
+        // addError(meta, item, path, {
+        //   type: "fix",
+        //   key: constants.FIXED_OPERATOR,
+        //   args: { from: properties.get("operator"), to: operator, field }
+        // });
         properties = properties.set("operator", operator);
       } else {
-        addError(meta, item, {
+        addError(meta, item, path, {
           key: constants.UNSUPPORTED_OPERATOR_FOR_FIELD,
-          args: { operator, field }
+          args: { operator, field },
+          side: "lhs",
         });
         operator = null;
       }
@@ -281,15 +321,17 @@ function validateRule (item, path, itemId, meta, c) {
   //validate values
   valueSrc = properties.get("valueSrc");
   value = properties.get("value");
-  const canFix = !showErrorMessage;
+  const canFix = !showErrorMessage || forceFix;
   const isEndValue = true;
   let {
-    newValue, newValueSrc, newValueError, validationErrors, newFieldError,
+    newValue, newValueSrc, newValueError, validationErrors, newFieldError, fixedField,
   } = getNewValueForFieldOp(config, oldConfig, properties, field, operator, null, canFix, isEndValue);
   value = newValue;
   valueSrc = newValueSrc;
   valueError = newValueError;
   fieldError = newFieldError;
+  field = fixedField;
+  properties = properties.set("field", field);
   properties = properties.set("value", value);
   properties = properties.set("valueSrc", valueSrc);
   if (showErrorMessage) {
@@ -305,35 +347,38 @@ function validateRule (item, path, itemId, meta, c) {
   const newSerialized = serializeRule();
   const hasBeenSanitized = !deepEqual(oldSerialized, newSerialized);
   const compl = whatRulePropertiesAreCompleted(properties.toObject(), config);
+  const isCompleted = compl.score >= 3;
   if (hasBeenSanitized)
     meta.sanitized = true;
-  if (compl.score < 3) {
-    let errorKey = constants.INCOMPLETE_RULE, errorArgs = {};
+  if (isCompleted && hasBeenSanitized) {
+    item = item.set("properties", properties);
+  }
+  if (!isCompleted) {
+    let incError = { key: constants.INCOMPLETE_RULE, args: {} };
     if (!compl.parts.field) {
-      errorKey = constants.INCOMPLETE_LHS;
+      incError.key = constants.INCOMPLETE_LHS;
+      incError.side = "lhs";
     } else if(!compl.parts.value) {
-      errorKey = constants.INCOMPLETE_RHS;
+      incError.key = constants.INCOMPLETE_RHS;
+      incError.side = "rhs";
       if (newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
         // eg. operator `starts_with` supports only valueSrc "value"
-        errorKey = constants.INVALID_VALUE_SRC;
-        errorArgs = {
+        incError.key = constants.INVALID_VALUE_SRC;
+        incError.args = {
           valueSrc: newSerialized.valueSrc
         };
       }
     }
-    addError(meta, item, {
-      key: errorKey,
-      args: errorArgs,
-    });
+    incError.fixed = removeIncompleteRules;
+    addError(meta, item, path, incError);
     if (removeIncompleteRules) {
       item = undefined;
     }
-  } else {
-    if (hasBeenSanitized) {
-      item = item.set("properties", properties);
-    }
-    validationErrors?.map(e => addError(meta, origItem, e));
   }
+  validationErrors?.map(e =>
+    addError(meta, origItem, path, e)
+  );
+
   return item;
 }
 
@@ -342,28 +387,28 @@ function validateRule (item, path, itemId, meta, c) {
  * 
  * @param {bool} canFix true is useful for func values to remove bad args
  * @param {bool} isEndValue false if value is in process of editing by user
- * @return {array} [fixedValue, errorKey, errorArgs] - if errorKey === null and canFix == true, fixedValue can differ from value if was fixed
- *   If errorArgs === null, errorKey should not be translated
+ * @return {array} [fixedValue, allErrors] - if `allErrors` is empty and `canFix` == true, `fixedValue` can differ from value if was fixed.
+ *  `allErrors` is an array of {key, args, fixed}. If `args` === null, `key` should not be translated
  */
 export const validateValue = (
   config, leftField, field, operator, value, valueType, valueSrc, asyncListValues,
   canFix = false, isEndValue = false, canDropArgs = false
 ) => {
-  let errorKey, errorArgs, allErrors;
+  let allErrors = [];
   let fixedValue = value;
 
   if (value != null) {
     if (valueSrc === "field") {
-      [fixedValue, errorKey, errorArgs] = validateFieldValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue);
+      [fixedValue, allErrors] = validateFieldValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue);
     } else if (valueSrc === "func") {
-      [fixedValue, errorKey, errorArgs, allErrors] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue, canDropArgs);
+      [fixedValue, allErrors] = validateFuncValue(leftField, field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue, canDropArgs);
     } else if (valueSrc === "value" || !valueSrc) {
-      [fixedValue, errorKey, errorArgs] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue);
+      [fixedValue, allErrors] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue);
     }
 
-    let shouldCallValidateFn = !errorKey;
-    if (errorKey && fixedValue !== value) {
-      // eg. if value was > max, but fixed to max, then errorKey is defined, but max value can not satisfy validateValue() in config
+    let shouldCallValidateFn = !allErrors?.length;
+    if (allErrors?.length && fixedValue !== value) {
+      // eg. if value was > max, and fixed to max, but max value can not satisfy validateValue() in config
       shouldCallValidateFn = true;
     }
     if (shouldCallValidateFn && field) {
@@ -387,39 +432,33 @@ export const validateValue = (
         const validResult = fn.call(config.ctx, ...args);
         if (typeof validResult === "object" && validResult !== null && !Array.isArray(validResult)) {
           if (validResult.error?.key) {
-            errorKey = validResult.error.key;
-            errorArgs = validResult.error.args;
+            allErrors.push(validResult.error);
           } else {
-            errorKey = validResult.error;
-            errorArgs = null; // Note: `null` means it's not translated string!
+            // Note: `null` means it's not translated string!
+            allErrors.push({key: validResult.error, args: null});
           }
           if (validResult.fixedValue !== undefined && canFix) {
             fixedValue = validResult.fixedValue;
+            allErrors[allErrors.length-1].fixed = true;
           }
         } else if (typeof validResult === "boolean") {
           if (validResult == false) {
-            errorKey = constants.INVALID_VALUE;
-            errorArgs = {};
+            allErrors.push({key: constants.INVALID_VALUE, args: {}});
           }
-        } else {
-          errorKey = validResult;
+        } else if (typeof validResult === "string") {
+          allErrors.push({key: validResult, args: null});
         }
       }
     }
   }
-
-  if (!allErrors && errorKey) {
-    allErrors = [{
-      key: errorKey,
-      args: errorArgs,
-    }];
-  }
   
-  return [fixedValue, errorKey, errorArgs, allErrors];
+  return [fixedValue, allErrors];
 };
 
 const validateValueInList = (value, listValues, canFix, isEndValue, removeInvalidMultiSelectValuesOnLoad) => {
   const values = Immutable.List.isList(value) ? value.toJS() : (value instanceof Array ? [...value] : undefined);
+  let fixedValue = value;
+  let allErrors = [];
   if (values) {
     const [goodValues, badValues] = values.reduce(([goodVals, badVals], val) => {
       const vv = getItemInListValues(listValues, val);
@@ -432,17 +471,28 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
     const needFix = badValues.length > 0;
     // always remove bad values at tree validation as user can't unselect them (except AntDesign widget)
     canFix = canFix || removeInvalidMultiSelectValuesOnLoad === true;
-    return [canFix && needFix ? goodValues : value, badValues.length && constants.BAD_MULTISELECT_VALUES, {
-      badValues, count: badValues.length
-    }];
+    if (badValues.length) {
+      allErrors.push({
+        key: constants.BAD_MULTISELECT_VALUES,
+        args: { badValues, count: badValues.length },
+        fixed: canFix && needFix,
+      });
+    }
+    fixedValue = canFix && needFix ? goodValues : value;
+    return [fixedValue, allErrors];
   } else {
     const vv = getItemInListValues(listValues, value);
     if (vv == undefined) {
-      return [value, constants.BAD_SELECT_VALUE, { value }];
+      fixedValue = canFix ? null : value;
+      allErrors.push({
+        key: constants.BAD_SELECT_VALUE,
+        args: { value },
+        fixed: canFix,
+      });
     } else {
-      value = vv.value;
+      fixedValue = vv.value;
     }
-    return [value];
+    return [fixedValue, allErrors];
   }
 };
 
@@ -450,6 +500,8 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
 * 
 */
 const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues, config, operator = null, canFix = false, isEndValue = false) => {
+  let allErrors = [];
+  let fixedValue = value;
   if (field) {
     const fieldConfig = getFieldConfig(config, field);
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -462,27 +514,48 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
     // todo: for select/multiselect value can be string or number
     const canSkipCheck = listValues || isAsyncListValues;
 
-    if (valueType && wType && valueType != wType)
-      return [value, constants.INCORRECT_VALUE_TYPE, { wType, valueType }];
+    if (valueType && wType && valueType != wType) {
+      allErrors.push({
+        key: constants.INCORRECT_VALUE_TYPE,
+        args: { wType, valueType }
+      });
+      return [value, allErrors];
+    }
     if (jsType && !isTypeOf(value, jsType) && !canSkipCheck) {
-      return [value, constants.INCORRECT_VALUE_JS_TYPE, { jsType, valueTypeof: typeof value }];
+      allErrors.push({
+        key: constants.INCORRECT_VALUE_JS_TYPE,
+        args: { jsType, valueTypeof: typeof value }
+      });
+      return [value, allErrors];
     }
 
     if (fieldSettings) {
       const realListValues = asyncListValues || listValues;
       if (realListValues && !fieldSettings.allowCustomValues) {
-        return validateValueInList(value, realListValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad);
+        [fixedValue, allErrors] = validateValueInList(
+          value, realListValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad
+        );
       }
       if (fieldSettings.min != null && value < fieldSettings.min) {
-        return [canFix ? fieldSettings.min : value, constants.VALUE_MIN_CONSTRAINT_FAIL, { value, fieldSettings }];
+        allErrors.push({
+          key: constants.VALUE_MIN_CONSTRAINT_FAIL,
+          args: { value, fieldSettings },
+          fixed: canFix,
+        });
+        fixedValue = canFix ? fieldSettings.min : value;
       }
       if (fieldSettings.max != null && value > fieldSettings.max) {
-        return [canFix ? fieldSettings.max : value, constants.VALUE_MAX_CONSTRAINT_FAIL, { value, fieldSettings }];
+        allErrors.push({
+          key: constants.VALUE_MAX_CONSTRAINT_FAIL,
+          args: { value, fieldSettings },
+          fixed: canFix,
+        });
+        fixedValue = canFix ? fieldSettings.max : value;
       }
     }
   }
 
-  return [value];
+  return [fixedValue, allErrors];
 };
 
 
@@ -490,19 +563,33 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
 * 
 */
 const validateFieldValue = (leftField, field, value, _valueSrc, valueType, asyncListValues, config, operator = null, canFix = false, isEndValue = false) => {
+  const allErrors = [];
   const {fieldSeparator} = config.settings;
   const isFuncArg = typeof field == "object" && field?._isFuncArg;
   const leftFieldStr = Array.isArray(leftField) ? leftField.join(fieldSeparator) : leftField;
   const rightFieldStr = Array.isArray(value) ? value.join(fieldSeparator) : value;
   const rightFieldDefinition = getFieldConfig(config, value);
-  if (!rightFieldDefinition)
-    return [value, constants.NO_CONFIG_FOR_FIELD_VALUE, { field: value }];
-  if (leftField && rightFieldStr == leftFieldStr && !isFuncArg)
-    return [value, constants.CANT_COMPARE_FIELD_WITH_ITSELF, { field: leftField }];
-  if (valueType && valueType != rightFieldDefinition.type)
-    return [value, constants.INCORRECT_FIELD_TYPE, {
-      field: value, type: rightFieldDefinition.type, expected: valueType
-    }];
+  if (!rightFieldDefinition) {
+    allErrors.push({
+      key: constants.NO_CONFIG_FOR_FIELD_VALUE,
+      args: { field: value }
+    });
+    return [value, allErrors];
+  }
+  if (leftField && rightFieldStr == leftFieldStr && !isFuncArg) {
+    allErrors.push({
+      key: constants.CANT_COMPARE_FIELD_WITH_ITSELF,
+      args: { field: leftField }
+    });
+    return [value, allErrors];
+  }
+  if (valueType && valueType != rightFieldDefinition.type) {
+    allErrors.push({
+      key: constants.INCORRECT_FIELD_TYPE,
+      args: { field: value, type: rightFieldDefinition.type, expected: valueType }
+    });
+    return [value, allErrors];
+  }
   return [value];
 };
 
@@ -514,81 +601,91 @@ const validateFuncValue = (
   canFix = false, isEndValue = false, canDropArgs = false
 ) => {
   let fixedValue = value;
+  const allErrors = [];
 
-  if (value) {
-    const funcKey = value.get("func");
-    if (funcKey) {
-      const fieldDef = getFieldConfig(config, field);
-      if (fieldDef?.funcs) {
-        if (!fieldDef.funcs.includes(funcKey)) {
-          return [value, constants.UNSUPPORTED_FUNCTION_FOR_FIELD, { funcKey, field }];
-        }
+  if (!value) {
+    // empty value
+    return [value];
+  }
+  const funcKey = value.get?.("func");
+  if (!funcKey) {
+    // it's not a function value
+    return [value];
+  }
+  const fieldDef = getFieldConfig(config, field);
+  if (fieldDef?.funcs && !fieldDef.funcs.includes(funcKey)) {
+    allErrors.push({
+      key: constants.UNSUPPORTED_FUNCTION_FOR_FIELD,
+      args: { funcKey, field }
+    });
+    return [value, allErrors];
+  }
+  const funcConfig = getFuncConfig(config, funcKey);
+  if (!funcConfig) {
+    allErrors.push({
+      key: constants.NO_CONFIG_FOR_FUNCTION,
+      args: { funcKey }
+    });
+    return [value, allErrors];
+  }
+  if (valueType && funcConfig.returnType != valueType) {
+    allErrors.push({
+      key: constants.INCORRECT_FUNCTION_RETURN_TYPE,
+      args: { funcKey, returnType: funcConfig.returnType, valueType }
+    });
+    return [value, allErrors];
+  }
+  for (const argKey in funcConfig.args) {
+    const argConfig = funcConfig.args[argKey];
+    const args = fixedValue.get("args");
+    const argVal = args ? args.get(argKey) : undefined;
+    const argDef = getFieldConfig(config, argConfig);
+    const argValue = argVal ? argVal.get("value") : undefined;
+    const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
+    if (argValue !== undefined) {
+      const [fixedArgVal, argErrors] = validateValue(
+        config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, canDropArgs,
+      );
+      const willFix = canFix && fixedArgVal !== argValue;
+      const hasError = argErrors?.length > 0;
+      //tip: reset to default ONLY if isEndValue==true
+      const canDrop = canFix && hasError && !willFix && (isEndValue || canDropArgs);
+      if (willFix) {
+        fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
       }
-      if (fixedValue) {
-        const funcConfig = getFuncConfig(config, funcKey);
-        if (funcConfig) {
-          if (valueType && funcConfig.returnType != valueType) {
-            return [value, constants.INCORRECT_FUNCTION_RETURN_TYPE, { funcKey, returnType: funcConfig.returnType, valueType }];
-          }
-          const allArgsErrors = [];
-          for (const argKey in funcConfig.args) {
-            const argConfig = funcConfig.args[argKey];
-            const args = fixedValue.get("args");
-            const argVal = args ? args.get(argKey) : undefined;
-            const argDef = getFieldConfig(config, argConfig);
-            const argValue = argVal ? argVal.get("value") : undefined;
-            const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
-            if (argValue !== undefined) {
-              const [fixedArgVal, errorKey, errorArgs] = validateValue(
-                config, leftField, argDef, operator, argValue, argConfig.type, argValueSrc, asyncListValues, canFix, isEndValue, canDropArgs,
-              );
-              const willFix = canFix && fixedArgVal !== argValue;
-              const hasError = !!errorKey;
-              //tip: reset to default ONLY if isEndValue==true
-              const canDrop = canFix && hasError && !willFix && (isEndValue || canDropArgs);
-              if (willFix) {
-                fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
-              }
-              if (canDrop) {
-                // reset to default
-                fixedValue = fixedValue.deleteIn(["args", argKey]);
-                fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
-              }
-              if (hasError) {
-                const argValidationError = translateValidation(errorKey, errorArgs);
-                allArgsErrors.push({
-                  key: constants.INVALID_FUNC_ARG_VALUE,
-                  args: {
-                    funcKey, argKey, argValidationError,
-                    i18n: {key: errorKey, args: errorArgs}
-                  }
-                });
-                canFix = false;
-              }
-            } else if (!argConfig.isOptional && isEndValue) {
-              const canDrop = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
-              if (canDrop) {
-                // set default
-                fixedValue = fixedValue.deleteIn(["args", argKey]);
-                fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
-              } else {
-                allArgsErrors.push({
-                  key: constants.REQUIRED_FUNCTION_ARG,
-                  args: { funcKey, argKey }
-                });
-                canFix = false;
-              }
-            }
-          }
-          if (allArgsErrors.length) {
-            return [fixedValue, allArgsErrors[0].key, allArgsErrors[0].args, allArgsErrors];
-          }
-        } else return [value, constants.NO_CONFIG_FOR_FUNCTION, {funcKey}];
+      if (canDrop) {
+        // reset to default
+        fixedValue = fixedValue.deleteIn(["args", argKey]);
+        fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
       }
-    } // else it's not function value
-  } // empty value
+      if (hasError) {
+        const argValidationError = translateValidation(argErrors[0]);
+        allErrors.push({
+          key: constants.INVALID_FUNC_ARG_VALUE,
+          args: {
+            funcKey, argKey,
+            argValidationError,
+            i18n: argErrors[0]
+          },
+          fixed: willFix || canDrop,
+        });
+      }
+    } else if (!argConfig.isOptional && isEndValue) {
+      const canDrop = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
+      allErrors.push({
+        key: constants.REQUIRED_FUNCTION_ARG,
+        args: { funcKey, argKey },
+        fixed: canDrop,
+      });
+      if (canDrop) {
+        // set default
+        fixedValue = fixedValue.deleteIn(["args", argKey]);
+        fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
+      }
+    }
+  }
 
-  return [fixedValue];
+  return [fixedValue, allErrors];
 };
 
 /**
@@ -600,7 +697,7 @@ export const validateRange = (config, field, operator, values, valueSrcs) => {
   const valueSrcsArr = (valueSrcs.toJS ? valueSrcs.toJS() : valueSrcs);
   const valuesArr = (values.toJS ? values.toJS() : values);
   const areValueSrcsPureValues = valueSrcsArr.filter(vs => vs == "value" || vs == null).length == operatorCardinality;
-  let rangeErrorKey, rangeErrorArgs;
+  let rangeError;
   if (operatorConfig?.validateValues && areValueSrcsPureValues) {
     const valueSrc = valueSrcsArr[0];
     const w = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -617,15 +714,17 @@ export const validateRange = (config, field, operator, values, valueSrcs) => {
     const validResult = operatorConfig.validateValues(jsValues);
     if (typeof validResult === "boolean") {
       if (validResult == false) {
-        rangeErrorKey = constants.INVALID_RANGE;
-        rangeErrorArgs = {
-          jsValues,
-          values: valuesArr,
+        rangeError = {
+          key: constants.INVALID_RANGE,
+          args: {
+            jsValues,
+            values: valuesArr,
+          }
         };
       }
     }
   }
-  return [rangeErrorKey, rangeErrorArgs];
+  return rangeError;
 };
 
 
@@ -699,10 +798,10 @@ export const getNewValueForFieldOp = function (
 
   // validate func LHS
   if (currentFieldSrc === "func" && newField) {
-    const [fixedField, errorKey, errorArgs, allErrors] = validateValue(
+    const [fixedField, fieldErrors] = validateValue(
       config, null, null, newOperator, newField, newType, currentFieldSrc, asyncListValues, canFix, isEndValue, canDropArgs
     );
-    const isValid = !errorKey;
+    const isValid = !fieldErrors?.length;
     const willFix = fixedField !== newField;
     const willRevert = !isValid && !willFix && canFix;
     if (willFix) {
@@ -713,11 +812,11 @@ export const getNewValueForFieldOp = function (
     if (!isValid) {
       const showError = !isValid && !willFix;
       if (showError) {
-        newFieldError = translateValidation(errorKey, errorArgs);
+        newFieldError = translateValidation(fieldErrors[0]);
       }
       // tip: even if we don't show errors, but revert LHS, put the reason of revert
-      allErrors?.map(e => validationErrors.push({
-        src: "lhs",
+      fieldErrors?.map(e => validationErrors.push({
+        side: "lhs",
         ...e,
       }));
     }
@@ -769,10 +868,10 @@ export const getNewValueForFieldOp = function (
         vType = currentValueType.get(0) || null;
         vSrc = currentValueSrc.get(0) || null;
       }
-      const [fixedValue, errorKey, errorArgs, allErrors] = validateValue(
+      const [fixedValue, allErrors] = validateValue(
         config, newField, newField, newOperator, v, vType, vSrc, asyncListValues, canFix, isEndValue, canDropArgs
       );
-      const isValid = !errorKey;
+      const isValid = !allErrors?.length;
       // Allow bad value with error message
       // But not on field change - in that case just drop bad value that can't be reused
       // ? Maybe we should also drop bad value on op change?
@@ -783,7 +882,7 @@ export const getNewValueForFieldOp = function (
       if (!isValid) {
         // tip: even if we don't show errors, but drop bad values, put the reason of removal
         allErrors?.map(e => validationErrors.push({
-          src: "rhs",
+          side: "rhs",
           delta: i,
           ...e,
         }));
@@ -798,7 +897,7 @@ export const getNewValueForFieldOp = function (
       }
       const showError = !isValid && !willFix;
       if (showError) {
-        valueErrors[i] = translateValidation(errorKey, errorArgs);
+        valueErrors[i] = translateValidation(allErrors[0]);
       }
       if (willFix) {
         valueFixes[i] = fixedValue;
@@ -849,10 +948,10 @@ export const getNewValueForFieldOp = function (
   }));
 
   // Validate range
-  const [rangeErrorKey, rangeErrorArgs] = validateRange(config, newField, newOperator, newValue, newValueSrc);
-  if (rangeErrorKey) {
+  const rangeErrorObj = validateRange(config, newField, newOperator, newValue, newValueSrc);
+  if (rangeErrorObj) {
     // last element in `valueError` list is for range validation error
-    rangeValidationError = translateValidation(rangeErrorKey, rangeErrorArgs);
+    rangeValidationError = translateValidation(rangeErrorObj);
     const willFix = canFix && operatorCardinality >= 2;
     if (willFix) {
       valueFixes[1] = newValue.get(0);
@@ -864,10 +963,10 @@ export const getNewValueForFieldOp = function (
       valueErrors.push(rangeValidationError);
     }
     validationErrors.push({
-      src: "rhs",
+      side: "rhs",
       delta: -1,
-      key: rangeErrorKey,
-      args: rangeErrorArgs,
+      ...rangeErrorObj,
+      fixed: willFix,
     });
   }
 

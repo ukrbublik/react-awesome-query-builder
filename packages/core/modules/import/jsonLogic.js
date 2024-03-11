@@ -13,9 +13,10 @@ import moment from "moment";
 const arrayUniq = (arr) => Array.from(new Set(arr));
 const arrayToObject = (arr) => arr.reduce((acc, [f, fc]) => ({ ...acc, [f]: fc }), {});
 
-const createMeta = () => {
+const createMeta = (parentMeta) => {
   return {
-    errors: []
+    errors: [],
+    settings: parentMeta?.settings,
   };
 };
 
@@ -26,6 +27,10 @@ export const loadFromJsonLogic = (logicTree, config) => {
 export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   //meta is mutable
   let meta = createMeta();
+  meta.settings = {
+    allowUnknownFields: false,
+    returnErrors,
+  };
   const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
   let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
@@ -146,7 +151,7 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
   const fieldType = fieldConfig?.type;
 
-  if (!widgetConfig) {
+  if (fieldType && !widgetConfig) {
     meta.errors.push(`No widget for type ${fieldType}`);
     return undefined;
   }
@@ -202,7 +207,7 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   return {
     valueSrc: "value",
     value: val,
-    valueType: widgetConfig.type,
+    valueType: widgetConfig?.type,
     asyncListValues
   };
 };
@@ -211,7 +216,7 @@ const convertFieldRhs = (op, vals, conv, config, not, meta, parentField = null) 
   if (conv.varKeys.includes(op) && typeof vals[0] == "string") {
     const field = normalizeField(config, vals[0], parentField);
     const fieldConfig = getFieldConfig(config, field);
-    if (!fieldConfig) {
+    if (!fieldConfig && !meta.settings?.allowUnknownFields) {
       meta.errors.push(`No config for field ${field}`);
       return undefined;
     }
@@ -219,7 +224,7 @@ const convertFieldRhs = (op, vals, conv, config, not, meta, parentField = null) 
     return {
       valueSrc: "field",
       value: field,
-      valueType: fieldConfig.type,
+      valueType: fieldConfig?.type,
     };
   }
 
@@ -557,11 +562,11 @@ const wrapInDefaultConj = (rule, config, not = false) => {
 };
 
 const parseRule = (op, arity, vals, parentField, conv, config, meta) => {
-  const submeta = createMeta();
+  const submeta = createMeta(meta);
   let res = _parseRule(op, arity, vals, parentField, conv, config, false, submeta);
   if (!res) {
     // try reverse
-    res = _parseRule(op, arity, vals, parentField, conv, config, true, createMeta());
+    res = _parseRule(op, arity, vals, parentField, conv, config, true, createMeta(meta));
   }
   if (!res) {
     meta.errors.push(submeta.errors.join("; ") || `Unknown op ${op}/${arity}`);
@@ -618,7 +623,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
     field, fieldSrc, having, isGroup, args
   } = lhs;
   const fieldConfig = getFieldConfig(config, field);
-  if (!fieldConfig) {
+  if (!fieldConfig && !meta.settings?.allowUnknownFields) {
     meta.errors.push(`No config for LHS ${field}`);
     return;
   }
@@ -664,7 +669,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   // Group component in array mode can show NOT checkbox, so do nothing in this case
   // Otherwise try to revert
-  const showNot = fieldConfig.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
+  const showNot = fieldConfig?.showNot !== undefined ? fieldConfig.showNot : config.settings.showNot; 
   let canRev = true;
   // if (fieldConfig.type == "!group" && fieldConfig.mode == "array" && showNot)
   //   canRev = false;
@@ -672,7 +677,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   let conj;
   let havingVals;
   let havingNot = false;
-  if (fieldConfig.type == "!group" && having) {
+  if (fieldConfig?.type == "!group" && having) {
     conj = Object.keys(having)[0];
     havingVals = having[conj];
     if (!Array.isArray(havingVals))
@@ -709,12 +714,12 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
 
   let res;
 
-  let fieldType = fieldConfig.type;
+  let fieldType = fieldConfig?.type;
   if (fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
   }
 
-  if (fieldConfig.type == "!group" && having) {
+  if (fieldConfig?.type == "!group" && having) {
     if (conv.conjunctions[conj] !== undefined) {
       // group
       res = convertConj(conj, havingVals, conv, config, havingNot, meta, field, true);
@@ -744,7 +749,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
     if (not) {
       res = wrapInDefaultConj(res, config, not);
     }
-  } else if (fieldConfig.type == "!group" && !having) {
+  } else if (fieldConfig?.type == "!group" && !having) {
     res = {
       type: "rule_group",
       id: uuid(),

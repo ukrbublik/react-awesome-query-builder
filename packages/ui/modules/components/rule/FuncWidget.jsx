@@ -52,7 +52,7 @@ export default class FuncWidget extends Component {
   }
 
   getMeta({config, field, operator, value}) {
-    const funcKey = value ? value.get("func") : null;
+    const funcKey = value?.get?.("func") ?? null;
     const funcDefinition = funcKey ? getFuncConfig(config, funcKey) : null;
 
     return {
@@ -123,7 +123,7 @@ export default class FuncWidget extends Component {
 
   renderFuncSelect = () => {
     const {config, field, fieldType, fieldSrc, isLHS, operator, customProps, value, readonly, parentFuncs, id, groupId, isFuncArg, fieldDefinition} = this.props;
-    const funcKey = value ? value.get("func") : null;
+    const funcKey = value?.get?.("func") ?? null;
     const selectProps = {
       value: funcKey,
       setValue: this.setFunc,

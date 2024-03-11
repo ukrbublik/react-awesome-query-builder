@@ -21,10 +21,10 @@ describe("validation", () => {
       
       const ruleError = qb.find(".rule--error");
       expect(ruleError).to.have.length(1);
-      expect(ruleError.first().text()).to.eq("Value 200 > max 10");
+      expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
     }, {
       ignoreLog: (errText) => {
-        return errText.includes("Field num: Value 200 > max 10");
+        return errText.includes("Field num: Value 200 should be from 0 to 10");
       }
     });
   });

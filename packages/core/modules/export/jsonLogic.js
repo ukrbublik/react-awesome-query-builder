@@ -276,8 +276,8 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
 
 
 const formatFunc = (meta, config, currentValue, parentField = null) => {
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   const funcParts = getFieldParts(funcKey, config);
   const funcLastKey = funcParts[funcParts.length-1];
