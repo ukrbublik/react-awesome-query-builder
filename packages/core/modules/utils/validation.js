@@ -10,7 +10,7 @@ import {
 import {defaultValue, getFirstDefined, deepEqual} from "../utils/stuff";
 import {getItemInListValues} from "../utils/listValues";
 import {defaultOperatorOptions} from "../utils/defaultUtils";
-import {fixPathsInTree, getItemByPath} from "../utils/treeUtils";
+import {fixPathsInTree, getItemByPath, getFlatTree} from "../utils/treeUtils";
 import {setFuncDefaultArg} from "../utils/funcUtils";
 import {queryString} from "../export/queryString";
 import * as constants from "../i18n/validation/constains";
@@ -68,7 +68,7 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
     newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix
   );
   if (isSanitized && allErrros.length) {
-    console.warn("Tree validation errors: ", allErrros)
+    console.warn("Tree validation errors: ", allErrros);
   }
   fixedTree = fixPathsInTree(fixedTree);
   return fixedTree;
@@ -85,10 +85,12 @@ export const _validateTree = (
     errors: {},
   };
   const fixedTree = validateItem(tree, [], null, meta, c);
+  const flatItems = getFlatTree(fixedTree).items;
   const isSanitized = meta.sanitized;
   const errorsArr = [];
   for (const id in meta.errors) {
     let {path, errors} = meta.errors[id];
+    const flatItem = flatItems[id];
     if (translateErrors) {
       errors = errors.map(e => {
         return {
@@ -99,10 +101,14 @@ export const _validateTree = (
     }
     let errorItem = { path, errors };
     if (stringifyRules) {
-      const item = getItemByPath(tree, path);
+      const item = getItemByPath(fixedTree, path);
       const itemStr = queryString(item, config, false, true);
       errorItem.itemStr = itemStr;
     }
+    // todo
+    // if (1) {
+    //   errorItem.itemMeta = flatItem?.nums;
+    // }
     errorsArr.push(errorItem);
   }
   return [fixedTree, errorsArr, isSanitized];

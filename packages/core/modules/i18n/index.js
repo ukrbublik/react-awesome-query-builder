@@ -1,4 +1,4 @@
-import i18next from 'i18next';
+import i18next from "i18next";
 import { translations as validationTranslations } from "./validation/translations";
 
 export const NSV = "raqbvalidation";
