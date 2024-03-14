@@ -6,6 +6,7 @@ import {
 } from "@react-awesome-query-builder/ui";
 import ImportSkinStyles from "../skins";
 import throttle from "lodash/throttle";
+import omit from "lodash/omit";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
@@ -64,7 +65,7 @@ interface DemoQueryBuilderMemo {
 // Add translations
 Utils.i18n.addResources("en", "custom", {
   "INVALID_SLIDER_VALUE": "Invalid slider value {{val}} translated with i18next",
-  "BAD_LEN": "bad len {{val}} translated with i18next"
+  "BAD_LEN": "Bad length {{val}} translated with i18next"
 });
 
 const DemoQueryBuilder: React.FC = () => {
@@ -113,23 +114,17 @@ const DemoQueryBuilder: React.FC = () => {
   const sanitize = () => {
     setState({
       ...state,
-      tree: sanitizeTree(state.tree, state.config, true)
+      tree: sanitizeTree(state.tree, state.config, {
+        forceFix: true
+      })
     });
   };
 
   const validate = () => {
-    const validationErrors = validateTree(state.tree, state.config).map(({path, errors}) => {
-      const errorsTranslated = errors.map(e => ({
-        ...e,
-        str: Utils.Validation.translateValidation(e)
-      }));
-      const item = Utils.TreeUtils.getItemByPath(state.tree, path);
-      const itemStr = Utils.Export.queryString(item, state.config, false, true);
-      return {
-        path,
-        itemStr,
-        errorsTranslated,
-      };
+    const validationErrors = validateTree(state.tree, state.config, {
+      translateErrors: true,
+      includeItemsPositions: true,
+      includeStringifiedItems: true,
     });
     console.log(">>> validationErrors", validationErrors);
   };
@@ -340,11 +335,33 @@ const DemoQueryBuilder: React.FC = () => {
     const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
     const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
     const elasticSearch = elasticSearchFormat(immutableTree, config);
-    const validationRes = validateTree(immutableTree, config);
+
+    const validationRes = validateTree(immutableTree, config, {
+      includeItemsPositions: true,
+      includeStringifiedItems: true,
+      translateErrors: true,
+    }).map(({
+      errors, itemStr, itemPositionStr, itemIndexPathStr,
+    }) => ({
+      errors: errors.map(({side, delta, str, fixed}) => `${fixed ? "* " : ""}[${side ?? ""} ${delta ?? ""}] ${str}`),
+      itemStr,
+      itemPositionStr,
+      itemIndexPathStr,
+    }));
 
     return (
       <div>
         {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
+        <hr/>
+        <div>
+        Errors: 
+        { validationRes.length > 0
+          ? <pre style={preErrorStyle}>
+            {stringify(validationRes, undefined, 2)}
+          </pre>
+          : "no"
+        }
+        </div>
         <br />
         <div>
         spelFormat: 
@@ -427,16 +444,6 @@ const DemoQueryBuilder: React.FC = () => {
           <pre style={preStyle}>
             {stringify(treeJs, undefined, 2)}
           </pre>
-        </div>
-        <hr/>
-        <div>
-        Errors: 
-        { validationRes.length > 0
-          ? <pre style={preErrorStyle}>
-            {stringify(validationRes, undefined, 2)}
-          </pre>
-          : "no"
-        }
         </div>
         {/* <hr/>
       <div>

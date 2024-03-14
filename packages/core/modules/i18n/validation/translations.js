@@ -2,6 +2,9 @@ import * as constants from "./constains";
 
 export const translations = {
   [constants.EMPTY_GROUP]: "Empty group",
+  [constants.EMPTY_RULE_GROUP]: "No conditions for group field {{field}}",
+  [constants.EMPTY_QUERY]: "Empty query",
+  [constants.EMPTY_CASE]: "Empty case",
   [constants.NO_CONFIG_FOR_FIELD]: "No config for field {{field}}",
   [constants.FIXED_OPERATOR]: "Fixed operator {{from}} to {{to}} for field {{field}}",
   [constants.NO_CONFIG_FOR_OPERATOR]: "No config for operator {{operator}}",
@@ -28,4 +31,8 @@ export const translations = {
   [constants.REQUIRED_FUNCTION_ARG]: "Value of arg {{argKey}} for func {{funcKey}} is required",
   [constants.INCORRECT_FUNCTION_RETURN_TYPE]: "Function {{funcKey}} should return value of type {{returnType}}, but got {{valueType}}",
   [constants.INVALID_RANGE]: "Invalid range",
+  
+  [constants.ITEM_POSITION_RULE]: "Leaf number {{globalLeafNo}}",
+  [constants.ITEM_POSITION_GROUP]: "Group number {{globalGroupNo}}",
+  [constants.ITEM_POSITION_BY_TYPE]: "Rule-group number {{globalNoByType}}",
 };

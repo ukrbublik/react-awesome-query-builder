@@ -3,7 +3,7 @@ import merge from "lodash/merge";
 import {
   BasicFuncs, Utils, BasicConfig,
   // types:
-  Operators, Fields, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
+  Operators, Fields, Func, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
   Settings,
   DateTimeFieldSettings, TextFieldSettings, SelectFieldSettings, MultiSelectFieldSettings, NumberFieldSettings,
   TextWidgetProps,
@@ -647,12 +647,27 @@ export default (skin: string) => {
     string: {
       type: "!struct",
       label: "String",
+      tooltip: "String functions",
       subfields: {
         LOWER: merge({}, BasicFuncs.LOWER, {
+          tooltip: "Convert to lower case",
           allowSelfNesting: true,
-        }),
-        UPPER: merge({}, BasicFuncs.UPPER, {
-          allowSelfNesting: true,
+          validateValue: (s: string) => {
+            return s.length <= 7 ? null : {
+              error: "bad len",
+              fixedValue: "_fixed_"
+            };
+          },
+          args: {
+            str: {
+              validateValue: (s: string) => {
+                return s.length <= 7 ? null : {
+                  error: { key: "custom:BAD_LEN", args: {val: s} },
+                  fixedValue: "_fixed_"
+                };
+              }
+            },
+          }
         }),
       }
     },

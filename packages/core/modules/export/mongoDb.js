@@ -64,10 +64,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const realParentPath = hasParentRuleGroup && parentPath;
 
   const groupField = type === "rule_group" ? properties.get("field") : null;
+  const groupOperator = type === "rule_group" ? properties.get("operator") : null;
+  const groupOperatorCardinality = groupOperator ? config.operators[groupOperator]?.cardinality ?? 1 : undefined;
   const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
-  const canHaveEmptyChildren = groupField && mode == "array";
+  const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
 
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children

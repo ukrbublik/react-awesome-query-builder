@@ -39,7 +39,7 @@ export const getItemByPath = (tree, path) => {
   let res = tree;
   path.forEach((id) => {
     res = children.get(id);
-    children = res.get("children1");
+    children = res?.get("children1");
   });
   return res;
 };
@@ -178,91 +178,160 @@ export const fixEmptyGroupsInTree = (tree) => {
 export const getFlatTree = (tree) => {
   let flat = [];
   let items = {};
-  let realHeight = 0;
+  let cases = [];
+  let visibleHeight = 0; // number of non-collapsed nodes
+  let globalLeafCount = 0;
+  let globalAtomicCount = 0;
+  let globalGroupCount = 0;
+  let globalCountByType = {};
+  // rule_group_ext can be counted as group  (group #x)
+  // or by similars (rule-group #x) (NOT both _ext and no ext)
 
-  function _flatizeTree (item, path, insideCollapsed, insideLocked, insideRuleGroup, lev, info, parentType, caseId) {
+  function _flatizeTree (
+    item, path, insideCollapsed, insideLocked, insideRuleGroup, lev, caseId, childNo
+  ) {
+    const isRoot = item === tree;
     const type = item.get("type");
     const collapsed = item.get("collapsed");
     const id = item.get("id");
     const children = item.get("children1");
     const isLocked = item.getIn(["properties", "isLocked"]);
     const childrenIds = children ? children.map((_child, childId) => childId).valueSeq().toArray() : null;
-    const isRuleGroup = type == "rule_group";
-    // tip: count rule_group as 1 rule
-    const isLeaf = !insideRuleGroup && (!children || isRuleGroup);
+    const isRuleGroup = type === "rule_group";
+    const isRule = type === "rule";
+    const isGroup = type === "group";
+    const isCaseGroup = type === "case_group";
+    // tip: count rule_group as 1 atomic rule
+    const isAtomicRule = !insideRuleGroup && (!children || isRuleGroup);
     const hasChildren = childrenIds?.length > 0;
+    const parentId = path.length ? path[path.length-1] : null;
+    const currentCaseId = isCaseGroup ? id : caseId;
 
+    // Calculations before
+    if (isCaseGroup) {
+      cases.push(id);
+      // reset counters
+      globalLeafCount = 0;
+      globalAtomicCount = 0;
+      globalGroupCount = 0;
+      globalCountByType = {};
+    }
+    const caseNo = currentCaseId ? cases.indexOf(currentCaseId) : null;
     const itemsBefore = flat.length;
-    const top = realHeight;
-    flat.push(id);
-    if (!insideCollapsed)
-      realHeight += 1;
-    info.height = (info.height || 0) + 1;
+    const top = visibleHeight;
 
-    items[id] = {
-      type: type,
-      parent: path.length ? path[path.length-1] : null,
-      parentType: parentType,
-      caseId: type == "case_group" ? id : caseId,
-      isDefaultCase: type == "case_group" && !children,
-      path: path.concat(id),
-      lev: lev,
-      leaf: !children,
-      index: itemsBefore,
-      id: id,
-      children: childrenIds,
-      leafsCount: 0,
-      _top: itemsBefore,
-      //_height: (itemsAfter - itemsBefore),
-      top: (insideCollapsed ? null : top),
-      //height: height,
-      //bottom: (insideCollapsed ? null : top) + height,
-      collapsed: collapsed,
-      node: item,
-      isLocked: isLocked || insideLocked,
-    };
-
-    let depth;
-    if (children) {
-      let subinfo = {};
-      children.map((child, _childId) => {
-        _flatizeTree(
-          child, path.concat(id), 
-          insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
-          lev + 1, subinfo, type, type == "case_group" ? id : caseId
-        );
-      });
-      if (!collapsed) {
-        info.height = (info.height || 0) + (subinfo.height || 0);
-        if (hasChildren && !isRuleGroup) { // tip: don't count children of rule_group
-          depth = (subinfo.depth || 0) + 1;
-        }
+    let position;
+    if (!isRoot) {
+      position = {};
+      position.caseNo = caseNo;
+      position.globalNoByType = globalCountByType[type] || 0;
+      position.indexPath = [ ...path.slice(1).map(id => items[id].childNo), childNo ];
+      if (isRule) {
+        position.globalLeafNo = globalLeafCount;
+      } else if (isGroup) {
+        position.globalGroupNo = globalGroupCount;
       }
     }
-    
-    if (caseId && isLeaf) {
-      items[caseId].leafsCount++;
+
+    flat.push(id);
+    items[id] = {
+      node: item,
+      index: itemsBefore, // index in `flat`
+      id: id,
+      type: type,
+      parent: parentId,
+      parentType: parentId ? items[parentId].type : null,
+      children: childrenIds,
+      childNo,
+      caseId: currentCaseId,
+      caseNo,
+      path: path.concat(id),
+      lev: lev, // depth level (0 for root node)
+      isLeaf: !children, // is atomic rule OR rule inside rule_group
+      isAtomicRule, // is atomic (rule or rule_group, but not rules inside rule_group)
+      isLocked: isLocked || insideLocked,
+      // vertical
+      top: (insideCollapsed ? null : top),
+      // for case
+      isDefaultCase: isCaseGroup ? !children : undefined,
+      atomicRulesCountInCase: isCaseGroup ? 0 : undefined,
+      // object with numbers indicating # of item in tree
+      position,
+      // unused
+      collapsed: collapsed,
+      _top: itemsBefore,
+      // @deprecated use isLeaf instead
+      leaf: !children,
+
+      // will be added later:
+      //  prev
+      //  next
+      //  depth  - for any group (children of rule_group are not counted, collapsed are not counted)
+      //  height  - visible height
+      //  bottom = (insideCollapsed ? null : top + height)
+      //  _height = (itemsAfter - itemsBefore)  - real height (incl. collapsed)
+    };
+
+    // Calculations before traversing children
+    let height = 0;
+    let depth = 0;
+    if (!insideCollapsed) {
+      visibleHeight += 1;
+      height += 1;
+      if (hasChildren && !collapsed && !isRuleGroup) {
+        // tip: don't count children of rule_group
+        depth += 1;
+      }
+      if (!isRoot && !isCaseGroup) {
+        isGroup && globalGroupCount++;
+        isAtomicRule && globalAtomicCount++;
+        isRule && globalLeafCount++;
+        globalCountByType[type] = (globalCountByType[type] || 0) + 1;
+      }
+    }
+    if (caseId && isAtomicRule) {
+      items[caseId].atomicRulesCountInCase++;
     }
 
-    const itemsAfter = flat.length;
-    const _bottom = realHeight;
-    const height = info.height;
-        
-    Object.assign(items[id], {
-      _height: (itemsAfter - itemsBefore),
-      height: height,
-      bottom: (insideCollapsed ? null : top) + height,
-    });
-    if (depth != undefined) {
-      Object.assign(items[id], {
-        depth: depth,
+    // Traverse children deeply
+    let maxChildDepth = 0;
+    let sumHeight = 0;
+    if (hasChildren) {
+      let childCount = 0;
+      children.map((child, childId) => {
+        _flatizeTree(
+          child, 
+          path.concat(id), 
+          insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
+          lev + 1, currentCaseId, childCount
+        );
+        const childItem = items[childId];
+        // Calculations after deep traversing 1 child
+        maxChildDepth = Math.max(maxChildDepth, childItem.depth || 0);
+        sumHeight += childItem.height;
+        childCount++;
       });
-      info.depth = Math.max(info.depth || 0, depth);
     }
+
+    // Calculations after deep traversing ALL children
+    height += sumHeight;
+    depth += maxChildDepth;
+    const itemsAfter = flat.length;
+    const _height = itemsAfter - itemsBefore;
+    const bottom = (insideCollapsed ? null : top + height);
+
+    Object.assign(items[id], {
+      depth: children ? depth : undefined,
+      _height,
+      height,
+      bottom,
+    });
   }
 
-  _flatizeTree(tree, [], false, false, false, 0, {}, null, null);
+  // Start recursion
+  _flatizeTree(tree, [], false, false, false, 0, null, null);
 
+  // Calc after recursion
   for (let i = 0 ; i < flat.length ; i++) {
     const prevId = i > 0 ? flat[i-1] : null;
     const nextId = i < (flat.length-1) ? flat[i+1] : null;
@@ -271,7 +340,7 @@ export const getFlatTree = (tree) => {
     item.next = nextId;
   }
 
-  return {flat, items};
+  return {flat, items, cases};
 };
 
 
@@ -312,7 +381,7 @@ export const getTotalReordableNodesCountInTree = (tree) => {
 };
 
 /**
- * Returns count of rules (leafs, i.e. don't count groups)
+ * Returns count of atomic rules (i.e. don't count groups; count rule_group as 1 atomic rule)
  * @param {Immutable.Map} tree
  * @return {Integer}
  */

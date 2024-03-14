@@ -80,31 +80,52 @@ export type ConfigContext = {
   [key: string]: any;
 };
 
+export type FlatItemPosition = {
+  caseNo: number | null;
+  globalNoByType: number;
+  indexPath: number[];
+  globalLeafNo?: number;
+  globalGroupNo?: number;
+};
 export type FlatItem = {
+  node: ImmutableItem;
+  index: number; // index in `flat`
+  id: string;
+  path: string[];
   type: ItemType;
   parent: string | null;
-  parentType: ItemType;
-  caseId: string;
-  isDefaultCase: boolean;
-  path: string[];
-  lev: number;
-  leaf: boolean;
-  index: number;
-  id: string;
-  children: string[];
-  leafsCount: number;
-  _top: number;
-  _height: number;
-  top: number;
-  height: number;
-  bottom: number;
-  collapsed: boolean;
-  node: ImmutableItem;
+  parentType: ItemType | null;
+  children: string[] | null;
+  caseId: string | null;
+  caseNo: number | null;
+  prev: string | null;
+  next: string | null;
+  lev: number; // depth level
+  isLeaf: boolean; // is atomic rule OR rule inside rule_group
+  isAtomicRule: boolean; // is atomic (rule or rule_group, but not rules inside rule_group)
   isLocked: boolean;
+  // vertical
+  height: number; // visible height
+  _height: number; // real height (incl. collapsed)
+  top: number | null; // null if inside collapsed
+  bottom: number | null; // null if inside collapsed
+  // object with numbers indicating # of item in tree
+  position?: FlatItemPosition;
+  // for any group
+  depth?: number; // children of rule_group are not counted, collapsed are not counted
+  // for case only
+  isDefaultCase?: boolean;
+  atomicRulesCountInCase?: number;
+  // unused
+  _top: number;
+  collapsed: boolean;
+  // @deprecated use isLeaf instead
+  leaf: boolean;
 };
 export type FlatTree = {
-  flat: string[];
   items: TypedMap<FlatItem>;
+  flat: string[]; // ids of all items in top-to-bottom order
+  cases: string[]; // ids of cases
 };
 
 ////////////////
@@ -362,19 +383,33 @@ export interface ValidationError extends Translatable {
 export interface ValidationItemErrors {
   path: Array<string>;
   errors: ValidationError[];
+  itemStr?: string;
+  itemPosition?: FlatItemPosition;
+  itemPositionStr?: string;
+  itemIndexPathStr?: string;
 }
 export type ValidationResult = ValidationItemErrors[];
+export interface SanitizeOptions {
+  removeEmptyGroups?: boolean;
+  removeIncompleteRules?: boolean;
+  forceFix?: boolean;
+}
+export interface ValidationOptions {
+  translateErrors?: boolean;
+  includeStringifiedItems?: boolean;
+  includeItemsPositions?: boolean;
+}
 
 interface Validation {
-  sanitizeTree(tree: ImmutableTree, config: Config, forceFix?: boolean): ImmutableTree;
-  validateTree(tree: ImmutableTree, config: Config): ValidationResult;
+  sanitizeTree(tree: ImmutableTree, config: Config, options?: SanitizeOptions): ImmutableTree;
+  validateTree(tree: ImmutableTree, config: Config, options?: ValidationOptions): ValidationResult;
 
   translateValidation(tr: Translatable): string;
   translateValidation(key: Translatable["key"], args?: Translatable["args"]): string;
 
   _validateTree(
     tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config,
-    removeEmptyGroups?: boolean, removeIncompleteRules?: boolean, forceFix?: boolean,
+    options?: ValidationOptions
   ): [ImmutableTree, ValidationResult];
 }
 
@@ -448,7 +483,7 @@ interface TreeUtils {
   immutableToJs(imm: AnyImmutable): any;
   isImmutable(value: any): boolean;
   toImmutableList(path: string[]): ImmutablePath;
-  getItemByPath(tree: ImmutableTree, path: IdPath): ImmutableItem;
+  getItemByPath(tree: ImmutableTree, path: IdPath): ImmutableItem | undefined;
   expandTreePath(path: ImmutablePath, ...suffix: string[]): ImmutablePath;
   expandTreeSubpath(path: ImmutablePath, ...suffix: string[]): ImmutablePath;
   fixEmptyGroupsInTree(tree: ImmutableTree): ImmutableTree;

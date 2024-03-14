@@ -33,26 +33,38 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
-export const validateTree = (tree, config) => {
+export const validateTree = (tree, config, options = {}) => {
   if (!tree) return undefined;
   const extendedConfig = extendConfig(config, undefined, true);
-  const removeEmptyGroups = false;
-  const removeIncompleteRules = false;
-  const forceFix = false;
+  const finalOptions = {
+    ...options,
+    removeEmptyGroups: false,
+    removeIncompleteRules: false,
+    forceFix: false,
+  };
   const [_t, allErrros, _s] = _validateTree(
-    tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, forceFix
+    tree, null, extendedConfig, extendedConfig,
+    finalOptions
   );
   return allErrros;
 };
 
-export const sanitizeTree = (tree, config, forceFix = false) => {
+export const sanitizeTree = (tree, config, options = {}) => {
   if (!tree) return undefined;
   const extendedConfig = extendConfig(config, undefined, true);
-  const removeEmptyGroups = config.settings.removeEmptyGroupsOnLoad;
-  const removeIncompleteRules = config.settings.removeIncompleteRulesOnLoad;
-  const [fixedTree, _e, _s] = _validateTree(
-    tree, null, extendedConfig, extendedConfig, removeEmptyGroups, removeIncompleteRules, forceFix
+  const finalOptions = {
+    removeEmptyGroups: config.settings.removeEmptyGroupsOnLoad,
+    removeIncompleteRules: config.settings.removeIncompleteRulesOnLoad,
+    //forceFix: true,
+    ...options,
+  };
+  const [fixedTree, allErrros, isSanitized] = _validateTree(
+    tree, null, extendedConfig, extendedConfig,
+    finalOptions
   );
+  if (isSanitized && allErrros.length) {
+    console.warn("Tree sanitize errors: ", allErrros);
+  }
   return fixedTree;
 };
 
@@ -64,8 +76,14 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
   if (removeIncompleteRules === undefined) {
     removeIncompleteRules = newConfig.settings.removeIncompleteRulesOnLoad;
   }
+  const options = {
+    removeEmptyGroups,
+    removeIncompleteRules,
+    forceFix,
+  };
   let [fixedTree, allErrros, isSanitized] = _validateTree(
-    newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix
+    newTree, _oldTree, newConfig, oldConfig,
+    options
   );
   if (isSanitized && allErrros.length) {
     console.warn("Tree validation errors: ", allErrros);
@@ -75,9 +93,16 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
 };
 
 export const _validateTree = (
-  tree, _oldTree, config, oldConfig,
-  removeEmptyGroups, removeIncompleteRules, forceFix, translateErrors, stringifyRules,
+  tree, _oldTree, config, oldConfig, options
 ) => {
+  const {
+    removeEmptyGroups,
+    removeIncompleteRules,
+    forceFix,
+    translateErrors,
+    includeStringifiedItems,
+    includeItemsPositions,
+  } = options || {};
   const c = {
     config, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix,
   };
@@ -100,15 +125,34 @@ export const _validateTree = (
       });
     }
     let errorItem = { path, errors };
-    if (stringifyRules) {
-      const item = getItemByPath(fixedTree, path);
+    if (includeStringifiedItems) {
+      const item = getItemByPath(fixedTree, path) ?? getItemByPath(tree, path);
       const itemStr = queryString(item, config, false, true);
       errorItem.itemStr = itemStr;
     }
-    // todo
-    // if (1) {
-    //   errorItem.itemMeta = flatItem?.nums;
-    // }
+    if (includeItemsPositions && flatItem) {
+      const itemPosition = {
+        ...flatItem.position,
+        index: flatItem.index,
+        type: flatItem.type,
+      };
+      const args = {
+        ...itemPosition,
+        globalLeafNo: itemPosition.globalLeafNo + 1,
+        globalGroupNo: itemPosition.globalGroupNo + 1,
+        globalNoByType: itemPosition.globalNoByType + 1,
+        indexPath: itemPosition.indexPath.map(ind => ind+1),
+      };
+      errorItem.itemPosition = itemPosition;
+      let k = flatItem.type === "rule"
+        ? constants.ITEM_POSITION_RULE
+        : flatItem.type === "group"
+        ? constants.ITEM_POSITION_GROUP
+        : constants.ITEM_POSITION_BY_TYPE;
+      errorItem.itemPositionStr = translateValidation(k, args);
+      errorItem.itemIndexPathStr = itemPosition.indexPath.map(ind => ind+1).join(".");
+      //todo: if in case, use `caseNo` and another translations
+    }
     errorsArr.push(errorItem);
   }
   return [fixedTree, errorsArr, isSanitized];
@@ -141,10 +185,13 @@ function validateGroup (item, path, itemId, meta, c) {
   const {removeEmptyGroups, config} = c;
   let id = item.get("id");
   let children = item.get("children1");
+  const isRoot = !path.length;
   const oldChildren = children;
   const type = item.get("type");
-  const mode = item.getIn(["properties", "mode"]);
-  const operator = item.getIn(["properties", "operator"]);
+  const properties = item.get("properties");
+  const field = properties?.get("field");
+  const mode = properties?.get("mode");
+  const operator = properties?.get?.("operator");
   const isGroupExt = type === "rule_group" && mode === "array";
   const isCase = type === "case_group";
   const cardinality = operator ? config.operators[operator]?.cardinality ?? 1 : undefined;
@@ -172,13 +219,20 @@ function validateGroup (item, path, itemId, meta, c) {
   if (removeEmptyGroups)
     children = nonEmptyChildren;
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
-  const isEmptyChildren = !nonEmptyChildren?.size && path.length;
+  const isEmptyChildren = !nonEmptyChildren?.size;
   if (isEmptyChildren && childrenAreRequired) {
     addError(meta, item, path, {
-      key: constants.EMPTY_GROUP,
+      key: isRoot
+        ? constants.EMPTY_QUERY
+        : isCase
+          ? constants.EMPTY_CASE
+          : isGroupExt
+            ? constants.EMPTY_RULE_GROUP
+            : constants.EMPTY_GROUP,
+      args: { field },
       fixed: removeEmptyGroups,
     });
-    if (removeEmptyGroups) {
+    if (removeEmptyGroups && !isRoot) {
       item = undefined;
     }
   }

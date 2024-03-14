@@ -55,7 +55,9 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
   const groupField = isRuleGroup && mode == "array" ? properties.get("field") : null;
-  const canHaveEmptyChildren = isRuleGroup && mode === "array";
+  const groupOperator = type === "rule_group" ? properties.get("operator") : null;
+  const groupOperatorCardinality = groupOperator ? config.operators[groupOperator]?.cardinality ?? 1 : undefined;
+  const canHaveEmptyChildren = isRuleGroup && mode === "array" && groupOperatorCardinality >= 1;
   const not = properties.get("not");
   const list = children
     .map((currentChild) => formatItem(currentChild, config, meta, groupField))
