@@ -378,9 +378,9 @@ export default DemoQueryBuilder;
 
 
 
-## API
+# API
 
-### `<Query />`
+## `<Query />`
 Props:
 - `{...config}` - destructured [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
@@ -398,7 +398,7 @@ Props:
 - `props` arg in `renderBuilder` have `actions` and `dispatch` you can use to run actions programmatically
 - For a list of available actions see `Actions` interface in [`index.d.ts`](/packages/core/modules/index.d.ts). See `runActions()` in [examples](/packages/examples/demo/index.tsx) as a demonstration of calling actions programmatically.
 
-### `<Builder />`
+## `<Builder />`
 Render this component only inside `Query.renderBuilder()` like in example above:
 ```js
   renderBuilder = (props) => (
@@ -413,64 +413,83 @@ Wrapping `<Builder />` in `div.query-builder` is necessary.
 Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
 Wrapping in `div.query-builder-container` is necessary if you put query builder inside scrollable block.  
 
-### `Utils`
-- Save, load:
+## `Utils`
+
+### Save, load
   #### getTree
   `(immutableValue, light = true, children1AsArray = true) -> Object`  
   Convert query value from internal Immutable format to JS object.  
   You can use it to save value on backend in `onChange` callback of `<Query>`.  
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
+
   #### loadTree
   `(jsValue) -> Immutable`  
   Convert query value from JS format to internal Immutable format.  
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `sanitizeTree()`).
-- Validation:
+
+### Validation
+
   #### sanitizeTree
   `(immutableValue, config) -> Immutable`  
   Validate query value corresponding to config.  
   Invalid parts of query (eg. if field was removed from config) will be always deleted.  
   Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
+
   #### isValidTree
   `(immutableValue, config) -> Boolean`  
   If `showErrorMessage` in config.settings is true, use this method to check if query has validation errors.  
   If `showErrorMessage` is false, this function will always return true.
-- Export:
+
+### Export
+
   #### queryString
   `(immutableValue, config, isForDisplay = false) -> String`  
   Convert query value to custom string representation.  
   `isForDisplay` = true can be used to make string more "human readable".
+
   #### mongodbFormat
   `(immutableValue, config) -> Object`  
   Convert query value to MongoDb query object.
+
   #### sqlFormat
   `(immutableValue, config) -> String`  
   Convert query value to SQL where string.
+
   #### spelFormat
   `(immutableValue, config) -> String`  
   Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
+
   #### elasticSearchFormat
   `(immutableValue, config) -> Object`  
   Convert query value to ElasticSearch query object.
+
   #### jsonLogicFormat
   `(immutableValue, config) -> {logic, data, errors}`  
   Convert query value to [JsonLogic](http://jsonlogic.com) format.  
   If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
-- Import:
+
+## Import
+
   #### loadFromJsonLogic
   `(jsonLogicObject, config) -> Immutable`  
-  Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
+  Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format.
+ 
   #### _loadFromJsonLogic
   `(jsonLogicObject, config) -> [Immutable, errors]`
+
   #### loadFromSpel
   `(string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
-- Save/load config from server:
+
+## Save/load config from server
+
   #### compressConfig
   `(config, baseConfig) -> ZipConfig`  
   Returns compressed config that can be serialized to JSON and saved on server.  
   `ZipConfig` is a special format that contains only changes agains `baseConfig`.  
   `baseConfig` is a config you used as a base for constructing `config`, like `InitialConfig` in examples above.  
   It depends on UI framework you choose - eg. if you use `@react-awesome-query-builder/mui`, please provide `MuiConfig` to `baseConfig`. 
+
   #### decompressConfig
   `(zipConfig, baseConfig, ctx?) -> Config`  
   Converts `zipConfig` (compressed config you receive from server) to a full config that can be passed to `<Query />`.  
@@ -481,7 +500,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Note that you should set `config.settings.useConfigCompress = true` in order for this function to work. 
 
 
-### Config format
+## Config format
 This library uses config-driven aproach. 
 Config defines what value types, operators are supported, how they are rendered, imported, exported. 
 At minimum, you need to provide your own set of fields as in [basic usage](#usage).  
@@ -528,6 +547,13 @@ It's recommended to update your version to 6.x. You just need to change your imp
 
 ### Changelog
 See [`CHANGELOG`](/CHANGELOG.md)
+
+### Migration to 6.5.0
+
+Validation API has been changed:
+- `Utils.validateTree()` now returns array of validation errors intead of boolean
+- `Utils.validateAndFixTree()` has been removed. Please use `Utils.sanitizeTree()` instead
+- `Utils.checkTree()` is deprecated. Use `Utils.sanitizeTree()` instead
 
 ### Migration to 6.4.0
 
