@@ -311,25 +311,26 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
   const args = funcValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   if (!funcConfig) {
-    meta.errors.push(`Func ${funcKey} is not defined in config`);
     if (!isDebugMode) {
+      meta.errors.push(`Func ${funcKey} is not defined in config`);
       return undefined;
     }
   }
   const funcParts = getFieldParts(funcKey, config);
   const funcLastKey = funcParts[funcParts.length-1];
-  const funcName = isForDisplay && funcConfig.label || funcLastKey;
+  const funcName = isForDisplay && funcConfig?.label || funcLastKey;
 
   let formattedArgs = {};
   let gaps = [];
   let missingArgKeys = [];
   let formattedArgsWithNames = {};
-  for (const argKey in funcConfig.args) {
-    const argConfig = funcConfig.args[argKey];
+  const argsKeys = funcConfig ? Object.keys(funcConfig.args) : args?.keySeq?.().toArray() || [];
+  for (const argKey of argsKeys) {
+    const argConfig = funcConfig?.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);
-    const {defaultValue, isOptional} = argConfig;
+    const {defaultValue, isOptional} = argConfig || {};
     const defaultValueSrc = defaultValue?.func ? "func" : "value";
-    const argName = isForDisplay && argConfig.label || argKey;
+    const argName = isForDisplay && argConfig?.label || argKey;
     const argVal = args ? args.get(argKey) : undefined;
     let argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
@@ -339,7 +340,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     }
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const formattedArgVal = formatValue(
-      config, meta, argValue, argValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+      config, meta, argValue, argValueSrc, argConfig?.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
       if (argValueSrc != "func") // don't triger error if args value is another incomplete function
@@ -349,7 +350,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       formattedDefaultVal = formatValue(
-        config, meta, defaultValue, defaultValueSrc, argConfig.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
+        config, meta, defaultValue, defaultValueSrc, argConfig?.type, fieldDef, argConfig, null, null, parentField, argAsyncListValues
       );
       if (formattedDefaultVal === undefined) {
         if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
@@ -383,7 +384,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
   }
 
   let ret = null;
-  if (typeof funcConfig.formatFunc === "function") {
+  if (typeof funcConfig?.formatFunc === "function") {
     const fn = funcConfig.formatFunc;
     const args = [
       formattedArgs,

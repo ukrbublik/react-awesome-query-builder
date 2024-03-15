@@ -17,15 +17,22 @@ const stringify = JSON.stringify;
 const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, sanitizeTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree, validateTree} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
+const sanitizeOptions = {
+  translateErrors: true,
+  includeStringifiedItems: true,
+  includeItemsPositions: true,
+};
 
 const initialSkin = window._initialSkin || "mui";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
+//const emptyInitValue: JsonTree = {id: uuid(), type: "switch_group"};
 const loadedConfig = loadConfig(initialSkin);
 let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
 let initTree: ImmutableTree;
-//initTree = sanitizeTree(loadTree(initValue), loadedConfig);
-initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig); // <- this will work same  
+//initTree = loadTree(emptyInitValue);
+//initTree = sanitizeTree(loadTree(initValue), loadedConfig, sanitizeOptions);
+initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig, sanitizeOptions); // <- this will work same  
 
 
 // Trick to hot-load new config when you edit `config.tsx`
@@ -115,6 +122,7 @@ const DemoQueryBuilder: React.FC = () => {
     setState({
       ...state,
       tree: sanitizeTree(state.tree, state.config, {
+        ...sanitizeOptions,
         forceFix: true
       })
     });
@@ -141,7 +149,7 @@ const DemoQueryBuilder: React.FC = () => {
     const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
     setState({
       ...state, 
-      tree: tree ? sanitizeTree(tree, state.config) : state.tree,
+      tree: tree ? sanitizeTree(tree, state.config, sanitizeOptions) : state.tree,
       spelErrors
     });
   };
@@ -153,7 +161,7 @@ const DemoQueryBuilder: React.FC = () => {
       ...state,
       skin,
       config,
-      tree: sanitizeTree(state.tree, config)
+      tree: sanitizeTree(state.tree, config, sanitizeOptions)
     });
     window._initialSkin = skin;
   };
@@ -341,12 +349,11 @@ const DemoQueryBuilder: React.FC = () => {
       includeStringifiedItems: true,
       translateErrors: true,
     }).map(({
-      errors, itemStr, itemPositionStr, itemIndexPathStr,
+      errors, itemStr, itemPositionStr,
     }) => ({
       errors: errors.map(({side, delta, str, fixed}) => `${fixed ? "* " : ""}[${side ?? ""} ${delta ?? ""}] ${str}`),
       itemStr,
       itemPositionStr,
-      itemIndexPathStr,
     }));
 
     return (

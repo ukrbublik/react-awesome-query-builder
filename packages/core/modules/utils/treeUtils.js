@@ -125,7 +125,7 @@ export const fixPathsInTree = (tree) => {
 
     const children = item.get("children1");
     if (children) {
-      if (children.constructor.name == "Map") {
+      if (children.constructor.name === "Map") {
         // protect: should be OrderedMap, not Map (issue #501)
         newTree = newTree.setIn(
           expandTreePath(itemPath, "children1"), 

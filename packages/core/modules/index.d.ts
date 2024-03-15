@@ -384,20 +384,25 @@ export interface ValidationItemErrors {
   path: Array<string>;
   errors: ValidationError[];
   itemStr?: string;
-  itemPosition?: FlatItemPosition;
+  itemPosition?: FlatItemPosition & Pick<FlatItem, "type" | "index"> & {
+    isDeleted: boolean;
+  };
   itemPositionStr?: string;
-  itemIndexPathStr?: string;
 }
 export type ValidationResult = ValidationItemErrors[];
-export interface SanitizeOptions {
+export interface SanitizeOptions extends ValidationTranslateOptions {
   removeEmptyGroups?: boolean;
   removeIncompleteRules?: boolean;
   forceFix?: boolean;
 }
-export interface ValidationOptions {
+export interface ValidationTranslateOptions {
   translateErrors?: boolean;
-  includeStringifiedItems?: boolean;
   includeItemsPositions?: boolean;
+  includeStringifiedItems?: boolean;
+  stringifyItemsUserFriendly?: boolean; // default: true
+  stringifyFixedItems?: boolean; // default: false (stringify item with error)
+}
+export interface ValidationOptions extends ValidationTranslateOptions {
 }
 
 interface Validation {

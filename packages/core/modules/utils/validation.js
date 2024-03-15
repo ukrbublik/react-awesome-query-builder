@@ -38,6 +38,7 @@ export const validateTree = (tree, config, options = {}) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const finalOptions = {
     ...options,
+    // disbale sanitize options, just validate
     removeEmptyGroups: false,
     removeIncompleteRules: false,
     forceFix: false,
@@ -69,7 +70,6 @@ export const sanitizeTree = (tree, config, options = {}) => {
 };
 
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
-  const forceFix = false;
   if (removeEmptyGroups === undefined) {
     removeEmptyGroups = newConfig.settings.removeEmptyGroupsOnLoad;
   }
@@ -77,9 +77,10 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
     removeIncompleteRules = newConfig.settings.removeIncompleteRulesOnLoad;
   }
   const options = {
+    // sanitize options
     removeEmptyGroups,
     removeIncompleteRules,
-    forceFix,
+    forceFix: false,
   };
   let [fixedTree, allErrros, isSanitized] = _validateTree(
     newTree, _oldTree, newConfig, oldConfig,
@@ -96,11 +97,15 @@ export const _validateTree = (
   tree, _oldTree, config, oldConfig, options
 ) => {
   const {
+    // sanitize options
     removeEmptyGroups,
     removeIncompleteRules,
     forceFix,
+    // translation options
     translateErrors,
     includeStringifiedItems,
+    stringifyFixedItems,
+    stringifyItemsUserFriendly = true,
     includeItemsPositions,
   } = options || {};
   const c = {
@@ -111,11 +116,20 @@ export const _validateTree = (
   };
   const fixedTree = validateItem(tree, [], null, meta, c);
   const flatItems = getFlatTree(fixedTree).items;
+  let oldFlatItems;
   const isSanitized = meta.sanitized;
   const errorsArr = [];
   for (const id in meta.errors) {
     let {path, errors} = meta.errors[id];
-    const flatItem = flatItems[id];
+    let flatItem = flatItems[id];
+    const isDeleted = !flatItem;
+    if (isDeleted) {
+      // get positions from old tree
+      if (!oldFlatItems) {
+        oldFlatItems = getFlatTree(tree).items;
+      }
+      flatItem = oldFlatItems[id];
+    }
     if (translateErrors) {
       errors = errors.map(e => {
         return {
@@ -126,8 +140,10 @@ export const _validateTree = (
     }
     let errorItem = { path, errors };
     if (includeStringifiedItems) {
-      const item = getItemByPath(fixedTree, path) ?? getItemByPath(tree, path);
-      const itemStr = queryString(item, config, false, true);
+      const item = getItemByPath(stringifyFixedItems ? fixedTree : tree, path);
+      const isDebugMode = true;
+      const isForDisplay = stringifyItemsUserFriendly;
+      const itemStr = queryString(item, config, isForDisplay, isDebugMode);
       errorItem.itemStr = itemStr;
     }
     if (includeItemsPositions && flatItem) {
@@ -135,23 +151,31 @@ export const _validateTree = (
         ...flatItem.position,
         index: flatItem.index,
         type: flatItem.type,
-      };
-      const args = {
-        ...itemPosition,
-        globalLeafNo: itemPosition.globalLeafNo + 1,
-        globalGroupNo: itemPosition.globalGroupNo + 1,
-        globalNoByType: itemPosition.globalNoByType + 1,
-        indexPath: itemPosition.indexPath.map(ind => ind+1),
+        isDeleted,
       };
       errorItem.itemPosition = itemPosition;
-      let k = flatItem.type === "rule"
-        ? constants.ITEM_POSITION_RULE
-        : flatItem.type === "group"
-        ? constants.ITEM_POSITION_GROUP
-        : constants.ITEM_POSITION_BY_TYPE;
-      errorItem.itemPositionStr = translateValidation(k, args);
-      errorItem.itemIndexPathStr = itemPosition.indexPath.map(ind => ind+1).join(".");
-      //todo: if in case, use `caseNo` and another translations
+      // convert indexes from 0-based to 1-based (user friendly)
+      const trArgs = {
+        ...itemPosition
+      };
+      if (stringifyItemsUserFriendly) {
+        for (const k of ["caseNo", "globalLeafNo", "globalGroupNo", "globalNoByType"]) {
+          if (trArgs[k] != undefined) {
+            trArgs[k] = trArgs[k] + 1;
+          }
+        }
+        trArgs.indexPath = itemPosition.indexPath?.map(ind => ind+1);
+      }
+      let trKey = !flatItem.index
+        ? constants.ITEM_POSITION_ROOT
+        : constants.ITEM_POSITION+"__"+flatItem.type+(flatItem.caseId ? "__with_case" : "")+(isDeleted ? "__deleted" : "");
+      errorItem.itemPositionStr = translateValidation(trKey, trArgs);
+      if (flatItem.index) {
+        errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
+          ...trArgs,
+          str: errorItem.itemPositionStr
+        });
+      }
     }
     errorsArr.push(errorItem);
   }
