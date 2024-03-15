@@ -324,7 +324,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
   let gaps = [];
   let missingArgKeys = [];
   let formattedArgsWithNames = {};
-  const argsKeys = funcConfig ? Object.keys(funcConfig.args) : args?.keySeq?.().toArray() || [];
+  const argsKeys = funcConfig ? Object.keys(funcConfig.args || {}) : args?.keySeq?.().toArray() || [];
   for (const argKey of argsKeys) {
     const argConfig = funcConfig?.args[argKey];
     const fieldDef = getFieldConfig(config, argConfig);

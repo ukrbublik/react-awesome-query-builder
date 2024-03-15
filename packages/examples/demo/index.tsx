@@ -27,10 +27,9 @@ const initialSkin = window._initialSkin || "mui";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 //const emptyInitValue: JsonTree = {id: uuid(), type: "switch_group"};
 const loadedConfig = loadConfig(initialSkin);
-let initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
+const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
-let initTree: ImmutableTree;
-//initTree = loadTree(emptyInitValue);
+let initTree: ImmutableTree = loadTree(emptyInitValue);
 //initTree = sanitizeTree(loadTree(initValue), loadedConfig, sanitizeOptions);
 initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig, sanitizeOptions); // <- this will work same  
 
@@ -351,7 +350,7 @@ const DemoQueryBuilder: React.FC = () => {
     }).map(({
       errors, itemStr, itemPositionStr,
     }) => ({
-      errors: errors.map(({side, delta, str, fixed}) => `${fixed ? "* " : ""}[${side ?? ""} ${delta ?? ""}] ${str}`),
+      errors: errors.map(({side, delta, str, fixed}) => `${fixed ? "* " : ""}[${side ?? ""} ${delta ?? ""}] ${str!}`),
       itemStr,
       itemPositionStr,
     }));
@@ -362,12 +361,12 @@ const DemoQueryBuilder: React.FC = () => {
         <hr/>
         <div>
         Errors: 
-        { validationRes.length > 0
-          ? <pre style={preErrorStyle}>
-            {stringify(validationRes, undefined, 2)}
-          </pre>
-          : "no"
-        }
+          { validationRes.length > 0
+            ? <pre style={preErrorStyle}>
+              {stringify(validationRes, undefined, 2)}
+            </pre>
+            : "no"
+          }
         </div>
         <br />
         <div>
