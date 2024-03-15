@@ -350,7 +350,9 @@ const DemoQueryBuilder: React.FC = () => {
     }).map(({
       errors, itemStr, itemPositionStr,
     }) => ({
-      errors: errors.map(({side, delta, str, fixed}) => `${fixed ? "* " : ""}[${side ?? ""} ${delta ?? ""}] ${str!}`),
+      errors: errors.map(({
+        side, delta, str, fixed
+      }) => `${fixed ? "* " : ""}${side ? `[${[side, delta].filter(a => a != undefined).join(" ")}] ` : ""}${str!}`),
       itemStr,
       itemPositionStr,
     }));

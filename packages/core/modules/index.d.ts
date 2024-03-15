@@ -396,9 +396,9 @@ export interface SanitizeOptions extends ValidationTranslateOptions {
   forceFix?: boolean;
 }
 export interface ValidationTranslateOptions {
-  translateErrors?: boolean;
-  includeItemsPositions?: boolean;
-  includeStringifiedItems?: boolean;
+  translateErrors?: boolean; // default: true
+  includeItemsPositions?: boolean; // default: true
+  includeStringifiedItems?: boolean; // default: true
   stringifyItemsUserFriendly?: boolean; // default: true
   stringifyFixedItems?: boolean; // default: false (stringify item with error)
 }

@@ -275,7 +275,7 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
       ret = value;
     }
   }
-  if (ret == undefined && isDebugMode) {
+  if (value == undefined && isDebugMode) {
     return "?";
   }
   return ret;

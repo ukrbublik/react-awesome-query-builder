@@ -102,11 +102,11 @@ export const _validateTree = (
     removeIncompleteRules,
     forceFix,
     // translation options
-    translateErrors,
-    includeStringifiedItems,
-    stringifyFixedItems,
+    translateErrors = true,
+    includeStringifiedItems = true,
+    stringifyFixedItems = false,
     stringifyItemsUserFriendly = true,
-    includeItemsPositions,
+    includeItemsPositions = true,
   } = options || {};
   const c = {
     config, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix,
@@ -115,21 +115,14 @@ export const _validateTree = (
     errors: {},
   };
   const fixedTree = validateItem(tree, [], null, meta, c);
-  const flatItems = getFlatTree(fixedTree).items;
-  let oldFlatItems;
+  let flatItems, oldFlatItems;
   const isSanitized = meta.sanitized;
   const errorsArr = [];
+  if (includeItemsPositions) {
+    flatItems = getFlatTree(fixedTree).items;
+  }
   for (const id in meta.errors) {
-    let {path, errors} = meta.errors[id];
-    let flatItem = flatItems[id];
-    const isDeleted = !flatItem;
-    if (isDeleted) {
-      // get positions from old tree
-      if (!oldFlatItems) {
-        oldFlatItems = getFlatTree(tree).items;
-      }
-      flatItem = oldFlatItems[id];
-    }
+    let { path, errors } = meta.errors[id];
     if (translateErrors) {
       errors = errors.map(e => {
         return {
@@ -146,35 +139,54 @@ export const _validateTree = (
       const itemStr = queryString(item, config, isForDisplay, isDebugMode);
       errorItem.itemStr = itemStr;
     }
-    if (includeItemsPositions && flatItem) {
-      const itemPosition = {
-        ...flatItem.position,
-        index: flatItem.index,
-        type: flatItem.type,
-        isDeleted,
-      };
-      errorItem.itemPosition = itemPosition;
-      // convert indexes from 0-based to 1-based (user friendly)
-      const trArgs = {
-        ...itemPosition
-      };
-      if (stringifyItemsUserFriendly) {
-        for (const k of ["caseNo", "globalLeafNo", "globalGroupNo", "globalNoByType"]) {
-          if (trArgs[k] != undefined) {
-            trArgs[k] = trArgs[k] + 1;
-          }
+    if (includeItemsPositions) {
+      let flatItem = flatItems[id];
+      const isDeleted = !flatItem;
+      if (isDeleted) {
+        // get positions from old tree
+        if (!oldFlatItems) {
+          oldFlatItems = getFlatTree(tree).items;
         }
-        trArgs.indexPath = itemPosition.indexPath?.map(ind => ind+1);
+        flatItem = oldFlatItems[id];
       }
-      let trKey = !flatItem.index
-        ? constants.ITEM_POSITION_ROOT
-        : constants.ITEM_POSITION+"__"+flatItem.type+(flatItem.caseId ? "__with_case" : "")+(isDeleted ? "__deleted" : "");
-      errorItem.itemPositionStr = translateValidation(trKey, trArgs);
-      if (flatItem.index) {
-        errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
-          ...trArgs,
-          str: errorItem.itemPositionStr
-        });
+      if (flatItem) {
+        // build position object
+        const itemPosition = {
+          ...flatItem.position,
+          index: flatItem.index,
+          type: flatItem.type,
+          isDeleted,
+        };
+        errorItem.itemPosition = itemPosition;
+        // build position string
+        const trKey = !flatItem.index
+          ? constants.ITEM_POSITION_ROOT
+          : constants.ITEM_POSITION+"__"+flatItem.type+(isDeleted ? "__deleted" : "");
+        const trArgs = {
+          ...itemPosition
+        };
+        if (stringifyItemsUserFriendly) {
+          // convert indexes from 0-based to 1-based (user friendly)
+          for (const k of ["caseNo", "globalLeafNo", "globalGroupNo", "globalNoByType"]) {
+            if (trArgs[k] != undefined) {
+              trArgs[k] = trArgs[k] + 1;
+            }
+          }
+          trArgs.indexPath = itemPosition.indexPath?.map(ind => ind+1);
+        }
+        errorItem.itemPositionStr = translateValidation(trKey, trArgs);
+        if (flatItem.index) { // don't extend for root
+          if (flatItem.caseId) {
+            errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_IN_CASE, {
+              ...trArgs,
+              str: errorItem.itemPositionStr
+            });
+          }
+          errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_WITH_INDEX_PATH, {
+            ...trArgs,
+            str: errorItem.itemPositionStr
+          });
+        }
       }
     }
     errorsArr.push(errorItem);
