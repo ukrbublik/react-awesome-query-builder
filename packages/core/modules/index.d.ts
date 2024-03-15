@@ -409,6 +409,9 @@ interface Validation {
   sanitizeTree(tree: ImmutableTree, config: Config, options?: SanitizeOptions): ImmutableTree;
   validateTree(tree: ImmutableTree, config: Config, options?: ValidationOptions): ValidationResult;
 
+  isValidTree(tree: ImmutableTree, config: Config): boolean;
+  getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldValue>;
+
   translateValidation(tr: Translatable): string;
   translateValidation(key: Translatable["key"], args?: Translatable["args"]): string;
 
@@ -424,6 +427,7 @@ interface Import {
   loadTree(jsonTree: JsonTree): ImmutableTree;
   // @deprecated Use Utils.sanitizeTree() instead
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
+  // @deprecated Use Utils.Validation.isValidTree()
   isValidTree(tree: ImmutableTree, config: Config): boolean;
   isImmutableTree(tree: any): boolean;
   isTree(tree: any): boolean; // is JsonTree ?
@@ -496,6 +500,7 @@ interface TreeUtils {
   getFlatTree(tree: ImmutableTree): FlatTree;
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
+  // @deprecated
   getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldValue>;
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
@@ -517,8 +522,8 @@ interface OtherUtils {
   toImmutableList(path: string[]): ImmutablePath;
 }
 
-export interface Utils extends Import, Export, 
-  Pick<Validation, "sanitizeTree" | "validateTree">,
+export interface Utils extends Omit<Import, "isValidTree">, Export, 
+  Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree">,
   Pick<ConfigUtils, "compressConfig" | "decompressConfig">,
   Pick<OtherUtils, "uuid">,
   Pick<TreeUtils, "getSwitchValues">

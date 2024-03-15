@@ -33,8 +33,44 @@ const isTypeOf = (v, type) => {
   return false;
 };
 
+// tip: If showErrorMessage is false, this function will always return true
+export const isValidTree = (tree, config) => {
+  return getTreeBadFields(tree, config).length === 0;
+};
+
+// tip: If showErrorMessage is false, this function will always return []
+// tip: If LHS is func, func key will be used to put in array of bad fields (naive)
+export const getTreeBadFields = (tree, config) => {
+  const {showErrorMessage} = config.settings;
+  let badFields = [];
+
+  function _processNode (item, path, lev) {
+    const id = item.get("id");
+    const children = item.get("children1");
+    const valueError = item.getIn(["properties", "valueError"]);
+    const fieldError = item.getIn(["properties", "fieldError"]);
+    const field = item.getIn(["properties", "field"]);
+    const fieldStr = field?.get?.("func") ?? field;
+    const hasValueError = valueError?.size > 0 && valueError.filter(v => v != null).size > 0
+    const isBad = hasValueError || !!fieldError;
+    if (isBad && showErrorMessage) {
+      // for showErrorMessage=false valueError/fieldError is used to hold last error, but actual value is always valid
+      badFields.push(fieldStr);
+    }
+    if (children) {
+      children.map((child, _childId) => {
+        _processNode(child, path.concat(id), lev + 1);
+      });
+    }
+  }
+
+  if (tree)
+    _processNode(tree, [], 0);
+
+  return Array.from(new Set(badFields));
+};
+
 export const validateTree = (tree, config, options = {}) => {
-  if (!tree) return undefined;
   const extendedConfig = extendConfig(config, undefined, true);
   const finalOptions = {
     ...options,
@@ -50,13 +86,31 @@ export const validateTree = (tree, config, options = {}) => {
   return allErrros;
 };
 
-export const sanitizeTree = (tree, config, options = {}) => {
-  if (!tree) return undefined;
+// @deprecated
+export const checkTree = (tree, config) => {
   const extendedConfig = extendConfig(config, undefined, true);
-  const finalOptions = {
+  const options = {
     removeEmptyGroups: config.settings.removeEmptyGroupsOnLoad,
     removeIncompleteRules: config.settings.removeIncompleteRulesOnLoad,
-    //forceFix: true,
+    forceFix: false,
+  };
+  const [fixedTree, allErrros, isSanitized] = _validateTree(
+    tree, null, extendedConfig, extendedConfig,
+    options
+  );
+  if (isSanitized && allErrros.length) {
+    console.warn("Tree check errors: ", allErrros);
+  }
+  return fixedTree;
+};
+
+export const sanitizeTree = (tree, config, options = {}) => {
+  const extendedConfig = extendConfig(config, undefined, true);
+  const finalOptions = {
+    // defaults
+    removeEmptyGroups: true,
+    removeIncompleteRules: true,
+    forceFix: false,
     ...options,
   };
   const [fixedTree, allErrros, isSanitized] = _validateTree(
@@ -69,6 +123,7 @@ export const sanitizeTree = (tree, config, options = {}) => {
   return fixedTree;
 };
 
+// tip: Should be used only internally in createValidationMemo()
 export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
   if (removeEmptyGroups === undefined) {
     removeEmptyGroups = newConfig.settings.removeEmptyGroupsOnLoad;
@@ -93,9 +148,39 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
   return fixedTree;
 };
 
+/**
+ * @param {Immutable.Map} tree
+ * @param {{
+ *   removeEmptyGroups?: boolean,
+ *   removeIncompleteRules?: boolean,
+ *   forceFix?: boolean,
+ *   translateErrors?: boolean,
+ *   includeStringifiedItems?: boolean,
+ *   stringifyFixedItems?: boolean,
+ *   stringifyItemsUserFriendly?: boolean,
+ *   includeItemsPositions?: boolean,
+ * }} options
+ * @returns {[
+ *   Immutable.Map, 
+ *   {
+ *     path: string[],
+ *     errors: { str?: string, key: string, args?: object | null }[],
+ *     itemStr?: string,
+ *     itemPosition?: {
+ *       caseNo: number | null, globalNoByType: number, indexPath: number[], globalLeafNo?: number, globalGroupNo?: number,
+ *       isDeleted: boolean, index: number, type: "rule"|"group"|"rule_group"
+ *     },
+ *     itemPositionStr?: string,
+ *   }[],
+ *   boolean
+ * ]}
+ */
 export const _validateTree = (
   tree, _oldTree, config, oldConfig, options
 ) => {
+  if (!tree) {
+    return [tree, [], false];
+  }
   const {
     // sanitize options
     removeEmptyGroups,

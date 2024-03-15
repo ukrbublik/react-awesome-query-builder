@@ -1,7 +1,13 @@
 import Immutable, { fromJS, Map } from "immutable";
-import {sanitizeTree} from "../utils/validation";
-import {getTreeBadFields, getLightTree, _fixImmutableValue, fixPathsInTree} from "../utils/treeUtils";
+import {checkTree, isValidTree} from "../utils/validation";
+import {getLightTree, _fixImmutableValue, fixPathsInTree} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
+
+export {
+  isJsonLogic,
+  // for backward compatibility:
+  checkTree, isValidTree
+};
 
 export const getTree = (immutableTree, light = true, children1AsArray = true) => {
   if (!immutableTree) return undefined;
@@ -26,13 +32,6 @@ export const loadTree = (serTree) => {
   } else throw new Error("Can't load tree!");
 };
 
-// @deprecated
-export const checkTree = sanitizeTree;
-
-export const isValidTree = (tree, config) => {
-  return getTreeBadFields(tree, config).length == 0;
-};
-
 export const isImmutableTree = (tree) => {
   return Map.isMap(tree);
 };
@@ -40,8 +39,6 @@ export const isImmutableTree = (tree) => {
 export const isTree = (tree) => {
   return typeof tree == "object" && (tree.type == "group" || tree.type == "switch_group");
 };
-
-export {isJsonLogic};
 
 export function jsToImmutable(tree) {
   const imm = fromJS(tree, function (key, value, path) {

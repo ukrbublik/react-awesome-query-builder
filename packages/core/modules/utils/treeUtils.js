@@ -1,8 +1,13 @@
 import Immutable  from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
+import {getTreeBadFields} from "./validation";
 import {jsToImmutable} from "../import/tree";
 
-export {toImmutableList, jsToImmutable, immutableToJs, isImmutable};
+export {
+  toImmutableList, jsToImmutable, immutableToJs, isImmutable,
+  // for backward compatibility
+  getTreeBadFields
+};
 
 /**
  * @param {Immutable.List} path
@@ -415,35 +420,6 @@ export const getTotalRulesCountInTree = (tree) => {
   _processNode(tree, [], 0);
     
   return cnt;
-};
-
-export const getTreeBadFields = (tree, config) => {
-  const {showErrorMessage} = config.settings;
-  let badFields = [];
-
-  function _processNode (item, path, lev) {
-    const id = item.get("id");
-    const children = item.get("children1");
-    const valueError = item.getIn(["properties", "valueError"]);
-    const fieldError = item.getIn(["properties", "fieldError"]);
-    const field = item.getIn(["properties", "field"]);
-    const isBad = valueError?.size > 0 && valueError.filter(v => v != null).size > 0
-      || fieldError;
-    if (isBad && showErrorMessage) {
-      // for showErrorMessage=false valueError/fieldError is used to hold last error, but actual value is always valid
-      badFields.push(field);
-    }
-    if (children) {
-      children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
-      });
-    }
-  }
-
-  if (tree)
-    _processNode(tree, [], 0);
-
-  return Array.from(new Set(badFields));
 };
 
 

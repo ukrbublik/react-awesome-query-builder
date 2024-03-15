@@ -415,47 +415,64 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
 ### `Utils`
 - Save, load:
-  #### getTree (immutableValue, light = true, children1AsArray = true) -> Object
-  Convert query value from internal Immutable format to JS object. 
+  #### getTree
+  `(immutableValue, light = true, children1AsArray = true) -> Object`  
+  Convert query value from internal Immutable format to JS object.  
   You can use it to save value on backend in `onChange` callback of `<Query>`.  
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
-  #### loadTree (jsValue) -> Immutable
-  Convert query value from JS format to internal Immutable format. 
+  #### loadTree
+  `(jsValue) -> Immutable`  
+  Convert query value from JS format to internal Immutable format.  
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `sanitizeTree()`).
 - Validation:
-  #### sanitizeTree (immutableValue, config) -> Immutable
-  Validate query value corresponding to config. 
-  Invalid parts of query (eg. if field was removed from config) will be always deleted. 
+  #### sanitizeTree
+  `(immutableValue, config) -> Immutable`  
+  Validate query value corresponding to config.  
+  Invalid parts of query (eg. if field was removed from config) will be always deleted.  
   Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
-  #### isValidTree (immutableValue, config) -> Boolean
-  If `showErrorMessage` in config.settings is true, use this method to check is query has bad values.
+  #### isValidTree
+  `(immutableValue, config) -> Boolean`  
+  If `showErrorMessage` in config.settings is true, use this method to check if query has validation errors.  
+  If `showErrorMessage` is false, this function will always return true.
 - Export:
-  #### queryString (immutableValue, config, isForDisplay = false) -> String
-  Convert query value to custom string representation. `isForDisplay` = true can be used to make string more "human readable".
-  #### mongodbFormat (immutableValue, config) -> Object
+  #### queryString
+  `(immutableValue, config, isForDisplay = false) -> String`  
+  Convert query value to custom string representation.  
+  `isForDisplay` = true can be used to make string more "human readable".
+  #### mongodbFormat
+  `(immutableValue, config) -> Object`  
   Convert query value to MongoDb query object.
-  #### sqlFormat (immutableValue, config) -> String
+  #### sqlFormat
+  `(immutableValue, config) -> String`  
   Convert query value to SQL where string.
-  #### spelFormat (immutableValue, config) -> String
+  #### spelFormat
+  `(immutableValue, config) -> String`  
   Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
-  #### elasticSearchFormat (immutableValue, config) -> Object
+  #### elasticSearchFormat
+  `(immutableValue, config) -> Object`  
   Convert query value to ElasticSearch query object.
-  #### jsonLogicFormat (immutableValue, config) -> {logic, data, errors}
-  Convert query value to [JsonLogic](http://jsonlogic.com) format. 
+  #### jsonLogicFormat
+  `(immutableValue, config) -> {logic, data, errors}`  
+  Convert query value to [JsonLogic](http://jsonlogic.com) format.  
   If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
 - Import:
-  #### loadFromJsonLogic (jsonLogicObject, config) -> Immutable
+  #### loadFromJsonLogic
+  `(jsonLogicObject, config) -> Immutable`  
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format. 
-  #### _loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]
-  #### loadFromSpel (string, config) -> [Immutable, errors]
+  #### _loadFromJsonLogic
+  `(jsonLogicObject, config) -> [Immutable, errors]`
+  #### loadFromSpel
+  `(string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
 - Save/load config from server:
-  #### compressConfig(config, baseConfig) -> ZipConfig
+  #### compressConfig
+  `(config, baseConfig) -> ZipConfig`  
   Returns compressed config that can be serialized to JSON and saved on server.  
   `ZipConfig` is a special format that contains only changes agains `baseConfig`.  
   `baseConfig` is a config you used as a base for constructing `config`, like `InitialConfig` in examples above.  
   It depends on UI framework you choose - eg. if you use `@react-awesome-query-builder/mui`, please provide `MuiConfig` to `baseConfig`. 
-  #### decompressConfig(zipConfig, baseConfig, ctx?) -> Config
+  #### decompressConfig
+  `(zipConfig, baseConfig, ctx?) -> Config`  
   Converts `zipConfig` (compressed config you receive from server) to a full config that can be passed to `<Query />`.  
   `baseConfig` is a config to be used as a base for constructing your config, like `InitialConfig` in examples above.  
   [`ctx`](#ctx) is optional and can contain your custom functions and custom React components used in your config.  
@@ -473,8 +490,8 @@ See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 ## SSR
 You can save and load config from server with help of utils:
-- [Utils.compressConfig()](#compressconfigconfig-baseconfig---zipconfig)
-- [Utils.decompressConfig()](#decompressconfigzipconfig-baseconfig-ctx---config)
+- [Utils.compressConfig()](#compressconfig)
+- [Utils.decompressConfig()](#decompressconfig)
 
 You need these utils because you can't just send config *as-is* to server, as it contains functions that can't be serialized to JSON.  
 Note that you need to set `config.settings.useConfigCompress = true` to enable this feature.  

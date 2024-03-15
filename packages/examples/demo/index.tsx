@@ -122,7 +122,17 @@ const DemoQueryBuilder: React.FC = () => {
       ...state,
       tree: sanitizeTree(state.tree, state.config, {
         ...sanitizeOptions,
-        forceFix: true
+        forceFix: false,
+      })
+    });
+  };
+
+  const sanitizeAndFix = () => {
+    setState({
+      ...state,
+      tree: sanitizeTree(state.tree, state.config, {
+        ...sanitizeOptions,
+        forceFix: true,
       })
     });
   };
@@ -204,11 +214,11 @@ const DemoQueryBuilder: React.FC = () => {
     const lastItem = state.tree.get("children1")?.last()!;
     const firstPath = [
       state.tree.get("id"), 
-      firstItem.get("id")
+      firstItem?.get("id")
     ];
     const lastPath = [
       state.tree.get("id"), 
-      lastItem.get("id")
+      lastItem?.get("id")
     ];
 
     // Change root group to NOT OR
@@ -362,7 +372,7 @@ const DemoQueryBuilder: React.FC = () => {
         {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
         <hr/>
         <div>
-        Errors: 
+        Validation errors: 
           { validationRes.length > 0
             ? <pre style={preErrorStyle}>
               {stringify(validationRes, undefined, 2)}
@@ -477,10 +487,11 @@ const DemoQueryBuilder: React.FC = () => {
         </select>
         <button onClick={resetValue}>reset</button>
         <button onClick={clearValue}>clear</button>
-        <button onClick={runActions}>run actions</button>
+        <button onClick={validate}>validate &gt; console</button>
         <button onClick={sanitize}>sanitize</button>
-        <button onClick={validate}>validate</button>
+        <button onClick={sanitizeAndFix}>sanitize & fix</button>
         <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
+        <button onClick={runActions}>run actions</button>
       </div>
 
       <ImportSkinStyles skin={state.skin} />

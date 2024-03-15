@@ -12,8 +12,8 @@ export * as Autocomplete from "./autocomplete";
 export * as Validation from "./validation";
 export * as OtherUtils from "./stuff";
 
-// for backward compatibility:
-export {validateTree, sanitizeTree} from "./validation";
+// expose validation api to top level for convenience
+export {validateTree, sanitizeTree, checkTree, isValidTree} from "./validation";
 export {default as uuid} from "./uuid";
 export {getSwitchValues} from "./treeUtils";
 export {compressConfig, decompressConfig} from "./configSerialize";

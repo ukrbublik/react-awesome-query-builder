@@ -11,7 +11,7 @@ const Utils = {
   Export, Import,
   // intrenal
   ConfigMixins,
-  // for backward compatibility
+  // expose import/export api to top level for convenience
   ...Export, ...Import
 };
 
