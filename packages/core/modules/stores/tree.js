@@ -862,7 +862,7 @@ const getActionMeta = (action, state) => {
  * @param {Immutable.Map} state
  * @param {object} action
  */
-export default (config, tree, getMemoizedTree, setLastTree) => {
+export default (initialConfig, tree, getMemoizedTree, setLastTree, getLastConfig) => {
   const initTree = tree;
   const emptyState = {
     tree: initTree, 
@@ -870,39 +870,40 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
   };
     
   return (state = emptyState, action) => {
+    const config = getLastConfig?.() ?? action.config ?? initialConfig;
     const unset = {__isInternalValueChange: undefined, __lastAction: undefined};
     let set = {};
     let actionMeta = getActionMeta(action, state);
 
     switch (action?.type) {
     case constants.SET_TREE: {
-      const validatedTree = getMemoizedTree(action.config, action.tree);
+      const validatedTree = getMemoizedTree(config, action.tree);
       set.tree = validatedTree;
       break;
     }
 
     case constants.ADD_CASE_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, action.config,  action.children, action.meta);
+      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, config,  action.children, action.meta);
       break;
     }
 
     case constants.ADD_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, action.config,  action.children, action.meta);
+      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, config,  action.children, action.meta);
       break;
     }
 
     case constants.REMOVE_GROUP: {
-      set.tree = removeGroup(state.tree, action.path, action.config);
+      set.tree = removeGroup(state.tree, action.path, config);
       break;
     }
 
     case constants.ADD_RULE: {
-      set.tree = addItem(state.tree, action.path, action.ruleType, action.id, action.properties, action.config, action.children);
+      set.tree = addItem(state.tree, action.path, action.ruleType, action.id, action.properties, config, action.children);
       break;
     }
 
     case constants.REMOVE_RULE: {
-      set.tree = removeRule(state.tree, action.path, action.config);
+      set.tree = removeRule(state.tree, action.path, config);
       break;
     }
 
@@ -917,9 +918,9 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_FIELD: {
-      const {optimizeRenderWithInternals} = action.config.settings;
+      const {optimizeRenderWithInternals} = config.settings;
       const {tree, isInternalValueChange} = setField(
-        state.tree, action.path, action.field, action.config,
+        state.tree, action.path, action.field, config,
         action.asyncListValues, action._meta
       );
       set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
@@ -928,7 +929,7 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_FIELD_SRC: {
-      set.tree = setFieldSrc(state.tree, action.path, action.srcKey, action.config);
+      set.tree = setFieldSrc(state.tree, action.path, action.srcKey, config);
       break;
     }
 
@@ -938,14 +939,14 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_OPERATOR: {
-      set.tree = setOperator(state.tree, action.path, action.operator, action.config);
+      set.tree = setOperator(state.tree, action.path, action.operator, config);
       break;
     }
 
     case constants.SET_VALUE: {
-      const {optimizeRenderWithInternals} = action.config.settings;
+      const {optimizeRenderWithInternals} = config.settings;
       const {tree, isInternalValueChange} = setValue(
-        state.tree, action.path, action.delta, action.value, action.valueType,  action.config,
+        state.tree, action.path, action.delta, action.value, action.valueType,  config,
         action.asyncListValues, action._meta
       );
       set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
@@ -954,9 +955,9 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_FUNC_VALUE: {
-      const {optimizeRenderWithInternals} = action.config.settings;
+      const {optimizeRenderWithInternals} = config.settings;
       const {tree, isInternalValueChange} = setFuncValue(
-        action.config, state.tree, action.path, action.delta, action.parentFuncs, 
+        config, state.tree, action.path, action.delta, action.parentFuncs, 
         action.argKey, action.value, action.valueType,
         action.asyncListValues, action._meta
       );
@@ -966,7 +967,7 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_VALUE_SRC: {
-      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config, action._meta);
+      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, config, action._meta);
       break;
     }
 
@@ -976,7 +977,7 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.MOVE_ITEM: {
-      set.tree = moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config);
+      set.tree = moveItem(state.tree, action.fromPath, action.toPath, action.placement, config);
       break;
     }
 

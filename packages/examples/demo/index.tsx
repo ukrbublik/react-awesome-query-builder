@@ -183,7 +183,6 @@ const DemoQueryBuilder: React.FC = () => {
   };
 
   const renderBuilder = useCallback((bprops: BuilderProps) => {
-    memo.current.actions = bprops.actions;
     return (
       <div className="query-builder-container" style={{padding: "10px"}}>
         <div className="query-builder qb-lite">
@@ -192,7 +191,7 @@ const DemoQueryBuilder: React.FC = () => {
       </div>
     );
   }, []);
-  
+
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions) => {
     if (actionMeta)
       console.info(actionMeta);
@@ -205,6 +204,20 @@ const DemoQueryBuilder: React.FC = () => {
   const updateResult = throttle(() => {
     setState(prevState => ({...prevState, tree: memo.current.immutableTree!, config: memo.current.config!}));
   }, 100);
+
+  const removeNumFromConfig = () => {
+    const currentConfig = memo.current.config as Config;
+    const newConfig: Config = {
+      ...currentConfig,
+      fields: {
+        ...omit(currentConfig.fields, ["num"]),
+      }
+    };
+    setState(prevState => ({
+      ...prevState,
+      config: newConfig,
+    }));
+  };
 
   // Demonstrates how actions can be called programmatically
   const runActions = () => {
@@ -492,6 +505,7 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={sanitizeAndFix}>sanitize & fix</button>
         <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
         <button onClick={runActions}>run actions</button>
+        <button onClick={removeNumFromConfig}>change config: remove num field</button>
       </div>
 
       <ImportSkinStyles skin={state.skin} />

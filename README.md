@@ -40,11 +40,17 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Query](#query-)
   * [Builder](#builder-)
   * [Utils](#utils)
+    * [Save/load tree](#saveload-tree)
+    * [Validation](#validation-utils)
+    * [Export](#export-utils)
+    * [Import](#import-utils)
+    * [Save/load config from server](#saveload-config-from-server)
   * [Config format](#config-format)
 * [SSR](#ssr)
   * [ctx](#ctx)
 * [Versions](#versions)
   * [Changelog](#changelog)
+  * [Migration to 6.5.0](#migration-to-650)
   * [Migration to 6.4.0](#migration-to-640)
   * [Migration to 6.3.0](#migration-to-630)
   * [Migration to 6.2.0](#migration-to-620)
@@ -112,7 +118,7 @@ graph LR;
 For using this library on frontend you need to install and use only `ui` (for basic widgets) or one of framework-specific packages (`antd` / `mui` / `bootstrap` / `fluent`). 
 
 For using this library on server-side (Node.js) you need only `core`. 
-This is useful if you want to pass query value from frontend to backend in JSON format and perform [export](#utils) eg. to SQL on server-side for security reasons.
+This is useful if you want to pass query value from frontend to backend in JSON format and perform [export](#export-utils) eg. to SQL on server-side for security reasons.
 
 Example of installation if you use [MUI](https://mui.com/):
 ```
@@ -384,8 +390,8 @@ export default DemoQueryBuilder;
 Props:
 - `{...config}` - destructured [`CONFIG`](/CONFIG.adoc)
 - `value` - query value in internal [Immutable](https://immutable-js.github.io/immutable-js/) format
-- `onChange` - callback when query value changed. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/packages/core/modules/index.d.ts)), `actions` (you can use to run actions programmatically, see `Actions` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
-- `onInit` - callback before initial render, has same arguments as `onChange` (but `actionMeta` is undefined)
+- `onChange` - callback called when query value changes. Params: `value` (in Immutable format), `config`, `actionMeta` (details about action which led to the change, see `ActionMeta` in [`index.d.ts`](/packages/core/modules/index.d.ts)), `actions` (you can use to run actions programmatically, see `Actions` in [`index.d.ts`](/packages/core/modules/index.d.ts)).
+- `onInit` - callback called before initial render, has same arguments as `onChange` (but `actionMeta` is undefined)
 - `renderBuilder` - function to render query builder itself. Takes 1 param `props` you need to pass into `<Builder {...props} />`.
 
 *Notes*:
@@ -399,6 +405,7 @@ Props:
 - For a list of available actions see `Actions` interface in [`index.d.ts`](/packages/core/modules/index.d.ts). See `runActions()` in [examples](/packages/examples/demo/index.tsx) as a demonstration of calling actions programmatically.
 
 ## `<Builder />`
+
 Render this component only inside `Query.renderBuilder()` like in example above:
 ```js
   renderBuilder = (props) => (
@@ -409,89 +416,98 @@ Render this component only inside `Query.renderBuilder()` like in example above:
     </div>
   )
 ```
+
 Wrapping `<Builder />` in `div.query-builder` is necessary.  
 Optionally you can add class `.qb-lite` to it for showing action buttons (like delete rule/group, add, etc.) only on hover, which will look cleaner.  
 Wrapping in `div.query-builder-container` is necessary if you put query builder inside scrollable block.  
 
 ## `Utils`
 
-### Save, load
-  #### getTree
-  `(immutableValue, light = true, children1AsArray = true) -> Object`  
+### Save/load tree
+
+  #### `getTree`
+  `Utils.getTree (immutableValue, light = true, children1AsArray = true) -> Object`  
   Convert query value from internal Immutable format to JS object.  
   You can use it to save value on backend in `onChange` callback of `<Query>`.  
   Tip: Use `light = false` in case if you want to store query value in your state in JS format and pass it as `value` of `<Query>` after applying `loadTree()` (which is not recommended because of double conversion). See issue [#190](https://github.com/ukrbublik/react-awesome-query-builder/issues/190)
 
-  #### loadTree
-  `(jsValue) -> Immutable`  
+  #### `loadTree`
+  `Utils.loadTree (jsValue) -> Immutable`  
   Convert query value from JS format to internal Immutable format.  
   You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `sanitizeTree()`).
 
-### Validation
+### Validation utils
 
-  #### sanitizeTree
-  `(immutableValue, config) -> Immutable`  
-  Validate query value corresponding to config.  
-  Invalid parts of query (eg. if field was removed from config) will be always deleted.  
-  Invalid values (values not passing `validateValue` in config, bad ranges) will be deleted if `showErrorMessage` is false OR marked with errors if `showErrorMessage` is true.
-
-  #### isValidTree
-  `(immutableValue, config) -> Boolean`  
-  If `showErrorMessage` in config.settings is true, use this method to check if query has validation errors.  
+  #### `isValidTree`
+  `Utils.isValidTree (immutableValue, config) -> Boolean`  
+  If `showErrorMessage` in config.settings is true, use this method to check if query has validation errors (presented in UI with red text color under the rule).  
   If `showErrorMessage` is false, this function will always return true.
 
-### Export
+  #### `sanitizeTree`
+  `Utils.sanitizeTree (immutableValue, config, options) -> Immutable`  
+  Validates and modifies query value to ensure it corresponds to the config and has no parts that are invalid or nonsense.  
+  Invalid rules (eg. if field is not found in config) will be always deleted.  
+  Invalid values (eg. value > max or < min, value not passing `validateValue()` in field config) will be either:
+   - always deleted if `showErrorMessage` in config.settings is false
+   - marked with error if `showErrorMessage` is true
+   - fixed (if possible) or deleted (if can't fix) if `options.forceFix` is true
+  `options` is an object with keys:
+    - `removeEmptyGroups` (default: true) - If group has no children, drop it.
+    - `removeIncompleteRules` (default: true) - If rule is not completed (eg. value in RHS is empty, or required argument for a function is empty), drop it. Cause it can't be exported (will not be present in result of any [export](#export-utils) function call) so can be treated as useless.
+    - `forceFix` (default: false) - If a rule has validation error(s), fix them if it's possible (eg. if value > max, can be reset to max) otherwise drop it.
 
-  #### queryString
-  `(immutableValue, config, isForDisplay = false) -> String`  
+### Export utils
+
+  #### `queryString`
+  `Utils.Export.queryString (immutableValue, config, isForDisplay = false) -> String`  
   Convert query value to custom string representation.  
   `isForDisplay` = true can be used to make string more "human readable".
 
-  #### mongodbFormat
-  `(immutableValue, config) -> Object`  
+  #### `mongodbFormat`
+  `Utils.Export.mongodbFormat (immutableValue, config) -> Object`  
   Convert query value to MongoDb query object.
 
-  #### sqlFormat
-  `(immutableValue, config) -> String`  
+  #### `sqlFormat`
+  `Utils.Export.sqlFormat (immutableValue, config) -> String`  
   Convert query value to SQL where string.
 
-  #### spelFormat
-  `(immutableValue, config) -> String`  
+  #### `spelFormat`
+  `Utils.Export.spelFormat (immutableValue, config) -> String`  
   Convert query value to [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html).
 
-  #### elasticSearchFormat
-  `(immutableValue, config) -> Object`  
+  #### `elasticSearchFormat`
+  `Utils.Export.elasticSearchFormat (immutableValue, config) -> Object`  
   Convert query value to ElasticSearch query object.
 
-  #### jsonLogicFormat
-  `(immutableValue, config) -> {logic, data, errors}`  
+  #### `jsonLogicFormat`
+  `Utils.Export.jsonLogicFormat (immutableValue, config) -> {logic, data, errors}`  
   Convert query value to [JsonLogic](http://jsonlogic.com) format.  
   If there are no `errors`, `logic` will be rule object and `data` will contain all used fields with null values ("template" data).
 
-## Import
+### Import utils
 
-  #### loadFromJsonLogic
-  `(jsonLogicObject, config) -> Immutable`  
+  #### `loadFromJsonLogic`
+  `Utils.Import.loadFromJsonLogic (jsonLogicObject, config) -> Immutable`  
   Convert query value from [JsonLogic](http://jsonlogic.com) format to internal Immutable format.
  
-  #### _loadFromJsonLogic
-  `(jsonLogicObject, config) -> [Immutable, errors]`
+  #### `_loadFromJsonLogic`
+  `Utils.Import._loadFromJsonLogic (jsonLogicObject, config) -> [Immutable, errors]`
 
-  #### loadFromSpel
-  `(string, config) -> [Immutable, errors]`  
+  #### `loadFromSpel`
+  `Utils.Import.loadFromSpel (string, config) -> [Immutable, errors]`  
   Convert query value from [Spring Expression Language (SpEL)](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html) format to internal Immutable format. 
 
-## Save/load config from server
+### Save/load config from server
 
-  #### compressConfig
-  `(config, baseConfig) -> ZipConfig`  
+  #### `compressConfig`
+  `Utils.ConfigUtils.compressConfig (config, baseConfig) -> ZipConfig`  
   Returns compressed config that can be serialized to JSON and saved on server.  
   `ZipConfig` is a special format that contains only changes agains `baseConfig`.  
   `baseConfig` is a config you used as a base for constructing `config`, like `InitialConfig` in examples above.  
   It depends on UI framework you choose - eg. if you use `@react-awesome-query-builder/mui`, please provide `MuiConfig` to `baseConfig`. 
 
-  #### decompressConfig
-  `(zipConfig, baseConfig, ctx?) -> Config`  
+  #### `decompressConfig`
+  `Utils.ConfigUtils.decompressConfig (zipConfig, baseConfig, ctx?) -> Config`  
   Converts `zipConfig` (compressed config you receive from server) to a full config that can be passed to `<Query />`.  
   `baseConfig` is a config to be used as a base for constructing your config, like `InitialConfig` in examples above.  
   [`ctx`](#ctx) is optional and can contain your custom functions and custom React components used in your config.  
@@ -690,7 +706,7 @@ If you used JsonLogic for saving, you need to replace `{"!": {"var": "your_field
 From v2.0 of this lib AntDesign is now optional (peer) dependency, so you need to explicitly include `antd` (4.x) in `package.json` of your project if you want to use AntDesign UI.  
 Please import `AntdConfig` from `react-awesome-query-builder/lib/config/antd` and use it as base for your config (see below in [usage](#usage)).  
 Alternatively you can use `BasicConfig` for simple vanilla UI, which is by default.  
-Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](#other-ui-frameworks).
+Support of other UI frameworks (like Bootstrap) are planned for future, see [Other UI frameworks](CONTRIBUTING.md#other-ui-frameworks).
 
 
 

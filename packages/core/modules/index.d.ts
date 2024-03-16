@@ -379,6 +379,8 @@ export interface ValidationError extends Translatable {
   side?: "lhs" | "rhs" | "op";
   delta?: number; // 0, 1, -1 for range, undefined for "lhs"
   fixed?: boolean;
+  fixedFrom?: any;
+  fixedTo?: any;
 }
 export interface ValidationItemErrors {
   path: Array<string>;
@@ -391,9 +393,9 @@ export interface ValidationItemErrors {
 }
 export type ValidationResult = ValidationItemErrors[];
 export interface SanitizeOptions extends ValidationTranslateOptions {
-  removeEmptyGroups?: boolean;
-  removeIncompleteRules?: boolean;
-  forceFix?: boolean;
+  removeEmptyGroups?: boolean; // default: true
+  removeIncompleteRules?: boolean; // default: true
+  forceFix?: boolean; // default: false
 }
 export interface ValidationTranslateOptions {
   translateErrors?: boolean; // default: true

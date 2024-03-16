@@ -16,7 +16,7 @@ export const translations = {
   [constants.INCOMPLETE_RULE]: "Incomplete rule",
   [constants.INCOMPLETE_LHS]: "Incomplete LHS",
   [constants.INCOMPLETE_RHS]: "Incomplete RHS",
-  [constants.INVALID_VALUE_SRC]: "Invalid value src {{valueSrc}}",
+  [constants.INVALID_VALUE_SRC]: "Invalid value src {{valueSrcs, list}}",
   [constants.BAD_MULTISELECT_VALUES+"_one"]: "Value {{badValues, list}} is not in the list of allowed values",
   [constants.BAD_MULTISELECT_VALUES+"_other"]: "Values {{badValues, list}} are not in the list of allowed values",
   [constants.BAD_SELECT_VALUE]: "Value {{value}} is not in the list of allowed values",

@@ -104,6 +104,36 @@ export const checkTree = (tree, config) => {
   return fixedTree;
 };
 
+/**
+ * @param {Immutable.Map} tree
+ * @param {{
+*   removeEmptyGroups?: boolean,
+*   removeIncompleteRules?: boolean,
+*   forceFix?: boolean,
+*   translateErrors?: boolean,
+*   includeStringifiedItems?: boolean,
+*   stringifyFixedItems?: boolean,
+*   stringifyItemsUserFriendly?: boolean,
+*   includeItemsPositions?: boolean,
+* }} options
+* @returns {[
+*   Immutable.Map, 
+*   {
+*     path: string[],
+*     errors: {
+*       key: string, args?: object | null, str?: string,
+*       side?: "lhs"|"rhs"|"op", delta?: number, fixed?: boolean, fixedTo?: any, fixedFrom?: any,
+*     }[],
+*     itemStr?: string,
+*     itemPosition?: {
+*       caseNo: number | null, globalNoByType: number, indexPath: number[], globalLeafNo?: number, globalGroupNo?: number,
+*       isDeleted: boolean, index: number, type: "rule"|"group"|"rule_group"
+*     },
+*     itemPositionStr?: string,
+*   }[],
+*   boolean
+* ]}
+*/
 export const sanitizeTree = (tree, config, options = {}) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const finalOptions = {
@@ -164,7 +194,10 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
  *   Immutable.Map, 
  *   {
  *     path: string[],
- *     errors: { str?: string, key: string, args?: object | null }[],
+ *     errors: {
+ *       key: string, args?: object | null, str?: string,
+ *       side?: "lhs"|"rhs"|"op", delta?: number, fixed?: boolean, fixedTo?: any, fixedFrom?: any,
+ *     }[],
  *     itemStr?: string,
  *     itemPosition?: {
  *       caseNo: number | null, globalNoByType: number, indexPath: number[], globalLeafNo?: number, globalGroupNo?: number,
@@ -219,10 +252,13 @@ export const _validateTree = (
     let errorItem = { path, errors };
     if (includeStringifiedItems) {
       const item = getItemByPath(stringifyFixedItems ? fixedTree : tree, path);
-      const isDebugMode = true;
-      const isForDisplay = stringifyItemsUserFriendly;
-      const itemStr = queryString(item, config, isForDisplay, isDebugMode);
-      errorItem.itemStr = itemStr;
+      const isRoot = path.length === 1;
+      if (!isRoot) {
+        const isDebugMode = true;
+        const isForDisplay = stringifyItemsUserFriendly;
+        const itemStr = queryString(item, config, isForDisplay, isDebugMode);
+        errorItem.itemStr = itemStr;
+      }
     }
     if (includeItemsPositions) {
       let flatItem = flatItems[id];
@@ -351,7 +387,7 @@ function validateGroup (item, path, itemId, meta, c) {
             ? constants.EMPTY_RULE_GROUP
             : constants.EMPTY_GROUP,
       args: { field },
-      fixed: removeEmptyGroups,
+      fixed: removeEmptyGroups && !isRoot,
     });
     if (removeEmptyGroups && !isRoot) {
       item = undefined;
@@ -377,6 +413,7 @@ function validateGroup (item, path, itemId, meta, c) {
 function validateRule (item, path, itemId, meta, c) {
   const {removeIncompleteRules, forceFix, config, oldConfig} = c;
   const {showErrorMessage} = config.settings;
+  const canFix = !showErrorMessage || forceFix;
   const origItem = item;
   let id = item.get("id");
   let properties = item.get("properties");
@@ -418,6 +455,7 @@ function validateRule (item, path, itemId, meta, c) {
       key: constants.NO_CONFIG_FOR_FIELD,
       args: { field },
       side: "lhs",
+      fixed: removeIncompleteRules,
     });
     field = null;
   }
@@ -449,6 +487,7 @@ function validateRule (item, path, itemId, meta, c) {
       key: constants.NO_CONFIG_FOR_OPERATOR,
       args: { operator },
       side: "op",
+      fixed: removeIncompleteRules,
     });
     operator = null;
   }
@@ -459,6 +498,7 @@ function validateRule (item, path, itemId, meta, c) {
         key: constants.UNSUPPORTED_FIELD_TYPE,
         args: { field },
         side: "lhs",
+        fixed: removeIncompleteRules,
       });
       operator = null;
     } else if (operator && availOps.indexOf(operator) == -1) {
@@ -476,6 +516,7 @@ function validateRule (item, path, itemId, meta, c) {
           key: constants.UNSUPPORTED_OPERATOR_FOR_FIELD,
           args: { operator, field },
           side: "lhs",
+          fixed: removeIncompleteRules,
         });
         operator = null;
       }
@@ -502,7 +543,6 @@ function validateRule (item, path, itemId, meta, c) {
   //validate values
   valueSrc = properties.get("valueSrc");
   value = properties.get("value");
-  const canFix = !showErrorMessage || forceFix;
   const isEndValue = true;
   let {
     newValue, newValueSrc, newValueError, validationErrors, newFieldError, fixedField,
@@ -542,11 +582,14 @@ function validateRule (item, path, itemId, meta, c) {
     } else if(!compl.parts.value) {
       incError.key = constants.INCOMPLETE_RHS;
       incError.side = "rhs";
-      if (newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]) {
+      if (
+        newSerialized.valueSrc?.[0] && newSerialized.valueSrc?.[0] != oldSerialized.valueSrc?.[0]
+        && newSerialized.value?.[0] != undefined 
+      ) {
         // eg. operator `starts_with` supports only valueSrc "value"
         incError.key = constants.INVALID_VALUE_SRC;
         incError.args = {
-          valueSrc: newSerialized.valueSrc
+          valueSrcs: newSerialized.valueSrc
         };
       }
     }
@@ -619,8 +662,10 @@ export const validateValue = (
             allErrors.push({key: validResult.error, args: null});
           }
           if (validResult.fixedValue !== undefined && canFix) {
-            fixedValue = validResult.fixedValue;
             allErrors[allErrors.length-1].fixed = true;
+            allErrors[allErrors.length-1].fixedFrom = fixedValue;
+            allErrors[allErrors.length-1].fixedTo = validResult.fixedValue;
+            fixedValue = validResult.fixedValue;
           }
         } else if (typeof validResult === "boolean") {
           if (validResult == false) {
@@ -652,14 +697,17 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
     const needFix = badValues.length > 0;
     // always remove bad values at tree validation as user can't unselect them (except AntDesign widget)
     canFix = canFix || removeInvalidMultiSelectValuesOnLoad === true;
+    fixedValue = canFix && needFix ? goodValues : value;
     if (badValues.length) {
+      const fixed = canFix && needFix;
       allErrors.push({
         key: constants.BAD_MULTISELECT_VALUES,
         args: { badValues, count: badValues.length },
-        fixed: canFix && needFix,
+        fixed,
+        fixedFrom: fixed ? values : undefined,
+        fixedTo: fixed ? fixedValue : undefined,
       });
     }
-    fixedValue = canFix && needFix ? goodValues : value;
     return [fixedValue, allErrors];
   } else {
     const vv = getItemInListValues(listValues, value);
@@ -669,6 +717,8 @@ const validateValueInList = (value, listValues, canFix, isEndValue, removeInvali
         key: constants.BAD_SELECT_VALUE,
         args: { value },
         fixed: canFix,
+        fixedFrom: canFix ? value : undefined,
+        fixedTo: canFix ? fixedValue : undefined,
       });
     } else {
       fixedValue = vv.value;
@@ -718,20 +768,24 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
         );
       }
       if (fieldSettings.min != null && value < fieldSettings.min) {
+        fixedValue = canFix ? fieldSettings.min : value;
         allErrors.push({
           key: constants.VALUE_MIN_CONSTRAINT_FAIL,
           args: { value, fieldSettings },
           fixed: canFix,
+          fixedFrom: canFix ? value : undefined,
+          fixedTo: canFix ? fixedValue : undefined,
         });
-        fixedValue = canFix ? fieldSettings.min : value;
       }
       if (fieldSettings.max != null && value > fieldSettings.max) {
+        fixedValue = canFix ? fieldSettings.max : value;
         allErrors.push({
           key: constants.VALUE_MAX_CONSTRAINT_FAIL,
           args: { value, fieldSettings },
           fixed: canFix,
+          fixedFrom: canFix ? value : undefined,
+          fixedTo: canFix ? fixedValue : undefined,
         });
-        fixedValue = canFix ? fieldSettings.max : value;
       }
     }
   }
@@ -841,6 +895,7 @@ const validateFuncValue = (
       }
       if (hasError) {
         const argValidationError = translateValidation(argErrors[0]);
+        const fixed = willFix || canDrop;
         allErrors.push({
           key: constants.INVALID_FUNC_ARG_VALUE,
           args: {
@@ -848,7 +903,9 @@ const validateFuncValue = (
             argValidationError,
             i18n: argErrors[0]
           },
-          fixed: willFix || canDrop,
+          fixed,
+          fixedFrom: fixed ? argValue : undefined,
+          fixedTo: willFix ? fixedArgVal : undefined,
         });
       }
     } else if (!argConfig.isOptional && isEndValue) {
@@ -984,7 +1041,7 @@ export const getNewValueForFieldOp = function (
     );
     const isValid = !fieldErrors?.length;
     const willFix = fixedField !== newField;
-    const willRevert = !isValid && !willFix && canFix;
+    const willRevert = !isValid && !willFix && canFix && newField !== currentField;
     if (willFix) {
       newField = fixedField;
     } else if (willRevert) {
@@ -999,6 +1056,7 @@ export const getNewValueForFieldOp = function (
       fieldErrors?.map(e => validationErrors.push({
         side: "lhs",
         ...e,
+        fixed: e.fixed || willFix || willRevert,
       }));
     }
   }
@@ -1066,6 +1124,7 @@ export const getNewValueForFieldOp = function (
           side: "rhs",
           delta: i,
           ...e,
+          fixed: e.fixed || willFix || willDrop,
         }));
       }
       if (willDrop) {
@@ -1134,6 +1193,7 @@ export const getNewValueForFieldOp = function (
     // last element in `valueError` list is for range validation error
     rangeValidationError = translateValidation(rangeErrorObj);
     const willFix = canFix && operatorCardinality >= 2;
+    const badValue = newValue;
     if (willFix) {
       valueFixes[1] = newValue.get(0);
       newValue = newValue.set(1, valueFixes[1]);
@@ -1148,6 +1208,8 @@ export const getNewValueForFieldOp = function (
       delta: -1,
       ...rangeErrorObj,
       fixed: willFix,
+      fixedFrom: willFix ? [badValue.get(0), badValue.get(1)] : undefined,
+      fixedTo: willFix ? [newValue.get(0), newValue.get(1)] : undefined
     });
   }
 

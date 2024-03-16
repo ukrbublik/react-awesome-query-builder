@@ -48,7 +48,7 @@ export default class QueryContainer extends Component {
     const tree = props.value || emptyTree;
     const validatedTree = this.getMemoizedTree(config, tree, undefined, sanitizeTree);
 
-    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree);
+    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree, this.getConfig);
     const store = createStore(reducer);
 
     this.config = config;
@@ -63,6 +63,10 @@ export default class QueryContainer extends Component {
       this.prevprevTree = this.prevTree;
     }
     this.prevTree = lastTree;
+  };
+
+  getConfig = () => {
+    return this.config;
   };
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
