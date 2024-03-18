@@ -1,8 +1,8 @@
 # Changelog
 - 6.5.0
   - Breaking: `Utils.validateTree` returns array of errors (PR #1034)
-  - Breaking: Removed `Utils.validateAndFixTree`. Use `Utils.sanitizeTree` instead (PR #1034)
-  - Deprecated `Utils.checkTree`. Use `Utils.sanitizeTree` instead (PR #1034)
+  - Deprecated `Utils.validateAndFixTree` and `Utils.checkTree` (and removed type defs). 
+    Use `Utils.sanitizeTree().fixedTree` instead (PR #1034)
   - `Utils.validateTree` now checks LHS and RHS are completed (issues #977, #781) (PR #1034)
   - Fixed import of `select_any_in` operator from JsonLogic (issue #1005) (PR #1034)
   - Fixed validation of date ranges (issue #374) (PR #1034)

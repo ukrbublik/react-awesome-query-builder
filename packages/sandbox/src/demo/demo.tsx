@@ -18,11 +18,11 @@ const emptyInitValue: JsonTree = {"id": uuid(), "type": "group"};
 
 // get init value in JsonTree format:
 const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
-const initTree: ImmutableTree = sanitizeTree(loadTree(initValue), loadedConfig);
+const initTree: ImmutableTree = loadTree(initValue);
 
 // -OR- alternativaly get init value in JsonLogic format:
 //const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
-//const initTree: ImmutableTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
+//const initTree: ImmutableTree = loadFromJsonLogic(initLogic, loadedConfig);
 
 
 interface DemoQueryBuilderState {

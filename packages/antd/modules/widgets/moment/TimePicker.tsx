@@ -6,6 +6,7 @@ import DatePicker from "./DatePicker";
 export interface TimePickerProps extends Omit<PickerProps<Moment>, "picker"> {}
 
 const TimePicker = React.forwardRef<any, TimePickerProps>((props, ref) => (
+  // @ts-ignore
   <DatePicker {...props} picker="time" mode={undefined} ref={ref} />
 ));
 

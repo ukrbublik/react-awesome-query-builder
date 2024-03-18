@@ -14,7 +14,7 @@ export const createConfigMemo = () => {
   const extendAndStore = (config) => {
     const extendedConfig = extendConfig(config, ++configId);
     if ((configStore.size + 1) > maxSize) {
-      configStore.delete(configStore.keys()[0]);
+      configStore.delete(configStore.keys().next().value);
     }
     configStore.set(config, extendedConfig);
     return extendedConfig;
@@ -36,14 +36,17 @@ export const createConfigMemo = () => {
     // return configStore.get(findConfig) || configStore.values().find(ec => ec === findConfig);
 
     for (const savedConfig of configStore.keys()) {
-      const found = configKeys.map(k => savedConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      const foundParts = configKeys.filter(k => savedConfig[k] === findConfig[k]);
+      const found = foundParts.length === configKeys.length;
       if (found) {
         return configStore.get(savedConfig);
       }
     }
 
+
     for (const extendedConfig of configStore.values()) {
-      const found = configKeys.map(k => extendedConfig[k] === findConfig[k]).filter(v => !v).length === 0;
+      const foundParts = configKeys.filter(k => extendedConfig[k] === findConfig[k]);
+      const found = foundParts.length === configKeys.length;
       if (found) {
         return extendedConfig;
       }

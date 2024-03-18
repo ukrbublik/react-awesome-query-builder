@@ -46,6 +46,7 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
     * [Import](#import-utils)
     * [Save/load config from server](#saveload-config-from-server)
   * [Config format](#config-format)
+* [i18n](#i18n)
 * [SSR](#ssr)
   * [ctx](#ctx)
 * [Versions](#versions)
@@ -211,7 +212,7 @@ const queryValue = {"id": QbUtils.uuid(), "type": "group"};
 
 class DemoQueryBuilder extends Component {
   state = {
-    tree: QbUtils.sanitizeTree(QbUtils.loadTree(queryValue), config),
+    tree: QbUtils.loadTree(queryValue),
     config: config
   };
   
@@ -321,7 +322,7 @@ const queryValue: JsonGroup = { id: QbUtils.uuid(), type: "group" };
 
 const DemoQueryBuilder: React.FC = () => {
   const [state, setState] = useState({
-    tree: QbUtils.sanitizeTree(QbUtils.loadTree(queryValue), config),
+    tree: QbUtils.loadTree(queryValue),
     config: config
   });
 
@@ -434,18 +435,33 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   #### `loadTree`
   `Utils.loadTree (jsValue) -> Immutable`  
   Convert query value from JS format to internal Immutable format.  
-  You can use it to load saved value from backend and pass as `value` prop to `<Query>` (don't forget to also apply `sanitizeTree()`).
+  You can use it to load saved value from backend and pass as `value` prop to `<Query>`.
 
 ### Validation utils
 
   #### `isValidTree`
   `Utils.isValidTree (immutableValue, config) -> Boolean`  
   If `showErrorMessage` in config.settings is true, use this method to check if query has validation errors (presented in UI with red text color under the rule).  
+  Note that incomplete rules or empty groups are not counted as validation errors for this function.  
   If `showErrorMessage` is false, this function will always return true.
 
+### `validateTree`
+  `Utils.validateTree (immutableValue, config, options?) -> Array`  
+  Validates immutable query value to check it corresponds to the config and has no parts that are invalid or incomplete.  
+  Returns array of errors grouped by item in tree.
+  Each array element is `{ path, errors, itemStr, itemPositionStr }` (see type [`ValidationItemErrors`](/packages/core/modules/index.d.ts)).  
+  To present item for user you can use `itemStr` (string representation of rule eg. `Number > 55`) and `itemPositionStr` (eg. `Rule #4 (index path: 1, 2)`).  
+  Also you can use `path` to get raw item data with `Utils.TreeUtils.getItemByPath(tree, path)`.  
+  `errors` is an array of objects `{ str, key, args }` (see type [`ValidationError`](/packages/core/modules/index.d.ts)).  
+  `str` is an error message translated with [i18next.t(key, args)](https://www.i18next.com/overview/api#t) (namespace is `raqbvalidation`).  
+  You can override/extend translations with `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`.
+  See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  
+  See [example](/packages/examples/demo/index.tsx) of overriding translations.
+
+
   #### `sanitizeTree`
-  `Utils.sanitizeTree (immutableValue, config, options) -> Immutable`  
-  Validates and modifies query value to ensure it corresponds to the config and has no parts that are invalid or nonsense.  
+  `Utils.sanitizeTree (immutableValue, config, options?) -> { fixedTree, fixedErrors, nonFixedErrors }`  
+  Validates and modifies immutable query value to ensure it corresponds to the config and has no parts that are invalid or incomplete.  
   Invalid rules (eg. if field is not found in config) will be always deleted.  
   Invalid values (eg. value > max or < min, value not passing `validateValue()` in field config) will be either:
    - always deleted if `showErrorMessage` in config.settings is false
@@ -455,6 +471,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
     - `removeEmptyGroups` (default: true) - If group has no children, drop it.
     - `removeIncompleteRules` (default: true) - If rule is not completed (eg. value in RHS is empty, or required argument for a function is empty), drop it. Cause it can't be exported (will not be present in result of any [export](#export-utils) function call) so can be treated as useless.
     - `forceFix` (default: false) - If a rule has validation error(s), fix them if it's possible (eg. if value > max, can be reset to max) otherwise drop it.
+  Returns an object with properties: `fixedTree` (fixed immutable tree value), `fixedErrors`, `nonFixedErrors`.  
+  `fixedErrors` is an array of fixed errors grouped by item (format is the same as returned from [validateTree](#validateTree)).  
+  There can be `nonFixedErrors` if `fixedTree` still has validation errors (eg. if `forceFix: false` and there are rules with value > max, or `removeEmptyGroups: false` and there are empty groups).  
+
 
 ### Export utils
 
@@ -523,6 +543,58 @@ At minimum, you need to provide your own set of fields as in [basic usage](#usag
 See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
+## i18n
+:construction:
+
+This library uses [i18next](https://www.i18next.com/overview/getting-started) for translations.  
+
+- Validation.
+  Namespace: `raqbvalidation`.
+  [Default translations resource](/packages/core/modules/i18n/validation/translations.js)
+
+Example of overriding translations for validation error messages:
+```js
+Utils.i18n.addResources("en", "raqbvalidation", {
+  "INCOMPLETE_LHS": "Incomplete left-hand side",
+  "INCOMPLETE_RHS": "Incomplete right-hand side",
+});
+```
+
+Example of using custom translations in `validateValue` in config:
+```js
+Utils.i18n.addResources("en", "mynamespace", {
+  "INVALID_SLIDER_VALUE": "Invalid slider value {{val}}",
+});
+
+const config = {
+  ...MuiConfig,
+  fields: {
+    slider: {
+      type: "number",
+      preferWidgets: ["slider"],
+      fieldSettings: {
+        validateValue: (val) => {
+          return (val < 50 ? null : {
+            error: {
+              // use `key` and `args` for i18next.t()
+              // `key` should have your namespace prefixed with ":"
+              key: "mynamespace:INVALID_SLIDER_VALUE",
+              args: { val }
+            },
+            fixedValue: 49
+          });
+        },
+      }
+    }
+  }
+};
+
+// then use <Query {...config} />
+```
+
+See [example](/packages/examples/demo/index.tsx).
+
+
 ## SSR
 You can save and load config from server with help of utils:
 - [Utils.compressConfig()](#compressconfig)
@@ -568,8 +640,7 @@ See [`CHANGELOG`](/CHANGELOG.md)
 
 Validation API has been changed:
 - `Utils.validateTree()` now returns array of validation errors intead of boolean
-- `Utils.validateAndFixTree()` has been removed. Please use `Utils.sanitizeTree()` instead
-- `Utils.checkTree()` is deprecated. Use `Utils.sanitizeTree()` instead
+- `Utils.checkTree()` and `Utils.validateAndFixTree()` are deprecated (and removed type defs). Use `Utils.sanitizeTree().fixedTree` instead
 
 ### Migration to 6.4.0
 

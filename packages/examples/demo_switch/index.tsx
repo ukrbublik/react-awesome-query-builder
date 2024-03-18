@@ -22,7 +22,7 @@ const emptyJsonTree: JsonSwitchGroup = {
   id: QbUtils.uuid(),
   type: "switch_group",
 };
-const emptyTree: ImmutableTree = QbUtils.sanitizeTree(QbUtils.loadTree(emptyJsonTree), config);
+const emptyTree: ImmutableTree = QbUtils.loadTree(emptyJsonTree);
 
 
 const Demo: React.FC = () => {
@@ -55,9 +55,13 @@ const Demo: React.FC = () => {
 
   const importFromSpel = () => {
     const [tree, spelErrors] = QbUtils.loadFromSpel(state.spelStr, state.config);
+    const {fixedTree, fixedErrors} = QbUtils.sanitizeTree(tree!, state.config);
+    if (fixedErrors.length) {
+      console.warn("Fixed errors after import from SpEL:", fixedErrors);
+    }
     setState({
       ...state, 
-      tree: tree ? QbUtils.sanitizeTree(tree, state.config) : state.tree,
+      tree: fixedTree ?? state.tree,
       spelErrors
     });
   };

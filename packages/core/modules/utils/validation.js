@@ -51,7 +51,7 @@ export const getTreeBadFields = (tree, config) => {
     const fieldError = item.getIn(["properties", "fieldError"]);
     const field = item.getIn(["properties", "field"]);
     const fieldStr = field?.get?.("func") ?? field;
-    const hasValueError = valueError?.size > 0 && valueError.filter(v => v != null).size > 0
+    const hasValueError = valueError?.size > 0 && valueError.filter(v => v != null).size > 0;
     const isBad = hasValueError || !!fieldError;
     if (isBad && showErrorMessage) {
       // for showErrorMessage=false valueError/fieldError is used to hold last error, but actual value is always valid
@@ -70,6 +70,29 @@ export const getTreeBadFields = (tree, config) => {
   return Array.from(new Set(badFields));
 };
 
+// @deprecated
+export const checkTree = (tree, config) => {
+  const extendedConfig = extendConfig(config, undefined, true);
+  const options = {
+    removeEmptyGroups: config.settings.removeEmptyGroupsOnLoad,
+    removeIncompleteRules: config.settings.removeIncompleteRulesOnLoad,
+    forceFix: false,
+  };
+  const {fixedTree, allErrors, isSanitized} = _validateTree(
+    tree, null, extendedConfig, extendedConfig,
+    options
+  );
+  if (isSanitized && allErrors.length) {
+    console.warn("Tree check errors: ", allErrors);
+  }
+  return fixedTree;
+};
+
+/**
+ * @param {Immutable.Map} tree
+ * @param {SanitizeOptions} options
+ * @returns {ValidationItemErrors[]}
+*/
 export const validateTree = (tree, config, options = {}) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const finalOptions = {
@@ -79,61 +102,23 @@ export const validateTree = (tree, config, options = {}) => {
     removeIncompleteRules: false,
     forceFix: false,
   };
-  const [_t, allErrros, _s] = _validateTree(
+  const {allErrors} = _validateTree(
     tree, null, extendedConfig, extendedConfig,
     finalOptions
   );
-  return allErrros;
-};
-
-// @deprecated
-export const checkTree = (tree, config) => {
-  const extendedConfig = extendConfig(config, undefined, true);
-  const options = {
-    removeEmptyGroups: config.settings.removeEmptyGroupsOnLoad,
-    removeIncompleteRules: config.settings.removeIncompleteRulesOnLoad,
-    forceFix: false,
-  };
-  const [fixedTree, allErrros, isSanitized] = _validateTree(
-    tree, null, extendedConfig, extendedConfig,
-    options
-  );
-  if (isSanitized && allErrros.length) {
-    console.warn("Tree check errors: ", allErrros);
-  }
-  return fixedTree;
+  return allErrors;
 };
 
 /**
  * @param {Immutable.Map} tree
- * @param {{
-*   removeEmptyGroups?: boolean,
-*   removeIncompleteRules?: boolean,
-*   forceFix?: boolean,
-*   translateErrors?: boolean,
-*   includeStringifiedItems?: boolean,
-*   stringifyFixedItems?: boolean,
-*   stringifyItemsUserFriendly?: boolean,
-*   includeItemsPositions?: boolean,
-* }} options
-* @returns {[
-*   Immutable.Map, 
-*   {
-*     path: string[],
-*     errors: {
-*       key: string, args?: object | null, str?: string,
-*       side?: "lhs"|"rhs"|"op", delta?: number, fixed?: boolean, fixedTo?: any, fixedFrom?: any,
-*     }[],
-*     itemStr?: string,
-*     itemPosition?: {
-*       caseNo: number | null, globalNoByType: number, indexPath: number[], globalLeafNo?: number, globalGroupNo?: number,
-*       isDeleted: boolean, index: number, type: "rule"|"group"|"rule_group"
-*     },
-*     itemPositionStr?: string,
-*   }[],
-*   boolean
-* ]}
-*/
+ * @param {SanitizeOptions} options
+ * @returns {{
+ *   fixedTree: Immutable.Map, 
+ *   fixedErrors: ValidationItemErrors[],
+ *   nonFixedErrors: ValidationItemErrors[],
+ *   allErrors: ValidationItemErrors[],
+ * }}
+ */
 export const sanitizeTree = (tree, config, options = {}) => {
   const extendedConfig = extendConfig(config, undefined, true);
   const finalOptions = {
@@ -143,14 +128,11 @@ export const sanitizeTree = (tree, config, options = {}) => {
     forceFix: false,
     ...options,
   };
-  const [fixedTree, allErrros, isSanitized] = _validateTree(
+  const {fixedTree, fixedErrors, nonFixedErrors, allErrors} = _validateTree(
     tree, null, extendedConfig, extendedConfig,
     finalOptions
   );
-  if (isSanitized && allErrros.length) {
-    console.warn("Tree sanitize errors: ", allErrros);
-  }
-  return fixedTree;
+  return {fixedTree, fixedErrors, nonFixedErrors, allErrors};
 };
 
 // tip: Should be used only internally in createValidationMemo()
@@ -167,20 +149,25 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
     removeIncompleteRules,
     forceFix: false,
   };
-  let [fixedTree, allErrros, isSanitized] = _validateTree(
+  let {fixedTree, allErrors, fixedErrors, nonFixedErrors, isSanitized} = _validateTree(
     newTree, _oldTree, newConfig, oldConfig,
     options
   );
-  if (isSanitized && allErrros.length) {
-    console.warn("Tree validation errors: ", allErrros);
+  if (isSanitized && fixedErrors.length) {
+    console.warn("Fixed tree errors: ", fixedErrors);
   }
+  // if (nonFixedErrors.length) {
+  //   console.info("Tree validation errors: ", nonFixedErrors);
+  // }
   fixedTree = fixPathsInTree(fixedTree);
   return fixedTree;
 };
 
+
 /**
  * @param {Immutable.Map} tree
- * @param {{
+ * @param {SanitizeOptions} options
+ * @typedef {{
  *   removeEmptyGroups?: boolean,
  *   removeIncompleteRules?: boolean,
  *   forceFix?: boolean,
@@ -189,31 +176,39 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
  *   stringifyFixedItems?: boolean,
  *   stringifyItemsUserFriendly?: boolean,
  *   includeItemsPositions?: boolean,
- * }} options
- * @returns {[
- *   Immutable.Map, 
- *   {
- *     path: string[],
- *     errors: {
- *       key: string, args?: object | null, str?: string,
- *       side?: "lhs"|"rhs"|"op", delta?: number, fixed?: boolean, fixedTo?: any, fixedFrom?: any,
- *     }[],
- *     itemStr?: string,
- *     itemPosition?: {
- *       caseNo: number | null, globalNoByType: number, indexPath: number[], globalLeafNo?: number, globalGroupNo?: number,
- *       isDeleted: boolean, index: number, type: "rule"|"group"|"rule_group"
- *     },
- *     itemPositionStr?: string,
+ * }} SanitizeOptions
+ * @typedef {{
+ *   path: string[],
+ *   errors: {
+ *     key: string, args?: object | null, str?: string,
+ *     side?: "lhs"|"rhs"|"op", delta?: number, fixed?: boolean, fixedTo?: any, fixedFrom?: any,
  *   }[],
- *   boolean
- * ]}
+ *   itemStr?: string,
+ *   itemPosition?: {
+ *     caseNo: number | null, globalNoByType: number, indexPath: number[], globalLeafNo?: number, globalGroupNo?: number,
+ *     isDeleted: boolean, index: number, type: "rule"|"group"|"rule_group"
+ *   },
+ *   itemPositionStr?: string,
+ * }} ValidationItemErrors
+ * @returns {{
+ *   fixedTree: Immutable.Map, 
+ *   allErrors: ValidationItemErrors[],
+ *   fixedErrors: ValidationItemErrors[],
+ *   nonFixedErrors: ValidationItemErrors[],
+ *   isSanitized: boolean
+ * }}
  */
 export const _validateTree = (
   tree, _oldTree, config, oldConfig, options
 ) => {
   if (!tree) {
-    return [tree, [], false];
+    return {
+      fixedTree: tree,
+      allErrors: [],
+      isSanitized: false,
+    };
   }
+
   const {
     // sanitize options
     removeEmptyGroups,
@@ -233,9 +228,11 @@ export const _validateTree = (
     errors: {},
   };
   const fixedTree = validateItem(tree, [], null, meta, c);
-  let flatItems, oldFlatItems;
   const isSanitized = meta.sanitized;
-  const errorsArr = [];
+
+  // build allErrors
+  const allErrors = [];
+  let flatItems, oldFlatItems;
   if (includeItemsPositions) {
     flatItems = getFlatTree(fixedTree).items;
   }
@@ -310,12 +307,35 @@ export const _validateTree = (
         }
       }
     }
-    errorsArr.push(errorItem);
+    allErrors.push(errorItem);
   }
-  return [fixedTree, errorsArr, isSanitized];
+
+  // split allErrors to fixedErrors and nonFixedErrors
+  let fixedErrors = [];
+  let nonFixedErrors = [];
+  for (const itemErrors of allErrors) {
+    const fixedItemErrors = itemErrors.errors.filter(e => !!e.fixed);
+    let nonFixedItemErrors = itemErrors.errors.filter(e => !e.fixed);
+    if (fixedItemErrors.length) {
+      fixedErrors.push({
+        ...itemErrors,
+        errors: fixedItemErrors,
+      });
+    }
+    if (nonFixedItemErrors.length) {
+      nonFixedErrors.push({
+        ...itemErrors,
+        errors: nonFixedItemErrors,
+      });
+    }
+  }
+
+  return {
+    fixedTree, allErrors, fixedErrors, nonFixedErrors, isSanitized
+  };
 };
 
-function addError(meta, item, path, err) {
+function _addError(meta, item, path, err) {
   const id = item.get("id");
   if (!meta.errors[id]) {
     meta.errors[id] = {
@@ -324,6 +344,15 @@ function addError(meta, item, path, err) {
     };
   }
   meta.errors[id].errors.push(err);
+}
+
+function _setErrorsAsFixed(meta, item) {
+  const id = item.get("id");
+  if (meta.errors[id]) {
+    meta.errors[id].errors.map(e => {
+      e.fixed = true;
+    });
+  }
 }
 
 function validateItem (item, path, itemId, meta, c) {
@@ -378,7 +407,7 @@ function validateGroup (item, path, itemId, meta, c) {
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
   const isEmptyChildren = !nonEmptyChildren?.size;
   if (isEmptyChildren && childrenAreRequired) {
-    addError(meta, item, path, {
+    _addError(meta, item, path, {
       key: isRoot
         ? constants.EMPTY_QUERY
         : isCase
@@ -390,6 +419,7 @@ function validateGroup (item, path, itemId, meta, c) {
       fixed: removeEmptyGroups && !isRoot,
     });
     if (removeEmptyGroups && !isRoot) {
+      _setErrorsAsFixed(meta, item);
       item = undefined;
     }
   }
@@ -451,7 +481,7 @@ function validateRule (item, path, itemId, meta, c) {
   //validate field
   const fieldDefinition = field ? getFieldConfig(config, field) : null;
   if (field && !fieldDefinition) {
-    addError(meta, item, path, {
+    _addError(meta, item, path, {
       key: constants.NO_CONFIG_FOR_FIELD,
       args: { field },
       side: "lhs",
@@ -474,7 +504,7 @@ function validateRule (item, path, itemId, meta, c) {
   // Backward compatibility: obsolete operator range_between
   if (operator === "range_between" || operator === "range_not_between") {
     operator = operator === "range_between" ? "between" : "not_between";
-    // addError(meta, item, path, {
+    // _addError(meta, item, path, {
     //   type: "fix",
     //   key: constants.FIXED_OPERATOR,
     //   args: { from: properties.get("operator"), to: operator, field }
@@ -483,7 +513,7 @@ function validateRule (item, path, itemId, meta, c) {
   }
   const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
   if (operator && !operatorDefinition) {
-    addError(meta, item, path, {
+    _addError(meta, item, path, {
       key: constants.NO_CONFIG_FOR_OPERATOR,
       args: { operator },
       side: "op",
@@ -494,7 +524,7 @@ function validateRule (item, path, itemId, meta, c) {
   const availOps = field ? getOperatorsForField(config, field) : [];
   if (field) {
     if (!availOps?.length) {
-      addError(meta, item, path, {
+      _addError(meta, item, path, {
         key: constants.UNSUPPORTED_FIELD_TYPE,
         args: { field },
         side: "lhs",
@@ -505,14 +535,14 @@ function validateRule (item, path, itemId, meta, c) {
       if (operator === "is_empty" || operator === "is_not_empty") {
         // Backward compatibility: is_empty #494
         operator = operator === "is_empty" ? "is_null" : "is_not_null";
-        // addError(meta, item, path, {
+        // _addError(meta, item, path, {
         //   type: "fix",
         //   key: constants.FIXED_OPERATOR,
         //   args: { from: properties.get("operator"), to: operator, field }
         // });
         properties = properties.set("operator", operator);
       } else {
-        addError(meta, item, path, {
+        _addError(meta, item, path, {
           key: constants.UNSUPPORTED_OPERATOR_FOR_FIELD,
           args: { operator, field },
           side: "lhs",
@@ -574,6 +604,9 @@ function validateRule (item, path, itemId, meta, c) {
   if (isCompleted && hasBeenSanitized) {
     item = item.set("properties", properties);
   }
+  validationErrors?.map(e =>
+    _addError(meta, item, path, e)
+  );
   if (!isCompleted) {
     let incError = { key: constants.INCOMPLETE_RULE, args: {} };
     if (!compl.parts.field) {
@@ -594,14 +627,12 @@ function validateRule (item, path, itemId, meta, c) {
       }
     }
     incError.fixed = removeIncompleteRules;
-    addError(meta, item, path, incError);
+    _addError(meta, item, path, incError);
     if (removeIncompleteRules) {
+      _setErrorsAsFixed(meta, item);
       item = undefined;
     }
   }
-  validationErrors?.map(e =>
-    addError(meta, origItem, path, e)
-  );
 
   return item;
 }
@@ -905,17 +936,18 @@ const validateFuncValue = (
           },
           fixed,
           fixedFrom: fixed ? argValue : undefined,
-          fixedTo: willFix ? fixedArgVal : undefined,
+          fixedTo: fixed ? (willFix ? fixedArgVal : argConfig.defaultValue) : undefined,
         });
       }
     } else if (!argConfig.isOptional && isEndValue) {
-      const canDrop = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
+      const canReset = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
       allErrors.push({
         key: constants.REQUIRED_FUNCTION_ARG,
         args: { funcKey, argKey },
-        fixed: canDrop,
+        fixed: canReset,
+        fixedTo: canReset ? argConfig.defaultValue : undefined,
       });
-      if (canDrop) {
+      if (canReset) {
         // set default
         fixedValue = fixedValue.deleteIn(["args", argKey]);
         fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);

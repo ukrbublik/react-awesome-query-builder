@@ -12,7 +12,7 @@ import {
   Utils,
   JsonLogicTree, JsonTree, ImmutableTree, ConfigContext,
   Query, Builder, BasicConfig, Config,
-  BuilderProps
+  BuilderProps, ValidationItemErrors
 } from "@react-awesome-query-builder/ui";
 const {
   uuid, 
@@ -108,6 +108,23 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
   return {mockedConsole, consoleData, origConsole};
 };
 
+const stringifyValidationErrors = (errors: ValidationItemErrors[]) => {
+  return errors
+    .map(({
+      errors, itemStr, itemPositionStr,
+    }) => ({
+      errors: errors.map(({
+        side, delta, str, fixed
+      }) => `${fixed ? "* " : ""}${side ? `[${[side, delta].filter(a => a != undefined).join(" ")}] ` : ""}${str}`),
+      itemStr,
+      itemPositionStr,
+    }))
+    .map(({errors, itemStr, itemPositionStr}, ii) => {
+      return `#${ii+1}. ` + (itemStr || itemPositionStr) + "  >>  "
+        + errors.map((e) => e).join(". ");
+    })
+    .join("\n");
+};
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null, options?: DoOptions) => {
   if (!valueFormat) {
@@ -124,14 +141,20 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   console = mockedConsole;
 
   let tree: ImmutableTree | undefined;
-  if (valueFormat == "JsonLogic") {
+  if (valueFormat === "JsonLogic") {
     [tree, errors] = _loadFromJsonLogic(value, config);
   } else if (valueFormat == "SpEL") {
     [tree, errors] = loadFromSpel(value as string, config);
   } else {
     tree = loadTree(value as JsonTree);
   }
-  tree = tree ? sanitizeTree(tree, config) : undefined;
+  if (tree) {
+    const { allErrors, fixedTree } = sanitizeTree(tree, config);
+    tree = fixedTree;
+    if (allErrors.length) {
+      console.warn("sanitizeTree errors: \n" + stringifyValidationErrors(allErrors) + "\n");
+    }
+  }
 
   // restore console
   // eslint-disable-next-line no-global-assign

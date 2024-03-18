@@ -13,26 +13,47 @@ import loadedInitLogic from "./init_logic";
 import Immutable from "immutable";
 import clone from "clone";
 
+const {
+  getTree, loadTree, isValidTree, validateTree, sanitizeTree, uuid,
+  loadFromJsonLogic, loadFromSpel, 
+  jsonLogicFormat, elasticSearchFormat, queryBuilderFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat,
+} = Utils;
 const stringify = JSON.stringify;
-const {elasticSearchFormat, queryBuilderFormat, jsonLogicFormat, queryString, _mongodbFormat, _sqlFormat, _spelFormat, getTree, sanitizeTree, loadTree, uuid, loadFromJsonLogic, loadFromSpel, isValidTree, validateTree} = Utils;
+
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 const sanitizeOptions = {
+  // fix options:
+  removeEmptyGroups: true,
+  removeIncompleteRules: true,
+  // translate options:
   translateErrors: true,
   includeStringifiedItems: true,
   includeItemsPositions: true,
 };
-
 const initialSkin = window._initialSkin || "mui";
+
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 //const emptyInitValue: JsonTree = {id: uuid(), type: "switch_group"};
 const loadedConfig = loadConfig(initialSkin);
-const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
-const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic as JsonLogicTree : undefined;
+const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0
+  ? loadedInitValue as JsonTree
+  : emptyInitValue;
+const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0
+  ? loadedInitLogic as JsonLogicTree
+  : undefined;
 let initTree: ImmutableTree = loadTree(emptyInitValue);
-//initTree = sanitizeTree(loadTree(initValue), loadedConfig, sanitizeOptions);
-initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfig, sanitizeOptions); // <- this will work same  
+initTree = loadTree(initValue);
+//initTree = loadFromJsonLogic(initLogic, loadedConfig)!; // <- this will work same
 
+const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(initTree, loadedConfig, sanitizeOptions);
+initTree = fixedTree;
+if (fixedErrors.length) {
+  console.warn("Fixed tree errors on load: ", fixedErrors);
+}
+if (nonFixedErrors.length) {
+  console.warn("Validation errors on load:", nonFixedErrors);
+}
 
 // Trick to hot-load new config when you edit `config.tsx`
 // const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
@@ -42,17 +63,17 @@ initTree = sanitizeTree(loadFromJsonLogic(initLogic, loadedConfig)!, loadedConfi
 // } });
 // window.dispatchEvent(updateEvent);
 
-declare global {
-  interface Window {
-    _initialSkin: string;
-  }
-}
-
 // interface CustomEventDetail {
 //   config: Config;
 //   _initTree: ImmutableTree;
 //   _initValue: JsonTree;
 // }
+
+declare global {
+  interface Window {
+    _initialSkin: string;
+  }
+}
 
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
@@ -73,6 +94,11 @@ Utils.i18n.addResources("en", "custom", {
   "INVALID_SLIDER_VALUE": "Invalid slider value {{val}} translated with i18next",
   "BAD_LEN": "Bad length {{val}} translated with i18next"
 });
+// Override translations
+Utils.i18n.addResources("en", "raqbvalidation", {
+  "INCOMPLETE_LHS": "Incomplete left-hand side",
+  "INCOMPLETE_RHS": "Incomplete right-hand side",
+});
 
 const DemoQueryBuilder: React.FC = () => {
   const memo: React.MutableRefObject<DemoQueryBuilderMemo> = useRef({});
@@ -91,7 +117,6 @@ const DemoQueryBuilder: React.FC = () => {
   //     window.removeEventListener("update", onConfigChanged);
   //   };
   // });
-
 
   // const onConfigChanged = (e: Event) => {
   //   const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
@@ -118,22 +143,36 @@ const DemoQueryBuilder: React.FC = () => {
   };
 
   const sanitize = () => {
+    const { fixedErrors, fixedTree, nonFixedErrors } = sanitizeTree(state.tree, state.config, {
+      ...sanitizeOptions,
+      forceFix: false,
+    });
+    if (fixedErrors.length) {
+      console.warn("> sanitizeTree fixed errors:", fixedErrors);
+    }
+    if (nonFixedErrors.length) {
+      console.warn("> sanitizeTree non-fixed validation errors:", nonFixedErrors);
+    }
     setState({
       ...state,
-      tree: sanitizeTree(state.tree, state.config, {
-        ...sanitizeOptions,
-        forceFix: false,
-      })
+      tree: fixedTree,
     });
   };
 
   const sanitizeAndFix = () => {
+    const { fixedErrors, fixedTree, nonFixedErrors } = sanitizeTree(state.tree, state.config, {
+      ...sanitizeOptions,
+      forceFix: true,
+    });
+    if (fixedErrors.length) {
+      console.warn("> sanitizeTree fixed errors:", fixedErrors);
+    }
+    if (nonFixedErrors.length) {
+      console.warn("> sanitizeTree non-fixed validation errors:", nonFixedErrors);
+    }
     setState({
       ...state,
-      tree: sanitizeTree(state.tree, state.config, {
-        ...sanitizeOptions,
-        forceFix: true,
-      })
+      tree: fixedTree,
     });
   };
 
@@ -143,7 +182,7 @@ const DemoQueryBuilder: React.FC = () => {
       includeItemsPositions: true,
       includeStringifiedItems: true,
     });
-    console.log(">>> validationErrors", validationErrors);
+    console.warn(">>> validationErrors", validationErrors);
   };
 
   const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,9 +195,13 @@ const DemoQueryBuilder: React.FC = () => {
 
   const importFromSpel = () => {
     const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
+    const {fixedTree, fixedErrors} = sanitizeTree(tree!, state.config, sanitizeOptions);
+    if (fixedErrors.length) {
+      console.warn("Fixed errors after import from SpEL:", fixedErrors);
+    }
     setState({
       ...state, 
-      tree: tree ? sanitizeTree(tree, state.config, sanitizeOptions) : state.tree,
+      tree: fixedTree ?? state.tree,
       spelErrors
     });
   };
@@ -166,11 +209,15 @@ const DemoQueryBuilder: React.FC = () => {
   const changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skin = e.target.value;
     const config = loadConfig(e.target.value);
+    const {fixedTree, fixedErrors} = sanitizeTree(state.tree, config, sanitizeOptions);
+    if (fixedErrors.length) {
+      console.warn("Fixed errors after chanage UI framework:", fixedErrors);
+    }
     setState({
       ...state,
       skin,
       config,
-      tree: sanitizeTree(state.tree, config, sanitizeOptions)
+      tree: fixedTree
     });
     window._initialSkin = skin;
   };
@@ -193,12 +240,15 @@ const DemoQueryBuilder: React.FC = () => {
   }, []);
 
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions) => {
+    const isInit = !actionMeta;
     if (actionMeta)
       console.info(actionMeta);
     memo.current.immutableTree = immutableTree;
     memo.current.config = config;
     memo.current.actions = actions;
-    updateResult();
+    if (!isInit) {
+      updateResult();
+    }
   }, []);
 
   const updateResult = throttle(() => {

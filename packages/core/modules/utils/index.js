@@ -13,7 +13,9 @@ export * as Validation from "./validation";
 export * as OtherUtils from "./stuff";
 
 // expose validation api to top level for convenience
-export {validateTree, sanitizeTree, checkTree, isValidTree} from "./validation";
+export {validateTree, sanitizeTree, isValidTree} from "./validation";
+// deprecated
+export {checkTree, validateAndFixTree} from "./validation";
 export {default as uuid} from "./uuid";
 export {getSwitchValues} from "./treeUtils";
 export {compressConfig, decompressConfig} from "./configSerialize";

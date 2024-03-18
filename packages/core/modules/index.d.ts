@@ -391,7 +391,13 @@ export interface ValidationItemErrors {
   };
   itemPositionStr?: string;
 }
-export type ValidationResult = ValidationItemErrors[];
+export type ValidationErrors = ValidationItemErrors[];
+export interface SanitizeResult {
+  fixedTree: ImmutableTree;
+  fixedErrors: ValidationErrors;
+  nonFixedErrors: ValidationErrors;
+  allErrors: ValidationErrors;
+}
 export interface SanitizeOptions extends ValidationTranslateOptions {
   removeEmptyGroups?: boolean; // default: true
   removeIncompleteRules?: boolean; // default: true
@@ -408,19 +414,14 @@ export interface ValidationOptions extends ValidationTranslateOptions {
 }
 
 interface Validation {
-  sanitizeTree(tree: ImmutableTree, config: Config, options?: SanitizeOptions): ImmutableTree;
-  validateTree(tree: ImmutableTree, config: Config, options?: ValidationOptions): ValidationResult;
+  sanitizeTree(tree: ImmutableTree, config: Config, options?: SanitizeOptions): SanitizeResult;
+  validateTree(tree: ImmutableTree, config: Config, options?: ValidationOptions): ValidationErrors;
 
   isValidTree(tree: ImmutableTree, config: Config): boolean;
   getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldValue>;
 
   translateValidation(tr: Translatable): string;
   translateValidation(key: Translatable["key"], args?: Translatable["args"]): string;
-
-  _validateTree(
-    tree: ImmutableTree, _oldTree: ImmutableTree, config: Config, oldConfig: Config,
-    options?: ValidationOptions
-  ): [ImmutableTree, ValidationResult];
 }
 
 interface Import {
@@ -510,6 +511,7 @@ interface TreeUtils {
 }
 interface OtherUtils {
   uuid(): string;
+  deepFreeze(obj: any): any;
   deepEqual(a: any, b: any): boolean;
   shallowEqual(a: any, b: any, deep?: boolean): boolean;
   mergeArraysSmart(a: string[], b: string[]): string[];
