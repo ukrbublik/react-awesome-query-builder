@@ -454,10 +454,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Also you can use `path` to get raw item data with `Utils.TreeUtils.getItemByPath(tree, path)`.  
   `errors` is an array of objects `{ str, key, args }` (see type [`ValidationError`](/packages/core/modules/index.d.ts)).  
   `str` is an error message translated with [i18next.t(key, args)](https://www.i18next.com/overview/api#t) (namespace is `raqbvalidation`).  
-  You can override/extend translations with `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`.
+  You can override/extend translations with:
+  `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`.  
   See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  
-  See [example](/packages/examples/demo/index.tsx) of overriding translations.
-
+  See [i18n](#i18n).
 
   #### `sanitizeTree`
   `Utils.sanitizeTree (immutableValue, config, options?) -> { fixedTree, fixedErrors, nonFixedErrors }`  
@@ -466,11 +466,13 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Invalid values (eg. value > max or < min, value not passing `validateValue()` in field config) will be either:
    - always deleted if `showErrorMessage` in config.settings is false
    - marked with error if `showErrorMessage` is true
-   - fixed (if possible) or deleted (if can't fix) if `options.forceFix` is true
+   - fixed (if possible) or deleted (if can't fix) if `options.forceFix` is true.
+
   `options` is an object with keys:
     - `removeEmptyGroups` (default: true) - If group has no children, drop it.
     - `removeIncompleteRules` (default: true) - If rule is not completed (eg. value in RHS is empty, or required argument for a function is empty), drop it. Cause it can't be exported (will not be present in result of any [export](#export-utils) function call) so can be treated as useless.
     - `forceFix` (default: false) - If a rule has validation error(s), fix them if it's possible (eg. if value > max, can be reset to max) otherwise drop it.
+
   Returns an object with properties: `fixedTree` (fixed immutable tree value), `fixedErrors`, `nonFixedErrors`.  
   `fixedErrors` is an array of fixed errors grouped by item (format is the same as returned from [validateTree](#validateTree)).  
   There can be `nonFixedErrors` if `fixedTree` still has validation errors (eg. if `forceFix: false` and there are rules with value > max, or `removeEmptyGroups: false` and there are empty groups).  
