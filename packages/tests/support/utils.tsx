@@ -114,13 +114,13 @@ const stringifyValidationErrors = (errors: ValidationItemErrors[]) => {
       errors, itemStr, itemPositionStr,
     }) => ({
       errors: errors.map(({
-        side, delta, str, fixed
-      }) => `${fixed ? "* " : ""}${side ? `[${[side, delta].filter(a => a != undefined).join(" ")}] ` : ""}${str}`),
+        side, delta, str, key, fixed
+      }) => `${fixed ? "* " : ""}${side ? `[${[side, delta].filter(a => a != undefined).join(" ")}] ` : ""}${str || key}`),
       itemStr,
       itemPositionStr,
     }))
     .map(({errors, itemStr, itemPositionStr}, ii) => {
-      return `#${ii+1}. ` + (itemStr || itemPositionStr) + "  >>  "
+      return `#${ii+1}. ` + (itemStr || itemPositionStr || "") + "  >>  "
         + errors.map((e) => e).join(". ");
     })
     .join("\n");
