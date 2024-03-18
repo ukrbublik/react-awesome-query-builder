@@ -241,8 +241,14 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
 const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, opDef, parentField = null, asyncListValues) => {
   const { isForDisplay, isDebugMode } = meta.settings;
   if (value === undefined) {
-    if (!isDebugMode)
+    if (isDebugMode) {
+      if (fieldWidgetDef?.jsType === "array") {
+        return [];
+      }
+      return "?";
+    } else {
       return undefined;
+    }
   }
   let ret;
   if (valueSrc == "field") {
@@ -274,9 +280,6 @@ const formatValue = (config, meta, value, valueSrc, valueType, fieldWidgetDef, f
     } else {
       ret = value;
     }
-  }
-  if (value == undefined && isDebugMode) {
-    return "?";
   }
   return ret;
 };

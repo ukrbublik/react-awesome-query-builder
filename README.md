@@ -458,18 +458,17 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   `str` is an error message translated with [i18next.t(key, args)](https://www.i18next.com/overview/api#t) (namespace is `raqbvalidation`).  
 
   You can override/extend translations with:  
-  `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`.  
-  See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  
-  See [i18n](#i18n).
+  `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`  
+  See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  See [i18n](#i18n).
 
   #### `sanitizeTree`
   `Utils.sanitizeTree (immutableValue, config, options?) -> { fixedTree, fixedErrors, nonFixedErrors }`  
   Validates and modifies immutable query value to ensure it corresponds to the config and has no parts that are invalid or incomplete.  
-  Invalid rules (eg. if field is not found in config) will be always deleted.  
+  Invalid rules (eg. if field is not found in config) will always be deleted.  
   Invalid values (eg. value > max or < min, value not passing `validateValue()` in field config) will be either:
    - always deleted if `showErrorMessage` in config.settings is false
-   - marked with error if `showErrorMessage` is true
-   - fixed (if possible) or deleted (if can't fix) if `options.forceFix` is true.
+   - fixed (if possible) or deleted (if can't fix) if `options.forceFix` is true
+   - marked with error if `showErrorMessage` is true.
 
   `options` is an object with keys:
   - `removeEmptyGroups` (default: true) - If group has no children, drop it.
