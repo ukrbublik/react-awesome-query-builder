@@ -445,15 +445,18 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   Note that incomplete rules or empty groups are not counted as validation errors for this function.  
   If `showErrorMessage` is false, this function will always return true.
 
-### `validateTree`
+  #### `validateTree`
   `Utils.validateTree (immutableValue, config, options?) -> Array`  
   Validates immutable query value to check it corresponds to the config and has no parts that are invalid or incomplete.  
-  Returns array of errors grouped by item in tree.
+  Returns array of errors grouped by item in tree.  
   Each array element is `{ path, errors, itemStr, itemPositionStr }` (see type [`ValidationItemErrors`](/packages/core/modules/index.d.ts)).  
+
   To present item for user you can use `itemStr` (string representation of rule eg. `Number > 55`) and `itemPositionStr` (eg. `Rule #4 (index path: 1, 2)`).  
   Also you can use `path` to get raw item data with `Utils.TreeUtils.getItemByPath(tree, path)`.  
+
   `errors` is an array of objects `{ str, key, args }` (see type [`ValidationError`](/packages/core/modules/index.d.ts)).  
   `str` is an error message translated with [i18next.t(key, args)](https://www.i18next.com/overview/api#t) (namespace is `raqbvalidation`).  
+
   You can override/extend translations with:  
   `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`.  
   See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  
@@ -473,9 +476,10 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
   - `removeIncompleteRules` (default: true) - If rule is not completed (eg. value in RHS is empty, or required argument for a function is empty), drop it. Cause it can't be exported (will not be present in result of any [export](#export-utils) function call) so can be treated as useless.
   - `forceFix` (default: false) - If a rule has validation error(s), fix them if it's possible (eg. if value > max, can be reset to max) otherwise drop it.
 
-  Returns an object with properties: `fixedTree` (fixed immutable tree value), `fixedErrors`, `nonFixedErrors`.  
-  `fixedErrors` is an array of fixed errors grouped by item (format is the same as returned from [validateTree](#validateTree)).  
-  There can be `nonFixedErrors` if a `fixedTree` still has validation errors (eg. if `forceFix: false` and there are rules with value > max, or `removeEmptyGroups: false` and there are empty groups).  
+  Returns an object with properties:
+  - `fixedTree` is a fixed immutable tree value 
+  - `fixedErrors` is an array of fixed errors grouped by item (format is the same as returned from [validateTree](#validateTree))
+  - `nonFixedErrors` can be present if a `fixedTree` still has validation errors (eg. if `forceFix: false` and there are rules with value > max, or `removeEmptyGroups: false` and there are empty groups).  
 
 
 ### Export utils
