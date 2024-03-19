@@ -205,6 +205,8 @@ export const _validateTree = (
     return {
       fixedTree: tree,
       allErrors: [],
+      fixedErrors: [],
+      nonFixedErrors: [],
       isSanitized: false,
     };
   }

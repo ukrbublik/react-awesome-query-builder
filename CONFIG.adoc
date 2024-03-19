@@ -10,7 +10,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay\--false---string
+:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring
 :config1:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx
 :config2:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx
 :config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx

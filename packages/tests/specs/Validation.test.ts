@@ -3,7 +3,7 @@ const { isValidTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb } from "../support/utils";
-
+import { expect } from "chai";
 
 describe("validation", () => {
   it("shows error when change number value to > max", async () => {
@@ -22,10 +22,6 @@ describe("validation", () => {
       const ruleError = qb.find(".rule--error");
       expect(ruleError).to.have.length(1);
       expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
-    }, {
-      ignoreLog: (errText) => {
-        return errText.includes("Field num: Value 200 should be from 0 to 10");
-      }
     });
   });
 });

@@ -17,7 +17,7 @@ import {
 const {
   uuid, 
   sanitizeTree, loadTree, _loadFromJsonLogic, loadFromSpel, isJsonLogic, elasticSearchFormat,
-  queryString, sqlFormat, _sqlFormat, spelFormat, mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
+  queryString, sqlFormat, _sqlFormat, spelFormat, _spelFormat, mongodbFormat, _mongodbFormat, jsonLogicFormat, queryBuilderFormat, getTree, ConfigUtils
 } = Utils;
 import { AntdConfig } from "@react-awesome-query-builder/antd";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
@@ -34,13 +34,13 @@ export const getCurrentTest = () => {
   return currentTest;
 };
 
+const ConsoleMethods = [
+  "warn", "error", "info", "log"
+] as const;
 
 type ConsoleIgnoreFn = (errText: string) => boolean;
-type ConsoleData = {
-  error: string[],
-  warn: string[],
-  info: string[],
-};
+type ConsoleMethod = Extract<Exclude<keyof Console, "Console">, typeof ConsoleMethods[number]>;
+type ConsoleData = Partial<Record<ConsoleMethod, string[]>>;
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
@@ -68,6 +68,7 @@ interface DoOptions {
   ignoreLog?: ConsoleIgnoreFn;
   withRender?: boolean;
   insideIt?: boolean;
+  expectedLoadErrors?: string[];
 }
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
@@ -80,31 +81,30 @@ const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
 
 const mockConsole = (options?: DoOptions, _configName?: string) => {
   const origConsole = console;
-  const consoleData: ConsoleData = {
-    error: [],
-    warn: [],
-    info: [],
-  };
-  const mockedConsole = {
+  const consoleData: ConsoleData = ConsoleMethods.reduce((aggr, m) => ({...aggr, [m]: []}), {});
+  let mockedConsole: Console = {
     ...origConsole,
-    error: (...args: string[]) => {
-      const errText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
-      consoleData.error.push(errText);
-      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.error.apply(null, [...args, "@", getCurrentTest()]);
-    },
-    warn: (...args: string[]) => {
-      const errText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
-      consoleData.warn.push(errText);
-      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText))
-        origConsole.warn.apply(null, [...args, "@", getCurrentTest()]);
-    },
-    info: (...args: string[]) => {
-      const infoText = args.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
-      if (!options?.ignoreLog?.(infoText) && !globalIgnoreFn(infoText))
-        origConsole.info.apply(null, [...args, "@", getCurrentTest()]);
-    },
   };
+  if (!(mockedConsole as any).__mocked) {
+    (mockedConsole as any).__mocked = true;
+    for (const method of ConsoleMethods) {
+      mockedConsole[method] = (...args: string[]) => {
+        let finalArgs = [...args];
+        if (args[0] === "Fixed tree errors: ") {
+          // Convert errors from `validateAndFixTree`
+          finalArgs = [
+            "Fixed tree errors: ",
+            ...stringifyValidationErrors(args[1] as any)
+          ];
+        }
+        const errText = finalArgs.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
+        consoleData[method]?.push(errText);
+        if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
+          origConsole[method].apply(null, [...finalArgs, "@", getCurrentTest()]);
+        }
+      }
+    }
+  }
   return {mockedConsole, consoleData, origConsole};
 };
 
@@ -120,10 +120,8 @@ const stringifyValidationErrors = (errors: ValidationItemErrors[]) => {
       itemPositionStr,
     }))
     .map(({errors, itemStr, itemPositionStr}, ii) => {
-      return `#${ii+1}. ` + (itemStr || itemPositionStr || "") + "  >>  "
-        + errors.map((e) => e).join(". ");
-    })
-    .join("\n");
+      return (itemStr || itemPositionStr || "") + "  >>  " + errors.map((e) => e).join(". ");
+    });
 };
 
 export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeValueFormat = null, options?: DoOptions) => {
@@ -152,7 +150,11 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     const { allErrors, fixedTree } = sanitizeTree(tree, config);
     tree = fixedTree;
     if (allErrors.length) {
-      console.warn("sanitizeTree errors: \n" + stringifyValidationErrors(allErrors) + "\n");
+      //console.warn("sanitizeTree errors: \n" + stringifyValidationErrors(allErrors) + "\n");
+      errors = [
+        ...errors,
+        ...stringifyValidationErrors(allErrors),
+      ];
     }
   }
 
@@ -196,20 +198,31 @@ export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, val
   await do_with_qb("fluent", FluentUIConfig, config_fn, value, valueFormat, checks, options);
 };
   
-const do_with_qb = async (configName: string, BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, checks: ChecksFn, options?: DoOptions) => {
+const do_with_qb = async (
+  configName: string, BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat,
+  checks: ChecksFn, options?: DoOptions
+) => {
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig);
   // normally config should be saved at state in `onChange`, see README
   const extendedConfig = ConfigUtils.extendConfig(config);
-  const onChange = spy();
+
+  // Load tree
   const {tree, errors} = load_tree(value, config, valueFormat, options);
   if (errors?.length) {
-    const errText = `Error while loading as ${valueFormat || "?"} with ${configName}: ` + errors.join("; ") + "\n" + JSON.stringify(value);
-    if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
-      console.error(errText);
+    if (options?.expectedLoadErrors) {
+      expect(errors.join("; ")).to.equal(options?.expectedLoadErrors?.join("; "));
+    } else {
+      const errText = `Error while loading as ${valueFormat || "?"} with ${configName} @ ${getCurrentTest()}:`
+      + "\n" + errors.join("\n")
+      + "\n" + JSON.stringify(value);
+      if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
+        console.error(errText);
+      }
     }
   }
 
+  const onChange = spy();
   const tasks: Tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
       expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
@@ -331,26 +344,34 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
   
     if (expects["sql"] !== undefined) {
       doIt("should work to SQL", () => {
-        const [expectedRes, expectedErrors] = Array.isArray(expects["sql"])
+        const [expectedRes, expectedExportErrors] = Array.isArray(expects["sql"])
           ? expects["sql"]
           : [expects["sql"], []];
         const [res, errors] = _sqlFormat(tree, config);
         expect(res).to.equal(expectedRes);
-        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedErrors || []));
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
       });
     }
   
     if (expects["spel"] !== undefined) {
       doIt("should work to SpEL", () => {
-        const res = spelFormat(tree, config);
-        expect(res).to.equal(expects["spel"]);
+        const [expectedRes, expectedExportErrors] = Array.isArray(expects["spel"])
+          ? expects["spel"]
+          : [expects["spel"], []];
+        const [res, errors] = _spelFormat(tree, config);
+        expect(res).to.equal(expectedRes);
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
       });
     }
     
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
-        const res = mongodbFormat(tree, config);
-        expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["mongo"]));
+        const [expectedRes, expectedExportErrors] = Array.isArray(expects["mongo"])
+          ? expects["mongo"]
+          : [expects["mongo"], []];
+        const [res, errors] = _mongodbFormat(tree, config);
+        expect(JSON.stringify(res)).to.eql(JSON.stringify(expectedRes));
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
       });
     }
 
@@ -370,13 +391,13 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
 
     if (expects["logic"] !== undefined) {
       doIt("should work to JsonLogic", () => {
-        const [expectedLogic, expectedErrors] = (Array.isArray(expects["logic"])
+        const [expectedLogic, expectedExportErrors] = (Array.isArray(expects["logic"])
           ? expects["logic"]
           : [expects["logic"], []]) as [JsonLogicTree, string[]];
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
         expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expectedLogic));
-        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedErrors || []));
+        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
       });
     }
   
@@ -410,7 +431,11 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
   }
 };
 
-export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat, expects?: ExtectedExports, expectedErrors: Array<string> = [], options: DoOptions = {}) => {
+export const export_checks = (
+  config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat,
+  expects?: ExtectedExports, expectedLoadErrors: Array<string> = [], options: DoOptions = {}
+) => {
+  const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
 
@@ -418,15 +443,15 @@ export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueForma
   try {
     ({tree, errors} = load_tree(value, config, valueFormat, options));
   } catch(e) {
-    it("should load tree", () => {
+    doIt("should load tree", () => {
       throw e;
     });
   }
 
   if (errors?.length) {
-    if (expectedErrors?.length) {
-      it("should return errors", () => {
-        expect(errors.join("; ")).to.equal(expectedErrors.join("; "));
+    if (expectedLoadErrors?.length) {
+      doIt("should return errors on load tree", () => {
+        expect(errors.join("; ")).to.equal(expectedLoadErrors.join("; "));
       });
 
       do_export_checks(config, tree as ImmutableTree, expects, {
@@ -434,7 +459,7 @@ export const export_checks = (config_fn: ConfigFns, value: TreeValue, valueForma
         withRender: options?.withRender ?? true,
       });
     } else {
-      it("should load tree without errors", () => {
+      doIt("should load tree without errors", () => {
         throw new Error(errors.join("; "));
       });
     }

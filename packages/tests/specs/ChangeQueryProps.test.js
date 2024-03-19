@@ -30,8 +30,7 @@ describe("change props", () => {
       expect(onChange.getCall(1)).to.equal(null);
     }, {
       ignoreLog: (errText) => {
-        return errText.includes("No config for field num2")
-          || errText.includes("Removing rule:") && errText.includes("\"field\":\"num2\"") && errText.includes("Reason: Incomplete LHS");
+        return errText.includes("No config for field num2");
       }
     });
   });
@@ -44,8 +43,7 @@ describe("change props", () => {
       });
     }, {
       ignoreLog: (errText) => {
-        return errText.includes("Type of field selecttree is not supported")
-          || errText.includes("Removing rule:") && errText.includes("\"field\":\"selecttree\"") && errText.includes("Reason: Incomplete RHS");
+        return errText.includes("Type of field selecttree is not supported");
       }
     });
   });

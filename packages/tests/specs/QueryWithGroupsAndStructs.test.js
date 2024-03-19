@@ -11,8 +11,7 @@ describe("query with !struct and !group", () => {
         expect(qb.find(".query-builder")).to.have.length(1);
       }, {
         ignoreLog: (errText) => {
-          return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Incomplete RHS")
-            || errText.includes("Operator between is not supported for field results.slider");
+          return errText.includes("Operator between is not supported for field results.slider");
         }
       });
     });
@@ -77,11 +76,11 @@ describe("query with !struct and !group", () => {
           }
         ]
       }
-    }, [], {
-      ignoreLog: (errText) => {
-        return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Incomplete RHS")
-          || errText.includes("Operator between is not supported for field results.slider");
-      }
+    }, [
+      // validation:
+      "Results.Slider BETWEEN 13 AND 36  >>  * [lhs] Operator between is not supported for field results.slider. * [rhs] Incomplete RHS"
+    ], {
+      //ignoreLog
     });
   });
 
@@ -128,7 +127,9 @@ describe("query with !group", () => {
     export_checks(configs.with_group_some, inits.with_bad_subfield_in_group, "JsonLogic", {
       "logic": undefined
     }, [
-      "No config for field results.bad-subfield"
+      "No config for field results.bad-subfield",
+      // validation
+      "Root  >>  Empty query"
     ]);
   });
 
