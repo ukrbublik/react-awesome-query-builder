@@ -246,9 +246,7 @@ const DemoQueryBuilder: React.FC = () => {
     memo.current.immutableTree = immutableTree;
     memo.current.config = config;
     memo.current.actions = actions;
-    if (!isInit) {
-      updateResult();
-    }
+    updateResult();
   }, []);
 
   const updateResult = throttle(() => {

@@ -2,6 +2,7 @@ import Immutable  from "immutable";
 import {toImmutableList, isImmutable, applyToJS as immutableToJs} from "./stuff";
 import {getTreeBadFields} from "./validation";
 import {jsToImmutable} from "../import/tree";
+import uuid from "./uuid";
 
 export {
   toImmutableList, jsToImmutable, immutableToJs, isImmutable,
@@ -119,7 +120,7 @@ export const fixPathsInTree = (tree) => {
     if (!item) return;
     const currPath = item.get("path");
     const currId = item.get("id");
-    const itemId = currId || nodeId;
+    const itemId = currId || nodeId || uuid();
     const itemPath = path.push(itemId);
     if (!currPath || !currPath.equals(itemPath)) {
       newTree = newTree.setIn(expandTreePath(itemPath, "path"), itemPath);
@@ -425,18 +426,21 @@ export const getTotalRulesCountInTree = (tree) => {
 
 // Remove fields that can be calced: "id", "path"
 // Remove empty fields: "operatorOptions"
-export const getLightTree = (tree, children1AsArray = false) => {
+export const getLightTree = (tree, deleteExcess = true, children1AsArray = true) => {
   let newTree = tree;
 
   function _processNode (item, itemId) {
-    if (item.path)
+    if (deleteExcess && item.path) {
       delete item.path;
-    if (!children1AsArray && itemId)
+    }
+    if (deleteExcess && !children1AsArray && itemId) {
       delete item.id;
+    }
     let properties = item.properties;
     if (properties) {
-      if (properties.operatorOptions == null)
+      if (properties.operatorOptions == null) {
         delete properties.operatorOptions;
+      }
     }
 
     const children = item.children1;

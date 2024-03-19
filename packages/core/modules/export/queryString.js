@@ -130,6 +130,8 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
     if (!( hasUndefinedValues || fvalue.size < cardinality )) {
       formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
     }
+  } else if (isDebugMode) {
+    formattedValue = cardinality > 1 ? new List(Array.from({length: cardinality}).map(_ => "?")) : "?";
   }
 
   return [
@@ -140,8 +142,8 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
 };
 
 const buildFnToFormatOp = (operator, operatorDefinition) => {
-  const fop = operatorDefinition.labelForFormat || operator;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const fop = operatorDefinition?.labelForFormat || operator;
+  const cardinality = defaultValue(operatorDefinition?.cardinality, 1);
   let fn;
   if (cardinality == 0) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
@@ -154,8 +156,8 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   } else if (cardinality == 2) {
     // between
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-      const valFrom = values.first();
-      const valTo = values.get(1);
+      const valFrom = values?.first?.();
+      const valTo = values?.get?.(1);
       return `${field} ${fop} ${valFrom} AND ${valTo}`;
     };
   }
@@ -188,6 +190,9 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
       [operatorDef, revOperatorDef] = [revOperatorDef, operatorDef];
     }
   }
+
+  if (isDebugMode && !operator)
+    operator = "?";
 
   //find fn to format expr
   if (!fn)
@@ -231,6 +236,10 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
     //rev
     if (isRev) {
       ret = config.settings.formatReverse(ret, operator, reversedOp, operatorDef, revOperatorDef, isForDisplay);
+    }
+
+    if (isDebugMode && ret === "? ? ?") {
+      ret = "?";
     }
 
     return ret;
@@ -309,7 +318,7 @@ const formatFunc = (config, meta, funcValue, parentField = null) => {
   const { isForDisplay, isDebugMode } = meta.settings;
   const funcKey = funcValue?.get?.("func");
   if (!funcKey) {
-    return undefined;
+    return isDebugMode ? "?()" : undefined;
   }
   const args = funcValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);

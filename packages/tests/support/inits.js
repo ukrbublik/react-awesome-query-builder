@@ -17,6 +17,80 @@ export const tree_with_empty_group = {
   }
 };
 
+export const tree_with_empty_groups_and_incomplete_rules = {
+  type: "group",
+  children1: [
+    {
+      type: "group",
+      properties: {
+        conjunction: "AND",
+        not: false
+      },
+      children1: [
+        {
+          type: "rule",
+          properties: {
+            field: "num",
+            operator: "between",
+            value: [null, null],
+            valueSrc: ["value", "value"],
+            valueType: ["number", "number"]
+          }
+        },
+      ]
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "is_null",
+        value: [],
+        valueSrc: [],
+        valueType: []
+      }
+    },
+    {
+      type: "group",
+      properties: {
+        conjunction: "AND",
+        not: false
+      },
+      children1: [
+        {
+          type: "rule",
+          properties: {
+            field: null,
+            operator: null,
+            value: [],
+            valueSrc: [],
+            valueType: []
+          }
+        },
+      ]
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "greater",
+        value: [null],
+        valueSrc: ["value"],
+        valueType: ["number"]
+      }
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "less",
+        value: [100],
+        valueSrc: ["value"],
+        valueType: ["number"]
+      }
+    },
+  ]
+};
+
 export const tree_with_number = {
   type: "group",
   id: uuid(),

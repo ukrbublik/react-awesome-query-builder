@@ -221,27 +221,30 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  const fvalue = iValue.map((currentValue, ind) => {
-    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
-    const valueType = iValueType ? iValueType.get(ind) : null;
-    const cValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    const [fv, fvUseExpr] = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
-    );
-    if (fv !== undefined) {
-      useExpr = useExpr || fvUseExpr;
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
+  let formattedValue;
+  if (iValue != undefined) {
+    const fvalue = iValue.map((currentValue, ind) => {
+      const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+      const valueType = iValueType ? iValueType.get(ind) : null;
+      const cValue = completeValue(currentValue, valueSrc, config);
+      const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const [fv, fvUseExpr] = formatValue(
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
+      );
+      if (fv !== undefined) {
+        useExpr = useExpr || fvUseExpr;
+        valueSrcs.push(valueSrc);
+        valueTypes.push(valueType);
+      }
+      return fv;
+    });
+    const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+    if (fvalue.size < cardinality || hasUndefinedValues)
+      return undefined;
+    formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
+  }
   const wrapExpr = useExpr && _canWrapExpr;
-  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
-  if (fvalue.size < cardinality || hasUndefinedValues)
-    return undefined;
-  const formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
 
   //build rule
   const fn = operatorDefinition.mongoFormatOp;

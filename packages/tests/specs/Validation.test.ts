@@ -1,5 +1,5 @@
 import { Utils, ImmutableTree } from "@react-awesome-query-builder/core";
-const { isValidTree, validateTree, sanitizeTree } = Utils;
+const { isValidTree, validateTree, sanitizeTree, checkTree, getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb } from "../support/utils";
@@ -94,3 +94,70 @@ describe("sanitizeTree", () => {
     );
   });
 });
+
+describe("deprecated checkTree", () => {
+  it("can't fix value > max but can remove empty groups and incomplete rules", async () => {
+    await with_qb(
+      configs.with_all_types__show_error__dont_fix_on_load, inits.tree_with_empty_groups_and_incomplete_rules, "default",
+      async (qb, onChange, {expect_jlogic, expect_tree_validation_errors, config}, consoleData, onInit) => {
+        const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+        const initialJsonTree = getTree(initialTree);
+        expect(initialJsonTree.children1?.length).to.eq(5);
+
+        const ruleError = qb.find(".rule--error");
+        expect(ruleError).to.have.length(1);
+        expect(ruleError.first().text()).to.eq("Value 100 should be from 0 to 10");
+
+        config = {
+          ...config,
+          settings: {
+            ...config.settings,
+            removeEmptyGroupsOnLoad: true,
+            removeIncompleteRulesOnLoad: true,
+          }
+        };
+        const fixedTree = checkTree(initialTree, config);
+        await qb.setProps({
+          value: fixedTree,
+          ...config
+        });
+        const ruleError2 = qb.find(".rule--error");
+        expect(ruleError2).to.have.length(1);
+        expect(ruleError2.first().text()).to.eq("Value 100 should be from 0 to 10");
+
+        const isValid2 = isValidTree(fixedTree, config);
+        expect(isValid2).to.eq(false);
+
+        const fixedJsonTree = getTree(fixedTree);
+        expect(fixedJsonTree.children1?.length).to.eq(2);
+        expect_tree_validation_errors([
+          "Tree check errors: ",
+          "Deleted group #1 (index path: 1)  >>  * Empty group",
+          "Number BETWEEN ? AND ?  >>  * [rhs] Incomplete RHS",
+          "Deleted group #2 (index path: 3)  >>  * Empty group",
+          "Deleted leaf #3 (index path: 3,1)  >>  * [lhs] Incomplete LHS",
+          "Number > ?  >>  * [rhs] Incomplete RHS",
+          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10"
+        ]);
+      },
+      {
+        expectedLoadErrors: [
+          "Number BETWEEN ? AND ?  >>  [rhs] Incomplete RHS",
+          "Leaf #3 (index path: 3,1)  >>  [lhs] Incomplete LHS",
+          "Number > ?  >>  [rhs] Incomplete RHS",
+          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10"
+        ],
+        sanitizeOptions: {
+          // don't fix tree in `load_tree`
+          removeEmptyGroups: false,
+          removeIncompleteRules: false,
+        },
+        ignoreLog: (errText) => {
+          return errText.includes("Tree check errors:");
+        },
+      }
+    );
+  });
+});
+
+//todo: same for validateAndFix tree

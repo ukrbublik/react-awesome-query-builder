@@ -327,7 +327,7 @@ class Rule extends Component {
   render () {
     const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
     const { valueSrc, value, config } = this.props;
-    const canShrinkValue = valueSrc.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
+    const canShrinkValue = valueSrc?.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
     const { renderButtonGroup } = config.settings;
     const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
 

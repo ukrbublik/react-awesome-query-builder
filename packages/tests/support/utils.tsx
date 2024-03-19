@@ -12,7 +12,7 @@ import {
   Utils,
   JsonLogicTree, JsonTree, ImmutableTree, ConfigContext,
   Query, Builder, BasicConfig, Config,
-  BuilderProps, ValidationItemErrors
+  BuilderProps, ValidationItemErrors, SanitizeOptions
 } from "@react-awesome-query-builder/ui";
 const {
   uuid, 
@@ -60,6 +60,7 @@ interface Tasks {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
   expect_queries: (queries: Array<string>) => void;
   expect_checks: (expects: ExtectedExports) => void;
+  expect_tree_validation_errors: (errs: string[]) => void;
   config: Config;
 }
 interface DoOptions {
@@ -69,6 +70,7 @@ interface DoOptions {
   withRender?: boolean;
   insideIt?: boolean;
   expectedLoadErrors?: string[];
+  sanitizeOptions?: SanitizeOptions;
 }
 
 const emptyOnChange = (_immutableTree: ImmutableTree, _config: Config) => {};
@@ -90,10 +92,10 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
     for (const method of ConsoleMethods) {
       mockedConsole[method] = (...args: string[]) => {
         let finalArgs = [...args];
-        if (args[0] === "Fixed tree errors: ") {
-          // Convert errors from `validateAndFixTree`
+        if (args[0] === "Fixed tree errors: " || args[0] === "Tree check errors: ") {
+          // Convert errors from `validateAndFixTree` or `checkTree`
           finalArgs = [
-            "Fixed tree errors: ",
+            args[0],
             ...stringifyValidationErrors(args[1] as any)
           ];
         }
@@ -147,12 +149,14 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     tree = loadTree(value as JsonTree);
   }
   if (tree) {
-    const { allErrors, fixedTree } = sanitizeTree(tree, config);
+    const { allErrors, fixedTree } = sanitizeTree(tree, config, options?.sanitizeOptions);
     tree = fixedTree;
     if (allErrors.length) {
       //console.warn("sanitizeTree errors: \n" + stringifyValidationErrors(allErrors) + "\n");
       errors = [
+        // import errors:
         ...errors,
+        // sanitize errors:
         ...stringifyValidationErrors(allErrors),
       ];
     }
@@ -211,6 +215,9 @@ const do_with_qb = async (
   const {tree, errors} = load_tree(value, config, valueFormat, options);
   if (errors?.length) {
     if (options?.expectedLoadErrors) {
+      for (let i = 0 ; i < Math.max(options.expectedLoadErrors.length, errors.length) ; i++) {
+        expect(errors[i], `load error ${i}`).to.equal(options.expectedLoadErrors[i]);
+      }
       expect(errors.join("; ")).to.equal(options?.expectedLoadErrors?.join("; "));
     } else {
       const errText = `Error while loading as ${valueFormat || "?"} with ${configName} @ ${getCurrentTest()}:`
@@ -224,6 +231,11 @@ const do_with_qb = async (
 
   const onChange = spy();
   const onInit = spy();
+  // mock console
+  const {mockedConsole, origConsole, consoleData} = mockConsole(options, configName);
+  // eslint-disable-next-line no-global-assign
+  console = mockedConsole;
+
   const tasks: Tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
       expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
@@ -237,6 +249,18 @@ const do_with_qb = async (
         withRender: false, 
         insideIt: true,
       });
+    },
+    expect_tree_validation_errors: (expectedLines) => {
+      const errs = consoleData.warn?.filter(
+        // Get console errors from `validateAndFixTree` or `checkTree`
+        e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
+      );
+      expect(errs?.length, "tree errors in console").eq(1);
+      const lines = errs![0].split("\n");
+      for (let i = 0 ; i < Math.max(expectedLines.length, lines.length) ; i++) {
+        expect(lines[i], `line ${i}`).to.equal(expectedLines[i]);
+      }
+      expect(errs![0]).to.equal(expectedLines.join("\n"));
     },
     config: config,
   };
@@ -269,11 +293,6 @@ const do_with_qb = async (
     }
     return cmp;
   };
-
-  // mock console
-  const {mockedConsole, origConsole, consoleData} = mockConsole(options, configName);
-  // eslint-disable-next-line no-global-assign
-  console = mockedConsole;
 
   //await act(async () => {
   const qb = mount(
@@ -453,6 +472,9 @@ export const export_checks = (
   if (errors?.length) {
     if (expectedLoadErrors?.length) {
       doIt("should return errors on load tree", () => {
+        for (let i = 0 ; i < Math.max(expectedLoadErrors.length, errors.length) ; i++) {
+          expect(errors[i], `load error ${i}`).to.equal(expectedLoadErrors[i]);
+        }
         expect(errors.join("; ")).to.equal(expectedLoadErrors.join("; "));
       });
 

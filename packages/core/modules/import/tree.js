@@ -2,6 +2,7 @@ import Immutable, { fromJS, Map } from "immutable";
 import {checkTree, isValidTree} from "../utils/validation";
 import {getLightTree, _fixImmutableValue, fixPathsInTree} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
+import uuid from "../utils/uuid";
 
 export {
   isJsonLogic,
@@ -13,8 +14,7 @@ export const getTree = (immutableTree, light = true, children1AsArray = true) =>
   if (!immutableTree) return undefined;
   let tree = immutableTree;
   tree = tree.toJS();
-  if (light)
-    tree = getLightTree(tree, children1AsArray);
+  tree = getLightTree(tree, light, children1AsArray);
   return tree;
 };
 
@@ -71,7 +71,7 @@ export function jsToImmutable(tree) {
       // keep in JS format
       outValue = value.toJS();
     } else if (key == "children1" && Immutable.Iterable.isIndexed(value)) {
-      outValue = new Immutable.OrderedMap(value.map(child => [child.get("id"), child]));
+      outValue = new Immutable.OrderedMap(value.map(child => [child.get("id") || uuid(), child]));
     } else {
       outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
     }

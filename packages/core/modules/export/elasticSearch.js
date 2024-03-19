@@ -323,7 +323,7 @@ export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
     const operator = properties.get("operator");
     const field = properties.get("field");
     const fieldSrc = properties.get("fieldSrc");
-    const value = properties.get("value").toJS();
+    const value = properties.get("value")?.toJS();
     const _valueType = properties.get("valueType")?.get(0);
     const valueSrc = properties.get("valueSrc")?.get(0);
 

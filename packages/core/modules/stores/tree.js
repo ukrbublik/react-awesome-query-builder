@@ -161,7 +161,7 @@ const _addChildren1 = (config, item, children) => {
   if (children && Array.isArray(children)) {
     item.children1 = new Immutable.OrderedMap(
       children.reduce((map, it) => {
-        const id1 = uuid();
+        const id1 = it.id ?? uuid();
         const it1 = {
           ...it,
           properties: defaultItemProperties(config, it).merge(fromJS(it.properties) || {}),
@@ -682,13 +682,7 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   }
 
   // init lists
-  const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
-  if (!lastValueArr) {
-    state = state
-      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
-  }
+  state = initEmptyValueLists(state, path, config, operatorCardinality);
 
   // Additional validation for range values
   const values = Array.from({length: operatorCardinality}, (_, i) =>
@@ -752,6 +746,11 @@ const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
   //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+  const operatorConfig = getOperatorConfig(config, operator, field);
+  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+
+  // init lists
+  state = initEmptyValueLists(state, path, config, operatorCardinality);
 
   state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
   state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
@@ -762,8 +761,6 @@ const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), null);
 
     // if current operator is range, clear possible range error
-    const operatorConfig = getOperatorConfig(config, operator, field);
-    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
     if (operatorConfig.validateValues) {
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), null);
     }
@@ -814,6 +811,25 @@ const checkEmptyGroups = (state, config) => {
   return state;
 };
 
+const initEmptyValueLists = (state, path, config, operatorCardinality) => {
+  if (!operatorCardinality) {
+    const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
+    const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+    const operatorConfig = getOperatorConfig(config, operator, field);
+    operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+  }
+
+  for (const k of ["value", "valueType", "valueError", "valueSrc"]) {
+    if (!state.getIn(expandTreePath(path, "properties", k))) {
+      state = state
+        .setIn(expandTreePath(path, "properties", k), new Immutable.List(
+          operatorCardinality ? Array.from({length: operatorCardinality}) : []
+        ));
+    }
+  }
+
+  return state;
+};
 
 const getField = (state, path) => {
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;

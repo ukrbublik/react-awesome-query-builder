@@ -93,8 +93,8 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
   } else if (cardinality == 2) {
     // between
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
-      const valFrom = values.first();
-      const valTo = values.get(1);
+      const valFrom = values?.first?.();
+      const valTo = values?.get?.(1);
       return `${field} ${sqlOp} ${valFrom} AND ${valTo}`;
     };
   }
@@ -137,25 +137,28 @@ const formatRule = (item, config, meta) => {
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  const fvalue = iValue.map((currentValue, ind) => {
-    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
-    const valueType = iValueType ? iValueType.get(ind) : null;
-    const cValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    let fv = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, opDef, asyncListValues
-    );
-    if (fv !== undefined) {
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
-  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
-  if (hasUndefinedValues || fvalue.size < cardinality)
-    return undefined;
-  const formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
+  let formattedValue;
+  if (iValue != undefined) {
+    const fvalue = iValue.map((currentValue, ind) => {
+      const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+      const valueType = iValueType ? iValueType.get(ind) : null;
+      const cValue = completeValue(currentValue, valueSrc, config);
+      const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      let fv = formatValue(
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, opDef, asyncListValues
+      );
+      if (fv !== undefined) {
+        valueSrcs.push(valueSrc);
+        valueTypes.push(valueType);
+      }
+      return fv;
+    });
+    const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+    if (hasUndefinedValues || fvalue.size < cardinality)
+      return undefined;
+    formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
+  }
 
   //find fn to format expr
   const fn = opDef.sqlFormatOp || buildFnToFormatOp(operator, opDef);

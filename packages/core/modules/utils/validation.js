@@ -252,7 +252,7 @@ export const _validateTree = (
     if (includeStringifiedItems) {
       const item = getItemByPath(stringifyFixedItems ? fixedTree : tree, path);
       const isRoot = path.length === 1;
-      if (!isRoot) {
+      if (!isRoot && item.get("type") !== "group") {
         const isDebugMode = true;
         const isForDisplay = stringifyItemsUserFriendly;
         const itemStr = queryString(item, config, isForDisplay, isDebugMode);
@@ -449,6 +449,15 @@ function validateRule (item, path, itemId, meta, c) {
   const origItem = item;
   let id = item.get("id");
   let properties = item.get("properties");
+  if (!properties) {
+    const err = {
+      key: constants.INCOMPLETE_RULE,
+      args: {},
+      fixed: removeIncompleteRules
+    };
+    _addError(meta, item, path, err);
+    return undefined;
+  }
   let field = properties.get("field") || null;
   let fieldSrc = properties.get("fieldSrc") || null;
   let operator = properties.get("operator") || null;
