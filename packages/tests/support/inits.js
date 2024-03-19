@@ -50,6 +50,14 @@ export const with_number = {
   }]
 };
 
+export const with_number_bigger_than_max = {
+  "and": [{
+    "==": [
+      { "var": "num" },  200
+    ]
+  }]
+};
+
 export const with_range_slider = {
   "and": [{
     "<=": [

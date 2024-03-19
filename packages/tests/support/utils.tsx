@@ -45,7 +45,7 @@ type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | ConfigFn[];
-type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, consoleData: ConsoleData) => Promise<void> | void;
+type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, consoleData: ConsoleData, onInit: sinon.SinonSpy) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
@@ -223,6 +223,7 @@ const do_with_qb = async (
   }
 
   const onChange = spy();
+  const onInit = spy();
   const tasks: Tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
       expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
@@ -256,6 +257,7 @@ const do_with_qb = async (
         value={tree as ImmutableTree}
         renderBuilder={render_builder}
         onChange={onChange}
+        onInit={onInit}
       />
     );
     if (options?.strict) {
@@ -280,7 +282,7 @@ const do_with_qb = async (
   ) as ReactWrapper;
 
   // @ts-ignore
-  await checks(qb, onChange, tasks, consoleData);
+  await checks(qb, onChange, tasks, consoleData, onInit);
   //});
 
   if (options?.attach) {
