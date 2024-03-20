@@ -66,6 +66,10 @@ describe("interactions on vanilla", () => {
       expect(child.properties.field).to.equal("str");
       expect(child.properties.operator).to.equal("like");
       expect(child.properties.value).to.eql([undefined]);
+    }, {
+      expectedLoadErrors: [
+        "Root  >>  Empty query"
+      ]
     });
   });
 
@@ -91,6 +95,10 @@ describe("interactions on vanilla", () => {
       });
       expect(child.properties.operator).to.equal("like");
       expect(child.properties.value).to.eql([undefined]);
+    }, {
+      expectedLoadErrors: [
+        "Root  >>  Empty query"
+      ]
     });
   });
 

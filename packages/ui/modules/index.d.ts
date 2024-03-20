@@ -183,7 +183,8 @@ export interface QueryProps {
   funcs?: Funcs;
   ctx: ConfigContext;
   value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta): void;
+  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions): void;
+  onInit?(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions): void;
   renderBuilder(props: BuilderProps): ReactElement;
 }
 
@@ -267,6 +268,7 @@ export interface RuleProps {
   operatorOptions: AnyObject | Empty,
   value: ImmutableList<RuleValue>, //depends on widget
   valueError: ImmutableList<string>,
+  fieldError: string | Empty,
   valueSrc: ImmutableList<ValueSource>,
   asyncListValues: Array<any> | Empty,
 

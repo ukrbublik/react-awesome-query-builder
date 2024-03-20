@@ -214,7 +214,7 @@ const operators = {
     jsonLogic: "<=",
     validateValues: (values) => {
       if (values[0] != undefined && values[1] != undefined) {
-        return values[0] <= values[1] ? null : "Invalid range";
+        return values[0] <= values[1];
       }
       return null;
     },
@@ -253,7 +253,7 @@ const operators = {
     reversedOp: "between",
     validateValues: (values) => {
       if (values[0] != undefined && values[1] != undefined) {
-        return values[0] <= values[1] ? null : "Invalid range";
+        return values[0] <= values[1];
       }
       return null;
     },

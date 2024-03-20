@@ -16,7 +16,7 @@
 
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true
+    "skipLibCheck": false
   },
   "include": [
     "modules/**/*"

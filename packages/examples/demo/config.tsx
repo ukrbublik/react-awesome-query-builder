@@ -3,7 +3,7 @@ import merge from "lodash/merge";
 import {
   BasicFuncs, Utils, BasicConfig,
   // types:
-  Operators, Fields, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
+  Operators, Fields, Func, Types, Conjunctions, LocaleSettings, OperatorProximity, Funcs, DateTimeWidget, FuncWidget, SelectWidget, 
   Settings,
   DateTimeFieldSettings, TextFieldSettings, SelectFieldSettings, MultiSelectFieldSettings, NumberFieldSettings,
   TextWidgetProps,
@@ -12,6 +12,7 @@ import {
   TextWidget,
   TreeSelectWidget,
   Config,
+  ValidateValue,
 } from "@react-awesome-query-builder/ui";
 import moment from "moment";
 import ru_RU from "antd/es/locale/ru_RU";
@@ -242,6 +243,29 @@ export default (skin: string) => {
     defaultSearchWidth: "100px",
     defaultMaxRows: 5,
 
+    // Example of how to correctly configure default LHS funtion with args:
+    // defaultField: {
+    //   func: "date.RELATIVE_DATETIME",
+    //   args: {
+    //     date: {
+    //       value: {func: "date.NOW", args: {}},
+    //       valueSrc: "func"
+    //     },
+    //     op: {
+    //       value: "plus",
+    //       valueSrc: "value"
+    //     },
+    //     dim: {
+    //       value: "day",
+    //       valueSrc: "value"
+    //     },
+    //     val: {
+    //       value: 1,
+    //       valueSrc: "value"
+    //     }
+    //   }
+    // },
+
     valueSourcesInfo: {
       value: {
         label: "Value"
@@ -266,6 +290,7 @@ export default (skin: string) => {
     canLeaveEmptyGroup: true,
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
+    optimizeRenderWithInternals: true,
     customFieldSelectProps: {
       showSearch: true
     },
@@ -365,6 +390,12 @@ export default (skin: string) => {
       defaultOperator: "some",
       initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
+      fieldSettings: {
+        validateValue: (val: number, _fieldSettings, _op) => {
+          return (val < 10 ? null : {error: "Too many cars, see validateValue()", fixedValue: 9});
+        },
+      },
+
       subfields: {
         vendor: {
           type: "select",
@@ -412,9 +443,14 @@ export default (skin: string) => {
           0: <strong>0%</strong>,
           100: <strong>100%</strong>
         },
-        validateValue: (val, fieldSettings) => {
-          return (val < 50 ? null : "Invalid slider value, see validateValue()");
-        },
+        validateValue: ((val, fieldSettings) => {
+          const ret: ReturnType<ValidateValue> = (val < 50 ? null : {
+            // error: "Invalid slider value, see validateValue()",
+            error: {key: "custom:INVALID_SLIDER_VALUE", args: {val}},
+            fixedValue: 49
+          });
+          return ret;
+        }),
       } as NumberFieldSettings,
       //overrides
       widgets: {
@@ -611,12 +647,27 @@ export default (skin: string) => {
     string: {
       type: "!struct",
       label: "String",
+      tooltip: "String functions",
       subfields: {
         LOWER: merge({}, BasicFuncs.LOWER, {
+          tooltip: "Convert to lower case",
           allowSelfNesting: true,
-        }),
-        UPPER: merge({}, BasicFuncs.UPPER, {
-          allowSelfNesting: true,
+          validateValue: (s: string) => {
+            return s.length <= 7 ? null : {
+              error: "bad len",
+              fixedValue: "_fixed_"
+            };
+          },
+          args: {
+            str: {
+              validateValue: (s: string) => {
+                return s.length <= 7 ? null : {
+                  error: { key: "custom:BAD_LEN", args: {val: s} },
+                  fixedValue: "_fixed_"
+                };
+              }
+            },
+          }
         }),
       }
     },

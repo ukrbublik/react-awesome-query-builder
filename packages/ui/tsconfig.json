@@ -22,7 +22,7 @@
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
     },
-    "skipLibCheck": true
+    "skipLibCheck": false
   },
   "include": [
     "modules/**/*"

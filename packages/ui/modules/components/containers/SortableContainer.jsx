@@ -593,7 +593,7 @@ const createSortableContainer = (Builder, CanMoveFn = null) =>
       
       if (fromII.type != "case_group" && fromII.caseId != toII.caseId) {
         const isLastFromCase = fromCaseII ? fromCaseII._height == 2 : false;
-        const newRulesInTargetCase = toCaseII ? toCaseII.leafsCount + 1 : 0;
+        const newRulesInTargetCase = toCaseII ? toCaseII.atomicRulesCountInCase + 1 : 0;
         if (maxNumberOfRules && newRulesInTargetCase > maxNumberOfRules)
           return false;
         if (isLastFromCase && !canLeaveEmptyCase)

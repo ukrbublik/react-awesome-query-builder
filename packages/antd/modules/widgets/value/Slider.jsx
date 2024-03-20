@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
 import { Utils } from "@react-awesome-query-builder/ui";
 const { useOnPropsChanged, pureShouldComponentUpdate } = Utils.ReactUtils;
-const __isInternal = true; //true to optimize render
 
 export default class SliderWidget extends Component {
   static propTypes = {
@@ -45,20 +44,25 @@ export default class SliderWidget extends Component {
   }
 
   handleChange = (val) => {
+    const {internalValue} = this.state;
+    const {optimizeRenderWithInternals} = this.props.config.settings;
     if (val === "")
       val = undefined;
-    if (__isInternal)
+    if (optimizeRenderWithInternals)
       this.setState({internalValue: val});
-    this.props.setValue(val, undefined, __isInternal);
+    const didEmptinessChanged = !!val !== !!internalValue;
+    const __isInternal = optimizeRenderWithInternals && !didEmptinessChanged;
+    this.props.setValue(val, undefined, { __isInternal });
   };
 
   tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
   shouldComponentUpdate = (nextProps, nextState) => {
+    const {optimizeRenderWithInternals} = nextProps.config.settings;
     const should = this.pureShouldComponentUpdate(nextProps, nextState);
     if (should) {
       // RHL fix
-      if (this.props.cacheBusterProp && __isInternal) {
+      if (this.props.cacheBusterProp && optimizeRenderWithInternals) {
         nextState.internalValue = this.state.internalValue;
       }
     }
@@ -66,14 +70,15 @@ export default class SliderWidget extends Component {
   };
 
   render() {
-    const {config, placeholder, customProps, value,  min, max, step, marks, readonly, valueError} = this.props;
-    const {renderSize, showErrorMessage, defaultSliderWidth} = config.settings;
+    const {config, placeholder, customProps, value,  min, max, step, marks, readonly, errorMessage} = this.props;
+    const {internalValue} = this.state;
+    const {renderSize, showErrorMessage, defaultSliderWidth, optimizeRenderWithInternals} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
 
-    const canUseInternal = showErrorMessage ? true : !valueError;
-    let aValue = __isInternal && canUseInternal ? this.state.internalValue : value;
+    const canUseInternal = optimizeRenderWithInternals && (showErrorMessage ? true : !errorMessage);
+    let aValue = canUseInternal ? internalValue : value;
     if (aValue == undefined)
       aValue = null;
     const sliderValue = aValue == null && min ? min : aValue;

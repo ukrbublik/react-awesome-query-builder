@@ -1,7 +1,7 @@
 import type { Moment } from "@react-awesome-query-builder/ui";
-import momentGenerateConfig from "rc-picker/lib/generate/moment";
-import generatePicker from "antd/es/date-picker/generatePicker";
+import { DatePicker } from "antd";
+import momentGenerateConfig from "./config";
 
-const DatePicker = generatePicker<Moment>(momentGenerateConfig);
+const MomentDatePicker = DatePicker.generatePicker<Moment>(momentGenerateConfig);
 
-export default DatePicker;
+export default MomentDatePicker;

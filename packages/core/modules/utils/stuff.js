@@ -135,6 +135,12 @@ export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
 };
 
+export const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _stack) => {
+  if (Array.isArray(objValue)) {
+    return srcValue;
+  }
+};
+
 export const cleanJSX = (jsx) => {
   const jsxKeys = ["$$typeof", "_owner", "_store", "ref", "key"];
 
@@ -306,4 +312,3 @@ export const getFirstDefined = (arr = []) => {
 };
 
 export const logger = getLogger();
-

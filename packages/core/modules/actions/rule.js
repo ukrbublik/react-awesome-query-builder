@@ -6,13 +6,13 @@ import {toImmutableList} from "../utils/stuff";
  * @param {Immutable.List} path
  * @param {string} field
  */
-export const setField = (config, path, field, asyncListValues, __isInternal) => ({
+export const setField = (config, path, field, asyncListValues, _meta) => ({
   type: constants.SET_FIELD,
   path: toImmutableList(path),
-  field: field,
-  config: config,
+  field,
+  config,
   asyncListValues,
-  __isInternal,
+  _meta,
 });
 
 /**
@@ -46,17 +46,16 @@ export const setOperator = (config, path, operator) => ({
  * @param {*} value
  * @param {string} valueType
  * @param {*} asyncListValues
- * @param {boolean} __isInternal
  */
-export const setValue = (config, path, delta, value, valueType, asyncListValues, __isInternal) => ({
+export const setValue = (config, path, delta, value, valueType, asyncListValues, _meta) => ({
   type: constants.SET_VALUE,
   path: toImmutableList(path),
-  delta: delta,
-  value: value,
-  valueType: valueType,
-  asyncListValues: asyncListValues,
-  config: config,
-  __isInternal: __isInternal
+  delta,
+  value,
+  valueType,
+  asyncListValues,
+  config,
+  _meta,
 });
 
 /**
@@ -65,12 +64,36 @@ export const setValue = (config, path, delta, value, valueType, asyncListValues,
  * @param {integer} delta
  * @param {*} srcKey
  */
-export const setValueSrc = (config, path, delta, srcKey) => ({
+export const setValueSrc = (config, path, delta, srcKey, _meta) => ({
   type: constants.SET_VALUE_SRC,
   path: toImmutableList(path),
-  delta: delta,
-  srcKey: srcKey,
-  config: config
+  delta,
+  srcKey,
+  config,
+  _meta,
+});
+
+/**
+ * @param {object} config
+ * @param {Immutable.List} path
+ * @param {integer} delta
+ * @param {Array} parentFuncs
+ * @param {string | null} argKey
+ * @param {*} value
+ * @param {string | "!valueSrc"} valueType
+ * @param {*} asyncListValues
+ */
+export const setFuncValue = (config, path, delta, parentFuncs, argKey, value, valueType, asyncListValues, _meta) => ({
+  type: constants.SET_FUNC_VALUE,
+  path: toImmutableList(path),
+  delta,
+  parentFuncs,
+  argKey,
+  value,
+  valueType,
+  asyncListValues,
+  config,
+  _meta,
 });
 
 /**

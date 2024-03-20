@@ -7,10 +7,10 @@ const { _fixImmutableValue } = Utils.TreeUtils;
 
 export default ({
   delta, isFuncArg, valueSrc,
-  value: immValue, valueError: immValueError, asyncListValues,
+  value: immValue, valueError: immValueError, fieldError, asyncListValues,
   isSpecialRange, fieldDefinition,
-  widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler,
-  config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId
+  widget, widgetDefinition, widgetValueLabel, valueLabels, textSeparators, setValueHandler, setFuncValue,
+  config, field, fieldSrc, fieldType, isLHS, operator, readonly, parentField, parentFuncs, id, groupId, widgetId,
 }) => {
   const {factory: widgetFactory, ...fieldWidgetProps} = widgetDefinition;
   const isConst = isFuncArg && fieldDefinition.valueSources && fieldDefinition.valueSources.length == 1 && fieldDefinition.valueSources[0] == "const";
@@ -26,13 +26,15 @@ export default ({
   let value = isSpecialRange 
     ? [fixedImmValue?.get(0), fixedImmValue?.get(1)] 
     : (fixedImmValue ? fixedImmValue.get(delta) : undefined);
-  const valueError = immValueError && (isSpecialRange 
-    ? [immValueError.get(0), immValueError.get(1)]
+  const valueError = immValueError?.get && (isSpecialRange 
+    ? [immValueError.get(0), immValueError.get(1), immValueError.get(2)]
     : immValueError.get(delta)
   ) || null;
+  const errorMessage = isLHS ? fieldError : valueError;
   if (isSpecialRange && value[0] === undefined && value[1] === undefined)
     value = undefined;
   const {fieldSettings} = fieldDefinition || {};
+
   const widgetProps = omit({
     ...fieldWidgetProps, 
     ...fieldSettings,
@@ -49,15 +51,18 @@ export default ({
     isSpecialRange: isSpecialRange,
     isFuncArg: isFuncArg,
     value: value,
-    valueError: valueError,
+    valueError,
+    fieldError,
+    errorMessage,
     label: widgetValueLabel.label,
     placeholder: widgetValueLabel.placeholder,
     placeholders: valueLabels ? valueLabels.placeholder : null,
     textSeparators: textSeparators,
     setValue: setValueHandler,
+    setFuncValue,
     readonly: readonly,
     asyncListValues: asyncListValues,
-    id, groupId
+    id, groupId, widgetId,
   }, [
     ..._widgetDefKeysToOmit,
     "toJS"

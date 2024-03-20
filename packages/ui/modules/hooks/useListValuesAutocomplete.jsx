@@ -19,7 +19,8 @@ const useListValuesAutocomplete = ({
 }, {
   debounceTimeout,
   multiple,
-  uif
+  uif,
+  isFieldAutocomplete,
 }) => {
   const knownSpecialValues = ["LOAD_MORE", "LOADING_MORE"];
   const loadMoreTitle = "Load more...";
@@ -40,13 +41,25 @@ const useListValuesAutocomplete = ({
   const isSelectedLoadMore = React.useRef(false);
 
   // compute
-  const nSelectedAsyncListValues = listValuesToArray(selectedAsyncListValues);
-  const listValues = asyncFetch
-    ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
-    : staticListValues;
+  const nSelectedAsyncListValues = React.useMemo(() => (
+    listValuesToArray(selectedAsyncListValues)
+  ), [
+    selectedAsyncListValues,
+  ]);
+  const listValues = React.useMemo(() => (
+    asyncFetch
+      ? (selectedAsyncListValues ? mergeListValues(asyncListValues, nSelectedAsyncListValues, true) : asyncListValues)
+      : listValuesToArray(staticListValues)
+  ), [
+    asyncFetch,
+    selectedAsyncListValues,
+    asyncListValues,
+    staticListValues,
+  ]);
+  // todo: useMemo for calcing listValuesToDisplay ?
   let listValuesToDisplay = asyncFetch
     ? asyncListValues
-    : staticListValues;
+    : listValuesToArray(staticListValues);
   if (allowCustomValues && inputValue && !searchListValue(inputValue, asyncListValues)) {
     listValuesToDisplay = mergeListValues(listValuesToDisplay, [makeCustomListValue(inputValue)], true);
   }
@@ -195,6 +208,7 @@ const useListValuesAutocomplete = ({
     const isClearingAll = multiple && uif === "mui" && option === "clear";
     // if user removes all chars in search, don't clear selected value
     const isClearingInput = !multiple && uif === "mui" && option === "clear" && e?.type === "change";
+    const isClearingSingle = !multiple && uif === "mui" && option === "clear" && e?.type !== "change";
     if (uif === "mui") {
       option = val;
       if (multiple) {
@@ -239,6 +253,11 @@ const useListValuesAutocomplete = ({
       } else {
         const [v, lvs] = optionToListValue(val, listValues, allowCustomValues);
         setValue(v, asyncFetch ? lvs : undefined);
+        if (isClearingSingle && isFieldAutocomplete) {
+          // Fix issue when dropdown stays visible after clicking "X"
+          await sleep(0);
+          setOpen(false);
+        }
       }
     }
   };

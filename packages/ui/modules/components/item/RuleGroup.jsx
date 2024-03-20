@@ -56,7 +56,10 @@ class RuleGroup extends BasicGroup {
   }
 
   renderField() {
-    const { config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
+    const {
+      config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFuncValue, setFieldSrc, 
+      parentField, id, groupId, isLocked
+    } = this.props;
     const { immutableFieldsMode } = config.settings;
     
     return <FieldWrapper
@@ -68,6 +71,7 @@ class RuleGroup extends BasicGroup {
       selectedFieldSrc={selectedFieldSrc}
       selectedFieldType={selectedFieldType}
       setField={setField}
+      setFuncValue={setFuncValue}
       setFieldSrc={setFieldSrc}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}

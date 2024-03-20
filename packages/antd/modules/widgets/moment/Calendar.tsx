@@ -1,7 +1,7 @@
 import type { Moment } from "@react-awesome-query-builder/ui";
-import momentGenerateConfig from "rc-picker/lib/generate/moment";
-import generateCalendar from "antd/es/calendar/generateCalendar";
+import { Calendar } from "antd";
+import momentGenerateConfig from "./config";
 
-const Calendar = generateCalendar<Moment>(momentGenerateConfig);
+const MomentCalendar = Calendar.generateCalendar<Moment>(momentGenerateConfig);
 
-export default Calendar;
+export default MomentCalendar;

@@ -177,7 +177,17 @@ const compileMeta = {
     }
   },
   funcs: {
-    x: compileMetaFunc
+    x: {
+      ...compileMetaFunc,
+      ...compileMetaFieldSettings,
+      fieldSettings: compileMetaFieldSettings,
+      args: {
+        x: {
+          ...compileMetaFieldSettings,
+          fieldSettings: compileMetaFieldSettings,
+        }
+      }
+    }
   },
   settings: compileMetaSettings,
 };

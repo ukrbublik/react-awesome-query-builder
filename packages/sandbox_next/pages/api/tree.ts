@@ -10,7 +10,7 @@ import loadedInitValue from "../../data/init_value";
 import loadedInitLogic from "../../data/init_logic";
 import { decompressSavedConfig } from "./config";
 const {
-  uuid, checkTree, loadFromJsonLogic, loadTree,
+  uuid, loadFromJsonLogic, loadTree,
   jsonLogicFormat, queryString, sqlFormat, mongodbFormat, getTree
 } = Utils;
 

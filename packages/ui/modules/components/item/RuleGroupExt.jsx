@@ -27,6 +27,7 @@ class RuleGroupExt extends BasicGroup {
     setFieldSrc: PropTypes.func,
     setOperator: PropTypes.func,
     setValue: PropTypes.func,
+    valueError: PropTypes.any,
   };
 
   constructor(props) {
@@ -77,8 +78,19 @@ class RuleGroupExt extends BasicGroup {
         {this.renderField()}
         {this.renderOperator()}
         {this.renderWidget()}
+        {this.renderError()}
       </div>
     );
+  }
+
+  renderError() {
+    const {config, valueError} = this.props;
+    const { renderRuleError, showErrorMessage } = config.settings;
+    const oneError = [...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+    return showErrorMessage && oneError 
+        && <div className="rule_group--error">
+          {renderRuleError ? renderRuleError({error: oneError}, config.ctx) : oneError}
+        </div>;
   }
 
   showNot() {
@@ -105,7 +117,10 @@ class RuleGroupExt extends BasicGroup {
   }
 
   renderField() {
-    const { config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFieldSrc, parentField, id, groupId, isLocked } = this.props;
+    const {
+      config, selectedField, selectedFieldSrc, selectedFieldType, setField, setFieldSrc, setFuncValue,
+      parentField, id, groupId, isLocked
+    } = this.props;
     const { immutableFieldsMode } = config.settings;
     
     return <FieldWrapper
@@ -117,6 +132,7 @@ class RuleGroupExt extends BasicGroup {
       selectedFieldSrc={selectedFieldSrc}
       selectedFieldType={selectedFieldType}
       setField={setField}
+      setFuncValue={setFuncValue}
       setFieldSrc={setFieldSrc}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
@@ -160,7 +176,7 @@ class RuleGroupExt extends BasicGroup {
   _buildWidgetProps({
     selectedField, selectedFieldSrc, selectedFieldType,
     selectedOperator, operatorOptions,
-    value, valueType, valueSrc, asyncListValues, valueError,
+    value, valueType, valueSrc, asyncListValues, valueError, fieldError,
     parentField,
   }) {
     return {
@@ -173,7 +189,8 @@ class RuleGroupExt extends BasicGroup {
       valueType, // new Immutable.List(["number"])
       valueSrc: ["value"], //new Immutable.List(["value"]), // should be fixed in isEmptyRuleGroupExtPropertiesAndChildren
       //asyncListValues,
-      valueError : null,
+      valueError,
+      fieldError: null,
       parentField,
     };
   }

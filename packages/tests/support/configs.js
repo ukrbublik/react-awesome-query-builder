@@ -736,6 +736,16 @@ export const with_all_types__show_error = (BasicConfig) => ({
   }
 });
 
+export const with_all_types__show_error__dont_fix_on_load = (BasicConfig) => ({
+  ...with_all_types(BasicConfig),
+  settings: {
+    ...BasicConfig.settings,
+    showErrorMessage: true,
+    removeEmptyGroupsOnLoad: false,
+    removeIncompleteRulesOnLoad: false,
+  }
+});
+
 export const dont_leave_empty_group = (BasicConfig) => ({
   ...simple_with_numbers_and_str(BasicConfig),
   settings: {

@@ -27,7 +27,7 @@
       "@react-awesome-query-builder/bootstrap": ["../bootstrap/modules"],
       "@react-awesome-query-builder/fluent": ["../fluent/modules"],
     },
-    "skipLibCheck": true,
+    "skipLibCheck": false,
   },
   "include": [
     "specs/**/*",

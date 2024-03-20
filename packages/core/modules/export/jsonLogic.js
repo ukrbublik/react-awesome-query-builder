@@ -276,8 +276,8 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
 
 
 const formatFunc = (meta, config, currentValue, parentField = null) => {
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   const funcParts = getFieldParts(funcKey, config);
   const funcLastKey = funcParts[funcParts.length-1];
@@ -312,7 +312,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+      if (argValueSrc != "func") // don't triger error if args value is another incomplete function
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return undefined;
     }
@@ -324,7 +324,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField
       );
       if (formattedDefaultVal === undefined) {
-        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+        if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
           meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
         return undefined;
       }
@@ -347,7 +347,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
   }
   if (missingArgKeys.length) {
     //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
-    return undefined; // uncomplete
+    return undefined; // incomplete
   }
 
   const formattedArgsArr = Object.values(formattedArgs);

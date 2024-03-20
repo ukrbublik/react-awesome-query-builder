@@ -10,7 +10,7 @@ export default
         "operator": "equal",
         "value": [
           {
-            "func": "LOWER",
+            "func": "string.LOWER",
             "args": {
               "str": {
                 "valueSrc": "field",

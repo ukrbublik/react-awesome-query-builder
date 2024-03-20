@@ -26,6 +26,7 @@ export default class QueryContainer extends Component {
     ctx: PropTypes.object.isRequired,
 
     onChange: PropTypes.func,
+    onInit: PropTypes.func,
     renderBuilder: PropTypes.func,
     value: PropTypes.any, //instanceOf(Immutable.Map)
   };
@@ -47,7 +48,7 @@ export default class QueryContainer extends Component {
     const tree = props.value || emptyTree;
     const validatedTree = this.getMemoizedTree(config, tree, undefined, sanitizeTree);
 
-    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree);
+    const reducer = treeStoreReducer(config, validatedTree, this.getMemoizedTree, this.setLastTree, this.getConfig);
     const store = createStore(reducer);
 
     this.config = config;
@@ -62,6 +63,10 @@ export default class QueryContainer extends Component {
       this.prevprevTree = this.prevTree;
     }
     this.prevTree = lastTree;
+  };
+
+  getConfig = () => {
+    return this.config;
   };
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
@@ -101,7 +106,7 @@ export default class QueryContainer extends Component {
 
   render() {
     // `get_children` is deprecated!
-    const {renderBuilder, get_children, onChange} = this.props;
+    const {renderBuilder, get_children, onChange, onInit} = this.props;
     const {store} = this.state;
     const config = this.config;
     const QueryWrapper = this.QueryWrapper;
@@ -115,6 +120,7 @@ export default class QueryContainer extends Component {
             getBasicConfig={this.getBasicConfig}
             sanitizeTree={this.sanitizeTree}
             onChange={onChange}
+            onInit={onInit}
             renderBuilder={renderBuilder || get_children}
           />
         </Provider>

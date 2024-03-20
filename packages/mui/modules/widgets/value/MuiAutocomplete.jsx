@@ -59,7 +59,8 @@ export default (props) => {
   } = useListValuesAutocomplete(props, {
     debounceTimeout: 100,
     multiple,
-    uif: "mui"
+    uif: "mui",
+    isFieldAutocomplete,
   });
 
   // setings

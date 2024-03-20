@@ -39,11 +39,11 @@ export default class RangeWidget extends PureComponent {
     if (props.value && (valueFrom == undefined || valueTo == undefined)) {
       // happens if we changed op from '==' to 'between'
       // (I know, timeout is dirty hack..)
-      setTimeout(() => {
-        const oneValue = valueFrom || valueTo;
-        const value = [oneValue, oneValue];
-        this.props.setValue(value);
-      }, 1);
+      // setTimeout(() => {
+      //   const oneValue = valueFrom || valueTo;
+      //   const value = [oneValue, oneValue];
+      //   this.props.setValue(value);
+      // }, 1);
     }
   }
 

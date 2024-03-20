@@ -10,7 +10,7 @@ import loadedConfig from "./config_mui"; // or ""./config_antd"
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, checkTree, loadTree, uuid, loadFromJsonLogic} = Utils;
+const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, sanitizeTree, loadTree, uuid, loadFromJsonLogic} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
@@ -18,11 +18,11 @@ const emptyInitValue: JsonTree = {"id": uuid(), "type": "group"};
 
 // get init value in JsonTree format:
 const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
-const initTree: ImmutableTree = checkTree(loadTree(initValue), loadedConfig);
+const initTree: ImmutableTree = loadTree(initValue);
 
 // -OR- alternativaly get init value in JsonLogic format:
 //const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
-//const initTree: ImmutableTree = checkTree(loadFromJsonLogic(initLogic, loadedConfig), loadedConfig);
+//const initTree: ImmutableTree = loadFromJsonLogic(initLogic, loadedConfig);
 
 
 interface DemoQueryBuilderState {

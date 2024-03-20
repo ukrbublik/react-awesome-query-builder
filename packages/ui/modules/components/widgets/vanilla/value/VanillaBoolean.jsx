@@ -1,7 +1,7 @@
 import React from "react";
 
 export default (props) => {
-  const {value, setValue, config, labelYes, labelNo, readonly, customProps = {}} = props;
+  const {value, setValue, config, labelYes, labelNo, readonly, widgetId, customProps = {}} = props;
   const customRadioYesProps = customProps.radioYes || {};
   const customRadioNoProps = customProps.radioNo || {};
 
@@ -9,8 +9,8 @@ export default (props) => {
   const onRadioChange = e => setValue(e.target.value == "true");
 
   // return <>
-  //     <input key={id}  type="checkbox" id={id} checked={!!value} disabled={readonly} onChange={onCheckboxChange} />
-  //     <label style={{display: "inline"}} key={id+"label"}  htmlFor={id}>{value ? labelYes : labelNo}</label>
+  //     <input key={widgetId}  type="checkbox" id={widgetId} checked={!!value} disabled={readonly} onChange={onCheckboxChange} />
+  //     <label style={{display: "inline"}} key={id+"label"}  htmlFor={widgetId}>{value ? labelYes : labelNo}</label>
   // </>;
 
   return <>
