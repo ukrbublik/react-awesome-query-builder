@@ -82,13 +82,21 @@ const globalIgnoreFn: ConsoleIgnoreFn = (errText) => {
 };
 
 const mockConsole = (options?: DoOptions, _configName?: string) => {
-  const origConsole = console;
-  const consoleData: ConsoleData = ConsoleMethods.reduce((aggr, m) => ({...aggr, [m]: []}), {});
-  let mockedConsole: Console = {
-    ...origConsole,
-  };
-  if (!(mockedConsole as any).__mocked) {
-    (mockedConsole as any).__mocked = true;
+  let origConsole = console;
+  let consoleData: ConsoleData;
+  let mockedConsole: Console;
+
+  if ((origConsole as any).__origConsole) {
+    mockedConsole = origConsole;
+    consoleData = (origConsole as any).__consoleData;
+    origConsole = (origConsole as any).__origConsole;
+  } else {
+    consoleData = ConsoleMethods.reduce((aggr, m) => ({...aggr, [m]: []}), {});
+    mockedConsole = {
+      ...origConsole,
+      __origConsole: origConsole,
+      __consoleData: consoleData,
+    } as any as Console;
     for (const method of ConsoleMethods) {
       mockedConsole[method] = (...args: string[]) => {
         let finalArgs = [...args];
@@ -107,6 +115,7 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
       }
     }
   }
+
   return {mockedConsole, consoleData, origConsole};
 };
 
@@ -370,7 +379,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
           : [expects["sql"], []];
         const [res, errors] = _sqlFormat(tree, config);
         expect(res).to.equal(expectedRes);
-        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
+        expect_objects_equal(errors, expectedExportErrors || []);
       });
     }
   
@@ -381,7 +390,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
           : [expects["spel"], []];
         const [res, errors] = _spelFormat(tree, config);
         expect(res).to.equal(expectedRes);
-        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
+        expect_objects_equal(errors, expectedExportErrors || []);
       });
     }
     
@@ -391,22 +400,22 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
           ? expects["mongo"]
           : [expects["mongo"], []];
         const [res, errors] = _mongodbFormat(tree, config);
-        expect(JSON.stringify(res)).to.eql(JSON.stringify(expectedRes));
-        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
+        expect_objects_equal(res, expectedRes);
+        expect_objects_equal(errors, expectedExportErrors || []);
       });
     }
 
     if (expects["elasticSearch"] !== undefined) {
       doIt("should work with elasticSearch", () => {
         const res = elasticSearchFormat(tree, config);
-        expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["elasticSearch"]));
+        expect_objects_equal(res, expects["elasticSearch"]);
       });
     }
 
     if (expects["elasticSearch7"] !== undefined) {
       doIt("should work with elasticSearch", () => {
         const res = elasticSearchFormat(tree, config, "ES_7_SYNTAX");
-        expect(JSON.stringify(res)).to.eql(JSON.stringify(expects["elasticSearch7"]));
+        expect_objects_equal(res, expects["elasticSearch7"]);
       });
     }
 
@@ -417,8 +426,8 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
           : [expects["logic"], []]) as [JsonLogicTree, string[]];
         const {logic, data, errors} = jsonLogicFormat(tree, config);
         const safe_logic = logic ? JSON.parse(JSON.stringify(logic)) as Object : undefined;
-        expect(JSON.stringify(safe_logic)).to.eql(JSON.stringify(expectedLogic));
-        expect(JSON.stringify(errors)).to.eql(JSON.stringify(expectedExportErrors || []));
+        expect_objects_equal(safe_logic, expectedLogic);
+        expect_objects_equal(errors, expectedExportErrors || []);
       });
     }
   
@@ -524,13 +533,23 @@ const expect_queries_before_and_after = (config: Config, tree: ImmutableTree, on
 const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onChange: sinon.SinonSpy, jlogics: Array<null | undefined | JsonLogicTree>, changeIndex = 0) => {
   const {logic: initTreeJl} = jsonLogicFormat(tree, config);
   if (jlogics[0] !== null) {
-    expect(JSON.stringify(initTreeJl)).to.equal(JSON.stringify(jlogics[0]));
+    expect_objects_equal(initTreeJl, jlogics[0]);
   }
   
   const call = onChange.getCall(changeIndex);
   if (!call) throw new Error("onChange was not called");
   const {logic: changedTreeJl} = jsonLogicFormat(call.args[0] as ImmutableTree, config);
-  expect(JSON.stringify(changedTreeJl)).to.equal(JSON.stringify(jlogics[1]));
+  expect_objects_equal(changedTreeJl, jlogics[1]);
+};
+
+export const expect_objects_equal = (act: any, exp: any, actLabel?: string, expLabel?: string) => {
+  const expStr = JSON.stringify(exp);
+  const actStr = JSON.stringify(act);
+  if (expStr !== actStr) {
+    console.log(`${actLabel ?? "Actual"}: ${actStr}`);
+    console.log(`${expLabel ?? "Expected"}: ${expStr}`);
+  }
+  expect(actStr).to.equal(expStr);
 };
 
 export function hexToRgb(hex: string) {

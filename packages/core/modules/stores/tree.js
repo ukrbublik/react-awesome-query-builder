@@ -343,9 +343,9 @@ const setFieldSrc = (state, path, srcKey, config) => {
   const currentRule = state.getIn(expandTreePath(path));
   const currentType = currentRule.get("type");
   const currentProperties = currentRule.get("properties");
-  const currentField = currentProperties.get("field");
-  //const currentFieldSrc = currentProperties.get("fieldSrc");
-  const currentFielType = currentProperties.get("fieldType");
+  const currentField = currentProperties?.get("field");
+  //const currentFieldSrc = currentProperties?.get("fieldSrc");
+  const currentFielType = currentProperties?.get("fieldType");
   const currentFieldConfig = getFieldConfig(config, currentField);
   let fieldType = currentFieldConfig?.type || currentFielType;
   if (!fieldType || fieldType === "!group" || fieldType === "!struct") {
@@ -363,6 +363,7 @@ const setFieldSrc = (state, path, srcKey, config) => {
   } else {
     // clear non-relevant properties
     state = state.setIn(expandTreePath(path, "properties", "field"), null);
+    state = state.deleteIn(expandTreePath(path, "properties", "fieldError"));
     // set fieldType for "memory effect"
     state = state.setIn(expandTreePath(path, "properties", "fieldType"), fieldType);
   }
@@ -408,7 +409,8 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
   if (!argKey) {
     const newFuncKey = argValue;
     targetFV = setFunc(targetFV, newFuncKey, config);
-    // allow dropping invalid args
+    // allow drop invalid args / reset to default, but don't trigger error if some arg is required
+    // (not same as setting isEndValue = true)
     _meta.canDropArgs = true;
   } else {
     const funcKey = targetFV.get("func");
@@ -458,8 +460,8 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
   const currentType = state.getIn(expandTreePath(path, "type"));
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
-  const currentFieldSrc = currentProperties.get("fieldSrc");
-  const currentFieldError = currentProperties.get("fieldError");
+  const currentFieldSrc = currentProperties?.get("fieldSrc");
+  const currentFieldError = currentProperties?.get("fieldError");
   const newFieldConfig = getFieldConfig(config, newField);
   if (!newFieldConfig) {
     console.warn(`No config for LHS ${newField}`);
@@ -470,18 +472,18 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
     fieldType = null;
   }
 
-  const currentOperator = currentProperties.get("operator");
-  const currentOperatorOptions = currentProperties.get("operatorOptions");
-  const currentField = currentProperties.get("field");
-  const currentValue = currentProperties.get("value");
-  const currentValueErrorStr = currentProperties.get("valueError")?.join?.("|");
-  const _currentValueSrc = currentProperties.get("valueSrc", new Immutable.List());
-  const _currentValueType = currentProperties.get("valueType", new Immutable.List());
+  const currentOperator = currentProperties?.get("operator");
+  const currentOperatorOptions = currentProperties?.get("operatorOptions");
+  const currentField = currentProperties?.get("field");
+  // const currentValue = currentProperties?.get("value");
+  const currentValueErrorStr = currentProperties?.get("valueError")?.join?.("|");
+  // const _currentValueSrc = currentProperties?.get("valueSrc", new Immutable.List());
+  // const _currentValueType = currentProperties?.get("valueType", new Immutable.List());
 
   const isRuleGroup = newFieldConfig.type == "!group";
   const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
   const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
-  const wasOkWithoutField = !currentField && currentFieldSrc && currentOperator;
+  // const wasOkWithoutField = !currentField && currentFieldSrc && currentOperator;
 
   // If the newly selected field supports the same operator the rule currently
   // uses, keep it selected.
@@ -517,6 +519,10 @@ const setField = (state, path, newField, config, asyncListValues, _meta = {}) =>
   if (wasRuleGroup && !isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule");
     state = state.deleteIn(expandTreePath(path, "children1"));
+    state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
+  }
+
+  if (!currentProperties) {
     state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
   }
 

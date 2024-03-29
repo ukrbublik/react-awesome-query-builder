@@ -59,7 +59,7 @@ export function jsToImmutable(tree) {
       // JSON doesn't support undefined and replaces undefined -> null
       // So fix: null -> undefined
       for (let i = 0 ; i < 2 ; i++) {
-        if (outValue.get("value")?.get(i) === null) {
+        if (outValue.get("value")?.get?.(i) === null) {
           outValue = outValue.setIn(["value", i], undefined);
         }
       }

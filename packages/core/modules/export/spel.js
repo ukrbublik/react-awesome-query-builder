@@ -380,9 +380,9 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   if (currentValue === undefined)
     return undefined;
   let ret;
-  if (valueSrc == "field") {
+  if (valueSrc === "field") {
     ret = formatField(meta, config, currentValue, parentField);
-  } else if (valueSrc == "func") {
+  } else if (valueSrc === "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
   } else {
     if (typeof fieldWidgetDef.spelFormatValue === "function") {

@@ -43,7 +43,7 @@ export default class Field extends Component {
   }
 
   getMeta({selectedField, selectedFieldType, config, parentField}) {
-    const selectedKey = selectedField;
+    let selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;
     const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
@@ -67,6 +67,11 @@ export default class Field extends Component {
 
     // Field source has been chnaged, no new field selected, but op & value remains
     const errorText = lookingForFieldType ? "Please select field" : null;
+
+    if (selectedKey && typeof selectedKey === "object") {
+      // can happen due to incorrect rule state: field is Map{func, args} but fieldSrc is not "func"
+      selectedKey = undefined;
+    }
 
     return {
       placeholder, items, parentField,

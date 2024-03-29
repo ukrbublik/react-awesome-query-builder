@@ -2,7 +2,7 @@ import { Utils, ImmutableTree } from "@react-awesome-query-builder/core";
 const { isValidTree, validateTree, sanitizeTree, checkTree, getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb } from "../support/utils";
+import { with_qb, expect_objects_equal } from "../support/utils";
 import { expect } from "chai";
 
 describe("validateTree", () => {
@@ -27,7 +27,7 @@ describe("validateTree", () => {
       expect(validationErrors.length).to.eq(1);
       expect(validationErrors[0].itemStr).to.eq("Number = 200");
       expect(validationErrors[0].itemPositionStr).to.eq("Leaf #1 (index path: 1)");
-      expect(JSON.stringify(validationErrors[0].itemPosition)).to.equal(JSON.stringify({
+      expect_objects_equal(validationErrors[0].itemPosition, {
         caseNo: null,
         globalNoByType: 0,
         indexPath: [0],
@@ -35,10 +35,10 @@ describe("validateTree", () => {
         index: 1,
         type: "rule",
         isDeleted: false,
-      }));
+      });
       expect(validationErrors[0].errors.length).to.eq(1);
       expect(validationErrors[0].errors[0].str).to.eq("Value 200 should be from 0 to 10");
-      expect(JSON.stringify(validationErrors[0].errors[0])).to.equal(JSON.stringify({
+      expect_objects_equal(validationErrors[0].errors[0], {
         side: "rhs",
         delta: 0,
         key: "VALUE_MAX_CONSTRAINT_FAIL",
@@ -51,7 +51,7 @@ describe("validateTree", () => {
         },
         fixed: false,
         str: "Value 200 should be from 0 to 10",
-      }));
+      });
     });
   });
 });
@@ -102,7 +102,7 @@ describe("deprecated checkTree", () => {
       async (qb, onChange, {expect_jlogic, expect_tree_validation_errors, config}, consoleData, onInit) => {
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const initialJsonTree = getTree(initialTree);
-        expect(initialJsonTree.children1?.length).to.eq(5);
+        expect(initialJsonTree.children1?.length).to.eq(6);
 
         const ruleError = qb.find(".rule--error");
         expect(ruleError).to.have.length(1);
@@ -135,17 +135,19 @@ describe("deprecated checkTree", () => {
           "Deleted group #1 (index path: 1)  >>  * Empty group",
           "Number BETWEEN ? AND ?  >>  * [rhs] Incomplete RHS",
           "Deleted group #2 (index path: 3)  >>  * Empty group",
-          "Deleted leaf #3 (index path: 3,1)  >>  * [lhs] Incomplete LHS",
+          "?  >>  * [lhs] Incomplete LHS",
           "Number > ?  >>  * [rhs] Incomplete RHS",
-          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10"
+          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10",
+          "Deleted group #3 (index path: 6)  >>  * Empty group"
         ]);
       },
       {
         expectedLoadErrors: [
           "Number BETWEEN ? AND ?  >>  [rhs] Incomplete RHS",
-          "Leaf #3 (index path: 3,1)  >>  [lhs] Incomplete LHS",
+          "?  >>  [lhs] Incomplete LHS",
           "Number > ?  >>  [rhs] Incomplete RHS",
-          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10"
+          "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10",
+          "Group #3 (index path: 6)  >>  Empty group"
         ],
         sanitizeOptions: {
           // don't fix tree in `load_tree`

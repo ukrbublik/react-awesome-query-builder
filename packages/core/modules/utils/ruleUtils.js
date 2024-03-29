@@ -335,7 +335,7 @@ export const isEmptyGroupChildren = (children, config) => {
 
 const isEmptyRule = (rule, config) => {
   const properties = rule.get("properties");
-  return isEmptyRuleProperties(properties.toObject(), config);
+  return isEmptyRuleProperties(properties?.toObject() || {}, config);
 };
 
 /**
@@ -369,9 +369,9 @@ export const whatRulePropertiesAreCompleted = ({
   const res = { parts: {}, score: 0 };
   res.parts.field = liteCheck ? (field != null) : isCompletedValue(field, fieldSrc, config);
   res.parts.operator = !!operator;
-  res.parts.value = value.filter((val, delta) => 
+  res.parts.value = value?.filter((val, delta) => 
     isCompletedValue(val, valueSrcs?.[delta], config, liteCheck)
-  ).size >= (liteCheck ? Math.min(cardinality, 1) : cardinality);
+  )?.size >= (liteCheck ? Math.min(cardinality, 1) : cardinality);
   res.score = Object.keys(res.parts).filter(k => !!res.parts[k]).length;
 
   if (liteCheck && res.score < 3) {
@@ -383,7 +383,7 @@ export const whatRulePropertiesAreCompleted = ({
       res.score++;
     }
     if (!res.parts.field) {
-      value.map((val, delta) => {
+      value?.map((val, delta) => {
         if (valueSrcs?.[delta] === "func" && isCompletedValue(val, valueSrcs?.[delta], config, false, deepCheck)) {
           res.score++;
         }

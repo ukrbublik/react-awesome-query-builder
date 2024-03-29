@@ -2,7 +2,7 @@ import { Utils } from "@react-awesome-query-builder/core";
 const { getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb } from "../support/utils";
+import { with_qb, expect_objects_equal } from "../support/utils";
 import chai from "chai";
 import deepEqualInAnyOrder from "deep-equal-in-any-order";
 chai.use(deepEqualInAnyOrder);
@@ -116,11 +116,11 @@ describe("interactions on vanilla", () => {
       expect(child.properties.conjunction).to.equal("AND"); //default
       const subchildKeys = Object.keys(child.children1);
       const subchild = child.children1[subchildKeys[0]];
-      expect(JSON.stringify(subchild)).to.eql(JSON.stringify({
+      expect_objects_equal(subchild, {
         type: "rule", 
         id: subchild.id,
         properties: {fieldSrc: "field", field: null, operator: null, value: [], valueSrc: []},
-      }));
+      });
     });
   });
 
@@ -138,7 +138,7 @@ describe("interactions on vanilla", () => {
       expect(child.properties.conjunction).to.equal("AND"); //default
       const subchildKeys = Object.keys(child.children1);
       const subchild = child.children1[subchildKeys[0]];
-      expect(JSON.stringify(subchild)).to.eql(JSON.stringify({
+      expect_objects_equal(subchild, {
         type: "rule", 
         id: subchild.id,
         properties: {
@@ -149,7 +149,7 @@ describe("interactions on vanilla", () => {
           valueSrc: ["value"], 
           valueType: ["text"]
         },
-      }));
+      });
     });
   });
 

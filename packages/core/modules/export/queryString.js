@@ -109,9 +109,10 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
   let valueSrcs = [];
   let valueTypes = [];
   let formattedValue;
+  let fvalue;
 
   if (iValue != undefined) {
-    const fvalue = iValue.map((currentValue, ind) => {
+    fvalue = iValue.map((currentValue, ind) => {
       const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
       const valueType = iValueType ? iValueType.get(ind) : null;
       const cValue = !isDebugMode ? completeValue(currentValue, valueSrc, config) : currentValue;
@@ -127,11 +128,15 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
       return fv;
     });
     const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
-    if (!( hasUndefinedValues || fvalue.size < cardinality )) {
+    const isOK = !hasUndefinedValues && fvalue.size === cardinality;
+    if (isOK) {
       formattedValue = (cardinality == 1 ? fvalue.first() : fvalue);
     }
-  } else if (isDebugMode) {
-    formattedValue = cardinality > 1 ? new List(Array.from({length: cardinality}).map(_ => "?")) : "?";
+  }
+  if (isDebugMode && !formattedValue) {
+    formattedValue = cardinality > 1 ? new List(Array.from({length: cardinality}).map(
+      (_, i) => fvalue?.get(i) ?? "?")
+    ) : "?";
   }
 
   return [
@@ -141,7 +146,8 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
   ];
 };
 
-const buildFnToFormatOp = (operator, operatorDefinition) => {
+const buildFnToFormatOp = (operator, operatorDefinition, meta) => {
+  const { isDebugMode } = meta.settings;
   const fop = operatorDefinition?.labelForFormat || operator;
   const cardinality = defaultValue(operatorDefinition?.cardinality, 1);
   let fn;
@@ -151,6 +157,9 @@ const buildFnToFormatOp = (operator, operatorDefinition) => {
     };
   } else if (cardinality == 1) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
+      if (isDebugMode && op === "?" && values === "?") {
+        return field && field !== "?" ? `${field} ?` : "?";
+      }
       return `${field} ${fop} ${values}`;
     };
   } else if (cardinality == 2) {
@@ -191,12 +200,13 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
     }
   }
 
-  if (isDebugMode && !operator)
+  if (isDebugMode && !operator) {
     operator = "?";
+  }
 
   //find fn to format expr
   if (!fn)
-    fn = buildFnToFormatOp(operator, operatorDef);
+    fn = buildFnToFormatOp(operator, operatorDef, meta);
   if (!fn)
     return undefined;
 
@@ -211,8 +221,9 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
   const [formattedValue, valueSrc, valueType] = formatItemValue(
     config, properties, meta, operator, parentField
   );
-  if (formattedValue === undefined)
+  if (formattedValue === undefined) {
     return undefined;
+  }
 
   const args = [
     formattedField,
@@ -236,10 +247,6 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
     //rev
     if (isRev) {
       ret = config.settings.formatReverse(ret, operator, reversedOp, operatorDef, revOperatorDef, isForDisplay);
-    }
-
-    if (isDebugMode && ret === "? ? ?") {
-      ret = "?";
     }
 
     return ret;

@@ -10,7 +10,7 @@ import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { export_checks, with_qb } from "../support/utils";
+import { export_checks, with_qb, expect_objects_equal } from "../support/utils";
 import { SliderMark, configMixin, makeCtx, zipInits, expectedZipConfig } from "../support/zipConfigs";
 import chai from "chai";
 import sinon from "sinon";
@@ -45,7 +45,7 @@ describe("Compressed config", () => {
       it("should contain only diff", () => {
         const zipConfig = ConfigUtils.compressConfig(config, BaseConfig);
         expect((zipConfig as Config).ctx).to.be.undefined;
-        expect(JSON.stringify(zipConfig.fields)).to.equal(JSON.stringify(config.fields));
+        expect_objects_equal(zipConfig.fields, config.fields);
         expect(Object.keys(zipConfig.widgets).length).to.equal(0);
       });
 
