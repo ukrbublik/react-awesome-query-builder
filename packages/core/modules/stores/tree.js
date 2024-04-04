@@ -16,7 +16,7 @@ import {
   getOperatorsForField, getOperatorsForType, getFirstOperator,
   isEmptyItem, selectTypes, calculateValueType
 } from "../utils/ruleUtils";
-import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
+import {deepEqual, getOpCardinality, applyToJS} from "../utils/stuff";
 import {validateValue, validateRange, getNewValueForFieldOp} from "../utils/validation";
 import {translateValidation} from "../i18n";
 import omit from "lodash/omit";
@@ -611,7 +611,7 @@ const setOperator = (state, path, newOperator, config) => {
   const fieldConfig = getFieldConfig(config, currentField);
   const isRuleGroup = fieldConfig?.type == "!group";
   const operatorConfig = getOperatorConfig(config, newOperator, currentField);
-  const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const operatorCardinality = operatorConfig ? getOpCardinality(operatorConfig) : null;
   const canFix = true;
 
   state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
@@ -672,7 +672,7 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
   const operatorConfig = getOperatorConfig(config, operator, field);
-  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const operatorCardinality = operator ? getOpCardinality(operatorConfig) : null;
 
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
   const canFix = !showErrorMessage;
@@ -753,7 +753,7 @@ const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
   //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
   const operatorConfig = getOperatorConfig(config, operator, field);
-  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const operatorCardinality = operator ? getOpCardinality(operatorConfig) : null;
 
   // init lists
   state = initEmptyValueLists(state, path, config, operatorCardinality);
@@ -822,7 +822,7 @@ const initEmptyValueLists = (state, path, config, operatorCardinality) => {
     const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
     const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
     const operatorConfig = getOperatorConfig(config, operator, field);
-    operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+    operatorCardinality = operator ? getOpCardinality(operatorConfig) : null;
   }
 
   for (const k of ["value", "valueType", "valueError", "valueSrc"]) {

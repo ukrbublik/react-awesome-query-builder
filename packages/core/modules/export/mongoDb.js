@@ -1,4 +1,4 @@
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
@@ -195,7 +195,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let operatorDefinition = getOperatorConfig(config, operator, field) || {};
   let reversedOp = operatorDefinition.reversedOp;
   let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
 
   let not = _not;
   if (not && reversedOp) {

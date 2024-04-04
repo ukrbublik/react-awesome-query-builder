@@ -26,6 +26,7 @@ export const translations = {
   [constants.VALUE_MAX_CONSTRAINT_FAIL]: "Value {{value}} should be from {{fieldSettings.min}} to {{fieldSettings.max}}",
   [constants.NO_CONFIG_FOR_FIELD_VALUE]: "No config for field {{field}}",
   [constants.CANT_COMPARE_FIELD_WITH_ITSELF]: "Can't compare field {{field}} with itself",
+  [constants.CANT_COMPARE_FIELD_WITH_FIELD]: "Can't compare field {{leftField}} with {{rightField}}",
   [constants.INCORRECT_FIELD_TYPE]: "Field {{field}} is of type {{type}}, but expected {{expected}}",
   [constants.UNSUPPORTED_FUNCTION_FOR_FIELD]: "Unsupported function {{funcKey}} for field {{field}}",
   [constants.REQUIRED_FUNCTION_ARG]: "Value of arg {{argKey}} for func {{funcKey}} is required",

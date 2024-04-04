@@ -6,7 +6,7 @@ import {
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, logger, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, logger, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";
@@ -203,7 +203,7 @@ const buildFnToFormatOp = (operator, operatorDefinition, valueType) => {
   const isCompareTo = TypesWithCompareTo[valueType];
   let sop = spelOp;
   let fn;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   if (isCompareTo) {
     // date1.compareTo(date2) >= 0
     //   instead of
@@ -339,7 +339,7 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
   }
   const fieldDef = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
   

@@ -4,7 +4,7 @@ import {getFieldConfig, getFuncConfig, extendConfig, normalizeField, iterateFunc
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
 import {defaultConjunction, defaultGroupConjunction} from "../utils/defaultUtils";
-import {logger, isJsonCompatible} from "../utils/stuff";
+import {getOpCardinality, logger, isJsonCompatible} from "../utils/stuff";
 import moment from "moment";
 import {compareToSign} from "../export/spel";
 
@@ -290,13 +290,13 @@ const buildConv = (config) => {
     if (opConfig.spelOps) {
       // examples: "==", "eq", ".contains", "matches" (can be used for starts_with, ends_with)
       opConfig.spelOps.forEach(spelOp => {
-        const opk = spelOp; // + "/" + defaultValue(opConfig.cardinality, 1);
+        const opk = spelOp; // + "/" + getOpCardinality(opConfig);
         if (!operators[opk])
           operators[opk] = [];
         operators[opk].push(opKey);
       });
     } else if (opConfig.spelOp) {
-      const opk = opConfig.spelOp; // + "/" + defaultValue(opConfig.cardinality, 1);
+      const opk = opConfig.spelOp; // + "/" + getOpCardinality(opConfig);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);

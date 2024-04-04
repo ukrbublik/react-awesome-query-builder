@@ -6,7 +6,7 @@ import {
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {SqlString} from "../utils/export";
@@ -80,7 +80,7 @@ const formatGroup = (item, config, meta) => {
 
 const buildFnToFormatOp = (operator, operatorDefinition) => {
   const sqlOp = operatorDefinition.sqlOp || operator;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   let fn;
   if (cardinality == 0) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, fieldDef) => {
@@ -118,7 +118,7 @@ const formatRule = (item, config, meta) => {
   let opDef = getOperatorConfig(config, operator, field) || {};
   let reversedOp = opDef.reversedOp;
   let revOpDef = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(opDef.cardinality, 1);
+  const cardinality = getOpCardinality(opDef);
 
   // check op
   let isRev = false;

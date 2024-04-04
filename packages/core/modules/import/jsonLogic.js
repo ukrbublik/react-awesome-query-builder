@@ -1,5 +1,5 @@
 import uuid from "../utils/uuid";
-import {defaultValue, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
+import {getOpCardinality, isJsonLogic, shallowEqual, logger} from "../utils/stuff";
 import {getFieldConfig, extendConfig, normalizeField, getFuncConfig, iterateFuncs, getFieldParts} from "../utils/configUtils";
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {loadTree} from "./tree";
@@ -55,13 +55,13 @@ const buildConv = (config) => {
     const opConfig = config.operators[opKey];
     if (typeof opConfig.jsonLogic == "string") {
       // example: "</2", "#in/1"
-      const opk = (opConfig._jsonLogicIsRevArgs ? "#" : "") + opConfig.jsonLogic + "/" + defaultValue(opConfig.cardinality, 1);
+      const opk = (opConfig._jsonLogicIsRevArgs ? "#" : "") + opConfig.jsonLogic + "/" + getOpCardinality(opConfig);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);
     } else if(typeof opConfig.jsonLogic2 == "string") {
       // example: all-in/1"
-      const opk = opConfig.jsonLogic2 + "/" + defaultValue(opConfig.cardinality, 1);
+      const opk = opConfig.jsonLogic2 + "/" + getOpCardinality(opConfig);
       if (!operators[opk])
         operators[opk] = [];
       operators[opk].push(opKey);

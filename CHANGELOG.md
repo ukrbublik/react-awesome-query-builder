@@ -5,6 +5,7 @@
     Use `Utils.sanitizeTree().fixedTree` instead (PR #1034)
   - `Utils.validateTree` now checks LHS and RHS are completed (issues #977, #781) (PR #1034)
   - Fixed import of `select_any_in` operator from JsonLogic (issue #1005) (PR #1034)
+  - Fixed issue #1036 (PR #1034)
   - Fixed validation of date ranges (issue #374) (PR #1034)
   - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}`, error can be `{key, args}` for i18n (PR #1034)
   - Added `optimizeRenderWithInternals` to `settings`, default is `true` (PR #1034)

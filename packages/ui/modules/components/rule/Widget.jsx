@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import range from "lodash/range";
-import {defaultValue} from "../../utils/stuff";
+import {getOpCardinality} from "../../utils/stuff";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
@@ -138,7 +138,7 @@ export default class Widget extends Component {
     const isSpecialRange = operatorDefinition?.isSpecialRange;
     const isSpecialRangeForSrcField = isSpecialRange && (iValueSrcs?.get(0) == "field" || iValueSrcs?.get(1) == "field");
     const isTrueSpecialRange = isSpecialRange && !isSpecialRangeForSrcField;
-    const cardinality = isTrueSpecialRange ? 1 : defaultValue(operatorDefinition?.cardinality, 1);
+    const cardinality = isTrueSpecialRange ? 1 : getOpCardinality(operatorDefinition);
     if (cardinality === 0) {
       return null;
     }

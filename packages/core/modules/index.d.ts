@@ -786,6 +786,7 @@ type ElasticSearchFormatValue =     (queryType: ElasticSearchQueryType, val: Rul
 
 export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   type: string;
+  // Used for validation. Can be one of JS types (typeof) or "array"
   jsType?: string;
   valueSrc?: ValueSource;
   valuePlaceholder?: string;

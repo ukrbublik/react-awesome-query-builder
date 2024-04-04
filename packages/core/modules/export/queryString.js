@@ -6,7 +6,7 @@ import {
 } from "../utils/ruleUtils";
 import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 
@@ -102,7 +102,7 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
   const fieldDef = getFieldConfig(config, field) || {};
   const operator = _operator || properties.get("operator");
   const operatorDef = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDef.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDef);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
 
@@ -149,7 +149,7 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
 const buildFnToFormatOp = (operator, operatorDefinition, meta) => {
   const { isDebugMode } = meta.settings;
   const fop = operatorDefinition?.labelForFormat || operator;
-  const cardinality = defaultValue(operatorDefinition?.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   let fn;
   if (cardinality == 0) {
     fn = (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {

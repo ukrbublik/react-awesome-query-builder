@@ -1,4 +1,4 @@
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
@@ -211,7 +211,7 @@ const formatItemValue = (config, properties, meta, operator, parentField) => {
   const iValueType = properties.get("valueType");
   const fieldDefinition = getFieldConfig(config, field) || {};
   const operatorDefinition = getOperatorConfig(config, operator, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
   const iValue = properties.get("value");
   const asyncListValues = properties.get("asyncListValues");
   if (iValue == undefined)
@@ -396,8 +396,8 @@ const formatField = (meta, config, field, parentField = null) => {
 
 const buildFnToFormatOp = (operator, operatorDefinition, formattedField, formattedValue) => {
   let formatteOp = operator;
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
-  const isReverseArgs = defaultValue(operatorDefinition._jsonLogicIsRevArgs, false);
+  const cardinality = getOpCardinality(operatorDefinition);
+  const isReverseArgs = operatorDefinition._jsonLogicIsRevArgs ?? false;
   if (typeof operatorDefinition.jsonLogic == "string")
     formatteOp = operatorDefinition.jsonLogic;
   const rangeOps = ["<", "<=", ">", ">="];

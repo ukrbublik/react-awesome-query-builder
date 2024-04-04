@@ -18,8 +18,8 @@ export const opDefKeysToOmit = [
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 // };
 
-export const defaultValue = (value, _default) => {
-  return (typeof value === "undefined") ? _default : value;
+export const getOpCardinality = (opDef) => {
+  return opDef?.cardinality ?? 1;
 };
 
 // const immutableEqual = function(v1, v2) {
