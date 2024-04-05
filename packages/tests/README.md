@@ -23,7 +23,7 @@ In this mode Karma server is being run in background.
 You can modify tests and library sources, and tests would be executed on the fly.  
 
 
-### Run selected tests
+### Run selected specs
 
 ```sh
 pnpm test --filter Validation Serialize
@@ -39,7 +39,7 @@ pnpm test-debug --filter YourTest
 
 This will open the Chromium browser with opened devtools (don't close them).  
 
-To debug a test, add `debug: true, attach: true` in options of `with_qb()` (last arg), see [test example](#test-example). 
+To debug a test, add `debug: true` in options of `with_qb()` (last arg), see [test example](#test-example). 
 Then type `debugger;` in your test code.  
 In the console you can use global `window.dbg` object for debugging.  
 
@@ -56,7 +56,7 @@ Now you can put breakpoints on test code and library code.
 ### Idle
 
 If you want to pause and play with one test in the dev console...  
-Add `idle: true, debug: true, attach: true` to the options of `with_qb()`.  
+Add `idle: true, debug: true` to the options of `with_qb()`.  
 Only one test should have `idle: true`.  
 Click `DEBUG` to open Karma DEBUG RUNNER (`http://localhost:9876/debug.html`)  
 Testing will be stopped on the test with `idle`.  
@@ -102,7 +102,6 @@ describe("my first tests", () => {
       const changedSpel = Utils.spelFormat(changedTree, config);
       expect(changedSpel).to.eq("num == 200");
     }, {
-      attach: true,
       debug: true,
       // idle: true,
     });

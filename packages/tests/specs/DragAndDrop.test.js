@@ -56,16 +56,18 @@ describe("drag-n-drop", () => {
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
   
-        simulate_drag_n_drop(secondRule, groupHeader, {
-          "dragRect":{"x":83,"y":167,"width":1525,"height":43,"top":167,"right":1608,"bottom":210,"left":83},
-          "plhRect":{"x":59,"y":129,"width":1525,"height":43,"top":129,"right":1584,"bottom":172,"left":59},
-          "treeRect":{"x":34,"y":34,"width":1571,"height":430,"top":34,"right":1605,"bottom":464,"left":34},
-          "hovRect":{"x":59,"y":182,"width":1535,"height":158,"top":182,"right":1594,"bottom":340,"left":59},
-          "startMousePos":{"clientX":81,"clientY":147},
-          "mousePos":{"clientX":105,"clientY":185}
+        simulate_drag_n_drop(secondRule, groupHeader,         {
+          "dragRect":{"x":64,"y":170,"width":709,"height":43.5,"top":170,"right":773,"bottom":213.5,"left":64},
+          "plhRect":{"x":59,"y":130,"width":709,"height":43.5,"top":130,"right":768,"bottom":173.5,"left":59},
+          "treeRect":{"x":34,"y":34,"width":755,"height":314,"top":34,"right":789,"bottom":348,"left":34},
+          "hovRect":{"x":59,"y":183.5,"width":719,"height":153.5,"top":183.5,"right":778,"bottom":337,"left":59},
+          "startMousePos":{"clientX":84,"clientY":152},
+          "mousePos":{"clientX":89,"clientY":192}
         });
 
         checks(config, value, onChange, tasks);
+      }, {
+        attach: true,
       });
     };
 

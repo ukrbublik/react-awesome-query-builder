@@ -2,13 +2,21 @@ const webpack = require('webpack');
 const path = require('path');
 const os = require('os');
 
-const CORE = path.resolve(__dirname, "../core/modules");
-const UI = path.resolve(__dirname, "../ui/modules");
-const ANTD = path.resolve(__dirname, "../antd/modules");
-const MUI = path.resolve(__dirname, "../mui/modules");
-const MATERIAL = path.resolve(__dirname, "../material/modules");
-const BOOTSTRAP = path.resolve(__dirname, "../bootstrap/modules");
-const FLUENT = path.resolve(__dirname, "../fluent/modules");
+const CORE_MODULES = path.resolve(__dirname, "../core/modules");
+const UI_MODULES = path.resolve(__dirname, "../ui/modules");
+const ANTD_MODULES = path.resolve(__dirname, "../antd/modules");
+const MUI_MODULES = path.resolve(__dirname, "../mui/modules");
+const MATERIAL_MODULES = path.resolve(__dirname, "../material/modules");
+const BOOTSTRAP_MODULES = path.resolve(__dirname, "../bootstrap/modules");
+const FLUENT_MODULES = path.resolve(__dirname, "../fluent/modules");
+
+const UI_CSS = path.resolve(__dirname, '../ui/styles/');
+const ANTD_CSS = path.resolve(__dirname, '../antd/styles/');
+const MUI_CSS = path.resolve(__dirname, '../mui/styles/');
+const MATERIAL_CSS = path.resolve(__dirname, '../material/styles/');
+const BOOTSTRAP_CSS = path.resolve(__dirname, '../bootstrap/styles/');
+const FLUENT_CSS = path.resolve(__dirname, '../fluent/styles/');
+
 const TESTS = path.resolve(__dirname);
 
 const isDebug = process.env.TEST_DEBUG === "1";
@@ -71,13 +79,13 @@ module.exports = {
       {
         test: /\.[tj]sx?$/,
         include: [
-          CORE,
-          UI,
-          ANTD,
-          MUI,
-          MATERIAL,
-          BOOTSTRAP,
-          FLUENT
+          CORE_MODULES,
+          UI_MODULES,
+          ANTD_MODULES,
+          MUI_MODULES,
+          MATERIAL_MODULES,
+          BOOTSTRAP_MODULES,
+          FLUENT_MODULES,
         ],
         use: [
           {
@@ -131,14 +139,22 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.jsx'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx', '.less', '.scss'],
     alias: {
-      '@react-awesome-query-builder/core': CORE,
-      '@react-awesome-query-builder/ui': UI,
-      '@react-awesome-query-builder/antd': ANTD,
-      '@react-awesome-query-builder/mui': MUI,
-      '@react-awesome-query-builder/material': MATERIAL,
-      '@react-awesome-query-builder/bootstrap': BOOTSTRAP,
+      '@react-awesome-query-builder/ui/css': UI_CSS,
+      '@react-awesome-query-builder/antd/css': ANTD_CSS,
+      '@react-awesome-query-builder/mui/css': MUI_CSS,
+      '@react-awesome-query-builder/material/css': MATERIAL_CSS,
+      '@react-awesome-query-builder/bootstrap/css': BOOTSTRAP_CSS,
+      '@react-awesome-query-builder/fluent/css': FLUENT_CSS,
+
+      '@react-awesome-query-builder/core': CORE_MODULES,
+      '@react-awesome-query-builder/ui': UI_MODULES,
+      '@react-awesome-query-builder/antd': ANTD_MODULES,
+      '@react-awesome-query-builder/mui': MUI_MODULES,
+      '@react-awesome-query-builder/material': MATERIAL_MODULES,
+      '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
+      '@react-awesome-query-builder/fluent': FLUENT_MODULES,
     },
     fallback: {
       fs: false,

@@ -72,7 +72,7 @@ interface Tasks {
   config: Config;
 }
 interface DoOptions {
-  attach?: boolean;
+  attach?: boolean; // default: true
   debug?: boolean;
   idle?: boolean;
   strict?: boolean;
@@ -340,7 +340,7 @@ const do_with_qb = async (
   let qbWrapper: HTMLElement;
   
   const mountOptions: MountRendererProps = {};
-  if (options?.attach) {
+  if (options?.attach !== false) {
     qbWrapper = global.document.createElement("div");
     global.document.body.appendChild(qbWrapper);
     mountOptions.attachTo = qbWrapper;
@@ -388,11 +388,15 @@ const do_with_qb = async (
     await startIdle();
   }
 
-  if (options?.attach) {
+  if (options?.attach !== false) {
     // @ts-ignore
     qb.detach();
     // @ts-ignore
     global.document.body.removeChild(qbWrapper);
+    // @ts-ignore
+    qb.unmount();
+    // @ts-ignore
+    qbWrapper.remove();
   } else {
     // @ts-ignore
     qb.unmount();
