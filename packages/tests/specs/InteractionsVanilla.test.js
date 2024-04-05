@@ -8,9 +8,29 @@ import deepEqualInAnyOrder from "deep-equal-in-any-order";
 chai.use(deepEqualInAnyOrder);
 const { expect } = chai;
 
+const {
+  simple_with_number,
+  simple_with_numbers_and_str,
+  with_dont_leave_empty_group,
+  with_default_field_and_operator,
+  with_default_func_field,
+  with_funcs,
+  with_group_array_cars,
+  with_group_array_custom_operator,
+  with_default_field_in_cars,
+  with_settings_confirm,
+  with_settings_not_show_not,
+  with_settings_max_number_of_rules_3,
+  with_different_groups,
+  with_settings_show_labels,
+  with_settings_show_lock,
+} = configs;
+
 describe("interactions on vanilla", () => {
   it("click on remove single rule will leave empty rule if canLeaveEmptyGroup=false", async () => {
-    await with_qb([configs.dont_leave_empty_group, configs.with_default_field_and_operator], inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb([
+      simple_with_numbers_and_str, with_dont_leave_empty_group, with_default_field_and_operator
+    ], inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--header button")
         .first()
@@ -26,7 +46,9 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on remove group will leave empty rule if canLeaveEmptyGroup=false", async () => {
-    await with_qb(configs.dont_leave_empty_group, inits.with_group, "JsonLogic", (qb, onChange) => {
+    await with_qb([
+      simple_with_numbers_and_str, with_dont_leave_empty_group
+    ], inits.with_group, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--children .group .group--header .group--actions button")
         .at(2)
@@ -42,7 +64,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on add rule will add new empty rule", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")
         .first()
@@ -54,7 +76,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on add rule will add default rule if defaultField/defaultOperator is present", async () => {
-    await with_qb([configs.simple_with_numbers_and_str, configs.with_default_field_and_operator], inits.empty, "JsonLogic", (qb, onChange) => {
+    await with_qb([simple_with_numbers_and_str, with_default_field_and_operator], inits.empty, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")
         .first()
@@ -74,7 +96,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on add rule will add default rule with func at LHS if defaultField is present", async () => {
-    await with_qb([configs.simple_with_numbers_and_str, configs.with_default_func_field, configs.with_funcs], inits.empty, "JsonLogic", (qb, onChange) => {
+    await with_qb([simple_with_numbers_and_str, with_default_func_field, with_funcs], inits.empty, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")
         .first()
@@ -103,7 +125,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on add group will add new group with one empty rule if shouldCreateEmptyGroup=false", async () => {
-    await with_qb(configs.dont_leave_empty_group, inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb([simple_with_numbers_and_str, with_dont_leave_empty_group], inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")
         .at(1)
@@ -125,7 +147,9 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on add group will add new group with one default rule if shouldCreateEmptyGroup=false AND defaultField is present", async () => {
-    await with_qb([configs.dont_leave_empty_group, configs.with_default_field_and_operator], inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb([
+      simple_with_numbers_and_str, with_dont_leave_empty_group, with_default_field_and_operator
+    ], inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".group--actions button")
         .at(1)
@@ -154,7 +178,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field to of same type will same op & value", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "num2" } });
@@ -169,7 +193,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field to of another type will flush value and incompatible op", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "str2" } });
@@ -184,7 +208,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field to of another type will flush value and leave compatible op", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "str" } });
@@ -199,7 +223,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from group_ext to simple", async () => {
-    await with_qb(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
+    await with_qb(with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule_group_ext .group--field--count--rule .rule--field select")
         .simulate("change", { target: { value: "str" } });
@@ -214,7 +238,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from group_ext to simple with custom operator", async () => {
-    await with_qb(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange) => {
+    await with_qb(with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule_group_ext .group--field--count--rule .rule--field select")
         .simulate("change", { target: { value: "str" } });
@@ -229,7 +253,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from simple to group_ext, will add empty subfield", async () => {
-    await with_qb([configs.with_group_array_cars, configs.with_default_field_and_operator], inits.with_text, "JsonLogic", (qb, onChange) => {
+    await with_qb([with_group_array_cars, with_default_field_and_operator], inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });
@@ -251,7 +275,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change field from simple to group_ext, will add default subfield if defaultField is set in group", async () => {
-    await with_qb([configs.with_group_array_cars, configs.with_default_field_in_cars], inits.with_text, "JsonLogic", (qb, onChange) => {
+    await with_qb([with_group_array_cars, with_default_field_in_cars], inits.with_text, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule .rule--field select")
         .simulate("change", { target: { value: "cars" } });
@@ -274,7 +298,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("set not", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find('.group--conjunctions input[type="checkbox"]')
         .simulate("change", { target: { checked: true } });
@@ -285,7 +309,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change conjunction from AND to OR", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find('.group--conjunctions input[type="radio"][value="OR"]')
         .simulate("change", { target: { value: "OR" } });
@@ -299,7 +323,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change value source to another field of same type", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--valuesrc select")
         .simulate("change", { target: { value: "field" } });
@@ -313,7 +337,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("change op from equal to not_equal", async () => {
-    await with_qb(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
       qb
         .find(".rule .rule--operator select")
         .simulate("change", { target: { value: "not_equal" } });
@@ -324,7 +348,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("remove group with 2 rules with confirm", async () => {
-    await with_qb(configs.with_settings_confirm, inits.with_number_and_group, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
+    await with_qb([simple_with_number, with_settings_confirm], inits.with_number_and_group, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
       const renderConfirm = config.settings.renderConfirm;
       qb
         .find(".group--children .group .group--header .group--actions button")
@@ -336,7 +360,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("remove group with 1 rule with confirm", async () => {
-    await with_qb(configs.with_settings_confirm, inits.with_number_and_group_1, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
+    await with_qb([simple_with_number, with_settings_confirm], inits.with_number_and_group_1, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
       const renderConfirm = config.settings.renderConfirm;
       qb
         .find(".group--children .group .group--header .group--actions button")
@@ -348,7 +372,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("remove rule with confirm", async () => {
-    await with_qb(configs.with_settings_confirm, inits.with_2_numbers, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
+    await with_qb([simple_with_number, with_settings_confirm], inits.with_2_numbers, "JsonLogic", (qb, onChange,  {expect_jlogic, config}) => {
       const renderConfirm = config.settings.renderConfirm;
       qb
         .find(".group--children .rule-container")
@@ -362,7 +386,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("should not render not with showNot=false", async () => {
-    await with_qb(configs.with_settings_not_show_not, inits.with_numbers_and_group, "JsonLogic", (qb) => {
+    await with_qb([simple_with_number, with_settings_not_show_not], inits.with_numbers_and_group, "JsonLogic", (qb) => {
       expect(qb.find(".group--conjunctions input[type='checkbox']")).to.have.length(0);
     }, {
       ignoreLog: (errText) => {
@@ -373,7 +397,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("should handle maxNumberOfRules=3", async () => {
-    await with_qb(configs.with_settings_max_number_of_rules_3, inits.with_number_and_group, "JsonLogic", (qb) => {
+    await with_qb([simple_with_number, with_settings_max_number_of_rules_3], inits.with_number_and_group, "JsonLogic", (qb) => {
       // if max exceeded --> (3) Add group | Add group, Delete group
       // else -->            (5) Add rule, Add group | Add rule, Add group, Delete group
       expect(qb.find(".group--actions button")).to.have.length(3);
@@ -381,19 +405,19 @@ describe("interactions on vanilla", () => {
   });
 
   it("should render labels with showLabels=true", async () => {
-    await with_qb([configs.with_different_groups, configs.with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
+    await with_qb([with_different_groups, with_settings_show_labels], inits.with_different_groups, "JsonLogic", (qb) => {
       //todo
     });
   });
 
   it("should render admin mode with showLock=true", async () => {
-    await with_qb([configs.with_different_groups, configs.with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
+    await with_qb([with_different_groups, with_settings_show_lock], inits.with_different_groups, "JsonLogic", (qb) => {
       //todo
     });
   });
 
   it("change group operator", async () => {
-    await with_qb(configs.with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
+    await with_qb(with_group_array_cars, inits.with_group_array_cars, "JsonLogic", (qb, onChange) => {
       qb
         .find(".rule_group_ext .group--field--count--rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: 4 } });

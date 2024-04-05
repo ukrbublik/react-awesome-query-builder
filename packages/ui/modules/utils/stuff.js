@@ -15,7 +15,7 @@ export const immutableEqual = function(v1, v2) {
   if (v1 === v2) {
     return true;
   } else {
-    return v1.equals(v2);
+    return v1?.equals(v2);
   }
 };
 

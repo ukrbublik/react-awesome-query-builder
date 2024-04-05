@@ -4,6 +4,11 @@ import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb_material, hexToRgbString } from "../support/utils";
 
+const {
+  with_theme_material,
+  with_all_types,
+} = configs;
+
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid")
     || errText.includes("The `fade` color utility was renamed to `alpha` to better describe its functionality");
@@ -11,7 +16,7 @@ const ignoreLogDatePicker = (errText: string) => {
 
 describe("material-ui theming", () => {
   it("applies secondary color", async () => {
-    await with_qb_material(configs.with_theme_material, inits.with_bool, "JsonLogic", (qb) => {
+    await with_qb_material([with_all_types, with_theme_material], inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
       expect(boolSwitch, "boolSwitch").to.have.length(1);
       const boolSwitchNode = boolSwitch.at(0).getDOMNode() ;

@@ -173,7 +173,7 @@ export const with_date_and_time = (BasicConfig) => ({
 
 
 export const with_theme_material = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     theme: {
@@ -213,7 +213,7 @@ export const without_field_autocomplete = (BasicConfig) => ({
 });
 
 export const with_theme_mui = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     theme: {
@@ -728,26 +728,25 @@ export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
   }
 });
 
-export const with_all_types__show_error = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+export const with_show_error = (BasicConfig) => ({
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     showErrorMessage: true,
   }
 });
 
-export const with_all_types__show_error__dont_fix_on_load = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+export const with_dont_fix_on_load = (BasicConfig) => ({
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
-    showErrorMessage: true,
     removeEmptyGroupsOnLoad: false,
     removeIncompleteRulesOnLoad: false,
   }
 });
 
-export const dont_leave_empty_group = (BasicConfig) => ({
-  ...simple_with_numbers_and_str(BasicConfig),
+export const with_dont_leave_empty_group = (BasicConfig) => ({
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     canLeaveEmptyGroup: false,
@@ -920,7 +919,7 @@ export const with_wrong_type = (BasicConfig) => ({
 });
 
 export const with_settings_confirm = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     removeRuleConfirmOptions: {
@@ -943,7 +942,7 @@ export const with_settings_confirm = (BasicConfig) => ({
 });
 
 export const with_settings_not_show_not = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   conjunctions: {
     AND: BasicConfig.conjunctions.AND,
   },
@@ -954,7 +953,7 @@ export const with_settings_not_show_not = (BasicConfig) => ({
 });
 
 export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     maxNumberOfRules: 3

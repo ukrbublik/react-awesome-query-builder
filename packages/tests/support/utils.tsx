@@ -26,12 +26,20 @@ import { BootstrapConfig } from "@react-awesome-query-builder/bootstrap";
 import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 
 
-let currentTest: string;
-export const setCurrentTest = (testName: string) => {
-  currentTest = testName;
+let currentTestName: string;
+let currentTest: Mocha.Test;
+export const setCurrentTest = (test: Mocha.Test) => {
+  currentTestName = test.titlePath().join(" - ");
+  currentTest = test;
 };
-export const getCurrentTest = () => {
-  return currentTest;
+export const setCurrentTestName = (name: string) => {
+  currentTestName = name;
+};
+export const getCurrentTestName = () => {
+  return currentTestName;
+};
+export const setCurrentTestTimeout = (ms: number) => {
+  currentTest?.timeout?.(ms);
 };
 
 const ConsoleMethods = [
@@ -65,6 +73,8 @@ interface Tasks {
 }
 interface DoOptions {
   attach?: boolean;
+  debug?: boolean;
+  idle?: boolean;
   strict?: boolean;
   ignoreLog?: ConsoleIgnoreFn;
   withRender?: boolean;
@@ -110,7 +120,7 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
         const errText = finalArgs.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
         consoleData[method]?.push(errText);
         if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
-          origConsole[method].apply(null, [...finalArgs, "@", getCurrentTest()]);
+          origConsole[method].apply(null, [...finalArgs, "@", getCurrentTestName()]);
         }
       }
     }
@@ -139,6 +149,8 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   if (!valueFormat) {
     if (isJsonLogic(value))
       valueFormat = "JsonLogic";
+    else if (typeof value === "string")
+      valueFormat = "SpEL";
     else
       valueFormat = "default";
   }
@@ -229,7 +241,7 @@ const do_with_qb = async (
       }
       expect(errors.join("; ")).to.equal(options?.expectedLoadErrors?.join("; "));
     } else {
-      const errText = `Error while loading as ${valueFormat || "?"} with ${configName} @ ${getCurrentTest()}:`
+      const errText = `Error while loading as ${valueFormat || "?"} with ${configName} @ ${getCurrentTestName()}:`
       + "\n" + errors.join("\n")
       + "\n" + JSON.stringify(value);
       if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
@@ -238,12 +250,63 @@ const do_with_qb = async (
     }
   }
 
+  let qb: ReactWrapper;
   const onChange = spy();
   const onInit = spy();
   // mock console
   const {mockedConsole, origConsole, consoleData} = mockConsole(options, configName);
   // eslint-disable-next-line no-global-assign
   console = mockedConsole;
+
+  const isDebugPage = document.location.href.includes("/debug.html");
+
+  const startIdle = async () => {
+    let isIdle = true;
+    const startIdleTime = new Date();
+    while (isIdle) {
+      await sleep(500);
+      const currentTime = new Date();
+      const isTimedOut = process?.env?.MAX_IDLE_TIME
+        && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME as string);
+      if (isTimedOut) {
+        isIdle = false;
+        break;
+      }
+    }
+    isIdle = false;
+  };
+
+  const printDebug = () => {
+    console.log("Debug " + getCurrentTestName());
+
+    const qbDom = qb.first().getDOMNode();
+    const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+    const initialJsonTree = getTree(initialTree);
+    const ruleErrors = qb.find(".rule--error").map(e => e.text());
+
+    // expose to window
+    const dbg: Record<string, unknown> = {
+      qb,
+      tree,
+      errors,
+      config,
+      extendedConfig,
+      initialTree,
+      initialJsonTree,
+      onInit,
+      onChange,
+      Utils,
+      ruleErrors,
+    };
+    (window as any).dbg = dbg;
+    if (isDebugPage) {
+      for (const k in dbg) {
+        (window as any)[k] = dbg[k];
+      }
+    }
+
+    console.dirxml( qbDom );
+  };
 
   const tasks: Tasks = {
     expect_jlogic: (jlogics, changeIndex = 0) => {
@@ -303,15 +366,27 @@ const do_with_qb = async (
     return cmp;
   };
 
+  if (options?.debug) {
+    setCurrentTestTimeout(parseInt(process?.env?.DEBUG_TEST_TIMEOUT ?? "60000"));
+  }
+
   //await act(async () => {
-  const qb = mount(
+  qb = mount(
     query(), 
     mountOptions
-  ) as ReactWrapper;
+  );
+
+  if (options?.debug) {
+    printDebug();
+  }
 
   // @ts-ignore
   await checks(qb, onChange, tasks, consoleData, onInit);
   //});
+
+  if (options?.idle && isDebugPage) {
+    await startIdle();
+  }
 
   if (options?.attach) {
     // @ts-ignore
@@ -356,7 +431,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
       logic: logic,
       elasticSearch: elasticSearchFormat(tree, config),
     };
-    console.log(getCurrentTest(), stringify(correct, undefined, 2));
+    console.log(getCurrentTestName(), stringify(correct, undefined, 2));
   } else {
     if (expects["query"] !== undefined) {
       doIt("should work to query string", () => {

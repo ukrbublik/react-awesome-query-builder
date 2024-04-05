@@ -5,10 +5,17 @@ import * as inits from "../support/inits";
 import { with_qb, expect_objects_equal } from "../support/utils";
 import { expect } from "chai";
 
+const {
+  with_all_types,
+  with_show_error,
+  with_dont_fix_on_load,
+} = configs;
+
 describe("validateTree", () => {
   it("shows error when change number value to > max", async () => {
-    const configFn = configs.with_all_types__show_error;
-    await with_qb(configFn, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic, config}) => {
+    await with_qb([
+      with_all_types, with_show_error,
+    ], inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic, config}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "200" } });
@@ -57,14 +64,43 @@ describe("validateTree", () => {
 });
 
 describe("sanitizeTree", () => {
-  it("can fix value > max with forceFix: true", async () => {
+  it("should remove empty group", async () => {
+    
+  });
+
+  it("can't fix value > max with showErrorMessage: true and forceFix: false", async () => {
     await with_qb(
-      configs.with_all_types__show_error, inits.with_number_bigger_than_max, "JsonLogic",
+      [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
       async (qb, onChange, {expect_jlogic, config}, consoleData, onInit) => {
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const isValid = isValidTree(initialTree, config);
         expect(isValid).to.eq(false);
-        
+        const ruleError = qb.find(".rule--error");
+        expect(ruleError).to.have.length(1);
+        expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
+
+        const { fixedErrors, nonFixedErrors } = sanitizeTree(initialTree, config);
+        expect(fixedErrors).to.have.length(0);
+        expect(nonFixedErrors).to.have.length(1);
+        expect(nonFixedErrors[0].errors.length).to.eq(1);
+        expect(nonFixedErrors[0].errors[0].str).to.eq("Value 200 should be from 0 to 10");
+        expect(nonFixedErrors[0].errors[0].fixed).to.eq(false);
+      },
+      {
+        expectedLoadErrors: [
+          "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
+        ]
+      }
+    );
+  });
+
+  it("can fix value > max with forceFix: true", async () => {
+    await with_qb(
+      [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
+      async (qb, onChange, {expect_jlogic, config}, consoleData, onInit) => {
+        const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+        const isValid = isValidTree(initialTree, config);
+        expect(isValid).to.eq(false);
         const ruleError = qb.find(".rule--error");
         expect(ruleError).to.have.length(1);
         expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
@@ -98,7 +134,7 @@ describe("sanitizeTree", () => {
 describe("deprecated checkTree", () => {
   it("can't fix value > max but can remove empty groups and incomplete rules", async () => {
     await with_qb(
-      configs.with_all_types__show_error__dont_fix_on_load, inits.tree_with_empty_groups_and_incomplete_rules, "default",
+      [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.tree_with_empty_groups_and_incomplete_rules, "default",
       async (qb, onChange, {expect_jlogic, expect_tree_validation_errors, config}, consoleData, onInit) => {
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const initialJsonTree = getTree(initialTree);

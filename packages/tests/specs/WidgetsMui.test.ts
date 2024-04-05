@@ -6,13 +6,18 @@ import { with_qb_mui, hexToRgbString } from "../support/utils";
 import { getAutocompleteUtils } from "../support/autocomplete";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
+const {
+  with_all_types,
+  with_theme_mui,
+} = configs;
+
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
 };
 
 describe("mui theming", () => {
   it("applies secondary color", async () => {
-    await with_qb_mui(configs.with_theme_mui, inits.with_bool, "JsonLogic", (qb) => {
+    await with_qb_mui([with_all_types, with_theme_mui], inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
       // for some reason elements are duplicated for MUI
       expect(boolSwitch, "boolSwitch").to.have.length(2);

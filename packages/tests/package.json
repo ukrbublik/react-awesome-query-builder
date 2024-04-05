@@ -17,7 +17,8 @@
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./specs/ ./support/",
     "test": "karma start ./karma.conf.js",
-    "test-debug": "TEST_DEBUG=1 karma start ./karma.conf.js --debug",
+    "test-dev": "TEST_WATCH=1 karma start ./karma.conf.js",
+    "test-debug": "TEST_WATCH=1 TEST_DEBUG=1 karma start ./karma.conf.js --debug",
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {

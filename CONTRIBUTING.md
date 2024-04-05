@@ -1,19 +1,34 @@
 # Contributing
 
-Feel free to open PRs to fix bugs, add new features, add new reusable types/widgets/operators (eg., regex operator/widget, IP type/widget).  
+Feel free to open PRs to fix bugs, add new features, add new reusable types/widgets/operators (eg., regex operator/widget, IP type/widget etc.).  
 
 * [Development](#development)
   * [Directory structure](#directory-structure) 
   * [Scripts](#scripts)
   * [Other UI frameworks](#other-ui-frameworks)
+* [Tests](#tests)
 
 
 ## Development
-Clone this repo, install `npm 7+` and run `npm start`. 
-Open `http://localhost:3001/` in a browser. 
-You will see demo app with hot reload of demo code and local library code. 
+
+We use [pnpm](https://pnpm.io/). Please [install pnpm](https://pnpm.io/installation):
+```
+npm install -g pnpm
+```
+Clone this repo, install deps with `pnpm i`.
+
+Start with the demo app (with hot reload of demo code and local library code):
+- Run `pnpm start`. 
+- Open `http://localhost:3001/` in a browser. 
+
+Or with VSCode:
+- Open `Run and Debug` in VS Code
+- Run `Run examples`
+- Run `Open Chrome with examples`
+
 
 ### Directory structure
+
 - [`packages/core/modules`](/packages/core/modules) - Core functionality, does not depend from React
   - [`config`](/packages/core/modules/config) - Core config. See [`CONFIG`](/CONFIG.adoc) docs.
   - [`export`](/packages/core/modules/export) - Code for export to JsonLogic, MongoDb, SQL, ElasticSearch, plain string, SpEL
@@ -48,15 +63,15 @@ You will see demo app with hot reload of demo code and local library code.
 - [`packages/tests`](/packages/tests) - All tests are here. Uses Karma, Mocha, Chai, Enzyme
 
 ### Scripts
-We use [pnpm](https://pnpm.io/). Please [install pnpm](https://pnpm.io/installation):
-```
-npm install -g pnpm
-```
 
 Useful scripts:
 - `pnpm i` - Install packages in all workspaces. **Required for other scripts!**
+- `pnpm start` - Run [`examples`](/packages/examples)
 - `pnpm build` - Build all packages and examples
-- `pnpm test` - Run tests with Karma and update coverage.
+- `pnpm test` - Run all tests with Karma and update coverage.
+- `pnpm test-dev` - Run all tests with Karma in watch mode.
+- `pnpm test-debug` - Run tests with Karma in watch & debug mode.
+- `pnpm test-debug --filter Validation WidgetsVanilla` - Run only selected tests with Karma.
 - `pnpm lint` - Run ESLint and TSC (in all workspaces)
 - `pnpm lint-fix` - Run ESLint with `--fix` option (in in all workspaces)
 - `pnpm clean` - Clean all data that can be re-generated (like `node_modules`, `build`, `coverage`)
@@ -66,6 +81,7 @@ Feel free to open PR to add new reusable types/widgets/operators (eg., regex ope
 Pull Requests are always welcomed :)
 
 ### Other UI frameworks
+
 Currently there are 5 collections of widgets:
 - [vanilla widgets](/packages/ui/modules/components/widgets/vanilla)
 - [antdesign widgets](/packages/antd)
@@ -80,3 +96,7 @@ Create new package `@react-awesome-query-builder/x` in [packages](/packages).
 For a playground integrate it in [examples](/packages/examples) - add to `dependecies` in [package.json](/packages/examples/package.json), `paths` in [tsconfig.json](/packages/examples/tsconfig.json), `aliases` in [webpack.config.js](/packages/examples/webpack.config.js), `skinToConfig` in [config.tsx](/packages/examples/demo/config.tsx).
 
 Take [PR #727 to add Fluent UI widgets](https://github.com/ukrbublik/react-awesome-query-builder/pull/727) as an example.
+
+## Tests
+
+See [tests readme](/packages/tests)
