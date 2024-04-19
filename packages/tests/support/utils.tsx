@@ -29,7 +29,6 @@ import { FluentUIConfig } from "@react-awesome-query-builder/fluent";
 let currentTestName: string;
 let currentTest: Mocha.Test;
 export const setCurrentTest = (test: Mocha.Test) => {
-  currentTestName = test.titlePath().join(" - ");
   currentTest = test;
 };
 export const setCurrentTestName = (name: string) => {
@@ -70,11 +69,12 @@ interface Tasks {
   expect_checks: (expects: ExtectedExports) => void;
   expect_tree_validation_errors: (errs: string[]) => void;
   config: Config;
+  startIdle: () => Promise<void>;
+  stopIdle: () => void;
 }
 interface DoOptions {
   attach?: boolean; // default: true
   debug?: boolean;
-  idle?: boolean;
   strict?: boolean;
   ignoreLog?: ConsoleIgnoreFn;
   withRender?: boolean;
@@ -260,20 +260,35 @@ const do_with_qb = async (
 
   const isDebugPage = document.location.href.includes("/debug.html");
 
+  let idleOptions: SleepOptions = {};
+  let isIdle = false;
+
   const startIdle = async () => {
-    let isIdle = true;
-    const startIdleTime = new Date();
-    while (isIdle) {
-      await sleep(500);
-      const currentTime = new Date();
-      const isTimedOut = process?.env?.MAX_IDLE_TIME
-        && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME as string);
-      if (isTimedOut) {
-        isIdle = false;
-        break;
+    if (isDebugPage) {
+      console.log("Staring idle... Type `stopIdle()` to continue");
+      isIdle = true;
+      const startIdleTime = new Date();
+      while (isIdle) {
+        await sleep(500, idleOptions);
+        const currentTime = new Date();
+        const isTimedOut = process?.env?.MAX_IDLE_TIME
+          && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME as string);
+        if (isTimedOut) {
+          isIdle = false;
+          break;
+        }
+      }
+      isIdle = false;
+    }
+  };
+
+  const stopIdle = () => {
+    if (isIdle) {
+      isIdle = false;
+      if (idleOptions?.wakeUp) {
+        idleOptions?.wakeUp();
       }
     }
-    isIdle = false;
   };
 
   const printDebug = () => {
@@ -297,6 +312,7 @@ const do_with_qb = async (
       onChange,
       Utils,
       ruleErrors,
+      stopIdle,
     };
     (window as any).dbg = dbg;
     if (isDebugPage) {
@@ -335,6 +351,8 @@ const do_with_qb = async (
       expect(errs![0]).to.equal(expectedLines.join("\n"));
     },
     config: config,
+    startIdle,
+    stopIdle,
   };
 
   let qbWrapper: HTMLElement;
@@ -383,10 +401,6 @@ const do_with_qb = async (
   // @ts-ignore
   await checks(qb, onChange, tasks, consoleData, onInit);
   //});
-
-  if (options?.idle && isDebugPage) {
-    await startIdle();
-  }
 
   if (options?.attach !== false) {
     // @ts-ignore
@@ -650,9 +664,26 @@ export function hexToRgbString(hex: string) {
   }
 }
 
-export function sleep(delay: number) {
+interface SleepOptions {
+  wakeUp?: () => void;
+}
+
+export function sleep(delay: number, options?: SleepOptions) {
   return new Promise((resolve) => {
-    setTimeout(resolve, delay);
+    let timerId: number | undefined;
+    const onTimeout = () => {
+      timerId = undefined;
+      resolve(undefined);
+    };
+    timerId = setTimeout(onTimeout, delay) as unknown as number;
+    if (options) {
+      options.wakeUp = () => {
+        if (timerId) {
+          clearTimeout(timerId);
+          onTimeout();
+        }
+      };
+    }
   });
 }
 

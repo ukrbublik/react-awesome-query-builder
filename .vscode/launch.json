@@ -32,8 +32,8 @@
       "args": [
         "start",
         "./karma.conf.js",
-        "--filter",
-        "${input:filterTests}",
+        // "--filter",
+        // "${input:filterTests}",
       ],
       "env": {
         "TEST_WATCH": "1",
@@ -62,8 +62,8 @@
       "args": [
         "start",
         "./karma.conf.js",
-        "--filter",
-        "${input:filterTests}",
+        // "--filter",
+        // "${input:filterTests}",
       ],
       "env": {
         "TEST_WATCH": "1",
@@ -76,7 +76,7 @@
     {
       "id": "filterTests",
       "type": "promptString",
-      "description": "Enter filenames of specs to filter (without extension), space separated. Or leave empty to test all specs.",
+      "description": "Enter test filenames to filter (without extension), space separated. Or leave empty to test all specs.",
       "default": ""
     }
   ]
