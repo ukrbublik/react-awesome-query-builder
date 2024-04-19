@@ -8,7 +8,7 @@ import { simulate_drag_n_drop } from "../support/dnd";
 describe("drag-n-drop", () => {
 
   it("should move rule after second rule", async () => {
-    await with_qb(configs.simple_with_number, inits.with_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
+    await with_qb(configs.simple_with_number, inits.with_group, "JsonLogic", (qb, {expect_queries}) => {
       const firstRule = qb.find(".rule").at(0);
       const secondRule = qb.find(".rule").at(1);
 
@@ -29,7 +29,7 @@ describe("drag-n-drop", () => {
   });
 
   it("should move group before rule", async () => {
-    await with_qb(configs.simple_with_number, inits.with_number_and_group, "JsonLogic", (qb, onChange, {expect_queries}) => {
+    await with_qb(configs.simple_with_number, inits.with_number_and_group, "JsonLogic", (qb, {expect_queries}) => {
       const firstRule = qb.find(".rule").at(0);
       const group = qb.find(".group--children .group").at(0);
 
@@ -51,7 +51,7 @@ describe("drag-n-drop", () => {
 
   it("should move rule into group", async () => {
     const do_test = async (config, value, checks) => {
-      await with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
+      await with_qb(config, value, "JsonLogic", (qb, {onChange, ...expects}) => {
         const secondRule = qb.find(".rule").at(1);
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
@@ -65,7 +65,7 @@ describe("drag-n-drop", () => {
           "mousePos":{"clientX":89,"clientY":192}
         });
 
-        checks(config, value, onChange, tasks);
+        checks(config, value, onChange, expects);
       }, {
         attach: true,
       });
@@ -78,18 +78,18 @@ describe("drag-n-drop", () => {
       ]);
     });
     
-    await do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
+    await do_test(configs.simple_with_number_without_regroup, inits.with_numbers_and_group, (_config, _value, onChange, _expects) => {
       assert.notCalled(onChange);
     });
     
-    await do_test(configs.simple_with_number_max_nesting_1, inits.with_numbers_and_group, (_config, _value, onChange, _tasks) => {
+    await do_test(configs.simple_with_number_max_nesting_1, inits.with_numbers_and_group, (_config, _value, onChange, _expects) => {
       assert.notCalled(onChange);
     });
   });
 
   it("should move rule out of group", async () => {
     const do_test = async (config, value, checks) => {
-      await with_qb(config, value, "JsonLogic", (qb, onChange, tasks) => {
+      await with_qb(config, value, "JsonLogic", (qb, {onChange, ...expects}) => {
         const firstRuleInGroup = qb.find(".rule").at(1);
         const group = qb.find(".group--children .group").at(0);
         const groupHeader = group.find(".group--header").first();
@@ -103,7 +103,7 @@ describe("drag-n-drop", () => {
           "mousePos":{"clientX":104,"clientY":100}
         });
   
-        checks(config, value, onChange, tasks);
+        checks(config, value, onChange, expects);
       });
     };
 
@@ -114,13 +114,13 @@ describe("drag-n-drop", () => {
       ]);
     });
     
-    await do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange, _tasks) => {
+    await do_test(configs.simple_with_number_without_regroup, inits.with_number_and_group_3, (_config, _value, onChange, _expects) => {
       assert.notCalled(onChange);
     });
   });
 
   it("should move group before group", async () => {
-    await with_qb(configs.simple_with_number_without_regroup, inits.with_groups, "JsonLogic", (qb, onChange, {expect_queries}) => {
+    await with_qb(configs.simple_with_number_without_regroup, inits.with_groups, "JsonLogic", (qb, {expect_queries}) => {
       const firstGroup = qb.find(".group--children .group").at(0);
       const secondGroup = qb.find(".group--children .group").at(1);
       const firstGroupHeader = firstGroup.find(".group--header").first();

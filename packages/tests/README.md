@@ -63,6 +63,7 @@ This will run Karma in watch mode and start the Chromium browser with opened dev
 To debug a test, add `debug: true` in options of `with_qb()` (last arg), see [test example](#test-example). 
 Then write `debugger;` somewhere in your test code to pause test and debug in Chrome DevTools or VSCode.  
 In the browser's console you can use global `window.dbg` object for debugging.  
+See [known issue #1](#known-issues-in-debug-mode).  
 
 
 ### Debug with VSCode
@@ -103,6 +104,8 @@ qb.setProps({value: null});
 You can write your test code completely in the browser console, then copy it to your test file.  
 You can also use `debugger;`
 
+Note that `await startIdle();` works ONLY on Karma debug page.  
+
 
 ### Known issues in debug mode
 
@@ -111,7 +114,7 @@ You can also use `debugger;`
 ```
 [karma]: Delaying execution, these browsers are not ready: Chrome
 ```
-**Reason:** Probably you've put `debugger` in your test code, and test script execution was paused for >30s.  
+**Reason:** Probably you've put `debugger` in your test code, and test script execution was paused for more than 30 seconds.  
 **Solution:** Reload (`F5`) Karma page in Chromium. 
 
 2. 
@@ -130,33 +133,37 @@ import { expect } from "chai";
 
 describe("my first tests", () => {
   it("change value from 2 to 200", async () => {
-    await with_qb([
-      configs.with_all_types, configs.with_show_error,
-    ], inits.with_number, null, (qb, onChange, {
-      startIdle,
-      expect_jlogic, config
-    }, consoleData, onInit) => {
-      await startIdle(); // pause execution to debug initial state
+    await with_qb(
+      [ configs.with_all_types, configs.with_show_error ],
+      inits.with_number,
+      null,
+      async (qb, {
+        config, onInit, onChange, startIdle, 
+        expect_jlogic,
+      }) => {
+        await startIdle(); // pause execution to debug initial state
 
-      const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
-      const initialSpel = Utils.spelFormat(initialTree, config);
-      expect(initialSpel).to.eq("num == 2");
+        const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+        const initialSpel = Utils.spelFormat(initialTree, config);
+        expect(initialSpel).to.eq("num == 2");
 
-      qb
-        .find(".rule .rule--value .widget--widget input")
-        .simulate("change", { target: { value: "200" } });
-      expect_jlogic([null,
-        { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
-      ]);
+        qb
+          .find(".rule .rule--value .widget--widget input")
+          .simulate("change", { target: { value: "200" } });
+        expect_jlogic([null,
+          { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
+        ]);
 
-      await startIdle(); // pause execution to debug changed state
+        await startIdle(); // pause execution to debug changed state
 
-      const changedTree = onChange.lastCall.args[0];
-      const changedSpel = Utils.spelFormat(changedTree, config);
-      expect(changedSpel).to.eq("num == 200");
-    }, {
-      debug: true,
-    });
+        const changedTree = onChange.lastCall.args[0];
+        const changedSpel = Utils.spelFormat(changedTree, config);
+        expect(changedSpel).to.eq("num == 200");
+      },
+      {
+        debug: true,
+      }
+    );
   });
 });
 ```

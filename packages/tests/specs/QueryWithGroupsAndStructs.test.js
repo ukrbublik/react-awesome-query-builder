@@ -16,7 +16,7 @@ describe("query with !struct and !group", () => {
       });
     });
     it("should handle custom operator in !group arrays", async () => {
-      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, {onChange, expect_jlogic, expect_checks}) => {
         expect_checks({
           "logic": {
             "and": [

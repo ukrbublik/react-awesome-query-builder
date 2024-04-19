@@ -26,7 +26,7 @@ describe("interactions on MUI", () => {
   //-------
 
   it("change range slider value", async () => {
-    await with_qb_mui(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+    await with_qb_mui(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, {expect_jlogic, expect_checks}) => {
       expect_checks({
         "query": "slider >= 18 && slider <= 42",
         "queryHuman": "Slider BETWEEN 18 AND 42",

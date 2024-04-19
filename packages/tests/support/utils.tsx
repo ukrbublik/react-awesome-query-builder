@@ -52,7 +52,7 @@ type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
 type ConfigFns = ConfigFn | ConfigFn[];
-type ChecksFn = (qb: ReactWrapper, onChange: sinon.SinonSpy, tasks: Tasks, consoleData: ConsoleData, onInit: sinon.SinonSpy) => Promise<void> | void;
+type ChecksFn = (qb: ReactWrapper, checkMeta: CheckMeta) => Promise<void> | void;
 interface ExtectedExports {
   query?: string;
   queryHuman?: string;
@@ -63,14 +63,22 @@ interface ExtectedExports {
   elasticSearch7?: Object;
   logic?: JsonLogicTree | [JsonLogicTree, string[]];
 }
-interface Tasks {
+interface CheckExpects {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
   expect_queries: (queries: Array<string>) => void;
   expect_checks: (expects: ExtectedExports) => void;
   expect_tree_validation_errors: (errs: string[]) => void;
-  config: Config;
+}
+interface CheckUtils {
   startIdle: () => Promise<void>;
   stopIdle: () => void;
+  onChange: sinon.SinonSpy;
+  onInit: sinon.SinonSpy;
+  consoleData: ConsoleData;
+}
+interface CheckMeta extends CheckExpects, CheckUtils  {
+  qb: ReactWrapper;
+  config: Config;
 }
 interface DoOptions {
   attach?: boolean; // default: true
@@ -292,8 +300,6 @@ const do_with_qb = async (
   };
 
   const printDebug = () => {
-    console.log("Debug " + getCurrentTestName());
-
     const qbDom = qb.first().getDOMNode();
     const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
     const initialJsonTree = getTree(initialTree);
@@ -322,37 +328,6 @@ const do_with_qb = async (
     }
 
     console.dirxml( qbDom );
-  };
-
-  const tasks: Tasks = {
-    expect_jlogic: (jlogics, changeIndex = 0) => {
-      expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
-    },
-    expect_queries: (queries) => {
-      expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
-    },
-    expect_checks: (expects) => {
-      do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
-        ...options,
-        withRender: false, 
-        insideIt: true,
-      });
-    },
-    expect_tree_validation_errors: (expectedLines) => {
-      const errs = consoleData.warn?.filter(
-        // Get console errors from `validateAndFixTree` or `checkTree`
-        e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
-      );
-      expect(errs?.length, "tree errors in console").eq(1);
-      const lines = errs![0].split("\n");
-      for (let i = 0 ; i < Math.max(expectedLines.length, lines.length) ; i++) {
-        expect(lines[i], `line ${i}`).to.equal(expectedLines[i]);
-      }
-      expect(errs![0]).to.equal(expectedLines.join("\n"));
-    },
-    config: config,
-    startIdle,
-    stopIdle,
   };
 
   let qbWrapper: HTMLElement;
@@ -388,19 +363,56 @@ const do_with_qb = async (
     setCurrentTestTimeout(parseInt(process?.env?.DEBUG_TEST_TIMEOUT ?? "60000"));
   }
 
-  //await act(async () => {
   qb = mount(
     query(), 
     mountOptions
   );
+
+  const checkMeta: CheckMeta = {
+    qb,
+    config,
+
+    // utils
+    startIdle,
+    stopIdle,
+    onInit,
+    onChange,
+    consoleData,
+
+    // expects
+    expect_jlogic: (jlogics, changeIndex = 0) => {
+      expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
+    },
+    expect_queries: (queries) => {
+      expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
+    },
+    expect_checks: (expects) => {
+      do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
+        ...options,
+        withRender: false, 
+        insideIt: true,
+      });
+    },
+    expect_tree_validation_errors: (expectedLines) => {
+      const errs = consoleData.warn?.filter(
+        // Get console errors from `validateAndFixTree` or `checkTree`
+        e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
+      );
+      expect(errs?.length, "tree errors in console").eq(1);
+      const lines = errs![0].split("\n");
+      for (let i = 0 ; i < Math.max(expectedLines.length, lines.length) ; i++) {
+        expect(lines[i], `line ${i}`).to.equal(expectedLines[i]);
+      }
+      expect(errs![0]).to.equal(expectedLines.join("\n"));
+    },
+  };
 
   if (options?.debug) {
     printDebug();
   }
 
   // @ts-ignore
-  await checks(qb, onChange, tasks, consoleData, onInit);
-  //});
+  await checks(qb, checkMeta);
 
   if (options?.attach !== false) {
     // @ts-ignore

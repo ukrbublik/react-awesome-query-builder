@@ -155,7 +155,7 @@ describe("settings.useConfigCompress", () => {
     const decConfig = ConfigUtils.decompressConfig(zipConfig, BaseConfig, ctx);
 
     // extend via render
-    await with_qb(() => decConfig, zipInits.withSlider, "JsonLogic", (qb, onChange, {expect_queries}) => {
+    await with_qb(() => decConfig, zipInits.withSlider, "JsonLogic", (qb, {expect_queries}) => {
       // check slider marks
       const rule0 = qb.find(".rule").at(0);
       const slider0 = rule0.find(".rule--value .widget--widget .MuiSlider-root").at(0);

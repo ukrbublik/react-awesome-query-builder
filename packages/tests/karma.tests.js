@@ -4,13 +4,10 @@ import {setCurrentTest, setCurrentTestName, setFilterSpec, getCurrentTestName} f
 import '@react-awesome-query-builder/ui/css/styles.scss';
 Enzyme.configure({adapter: new Adapter()});
 
+// FILTER YOUR TESTS HERE
 const testsFilter = [
-  //todo: remove
-  "Validation"
 ];
 const specFilter = [
-  //todo: remove
-  "sanitizeTree - should remove empty group"
 ];
 
 const origDescribe = describe;

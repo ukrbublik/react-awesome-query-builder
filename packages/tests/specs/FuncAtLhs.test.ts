@@ -314,7 +314,7 @@ describe("LHS func", () => {
     it("change field source to func, and vice versa", async () => {
       await with_qb([
         configs.with_fieldSources, configs.with_funcs, configs.with_keepInputOnChangeFieldSrc
-      ], inits.with_text, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+      ], inits.with_text, "JsonLogic", (qb, {expect_jlogic}) => {
         // select src = func
         selectFieldSrc(qb, "func");
         expect_jlogic([null, undefined], 0);
