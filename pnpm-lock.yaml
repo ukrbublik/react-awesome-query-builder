@@ -1057,6 +1057,9 @@ importers:
       '@types/chai':
         specifier: ^4.2.18
         version: 4.3.4
+      '@types/chai-subset-in-order':
+        specifier: ^3.1.2
+        version: 3.1.2
       '@types/deep-equal-in-any-order':
         specifier: ^1.0.1
         version: 1.0.1
@@ -1096,6 +1099,9 @@ importers:
       chai:
         specifier: ^4.3.2
         version: 4.3.7
+      chai-subset-in-order:
+        specifier: ^3.1.0
+        version: 3.1.0
       css-loader:
         specifier: ^6.2.0
         version: 6.7.3(webpack@5.88.2)
@@ -1120,9 +1126,6 @@ importers:
       karma-coverage:
         specifier: ^2.2.1
         version: 2.2.1
-      karma-es6-shim:
-        specifier: ^1.0.0
-        version: 1.0.0
       karma-junit-reporter:
         specifier: ^2.0.1
         version: 2.0.1(karma@6.4.2)
@@ -4778,6 +4781,12 @@ packages:
       '@types/node': 18.15.11
     dev: true
 
+  /@types/chai-subset-in-order@3.1.2:
+    resolution: {integrity: sha512-M7C9DJ7vdGugFkwQn3RkYKoHQ0gIE9PosgQDT0OINzKXn3fiAJOS2tiB8DwjSA8Cxoh2AriaujP6ETblsuBoag==}
+    dependencies:
+      '@types/chai': 4.3.4
+    dev: true
+
   /@types/chai@4.3.4:
     resolution: {integrity: sha512-KnRanxnpfpjUTqTCXslZSEdLfXExwgNxYPdiO2WGUj8+HDjFi8R3k5RVKPeSCzLjCcshCAtVO2QBbVuAV4kTnw==}
     dev: true
@@ -6238,6 +6247,11 @@ packages:
   /caniuse-lite@1.0.30001517:
     resolution: {integrity: sha512-Vdhm5S11DaFVLlyiKu4hiUTkpZu+y1KA/rZZqVQfOD5YdDT/eQKlkt7NaE0WGOFgX32diqt9MiP9CAiFeRklaA==}
 
+  /chai-subset-in-order@3.1.0:
+    resolution: {integrity: sha512-n730aKOfEoXRRgMgDplLCqI6zKNCq257Zafzey+0QLCCm9aAJqSP59zUJMGt1vEIzes2SNA9QA7BWRsBQLOJzA==}
+    engines: {node: '>=v14.16.0'}
+    dev: true
+
   /chai@4.3.7:
     resolution: {integrity: sha512-HLnAzZ2iupm25PlN0xFreAlBA5zaBSv3og0DdeGA4Ar6h6rJ3A0rolRUKJhSF2V10GZKDgWF/VmAEsNWjCRB+A==}
     engines: {node: '>=4'}
@@ -7400,15 +7414,6 @@ packages:
       is-callable: 1.2.7
       is-date-object: 1.0.5
       is-symbol: 1.0.4
-    dev: true
-
-  /es5-shim@4.5.15:
-    resolution: {integrity: sha512-FYpuxEjMeDvU4rulKqFdukQyZSTpzhg4ScQHrAosrlVpR6GFyaw14f74yn2+4BugniIS0Frpg7TvwZocU4ZMTw==}
-    engines: {node: '>=0.4.0'}
-    dev: true
-
-  /es6-shim@0.35.7:
-    resolution: {integrity: sha512-baZkUfTDSx7X69+NA8imbvGrsPfqH0MX7ADdIDjqwsI8lkTgLIiD2QWrUCSGsUQ0YMnSCA/4pNgSyXdnLHWf3A==}
     dev: true
 
   /esbuild@0.18.15:
@@ -9544,13 +9549,6 @@ packages:
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /karma-es6-shim@1.0.0:
-    resolution: {integrity: sha512-G2AiltA80A/MLgANB57m2LOPf4e0MiqiwbEm7NsuELpSQ4vvwcsGHlEYFhW7E86AUH56Rf5v3lo1ro+Sx1KjkQ==}
-    dependencies:
-      es5-shim: 4.5.15
-      es6-shim: 0.35.7
     dev: true
 
   /karma-junit-reporter@2.0.1(karma@6.4.2):
