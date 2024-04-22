@@ -29,9 +29,11 @@ if (filterArgs.length === 1) {
 }
 const hasFilterArgs = filterArgs?.length > 0;
 const useCoverage = !isDebug && !isWatch; // && !hasFilterArgs
+
 // 'source-map' is needed for adequate coverage data ('inline-source-map' is OK too)
-// 'inline-source-map' is needed for debugging tests (?)
+// 'inline-source-map' is needed for debugging tests
 // 'eval' only produces readable stacktraces (with correct source files, but incorrect lines)
+// NOTE: Last rule is obsolete after disabling `optimization`, can try 'inline-source-map' for all cases
 const devtool = useCoverage ? 'source-map' : isDebug ? 'inline-source-map' : 'eval';
 console.log('karma-webpack devtool: ' + devtool);
 console.log('karma-webpack output: ' + outputPath);
@@ -160,5 +162,11 @@ module.exports = {
       fs: false,
       util: false
     }
+  },
+  optimization: {
+    // Required for correct stacktraces
+    // https://github.com/codymikol/karma-webpack/issues/493#issuecomment-780411348
+    splitChunks: false,
+    runtimeChunk: false,
   },
 };

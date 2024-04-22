@@ -70,7 +70,7 @@ interface CheckExpects {
   expect_tree_validation_errors: (errs: string[]) => void;
 }
 interface CheckUtils {
-  startIdle: () => Promise<void>;
+  startIdle: (addToGlobal?: Record<string, unknown>) => Promise<void>;
   stopIdle: () => void;
   onChange: sinon.SinonSpy;
   onInit: sinon.SinonSpy;
@@ -271,9 +271,13 @@ const do_with_qb = async (
   let idleOptions: SleepOptions = {};
   let isIdle = false;
 
-  const startIdle = async () => {
+  const startIdle = async (addToGlobal?: Record<string, unknown>) => {
     if (isDebugPage) {
       console.log("Staring idle... Type `stopIdle()` to continue");
+      if (addToGlobal) {
+        Object.assign((window as any).dbg, addToGlobal);
+        Object.assign(window as any, addToGlobal);
+      }
       isIdle = true;
       const startIdleTime = new Date();
       while (isIdle) {
@@ -307,18 +311,14 @@ const do_with_qb = async (
 
     // expose to window
     const dbg: Record<string, unknown> = {
-      qb,
+      ...checkMeta,
       tree,
       errors,
-      config,
       extendedConfig,
       initialTree,
       initialJsonTree,
-      onInit,
-      onChange,
       Utils,
       ruleErrors,
-      stopIdle,
     };
     (window as any).dbg = dbg;
     if (isDebugPage) {
@@ -398,12 +398,12 @@ const do_with_qb = async (
         // Get console errors from `validateAndFixTree` or `checkTree`
         e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
       );
-      expect(errs?.length, "tree errors in console").eq(1);
-      const lines = errs![0].split("\n");
+      expect(errs?.length, "tree errors in console").eq(expectedLines.length ? 1 : 0);
+      const lines = errs?.[0]?.split("\n") || [];
       for (let i = 0 ; i < Math.max(expectedLines.length, lines.length) ; i++) {
         expect(lines[i], `line ${i}`).to.equal(expectedLines[i]);
       }
-      expect(errs![0]).to.equal(expectedLines.join("\n"));
+      expect(errs?.[0] ?? "").to.equal(expectedLines.join("\n"));
     },
   };
 

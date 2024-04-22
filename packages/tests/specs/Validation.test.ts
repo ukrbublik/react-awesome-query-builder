@@ -3,7 +3,10 @@ const { isValidTree, validateTree, sanitizeTree, checkTree, getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import { with_qb, expect_objects_equal } from "../support/utils";
-import { expect } from "chai";
+import chai from "chai";
+import chaiSubsetInOrder from "chai-subset-in-order";
+const { expect } = chai;
+chai.use(chaiSubsetInOrder);
 
 const {
   with_all_types,
@@ -68,55 +71,124 @@ describe("sanitizeTree", () => {
     await with_qb(
       [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.tree_with_empty_groups_and_incomplete_rules, "default",
       async (qb, {expect_jlogic, expect_tree_validation_errors, config, startIdle, onInit}) => {
-
-
+        // initial tree should NTO be sanitized
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const initialJsonTree = getTree(initialTree);
         expect(initialJsonTree.children1?.length).to.eq(6);
 
-
+        // only 1 error is visible
         const ruleError = qb.find(".rule--error");
         expect(ruleError).to.have.length(1);
         expect(ruleError.first().text()).to.eq("Value 100 should be from 0 to 10");
 
-
+        // sanitizeTree
         const { fixedTree, fixedErrors, nonFixedErrors } = sanitizeTree(initialTree, config);
-        //expect(fixedErrors).to.have.length(0);
-        //expect(nonFixedErrors).to.have.length(0);
 
+        // empty groups and incomplete rules should be removed
+        expect(fixedErrors).to.have.length(6);
+        expect(fixedErrors, "fixedErrors").to.containSubsetInOrder([{
+          itemPositionStr: "Deleted group #1 (index path: 1)",
+          errors: [{
+            key: "EMPTY_GROUP",
+            str: "Empty group"
+          }],
+        }, {
+          itemPositionStr: "Deleted leaf #1 (index path: 1,1)",
+          itemStr: "Number BETWEEN ? AND ?",
+          errors: [{
+            key: "INCOMPLETE_RHS",
+            side: "rhs",
+            str: "Incomplete RHS"
+          }],
+        }, {
+          itemPositionStr: "Deleted group #2 (index path: 3)",
+          errors: [{
+            key: "EMPTY_GROUP",
+            str: "Empty group"
+          }],
+        }, {
+          itemPositionStr: "Deleted leaf #3 (index path: 3,1)",
+          itemStr: "?",
+          errors: [{
+            key: "INCOMPLETE_LHS",
+            side: "lhs",
+            str: "Incomplete LHS"
+          }],
+        }, {
+          itemPositionStr: "Deleted leaf #4 (index path: 4)",
+          itemStr: "Number > ?",
+          errors: [{
+            key: "INCOMPLETE_RHS",
+            side: "rhs",
+            str: "Incomplete RHS"
+          }],
+        }, {
+          itemPositionStr: "Deleted group #3 (index path: 6)",
+          errors: [{
+            key: "EMPTY_GROUP",
+            str: "Empty group"
+          }],
+        }]);
 
-        await startIdle();
-
-
-
+        // 1 error can't be fixed
+        expect(nonFixedErrors).to.have.length(1);
+        expect(nonFixedErrors, "nonFixedErrors").to.containSubsetInOrder([{
+          itemStr: "Number < 100",
+          itemPositionStr: "Leaf #2 (index path: 2)",
+          errors: [{
+            key: "VALUE_MAX_CONSTRAINT_FAIL",
+            side: "rhs",
+            str: "Value 100 should be from 0 to 10",
+            delta: 0,
+            fixedFrom: undefined,
+            fixedTo: undefined,
+            args: {
+              value: 100,
+              fieldSettings: { min: 0, max: 10 }
+            }
+          }]
+        }]);
 
         await qb.setProps({
           value: fixedTree,
           ...config
         });
 
-
+        // still 1 error is visible
         const ruleError2 = qb.find(".rule--error");
         expect(ruleError2).to.have.length(1);
         expect(ruleError2.first().text()).to.eq("Value 100 should be from 0 to 10");
         const isValid2 = isValidTree(fixedTree, config);
         expect(isValid2).to.eq(false);
 
+        // only 2 rules left
         const fixedJsonTree = getTree(fixedTree);
         expect(fixedJsonTree.children1?.length).to.eq(2);
-        // expect_tree_validation_errors([
-        //   "Tree check errors: ",
-        //   "Deleted group #1 (index path: 1)  >>  * Empty group",
-        //   "Number BETWEEN ? AND ?  >>  * [rhs] Incomplete RHS",
-        //   "Deleted group #2 (index path: 3)  >>  * Empty group",
-        //   "?  >>  * [lhs] Incomplete LHS",
-        //   "Number > ?  >>  * [rhs] Incomplete RHS",
-        //   "Number < 100  >>  [rhs 0] Value 100 should be from 0 to 10",
-        //   "Deleted group #3 (index path: 6)  >>  * Empty group"
-        // ]);
+        expect(fixedJsonTree, "fixedJsonTree").to.containSubsetInOrder({
+          children1: [{
+            type: "rule",
+            properties: {
+              field: "num",
+              fieldError: undefined,
+              operator: "is_null",
+              value: [],
+              valueError: [],
+            }
+          }, {
+            type: "rule",
+            properties: {
+              field: "num",
+              fieldError: undefined,
+              operator: "less",
+              value: [100],
+              valueError: ["Value 100 should be from 0 to 10"]
+            }
+          }]
+        });
+
+        expect_tree_validation_errors([]);
       },
       {
-        debug: true,
         expectedLoadErrors: [
           "Number BETWEEN ? AND ?  >>  [rhs] Incomplete RHS",
           "?  >>  [lhs] Incomplete LHS",
@@ -179,6 +251,7 @@ describe("sanitizeTree", () => {
         expect(fixedErrors[0].errors[0].str).to.eq("Value 200 should be from 0 to 10");
         expect(fixedErrors[0].errors[0].fixed).to.eq(true);
         expect(nonFixedErrors).to.have.length(0);
+        expect(Utils.spelFormat(fixedTree, config)).to.eq("num == 10");
 
         await qb.setProps({
           value: fixedTree

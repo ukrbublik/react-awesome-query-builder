@@ -28,7 +28,7 @@ if (isCI) {
 } else if (useCoverage) {
   reporters = ["progress", "coverage"];
 } else {
-  reporters = ["progress"];
+  reporters = ["mocha"];
 }
 
 module.exports = function(config) {
@@ -37,7 +37,6 @@ module.exports = function(config) {
     plugins: [
       "karma-mocha",
       "karma-chai",
-      //"karma-es6-shim",
       "karma-chrome-launcher",
       "karma-sourcemap-loader",
       "karma-webpack",
@@ -64,6 +63,10 @@ module.exports = function(config) {
     },
 
     reporters,
+
+    mochaReporter: {
+      showDiff: true
+    },
 
     junitReporter: {
       outputDir: "junit",
