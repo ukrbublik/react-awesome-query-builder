@@ -4,12 +4,18 @@ import { export_checks, with_qb } from "../support/utils";
 import chai from "chai";
 import { ReactWrapper } from "enzyme";
 const { expect } = chai;
+const {
+  with_all_types,
+  with_fieldSources,
+  with_funcs,
+  with_keepInputOnChangeFieldSrc,
+} = configs;
 // warning: don't put `export_checks` inside `it`
 
 describe("LHS func", () => {
   describe("load forom SpEL", () => {
     describe(".toLowerCase().startsWith()", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_toLowerCase, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_toLowerCase, "SpEL", {
         "query": "LOWER(str) Starts with \"aaa\"",
         "queryHuman": "Lowercase(String: String) Starts with aaa",
         "sql": "LOWER(str) LIKE 'aaa%'",
@@ -29,7 +35,7 @@ describe("LHS func", () => {
     });
 
     describe(".toLowerCase().toUpperCase()", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_toLowerCase_toUpperCase, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_toLowerCase_toUpperCase, "SpEL", {
         "sql": "UPPER(LOWER(str)) = UPPER(str)",
         "spel": "str.toLowerCase().toUpperCase() == str.toUpperCase()",
         "mongo": {
@@ -72,15 +78,15 @@ describe("LHS func", () => {
     });
 
     // describe("new Date()", () => {
-    //   export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_new_Date, "SpEL");
+    //   export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_new_Date, "SpEL");
     // });
 
     // describe("new SimpleDateFormat().parse()", () => {
-    //   export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_SimpleDateFormat, "SpEL");
+    //   export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_SimpleDateFormat, "SpEL");
     // });
 
     describe("T(LocalTime).parse()", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_LocalTime, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_LocalTime, "SpEL", {
         "spel": "time.compareTo(T(java.time.LocalTime).parse('02:03:00')) == 0",
         "logic": {
           "and": [
@@ -96,7 +102,7 @@ describe("LHS func", () => {
     });
 
     describe("new String().toUpperCase()", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_new_String, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_new_String, "SpEL", {
         "sql": "str = UPPER('hello world')",
         "spel": "str == 'hello world'.toUpperCase()",
         "logic": {
@@ -117,7 +123,7 @@ describe("LHS func", () => {
     });
 
     describe(".compareTo() + T(LocalDateTime).now().plusDays()", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_compareTo, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_compareTo, "SpEL", {
         "sql": "datetime < DATE_ADD(NOW(), INTERVAL 6 day)",
         "spel": "datetime.compareTo(T(java.time.LocalDateTime).now().plusDays(6)) < 0",
         "logic": {
@@ -140,7 +146,7 @@ describe("LHS func", () => {
     });
 
     describe(".compareTo() + T(LocalDateTime).parse(v, T(DateTimeFormatter).ofPattern(p))", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_compareTo_parse, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_compareTo_parse, "SpEL", {
         "sql": "datetime = '2005-11-12 11:11:12.000'",
         "spel": "datetime.compareTo(T(java.time.LocalDateTime).parse('2005-11-12 11:11:12', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss'))) == 0",
         "logic": {
@@ -157,7 +163,7 @@ describe("LHS func", () => {
     });
 
     describe(".compareTo() + T(LocalDateTime).parse(v, T(DateTimeFormatter).ofPattern(p)).plusDays()", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_compareTo_parse_plusDays, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_compareTo_parse_plusDays, "SpEL", {
         "sql": "datetime > DATE_ADD('2023-01-01 00:00:00', INTERVAL 7 day)",
         "spel": "datetime.compareTo(T(java.time.LocalDateTime).parse('2023-01-01 00:00:00', T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd HH:mm:ss')).plusDays(7)) > 0",
         "logic": {
@@ -182,7 +188,7 @@ describe("LHS func", () => {
 
   describe("defaultValue, isOptional", () => {
     describe("fills defaultValue when loading from SpeL", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.spel_with_lhs_toLowerCase2, "SpEL", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.spel_with_lhs_toLowerCase2, "SpEL", {
         "spel": "str.toLowerCase2(11) == 'aaa'",
         "query": "LOWER2(str, 11) == \"aaa\"",
         "queryHuman": "Lowercase2(String: String, def: 11) = aaa",
@@ -219,7 +225,7 @@ describe("LHS func", () => {
     });
 
     describe("uses defaultValue on export", () => {
-      export_checks([configs.with_fieldSources, configs.with_funcs], inits.tree_with_lhs_toLowerCase2, "default", {
+      export_checks([with_fieldSources, with_all_types, with_funcs], inits.tree_with_lhs_toLowerCase2, "default", {
         "spel": "str.toLowerCase2(11) == 'aaa'",
         "query": "LOWER2(str, 11) == \"aaa\"",
         "queryHuman": "Lowercase2(String: String, def: 11) = aaa",
@@ -313,7 +319,7 @@ describe("LHS func", () => {
 
     it("change field source to func, and vice versa", async () => {
       await with_qb([
-        configs.with_fieldSources, configs.with_funcs, configs.with_keepInputOnChangeFieldSrc
+        with_fieldSources, with_all_types, with_funcs, with_keepInputOnChangeFieldSrc
       ], inits.with_text, "JsonLogic", (qb, {expect_jlogic}) => {
         // select src = func
         selectFieldSrc(qb, "func");

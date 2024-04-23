@@ -609,8 +609,26 @@ export const with_all_types = (BasicConfig) => ({
         max: 10,
       },
     },
+    negativeNum: {
+      label: "Number negative",
+      type: "number",
+      preferWidgets: ["number"],
+      fieldSettings: {
+        min: -999,
+        max: -1,
+      },
+    },
+    numField: {
+      label: "Number field",
+      type: "number",
+      valueSources: ["field"],
+    },
     str: {
       label: "String",
+      type: "text",
+    },
+    str2: {
+      label: "String2",
       type: "text",
     },
     text: {
@@ -736,6 +754,14 @@ export const with_show_error = (BasicConfig) => ({
   }
 });
 
+export const with_dont_show_error = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    showErrorMessage: false,
+  }
+});
+
 export const with_dont_fix_on_load = (BasicConfig) => ({
   ...BasicConfig,
   settings: {
@@ -813,37 +839,12 @@ export const with_funcs = (BasicConfig) => ({
       },
     },
   },
-  fields: {
-    num: {
-      label: "Number",
-      type: "number",
-    },
-    date: {
-      label: "Date",
-      type: "date",
-    },
-    datetime: {
-      label: "Datetime",
-      type: "datetime",
-    },
-    time: {
-      label: "Time",
-      type: "time",
-    },
-    str: {
-      label: "String",
-      type: "text",
-    },
-    str2: {
-      label: "String2",
-      type: "text",
-    },
-  }
 });
 
 export const with_struct = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
+    ...(BasicConfig.fields ?? {}),
     user: {
       label: "User",
       tooltip: "Group of fields",

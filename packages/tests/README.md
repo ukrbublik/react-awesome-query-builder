@@ -1,6 +1,6 @@
 # @react-awesome-query-builder/tests
 
-Karma tests.
+Karma + Mocha + Chai tests.
 
 
 ### Run all tests
@@ -58,7 +58,7 @@ const specFilter = [
 pnpm test-debug
 ```
 
-This will run Karma in watch mode and start the Chromium browser with opened devtools (don't close them).  
+This will run Karma in watch mode and start the Chromium browser with opened devtools (don't close it).  
 
 To debug a test, add `debug: true` in options of `with_qb()` (last arg), see [test example](#test-example). 
 Then write `debugger;` somewhere in your test code to pause test and debug in Chrome DevTools or VSCode.  
@@ -85,14 +85,14 @@ Here is a useful setup for writing new tests.
 - Run Karma tests in debug mode (with [terminal](#debug) or [VSCode](#debug-with-vscode))
 - Click `DEBUG` in top-right corner of window, this will open new `Karma DEBUG RUNNER` page (`http://localhost:9876/debug.html`) in another tab
 - Close original Karma tab (`http://localhost:9876/`)
-- In your test code use `await startIdle();` to pause test execution. It's like `debugger;` but better for writing tests. You can inspect and interact with web page, use browser console etc.
-- Type `stopIdle()` in browser console to continue test execution.
+- In your test code use `await pauseTest();` to pause test execution. It's like `debugger;` but better for writing tests. You can inspect and interact with web page, use browser console etc.
+- Type `continueTest()` in browser console to continue test execution.
 
 If you update test code, Karma won't reload the `DEBUG RUNNER` page automatically. It's fine. Just reload the page (`F5`) manually. You should see one of these messages in terminal when tests are recompiled after your chnages and ready to be executed:
 - `WARN [karma]: Delaying execution, these browsers are not ready: Chrome xxx`
 - `WARN [karma]: No captured browser, open http://localhost:9877/`.
 
-Why `await startIdle();` is better that `debugger;` for writing tests?  
+Why `await pauseTest();` is better that `debugger;` for writing tests?  
 You can interact with UI!
 You can just type something like this in browser console and see/debug results:
 ```js
@@ -104,7 +104,7 @@ qb.setProps({value: null});
 You can write your test code completely in the browser console, then copy it to your test file.  
 You can also use `debugger;`
 
-Note that `await startIdle();` works ONLY on Karma debug page.  
+Note that `await pauseTest();` works ONLY on Karma debug page.  
 
 
 ### Known issues in debug mode
@@ -138,10 +138,10 @@ describe("my first tests", () => {
       inits.with_number,
       null,
       async (qb, {
-        config, onInit, onChange, startIdle, 
+        config, onInit, onChange, pauseTest, 
         expect_jlogic,
       }) => {
-        await startIdle(); // pause execution to debug initial state
+        await pauseTest(); // pause execution to debug initial state
 
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const initialSpel = Utils.spelFormat(initialTree, config);
@@ -154,7 +154,7 @@ describe("my first tests", () => {
           { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
         ]);
 
-        await startIdle(); // pause execution to debug changed state
+        await pauseTest(); // pause execution to debug changed state
 
         const changedTree = onChange.lastCall.args[0];
         const changedSpel = Utils.spelFormat(changedTree, config);

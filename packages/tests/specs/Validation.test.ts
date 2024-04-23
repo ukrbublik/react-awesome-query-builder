@@ -11,8 +11,326 @@ chai.use(chaiSubsetInOrder);
 const {
   with_all_types,
   with_show_error,
+  with_dont_show_error,
   with_dont_fix_on_load,
 } = configs;
+
+
+describe("validation in store on change", () => {
+  describe("with showErrorMessage=false", () => {
+    it("should fix number value to max when change to > max", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_number, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          qb
+            .find(".rule .rule--value .widget--widget input")
+            .simulate("change", { target: { value: "200" } });
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 2 ] }] },
+            { "and": [{ "==": [ { "var": "num" }, 10 ] }] }
+          ]);
+        }, {
+        }
+      );
+    });
+
+    it("should fix number values to [max, max] when change op to between and initial value == max", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          qb
+            .find(".rule .rule--operator select")
+            .simulate("change", { target: { value: "between" } });
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 10 ] }] },
+            { "and": [{ "<=": [ 10, { "var": "num" }, 10 ] }] }
+          ]);
+        }, {
+          expectedLoadErrors: [
+            "Number = 200  >>  * [rhs 0] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should fix number value to max when change op from between to equal and initial values == max", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_range_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql([]);
+
+          qb
+            .find(".rule .rule--operator select")
+            .simulate("change", { target: { value: "equal" } });
+          expect_jlogic([
+            { "and": [{ "<=": [ 10, { "var": "num" }, 10 ] }] },
+            { "and": [{ "==": [ { "var": "num" }, 10 ] }] }
+          ]);
+          const ruleErrors2 = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors2).to.eql([]);
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 100 AND 200  >>  * [rhs 0] Value 100 should be from 0 to 10. * [rhs 1] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should change value to max when change field to another with max < current", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_number, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          qb
+            .find(".rule .rule--field select")
+            .simulate("change", { target: { value: "negativeNum" } });
+
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 2 ] }] },
+            { "and": [{ "==": [ { "var": "negativeNum" }, -1 ] }] },
+          ]);
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+        }, {
+        }
+      );
+    });
+  });
+
+  describe("with showErrorMessage=true", () => {
+    it("shows error when change number value to > max", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_number, "JsonLogic",
+        async (qb, {expect_jlogic, config, onChange}) => {
+          qb
+            .find(".rule .rule--value .widget--widget input")
+            .simulate("change", { target: { value: "200" } });
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 2 ] }] },
+            { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
+          ]);
+
+          const changedTree = onChange.getCall(0).args[0];
+          const isValid = isValidTree(changedTree, config);
+          expect(isValid).to.eq(false);
+          
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
+        }, {
+        }
+      );
+    });
+
+    it("should fix number values to [max, max] when change op to between and initial value > max", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic, config, onChange}) => {
+          qb
+            .find(".rule .rule--operator select")
+            .simulate("change", { target: { value: "between" } });
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 200 ] }] },
+            { "and": [{ "<=": [ 10, { "var": "num" }, 10 ] }] }
+          ]);
+
+          const changedTree = onChange.getCall(0).args[0];
+          const isValid = isValidTree(changedTree, config);
+          expect(isValid).to.eq(true);
+
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+        }, {
+          expectedLoadErrors: [
+            "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should fix number value to max when change op from between to equal and initial values > max", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_range_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql(["Value 100 should be from 0 to 10"]);
+
+          qb
+            .find(".rule .rule--operator select")
+            .simulate("change", { target: { value: "equal" } });
+          expect_jlogic([
+            { "and": [{ "<=": [ 100, { "var": "num" }, 200 ] }] },
+            { "and": [{ "==": [ { "var": "num" }, 10 ] }] }
+          ]);
+          const ruleErrors2 = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors2).to.eql([]);
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 100 AND 200  >>  [rhs 0] Value 100 should be from 0 to 10. [rhs 1] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should fix from [4, 3] to 4 when change op from between to equal", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_bad_range, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql(["Invalid range"]);
+
+          qb
+            .find(".rule .rule--operator select")
+            .simulate("change", { target: { value: "equal" } });
+          expect_jlogic([
+            { "and": [{ "<=": [ 4, { "var": "num" }, 3 ] }] },
+            { "and": [{ "==": [ { "var": "num" }, 4 ] }] }
+          ]);
+          const ruleErrors2 = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors2).to.eql([]);
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 4 AND 3  >>  [rhs -1] Invalid range"
+          ],
+        }
+      );
+    });
+
+    it("should fix from [400, 300] to max when change op from between to equal", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_bad_range_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql(["Value 400 should be from 0 to 10"]);
+
+          qb
+            .find(".rule .rule--operator select")
+            .simulate("change", { target: { value: "equal" } });
+          expect_jlogic([
+            { "and": [{ "<=": [ 400, { "var": "num" }, 300 ] }] },
+            { "and": [{ "==": [ { "var": "num" }, 10 ] }] }
+          ]);
+          const ruleErrors2 = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors2).to.eql([]);
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 400 AND 300  >>  [rhs 0] Value 400 should be from 0 to 10. [rhs 1] Value 300 should be from 0 to 10. [rhs -1] Invalid range"
+          ],
+        }
+      );
+    });
+
+    it("should discard value when change field to another with valueSources=[field]", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic, onChange}) => {
+          qb
+            .find(".rule .rule--field select")
+            .simulate("change", { target: { value: "numField" } });
+
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 200 ] }] },
+            undefined
+          ]);
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+
+          const changedTree = onChange.getCall(0).args[0];
+          const changedJsonTree = Utils.getTree(changedTree);
+          expect(changedJsonTree, "changedJsonTree").to.containSubsetInOrder({
+            children1: [{
+              properties: {
+                field: "numField",
+                operator: "equal",
+                value: [null],
+                valueError: [null],
+                valueSrc: ["field"],
+                valueType: ["number"],
+              }
+            }]
+          });
+        }, {
+          expectedLoadErrors: [
+            "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should not discard value when change field to another with max < current", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_number, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          qb
+            .find(".rule .rule--field select")
+            .simulate("change", { target: { value: "negativeNum" } });
+
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 2 ] }] },
+            { "and": [{ "==": [ { "var": "negativeNum" }, 2 ] }] },
+          ]);
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Value 2 should be from -999 to -1");
+        }, {
+        }
+      );
+    });
+  });
+});
+
+describe("validateAndFix (internal, on load)", () => {
+  describe("with showErrorMessage=false", () => {
+    it("should fix number value to max", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          expect_jlogic([
+            { "and": [{ "==": [ { "var": "num" }, 10 ] }] }
+          ]);
+        }, {
+          expectedLoadErrors: [
+            "Number = 200  >>  * [rhs 0] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should fix bad range from [4, 3] to [4, 4]", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_bad_range, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql([]);
+          expect_jlogic([
+            { "and": [{ "<=": [ 4, { "var": "num" }, 4 ] }] }
+          ]);
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 4 AND 3  >>  * [rhs -1] Invalid range"
+          ],
+        }
+      );
+    });
+
+    it("should fix bad range from [400, 300] to [max, max]", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_bad_range_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql([]);
+          expect_jlogic([
+            { "and": [{ "<=": [ 10, { "var": "num" }, 10 ] }] }
+          ]);
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 400 AND 300  >>  * [rhs 0] Value 400 should be from 0 to 10. * [rhs 1] Value 300 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+  });
+});
 
 describe("validateTree", () => {
   it("shows error when change number value to > max", async () => {
@@ -25,10 +343,11 @@ describe("validateTree", () => {
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "num" }, 200 ] }] }
       ]);
+
       const changedTree = onChange.getCall(0).args[0];
       const isValid = isValidTree(changedTree, config);
       expect(isValid).to.eq(false);
-      
+
       const ruleError = qb.find(".rule--error");
       expect(ruleError).to.have.length(1);
       expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
@@ -67,11 +386,11 @@ describe("validateTree", () => {
 });
 
 describe("sanitizeTree", () => {
-  it("should remove empty group", async () => {
+  it("should remove empty groups and incomplete rules", async () => {
     await with_qb(
       [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.tree_with_empty_groups_and_incomplete_rules, "default",
-      async (qb, {expect_jlogic, expect_tree_validation_errors, config, startIdle, onInit}) => {
-        // initial tree should NTO be sanitized
+      async (qb, {expect_tree_validation_errors_in_console, config, onInit}) => {
+        // initial tree should NOT be sanitized
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const initialJsonTree = getTree(initialTree);
         expect(initialJsonTree.children1?.length).to.eq(6);
@@ -186,7 +505,7 @@ describe("sanitizeTree", () => {
           }]
         });
 
-        expect_tree_validation_errors([]);
+        expect_tree_validation_errors_in_console([]);
       },
       {
         expectedLoadErrors: [
@@ -204,9 +523,8 @@ describe("sanitizeTree", () => {
       }
     );
   });
-  
 
-  it("can't fix value > max with showErrorMessage: true and forceFix: false", async () => {
+  it("can't fix value > max with showErrorMessage=true and forceFix=false", async () => {
     await with_qb(
       [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
       async (qb, {expect_jlogic, config, onInit}) => {
@@ -232,7 +550,7 @@ describe("sanitizeTree", () => {
     );
   });
 
-  it("can fix value > max with forceFix: true", async () => {
+  it("can fix value > max with forceFix=true", async () => {
     await with_qb(
       [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
       async (qb, {expect_jlogic, config, onInit}) => {
@@ -270,11 +588,11 @@ describe("sanitizeTree", () => {
   });
 });
 
-describe("deprecated checkTree", () => {
+describe("checkTree (deprecated)", () => {
   it("can't fix value > max but can remove empty groups and incomplete rules", async () => {
     await with_qb(
       [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.tree_with_empty_groups_and_incomplete_rules, "default",
-      async (qb, {expect_jlogic, expect_tree_validation_errors, config, onInit}) => {
+      async (qb, {expect_jlogic, expect_tree_validation_errors_in_console, config, onInit}) => {
         const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
         const initialJsonTree = getTree(initialTree);
         expect(initialJsonTree.children1?.length).to.eq(6);
@@ -296,6 +614,7 @@ describe("deprecated checkTree", () => {
           value: fixedTree,
           ...config
         });
+
         const ruleError2 = qb.find(".rule--error");
         expect(ruleError2).to.have.length(1);
         expect(ruleError2.first().text()).to.eq("Value 100 should be from 0 to 10");
@@ -305,7 +624,7 @@ describe("deprecated checkTree", () => {
 
         const fixedJsonTree = getTree(fixedTree);
         expect(fixedJsonTree.children1?.length).to.eq(2);
-        expect_tree_validation_errors([
+        expect_tree_validation_errors_in_console([
           "Tree check errors: ",
           "Deleted group #1 (index path: 1)  >>  * Empty group",
           "Number BETWEEN ? AND ?  >>  * [rhs] Incomplete RHS",
@@ -336,5 +655,3 @@ describe("deprecated checkTree", () => {
     );
   });
 });
-
-//todo: same for validateAndFix tree

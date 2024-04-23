@@ -111,6 +111,36 @@ export const with_number_bigger_than_max = {
   }]
 };
 
+export const with_range_bigger_than_max = {
+  "and": [{
+    "<=": [
+      100,
+      { "var": "num" },
+      200
+    ]
+  }]
+};
+
+export const with_bad_range = {
+  "and": [{
+    "<=": [
+      4,
+      { "var": "num" },
+      3
+    ]
+  }]
+};
+
+export const with_bad_range_bigger_than_max = {
+  "and": [{
+    "<=": [
+      400,
+      { "var": "num" },
+      300
+    ]
+  }]
+};
+
 export const with_range_slider = {
   "and": [{
     "<=": [

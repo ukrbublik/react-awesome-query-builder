@@ -67,11 +67,11 @@ interface CheckExpects {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
   expect_queries: (queries: Array<string>) => void;
   expect_checks: (expects: ExtectedExports) => void;
-  expect_tree_validation_errors: (errs: string[]) => void;
+  expect_tree_validation_errors_in_console: (errs: string[]) => void;
 }
 interface CheckUtils {
-  startIdle: (addToGlobal?: Record<string, unknown>) => Promise<void>;
-  stopIdle: () => void;
+  pauseTest: (addToGlobal?: Record<string, unknown>) => Promise<void>;
+  continueTest: () => void;
   onChange: sinon.SinonSpy;
   onInit: sinon.SinonSpy;
   consoleData: ConsoleData;
@@ -256,6 +256,8 @@ const do_with_qb = async (
         console.error(errText);
       }
     }
+  } else {
+    expect(options?.expectedLoadErrors?.length ?? 0, "expectedLoadErrors count").equal(0);
   }
 
   let qb: ReactWrapper;
@@ -271,9 +273,12 @@ const do_with_qb = async (
   let idleOptions: SleepOptions = {};
   let isIdle = false;
 
-  const startIdle = async (addToGlobal?: Record<string, unknown>) => {
+  const pauseTest = async (addToGlobal?: Record<string, unknown>) => {
+    exposeDebugVars();
+    printDebug();
+
     if (isDebugPage) {
-      console.log("Staring idle... Type `stopIdle()` to continue");
+      console.log("Pausing test... Type `continueTest()` to continue");
       if (addToGlobal) {
         Object.assign((window as any).dbg, addToGlobal);
         Object.assign(window as any, addToGlobal);
@@ -294,7 +299,7 @@ const do_with_qb = async (
     }
   };
 
-  const stopIdle = () => {
+  const continueTest = () => {
     if (isIdle) {
       isIdle = false;
       if (idleOptions?.wakeUp) {
@@ -303,13 +308,12 @@ const do_with_qb = async (
     }
   };
 
-  const printDebug = () => {
+  const exposeDebugVars = () => {
     const qbDom = qb.first().getDOMNode();
     const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
     const initialJsonTree = getTree(initialTree);
     const ruleErrors = qb.find(".rule--error").map(e => e.text());
 
-    // expose to window
     const dbg: Record<string, unknown> = {
       ...checkMeta,
       tree,
@@ -319,14 +323,21 @@ const do_with_qb = async (
       initialJsonTree,
       Utils,
       ruleErrors,
+      qbDom,
+      expect,
     };
+
+    // expose to window
     (window as any).dbg = dbg;
     if (isDebugPage) {
       for (const k in dbg) {
         (window as any)[k] = dbg[k];
       }
     }
+  };
 
+  const printDebug = () => {
+    const qbDom = qb.first().getDOMNode();
     console.dirxml( qbDom );
   };
 
@@ -373,8 +384,8 @@ const do_with_qb = async (
     config,
 
     // utils
-    startIdle,
-    stopIdle,
+    pauseTest,
+    continueTest,
     onInit,
     onChange,
     consoleData,
@@ -393,7 +404,7 @@ const do_with_qb = async (
         insideIt: true,
       });
     },
-    expect_tree_validation_errors: (expectedLines) => {
+    expect_tree_validation_errors_in_console: (expectedLines) => {
       const errs = consoleData.warn?.filter(
         // Get console errors from `validateAndFixTree` or `checkTree`
         e => e.startsWith("Tree check errors:") || e.startsWith("Fixed tree errors:")
@@ -408,7 +419,7 @@ const do_with_qb = async (
   };
 
   if (options?.debug) {
-    printDebug();
+    exposeDebugVars();
   }
 
   // @ts-ignore
@@ -610,7 +621,9 @@ export const export_checks = (
 };
 
 export const export_checks_in_it = (config_fn: ConfigFn, value: TreeValue, valueFormat: TreeValueFormat, expects: ExtectedExports, options?: DoOptions) => {
-  const config = config_fn(BasicConfig);
+  const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
+  const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+
   const {tree, errors} = load_tree(value, config, valueFormat);
   if (errors?.length) {
     throw new Error(errors.join("; "));
@@ -640,20 +653,17 @@ const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onC
   if (jlogics[0] !== null) {
     expect_objects_equal(initTreeJl, jlogics[0]);
   }
-  
-  const call = onChange.getCall(changeIndex);
-  if (!call) throw new Error("onChange was not called");
-  const {logic: changedTreeJl} = jsonLogicFormat(call.args[0] as ImmutableTree, config);
-  expect_objects_equal(changedTreeJl, jlogics[1]);
+  if (jlogics.length > 1 && jlogics[1] !== null) {
+    const call = onChange.getCall(changeIndex);
+    if (!call) throw new Error("onChange was not called");
+    const {logic: changedTreeJl} = jsonLogicFormat(call.args[0] as ImmutableTree, config);
+    expect_objects_equal(changedTreeJl, jlogics[1]);
+  }
 };
 
 export const expect_objects_equal = (act: any, exp: any, actLabel?: string, expLabel?: string) => {
   const expStr = JSON.stringify(exp);
   const actStr = JSON.stringify(act);
-  if (expStr !== actStr) {
-    console.log(`${actLabel ?? "Actual"}: ${actStr}`);
-    console.log(`${expLabel ?? "Expected"}: ${expStr}`);
-  }
   expect(actStr).to.equal(expStr);
 };
 

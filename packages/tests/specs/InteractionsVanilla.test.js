@@ -14,6 +14,7 @@ const {
   with_dont_leave_empty_group,
   with_default_field_and_operator,
   with_default_func_field,
+  with_all_types,
   with_funcs,
   with_group_array_cars,
   with_group_array_custom_operator,
@@ -96,7 +97,7 @@ describe("interactions on vanilla", () => {
   });
 
   it("click on add rule will add default rule with func at LHS if defaultField is present", async () => {
-    await with_qb([simple_with_numbers_and_str, with_default_func_field, with_funcs], inits.empty, "JsonLogic", (qb, {onChange}) => {
+    await with_qb([simple_with_numbers_and_str, with_default_func_field, with_all_types, with_funcs], inits.empty, "JsonLogic", (qb, {onChange}) => {
       qb
         .find(".group--actions button")
         .first()
