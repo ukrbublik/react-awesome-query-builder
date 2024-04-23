@@ -15,6 +15,12 @@ const {
   with_dont_fix_on_load,
 } = configs;
 
+before(() => {
+  // Add translations
+  Utils.i18n.addResources("en", "custom", {
+    "NOT_EVEN": "Number should be even but got {{val}}"
+  });
+});
 
 describe("validation in store on change", () => {
   describe("with showErrorMessage=false", () => {
@@ -276,6 +282,29 @@ describe("validation in store on change", () => {
         }
       );
     });
+
+    it("should not discard range value when change field to another with max < current", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_range_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          qb
+            .find(".rule .rule--field select")
+            .simulate("change", { target: { value: "negativeNum" } });
+
+          expect_jlogic([
+            { "and": [{ "<=": [ 100, { "var": "num" }, 200 ] }] },
+            { "and": [{ "<=": [ 100, { "var": "negativeNum" }, 200 ] }] },
+          ]);
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Value 100 should be from -999 to -1");
+        }, {
+          expectedLoadErrors: [
+            "Number BETWEEN 100 AND 200  >>  [rhs 0] Value 100 should be from 0 to 10. [rhs 1] Value 200 should be from 0 to 10"
+          ],
+        }
+      );
+    });
   });
 });
 
@@ -325,6 +354,27 @@ describe("validateAndFix (internal, on load)", () => {
         }, {
           expectedLoadErrors: [
             "Number BETWEEN 400 AND 300  >>  * [rhs 0] Value 400 should be from 0 to 10. * [rhs 1] Value 300 should be from 0 to 10"
+          ],
+        }
+      );
+    });
+
+    it("should fix bad date range", async () => {
+      await with_qb(
+        [ with_all_types, with_dont_show_error ], inits.with_bad_date_range, "JsonLogic",
+        async (qb, {expect_jlogic}) => {
+          const ruleErrors = qb.find(".rule--error").map(e => e.text());
+          expect(ruleErrors).to.eql([]);
+          expect_jlogic([
+            { "and": [{ "<=": [
+              "2020-05-15T00:00:00.000Z",
+              { "var": "date" },
+              "2020-05-15T00:00:00.000Z"
+            ] }] }
+          ]);
+        }, {
+          expectedLoadErrors: [
+            "Date BETWEEN 15.05.2020 AND 10.05.2020  >>  * [rhs -1] Invalid range"
           ],
         }
       );
@@ -381,6 +431,79 @@ describe("validateTree", () => {
         fixed: false,
         str: "Value 200 should be from 0 to 10",
       });
+    });
+  });
+
+  it("does not call validateValue if max constraint fails", async () => {
+    await with_qb([
+      with_all_types, with_show_error,
+    ], inits.with_uneven_number_bigger_than_max, "JsonLogic", 
+    async (qb, {config, onInit}) => {
+      const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+      const validationErrors = Utils.validateTree(initialTree, config);
+      expect(validationErrors).to.containSubsetInOrder([{
+        itemPositionStr: "Leaf #1 (index path: 1)",
+        itemStr: "Number even = 13",
+        errors: [{
+          key: "VALUE_MAX_CONSTRAINT_FAIL",
+          side: "rhs",
+          str: "Value 13 should be from 0 to 11",
+          args: {
+            value: 13,
+            fieldSettings: {
+              min: 0,
+              max: 11,
+            }
+          },
+          delta: 0,
+          fixed: false,
+        }],
+      }]);
+    }, {
+      expectedLoadErrors: [
+        "Number even = 13  >>  [rhs 0] Value 13 should be from 0 to 11"
+      ],
+    });
+  });
+
+  it("calls validateValue if exists", async () => {
+    await with_qb([
+      with_all_types, with_show_error,
+    ], inits.with_uneven_number, "JsonLogic", 
+    async (qb, {config, onInit}) => {
+      const ruleError = qb.find(".rule--error");
+      expect(ruleError).to.have.length(1);
+      expect(ruleError.first().text()).to.eq("Number should be even but got 7");
+
+      const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+      const validationErrors = Utils.validateTree(initialTree, config);
+      expect(validationErrors).to.containSubsetInOrder([{
+        itemPositionStr: "Leaf #1 (index path: 1)",
+        itemStr: "Number even = 7",
+        errors: [{
+          key: "custom:NOT_EVEN",
+          side: "rhs",
+          str: "Number should be even but got 7",
+          args: {
+            val: 7,
+          },
+          delta: 0,
+          fixed: false,
+        }],
+      }]);
+
+      // Apply custom translations
+      qb
+        .find(".rule .rule--value .widget--widget input")
+        .simulate("change", { target: { value: "5" } });
+
+      const ruleError2 = qb.find(".rule--error");
+      expect(ruleError2).to.have.length(1);
+      expect(ruleError2.first().text()).to.eq("Number should be even but got 5");
+    }, {
+      expectedLoadErrors: [
+        "Number even = 7  >>  [rhs 0] Number should be even but got 7"
+      ],
     });
   });
 });
@@ -582,6 +705,65 @@ describe("sanitizeTree", () => {
       {
         expectedLoadErrors: [
           "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
+        ]
+      }
+    );
+  });
+
+  it("can fix value using return of validateValue() with forceFix=true", async () => {
+    await with_qb(
+      [ with_all_types, with_show_error ], inits.with_uneven_number_bigger_than_max, "JsonLogic",
+      async (qb, {expect_jlogic, config, onInit}) => {
+        const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+        const ruleError = qb.find(".rule--error");
+        expect(ruleError).to.have.length(1);
+        expect(ruleError.first().text()).to.eq("Value 13 should be from 0 to 11");
+        
+        const { fixedTree, fixedErrors, nonFixedErrors } = Utils.sanitizeTree(initialTree, config, {
+          forceFix: true
+        });
+        expect(fixedErrors).to.containSubsetInOrder([{
+          itemStr: "Number even = 13",
+          itemPositionStr: "Leaf #1 (index path: 1)",
+          errors: [{
+            key: "VALUE_MAX_CONSTRAINT_FAIL",
+            side: "rhs",
+            str: "Value 13 should be from 0 to 11",
+            args: {
+              value: 13,
+            },
+            delta: 0,
+            fixed: true,
+            fixedFrom: 13,
+            fixedTo: 11,
+          }, {
+            key: "custom:NOT_EVEN",
+            side: "rhs",
+            str: "Number should be even but got 11",
+            args: {
+              val: 11,
+            },
+            delta: 0,
+            fixed: true,
+            fixedFrom: 11,
+            fixedTo: 10,
+          }],
+        }]);
+        expect(nonFixedErrors).to.eql([]);
+
+        await qb.setProps({
+          value: fixedTree
+        });
+
+        const ruleError2 = qb.find(".rule--error");
+        expect(ruleError2).to.have.length(0);
+        const isValid2 = Utils.isValidTree(fixedTree, config);
+        expect(isValid2).to.eq(true);
+        expect(Utils.spelFormat(fixedTree, config)).to.eq("evenNum == 10");
+      },
+      {
+        expectedLoadErrors: [
+          "Number even = 13  >>  [rhs 0] Value 13 should be from 0 to 11"
         ]
       }
     );

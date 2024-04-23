@@ -262,7 +262,7 @@ describe("antdesign widgets interactions", () => {
   describe("antdesign widgets", () => {
 
     it("load date range", async () => {
-      await with_qb_ant(configs.with_all_types, inits.with_range_dates, "JsonLogic", (qb, {expect_jlogic, expect_checks}) => {
+      await with_qb_ant(configs.with_all_types, inits.with_date_range, "JsonLogic", async (qb, {expect_jlogic, expect_checks}) => {
         expect_checks({
           "query": "date >= \"2020-05-10\" && date <= \"2020-05-15\"",
           "queryHuman": "Date BETWEEN 10.05.2020 AND 15.05.2020",

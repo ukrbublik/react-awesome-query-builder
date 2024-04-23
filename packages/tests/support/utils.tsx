@@ -341,6 +341,10 @@ const do_with_qb = async (
     console.dirxml( qbDom );
   };
 
+  const updateTestTimeout = () => {
+    setCurrentTestTimeout(parseInt(process?.env?.DEBUG_TEST_TIMEOUT ?? "60000"));
+  };
+
   let qbWrapper: HTMLElement;
   
   const mountOptions: MountRendererProps = {};
@@ -371,7 +375,7 @@ const do_with_qb = async (
   };
 
   if (options?.debug) {
-    setCurrentTestTimeout(parseInt(process?.env?.DEBUG_TEST_TIMEOUT ?? "60000"));
+    updateTestTimeout();
   }
 
   qb = mount(

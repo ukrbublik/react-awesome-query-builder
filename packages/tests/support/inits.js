@@ -103,6 +103,22 @@ export const with_number = {
   }]
 };
 
+export const with_uneven_number = {
+  "and": [{
+    "==": [
+      { "var": "evenNum" },  7
+    ]
+  }]
+};
+
+export const with_uneven_number_bigger_than_max = {
+  "and": [{
+    "==": [
+      { "var": "evenNum" },  13
+    ]
+  }]
+};
+
 export const with_number_bigger_than_max = {
   "and": [{
     "==": [
@@ -151,7 +167,17 @@ export const with_range_slider = {
   }]
 };
 
-export const with_range_dates = {
+export const with_bad_date_range = {
+  "and": [{
+    "<=": [
+      "2020-05-15T21:00:00.000Z", 
+      { "var": "date" },
+      "2020-05-10T21:00:00.000Z"
+    ]
+  }]
+};
+
+export const with_date_range = {
   "and": [{
     "<=": [
       "2020-05-10T21:00:00.000Z", 

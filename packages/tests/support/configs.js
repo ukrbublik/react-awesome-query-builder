@@ -618,6 +618,20 @@ export const with_all_types = (BasicConfig) => ({
         max: -1,
       },
     },
+    evenNum: {
+      label: "Number even",
+      type: "number",
+      fieldSettings: {
+        min: 0,
+        max: 11, // tip: 11 is uneven, in purpose!
+        validateValue: (val) => {
+          return val % 2 === 0 ? null : {
+            error: { key: "custom:NOT_EVEN", args: {val} },
+            fixedValue: Math.max(0, Math.min(10, val - 1))
+          };
+        }
+      },
+    },
     numField: {
       label: "Number field",
       type: "number",
