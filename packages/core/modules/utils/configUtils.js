@@ -282,7 +282,7 @@ export const getOperatorConfig = (config, operator, field = null) => {
 export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
   if (!field)
     return null;
-  if (!(operator || widget) && valueSrc != "const" && field != "!case_value")
+  if (!(operator || widget) && valueSrc !== "const" && field !== "!case_value")
     return null;
   const fieldConfig = getFieldConfig(config, field);
   if (!widget)
@@ -290,7 +290,7 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   const widgetConfig = config.widgets[widget] || {};
   const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
   const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});
-  const valueFieldSettings = (valueSrc == "value" || !valueSrc) && fieldConfig && fieldConfig.fieldSettings || {}; // useful to take 'validateValue'
+  const valueFieldSettings = (valueSrc === "value" || !valueSrc) && fieldConfig && fieldConfig.fieldSettings || {}; // useful to take 'validateValue'
   const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
   return mergedConfig;
 };

@@ -17,6 +17,31 @@ export const tree_with_empty_group = {
   }
 };
 
+export const tree_with_incorrect_value_type_in_rule = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      field: "num",
+      operator: "equal",
+      value: ["100"],
+      valueType: ["string"],
+    }
+  }],
+};
+
+export const tree_with_missing_value_type_in_rule = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      field: "num",
+      operator: "equal",
+      value: ["5"],
+    }
+  }],
+};
+
 export const tree_with_empty_groups_and_incomplete_rules = {
   type: "group",
   children1: [
@@ -119,6 +144,14 @@ export const with_uneven_number_bigger_than_max = {
   }]
 };
 
+export const with_numLess5_eq_7 = {
+  "and": [{
+    "==": [
+      { "var": "numLess5" },  7
+    ]
+  }]
+};
+
 export const with_number_bigger_than_max = {
   "and": [{
     "==": [
@@ -133,6 +166,16 @@ export const with_range_bigger_than_max = {
       100,
       { "var": "num" },
       200
+    ]
+  }]
+};
+
+export const with_range_from_field_to_big_number = {
+  "and": [{
+    "<=": [
+      { "var": "numField" },
+      { "var": "num" },
+      100
     ]
   }]
 };
@@ -609,6 +652,10 @@ export const with_select = {
   "and": [{  "==": [ { "var": "color" }, "orange" ]  }]
 };
 
+export const with_bad_select_value = {
+  "and": [{  "==": [ { "var": "color" }, "unexisting" ]  }]
+};
+
 export const with_bool = {
   "and": [{  "==": [ { "var": "stock" }, true ]  }]
 };
@@ -627,6 +674,17 @@ export const with_multiselect = {
       "all": [
         { "var": "multicolor" },
         { "in": [ { "var": "" }, [ "green", "orange" ] ] }
+      ]
+    }
+  ]
+};
+
+export const with_bad_multiselect_value = {
+  "and": [
+    {
+      "all": [
+        { "var": "multicolor" },
+        { "in": [ { "var": "" }, [ "unexisting1", "orange", "unexisting2" ] ] }
       ]
     }
   ]
@@ -860,6 +918,27 @@ export const with_func_sum_of_multiselect_in_lhs = {
       ]
     }
   ]
+};
+
+export const tree_with_vfunc_in_lhs_with_all_args_invalid = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaaa" },
+          str2: { valueSrc: "value", value: "bbbbbb" },
+          num1: { valueSrc: "value", value: 20 }
+        },
+      },
+      operator: "equal",
+      value: ["xxxxxx"],
+      valueSrc: ["value"],
+    },
+  }]
 };
 
 export const with_prox = {

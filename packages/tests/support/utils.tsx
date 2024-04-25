@@ -7,6 +7,8 @@ const stringify = JSON.stringify;
 import serializeJs from "serialize-javascript";
 import mergeWith from "lodash/mergeWith";
 import omit from "lodash/omit";
+import * as configs from "../support/configs";
+import * as inits from "../support/inits";
 
 import {
   Utils,
@@ -79,6 +81,8 @@ interface CheckUtils {
 interface CheckMeta extends CheckExpects, CheckUtils  {
   qb: ReactWrapper;
   config: Config;
+  initialTree: ImmutableTree;
+  initialJsonTree: JsonTree;
 }
 interface DoOptions {
   attach?: boolean; // default: true
@@ -325,6 +329,8 @@ const do_with_qb = async (
       ruleErrors,
       qbDom,
       expect,
+      configs,
+      inits,
     };
 
     // expose to window
@@ -383,9 +389,13 @@ const do_with_qb = async (
     mountOptions
   );
 
+  const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+  const initialJsonTree = getTree(initialTree);
   const checkMeta: CheckMeta = {
     qb,
     config,
+    initialTree,
+    initialJsonTree,
 
     // utils
     pauseTest,

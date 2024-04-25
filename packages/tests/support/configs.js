@@ -618,20 +618,6 @@ export const with_all_types = (BasicConfig) => ({
         max: -1,
       },
     },
-    evenNum: {
-      label: "Number even",
-      type: "number",
-      fieldSettings: {
-        min: 0,
-        max: 11, // tip: 11 is uneven, in purpose!
-        validateValue: (val) => {
-          return val % 2 === 0 ? null : {
-            error: { key: "custom:NOT_EVEN", args: {val} },
-            fixedValue: Math.max(0, Math.min(10, val - 1))
-          };
-        }
-      },
-    },
     numField: {
       label: "Number field",
       type: "number",
@@ -744,6 +730,44 @@ export const with_all_types = (BasicConfig) => ({
   },
 });
 
+export const with_validateValue = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    ...(BasicConfig.fields || {}),
+    evenNum: {
+      label: "Number even",
+      type: "number",
+      fieldSettings: {
+        min: 0,
+        max: 11, // tip: 11 is uneven, in purpose!
+        validateValue: (val) => {
+          return val % 2 === 0 ? null : {
+            error: { key: "custom:NOT_EVEN", args: {val} },
+            fixedValue: Math.max(0, Math.min(10, val - 1))
+          };
+        }
+      },
+    },
+  },
+});
+
+export const with_validateValue_without_fixedValue_with_defaultValue = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    ...(BasicConfig.fields || {}),
+    numLess5: {
+      label: "NumberLess5",
+      type: "number",
+      fieldSettings: {
+        defaultValue: 3,
+        validateValue: (val) => {
+          return val < 5;
+        },
+      },
+    },
+  },
+});
+
 export const simple_with_number_without_regroup = (BasicConfig) => ({
   ...simple_with_number(BasicConfig),
   settings: {
@@ -794,9 +818,68 @@ export const with_dont_leave_empty_group = (BasicConfig) => ({
   }
 });
 
+export const with_funcs_validation = (BasicConfig) => ({
+  ...BasicConfig,
+  funcs: {
+    ...(BasicConfig?.funcs || {}),
+    vld: {
+      type: "!struct",
+      label: "Vld",
+      subfields: {
+        tfunc1: {
+          label: "TextFunc1",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 5,
+          },
+          jsonLogic: ({ str1, str2, num1 }) => {
+            return { vfunc1: [ str1, str2, num1 ] };
+          },
+          jsonLogicImport: ({ vfunc1 }) => {
+            return vfunc1;
+          },
+          spelFunc: "T(String).tfunc1(${str1}, ${str2}, ${num1})",
+          args: {
+            str1: {
+              label: "Str1",
+              type: "text",
+              valueSources: ["value", "field", "func"],
+              defaultValue: "_d1_",
+              fieldSettings: {
+                maxLength: 5,
+              },
+            },
+            str2: {
+              label: "Str2",
+              type: "text",
+              valueSources: ["value", "field", "func"],
+              defaultValue: "_d2_",
+              fieldSettings: {
+                maxLength: 5,
+              },
+            },
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 0,
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
+          }
+        }
+      }
+    }
+  },
+});
+
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   funcs: {
+    ...(BasicConfig?.funcs || {}),
     ...BasicFuncs,
     custom: {
       type: "!struct",

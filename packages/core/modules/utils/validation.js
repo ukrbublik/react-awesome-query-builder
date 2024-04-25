@@ -672,14 +672,16 @@ export const validateValue = (
       [fixedValue, allErrors] = validateNormalValue(field, value, valueSrc, valueType, asyncListValues, config, operator, canFix, isEndValue);
     }
 
-    const fixedAllErrors = !allErrors?.find(e => !e.fixed);
+    let fixedAllErrors = !allErrors?.find(e => !e.fixed);
     const shouldCallValidateFn = !!field
       // `validateValue` should not be available for valueSrc === "func" or "field"
       && !["field", "func"].includes(valueSrc)
       // eg. if value was > max, and fixed to max, but max value can not satisfy validateValue() in config
       && (!allErrors?.length || fixedAllErrors);
     if (shouldCallValidateFn) {
-      //const _fieldConfig = getFieldConfig(config, field);
+      //todo: why not just take fieldSettings from fieldConfig, why need to use getFieldWidgetConfig() ??
+      // const fieldConfig = getFieldConfig(config, field);
+      // const fieldSettings = fieldConfig?.fieldSettings;
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
       const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
       const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
@@ -698,18 +700,20 @@ export const validateValue = (
           args.push(rightFieldDefinition);
         const validResult = fn.call(config.ctx, ...args);
         if (typeof validResult === "object" && validResult !== null && !Array.isArray(validResult)) {
+          let newError;
           if (validResult.error?.key) {
-            allErrors.push(validResult.error);
+            newError = {...validResult.error};
           } else {
             // Note: `null` means it's not translated string!
-            allErrors.push({key: validResult.error, args: null});
+            newError = {key: validResult.error, args: null};
           }
           if (validResult.fixedValue !== undefined && canFix) {
-            allErrors[allErrors.length-1].fixed = true;
-            allErrors[allErrors.length-1].fixedFrom = fixedValue;
-            allErrors[allErrors.length-1].fixedTo = validResult.fixedValue;
+            newError.fixed = true;
+            newError.fixedFrom = fixedValue;
+            newError.fixedTo = validResult.fixedValue;
             fixedValue = validResult.fixedValue;
           }
+          allErrors.push(newError);
         } else if (typeof validResult === "boolean") {
           if (validResult == false) {
             allErrors.push({key: constants.INVALID_VALUE, args: {}});
@@ -717,6 +721,25 @@ export const validateValue = (
         } else if (typeof validResult === "string") {
           allErrors.push({key: validResult, args: null});
         }
+      }
+    }
+
+    // if can't fix value, use defaultValue
+    fixedAllErrors = !allErrors?.find(e => !e.fixed);
+    if (allErrors?.length && !fixedAllErrors && canFix) {
+      const fieldConfig = getFieldConfig(config, field);
+      const fieldSettings = fieldConfig.fieldSettings;
+      const defaultValue = fieldSettings?.defaultValue;
+      if (defaultValue !== undefined) {
+        const lastError = allErrors[allErrors.length - 1];
+        lastError.fixed = true;
+        lastError.fixedFrom = fixedValue;
+        lastError.fixedTo = defaultValue;
+        fixedValue = defaultValue;
+        // mark all errors as fixed
+        allErrors.map(e => {
+          e.fixed = true;
+        });
       }
     }
   }
@@ -814,6 +837,17 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
         [fixedValue, allErrors] = validateValueInList(
           value, realListValues, canFix, isEndValue, config.settings.removeInvalidMultiSelectValuesOnLoad
         );
+      }
+      // validate length
+      if (fieldSettings.maxLength > 0 && value != null && String(value).length > fieldSettings.maxLength) {
+        fixedValue = canFix ? String(value).substring(0, fieldSettings.maxLength) : value;
+        allErrors.push({
+          key: constants.VALUE_LENGTH_CONSTRAINT_FAIL,
+          args: { value, length: String(value).length, fieldSettings },
+          fixed: canFix,
+          fixedFrom: canFix ? value : undefined,
+          fixedTo: canFix ? fixedValue : undefined,
+        });
       }
       // validate min/max
       if (fieldSettings.min != null && value < fieldSettings.min) {
@@ -925,10 +959,11 @@ const validateFuncValue = (
     });
     return [value, allErrors];
   }
+  const funcName = funcConfig.label ?? funcKey;
   if (valueType && funcConfig.returnType != valueType) {
     allErrors.push({
       key: constants.INCORRECT_FUNCTION_RETURN_TYPE,
-      args: { funcKey, returnType: funcConfig.returnType, valueType }
+      args: { funcKey, funcName, returnType: funcConfig.returnType, valueType }
     });
     return [value, allErrors];
   }
@@ -937,6 +972,7 @@ const validateFuncValue = (
     const args = fixedValue.get("args");
     const argVal = args ? args.get(argKey) : undefined;
     const argDef = getFieldConfig(config, argConfig);
+    const argName = argDef?.label ?? argKey;
     const argValue = argVal ? argVal.get("value") : undefined;
     const argValueSrc = argVal ? argVal.get("valueSrc") : undefined;
     if (argValue !== undefined) {
