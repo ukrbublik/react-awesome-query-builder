@@ -290,6 +290,8 @@ export default (skin: string) => {
     canLeaveEmptyGroup: true,
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
+    removeEmptyGroupsOnLoad: false,
+    removeIncompleteRulesOnLoad: false,
     optimizeRenderWithInternals: true,
     customFieldSelectProps: {
       showSearch: true
@@ -298,6 +300,16 @@ export default (skin: string) => {
     // renderOperator: (props) => <FieldDropdown {...props} />,
     // renderFunc: (props) => <FieldSelect {...props} />,
     // maxNumberOfRules: 10 // number of rules can be added to the query builder
+
+    // defaultField: "user.firstName",
+    // defaultOperator: "starts_with",
+
+    // canCompareFieldWithField: (leftField, leftFieldConfig, rightField, rightFieldConfig, op) => {
+    //   if (leftField === 'slider' && rightField === 'results.score') {
+    //     return false;
+    //   }
+    //   return true;
+    // }
   };
 
   //////////////////////////////////////////////////////////////////////
@@ -388,6 +400,7 @@ export default (skin: string) => {
         "none",
       ],
       defaultOperator: "some",
+      //defaultField: "year",
       initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
       fieldSettings: {

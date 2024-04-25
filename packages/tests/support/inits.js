@@ -1,20 +1,17 @@
 
-import { Utils } from "@react-awesome-query-builder/core";
-const { uuid } = Utils;
 
 export const tree_with_empty_group = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "group",
       properties: {
         conjunction: "AND",
         not: false
       },
-      children1: {}
+      children1: []
     },
-  }
+  ]
 };
 
 export const tree_with_incorrect_value_type_in_rule = {
@@ -97,9 +94,8 @@ export const tree_with_empty_groups_and_incomplete_rules = {
 
 export const tree_with_number = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "num",
@@ -109,7 +105,7 @@ export const tree_with_number = {
         valueType: ["number"]
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -839,9 +835,8 @@ export const with_func_tolower_from_field = {
 
 export const with_func_linear_regression_tree = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "num",
@@ -861,7 +856,7 @@ export const with_func_linear_regression_tree = {
         valueError: [ null ]
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -943,9 +938,8 @@ export const tree_with_vfunc_in_lhs_with_all_args_invalid = {
 
 export const with_prox = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "str",
@@ -958,7 +952,7 @@ export const with_prox = {
         }
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -1264,11 +1258,9 @@ export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java
 export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
 export const tree_with_lhs_toLowerCase2 = {
   "type": "group",
-  "id": uuid(),
   "children1": [
     {
       "type": "rule",
-      "id": uuid(),
       "properties": {
         //"fieldSrc": "func", //should be determined
         "field": {

@@ -2,8 +2,9 @@ export default
 {
   "type": "group",
   "id": "9a99988a-0123-4456-b89a-b1607f326fd8",
-  "children1": {
-    "a98ab9b9-cdef-4012-b456-71607f326fd9": {
+  "children1": [
+    {
+      "id": "a98ab9b9-cdef-4012-b456-71607f326fd9",
       "type": "rule",
       "properties": {
         "field": "user.login",
@@ -30,7 +31,8 @@ export default
         ]
       }
     },
-    "98a8a9ba-0123-4456-b89a-b16e721c8cd0": {
+    {
+      "id": "98a8a9ba-0123-4456-b89a-b16e721c8cd0",
       "type": "rule",
       "properties": {
         "field": "stock",
@@ -49,7 +51,8 @@ export default
         ]
       }
     },
-    "aabbab8a-cdef-4012-b456-716e85c65e9c": {
+    {
+      "id": "aabbab8a-cdef-4012-b456-716e85c65e9c",
       "type": "rule",
       "properties": {
         "field": "slider",
@@ -68,14 +71,16 @@ export default
         ]
       }
     },
-    "aaab8999-cdef-4012-b456-71702cd50090": {
+    {
+      "id": "aaab8999-cdef-4012-b456-71702cd50090",
       "type": "rule_group",
       "properties": {
         "conjunction": "AND",
         "field": "results"
       },
-      "children1": {
-        "99b8a8a8-89ab-4cde-b012-31702cd5078b": {
+      "children1": [
+        {
+          "id": "99b8a8a8-89ab-4cde-b012-31702cd5078b",
           "type": "rule",
           "properties": {
             "field": "results.product",
@@ -94,7 +99,8 @@ export default
             ]
           }
         },
-        "88b9bb89-4567-489a-bcde-f1702cd53266": {
+        {
+          "id": "88b9bb89-4567-489a-bcde-f1702cd53266",
           "type": "rule",
           "properties": {
             "field": "results.score",
@@ -113,9 +119,10 @@ export default
             ]
           }
         }
-      }
+      ]
     },
-    "a99a9b9b-cdef-4012-b456-7175a7d54553": {
+    {
+      "id": "a99a9b9b-cdef-4012-b456-7175a7d54553",
       "type": "rule_group",
       "properties": {
         "mode": "array",
@@ -135,8 +142,9 @@ export default
         ],
         "field": "cars"
       },
-      "children1": {
-        "99a9a9a8-89ab-4cde-b012-3175a7d55374": {
+      "children1": [
+        {
+          "id": "99a9a9a8-89ab-4cde-b012-3175a7d55374",
           "type": "rule",
           "properties": {
             "field": "cars.vendor",
@@ -155,7 +163,8 @@ export default
             ]
           }
         },
-        "988bbbab-4567-489a-bcde-f175a7d58793": {
+        {
+          "id": "988bbbab-4567-489a-bcde-f175a7d58793",
           "type": "rule",
           "properties": {
             "field": "cars.year",
@@ -174,9 +183,9 @@ export default
             ]
           }
         }
-      }
+      ]
     }
-  },
+  ],
   "properties": {
     "conjunction": "AND",
     "not": false

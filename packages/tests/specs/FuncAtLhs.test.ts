@@ -260,7 +260,7 @@ describe("LHS func", () => {
         }
       }, [
         // validation:
-        "custom.LOWER2 = aaa  >>  * [lhs] Value of arg def for func custom.LOWER2 is required"
+        "custom.LOWER2 = aaa  >>  * [lhs] Value of arg def for func Lowercase2 is required"
       ]);
     });
   });

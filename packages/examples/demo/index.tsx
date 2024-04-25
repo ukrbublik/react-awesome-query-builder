@@ -22,11 +22,7 @@ const stringify = JSON.stringify;
 
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
-const sanitizeOptions = {
-  // fix options:
-  removeEmptyGroups: true,
-  removeIncompleteRules: true,
-  // translate options:
+const validationTranslateOptions = {
   translateErrors: true,
   includeStringifiedItems: true,
   includeItemsPositions: true,
@@ -36,7 +32,7 @@ const initialSkin = window._initialSkin || "mui";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 //const emptyInitValue: JsonTree = {id: uuid(), type: "switch_group"};
 const loadedConfig = loadConfig(initialSkin);
-const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0
+const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0
   ? loadedInitValue as JsonTree
   : emptyInitValue;
 const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0
@@ -46,7 +42,11 @@ let initTree: ImmutableTree = loadTree(emptyInitValue);
 initTree = loadTree(initValue);
 //initTree = loadFromJsonLogic(initLogic, loadedConfig)!; // <- this will work same
 
-const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(initTree, loadedConfig, sanitizeOptions);
+const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(initTree, loadedConfig, {
+  ...validationTranslateOptions,
+  removeEmptyGroups: false,
+  removeIncompleteRules: false,
+});
 initTree = fixedTree;
 if (fixedErrors.length) {
   console.warn("Fixed tree errors on load: ", fixedErrors);
@@ -144,7 +144,7 @@ const DemoQueryBuilder: React.FC = () => {
 
   const sanitize = () => {
     const { fixedErrors, fixedTree, nonFixedErrors } = sanitizeTree(state.tree, state.config, {
-      ...sanitizeOptions,
+      ...validationTranslateOptions,
       forceFix: false,
     });
     if (fixedErrors.length) {
@@ -161,7 +161,7 @@ const DemoQueryBuilder: React.FC = () => {
 
   const sanitizeAndFix = () => {
     const { fixedErrors, fixedTree, nonFixedErrors } = sanitizeTree(state.tree, state.config, {
-      ...sanitizeOptions,
+      ...validationTranslateOptions,
       forceFix: true,
     });
     if (fixedErrors.length) {
@@ -178,11 +178,9 @@ const DemoQueryBuilder: React.FC = () => {
 
   const validate = () => {
     const validationErrors = validateTree(state.tree, state.config, {
-      translateErrors: true,
-      includeItemsPositions: true,
-      includeStringifiedItems: true,
+      ...validationTranslateOptions,
     });
-    console.warn(">>> validationErrors", validationErrors);
+    console.warn(">>> Utils.validateTree()", validationErrors);
   };
 
   const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,7 +193,7 @@ const DemoQueryBuilder: React.FC = () => {
 
   const importFromSpel = () => {
     const [tree, spelErrors] = loadFromSpel(state.spelStr, state.config);
-    const {fixedTree, fixedErrors} = sanitizeTree(tree!, state.config, sanitizeOptions);
+    const {fixedTree, fixedErrors} = sanitizeTree(tree!, state.config, validationTranslateOptions);
     if (fixedErrors.length) {
       console.warn("Fixed errors after import from SpEL:", fixedErrors);
     }
@@ -209,9 +207,16 @@ const DemoQueryBuilder: React.FC = () => {
   const changeSkin = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skin = e.target.value;
     const config = loadConfig(e.target.value);
-    const {fixedTree, fixedErrors} = sanitizeTree(state.tree, config, sanitizeOptions);
+    const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(state.tree, config, {
+      ...validationTranslateOptions,
+      removeEmptyGroups: false,
+      removeIncompleteRules: false,
+    });
     if (fixedErrors.length) {
-      console.warn("Fixed errors after chanage UI framework:", fixedErrors);
+      console.warn("Fixed errors after change UI framework:", fixedErrors);
+    }
+    if (nonFixedErrors.length) {
+      console.warn("Not fixed errors after change UI framework:", nonFixedErrors);
     }
     setState({
       ...state,
@@ -415,9 +420,7 @@ const DemoQueryBuilder: React.FC = () => {
     const elasticSearch = elasticSearchFormat(immutableTree, config);
 
     const validationRes = validateTree(immutableTree, config, {
-      includeItemsPositions: true,
-      includeStringifiedItems: true,
-      translateErrors: true,
+      ...validationTranslateOptions,
     }).map(({
       errors, itemStr, itemPositionStr,
     }) => ({
