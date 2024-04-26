@@ -24,13 +24,11 @@ export type FactoryWithContext<P> = (props: ReactAttributes & P, ctx?: ConfigCon
 export type RenderedReactElement = ReactElement | string;
 export type SerializedFunction = JsonLogicFunction | string;
 
-type AnyObject = {
-  [key: string]: unknown;
-};
+type AnyObject = Record<string, unknown>;
 type Empty = null | undefined;
 
 type ImmutablePath = ImmutableList<string>;
-type IdPath = Array<string> | ImmutablePath;
+type IdPath = Array<string> | ImmutablePath; // should be used in actions only
 
 type Optional<T> = {
   [P in keyof T]?: T[P];
@@ -47,36 +45,43 @@ type TypedKeyMap<K extends string|number, T> = {
   [key: number]: T;
 }
 
+interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
+  get<K extends keyof P>(name: K): P[K];
+  get(name: string): any;
+}
+
+export type AsyncListValues = Array<any>;
+
 // for export/import
 
 type MongoValue = any;
 type ElasticSearchQueryType = string;
 
 type JsonLogicResult = {
-  logic?: JsonLogicTree,
-  data?: Object,
-  errors?: Array<string>
+  logic?: JsonLogicTree;
+  data?: Object;
+  errors?: Array<string>;
 }
 type JsonLogicFunction = Object;
 type JsonLogicTree = Object;
 type JsonLogicValue = any;
 type JsonLogicField = { "var": string };
 interface SpelRawValue {
-  type: string,
-  children?: SpelRawValue[],
-  val?: RuleValue,
-  methodName?: string,
-  args?: SpelRawValue[],
-  obj?: SpelRawValue[],
-  isVar?: boolean,
-  cls: string[],
+  type: string;
+  children?: SpelRawValue[];
+  val?: RuleValue;
+  methodName?: string;
+  args?: SpelRawValue[];
+  obj?: SpelRawValue[];
+  isVar?: boolean;
+  cls: string[];
 }
 
 export type ConfigContext = {
-  utils: TypedMap<any>,
-  W: TypedMap<ElementType<any>>,
-  O: TypedMap<ElementType<any>>,
-  components?: TypedMap<ElementType<any>>,
+  utils: TypedMap<any>;
+  W: TypedMap<ElementType<any>>;
+  O: TypedMap<ElementType<any>>;
+  components?: TypedMap<ElementType<any>>;
   [key: string]: any;
 };
 
@@ -132,14 +137,27 @@ export type FlatTree = {
 // query value
 /////////////////
 
-export type RuleValue = boolean | number | string | Date | Array<string> | any;
+// tip: Date is stored as string
+export type SimpleValue = boolean | number | string | Array<string> | undefined;
+export type RuleValue = SimpleValue | FuncValue;
+// tip: multiselect value is stored as Array<string>, not ImmutableList<string>
+export type RuleValueI = SimpleValue | FuncValueI;
 export type FieldPath = string;
-export type FieldFuncValueI = ImmutableMap<"func" | "args", any>;
-export interface FieldFuncValue {
-  func: string,
-  args: Record<string, any>
+export interface FuncArgValue<V = unknown> {
+  value: V;
+  valueSrc: ValueSource;
 }
-export type FieldValue = FieldPath | FieldFuncValueI;
+export type FuncArgValueI = ObjectToImmOMap<FuncArgValue<RuleValueI>>;
+export interface FuncValue {
+  func: string;
+  args: TypedMap<FuncArgValue<RuleValue>>;
+}
+export type FuncValueI = ObjectToImmOMap<{
+  func: string;
+  args: ImmutableOMap<string, FuncArgValueI>;
+}>;
+export type FieldValue = FieldPath | FuncValue;
+export type FieldValueI = FieldPath | FuncValueI;
 
 export type ValueSource = "value" | "field" | "func" | "const";
 export type FieldSource = "field" | "func";
@@ -156,40 +174,44 @@ export type TypedValueSourceMap<T> = {
 
 interface ExtraActionProperties {
   // note: id can pre-generated for actions addRule, addGroup
-  id?: string,
+  id?: string;
 }
 
 interface BasicItemProperties {
-  isLocked?: boolean,
+  isLocked?: boolean;
 }
 
+export type OperatorOptions = Record<string, SimpleValue>;
+export type OperatorOptionsI = ImmMap<string, SimpleValue>;
+
 export interface RuleProperties extends BasicItemProperties {
-  field: FieldValue | Empty,
-  fieldSrc?: FieldSource,
-  fieldError?: string | Empty,
-  operator: string | Empty,
-  value: Array<RuleValue>,
-  valueSrc?: Array<ValueSource>,
-  valueType?: Array<string>,
-  valueError?: Array<string | Empty>,
-  operatorOptions?: AnyObject,
+  field: FieldValue | Empty;
+  fieldSrc?: FieldSource;
+  fieldType?: string;
+  fieldError?: string | Empty;
+  operator: string | Empty;
+  value: Array<RuleValue>;
+  valueSrc?: Array<ValueSource>;
+  valueType?: Array<string>;
+  valueError?: Array<string | Empty>;
+  operatorOptions?: OperatorOptions | Empty;
 }
 
 export interface RuleGroupExtProperties extends RuleProperties {
-  field: FieldPath | Empty, // tip: field can be only string, not func
-  mode: RuleGroupMode,
-  conjunction?: string,
-  not?: boolean,
+  field: FieldPath | Empty; // tip: field can be only string, not func
+  mode: RuleGroupMode;
+  conjunction?: string;
+  not?: boolean;
 }
 
 export interface RuleGroupProperties extends BasicItemProperties {
-  field: FieldPath | Empty, // tip: field can be only string, not func
-  mode?: RuleGroupMode,
+  field: FieldPath | Empty; // tip: field can be only string, not func
+  mode?: RuleGroupMode;
 }
 
 export interface GroupProperties extends BasicItemProperties {
-  conjunction: string,
-  not?: boolean,
+  conjunction: string;
+  not?: boolean;
 }
 
 export interface SwitchGroupProperties extends BasicItemProperties {
@@ -202,12 +224,13 @@ export interface CaseGroupProperties extends BasicItemProperties {
 
 //////
 
-interface _RulePropertiesI extends Omit<RuleProperties, "value" | "valueSrc" | "valueType" | "valueError" | "operatorOptions"> {
-  value: ImmutableList<RuleValue>,
-  valueSrc?: ImmutableList<ValueSource>,
-  valueType?: ImmutableList<string>,
-  valueError?: ImmutableList<string | Empty>,
-  operatorOptions?: ImmMap<string, unknown>,
+interface _RulePropertiesI extends Omit<RuleProperties, "field" | "value" | "valueSrc" | "valueType" | "valueError" | "operatorOptions"> {
+  field: FieldValueI | Empty;
+  value: ImmutableList<RuleValueI>;
+  valueSrc?: ImmutableList<ValueSource>;
+  valueType?: ImmutableList<string>;
+  valueError?: ImmutableList<string | Empty>;
+  operatorOptions?: OperatorOptionsI;
 }
 
 // correct unions
@@ -216,11 +239,6 @@ interface _AnyRulePropertiesI extends Optional<_RulePropertiesI>, Optional<Pick<
 interface _ItemPropertiesI extends _AnyRulePropertiesI, Optional<Pick<GroupProperties, "conjunction" | "not">> {}
 interface _ItemOrCasePropertiesI extends _ItemPropertiesI, Optional<CaseGroupProperties> {}
 interface _GroupOrSwitchPropertiesI extends Optional<GroupProperties>, Optional<SwitchGroupProperties> {}
-
-interface ObjectToImmOMap<P> extends ImmutableOMap<keyof P, any> {
-  get<K extends keyof P>(name: K): P[K];
-  get(name: string): any;
-}
 
 export interface BasicItemPropertiesI<P = BasicItemProperties> extends ObjectToImmOMap<P> {}
 export interface ImmutableRuleProperties<P = _RulePropertiesI> extends BasicItemPropertiesI<P> {}
@@ -238,104 +256,128 @@ export interface ImmutableGroupOrSwitchProperties<P = _GroupOrSwitchPropertiesI>
 
 //////
 
+export interface JsonBasicItem {
+  type: ItemType;
+  id?: string;
+}
+export interface JsonRule extends Omit<JsonBasicItem, "type"> {
+  type: "rule";
+  properties: RuleProperties;
+}
+
+// OldJson.. are types with `children1` as object instead of array (discouraged)
+// `children1` as object can be used for import or export with children1AsArray = false
+export interface OldJsonSwitchGroup extends JsonBasicItem {
+  type: "switch_group";
+  children1?: {[id: string]: OldJsonCaseGroup} | OldJsonCaseGroup[];
+  properties?: SwitchGroupProperties;
+}
+export interface OldJsonCaseGroup extends JsonBasicItem {
+  type: "case_group";
+  children1?: {[id: string]: OldJsonGroup} | OldJsonGroup[];
+  properties?: CaseGroupProperties;
+}
+export interface OldJsonGroup extends JsonBasicItem {
+  type: "group";
+  children1?: {[id: string]: OldJsonItem} | OldJsonItem[];
+  properties?: GroupProperties;
+}
+export interface OldJsonRuleGroup extends JsonBasicItem {
+  type: "rule_group";
+  children1?: {[id: string]: JsonRule} | JsonRule[];
+  properties?: RuleGroupProperties;
+}
+export interface OldJsonRuleGroupExt extends JsonBasicItem {
+  type: "rule_group";
+  children1?: {[id: string]: JsonRule} | JsonRule[];
+  properties?: RuleGroupExtProperties;
+}
+export type OldJsonAnyRule = JsonRule|OldJsonRuleGroup|OldJsonRuleGroupExt;
+export type OldJsonItem = OldJsonGroup|OldJsonAnyRule;
+export type OldJsonTree = OldJsonGroup|OldJsonSwitchGroup;
+
+// Json.. (in comparison with OldJson..) are types with `children1` as array (default)
+// Used as default for export with children1AsArray = true
+export interface JsonSwitchGroup extends OldJsonSwitchGroup {
+  children1?: JsonCaseGroup[];
+}
+export interface JsonCaseGroup extends OldJsonCaseGroup {
+  children1?: JsonGroup[];
+}
+export interface JsonGroup extends OldJsonGroup {
+  children1?: JsonItem[];
+}
+export interface JsonRuleGroup extends OldJsonRuleGroup {
+  children1?: JsonRule[];
+}
+export interface JsonRuleGroupExt extends OldJsonRuleGroupExt {
+  children1?: JsonRule[];
+}
 export type JsonAnyRule = JsonRule|JsonRuleGroup|JsonRuleGroupExt;
 export type JsonItem = JsonGroup|JsonAnyRule;
-export interface JsonBasicItem {
-  type: ItemType,
-  id?: string,
-}
-export interface JsonSwitchGroup extends JsonBasicItem {
-  type: "switch_group",
-  children1?: {[id: string]: JsonCaseGroup} | JsonCaseGroup[],
-  properties?: SwitchGroupProperties
-}
-export interface JsonCaseGroup extends JsonBasicItem {
-  type: "case_group",
-  children1?: {[id: string]: JsonGroup} | JsonGroup[],
-  properties?: CaseGroupProperties
-}
-export interface JsonGroup extends JsonBasicItem {
-  type: "group",
-  // tip: if got array, it will be converted to immutable ordered map in `_addChildren1`
-  children1?: {[id: string]: JsonItem} | JsonItem[],
-  properties?: GroupProperties
-}
-export interface JsonRuleGroup extends JsonBasicItem {
-  type: "rule_group",
-  children1?: {[id: string]: JsonRule} | JsonRule[],
-  properties?: RuleGroupProperties
-}
-export interface JsonRuleGroupExt extends JsonBasicItem {
-  type: "rule_group",
-  children1?: {[id: string]: JsonRule} | JsonRule[],
-  properties?: RuleGroupExtProperties
-}
-export interface JsonRule extends JsonBasicItem {
-  type: "rule",
-  properties: RuleProperties,
-}
 export type JsonTree = JsonGroup|JsonSwitchGroup;
+
 
 ////
 
 interface _BasicItemI {
-  type: ItemType,
-  id: string,
+  type: ItemType;
+  id: string;
 }
 interface _RuleI extends _BasicItemI {
-  type: "rule",
-  properties: ImmutableRuleProperties,
+  type: "rule";
+  properties: ImmutableRuleProperties;
 }
 interface _GroupI extends _BasicItemI {
-  type: "group",
-  children1?: ImmOMap<string, ImmutableItem>,
-  properties: ImmutableGroupProperties,
+  type: "group";
+  children1?: ImmOMap<string, ImmutableItem>;
+  properties: ImmutableGroupProperties;
 }
 interface _RuleGroupI extends _BasicItemI {
-  type: "rule_group",
-  children1?: ImmOMap<string, ImmutableRule>,
-  properties: ImmutableRuleGroupProperties,
+  type: "rule_group";
+  children1?: ImmOMap<string, ImmutableRule>;
+  properties: ImmutableRuleGroupProperties;
 }
 interface _RuleGroupExtI extends _BasicItemI {
-  type: "rule_group",
-  children1?: ImmOMap<string, ImmutableRule>,
-  properties: ImmutableRuleGroupExtProperties,
+  type: "rule_group";
+  children1?: ImmOMap<string, ImmutableRule>;
+  properties: ImmutableRuleGroupExtProperties;
 }
 interface _SwitchGroupI extends _BasicItemI {
-  type: "switch_group",
-  children1?: ImmOMap<string, ImmutableCaseGroup>,
-  properties: ImmutableSwitchGroupProperties,
+  type: "switch_group";
+  children1?: ImmOMap<string, ImmutableCaseGroup>;
+  properties: ImmutableSwitchGroupProperties;
 }
 interface _CaseGroupI extends _BasicItemI {
-  type: "case_group",
-  children1?: ImmOMap<string, ImmutableGroup>,
-  properties: ImmutableCaseGroupProperties,
+  type: "case_group";
+  children1?: ImmOMap<string, ImmutableGroup>;
+  properties: ImmutableCaseGroupProperties;
 }
 // Fix unions manially:
 type _OmitI<T> = Omit<T, "type" | "properties" | "children1">;
 // type _AnyRuleI = _RuleI | _RuleGroupI | _RuleGroupExtI;
 interface _AnyRuleI extends _OmitI<_RuleI> {
-  type: "rule" | "rule_group",
-  properties: ImmutableAnyRuleProperties,
-  children1?: ImmOMap<string, ImmutableRule>,
+  type: "rule" | "rule_group";
+  properties: ImmutableAnyRuleProperties;
+  children1?: ImmOMap<string, ImmutableRule>;
 }
 // type _ItemI = _GroupI | _AnyRuleI;
 interface _ItemI extends _OmitI<_GroupI>, _OmitI<_AnyRuleI> {
-  type: "rule" | "rule_group" | "group",
-  properties: ImmutableItemProperties,
-  children1?: ImmOMap<string, ImmutableItem>,
+  type: "rule" | "rule_group" | "group";
+  properties: ImmutableItemProperties;
+  children1?: ImmOMap<string, ImmutableItem>;
 }
 // type _ItemOrCaseI = _ItemI | _CaseGroupI;
 interface _ItemOrCaseI extends _OmitI<_ItemI>, _OmitI<_CaseGroupI> {
-  type: "rule" | "rule_group" | "group" | "case_group",
-  properties: ImmutableItemOrCaseProperties,
-  children1?: ImmOMap<string, ImmutableItem>,
+  type: "rule" | "rule_group" | "group" | "case_group";
+  properties: ImmutableItemOrCaseProperties;
+  children1?: ImmOMap<string, ImmutableItem>;
 }
 // type _TreeI = _GroupI | _SwitchGroupI;
 interface _TreeI extends _OmitI<_GroupI>, _OmitI<_SwitchGroupI> {
-  type: "group" | "switch_group",
-  children1?: ImmOMap<string, ImmutableBasicItem<_ItemOrCaseI>>,
-  properties: ImmutableGroupOrSwitchProperties,
+  type: "group" | "switch_group";
+  children1?: ImmOMap<string, ImmutableBasicItem<_ItemOrCaseI>>;
+  properties: ImmutableGroupOrSwitchProperties;
 }
 export interface ImmutableBasicItem<P = _BasicItemI> extends ObjectToImmOMap<P> {}
 export interface ImmutableRule<P = _RuleI> extends ImmutableBasicItem<P> {}
@@ -418,7 +460,7 @@ interface Validation {
   validateTree(tree: ImmutableTree, config: Config, options?: ValidationOptions): ValidationErrors;
 
   isValidTree(tree: ImmutableTree, config: Config): boolean;
-  getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldValue>;
+  getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldPath>;
 
   translateValidation(tr: Translatable): string;
   translateValidation(key: Translatable["key"], args?: Translatable["args"]): string;
@@ -427,7 +469,9 @@ interface Validation {
 interface Import {
   // tree
   getTree(tree: ImmutableTree, light?: boolean, children1AsArray?: boolean): JsonTree;
+  getTree(tree: ImmutableTree, light: boolean, children1AsArray: false): OldJsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
+  loadTree(jsonTree: OldJsonTree): ImmutableTree;
   // @deprecated Use Utils.sanitizeTree() instead
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
   // @deprecated Use Utils.Validation.isValidTree()
@@ -467,11 +511,11 @@ interface ConfigUtils {
   decompressConfig(zipConfig: ZipConfig, baseConfig: Config, ctx?: ConfigContext): Config;
   compileConfig(config: Config): Config;
   extendConfig(config: Config): Config;
-  getFieldConfig(config: Config, field: FieldValue): Field | Func | null;
+  getFieldConfig(config: Config, field: FieldValue | FieldValueI): Field | Func | null;
   getFuncConfig(config: Config, func: string): Func | null;
   getFuncArgConfig(config: Config, func: string, arg: string): FuncArg | null;
-  getOperatorConfig(config: Config, operator: string, field?: FieldValue): Operator | null;
-  getFieldWidgetConfig(config: Config, field: FieldValue, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
+  getOperatorConfig(config: Config, operator: string, field?: FieldValue | FieldValueI): Operator | null;
+  getFieldWidgetConfig(config: Config, field: FieldValue | FieldValueI, operator: string, widget?: string, valueStr?: ValueSource): Widget | null;
   isJSX(jsx: any): boolean;
   isDirtyJSX(jsx: any): boolean;
   cleanJSX(jsx: any): Object;
@@ -504,7 +548,7 @@ interface TreeUtils {
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
   // @deprecated
-  getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldValue>;
+  getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldPath>;
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
   getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
@@ -526,7 +570,7 @@ interface OtherUtils {
   toImmutableList(path: string[]): ImmutablePath;
 }
 
-export interface Utils extends Omit<Import, "isValidTree">, Export, 
+export interface Utils extends Omit<Import, "isValidTree">, Export,
   Pick<Validation, "sanitizeTree" | "validateTree" | "isValidTree">,
   Pick<ConfigUtils, "compressConfig" | "decompressConfig">,
   Pick<OtherUtils, "uuid">,
@@ -552,27 +596,27 @@ export interface Utils extends Omit<Import, "isValidTree">, Export,
 /////////////////
 
 export interface Config {
-  conjunctions: Conjunctions,
-  operators: Operators,
-  widgets: Widgets,
-  types: Types,
-  settings: Settings,
-  fields: Fields,
-  funcs?: Funcs,
-  ctx: ConfigContext,
+  conjunctions: Conjunctions;
+  operators: Operators;
+  widgets: Widgets;
+  types: Types;
+  settings: Settings;
+  fields: Fields;
+  funcs?: Funcs;
+  ctx: ConfigContext;
 }
 
 export type ZipConfig = Omit<Config, "ctx">;
 
 export interface ConfigMixin<C = Config, S = Settings> {
-  conjunctions?: Record<string, Partial<Conjunction>>,
-  operators?: Record<string, Partial<Operator<C>>>,
-  widgets?: Record<string, Partial<Widget<C>>>,
-  types?: Record<string, Partial<Type>>,
-  settings?: Partial<S>,
-  fields?: Record<string, Partial<FieldOrGroup>>,
-  funcs?: Record<string, Partial<FuncOrGroup>>,
-  ctx?: Partial<ConfigContext>,
+  conjunctions?: Record<string, Partial<Conjunction>>;
+  operators?: Record<string, Partial<Operator<C>>>;
+  widgets?: Record<string, Partial<Widget<C>>>;
+  types?: Record<string, Partial<Type>>;
+  settings?: Partial<S>;
+  fields?: Record<string, Partial<FieldOrGroup>>;
+  funcs?: Record<string, Partial<FuncOrGroup>>;
+  ctx?: Partial<ConfigContext>;
 }
 
 /////////////////
@@ -582,31 +626,31 @@ export interface ConfigMixin<C = Config, S = Settings> {
 type Placement = "after" | "before" | "append" | "prepend";
 type ActionType = string | "ADD_RULE" | "REMOVE_RULE" | "ADD_GROUP" | "ADD_CASE_GROUP" | "REMOVE_GROUP" | "SET_NOT" | "SET_LOCK" | "SET_CONJUNCTION" | "SET_FIELD" | "SET_FIELD_SRC" | "SET_OPERATOR" | "SET_VALUE" | "SET_VALUE_SRC" | "SET_OPERATOR_OPTION" | "MOVE_ITEM";
 interface BaseAction {
-  type: ActionType,
+  type: ActionType;
 
-  id?: string, // for ADD_RULE, ADD_GROUP - id of new item
-  path?: IdPath, // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
+  id?: string; // for ADD_RULE, ADD_GROUP - id of new item
+  path?: string[]; // for all except MOVE_ITEM (for ADD_RULE/ADD_GROUP it's parent path)
 
-  conjunction?: string,
-  not?: boolean,
-  lock?: boolean,
-  field?: string,
-  operator?: string,
-  delta?: number, // for SET_VALUE
-  value?: RuleValue,
-  valueType?: string,
-  srcKey?: ValueSource,
-  name?: string, // for SET_OPERATOR_OPTION
-  fromPath?: IdPath, // for MOVE_ITEM
-  toPath?: IdPath, // for MOVE_ITEM
-  placement?: Placement, // for MOVE_ITEM
-  properties?: TypedMap<any>, // for ADD_RULE, ADD_GROUP
+  conjunction?: string;
+  not?: boolean;
+  lock?: boolean;
+  field?: string;
+  operator?: string;
+  delta?: number; // for SET_VALUE
+  value?: SimpleValue;
+  valueType?: string;
+  srcKey?: ValueSource;
+  name?: string; // for SET_OPERATOR_OPTION
+  fromPath?: string[]; // for MOVE_ITEM
+  toPath?: string[]; // for MOVE_ITEM
+  placement?: Placement; // for MOVE_ITEM
+  properties?: TypedMap<any>; // for ADD_RULE, ADD_GROUP
 }
 export interface InputAction extends BaseAction {
-  config: Config,
+  config: Config;
 }
 export interface ActionMeta extends BaseAction {
-  affectedField?: string, // gets field name from `path` (or `field` for first SET_FIELD)
+  affectedField?: string; // gets field name from `path` (or `field` for first SET_FIELD)
 }
 
 export interface Actions {
@@ -618,49 +662,49 @@ export interface Actions {
   setNot(path: IdPath, not: boolean): undefined;
   setLock(path: IdPath, lock: boolean): undefined;
   setConjunction(path: IdPath, conjunction: string): undefined;
-  setField(path: IdPath, field: FieldValue): undefined;
+  setField(path: IdPath, field: FieldValueI): undefined; // todo: try to support FieldValue - apply jsToImmutable() just like for `defaultField`
   setFieldSrc(path: IdPath, fieldSrc: FieldSource): undefined;
   setOperator(path: IdPath, operator: string): undefined;
-  setValue(path: IdPath, delta: number, value: RuleValue, valueType: string): undefined;
-  setFuncValue(path: IdPath, delta: number, parentFuncs: string[], argKey: string | null, value: RuleValue, type: string | "!valueSrc"): undefined;
+  setValue(path: IdPath, delta: number, value: RuleValueI, valueType: string): undefined; // todo: try to support RuleValue
+  setFuncValue(path: IdPath, delta: number, parentFuncs: string[], argKey: string | null, value: SimpleValue, valueType: string | "!valueSrc"): undefined;
   setValueSrc(path: IdPath, delta: number, valueSrc: ValueSource): undefined;
-  setOperatorOption(path: IdPath, name: string, value: RuleValue): undefined;
+  setOperatorOption(path: IdPath, name: string, value: SimpleValue): undefined;
   moveItem(fromPath: IdPath, toPath: IdPath, placement: Placement): undefined;
   setTree(tree: ImmutableTree): undefined;
 }
 
 interface TreeState {
-  tree: ImmutableTree,
-  __lastAction?: ActionMeta,
+  tree: ImmutableTree;
+  __lastAction?: ActionMeta;
 }
 type TreeReducer = (state?: TreeState, action?: InputAction) => TreeState;
 type TreeStore = (config: Config, tree?: ImmutableTree) => TreeReducer;
 
 export interface TreeActions {
   tree: {
-    setTree(config: Config, tree: ImmutableTree): InputAction,
-    addRule(config: Config, path: IdPath, properties?: AnyRuleProperties, type?: ItemType, children?: Array<JsonAnyRule>): InputAction,
-    removeRule(config: Config, path: IdPath): InputAction,
-    addDefaultCaseGroup(config: Config, path: IdPath, properties?: CaseGroupProperties, children?: Array<JsonAnyRule>): InputAction,
-    addCaseGroup(config: Config, path: IdPath, properties?: CaseGroupProperties, children?: Array<JsonAnyRule>): InputAction,
-    addGroup(config: Config, path: IdPath, properties?: GroupProperties, children?: Array<JsonItem>): InputAction,
+    setTree(config: Config, tree: ImmutableTree): InputAction;
+    addRule(config: Config, path: IdPath, properties?: AnyRuleProperties, type?: ItemType, children?: Array<JsonAnyRule>): InputAction;
+    removeRule(config: Config, path: IdPath): InputAction;
+    addDefaultCaseGroup(config: Config, path: IdPath, properties?: CaseGroupProperties, children?: Array<JsonAnyRule>): InputAction;
+    addCaseGroup(config: Config, path: IdPath, properties?: CaseGroupProperties, children?: Array<JsonAnyRule>): InputAction;
+    addGroup(config: Config, path: IdPath, properties?: GroupProperties, children?: Array<JsonItem>): InputAction;
     removeGroup(config: Config, path: IdPath): InputAction;
     moveItem(config: Config, fromPath: IdPath, toPath: IdPath, placement: Placement): InputAction;
-  },
+  };
   group: {
     setConjunction(config: Config, path: IdPath, conjunction: string): InputAction;
     setNot(config: Config, path: IdPath, not: boolean): InputAction;
     setLock(config: Config, path: IdPath, lock: boolean): InputAction;
-  },
+  };
   rule: {
-    setField(config: Config, path: IdPath, field: FieldValue): InputAction;
+    setField(config: Config, path: IdPath, field: FieldValueI): InputAction; // todo: try to support FieldValue
     setFieldSrc(config: Config, path: IdPath, fieldSrc: FieldSource): InputAction;
     setOperator(config: Config, path: IdPath, operator: string): InputAction;
-    setValue(config: Config, path: IdPath, delta: number, value: RuleValue, valueType: string): InputAction;
+    setValue(config: Config, path: IdPath, delta: number, value: RuleValueI, valueType: string): InputAction; // todo: try to support RuleValue
     setValueSrc(config: Config, path: IdPath, delta: number, valueSrc: ValueSource): InputAction;
-    setOperatorOption(config: Config, path: IdPath, name: string, value: RuleValue): InputAction;
-    setFuncValue(config: Config, path: IdPath, delta: number, parentFuncs: string[], value: RuleValue, valueType: string): InputAction;
-  },
+    setOperatorOption(config: Config, path: IdPath, name: string, value: SimpleValue): InputAction;
+    setFuncValue(config: Config, path: IdPath, delta: number, parentFuncs: string[], argKey: string | null, value: SimpleValue, valueType: string | "!valueSrc"): InputAction;
+  };
 }
 
 
@@ -671,48 +715,50 @@ export interface TreeActions {
 /////////////////
 
 interface AbstractWidgetProps<C = Config> {
-  placeholder: string,
-  label?: string,
-  field: FieldValue,
-  fieldSrc: FieldSource,
-  fieldType?: FieldType,
-  fieldError?: string | Empty,
-  parentField?: string,
-  operator: string,
-  fieldDefinition: Field,
-  config: C,
-  delta?: number,
-  customProps?: AnyObject,
-  readonly?: boolean,
-  id?: string, // id of rule
-  groupId?: string, // id of parent group
-  widgetId?: string, // unique id of widget
-  isLHS?: boolean,
-  isSpecialRange?: boolean,
-  isFuncArg?: boolean,
+  placeholder: string;
+  label?: string;
+  field: FieldValueI;
+  fieldDefinition: Field;
+  fieldSrc: FieldSource;
+  fieldType?: string;
+  fieldError?: string | Empty;
+  parentField?: string;
+  parentFuncs?: Array<[string, string]> | Empty; // array of [funcKey, argKey]
+  operator: string;
+  config: C;
+  delta?: number;
+  customProps?: AnyObject;
+  readonly?: boolean;
+  id?: string; // id of rule
+  groupId?: string; // id of parent group
+  widgetId?: string; // unique id of widget
+  isLHS?: boolean;
+  isSpecialRange?: boolean;
+  isFuncArg?: boolean;
+  // tip: setFuncValue prop exists, but is internal
 }
 interface BaseWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
-  value: V | Empty,
-  setValue(val: V | Empty, asyncListValues?: Array<any>): void,
-  valueError?: string | Empty,
-  errorMessage?: string | Empty, // fieldError or valueError
+  value: V | Empty;
+  setValue(val: V | Empty, asyncListValues?: AsyncListValues): void;
+  valueError?: string | Empty;
+  errorMessage?: string | Empty; // fieldError or valueError
 }
 interface RangeWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
-  value: Array<V | Empty>,
-  setValue(val: Array<V | Empty>, asyncListValues?: Array<any>): void,
-  placeholders: Array<string>,
-  textSeparators: Array<string>,
-  valueError?: Array<string | Empty>,
-  errorMessage?: Array<string | Empty>, // same as valueError
+  value: Array<V | Empty>;
+  setValue(val: Array<V | Empty>, asyncListValues?: AsyncListValues): void;
+  placeholders: Array<string>;
+  textSeparators: Array<string>;
+  valueError?: Array<string | Empty>;
+  errorMessage?: Array<string | Empty>; // same as valueError
 }
 // BaseWidgetProps | RangeWidgetProps
 interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidgetProps<C> {
-  value: V | Empty | Array<V | Empty>,
-  setValue(val: V | Empty | Array<V | Empty>, asyncListValues?: Array<any>): void,
-  placeholders?: Array<string>,
-  textSeparators?: Array<string>,
-  valueError?: string | Empty | Array<string | Empty>,
-  errorMessage?: string | Empty | Array<string | Empty>, // fieldError or valueError
+  value: V | Empty | Array<V | Empty>;
+  setValue(val: V | Empty | Array<V | Empty>, asyncListValues?: AsyncListValues): void;
+  placeholders?: Array<string>;
+  textSeparators?: Array<string>;
+  valueError?: string | Empty | Array<string | Empty>;
+  errorMessage?: string | Empty | Array<string | Empty>; // fieldError or valueError
 }
 export type WidgetProps<C = Config> = RangeableWidgetProps<C> & FieldSettings;
 
@@ -736,37 +782,37 @@ export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFie
 type FieldItemSearchableKey = "key" | "path" | "label" | "altLabel" | "tooltip" | "grouplabel";
 
 export type FieldItem = {
-  items?: FieldItems, 
-  key: string, 
-  path?: string, // field path with separator
-  label: string, 
-  fullLabel?: string, 
-  altLabel?: string, // label2
-  tooltip?: string,
-  disabled?: boolean,
-  grouplabel?: string,
-  matchesType?: boolean,
+  items?: FieldItems;
+  key: string;
+  path?: string; // field path with separator
+  label: string;
+  fullLabel?: string;
+  altLabel?: string; // label2
+  tooltip?: string;
+  disabled?: boolean;
+  grouplabel?: string;
+  matchesType?: boolean;
 }
 type FieldItems = FieldItem[];
 
 export interface FieldProps<C = Config> {
-  items: FieldItems,
-  selectedFieldSrc?: FieldSource,
-  setField(field: FieldValue): void,
-  errorText?: string,
-  selectedKey: string | Empty,
-  selectedKeys?: Array<string> | Empty,
-  selectedPath?: Array<string> | Empty,
-  selectedLabel?: string | Empty,
-  selectedAltLabel?: string | Empty,
-  selectedFullLabel?: string | Empty,
-  config?: C,
-  customProps?: AnyObject,
-  placeholder?: string,
-  selectedOpts?: {tooltip?: string},
-  readonly?: boolean,
-  id?: string, // id of rule
-  groupId?: string, // id of parent group
+  items: FieldItems;
+  selectedFieldSrc?: FieldSource;
+  setField(field: FieldPath): void;
+  errorText?: string;
+  selectedKey: string | Empty;
+  selectedKeys?: Array<string> | Empty;
+  selectedPath?: Array<string> | Empty;
+  selectedLabel?: string | Empty;
+  selectedAltLabel?: string | Empty;
+  selectedFullLabel?: string | Empty;
+  config?: C;
+  customProps?: AnyObject;
+  placeholder?: string;
+  selectedOpts?: {tooltip?: string};
+  readonly?: boolean;
+  id?: string; // id of rule
+  groupId?: string; // id of parent group
 }
 
 /////////////////
@@ -809,26 +855,26 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   customProps?: AnyObject;
 }
 export interface RangeableWidget<C = Config, WP = WidgetProps<C>> extends BaseWidget<C, WP> {
-  singleWidget?: string,
-  valueLabels?: Array<string | {label: string, placeholder: string}>,
+  singleWidget?: string;
+  valueLabels?: Array<string | {label: string, placeholder: string}>;
 }
 interface BaseFieldWidget<C = Config, WP = WidgetProps<C>> {
-  valuePlaceholder?: string,
-  valueLabel?: string,
-  formatValue: FormatValue | SerializedFunction, // with rightFieldDef
-  sqlFormatValue?: SqlFormatValue | SerializedFunction, // with rightFieldDef
-  spelFormatValue?: SpelFormatValue | SerializedFunction, // with rightFieldDef
+  valuePlaceholder?: string;
+  valueLabel?: string;
+  formatValue: FormatValue | SerializedFunction; // with rightFieldDef
+  sqlFormatValue?: SqlFormatValue | SerializedFunction; // with rightFieldDef
+  spelFormatValue?: SpelFormatValue | SerializedFunction; // with rightFieldDef
   //obsolete:
-  validateValue?: ValidateValue | SerializedFunction,
+  validateValue?: ValidateValue | SerializedFunction;
   //@ui
-  customProps?: AnyObject,
-  factory?: FactoryWithContext<WP>,
+  customProps?: AnyObject;
+  factory?: FactoryWithContext<WP>;
 }
 export interface FieldWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
-  valueSrc: "field",
+  valueSrc: "field";
 }
 export interface FuncWidget<C = Config, WP = WidgetProps<C>> extends BaseFieldWidget<C, WP> {
-  valueSrc: "func",
+  valueSrc: "func";
 }
 
 export type TextWidget<C = Config, WP = TextWidgetProps<C>> = BaseWidget<C, WP> & TextFieldSettings;
@@ -873,16 +919,16 @@ type SqlFormatConj = (children: ImmutableList<string>, conj: string, not: boolea
 type SpelFormatConj = (children: ImmutableList<string>, conj: string, not: boolean, omitBrackets?: boolean) => string;
 
 export interface Conjunction {
-  label: string,
-  formatConj: FormatConj | SerializedFunction,
-  sqlFormatConj: SqlFormatConj | SerializedFunction,
-  spelFormatConj: SpelFormatConj | SerializedFunction,
-  mongoConj: string,
-  jsonLogicConj?: string,
-  sqlConj?: string,
-  spelConj?: string,
-  spelConjs?: string[],
-  reversedConj?: string,
+  label: string;
+  formatConj: FormatConj | SerializedFunction;
+  sqlFormatConj: SqlFormatConj | SerializedFunction;
+  spelFormatConj: SpelFormatConj | SerializedFunction;
+  mongoConj: string;
+  jsonLogicConj?: string;
+  sqlConj?: string;
+  spelConj?: string;
+  spelConjs?: string[];
+  reversedConj?: string;
 }
 export type Conjunctions = TypedMap<Conjunction>;
 
@@ -892,24 +938,24 @@ export type Conjunctions = TypedMap<Conjunction>;
 /////////////////
 
 export interface ConjunctionOption {
-  id: string,
-  key: string,
-  label: string,
-  checked: boolean,
+  id: string;
+  key: string;
+  label: string;
+  checked: boolean;
 }
 
 export interface ConjsProps {
-  id: string,
-  readonly?: boolean,
-  disabled?: boolean,
-  selectedConjunction?: string,
-  setConjunction(conj: string): void,
-  conjunctionOptions?: TypedMap<ConjunctionOption>,
-  config?: Config,
-  not: boolean,
-  setNot(not: boolean): void,
-  showNot?: boolean,
-  notLabel?: string,
+  id: string;
+  readonly?: boolean;
+  disabled?: boolean;
+  selectedConjunction?: string;
+  setConjunction(conj: string): void;
+  conjunctionOptions?: TypedMap<ConjunctionOption>;
+  config?: Config;
+  not: boolean;
+  setNot(not: boolean): void;
+  showNot?: boolean;
+  notLabel?: string;
 }
 
 
@@ -917,67 +963,67 @@ export interface ConjsProps {
 // Operators
 /////////////////
 
-type FormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, isForDisplay?: boolean, fieldDef?: Field) => string;
-type MongoFormatOperator = (field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => Object;
-type SqlFormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
-type SpelFormatOperator = (field: FieldPath, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => string;
-type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: AnyObject, fieldDef?: Field) => JsonLogicTree;
+type FormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, isForDisplay?: boolean, fieldDef?: Field) => string;
+type MongoFormatOperator = (field: FieldPath, op: string, vals: MongoValue | Array<MongoValue>, useExpr?: boolean, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => Object;
+type SqlFormatOperator = (field: FieldPath, op: string, vals: string | ImmutableList<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string;
+type SpelFormatOperator = (field: FieldPath, op: string, vals: string | Array<string>, valueSrc?: ValueSource, valueType?: string, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => string;
+type JsonLogicFormatOperator = (field: JsonLogicField, op: string, vals: JsonLogicValue | Array<JsonLogicValue>, opDef?: Operator, operatorOptions?: OperatorOptionsI, fieldDef?: Field) => JsonLogicTree;
 type ElasticSearchFormatQueryType = (valueType: string) => ElasticSearchQueryType;
 
 interface ProximityConfig {
-  optionLabel: string,
-  optionTextBefore: string,
-  optionPlaceholder: string,
-  minProximity: number,
-  maxProximity: number,
+  optionLabel: string;
+  optionTextBefore: string;
+  optionPlaceholder: string;
+  minProximity: number;
+  maxProximity: number;
   defaults: {
-    proximity: number,
-  },
-  customProps?: AnyObject,
+    proximity: number;
+  };
+  customProps?: AnyObject;
 }
 export interface ProximityProps<C = Config> extends ProximityConfig {
-  options: ImmutableMap<string, any>,
-  setOption: (key: string, value: any) => void,
-  config: C,
+  options: ImmutableMap<string, any>;
+  setOption: (key: string, value: any) => void;
+  config: C;
 }
 export interface ProximityOptions<C = Config, PP = ProximityProps<C>> extends ProximityConfig {
   //@ui
-  factory: FactoryWithContext<PP> | SerializedFunction,
+  factory: FactoryWithContext<PP> | SerializedFunction;
 }
 
 export interface BaseOperator {
-  label: string,
-  reversedOp?: string,
-  isNotOp?: boolean,
-  cardinality?: number,
-  formatOp?: FormatOperator | SerializedFunction,
-  labelForFormat?: string,
-  mongoFormatOp?: MongoFormatOperator | SerializedFunction,
-  sqlOp?: string,
-  sqlFormatOp?: SqlFormatOperator | SerializedFunction,
-  spelOp?: string,
-  spelOps?: string[],
-  spelFormatOp?: SpelFormatOperator | SerializedFunction,
-  jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction,
-  _jsonLogicIsRevArgs?: boolean,
-  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction,
-  valueSources?: Array<ValueSource>,
-  valueTypes?: Array<string>,
+  label: string;
+  reversedOp?: string;
+  isNotOp?: boolean;
+  cardinality?: number;
+  formatOp?: FormatOperator | SerializedFunction;
+  labelForFormat?: string;
+  mongoFormatOp?: MongoFormatOperator | SerializedFunction;
+  sqlOp?: string;
+  sqlFormatOp?: SqlFormatOperator | SerializedFunction;
+  spelOp?: string;
+  spelOps?: string[];
+  spelFormatOp?: SpelFormatOperator | SerializedFunction;
+  jsonLogic?: string | JsonLogicFormatOperator | JsonLogicFunction;
+  _jsonLogicIsRevArgs?: boolean;
+  elasticSearchQueryType?: ElasticSearchQueryType | ElasticSearchFormatQueryType | JsonLogicFunction;
+  valueSources?: Array<ValueSource>;
+  valueTypes?: Array<string>;
 }
 export interface UnaryOperator extends BaseOperator {
-  //cardinality: 0,
+  //cardinality: 0;
 }
 export interface BinaryOperator extends BaseOperator {
-  //cardinality: 1,
+  //cardinality: 1;
 }
 export interface Operator2 extends BaseOperator {
-  //cardinality: 2
-  textSeparators: Array<RenderedReactElement>,
-  valueLabels: Array<string | {label: string, placeholder: string}>,
-  isSpecialRange?: boolean,
+  //cardinality: 2;
+  textSeparators: Array<RenderedReactElement>;
+  valueLabels: Array<string | {label: string, placeholder: string}>;
+  isSpecialRange?: boolean;
 }
 export interface OperatorProximity<C = Config> extends Operator2 {
-  options: ProximityOptions<C, ProximityProps<C>>,
+  options: ProximityOptions<C, ProximityProps<C>>;
 }
 export type Operator<C = Config> = UnaryOperator | BinaryOperator | Operator2 | OperatorProximity<C>;
 export type Operators<C = Config> = TypedMap<Operator<C>>;
@@ -989,17 +1035,17 @@ export type Operators<C = Config> = TypedMap<Operator<C>>;
 /////////////////
 
 interface WidgetConfigForType {
-  widgetProps?: Optional<Widget>,
-  opProps?: Optional<Operator>,
-  operators?: Array<string>,
+  widgetProps?: Optional<Widget>;
+  opProps?: Optional<Operator>;
+  operators?: Array<string>;
 }
 
 interface Type {
-  valueSources?: Array<ValueSource>,
-  defaultOperator?: string,
-  widgets: TypedMap<WidgetConfigForType>,
-  mainWidget?: string,
-  excludeOperators?: Array<string>,
+  valueSources?: Array<ValueSource>;
+  defaultOperator?: string;
+  widgets: TypedMap<WidgetConfigForType>;
+  mainWidget?: string;
+  excludeOperators?: Array<string>;
 }
 export type Types = TypedMap<Type>;
 
@@ -1008,83 +1054,82 @@ export type Types = TypedMap<Type>;
 // Fields
 /////////////////
 
-type FieldType = string | "!struct" | "!group";
 
 export interface ListItem {
-  value: string | number,
-  title?: string,
-  disabled?: boolean,
-  isCustom?: boolean,
-  isHidden?: boolean,
-  groupTitle?: string,
-  renderTitle?: string, // internal for MUI
+  value: string | number;
+  title?: string;
+  disabled?: boolean;
+  isCustom?: boolean;
+  isHidden?: boolean;
+  groupTitle?: string;
+  renderTitle?: string; // internal for MUI
 }
 type ListItemSearchableKey = "title" | "value" | "groupTitle";
 export interface ListOptionUi extends ListItem {
-  specialValue?: string,
+  specialValue?: string;
 }
 export type ListItems = Array<ListItem>;
 export interface TreeItem extends ListItem {
-  children?: Array<TreeItem>,
-  parent?: any,
-  disabled?: boolean,
-  selectable?: boolean,
-  disableCheckbox?: boolean,
-  checkable?: boolean,
-  path?: Array<string>
+  children?: Array<TreeItem>;
+  parent?: any;
+  disabled?: boolean;
+  selectable?: boolean;
+  disableCheckbox?: boolean;
+  checkable?: boolean;
+  path?: Array<string>;
 }
 export type TreeData = Array<TreeItem>;
 export type ListValues = TypedMap<string> | TypedKeyMap<string | number, string> | Array<ListItem> | Array<string | number>;
 
 export interface AsyncFetchListValuesResult {
-  values: ListItems,
-  hasMore?: boolean,
+  values: ListItems;
+  hasMore?: boolean;
 }
 export type AsyncFetchListValuesFn = (search: string | null, offset: number) => Promise<AsyncFetchListValuesResult>;
 
 
 export interface BasicFieldSettings<V = RuleValue> {
-  validateValue?: ValidateValue<V> | SerializedFunction,
+  validateValue?: ValidateValue<V> | SerializedFunction;
 }
 export interface TextFieldSettings<V = string> extends BasicFieldSettings<V> {
-  maxLength?: number,
-  maxRows?: number,
+  maxLength?: number;
+  maxRows?: number;
 }
 export interface NumberFieldSettings<V = number> extends BasicFieldSettings<V> {
-  min?: number,
-  max?: number,
-  step?: number,
-  marks?: {[mark: number]: RenderedReactElement}
+  min?: number;
+  max?: number;
+  step?: number;
+  marks?: {[mark: number]: RenderedReactElement};
 }
 export interface DateTimeFieldSettings<V = string> extends BasicFieldSettings<V> {
-  timeFormat?: string,
-  dateFormat?: string,
-  valueFormat?: string,
-  use12Hours?: boolean,
-  useKeyboard?: boolean, // obsolete
+  timeFormat?: string;
+  dateFormat?: string;
+  valueFormat?: string;
+  use12Hours?: boolean;
+  useKeyboard?: boolean; // obsolete
 }
 export interface SelectFieldSettings<V = string | number> extends BasicFieldSettings<V> {
-  listValues?: ListValues,
-  allowCustomValues?: boolean,
-  showSearch?: boolean,
-  showCheckboxes?: boolean,
-  asyncFetch?: AsyncFetchListValuesFn | SerializedFunction,
-  useLoadMore?: boolean,
-  useAsyncSearch?: boolean,
-  forceAsyncSearch?: boolean,
+  listValues?: ListValues;
+  allowCustomValues?: boolean;
+  showSearch?: boolean;
+  showCheckboxes?: boolean;
+  asyncFetch?: AsyncFetchListValuesFn | SerializedFunction;
+  useLoadMore?: boolean;
+  useAsyncSearch?: boolean;
+  forceAsyncSearch?: boolean;
 }
 export interface MultiSelectFieldSettings<V = string[] | number[]> extends SelectFieldSettings<V> {
 }
 export interface TreeSelectFieldSettings<V = string | number> extends BasicFieldSettings<V> {
-  treeValues?: TreeData,
-  treeExpandAll?: boolean,
-  treeSelectOnlyLeafs?: boolean,
+  treeValues?: TreeData;
+  treeExpandAll?: boolean;
+  treeSelectOnlyLeafs?: boolean;
 }
 export interface TreeMultiSelectFieldSettings<V = string[] | number[]> extends TreeSelectFieldSettings<V> {
 }
 export interface BooleanFieldSettings<V = boolean> extends BasicFieldSettings<V> {
-  labelYes?: RenderedReactElement,
-  labelNo?: RenderedReactElement,
+  labelYes?: RenderedReactElement;
+  labelNo?: RenderedReactElement;
 }
 export interface CaseValueFieldSettings<V = any> extends BasicFieldSettings<V> {
 }
@@ -1100,61 +1145,62 @@ export type FieldSettings =
   | TextFieldSettings<RuleValue>
   | BasicFieldSettings<RuleValue>;
 
+type FieldTypeInConfig = string | "!struct" | "!group";
 interface BaseField {
-  type: FieldType,
-  label?: string,
-  tooltip?: string,
+  type: FieldTypeInConfig;
+  label?: string;
+  tooltip?: string;
 }
 interface BaseSimpleField<FS = FieldSettings> extends BaseField {
-  type: string,
-  preferWidgets?: Array<string>,
-  valueSources?: Array<ValueSource>,
-  funcs?: Array<string>,
-  tableName?: string, // legacy: PR #18, PR #20
-  fieldName?: string,
-  jsonLogicVar?: string,
-  fieldSettings?: FS,
-  defaultValue?: RuleValue,
-  widgets?: TypedMap<WidgetConfigForType>,
-  mainWidgetProps?: Optional<Widget>,
-  hideForSelect?: boolean,
-  hideForCompare?: boolean,
+  type: string;
+  preferWidgets?: Array<string>;
+  valueSources?: Array<ValueSource>;
+  funcs?: Array<string>;
+  tableName?: string; // legacy: PR #18, PR #20
+  fieldName?: string;
+  jsonLogicVar?: string;
+  fieldSettings?: FS;
+  defaultValue?: RuleValue;
+  widgets?: TypedMap<WidgetConfigForType>;
+  mainWidgetProps?: Optional<Widget>;
+  hideForSelect?: boolean;
+  hideForCompare?: boolean;
   //obsolete - moved to FieldSettings
-  listValues?: ListValues,
-  allowCustomValues?: boolean,
-  isSpelVariable?: boolean,
+  listValues?: ListValues;
+  allowCustomValues?: boolean;
+  isSpelVariable?: boolean;
 }
 interface SimpleField<FS = FieldSettings> extends BaseSimpleField<FS> {
-  label2?: string,
-  operators?: Array<string>,
-  defaultOperator?: string,
-  excludeOperators?: Array<string>,
+  label2?: string;
+  operators?: Array<string>;
+  defaultOperator?: string;
+  excludeOperators?: Array<string>;
 }
 interface FieldStruct extends BaseField {
-  type: "!struct",
-  subfields: Fields,
-  isSpelMap?: boolean,
+  type: "!struct";
+  subfields: Fields;
+  isSpelMap?: boolean;
 }
 interface FieldGroup extends BaseField {
-  type: "!group",
-  subfields: Fields,
-  mode: RuleGroupMode,
-  isSpelArray?: boolean,
-  isSpelItemMap?: boolean,
-  defaultField?: FieldPath,
+  type: "!group";
+  subfields: Fields;
+  mode: RuleGroupMode;
+  isSpelArray?: boolean;
+  isSpelItemMap?: boolean;
+  defaultField?: FieldPath;
 }
 interface FieldGroupExt extends BaseField {
-  type: "!group",
-  subfields: Fields,
-  mode: "array",
-  operators?: Array<string>,
-  defaultOperator?: string,
-  defaultField?: FieldPath,
-  initialEmptyWhere?: boolean,
-  showNot?: boolean,
-  conjunctions?: Array<string>,
-  isSpelArray?: boolean,
-  isSpelItemMap?: boolean,
+  type: "!group";
+  subfields: Fields;
+  mode: "array";
+  operators?: Array<string>;
+  defaultOperator?: string;
+  defaultField?: FieldPath;
+  initialEmptyWhere?: boolean;
+  showNot?: boolean;
+  conjunctions?: Array<string>;
+  isSpelArray?: boolean;
+  isSpelItemMap?: boolean;
 }
 
 export type Field = SimpleField;
@@ -1176,9 +1222,9 @@ export type TextField = SimpleField<TextFieldSettings>;
 /////////////////
 
 type SpelFieldMeta = {
-  key: string,
-  parent: "map" | "class" | "[class]" | "[map]" | null,
-  isSpelVariable?: boolean,
+  key: string;
+  parent: "map" | "class" | "[class]" | "[map]" | null;
+  isSpelVariable?: boolean;
 };
 type ValueSourcesInfo = {[vs in ValueSource]?: {label: string, widget?: string}};
 type AntdPosition = "topLeft" | "topCenter" | "topRight" | "bottomLeft" | "bottomCenter" | "bottomRight";
@@ -1190,104 +1236,104 @@ type SpelFormatReverse = (q: string) => string;
 type FormatField = (field: FieldPath, parts: Array<string>, label2: string, fieldDefinition: Field, config: Config, isForDisplay: boolean) => string;
 type FormatSpelField = (field: FieldPath, parentField: FieldPath | null, parts: Array<string>, partsExt: Array<SpelFieldMeta>, fieldDefinition: Field, config: Config) => string;
 type CanCompareFieldWithField = (leftField: FieldPath, leftFieldConfig: Field, rightField: FieldPath, rightFieldConfig: Field, op: string) => boolean;
-type FormatAggr = (whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: AnyObject, isForDisplay: boolean, aggrFieldDef: Field) => string;
+type FormatAggr = (whereStr: string, aggrField: FieldPath, operator: string, value: string | ImmutableList<string>, valueSrc: ValueSource, valueType: string, opDef: Operator, operatorOptions: OperatorOptionsI, isForDisplay: boolean, aggrFieldDef: Field) => string;
 
 export interface LocaleSettings {
   locale?: {
-    moment?: string,
-    antd?: Object,
-    material?: Object,
-    mui?: Object,
-  },
+    moment?: string;
+    antd?: Object;
+    material?: Object;
+    mui?: Object;
+  };
   theme?: {
-    material?: Object,
-    mui?: Object,
-  },
-  valueLabel?: string,
-  valuePlaceholder?: string,
-  fieldLabel?: string,
-  operatorLabel?: string,
-  fieldPlaceholder?: string,
-  funcPlaceholder?: string,
-  funcLabel?: string,
-  operatorPlaceholder?: string,
-  lockLabel?: string,
-  lockedLabel?: string,
-  deleteLabel?: string,
-  addGroupLabel?: string,
-  addCaseLabel?: string,
-  addDefaultCaseLabel?: string,
-  defaultCaseLabel?: string,
-  addRuleLabel?: string,
-  addSubRuleLabel?: string,
-  delGroupLabel?: string,
-  notLabel?: string,
-  fieldSourcesPopupTitle?: string,
-  valueSourcesPopupTitle?: string,
+    material?: Object;
+    mui?: Object;
+  };
+  valueLabel?: string;
+  valuePlaceholder?: string;
+  fieldLabel?: string;
+  operatorLabel?: string;
+  fieldPlaceholder?: string;
+  funcPlaceholder?: string;
+  funcLabel?: string;
+  operatorPlaceholder?: string;
+  lockLabel?: string;
+  lockedLabel?: string;
+  deleteLabel?: string;
+  addGroupLabel?: string;
+  addCaseLabel?: string;
+  addDefaultCaseLabel?: string;
+  defaultCaseLabel?: string;
+  addRuleLabel?: string;
+  addSubRuleLabel?: string;
+  delGroupLabel?: string;
+  notLabel?: string;
+  fieldSourcesPopupTitle?: string;
+  valueSourcesPopupTitle?: string;
   removeRuleConfirmOptions?: {
-    title?: string,
-    okText?: string,
-    okType?: string,
-    cancelText?: string,
-  },
+    title?: string;
+    okText?: string;
+    okType?: string;
+    cancelText?: string;
+  };
   removeGroupConfirmOptions?: {
-    title?: string,
-    okText?: string,
-    okType?: string,
-    cancelText?: string,
-  },
+    title?: string;
+    okText?: string;
+    okType?: string;
+    cancelText?: string;
+  };
 }
 
 
 export interface BehaviourSettings {
-  defaultField?: FieldPath | FieldFuncValue | FieldFuncValueI,
+  defaultField?: FieldValue | FieldValueI;
   defaultOperator?: string;
-  fieldSources?: Array<FieldSource>,
-  valueSourcesInfo?: ValueSourcesInfo,
-  canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction,
-  canReorder?: boolean,
-  canRegroup?: boolean,
-  canRegroupCases?: boolean,
-  showNot?: boolean,
-  showLock?: boolean,
-  canDeleteLocked?: boolean,
-  maxNesting?: number,
-  setOpOnChangeField: Array<ChangeFieldStrategy>,
-  clearValueOnChangeField?: boolean,
-  clearValueOnChangeOp?: boolean,
-  canLeaveEmptyGroup?: boolean,
-  canLeaveEmptyCase?: boolean,
-  shouldCreateEmptyGroup?: boolean,
-  forceShowConj?: boolean,
-  immutableGroupsMode?: boolean,
-  immutableFieldsMode?: boolean,
-  immutableOpsMode?: boolean,
-  immutableValuesMode?: boolean,
-  maxNumberOfRules?: Number,
-  maxNumberOfCases?: Number,
-  showErrorMessage?: boolean,
-  optimizeRenderWithInternals?: boolean,
-  canShortMongoQuery?: boolean,
-  convertableWidgets?: TypedMap<Array<string>>,
-  removeEmptyGroupsOnLoad?: boolean,
-  removeIncompleteRulesOnLoad?: boolean,
-  removeInvalidMultiSelectValuesOnLoad?: boolean,
-  groupOperators?: Array<string>,
-  useConfigCompress?: boolean,
-  keepInputOnChangeFieldSrc?: boolean,
+  fieldSources?: Array<FieldSource>;
+  valueSourcesInfo?: ValueSourcesInfo;
+  canCompareFieldWithField?: CanCompareFieldWithField | SerializedFunction;
+  canReorder?: boolean;
+  canRegroup?: boolean;
+  canRegroupCases?: boolean;
+  showNot?: boolean;
+  showLock?: boolean;
+  canDeleteLocked?: boolean;
+  maxNesting?: number;
+  setOpOnChangeField: Array<ChangeFieldStrategy>;
+  clearValueOnChangeField?: boolean;
+  clearValueOnChangeOp?: boolean;
+  canLeaveEmptyGroup?: boolean;
+  canLeaveEmptyCase?: boolean;
+  shouldCreateEmptyGroup?: boolean;
+  forceShowConj?: boolean;
+  immutableGroupsMode?: boolean;
+  immutableFieldsMode?: boolean;
+  immutableOpsMode?: boolean;
+  immutableValuesMode?: boolean;
+  maxNumberOfRules?: Number;
+  maxNumberOfCases?: Number;
+  showErrorMessage?: boolean;
+  optimizeRenderWithInternals?: boolean;
+  canShortMongoQuery?: boolean;
+  convertableWidgets?: TypedMap<Array<string>>;
+  removeEmptyGroupsOnLoad?: boolean;
+  removeIncompleteRulesOnLoad?: boolean;
+  removeInvalidMultiSelectValuesOnLoad?: boolean;
+  groupOperators?: Array<string>;
+  useConfigCompress?: boolean;
+  keepInputOnChangeFieldSrc?: boolean;
   fieldItemKeysForSearch?: FieldItemSearchableKey[];
   listKeysForSearch?: ListItemSearchableKey[];
 }
 
 export interface OtherSettings {
-  fieldSeparator?: string,
-  fieldSeparatorDisplay?: string,
-  formatReverse?: FormatReverse | SerializedFunction,
-  sqlFormatReverse?: SqlFormatReverse | SerializedFunction,
-  spelFormatReverse?: SpelFormatReverse | SerializedFunction,
-  formatField?: FormatField | SerializedFunction,
-  formatSpelField?: FormatSpelField | SerializedFunction,
-  formatAggr?: FormatAggr | SerializedFunction,
+  fieldSeparator?: string;
+  fieldSeparatorDisplay?: string;
+  formatReverse?: FormatReverse | SerializedFunction;
+  sqlFormatReverse?: SqlFormatReverse | SerializedFunction;
+  spelFormatReverse?: SpelFormatReverse | SerializedFunction;
+  formatField?: FormatField | SerializedFunction;
+  formatSpelField?: FormatSpelField | SerializedFunction;
+  formatAggr?: FormatAggr | SerializedFunction;
 }
 
 export interface Settings extends LocaleSettings, BehaviourSettings, OtherSettings {
@@ -1307,36 +1353,36 @@ type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 
 interface FuncGroup extends BaseField {
-  type: "!struct",
-  subfields: TypedMap<FuncOrGroup>,
+  type: "!struct";
+  subfields: TypedMap<FuncOrGroup>;
 }
 
 // todo: uses `returnType` instead of `type` for now, but should be revisited to use `type`
 export interface Func extends Omit<BaseSimpleField, "type"> {
-  returnType: string,
-  args: TypedMap<FuncArg>,
-  sqlFunc?: string,
-  spelFunc?: string,
-  mongoFunc?: string,
-  mongoArgsAsObject?: boolean,
-  jsonLogic?: string | JsonLogicFormatFunc | JsonLogicFunction,
+  returnType: string;
+  args: TypedMap<FuncArg>;
+  sqlFunc?: string;
+  spelFunc?: string;
+  mongoFunc?: string;
+  mongoArgsAsObject?: boolean;
+  jsonLogic?: string | JsonLogicFormatFunc | JsonLogicFunction;
   // Deprecated!
   // Calling methods on objects was remvoed in JsonLogic 2.x
   // https://github.com/jwadhams/json-logic-js/issues/86
-  jsonLogicIsMethod?: boolean,
-  jsonLogicImport?: JsonLogicImportFunc | SerializedFunction,
-  spelImport?: SpelImportFunc | SerializedFunction,
-  formatFunc?: FormatFunc | SerializedFunction,
-  sqlFormatFunc?: SqlFormatFunc | SerializedFunction,
-  mongoFormatFunc?: MongoFormatFunc | SerializedFunction,
-  renderBrackets?: Array<RenderedReactElement>,
-  renderSeps?: Array<RenderedReactElement>,
-  spelFormatFunc?: SpelFormatFunc | SerializedFunction,
-  allowSelfNesting?: boolean,
+  jsonLogicIsMethod?: boolean;
+  jsonLogicImport?: JsonLogicImportFunc | SerializedFunction;
+  spelImport?: SpelImportFunc | SerializedFunction;
+  formatFunc?: FormatFunc | SerializedFunction;
+  sqlFormatFunc?: SqlFormatFunc | SerializedFunction;
+  mongoFormatFunc?: MongoFormatFunc | SerializedFunction;
+  renderBrackets?: Array<RenderedReactElement>;
+  renderSeps?: Array<RenderedReactElement>;
+  spelFormatFunc?: SpelFormatFunc | SerializedFunction;
+  allowSelfNesting?: boolean;
 }
 export interface FuncArg extends BaseSimpleField {
-  isOptional?: boolean,
-  showPrefix?: boolean,
+  isOptional?: boolean;
+  showPrefix?: boolean;
 }
 export type FuncOrGroup = Func | FuncGroup;
 export type Funcs = TypedMap<FuncOrGroup>;
@@ -1347,78 +1393,78 @@ export type Funcs = TypedMap<FuncOrGroup>;
 /////////////////
 
 export interface CoreOperators<C = Config> extends Operators<C> {
-  equal: BinaryOperator,
-  not_equal: BinaryOperator,
-  less: BinaryOperator,
-  less_or_equal: BinaryOperator,
-  greater: BinaryOperator,
-  greater_or_equal: BinaryOperator,
-  like: BinaryOperator,
-  not_like: BinaryOperator,
-  starts_with: BinaryOperator,
-  ends_with: BinaryOperator,
-  between: Operator2,
-  not_between: Operator2,
-  is_null: UnaryOperator,
-  is_not_null: UnaryOperator,
-  is_empty: UnaryOperator,
-  is_not_empty: UnaryOperator,
-  select_equals: BinaryOperator,
-  select_not_equals: BinaryOperator,
-  select_any_in: BinaryOperator,
-  select_not_any_in: BinaryOperator,
-  multiselect_contains: BinaryOperator,
-  multiselect_not_contains: BinaryOperator,
-  multiselect_equals: BinaryOperator,
-  multiselect_not_equals: BinaryOperator,
-  proximity: OperatorProximity<C>,
+  equal: BinaryOperator;
+  not_equal: BinaryOperator;
+  less: BinaryOperator;
+  less_or_equal: BinaryOperator;
+  greater: BinaryOperator;
+  greater_or_equal: BinaryOperator;
+  like: BinaryOperator;
+  not_like: BinaryOperator;
+  starts_with: BinaryOperator;
+  ends_with: BinaryOperator;
+  between: Operator2;
+  not_between: Operator2;
+  is_null: UnaryOperator;
+  is_not_null: UnaryOperator;
+  is_empty: UnaryOperator;
+  is_not_empty: UnaryOperator;
+  select_equals: BinaryOperator;
+  select_not_equals: BinaryOperator;
+  select_any_in: BinaryOperator;
+  select_not_any_in: BinaryOperator;
+  multiselect_contains: BinaryOperator;
+  multiselect_not_contains: BinaryOperator;
+  multiselect_equals: BinaryOperator;
+  multiselect_not_equals: BinaryOperator;
+  proximity: OperatorProximity<C>;
 }
 
 export interface CoreConjunctions extends Conjunctions {
-  AND: Conjunction,
-  OR: Conjunction,
+  AND: Conjunction;
+  OR: Conjunction;
 }
 
 export interface CoreWidgets<C = Config> extends Widgets<C> {
-  text: TextWidget<C>,
-  textarea: TextWidget<C>,
-  number: NumberWidget<C>,
-  slider: NumberWidget<C>,
-  rangeslider: RangeSliderWidget<C>,
-  select: SelectWidget<C>,
-  multiselect: MultiSelectWidget<C>,
-  treeselect: TreeSelectWidget<C>,
-  treemultiselect: TreeMultiSelectWidget<C>,
-  date: DateTimeWidget<C>,
-  time: DateTimeWidget<C>,
-  datetime: DateTimeWidget<C>,
-  boolean: BooleanWidget<C>,
-  field: FieldWidget<C>,
-  func: FuncWidget<C>,
-  case_value: CaseValueWidget<C>,
+  text: TextWidget<C>;
+  textarea: TextWidget<C>;
+  number: NumberWidget<C>;
+  slider: NumberWidget<C>;
+  rangeslider: RangeSliderWidget<C>;
+  select: SelectWidget<C>;
+  multiselect: MultiSelectWidget<C>;
+  treeselect: TreeSelectWidget<C>;
+  treemultiselect: TreeMultiSelectWidget<C>;
+  date: DateTimeWidget<C>;
+  time: DateTimeWidget<C>;
+  datetime: DateTimeWidget<C>;
+  boolean: BooleanWidget<C>;
+  field: FieldWidget<C>;
+  func: FuncWidget<C>;
+  case_value: CaseValueWidget<C>;
 }
 
 export interface CoreTypes extends Types {
-  text: Type,
-  number: Type,
-  date: Type,
-  time: Type,
-  datetime: Type,
-  select: Type,
-  multiselect: Type,
-  treeselect: Type,
-  treemultiselect: Type,
-  boolean: Type,
-  case_value: Type,
+  text: Type;
+  number: Type;
+  date: Type;
+  time: Type;
+  datetime: Type;
+  select: Type;
+  multiselect: Type;
+  treeselect: Type;
+  treemultiselect: Type;
+  boolean: Type;
+  case_value: Type;
 }
 
 export interface CoreConfig extends Config {
-  conjunctions: CoreConjunctions,
-  operators: CoreOperators,
-  widgets: CoreWidgets,
-  types: CoreTypes,
-  settings: Settings,
-  ctx: ConfigContext,
+  conjunctions: CoreConjunctions;
+  operators: CoreOperators;
+  widgets: CoreWidgets;
+  types: CoreTypes;
+  settings: Settings;
+  ctx: ConfigContext;
 }
 
 

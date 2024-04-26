@@ -141,7 +141,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
-  const isFuncArg = typeof field == "object" && (!!field.func && !!field.arg || field._isFuncArg);
+  const isFuncArg = typeof field === "object" && (!!field.func && !!field.arg || field._isFuncArg);
   const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
   

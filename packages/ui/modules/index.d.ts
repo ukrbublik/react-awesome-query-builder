@@ -2,7 +2,8 @@
 
 import {ElementType, ReactElement, Factory} from "react";
 import {
-  Conjunctions, Types, Fields, Funcs, CoreConfig, RuleValue,
+  Conjunctions, Types, Fields, Funcs, CoreConfig, RuleValue, RuleValueI, 
+  SimpleValue, OperatorOptionsI, FieldValueI, FieldSource, AsyncListValues,
   InputAction,
   ImmutableTree,
   Actions,
@@ -15,7 +16,6 @@ import {
   ConjsProps,
 
   ImmutableList, ImmutableMap, ImmutableOMap,
-  IdPath,
   ImmutablePath,
   ImmutableItemProperties,
 
@@ -114,15 +114,15 @@ export type ConfigMixin<C = Config, S = Settings> = _ConfigMixin<C, S>;
 /////////////////
 
 export interface Config extends CoreConfigType {
-  settings: Settings,
-  operators: Operators,
-  widgets: Widgets,
+  settings: Settings;
+  operators: Operators;
+  widgets: Widgets;
 }
 
 export interface BasicConfig extends CoreConfig {
-  settings: Settings,
-  operators: CoreOperators<Config>,
-  widgets: CoreWidgets<Config>,
+  settings: Settings;
+  operators: CoreOperators<Config>;
+  widgets: CoreWidgets<Config>;
 }
 
 
@@ -131,7 +131,7 @@ export interface BasicConfig extends CoreConfig {
 /////////////////
 
 
-type AnyObject = object;
+type AnyObject = Record<string, unknown>;
 type TypedMap<T> = {
   [key: string]: T;
 }
@@ -145,10 +145,10 @@ type Empty = null | undefined;
 export type Dispatch = (action: InputAction) => void;
 
 export interface BuilderProps {
-  tree: ImmutableTree,
-  config: Config,
-  actions: Actions,
-  dispatch: Dispatch,
+  tree: ImmutableTree;
+  config: Config;
+  actions: Actions;
+  dispatch: Dispatch;
 }
 
 export interface ItemProps {
@@ -200,96 +200,101 @@ type ButtonIconType = "addRule" | "addGroup" | "delRule" | "delGroup"  | "addRul
 type IconType = ButtonIconType | "drag";
 
 export interface ButtonProps {
-  type: ButtonIconType,
-  renderIcon?: FactoryWithContext<IconProps>,
-  onClick(): void,
-  label: string,
-  config?: Config,
-  readonly?: boolean,
+  type: ButtonIconType;
+  renderIcon?: FactoryWithContext<IconProps>;
+  onClick(): void;
+  label: string;
+  config?: Config;
+  readonly?: boolean;
 }
 
 export interface IconProps {
   type: IconType;
-  config?: Config,
-  readonly?: boolean,
+  config?: Config;
+  readonly?: boolean;
 }
 
 export interface SwitchProps {
-  value: boolean,
-  setValue(newValue?: boolean): void,
-  label: string,
-  checkedLabel?: string,
-  hideLabel?: boolean,
-  config?: Config,
+  value: boolean;
+  setValue(newValue?: boolean): void;
+  label: string;
+  checkedLabel?: string;
+  hideLabel?: boolean;
+  config?: Config;
 }
 
 export interface ButtonGroupProps {
-  children: ReactElement,
-  config?: Config,
+  children: ReactElement;
+  config?: Config;
 }
 
 export interface ProviderProps {
-  children: ReactElement,
-  config?: Config,
+  children: ReactElement;
+  config?: Config;
 }
 
 export type ValueSourceItem = {
-  label: string, 
+  label: string;
 }
 type ValueSourcesItems = TypedValueSourceMap<ValueSourceItem>;
 
 export interface ValueSourcesProps {
-  config?: Config,
-  valueSources: ValueSourcesItems, 
-  valueSrc?: ValueSource, 
-  setValueSrc(valueSrc: string): void, 
-  readonly?: boolean,
-  title: string,
+  config?: Config;
+  valueSources: ValueSourcesItems;
+  valueSrc?: ValueSource;
+  setValueSrc(valueSrc: string): void;
+  readonly?: boolean;
+  title: string;
 }
 
 export interface ConfirmModalProps {
-  onOk(): void, 
-  okText: string, 
-  cancelText?: string, 
-  title: string,
+  onOk(): void;
+  okText: string;
+  cancelText?: string;
+  title: string;
 }
 
 export interface RuleErrorProps {
-  error: string,
+  error: string;
 }
 
 export interface RuleProps {
-  config: Config,
-  id: string, // id of rule
-  groupId: string | Empty, // id of parent group
-  parentField: string | Empty, //from RuleGroup
-  selectedField: string | Empty,
-  selectedOperator: string | Empty,
-  operatorOptions: AnyObject | Empty,
-  value: ImmutableList<RuleValue>, //depends on widget
-  valueError: ImmutableList<string>,
-  fieldError: string | Empty,
-  valueSrc: ImmutableList<ValueSource>,
-  asyncListValues: Array<any> | Empty,
+  config: Config;
+  id: string; // id of rule
+  groupId: string | Empty; // id of parent group
+  parentField: string | Empty; //from RuleGroup
+  selectedField: FieldValueI | Empty;
+  selectedFieldSrc: FieldSource | Empty;
+  selectedFieldType: string | Empty;
+  fieldError: string | Empty;
+  selectedOperator: string | Empty;
+  operatorOptions: OperatorOptionsI | Empty;
+  value: ImmutableList<RuleValueI>; //depends on widget
+  valueError: ImmutableList<string | Empty>;
+  valueSrc: ImmutableList<ValueSource>;
+  valueType: ImmutableList<string>;
+  asyncListValues: AsyncListValues | Empty;
 
-  isDraggingMe: boolean | Empty,
-  isDraggingTempo: boolean | Empty,
-  isLocked: boolean | Empty,
-  isTrueLocked: boolean | Empty,
-  reordableNodesCnt: number | Empty,
-  totalRulesCnt: number | Empty,
-  parentReordableNodesCnt: number | Empty,
-  onDragStart: Function | Empty,
-  handleDraggerMouseDown: Function | Empty,
-  removeSelf: Function | Empty,
-  confirmFn: Function | Empty,
+  isDraggingMe: boolean | Empty;
+  isDraggingTempo: boolean | Empty;
+  isLocked: boolean | Empty;
+  isTrueLocked: boolean | Empty;
+  reordableNodesCnt: number | Empty;
+  totalRulesCnt: number | Empty;
+  parentReordableNodesCnt: number | Empty;
+  onDragStart: Function | Empty;
+  handleDraggerMouseDown: Function | Empty;
+  removeSelf: Function | Empty;
+  confirmFn: Function | Empty;
 
   //actions
-  setField(field: string): undefined;
+  setField(field: FieldValueI): undefined;
+  setFieldSrc(fieldSrc: FieldSource): undefined;
+  setFuncValue(delta: number, parentFuncs: string[], argKey: string | null, value: SimpleValue, type: string | "!valueSrc"): undefined;
   setOperator(operator: string): undefined;
-  setOperatorOption(name: string, value: RuleValue): undefined;
+  setOperatorOption(name: string, value: SimpleValue): undefined;
   setLock(lock: boolean): undefined;
-  setValue(delta: number, value: RuleValue, valueType: string, asyncListValues?: Array<any>): undefined;
+  setValue(delta: number, value: RuleValueI, valueType: string, asyncListValues?: AsyncListValues): undefined;
   setValueSrc(delta: number, valueSrc: ValueSource): undefined;
 }
 
@@ -303,36 +308,36 @@ type AntdSize = "small" | "large" | "medium";
 
 
 export interface RenderSettings {
-  renderField?: FactoryWithContext<FieldProps> | SerializedFunction,
-  renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction,
-  renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction,
-  renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction,
-  renderButton?: FactoryWithContext<ButtonProps> | SerializedFunction,
-  renderIcon?: FactoryWithContext<IconProps> | SerializedFunction,
-  renderButtonGroup?: FactoryWithContext<ButtonGroupProps> | SerializedFunction,
-  renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction,
-  renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction,
-  renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
-  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction,
-  renderConfirm?: ConfirmFunc | SerializedFunction,
-  useConfirm?: (() => Function) | SerializedFunction,
-  renderSize?: AntdSize,
-  renderItem?: FactoryWithContext<ItemBuilderProps> | SerializedFunction,
-  dropdownPlacement?: AntdPosition,
-  groupActionsPosition?: AntdPosition,
-  showLabels?: boolean,
-  maxLabelsLength?: number,
-  customFieldSelectProps?: AnyObject,
-  renderBeforeWidget?: FactoryWithContext<RuleProps> | SerializedFunction,
-  renderAfterWidget?: FactoryWithContext<RuleProps> | SerializedFunction,
-  renderBeforeActions?: FactoryWithContext<RuleProps> | SerializedFunction,
-  renderAfterActions?: FactoryWithContext<RuleProps> | SerializedFunction,
-  renderRuleError?: FactoryWithContext<RuleErrorProps> | SerializedFunction,
-  renderSwitchPrefix?: RenderedReactElement | SerializedFunction,
-  defaultSliderWidth?: string,
-  defaultSelectWidth?: string,
-  defaultSearchWidth?: string,
-  defaultMaxRows?: number,
+  renderField?: FactoryWithContext<FieldProps> | SerializedFunction;
+  renderOperator?: FactoryWithContext<FieldProps> | SerializedFunction;
+  renderFunc?: FactoryWithContext<FieldProps> | SerializedFunction;
+  renderConjs?: FactoryWithContext<ConjsProps> | SerializedFunction;
+  renderButton?: FactoryWithContext<ButtonProps> | SerializedFunction;
+  renderIcon?: FactoryWithContext<IconProps> | SerializedFunction;
+  renderButtonGroup?: FactoryWithContext<ButtonGroupProps> | SerializedFunction;
+  renderSwitch?: FactoryWithContext<SwitchProps> | SerializedFunction;
+  renderProvider?: FactoryWithContext<ProviderProps> | SerializedFunction;
+  renderValueSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction;
+  renderFieldSources?: FactoryWithContext<ValueSourcesProps> | SerializedFunction;
+  renderConfirm?: ConfirmFunc | SerializedFunction;
+  useConfirm?: (() => Function) | SerializedFunction;
+  renderSize?: AntdSize;
+  renderItem?: FactoryWithContext<ItemBuilderProps> | SerializedFunction;
+  dropdownPlacement?: AntdPosition;
+  groupActionsPosition?: AntdPosition;
+  showLabels?: boolean;
+  maxLabelsLength?: number;
+  customFieldSelectProps?: AnyObject;
+  renderBeforeWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
+  renderAfterWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
+  renderBeforeActions?: FactoryWithContext<RuleProps> | SerializedFunction;
+  renderAfterActions?: FactoryWithContext<RuleProps> | SerializedFunction;
+  renderRuleError?: FactoryWithContext<RuleErrorProps> | SerializedFunction;
+  renderSwitchPrefix?: RenderedReactElement | SerializedFunction;
+  defaultSliderWidth?: string;
+  defaultSelectWidth?: string;
+  defaultSearchWidth?: string;
+  defaultMaxRows?: number;
 }
 
 export interface Settings extends CoreSettings, RenderSettings {
@@ -346,30 +351,30 @@ export type ConfirmFunc = (opts: ConfirmModalProps) => void;
 
 interface VanillaWidgets {
   // core
-  VanillaFieldSelect: ElementType<FieldProps>,
-  VanillaConjs: ElementType<ConjsProps>,
-  VanillaSwitch: ElementType<SwitchProps>,
-  VanillaButton: ElementType<ButtonProps>,
-  VanillaButtonGroup: ElementType<ButtonGroupProps>,
-  VanillaProvider: ElementType<ProviderProps>,
-  VanillaValueSources: ElementType<ValueSourcesProps>,
-  vanillaConfirm: ConfirmFunc,
+  VanillaFieldSelect: ElementType<FieldProps>;
+  VanillaConjs: ElementType<ConjsProps>;
+  VanillaSwitch: ElementType<SwitchProps>;
+  VanillaButton: ElementType<ButtonProps>;
+  VanillaButtonGroup: ElementType<ButtonGroupProps>;
+  VanillaProvider: ElementType<ProviderProps>;
+  VanillaValueSources: ElementType<ValueSourcesProps>;
+  vanillaConfirm: ConfirmFunc;
 
   // value
-  VanillaBooleanWidget: ElementType<BooleanWidgetProps>,
-  VanillaTextWidget: ElementType<TextWidgetProps>,
-  VanillaTextAreaWidget: ElementType<TextWidgetProps>,
-  VanillaDateWidget: ElementType<DateTimeWidgetProps>,
-  VanillaTimeWidget: ElementType<DateTimeWidgetProps>,
-  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>,
-  VanillaMultiSelectWidget: ElementType<SelectWidgetProps>,
-  VanillaSelectWidget: ElementType<SelectWidgetProps>,
-  VanillaNumberWidget: ElementType<NumberWidgetProps>,
-  VanillaSliderWidget: ElementType<NumberWidgetProps>,
+  VanillaBooleanWidget: ElementType<BooleanWidgetProps>;
+  VanillaTextWidget: ElementType<TextWidgetProps>;
+  VanillaTextAreaWidget: ElementType<TextWidgetProps>;
+  VanillaDateWidget: ElementType<DateTimeWidgetProps>;
+  VanillaTimeWidget: ElementType<DateTimeWidgetProps>;
+  VanillaDateTimeWidget: ElementType<DateTimeWidgetProps>;
+  VanillaMultiSelectWidget: ElementType<SelectWidgetProps>;
+  VanillaSelectWidget: ElementType<SelectWidgetProps>;
+  VanillaNumberWidget: ElementType<NumberWidgetProps>;
+  VanillaSliderWidget: ElementType<NumberWidgetProps>;
   
   // common
-  ValueFieldWidget: ElementType<WidgetProps>,
-  FuncWidget: ElementType<WidgetProps>,
+  ValueFieldWidget: ElementType<WidgetProps>;
+  FuncWidget: ElementType<WidgetProps>;
 }
 
 /////////////////
@@ -379,7 +384,7 @@ interface VanillaWidgets {
 export interface Utils extends CoreUtils {
   // ReactUtils: {
   //   useOnPropsChanged(obj: ReactElement): void;
-  // },
+  // }
 }
 
 export declare const Utils: Utils;
