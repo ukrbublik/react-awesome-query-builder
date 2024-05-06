@@ -983,7 +983,7 @@ const validateFuncValue = (
       const willFix = canFix && fixedArgVal !== argValue;
       const willFixAllErrors = !isValid && willFix && !allErrors?.find(e => !e.fixed);
       //tip: reset to default ONLY if isEndValue==true
-      const canDropOrReset = canFix && !isValid && !willFix && (isEndValue || canDropArgs);
+      const canDropOrReset = canFix && !isValid && !willFixAllErrors   && (isEndValue || canDropArgs); //todo: !willFixAllErrors or !willFix ??? 
       if (willFix) {
         fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
       }
@@ -993,13 +993,13 @@ const validateFuncValue = (
         fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
       }
       if (!isValid) {
-        const firstError = argErrors.find(e => !e.fixed);
+        const firstError = argErrors.find(e => !e.fixed) ?? argErrors[0];
         const argValidationError = translateValidation(firstError);
         const fixed = willFix || canDropOrReset;
         allErrors.push({
           key: constants.INVALID_FUNC_ARG_VALUE,
           args: {
-            funcKey, argKey, argValidationError,
+            funcKey, funcName, argKey, argName, argValidationError,
             // more meta
             argErrors,
           },
@@ -1011,10 +1011,11 @@ const validateFuncValue = (
     } else if (!argConfig.isOptional && (isEndValue || canDropArgs)) {
       const canReset = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
       const canAddError = isEndValue;
+      //tip: Exception for canDropArgs (true only if changing func) - don't show error about required args
       if (canAddError) {
         allErrors.push({
           key: constants.REQUIRED_FUNCTION_ARG,
-          args: { funcKey, argKey },
+          args: { funcKey, funcName, argKey, argName },
           fixed: canReset,
           fixedTo: canReset ? argConfig.defaultValue : undefined,
         });
@@ -1141,6 +1142,7 @@ export const getNewValueForFieldOp = function (
     const isValid = !fieldErrors?.length;
     const willFix = fixedField !== newField;
     const willFixAllErrors = !isValid && willFix && !fieldErrors.find(e => !e.fixed);
+    //todo: sure never drop??
     const willRevert = false; //canFix && !isValid && !willFixAllErrors && !!changedProp && newField !== currentField;
     const willDrop = false; //canFix && !isValid && !willFixAllErrors && !willRevert && !changedProp;
     if (willDrop) {
@@ -1237,8 +1239,7 @@ export const getNewValueForFieldOp = function (
       const willFixAllErrors = !isValid && willFix && !allErrors?.find(e => !e.fixed);
       // tip: is value src is invalid, drop ANYWAY
       const willDrop = !isValidSrc
-        || canFix && !isValid && (hasFieldChanged ? true : !willFix);
-      console.log(2, isValidSrc, newField, v, {isValid, changedProp, canFix, willFix, willDrop})
+        || canFix && !isValid && (hasFieldChanged ? true : !willFix); //todo: !willFixAllErrors ??? 
       if (!isValid) {
         // tip: even if we don't show errors, but drop bad values, put the reason of removal
         allErrors?.map(e => validationErrors.push({
@@ -1256,7 +1257,7 @@ export const getNewValueForFieldOp = function (
         }
       }
       const showError = !isValid && !willFix;
-      const firstError = allErrors?.find(e => !e.fixed);
+      const firstError = allErrors?.find(e => !e.fixed) ?? allErrors?.[0];
       if (showError) {
         valueErrors[i] = translateValidation(firstError);
       }

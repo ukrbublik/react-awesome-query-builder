@@ -927,7 +927,7 @@ export const tree_with_vfunc_in_lhs_with_missing_args = {
           str1: { valueSrc: "value", value: "aaaaa" },
           str2: { valueSrc: "value", value: "bbbbb" },
           // num1 has defaultValue
-          // num2 has no defaultValue
+          // num2 has NO defaultValue !!!
         },
       },
       operator: "equal",
@@ -993,6 +993,56 @@ export const tree_with_vfunc_in_both_sides_with_invalid_args_in_nested_funcs = {
           str2: { valueSrc: "value", value: "rbbbbbb" },
           // num1 has defaultValue
           num2: { valueSrc: "value", value: 13 },
+        }
+      }],
+      valueSrc: ["func"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_both_sides_with_missing_args_in_nested_funcs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc2",
+              args: {
+                // num1 has defaultValue
+                num2: { valueSrc: "value", value: 3 },
+                num3: { valueSrc: "value", value: 4 },
+              },
+            }
+          },
+          str2: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc2",
+              args: {
+                num1: { valueSrc: "value", value: -13 },
+                // num2 has NO defaultValue !!!
+                num3: { valueSrc: "value", value: -14 },
+              }
+            }
+          },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: [{
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "raaaaaaa" },
+          str2: { valueSrc: "value", value: "rbbb" },
+          num1: { valueSrc: "value", value: 3 },
+          num2: { valueSrc: "value", value: 4 },
         }
       }],
       valueSrc: ["func"],

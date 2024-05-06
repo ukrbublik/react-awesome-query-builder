@@ -752,7 +752,7 @@ export const UNSAFE_deserializeConfig = (strConfig: string, ctx: ConfigContext):
 // interaction helpers
 
 export const getLhsOptions = (qb: ReactWrapper, fieldSrc: string) => {
-  const select = fieldSrc == "func"
+  const select = fieldSrc === "func"
     ? qb.find(".rule .rule--field--func .rule--func select")
     : qb.find(".rule .rule--field select").at(0);
   const fieldOptions = Object.fromEntries(select
@@ -785,12 +785,14 @@ export const selectField = (qb: ReactWrapper, val: string) => {
 export const selectFieldFunc = (qb: ReactWrapper, val: string) => {
   qb
     .find(".rule .rule--field--func .rule--func select")
+    .filterWhere((n) => n.closest(".rule--func--wrapper--lev-1").length === 0)
     .simulate("change", { target: { value: val } });
 };
 
 export const setFieldFuncArgValue = (qb: ReactWrapper, ind: number, val: string) => {
   qb
     .find(".rule .rule--field--func .rule--func--args .rule--func--arg")
+    .filterWhere((n) => n.closest(".rule--func--wrapper--lev-1").length === 0)
     .filterWhere((n) => typeof n.type() !== 'string')
     .at(ind)
     .find(".rule--func--arg-value .rule--widget .widget--widget input")

@@ -1027,7 +1027,7 @@ describe("sanitizeTree", () => {
             removeIncompleteRules: false,
           });
 
-          // todo: remove fixed errors if still whole rule can't be fixed ???   or at least with same side ???
+          // Tree will be partially fixed
           expect(fixedErrors).to.containSubsetInOrder([{
             itemStr: "TextFunc1(Str1: aaaaa, Str2: bbbbb, Num1: ?, Num2: ?) = xxxxxx",
             errors: [{
@@ -1043,6 +1043,7 @@ describe("sanitizeTree", () => {
               fixedTo: "xxxxx",
             }],
           }]);
+
           expect(nonFixedErrors).to.containSubsetInOrder([{
             itemStr: "TextFunc1(Str1: aaaaa, Str2: bbbbb, Num1: ?, Num2: ?) = xxxxxx",
             errors: [{
@@ -1056,6 +1057,7 @@ describe("sanitizeTree", () => {
               key: "INCOMPLETE_LHS",
             }],
           }]);
+          expect(nonFixedErrors[0].errors.length).eq(2);
 
           // Tree should be invalid on load
           await qb.setProps({
@@ -1085,6 +1087,7 @@ describe("sanitizeTree", () => {
               key: "INCOMPLETE_LHS",
             }],
           }]);
+          expect(validationErrors2[0].errors).to.have.length(2);
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
@@ -1200,6 +1203,127 @@ describe("sanitizeTree", () => {
           expect(ruleError2).to.have.length(0);
           const isValid2 = Utils.isValidTree(fixedTree, config);
           expect(isValid2).to.eq(true);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+  
+    it("can't fix missing required arg in nested func in LHS", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange, pauseTest }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_both_sides_with_missing_args_in_nested_funcs as JsonTree);
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            forceFix: true,
+            removeIncompleteRules: false,
+          });
+
+          // Tree will be partially fixed
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: TextFunc2(Num1: ?, Num2: 3, Num3: 4), Str2: TextFunc2(Num1: -13, Num2: ?, Num3: -14), Num1: 20, Num2: 4) = TextFunc1(Str1: raaaaaaa, Str2: rbbb, Num1: 3, Num2: 4)",
+            errors: [{
+              key: "INVALID_FUNC_ARG_VALUE",
+              str: "Invalid value of arg Str1 for func TextFunc1: Value of arg Num1 for func TextFunc2 is required",
+              args: {
+                argKey: "str1",
+                funcKey: "vld.tfunc1",
+                argErrors: [{
+                  key: "REQUIRED_FUNCTION_ARG",
+                  fixedTo: 0,
+                  args: {
+                    argKey: "num1",
+                    funcKey: "vld.tfunc2",
+                  }
+                }]
+              },
+              // todo: no OrderedMap ??
+              // fixedFrom: OrderedMap,
+              // fixedTo: OrderedMap,
+            }, {
+              key: "INVALID_FUNC_ARG_VALUE",
+              // tip: `str` has first non-fixed error here!
+              str: "Invalid value of arg Str2 for func TextFunc1: Value of arg Num2 for func TextFunc2 is required",
+              // todo: no OrderedMap ??
+              // fixedFrom: OrderedMap,
+              // fixedTo: OrderedMap,
+              // todo: here is partial fix in arguments of nested func. is all correct?
+              fixed: true, // !!! partially fixed
+              args: {
+                argKey: "str2",
+                funcKey: "vld.tfunc1",
+                argErrors: [{
+                  key: "INVALID_FUNC_ARG_VALUE",
+                  fixedTo: 0,
+                  fixed: true,
+                  args: {
+                    argKey: "num1",
+                    funcKey: "vld.tfunc2",
+                  }
+                }, {
+                  key: "REQUIRED_FUNCTION_ARG",
+                  fixedTo: undefined, // !!!
+                  fixed: false, // !!!
+                  args: {
+                    argKey: "num2",
+                    funcKey: "vld.tfunc2",
+                  }
+                }, {
+                  key: "INVALID_FUNC_ARG_VALUE",
+                  fixedTo: 0,
+                  fixed: true,
+                  args: {
+                    argKey: "num3",
+                    funcKey: "vld.tfunc2",
+                  }
+                }]
+              },
+            }, {
+              key: "INVALID_FUNC_ARG_VALUE",
+              str: "Invalid value of arg Num1 for func TextFunc1: Value 20 should be from 0 to 10",
+              fixedTo: 10,
+            }, {
+              side: "rhs",
+              delta: 0,
+              key: "INVALID_FUNC_ARG_VALUE",
+              str: "Invalid value of arg Str1 for func TextFunc1: Value raaaaaaa should have max length 5 but got 8",
+              fixedTo: "raaaa",
+            }],
+          }]);
+
+          expect(nonFixedErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: TextFunc2(Num1: ?, Num2: 3, Num3: 4), Str2: TextFunc2(Num1: -13, Num2: ?, Num3: -14), Num1: 20, Num2: 4) = TextFunc1(Str1: raaaaaaa, Str2: rbbb, Num1: 3, Num2: 4)",
+            errors: [{
+              side: "lhs",
+              key: "INCOMPLETE_LHS",
+            }],
+          }]);
+          expect(nonFixedErrors[0].errors.length).eq(1);
+
+          // Tree should be invalid on load
+          await qb.setProps({
+            value: fixedTree
+          });
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Invalid value of arg Str2 for func TextFunc1: Value of arg Num2 for func TextFunc2 is required");
+
+          // If user starts updating tree, validation errors about missing required args are not being shown in UI.
+          // Beucase tree in not completed yet.
+          await setFieldFuncArgValue(qb, 3, "5");
+          const ruleError2 = qb.find(".rule--error");
+          expect(ruleError2).to.have.length(0);
+          const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors2).to.have.length(1);
+          expect(validationErrors2).to.containSubsetInOrder([{
+            errors: [{
+              key: "INVALID_FUNC_ARG_VALUE",
+              str: "Invalid value of arg Str2 for func TextFunc1: Value of arg Num2 for func TextFunc2 is required",
+              fixed: false,
+            }, {
+              key: "INCOMPLETE_LHS",
+            }],
+          }]);
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }

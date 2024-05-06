@@ -247,9 +247,9 @@ export default class FuncWidget extends Component {
     return (
       <>
         {this.renderBracketBefore(funcDefinition)}
-        <Col key="args" className="rule--func--args">
+        <Col key={`args-${funcKey}`} className={`rule--func--args rule--func--${funcKey}--args`}>
           {Object.keys(args).map((argKey, argIndex) => (
-            <Col key={`arg-${argKey}-${argIndex}`} className="rule--func--arg">
+            <Col key={`arg-${argKey}-${argIndex}`} className={`rule--func--arg rule--func--${funcKey}--arg--${argKey}`}>
               {this.renderArgSep(argKey, args[argKey], argIndex, funcDefinition)}
               {this.renderArgLabel(argKey, args[argKey])}
               {this.renderArgLabelSep(argKey, args[argKey])}
@@ -263,8 +263,11 @@ export default class FuncWidget extends Component {
   };
 
   render() {
+    const { parentFuncs } = this.props;
+    const funcPath = parentFuncs ? parentFuncs.map(([f, a]) => `${f}_${a}`).join("-") : "root";
+    const funcLevel = parentFuncs?.length || 0;
     return (
-      <Col className="rule--func--wrapper">
+      <Col className={`rule--func--wrapper rule--func--wrapper--under-${funcPath} rule--func--wrapper--lev-${funcLevel}`}>
         {this.renderFuncSelect()}
         {this.renderFuncArgs()}
       </Col>
