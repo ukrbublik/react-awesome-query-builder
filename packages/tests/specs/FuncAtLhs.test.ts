@@ -1,6 +1,10 @@
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { export_checks, with_qb } from "../support/utils";
+import {
+  export_checks, with_qb,
+  getLhsOptions, getFuncsOptions, getFieldsOptions, selectFieldSrc, selectField,
+  selectFieldFunc, setFieldFuncArgValue, setRhsValue,
+} from "../support/utils";
 import chai from "chai";
 import { ReactWrapper } from "enzyme";
 const { expect } = chai;
@@ -266,57 +270,6 @@ describe("LHS func", () => {
   });
 
   describe("interactions on vanilla", () => {
-    const getLhsOptions = (qb: ReactWrapper, fieldSrc: string) => {
-      const select = fieldSrc == "func"
-        ? qb.find(".rule .rule--field--func .rule--func select")
-        : qb.find(".rule .rule--field select").at(0);
-      const fieldOptions = Object.fromEntries(select
-        .find("option")
-        .map((o, i) => ([
-          o.getDOMNode().getAttribute("value"),
-          o.getDOMNode().getAttribute("style"),
-        ]))
-        .filter(([v, _s]) => !!v)) as Record<string, string | undefined>;
-      const allOptions = Object.keys(fieldOptions);
-      const boldOptions = Object.keys(fieldOptions).filter(k => fieldOptions[k]?.includes("bold"));
-      return [allOptions, boldOptions];
-    };
-
-    const getFuncsOptions = (qb: ReactWrapper) => getLhsOptions(qb, "func");
-    const getFieldsOptions = (qb: ReactWrapper) => getLhsOptions(qb, "field");
-
-    const selectFieldSrc = (qb: ReactWrapper, val: string) => {
-      qb
-        .find(".rule .rule--fieldsrc select")
-        .simulate("change", { target: { value: val } });
-    };
-
-    const selectField = (qb: ReactWrapper, val: string) => {
-      qb
-        .find(".rule .rule--field select")
-        .simulate("change", { target: { value: val } });
-    };
-
-    const selectFieldFunc = (qb: ReactWrapper, val: string) => {
-      qb
-        .find(".rule .rule--field--func .rule--func select")
-        .simulate("change", { target: { value: val } });
-    };
-
-    const setFieldFuncArgValue = (qb: ReactWrapper, ind: number, val: string) => {
-      qb
-        .find(".rule .rule--field--func .rule--func--args .rule--func--arg")
-        .at(ind)
-        .find(".rule--func--arg-value .rule--widget .widget--widget input")
-        .simulate("change", { target: { value: val } });
-    };
-
-    const setRhsValue = (qb: ReactWrapper, val: string) => {
-      qb
-        .find(".rule .rule--value .widget--widget input")
-        .simulate("change", { target: { value: val } });
-    };
-
     it("change field source to func, and vice versa", async () => {
       await with_qb([
         with_fieldSources, with_all_types, with_funcs, with_keepInputOnChangeFieldSrc

@@ -728,7 +728,7 @@ export const validateValue = (
     fixedAllErrors = !allErrors?.find(e => !e.fixed);
     if (allErrors?.length && !fixedAllErrors && canFix) {
       const fieldConfig = getFieldConfig(config, field);
-      const fieldSettings = fieldConfig.fieldSettings;
+      const fieldSettings = fieldConfig?.fieldSettings;
       const defaultValue = fieldSettings?.defaultValue;
       if (defaultValue !== undefined) {
         const lastError = allErrors[allErrors.length - 1];
@@ -808,7 +808,7 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
     const wConfig = config.widgets[w];
     const wType = wConfig?.type;
     const jsType = wConfig?.jsType;
-    const fieldSettings = fieldConfig.fieldSettings;
+    const fieldSettings = fieldConfig?.fieldSettings;
     const listValues = fieldSettings?.treeValues || fieldSettings?.listValues;
     const isAsyncListValues = !!fieldSettings?.asyncFetch;
     // todo: for select/multiselect value can be string or number

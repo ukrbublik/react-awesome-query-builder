@@ -915,7 +915,29 @@ export const with_func_sum_of_multiselect_in_lhs = {
   ]
 };
 
-export const tree_with_vfunc_in_lhs_with_all_args_invalid = {
+export const tree_with_vfunc_in_lhs_with_missing_args = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaa" },
+          str2: { valueSrc: "value", value: "bbbbb" },
+          // num1 has defaultValue
+          // num2 has no defaultValue
+        },
+      },
+      operator: "equal",
+      value: ["xxxxxx"],
+      valueSrc: ["value"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_lhs_with_invalid_args_and_rhs = {
   type: "group",
   children1: [{
     type: "rule",
@@ -926,12 +948,54 @@ export const tree_with_vfunc_in_lhs_with_all_args_invalid = {
         args: {
           str1: { valueSrc: "value", value: "aaaaaa" },
           str2: { valueSrc: "value", value: "bbbbbb" },
-          num1: { valueSrc: "value", value: 20 }
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
         },
       },
       operator: "equal",
       value: ["xxxxxx"],
       valueSrc: ["value"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_both_sides_with_invalid_args_in_nested_funcs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaaa" },
+          str2: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc1",
+              args: {
+                str1: { valueSrc: "value", value: "_aaaaaa" },
+                // str2 has defaultValue
+                // num1 has defaultValue
+                num2: { valueSrc: "value", value: 4 },
+              }
+            }
+          },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: [{
+        func: "vld.tfunc1",
+        args: {
+          // str1 has defaultValue
+          str2: { valueSrc: "value", value: "rbbbbbb" },
+          // num1 has defaultValue
+          num2: { valueSrc: "value", value: 13 },
+        }
+      }],
+      valueSrc: ["func"],
     },
   }]
 };

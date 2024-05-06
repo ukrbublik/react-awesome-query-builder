@@ -290,7 +290,7 @@ export const getFieldWidgetConfig = (config, field, operator, widget = null, val
   const widgetConfig = config.widgets[widget] || {};
   const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
   const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});
-  const valueFieldSettings = (valueSrc === "value" || !valueSrc) && fieldConfig && fieldConfig.fieldSettings || {}; // useful to take 'validateValue'
+  const valueFieldSettings = (valueSrc === "value" || !valueSrc) && fieldConfig?.fieldSettings || {}; // useful to take 'validateValue'
   const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
   return mergedConfig;
 };

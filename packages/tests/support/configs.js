@@ -869,6 +869,16 @@ export const with_funcs_validation = (BasicConfig) => ({
                 max: 10,
               },
             },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // no defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
           }
         }
       }

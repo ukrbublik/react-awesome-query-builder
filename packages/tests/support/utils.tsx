@@ -747,3 +747,58 @@ export const UNSAFE_deserializeConfig = (strConfig: string, ctx: ConfigContext):
   config.ctx = ctx;
   return config;
 };
+
+
+// interaction helpers
+
+export const getLhsOptions = (qb: ReactWrapper, fieldSrc: string) => {
+  const select = fieldSrc == "func"
+    ? qb.find(".rule .rule--field--func .rule--func select")
+    : qb.find(".rule .rule--field select").at(0);
+  const fieldOptions = Object.fromEntries(select
+    .find("option")
+    .map((o, i) => ([
+      o.getDOMNode().getAttribute("value"),
+      o.getDOMNode().getAttribute("style"),
+    ]))
+    .filter(([v, _s]) => !!v)) as Record<string, string | undefined>;
+  const allOptions = Object.keys(fieldOptions);
+  const boldOptions = Object.keys(fieldOptions).filter(k => fieldOptions[k]?.includes("bold"));
+  return [allOptions, boldOptions];
+};
+
+export const getFuncsOptions = (qb: ReactWrapper) => getLhsOptions(qb, "func");
+export const getFieldsOptions = (qb: ReactWrapper) => getLhsOptions(qb, "field");
+
+export const selectFieldSrc = (qb: ReactWrapper, val: string) => {
+  qb
+    .find(".rule .rule--fieldsrc select")
+    .simulate("change", { target: { value: val } });
+};
+
+export const selectField = (qb: ReactWrapper, val: string) => {
+  qb
+    .find(".rule .rule--field select")
+    .simulate("change", { target: { value: val } });
+};
+
+export const selectFieldFunc = (qb: ReactWrapper, val: string) => {
+  qb
+    .find(".rule .rule--field--func .rule--func select")
+    .simulate("change", { target: { value: val } });
+};
+
+export const setFieldFuncArgValue = (qb: ReactWrapper, ind: number, val: string) => {
+  qb
+    .find(".rule .rule--field--func .rule--func--args .rule--func--arg")
+    .filterWhere((n) => typeof n.type() !== 'string')
+    .at(ind)
+    .find(".rule--func--arg-value .rule--widget .widget--widget input")
+    .simulate("change", { target: { value: val } });
+};
+
+export const setRhsValue = (qb: ReactWrapper, val: string) => {
+  qb
+    .find(".rule .rule--value .widget--widget input")
+    .simulate("change", { target: { value: val } });
+};

@@ -2,7 +2,10 @@ import { Utils, ImmutableTree, JsonGroup, JsonTree } from "@react-awesome-query-
 const { isValidTree, validateTree, sanitizeTree, checkTree, getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
-import { with_qb } from "../support/utils";
+import {
+  with_qb,
+  setFieldFuncArgValue,
+} from "../support/utils";
 import chai from "chai";
 import chaiSubsetInOrder from "chai-subset-in-order";
 const { expect } = chai;
@@ -933,15 +936,15 @@ describe("sanitizeTree", () => {
     it("can fix all args in func in LHS", async () => {
       await with_qb(
         [ with_all_types, with_funcs_validation, with_show_error, with_fieldSources ], inits.empty, null,
-        async (qb, { config, pauseTest }) => {
-          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_all_args_invalid as JsonTree);
+        async (qb, { config }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_invalid_args_and_rhs as JsonTree);
           const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
             forceFix: true
           });
 
           expect(nonFixedErrors.length).eq(0);
           expect(fixedErrors).to.containSubsetInOrder([{
-            itemStr: "TextFunc1(Str1: aaaaaa, Str2: bbbbbb, Num1: 20) = xxxxxx",
+            itemStr: "TextFunc1(Str1: aaaaaa, Str2: bbbbbb, Num1: 20, Num2: 4) = xxxxxx",
             errors: [{
               side: "lhs",
               str: "Invalid value of arg Str1 for func TextFunc1: Value aaaaaa should have max length 5 but got 6",
@@ -1010,7 +1013,195 @@ describe("sanitizeTree", () => {
           expect(isValid2).to.eq(true);
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
-          debug: true,
+        }
+      );
+    });
+
+    it("can't fix missing required arg in func in LHS", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_missing_args as JsonTree);
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            forceFix: true,
+            removeIncompleteRules: false,
+          });
+
+          // todo: remove fixed errors if still whole rule can't be fixed ???   or at least with same side ???
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: aaaaa, Str2: bbbbb, Num1: ?, Num2: ?) = xxxxxx",
+            errors: [{
+              key: "REQUIRED_FUNCTION_ARG",
+              args: {
+                argKey: "num1",
+              },
+              fixedTo: 0, // defaultValue
+            }, {
+              side: "rhs",
+              key: "VALUE_LENGTH_CONSTRAINT_FAIL",
+              fixedFrom: "xxxxxx",
+              fixedTo: "xxxxx",
+            }],
+          }]);
+          expect(nonFixedErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: aaaaa, Str2: bbbbb, Num1: ?, Num2: ?) = xxxxxx",
+            errors: [{
+              key: "REQUIRED_FUNCTION_ARG",
+              args: {
+                argKey: "num2",
+              },
+              fixedTo: undefined, // NO defaultValue
+            }, {
+              side: "lhs",
+              key: "INCOMPLETE_LHS",
+            }],
+          }]);
+
+          // Tree should be invalid on load
+          await qb.setProps({
+            value: fixedTree
+          });
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Value of arg Num2 for func TextFunc1 is required");
+
+          // If user starts updating tree, validation errors about missing required args are not being shown in UI.
+          // Beucase tree in not completed yet.
+          await setFieldFuncArgValue(qb, 3, "");
+          const ruleError2 = qb.find(".rule--error");
+          expect(ruleError2).to.have.length(0);
+          const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors2).to.have.length(1);
+          expect(validationErrors2).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: aaaaa, Str2: bbbbb, Num1: 0, Num2: ?) = xxxxx",
+            errors: [{
+              key: "REQUIRED_FUNCTION_ARG",
+              args: {
+                argKey: "num2",
+              },
+              fixedTo: undefined, // NO defaultValue
+            }, {
+              side: "lhs",
+              key: "INCOMPLETE_LHS",
+            }],
+          }]);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("can fix all args in nested func in LHS", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_both_sides_with_invalid_args_in_nested_funcs as JsonTree);
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            forceFix: true
+          });
+
+          expect(nonFixedErrors.length).eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: aaaaaa, Str2: TextFunc1(Str1: _aaaaaa, Str2: ?, Num1: ?, Num2: 4), Num1: 20, Num2: 4) = TextFunc1(Str1: ?, Str2: rbbbbbb, Num1: ?, Num2: 13)",
+            errors: [{
+              side: "lhs",
+              str: "Invalid value of arg Str1 for func TextFunc1: Value aaaaaa should have max length 5 but got 6",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixedTo: "aaaaa",
+              fixed: true,
+            }, {
+              side: "lhs",
+              // tip: only first error is shown in `str` for nested func, but see `args.argErrors` for full details
+              str: "Invalid value of arg Str2 for func TextFunc1: Invalid value of arg Str1 for func TextFunc1: Value _aaaaaa should have max length 5 but got 7",
+              key: "INVALID_FUNC_ARG_VALUE",
+              // todo: no OrderedMap ??
+              // fixedFrom: OrderedMap,
+              // fixedTo: OrderedMap,
+              fixed: true,
+              args: {
+                funcKey: "vld.tfunc1",
+                funcName: "TextFunc1",
+                argKey: "str2",
+                argName: "Str2",
+                argValidationError: "Invalid value of arg Str1 for func TextFunc1: Value _aaaaaa should have max length 5 but got 7",
+                argErrors: [{
+                  key: "INVALID_FUNC_ARG_VALUE",
+                  fixedFrom: "_aaaaaa",
+                  fixedTo: "_aaaa",
+                  args: {
+                    funcKey: "vld.tfunc1",
+                    argKey: "str1",
+                    argErrors: [{
+                      key: "VALUE_LENGTH_CONSTRAINT_FAIL",
+                    }],
+                  },
+                }, {
+                  key: "REQUIRED_FUNCTION_ARG",
+                  fixedTo: "_d2_",
+                  args: {
+                    funcKey: "vld.tfunc1",
+                    argKey: "str2",
+                    argErrors: undefined,
+                  },
+                }, {
+                  key: "REQUIRED_FUNCTION_ARG",
+                  fixedTo: 0,
+                  args: {
+                    funcKey: "vld.tfunc1",
+                    argKey: "num1",
+                    argErrors: undefined,
+                  },
+                }]
+              },
+            }, {
+              side: "lhs",
+              str: "Invalid value of arg Num1 for func TextFunc1: Value 20 should be from 0 to 10",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixed: true,
+              fixedTo: 10,
+              args: {
+                argKey: "num1",
+                argErrors: [{
+                  key: "VALUE_MAX_CONSTRAINT_FAIL",
+                }],
+              },
+            }, {
+              side: "rhs",
+              delta: 0,
+              str: "Value of arg Str1 for func TextFunc1 is required",
+              key: "REQUIRED_FUNCTION_ARG",
+              fixedTo: "_d1_",
+            }, {
+              side: "rhs",
+              delta: 0,
+              str: "Invalid value of arg Str2 for func TextFunc1: Value rbbbbbb should have max length 5 but got 7",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixedTo: "rbbbb",
+            }, {
+              side: "rhs",
+              delta: 0,
+              str: "Value of arg Num1 for func TextFunc1 is required",
+              key: "REQUIRED_FUNCTION_ARG",
+              fixedTo: 0,
+            }, {
+              side: "rhs",
+              delta: 0,
+              str: "Invalid value of arg Num2 for func TextFunc1: Value 13 should be from 0 to 10",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixedTo: 10,
+            }]
+          }]);
+          expect(fixedErrors[0].errors.length).eq(7);
+
+          await qb.setProps({
+            value: fixedTree
+          });
+          const ruleError2 = qb.find(".rule--error");
+          expect(ruleError2).to.have.length(0);
+          const isValid2 = Utils.isValidTree(fixedTree, config);
+          expect(isValid2).to.eq(true);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
       );
     });
