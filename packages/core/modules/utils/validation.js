@@ -59,7 +59,9 @@ export const getTreeBadFields = (tree, config) => {
     }
     if (children) {
       children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
+        if (child) {
+          _processNode(child, path.concat(id), lev + 1);
+        }
       });
     }
   }
@@ -76,6 +78,7 @@ export const checkTree = (tree, config) => {
   const options = {
     removeEmptyGroups: config.settings.removeEmptyGroupsOnLoad,
     removeIncompleteRules: config.settings.removeIncompleteRulesOnLoad,
+    removeEmptyRules: config.settings.removeEmptyRulesOnLoad,
     forceFix: false,
   };
   const {fixedTree, allErrors, isSanitized} = _validateTree(
@@ -99,6 +102,7 @@ export const validateTree = (tree, config, options = {}) => {
     ...options,
     // disbale sanitize options, just validate
     removeEmptyGroups: false,
+    removeEmptyRules: false,
     removeIncompleteRules: false,
     forceFix: false,
   };
@@ -124,6 +128,7 @@ export const sanitizeTree = (tree, config, options = {}) => {
   const finalOptions = {
     // defaults
     removeEmptyGroups: true,
+    removeEmptyRules: true,
     removeIncompleteRules: true,
     forceFix: false,
     ...options,
@@ -136,9 +141,12 @@ export const sanitizeTree = (tree, config, options = {}) => {
 };
 
 // tip: Should be used only internally in createValidationMemo()
-export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeIncompleteRules) => {
+export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, removeEmptyGroups, removeEmptyRules, removeIncompleteRules) => {
   if (removeEmptyGroups === undefined) {
     removeEmptyGroups = newConfig.settings.removeEmptyGroupsOnLoad;
+  }
+  if (removeEmptyRules === undefined) {
+    removeEmptyRules = newConfig.settings.removeEmptyRulesOnLoad;
   }
   if (removeIncompleteRules === undefined) {
     removeIncompleteRules = newConfig.settings.removeIncompleteRulesOnLoad;
@@ -146,6 +154,7 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
   const options = {
     // sanitize options
     removeEmptyGroups,
+    removeEmptyRules,
     removeIncompleteRules,
     forceFix: false,
   };
@@ -169,6 +178,7 @@ export const validateAndFixTree = (newTree, _oldTree, newConfig, oldConfig, remo
  * @param {SanitizeOptions} options
  * @typedef {{
  *   removeEmptyGroups?: boolean,
+ *   removeEmptyRules?: boolean,
  *   removeIncompleteRules?: boolean,
  *   forceFix?: boolean,
  *   translateErrors?: boolean,
@@ -214,6 +224,7 @@ export const _validateTree = (
   const {
     // sanitize options
     removeEmptyGroups,
+    removeEmptyRules,
     removeIncompleteRules,
     forceFix,
     // translation options
@@ -224,7 +235,7 @@ export const _validateTree = (
     includeItemsPositions = true,
   } = options || {};
   const c = {
-    config, oldConfig, removeEmptyGroups, removeIncompleteRules, forceFix,
+    config, oldConfig, removeEmptyGroups, removeEmptyRules, removeIncompleteRules, forceFix,
   };
   const meta = {
     errors: {},
@@ -358,7 +369,7 @@ function _setErrorsAsFixed(meta, item) {
 }
 
 function validateItem (item, path, itemId, meta, c) {
-  const type = item.get("type");
+  const type = item?.get("type");
 
   if ((type === "group" || type === "rule_group" || type == "case_group" || type == "switch_group")) {
     return validateGroup(item, path, itemId, meta, c);
@@ -404,8 +415,9 @@ function validateGroup (item, path, itemId, meta, c) {
   children = children
     ?.map( (currentChild, childId) => validateItem(currentChild, path.concat(id), childId, submeta, c) );
   const nonEmptyChildren = children?.filter((currentChild) => (currentChild != undefined));
-  if (removeEmptyGroups)
+  if (removeEmptyGroups) {
     children = nonEmptyChildren;
+  }
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
   const isEmptyChildren = !nonEmptyChildren?.size;
   if (isEmptyChildren && childrenAreRequired) {
@@ -443,7 +455,7 @@ function validateGroup (item, path, itemId, meta, c) {
  * @returns {Immutable.Map}
  */
 function validateRule (item, path, itemId, meta, c) {
-  const {removeIncompleteRules, forceFix, config, oldConfig} = c;
+  const {removeIncompleteRules, removeEmptyRules, forceFix, config, oldConfig} = c;
   const {showErrorMessage} = config.settings;
   const canFix = !showErrorMessage || forceFix;
   const origItem = item;
@@ -453,7 +465,7 @@ function validateRule (item, path, itemId, meta, c) {
     const err = {
       key: constants.INCOMPLETE_RULE,
       args: {},
-      fixed: removeIncompleteRules
+      fixed: removeIncompleteRules || removeEmptyRules
     };
     _addError(meta, item, path, err);
     return undefined;
@@ -496,7 +508,7 @@ function validateRule (item, path, itemId, meta, c) {
       key: constants.NO_CONFIG_FOR_FIELD,
       args: { field },
       side: "lhs",
-      fixed: removeIncompleteRules,
+      fixed: removeIncompleteRules || removeEmptyRules,
     });
     field = null;
   }
@@ -528,7 +540,7 @@ function validateRule (item, path, itemId, meta, c) {
       key: constants.NO_CONFIG_FOR_OPERATOR,
       args: { operator },
       side: "op",
-      fixed: removeIncompleteRules,
+      fixed: removeIncompleteRules || removeEmptyRules,
     });
     operator = null;
   }
@@ -539,7 +551,7 @@ function validateRule (item, path, itemId, meta, c) {
         key: constants.UNSUPPORTED_FIELD_TYPE,
         args: { field },
         side: "lhs",
-        fixed: removeIncompleteRules,
+        fixed: removeIncompleteRules || removeEmptyRules,
       });
       operator = null;
     } else if (operator && availOps.indexOf(operator) == -1) {
@@ -557,7 +569,7 @@ function validateRule (item, path, itemId, meta, c) {
           key: constants.UNSUPPORTED_OPERATOR_FOR_FIELD,
           args: { operator, field },
           side: "lhs",
-          fixed: removeIncompleteRules,
+          fixed: removeIncompleteRules || removeEmptyRules,
         });
         operator = null;
       }
@@ -618,6 +630,15 @@ function validateRule (item, path, itemId, meta, c) {
     _addError(meta, item, path, e)
   );
   if (!isCompleted) {
+    let shoudlRemoveRule = !compl.score ? removeEmptyRules : removeIncompleteRules;
+    // if (shoudlRemoveRule && showErrorMessage) {
+    //   // try to be not so rude about removing incomplete rule with functions
+    //   const complLite = whatRulePropertiesAreCompleted(properties.toObject(), config, true);
+    //   const isCompletedLite = complLite.score >= 3;
+    //   if (isCompletedLite) {
+    //     shoudlRemoveRule = false;
+    //   }
+    // }
     let incError = { key: constants.INCOMPLETE_RULE, args: {} };
     if (!compl.parts.field) {
       incError.key = constants.INCOMPLETE_LHS;
@@ -636,9 +657,9 @@ function validateRule (item, path, itemId, meta, c) {
         };
       }
     }
-    incError.fixed = removeIncompleteRules;
+    incError.fixed = shoudlRemoveRule;
     _addError(meta, item, path, incError);
-    if (removeIncompleteRules) {
+    if (shoudlRemoveRule) {
       _setErrorsAsFixed(meta, item);
       item = undefined;
     }

@@ -291,6 +291,7 @@ export default (skin: string) => {
     shouldCreateEmptyGroup: false,
     showErrorMessage: true,
     removeEmptyGroupsOnLoad: false,
+    removeEmptyRulesOnLoad: false,
     removeIncompleteRulesOnLoad: false,
     optimizeRenderWithInternals: true,
     customFieldSelectProps: {

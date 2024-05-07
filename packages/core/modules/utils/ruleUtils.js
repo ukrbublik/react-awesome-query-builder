@@ -353,7 +353,7 @@ export const isEmptyRuleProperties = (properties, config) => {
 
 /**
  * Used to validate rule
- * @param properties is an Object, but properties (like value) are Immutable
+ * @param properties is an Object, but its properties (like `value`) are Immutable
  * @param liteCheck true can be used to check that rule has enough data to ask confirmation before delete
  * @return {{parts: {field: boolean, operator: boolean, value: boolean}, score: number}}
  */

@@ -71,7 +71,7 @@ export function jsToImmutable(tree) {
       // keep in JS format
       outValue = value.toJS();
     } else if (key == "children1" && Immutable.Iterable.isIndexed(value)) {
-      outValue = new Immutable.OrderedMap(value.map(child => [child.get("id") || uuid(), child]));
+      outValue = new Immutable.OrderedMap(value.map(child => [child?.get("id") || uuid(), child]));
     } else {
       outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
     }

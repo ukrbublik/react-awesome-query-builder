@@ -442,6 +442,7 @@ export interface SanitizeResult {
 }
 export interface SanitizeOptions extends ValidationTranslateOptions {
   removeEmptyGroups?: boolean; // default: true
+  removeEmptyRules?: boolean; // default: true
   removeIncompleteRules?: boolean; // default: true
   forceFix?: boolean; // default: false
 }
@@ -1316,6 +1317,7 @@ export interface BehaviourSettings {
   canShortMongoQuery?: boolean;
   convertableWidgets?: TypedMap<Array<string>>;
   removeEmptyGroupsOnLoad?: boolean;
+  removeEmptyRulesOnLoad?: boolean;
   removeIncompleteRulesOnLoad?: boolean;
   removeInvalidMultiSelectValuesOnLoad?: boolean;
   groupOperators?: Array<string>;

@@ -558,6 +558,30 @@ describe("validateTree", () => {
 });
 
 describe("sanitizeTree", () => {
+  describe("with removeIncompleteRules=true", () => {
+    it("rule with missing required arg in func should be treated as incomplete => deleted", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_missing_args as JsonTree);
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            removeIncompleteRules: true,
+          });
+
+          // rule should be removed as incomplete
+          expect(nonFixedErrors.length).eq(0);
+          expect(fixedErrors.length).eq(1);
+          expect(fixedErrors[0].errors).to.containSubsetInOrder([{
+            key: "INCOMPLETE_LHS",
+            fixed: true
+          }]);
+          expect(Utils.getTree(fixedTree).children1?.length).eq(0);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        });
+    });
+  });
+
   describe("with forceFix=false", () => {
     it("should remove empty groups and incomplete rules", async () => {
       await with_qb(
@@ -689,6 +713,7 @@ describe("sanitizeTree", () => {
           sanitizeOptions: {
             // don't fix tree in `load_tree`
             removeEmptyGroups: false,
+            removeEmptyRules: false,
             removeIncompleteRules: false,
           },
         }
@@ -716,42 +741,6 @@ describe("sanitizeTree", () => {
           expectedLoadErrors: [
             "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
           ]
-        }
-      );
-    });
-
-    it("can set defaultValue if can't fix", async () => {
-      await with_qb(
-        [ with_all_types, with_validateValue_without_fixedValue_with_defaultValue ], inits.empty, null,
-        async (qb, { config }) => {
-          const invalidTree = Utils.loadFromJsonLogic(inits.with_numLess5_eq_7, config)!;
-          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
-            forceFix: true
-          });
-          const fixedJsonTree = Utils.getTree(fixedTree);
-
-          expect(nonFixedErrors.length).to.eq(0);
-          expect(fixedErrors).to.containSubsetInOrder([{
-            itemStr: "NumberLess5 = 7",
-            errors: [{
-              key: "INVALID_VALUE",
-              fixed: true,
-              fixedFrom: 7,
-              fixedTo: 3,
-            }]
-          }]);
-          expect(fixedJsonTree).to.containSubsetInOrder({
-            children1: [{
-              properties: {
-                field: "numLess5",
-                fieldSrc: "field",
-                operator: "equal",
-                value: [3],
-              }
-            }]
-          });
-        }, {
-          expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
       );
     });
@@ -928,6 +917,42 @@ describe("sanitizeTree", () => {
           });
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ]
+        }
+      );
+    });
+
+    it("can set defaultValue if can't fix", async () => {
+      await with_qb(
+        [ with_all_types, with_validateValue_without_fixedValue_with_defaultValue ], inits.empty, null,
+        async (qb, { config }) => {
+          const invalidTree = Utils.loadFromJsonLogic(inits.with_numLess5_eq_7, config)!;
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            forceFix: true
+          });
+          const fixedJsonTree = Utils.getTree(fixedTree);
+
+          expect(nonFixedErrors.length).to.eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemStr: "NumberLess5 = 7",
+            errors: [{
+              key: "INVALID_VALUE",
+              fixed: true,
+              fixedFrom: 7,
+              fixedTo: 3,
+            }]
+          }]);
+          expect(fixedJsonTree).to.containSubsetInOrder({
+            children1: [{
+              properties: {
+                field: "numLess5",
+                fieldSrc: "field",
+                operator: "equal",
+                value: [3],
+              }
+            }]
+          });
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
       );
     });
@@ -1348,6 +1373,7 @@ describe("checkTree (deprecated)", () => {
           settings: {
             ...config.settings,
             removeEmptyGroupsOnLoad: true,
+            removeEmptyRulesOnLoad: true,
             removeIncompleteRulesOnLoad: true,
           }
         };
@@ -1388,6 +1414,7 @@ describe("checkTree (deprecated)", () => {
         sanitizeOptions: {
           // don't fix tree in `load_tree`
           removeEmptyGroups: false,
+          removeEmptyRules: false,
           removeIncompleteRules: false,
         },
         ignoreLog: (errText) => {

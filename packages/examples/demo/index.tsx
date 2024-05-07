@@ -45,6 +45,7 @@ initTree = loadTree(initValue);
 const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(initTree, loadedConfig, {
   ...validationTranslateOptions,
   removeEmptyGroups: false,
+  removeEmptyRules: false,
   removeIncompleteRules: false,
 });
 initTree = fixedTree;
@@ -142,16 +143,43 @@ const DemoQueryBuilder: React.FC = () => {
     });
   };
 
+  const validateToConsole = () => {
+    const validationErrors = validateTree(state.tree, state.config, {
+      ...validationTranslateOptions,
+    });
+    console.warn(">>> Utils.validateTree()", validationErrors);
+  };
+
   const sanitize = () => {
     const { fixedErrors, fixedTree, nonFixedErrors } = sanitizeTree(state.tree, state.config, {
       ...validationTranslateOptions,
-      forceFix: false,
+      removeEmptyGroups: true, // default
+      removeEmptyRules: true, // default
+      removeIncompleteRules: true, // default
+      forceFix: false, // default
     });
     if (fixedErrors.length) {
       console.warn("> sanitizeTree fixed errors:", fixedErrors);
     }
     if (nonFixedErrors.length) {
       console.warn("> sanitizeTree non-fixed validation errors:", nonFixedErrors);
+    }
+    setState({
+      ...state,
+      tree: fixedTree,
+    });
+  };
+
+  const sanitizeLight = () => {
+    const { fixedTree, allErrors } = sanitizeTree(state.tree, state.config, {
+      ...validationTranslateOptions,
+      removeEmptyGroups: false,
+      removeEmptyRules: false,
+      removeIncompleteRules: false,
+      forceFix: false, // default
+    });
+    if (allErrors.length) {
+      console.warn("> sanitizeTree validation errors:", allErrors);
     }
     setState({
       ...state,
@@ -174,13 +202,6 @@ const DemoQueryBuilder: React.FC = () => {
       ...state,
       tree: fixedTree,
     });
-  };
-
-  const validate = () => {
-    const validationErrors = validateTree(state.tree, state.config, {
-      ...validationTranslateOptions,
-    });
-    console.warn(">>> Utils.validateTree()", validationErrors);
   };
 
   const onChangeSpelStr = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -210,6 +231,7 @@ const DemoQueryBuilder: React.FC = () => {
     const {fixedTree, fixedErrors, nonFixedErrors} = sanitizeTree(state.tree, config, {
       ...validationTranslateOptions,
       removeEmptyGroups: false,
+      removeEmptyRules: false,
       removeIncompleteRules: false,
     });
     if (fixedErrors.length) {
@@ -541,6 +563,7 @@ const DemoQueryBuilder: React.FC = () => {
   return (
     <div>
       <div>
+        View: &nbsp;
         <select value={state.skin} onChange={changeSkin}>
           <option key="vanilla">vanilla</option>
           <option key="antd">antd</option>
@@ -549,29 +572,26 @@ const DemoQueryBuilder: React.FC = () => {
           <option key="bootstrap">bootstrap</option>
           <option key="fluent">fluent</option>
         </select>
+        &nbsp;
+        <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
+      </div>
+      <div>
+        Data: &nbsp;
         <button onClick={resetValue}>reset</button>
         <button onClick={clearValue}>clear</button>
-        <button onClick={validate}>validate &gt; console</button>
-        <button onClick={sanitize}>sanitize</button>
-        <button onClick={sanitizeAndFix}>sanitize & fix</button>
-        <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
         <button onClick={runActions}>run actions</button>
         <button onClick={removeNumFromConfig}>change config: remove num field</button>
       </div>
-
-      <ImportSkinStyles skin={state.skin} />
-      
-      <Query
-        {...state.config}
-        value={state.tree}
-        onInit={onChange}
-        onChange={onChange}
-        renderBuilder={renderBuilder}
-      />
-
-
+      <div>
+        Validation: &nbsp;
+        <button onClick={validateToConsole}>show errors in console</button>
+        <button onClick={sanitizeLight}>validate</button>
+        <button onClick={sanitize}>sanitize</button>
+        <button onClick={sanitizeAndFix}>sanitize & fix</button>
+      </div>
+      <br />
       <div className="query-import-spel">
-        SpEL:
+        SpEL: &nbsp;
         <input type="text" size={150} value={state.spelStr} onChange={onChangeSpelStr} />
         <button onClick={importFromSpel}>import</button>
         <br />
@@ -581,6 +601,17 @@ const DemoQueryBuilder: React.FC = () => {
             </pre> 
         }
       </div>
+
+      <ImportSkinStyles skin={state.skin} />
+      
+      <br />
+      <Query
+        {...state.config}
+        value={state.tree}
+        onInit={onChange}
+        onChange={onChange}
+        renderBuilder={renderBuilder}
+      />
 
       <div className="query-builder-result">
         {renderResult(state)}

@@ -17,7 +17,7 @@ export const createValidationMemo = () => {
       configId = config.__configId;
       originalTree = tree;
       if (sanitizeTree === false) {
-        validatedTree = validateAndFixTree(tree, null, config, oldConfig || config, false, false);
+        validatedTree = validateAndFixTree(tree, null, config, oldConfig || config, false, false, false);
       } else {
         validatedTree = validateAndFixTree(tree, null, config, oldConfig || config);
       }

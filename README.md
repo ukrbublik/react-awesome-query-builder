@@ -472,6 +472,7 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
   `options` is an object with keys:
   - `removeEmptyGroups` (default: true) - If group has no children, drop it.
+  - `removeEmptyRules` (default: true) - If rule is empty, drop it.
   - `removeIncompleteRules` (default: true) - If rule is not completed (eg. value in RHS is empty, or required argument for a function is empty), drop it. Cause it can't be exported (will not be present in result of any [export](#export-utils) function call) so can be treated as useless.
   - `forceFix` (default: false) - If a rule has validation error(s), fix them if it's possible (eg. if value > max, can be reset to max) otherwise drop it.
 

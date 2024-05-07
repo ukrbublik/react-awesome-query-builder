@@ -305,17 +305,19 @@ export const getFlatTree = (tree) => {
     if (hasChildren) {
       let childCount = 0;
       children.map((child, childId) => {
-        _flatizeTree(
-          child, 
-          path.concat(id), 
-          insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
-          lev + 1, currentCaseId, childCount
-        );
-        const childItem = items[childId];
-        // Calculations after deep traversing 1 child
-        maxChildDepth = Math.max(maxChildDepth, childItem.depth || 0);
-        sumHeight += childItem.height;
-        childCount++;
+        if (child) {
+          _flatizeTree(
+            child, 
+            path.concat(id), 
+            insideCollapsed || collapsed, insideLocked || isLocked, insideRuleGroup || isRuleGroup,
+            lev + 1, currentCaseId, childCount
+          );
+          const childItem = items[childId];
+          // Calculations after deep traversing 1 child
+          maxChildDepth = Math.max(maxChildDepth, childItem.depth || 0);
+          sumHeight += childItem.height;
+          childCount++;
+        }
       });
     }
 
@@ -376,7 +378,9 @@ export const getTotalReordableNodesCountInTree = (tree) => {
     //tip: rules in rule-group can be reordered only inside
     if (children && !isRuleGroup) {
       children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
+        if (child) {
+          _processNode(child, path.concat(id), lev + 1);
+        }
       });
     }
   }
@@ -413,7 +417,9 @@ export const getTotalRulesCountInTree = (tree) => {
       cnt++;
     } else if (children) {
       children.map((child, _childId) => {
-        _processNode(child, path.concat(id), lev + 1);
+        if (child) {
+          _processNode(child, path.concat(id), lev + 1);
+        }
       });
     }
   }
@@ -446,7 +452,9 @@ export const getLightTree = (tree, deleteExcess = true, children1AsArray = true)
     const children = item.children1;
     if (children) {
       for (let id in children) {
-        _processNode(children[id], id);
+        if (children[id]) {
+          _processNode(children[id], id);
+        }
       }
       if (children1AsArray) {
         item.children1 = Object.values(children);

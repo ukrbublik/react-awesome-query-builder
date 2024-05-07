@@ -805,6 +805,7 @@ export const with_dont_fix_on_load = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     removeEmptyGroupsOnLoad: false,
+    removeEmptyRulesOnLoad: false,
     removeIncompleteRulesOnLoad: false,
   }
 });
