@@ -5,6 +5,7 @@ import * as inits from "../support/inits";
 import {
   with_qb,
   setFieldFuncArgValue,
+  selectFieldFunc,
 } from "../support/utils";
 import chai from "chai";
 import chaiSubsetInOrder from "chai-subset-in-order";
@@ -336,6 +337,51 @@ describe("validation in store on change", () => {
         }
       );
     });
+
+    it("should fix args on func change", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs as JsonTree);
+          await qb.setProps({
+            value: treeWithFunc2
+          });
+
+          await selectFieldFunc(qb, "vld.tfunc2a");
+
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("should fix args on func change but not func value", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs_and_long_rhs as JsonTree);
+          await qb.setProps({
+            value: treeWithFunc2
+          });
+
+          await selectFieldFunc(qb, "vld.tfunc2a");
+
+          const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors2).to.have.length(1);
+          expect(validationErrors2).to.containSubsetInOrder([{
+            itemStr: "TextFunc2a(Num1: 5, Num2: 5, Num3: 5) = xxxxxyyyyyzzz",
+            errors: [{
+              str: "Value xxxxxyyyyyzzz should have max length 10 but got 13"
+            }]
+          }]);
+          expect(validationErrors2[0].errors).to.have.length(1);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
   });
 });
 
@@ -438,9 +484,6 @@ describe("validateAndFix (internal, on load)", () => {
       );
     });
   });
-
-  // describe("with showErrorMessage=true", () => {
-  // });
 });
 
 describe("validateTree", () => {

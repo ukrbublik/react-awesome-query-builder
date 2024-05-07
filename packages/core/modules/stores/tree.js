@@ -385,6 +385,7 @@ const setFieldSrc = (state, path, srcKey, config) => {
  * @param {*} asyncListValues
  */
 const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue, valueType, asyncListValues, _meta = {}) => {
+  const {showErrorMessage} = config.settings;
   const isLHS = delta === -1;
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const currentField = currentProperties.get("field");
@@ -408,7 +409,8 @@ const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue,
   // modify
   if (!argKey) {
     const newFuncKey = argValue;
-    targetFV = setFunc(targetFV, newFuncKey, config);
+    const canFixArgs = true; // try to fix args to fit new func validations, otherwise - drop invalid args
+    targetFV = setFunc(targetFV, newFuncKey, config, canFixArgs);
     // allow drop invalid args / reset to default, but don't trigger error if some arg is required
     // (not same as setting isEndValue = true)
     _meta.canDropArgs = true;

@@ -95,8 +95,9 @@ export const completeFuncValue = (value, config) => {
  * @param {Immutable.Map} value 
  * @param {string} funcKey 
  * @param {object} config 
+ * @param {boolean} canFixArgs
  */
-export const setFunc = (value, funcKey, config) => {
+export const setFunc = (value, funcKey, config, canFixArgs) => {
   const fieldSeparator = config.settings.fieldSeparator;
   value = value || new Immutable.Map();
   if (Array.isArray(funcKey)) {
@@ -110,7 +111,7 @@ export const setFunc = (value, funcKey, config) => {
   const funcConfig = funcKey && getFuncConfig(config, funcKey);
   const newFuncSignature = funcKey && getFuncSignature(config, funcKey);
   const oldFuncSignature = oldFuncKey && getFuncSignature(config, oldFuncKey);
-  const keepArgsKeys = getCompatibleArgsOnFuncChange(oldFuncSignature, newFuncSignature, oldArgs, config);
+  const keepArgsKeys = getCompatibleArgsOnFuncChange(oldFuncSignature, newFuncSignature, oldArgs, config, canFixArgs);
   if (keepArgsKeys.length) {
     const argsKeys = Object.keys(newFuncSignature.args);
     const deleteArgsKeys = argsKeys.filter(k => !keepArgsKeys.includes(k));
@@ -203,7 +204,7 @@ export const setArgValueSrc = (value, argKey, argValSrc, _argConfig, _config) =>
 };
 
 // see getFuncSignature in configUtils
-export const getCompatibleArgsOnFuncChange = (s1, s2, argVals, config) => {
+export const getCompatibleArgsOnFuncChange = (s1, s2, argVals, config, canFixArgs = false) => {
   if (s1?.returnType != s2?.returnType)
     return [];
   const checkIndexes = false;
@@ -230,11 +231,11 @@ export const getCompatibleArgsOnFuncChange = (s1, s2, argVals, config) => {
       const argValueSrc = argVal?.get("valueSrc");
       if (arg2.valueSources && !arg2.valueSources.includes(argValueSrc))
         return false;
-      const leftField = null, operator = null, argDef = arg2, asyncListValues = null, canFix = false, isEndValue = true;
+      const leftField = null, operator = null, argDef = arg2, asyncListValues = null, isEndValue = true;
       const [_fixedArgVal, argValidErrors] = validateValue(
-        config, leftField, argDef, operator, argValue, argDef.type, argValueSrc, asyncListValues, canFix, isEndValue
+        config, leftField, argDef, operator, argValue, argDef.type, argValueSrc, asyncListValues, canFixArgs, isEndValue
       );
-      if (argValidErrors?.length)
+      if (argValidErrors?.filter(e => !e.fixed)?.length)
         return false;
     }
 

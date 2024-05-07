@@ -929,6 +929,54 @@ export const with_funcs_validation = (BasicConfig) => ({
             },
           }
         },
+        tfunc2a: {
+          // same as tfunc2, but with different validations
+          label: "TextFunc2a",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 10, // vs 5
+          },
+          jsonLogic: ({ num1, num2, num3 }) => {
+            return { vfunc2a: [ num1, num2, num3 ] };
+          },
+          jsonLogicImport: ({ vfunc2 }) => {
+            return vfunc2a;
+          },
+          spelFunc: "T(String).tfunc2a(${num1}, ${num2}, ${num3})",
+          args: {
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 5, // vs 10
+              },
+            },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 5, // vs 10
+              },
+            },
+            num3: {
+              label: "Num3",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 3,
+              fieldSettings: {
+                min: 0,
+                max: 5, // vs 10
+              },
+            },
+          }
+        },
       }
     }
   },

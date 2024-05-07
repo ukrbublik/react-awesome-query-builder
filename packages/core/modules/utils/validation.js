@@ -988,6 +988,8 @@ const validateFuncValue = (
     });
     return [value, allErrors];
   }
+  //tip: Exception for canDropArgs (true only if changing func) - can fix/drop args to fit new func validations
+  canFix = canFix || canDropArgs;
   for (const argKey in funcConfig.args) {
     const argConfig = funcConfig.args[argKey];
     const args = fixedValue.get("args");
