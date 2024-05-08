@@ -339,6 +339,7 @@ describe("validation in store on change", () => {
     });
 
     it("should fix args on func change", async () => {
+      // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
         async (qb, { config, onChange }) => {
@@ -349,15 +350,77 @@ describe("validation in store on change", () => {
 
           selectFieldFunc(qb, "vld.tfunc2a");
 
+          // Args should change value from 7 to 5 (max)
           const ruleError = qb.find(".rule--error");
           expect(ruleError).to.have.length(0);
+          const newSpel = Utils.spelFormat(onChange.lastCall.args[0], config);
+          expect(newSpel).to.equal("T(String).tfunc2a(5, 5, 5) == 'xxxxxxx'");
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
       );
     });
 
-    it("should fix args on func change but not func value", async () => {
+    it("should fix args on func change, even if valueSrc is missing in args", async () => {
+      // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs_without_valueSrc as JsonTree);
+          qb.setProps({
+            value: treeWithFunc2
+          });
+
+          selectFieldFunc(qb, "vld.tfunc2a");
+
+          // Arg `num1` should be fixed 7 -> 5 (max)
+          // Arg `num3` should be fixed 7 -> 5 (max)
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+          const validationErrors = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors).to.have.length(0);
+          const newSpel = Utils.spelFormat(onChange.lastCall.args[0], config);
+          expect(newSpel).to.equal("T(String).tfunc2a(5, 3, 5) == 'xxxxxxx'");
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("should drop args on func change if validateValue() returns false for arg", async () => {
+      // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs_without_valueSrc as JsonTree);
+          qb.setProps({
+            value: treeWithFunc2
+          });
+
+          selectFieldFunc(qb, "vld.tfunc2b");
+
+          // Arg `num1` should be dropped because validateValue() returns false
+          // For arg `num3` also validateValue() returns false, but it has defaultValue
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+          const validationErrors = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors).to.have.length(1);
+          expect(validationErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc2b(Num1: ?, Num2: 3, Num3: 4) = xxxxxxx",
+            errors: [{
+              str: "Value of arg Num1 for func TextFunc2b is required"
+            }, {
+              key: "INCOMPLETE_LHS"
+            }]
+          }]);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("should fix args on func change, but not func value", async () => {
+      // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
         async (qb, { config, onChange }) => {
@@ -384,6 +447,7 @@ describe("validation in store on change", () => {
     });
 
     it("should ignore missing args args on func change", async () => {
+      // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
         async (qb, { config, onChange }) => {
@@ -395,6 +459,10 @@ describe("validation in store on change", () => {
           selectFieldFunc(qb, "vld.tfunc2a");
 
           // should not show error "Value of arg Num2 for func TextFunc2a is required"
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Value xxxxxyyyyyzzz should have max length 10 but got 13");
+
           const validationErrors = Utils.validateTree(onChange.lastCall.args[0], config);
           expect(validationErrors).to.have.length(1);
           expect(validationErrors).to.containSubsetInOrder([{
@@ -1312,7 +1380,7 @@ describe("sanitizeTree", () => {
     it("can't fix missing required arg in nested func in LHS", async () => {
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
-        async (qb, { config, onChange, pauseTest }) => {
+        async (qb, { config, onChange }) => {
           const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_both_sides_with_missing_args_in_nested_funcs as JsonTree);
           const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
             forceFix: true,

@@ -41,11 +41,12 @@ See [live demo](https://ukrbublik.github.io/react-awesome-query-builder)
   * [Builder](#builder-)
   * [Utils](#utils)
     * [Save/load tree](#saveload-tree)
-    * [Validation](#validation-utils)
+    * [Validation utils](#validation-utils)
     * [Export](#export-utils)
     * [Import](#import-utils)
     * [Save/load config from server](#saveload-config-from-server)
   * [Config format](#config-format)
+  * [Validation](#validation)
 * [i18n](#i18n)
 * [SSR](#ssr)
   * [ctx](#ctx)
@@ -459,7 +460,8 @@ Wrapping in `div.query-builder-container` is necessary if you put query builder 
 
   You can override/extend translations with:  
   `Utils.i18n.addResources("en", "raqbvalidation", { ...yourTranslations })`  
-  See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  See [i18n](#i18n).
+  See default [validation translations](/packages/core/modules/i18n/validation/translations.js).  
+  See [i18n for validation](#validation-translations).
 
   #### `sanitizeTree`
   `Utils.sanitizeTree (immutableValue, config, options?) -> { fixedTree, fixedErrors, nonFixedErrors }`  
@@ -549,12 +551,32 @@ At minimum, you need to provide your own set of fields as in [basic usage](#usag
 See [`CONFIG`](/CONFIG.adoc) for full documentation.
 
 
+## Validation
+
+Useful [config settings](/CONFIG.adoc#configsettings) to manage global validation behaviour:
+- `showErrorMessage`: If it's `false`, query builder won't allow user to input incorrect values (like > max or < min or value that doesn't bypass `validateValue()` in field config). If it's `true`, inputs can have invalid values but the appropriate error message will be shown under the rule.
+- `removeIncompleteRulesOnLoad`, `removeEmptyRulesOnLoad`, `removeEmptyGroupsOnLoad`, `removeInvalidMultiSelectValuesOnLoad`: during initial validation of `value` prop passed to `<Query>`.
+
+Useful [field config settings](/CONFIG.adoc#configfields) to manage validation behaviour per field:
+- `fieldSettings.min`, `fieldSettings.max` for numeric fields
+- `fieldSettings.maxLength` for string fields
+- `fieldSettings.validateValue` - Custom JS function to validate value and return null (if value is valid) or object `{error, fixedValue?}`. 
+  `error` can be a string or an object `{key, args}` to use [i18n](#validation-translations)
+- Note that functions and their arguments can also have `fieldSettings`
+
+Use [`Utils.sanitizeTree()`](#sanitizetree) to perform validation on tree value and return validation errors and fixed tree value.
+See the list of [validation utils](#validation-utils).
+
+See [i18n for validation](#validation-translations).
+
+
 ## i18n
 :construction:
 
 This library uses [i18next](https://www.i18next.com/overview/getting-started) for translations.  
 
-- Validation.
+### Validation translations
+
   Namespace: `raqbvalidation`.
   [Default translations resource](/packages/core/modules/i18n/validation/translations.js)
 

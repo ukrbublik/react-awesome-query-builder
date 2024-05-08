@@ -84,7 +84,7 @@ describe("query with !struct and !group", () => {
     });
   });
 
-  describe("should handle if !group isnot wrapped in #some (old format)", () => {
+  describe("should handle if !group is not wrapped in #some (old format)", () => {
     export_checks(configs.with_struct_and_group, inits.with_struct_and_group_mixed_obsolete, "JsonLogic", {
       "query": "(results.slider == 22 && user.firstName == \"abc\")",
       "queryHuman": "(Results.Slider = 22 AND Username = abc)",
@@ -108,6 +108,13 @@ describe("query with !struct and !group", () => {
       }
     }, [], {
       // ignoreLog
+    });
+  });
+
+  describe("should handle some-in when it's not related to multiselect_contains op", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_select_any_in_in_some, "JsonLogic", {
+      "query": "vehicles.cars.vendor IN (\"Ford\", \"Toyota\")",
+      logic: inits.with_select_any_in_in_some,
     });
   });
 

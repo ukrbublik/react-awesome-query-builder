@@ -138,10 +138,11 @@ export type FlatTree = {
 /////////////////
 
 // tip: Date is stored as string
-export type SimpleValue = boolean | number | string | Array<string> | undefined;
-export type RuleValue = SimpleValue | FuncValue;
+export type SimpleValue = boolean | number | string | Array<string> | undefined | null;
+type AnyValue = any;
+export type RuleValue = SimpleValue | FuncValue | AnyValue;
 // tip: multiselect value is stored as Array<string>, not ImmutableList<string>
-export type RuleValueI = SimpleValue | FuncValueI;
+export type RuleValueI = SimpleValue | FuncValueI | AnyValue;
 export type FieldPath = string;
 export interface FuncArgValue<V = unknown> {
   value: V;
@@ -762,8 +763,7 @@ interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidget
   errorMessage?: string | Empty | Array<string | Empty>; // fieldError or valueError
 }
 
-// tip: SpelConcatParts is used for CaseValueWidgetProps, see `demo_switch`
-export type WidgetProps<C = Config> = RangeableWidgetProps<C, RuleValue | SpelConcatParts> & FieldSettings;
+export type WidgetProps<C = Config> = RangeableWidgetProps<C> & FieldSettings;
 
 export type TextWidgetProps<C = Config> = BaseWidgetProps<C, string> & TextFieldSettings;
 export type DateTimeWidgetProps<C = Config> = RangeableWidgetProps<C, string> & DateTimeFieldSettings;
@@ -774,7 +774,7 @@ export type SelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> 
 export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & MultiSelectFieldSettings;
 export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & TreeSelectFieldSettings;
 export type TreeMultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & TreeMultiSelectFieldSettings;
-export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C, SpelConcatParts> & CaseValueFieldSettings;
+export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
 
 
 /////////////////

@@ -345,6 +345,15 @@ export const with_bad_subfield_in_group = {
   ]
 };
 
+export const with_select_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "vehicles.cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] }
+  ]
+};
+
 export const with_select_not_any_in_in_some = {
   "and": [
     { "some": [
@@ -1062,6 +1071,26 @@ export const tree_with_vfunc2_at_lhs = {
           num1: { valueSrc: "value", value: 7 },
           num2: { valueSrc: "value", value: 7 },
           num3: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxxx"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_without_valueSrc = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { value: 7 },
+          num2: { value: 3 },
+          num3: { value: 7 },
         }
       },
       operator: "equal",

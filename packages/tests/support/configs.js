@@ -890,10 +890,10 @@ export const with_funcs_validation = (BasicConfig) => ({
             maxLength: 5,
           },
           jsonLogic: ({ num1, num2, num3 }) => {
-            return { vfunc2: [ num1, num2, num3 ] };
+            return { tfunc2: [ num1, num2, num3 ] };
           },
-          jsonLogicImport: ({ vfunc2 }) => {
-            return vfunc2;
+          jsonLogicImport: ({ tfunc2 }) => {
+            return tfunc2;
           },
           spelFunc: "T(String).tfunc2(${num1}, ${num2}, ${num3})",
           args: {
@@ -938,10 +938,10 @@ export const with_funcs_validation = (BasicConfig) => ({
             maxLength: 10, // vs 5
           },
           jsonLogic: ({ num1, num2, num3 }) => {
-            return { vfunc2a: [ num1, num2, num3 ] };
+            return { tfunc2a: [ num1, num2, num3 ] };
           },
-          jsonLogicImport: ({ vfunc2a }) => {
-            return vfunc2a;
+          jsonLogicImport: ({ tfunc2a }) => {
+            return tfunc2a;
           },
           spelFunc: "T(String).tfunc2a(${num1}, ${num2}, ${num3})",
           args: {
@@ -973,6 +973,54 @@ export const with_funcs_validation = (BasicConfig) => ({
               fieldSettings: {
                 min: 0,
                 max: 5, // vs 10
+              },
+            },
+          }
+        },
+        tfunc2b: {
+          // same as tfunc2, but with custom validations
+          label: "TextFunc2b",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 10, // vs 5
+          },
+          jsonLogic: ({ num1, num2, num3 }) => {
+            return { tfunc2b: [ num1, num2, num3 ] };
+          },
+          jsonLogicImport: ({ tfunc2b }) => {
+            return tfunc2b;
+          },
+          spelFunc: "T(String).tfunc2b(${num1}, ${num2}, ${num3})",
+          args: {
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                 // vs 0..10
+                validateValue: (v) => (v >= 0 && v <= 5),
+              },
+            },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                // vs 0..10
+               validateValue: (v) => (v >= 0 && v <= 5),
+              },
+            },
+            num3: {
+              label: "Num3",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 4,
+              fieldSettings: {
+                // vs 0..10
+               validateValue: (v) => (v >= 0 && v <= 5),
               },
             },
           }
