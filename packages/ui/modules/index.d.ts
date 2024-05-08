@@ -173,6 +173,9 @@ export interface ItemBuilderProps extends ItemProps {
   itemComponent: Factory<ItemProps>;
 }
 
+export type OnChange = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions) => void;
+export type OnInit = (immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions) => void;
+
 export interface QueryProps {
   conjunctions: Conjunctions;
   operators: Operators;
@@ -183,8 +186,8 @@ export interface QueryProps {
   funcs?: Funcs;
   ctx: ConfigContext;
   value: ImmutableTree;
-  onChange(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions): void;
-  onInit?(immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions): void;
+  onChange: OnChange;
+  onInit?: OnInit;
   renderBuilder(props: BuilderProps): ReactElement;
 }
 

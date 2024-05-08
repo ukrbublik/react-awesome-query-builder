@@ -17,7 +17,7 @@ export default (): Config => {
       spelImportValue: QbUtils.ExportUtils.spelImportConcat,
       factory: ({value, setValue, id}: WidgetProps) => 
         <ReactSelect 
-          value={value as Array<SpelConcatPart>}
+          value={value as SpelConcatPart[]}
           setValue={setValue}
           k={id!}
         />

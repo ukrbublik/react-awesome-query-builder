@@ -1,3 +1,4 @@
+/*eslint @typescript-eslint/require-await: ["off"]*/
 import { Utils, ImmutableTree, JsonGroup, JsonTree } from "@react-awesome-query-builder/core";
 const { isValidTree, validateTree, sanitizeTree, checkTree, getTree } = Utils;
 import * as configs from "../support/configs";
@@ -318,7 +319,6 @@ describe("validation in store on change", () => {
       await with_qb(
         [ with_all_types, with_show_error ], inits.with_range_from_field_to_big_number, "JsonLogic",
         async (qb, {expect_jlogic}) => {
-          await 
           qb
             .find(".rule .rule--field select")
             .simulate("change", { target: { value: "negativeNum" } });
@@ -343,11 +343,11 @@ describe("validation in store on change", () => {
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
         async (qb, { config, onChange }) => {
           const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs as JsonTree);
-          await qb.setProps({
+          qb.setProps({
             value: treeWithFunc2
           });
 
-          await selectFieldFunc(qb, "vld.tfunc2a");
+          selectFieldFunc(qb, "vld.tfunc2a");
 
           const ruleError = qb.find(".rule--error");
           expect(ruleError).to.have.length(0);
@@ -362,26 +362,58 @@ describe("validation in store on change", () => {
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
         async (qb, { config, onChange }) => {
           const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs_and_long_rhs as JsonTree);
-          await qb.setProps({
+          qb.setProps({
             value: treeWithFunc2
           });
 
-          await selectFieldFunc(qb, "vld.tfunc2a");
+          selectFieldFunc(qb, "vld.tfunc2a");
 
-          const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
-          expect(validationErrors2).to.have.length(1);
-          expect(validationErrors2).to.containSubsetInOrder([{
+          const validationErrors = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors).to.have.length(1);
+          expect(validationErrors).to.containSubsetInOrder([{
             itemStr: "TextFunc2a(Num1: 5, Num2: 5, Num3: 5) = xxxxxyyyyyzzz",
             errors: [{
               str: "Value xxxxxyyyyyzzz should have max length 10 but got 13"
             }]
           }]);
-          expect(validationErrors2[0].errors).to.have.length(1);
+          expect(validationErrors[0].errors).to.have.length(1);
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
       );
     });
+
+    it("should ignore missing args args on func change", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs_with_missing_args as JsonTree);
+          qb.setProps({
+            value: treeWithFunc2
+          });
+
+          selectFieldFunc(qb, "vld.tfunc2a");
+
+          // should not show error "Value of arg Num2 for func TextFunc2a is required"
+          const validationErrors = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors).to.have.length(1);
+          expect(validationErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc2a(Num1: 5, Num2: ?, Num3: 3) = xxxxxyyyyyzzz",
+            errors: [{
+              str: "Value of arg Num2 for func TextFunc2a is required"
+            }, {
+              str: "Value xxxxxyyyyyzzz should have max length 10 but got 13"
+            }, {
+              str: "Incomplete LHS"
+            }]
+          }]);
+          expect(validationErrors[0].errors).to.have.length(3);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
   });
 });
 
@@ -706,7 +738,7 @@ describe("sanitizeTree", () => {
             }]
           }]);
   
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree,
             ...config
           });
@@ -810,7 +842,7 @@ describe("sanitizeTree", () => {
           expect(nonFixedErrors).to.have.length(0);
           expect(Utils.spelFormat(fixedTree, config)).to.eq("num == 10");
   
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree
           });
           const ruleError2 = qb.find(".rule--error");
@@ -866,7 +898,7 @@ describe("sanitizeTree", () => {
           }]);
           expect(nonFixedErrors).to.eql([]);
   
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree
           });
   
@@ -1072,7 +1104,7 @@ describe("sanitizeTree", () => {
           }]);
           expect(fixedErrors[0].errors.length).eq(4);
 
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree
           });
           const ruleError2 = qb.find(".rule--error");
@@ -1128,7 +1160,7 @@ describe("sanitizeTree", () => {
           expect(nonFixedErrors[0].errors.length).eq(2);
 
           // Tree should be invalid on load
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree
           });
           const ruleError = qb.find(".rule--error");
@@ -1137,7 +1169,7 @@ describe("sanitizeTree", () => {
 
           // If user starts updating tree, validation errors about missing required args are not being shown in UI.
           // Beucase tree in not completed yet.
-          await setFieldFuncArgValue(qb, 3, "");
+          setFieldFuncArgValue(qb, 3, "");
           const ruleError2 = qb.find(".rule--error");
           expect(ruleError2).to.have.length(0);
           const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
@@ -1264,7 +1296,7 @@ describe("sanitizeTree", () => {
           }]);
           expect(fixedErrors[0].errors.length).eq(7);
 
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree
           });
           const ruleError2 = qb.find(".rule--error");
@@ -1369,7 +1401,7 @@ describe("sanitizeTree", () => {
           expect(nonFixedErrors[0].errors.length).eq(1);
 
           // Tree should be invalid on load
-          await qb.setProps({
+          qb.setProps({
             value: fixedTree
           });
           const ruleError = qb.find(".rule--error");
@@ -1378,7 +1410,7 @@ describe("sanitizeTree", () => {
 
           // If user starts updating tree, validation errors about missing required args are not being shown in UI.
           // Beucase tree in not completed yet.
-          await setFieldFuncArgValue(qb, 3, "5");
+          setFieldFuncArgValue(qb, 3, "5");
           const ruleError2 = qb.find(".rule--error");
           expect(ruleError2).to.have.length(0);
           const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
@@ -1421,7 +1453,7 @@ describe("checkTree (deprecated)", () => {
           }
         };
         const fixedTree = checkTree(initialTree, config);
-        await qb.setProps({
+        qb.setProps({
           value: fixedTree,
           ...config
         });

@@ -761,7 +761,9 @@ interface RangeableWidgetProps<C = Config, V = RuleValue> extends AbstractWidget
   valueError?: string | Empty | Array<string | Empty>;
   errorMessage?: string | Empty | Array<string | Empty>; // fieldError or valueError
 }
-export type WidgetProps<C = Config> = RangeableWidgetProps<C> & FieldSettings;
+
+// tip: SpelConcatParts is used for CaseValueWidgetProps, see `demo_switch`
+export type WidgetProps<C = Config> = RangeableWidgetProps<C, RuleValue | SpelConcatParts> & FieldSettings;
 
 export type TextWidgetProps<C = Config> = BaseWidgetProps<C, string> & TextFieldSettings;
 export type DateTimeWidgetProps<C = Config> = RangeableWidgetProps<C, string> & DateTimeFieldSettings;
@@ -772,7 +774,7 @@ export type SelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> 
 export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & MultiSelectFieldSettings;
 export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & TreeSelectFieldSettings;
 export type TreeMultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & TreeMultiSelectFieldSettings;
-export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
+export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C, SpelConcatParts> & CaseValueFieldSettings;
 
 
 /////////////////

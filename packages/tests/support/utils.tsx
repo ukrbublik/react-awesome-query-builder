@@ -14,7 +14,8 @@ import {
   Utils,
   JsonLogicTree, JsonTree, ImmutableTree, ConfigContext,
   Query, Builder, BasicConfig, Config,
-  BuilderProps, ValidationItemErrors, SanitizeOptions
+  BuilderProps, ValidationItemErrors, SanitizeOptions,
+  ActionMeta, OnInit, OnChange,
 } from "@react-awesome-query-builder/ui";
 const {
   uuid, 
@@ -50,6 +51,10 @@ const ConsoleMethods = [
 type ConsoleIgnoreFn = (errText: string) => boolean;
 type ConsoleMethod = Extract<Exclude<keyof Console, "Console">, typeof ConsoleMethods[number]>;
 type ConsoleData = Partial<Record<ConsoleMethod, string[]>>;
+interface MockedConsole extends Console {
+  __origConsole: Console;
+  __consoleData: ConsoleData;
+}
 type TreeValueFormat = "JsonLogic" | "default" | "SpEL" | null;
 type TreeValue = JsonLogicTree | JsonTree | string | undefined;
 type ConfigFn = (_: Config) => Config;
@@ -74,8 +79,8 @@ interface CheckExpects {
 interface CheckUtils {
   pauseTest: (addToGlobal?: Record<string, unknown>) => Promise<void>;
   continueTest: () => void;
-  onChange: sinon.SinonSpy;
-  onInit: sinon.SinonSpy;
+  onChange: sinon.SinonSpy<Parameters<OnChange>>;
+  onInit: sinon.SinonSpy<Parameters<OnInit>>;
   consoleData: ConsoleData;
 }
 interface CheckMeta extends CheckExpects, CheckUtils  {
@@ -108,17 +113,17 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
   let consoleData: ConsoleData;
   let mockedConsole: Console;
 
-  if ((origConsole as any).__origConsole) {
+  if ((origConsole as MockedConsole).__origConsole) {
     mockedConsole = origConsole;
-    consoleData = (origConsole as any).__consoleData;
-    origConsole = (origConsole as any).__origConsole;
+    consoleData = (origConsole as MockedConsole).__consoleData;
+    origConsole = (origConsole as MockedConsole).__origConsole;
   } else {
     consoleData = ConsoleMethods.reduce((aggr, m) => ({...aggr, [m]: []}), {});
     mockedConsole = {
       ...origConsole,
       __origConsole: origConsole,
       __consoleData: consoleData,
-    } as any as Console;
+    } as Console;
     for (const method of ConsoleMethods) {
       mockedConsole[method] = (...args: string[]) => {
         let finalArgs = [...args];
@@ -126,7 +131,7 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
           // Convert errors from `validateAndFixTree` or `checkTree`
           finalArgs = [
             args[0],
-            ...stringifyValidationErrors(args[1] as any)
+            ...stringifyValidationErrors(args[1] as unknown as ValidationItemErrors[])
           ];
         }
         const errText = finalArgs.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
@@ -134,7 +139,7 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
         if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
           origConsole[method].apply(null, [...finalArgs, "@", getCurrentTestName()]);
         }
-      }
+      };
     }
   }
 
@@ -264,9 +269,10 @@ const do_with_qb = async (
     expect(options?.expectedLoadErrors?.length ?? 0, "expectedLoadErrors count").equal(0);
   }
 
+  // eslint-disable-next-line prefer-const
   let qb: ReactWrapper;
-  const onChange = spy();
-  const onInit = spy();
+  const onChange = spy() as CheckUtils["onChange"];
+  const onInit = spy() as CheckUtils["onInit"];
   // mock console
   const {mockedConsole, origConsole, consoleData} = mockConsole(options, configName);
   // eslint-disable-next-line no-global-assign
@@ -274,7 +280,7 @@ const do_with_qb = async (
 
   const isDebugPage = document.location.href.includes("/debug.html");
 
-  let idleOptions: SleepOptions = {};
+  const idleOptions: SleepOptions = {};
   let isIdle = false;
 
   const pauseTest = async (addToGlobal?: Record<string, unknown>) => {
@@ -284,7 +290,9 @@ const do_with_qb = async (
     if (isDebugPage) {
       console.log("Pausing test... Type `continueTest()` to continue");
       if (addToGlobal) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         Object.assign((window as any).dbg, addToGlobal);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         Object.assign(window as any, addToGlobal);
       }
       isIdle = true;
@@ -293,7 +301,7 @@ const do_with_qb = async (
         await sleep(500, idleOptions);
         const currentTime = new Date();
         const isTimedOut = process?.env?.MAX_IDLE_TIME
-          && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME as string);
+          && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME );
         if (isTimedOut) {
           isIdle = false;
           break;
@@ -314,7 +322,7 @@ const do_with_qb = async (
 
   const exposeDebugVars = () => {
     const qbDom = qb.first().getDOMNode();
-    const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+    const initialTree = onInit.getCall(0).args[0] ;
     const initialJsonTree = getTree(initialTree);
     const ruleErrors = qb.find(".rule--error").map(e => e.text());
 
@@ -334,9 +342,11 @@ const do_with_qb = async (
     };
 
     // expose to window
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     (window as any).dbg = dbg;
     if (isDebugPage) {
       for (const k in dbg) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         (window as any)[k] = dbg[k];
       }
     }
@@ -384,12 +394,13 @@ const do_with_qb = async (
     updateTestTimeout();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   qb = mount(
     query(), 
     mountOptions
   );
 
-  const initialTree = onInit.getCall(0).args[0] as ImmutableTree;
+  const initialTree = onInit.getCall(0).args[0] ;
   const initialJsonTree = getTree(initialTree);
   const checkMeta: CheckMeta = {
     qb,
@@ -527,7 +538,7 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
     if (expects["mongo"] !== undefined) {
       doIt("should work to MongoDb", () => {
         const [expectedRes, expectedExportErrors] = Array.isArray(expects["mongo"])
-          ? expects["mongo"]
+          ? expects["mongo"] as [Object, string[]]
           : [expects["mongo"], []];
         const [res, errors] = _mongodbFormat(tree, config);
         expect_objects_equal(res, expectedRes);
@@ -793,7 +804,7 @@ export const setFieldFuncArgValue = (qb: ReactWrapper, ind: number, val: string)
   qb
     .find(".rule .rule--field--func .rule--func--args .rule--func--arg")
     .filterWhere((n) => n.closest(".rule--func--wrapper--lev-1").length === 0)
-    .filterWhere((n) => typeof n.type() !== 'string')
+    .filterWhere((n) => typeof n.type() !== "string")
     .at(ind)
     .find(".rule--func--arg-value .rule--widget .widget--widget input")
     .simulate("change", { target: { value: val } });

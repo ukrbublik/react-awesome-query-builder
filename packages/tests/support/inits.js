@@ -1090,6 +1090,24 @@ export const tree_with_vfunc2_at_lhs_and_long_rhs = {
   }],
 };
 
+export const tree_with_vfunc2_at_lhs_with_missing_args = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxyyyyyzzz"]
+    }
+  }],
+};
+
 export const with_prox = {
   type: "group",
   children1: [

@@ -940,7 +940,7 @@ export const with_funcs_validation = (BasicConfig) => ({
           jsonLogic: ({ num1, num2, num3 }) => {
             return { vfunc2a: [ num1, num2, num3 ] };
           },
-          jsonLogicImport: ({ vfunc2 }) => {
+          jsonLogicImport: ({ vfunc2a }) => {
             return vfunc2a;
           },
           spelFunc: "T(String).tfunc2a(${num1}, ${num2}, ${num3})",
