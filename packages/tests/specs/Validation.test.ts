@@ -39,6 +39,7 @@ before(() => {
 
 //todo: validate case_value ?
 
+
 describe("validation in store on change", () => {
   describe("with showErrorMessage=false", () => {
     it("should fix number value to max when change to > max", async () => {
@@ -118,6 +119,53 @@ describe("validation in store on change", () => {
         }
       );
     });
+
+    it("should fix args on func change", async () => {
+      // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_dont_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config, onChange, pauseTest }) => {
+          const treeWithFunc2 = Utils.loadTree(inits.tree_with_vfunc2_at_lhs_with_missing_args as JsonTree);
+          qb.setProps({
+            value: treeWithFunc2
+          });
+
+          // num3 will be set to default (0), rhs should be fixed
+          const validationErrors1 = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors1).to.have.length(1);
+          expect(validationErrors1).to.containSubsetInOrder([{
+            itemStr: "TextFunc2(Num1: 7, Num2: ?, Num3: 0) = xxxxx",
+            errors: [{
+              str: "Value of arg Num2 for func TextFunc2 is required"
+            }, {
+              str: "Incomplete LHS"
+            }]
+          }]);
+
+          selectFieldFunc(qb, "vld.tfunc2a");
+
+          // num1 will be fixed to max
+          const validationErrors2 = Utils.validateTree(onChange.lastCall.args[0], config);
+          expect(validationErrors2).to.have.length(1);
+          expect(validationErrors2).to.containSubsetInOrder([{
+            itemStr: "TextFunc2a(Num1: 5, Num2: ?, Num3: 0) = xxxxx",
+            errors: [{
+              str: "Value of arg Num2 for func TextFunc2a is required"
+            }, {
+              str: "Incomplete LHS"
+            }]
+          }]);
+          expect(validationErrors2[0].errors).to.have.length(2);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+          ignoreLog: (errText) => {
+            // TextFunc2(Num1: 7, Num2: ?, Num3: ?) = xxxxxyyyyyzzz  >>  * [lhs] Value of arg Num3 for func TextFunc2 is required. * [rhs 0] Value xxxxxyyyyyzzz should have max length 5 but got 13
+            return errText.includes("Fixed tree errors:");
+          },
+        }
+      );
+    });
+
   });
 
   describe("with showErrorMessage=true", () => {
@@ -454,7 +502,7 @@ describe("validation in store on change", () => {
       );
     });
 
-    it("should ignore missing args args on func change", async () => {
+    it("should ignore missing args on func change", async () => {
       // tip: See line `canFix = canFix || canDropArgs` at `validateFuncValue()` - it affects this test
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
