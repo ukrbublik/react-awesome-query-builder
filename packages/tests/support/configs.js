@@ -999,7 +999,7 @@ export const with_funcs_validation = (BasicConfig) => ({
               valueSources: ["value", "field", "func"],
               // NO defaultValue
               fieldSettings: {
-                 // vs 0..10
+                // vs 0..10
                 validateValue: (v) => (v >= 0 && v <= 5),
               },
             },
@@ -1010,7 +1010,7 @@ export const with_funcs_validation = (BasicConfig) => ({
               // NO defaultValue
               fieldSettings: {
                 // vs 0..10
-               validateValue: (v) => (v >= 0 && v <= 5),
+                validateValue: (v) => (v >= 0 && v <= 5),
               },
             },
             num3: {
@@ -1020,7 +1020,7 @@ export const with_funcs_validation = (BasicConfig) => ({
               defaultValue: 4,
               fieldSettings: {
                 // vs 0..10
-               validateValue: (v) => (v >= 0 && v <= 5),
+                validateValue: (v) => (v >= 0 && v <= 5),
               },
             },
           }
@@ -1531,20 +1531,6 @@ export const with_groupVarKey = (BasicConfig) => ({
 
 export const with_cases = (BasicConfig) => ({
   ...BasicConfig,
-  fields: {
-    num: {
-      label: "Number",
-      type: "number",
-    },
-    datetime: {
-      label: "Datetime",
-      type: "datetime",
-    },
-    str: {
-      label: "String",
-      type: "text",
-    },
-  },
   settings: {
     ...BasicConfig.settings,
     maxNumberOfCases: 3,

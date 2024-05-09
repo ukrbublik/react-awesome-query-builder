@@ -26,6 +26,7 @@ const {
   with_validationin_cars,
   with_fieldSources,
   with_validateValue_without_fixedValue_with_defaultValue,
+  with_cases,
 } = configs;
 
 before(() => {
@@ -34,6 +35,9 @@ before(() => {
     "NOT_EVEN": "Number should be even but got {{val}}"
   });
 });
+
+
+//todo: validate case_value ?
 
 describe("validation in store on change", () => {
   describe("with showErrorMessage=false", () => {
@@ -727,6 +731,26 @@ describe("validateTree", () => {
       }
     );
   });
+
+  it("switch without default case and cases without case values are considered as valid", async () => {
+    await with_qb(
+      [ with_all_types, with_cases, with_show_error, with_dont_fix_on_load, with_validateValue ], inits.empty, null,
+      async (qb, { config, onChange }) => {
+        const validTree = Utils.loadTree(inits.tree_with_case__without_case_value__without_default_case as JsonTree);
+        qb.setProps({
+          value: validTree
+        });
+        const ruleError = qb.find(".rule--error");
+        expect(ruleError).to.have.length(0);
+        const spel = Utils.spelFormat(onChange.lastCall.args[0], config);
+        expect(spel).to.eql("(evenNum == 6 ? null : null)");
+        const isValid2 = Utils.isValidTree(validTree, config);
+        expect(isValid2).to.eq(true);
+      }, {
+        expectedLoadErrors: [ "Root  >>  Empty query" ],
+      }
+    );
+  });
 });
 
 describe("sanitizeTree", () => {
@@ -1006,7 +1030,7 @@ describe("sanitizeTree", () => {
           expect(isValid2).to.eq(false);
           const ruleError2 = qb.find(".rule--error");
           expect(ruleError2).to.have.length(1);
-          expect(ruleError2.first().text()).to.eq("Invalid value of arg Str1 for func TextFunc1: Value aaaaaa should have max length 5 but got 6")
+          expect(ruleError2.first().text()).to.eq("Invalid value of arg Str1 for func TextFunc1: Value aaaaaa should have max length 5 but got 6");
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
@@ -1016,7 +1040,7 @@ describe("sanitizeTree", () => {
     it("if both parts of value for between op have errors, only first error will be shown in UI", async () => {
       await with_qb(
         [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.empty, null,
-        async (qb, { config, pauseTest }) => {
+        async (qb, { config }) => {
           const invalidTree = Utils.loadFromJsonLogic(inits.with_bad_range_bigger_than_max, config)!;
           const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config);
 
@@ -1059,7 +1083,7 @@ describe("sanitizeTree", () => {
     it("group with some/all/none should have 1+ children", async () => {
       await with_qb(
         [ with_all_types, with_group_array_cars, with_validationin_cars, with_show_error, with_dont_fix_on_load ], inits.empty, null,
-        async (qb, { config, pauseTest }) => {
+        async (qb, { config }) => {
           const incompleteTree = Utils.loadTree(inits.with_empty_group_some as JsonTree);
           qb.setProps({
             value: incompleteTree
@@ -1074,7 +1098,7 @@ describe("sanitizeTree", () => {
           expect(isValid).to.eq(true);
 
           // without `removeIncompleteRules` it won't be fixed
-          const { fixedErrors: fixedErrors1, nonFixedErrors: nonFixedErrors1 } = Utils.sanitizeTree(incompleteTree, config, {
+          const { fixedErrors: fixedErrors1, nonFixedErrors: nonFixedErrors1, fixedTree: fixedTree1 } = Utils.sanitizeTree(incompleteTree, config, {
             removeIncompleteRules: false,
             forceFix: false,
           });
@@ -1094,6 +1118,39 @@ describe("sanitizeTree", () => {
               str: "No conditions for group field cars",
             }]
           }]);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("should detect empty cases", async () => {
+      await with_qb(
+        [ with_all_types, with_cases, with_show_error, with_dont_fix_on_load, with_validateValue ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const emptyCasesTree = Utils.loadTree(inits.tree_with_empty_cases as JsonTree);
+          qb.setProps({
+            value: emptyCasesTree
+          });
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(emptyCasesTree, config);
+          expect(nonFixedErrors.length).eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemPositionStr: "Deleted case #1 (index path: 1)",
+            errors: [{
+              key: "EMPTY_CASE",
+              fixed: true,
+            }]
+          }]);
+          expect(fixedErrors[0].errors).to.have.length(1);
+
+          qb.setProps({
+            value: fixedTree
+          });
+          const newJsonTree = Utils.getTree(onChange.lastCall.args[0]);
+          expect(newJsonTree.children1).to.have.length(1);
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
@@ -1765,6 +1822,45 @@ describe("sanitizeTree", () => {
         }
       );
     });
+
+    it("should fix rules in case", async () => {
+      await with_qb(
+        [ with_all_types, with_cases, with_show_error, with_dont_fix_on_load, with_validateValue ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_case__with_invalid_rules__without_default_case as JsonTree);
+          qb.setProps({
+            value: invalidTree
+          });
+          const ruleError1 = qb.find(".rule--error");
+          expect(ruleError1).to.have.length(1);
+          expect(ruleError1.first().text()).to.eql("Number should be even but got 7");
+
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            forceFix: true
+          });
+          expect(nonFixedErrors.length).eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemPositionStr: "Leaf #1 in case #1 (index path: 1,1)",
+            itemStr: "Number even = 7",
+            errors: [{
+              side: "rhs",
+              str: "Number should be even but got 7",
+              fixedTo: 6,
+            }]
+          }]);
+
+          qb.setProps({
+            value: fixedTree
+          });
+          const newSpel = Utils.spelFormat(onChange.lastCall.args[0], config);
+          expect(newSpel).to.eql("(evenNum == 6 ? 'aa' : null)");
+          const isValid2 = Utils.isValidTree(fixedTree, config);
+          expect(isValid2).to.eq(true);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
   });
 });
 
@@ -1844,6 +1940,7 @@ describe("optimizeRenderWithInternals (MUI)", () => {
         // configs.with_optimizeRenderWithInternals, // test will fail with optimization
       ], inits.empty, null,
       async (qb, { config, onChange, pauseTest }) => {
+        /* eslint-disable @typescript-eslint/no-unsafe-argument */
         const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_missing_args as JsonTree);
         qb.setProps({
           value: invalidTree

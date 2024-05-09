@@ -654,7 +654,7 @@ const DemoQueryBuilder: React.FC = () => {
         <hr/>
       </>
     );
-  }
+  };
 
   const renderSpelInputBlock = ({renderBocks} : DemoQueryBuilderState) => {
     if (!renderBocks.spel) {

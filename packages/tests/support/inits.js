@@ -1478,7 +1478,7 @@ export const spel_with_number = "num == 2";
 export const spel_with_between = "num >= 1 && num <= 2";
 export const spel_with_not = "!(num == 2)";
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
-export const spel_with_cases = "(str == '222' ? is_string : (num == 222 ? is_number : unknown))";
+export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_number : unknown))";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
@@ -1531,3 +1531,55 @@ export const with_dot_in_field = {
 };
 
 export const spel_with_dot_in_field = "number.one == 11";
+
+export const tree_with_case__with_invalid_rules__without_default_case = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      properties: {
+        value: ["aa"],
+        valueType: ["case_value"],
+        valueSrc: ["value"],
+      },
+      children1: [{
+        type: "rule",
+        properties: {
+          field: "evenNum",
+          operator: "equal",
+          value: [7]
+        }
+      }]
+    },
+  ]
+};
+
+export const tree_with_case__without_case_value__without_default_case = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      children1: [{
+        type: "rule",
+        properties: {
+          field: "evenNum",
+          operator: "equal",
+          value: [6]
+        }
+      }]
+    },
+  ]
+};
+
+export const tree_with_empty_cases = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      children1: []
+    },
+    {
+      type: "case_group",
+    },
+  ]
+};

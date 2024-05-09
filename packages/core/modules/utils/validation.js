@@ -307,7 +307,7 @@ export const _validateTree = (
         }
         errorItem.itemPositionStr = translateValidation(trKey, trArgs);
         if (flatItem.index) { // don't extend for root
-          if (flatItem.caseId) {
+          if (flatItem.caseId && flatItem.type !== "case_group") {
             errorItem.itemPositionStr = translateValidation(constants.ITEM_POSITION_IN_CASE, {
               ...trArgs,
               str: errorItem.itemPositionStr
@@ -395,10 +395,11 @@ function validateGroup (item, path, itemId, meta, c) {
   const operator = properties?.get?.("operator");
   const isGroupExt = type === "rule_group" && mode === "array";
   const isCase = type === "case_group";
+  const isDefaultCase = isCase && children == undefined;
   const cardinality = operator ? config.operators[operator]?.cardinality ?? 1 : undefined;
   // tip: for group operators some/none/all children ARE required, for group operator count children are NOT required
   // tip: default case should contain only value
-  const childrenAreRequired = isCase ? false : (isGroupExt ? cardinality == 0 : true);
+  const childrenAreRequired = isCase ? !isDefaultCase : (isGroupExt ? cardinality == 0 : true);
 
   if (!id && itemId) {
     id = itemId;
