@@ -46,7 +46,7 @@ const formatItem = (item, config, meta, parentField = null) => {
 
 
 const formatGroup = (item, config, meta, parentField = null) => {
-  const { isForDisplay } = meta.settings;
+  const { isForDisplay, isDebugMode } = meta.settings;
   const type = item.get("type");
   const properties = item.get("properties") || new Map();
   const mode = properties.get("mode");
@@ -62,8 +62,9 @@ const formatGroup = (item, config, meta, parentField = null) => {
   const list = children
     .map((currentChild) => formatItem(currentChild, config, meta, groupField))
     .filter((currentChild) => typeof currentChild !== "undefined");
-  if (!canHaveEmptyChildren && !list.size)
+  if (!canHaveEmptyChildren && !list.size && !isDebugMode) {
     return undefined;
+  }
 
   let conjunction = properties.get("conjunction");
   if (!conjunction)
@@ -90,6 +91,9 @@ const formatGroup = (item, config, meta, parentField = null) => {
     ret = conjStr;
   }
 
+  if (isDebugMode && ret == null) {
+    ret = "?";
+  }
   return ret;
 };
 

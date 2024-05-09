@@ -366,6 +366,19 @@ export const with_select_not_any_in_in_some = {
 };
 export const spel_with_select_not_any_in_in_some = "cars.?[!({'Ford', 'Toyota'}.?[true].contains(vendor))].size() > 0";
 
+export const with_empty_group_some = {
+  type: "group",
+  children1: [{
+    type: "rule_group",
+    properties: {
+      mode: "array",
+      operator: "some",
+      field: "cars",
+    }
+  }]
+};
+
+
 export const with_not_and_in_some = {
   "and": [
     { "some": [
@@ -1184,6 +1197,28 @@ export const with_group_array_cars = {
         0
       ] },
       2
+    ] }
+  ]
+};
+
+export const with_group_array_cars_bad_count_and_year = {
+  "and": [
+    { ">": [
+      { "reduce": [
+        { "filter": [
+          { "var": "cars" },
+          { "and": [
+            {
+              "==": [ { "var": "vendor" }, "Toyota" ]
+            }, {
+              ">=": [ { "var": "year" }, 3000 ]
+            }
+          ] }
+        ] },
+        { "+": [ 1, { "var": "accumulator" } ] },
+        0
+      ] },
+      222
     ] }
   ]
 };

@@ -381,7 +381,9 @@ function validateItem (item, path, itemId, meta, c) {
 }
 
 function validateGroup (item, path, itemId, meta, c) {
-  const {removeEmptyGroups, config} = c;
+  const {removeEmptyGroups, removeIncompleteRules, forceFix, config} = c;
+  const {showErrorMessage} = config.settings;
+  const canFix = !showErrorMessage || forceFix;
   let id = item.get("id");
   let children = item.get("children1");
   const isRoot = !path.length;
@@ -420,6 +422,11 @@ function validateGroup (item, path, itemId, meta, c) {
   }
   let sanitized = submeta.sanitized || (oldChildren?.size != children?.size);
   const isEmptyChildren = !nonEmptyChildren?.size;
+  let canDrop = removeEmptyGroups && !isRoot;
+  if (isGroupExt && field) {
+    // to remove rule-group like "SOME cars" (with SOME/ALL/NONE, but without filters), we need to rely on removeIncompleteRules
+    canDrop = removeIncompleteRules;
+  }
   if (isEmptyChildren && childrenAreRequired) {
     _addError(meta, item, path, {
       key: isRoot
@@ -430,9 +437,9 @@ function validateGroup (item, path, itemId, meta, c) {
             ? constants.EMPTY_RULE_GROUP
             : constants.EMPTY_GROUP,
       args: { field },
-      fixed: removeEmptyGroups && !isRoot,
+      fixed: canDrop,
     });
-    if (removeEmptyGroups && !isRoot) {
+    if (canDrop) {
       _setErrorsAsFixed(meta, item);
       item = undefined;
     }

@@ -1236,6 +1236,18 @@ export const with_default_field_in_cars = (BasicConfig) => merge({}, BasicConfig
   }
 });
 
+export const with_validationin_cars = (BasicConfig) => merge({}, BasicConfig, {
+  fields: {
+    cars: {
+      fieldSettings: {
+        validateValue: (val, _fieldSettings, _op) => {
+          return (val < 10 ? null : {error: "Too many cars", fixedValue: 9});
+        },
+      },
+    }
+  }
+});
+
 export const with_group_array_cars = (BasicConfig) => ({
   ...BasicConfig,
   fields: {

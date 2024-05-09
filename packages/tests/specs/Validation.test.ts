@@ -22,6 +22,8 @@ const {
   with_dont_show_error,
   with_dont_fix_on_load,
   with_funcs_validation,
+  with_group_array_cars,
+  with_validationin_cars,
   with_fieldSources,
   with_validateValue_without_fixedValue_with_defaultValue,
 } = configs;
@@ -700,6 +702,31 @@ describe("validateTree", () => {
       ],
     });
   });
+
+  it("group with count > X can have 0 children, it's valid", async () => {
+    await with_qb(
+      [ with_all_types, with_group_array_cars, with_validationin_cars, with_show_error ], inits.empty, null,
+      async (qb, { config }) => {
+        const validTree = Utils.loadFromJsonLogic(inits.with_group_count, config)!;
+        qb.setProps({
+          value: validTree
+        });
+
+        const ruleGroupError = qb.find(".rule_group--error");
+        expect(ruleGroupError).to.have.length(0);
+        const ruleError = qb.find(".rule--error");
+        expect(ruleError).to.have.length(0);
+
+        const isValid = Utils.isValidTree(validTree, config);
+        expect(isValid).to.eq(true);
+
+        const validationErrors = Utils.validateTree(validTree, config);
+        expect(validationErrors).to.have.length(0);
+      }, {
+        expectedLoadErrors: [ "Root  >>  Empty query" ],
+      }
+    );
+  });
 });
 
 describe("sanitizeTree", () => {
@@ -1023,6 +1050,50 @@ describe("sanitizeTree", () => {
           const ruleError2 = qb.find(".rule--error");
           expect(ruleError2).to.have.length(1);
           expect(ruleError2.first().text()).to.eq("Value 400 should be from 0 to 10");
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("group with some/all/none should have 1+ children", async () => {
+      await with_qb(
+        [ with_all_types, with_group_array_cars, with_validationin_cars, with_show_error, with_dont_fix_on_load ], inits.empty, null,
+        async (qb, { config, pauseTest }) => {
+          const incompleteTree = Utils.loadTree(inits.with_empty_group_some as JsonTree);
+          qb.setProps({
+            value: incompleteTree
+          });
+
+          // tree is cosidered as valid, but incomplete: user can (should) add subrules for cars
+          const ruleGroupError = qb.find(".rule_group--error");
+          expect(ruleGroupError).to.have.length(0);
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(0);
+          const isValid = Utils.isValidTree(incompleteTree, config);
+          expect(isValid).to.eq(true);
+
+          // without `removeIncompleteRules` it won't be fixed
+          const { fixedErrors: fixedErrors1, nonFixedErrors: nonFixedErrors1 } = Utils.sanitizeTree(incompleteTree, config, {
+            removeIncompleteRules: false,
+            forceFix: false,
+          });
+          expect(nonFixedErrors1.length).eq(1);
+          expect(fixedErrors1.length).eq(0);
+
+          // by default it will be fixed
+          const { fixedErrors, nonFixedErrors } = Utils.sanitizeTree(incompleteTree, config, {
+            forceFix: false,
+          });
+          expect(nonFixedErrors.length).eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemPositionStr: "Deleted rule-group #1 (index path: 1)",
+            itemStr: "SOME OF Cars",
+            errors: [{
+              key: "EMPTY_RULE_GROUP",
+              str: "No conditions for group field cars",
+            }]
+          }]);
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
@@ -1632,6 +1703,63 @@ describe("sanitizeTree", () => {
               key: "INCOMPLETE_LHS",
             }],
           }]);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("can fix group aggregate value", async () => {
+      await with_qb(
+        [ with_all_types, with_group_array_cars, with_validationin_cars, with_show_error ], inits.empty, null,
+        async (qb, { config, onChange }) => {
+          const invalidTree = Utils.loadFromJsonLogic(inits.with_group_array_cars_bad_count_and_year, config)!;
+          qb.setProps({
+            value: invalidTree
+          });
+
+          const ruleGroupError = qb.find(".rule_group--error");
+          expect(ruleGroupError).to.have.length(1);
+          expect(ruleGroupError.first().text()).to.eql("Too many cars");
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eql("Value 3000 should be from 1990 to 2021");
+
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
+            forceFix: true
+          });
+          expect(nonFixedErrors.length).eq(0);
+          expect(fixedErrors).to.containSubsetInOrder([{
+            itemPositionStr: "Rule-group #1 (index path: 1)",
+            itemStr: "COUNT OF Cars WHERE (vendor = Toyota AND year >= 3000) > 222",
+            errors: [{
+              side: "rhs",
+              str: "Too many cars",
+              fixedFrom: 222,
+              fixedTo: 9,
+            }]
+          }, {
+            itemPositionStr: "Leaf #2 (index path: 1,2)",
+            itemStr: "Cars.year >= 3000",
+            errors: [{
+              fixedFrom: 3000,
+              fixedTo: 2021,
+              key: "VALUE_MAX_CONSTRAINT_FAIL",
+              side: "rhs",
+              str: "Value 3000 should be from 1990 to 2021",
+            }]
+          }]);
+          expect(fixedErrors).to.have.length(2);
+          expect(fixedErrors[0].errors).to.have.length(1);
+          expect(fixedErrors[1].errors).to.have.length(1);
+
+          qb.setProps({
+            value: fixedTree
+          });
+          const isValid2 = Utils.isValidTree(fixedTree, config);
+          expect(isValid2).to.eq(true);
+          const newSpel = Utils.spelFormat(onChange.lastCall.args[0], config);
+          expect(newSpel).to.equal("cars.?[vendor == 'Toyota' && year >= 2021].size() > 9");
         }, {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         }

@@ -1184,21 +1184,23 @@ interface FieldStruct extends BaseField {
   subfields: Fields;
   isSpelMap?: boolean;
 }
-interface FieldGroup extends BaseField {
+interface FieldGroup<FS = NumberFieldSettings<number>> extends BaseField {
   type: "!group";
   subfields: Fields;
   mode: RuleGroupMode;
   isSpelArray?: boolean;
   isSpelItemMap?: boolean;
   defaultField?: FieldPath;
+  fieldSettings?: FS;
 }
-interface FieldGroupExt extends BaseField {
+interface FieldGroupExt<FS = NumberFieldSettings<number>> extends BaseField {
   type: "!group";
   subfields: Fields;
   mode: "array";
   operators?: Array<string>;
   defaultOperator?: string;
   defaultField?: FieldPath;
+  fieldSettings?: FS;
   initialEmptyWhere?: boolean;
   showNot?: boolean;
   conjunctions?: Array<string>;

@@ -405,7 +405,7 @@ export default (skin: string) => {
       initialEmptyWhere: true, // if default operator is not in config.settings.groupOperators, true - to set no children, false - to add 1 empty
 
       fieldSettings: {
-        validateValue: (val: number, _fieldSettings, _op) => {
+        validateValue: (val, _fieldSettings, _op) => {
           return (val < 10 ? null : {error: "Too many cars, see validateValue()", fixedValue: 9});
         },
       },
