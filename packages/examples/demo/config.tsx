@@ -663,13 +663,15 @@ export default (skin: string) => {
       label: "String",
       tooltip: "String functions",
       subfields: {
+        // LOWER: max length - 7
+        // UPPER: max length - 6
         LOWER: merge({}, BasicFuncs.LOWER, {
           tooltip: "Convert to lower case",
           allowSelfNesting: true,
           validateValue: (s: string) => {
             return s.length <= 7 ? null : {
               error: "bad len",
-              fixedValue: "_fixed_"
+              fixedValue: s.substring(0, 7)
             };
           },
           args: {
@@ -677,7 +679,27 @@ export default (skin: string) => {
               validateValue: (s: string) => {
                 return s.length <= 7 ? null : {
                   error: { key: "custom:BAD_LEN", args: {val: s} },
-                  fixedValue: "_fixed_"
+                  fixedValue: s.substring(0, 7)
+                };
+              }
+            },
+          }
+        }),
+        UPPER: merge({}, BasicFuncs.UPPER, {
+          tooltip: "Convert to upper case",
+          allowSelfNesting: true,
+          validateValue: (s: string) => {
+            return s.length <= 6 ? null : {
+              error: "bad len",
+              fixedValue: s.substring(0, 6)
+            };
+          },
+          args: {
+            str: {
+              validateValue: (s: string) => {
+                return s.length <= 6 ? null : {
+                  error: { key: "custom:BAD_LEN", args: {val: s} },
+                  fixedValue: s.substring(0, 6)
                 };
               }
             },

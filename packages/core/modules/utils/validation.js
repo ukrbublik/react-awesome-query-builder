@@ -1012,9 +1012,9 @@ const validateFuncValue = (
       );
       const isValid = !argErrors?.length;
       const willFix = canFix && fixedArgVal !== argValue;
-      const willFixAllErrors = !isValid && willFix && !allErrors?.find(e => !e.fixed);
+      //const willFixAllErrors = !isValid && willFix && !allErrors?.find(e => !e.fixed);
       //tip: reset to default ONLY if isEndValue==true
-      const canDropOrReset = canFix && !isValid && !willFixAllErrors   && (isEndValue || canDropArgs); //todo: !willFixAllErrors or !willFix ??? 
+      const canDropOrReset = canFix && !isValid && !willFix && (isEndValue || canDropArgs);
       if (willFix) {
         fixedValue = fixedValue.setIn(["args", argKey, "value"], fixedArgVal);
       }
@@ -1024,7 +1024,7 @@ const validateFuncValue = (
         fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
       }
       if (!isValid) {
-        const firstError = argErrors.find(e => !e.fixed) ?? argErrors[0];
+        const firstError = argErrors.find(e => !e.fixed) ?? argErrors?.[0];
         const argValidationError = translateValidation(firstError);
         const fixed = willFix || canDropOrReset;
         allErrors.push({
@@ -1049,6 +1049,7 @@ const validateFuncValue = (
           args: { funcKey, funcName, argKey, argName },
           fixed: canReset,
           fixedTo: canReset ? argConfig.defaultValue : undefined,
+          ignore: !canReset, // tip: don't show error message in UI about missing arg after validation API call
         });
       }
       if (canReset) {
@@ -1173,8 +1174,7 @@ export const getNewValueForFieldOp = function (
     const isValid = !fieldErrors?.length;
     const willFix = fixedField !== newField;
     const willFixAllErrors = !isValid && willFix && !fieldErrors.find(e => !e.fixed);
-    //todo: sure never drop??
-    const willRevert = false; //canFix && !isValid && !willFixAllErrors && !!changedProp && newField !== currentField;
+    const willRevert = canFix && !isValid && !willFixAllErrors && !!changedProp && newField !== currentField;
     const willDrop = false; //canFix && !isValid && !willFixAllErrors && !willRevert && !changedProp;
     if (willDrop) {
       newField = null;
@@ -1185,8 +1185,8 @@ export const getNewValueForFieldOp = function (
     }
     if (!isValid) {
       const showError = !isValid && !willFixAllErrors && !willDrop && !willRevert;
-      const firstError = fieldErrors.find(e => !e.fixed);
-      if (showError) {
+      const firstError = fieldErrors.find(e => !e.fixed && !e.ignore);
+      if (showError && firstError) {
         newFieldError = translateValidation(firstError);
       }
       // tip: even if we don't show errors, but revert LHS, put the reason of revert
@@ -1265,19 +1265,23 @@ export const getNewValueForFieldOp = function (
       // ? Maybe we should also drop bad value on op change?
       // For bad multiselect value we have both error message + fixed value.
       //  If we show error message, it will gone on next tree validation
-      //todo: wat? hasFieldChanged???
       const willFix = fixedValue !== v;
       const willFixAllErrors = !isValid && willFix && !allErrors?.find(e => !e.fixed);
+      const allErrorsHandled = !allErrors?.find(e => !e.fixed && !e.ignore);
+     
       // tip: is value src is invalid, drop ANYWAY
+      // tip: Edge case in demo:
+      //      Given "login = LOWER(?)", change config to not show errors -> "LOWER(?)" will be dropped
+      //      We don't want to drop func completely, so need to add `allErrorsAheHandled` or `vSrc !== "func"`
+      // todo: `hasFieldChanged` is not needed ?
       const willDrop = !isValidSrc
-        || canFix && !isValid && (hasFieldChanged ? true : !willFix); //todo: !willFixAllErrors ??? 
+        || canFix && !isValid && !willFixAllErrors && (!allErrorsHandled || hasFieldChanged);
       if (!isValid) {
         // tip: even if we don't show errors, but drop bad values, put the reason of removal
         allErrors?.map(e => validationErrors.push({
           side: "rhs",
           delta: i,
           ...e,
-          //todo: if partially fixed (like 1 arg of 2), don't set `fixed: true` for all?
           fixed: e.fixed || willDrop,
         }));
       }
@@ -1288,8 +1292,8 @@ export const getNewValueForFieldOp = function (
         }
       }
       const showError = !isValid && !willFix;
-      const firstError = allErrors?.find(e => !e.fixed) ?? allErrors?.[0];
-      if (showError) {
+      const firstError = allErrors?.find(e => !e.fixed && !e.ignore);
+      if (showError && firstError) {
         valueErrors[i] = translateValidation(firstError);
       }
       if (willFix) {

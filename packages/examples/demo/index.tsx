@@ -147,6 +147,12 @@ const DemoQueryBuilder: React.FC = () => {
     setState({...state, config: newConfig});
   };
 
+  const switchShowErrors = () => {
+    const newConfig: Config = clone(state.config);
+    newConfig.settings.showErrorMessage = !newConfig.settings.showErrorMessage;
+    setState({...state, config: newConfig});
+  };
+
   const switchRenderBlock = (blockName: string) => {
     setState({...state, renderBocks: {...state.renderBocks, [blockName]: !state.renderBocks[blockName]}});
   };
@@ -698,7 +704,7 @@ const DemoQueryBuilder: React.FC = () => {
   return (
     <div>
       <div>
-        View: &nbsp;
+        Settings: &nbsp;
         <select value={state.skin} onChange={changeSkin}>
           <option key="vanilla">vanilla</option>
           <option key="antd">antd</option>
@@ -709,6 +715,7 @@ const DemoQueryBuilder: React.FC = () => {
         </select>
         &nbsp;
         <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
+        <button onClick={switchShowErrors}>show errors: {state.config.settings.showErrorMessage ? "on" : "off"}</button>
       </div>
       <div>
         Output: &nbsp;

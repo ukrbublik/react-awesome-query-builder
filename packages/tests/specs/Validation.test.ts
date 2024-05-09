@@ -1504,7 +1504,7 @@ describe("sanitizeTree", () => {
     it("can't fix missing required arg in func in LHS", async () => {
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
-        async (qb, { config, onChange }) => {
+        async (qb, { config, onChange, pauseTest }) => {
           const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_missing_args as JsonTree);
           const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config, {
             forceFix: true,
@@ -1547,9 +1547,11 @@ describe("sanitizeTree", () => {
           qb.setProps({
             value: fixedTree
           });
+
           const ruleError = qb.find(".rule--error");
-          expect(ruleError).to.have.length(1);
-          expect(ruleError.first().text()).to.eq("Value of arg Num2 for func TextFunc1 is required");
+          expect(ruleError).to.have.length(0);
+          // See tip in code "don't show error message in UI about missing arg after validation API call"
+          //expect(ruleError.first().text()).to.eq("Value of arg Num2 for func TextFunc1 is required");
 
           // If user starts updating tree, validation errors about missing required args are not being shown in UI.
           // Beucase tree in not completed yet.

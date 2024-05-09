@@ -681,8 +681,8 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   const [fixedValue, allErrors] = validateValue(
     config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, canDropArgs
   );
-  //todo: why translateValidation?  maybe get first unfixed?
-  const validationError = allErrors?.length ? translateValidation(allErrors[0]) : null;
+  const firstError = allErrors?.find(e => !e.fixed && !e.ignore);
+  const validationError = firstError ? translateValidation(firstError) : null;
   // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
   //  (get exact value from listValues, not string)
   let willFix = fixedValue !== value;
