@@ -80,6 +80,7 @@ interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
   skin: string,
+  renderBocks: Record<string, boolean>;
   spelStr: string;
   spelErrors: Array<string>;
 }
@@ -109,7 +110,17 @@ const DemoQueryBuilder: React.FC = () => {
     config: loadedConfig,
     skin: initialSkin,
     spelStr: "",
-    spelErrors: [] as Array<string>
+    spelErrors: [] as Array<string>,
+    renderBocks: {
+      validation: true,
+      jsonlogic: true,
+      elasticSearch: true,
+      mongo: true,
+      jsTree: true,
+      spel: true,
+      strings: true,
+      sql: true,
+    },
   });
 
   // useEffect(() => {
@@ -135,6 +146,11 @@ const DemoQueryBuilder: React.FC = () => {
     newConfig.settings.showLock = !newConfig.settings.showLock;
     setState({...state, config: newConfig});
   };
+
+  const switchRenderBlock = (blockName: string) => {
+    setState({...state, renderBocks: {...state.renderBocks, [blockName]: !state.renderBocks[blockName]}});
+  };
+
 
   const resetValue = () => {
     setState({
@@ -430,17 +446,12 @@ const DemoQueryBuilder: React.FC = () => {
     );
   };
 
-  const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
-    const isValid = isValidTree(immutableTree, config);
-    const treeJs = getTree(immutableTree);
-    const {logic, data: logicData, errors: logicErrors} = jsonLogicFormat(immutableTree, config);
-    const [spel, spelErrors] = _spelFormat(immutableTree, config);
-    const queryStr = queryString(immutableTree, config);
-    const humanQueryStr = queryString(immutableTree, config, true);
-    const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
-    const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
-    const elasticSearch = elasticSearchFormat(immutableTree, config);
+  const renderValidationBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.validation) {
+      return null;
+    }
 
+    const isValid = isValidTree(immutableTree, config);
     const validationRes = validateTree(immutableTree, config, {
       ...validationTranslateOptions,
     }).map(({
@@ -454,11 +465,10 @@ const DemoQueryBuilder: React.FC = () => {
     }));
 
     return (
-      <div>
+      <>
         {isValid ? null : <pre style={preErrorStyle}>{"Tree has errors"}</pre>}
-        <hr/>
         <div>
-        Validation errors: 
+          Validation errors: 
           { validationRes.length > 0
             ? <pre style={preErrorStyle}>
               {stringify(validationRes, undefined, 2)}
@@ -466,45 +476,20 @@ const DemoQueryBuilder: React.FC = () => {
             : "no"
           }
         </div>
-        <br />
-        <div>
-        spelFormat: 
-          { spelErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(spelErrors, undefined, 2)}
-            </pre> 
-          }
-          <pre style={preStyle}>
-            {stringify(spel, undefined, 2)}
-          </pre>
-        </div>
         <hr/>
-        <div>
-        stringFormat: 
-          <pre style={preStyle}>
-            {stringify(queryStr, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-        humanStringFormat: 
-          <pre style={preStyle}>
-            {stringify(humanQueryStr, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
-        <div>
-        sqlFormat: 
-          { sqlErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(sqlErrors, undefined, 2)}
-            </pre> 
-          }
-          <pre style={preStyle}>
-            {stringify(sql, undefined, 2)}
-          </pre>
-        </div>
-        <hr/>
+      </>
+    );
+  };
+
+  const renderJsonLogicBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.jsonlogic) {
+      return null;
+    }
+
+    const {logic, data: logicData, errors: logicErrors} = jsonLogicFormat(immutableTree, config);
+
+    return (
+      <>
         <div>
           <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
           { (logicErrors?.length || 0) > 0 
@@ -524,8 +509,21 @@ const DemoQueryBuilder: React.FC = () => {
           }
         </div>
         <hr/>
+      </>
+    );
+  };
+
+  const renderMongoBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.mongo) {
+      return null;
+    }
+
+    const [mongo, mongoErrors] = _mongodbFormat(immutableTree, config);
+
+    return (
+      <>
         <div>
-        mongodbFormat: 
+          mongodbFormat: 
           { mongoErrors.length > 0 
             && <pre style={preErrorStyle}>
               {stringify(mongoErrors, undefined, 2)}
@@ -536,26 +534,163 @@ const DemoQueryBuilder: React.FC = () => {
           </pre>
         </div>
         <hr/>
+      </>
+    );
+  };
+
+  const renderElasticSearchBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.elasticSearch) {
+      return null;
+    }
+
+    const elasticSearch = elasticSearchFormat(immutableTree, config);
+
+    return (
+      <>
         <div>
-        elasticSearchFormat: 
+          elasticSearchFormat: 
           <pre style={preStyle}>
             {stringify(elasticSearch, undefined, 2)}
           </pre>
         </div>
         <hr/>
+      </>
+    );
+  };
+
+  const renderJsTreeBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.jsTree) {
+      return null;
+    }
+
+    const treeJs = getTree(immutableTree);
+
+    return (
+      <>
         <div>
-        Tree: 
+          Tree: 
           <pre style={preStyle}>
             {stringify(treeJs, undefined, 2)}
           </pre>
         </div>
-        {/* <hr/>
-      <div>
-        queryBuilderFormat: 
+        <hr/>
+      </>
+    );
+  };
+
+  const renderSpelBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.spel) {
+      return null;
+    }
+
+    const [spel, spelErrors] = _spelFormat(immutableTree, config);
+
+    return (
+      <>
+        <div>
+          spelFormat: 
+          { spelErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(spelErrors, undefined, 2)}
+            </pre> 
+          }
           <pre style={preStyle}>
-            {stringify(queryBuilderFormat(immutableTree, config), undefined, 2)}
+            {stringify(spel, undefined, 2)}
           </pre>
-      </div> */}
+        </div>
+        <hr/>
+      </>
+    );
+  };
+
+  const renderStringsBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.strings) {
+      return null;
+    }
+
+    const queryStr = queryString(immutableTree, config);
+    const humanQueryStr = queryString(immutableTree, config, true);
+
+    return (
+      <>
+        <div>
+          stringFormat: 
+          <pre style={preStyle}>
+            {stringify(queryStr, undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+        <div>
+          humanStringFormat: 
+          <pre style={preStyle}>
+            {stringify(humanQueryStr, undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+      </>
+    );
+  };
+
+  const renderSqlBlock = ({tree: immutableTree, config, renderBocks}: DemoQueryBuilderState) => {
+    if (!renderBocks.sql) {
+      return null;
+    }
+
+    const [sql, sqlErrors] = _sqlFormat(immutableTree, config);
+
+    return (
+      <>
+        <div>
+          sqlFormat: 
+          { sqlErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {stringify(sqlErrors, undefined, 2)}
+            </pre> 
+          }
+          <pre style={preStyle}>
+            {stringify(sql, undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+      </>
+    );
+  }
+
+  const renderSpelInputBlock = ({renderBocks} : DemoQueryBuilderState) => {
+    if (!renderBocks.spel) {
+      return null;
+    }
+
+    return (
+      <>
+        <br />
+        <div className="query-import-spel">
+          SpEL: &nbsp;
+          <input type="text" size={150} value={state.spelStr} onChange={onChangeSpelStr} />
+          <button onClick={importFromSpel}>import</button>
+          <br />
+          { state.spelErrors.length > 0 
+              && <pre style={preErrorStyle}>
+                {stringify(state.spelErrors, undefined, 2)}
+              </pre> 
+          }
+        </div>
+      </>
+    );
+  };
+
+  const renderResult = (state : DemoQueryBuilderState) => {
+    return (
+      <div>
+        <hr/>
+        {renderValidationBlock(state)}
+        {renderSpelBlock(state)}
+        {renderStringsBlock(state)}
+        {renderSqlBlock(state)}
+        {renderJsonLogicBlock(state)}
+        {renderMongoBlock(state)}
+        {renderElasticSearchBlock(state)}
+        {renderJsTreeBlock(state)}
       </div>
     );
   };
@@ -576,6 +711,17 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={switchShowLock}>show lock: {state.config.settings.showLock ? "on" : "off"}</button>
       </div>
       <div>
+        Output: &nbsp;
+        <button onClick={switchRenderBlock.bind(null, "validation")}>Validation: {state.renderBocks.validation ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "jsTree")}>Tree: {state.renderBocks.jsTree ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "jsonlogic")}>JsonLogic: {state.renderBocks.jsonlogic ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "spel")}>SpEL: {state.renderBocks.spel ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "strings")}>Strings: {state.renderBocks.strings ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "sql")}>SQL: {state.renderBocks.sql ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "mongo")}>Mongo: {state.renderBocks.mongo ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "elasticSearch")}>ElasticSearch: {state.renderBocks.elasticSearch ? "on" : "off"}</button>
+      </div>
+      <div>
         Data: &nbsp;
         <button onClick={resetValue}>reset</button>
         <button onClick={clearValue}>clear</button>
@@ -589,22 +735,11 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={sanitize}>sanitize</button>
         <button onClick={sanitizeAndFix}>sanitize & fix</button>
       </div>
-      <br />
-      <div className="query-import-spel">
-        SpEL: &nbsp;
-        <input type="text" size={150} value={state.spelStr} onChange={onChangeSpelStr} />
-        <button onClick={importFromSpel}>import</button>
-        <br />
-        { state.spelErrors.length > 0 
-            && <pre style={preErrorStyle}>
-              {stringify(state.spelErrors, undefined, 2)}
-            </pre> 
-        }
-      </div>
+
+      {renderSpelInputBlock(state)}
 
       <ImportSkinStyles skin={state.skin} />
       
-      <br />
       <Query
         {...state.config}
         value={state.tree}

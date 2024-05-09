@@ -1,10 +1,12 @@
 /*eslint @typescript-eslint/require-await: ["off"]*/
-import { Utils, ImmutableTree, JsonGroup, JsonTree } from "@react-awesome-query-builder/core";
+import { Utils, ImmutableTree, JsonGroup, JsonTree, RuleProperties } from "@react-awesome-query-builder/core";
+import TextField from "@mui/material/TextField";
 const { isValidTree, validateTree, sanitizeTree, checkTree, getTree } = Utils;
 import * as configs from "../support/configs";
 import * as inits from "../support/inits";
 import {
   with_qb,
+  with_qb_mui,
   setFieldFuncArgValue,
   selectFieldFunc,
 } from "../support/utils";
@@ -701,7 +703,32 @@ describe("validateTree", () => {
 });
 
 describe("sanitizeTree", () => {
-  describe("with removeIncompleteRules=true", () => {
+  describe("with forceFix=false", () => {
+    it("can't fix VALUE_MAX_CONSTRAINT_FAIL with showErrorMessage=true", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
+        async (qb, {expect_jlogic, config, initialTree}) => {
+          const isValid = isValidTree(initialTree, config);
+          expect(isValid).to.eq(false);
+          const ruleError = qb.find(".rule--error");
+          expect(ruleError).to.have.length(1);
+          expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
+  
+          const { fixedErrors, nonFixedErrors } = sanitizeTree(initialTree, config);
+          expect(fixedErrors).to.have.length(0);
+          expect(nonFixedErrors).to.have.length(1);
+          expect(nonFixedErrors[0].errors.length).to.eq(1);
+          expect(nonFixedErrors[0].errors[0].str).to.eq("Value 200 should be from 0 to 10");
+          expect(nonFixedErrors[0].errors[0].fixed).to.eq(false);
+        },
+        {
+          expectedLoadErrors: [
+            "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
+          ]
+        }
+      );
+    });
+
     it("rule with missing required arg in func should be treated as incomplete => deleted", async () => {
       await with_qb(
         [ with_all_types, with_funcs_validation, with_dont_fix_on_load, with_show_error, with_fieldSources ], inits.empty, null,
@@ -723,9 +750,7 @@ describe("sanitizeTree", () => {
           expectedLoadErrors: [ "Root  >>  Empty query" ],
         });
     });
-  });
 
-  describe("with forceFix=false", () => {
     it("should remove empty groups and incomplete rules", async () => {
       await with_qb(
         [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.tree_with_empty_groups_and_incomplete_rules, "default",
@@ -863,27 +888,143 @@ describe("sanitizeTree", () => {
       );
     });
 
-    it("can't fix VALUE_MAX_CONSTRAINT_FAIL with showErrorMessage=true", async () => {
+    it("will not set defaultValue if value is invalid", async () => {
       await with_qb(
-        [ with_all_types, with_show_error ], inits.with_number_bigger_than_max, "JsonLogic",
-        async (qb, {expect_jlogic, config, initialTree}) => {
-          const isValid = isValidTree(initialTree, config);
-          expect(isValid).to.eq(false);
-          const ruleError = qb.find(".rule--error");
-          expect(ruleError).to.have.length(1);
-          expect(ruleError.first().text()).to.eq("Value 200 should be from 0 to 10");
-  
-          const { fixedErrors, nonFixedErrors } = sanitizeTree(initialTree, config);
-          expect(fixedErrors).to.have.length(0);
-          expect(nonFixedErrors).to.have.length(1);
-          expect(nonFixedErrors[0].errors.length).to.eq(1);
-          expect(nonFixedErrors[0].errors[0].str).to.eq("Value 200 should be from 0 to 10");
-          expect(nonFixedErrors[0].errors[0].fixed).to.eq(false);
-        },
-        {
-          expectedLoadErrors: [
-            "Number = 200  >>  [rhs 0] Value 200 should be from 0 to 10"
-          ]
+        [ with_all_types, with_show_error, with_validateValue_without_fixedValue_with_defaultValue ], inits.empty, null,
+        async (qb, { config }) => {
+          const invalidTree = Utils.loadFromJsonLogic(inits.with_numLess5_eq_7, config)!;
+          const { fixedErrors, nonFixedErrors } = Utils.sanitizeTree(invalidTree, config);
+
+          expect(fixedErrors.length).to.eq(0);
+          expect(nonFixedErrors.length).to.eq(1);
+          expect(nonFixedErrors).to.containSubsetInOrder([{
+            itemStr: "NumberLess5 = 7",
+            errors: [{
+              key: "INVALID_VALUE",
+              fixed: false,
+            }]
+          }]);
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("if both LHS and RHS have errors, only first error will be shown in UI", async () => {
+      await with_qb(
+        [ with_all_types, with_funcs_validation, with_show_error, with_fieldSources ], inits.empty, null,
+        async (qb, { config }) => {
+          const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_invalid_args_and_rhs as JsonTree);
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config);
+
+          expect(fixedErrors.length).eq(0);
+          expect(nonFixedErrors).to.containSubsetInOrder([{
+            itemStr: "TextFunc1(Str1: aaaaaa, Str2: bbbbbb, Num1: 20, Num2: 4) = xxxxxx",
+            errors: [{
+              side: "lhs",
+              str: "Invalid value of arg Str1 for func TextFunc1: Value aaaaaa should have max length 5 but got 6",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixed: false,
+              args: {
+                funcKey: "vld.tfunc1",
+                funcName: "TextFunc1",
+                argKey: "str1",
+                argName: "Str1",
+                argValidationError: "Value aaaaaa should have max length 5 but got 6",
+                argErrors: [{
+                  key: "VALUE_LENGTH_CONSTRAINT_FAIL",
+                  args: {
+                    fieldSettings: {maxLength: 5},
+                    length: 6,
+                    value: "aaaaaa",
+                  },
+                }],
+              },
+            }, {
+              side: "lhs",
+              str: "Invalid value of arg Str2 for func TextFunc1: Value bbbbbb should have max length 5 but got 6",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixed: false,
+              args: {
+                funcKey: "vld.tfunc1",
+                funcName: "TextFunc1",
+                argKey: "str2",
+                argName: "Str2",
+                argValidationError: "Value bbbbbb should have max length 5 but got 6",
+              },
+            }, {
+              side: "lhs",
+              str: "Invalid value of arg Num1 for func TextFunc1: Value 20 should be from 0 to 10",
+              key: "INVALID_FUNC_ARG_VALUE",
+              fixed: false,
+              args: {
+                argKey: "num1",
+                argName: "Num1",
+              }
+            }, {
+              side: "rhs",
+              delta: 0,
+              str: "Value xxxxxx should have max length 5 but got 6",
+              key: "VALUE_LENGTH_CONSTRAINT_FAIL",
+              fixed: false,
+            }]
+          }]);
+          expect(nonFixedErrors[0].errors.length).eq(4);
+
+          qb.setProps({
+            value: fixedTree
+          });
+          
+          const isValid2 = Utils.isValidTree(fixedTree, config);
+          expect(isValid2).to.eq(false);
+          const ruleError2 = qb.find(".rule--error");
+          expect(ruleError2).to.have.length(1);
+          expect(ruleError2.first().text()).to.eq("Invalid value of arg Str1 for func TextFunc1: Value aaaaaa should have max length 5 but got 6")
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
+        }
+      );
+    });
+
+    it("if both parts of value for between op have errors, only first error will be shown in UI", async () => {
+      await with_qb(
+        [ with_all_types, with_show_error, with_dont_fix_on_load ], inits.empty, null,
+        async (qb, { config, pauseTest }) => {
+          const invalidTree = Utils.loadFromJsonLogic(inits.with_bad_range_bigger_than_max, config)!;
+          const { fixedErrors, nonFixedErrors, fixedTree } = Utils.sanitizeTree(invalidTree, config);
+
+          expect(fixedErrors.length).to.eq(0);
+          expect(nonFixedErrors.length).to.eq(1);
+          expect(nonFixedErrors).to.containSubsetInOrder([{
+            itemStr: "Number BETWEEN 400 AND 300",
+            errors: [{
+              side: "rhs",
+              delta: 0,
+              key: "VALUE_MAX_CONSTRAINT_FAIL",
+              fixed: false,
+            }, {
+              side: "rhs",
+              delta: 1,
+              key: "VALUE_MAX_CONSTRAINT_FAIL",
+              fixed: false,
+            }, {
+              side: "rhs",
+              delta: -1,
+              key: "INVALID_RANGE",
+              fixed: false,
+            }]
+          }]);
+          expect(nonFixedErrors[0].errors).to.have.length(3);
+
+          qb.setProps({
+            value: fixedTree
+          });
+
+          const ruleError2 = qb.find(".rule--error");
+          expect(ruleError2).to.have.length(1);
+          expect(ruleError2.first().text()).to.eq("Value 400 should be from 0 to 10");
+        }, {
+          expectedLoadErrors: [ "Root  >>  Empty query" ],
         }
       );
     });
@@ -1100,7 +1241,6 @@ describe("sanitizeTree", () => {
       );
     });
 
-    //todo: add same without forceFix - should have 4 errors, but display 1 at UI
     it("can fix all args in func in LHS", async () => {
       await with_qb(
         [ with_all_types, with_funcs_validation, with_show_error, with_fieldSources ], inits.empty, null,
@@ -1563,6 +1703,44 @@ describe("checkTree (deprecated)", () => {
         ignoreLog: (errText) => {
           return errText.includes("Tree check errors:");
         },
+      }
+    );
+  });
+});
+
+describe("optimizeRenderWithInternals (MUI)", () => {
+  it("input with state should not loose focus", async () => {
+    await with_qb_mui(
+      [
+        with_all_types, with_funcs_validation, with_show_error, with_fieldSources,
+        // configs.with_optimizeRenderWithInternals, // test will fail with optimization
+      ], inits.empty, null,
+      async (qb, { config, onChange, pauseTest }) => {
+        const invalidTree = Utils.loadTree(inits.tree_with_vfunc_in_lhs_with_missing_args as JsonTree);
+        qb.setProps({
+          value: invalidTree
+        });
+
+        // BUG:
+        // 1. change "aaaaa" to "aaa" (delete 2 chars)
+        // 2. change "xxxxxx" to "xxxxx" (delete 2 char)
+        // -> input "xxxxx" lost its focus
+
+        // await pauseTest({});
+
+        qb.find(TextField).filter({placeholder: "Str1"}).prop("onChange")?.({target: {value: "aaaa"}} as any);
+        qb.find(TextField).filter({placeholder: "Str1"}).prop("onChange")?.({target: {value: "aaa"}} as any);
+        qb.find(TextField).filter({placeholder: "Str2"}).prop("onChange")?.({target: {value: "bbb"}} as any);
+        qb.find(TextField).filter({placeholder: "Enter string"}).prop("onChange")?.({target: {value: "xxxxx"}} as any);
+        qb.find(TextField).filter({placeholder: "Enter string"}).prop("onChange")?.({target: {value: "xxx"}} as any);
+        qb.update();
+
+        const newTree = Utils.getTree(onChange.lastCall.args[0]);
+        expect((newTree.children1?.[0].properties as RuleProperties).value[0]).eql("xxx");
+        expect(qb.find(TextField).filter({placeholder: "Enter string"}).prop("value")).eql("xxx");
+      }, {
+        expectedLoadErrors: [ "Root  >>  Empty query" ],
+        debug: true,
       }
     );
   });

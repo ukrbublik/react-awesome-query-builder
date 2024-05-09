@@ -10,7 +10,7 @@
   - Fixed issue #1036 (PR #1034)
   - Fixed validation of date ranges (issue #374) (PR #1034)
   - Function `validateValue` in `fieldSettings` config can now return object `{error, fixedValue}`, error can be `{key, args}` for i18n (PR #1034)
-  - Added `optimizeRenderWithInternals` to `settings`, default is `true` (PR #1034)
+  - Added `optimizeRenderWithInternals` to `settings`, default is `false` (PR #1034)
   - Updated type `RuleGroupExtProperties` (issue #1021) (PR #1034)
   - Fixed typedef errors (issue #1016) (PR #1034)
   - Fixed issue with antd and date/time pickers (issue #1033) (PR #1034)

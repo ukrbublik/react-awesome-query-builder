@@ -293,7 +293,7 @@ export default (skin: string) => {
     removeEmptyGroupsOnLoad: false,
     removeEmptyRulesOnLoad: false,
     removeIncompleteRulesOnLoad: false,
-    optimizeRenderWithInternals: true,
+    optimizeRenderWithInternals: false,
     customFieldSelectProps: {
       showSearch: true
     },
