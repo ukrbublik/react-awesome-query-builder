@@ -95,7 +95,7 @@ export const saveSessionData = async (req: IncomingMessage, newData: SessionData
 export const getSessionData = async (req: IncomingMessage): Promise<SessionData> => {
   const sid = (req.session as Session).id;
   if (redis) {
-    return await redis.json.get(`sessions.${sid}`) as SessionData;
+    return await redis.json.get(`sessions.${sid}`);
   } else {
     return existsSync(`/tmp/sessions_${sid}`) ? jsonfile.readFileSync(`/tmp/sessions_${sid}`) as SessionData : {};
   }
