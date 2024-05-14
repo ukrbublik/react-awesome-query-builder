@@ -184,6 +184,7 @@ module.exports = {
             "plugin:@typescript-eslint/recommended-requiring-type-checking"
         ],
         "rules": {
+            "@typescript-eslint/no-unnecessary-type-assertion": 0,
             //todo
             "@typescript-eslint/no-unused-vars": 0,
             "@typescript-eslint/ban-types": 0,
