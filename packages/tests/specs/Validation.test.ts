@@ -1790,9 +1790,10 @@ describe("sanitizeTree", () => {
           qb.setProps({
             value: fixedTree
           });
+          // See tip in code "don't show error message in UI about missing arg after validation API call"
           const ruleError = qb.find(".rule--error");
-          expect(ruleError).to.have.length(1);
-          expect(ruleError.first().text()).to.eq("Invalid value of arg Str2 for func TextFunc1: Value of arg Num2 for func TextFunc2 is required");
+          expect(ruleError).to.have.length(0);
+          //expect(ruleError.first().text()).to.eq("Invalid value of arg Str2 for func TextFunc1: Value of arg Num2 for func TextFunc2 is required");
 
           // If user starts updating tree, validation errors about missing required args are not being shown in UI.
           // Beucase tree in not completed yet.

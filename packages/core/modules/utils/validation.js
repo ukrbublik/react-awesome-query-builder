@@ -1024,20 +1024,24 @@ const validateFuncValue = (
         fixedValue = setFuncDefaultArg(config, fixedValue, funcConfig, argKey);
       }
       if (!isValid) {
-        const firstError = argErrors.find(e => !e.fixed) ?? argErrors?.[0];
-        const argValidationError = translateValidation(firstError);
+        const firstError = argErrors.find(e => !e.fixed && !e.ignore) ?? argErrors.find(e => !e.fixed) ?? argErrors[0];
         const fixed = willFix || canDropOrReset;
-        allErrors.push({
-          key: constants.INVALID_FUNC_ARG_VALUE,
-          args: {
-            funcKey, funcName, argKey, argName, argValidationError,
-            // more meta
-            argErrors,
-          },
-          fixed,
-          fixedFrom: fixed ? argValue : undefined,
-          fixedTo: fixed ? (willFix ? fixedArgVal : argConfig.defaultValue) : undefined,
-        });
+        const ignore = argErrors.filter(e => !e.ignore).length === 0;
+        if (firstError) {
+          const argValidationError = translateValidation(firstError);
+          allErrors.push({
+            key: constants.INVALID_FUNC_ARG_VALUE,
+            args: {
+              funcKey, funcName, argKey, argName, argValidationError,
+              // more meta
+              argErrors,
+            },
+            ignore,
+            fixed,
+            fixedFrom: fixed ? argValue : undefined,
+            fixedTo: fixed ? (willFix ? fixedArgVal : argConfig.defaultValue) : undefined,
+          });
+        }
       }
     } else if (!argConfig.isOptional && (isEndValue || canDropArgs)) {
       const canReset = canFix && argConfig.defaultValue !== undefined && (isEndValue || canDropArgs);
