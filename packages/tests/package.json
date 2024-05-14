@@ -39,7 +39,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.3",
     "@mui/system": "^5.12.3",
-    "@mui/x-date-pickers": "^6.3.1",
+    "@mui/x-date-pickers": "^6.19.9",
     "@popperjs/core": "^2.11.6",
     "@react-awesome-query-builder/antd": "workspace:^",
     "@react-awesome-query-builder/bootstrap": "workspace:^",

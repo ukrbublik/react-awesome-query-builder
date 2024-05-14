@@ -167,7 +167,7 @@ describe("mui widgets interactions", () => {
 
         const hourBtn = document.querySelector<HTMLElement>(
           ".MuiMultiSectionDigitalClock-root" 
-          + " > .MuiMultiSectionDigitalClock-root:nth-child(1)" 
+          + " > .MuiMultiSectionDigitalClockSection-root:nth-child(1)" 
           + " > .MuiMenuItem-root:nth-child(11)" 
         );
         expect(hourBtn, "hourBtn").to.exist;
@@ -176,7 +176,7 @@ describe("mui widgets interactions", () => {
 
         const minBtn = document.querySelector<HTMLElement>(
           ".MuiMultiSectionDigitalClock-root" 
-          + " > .MuiMultiSectionDigitalClock-root:nth-child(2)" 
+          + " > .MuiMultiSectionDigitalClockSection-root:nth-child(2)" 
           + " > .MuiMenuItem-root:nth-child(7)" 
         );
         expect(minBtn, "minBtn").to.exist;
