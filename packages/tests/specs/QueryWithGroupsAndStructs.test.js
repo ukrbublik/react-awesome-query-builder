@@ -11,13 +11,12 @@ describe("query with !struct and !group", () => {
         expect(qb.find(".query-builder")).to.have.length(1);
       }, {
         ignoreLog: (errText) => {
-          return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Uncomplete RHS")
-            || errText.includes("Operator between is not supported for field results.slider");
+          return errText.includes("Operator between is not supported for field results.slider");
         }
       });
     });
     it("should handle custom operator in !group arrays", async () => {
-      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      await with_qb_skins(configs.with_group_array_custom_operator, inits.with_group_array_custom_operator, "JsonLogic", (qb, {onChange, expect_jlogic, expect_checks}) => {
         expect_checks({
           "logic": {
             "and": [
@@ -77,15 +76,15 @@ describe("query with !struct and !group", () => {
           }
         ]
       }
-    }, [], {
-      ignoreLog: (errText) => {
-        return errText.includes("Removing rule:") && errText.includes("\"value\":[13,36]") && errText.includes("Reason: Uncomplete RHS")
-          || errText.includes("Operator between is not supported for field results.slider");
-      }
+    }, [
+      // validation:
+      "Results.Slider BETWEEN 13 AND 36  >>  * [lhs] Operator between is not supported for field results.slider. * [rhs] Incomplete RHS"
+    ], {
+      //ignoreLog
     });
   });
 
-  describe("should handle if !group isnot wrapped in #some (old format)", () => {
+  describe("should handle if !group is not wrapped in #some (old format)", () => {
     export_checks(configs.with_struct_and_group, inits.with_struct_and_group_mixed_obsolete, "JsonLogic", {
       "query": "(results.slider == 22 && user.firstName == \"abc\")",
       "queryHuman": "(Results.Slider = 22 AND Username = abc)",
@@ -112,6 +111,13 @@ describe("query with !struct and !group", () => {
     });
   });
 
+  describe("should handle some-in when it's not related to multiselect_contains op", () => {
+    export_checks(configs.with_group_inside_struct, inits.with_select_any_in_in_some, "JsonLogic", {
+      "query": "vehicles.cars.vendor IN (\"Ford\", \"Toyota\")",
+      logic: inits.with_select_any_in_in_some,
+    });
+  });
+
 });
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +134,9 @@ describe("query with !group", () => {
     export_checks(configs.with_group_some, inits.with_bad_subfield_in_group, "JsonLogic", {
       "logic": undefined
     }, [
-      "No config for field results.bad-subfield"
+      "No config for field results.bad-subfield",
+      // validation
+      "Root  >>  Empty query"
     ]);
   });
 

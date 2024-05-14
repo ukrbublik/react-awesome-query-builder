@@ -1,15 +1,20 @@
 import Immutable, { fromJS, Map } from "immutable";
-import {validateTree} from "../utils/validation";
-import {extendConfig} from "../utils/configUtils";
-import {getTreeBadFields, getLightTree, _fixImmutableValue} from "../utils/treeUtils";
+import {checkTree, isValidTree} from "../utils/validation";
+import {getLightTree, _fixImmutableValue, fixPathsInTree} from "../utils/treeUtils";
 import {isJsonLogic} from "../utils/stuff";
+import uuid from "../utils/uuid";
+
+export {
+  isJsonLogic,
+  // for backward compatibility:
+  checkTree, isValidTree
+};
 
 export const getTree = (immutableTree, light = true, children1AsArray = true) => {
   if (!immutableTree) return undefined;
   let tree = immutableTree;
   tree = tree.toJS();
-  if (light)
-    tree = getLightTree(tree, children1AsArray);
+  tree = getLightTree(tree, light, children1AsArray);
   return tree;
 };
 
@@ -17,24 +22,14 @@ export const loadTree = (serTree) => {
   if (isImmutableTree(serTree)) {
     return serTree;
   } else if (isTree(serTree)) {
-    return jsToImmutable(serTree);
+    return fixPathsInTree(jsToImmutable(serTree));
   } else if (typeof serTree == "string" && serTree.startsWith('["~#iM"')) {
     //tip: old versions of RAQB were saving tree with `transit.toJSON()`
     // https://github.com/ukrbublik/react-awesome-query-builder/issues/69
-    throw "You are trying to load query in obsolete serialization format (Immutable string) which is not supported in versions starting from 2.1.17";
-  } else if (typeof serTree == "string") {
-    return jsToImmutable(JSON.parse(serTree));
-  } else throw "Can't load tree!";
-};
-
-export const checkTree = (tree, config) => {
-  if (!tree) return undefined;
-  const extendedConfig = extendConfig(config, undefined, true);
-  return validateTree(tree, null, extendedConfig, extendedConfig);
-};
-
-export const isValidTree = (tree) => {
-  return getTreeBadFields(tree).length == 0;
+    throw new Error("You are trying to load query in obsolete serialization format (Immutable string) which is not supported in versions starting from 2.1.17");
+  } else if (typeof serTree === "string") {
+    return fixPathsInTree(jsToImmutable(JSON.parse(serTree)));
+  } else throw new Error("Can't load tree!");
 };
 
 export const isImmutableTree = (tree) => {
@@ -44,8 +39,6 @@ export const isImmutableTree = (tree) => {
 export const isTree = (tree) => {
   return typeof tree == "object" && (tree.type == "group" || tree.type == "switch_group");
 };
-
-export {isJsonLogic};
 
 export function jsToImmutable(tree) {
   const imm = fromJS(tree, function (key, value, path) {
@@ -66,7 +59,7 @@ export function jsToImmutable(tree) {
       // JSON doesn't support undefined and replaces undefined -> null
       // So fix: null -> undefined
       for (let i = 0 ; i < 2 ; i++) {
-        if (outValue.get("value")?.get(i) === null) {
+        if (outValue.get("value")?.get?.(i) === null) {
           outValue = outValue.setIn(["value", i], undefined);
         }
       }
@@ -78,7 +71,7 @@ export function jsToImmutable(tree) {
       // keep in JS format
       outValue = value.toJS();
     } else if (key == "children1" && Immutable.Iterable.isIndexed(value)) {
-      outValue = new Immutable.OrderedMap(value.map(child => [child.get("id"), child]));
+      outValue = new Immutable.OrderedMap(value.map(child => [child?.get("id") || uuid(), child]));
     } else {
       outValue = Immutable.Iterable.isIndexed(value) ? value.toList() : value.toOrderedMap();
     }
@@ -86,4 +79,3 @@ export function jsToImmutable(tree) {
   });
   return imm;
 }
-

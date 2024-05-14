@@ -6,13 +6,18 @@ import { with_qb_mui, hexToRgbString } from "../support/utils";
 import { getAutocompleteUtils } from "../support/autocomplete";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 
+const {
+  with_all_types,
+  with_theme_mui,
+} = configs;
+
 const ignoreLogDatePicker = (errText: string) => {
   return errText.includes("The `anchorEl` prop provided to the component is invalid");
 };
 
 describe("mui theming", () => {
   it("applies secondary color", async () => {
-    await with_qb_mui(configs.with_theme_mui, inits.with_bool, "JsonLogic", (qb) => {
+    await with_qb_mui([with_all_types, with_theme_mui], inits.with_bool, "JsonLogic", (qb) => {
       const boolSwitch = qb.find(".rule--value .MuiSwitch-thumb");
       // for some reason elements are duplicated for MUI
       expect(boolSwitch, "boolSwitch").to.have.length(2);
@@ -60,7 +65,7 @@ describe("mui core widgets", () => {
   });
 
   it("change field without autocomplete", async () => {
-    await with_qb_mui([configs.with_struct, configs.without_field_autocomplete], inits.with_nested, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_mui([configs.with_struct, configs.without_field_autocomplete], inits.with_nested, "JsonLogic", (qb, {expect_jlogic}) => {
       const sel = qb.find(".rule--field").find(Select).last();
       sel.prop("onChange")?.({target: {value: "user.login"}} as SelectChangeEvent, null);
       qb.update();
@@ -81,7 +86,7 @@ describe("mui core widgets", () => {
 describe("mui widgets interactions", () => {
 
   it("change date", async () => {
-    await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_mui(configs.with_date_and_time, inits.with_date_and_time, "JsonLogic", (qb, {expect_jlogic}) => {
       // open date picker for '2020-05-18'
       const openPickerBtn = qb.find(".rule--widget--DATE button.MuiIconButton-root");
       const dateInput = qb.find(".rule--widget--DATE input.MuiInput-input");
@@ -140,7 +145,7 @@ describe("mui widgets interactions", () => {
   });
 
   it("change time value", async function() {
-    await with_qb_mui(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_mui(configs.with_all_types, inits.with_time, "JsonLogic", (qb, {expect_jlogic}) => {
       const timeInput = qb.find(".rule--widget--TIME input.MuiInput-input");
       expect(timeInput, "timeInput").to.have.length(1);
       timeInput.simulate("click");

@@ -1,27 +1,101 @@
 
-import { Utils } from "@react-awesome-query-builder/core";
-const { uuid } = Utils;
 
 export const tree_with_empty_group = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "group",
       properties: {
         conjunction: "AND",
         not: false
       },
-      children1: {}
+      children1: []
     },
-  }
+  ]
+};
+
+export const tree_with_incorrect_value_type_in_rule = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      field: "num",
+      operator: "equal",
+      value: ["100"],
+      valueType: ["string"],
+    }
+  }],
+};
+
+export const tree_with_missing_value_type_in_rule = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      field: "num",
+      operator: "equal",
+      value: ["5"],
+    }
+  }],
+};
+
+export const tree_with_empty_groups_and_incomplete_rules = {
+  type: "group",
+  children1: [
+    {
+      type: "group",
+      children1: [
+        {
+          type: "rule",
+          properties: {
+            field: "num",
+            operator: "between",
+          }
+        },
+      ]
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "is_null",
+      }
+    },
+    {
+      type: "group",
+      children1: [
+        {
+          type: "rule",
+          properties: {
+          }
+        },
+      ]
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "greater",
+      }
+    },
+    {
+      type: "rule",
+      properties: {
+        field: "num",
+        operator: "less",
+        value: [100],
+      }
+    },
+    {
+      type: "group"
+    }
+  ]
 };
 
 export const tree_with_number = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "num",
@@ -31,7 +105,7 @@ export const tree_with_number = {
         valueType: ["number"]
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -50,6 +124,78 @@ export const with_number = {
   }]
 };
 
+export const with_uneven_number = {
+  "and": [{
+    "==": [
+      { "var": "evenNum" },  7
+    ]
+  }]
+};
+
+export const with_uneven_number_bigger_than_max = {
+  "and": [{
+    "==": [
+      { "var": "evenNum" },  13
+    ]
+  }]
+};
+
+export const with_numLess5_eq_7 = {
+  "and": [{
+    "==": [
+      { "var": "numLess5" },  7
+    ]
+  }]
+};
+
+export const with_number_bigger_than_max = {
+  "and": [{
+    "==": [
+      { "var": "num" },  200
+    ]
+  }]
+};
+
+export const with_range_bigger_than_max = {
+  "and": [{
+    "<=": [
+      100,
+      { "var": "num" },
+      200
+    ]
+  }]
+};
+
+export const with_range_from_field_to_big_number = {
+  "and": [{
+    "<=": [
+      { "var": "numField" },
+      { "var": "num" },
+      100
+    ]
+  }]
+};
+
+export const with_bad_range = {
+  "and": [{
+    "<=": [
+      4,
+      { "var": "num" },
+      3
+    ]
+  }]
+};
+
+export const with_bad_range_bigger_than_max = {
+  "and": [{
+    "<=": [
+      400,
+      { "var": "num" },
+      300
+    ]
+  }]
+};
+
 export const with_range_slider = {
   "and": [{
     "<=": [
@@ -60,7 +206,17 @@ export const with_range_slider = {
   }]
 };
 
-export const with_range_dates = {
+export const with_bad_date_range = {
+  "and": [{
+    "<=": [
+      "2020-05-15T21:00:00.000Z", 
+      { "var": "date" },
+      "2020-05-10T21:00:00.000Z"
+    ]
+  }]
+};
+
+export const with_date_range = {
   "and": [{
     "<=": [
       "2020-05-10T21:00:00.000Z", 
@@ -189,6 +345,15 @@ export const with_bad_subfield_in_group = {
   ]
 };
 
+export const with_select_any_in_in_some = {
+  "and": [
+    { "some": [
+      { "var": "vehicles.cars" },
+      { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
+    ] }
+  ]
+};
+
 export const with_select_not_any_in_in_some = {
   "and": [
     { "some": [
@@ -200,6 +365,19 @@ export const with_select_not_any_in_in_some = {
   ]
 };
 export const spel_with_select_not_any_in_in_some = "cars.?[!({'Ford', 'Toyota'}.?[true].contains(vendor))].size() > 0";
+
+export const with_empty_group_some = {
+  type: "group",
+  children1: [{
+    type: "rule_group",
+    properties: {
+      mode: "array",
+      operator: "some",
+      field: "cars",
+    }
+  }]
+};
+
 
 export const with_not_and_in_some = {
   "and": [
@@ -492,6 +670,10 @@ export const with_select = {
   "and": [{  "==": [ { "var": "color" }, "orange" ]  }]
 };
 
+export const with_bad_select_value = {
+  "and": [{  "==": [ { "var": "color" }, "unexisting" ]  }]
+};
+
 export const with_bool = {
   "and": [{  "==": [ { "var": "stock" }, true ]  }]
 };
@@ -510,6 +692,17 @@ export const with_multiselect = {
       "all": [
         { "var": "multicolor" },
         { "in": [ { "var": "" }, [ "green", "orange" ] ] }
+      ]
+    }
+  ]
+};
+
+export const with_bad_multiselect_value = {
+  "and": [
+    {
+      "all": [
+        { "var": "multicolor" },
+        { "in": [ { "var": "" }, [ "unexisting1", "orange", "unexisting2" ] ] }
       ]
     }
   ]
@@ -664,9 +857,8 @@ export const with_func_tolower_from_field = {
 
 export const with_func_linear_regression_tree = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "num",
@@ -686,7 +878,7 @@ export const with_func_linear_regression_tree = {
         valueError: [ null ]
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -745,11 +937,223 @@ export const with_func_sum_of_multiselect_in_lhs = {
   ]
 };
 
+export const tree_with_vfunc_in_lhs_with_missing_args = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaa" },
+          str2: { valueSrc: "value", value: "bbbbb" },
+          // num1 has defaultValue
+          // num2 has NO defaultValue !!!
+        },
+      },
+      operator: "equal",
+      value: ["xxxxxx"],
+      valueSrc: ["value"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_lhs_with_invalid_args_and_rhs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaaa" },
+          str2: { valueSrc: "value", value: "bbbbbb" },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: ["xxxxxx"],
+      valueSrc: ["value"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_both_sides_with_invalid_args_in_nested_funcs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "aaaaaa" },
+          str2: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc1",
+              args: {
+                str1: { valueSrc: "value", value: "_aaaaaa" },
+                // str2 has defaultValue
+                // num1 has defaultValue
+                num2: { valueSrc: "value", value: 4 },
+              }
+            }
+          },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: [{
+        func: "vld.tfunc1",
+        args: {
+          // str1 has defaultValue
+          str2: { valueSrc: "value", value: "rbbbbbb" },
+          // num1 has defaultValue
+          num2: { valueSrc: "value", value: 13 },
+        }
+      }],
+      valueSrc: ["func"],
+    },
+  }]
+};
+
+export const tree_with_vfunc_in_both_sides_with_missing_args_in_nested_funcs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc1",
+        args: {
+          str1: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc2",
+              args: {
+                // num1 has defaultValue
+                num2: { valueSrc: "value", value: 3 },
+                num3: { valueSrc: "value", value: 4 },
+              },
+            }
+          },
+          str2: {
+            valueSrc: "func",
+            value: {
+              func: "vld.tfunc2",
+              args: {
+                num1: { valueSrc: "value", value: -13 },
+                // num2 has NO defaultValue !!!
+                num3: { valueSrc: "value", value: -14 },
+              }
+            }
+          },
+          num1: { valueSrc: "value", value: 20 },
+          num2: { valueSrc: "value", value: 4 },
+        },
+      },
+      operator: "equal",
+      value: [{
+        func: "vld.tfunc1",
+        args: {
+          str1: { valueSrc: "value", value: "raaaaaaa" },
+          str2: { valueSrc: "value", value: "rbbb" },
+          num1: { valueSrc: "value", value: 3 },
+          num2: { valueSrc: "value", value: 4 },
+        }
+      }],
+      valueSrc: ["func"],
+    },
+  }]
+};
+
+export const tree_with_vfunc2_at_lhs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+          num2: { valueSrc: "value", value: 7 },
+          num3: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxxx"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_without_valueSrc = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { value: 7 },
+          num2: { value: 3 },
+          num3: { value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxxx"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_and_long_rhs = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+          num2: { valueSrc: "value", value: 7 },
+          num3: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxyyyyyzzz"]
+    }
+  }],
+};
+
+export const tree_with_vfunc2_at_lhs_with_missing_args = {
+  type: "group",
+  children1: [{
+    type: "rule",
+    properties: {
+      fieldSrc: "func",
+      field: {
+        func: "vld.tfunc2",
+        args: {
+          num1: { valueSrc: "value", value: 7 },
+        }
+      },
+      operator: "equal",
+      value: ["xxxxxyyyyyzzz"]
+    }
+  }],
+};
+
 export const with_prox = {
   type: "group",
-  id: uuid(),
-  children1: {
-    [uuid()]: {
+  children1: [
+    {
       type: "rule",
       properties: {
         field: "str",
@@ -762,7 +1166,7 @@ export const with_prox = {
         }
       }
     },
-  },
+  ],
   properties: {
     conjunction: "AND",
     not: false
@@ -793,6 +1197,28 @@ export const with_group_array_cars = {
         0
       ] },
       2
+    ] }
+  ]
+};
+
+export const with_group_array_cars_bad_count_and_year = {
+  "and": [
+    { ">": [
+      { "reduce": [
+        { "filter": [
+          { "var": "cars" },
+          { "and": [
+            {
+              "==": [ { "var": "vendor" }, "Toyota" ]
+            }, {
+              ">=": [ { "var": "year" }, 3000 ]
+            }
+          ] }
+        ] },
+        { "+": [ 1, { "var": "accumulator" } ] },
+        0
+      ] },
+      222
     ] }
   ]
 };
@@ -1052,7 +1478,7 @@ export const spel_with_number = "num == 2";
 export const spel_with_between = "num >= 1 && num <= 2";
 export const spel_with_not = "!(num == 2)";
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
-export const spel_with_cases = "(str == '222' ? is_string : (num == 222 ? is_number : unknown))";
+export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_number : unknown))";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
@@ -1068,11 +1494,9 @@ export const spel_with_lhs_compareTo_parse_plusDays = "datetime.compareTo(T(java
 export const spel_with_lhs_toLowerCase2 = "str.toLowerCase2() == 'aaa'";
 export const tree_with_lhs_toLowerCase2 = {
   "type": "group",
-  "id": uuid(),
   "children1": [
     {
       "type": "rule",
-      "id": uuid(),
       "properties": {
         //"fieldSrc": "func", //should be determined
         "field": {
@@ -1107,3 +1531,55 @@ export const with_dot_in_field = {
 };
 
 export const spel_with_dot_in_field = "number.one == 11";
+
+export const tree_with_case__with_invalid_rules__without_default_case = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      properties: {
+        value: ["aa"],
+        valueType: ["case_value"],
+        valueSrc: ["value"],
+      },
+      children1: [{
+        type: "rule",
+        properties: {
+          field: "evenNum",
+          operator: "equal",
+          value: [7]
+        }
+      }]
+    },
+  ]
+};
+
+export const tree_with_case__without_case_value__without_default_case = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      children1: [{
+        type: "rule",
+        properties: {
+          field: "evenNum",
+          operator: "equal",
+          value: [6]
+        }
+      }]
+    },
+  ]
+};
+
+export const tree_with_empty_cases = {
+  type: "switch_group",
+  children1: [
+    {
+      type: "case_group",
+      children1: []
+    },
+    {
+      type: "case_group",
+    },
+  ]
+};

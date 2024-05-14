@@ -45,12 +45,11 @@ export default ({
           renderOptions(items, level+1),
         ];
       } else {
-        res = (
+        return (
           <MenuItem disabled={disabled} key={path} value={path}>
             {finalLabel}
           </MenuItem>
         );
-        return res;
       }
     })
   );

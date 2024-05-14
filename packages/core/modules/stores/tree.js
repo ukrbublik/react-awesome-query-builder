@@ -10,23 +10,27 @@ import {
 import * as constants from "./constants";
 import uuid from "../utils/uuid";
 import {
-  getFuncConfig, getFieldConfig, getFieldWidgetConfig, getOperatorConfig
+  getFuncConfig, getFieldConfig, getOperatorConfig
 } from "../utils/configUtils";
 import {
-  getOperatorsForField, getOperatorsForType, getFirstOperator, getWidgetForFieldOp,
-  getNewValueForFieldOp, isEmptyItem, selectTypes
+  getOperatorsForField, getOperatorsForType, getFirstOperator,
+  isEmptyItem, selectTypes, calculateValueType
 } from "../utils/ruleUtils";
-import {deepEqual, defaultValue, applyToJS} from "../utils/stuff";
-import {validateValue} from "../utils/validation";
+import {deepEqual, getOpCardinality, applyToJS} from "../utils/stuff";
+import {validateValue, validateRange, getNewValueForFieldOp} from "../utils/validation";
+import {translateValidation} from "../i18n";
 import omit from "lodash/omit";
 import mapValues from "lodash/mapValues";
+import {setFunc, setArgValue, setArgValueSrc} from "../utils/funcUtils";
+
 
 /**
  * @param {object} config
  * @param {Immutable.List} path
  * @param {Immutable.Map} properties
  */
-const addNewGroup = (state, path, type, groupUuid, properties, config, children = null, meta = {}) => {
+const addNewGroup = (state, path, type, generatedId, properties, config, children = null, meta = {}) => {
+  const groupUuid = properties?.get?.("id") || generatedId;
   const {shouldCreateEmptyGroup} = config.settings;
   const groupPath = path.push(groupUuid);
   const canAddNewRule = !shouldCreateEmptyGroup;
@@ -157,7 +161,7 @@ const _addChildren1 = (config, item, children) => {
   if (children && Array.isArray(children)) {
     item.children1 = new Immutable.OrderedMap(
       children.reduce((map, it) => {
-        const id1 = uuid();
+        const id1 = it.id ?? uuid();
         const it1 = {
           ...it,
           properties: defaultItemProperties(config, it).merge(fromJS(it.properties) || {}),
@@ -182,7 +186,8 @@ const _addChildren1 = (config, item, children) => {
  * @param {Immutable.OrderedMap} properties
  * @param {object} config
  */
-const addItem = (state, path, type, id, properties, config, children = null) => {
+const addItem = (state, path, type, generatedId, properties, config, children = null) => {
+  const id = properties?.get?.("id") || generatedId;
   if (type == "switch_group")
     throw new Error("Can't add switch_group programmatically");
   const { maxNumberOfCases, maxNumberOfRules, maxNesting } = config.settings;
@@ -329,7 +334,7 @@ const moveItem = (state, fromPath, toPath, placement, config) => {
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
  * @param {integer} delta
- * @param {*} srcKey
+ * @param {string} srcKey
  */
 const setFieldSrc = (state, path, srcKey, config) => {
   const {keepInputOnChangeFieldSrc} = config.settings;
@@ -338,16 +343,16 @@ const setFieldSrc = (state, path, srcKey, config) => {
   const currentRule = state.getIn(expandTreePath(path));
   const currentType = currentRule.get("type");
   const currentProperties = currentRule.get("properties");
-  const currentField = currentProperties.get("field");
-  //const currentFieldSrc = currentProperties.get("fieldSrc");
-  const currentFielType = currentProperties.get("fieldType");
+  const currentField = currentProperties?.get("field");
+  //const currentFieldSrc = currentProperties?.get("fieldSrc");
+  const currentFielType = currentProperties?.get("fieldType");
   const currentFieldConfig = getFieldConfig(config, currentField);
   let fieldType = currentFieldConfig?.type || currentFielType;
   if (!fieldType || fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
   }
   const canReuseValue = !selectTypes.includes(fieldType);
-  const keepInput = keepInputOnChangeFieldSrc && !isEmptyItem(currentRule, config, true) && canReuseValue;
+  const keepInput = keepInputOnChangeFieldSrc && !isEmptyItem(currentRule, config) && canReuseValue;
 
   if (!keepInput) {
     // clear ALL properties
@@ -358,6 +363,7 @@ const setFieldSrc = (state, path, srcKey, config) => {
   } else {
     // clear non-relevant properties
     state = state.setIn(expandTreePath(path, "properties", "field"), null);
+    state = state.deleteIn(expandTreePath(path, "properties", "fieldError"));
     // set fieldType for "memory effect"
     state = state.setIn(expandTreePath(path, "properties", "fieldType"), fieldType);
   }
@@ -371,21 +377,93 @@ const setFieldSrc = (state, path, srcKey, config) => {
 /**
  * @param {Immutable.Map} state
  * @param {Immutable.List} path
- * @param {string} field
+ * @param {integer} delta
+ * @param {Array} parentFuncs
+ * @param {string | null} argKey
+ * @param {*} argValue if argKey is null, it's new func key
+ * @param {string | "!valueSrc"} valueType
+ * @param {*} asyncListValues
  */
-const setField = (state, path, newField, config, asyncListValues, __isInternal) => {
+const setFuncValue = (config, state, path, delta, parentFuncs, argKey, argValue, valueType, asyncListValues, _meta = {}) => {
+  const {showErrorMessage} = config.settings;
+  const isLHS = delta === -1;
+  const currentProperties = state.getIn(expandTreePath(path, "properties"));
+  const currentField = currentProperties.get("field");
+  const currentValue = currentProperties.get("value");
+  const currentV = isLHS ? currentField : currentValue.getIn([delta]);
+
+  // go inwards
+  let funcsPath = [];
+  let targetFV = currentV;
+  for (const [funcK, argK] of parentFuncs || []) {
+    funcsPath.push([funcK, argK, targetFV]);
+    if (funcK !== targetFV.get("func")) {
+      const funcPath = funcsPath.map(([f, a]) => `${f}(${a})`).join("/") || "root";
+      throw new Error(
+        `In ${isLHS ? "LHS" : "RHS"} for path ${funcPath} expected func key ${funcK} but got ${parent.get("func")}`
+      );
+    }
+    targetFV = targetFV.getIn(["args", argK, "value"]);
+  }
+
+  // modify
+  if (!argKey) {
+    const newFuncKey = argValue;
+    const canFixArgs = true; // try to fix args to fit new func validations, otherwise - drop invalid args
+    targetFV = setFunc(targetFV, newFuncKey, config, canFixArgs);
+    // allow drop invalid args / reset to default, but don't trigger error if some arg is required
+    // (not same as setting isEndValue = true)
+    _meta.canDropArgs = true;
+  } else {
+    const funcKey = targetFV.get("func");
+    const funcDefinition = getFuncConfig(config, funcKey);
+    const {args} = funcDefinition;
+    const argDefinition = args[argKey];
+
+    if (valueType === "!valueSrc") {
+      targetFV = setArgValueSrc(targetFV, argKey, argValue, argDefinition, config);
+    } else {
+      targetFV = setArgValue(targetFV, argKey, argValue, argDefinition, config);
+    }
+  }
+
+  // go outwards
+  let newV = targetFV;
+  while (funcsPath.length) {
+    const [funcK, argK, parentFV] = funcsPath.pop();
+    const funcDefinition = getFuncConfig(config, funcK);
+    const {args} = funcDefinition;
+    const argDefinition = args[argK];
+    newV = setArgValue(parentFV, argK, newV, argDefinition, config);
+  }
+
+  if (isLHS) {
+    return setField(state, path, newV, config, asyncListValues, _meta);
+  } else {
+    return setValue(state, path, delta, newV, undefined, config, asyncListValues, _meta);
+  }
+};
+
+/**
+ * @param {Immutable.Map} state
+ * @param {Immutable.List} path
+ * @param {string | Immutable.OrderedMap} newField
+ */
+const setField = (state, path, newField, config, asyncListValues, _meta = {}) => {
+  const { __isInternal, isEndValue, canDropArgs } = _meta;
   let isInternalValueChange;
   if (!newField)
     return {tree: removeItem(state, path), isInternalValueChange};
 
-  const {fieldSeparator, setOpOnChangeField, showErrorMessage, keepInputOnChangeFieldSrc} = config.settings;
+  const {fieldSeparator, setOpOnChangeField, showErrorMessage} = config.settings;
   if (Array.isArray(newField))
     newField = newField.join(fieldSeparator);
 
   const currentType = state.getIn(expandTreePath(path, "type"));
   const currentProperties = state.getIn(expandTreePath(path, "properties"));
   const wasRuleGroup = currentType == "rule_group";
-  const currentFieldSrc = currentProperties.get("fieldSrc");
+  const currentFieldSrc = currentProperties?.get("fieldSrc");
+  const currentFieldError = currentProperties?.get("fieldError");
   const newFieldConfig = getFieldConfig(config, newField);
   if (!newFieldConfig) {
     console.warn(`No config for LHS ${newField}`);
@@ -395,30 +473,35 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
   if (fieldType === "!group" || fieldType === "!struct") {
     fieldType = null;
   }
-  
-  const currentOperator = currentProperties.get("operator");
-  const currentOperatorOptions = currentProperties.get("operatorOptions");
-  const currentField = currentProperties.get("field");
-  const currentValue = currentProperties.get("value");
-  const _currentValueSrc = currentProperties.get("valueSrc", new Immutable.List());
-  const _currentValueType = currentProperties.get("valueType", new Immutable.List());
+
+  const currentOperator = currentProperties?.get("operator");
+  const currentOperatorOptions = currentProperties?.get("operatorOptions");
+  const currentField = currentProperties?.get("field");
+  // const currentValue = currentProperties?.get("value");
+  const currentValueErrorStr = currentProperties?.get("valueError")?.join?.("|");
+  // const _currentValueSrc = currentProperties?.get("valueSrc", new Immutable.List());
+  // const _currentValueType = currentProperties?.get("valueType", new Immutable.List());
 
   const isRuleGroup = newFieldConfig.type == "!group";
   const isRuleGroupExt = isRuleGroup && newFieldConfig.mode == "array";
   const isChangeToAnotherType = wasRuleGroup != isRuleGroup;
-  const wasOkWithoutField = !currentField && currentFieldSrc && currentOperator;
+  // const wasOkWithoutField = !currentField && currentFieldSrc && currentOperator;
 
   // If the newly selected field supports the same operator the rule currently
   // uses, keep it selected.
   const lastOp = newFieldConfig && newFieldConfig.operators?.indexOf(currentOperator) !== -1 ? currentOperator : null;
+  const isSameFunc = currentFieldSrc === "func" && currentField?.get?.("func") === newField?.get?.("func");
+  const forceKeepOp = isSameFunc && !!lastOp;
   let newOperator = null;
   const availOps = currentFieldSrc === "func" 
     ? getOperatorsForType(config, fieldType)
     : getOperatorsForField(config, newField);
   if (availOps && availOps.length == 1)
     newOperator = availOps[0];
+  else if (forceKeepOp)
+    newOperator = lastOp;
   else if (availOps && availOps.length > 1) {
-    for (let strategy of setOpOnChangeField || []) {
+    for (let strategy of setOpOnChangeField) {
       if (strategy == "keep" && !isChangeToAnotherType)
         newOperator = lastOp;
       else if (strategy == "default")
@@ -441,10 +524,15 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
     state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
   }
 
+  if (!currentProperties) {
+    state = state.setIn(expandTreePath(path, "properties"), new Immutable.OrderedMap());
+  }
+
+  const canFix = !showErrorMessage;
   if (isRuleGroup) {
     state = state.setIn(expandTreePath(path, "type"), "rule_group");
     const {canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality} = getNewValueForFieldOp(
-      config, config, currentProperties, newField, newOperator, "field", true
+      config, config, currentProperties, newField, newOperator, "field", canFix, isEndValue, canDropArgs
     );
     let groupProperties = defaultGroupProperties(config, newFieldConfig).merge({
       field: newField,
@@ -462,37 +550,52 @@ const setField = (state, path, newField, config, asyncListValues, __isInternal) 
     state = state.setIn(expandTreePath(path, "children1"), new Immutable.OrderedMap());
     state = state.setIn(expandTreePath(path, "properties"), groupProperties);
     if (newFieldConfig.initialEmptyWhere && operatorCardinality == 1) { // just `COUNT(grp) > 1` without `HAVING ..`
-      // no childeren
+      // no children
     } else {
       state = addItem(state, path, "rule", uuid(), defaultRuleProperties(config, newField), config);
     }
     state = fixPathsInTree(state);
   } else {
     state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
-      const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-        config, config, current, newField, newOperator, "field", true
+      const {
+        canReuseValue, newValue, newValueSrc, newValueType, newValueError, newFieldError, fixedField
+      } = getNewValueForFieldOp(
+        config, config, current, newField, newOperator, "field", canFix, isEndValue, canDropArgs
       );
-      if (showErrorMessage) {
-        current = current
-          .set("valueError", newValueError);
+      const newValueErrorStr = newValueError?.join?.("|");
+      let newCorrectField = newField;
+      const willFixField = (fixedField !== newField);
+      if (willFixField) {
+        newCorrectField = fixedField;
       }
-      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newField);
-      isInternalValueChange = __isInternal; //todo: filter edge cases?
-      return current
-        .set("field", newField)
+      // tip: `newCorrectField` is SAFE to set: even if it can't be fixed, it is reverted to previous good field.
+      //      Unlike logic in `setValue()` action where we need to calc `canUpdValue`
+      const didFieldErrorChanged = showErrorMessage ? currentFieldError != newFieldError : !!currentFieldError != !!newFieldError;
+      const didValueErrorChanged = showErrorMessage ? currentValueErrorStr != newValueErrorStr : !!currentValueErrorStr != !!newValueErrorStr;
+      const didErrorChanged = didFieldErrorChanged || didValueErrorChanged;
+      isInternalValueChange = !!__isInternal && !didErrorChanged && !willFixField;
+      if (showErrorMessage || !!__isInternal && didErrorChanged) {
+        current = current.set("fieldError", newFieldError);
+        current = current.set("valueError", newValueError);
+      }
+      const newOperatorOptions = canReuseValue ? currentOperatorOptions : defaultOperatorOptions(config, newOperator, newCorrectField);
+      current = current
+        .set("field", newCorrectField)
         .delete("fieldType") // remove "memory effect"
         .set("fieldSrc", currentFieldSrc)
         .set("operator", newOperator)
         .set("operatorOptions", newOperatorOptions)
         .set("value", newValue)
         .set("valueSrc", newValueSrc)
-        .set("valueType", newValueType)
-        .delete("asyncListValues");
+        .set("valueType", newValueType);
+      if (!canReuseValue) {
+        current = current.delete("asyncListValues");
+      }
+      return current;
     }));
   }
 
   return {tree: state, isInternalValueChange};
-
 };
 
 /**
@@ -510,7 +613,8 @@ const setOperator = (state, path, newOperator, config) => {
   const fieldConfig = getFieldConfig(config, currentField);
   const isRuleGroup = fieldConfig?.type == "!group";
   const operatorConfig = getOperatorConfig(config, newOperator, currentField);
-  const operatorCardinality = operatorConfig ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const operatorCardinality = operatorConfig ? getOpCardinality(operatorConfig) : null;
+  const canFix = true;
 
   state = state.updateIn(expandTreePath(path, "properties"), (map) => map.withMutations((current) => {
     const currentField = current.get("field");
@@ -520,7 +624,7 @@ const setOperator = (state, path, newOperator, config) => {
     const _currentOperator = current.get("operator");
 
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-      config, config, current, currentField, newOperator, "operator", true
+      config, config, current, currentField, newOperator, "operator", canFix
     );
     if (showErrorMessage) {
       current = current
@@ -557,9 +661,9 @@ const setOperator = (state, path, newOperator, config) => {
  * @param {*} value
  * @param {string} valueType
  * @param {*} asyncListValues
- * @param {boolean} __isInternal
  */
-const setValue = (state, path, delta, value, valueType, config, asyncListValues, __isInternal) => {
+const setValue = (state, path, delta, value, valueType, config, asyncListValues, _meta = {}) => {
+  const { __isInternal, canDropArgs, isEndValue } = _meta;
   const {fieldSeparator, showErrorMessage} = config.settings;
   let isInternalValueChange;
   const valueSrc = state.getIn(expandTreePath(path, "properties", "valueSrc", delta + "")) || null;
@@ -570,72 +674,72 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
   //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
   const operatorConfig = getOperatorConfig(config, operator, field);
-  const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
+  const operatorCardinality = operator ? getOpCardinality(operatorConfig) : null;
 
-  const isEndValue = false;
   const calculatedValueType = valueType || calculateValueType(value, valueSrc, config);
-  const canFix = false;
-  const [validateError, fixedValue] = validateValue(
-    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, true
+  const canFix = !showErrorMessage;
+  const [fixedValue, allErrors] = validateValue(
+    config, field, field, operator, value, calculatedValueType, valueSrc, asyncListValues, canFix, isEndValue, canDropArgs
   );
-  const isValid = !validateError;
-  if (fixedValue !== value) {
-    // eg, get exact value from listValues (not string)
+  const firstError = allErrors?.find(e => !e.fixed && !e.ignore);
+  const validationError = firstError ? translateValidation(firstError) : null;
+  // tip: even if canFix == false, use fixedValue, it can SAFELY fix value of select
+  //  (get exact value from listValues, not string)
+  let willFix = fixedValue !== value;
+  if (willFix) {
     value = fixedValue;
   }
 
+  // init lists
+  state = initEmptyValueLists(state, path, config, operatorCardinality);
+
   // Additional validation for range values
-  if (showErrorMessage) {
-    const w = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc);
-    const valueSrcs = Array.from({length: operatorCardinality}, (_, i) => (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
-        
-    if (operatorConfig && operatorConfig.validateValues && valueSrcs.filter(vs => vs == "value" || vs == null).length == operatorCardinality) {
-      const values = Array.from({length: operatorCardinality}, (_, i) => (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
-      const jsValues = fieldWidgetDefinition && fieldWidgetDefinition.toJS
-        ? values.map(v => fieldWidgetDefinition.toJS.call(config.ctx, v, fieldWidgetDefinition))
-        : values;
-      const rangeValidateError = operatorConfig.validateValues(jsValues);
+  const values = Array.from({length: operatorCardinality}, (_, i) =>
+    (i == delta ? value : state.getIn(expandTreePath(path, "properties", "value", i + "")) || null));
+  const valueSrcs = Array.from({length: operatorCardinality}, (_, i) =>
+    (state.getIn(expandTreePath(path, "properties", "valueSrc", i + "")) || null));
+  const rangeErrorObj = validateRange(config, field, operator, values, valueSrcs);
+  const rangeValidationError = rangeErrorObj ? translateValidation(rangeErrorObj) : null;
 
-      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidateError);
-    }
-  }
-  
-  const lastValueArr = state.getIn(expandTreePath(path, "properties", "value"));
-  if (!lastValueArr) {
-    state = state
-      .setIn(expandTreePath(path, "properties", "value"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueType"), new Immutable.List(new Array(operatorCardinality)))
-      .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
-  }
-
-  const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta + ""));
+  const isValid = !validationError && !rangeValidationError;
+  const lastValue = state.getIn(expandTreePath(path, "properties", "value", delta));
   const lastError = state.getIn(expandTreePath(path, "properties", "valueError", delta));
-  const isLastEmpty = lastValue == undefined;
-  const isLastError = !!lastError;
-  if (isValid || showErrorMessage) {
+  const lastRangeError = state.getIn(expandTreePath(path, "properties", "valueError", operatorCardinality));
+  const didDeltaErrorChanged = showErrorMessage ? lastError != validationError : !!lastError != !!validationError;
+  const didRangeErrorChanged = showErrorMessage ? lastRangeError != rangeValidationError : !!lastRangeError != !!rangeValidationError;
+  const didErrorChanged = didDeltaErrorChanged || didRangeErrorChanged;
+  const didEmptinessChanged = !!lastValue != !!value;
+  const canUpdValue = showErrorMessage ? true : isValid || willFix; // set only good value
+  isInternalValueChange = !!__isInternal && !didEmptinessChanged && !didErrorChanged && !willFix;
+
+  if (canUpdValue) {
     state = state.deleteIn(expandTreePath(path, "properties", "asyncListValues"));
-    // set only good value
     if (typeof value === "undefined") {
-      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
-      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
+      state = state.setIn(expandTreePath(path, "properties", "value", delta), undefined);
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta), null);
     } else {
       if (asyncListValues) {
         state = state.setIn(expandTreePath(path, "properties", "asyncListValues"), asyncListValues);
       }
-      state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), value);
-      state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), calculatedValueType);
-      isInternalValueChange = __isInternal && !isLastEmpty && !isLastError;
+      state = state.setIn(expandTreePath(path, "properties", "value", delta), value);
+      state = state.setIn(expandTreePath(path, "properties", "valueType", delta), calculatedValueType);
     }
   }
-  if (showErrorMessage) {
-    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
+  if (showErrorMessage || !!__isInternal && didErrorChanged) {
+    // check list
+    const lastValueErrorArr = state.getIn(expandTreePath(path, "properties", "valueError"));
+    if (!lastValueErrorArr) {
+      state = state
+        .setIn(expandTreePath(path, "properties", "valueError"), new Immutable.List(new Array(operatorCardinality)));
+    }
+    // set error at delta
+    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validationError);
+    // set range error
+    if (operatorCardinality >= 2) {
+      state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), rangeValidationError);
+    }
   }
-  if (__isInternal && (isValid && isLastError || !isValid && !isLastError)) {
-    state = state.setIn(expandTreePath(path, "properties", "valueError", delta), validateError);
-    isInternalValueChange = false;
-  }
-  
+
   return {tree: state, isInternalValueChange};
 };
 
@@ -645,12 +749,17 @@ const setValue = (state, path, delta, value, valueType, config, asyncListValues,
  * @param {integer} delta
  * @param {*} srcKey
  */
-const setValueSrc = (state, path, delta, srcKey, config) => {
+const setValueSrc = (state, path, delta, srcKey, config, _meta = {}) => {
   const {showErrorMessage} = config.settings;
 
   const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
-  const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
+  //const fieldSrc = state.getIn(expandTreePath(path, "properties", "fieldSrc")) || null;
   const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+  const operatorConfig = getOperatorConfig(config, operator, field);
+  const operatorCardinality = operator ? getOpCardinality(operatorConfig) : null;
+
+  // init lists
+  state = initEmptyValueLists(state, path, config, operatorCardinality);
 
   state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), undefined);
   state = state.setIn(expandTreePath(path, "properties", "valueType", delta + ""), null);
@@ -661,8 +770,6 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
     state = state.setIn(expandTreePath(path, "properties", "valueError", delta), null);
 
     // if current operator is range, clear possible range error
-    const operatorConfig = getOperatorConfig(config, operator, field);
-    const operatorCardinality = operator ? defaultValue(operatorConfig.cardinality, 1) : null;
     if (operatorConfig.validateValues) {
       state = state.setIn(expandTreePath(path, "properties", "valueError", operatorCardinality), null);
     }
@@ -679,8 +786,9 @@ const setValueSrc = (state, path, delta, srcKey, config) => {
   if (srcKey) {
     const properties = state.getIn(expandTreePath(path, "properties"));
     // this call should return canReuseValue = false and provide default value
+    const canFix = true;
     const {canReuseValue, newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-      config, config, properties, field, operator, "valueSrc", true
+      config, config, properties, field, operator, "valueSrc", canFix
     );
     if (!canReuseValue && newValueSrc.get(delta) == srcKey) {
       state = state.setIn(expandTreePath(path, "properties", "value", delta + ""), newValue.get(delta));
@@ -712,29 +820,24 @@ const checkEmptyGroups = (state, config) => {
   return state;
 };
 
+const initEmptyValueLists = (state, path, config, operatorCardinality) => {
+  if (!operatorCardinality) {
+    const field = state.getIn(expandTreePath(path, "properties", "field")) || null;
+    const operator = state.getIn(expandTreePath(path, "properties", "operator")) || null;
+    const operatorConfig = getOperatorConfig(config, operator, field);
+    operatorCardinality = operator ? getOpCardinality(operatorConfig) : null;
+  }
 
-/**
- * 
- */
-const calculateValueType = (value, valueSrc, config) => {
-  let calculatedValueType = null;
-  if (value) {
-    if (valueSrc === "field") {
-      const fieldConfig = getFieldConfig(config, value);
-      if (fieldConfig) {
-        calculatedValueType = fieldConfig.type;
-      }
-    } else if (valueSrc === "func") {
-      const funcKey = value.get("func");
-      if (funcKey) {
-        const funcConfig = getFuncConfig(config, funcKey);
-        if (funcConfig) {
-          calculatedValueType = funcConfig.returnType;
-        }
-      }
+  for (const k of ["value", "valueType", "valueError", "valueSrc"]) {
+    if (!state.getIn(expandTreePath(path, "properties", k))) {
+      state = state
+        .setIn(expandTreePath(path, "properties", k), new Immutable.List(
+          operatorCardinality ? Array.from({length: operatorCardinality}) : []
+        ));
     }
   }
-  return calculatedValueType;
+
+  return state;
 };
 
 const getField = (state, path) => {
@@ -760,7 +863,7 @@ const getActionMeta = (action, state) => {
   if (!action || !action.type)
     return null;
   const actionKeysToOmit = [
-    "config", "asyncListValues", "__isInternal"
+    "config", "asyncListValues"
   ];
   const actionTypesToIgnore = [
     constants.SET_TREE,
@@ -784,7 +887,7 @@ const getActionMeta = (action, state) => {
  * @param {Immutable.Map} state
  * @param {object} action
  */
-export default (config, tree, getMemoizedTree, setLastTree) => {
+export default (initialConfig, tree, getMemoizedTree, setLastTree, getLastConfig) => {
   const initTree = tree;
   const emptyState = {
     tree: initTree, 
@@ -792,39 +895,40 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
   };
     
   return (state = emptyState, action) => {
+    const config = getLastConfig?.() ?? action.config ?? initialConfig;
     const unset = {__isInternalValueChange: undefined, __lastAction: undefined};
     let set = {};
     let actionMeta = getActionMeta(action, state);
 
     switch (action?.type) {
     case constants.SET_TREE: {
-      const validatedTree = getMemoizedTree(action.config, action.tree);
+      const validatedTree = getMemoizedTree(config, action.tree);
       set.tree = validatedTree;
       break;
     }
 
     case constants.ADD_CASE_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, action.config,  action.children, action.meta);
+      set.tree = addNewGroup(state.tree, action.path, "case_group", action.id, action.properties, config,  action.children, action.meta);
       break;
     }
 
     case constants.ADD_GROUP: {
-      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, action.config,  action.children, action.meta);
+      set.tree = addNewGroup(state.tree, action.path, "group", action.id, action.properties, config,  action.children, action.meta);
       break;
     }
 
     case constants.REMOVE_GROUP: {
-      set.tree = removeGroup(state.tree, action.path, action.config);
+      set.tree = removeGroup(state.tree, action.path, config);
       break;
     }
 
     case constants.ADD_RULE: {
-      set.tree = addItem(state.tree, action.path, action.ruleType, action.id, action.properties, action.config, action.children);
+      set.tree = addItem(state.tree, action.path, action.ruleType, action.id, action.properties, config, action.children);
       break;
     }
 
     case constants.REMOVE_RULE: {
-      set.tree = removeRule(state.tree, action.path, action.config);
+      set.tree = removeRule(state.tree, action.path, config);
       break;
     }
 
@@ -839,17 +943,18 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_FIELD: {
+      const {optimizeRenderWithInternals} = config.settings;
       const {tree, isInternalValueChange} = setField(
-        state.tree, action.path, action.field, action.config,
-        action.asyncListValues, action.__isInternal
+        state.tree, action.path, action.field, config,
+        action.asyncListValues, action._meta
       );
-      set.__isInternalValueChange = isInternalValueChange;
+      set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
       set.tree = tree;
       break;
     }
 
     case constants.SET_FIELD_SRC: {
-      set.tree = setFieldSrc(state.tree, action.path, action.srcKey, action.config);
+      set.tree = setFieldSrc(state.tree, action.path, action.srcKey, config);
       break;
     }
 
@@ -859,21 +964,35 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.SET_OPERATOR: {
-      set.tree = setOperator(state.tree, action.path, action.operator, action.config);
+      set.tree = setOperator(state.tree, action.path, action.operator, config);
       break;
     }
 
     case constants.SET_VALUE: {
+      const {optimizeRenderWithInternals} = config.settings;
       const {tree, isInternalValueChange} = setValue(
-        state.tree, action.path, action.delta, action.value, action.valueType, action.config, action.asyncListValues, action.__isInternal
+        state.tree, action.path, action.delta, action.value, action.valueType,  config,
+        action.asyncListValues, action._meta
       );
-      set.__isInternalValueChange = isInternalValueChange;
+      set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
+      set.tree = tree;
+      break;
+    }
+
+    case constants.SET_FUNC_VALUE: {
+      const {optimizeRenderWithInternals} = config.settings;
+      const {tree, isInternalValueChange} = setFuncValue(
+        config, state.tree, action.path, action.delta, action.parentFuncs, 
+        action.argKey, action.value, action.valueType,
+        action.asyncListValues, action._meta
+      );
+      set.__isInternalValueChange = optimizeRenderWithInternals && isInternalValueChange;
       set.tree = tree;
       break;
     }
 
     case constants.SET_VALUE_SRC: {
-      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, action.config);
+      set.tree = setValueSrc(state.tree, action.path, action.delta, action.srcKey, config, action._meta);
       break;
     }
 
@@ -883,7 +1002,7 @@ export default (config, tree, getMemoizedTree, setLastTree) => {
     }
 
     case constants.MOVE_ITEM: {
-      set.tree = moveItem(state.tree, action.fromPath, action.toPath, action.placement, action.config);
+      set.tree = moveItem(state.tree, action.fromPath, action.toPath, action.placement, config);
       break;
     }
 

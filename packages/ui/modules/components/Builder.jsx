@@ -5,7 +5,7 @@ import { Item } from "./item/Item";
 import SortableContainer from "./containers/SortableContainer";
 import {pureShouldComponentUpdate} from "../utils/reactUtils";
 const { getTotalReordableNodesCountInTree, getTotalRulesCountInTree } = Utils.TreeUtils;
-const { createListFromArray, emptyProperies } = Utils.DefaultUtils;
+const { createListFromArray, emptyProperties } = Utils.DefaultUtils;
 
 class Builder extends Component {
   static propTypes = {
@@ -48,7 +48,9 @@ class Builder extends Component {
   }
 
   render() {
-    const tree = this.props.tree;
+    const {
+      tree, config, actions, onDragStart,
+    } = this.props;
     const rootType = tree.get("type");
     const isTernary = rootType == "switch_group";
     const reordableNodesCnt = isTernary ? null : getTotalReordableNodesCountInTree(tree);
@@ -60,15 +62,14 @@ class Builder extends Component {
         id={id}
         path={this.path}
         type={rootType}
-        properties={tree.get("properties") || emptyProperies()}
-        config={this.props.config}
-        actions={this.props.actions}
-        children1={tree.get("children1") || emptyProperies()}
-        //tree={tree}
+        properties={tree.get("properties") || emptyProperties()}
+        config={config}
+        actions={actions}
+        children1={tree.get("children1") || emptyProperties()}
         reordableNodesCnt={reordableNodesCnt}
         totalRulesCnt={totalRulesCnt}
         parentReordableNodesCnt={0}
-        onDragStart={this.props.onDragStart}
+        onDragStart={onDragStart}
       />
     );
   }

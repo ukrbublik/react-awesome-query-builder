@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import mapValues from "lodash/mapValues";
 import context from "../../stores/context";
 import {pureShouldComponentUpdate, useOnPropsChanged} from "../../utils/reactUtils";
+import classNames from "classnames";
 import {connect} from "react-redux";
 const {defaultGroupConjunction} = Utils.DefaultUtils;
 
@@ -25,6 +26,7 @@ const createGroupContainer = (Group, itemType) =>
       fieldSrc: PropTypes.string, // for RuleGroup
       fieldType: PropTypes.string, // for RuleGroup
       parentField: PropTypes.string, //from RuleGroup
+      valueError: PropTypes.any, // for RuleGroup
       isLocked: PropTypes.bool,
       isTrueLocked: PropTypes.bool,
       //connected:
@@ -129,8 +131,8 @@ const createGroupContainer = (Group, itemType) =>
     };
 
     // for RuleGroup
-    setField = (field, asyncListValues, __isInternal) => {
-      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
+    setField = (field, asyncListValues, _meta) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, _meta);
     };
 
     // for RuleGroupExt
@@ -138,16 +140,26 @@ const createGroupContainer = (Group, itemType) =>
       this.props.actions.setOperator(this.props.path, operator);
     };
 
-    setValue = (delta, value, type) => {
-      this.props.actions.setValue(this.props.path, delta, value, type);
+    setValue = (delta, value, type, asyncListValues, _meta) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
+    };
+
+    // can be used for both LHS and LHS
+    setFuncValue = (delta, parentFuncs, argKey, value, type, asyncListValues, _meta) => {
+      this.props.actions.setFuncValue(this.props.path, delta, parentFuncs, argKey, value, type, asyncListValues, _meta);
     };
 
     render() {
+      const {showErrorMessage} = this.props.config.settings;
       const isDraggingMe = this.props.dragging.id == this.props.id;
       const currentNesting = this.props.path.size;
       const maxNesting = this.props.config.settings.maxNesting;
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
       const fieldType = this.props.fieldType || null;
+
+      const {valueError} = this.props;
+      const oneError = [...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+      const hasError = oneError != null && showErrorMessage;
 
       // Don't allow nesting further than the maximum configured depth and don't
       // allow removal of the root group.
@@ -155,7 +167,7 @@ const createGroupContainer = (Group, itemType) =>
       const isRoot = currentNesting == 1;
       return (
         <div
-          className={"group-or-rule-container group-container"}
+          className={classNames("group-or-rule-container", "group-container", hasError ? "group-with-error" : null)}
           data-id={this.props.id}
         >
           {[
@@ -180,9 +192,11 @@ const createGroupContainer = (Group, itemType) =>
               addDefaultCaseGroup={this.dummyFn}
               addRule={this.dummyFn}
               setField={this.dummyFn}
+              setFuncValue={this.dummyFn}
               setOperator={this.dummyFn}
               setValue={this.dummyFn}
               value={this.props.value || null}
+              valueError={this.props.valueError || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}
@@ -219,9 +233,11 @@ const createGroupContainer = (Group, itemType) =>
               addDefaultCaseGroup={isInDraggingTempo ? this.dummyFn : this.addDefaultCaseGroup}
               addRule={isInDraggingTempo ? this.dummyFn : this.addRule}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
+              setFuncValue={isInDraggingTempo ? this.dummyFn : this.setFuncValue}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
               value={this.props.value || null}
+              valueError={this.props.valueError || null}
               config={this.props.config}
               children1={this.props.children1}
               actions={this.props.actions}

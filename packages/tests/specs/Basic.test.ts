@@ -21,14 +21,17 @@ describe("basic query", () => {
 
   describe("strict mode", () => {
     it("should not produce warnings", async () => {
-      await with_qb(configs.simple_with_number, empty_value, "default", (qb, _onChange, _tasks, consoleData) => {
+      await with_qb(configs.simple_with_number, empty_value, "default", (qb, { consoleData }) => {
         expect(qb.find(".query-builder")).to.have.length(1);
-        const consoleErrors = consoleData.error.join("\n");
-        const consoleWarns = consoleData.warn.join("\n");
+        const consoleErrors = consoleData.error?.join("\n");
+        const consoleWarns = consoleData.warn?.join("\n");
         expect(consoleErrors).to.not.contain("componentWillReceiveProps");
         expect(consoleWarns).to.not.contain("componentWillReceiveProps");
       }, {
-        strict: true
+        strict: true,
+        expectedLoadErrors: [
+          "Root  >>  Empty query"
+        ]
       });
     });
   });
@@ -37,6 +40,10 @@ describe("basic query", () => {
     it("should work with empty value", async () => {
       await with_qb(configs.simple_with_number, empty_value, "default", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
+      }, {
+        expectedLoadErrors: [
+          "Root  >>  Empty query"
+        ]
       });
     });
 
@@ -51,6 +58,11 @@ describe("basic query", () => {
     it("should work with empty group", async () => {
       await with_qb(configs.simple_with_number, inits.tree_with_empty_group, "default", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
+      }, {
+        expectedLoadErrors: [
+          "Root  >>  Empty query",
+          "Deleted group #1 (index path: 1)  >>  * Empty group"
+        ]
       });
     });
 
@@ -109,30 +121,41 @@ describe("basic query", () => {
     });
 
     describe("should handle undefined value in JsonLogic format", () => {
-      export_checks(configs.simple_with_number, inits.with_undefined_as_number, "JsonLogic", {}, [
-        "Can't parse logic undefined"
+      export_checks(configs.simple_with_number, inits.with_undefined_as_number, "JsonLogic", {
+        logic: undefined,
+      }, [
+        "Can't parse logic undefined",
+        // validation:
+        "Root  >>  Empty query"
       ]);
     });
 
     describe("should handle unexpected json logic value in JsonLogic format", () => {
-      export_checks(configs.simple_with_number, inits.with_jl_value, "JsonLogic", {}, [
-        "Unexpected logic in value: {\"+\":[1,2]}"
-      ], {
-        ignoreLog: (errText) => {
-          return errText.includes("Removing rule:") && errText.includes("\"field\":null") && errText.includes("Reason: Uncomplete LHS");
-        }
-      });
+      export_checks(configs.simple_with_number, inits.with_jl_value, "JsonLogic", {
+        logic: undefined,
+      }, [
+        "Unexpected logic in value: {\"+\":[1,2]}",
+        // tree is undefined, so no validation errors
+      ]);
     });
 
     describe("should handle unknown field", () => {
-      export_checks(configs.simple_with_number, inits.with_nested, "JsonLogic", {}, [
-        "No config for field user.info.firstName"
+      export_checks(configs.simple_with_number, inits.with_nested, "JsonLogic", {
+        logic: undefined,
+      }, [
+        "No config for field user.info.firstName",
+        // validation:
+        "Root  >>  Empty query"
       ]);
     });
 
     describe("should handle unknown type", () => {
-      export_checks(configs.with_wrong_type, inits.with_number, "JsonLogic", {}, [
-        "No widget for type not-a-text"
+      export_checks(configs.with_wrong_type, inits.with_number, "JsonLogic", {
+        logic: undefined,
+      }, [
+        "No widget for type not-a-text",
+        // validation:
+        "Root  >>  Empty query"
       ]);
     });
 

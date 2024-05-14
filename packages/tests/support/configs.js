@@ -173,7 +173,7 @@ export const with_date_and_time = (BasicConfig) => ({
 
 
 export const with_theme_material = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     theme: {
@@ -213,7 +213,7 @@ export const without_field_autocomplete = (BasicConfig) => ({
 });
 
 export const with_theme_mui = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     theme: {
@@ -609,8 +609,26 @@ export const with_all_types = (BasicConfig) => ({
         max: 10,
       },
     },
+    negativeNum: {
+      label: "Number negative",
+      type: "number",
+      preferWidgets: ["number"],
+      fieldSettings: {
+        min: -999,
+        max: -1,
+      },
+    },
+    numField: {
+      label: "Number field",
+      type: "number",
+      valueSources: ["field"],
+    },
     str: {
       label: "String",
+      type: "text",
+    },
+    str2: {
+      label: "String2",
       type: "text",
     },
     text: {
@@ -712,6 +730,44 @@ export const with_all_types = (BasicConfig) => ({
   },
 });
 
+export const with_validateValue = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    ...(BasicConfig.fields || {}),
+    evenNum: {
+      label: "Number even",
+      type: "number",
+      fieldSettings: {
+        min: 0,
+        max: 11, // tip: 11 is uneven, in purpose!
+        validateValue: (val) => {
+          return val % 2 === 0 ? null : {
+            error: { key: "custom:NOT_EVEN", args: {val} },
+            fixedValue: Math.max(0, Math.min(10, val - 1))
+          };
+        }
+      },
+    },
+  },
+});
+
+export const with_validateValue_without_fixedValue_with_defaultValue = (BasicConfig) => ({
+  ...BasicConfig,
+  fields: {
+    ...(BasicConfig.fields || {}),
+    numLess5: {
+      label: "NumberLess5",
+      type: "number",
+      fieldSettings: {
+        defaultValue: 3,
+        validateValue: (val) => {
+          return val < 5;
+        },
+      },
+    },
+  },
+});
+
 export const simple_with_number_without_regroup = (BasicConfig) => ({
   ...simple_with_number(BasicConfig),
   settings: {
@@ -728,16 +784,34 @@ export const simple_with_number_max_nesting_1 = (BasicConfig) => ({
   }
 });
 
-export const with_all_types__show_error = (BasicConfig) => ({
-  ...with_all_types(BasicConfig),
+export const with_show_error = (BasicConfig) => ({
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     showErrorMessage: true,
   }
 });
 
-export const dont_leave_empty_group = (BasicConfig) => ({
-  ...simple_with_numbers_and_str(BasicConfig),
+export const with_dont_show_error = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    showErrorMessage: false,
+  }
+});
+
+export const with_dont_fix_on_load = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    removeEmptyGroupsOnLoad: false,
+    removeEmptyRulesOnLoad: false,
+    removeIncompleteRulesOnLoad: false,
+  }
+});
+
+export const with_dont_leave_empty_group = (BasicConfig) => ({
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     canLeaveEmptyGroup: false,
@@ -745,9 +819,221 @@ export const dont_leave_empty_group = (BasicConfig) => ({
   }
 });
 
+export const with_funcs_validation = (BasicConfig) => ({
+  ...BasicConfig,
+  funcs: {
+    ...(BasicConfig?.funcs || {}),
+    vld: {
+      type: "!struct",
+      label: "Vld",
+      subfields: {
+        tfunc1: {
+          label: "TextFunc1",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 5,
+          },
+          jsonLogic: ({ str1, str2, num1 }) => {
+            return { vfunc1: [ str1, str2, num1 ] };
+          },
+          jsonLogicImport: ({ vfunc1 }) => {
+            return vfunc1;
+          },
+          spelFunc: "T(String).tfunc1(${str1}, ${str2}, ${num1})",
+          args: {
+            str1: {
+              label: "Str1",
+              type: "text",
+              valueSources: ["value", "field", "func"],
+              defaultValue: "_d1_",
+              fieldSettings: {
+                maxLength: 5,
+              },
+            },
+            str2: {
+              label: "Str2",
+              type: "text",
+              valueSources: ["value", "field", "func"],
+              defaultValue: "_d2_",
+              fieldSettings: {
+                maxLength: 5,
+              },
+            },
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 0,
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // no defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
+          }
+        },
+        tfunc2: {
+          label: "TextFunc2",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 5,
+          },
+          jsonLogic: ({ num1, num2, num3 }) => {
+            return { tfunc2: [ num1, num2, num3 ] };
+          },
+          jsonLogicImport: ({ tfunc2 }) => {
+            return tfunc2;
+          },
+          spelFunc: "T(String).tfunc2(${num1}, ${num2}, ${num3})",
+          args: {
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 0,
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
+            num3: {
+              label: "Num3",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 0,
+              fieldSettings: {
+                min: 0,
+                max: 10,
+              },
+            },
+          }
+        },
+        tfunc2a: {
+          // same as tfunc2, but with different validations
+          label: "TextFunc2a",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 10, // vs 5
+          },
+          jsonLogic: ({ num1, num2, num3 }) => {
+            return { tfunc2a: [ num1, num2, num3 ] };
+          },
+          jsonLogicImport: ({ tfunc2a }) => {
+            return tfunc2a;
+          },
+          spelFunc: "T(String).tfunc2a(${num1}, ${num2}, ${num3})",
+          args: {
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 5, // vs 10
+              },
+            },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                min: 0,
+                max: 5, // vs 10
+              },
+            },
+            num3: {
+              label: "Num3",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 3,
+              fieldSettings: {
+                min: 0,
+                max: 5, // vs 10
+              },
+            },
+          }
+        },
+        tfunc2b: {
+          // same as tfunc2, but with custom validations
+          label: "TextFunc2b",
+          returnType: "text",
+          allowSelfNesting: true,
+          fieldSettings: {
+            maxLength: 10, // vs 5
+          },
+          jsonLogic: ({ num1, num2, num3 }) => {
+            return { tfunc2b: [ num1, num2, num3 ] };
+          },
+          jsonLogicImport: ({ tfunc2b }) => {
+            return tfunc2b;
+          },
+          spelFunc: "T(String).tfunc2b(${num1}, ${num2}, ${num3})",
+          args: {
+            num1: {
+              label: "Num1",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                // vs 0..10
+                validateValue: (v) => (v >= 0 && v <= 5),
+              },
+            },
+            num2: {
+              label: "Num2",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              // NO defaultValue
+              fieldSettings: {
+                // vs 0..10
+                validateValue: (v) => (v >= 0 && v <= 5),
+              },
+            },
+            num3: {
+              label: "Num3",
+              type: "number",
+              valueSources: ["value", "field", "func"],
+              defaultValue: 4,
+              fieldSettings: {
+                // vs 0..10
+                validateValue: (v) => (v >= 0 && v <= 5),
+              },
+            },
+          }
+        },
+      }
+    }
+  },
+});
+
 export const with_funcs = (BasicConfig) => ({
   ...BasicConfig,
   funcs: {
+    ...(BasicConfig?.funcs || {}),
     ...BasicFuncs,
     custom: {
       type: "!struct",
@@ -804,37 +1090,12 @@ export const with_funcs = (BasicConfig) => ({
       },
     },
   },
-  fields: {
-    num: {
-      label: "Number",
-      type: "number",
-    },
-    date: {
-      label: "Date",
-      type: "date",
-    },
-    datetime: {
-      label: "Datetime",
-      type: "datetime",
-    },
-    time: {
-      label: "Time",
-      type: "time",
-    },
-    str: {
-      label: "String",
-      type: "text",
-    },
-    str2: {
-      label: "String2",
-      type: "text",
-    },
-  }
 });
 
 export const with_struct = (BasicConfig) => ({
   ...BasicConfig,
   fields: {
+    ...(BasicConfig.fields ?? {}),
     user: {
       label: "User",
       tooltip: "Group of fields",
@@ -910,7 +1171,7 @@ export const with_wrong_type = (BasicConfig) => ({
 });
 
 export const with_settings_confirm = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     removeRuleConfirmOptions: {
@@ -933,7 +1194,7 @@ export const with_settings_confirm = (BasicConfig) => ({
 });
 
 export const with_settings_not_show_not = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   conjunctions: {
     AND: BasicConfig.conjunctions.AND,
   },
@@ -944,7 +1205,7 @@ export const with_settings_not_show_not = (BasicConfig) => ({
 });
 
 export const with_settings_max_number_of_rules_3 = (BasicConfig) => ({
-  ...simple_with_number(BasicConfig),
+  ...BasicConfig,
   settings: {
     ...BasicConfig.settings,
     maxNumberOfRules: 3
@@ -971,6 +1232,18 @@ export const with_default_field_in_cars = (BasicConfig) => merge({}, BasicConfig
   fields: {
     cars: {
       defaultField: "year"
+    }
+  }
+});
+
+export const with_validationin_cars = (BasicConfig) => merge({}, BasicConfig, {
+  fields: {
+    cars: {
+      fieldSettings: {
+        validateValue: (val, _fieldSettings, _op) => {
+          return (val < 10 ? null : {error: "Too many cars", fixedValue: 9});
+        },
+      },
     }
   }
 });
@@ -1258,20 +1531,6 @@ export const with_groupVarKey = (BasicConfig) => ({
 
 export const with_cases = (BasicConfig) => ({
   ...BasicConfig,
-  fields: {
-    num: {
-      label: "Number",
-      type: "number",
-    },
-    datetime: {
-      label: "Datetime",
-      type: "datetime",
-    },
-    str: {
-      label: "String",
-      type: "text",
-    },
-  },
   settings: {
     ...BasicConfig.settings,
     maxNumberOfCases: 3,
@@ -1305,6 +1564,22 @@ export const with_keepInputOnChangeFieldSrc = (BasicConfig) => ({
   settings: {
     ...BasicConfig.settings,
     keepInputOnChangeFieldSrc: true,
+  }
+});
+
+export const with_optimizeRenderWithInternals = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    optimizeRenderWithInternals: true,
+  }
+});
+
+export const without_optimizeRenderWithInternals = (BasicConfig) => ({
+  ...BasicConfig,
+  settings: {
+    ...BasicConfig.settings,
+    optimizeRenderWithInternals: false,
   }
 });
 

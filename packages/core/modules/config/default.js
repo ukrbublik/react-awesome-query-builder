@@ -25,8 +25,11 @@ export const settings = {
   shouldCreateEmptyGroup: false,
   canShortMongoQuery: true,
   removeEmptyGroupsOnLoad: true,
-  removeIncompleteRulesOnLoad: true,
+  removeEmptyRulesOnLoad: true,
+  removeIncompleteRulesOnLoad: false,
   removeInvalidMultiSelectValuesOnLoad: true,
+  optimizeRenderWithInternals: false,
+  showErrorMessage: false,
   setOpOnChangeField: ["keep", "default"], // 'default' (default if present), 'keep' (keep prev from last field), 'first', 'none'
   groupOperators: ["some", "all", "none"],
 

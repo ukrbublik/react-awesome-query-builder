@@ -10,14 +10,15 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring-immutablevalue-config-isfordisplay\--false---string
+:queryString:  https://github.com/ukrbublik/react-awesome-query-builder/#querystring
+:i18n:         https://github.com/ukrbublik/react-awesome-query-builder/#i18n
 :config1:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox_simple/src/demo/config.jsx
 :config2:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/sandbox/src/demo/config.tsx
 :config3:      https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/examples/demo/config.tsx
 :funcs:        https://github.com/ukrbublik/react-awesome-query-builder/tree/master/packages/core/modules/config/funcs.js
 :renderSwitch: https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/antd/modules/config/index.jsx#L54
 :config_ser:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/sandbox_next/lib/config_ser.js
-:d_ts:   https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/core/modules/index.d.ts
+:d_ts:         https://github.com/ukrbublik/react-awesome-query-builder/blob/master/packages/core/modules/index.d.ts
 
 = Config format
 
@@ -219,8 +220,10 @@ Example:
 |fieldSettings.treeValues |+ for tree (multi)select | |List of values for tree (multi)select widget. +
   Example: `[{value: 'warm', title: 'Warm colors'}, {value: 'red', title: 'Red', parent: 'warm'}, {value: 'orange', title: 'Orange', parent: 'warm'}]` 
    (or alternatively `[{value: 'warm', title: 'Warm colors', children: [ {value: 'red', title: 'Red'}, {value: 'orange', title: 'Orange'} ]}]`)
-|fieldSettings.validateValue | | |Function to validate entered value. Return true/false or error string / null. +
-  `(mixed val, Object fieldSettings) => boolean \| string \| null`
+|fieldSettings.validateValue | | |Function to validate input value. +
+  Simple way: return true/false. Advanced: if value is valid, return `null`, otherwise return error string or object `{error, fixedValue?}`. +
+  `error` can be a string or an object `{key, args}` to use {i18n}[i18n]. +
+  `(val: any, fieldSettings: Object) => boolean \| string \| {error: string | Object, fixedValue?: any} \| null`
 |fieldSettings.allowCustomValues |- for `multiselect` widget |false |If true, user can provide own options in multiselect, otherwise they will be limited to `listValues`
 |fieldSettings.showSearch |- for (multi)select, tree (multi)select|false |Show search (autocomplete)?
 |fieldSettings.treeExpandAll |- for `treeselect/treemultiselect` widgets|false |Whether to expand all nodes by default
@@ -310,7 +313,7 @@ Behaviour settings:
   If you want to enable comparing with result of function, add `func` like in example above.
 |fieldSources |`["field"]` |To enable functions in LHS, set to `["field", "func"]`
 |keepInputOnChangeFieldSrc |true |Keep value entered in RHS after changing source of LHS? 
-|showErrorMessage |false |Show error message in QueryBuilder if validateValue() in field config returns false
+|showErrorMessage |false |Show error message in QueryBuilder if `validateValue()` in field config returns false for the value or if input value does not satisfy `max`, `min` constraints in `fieldSettings`
 |canReorder |true |Activate reordering support for rules and groups of rules?
 |canRegroup |true |Allow move rules (or groups) in/out groups during reorder? +
   False - allow "safe" reorder, means only reorder at same level
@@ -336,9 +339,10 @@ Behaviour settings:
 |showLock |false |Show "Lock" switch for rules and groups to make them read-only ("admin mode") +
   NOTE: To preserve read-only state of rules in JsonLogic, please use `jsonLogic.add_operation("locked", v => v);` in your code
 |canDeleteLocked |false |Show "Delete" button for locked rule?
-|removeIncompleteRulesOnLoad |true |Remove incomplete rules (w/o value) during validation in `Utils.checkTree()`?
-|removeEmptyGroupsOnLoad |true |Remove empty groups during validation in `Utils.checkTree()`?
-|removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during validation in `Utils.checkTree()`? +
+|removeIncompleteRulesOnLoad |false |Remove incomplete rules (without field, operator, value, or if not all required args are present for functin) during initial validation of `value` prop passed to `<Query>`
+|removeEmptyRulesOnLoad |true |Remove empty rules during initial validation of `value` prop passed to `<Query>`
+|removeEmptyGroupsOnLoad |true |Remove empty groups during initial validation of `value` prop passed to `<Query>`
+|removeInvalidMultiSelectValuesOnLoad |true |Remove values that are not in `listValues` during initial validation of `value` prop passed to `<Query>`? +
   By default `true`, but `false` for AntDesign as can be removed manually
 |useConfigCompress |false |Set to `true` if you use `Utils.decompressConfig()`
 |fieldItemKeysForSearch |`["label", "path", "altLabel", "grouplabel"]` |Keys in field item (see {d_ts}[type] `FieldItem`) available for search. Available keys: "key", "path", "label", "altLabel" (label2), "tooltip", "grouplabel" (label of parent group, for subfields of complex fields)

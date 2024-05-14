@@ -23,7 +23,7 @@ describe("interactions on antd", () => {
   // -------
 
   it("set not", async () => {
-    await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_number, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".group--conjunctions .ant-btn-group button")
         .at(0)
@@ -35,7 +35,7 @@ describe("interactions on antd", () => {
   });
 
   it("change conjunction from AND to OR", async () => {
-    await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.simple_with_numbers_and_str, inits.with_2_numbers, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".group--conjunctions .ant-btn-group button")
         .at(2)

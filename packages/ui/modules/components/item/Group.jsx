@@ -211,6 +211,9 @@ export class BasicGroup extends Component {
   }
 
   renderItem(item) {
+    if (!item) {
+      return undefined;
+    }
     const props = this.props;
     const {config, actions, onDragStart, isLocked} = props;
     const isRuleGroup = item.get("type") == "group" && item.getIn(["properties", "field"]) != null;

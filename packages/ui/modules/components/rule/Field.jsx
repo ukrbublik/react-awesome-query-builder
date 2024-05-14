@@ -43,7 +43,7 @@ export default class Field extends Component {
   }
 
   getMeta({selectedField, selectedFieldType, config, parentField}) {
-    const selectedKey = selectedField;
+    let selectedKey = selectedField;
     const {maxLabelsLength, fieldSeparatorDisplay, fieldPlaceholder, fieldSeparator} = config.settings;
     const isFieldSelected = !!selectedField;
     const placeholder = !isFieldSelected ? truncateString(fieldPlaceholder, maxLabelsLength) : null;
@@ -67,6 +67,11 @@ export default class Field extends Component {
 
     // Field source has been chnaged, no new field selected, but op & value remains
     const errorText = lookingForFieldType ? "Please select field" : null;
+
+    if (selectedKey && typeof selectedKey === "object") {
+      // can happen due to incorrect rule state: field is Map{func, args} but fieldSrc is not "func"
+      selectedKey = undefined;
+    }
 
     return {
       placeholder, items, parentField,
@@ -151,8 +156,21 @@ export default class Field extends Component {
     }).filter(o => !!o);
   }
 
+  setField = (field, asyncListValues, _meta = {}) => {
+    const {id} = this.props;
+    if (!_meta.widgetId) {
+      const widgetId = [
+        id,
+        "L",
+        -1,
+      ].join(":");
+      _meta.widgetId = widgetId;
+    }
+    this.props.setField(field, asyncListValues, _meta);
+  };
+
   render() {
-    const {config, customProps, setField, setFieldSrc, readonly, id, groupId} = this.props;
+    const {config, customProps, setFieldSrc, readonly, id, groupId} = this.props;
     const {renderField} = config.settings;
     const renderProps = {
       id,
@@ -160,7 +178,7 @@ export default class Field extends Component {
       config, 
       customProps, 
       readonly,
-      setField,
+      setField: this.setField,
       setFieldSrc,
       ...this.meta
     };

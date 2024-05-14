@@ -17,7 +17,8 @@
     "lint": "npm run eslint && npm run tsc",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix  ./specs/ ./support/",
     "test": "karma start ./karma.conf.js",
-    "test-debug": "TEST_DEBUG=1 karma start ./karma.conf.js --debug",
+    "test-dev": "TEST_WATCH=1 karma start ./karma.conf.js",
+    "test-debug": "TEST_WATCH=1 TEST_DEBUG=1 karma start ./karma.conf.js --debug",
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
@@ -62,6 +63,7 @@
     "@babel/runtime": "^7.22.5",
     "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
     "@types/chai": "^4.2.18",
+    "@types/chai-subset-in-order": "^3.1.2",
     "@types/deep-equal-in-any-order": "^1.0.1",
     "@types/enzyme": "^3.10.8",
     "@types/estree": "^1.0.0",
@@ -75,6 +77,7 @@
     "babel-loader": "^8.2.2",
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.3.2",
+    "chai-subset-in-order": "^3.1.0",
     "css-loader": "^6.2.0",
     "deep-equal-in-any-order": "^2.0.6",
     "enzyme": "^3.11.0",
@@ -83,7 +86,6 @@
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.1",
-    "karma-es6-shim": "^1.0.0",
     "karma-junit-reporter": "^2.0.1",
     "karma-mocha": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",

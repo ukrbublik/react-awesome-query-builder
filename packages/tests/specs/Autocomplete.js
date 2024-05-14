@@ -28,7 +28,7 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
 
   const testsSingleStrict = () => {
     it("should load more, search, close", async () => {
-      await with_qb(configs.with_autocomplete, inits.with_autocomplete_strict_a, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+      await with_qb(configs.with_autocomplete, inits.with_autocomplete_strict_a, "JsonLogic", async (qb, {expect_jlogic}) => {
         createCtx({qb, multiple: false, strict: true});
         expectInput("a");
         if (uif === "mui")
@@ -75,7 +75,7 @@ export const autocompleteTestsFor = (uif, uifv, it, with_qb) => {
 
   const testsMultipleStrict = () => {
     it("should select, unselect, del tag", async () => {
-      await with_qb(configs.with_autocomplete, inits.with_autocomplete_multi_strict_a, "JsonLogic", async (qb, onChange, {expect_jlogic}) => {
+      await with_qb(configs.with_autocomplete, inits.with_autocomplete_multi_strict_a, "JsonLogic", async (qb, {expect_jlogic}) => {
         createCtx({qb, multiple: true, strict: true});
         expectInput("");
         if (uif === "mui")

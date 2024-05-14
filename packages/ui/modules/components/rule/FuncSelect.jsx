@@ -8,6 +8,7 @@ import keys from "lodash/keys";
 const { clone } = Utils;
 const {getFieldConfig, getFuncConfig, getFieldParts, getFieldPathParts} = Utils.ConfigUtils;
 const {getFuncPathLabels, getWidgetForFieldOp} = Utils.RuleUtils;
+const {shallowEqual} = Utils.OtherUtils;
 
 //tip: this.props.value - right value, this.props.field - left value
 
@@ -39,10 +40,14 @@ export default class FuncSelect extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
-    const keysForItems = ["config", "field", "fieldType", "fieldSrc", "operator", "isFuncArg", "isLHS"];
+    const keysForItems = ["config", "field", "fieldType", "fieldSrc", "operator", "isFuncArg", "isLHS", "parentFuncs"];
     const keysForMeta = ["config", "field", "fieldType", "fieldSrc", "value", "isLHS"];
-    const needUpdateItems = !this.items || keysForItems.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
-    const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
+    const needUpdateItems = !this.items || keysForItems.map(k =>
+      (k === "parentFuncs" ? !shallowEqual(nextProps[k], prevProps[k], true) : nextProps[k] !== prevProps[k])
+    ).filter(ch => ch).length > 0;
+    const needUpdateMeta = !this.meta || keysForMeta.map(k =>
+      nextProps[k] !== prevProps[k]
+    ).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
@@ -54,19 +59,21 @@ export default class FuncSelect extends Component {
 
   getItems({config, field, fieldType, isLHS, operator, parentFuncs, fieldDefinition, isFuncArg}, {lookingForFieldType}) {
     const {canUseFuncForField} = config.settings;
-    const filteredFuncs = this.filterFuncs(config, config.funcs, field, fieldType, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition);
+    const filteredFuncs = this.filterFuncs(
+      config, config.funcs, field, fieldType, isLHS, operator, canUseFuncForField, parentFuncs, isFuncArg, fieldDefinition
+    );
     const items = this.buildOptions(config, filteredFuncs, lookingForFieldType);
     return items;
   }
 
-  getMeta({config, field, fieldType, value, isLHS, isFuncArg}) {
+  getMeta({config, _field, fieldType, value, isLHS, isFuncArg}) {
     const {funcPlaceholder, fieldSeparatorDisplay} = config.settings;
     const selectedFuncKey = value;
     const isFuncSelected = !!value;
 
-    const leftFieldConfig = getFieldConfig(config, field);
-    const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
-    const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
+    // const leftFieldConfig = getFieldConfig(config, field);
+    // const leftFieldWidgetField = leftFieldConfig?.widgets?.field;
+    // const leftFieldWidgetFieldProps = leftFieldWidgetField && leftFieldWidgetField.widgetProps || {};
     const placeholder = !isFuncSelected ? funcPlaceholder : null;
 
     const currFunc = isFuncSelected ? getFuncConfig(config, selectedFuncKey) : null;
@@ -204,7 +211,6 @@ export default class FuncSelect extends Component {
 
   getFuncLabel(funcOpts, funcKey, config) {
     if (!funcKey) return null;
-    let fieldSeparator = config.settings.fieldSeparator;
     let maxLabelsLength = config.settings.maxLabelsLength;
     let funcParts = getFieldParts(funcKey, config);
     let label = funcOpts?.label || last(funcParts);

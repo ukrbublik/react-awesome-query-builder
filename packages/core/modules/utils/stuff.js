@@ -18,8 +18,8 @@ export const opDefKeysToOmit = [
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 // };
 
-export const defaultValue = (value, _default) => {
-  return (typeof value === "undefined") ? _default : value;
+export const getOpCardinality = (opDef) => {
+  return opDef?.cardinality ?? 1;
 };
 
 // const immutableEqual = function(v1, v2) {
@@ -133,6 +133,12 @@ export function applyToJS(v) {
 
 export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&"); // $& means the whole matched string
+};
+
+export const mergeCustomizerNoArrays = (objValue, srcValue, _key, _object, _source, _stack) => {
+  if (Array.isArray(objValue)) {
+    return srcValue;
+  }
 };
 
 export const cleanJSX = (jsx) => {
@@ -306,4 +312,3 @@ export const getFirstDefined = (arr = []) => {
 };
 
 export const logger = getLogger();
-

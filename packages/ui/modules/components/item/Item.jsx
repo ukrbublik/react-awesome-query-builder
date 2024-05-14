@@ -139,7 +139,7 @@ class Item extends PureComponent {
     groupId: PropTypes.string,
     type: PropTypes.oneOf(types).isRequired,
     path: PropTypes.any.isRequired, //instanceOf(Immutable.List)
-    properties: PropTypes.any.isRequired, //instanceOf(Immutable.Map)
+    properties: PropTypes.any, //instanceOf(Immutable.Map)
     children1: PropTypes.any, //instanceOf(Immutable.OrderedMap)
     actions: PropTypes.object.isRequired,
     reordableNodesCnt: PropTypes.number,

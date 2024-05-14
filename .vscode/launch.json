@@ -2,10 +2,45 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Karma tests with debugger",
-      "type": "node-terminal",
+      "name": "Run examples",
+      "type": "node",
       "request": "launch",
-      "command": "npm run test-debug",
+      "cwd": "${workspaceRoot}/packages/examples",
+      "program": "${workspaceRoot}/packages/examples/node_modules/webpack/bin/webpack.js",
+      "args": [
+        "serve",
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true,
+    },
+    {
+      "name": "Open Chrome with examples",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001/",
+      "webRoot": "${workspaceFolder}/packages/examples",
+    },
+    {
+      "name": "Run Karma tests in debug mode",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}/packages/tests",
+      "program": "${workspaceRoot}/packages/tests/node_modules/karma/bin/karma",
+      "args": [
+        "start",
+        "./karma.conf.js",
+        // "--filter",
+        // "${input:filterTests}",
+      ],
+      "env": {
+        "TEST_WATCH": "1",
+        "TEST_DEBUG": "1",
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     },
     {
       "name": "Attach to Karma",
@@ -17,6 +52,32 @@
       "timeout": 600000,
       "sourceMaps": true,
       "webRoot": "${workspaceFolder}/packages/tests",
+    },
+    {
+      "name": "Run Karma tests in watch mode",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}/packages/tests",
+      "program": "${workspaceRoot}/packages/tests/node_modules/karma/bin/karma",
+      "args": [
+        "start",
+        "./karma.conf.js",
+        // "--filter",
+        // "${input:filterTests}",
+      ],
+      "env": {
+        "TEST_WATCH": "1",
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+  ],
+  "inputs": [
+    {
+      "id": "filterTests",
+      "type": "promptString",
+      "description": "Enter test filenames to filter (without extension), space separated. Or leave empty to test all specs.",
+      "default": ""
     }
   ]
 }

@@ -12,6 +12,7 @@ class Query extends Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func,
+    onInit: PropTypes.func,
     renderBuilder: PropTypes.func,
     tree: PropTypes.any, //instanceOf(Immutable.Map)
     //dispatch: PropTypes.func.isRequired,
@@ -34,7 +35,8 @@ class Query extends Component {
     this.validatedTree = props.getMemoizedTree(props.config, props.tree, undefined, props.sanitizeTree);
     this.oldValidatedTree = this.validatedTree;
 
-    //props.onChange && props.onChange(this.validatedTree, props.config);
+    const basicConfig = props.getBasicConfig(props.config);
+    props.onInit && props.onInit(this.validatedTree, basicConfig, undefined, this.actions);
   }
 
   _updateActions (props) {
@@ -70,7 +72,7 @@ class Query extends Component {
     const validatedTreeChanged = !immutableEqual(this.validatedTree, this.oldValidatedTree);
     if (validatedTreeChanged) {
       const newBasicConfig = nextProps.getBasicConfig(newConfig);
-      onChange && onChange(this.validatedTree, newBasicConfig, nextProps.__lastAction);
+      onChange && onChange(this.validatedTree, newBasicConfig, nextProps.__lastAction, this.actions);
     }
   }
 

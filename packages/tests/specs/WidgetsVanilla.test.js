@@ -5,7 +5,7 @@ import { with_qb, with_qb_skins } from "../support/utils";
 
 describe("vanilla widgets interactions", () => {
   it("change number value", async () => {
-    await with_qb_skins(configs.with_all_types, inits.with_number, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_skins(configs.with_all_types, inits.with_number, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "3" } });
@@ -16,7 +16,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change text value", async () => {
-    await with_qb_skins(configs.with_all_types, inits.with_text, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_skins(configs.with_all_types, inits.with_text, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "def" } });
@@ -27,7 +27,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change date value", async () => {
-    await with_qb(configs.with_all_types, inits.with_date, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_date, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "2020-05-05" } });
@@ -38,7 +38,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change datetime value", async () => {
-    await with_qb(configs.with_all_types, inits.with_datetime, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_datetime, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input")
         .simulate("change", { target: { value: "2020-05-05T02:30" } });
@@ -49,7 +49,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change select value", async () => {
-    await with_qb(configs.with_all_types, inits.with_select, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_select, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget select")
         .simulate("change", { target: { value: "green" } });
@@ -60,7 +60,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change multiselect value", async () => {
-    await with_qb(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget select")
         .simulate("change", { target: { options: [ {value: "yellow", selected: true}, {value: "green"}, {value: "orange"} ] } });
@@ -78,7 +78,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change bool value", async () => {
-    await with_qb(configs.with_all_types, inits.with_bool, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_bool, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input[value=false]")
         .simulate("change", { target: { value: "false" } });
@@ -89,7 +89,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change slider value", async () => {
-    await with_qb(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input[type='range']")
         .simulate("change", { target: { value: 42 } });
@@ -100,7 +100,7 @@ describe("vanilla widgets interactions", () => {
   });
 
   it("change time value", async () => {
-    await with_qb(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb(configs.with_all_types, inits.with_time, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find(".rule .rule--value .widget--widget input[type='time']")
         .simulate("change", { target: { value: "10:30" } });

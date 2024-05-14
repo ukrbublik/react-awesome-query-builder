@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "clone": "^2.1.2",
+    "i18next": "^23.10.0",
     "immutable": "^4.3.4",
     "json-logic-js": "^2.0.2",
     "lodash": "^4.17.21",

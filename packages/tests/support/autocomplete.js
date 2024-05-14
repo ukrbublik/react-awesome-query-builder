@@ -1,7 +1,7 @@
 
 import { Utils } from "@react-awesome-query-builder/core";
 const { simulateAsyncFetch } = Utils.Autocomplete;
-import { expect } from "chai";
+//import { expect } from "chai";
 import MuiAutocomplete from "@mui/material/Autocomplete";
 import MaterialAutocomplete from "@material-ui/lab/Autocomplete";
 import { sleep } from "./utils";

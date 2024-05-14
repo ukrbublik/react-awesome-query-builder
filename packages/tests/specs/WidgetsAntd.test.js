@@ -47,7 +47,7 @@ describe("antdesign widgets render", () => {
 
 describe("antdesign widgets interactions", () => {
   it("change date value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_date, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_date, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find("DateWidget")
         .instance()
@@ -59,7 +59,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change select value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_select, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_select, "JsonLogic", (qb, {expect_jlogic}) => {
       const w = qb.find("SelectWidget").instance();
 
       w.handleChange("green");
@@ -74,7 +74,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change multiselect value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_multiselect, "JsonLogic", (qb, {expect_jlogic}) => {
       const w = qb.find("MultiSelectWidget").instance();
       
       w.handleChange(["orange"]);
@@ -99,7 +99,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change treeselect value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_treeselect, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_treeselect, "JsonLogic", (qb, {expect_jlogic, expect_checks}) => {
       expect_checks({
         "query": "selecttree == \"2\"",
         "queryHuman": "Color (tree) = Red",
@@ -125,7 +125,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change multitreeselect value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_multiselecttree, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_multiselecttree, "JsonLogic", (qb, {expect_jlogic, expect_checks}) => {
       expect_checks({
         "query": "multiselecttree == [\"2\", \"5\"]",
         "queryHuman": "Colors (tree) = [Red, Green]",
@@ -165,7 +165,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change time value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_time, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_time, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find("TimeWidget")
         .instance()
@@ -177,7 +177,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change datetime value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_datetime, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_datetime, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find("DateTimeWidget")
         .instance()
@@ -189,7 +189,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change slider value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, {expect_jlogic}) => {
       const w = qb.find("SliderWidget").instance();
 
       w.handleChange(12);
@@ -203,7 +203,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change bool value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_bool, "JsonLogic", (qb, onChange, {expect_jlogic}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_bool, "JsonLogic", (qb, {expect_jlogic}) => {
       qb
         .find("BooleanWidget")
         .instance()
@@ -215,7 +215,7 @@ describe("antdesign widgets interactions", () => {
   });
 
   it("change range slider value", async () => {
-    await with_qb_ant(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+    await with_qb_ant(configs.with_all_types, inits.with_range_slider, "JsonLogic", (qb, {expect_jlogic, expect_checks}) => {
       expect_checks({
         "query": "slider >= 18 && slider <= 42",
         "queryHuman": "Slider BETWEEN 18 AND 42",
@@ -262,7 +262,7 @@ describe("antdesign widgets interactions", () => {
   describe("antdesign widgets", () => {
 
     it("load date range", async () => {
-      await with_qb_ant(configs.with_all_types, inits.with_range_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      await with_qb_ant(configs.with_all_types, inits.with_date_range, "JsonLogic", async (qb, {expect_jlogic, expect_checks}) => {
         expect_checks({
           "query": "date >= \"2020-05-10\" && date <= \"2020-05-15\"",
           "queryHuman": "Date BETWEEN 10.05.2020 AND 15.05.2020",
@@ -278,12 +278,11 @@ describe("antdesign widgets interactions", () => {
     });
   
     it("load bad date range", async () => {
-      await with_qb_ant(configs.with_all_types, inits.with_range_bad_dates, "JsonLogic", (qb, onChange, {expect_jlogic, expect_checks}) => {
+      await with_qb_ant(configs.with_all_types, inits.with_range_bad_dates, "JsonLogic", (qb, {expect_jlogic, expect_checks}) => {
         expect_checks({});
       }, {
         ignoreLog: (errText) => {
-          return errText.includes("Can't convert value 2020-05-10TTTT as Date")
-            || errText.includes("Removing rule:") && errText.includes("\"field\":\"date\"");
+          return errText.includes("Can't convert value 2020-05-10TTTT as Date");
         }
       });
     });

@@ -1,7 +1,8 @@
 import Immutable from "immutable";
 import uuid from "./uuid";
-import {getFieldConfig, getOperatorConfig, getFieldParts} from "./configUtils";
-import {getNewValueForFieldOp, getFirstField, getFirstOperator} from "../utils/ruleUtils";
+import {getFieldConfig, getOperatorConfig, getFieldParts, getFirstField} from "./configUtils";
+import {getFirstOperator} from "../utils/ruleUtils";
+import {getNewValueForFieldOp} from "../utils/validation";
 import { isImmutable } from "./stuff";
 import { jsToImmutable } from "../import";
 
@@ -93,8 +94,9 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
   }
   
   if (field && operator) {
-    let {newValue, newValueSrc, newValueType, newValueError} = getNewValueForFieldOp(
-      config, config, current, field, operator, "operator", false
+    const canFix = false;
+    let {newValue, newValueSrc, newValueType, newValueError, newFieldError} = getNewValueForFieldOp(
+      config, config, current, field, operator, "operator", canFix
     );
     current = current
       .set("value", newValue)
@@ -102,7 +104,8 @@ export const defaultRuleProperties = (config, parentRuleGroupPath = null, item =
       .set("valueType", newValueType);
     if (showErrorMessage) {
       current = current
-        .set("valueError", newValueError);
+        .set("valueError", newValueError)
+        .set("fieldError", newFieldError);
     }
   }
   return current; 
@@ -152,4 +155,4 @@ export const createListFromArray = (ids) => {
   return new Immutable.List(ids);
 };
 
-export const emptyProperies = () => new Immutable.Map();
+export const emptyProperties = () => new Immutable.Map();

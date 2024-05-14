@@ -25,6 +25,7 @@ const createRuleContainer = (Rule) =>
       valueSrc: PropTypes.any,
       asyncListValues: PropTypes.array,
       valueError: PropTypes.any,
+      fieldError: PropTypes.string,
       operatorOptions: PropTypes.object,
       reordableNodesCnt: PropTypes.number,
       parentField: PropTypes.string, //from RuleGroup
@@ -52,8 +53,8 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setLock(this.props.path, lock);
     };
 
-    setField = (field, asyncListValues, __isInternal) => {
-      this.props.actions.setField(this.props.path, field, asyncListValues, __isInternal);
+    setField = (field, asyncListValues, _meta) => {
+      this.props.actions.setField(this.props.path, field, asyncListValues, _meta);
     };
 
     setFieldSrc = (srcKey) => {
@@ -68,12 +69,17 @@ const createRuleContainer = (Rule) =>
       this.props.actions.setOperatorOption(this.props.path, name, value);
     };
 
-    setValue = (delta, value, type, asyncListValues, __isInternal) => {
-      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, __isInternal);
+    setValue = (delta, value, type, asyncListValues, _meta) => {
+      this.props.actions.setValue(this.props.path, delta, value, type, asyncListValues, _meta);
     };
 
-    setValueSrc = (delta, srcKey) => {
-      this.props.actions.setValueSrc(this.props.path, delta, srcKey);
+    setValueSrc = (delta, srcKey, _meta) => {
+      this.props.actions.setValueSrc(this.props.path, delta, srcKey, _meta);
+    };
+
+    // can be used for both LHS and LHS
+    setFuncValue = (delta, parentFuncs, argKey, value, type, asyncListValues, _meta) => {
+      this.props.actions.setFuncValue(this.props.path, delta, parentFuncs, argKey, value, type, asyncListValues, _meta);
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -110,9 +116,9 @@ const createRuleContainer = (Rule) =>
       const _isGroup = fieldConfig && fieldConfig.type == "!struct";
       const isInDraggingTempo = !isDraggingMe && this.props.isDraggingTempo;
 
-      const valueError = this.props.valueError;
-      const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
-      const hasError = oneValueError != null && showErrorMessage;
+      const {valueError, fieldError} = this.props;
+      const oneError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+      const hasError = oneError != null && showErrorMessage;
 
       return (
         <div
@@ -129,6 +135,7 @@ const createRuleContainer = (Rule) =>
               dragging={this.props.dragging}
               setField={this.dummyFn}
               setFieldSrc={this.dummyFn}
+              setFuncValue={this.dummyFn}
               setOperator={this.dummyFn}
               setOperatorOption={this.dummyFn}
               setLock={this.dummyFn}
@@ -144,6 +151,7 @@ const createRuleContainer = (Rule) =>
               valueSrc={this.props.valueSrc || null}
               valueType={this.props.valueType || null}
               valueError={this.props.valueError || null}
+              fieldError={this.props.fieldError || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}
@@ -165,6 +173,7 @@ const createRuleContainer = (Rule) =>
               removeSelf={isInDraggingTempo ? this.dummyFn : this.removeSelf}
               setField={isInDraggingTempo ? this.dummyFn : this.setField}
               setFieldSrc={isInDraggingTempo ? this.dummyFn : this.setFieldSrc}
+              setFuncValue={isInDraggingTempo ? this.dummyFn : this.setFuncValue}
               setOperator={isInDraggingTempo ? this.dummyFn : this.setOperator}
               setOperatorOption={isInDraggingTempo ? this.dummyFn : this.setOperatorOption}
               setValue={isInDraggingTempo ? this.dummyFn : this.setValue}
@@ -178,6 +187,7 @@ const createRuleContainer = (Rule) =>
               valueSrc={this.props.valueSrc || null}
               valueType={this.props.valueType || null}
               valueError={this.props.valueError || null}
+              fieldError={this.props.fieldError || null}
               operatorOptions={this.props.operatorOptions}
               config={this.props.config}
               reordableNodesCnt={this.props.reordableNodesCnt}

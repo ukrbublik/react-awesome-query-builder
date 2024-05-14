@@ -1,4 +1,4 @@
-import {defaultValue, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
@@ -64,10 +64,12 @@ const formatGroup = (parents, item, config, meta, _not = false, _canWrapExpr = t
   const realParentPath = hasParentRuleGroup && parentPath;
 
   const groupField = type === "rule_group" ? properties.get("field") : null;
+  const groupOperator = type === "rule_group" ? properties.get("operator") : null;
+  const groupOperatorCardinality = groupOperator ? config.operators[groupOperator]?.cardinality ?? 1 : undefined;
   const groupFieldName = formatFieldName(groupField, config, meta, realParentPath);
   const groupFieldDef = getFieldConfig(config, groupField) || {};
   const mode = groupFieldDef.mode; //properties.get("mode");
-  const canHaveEmptyChildren = groupField && mode == "array";
+  const canHaveEmptyChildren = groupField && mode === "array" && groupOperatorCardinality >= 1;
 
   const not = _not ? !(properties.get("not")) : (properties.get("not"));
   const list = children
@@ -193,7 +195,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   let operatorDefinition = getOperatorConfig(config, operator, field) || {};
   let reversedOp = operatorDefinition.reversedOp;
   let revOperatorDefinition = getOperatorConfig(config, reversedOp, field) || {};
-  const cardinality = defaultValue(operatorDefinition.cardinality, 1);
+  const cardinality = getOpCardinality(operatorDefinition);
 
   let not = _not;
   if (not && reversedOp) {
@@ -219,27 +221,30 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
   //format value
   let valueSrcs = [];
   let valueTypes = [];
-  const fvalue = iValue.map((currentValue, ind) => {
-    const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
-    const valueType = iValueType ? iValueType.get(ind) : null;
-    const cValue = completeValue(currentValue, valueSrc, config);
-    const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
-    const [fv, fvUseExpr] = formatValue(
-      meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
-    );
-    if (fv !== undefined) {
-      useExpr = useExpr || fvUseExpr;
-      valueSrcs.push(valueSrc);
-      valueTypes.push(valueType);
-    }
-    return fv;
-  });
+  let formattedValue;
+  if (iValue != undefined) {
+    const fvalue = iValue.map((currentValue, ind) => {
+      const valueSrc = iValueSrc ? iValueSrc.get(ind) : null;
+      const valueType = iValueType ? iValueType.get(ind) : null;
+      const cValue = completeValue(currentValue, valueSrc, config);
+      const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const [fv, fvUseExpr] = formatValue(
+        meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
+      );
+      if (fv !== undefined) {
+        useExpr = useExpr || fvUseExpr;
+        valueSrcs.push(valueSrc);
+        valueTypes.push(valueType);
+      }
+      return fv;
+    });
+    const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
+    if (fvalue.size < cardinality || hasUndefinedValues)
+      return undefined;
+    formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
+  }
   const wrapExpr = useExpr && _canWrapExpr;
-  const hasUndefinedValues = fvalue.filter(v => v === undefined).size > 0;
-  if (fvalue.size < cardinality || hasUndefinedValues)
-    return undefined;
-  const formattedValue = cardinality > 1 ? fvalue.toArray() : (cardinality == 1 ? fvalue.first() : null);
 
   //build rule
   const fn = operatorDefinition.mongoFormatOp;
@@ -330,8 +335,8 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   const useExpr = true;
   let ret;
 
-  const funcKey = currentValue.get("func");
-  const args = currentValue.get("args");
+  const funcKey = currentValue.get?.("func");
+  const args = currentValue.get?.("args");
   const funcConfig = getFuncConfig(config, funcKey);
   if (!funcConfig) {
     meta.errors.push(`Func ${funcKey} is not defined in config`);
@@ -368,7 +373,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
     );
     if (argValue != undefined && formattedArgVal === undefined) {
-      if (argValueSrc != "func") // don't triger error if args value is another uncomplete function
+      if (argValueSrc != "func") // don't triger error if args value is another incomplete function
         meta.errors.push(`Can't format value of arg ${argKey} for func ${funcKey}`);
       return [undefined, false];
     }
@@ -381,7 +386,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
       ));
       if (formattedDefaultVal === undefined) {
-        if (defaultValueSrc != "func") // don't triger error if args value is another uncomplete function
+        if (defaultValueSrc != "func") // don't triger error if args value is another incomplete function
           meta.errors.push(`Can't format default value of arg ${argKey} for func ${funcKey}`);
         return [undefined, false];
       }
@@ -405,7 +410,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
   }
   if (missingArgKeys.length) {
     //meta.errors.push(`Missing vals for args ${missingArgKeys.join(", ")} for func ${funcKey}`);
-    return [undefined, false]; // uncomplete
+    return [undefined, false]; // incomplete
   }
 
   if (typeof funcConfig.mongoFormatFunc === "function") {

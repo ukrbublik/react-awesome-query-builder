@@ -196,6 +196,7 @@ module.exports = {
             "@typescript-eslint/ban-ts-comment": 0,
             "@typescript-eslint/no-floating-promises": 0,
             "@typescript-eslint/no-non-null-assertion": 0,
+            "@typescript-eslint/no-non-null-asserted-optional-chain": 0,
         }
       },
     ],

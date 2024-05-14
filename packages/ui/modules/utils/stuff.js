@@ -1,10 +1,10 @@
 
-export const defaultValue = (value, _default) => {
-  return (typeof value === "undefined") ? _default : value;
+export const getOpCardinality = (opDef) => {
+  return opDef?.cardinality ?? 1;
 };
 
 export const truncateString = (str, n, useWordBoundary) => {
-  if (!n || str.length <= n) { return str; }
+  if (!n || !str || str.length <= n) { return str; }
   var subString = str.substr(0, n-1);
   return (useWordBoundary 
     ? subString.substr(0, subString.lastIndexOf(" ")) 
@@ -15,7 +15,7 @@ export const immutableEqual = function(v1, v2) {
   if (v1 === v2) {
     return true;
   } else {
-    return v1.equals(v2);
+    return v1?.equals(v2);
   }
 };
 
@@ -112,4 +112,3 @@ export const getLogger = (devMode = false) => {
 
 
 export const logger = getLogger();
-

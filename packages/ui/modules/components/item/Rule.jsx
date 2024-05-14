@@ -32,6 +32,7 @@ class Rule extends Component {
     isDraggingTempo: PropTypes.bool,
     parentField: PropTypes.string, //from RuleGroup
     valueError: PropTypes.any,
+    fieldError: PropTypes.string,
     isLocked: PropTypes.bool,
     isTrueLocked: PropTypes.bool,
     //path: PropTypes.instanceOf(Immutable.List),
@@ -118,7 +119,7 @@ class Rule extends Component {
   _buildWidgetProps({
     selectedField, selectedFieldSrc, selectedFieldType,
     selectedOperator, operatorOptions,
-    value, valueType, valueSrc, asyncListValues, valueError,
+    value, valueType, valueSrc, asyncListValues, valueError, fieldError,
     parentField,
   }) {
     return {
@@ -132,6 +133,7 @@ class Rule extends Component {
       valueSrc,
       asyncListValues,
       valueError,
+      fieldError,
       parentField,
     };
   }
@@ -145,7 +147,7 @@ class Rule extends Component {
   renderField() {
     const {
       config, isLocked, parentField, groupId, id,
-      selectedFieldSrc, selectedField, selectedFieldType, setField, setFieldSrc,
+      selectedFieldSrc, selectedField, selectedFieldType, setField, setFuncValue, setFieldSrc, fieldError,
     } = this.props;
     const { immutableFieldsMode } = config.settings;
     // tip: don't allow function inside !group (yet)
@@ -160,7 +162,9 @@ class Rule extends Component {
       selectedField={selectedField}
       selectedFieldSrc={selectedFieldSrc}
       selectedFieldType={selectedFieldType}
+      fieldError={fieldError}
       setField={!immutableFieldsMode ? setField : dummyFn}
+      setFuncValue={!immutableFieldsMode ? setFuncValue : dummyFn}
       setFieldSrc={!immutableFieldsMode ? setFieldSrc : dummyFn}
       parentField={parentField}
       readonly={immutableFieldsMode || isLocked}
@@ -206,6 +210,7 @@ class Rule extends Component {
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
       setValueSrc={!immutableValuesMode ? this.props.setValueSrc : dummyFn}
+      setFuncValue={!immutableValuesMode ? this.props.setFuncValue : dummyFn}
       readonly={immutableValuesMode || isLocked}
       id={this.props.id}
       groupId={this.props.groupId}
@@ -260,12 +265,12 @@ class Rule extends Component {
   }
 
   renderError() {
-    const {config, valueError} = this.props;
+    const {config, valueError, fieldError} = this.props;
     const { renderRuleError, showErrorMessage } = config.settings;
-    const oneValueError = valueError && valueError.toArray().filter(e => !!e).shift() || null;
-    return showErrorMessage && oneValueError 
+    const oneError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
+    return showErrorMessage && oneError 
         && <div className="rule--error">
-          {renderRuleError ? renderRuleError({error: oneValueError}, config.ctx) : oneValueError}
+          {renderRuleError ? renderRuleError({error: oneError}, config.ctx) : oneError}
         </div>;
   }
 
@@ -322,7 +327,7 @@ class Rule extends Component {
   render () {
     const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
     const { valueSrc, value, config } = this.props;
-    const canShrinkValue = valueSrc.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
+    const canShrinkValue = valueSrc?.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
     const { renderButtonGroup } = config.settings;
     const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
 

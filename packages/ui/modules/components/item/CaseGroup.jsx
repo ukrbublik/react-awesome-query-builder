@@ -139,6 +139,7 @@ class CaseGroup extends BasicGroup {
       value={value}
       valueSrc={"value"}
       valueError={null}
+      fieldError={null}
       config={config}
       setValue={!immutableValuesMode ? setValue : dummyFn}
       setValueSrc={dummyFn}
