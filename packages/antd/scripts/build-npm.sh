@@ -3,11 +3,11 @@ rm -rf ./cjs
 rm -rf ./esm
 rm -rf ./css
 
-babel --extensions ".tsx,.jsx,.js" -d ./cjs ./modules
+babel --extensions ".tsx,.jsx,.ts,.js" -d ./cjs ./modules
 #find ./cjs -name "*.js" -exec sed -i.bak "s+antd/es/+antd/lib/+g" {} +
 #rm ./cjs/**/*.bak
 node ./scripts/fix-antd.js
-ESM=1 babel --extensions ".tsx,.jsx,.js" -d ./esm ./modules
+ESM=1 babel --extensions ".tsx,.jsx,.ts,.js" -d ./esm ./modules
 cp ./modules/index.d.ts ./cjs/index.d.ts
 cp ./modules/index.d.ts ./esm/index.d.ts
 
