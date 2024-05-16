@@ -495,7 +495,8 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
           left,
           from,
           to
-        ]
+        ],
+        not: isBetweenRev,
       };
       return convertOp(oneSpel, conv, config, meta, parentSpel);
     }
