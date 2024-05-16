@@ -1476,6 +1476,7 @@ export const with_groupVarKey = {
 
 export const spel_with_number = "num == 2";
 export const spel_with_between = "num >= 1 && num <= 2";
+export const spel_with_not_between = "(num < 1 || num > 2)";
 export const spel_with_not = "!(num == 2)";
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
 export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_number : unknown))";

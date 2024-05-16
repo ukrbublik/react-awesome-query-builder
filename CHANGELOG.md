@@ -1,6 +1,7 @@
 # Changelog
 - 6.5.1
   - Fix missing config file in antd moment date widgets (PR #1046) (issue #1048)
+  - Fix SpEL import not_between (PR #1050) (issue #1047)
 - 6.5.0
   - Breaking: `Utils.validateTree` returns array of errors (PR #1034)
   - Breaking: `removeIncompleteRulesOnLoad` by default is false
