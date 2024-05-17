@@ -6,6 +6,7 @@
   - Fix SpEL import not_between (PR #1050) (issue #1047)
 - 6.5.0
   - Breaking: `Utils.validateTree` returns array of errors (PR #1034)
+  - Breaking: `Utils.sanitizeTree` returns object `{fixedTree, fixedErrors}` (PR #1034)
   - Breaking: `removeIncompleteRulesOnLoad` by default is false
   - Added config `removeEmptyRulesOnLoad` (default true) (PR #1034)
   - Deprecated `Utils.validateAndFixTree` and `Utils.checkTree` (and removed type defs). 
