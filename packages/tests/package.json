@@ -22,7 +22,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.2.6",
+    "@ant-design/icons": "^5.3.7",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@fluentui/font-icons-mdl2": "^8.2.0",
@@ -95,7 +95,7 @@
     "less-loader": "^10.0.0",
     "mocha": "^10.2.0",
     "puppeteer": "^13.7.0",
-    "sass": "^1.35.0",
+    "sass": "^1.77.2",
     "sass-loader": "^12.1.0",
     "sinon": "^15.2.0",
     "style-loader": "^3.2.1",

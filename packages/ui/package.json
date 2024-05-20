@@ -80,7 +80,7 @@
     "@types/react-dom": "^17.0.18",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "sass": "^1.35.0"
+    "sass": "^1.77.2"
   },
   "peerDependencies": {
     "react": "^16.8.4 || ^17.0.1 || ^18.0.0",

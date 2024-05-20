@@ -32,7 +32,7 @@ const initialSkin = window._initialSkin || "mui";
 const emptyInitValue: JsonTree = {id: uuid(), type: "group"};
 //const emptyInitValue: JsonTree = {id: uuid(), type: "switch_group"};
 const loadedConfig = loadConfig(initialSkin);
-const initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0
+let initValue = loadedInitValue && Object.keys(loadedInitValue).length > 0
   ? loadedInitValue as JsonTree
   : emptyInitValue;
 const initLogic: JsonLogicTree | undefined = loadedInitLogic && Object.keys(loadedInitLogic).length > 0
@@ -57,18 +57,18 @@ if (nonFixedErrors.length) {
 }
 
 // Trick to hot-load new config when you edit `config.tsx`
-// const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
-//   config: loadedConfig,
-//   _initTree: initTree,
-//   _initValue: initValue,
-// } });
-// window.dispatchEvent(updateEvent);
+const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
+  config: loadedConfig,
+  _initTree: initTree,
+  _initValue: initValue,
+} });
+window.dispatchEvent(updateEvent);
 
-// interface CustomEventDetail {
-//   config: Config;
-//   _initTree: ImmutableTree;
-//   _initValue: JsonTree;
-// }
+interface CustomEventDetail {
+  config: Config;
+  _initTree: ImmutableTree;
+  _initValue: JsonTree;
+}
 
 declare global {
   interface Window {
@@ -123,23 +123,23 @@ const DemoQueryBuilder: React.FC = () => {
     },
   });
 
-  // useEffect(() => {
-  //   window.addEventListener("update", onConfigChanged);
-  //   return () => {
-  //     window.removeEventListener("update", onConfigChanged);
-  //   };
-  // });
+  useEffect(() => {
+    window.addEventListener("update", onConfigChanged);
+    return () => {
+      window.removeEventListener("update", onConfigChanged);
+    };
+  });
 
-  // const onConfigChanged = (e: Event) => {
-  //   const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
-  //   console.log("Updating config...");
-  //   setState({
-  //     ...state,
-  //     config,
-  //   });
-  //   initTree = _initTree;
-  //   initValue = _initValue;
-  // };
+  const onConfigChanged = (e: Event) => {
+    const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
+    console.log("Updating config...");
+    setState({
+      ...state,
+      config,
+    });
+    initTree = _initTree;
+    initValue = _initValue;
+  };
 
   const switchShowLock = () => {
     const newConfig: Config = clone(state.config);

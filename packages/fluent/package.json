@@ -67,7 +67,7 @@
     "@types/react-dom": "^17.0.18",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "sass": "^1.35.0"
+    "sass": "^1.77.2"
   },
   "peerDependencies": {
     "@fluentui/font-icons-mdl2": "^8.4.2",

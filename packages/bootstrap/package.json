@@ -69,7 +69,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "reactstrap": "^9.0.0",
-    "sass": "^1.35.0"
+    "sass": "^1.77.2"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.0 || ^6.1.0",
