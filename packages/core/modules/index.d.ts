@@ -1,4 +1,5 @@
 /* eslint-disable no-extra-semi */
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 
 import {List as ImmList, Map as ImmMap, OrderedMap as ImmOMap} from "immutable";
 import {ElementType, ReactElement, Factory} from "react";

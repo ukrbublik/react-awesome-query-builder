@@ -27,5 +27,5 @@ export interface BootstrapWidgets {
   BootstrapSliderWidget: ElementType<NumberWidgetProps>,
 }
 
-declare const BootstrapWidgets: BootstrapWidgets;
+export declare const BootstrapWidgets: BootstrapWidgets;
 export default BootstrapWidgets;

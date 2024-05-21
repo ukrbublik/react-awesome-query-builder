@@ -26,5 +26,5 @@ export interface FluentUIWidgets {
   FluentUINumberWidget: ElementType<NumberWidgetProps>,
   FluentUISliderWidget: ElementType<NumberWidgetProps>,
 }
-declare const FluentUIWidgets: FluentUIWidgets;
+export declare const FluentUIWidgets: FluentUIWidgets;
 export default FluentUIWidgets;

@@ -49,8 +49,8 @@
   "dependencies": {
     "@react-awesome-query-builder/ui": "workspace:^",
     "lodash": "^4.17.21",
-    "prop-types": "^15.7.2",
-    "rc-picker": "^3.1.4"
+    "prop-types": "^15.8.1",
+    "rc-picker": "^4.5.0"
   },
   "devDependencies": {
     "@ant-design/icons": "^5.3.7",
@@ -65,9 +65,9 @@
     "@babel/preset-react": "^7.24.1",
     "@babel/preset-typescript": "^7.24.1",
     "@babel/runtime": "^7.24.5",
-    "@types/react": "^18.3.2",
+    "@types/react": "^17.0.39",
     "antd": "^5.17.2",
-    "less": "^4.1.1",
+    "less": "^4.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sass": "^1.77.2"
