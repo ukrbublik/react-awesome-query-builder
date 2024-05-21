@@ -1,10 +1,3 @@
-const puppeteer = require("puppeteer");
-const path = require("path");
-if (puppeteer.executablePath().indexOf("/home/ukrbublik/") == 0) {
-  // ignore for my local dev
-} else {
-  process.env.CHROME_BIN = puppeteer.executablePath();
-}
 // Required for date/time tests
 // Works only in ChromeHeadless, not Chrome
 process.env.TZ = "Etc/UTC";
