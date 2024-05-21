@@ -65,7 +65,7 @@
     "@babel/preset-react": "^7.24.1",
     "@babel/preset-typescript": "^7.24.1",
     "@babel/runtime": "^7.24.5",
-    "@types/react": "^17.0.39",
+    "@types/react": "^18.3.2",
     "antd": "^5.17.2",
     "less": "^4.1.1",
     "react": "^17.0.2",

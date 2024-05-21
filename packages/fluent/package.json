@@ -63,8 +63,8 @@
     "@fluentui/font-icons-mdl2": "^8.2.0",
     "@fluentui/react": "^8.110.10",
     "@fluentui/react-icons": "^2.0.175",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.18",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sass": "^1.77.2"

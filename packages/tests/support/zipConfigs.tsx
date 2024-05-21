@@ -13,7 +13,7 @@ export const SliderMark: React.FC<{ pct: number }> = ({ pct }) => {
   return <strong><span key="val">{pct}</span><span key="pct">%</span></strong>;
 };
 const SliderMark_NotExists: React.FC<{ pct: number }> = () => null;
-const MyLabel: React.FC = () => null;
+const MyLabel: React.FC<{ children?: string }> = () => null;
 
 const fields: Fields = {
   num: {
