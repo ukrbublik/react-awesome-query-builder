@@ -3,11 +3,11 @@ import {
   Utils as QbUtils, 
   Widgets, Fields, Config, Settings, SpelConcatPart, WidgetProps
 } from "@react-awesome-query-builder/ui";
-import { MaterialConfig } from "@react-awesome-query-builder/material";
+import { MuiConfig } from "@react-awesome-query-builder/mui";
 import ReactSelect from "./select";
 
 export default (): Config => {
-  const InitialConfig = MaterialConfig;
+  const InitialConfig = MuiConfig;
 
   const widgets: Widgets = {
     ...InitialConfig.widgets,
