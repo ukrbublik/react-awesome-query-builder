@@ -17,6 +17,8 @@ const MATERIAL_CSS = path.resolve(__dirname, '../material/styles/');
 const BOOTSTRAP_CSS = path.resolve(__dirname, '../bootstrap/styles/');
 const FLUENT_CSS = path.resolve(__dirname, '../fluent/styles/');
 
+const NODE_MODULES = path.resolve(__dirname, './node_modules/');
+
 const TESTS = path.resolve(__dirname);
 
 const isDebug = process.env.TEST_DEBUG === "1";
@@ -157,6 +159,9 @@ module.exports = {
       '@react-awesome-query-builder/material': MATERIAL_MODULES,
       '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
       '@react-awesome-query-builder/fluent': FLUENT_MODULES,
+
+      'react': path.resolve(NODE_MODULES, 'react'),
+      'react-dom': path.resolve(NODE_MODULES, 'react-dom'),
     },
     fallback: {
       fs: false,

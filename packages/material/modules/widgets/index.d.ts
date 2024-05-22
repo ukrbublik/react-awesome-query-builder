@@ -32,5 +32,5 @@ export interface MaterialWidgets {
   MaterialAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
 
-declare const MaterialWidgets: MaterialWidgets;
+export declare const MaterialWidgets: MaterialWidgets;
 export default MaterialWidgets;

@@ -1,3 +1,7 @@
+const path = require('path');
+
+const NODE_MODULES = path.resolve(__dirname, './node_modules/');
+
 const babel_options = {
   presets: [
     '@babel/preset-env', 
@@ -14,6 +18,11 @@ module.exports = {
         config.resolve.extensions.push(ext);
       }
     });
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      ['react']: path.resolve(NODE_MODULES, 'react'),
+      ['react-dom']: path.resolve(NODE_MODULES, 'react-dom'),
+    };
     config.module.rules.push(
       {
         test: /\.[jt]sx?$/, 

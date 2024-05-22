@@ -31,5 +31,5 @@ export interface MuiWidgets {
   MuiRangeWidget: ElementType<RangeSliderWidgetProps>,
   MuiAutocompleteWidget: ElementType<SelectWidgetProps>,
 }
-declare const MuiWidgets: MuiWidgets;
+export declare const MuiWidgets: MuiWidgets;
 export default MuiWidgets;

@@ -34,5 +34,5 @@ export interface AntdWidgets {
   BooleanWidget: ElementType<BooleanWidgetProps>,
 }
 
-declare const AntdWidgets: AntdWidgets;
+export declare const AntdWidgets: AntdWidgets;
 export default AntdWidgets;

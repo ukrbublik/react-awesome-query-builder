@@ -21,6 +21,8 @@
     "baseUrl": ".",
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
     },
     "skipLibCheck": false
   },

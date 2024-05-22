@@ -14,15 +14,19 @@
 
     "strict": true,
     "alwaysStrict": true,
+    "strictNullChecks": true,
     "noImplicitReturns": true,
 
     "esModuleInterop": true,
     "moduleResolution": "node",
+    // there is 1 null check issue with rc-picker
     "skipLibCheck": true,
     
     "paths": {
       "@react-awesome-query-builder/core": ["../core/modules"],
-      "@react-awesome-query-builder/ui": ["../ui/modules"]
+      "@react-awesome-query-builder/ui": ["../ui/modules"],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
     }
   },
   "include": [
