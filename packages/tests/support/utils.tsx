@@ -687,7 +687,9 @@ const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onC
 };
 
 export const expect_objects_equal = (act: any, exp: any, actLabel?: string, expLabel?: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const expSafe = exp ? JSON.parse(JSON.stringify(exp)) : exp;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const actSafe = act ? JSON.parse(JSON.stringify(act)) : act;
   expect(actSafe).to.eql(expSafe);
 };
