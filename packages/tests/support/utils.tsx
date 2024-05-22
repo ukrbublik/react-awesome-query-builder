@@ -687,9 +687,10 @@ const expect_jlogic_before_and_after = (config: Config, tree: ImmutableTree, onC
 };
 
 export const expect_objects_equal = (act: any, exp: any, actLabel?: string, expLabel?: string) => {
-  const expStr = JSON.stringify(exp);
-  const actStr = JSON.stringify(act);
-  expect(actStr).to.equal(expStr);
+  // const expStr = JSON.stringify(exp);
+  // const actStr = JSON.stringify(act);
+  // expect(actStr).to.equal(expStr);
+  expect(act).to.eql(exp);
 };
 
 export function hexToRgb(hex: string) {

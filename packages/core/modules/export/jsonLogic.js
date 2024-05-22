@@ -70,7 +70,7 @@ const formatItem = (item, config, meta, isRoot, parentField = null) => {
   } else if (type === "rule") {
     ret = formatRule(item, config, meta, parentField);
   } else if (type == "switch_group") {
-    ret = formatSwitch(item, config, meta, parentField);
+    ret = formatSwitch(item, config, meta);
   } else if (type == "case_group") {
     ret = formatCase(item, config, meta, parentField);
   }
@@ -207,73 +207,76 @@ const formatRule = (item, config, meta, parentField = null) => {
   return formatLogic(config, properties, formattedField, formattedValue, operator, operatorOptions, fieldDefinition, isRev);
 };
 
-const formatSwitch = (item, config, meta, parentField = null) => {
-  const properties = item.get("properties") || new Map();
+const formatSwitch = (item, config, meta) => {
   const children = item.get("children1");
-  if (!children) return undefined;
+  if (!children)
+    return undefined;
   const cases = children
     .map((currentChild) => formatCase(currentChild, config, meta, null))
     .filter((currentChild) => typeof currentChild !== "undefined")
-    .toArray();
+    .valueSeq().toArray();
 
-  if (!cases.length) return undefined;
-
-  if (cases.length == 1 && !cases[0][0]) {
-    // only 1 case without condition
-    return cases[0][1];
-  }
   let filteredCases = [];
   for (let i = 0 ; i < cases.length ; i++) {
-    if (i != (cases.length - 1) && !cases[i][0]) {
+    if (i !== (cases.length - 1) && !cases[i][0]) {
       meta.errors.push(`No condition for case ${i}`);
     } else {
       filteredCases.push(cases[i]);
-      if (i == (cases.length - 1) && cases[i][0]) {
+      if (i === (cases.length - 1) && cases[i][0]) {
         // no default - add null as default
         filteredCases.push([undefined, null]);
       }
     }
   }
 
-  let left = "", right = "";
-  const ret = {
-    "IF": [],
-  };
-  for (let i = 0 ; i < filteredCases.length ; i++) {
+  if (!filteredCases.length)
+    return undefined;
+
+  if (filteredCases.length === 1) {
+    // only 1 case without condition
+    let [_cond, defVal] = filteredCases[0];
+    if (defVal == undefined)
+      defVal = null;
+    return defVal;
+  }
+
+  const ret = { if: [] };
+  let ifArgs = ret.if;
+  const [_, defVal] = filteredCases[filteredCases.length - 1];
+  for (let i = 0 ; i < filteredCases.length - 1 ; i++) {
+    const isLastIf = i === (filteredCases.length - 2);
     let [cond, value] = filteredCases[i];
     if (value == undefined)
-      value = "null";
+      value = null;
     if (cond == undefined)
-      cond = "true";
-    if (i != (filteredCases.length - 1)) {
-      ret.IF.push(cond);
+      cond = true;
+    ifArgs.push(cond); // if
+    ifArgs.push(value); // then
+    if (isLastIf) {
+      ifArgs.push(defVal); // else
+    } else {
+      // elif..
+      ifArgs.push({ if: [] });
+      ifArgs = ifArgs[ifArgs.length - 1].if;
     }
-    ret.IF.push(value);
   }
   return ret;
 };
 
-const formatCase = (item, config, meta, isRoot, parentField = null) => {
-  const type = item.get('type');
-  if (type != 'case_group') {
+const formatCase = (item, config, meta, parentField = null) => {
+  const type = item.get("type");
+  if (type != "case_group") {
     meta.errors.push(`Unexpected child of type ${type} inside switch`);
     return undefined;
   }
-  const properties = item.get('properties') || new Map();
+  const properties = item.get("properties") || new Map();
 
   const cond = formatGroup(item, config, meta, parentField);
-  // return [cond, formattedValue];
 
-  const values = properties.get('value');
   const formattedItem = formatItemValue(
     config, properties, meta, null, parentField, "!case_value"
   );
-  if(typeof formattedItem == 'string'){
-    return [cond, formattedItem];
-  } else if (Array.isArray(formattedItem)) {
-    return [cond, formattedItem[0].value];
-  }
-  return [cond, null];
+  return [cond, formattedItem];
 };
 
 const formatItemValue = (config, properties, meta, operator, parentField, expectedValueType = null) => {

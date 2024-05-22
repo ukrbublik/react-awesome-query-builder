@@ -1480,7 +1480,7 @@ export const spel_with_not_between = "(num < 1 || num > 2)";
 export const spel_with_not = "!(num == 2)";
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
 export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_number : unknown))";
-export const spel_with_cases_simple = "(str == '222' ? foo : foo)";
+export const spel_with_cases_simple = "(str == '222' ? foo : bar)";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";

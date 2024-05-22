@@ -19,7 +19,7 @@ let reporters;
 if (isCI) {
   reporters = ["mocha", "junit", "coverage"];
 } else if (useCoverage) {
-  reporters = ["progress", "coverage"];
+  reporters = ["coverage", "mocha"]; // "progress"
 } else {
   reporters = ["mocha"];
 }
