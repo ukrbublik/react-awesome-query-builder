@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/core",
-  "version": "6.5.1",
+  "version": "6.5.2",
   "description": "User-friendly query builder for React. Core",
   "keywords": [
     "query-builder",
@@ -58,9 +58,9 @@
     "@babel/cli": "^7.24.5",
     "@babel/core": "^7.24.5",
     "@babel/plugin-transform-class-properties": "^7.24.1",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/plugin-transform-private-methods": "^7.24.1",
     "@babel/plugin-transform-private-property-in-object": "^7.24.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/plugin-transform-runtime": "^7.24.3",
     "@babel/preset-env": "^7.24.5",
     "@babel/preset-react": "^7.24.1",

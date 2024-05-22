@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox-simple",
-  "version": "6.5.1",
+  "version": "6.5.2",
   "description": "Simple demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -13,11 +13,11 @@
   "scripts": {
     "build": "vite build --mode dev --debug",
     "eslint": "eslint --ext .jsx --ext .js ./src/",
+    "preinstall": "node ./scripts/patch-versions.js",
     "lint": "npm run eslint",
     "lint-fix": "eslint --ext .jsx --ext .js --fix ./src/",
     "preview": "vite preview",
-    "start": "vite",
-    "preinstall": "node ./scripts/patch-versions.js"
+    "start": "vite"
   },
   "browserslist": {
     "production": [

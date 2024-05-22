@@ -59,32 +59,32 @@
   ],
   "scripts": {
     "build": "pnpm run build-libs && pnpm run build-examples",
-    "build-libs": "pnpm --filter @react-awesome-query-builder/examples^... run build",
     "build-examples": "pnpm --filter !@react-awesome-query-builder/examples^... run build",
-    "test": "pnpm --filter @react-awesome-query-builder/tests run test",
-    "test-dev": "pnpm --filter @react-awesome-query-builder/tests run test-dev",
-    "test-debug": "pnpm --filter @react-awesome-query-builder/tests run test-debug",
+    "build-libs": "pnpm --filter @react-awesome-query-builder/examples^... run build",
     "check-hot": "pnpm -r --parallel --aggregate-output --reporter=append-only check-hot",
     "clean": "sh ./scripts/clean.sh",
+    "examples": "pnpm --filter @react-awesome-query-builder/examples run start",
     "lint": "pnpm -r --parallel --aggregate-output --reporter=append-only run lint",
     "lint-fix": "pnpm -r --parallel --aggregate-output --reporter=append-only run lint-fix",
-    "examples": "pnpm --filter @react-awesome-query-builder/examples run start",
-    "sandbox-js": "pnpm --filter @react-awesome-query-builder/sandbox-simple run start",
-    "sandbox-ts": "pnpm --filter @react-awesome-query-builder/sandbox run start",
-    "sandbox-next": "pnpm --filter @react-awesome-query-builder/sandbox-next run start",
-    "sandbox": "pnpm run sandbox-ts",
-    "start": "pnpm run examples",
     "resmoke": "pnpm run clean && pnpm i && pnpm run smoke",
-    "smoke": "pnpm run lint && pnpm run test && pnpm run build && pnpm run check-hot"
+    "sandbox": "pnpm run sandbox-ts",
+    "sandbox-js": "pnpm --filter @react-awesome-query-builder/sandbox-simple run start",
+    "sandbox-next": "pnpm --filter @react-awesome-query-builder/sandbox-next run start",
+    "sandbox-ts": "pnpm --filter @react-awesome-query-builder/sandbox run start",
+    "smoke": "pnpm run lint && pnpm run test && pnpm run build && pnpm run check-hot",
+    "start": "pnpm run examples",
+    "test": "pnpm --filter @react-awesome-query-builder/tests run test",
+    "test-debug": "pnpm --filter @react-awesome-query-builder/tests run test-debug",
+    "test-dev": "pnpm --filter @react-awesome-query-builder/tests run test-dev"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.5",
     "@babel/core": "^7.24.5",
     "@babel/eslint-parser": "^7.24.5",
     "@babel/plugin-transform-class-properties": "^7.24.1",
+    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/plugin-transform-private-methods": "^7.24.1",
     "@babel/plugin-transform-private-property-in-object": "^7.24.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.24.1",
     "@babel/plugin-transform-runtime": "^7.24.3",
     "@babel/preset-env": "^7.24.5",
     "@babel/preset-react": "^7.24.1",
@@ -106,20 +106,20 @@
   },
   "pnpm": {
     "allowedDeprecatedVersions": {
-      "@material-ui/lab": "4.0.0-alpha.61",
       "@material-ui/core": "*",
-      "@material-ui/pickers": "*",
       "@material-ui/icons": "*",
+      "@material-ui/lab": "4.0.0-alpha.61",
+      "@material-ui/pickers": "*",
       "@material-ui/styles": "*"
     },
     "overrides": {
       "csstype@3.1.1": "^3.1.3",
       "ejs@3.1.9": "^3.1.10",
+      "express@4.18.2": "^4.19.2",
       "follow-redirects@1.15.2": "^1.15.6",
       "ip@2.0.0": "^2.0.1",
-      "postcss@8.4.27": "^8.4.31",
       "postcss@8.4.14": "^8.4.31",
-      "express@4.18.2": "^4.19.2"
+      "postcss@8.4.27": "^8.4.31"
     }
   }
 }
