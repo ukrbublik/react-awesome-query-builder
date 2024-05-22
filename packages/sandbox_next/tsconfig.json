@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    // tsc fails with false
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,

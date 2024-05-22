@@ -17,7 +17,8 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": false,
+    // there is 1 null check issue with rc-picker
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
