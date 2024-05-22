@@ -1,6 +1,6 @@
 {
   "name": "@react-awesome-query-builder/sandbox-next",
-  "version": "6.5.1",
+  "version": "6.5.2",
   "description": "Demo for @react-awesome-query-builder",
   "repository": {
     "type": "git",
@@ -13,12 +13,12 @@
   "scripts": {
     "build": "tsc && next build",
     "eslint": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts ./pages/ ./components/ ./lib/",
+    "preinstall": "node ./scripts/patch-versions.js",
     "lint": "npm run eslint && npm run tsc && next lint",
     "lint-fix": "eslint --ext .jsx --ext .js --ext .tsx --ext .ts --fix ./pages/ ./components/ ./lib/",
-    "tsc": "tsc -p . --noEmit",
-    "preinstall": "node ./scripts/patch-versions.js",
+    "preview": "PORT=3002 next start",
     "start": "PORT=3002 next dev",
-    "preview": "PORT=3002 next start"
+    "tsc": "tsc -p . --noEmit"
   },
   "browserslist": {
     "production": [
@@ -45,8 +45,8 @@
     "@upstash/redis": "^1.31.1",
     "iron-session": "^6.3.1",
     "jsonfile": "^6.1.0",
-    "nanoid": "^5.0.7",
     "lodash": "^4.17.21",
+    "nanoid": "^5.0.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "serialize-javascript": "^6.0.2"

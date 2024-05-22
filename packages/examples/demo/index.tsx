@@ -56,7 +56,7 @@ if (nonFixedErrors.length) {
   console.warn("Validation errors on load:", nonFixedErrors);
 }
 
-// Trick to hot-load new config when you edit `config.tsx`
+// Trick for HMR
 const updateEvent = new CustomEvent<CustomEventDetail>("update", { detail: {
   config: loadedConfig,
   _initTree: initTree,
@@ -124,19 +124,19 @@ const DemoQueryBuilder: React.FC = () => {
   });
 
   useEffect(() => {
-    window.addEventListener("update", onConfigChanged);
+    window.addEventListener("update", onHotUpdate);
     return () => {
-      window.removeEventListener("update", onConfigChanged);
+      window.removeEventListener("update", onHotUpdate);
     };
   });
 
-  const onConfigChanged = (e: Event) => {
+  const onHotUpdate = (e: Event) => {
     const {detail: {config, _initTree, _initValue}} = e as CustomEvent<CustomEventDetail>;
-    console.log("Updating config...");
-    setState({
+    console.log("Updating...");
+    setState(state => ({
       ...state,
       config,
-    });
+    }));
     initTree = _initTree;
     initValue = _initValue;
   };
