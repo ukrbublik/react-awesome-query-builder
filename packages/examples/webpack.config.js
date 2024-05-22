@@ -28,6 +28,7 @@ const MATERIAL_CSS = path.resolve(EXAMPLES, '../material/styles/');
 const BOOTSTRAP_CSS = path.resolve(EXAMPLES, '../bootstrap/styles/');
 const FLUENT_CSS = path.resolve(EXAMPLES, '../fluent/styles/');
 const DIST = path.resolve(EXAMPLES, './build');
+const NODE_MODULES = path.resolve(EXAMPLES, './node_modules/');
 const isMono = fs.existsSync(CORE_MODULES);
 
 let plugins = [
@@ -57,6 +58,9 @@ let aliases = isMono ? {
     '@react-awesome-query-builder/material': MATERIAL_MODULES,
     '@react-awesome-query-builder/bootstrap': BOOTSTRAP_MODULES,
     '@react-awesome-query-builder/fluent': FLUENT_MODULES,
+
+    'react': path.resolve(NODE_MODULES, 'react'),
+    'react-dom': path.resolve(NODE_MODULES, 'react-dom'),
 } : {};
 
 let style_loaders = [{

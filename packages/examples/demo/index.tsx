@@ -79,16 +79,16 @@ declare global {
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
-  skin: string,
+  skin: string;
   renderBocks: Record<string, boolean>;
   spelStr: string;
   spelErrors: Array<string>;
 }
 
 interface DemoQueryBuilderMemo {
-  immutableTree?: ImmutableTree,
-  config?: Config,
-  actions?: Actions,
+  immutableTree?: ImmutableTree;
+  config?: Config;
+  actions?: Actions;
 }
 
 // Add translations

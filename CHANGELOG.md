@@ -1,6 +1,6 @@
 # Changelog
 - 6.5.2
-  - Updated dependencies. `@babel/runtime` is now peer dep for core package (PR #1051) (issue #964)
+  - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
 - 6.5.1
   - Fix missing config file in antd moment date widgets (PR #1046) (issue #1048)
   - Fix SpEL import not_between (PR #1050) (issue #1047)

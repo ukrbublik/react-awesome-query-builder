@@ -17,7 +17,7 @@
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
@@ -31,6 +31,8 @@
       "@react-awesome-query-builder/mui": ["../mui/modules"],
       "@react-awesome-query-builder/material": ["../material/modules"],
       "@react-awesome-query-builder/bootstrap": ["../bootstrap/modules"],
+      "react": ["./node_modules/@types/react"],
+      "react-dom": ["./node_modules/@types/react-dom"],
     },
   },
   "include": [

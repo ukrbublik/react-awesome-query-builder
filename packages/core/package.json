@@ -44,6 +44,7 @@
     "tsc": "tsc -p . --noEmit"
   },
   "dependencies": {
+    "@babel/runtime": "^7.24.5",
     "clone": "^2.1.2",
     "i18next": "^23.11.5",
     "immutable": "^4.3.6",
@@ -69,8 +70,5 @@
     "@types/lodash": "^4.14.170",
     "@types/node": "^18.15.0",
     "@types/react": "^17.0.39"
-  },
-  "peerDependencies": {
-    "@babel/runtime": "^7.0.0"
   }
 }

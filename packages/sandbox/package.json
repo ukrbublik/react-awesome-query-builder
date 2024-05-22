@@ -45,14 +45,14 @@
     "@react-awesome-query-builder/mui": "workspace:^",
     "antd": "^5.17.2",
     "lodash": "^4.17.21",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
     "@types/lodash": "^4.14.170",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "sass": "^1.77.2",
     "typescript": "~5.4.5",

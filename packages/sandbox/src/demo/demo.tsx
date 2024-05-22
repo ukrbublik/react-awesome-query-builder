@@ -1,21 +1,21 @@
 /*eslint @typescript-eslint/no-unused-vars: ["off", {"varsIgnorePattern": "^_"}]*/
-import React, {Component} from "react";
+import React from "react";
 import {
   Utils, Query, Builder,
   //types:
   BuilderProps, ImmutableTree, Config, JsonTree, JsonLogicTree
 } from "@react-awesome-query-builder/mui";
 import throttle from "lodash/throttle";
-import loadedConfig from "./config_mui"; // or ""./config_antd"
+import loadedConfigMui from "./config_mui";
+import loadedConfigAntd from "./config_antd";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
 const stringify = JSON.stringify;
-const {queryBuilderFormat, jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, sanitizeTree, loadTree, uuid, loadFromJsonLogic} = Utils;
+const {jsonLogicFormat, queryString, mongodbFormat, sqlFormat, getTree, loadTree, uuid, loadFromJsonLogic} = Utils;
 const preStyle = { backgroundColor: "darkgrey", margin: "10px", padding: "10px" };
 const preErrorStyle = { backgroundColor: "lightpink", margin: "10px", padding: "10px" };
 
 const emptyInitValue: JsonTree = {"id": uuid(), "type": "group"};
-
 // get init value in JsonTree format:
 const initValue: JsonTree = loadedInitValue && Object.keys(loadedInitValue).length > 0 ? loadedInitValue as JsonTree : emptyInitValue;
 const initTree: ImmutableTree = loadTree(initValue);
@@ -24,75 +24,77 @@ const initTree: ImmutableTree = loadTree(initValue);
 //const initLogic: JsonLogicTree = loadedInitLogic && Object.keys(loadedInitLogic).length > 0 ? loadedInitLogic : undefined;
 //const initTree: ImmutableTree = loadFromJsonLogic(initLogic, loadedConfig);
 
-
+interface DemoQueryBuilderProps {
+  skin: string;
+}
 interface DemoQueryBuilderState {
   tree: ImmutableTree;
   config: Config;
 }
+interface DemoQueryBuilderMemo {
+  tree: ImmutableTree;
+  config: Config;
+}
 
-export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderState> {
-  private immutableTree: ImmutableTree | undefined;
-  private config: Config | undefined;
-    
-  state = {
+const DemoQueryBuilder: React.FC<DemoQueryBuilderProps> = ({
+  skin,
+}) => {
+  const loadedConfig = React.useMemo(() => (skin === "mui" ? loadedConfigMui : loadedConfigAntd), [skin]);
+  const [state, setState] = React.useState<DemoQueryBuilderState>({
     tree: initTree,
-    config: loadedConfig
-  };
+    config: loadedConfig, 
+  });
+  const memo: React.MutableRefObject<DemoQueryBuilderMemo> = React.useRef({
+    tree: state.tree,
+    config: state.config,
+  });
 
-  render = () => (
-    <div>
-      <Query 
-        {...loadedConfig} 
-        value={this.state.tree}
-        onChange={this.onChange}
-        renderBuilder={this.renderBuilder}
-      />
+  React.useEffect(() => {
+    setState(state => ({ ...state, config: loadedConfig }));
+  }, [loadedConfig]);
 
-      <button onClick={this.resetValue}>reset</button>
-      <button onClick={this.clearValue}>clear</button>
-
-      <div className="query-builder-result">
-        {this.renderResult(this.state)}
-      </div>
-    </div>
-  );
-
-  resetValue = () => {
-    this.setState({
+  const resetValue = React.useCallback(() => {
+    setState({
+      ...state,
       tree: initTree, 
     });
-  };
+  }, []);
 
-  clearValue = () => {
-    this.setState({
+  const clearValue = React.useCallback(() => {
+    setState({
+      ...state,
       tree: loadTree(emptyInitValue), 
     });
-  };
+  }, []);
 
-  renderBuilder = (props: BuilderProps) => (
+  const renderBuilder = React.useCallback((props: BuilderProps) => (
     <div className="query-builder-container" style={{padding: "10px"}}>
       <div className="query-builder qb-lite">
         <Builder {...props} />
       </div>
     </div>
-  );
-    
-  onChange = (immutableTree: ImmutableTree, config: Config) => {
-    this.immutableTree = immutableTree;
-    this.config = config;
-    this.updateResult();
+  ), []);
 
+  const onChange = React.useCallback((immutableTree: ImmutableTree, config: Config) => {
     // `jsonTree` or `logic` can be saved to backend
     // (and then loaded with `loadTree` or `loadFromJsonLogic` as seen above)
     const jsonTree = getTree(immutableTree);
     const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
-  };
 
-  updateResult = throttle(() => {
-    this.setState({tree: this.immutableTree as ImmutableTree, config: this.config as Config});
+    memo.current.tree = immutableTree;
+    memo.current.config = config;
+    updateResult();
+  }, []);
+
+  const updateResult = throttle(() => {
+    setState({
+      ...state,
+      tree: memo.current.tree,
+      config: memo.current.config,
+    });
   }, 100);
 
-  renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
+  const renderResult = ({tree: immutableTree, config} : {tree: ImmutableTree, config: Config}) => {
     const {logic, data, errors} = jsonLogicFormat(immutableTree, config);
     return (
       <div>
@@ -154,4 +156,25 @@ export default class DemoQueryBuilder extends Component<{}, DemoQueryBuilderStat
     );
   };
 
-}
+
+  return (
+    <div>
+      <Query 
+        {...state.config} 
+        value={state.tree}
+        onChange={onChange}
+        renderBuilder={renderBuilder}
+      />
+
+      <button onClick={resetValue}>reset</button>
+      <button onClick={clearValue}>clear</button>
+
+      <div className="query-builder-result">
+        {renderResult(state)}
+      </div>
+    </div>
+  );
+
+};
+
+export default DemoQueryBuilder;
