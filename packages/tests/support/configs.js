@@ -1547,6 +1547,7 @@ export const with_concat_case_value = (BasicConfig) => ({
       ...BasicConfig.widgets.case_value,
       spelFormatValue: ExportUtils.spelFormatConcat,
       spelImportValue: ExportUtils.spelImportConcat,
+      jsonLogic: ExportUtils.jsonLogicFormatConcat,
     },
   },
 });

@@ -941,7 +941,10 @@ const widgets = {
     },
     spelImportValue: (val) => {
       return [val.value, []];
-    }
+    },
+    jsonLogic: function (val) {
+      return val === "" ? null : val;
+    },
   }
 };
 

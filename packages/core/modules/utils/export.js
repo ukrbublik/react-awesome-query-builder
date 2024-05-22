@@ -129,6 +129,16 @@ export const spelEscape = (val, numberToFloat = false, arrayToArray = false) => 
   }
 };
 
+export const jsonLogicFormatConcat = (parts) => {
+  if (parts && Array.isArray(parts) && parts.length) {
+    return parts
+      .map(part => part?.value ?? part)
+      .filter(r => r != undefined);
+  } else {
+    return undefined;
+  }
+};
+
 export const spelFormatConcat = (parts) => {
   if (parts && Array.isArray(parts) && parts.length) {
     return parts

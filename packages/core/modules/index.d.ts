@@ -527,6 +527,7 @@ interface ConfigUtils {
 interface ExportUtils {
   spelEscape(val: any): string;
   spelFormatConcat(parts: SpelConcatParts): string;
+  jsonLogicFormatConcat(parts: SpelConcatParts): any;
   spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
 }
 interface ListUtils {

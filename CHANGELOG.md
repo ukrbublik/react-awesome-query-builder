@@ -1,4 +1,6 @@
 # Changelog
+- 6.6.0
+  - Add JsonLogic Export for SwitchCase (PR #1013)
 - 6.5.2
   - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
 - 6.5.1

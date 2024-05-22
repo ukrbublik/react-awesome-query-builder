@@ -75,26 +75,6 @@ const Demo: React.FC = () => {
     />
   );
 
-  const renderSpelOutput = () => (
-    <div className="query-builder-result">
-      Output SpEL:
-      <pre>
-        {QbUtils.spelFormat(state.tree, state.config)}
-      </pre>
-      Values:
-      <pre>
-        {JSON.stringify(QbUtils.getSwitchValues(state.tree), undefined, 2)}
-      </pre>
-      <br/>
-      <hr/>
-      <br/>
-      Tree:
-      <pre>
-        {JSON.stringify(QbUtils.getTree(state.tree), undefined, 2)}
-      </pre>
-    </div>
-  );
-
   const renderSpelInput = () => (
     <div className="query-import-spel">
       Input SpEL:
@@ -109,11 +89,84 @@ const Demo: React.FC = () => {
     </div>
   );
 
+  const renderSpelBlock = () => {
+    const [spel, spelErrors] = QbUtils._spelFormat(state.tree, state.config);
+
+    return (
+      <>
+        <div>
+          spelFormat: 
+          { spelErrors.length > 0 
+            && <pre style={preErrorStyle}>
+              {JSON.stringify(spelErrors, undefined, 2)}
+            </pre> 
+          }
+          <pre style={preStyle}>
+            {JSON.stringify(spel, undefined, 2)}
+          </pre>
+          Values:
+          <pre>
+            {JSON.stringify(QbUtils.getSwitchValues(state.tree), undefined, 2)}
+          </pre>
+        </div>
+        <hr/>
+      </>
+    );
+  };
+
+  const renderJsTreeBlock = () => {
+    const treeJs = QbUtils.getTree(state.tree);
+
+    return (
+      <>
+        Tree:
+        <pre>
+          {JSON.stringify(treeJs, undefined, 2)}
+        </pre>
+        <br/>
+        <hr/>
+        <br/>
+      </>
+    );
+  };
+
+  const renderJsonLogicBlock = () => {
+    const {logic, data: logicData, errors: logicErrors} = QbUtils.jsonLogicFormat(state.tree, state.config);
+
+    return (
+      <>
+        <div>
+          <a href="http://jsonlogic.com/play.html" target="_blank" rel="noopener noreferrer">jsonLogicFormat</a>: 
+          { (logicErrors?.length || 0) > 0 
+            && <pre style={preErrorStyle}>
+              {JSON.stringify(logicErrors, undefined, 2)}
+            </pre> 
+          }
+          { !!logic
+            && <pre style={preStyle}>
+              {"// Rule"}:<br />
+              {JSON.stringify(logic, undefined, 2)}
+              <br />
+              <hr />
+              {"// Data"}:<br />
+              {JSON.stringify(logicData, undefined, 2)}
+            </pre>
+          }
+        </div>
+        <hr/>
+      </>
+    );
+  };
+
   return (
     <div>
       {renderSpelInput()}
       {renderQueryBuilder()}
-      {renderSpelOutput()}
+      <div className="query-builder-result">
+        {renderSpelBlock()}
+        {renderJsonLogicBlock()}
+        {renderJsTreeBlock()}
+      </div>
     </div>
   );
 };

@@ -199,7 +199,7 @@ export const with_bad_range_bigger_than_max = {
 export const with_range_slider = {
   "and": [{
     "<=": [
-      18, 
+      18,
       { "var": "slider" },
       42
     ]
@@ -219,7 +219,7 @@ export const with_bad_date_range = {
 export const with_date_range = {
   "and": [{
     "<=": [
-      "2020-05-10T21:00:00.000Z", 
+      "2020-05-10T21:00:00.000Z",
       { "var": "date" },
       "2020-05-15T21:00:00.000Z"
     ]
@@ -229,7 +229,7 @@ export const with_date_range = {
 export const with_range_bad_dates = {
   "and": [{
     "<=": [
-      "2020-05-10TTTT", 
+      "2020-05-10TTTT",
       { "var": "date" },
       "2020-05-15T21:00:00.000Z"
     ]
@@ -289,7 +289,7 @@ export const with_date_and_time = {
     }]
   }]
 };
-  
+
 export const with_select_and_multiselect = {
   "and": [{
     "==": [ { "var": "color" }, "yellow" ]
@@ -300,7 +300,7 @@ export const with_select_and_multiselect = {
     ]
   }]
 };
-  
+
 export const with_struct_and_group = {
   "and": [
     {
@@ -358,7 +358,7 @@ export const with_select_not_any_in_in_some = {
   "and": [
     { "some": [
       { "var": "cars" },
-      { "!": 
+      { "!":
         { "in": [ { "var": "vendor" }, [ "Ford", "Toyota" ] ] }
       }
     ] }
@@ -426,7 +426,7 @@ export const two_rules_with_nested_group = {
       "some": [
         { "var": "results" },
         { "some": [
-          { "var": "user" }, 
+          { "var": "user" },
           { "==": [ { "var": "name" },  "aaa" ] }
         ] }
       ]
@@ -526,7 +526,7 @@ export const with_two_groups_1 = {
       "and": [
         {
           "==": [ { "var": "results.user.name" },  "ddd" ]
-        }, 
+        },
         {
           "==": [ { "var": "results.score" },  2 ]
         },
@@ -1239,7 +1239,7 @@ export const spel_with_group_count = "cars.size() == 2";
 
 export const with_not_group_count = {
   "and": [
-    { "!": 
+    { "!":
       { "==": [
         { "reduce": [
           { "var": "cars" },
@@ -1480,6 +1480,7 @@ export const spel_with_not_between = "(num < 1 || num > 2)";
 export const spel_with_not = "!(num == 2)";
 export const spel_with_not_not = "!(num == 2 || !(num == 3))";
 export const spel_with_cases = "(str == '222' ? is_string : (num == 4 ? is_number : unknown))";
+export const spel_with_cases_simple = "(str == '222' ? foo : bar)";
 export const spel_with_cases_and_concat = "(str == '222' ? foo : foo + bar)";
 
 export const spel_with_lhs_toLowerCase = "str.toLowerCase().startsWith('aaa')";
