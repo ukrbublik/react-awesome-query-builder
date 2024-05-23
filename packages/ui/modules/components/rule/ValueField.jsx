@@ -83,7 +83,7 @@ export default class ValueField extends Component {
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel || parentField)
       selectedFullLabel = null;
-    const selectedAltLabel = selectedOpts.label2;
+    const selectedAltLabel = selectedOpts.label2 || selectedOpts.tooltip;
 
     return {
       placeholder,

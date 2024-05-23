@@ -65,10 +65,12 @@ export default class Operator extends Component {
     const selectedKeys = selectedKey ? [selectedKey] : null;
     const selectedPath = selectedKeys;
     const selectedLabel = selectedOpts.label;
+    // tip: label2 is not documented for operators
+    const selectedAltLabel = selectedOpts.label2 || selectedOpts.tooltip;
     
     return {
       placeholder, items,
-      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedOpts, fieldConfig
+      selectedKey, selectedKeys, selectedPath, selectedLabel, selectedAltLabel, selectedOpts, fieldConfig
     };
   }
 
@@ -79,10 +81,14 @@ export default class Operator extends Component {
     return keys(fields).sort((a, b) => (ops.indexOf(a) - ops.indexOf(b))).map(fieldKey => {
       const field = fields[fieldKey];
       const label = field.label;
+      const altLabel = field.label2;
+      const tooltip = field.tooltip;
       return {
         key: fieldKey,
         path: fieldKey,
         label,
+        altLabel,
+        tooltip,
       };
     });
   }

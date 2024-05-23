@@ -57,7 +57,7 @@ export default class Field extends Component {
     let selectedFullLabel = partsLabels ? partsLabels.join(fieldSeparatorDisplay) : null;
     if (selectedFullLabel == selectedLabel || parentField)
       selectedFullLabel = null;
-    const selectedAltLabel = selectedOpts.label2;
+    const selectedAltLabel = selectedOpts.label2 || selectedOpts.tooltip;
 
     const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;

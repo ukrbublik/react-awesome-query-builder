@@ -80,9 +80,9 @@ export default ({
   }, [readonly, placeholder, items]);
   
   const hasValue = selectedKey != null;
-  let tooltipText = selectedAltLabel || selectedFullLabel || selectedLabel;
+  let tooltipText = selectedAltLabel || selectedFullLabel;
   if (tooltipText == selectedLabel)
-    tooltipText = selectedKey;
+    tooltipText = null;
   let res = (
     <Select
       error={!!errorText}

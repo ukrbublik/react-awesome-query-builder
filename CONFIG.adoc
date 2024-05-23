@@ -519,6 +519,7 @@ where `AND` and `OR` - available conjuctions (logical operators). You can add `N
 |===
 |key |required |default |meaning
 |label |+ | |Label to be displayed in operators select component
+|tooltip | | |Optional tooltip to be displayed in operators list by hovering on item
 |reversedOp |+ | |Opposite operator
 |isNotOp | |false |Eg. true for operator "!=", false for operator "=="
 |cardinality | |1 |Number of right operands (1 for binary, 2 for `between`)
