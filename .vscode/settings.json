@@ -1,5 +1,3 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "npm.packageManager": "pnpm",
-  "pnpm.runInTerminal": true
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
