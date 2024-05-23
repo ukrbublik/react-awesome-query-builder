@@ -3,7 +3,34 @@ import FormControl from "@mui/material/FormControl";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Button from "@mui/material/Button";
 
-export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config, showNot, notLabel}) => {
+const Conj = ({
+  conjKey, id, name, label, checked,
+  setConjunction, readonly, disabled,
+}) => {
+  const onClick = React.useCallback(() => {
+    setConjunction(conjKey);
+  }, [conjKey, setConjunction]);
+  const postfix = setConjunction.isDummyFn ? "__dummy" : "";
+  if ((readonly || disabled) && !checked) {
+    return null;
+  }
+  return (
+    <Button 
+      key={id+postfix} 
+      id={id+postfix} 
+      color={checked ? "primary" : "inherit"} 
+      value={conjKey} 
+      onClick={onClick} 
+      disabled={readonly || disabled}
+    >
+      {label}
+    </Button>
+  );
+};
+
+const Conjs = ({
+  id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config, showNot, notLabel
+}) => {
   //TIP: disabled=true if only 1 rule; readonly=true if immutable mode
   const conjsCount = Object.keys(conjunctionOptions).length;
   const lessThenTwo = disabled;
@@ -11,25 +38,21 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
   const showConj = forceShowConj || conjsCount > 1 && !lessThenTwo;
 
   const renderOptions = () => 
-    Object.keys(conjunctionOptions).map(key => {
-      const {id, name, label, checked} = conjunctionOptions[key];
-      let postfix = setConjunction.isDummyFn ? "__dummy" : "";
-      if ((readonly || disabled) && !checked)
-        return null;
+    Object.keys(conjunctionOptions).map(conjKey => {
+      const { id, name, label, checked } = conjunctionOptions[conjKey];
+      const conjProps = {
+        conjKey, id, name, label, checked,
+        setConjunction, readonly, disabled,
+      };
       return (
-        <Button 
-          key={id+postfix} 
-          id={id+postfix} 
-          color={checked ? "primary" : "inherit"} 
-          value={key} 
-          onClick={onClick.bind(null, key)} 
-          disabled={readonly || disabled}
-        >
-          {label}
-        </Button>
+        <Conj key={id} {...conjProps} />
       );
     });
   
+  const onNotClick = React.useCallback(() => {
+    setNot(!not);
+  }, [not, setNot]);
+
   const renderNot = () => {
     if (readonly && !not)
       return null;
@@ -38,16 +61,13 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
         key={id}
         id={id + "__not"}
         color={not ? "error" : "inherit"} 
-        onClick={onNotClick.bind(null, !not)} 
+        onClick={onNotClick} 
         disabled={readonly}
       >
         {notLabel || "NOT"}
       </Button>
     );
   };
-
-  const onClick = value => setConjunction(value);
-  const onNotClick = checked => setNot(checked);
 
   return (
     <FormControl>
@@ -62,5 +82,6 @@ export default ({id, not, setNot, conjunctionOptions, setConjunction, disabled, 
       </ButtonGroup>
     </FormControl>
   );
-  
 };
+
+export default Conjs;
