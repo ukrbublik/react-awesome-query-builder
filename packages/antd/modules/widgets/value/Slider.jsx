@@ -1,10 +1,9 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
 import { Utils } from "@react-awesome-query-builder/ui";
-const { useOnPropsChanged, pureShouldComponentUpdate } = Utils.ReactUtils;
 
-export default class SliderWidget extends Component {
+export default class SliderWidget extends PureComponent {
   static propTypes = {
     setValue: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
@@ -28,65 +27,35 @@ export default class SliderWidget extends Component {
     marks: undefined,
   };
 
-  state = {
-  };
-
-  constructor(props) {
-    super(props);
-    this.pureShouldComponentUpdate = pureShouldComponentUpdate(this);
-    useOnPropsChanged(this);
-
-    this.state.internalValue = props.value;
-  }
-
-  onPropsChanged(nextProps) {
-    this.setState({internalValue: nextProps.value});
-  }
-
   handleChange = (val) => {
-    const {internalValue} = this.state;
-    const {optimizeRenderWithInternals} = this.props.config.settings;
     if (val === "")
       val = undefined;
-    if (optimizeRenderWithInternals)
-      this.setState({internalValue: val});
-    const didEmptinessChanged = !!val !== !!internalValue;
-    const __isInternal = optimizeRenderWithInternals && !didEmptinessChanged;
-    this.props.setValue(val, undefined, { __isInternal });
+    this.props.setValue(val);
   };
 
-  tipFormatter = (val) => (val != undefined ? val.toString() : undefined);
+  tooltipFormatter = (val) => (val != undefined ? val.toString() : undefined);
 
-  shouldComponentUpdate = (nextProps, nextState) => {
-    const {optimizeRenderWithInternals} = nextProps.config.settings;
-    const should = this.pureShouldComponentUpdate(nextProps, nextState);
-    if (should) {
-      // RHL fix
-      if (this.props.cacheBusterProp && optimizeRenderWithInternals) {
-        nextState.internalValue = this.state.internalValue;
-      }
-    }
-    return should;
+  tooltip = {
+    formatter: this.tipFormatter
   };
 
   render() {
     const {config, placeholder, customProps, value,  min, max, step, marks, readonly, errorMessage} = this.props;
-    const {internalValue} = this.state;
-    const {renderSize, showErrorMessage, defaultSliderWidth, optimizeRenderWithInternals} = config.settings;
+    const {renderSize, showErrorMessage, defaultSliderWidth} = config.settings;
     const {width, ...rest} = customProps || {};
     const customInputProps = rest.input || {};
     const customSliderProps = rest.slider || rest;
 
-    const canUseInternal = optimizeRenderWithInternals && (showErrorMessage ? true : !errorMessage);
-    let aValue = canUseInternal ? internalValue : value;
+    let aValue = value;
     if (aValue == undefined)
       aValue = null;
     const sliderValue = aValue == null && min ? min : aValue;
       
     return (
       <Col style={{display: "inline-flex", flexWrap: "wrap"}}>
-        <Col style={{float: "left", marginRight: "5px"}}>
+        <Col key="col-number" style={{float: "left", marginRight: "5px"}}>
           <InputNumber
+            key="input-number"
             disabled={readonly}
             size={renderSize}
             value={aValue}
@@ -98,21 +67,22 @@ export default class SliderWidget extends Component {
             {...customInputProps}
           />
         </Col>
-        <Col style={{float: "left", width: width || defaultSliderWidth}}>
+        <Col key="col-slider" style={{float: "left", width: width || defaultSliderWidth}}>
           <Slider
+            key="input-slider"
             disabled={readonly}
             value={sliderValue}
-            tooltip={{formatter: this.tipFormatter}}
+            tooltip={this.tooltip}
             min={min}
             max={max}
-            included={false}
+            included={true}
             step={step}
             marks={marks}
             onChange={this.handleChange}
             {...customSliderProps}
           />
         </Col>
-        <Col style={{clear: "both"}} />
+        <Col key="col-clear" style={{clear: "both"}} />
       </Col>
     );
   }
