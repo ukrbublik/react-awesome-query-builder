@@ -286,7 +286,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc == "func") {
     [ret, useExpr] = formatFunc(meta, config, currentValue, parentPath);
   } else {
-    if (typeof fieldWidgetDef.mongoFormatValue === "function") {
+    if (typeof fieldWidgetDef?.mongoFormatValue === "function") {
       const fn = fieldWidgetDef.mongoFormatValue;
       const args = [
         currentValue,

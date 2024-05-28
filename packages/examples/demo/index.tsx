@@ -10,7 +10,6 @@ import omit from "lodash/omit";
 import loadConfig from "./config";
 import loadedInitValue from "./init_value";
 import loadedInitLogic from "./init_logic";
-import Immutable from "immutable";
 import clone from "clone";
 
 const {
@@ -74,6 +73,10 @@ declare global {
   interface Window {
     _initialSkin: string;
   }
+  interface Console {
+    profile: () => void;
+    profileEnd: () => void;
+  }
 }
 
 interface DemoQueryBuilderState {
@@ -120,6 +123,8 @@ const DemoQueryBuilder: React.FC = () => {
       spel: true,
       strings: true,
       sql: true,
+      actions: false,
+      withProfile: false,
     },
   });
 
@@ -290,13 +295,14 @@ const DemoQueryBuilder: React.FC = () => {
 
   const onChange = useCallback((immutableTree: ImmutableTree, config: Config, actionMeta?: ActionMeta, actions?: Actions) => {
     const isInit = !actionMeta;
-    if (actionMeta)
+    if (actionMeta && state.renderBocks.actions) {
       console.info(actionMeta);
+    }
     memo.current.immutableTree = immutableTree;
     memo.current.config = config;
     memo.current.actions = actions;
     updateResult();
-  }, []);
+  }, [state.renderBocks]);
 
   const updateResult = throttle(() => {
     setState(prevState => ({...prevState, tree: memo.current.immutableTree!, config: memo.current.config!}));
@@ -701,6 +707,83 @@ const DemoQueryBuilder: React.FC = () => {
     );
   };
 
+  const timeValidation = () => {
+    const tree = state.tree;
+    const config = state.config;
+    const run = () => {
+      validateTree(tree, config, {
+        ...validationTranslateOptions,
+      });
+    };
+
+    // cold
+    run();
+
+    if (state.renderBocks.withProfile) {
+      console.profile();
+    }
+    console.time("validation");
+
+    // hot
+    run();
+
+    console.timeEnd("validation");
+    if (state.renderBocks.withProfile) {
+      console.profileEnd();
+    }
+  };
+
+  const timeExport = () => {
+    const tree = state.tree;
+    const config = state.config;
+    const run = () => {
+      _spelFormat(tree, config);
+      _mongodbFormat(tree, config);
+      _sqlFormat(tree, config);
+      jsonLogicFormat(tree, config);
+      elasticSearchFormat(tree, config);
+      queryString(tree, config);
+    };
+
+    // cold
+    run();
+
+    if (state.renderBocks.withProfile) {
+      console.profile();
+    }
+    console.time("export");
+
+    // hot
+    run();
+
+    console.timeEnd("export");
+    if (state.renderBocks.withProfile) {
+      console.profileEnd();
+    }
+  };
+
+  const timeActions = () => {
+    const run = () => {
+      runActions();
+    };
+
+    // cold
+    run();
+
+    if (state.renderBocks.withProfile) {
+      console.profile();
+    }
+    console.time("actions");
+
+    // hot
+    run();
+
+    console.timeEnd("actions");
+    if (state.renderBocks.withProfile) {
+      console.profileEnd();
+    }
+  };
+
   return (
     <div>
       <div>
@@ -727,6 +810,7 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={switchRenderBlock.bind(null, "sql")}>SQL: {state.renderBocks.sql ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "mongo")}>Mongo: {state.renderBocks.mongo ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "elasticSearch")}>ElasticSearch: {state.renderBocks.elasticSearch ? "on" : "off"}</button>
+        <button onClick={switchRenderBlock.bind(null, "actions")}>Actions: {state.renderBocks.actions ? "on" : "off"}</button>
       </div>
       <div>
         Data: &nbsp;
@@ -741,6 +825,13 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={sanitizeLight}>validate</button>
         <button onClick={sanitize}>sanitize</button>
         <button onClick={sanitizeAndFix}>sanitize & fix</button>
+      </div>
+      <div>
+        Benchmark: &nbsp;
+        <button onClick={timeExport}>export</button>
+        <button onClick={timeValidation}>validation</button>
+        <button onClick={timeActions}>actions</button>
+        <button onClick={switchRenderBlock.bind(null, "withProfile")}>profile: {state.renderBocks.withProfile ? "on" : "off"}</button>
       </div>
 
       {renderSpelInputBlock(state)}

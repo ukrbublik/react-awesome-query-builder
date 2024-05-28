@@ -150,6 +150,9 @@ module.exports = {
             '.csb.app', // codesandbox.io
             '.webcontainer.io', // stackblitz.com
         ],
+        headers: {
+            'Document-Policy': 'js-profiling',
+        },
         historyApiFallback: true,
         hot: true,
         // inline: true,

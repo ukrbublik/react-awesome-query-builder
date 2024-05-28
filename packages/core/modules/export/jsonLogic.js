@@ -329,7 +329,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
     ret = formatField(meta, config, currentValue, parentField);
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
-  } else if (typeof fieldWidgetDef.jsonLogic === "function") {
+  } else if (typeof fieldWidgetDef?.jsonLogic === "function") {
     const fn = fieldWidgetDef.jsonLogic;
     const args = [
       currentValue,

@@ -1484,4 +1484,5 @@ export declare const CoreConfig: CoreConfig;
 export declare const BasicFuncs: Funcs;
 export declare const TreeStore: TreeStore;
 export declare const TreeActions: TreeActions;
+export declare const Immutable: any;
 

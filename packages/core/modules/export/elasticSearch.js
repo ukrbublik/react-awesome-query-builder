@@ -1,5 +1,6 @@
 import {getWidgetForFieldOp} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
+import { extendConfig } from "../utils/configUtils";
 
 
 /**
@@ -313,6 +314,7 @@ export const ES_7_SYNTAX = "ES_7_SYNTAX";
 export const ES_6_SYNTAX = "ES_6_SYNTAX";
 
 export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
+  const extendedConfig = extendConfig(config, undefined, false);
   // -- format the es dsl here
   if (!tree) return undefined;
   const type = tree.get("type");
@@ -335,10 +337,10 @@ export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
     if (value && Array.isArray(value[0])) {
       //TODO : Handle case where the value has multiple values such as in the case of a list
       return value[0].map((val) =>
-        buildEsRule(field, [val], operator, config, valueSrc, syntax)
+        buildEsRule(field, [val], operator, extendedConfig, valueSrc, syntax)
       );
     } else {
-      return buildEsRule(field, value, operator, config, valueSrc, syntax);
+      return buildEsRule(field, value, operator, extendedConfig, valueSrc, syntax);
     }
   }
 
@@ -346,8 +348,8 @@ export function elasticSearchFormat(tree, config, syntax = ES_6_SYNTAX) {
     const not = properties.get("not");
     let conjunction = properties.get("conjunction");
     if (!conjunction)
-      conjunction = defaultConjunction(config);
+      conjunction = defaultConjunction(extendedConfig);
     const children = tree.get("children1");
-    return buildEsGroup(children, conjunction, not, elasticSearchFormat, config, syntax);
+    return buildEsGroup(children, conjunction, not, elasticSearchFormat, extendedConfig, syntax);
   }
 }

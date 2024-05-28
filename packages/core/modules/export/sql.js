@@ -208,7 +208,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue);
   } else {
-    if (typeof fieldWidgetDef.sqlFormatValue === "function") {
+    if (typeof fieldWidgetDef?.sqlFormatValue === "function") {
       const fn = fieldWidgetDef.sqlFormatValue;
       const args = [
         currentValue,

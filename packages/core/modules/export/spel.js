@@ -385,7 +385,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc === "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
   } else {
-    if (typeof fieldWidgetDef.spelFormatValue === "function") {
+    if (typeof fieldWidgetDef?.spelFormatValue === "function") {
       const fn = fieldWidgetDef.spelFormatValue;
       const args = [
         currentValue,
