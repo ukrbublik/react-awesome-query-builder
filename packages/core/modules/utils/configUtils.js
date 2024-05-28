@@ -6,8 +6,9 @@ import {getWidgetForFieldOp} from "./ruleUtils";
 
 export * from "./configSerialize";
 export * from "./configExtend";
-export const _widgetDefKeysToOmit = widgetDefKeysToOmit; // for ui
+export * from "./configMemo";
 
+export const _widgetDefKeysToOmit = widgetDefKeysToOmit; // for ui
 
 export function* iterateFuncs(config) {
   yield* _iterateFields(config, config.funcs || {}, []);

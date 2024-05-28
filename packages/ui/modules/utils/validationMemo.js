@@ -1,4 +1,4 @@
-import {immutableEqual} from "../utils/stuff";
+import {immutableEqual} from "./stuff";
 import { Utils } from "@react-awesome-query-builder/core";
 const { validateAndFixTree } = Utils.Validation;
 

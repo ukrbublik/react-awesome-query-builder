@@ -1,15 +1,22 @@
 import pick from "lodash/pick";
-import { Utils } from "@react-awesome-query-builder/core";
-const { extendConfig, configKeys } = Utils.ConfigUtils;
+import { extendConfig } from "./configExtend";
+import { configKeys } from "./configUtils";
 
-const pickConfig = (props) => {
-  return pick(props, configKeys);
+let currentConfigMemo;
+
+export const getCurrentConfigMemo = () => {
+  return currentConfigMemo;
 };
 
 export const createConfigMemo = () => {
   const configStore = new Map();
   const maxSize = 2; // current and prev
   let configId = 0;
+  let isActive = true;
+
+  const pickConfig = (props) => {
+    return pick(props, configKeys);
+  };
 
   const extendAndStore = (config) => {
     const extendedConfig = extendConfig(config, ++configId);
@@ -43,7 +50,6 @@ export const createConfigMemo = () => {
       }
     }
 
-
     for (const extendedConfig of configStore.values()) {
       const foundParts = configKeys.filter(k => extendedConfig[k] === findConfig[k]);
       const found = foundParts.length === configKeys.length;
@@ -58,9 +64,19 @@ export const createConfigMemo = () => {
   const findOrExtend = (config) => {
     return findExtended(config) || extendAndStore(config);
   };
-  
-  return {
-    getExtended: (props) => findOrExtend(pickConfig(props)),
-    getBasic: findBasic
+
+  const clearConfigMemo = () => {
+    isActive = false;
+    configStore.clear();
   };
+
+  currentConfigMemo = {
+    getExtendedConfig: (props) => findOrExtend(pickConfig(props)),
+    findExtendedConfig: findExtended,
+    getBasicConfig: findBasic,
+    clearConfigMemo,
+    configId,
+  };
+
+  return currentConfigMemo;
 };

@@ -8,14 +8,27 @@ import clone from "clone";
 
 import { compileConfig } from "./configSerialize";
 import { getFieldRawConfig } from "./configUtils";
-
+import { getCurrentConfigMemo, createConfigMemo } from "./configMemo";
 
 export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
+  // Already extended?
   if (config.__configId) {
     return config;
+  }
+
+  // Try to take from memo (cache)
+  if (configId == undefined) {
+    let memo = getCurrentConfigMemo();
+    if (!memo) {
+      memo = createConfigMemo();
+    }
+    const found = memo.findExtendedConfig(config);
+    if (found) {
+      return found;
+    }
   }
 
   // Clone (and compile if need)
