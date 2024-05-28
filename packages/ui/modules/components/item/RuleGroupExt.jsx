@@ -32,11 +32,10 @@ class RuleGroupExt extends BasicGroup {
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "rule_group_ext--children";

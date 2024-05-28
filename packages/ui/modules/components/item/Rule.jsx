@@ -62,12 +62,24 @@ class Rule extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
+    const configChanged = !this.Icon || prevProps?.config !== nextProps?.config;
     const keysForMeta = ["selectedField", "selectedFieldSrc", "selectedFieldType", "selectedOperator", "config", "reordableNodesCnt", "isLocked"];
     const needUpdateMeta = !this.meta || keysForMeta.map(k => (nextProps[k] !== prevProps[k])).filter(ch => ch).length > 0;
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
     }
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderIcon, renderButton, renderButtonGroup, renderSwitch } = config.settings;
+      this.Icon = (pr) => renderIcon?.(pr, config.ctx);
+      this.Btn = (pr) => renderButton?.(pr, config.ctx);
+      this.BtnGrp = (pr) => renderButtonGroup?.(pr, config.ctx);
+      this.Switch = (pr) => renderSwitch?.(pr, config.ctx);
+    }
+    this.doRemove = () => {
+      this.props.removeSelf();
+    };
   }
 
   getMeta({selectedField, selectedFieldType, selectedOperator, config, reordableNodesCnt, isLocked}) {
@@ -102,17 +114,14 @@ class Rule extends Component {
   removeSelf() {
     const {confirmFn, config} = this.props;
     const {renderConfirm, removeRuleConfirmOptions: confirmOptions} = config.settings;
-    const doRemove = () => {
-      this.props.removeSelf();
-    };
     if (confirmOptions && !this.isEmptyCurrentRule()) {
       renderConfirm.call(config.ctx, {...confirmOptions,
-        onOk: doRemove,
+        onOk: this.doRemove,
         onCancel: null,
         confirmFn: confirmFn
       }, config.ctx);
     } else {
-      doRemove();
+      this.doRemove();
     }
   }
 
@@ -276,10 +285,8 @@ class Rule extends Component {
 
   renderDrag() {
     const { handleDraggerMouseDown } = this.props;
-    const { config } = this.props;
     const { showDragIcon } = this.meta;
-    const { renderIcon } = config.settings;
-    const Icon = (pr) => renderIcon?.(pr, config.ctx);
+    const Icon = this.Icon;
     const icon = <Icon
       type="drag"
     />;
@@ -293,14 +300,12 @@ class Rule extends Component {
   renderDel() {
     const {config, isLocked} = this.props;
     const {
-      deleteLabel, 
-      immutableGroupsMode, 
-      renderButton,
-      renderIcon,
+      deleteLabel,
+      immutableGroupsMode,
       canDeleteLocked
     } = config.settings;
-    const Icon = (pr) => renderIcon(pr, config.ctx);
-    const Btn = (pr) => renderButton(pr, config.ctx);
+    const Icon = this.Icon;
+    const Btn = this.Btn;
 
     return !immutableGroupsMode && (!isLocked || isLocked && canDeleteLocked) && (
       <Btn 
@@ -313,9 +318,8 @@ class Rule extends Component {
     const {config, isLocked, isTrueLocked, id} = this.props;
     const {
       lockLabel, lockedLabel, showLock,
-      renderSwitch
     } = config.settings;
-    const Switch = (pr) => renderSwitch(pr, config.ctx);
+    const Switch = this.Switch;
       
     return showLock && !(isLocked && !isTrueLocked) && (
       <Switch 
@@ -328,8 +332,7 @@ class Rule extends Component {
     const { showOperatorOptions, selectedFieldWidgetConfig } = this.meta;
     const { valueSrc, value, config } = this.props;
     const canShrinkValue = valueSrc?.first() == "value" && !showOperatorOptions && value.size == 1 && selectedFieldWidgetConfig.fullWidth;
-    const { renderButtonGroup } = config.settings;
-    const BtnGrp = (pr) => renderButtonGroup(pr, config.ctx);
+    const BtnGrp = this.BtnGrp;
 
     const parts = [
       this.renderField(),

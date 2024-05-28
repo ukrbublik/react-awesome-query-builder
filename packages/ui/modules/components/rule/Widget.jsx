@@ -58,6 +58,7 @@ export default class Widget extends Component {
 
   onPropsChanged(nextProps) {
     const prevProps = this.props;
+    const configChanged = !this.ValueSources || prevProps?.config !== nextProps?.config;
     const keysForMeta = [
       "config", "id", "parentFuncs",
       "field", "fieldSrc", "fieldType", "fieldFunc", "fieldArg", "leftField", "operator", "valueSrc", "asyncListValues",
@@ -77,6 +78,11 @@ export default class Widget extends Component {
 
     if (needUpdateMeta) {
       this.meta = this.getMeta(nextProps);
+    }
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderValueSources } = config.settings;
+      this.ValueSources = (pr) => renderValueSources(pr, config.ctx);
     }
   }
 
@@ -112,6 +118,7 @@ export default class Widget extends Component {
     config, field: simpleField, fieldSrc, fieldType, fieldFunc, fieldArg, operator, valueSrc: valueSrcs, value: values,
     isForRuleGroup, isCaseValue, isFuncArg, leftField, asyncListValues, parentFuncs, isLHS, id,
   }) {
+    const {valueSourcesInfo} = config.settings;
     const field = isFuncArg ? {func: fieldFunc, arg: fieldArg} : simpleField;
     const isOkWithoutField = !simpleField && fieldType;
     let iValueSrcs = valueSrcs;
@@ -145,8 +152,11 @@ export default class Widget extends Component {
 
     let valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition);
     if (!field) {
-      valueSources = Object.keys(config.settings.valueSourcesInfo);
+      valueSources = Object.keys(valueSourcesInfo);
     }
+    const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
+      label: valueSourcesInfo[srcKey].label
+    }]);
     const widgets = range(0, cardinality).map(delta => {
       const valueSrc = iValueSrcs?.get(delta) || null;
       let widget = getWidgetForFieldOp(config, field, operator, valueSrc);
@@ -211,6 +221,7 @@ export default class Widget extends Component {
       isSpecialRange: isTrueSpecialRange,
       cardinality,
       valueSources,
+      valueSourcesOptions,
       widgets,
       iValues, //correct for isFuncArg
       aField: field, //correct for isFuncArg
@@ -271,14 +282,10 @@ export default class Widget extends Component {
   renderValueSources = (delta, meta, props) => {
     const {config, isFuncArg, leftField, operator, readonly} = props;
     const {settings} = config;
-    const { valueSources, widgets, aField } = meta;
+    const { valueSources, widgets, aField, valueSourcesOptions } = meta;
     const field = isFuncArg ? leftField : aField;
     const {valueSrc, setValueSrcHandler} = widgets[delta];
-    const {valueSourcesInfo, renderValueSources} = settings;
-    const valueSourcesOptions = valueSources.map(srcKey => [srcKey, {
-      label: valueSourcesInfo[srcKey].label
-    }]);
-    const ValueSources = (pr) => renderValueSources(pr, config.ctx);
+    const ValueSources = this.ValueSources;
 
     const sourceLabel = settings.showLabels
       ? <label className="rule--label">&nbsp;</label>

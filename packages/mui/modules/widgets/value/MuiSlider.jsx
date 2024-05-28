@@ -9,25 +9,30 @@ export default (props) => {
 
   const handleSliderChange = useCallback((_e, newValue) => {
     setValue(newValue);
-  }, []);
+  }, [setValue]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     let val = e.target.value;
     if (val === "" || val === null)
       val = undefined;
     else
       val = Number(val);
     setValue(val);
-  };
+  }, [setValue]);
 
-  const handleInputBlur = () => {
+  const handleInputBlur = useCallback((e) => {
+    let val = e.target.value;
+    if (val === "" || val === null)
+      val = undefined;
+    else
+      val = Number(val);
     // TIP: Fix if typed value out of range in input
-    if (value < min) {
+    if (val < min) {
       setValue(min);
-    } else if (value > max) {
+    } else if (val > max) {
       setValue(max);
     }
-  };
+  }, [setValue, min, max]);
 
 
   const {width, ...rest} =  customProps || {};

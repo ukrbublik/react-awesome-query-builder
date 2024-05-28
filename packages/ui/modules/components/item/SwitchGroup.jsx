@@ -18,11 +18,10 @@ class SwitchGroup extends BasicGroup {
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "switch_group--children";

@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useCallback } from "react";
 import FormControl from "@mui/material/FormControl";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Button from "@mui/material/Button";
 
-const Conj = ({
+const Conj = React.memo(({
   conjKey, id, name, label, checked,
   setConjunction, readonly, disabled,
 }) => {
-  const onClick = React.useCallback(() => {
+  const onClick = useCallback(() => {
     setConjunction(conjKey);
   }, [conjKey, setConjunction]);
   const postfix = setConjunction.isDummyFn ? "__dummy" : "";
@@ -26,9 +26,9 @@ const Conj = ({
       {label}
     </Button>
   );
-};
+});
 
-const Conjs = ({
+const Conjs = React.memo(({
   id, not, setNot, conjunctionOptions, setConjunction, disabled, readonly, config, showNot, notLabel
 }) => {
   //TIP: disabled=true if only 1 rule; readonly=true if immutable mode
@@ -49,7 +49,7 @@ const Conjs = ({
       );
     });
   
-  const onNotClick = React.useCallback(() => {
+  const onNotClick = useCallback(() => {
     setNot(!not);
   }, [not, setNot]);
 
@@ -82,6 +82,6 @@ const Conjs = ({
       </ButtonGroup>
     </FormControl>
   );
-};
+});
 
 export default Conjs;

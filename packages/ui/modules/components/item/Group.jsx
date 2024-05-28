@@ -8,6 +8,7 @@ import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
 import {WithConfirmFn, dummyFn} from "../utils";
+import {useOnPropsChanged} from "../../utils/reactUtils";
 const {isEmptyGroupChildren} = Utils.RuleUtils;
 
 const defaultPosition = "topRight";
@@ -45,9 +46,30 @@ export class BasicGroup extends Component {
   constructor(props) {
     super(props);
 
+    useOnPropsChanged(this);
+    this.onPropsChanged(props);
+
     this.removeSelf = this.removeSelf.bind(this);
     this.setLock = this.setLock.bind(this);
     this.renderItem = this.renderItem.bind(this);
+  }
+
+  onPropsChanged(nextProps) {
+    const prevProps = this.props;
+    const configChanged = !this.Icon || prevProps?.config !== nextProps?.config;
+
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderIcon, renderConjs, renderBeforeActions, renderAfterActions } = config.settings;
+      this.Icon = (pr) => renderIcon?.(pr, config.ctx);
+      this.Conjs = (pr) => renderConjs?.(pr, config.ctx);
+      this.BeforeActions = typeof renderBeforeActions === "function" ? (pr) => renderBeforeActions?.(pr, config.ctx) : renderBeforeActions;
+      this.AfterActions = typeof renderAfterActions === "function" ? (pr) => renderAfterActions?.(pr, config.ctx) : renderAfterActions;
+    }
+
+    this.doRemove = () => {
+      this.props.removeSelf();
+    };
   }
 
   isGroupTopPosition() {
@@ -61,31 +83,20 @@ export class BasicGroup extends Component {
   removeSelf() {
     const {confirmFn, config} = this.props;
     const {renderConfirm, removeGroupConfirmOptions: confirmOptions} = config.settings;
-    const doRemove = () => {
-      this.props.removeSelf();
-    };
     if (confirmOptions && !this.isEmptyCurrentGroup()) {
       renderConfirm.call(config.ctx, {...confirmOptions,
-        onOk: doRemove,
+        onOk: this.doRemove,
         onCancel: null,
         confirmFn: confirmFn
       }, config.ctx);
     } else {
-      doRemove();
+      this.doRemove();
     }
   }
 
   isEmptyCurrentGroup() {
     const {children1, config} = this.props;
     return isEmptyGroupChildren(children1, config);
-  }
-
-  render() {
-    return <>
-      {this.renderHeaderWrapper()}
-      {this.renderChildrenWrapper()}
-      {this.renderFooterWrapper()}
-    </>;
   }
 
   showNot() {
@@ -157,25 +168,30 @@ export class BasicGroup extends Component {
   }
 
   renderBeforeActions = () => {
-    const BeforeActions = this.props.config.settings.renderBeforeActions;
+    const BeforeActions = this.BeforeActions;
     if (BeforeActions == undefined)
       return null;
-
-    return typeof BeforeActions === "function" ? BeforeActions(this.props, this.props.config.ctx) : BeforeActions;
+    return <BeforeActions
+      key="group-actions-before"
+      {...this.props}
+    />;
   };
 
   renderAfterActions = () => {
-    const AfterActions = this.props.config.settings.renderAfterActions;
+    const AfterActions = this.AfterActions;
     if (AfterActions == undefined)
       return null;
-
-    return typeof AfterActions === "function" ? AfterActions(this.props, this.props.config.ctx) : AfterActions;
+    return <AfterActions
+      key="group-actions-after"
+      {...this.props}
+    />;
   };
 
   renderActions() {
     const {config, addRule, addGroup, isLocked, isTrueLocked, id} = this.props;
 
     return <GroupActions
+      key="group-actions"
       config={config}
       addRule={addRule}
       addGroup={addGroup}
@@ -207,7 +223,7 @@ export class BasicGroup extends Component {
 
   renderChildren() {
     const {children1} = this.props;
-    return children1 ? children1.valueSeq().map(this.renderItem).toArray() : null;
+    return children1 ? children1.valueSeq().toArray().map(this.renderItem) : null;
   }
 
   renderItem(item) {
@@ -270,9 +286,7 @@ export class BasicGroup extends Component {
 
   renderDrag() {
     const { handleDraggerMouseDown } = this.props;
-    const { config } = this.props;
-    const { renderIcon } = config.settings;
-    const Icon = (pr) => renderIcon?.(pr, config.ctx);
+    const Icon = this.Icon;
     const icon = <Icon
       type="drag"
     />;
@@ -315,16 +329,30 @@ export class BasicGroup extends Component {
       showNot: this.showNot(),
       isLocked: isLocked
     };
-    return renderConjs(renderProps, config.ctx);
+    const Conjs = this.Conjs;
+    return (
+      <Conjs
+        key="group-conjs"
+        {...renderProps}
+      />
+    );
   }
 
   renderHeader() {
     return (
-      <div className={"group--conjunctions"}>
+      <div key="group-conjunctions" className={"group--conjunctions"}>
         {this.renderConjs()}
         {this.renderDrag()}
       </div>
     );
+  }
+
+  render() {
+    return <>
+      {this.renderHeaderWrapper()}
+      {this.renderChildrenWrapper()}
+      {this.renderFooterWrapper()}
+    </>;
   }
 }
 
