@@ -1988,7 +1988,6 @@ describe("optimizeRenderWithInternals (MUI)", () => {
     await with_qb_mui(
       [
         with_all_types, with_funcs_validation, with_show_error, with_fieldSources,
-        // configs.with_optimizeRenderWithInternals, // test will fail with optimization
       ], inits.empty, null,
       async (qb, { config, onChange, pauseTest }) => {
         /* eslint-disable @typescript-eslint/no-unsafe-argument */

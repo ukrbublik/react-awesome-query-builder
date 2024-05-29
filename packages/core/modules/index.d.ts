@@ -1319,7 +1319,6 @@ export interface BehaviourSettings {
   maxNumberOfRules?: Number;
   maxNumberOfCases?: Number;
   showErrorMessage?: boolean;
-  optimizeRenderWithInternals?: boolean;
   canShortMongoQuery?: boolean;
   convertableWidgets?: TypedMap<Array<string>>;
   removeEmptyGroupsOnLoad?: boolean;

@@ -32,15 +32,15 @@ const ValueSources = React.memo(({ valueSources, valueSrc, title, setValueSrc, r
 
   const handleOpen = useCallback((event) => {
     setAnchorEl(event.currentTarget);
-  }, []);
+  }, [setAnchorEl]);
 
   const handleClose = useCallback(() => {
     setAnchorEl(null);
-  }, []);
+  }, [setAnchorEl]);
 
   const toggleOpenClose = useCallback((event) => {
     anchorEl ? handleClose() : handleOpen(event);
-  }, [handleClose, handleOpen]);
+  }, [handleClose, handleOpen, anchorEl]);
 
   const handleChange = useCallback((_e, srcKey) => {
     setValueSrc(srcKey);

@@ -1568,22 +1568,6 @@ export const with_keepInputOnChangeFieldSrc = (BasicConfig) => ({
   }
 });
 
-export const with_optimizeRenderWithInternals = (BasicConfig) => ({
-  ...BasicConfig,
-  settings: {
-    ...BasicConfig.settings,
-    optimizeRenderWithInternals: true,
-  }
-});
-
-export const without_optimizeRenderWithInternals = (BasicConfig) => ({
-  ...BasicConfig,
-  settings: {
-    ...BasicConfig.settings,
-    optimizeRenderWithInternals: false,
-  }
-});
-
 export const with_dot_in_field = (BasicConfig) => ({
   ...BasicConfig,
   fields: {

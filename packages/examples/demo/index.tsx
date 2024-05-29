@@ -767,15 +767,11 @@ const DemoQueryBuilder: React.FC = () => {
       runActions();
     };
 
-    // cold
-    run();
-
     if (state.renderBocks.withProfile) {
       console.profile();
     }
     console.time("actions");
 
-    // hot
     run();
 
     console.timeEnd("actions");
