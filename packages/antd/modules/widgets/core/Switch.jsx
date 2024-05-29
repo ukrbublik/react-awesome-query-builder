@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Switch , Button } from "antd";
 import { LockFilled, UnlockOutlined } from "@ant-design/icons";
 
 export default ({value, setValue, label, checkedLabel, hideLabel, id, config, type}) => {
   const {renderSize} = config.settings;
-  const onSwitch = switchValue => setValue(switchValue);
-  const onClick = () => setValue(!value);
+  const onSwitch = useCallback(switchValue => setValue(switchValue), [setValue]);
+  const onClick = useCallback(() => setValue(!value), [setValue, value]);
   const postfix = type;
   const showLabel = hideLabel ? null : (value ? (checkedLabel || label) : label);
 
-  if (type == "lock") {
+  if (type === "lock") {
     return <Button
       key={id+postfix}
       type={value ? "danger" : undefined}
