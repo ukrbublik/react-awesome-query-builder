@@ -187,10 +187,41 @@ export const getFieldPathParts = (field, config, onlyKeys = false) => {
       .map((parts) => parts.join(fieldSeparator));
 };
 
+export const getFieldCacheKey = (field) => {
+  if (typeof field === "string" || Array.isArray(field)) {
+    return `field:${getFieldPath(field)}`;
+  }
+  if (typeof field === "object" && field) {
+    if (!field.func && !!field.type) {
+      // it's already a config
+      return null;
+    }
+    if (field.func) {
+      if (field.func && field.arg) {
+        // it's func arg
+        return `arg:${getFieldPath(field.func)}__${field.arg}`;
+      } else {
+        // it's field func
+        return `func:${getFieldPath(field.func)}`;
+      }
+    }
+  }
+  if (field?.get?.("func")) { // immutable
+    if (field?.get("arg")) {
+      // it's func arg
+      return `arg:${getFieldPath(field.get("func"))}__${field.get("arg")}`;
+    } else {
+      // it's field func
+      return `func:${getFieldPath(field.get("func"))}`;
+    }
+  }
+  return null;
+};
+
 export const getFieldSrc = (field) => {
   if (!field)
     return null;
-  if (typeof field == "object") {
+  if (typeof field === "object") {
     if (!field.func && !!field.type) {
       // it's already a config
       return "field";

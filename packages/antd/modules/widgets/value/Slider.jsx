@@ -2,7 +2,7 @@ import React, { PureComponent, useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import { Slider, InputNumber, Col } from "antd";
 
-const AntSlider = React.memo(({
+const SliderWidget = React.memo(({
   setValue, placeholder, config, field, value, customProps, fieldDefinition, readonly, errorMessage,
   min, max, step, marks,
 }) => {
@@ -63,8 +63,8 @@ const AntSlider = React.memo(({
   );
 });
 
-AntSlider.displayName = "AntSlider";
-AntSlider.propTypes = {
+SliderWidget.displayName = "SliderWidget";
+SliderWidget.propTypes = {
   setValue: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   config: PropTypes.object.isRequired,
@@ -80,4 +80,4 @@ AntSlider.propTypes = {
   marks: PropTypes.object,
 };
 
-export default AntSlider;
+export default SliderWidget;

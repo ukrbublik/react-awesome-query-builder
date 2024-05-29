@@ -190,14 +190,14 @@ describe("antdesign widgets interactions", () => {
 
   it("change slider value", async () => {
     await with_qb_ant(configs.with_all_types, inits.with_slider, "JsonLogic", (qb, {expect_jlogic}) => {
-      const w = qb.find("SliderWidget").instance();
+      const w = qb.find("Slider").last();
 
-      w.handleChange(12);
+      w.prop("onChange")?.(12);
       expect_jlogic([null,
         { "and": [{ "==": [ { "var": "slider" }, 12 ] }] }
       ]);
 
-      w.handleChange("");
+      w.prop("onChange")?.("");
       expect_jlogic([null, undefined], 1);
     });
   });

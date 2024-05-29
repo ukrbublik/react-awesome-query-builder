@@ -23,7 +23,7 @@ class RuleGroup extends BasicGroup {
   }
 
   onPropsChanged(nextProps) {
-    super.onPropsChanged(nextProps)
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "rule_group--children";

@@ -163,7 +163,7 @@ const setNot = (state, path, not) => {
   }
   state = state.setIn(expandTreePath(path, "properties", "not"), not);
   return state;
-}
+};
 
 /**
  * @param {Immutable.Map} state
@@ -178,7 +178,7 @@ const setLock = (state, path, lock) => {
   }
   state = removeIsLockedInTree(state.setIn(expandTreePath(path, "properties", "isLocked"), lock));
   return state;
-}
+};
 
 /**
  * @param {Immutable.Map} state
@@ -193,7 +193,7 @@ const setConjunction = (state, path, conjunction) => {
   }
   state = state.setIn(expandTreePath(path, "properties", "conjunction"), conjunction);
   return state;
-}
+};
 
 
 /**
