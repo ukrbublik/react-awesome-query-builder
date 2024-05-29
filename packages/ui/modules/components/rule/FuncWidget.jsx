@@ -6,7 +6,6 @@ import Widget from "./Widget";
 import {Col} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 const {getFuncConfig} = Utils.ConfigUtils;
-const {setFunc, setArgValue, setArgValueSrc} = Utils.FuncUtils;
 const {shallowEqual} = Utils.OtherUtils;
 
 
@@ -76,13 +75,6 @@ export default class FuncWidget extends Component {
     this.props.setFuncValue(
       isLHS ? -1 : (delta || 0), parentFuncs, null, funcKey, "!func", undefined, _meta
     );
-
-    // old bubbling
-    // this.props.setValue(
-    //   setFunc(this.props.value, funcKey, this.props.config),
-    //   undefined,
-    //   _meta,
-    // );
   };
 
   setArgValue = (argKey, argVal, widgetType, asyncListValues, _meta) => {
@@ -91,16 +83,6 @@ export default class FuncWidget extends Component {
     this.props.setFuncValue(
       isLHS ? -1 : (delta || 0), parentFuncs, argKey, argVal, widgetType, asyncListValues, _meta
     );
-
-    // old bubbling
-    // const {funcDefinition} = this.meta;
-    // const {args} = funcDefinition;
-    // const argDefinition = args[argKey];
-    // this.props.setValue(
-    //   setArgValue(this.props.value, argKey, argVal, argDefinition, config),
-    //   asyncListValues,
-    //   _meta,
-    // );
   };
 
   setArgValueSrc = (argKey, argValSrc, _meta) => {
@@ -109,16 +91,6 @@ export default class FuncWidget extends Component {
     this.props.setFuncValue(
       isLHS ? -1 : (delta || 0), parentFuncs, argKey, argValSrc, "!valueSrc", undefined, _meta
     );
-
-    // old bubbling
-    // const {funcDefinition} = this.meta;
-    // const {args} = funcDefinition;
-    // const argDefinition = args[argKey];
-    // this.props.setValue(
-    //   setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
-    //   undefined,
-    //   _meta,
-    // );
   };
 
   renderFuncSelect = () => {

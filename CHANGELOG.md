@@ -2,8 +2,8 @@
 - 6.6.0
   - Add JsonLogic Export for SwitchCase (PR #1013)
   - Add support of `tooltip` for operator config (PR #1011) (issue #261)
-  - Optimizations (issue #342)
-  - Removed `optimizeRenderWithInternals` from `settings`
+  - Optimizations (PR #1054) (issue #342)
+  - Removed `optimizeRenderWithInternals` from `settings` (PR #1054)
 - 6.5.2
   - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
 - 6.5.1

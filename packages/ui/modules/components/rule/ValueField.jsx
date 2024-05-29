@@ -53,7 +53,7 @@ export default class ValueField extends Component {
 
   getItems({config, field, fieldType, operator, parentField, isFuncArg, fieldDefinition}) {
     const {canCompareFieldWithField} = config.settings;
-    const fieldSeparator = config.settings.fieldSeparator;
+    // const fieldSeparator = config.settings.fieldSeparator;
     const parentFieldPath = getFieldParts(parentField, config);
     const parentFieldConfig = parentField ? getFieldConfig(config, parentField) : null;
     const sourceFields = parentField ? parentFieldConfig?.subfields : config.fields;

@@ -5,7 +5,6 @@ import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {SwitchGroupActions} from "./SwitchGroupActions";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} = Utils.TreeUtils;

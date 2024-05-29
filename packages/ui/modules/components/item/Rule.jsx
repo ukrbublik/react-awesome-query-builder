@@ -54,6 +54,7 @@ class Rule extends Component {
   constructor(props) {
     super(props);
     useOnPropsChanged(this);
+  
     this.removeSelf = this.removeSelf.bind(this);
     this.setLock = this.setLock.bind(this);
 
