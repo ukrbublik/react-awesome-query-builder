@@ -974,7 +974,7 @@ export default (initialConfig, tree, getMemoizedTree, setLastTree, getLastConfig
   };
     
   return (state = emptyState, action) => {
-    const config = getLastConfig?.() ?? action.config ?? initialConfig;
+    const config = getLastConfig?.() ?? action?.config ?? initialConfig;
     const unset = {__lastAction: undefined};
     let set = {};
     let actionMeta = getActionMeta(action, state);
