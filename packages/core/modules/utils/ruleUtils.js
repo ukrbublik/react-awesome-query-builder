@@ -153,21 +153,21 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       }
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
-      if (widget == "field") {
+      if (widget === "field") {
         canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig).length > 0;
       }
-      if (widget == "func") {
+      if (widget === "func") {
         canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig).length > 0;
       }
       // If can't check operators, don't add
       // Func args don't have operators
-      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg && field != "!case_value")
+      if (valueSrc === "value" && !widgetConfig.operators && !isFuncArg && field !== "!case_value")
         canAdd = false;
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
-      if (valueSrc && valueSrc != widgetValueSrc && valueSrc != "const")
+      if (valueSrc && valueSrc != widgetValueSrc && valueSrc !== "const")
         canAdd = false;
-      if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc != "value"))
+      if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc !== "value"))
         canAdd = false;
       if (canAdd) {
         widgets.push(widget);
@@ -188,10 +188,10 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
     } else if (w == fieldConfig.mainWidget) {
       wg += 100;
     }
-    if (w == "field") {
+    if (w === "field") {
       wg -= 1;
     }
-    if (w == "func") {
+    if (w === "func") {
       wg -= 2;
     }
     return wg;
@@ -210,19 +210,23 @@ export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) =
 export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
   if (!fieldDefinition)
     return valueSrcs;
-  const fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
+  let fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
+  if (fieldType === "!group") {
+    // todo: aggregation can be not only number?
+    fieldType = "number";
+  }
   if (!valueSrcs)
     valueSrcs = Object.keys(config.settings.valueSourcesInfo);
   return valueSrcs.filter(vs => {
     let canAdd = true;
-    if (vs == "field") {
+    if (vs === "field") {
       if (config.__fieldsCntByType) {
         // tip: LHS field can be used as arg in RHS function
         const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
         canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
       }
     }
-    if (vs == "func") {
+    if (vs === "func") {
       if (config.__funcsCntByType)
         canAdd = canAdd && !!config.__funcsCntByType[fieldType];
       if (fieldDefinition.funcs)

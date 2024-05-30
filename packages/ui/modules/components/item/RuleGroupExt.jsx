@@ -186,6 +186,7 @@ class RuleGroupExt extends BasicGroup {
       operatorOptions,
       value,
       valueType, // new Immutable.List(["number"])
+      // todo: aggregation can be not only number?
       valueSrc: ["value"], //new Immutable.List(["value"]), // should be fixed in isEmptyRuleGroupExtPropertiesAndChildren
       //asyncListValues,
       valueError,
@@ -207,6 +208,7 @@ class RuleGroupExt extends BasicGroup {
       {...this._buildWidgetProps(this.props)}
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
+      // todo: aggregation can be not only number?
       setValueSrc={dummyFn}
       readonly={immutableValuesMode || isLocked}
       id={this.props.id}

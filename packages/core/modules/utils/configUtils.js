@@ -254,12 +254,6 @@ export const getFieldConfig = (config, field) => {
   if (typeof field == "object") {
     if (!field.func && !!field.type) {
       // it's already a config
-      // if (!field.defaultOperator) {
-      //   // if not complete config..
-      //   // merge, but don't merge operators (rewrite instead)
-      //   const typeConfig = config.types[field.type] || {};
-      //   return mergeWith({}, typeConfig, field, mergeCustomizerNoArrays);
-      // }
       return field;
     }
     if (field.func) {
@@ -285,12 +279,7 @@ export const getFieldConfig = (config, field) => {
   const fieldConfig = getFieldRawConfig(config, field);
   if (!fieldConfig)
     return null; //throw new Error("Can't find field " + field + ", please check your config");
-
-  //merge, but don't merge operators (rewrite instead)
-  const typeConfig = config.types[fieldConfig.type] || {};
-  let ret = mergeWith({}, typeConfig, fieldConfig || {}, mergeCustomizerNoArrays);
-
-  return ret;
+  return fieldConfig;
 };
 
 export const getOperatorConfig = (config, operator, field = null) => {

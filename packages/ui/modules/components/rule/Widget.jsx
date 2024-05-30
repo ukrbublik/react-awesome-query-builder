@@ -151,6 +151,10 @@ export default class Widget extends Component {
     }
 
     let valueSources = getValueSourcesForFieldOp(config, field, operator, fieldDefinition);
+    if (isForRuleGroup) {
+      // todo: aggregation can be not only number?
+      valueSources = ["value"];
+    }
     if (!field) {
       valueSources = Object.keys(valueSourcesInfo);
     }

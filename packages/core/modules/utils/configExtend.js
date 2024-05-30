@@ -3,12 +3,12 @@ import uuid from "./uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart, logger, deepFreeze, mergeCustomizerNoArrays} from "./stuff";
+import {mergeArraysSmart, logger, deepFreeze, mergeCustomizerNoArrays, shallowCopy} from "./stuff";
 import clone from "clone";
 
 import { compileConfig } from "./configSerialize";
 import { getFieldRawConfig } from "./configUtils";
-import { getCurrentConfigMemo, createConfigMemo } from "./configMemo";
+import { findExtendedConfigInAllMemos, getCommonMemo } from "./configMemo";
 
 export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
@@ -20,16 +20,12 @@ export const extendConfig = (config, configId, canCompile = true) => {
   }
 
   // Try to take from memo (cache)
-  if (configId == undefined) {
-    let memo = getCurrentConfigMemo();
-    if (!memo) {
-      memo = createConfigMemo();
-    }
-    const found = memo.findExtendedConfig(config);
-    if (found) {
-      return found;
-    }
+  const cachedExtConfig = findExtendedConfigInAllMemos(config);
+  if (cachedExtConfig) {
+    return cachedExtConfig;
   }
+
+  const origConfig = config;
 
   // Clone (and compile if need)
   if (canCompile && config.settings.useConfigCompress) {
@@ -65,7 +61,13 @@ export const extendConfig = (config, configId, canCompile = true) => {
     value: configId || uuid()
   });
 
+  config.__cache__ = {};
+
   deepFreeze(config);
+
+  // Save to memo (cache)
+  const memo = getCommonMemo();
+  memo.storeConfigPair(origConfig, config);
 
   return config;
 };
@@ -156,92 +158,119 @@ function extendFuncArgsConfig(subconfig, config, path = []) {
   }
 }
 
+function normalizeFieldSettings(fieldConfig, config, type) {
+  const keysToPutInFieldSettings = ["listValues", "treeValues", "allowCustomValues", "validateValue"];
+  for (const k of keysToPutInFieldSettings) {
+    if (fieldConfig[k]) {
+      if (!fieldConfig.fieldSettings)
+        fieldConfig.fieldSettings = {};
+      fieldConfig.fieldSettings[k] = fieldConfig[k];
+      delete fieldConfig[k];
+    }
+  }
+
+  // normalize listValues
+  if (fieldConfig.fieldSettings?.listValues) {
+    if (config.settings.normalizeListValues) {
+      fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues.call(
+        config.ctx,
+        fieldConfig.fieldSettings.listValues, type, fieldConfig.fieldSettings
+      );
+    }
+  }
+  // same for treeValues
+  if (fieldConfig.fieldSettings?.treeValues) {
+    if (config.settings.normalizeListValues) {
+      fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues.call(
+        config.ctx,
+        fieldConfig.fieldSettings.treeValues, type, fieldConfig.fieldSettings
+      );
+    }
+  }
+}
+
 function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
-  let operators = null, defaultOperator = null;
-  const typeConfig = config.types[fieldConfig.type || fieldConfig.returnType];
   const isFunc = !!fieldConfig.returnType;
+  const type = fieldConfig.type || fieldConfig.returnType;
+  const isGroup = type === "!struct" || type === "!group";
+  const typeConfig = config.types[type];
   const excludeOperatorsForField = fieldConfig.excludeOperators || [];
-  if (fieldConfig.type != "!struct" && fieldConfig.type != "!group") {
-    const keysToPutInFieldSettings = ["listValues", "treeValues", "allowCustomValues", "validateValue"];
-    if (!fieldConfig.fieldSettings)
-      fieldConfig.fieldSettings = {};
-    for (const k of keysToPutInFieldSettings) {
-      if (fieldConfig[k]) {
-        fieldConfig.fieldSettings[k] = fieldConfig[k];
-        delete fieldConfig[k];
-      }
-    }
+  let operators = (fieldConfig.operators || typeConfig?.operators || []).filter(op => !excludeOperatorsForField.includes(op));
+  let defaultOperator = fieldConfig.defaultOperator || typeConfig?.defaultOperator;
 
-    // normalize listValues
-    if (fieldConfig.fieldSettings.listValues) {
-      if (config.settings.normalizeListValues) {
-        fieldConfig.fieldSettings.listValues = config.settings.normalizeListValues.call(
-          config.ctx,
-          fieldConfig.fieldSettings.listValues, fieldConfig.type, fieldConfig.fieldSettings
-        );
-      }
-    }
-    // same for treeValues
-    if (fieldConfig.fieldSettings.treeValues) {
-      if (config.settings.normalizeListValues) {
-        fieldConfig.fieldSettings.treeValues = config.settings.normalizeListValues.call(
-          config.ctx,
-          fieldConfig.fieldSettings.treeValues, fieldConfig.type, fieldConfig.fieldSettings
-        );
-      }
-    }
+  if (!typeConfig) {
+    //console.warn(`No type config for ${type}`);
+    fieldConfig.disabled = true;
+    return;
+  }
 
-    if (!typeConfig) {
-      //console.warn(`No type config for ${fieldConfig.type}`);
-      fieldConfig.disabled = true;
-      return;
-    }
-    if (!isFuncArg && !isFunc) {
-      if (!config.__fieldsCntByType[fieldConfig.type])
-        config.__fieldsCntByType[fieldConfig.type] = 0;
-      config.__fieldsCntByType[fieldConfig.type]++;
-    }
+  if (!isFuncArg && !isFunc) {
+    if (!config.__fieldsCntByType[type])
+      config.__fieldsCntByType[type] = 0;
+    config.__fieldsCntByType[type]++;
+  }
 
-    if (isFuncArg)
-      fieldConfig._isFuncArg = true;
+  if (isFuncArg) {
+    fieldConfig._isFuncArg = true;
+  }
 
-    if (!isFunc) { // tip: func always have its own widget
-      fieldConfig.mainWidget = fieldConfig.mainWidget || typeConfig.mainWidget;
-      fieldConfig.valueSources = fieldConfig.valueSources || typeConfig.valueSources;
-      const excludeOperatorsForType = typeConfig.excludeOperators || [];
-      if (!fieldConfig.widgets)
-        fieldConfig.widgets = {};
-      for (let widget in typeConfig.widgets) {
-        let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
-        const typeWidgetConfig = typeConfig.widgets[widget] || {};
-        if (!isFuncArg) {
-          const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
-          const shouldIncludeOperators = fieldConfig.preferWidgets
-            && (widget == "field" || fieldConfig.preferWidgets.includes(widget))
-            || excludeOperators.length > 0;
-          if (fieldWidgetConfig.operators) {
-            const addOperators = fieldWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
-            operators = [...(operators || []), ...addOperators];
-          } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
-            const addOperators = typeWidgetConfig.operators.filter(o => !excludeOperators.includes(o));
-            operators = [...(operators || []), ...addOperators];
-          }
-          if (fieldWidgetConfig.defaultOperator)
-            defaultOperator = fieldWidgetConfig.defaultOperator;
+  normalizeFieldSettings(fieldConfig, config, type);
+
+  // copy from type to field
+  Object.keys(typeConfig).filter((k) => !["widgets", "operators", "defaultOperator"].includes(k)).map((k) => {
+    if (!fieldConfig[k]) {
+      fieldConfig[k] = shallowCopy(typeConfig[k]);
+    }
+  });
+
+  // copy widgets
+  if (!isFunc) { // tip: func always have its own widget
+    const excludeOperatorsForType = typeConfig.excludeOperators || [];
+    if (!fieldConfig.widgets)
+      fieldConfig.widgets = {};
+    for (let widget in typeConfig.widgets) {
+      let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
+      const typeWidgetConfig = typeConfig.widgets[widget] || {};
+      if (!isFuncArg) {
+        const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
+        const shouldIncludeOperators = fieldConfig.preferWidgets
+          && (widget == "field" || fieldConfig.preferWidgets.includes(widget))
+          || excludeOperators.length > 0;
+        if (fieldWidgetConfig.operators) {
+          const addOperators = fieldWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
+          fieldWidgetConfig.operators = addOperators;
+          operators = [...(operators || []), ...addOperators];
+        } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
+          const addOperators = typeWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
+          fieldWidgetConfig.operators = addOperators;
+          operators = [...(operators || []), ...addOperators];
         }
-
-        if (widget == fieldConfig.mainWidget) {
-          fieldWidgetConfig = merge({}, {widgetProps: fieldConfig.mainWidgetProps || {}}, fieldWidgetConfig);
-        }
-        fieldConfig.widgets[widget] = fieldWidgetConfig;
+        if (fieldWidgetConfig.defaultOperator)
+          defaultOperator = fieldWidgetConfig.defaultOperator;
       }
+
+      if (widget == fieldConfig.mainWidget) {
+        fieldWidgetConfig.widgetProps = {
+          ...(fieldConfig.mainWidgetProps || {}),
+          ...(fieldWidgetConfig.widgetProps || {}),
+        };
+      }
+
+      fieldWidgetConfig = {
+        ...typeWidgetConfig,
+        ...fieldWidgetConfig,
+      };
+
+      fieldConfig.widgets[widget] = fieldWidgetConfig;
     }
-    if (!isFuncArg) {
-      if (!fieldConfig.operators && operators)
-        fieldConfig.operators = Array.from(new Set(operators));
-      fieldConfig._origDefaultOperator = fieldConfig.defaultOperator;
-      if (!fieldConfig.defaultOperator && defaultOperator)
-        fieldConfig.defaultOperator = defaultOperator;
+  }
+
+  if (!isFuncArg) { // tip: operators are not used for func args
+    if (!fieldConfig.operators) {
+      fieldConfig.operators = Array.from(new Set(operators));
+    }
+    if (!fieldConfig.defaultOperator) {
+      fieldConfig.defaultOperator = defaultOperator;
     }
   }
 

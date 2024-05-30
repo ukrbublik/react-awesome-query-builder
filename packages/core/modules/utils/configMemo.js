@@ -2,16 +2,40 @@ import pick from "lodash/pick";
 import { extendConfig } from "./configExtend";
 import { configKeys } from "./configUtils";
 
-let currentConfigMemo;
+let memoId = 0;
+let configId = 0;
+let commonMemo;
+const memos = {};
 
-export const getCurrentConfigMemo = () => {
-  return currentConfigMemo;
+export const getCommonMemo = () => {
+  if (!commonMemo) {
+    commonMemo = createConfigMemo({
+      maxSize: 3,
+    });
+  }
+  return commonMemo;
 };
 
-export const createConfigMemo = () => {
+export const findExtendedConfigInAllMemos = (config) => {
+  let foundExtConfig;
+  for (const k in memos) {
+    const found = memos[k].findExtendedConfig(config);
+    if (found) {
+      foundExtConfig = found;
+      break;
+    }
+  }
+  return foundExtConfig;
+};
+
+export const createConfigMemo = (meta = {
+  reactIndex: undefined,
+  maxSize: 2, // current and prev
+}) => {
   const configStore = new Map();
-  const maxSize = 2; // current and prev
-  let configId = 0;
+  const maxSize = meta.maxSize || 2;
+  const currentMemoId = ++memoId;
+  let currentMemo;
   let isActive = true;
 
   const pickConfig = (props) => {
@@ -20,11 +44,19 @@ export const createConfigMemo = () => {
 
   const extendAndStore = (config) => {
     const extendedConfig = extendConfig(config, ++configId);
+    storeConfigPair(config, extendedConfig);
+    return extendedConfig;
+  };
+
+  const getSize = () => {
+    return configStore.size;
+  };
+
+  const storeConfigPair = (config, extendedConfig) => {
     if ((configStore.size + 1) > maxSize) {
       configStore.delete(configStore.keys().next().value);
     }
     configStore.set(config, extendedConfig);
-    return extendedConfig;
   };
 
   const findBasic = (findConfig) => {
@@ -68,15 +100,29 @@ export const createConfigMemo = () => {
   const clearConfigMemo = () => {
     isActive = false;
     configStore.clear();
+    delete memos[currentMemoId];
+    if (commonMemo === currentMemo) {
+      commonMemo = undefined;
+    }
   };
 
-  currentConfigMemo = {
+  currentMemo = {
     getExtendedConfig: (props) => findOrExtend(pickConfig(props)),
     findExtendedConfig: findExtended,
     getBasicConfig: findBasic,
     clearConfigMemo,
     configId,
+    storeConfigPair,
+    getSize,
+    configStore,
+    memoId: currentMemoId,
+    meta,
   };
 
-  return currentConfigMemo;
+  if (meta.reactIndex === undefined) {
+    commonMemo = currentMemo;
+  }
+  memos[currentMemoId] = currentMemo;
+
+  return currentMemo;
 };
