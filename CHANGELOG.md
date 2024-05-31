@@ -4,6 +4,8 @@
   - Add support of `tooltip` for operator config (PR #1011) (issue #261)
   - Optimizations (PR #1054) (issue #342)
   - Removed `optimizeRenderWithInternals` from `settings` (PR #1054)
+  - Fixed `TreeStore` - 2nd arg `action` can be undefined (PR #1054) (issue #1056)
+  - Fixed import of negative number in SpEL (PR #1054) (issue #1055)
 - 6.5.2
   - Updated dependencies. `@babel/runtime` is now dep for core package (PR #1051) (issue #964)
 - 6.5.1
