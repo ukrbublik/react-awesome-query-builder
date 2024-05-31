@@ -10,9 +10,9 @@ describe("query with !struct and !group", () => {
       await with_qb_skins(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", (qb) => {
         expect(qb.find(".query-builder")).to.have.length(1);
       }, {
-        ignoreLog: (errText) => {
-          return errText.includes("Operator between is not supported for field results.slider");
-        }
+        // ignoreLog: (errText) => {
+        //   return errText.includes("Operator between is not supported for field results.slider");
+        // }
       });
     });
     it("should handle custom operator in !group arrays", async () => {
@@ -45,14 +45,17 @@ describe("query with !struct and !group", () => {
 
   describe("export", () => {
     export_checks(configs.with_struct_and_group, inits.with_struct_and_group, "JsonLogic", {
-      //tip: rule with slider in range [13, 36] will be removed, cause valueType[1] should be field
-      "query": "((results.slider == 22 && results.stock == true) && user.firstName == \"abc\" && !!user.login)",
-      "queryHuman": "((Results.Slider = 22 AND Results.In stock) AND Username = abc AND User.login IS NOT EMPTY)",
-      "sql": "((results.slider = 22 AND results.stock = true) AND user.firstName = 'abc' AND COALESCE(user.login, '') <> '')",
+      "query": "((results.slider == 22 && results.slider >= 13 && results.slider <= 36 && results.stock == true) && user.firstName == \"abc\" && !!user.login)",
+      "queryHuman": "((Results.Slider = 22 AND Results.Slider BETWEEN 13 AND 36 AND Results.In stock) AND Username = abc AND User.login IS NOT EMPTY)",
+      "sql": "((results.slider = 22 AND results.slider BETWEEN 13 AND 36 AND results.stock = true) AND user.firstName = 'abc' AND COALESCE(user.login, '') <> '')",
       "mongo": {
         "results": {
           "$elemMatch": {
-            "slider": 22,
+            "slider": {
+              "$eq": 22,
+              "$gte": 13,
+              "$lte": 36
+            },
             "stock": true
           }
         },
@@ -65,7 +68,9 @@ describe("query with !struct and !group", () => {
         "and": [
           {
             "and": [{
-              "==": [ { "var": "results.slider" },  22 ]
+              "==": [ { "var": "results.slider" }, 22 ]
+            }, {
+              "<=": [ 13, { "var": "results.slider" }, 36 ]
             }, {
               "==": [ { "var": "results.stock" },  true ]
             }]
@@ -78,7 +83,7 @@ describe("query with !struct and !group", () => {
       }
     }, [
       // validation:
-      "Results.Slider BETWEEN 13 AND 36  >>  * [lhs] Operator between is not supported for field results.slider. * [rhs] Incomplete RHS"
+      // "Results.Slider BETWEEN 13 AND 36  >>  * [lhs] Operator between is not supported for field results.slider. * [rhs] Incomplete RHS"
     ], {
       //ignoreLog
     });

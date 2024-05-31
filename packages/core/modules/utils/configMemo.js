@@ -10,16 +10,18 @@ const memos = {};
 export const getCommonMemo = () => {
   if (!commonMemo) {
     commonMemo = createConfigMemo({
+      reactIndex: undefined,
       maxSize: 3,
+      canCompile: undefined, // default is true
     });
   }
   return commonMemo;
 };
 
-export const findExtendedConfigInAllMemos = (config) => {
+export const findExtendedConfigInAllMemos = (config, needsToBeCompiled) => {
   let foundExtConfig;
   for (const k in memos) {
-    const found = memos[k].findExtendedConfig(config);
+    const found = memos[k].findExtendedConfig(config, needsToBeCompiled);
     if (found) {
       foundExtConfig = found;
       break;
@@ -31,6 +33,7 @@ export const findExtendedConfigInAllMemos = (config) => {
 export const createConfigMemo = (meta = {
   reactIndex: undefined,
   maxSize: 2, // current and prev
+  canCompile: true,
 }) => {
   const configStore = new Map();
   const maxSize = meta.maxSize || 2;
@@ -43,7 +46,7 @@ export const createConfigMemo = (meta = {
   };
 
   const extendAndStore = (config) => {
-    const extendedConfig = extendConfig(config, ++configId);
+    const extendedConfig = extendConfig(config, ++configId, meta.canCompile);
     storeConfigPair(config, extendedConfig);
     return extendedConfig;
   };
@@ -70,13 +73,13 @@ export const createConfigMemo = (meta = {
     return findConfig;
   };
 
-  const findExtended = (findConfig) => {
+  const findExtended = (findConfig, needsToBeCompiled) => {
     // strict find:
     // return configStore.get(findConfig) || configStore.values().find(ec => ec === findConfig);
 
     for (const savedConfig of configStore.keys()) {
       const foundParts = configKeys.filter(k => savedConfig[k] === findConfig[k]);
-      const found = foundParts.length === configKeys.length;
+      const found = foundParts.length === configKeys.length && (needsToBeCompiled ? savedConfig.__compliled : true);
       if (found) {
         return configStore.get(savedConfig);
       }
@@ -84,7 +87,7 @@ export const createConfigMemo = (meta = {
 
     for (const extendedConfig of configStore.values()) {
       const foundParts = configKeys.filter(k => extendedConfig[k] === findConfig[k]);
-      const found = foundParts.length === configKeys.length;
+      const found = foundParts.length === configKeys.length && (needsToBeCompiled ? extendedConfig.__compliled : true);
       if (found) {
         return extendedConfig;
       }

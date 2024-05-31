@@ -420,6 +420,8 @@ Other settings:
   `value` - for operators with cardinality 1/2 it is value for comparing with count of items
 |fieldSeparator |`.` |Separator for struct fields.
 |fieldSeparatorDisplay |`.` |Separator for struct fields in UI.
+|defaultField | |Field to be selected by default for new rule.
+|defaultOperator | |Operator to be selected by default for new rule.
 |===
 
 Localization:

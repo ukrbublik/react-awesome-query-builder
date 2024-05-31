@@ -14,13 +14,15 @@ export const extendConfig = (config, configId, canCompile = true) => {
   //operators, defaultOperator - merge
   //widgetProps (including valueLabel, valuePlaceholder, hideOperator, operatorInlineLabel) - concrete by widget
 
+  canCompile = canCompile && config.settings.useConfigCompress;
+
   // Already extended?
   if (config.__configId) {
     return config;
   }
 
   // Try to take from memo (cache)
-  const cachedExtConfig = findExtendedConfigInAllMemos(config);
+  const cachedExtConfig = findExtendedConfigInAllMemos(config, canCompile);
   if (cachedExtConfig) {
     return cachedExtConfig;
   }
@@ -28,7 +30,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
   const origConfig = config;
 
   // Clone (and compile if need)
-  if (canCompile && config.settings.useConfigCompress) {
+  if (canCompile) {
     if (config.__compliled) {
       // already compiled
       config = clone(config);
@@ -61,7 +63,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
     value: configId || uuid()
   });
 
-  config.__cache__ = {};
+  config.__cache = {};
 
   deepFreeze(config);
 
@@ -82,19 +84,24 @@ function extendTypesConfig(typesConfig, config) {
 function extendTypeConfig(type, typeConfig, config) {
   let operators = null, defaultOperator = null;
   typeConfig.mainWidget = typeConfig.mainWidget || Object.keys(typeConfig.widgets).filter(w => w != "field" && w != "func")[0];
+  const excludeOperators = typeConfig.excludeOperators || [];
   for (let widget in typeConfig.widgets) {
-    let typeWidgetConfig = typeConfig.widgets[widget];
+    const typeWidgetConfig = typeConfig.widgets[widget];
+    const defOp = typeWidgetConfig.defaultOperator;
     if (typeWidgetConfig.operators) {
-      let typeWidgetOperators = typeWidgetConfig.operators;
-      if (typeConfig.excludeOperators) {
-        typeWidgetOperators = typeWidgetOperators.filter(op => !typeConfig.excludeOperators.includes(op));
-      }
+      const typeWidgetOperators = typeWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
       operators = mergeArraysSmart(operators, typeWidgetOperators);
     }
-    if (typeWidgetConfig.defaultOperator)
-      defaultOperator = typeWidgetConfig.defaultOperator;
+    if (defOp && !excludeOperators.includes(defOp)) {
+      if (!defaultOperator || widget === typeConfig.mainWidget) {
+        defaultOperator = defOp;
+      }
+    }
     if (widget == typeConfig.mainWidget) {
-      typeWidgetConfig = merge({}, {widgetProps: typeConfig.mainWidgetProps || {}}, typeWidgetConfig);
+      typeWidgetConfig.widgetProps = {
+        ...(typeConfig.mainWidgetProps || {}),
+        ...(typeWidgetConfig.widgetProps || {}),
+      };
     }
     typeConfig.widgets[widget] = typeWidgetConfig;
   }
@@ -192,14 +199,20 @@ function normalizeFieldSettings(fieldConfig, config, type) {
 function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
   const isFunc = !!fieldConfig.returnType;
   const type = fieldConfig.type || fieldConfig.returnType;
-  const isGroup = type === "!struct" || type === "!group";
+  // const isGroup = type === "!struct" || type === "!group";
   const typeConfig = config.types[type];
   const excludeOperatorsForField = fieldConfig.excludeOperators || [];
   let operators = (fieldConfig.operators || typeConfig?.operators || []).filter(op => !excludeOperatorsForField.includes(op));
   let defaultOperator = fieldConfig.defaultOperator || typeConfig?.defaultOperator;
+  if (excludeOperatorsForField.includes(defaultOperator))
+    defaultOperator = undefined;
+  const hasOwnDefaultOperator = !!defaultOperator && defaultOperator == fieldConfig.defaultOperator;
+  if (hasOwnDefaultOperator) {
+    fieldConfig.ownDefaultOperator = fieldConfig.defaultOperator;
+  }
 
   if (!typeConfig) {
-    //console.warn(`No type config for ${type}`);
+    // console.warn(`No type config for ${type}`);
     fieldConfig.disabled = true;
     return;
   }
@@ -231,6 +244,7 @@ function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) 
     for (let widget in typeConfig.widgets) {
       let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
       const typeWidgetConfig = typeConfig.widgets[widget] || {};
+      const defOp = fieldWidgetConfig.defaultOperator;
       if (!isFuncArg) {
         const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
         const shouldIncludeOperators = fieldConfig.preferWidgets
@@ -239,18 +253,25 @@ function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) 
         if (fieldWidgetConfig.operators) {
           const addOperators = fieldWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
           fieldWidgetConfig.operators = addOperators;
-          operators = [...(operators || []), ...addOperators];
+          // operators = [...(operators || []), ...addOperators];
+          operators = mergeArraysSmart(operators, addOperators);
         } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
           const addOperators = typeWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
           fieldWidgetConfig.operators = addOperators;
-          operators = [...(operators || []), ...addOperators];
+          // operators = [...(operators || []), ...addOperators];
+          operators = mergeArraysSmart(operators, addOperators);
         }
-        if (fieldWidgetConfig.defaultOperator)
-          defaultOperator = fieldWidgetConfig.defaultOperator;
+        if (defOp && !excludeOperators.includes(defOp)) {
+          if (!defaultOperator || !hasOwnDefaultOperator && widget === fieldConfig.mainWidget) {
+            // tip: defOp can overwrite default operator from type config
+            defaultOperator = defOp;
+          }
+        }
       }
 
-      if (widget == fieldConfig.mainWidget) {
+      if (widget === fieldConfig.mainWidget) {
         fieldWidgetConfig.widgetProps = {
+          ...(typeWidgetConfig.widgetProps || {}),
           ...(fieldConfig.mainWidgetProps || {}),
           ...(fieldWidgetConfig.widgetProps || {}),
         };
@@ -267,7 +288,7 @@ function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) 
 
   if (!isFuncArg) { // tip: operators are not used for func args
     if (!fieldConfig.operators) {
-      fieldConfig.operators = Array.from(new Set(operators));
+      fieldConfig.operators = Array.from(new Set(operators)); // unique
     }
     if (!fieldConfig.defaultOperator) {
       fieldConfig.defaultOperator = defaultOperator;

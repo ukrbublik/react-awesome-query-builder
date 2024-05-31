@@ -38,6 +38,7 @@ export default class QueryContainer extends Component {
     const { getExtendedConfig, getBasicConfig, clearConfigMemo } = createConfigMemo({
       reactIndex: this._reactInternals?.index ?? -1,
       maxSize: 2, // current and prev
+      canCompile: true,
     });
     this.getMemoizedConfig = getExtendedConfig;
     this.getBasicConfig = getBasicConfig;

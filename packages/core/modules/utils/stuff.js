@@ -261,9 +261,11 @@ export function mergeArraysSmart(arr1, arr2) {
 }
 
 export const deepFreeze = obj => {
-  if (typeof obj === "object" && obj !== null) {
+  if (typeof obj === "object" && obj !== null && !isDirtyJSX(obj)) {
     Object.keys(obj).forEach(prop => {
-      deepFreeze(obj[prop]);
+      if (prop !== "__cache") {
+        deepFreeze(obj[prop]);
+      }
     });
     Object.freeze(obj);
   }

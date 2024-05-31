@@ -41,11 +41,10 @@ export const getDefaultOperator = (config, field, canGetFirst = true) => {
   let {defaultOperator: globalDefaultOperator} = config.settings;
   if (globalDefaultOperator && !fieldOperators.includes(globalDefaultOperator))
     globalDefaultOperator = null;
-  let fieldDefaultOperator = fieldConfig?.defaultOperator;
-  if (fieldDefaultOperator && !fieldOperators.includes(fieldDefaultOperator))
-    fieldDefaultOperator = null;
+  const fieldDefaultOperator = fieldConfig?.defaultOperator;
+  const fieldOwnDefaultOperator = fieldConfig?.ownDefaultOperator;
   const firstOperator = canGetFirst ? getFirstOperator(config, field) : null;
-  const op = fieldDefaultOperator || globalDefaultOperator || firstOperator;
+  const op = fieldOwnDefaultOperator || globalDefaultOperator || fieldDefaultOperator || firstOperator;
   return op;
 };
 

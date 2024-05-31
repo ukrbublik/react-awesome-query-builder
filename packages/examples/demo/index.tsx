@@ -725,7 +725,10 @@ const DemoQueryBuilder: React.FC = () => {
     console.time("validation");
 
     // hot
-    run();
+    const cnt = state.renderBocks.withProfile ? 1 : 10;
+    for (let i = 0 ; i < cnt ; i++) {
+      run();
+    }
 
     console.timeEnd("validation");
     if (state.renderBocks.withProfile) {
@@ -754,7 +757,10 @@ const DemoQueryBuilder: React.FC = () => {
     console.time("export");
 
     // hot
-    run();
+    const cnt = state.renderBocks.withProfile ? 1 : 10;
+    for (let i = 0 ; i < cnt ; i++) {
+      run();
+    }
 
     console.timeEnd("export");
     if (state.renderBocks.withProfile) {
