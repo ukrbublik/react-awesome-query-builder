@@ -474,8 +474,12 @@ const convertOp = (spel, conv, config, meta, parentSpel = null) => {
   // unary
   const isUnary = (op == "minus" || op == "plus") && spel.children.length == 1;
   if (isUnary) {
-    spel.isUnary = true;
-    return convertOp(spel.children[0], conv, config, meta, spel);
+    let negative = spel.negative;
+    if (op == "minus") {
+      negative = !negative;
+    }
+    spel.children[0].negative = negative;
+    return convertToTree(spel.children[0], conv, config, meta, parentSpel);
   }
 
   // between
@@ -689,7 +693,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
   } else if (SpelPrimitiveTypes[spel.type]) {
     let value = spel.val;
     const valueType = SpelPrimitiveTypes[spel.type];
-    if (parentSpel?.isUnary) {
+    if (spel.negative) {
       value = -value;
     }
     return {
