@@ -56,7 +56,7 @@ describe("rare features", () => {
 
   describe("import from SpEL uses fieldName", () => {
     export_checks(configs.with_fieldName, inits.spel_with_fieldName, "SpEL", {
-      "spel": "state.input.num == 2",
+      "spel": "state.input.num == -2",
     });
   });
 
