@@ -820,7 +820,7 @@ const _buildFuncSignatures = (spel, brns) => {
 
 const convertFunc = (spel, conv, config, meta, parentSpel) => {
   // Build signatures
-  const convertFuncArg = v => convertArg(v, conv, config, meta, {
+  const convertFuncArg = v => convertToTree(v, conv, config, meta, {
     ...spel,
     _groupField: parentSpel?._groupField
   });
