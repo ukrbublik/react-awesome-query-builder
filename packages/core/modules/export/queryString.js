@@ -4,9 +4,8 @@ import {
 import {
   getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
 } from "../utils/ruleUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 
@@ -121,7 +120,7 @@ const formatItemValue = (config, properties, meta, _operator, parentField) => {
       const valueType = iValueType ? iValueType.get(ind) : null;
       const cValue = !isDebugMode ? completeValue(currentValue, valueSrc, config) : currentValue;
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       let fv = formatValue(
         config, meta, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDef, parentField, asyncListValues
       );

@@ -1,10 +1,9 @@
-import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, getFieldParts, extendConfig,
 } from "../utils/configUtils";
 import {getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
 import {List, Map} from "immutable";
 
@@ -228,7 +227,7 @@ const formatRule = (parents, item, config, meta, _not = false, _canWrapExpr = tr
       const valueType = iValueType ? iValueType.get(ind) : null;
       const cValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       const [fv, fvUseExpr] = formatValue(
         meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, realParentPath,  operator, operatorDefinition, asyncListValues
       );
@@ -368,7 +367,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
     const argAsyncListValues = argVal ? argVal.get("asyncListValues") : undefined;
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc, { forExport: true });
     const [formattedArgVal, _argUseExpr] = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues
     );
@@ -380,7 +379,7 @@ const formatFunc = (meta, config, currentValue, parentPath) => {
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
-      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      const defaultFieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc, { forExport: true });
       let _;
       ([formattedDefaultVal, _] = formatValue(
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, parentPath, null, null, argAsyncListValues

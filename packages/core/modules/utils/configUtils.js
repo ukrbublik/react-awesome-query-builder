@@ -1,7 +1,5 @@
-import merge from "lodash/merge";
 import pick from "lodash/pick";
-import mergeWith from "lodash/mergeWith";
-import {widgetDefKeysToOmit, mergeCustomizerNoArrays} from "./stuff";
+import {widgetDefKeysToOmit, omit} from "./stuff";
 import {getWidgetForFieldOp} from "./ruleUtils";
 
 export * from "./configSerialize";
@@ -108,6 +106,10 @@ export const getFuncSignature = (config, func) => {
       "fieldSettings",
       // "asyncListValues", // not supported
       "isOptional",
+      // to get proper caching key
+      "_funcKey",
+      "_argKey",
+      "_isFuncArg",
     ]);
     return [k, argSignature];
   }));
@@ -124,10 +126,7 @@ export const getFuncConfig = (config, func) => {
   const funcConfig = getFieldRawConfig(config, func, "funcs", "subfields");
   if (!funcConfig)
     return null; //throw new Error("Can't find func " + func + ", please check your config");
-  const typeConfig = config.types[funcConfig.returnType] || {};
-  const ret = mergeWith({}, typeConfig, funcConfig, mergeCustomizerNoArrays);
-  ret.type = funcConfig.returnType || funcConfig.type;
-  return ret;
+  return funcConfig;
 };
 
 export const getFuncArgConfig = (config, funcKey, argKey) => {
@@ -137,11 +136,7 @@ export const getFuncArgConfig = (config, funcKey, argKey) => {
   const argConfig = funcConfig.args && funcConfig.args[argKey] || null;
   if (!argConfig)
     return null; //throw new Error(`Can't find arg ${argKey} for func ${funcKey}, please check your config`);
-
-  //merge, but don't merge operators (rewrite instead)
-  const typeConfig = config.types[argConfig.type] || {};
-  const ret = mergeWith({}, typeConfig, argConfig || {}, mergeCustomizerNoArrays);
-  return ret;
+  return argConfig;
 };
 
 export const isFieldDescendantOfField = (field, parentField, config = null) => {
@@ -192,18 +187,25 @@ export const getFieldCacheKey = (field) => {
     return `field:${getFieldPath(field)}`;
   }
   if (typeof field === "object" && field) {
-    if (!field.func && !!field.type) {
-      // it's already a config
-      return null;
+    if (field._funcKey && field._argKey) {
+      // it's func arg config
+      return `arg:${getFieldPath(field._funcKey)}__${field._argKey}`;
+    }
+    if (field._funcKey) {
+      // it's func config
+      return `func:${getFieldPath(field._funcKey)}`;
+    }
+    if (field.func && field.arg) {
+      // it's func arg
+      return `arg:${getFieldPath(field.func)}__${field.arg}`;
     }
     if (field.func) {
-      if (field.func && field.arg) {
-        // it's func arg
-        return `arg:${getFieldPath(field.func)}__${field.arg}`;
-      } else {
-        // it's field func
-        return `func:${getFieldPath(field.func)}`;
-      }
+      // it's field func
+      return `func:${getFieldPath(field.func)}`;
+    }
+    if (field.type) {
+      // it's already a config
+      return null;
     }
   }
   if (field?.get?.("func")) { // immutable
@@ -216,6 +218,20 @@ export const getFieldCacheKey = (field) => {
     }
   }
   return null;
+};
+
+export const _getFromConfigCache = (config, bucketKey, cacheKey) => {
+  return config.__cache?.[bucketKey]?.[cacheKey];
+};
+
+export const _saveToConfigCache = (config, bucketKey, cacheKey, value) => {
+  if (!config.__cache || !cacheKey) {
+    return;
+  }
+  if (!config.__cache[bucketKey]) {
+    config.__cache[bucketKey] = {};
+  }
+  config.__cache[bucketKey][cacheKey] = value;
 };
 
 export const getFieldSrc = (field) => {
@@ -287,32 +303,55 @@ export const getOperatorConfig = (config, operator, field = null) => {
     return null;
   const opConfig = config.operators[operator];
   if (field) {
+    const fieldCacheKey = getFieldCacheKey(field);
+    const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}` : null;
+    const cached = _getFromConfigCache(config, "getOperatorConfig", cacheKey);
+    if (cached)
+      return cached;
     const fieldConfig = getFieldConfig(config, field);
     const widget = getWidgetForFieldOp(config, field, operator, null);
     const widgetConfig = config.widgets[widget] || {};
     const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
-    const widgetOpProps = (widgetConfig.opProps || {})[operator];
-    const fieldWidgetOpProps = (fieldWidgetConfig.opProps || {})[operator];
-    const mergedOpConfig = merge({}, opConfig, widgetOpProps, fieldWidgetOpProps);
-    return mergedOpConfig;
+    const widgetOpProps = widgetConfig.opProps?.[operator] || {};
+    const fieldWidgetOpProps = fieldWidgetConfig.opProps?.[operator] || {};
+    const mergedConfig = {
+      ...opConfig,
+      ...widgetOpProps,
+      ...fieldWidgetOpProps,
+    };
+    _saveToConfigCache(config, "getOperatorConfig", cacheKey, mergedConfig);
+    return mergedConfig;
   } else {
     return opConfig;
   }
 };
 
-export const getFieldWidgetConfig = (config, field, operator, widget = null, valueSrc = null) => {
+export const getFieldWidgetConfig = (config, field, operator = null, widget = null, valueSrc = null, meta = {}) => {
   if (!field)
     return null;
-  if (!(operator || widget) && valueSrc !== "const" && field !== "!case_value")
-    return null;
   const fieldConfig = getFieldConfig(config, field);
-  if (!widget)
+  const fieldCacheKey = getFieldCacheKey(field);
+  if (!widget) {
     widget = getWidgetForFieldOp(config, field, operator, valueSrc);
+  }
+  const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}__${widget}__${valueSrc}` : null;
+  const cached = _getFromConfigCache(config, "getFieldWidgetConfig", cacheKey);
+  if (cached)
+    return cached;
   const widgetConfig = config.widgets[widget] || {};
-  const fieldWidgetConfig = (fieldConfig && fieldConfig.widgets ? fieldConfig.widgets[widget] : {}) || {};
-  const fieldWidgetProps = (fieldWidgetConfig.widgetProps || {});
-  const valueFieldSettings = (valueSrc === "value" || !valueSrc) && fieldConfig?.fieldSettings || {}; // useful to take 'validateValue'
-  const mergedConfig = merge({}, widgetConfig, fieldWidgetProps, valueFieldSettings);
+  const fieldWidgetConfig = fieldConfig?.widgets?.[widget] || {};
+  const fieldWidgetProps = fieldWidgetConfig.widgetProps || {};
+  const valueFieldSettings = (valueSrc === "value" || !valueSrc) ? fieldConfig?.fieldSettings : {}; // useful to take 'validateValue'
+  let mergedConfig = {
+    ...widgetConfig,
+    ...fieldWidgetConfig,
+    ...fieldWidgetProps,
+    ...valueFieldSettings,
+  };
+  _saveToConfigCache(config, "getFieldWidgetConfig", cacheKey, mergedConfig);
+  if (meta.forExport) {
+    mergedConfig = omit(mergedConfig, "factory");
+  }
   return mergedConfig;
 };
 

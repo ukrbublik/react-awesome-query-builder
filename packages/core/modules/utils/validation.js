@@ -713,7 +713,7 @@ export const validateValue = (
       // const fieldSettings = fieldConfig?.fieldSettings;
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
       const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
-      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
+      const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc, { forExport: true });
       const rightFieldDefinition = (valueSrc === "field" ? getFieldConfig(config, value) : null);
       const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
 

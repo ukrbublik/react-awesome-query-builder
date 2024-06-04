@@ -1,6 +1,6 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
-  isFieldDescendantOfField
+  isFieldDescendantOfField, getFieldCacheKey, _getFromConfigCache, _saveToConfigCache,
 } from "./configUtils";
 import last from "lodash/last";
 import {completeFuncValue} from "./funcUtils";
@@ -97,19 +97,19 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
 };
 
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
-  const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
-  const {showLabels} = config.settings;
-  const fieldConfig = getFieldConfig(config, field);
+  // const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
+  // const {showLabels} = config.settings;
+  // const fieldConfig = getFieldConfig(config, field);
   const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
   const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
-    
+
   const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
   let ret = null;
   if (cardinality > 1) {
     const valueLabels = fieldWidgetConfig.valueLabels || mergedOpConfig.valueLabels;
     if (valueLabels)
       ret = valueLabels[delta];
-    if (ret && typeof ret != "object") {
+    if (ret && typeof ret !== "object") {
       ret = {label: ret, placeholder: ret};
     }
     if (!ret) {
@@ -121,12 +121,13 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
   } else {
     let label = fieldWidgetConfig.valueLabel;
     let placeholder = fieldWidgetConfig.valuePlaceholder;
-    if (isFuncArg) {
-      if (!label)
-        label = fieldConfig.label || field.arg;
-      if (!placeholder && !showLabels)
-        placeholder = fieldConfig.label || field.arg;
-    }
+    // tip: this logic moved to extendFieldConfig(), see comment "label for func arg"
+    // if (isFuncArg) {
+    //   if (!label)
+    //     label = fieldConfig.label || field.arg;
+    //   if (!placeholder && !showLabels)
+    //     placeholder = fieldConfig.label || field.arg;
+    // }
 
     ret = {
       label: label || config.settings.valueLabel, 
@@ -141,6 +142,11 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
+  const fieldCacheKey = getFieldCacheKey(field);
+  const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}__${valueSrc}` : null;
+  const cached = _getFromConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey);
+  if (cached)
+    return cached;
   const isFuncArg = typeof field === "object" && (!!field.func && !!field.arg || field._isFuncArg);
   const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
@@ -198,8 +204,10 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   };
 
   widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
-    
-  return {widgets, valueSrcs};
+
+  const res = { widgets, valueSrcs };
+  _saveToConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey, res);
+  return res;
 }
 
 export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {

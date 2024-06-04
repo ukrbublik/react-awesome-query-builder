@@ -1043,6 +1043,9 @@ interface WidgetConfigForType {
   widgetProps?: Optional<Widget>;
   opProps?: Optional<Operator>;
   operators?: Array<string>;
+  defaultOperator?: string;
+  valueLabel?: string;
+  valuePlaceholder?: string;
 }
 
 interface Type {
@@ -1051,7 +1054,9 @@ interface Type {
   widgets: TypedMap<WidgetConfigForType>;
   mainWidget?: string;
   excludeOperators?: Array<string>;
+  mainWidgetProps?: Optional<Widget>;
 }
+
 export type Types = TypedMap<Type>;
 
 

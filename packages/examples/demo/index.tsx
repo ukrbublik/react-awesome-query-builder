@@ -74,8 +74,8 @@ declare global {
     _initialSkin: string;
   }
   interface Console {
-    profile: () => void;
-    profileEnd: () => void;
+    profile: (profileName?: string) => void;
+    profileEnd: (profileName?: string) => void;
   }
 }
 

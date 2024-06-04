@@ -1,5 +1,4 @@
 import Immutable, { Map } from "immutable";
-import omit from "lodash/omit";
 import {default as uuid} from "./uuid";
 
 export {uuid};
@@ -13,7 +12,7 @@ export const opDefKeysToOmit = [
 ];
 
 export const isObject = (v) => {
-  return typeof v === "object" && v !== null && Object.prototype.toString.call(v) === '[object Object]';
+  return typeof v === "object" && v !== null && Object.prototype.toString.call(v) === "[object Object]";
 };
 
 export const shallowCopy = (v) => {
@@ -25,6 +24,10 @@ export const shallowCopy = (v) => {
     }
   }
   return v;
+};
+
+export const omit = (obj, keys) => {
+  return Object.fromEntries(Object.entries(obj).filter(([k]) => !keys.includes(k)));
 };
 
 // RegExp.quote = function (str) {

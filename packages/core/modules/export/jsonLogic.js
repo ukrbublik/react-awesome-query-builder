@@ -1,11 +1,10 @@
-import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFuncConfig, extendConfig, getFieldParts
 } from "../utils/configUtils";
 import {getWidgetForFieldOp, formatFieldName, completeValue} from "../utils/ruleUtils";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
 
 // http://jsonlogic.com/
@@ -302,7 +301,7 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
     const valueType = iValueType ? iValueType.get(ind) : null;
     const cValue = completeValue(currentValue, valueSrc, config);
     const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-    const fieldWidgetDef = omit( getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"] );
+    const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
     const fv = formatValue(
       meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDefinition, operator, operatorDefinition, parentField, asyncListValues
     );
@@ -384,7 +383,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     }
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
-    const fieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"] );
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc, { forExport: true });
     const formattedArgVal = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField
     );
@@ -396,7 +395,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
-      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      const defaultFieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc, { forExport: true });
       formattedDefaultVal = formatValue(
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField
       );

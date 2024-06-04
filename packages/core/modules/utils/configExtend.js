@@ -1,9 +1,8 @@
-import merge from "lodash/merge";
 import uuid from "./uuid";
 import mergeWith from "lodash/mergeWith";
 import {settings as defaultSettings} from "../config/default";
 import moment from "moment";
-import {mergeArraysSmart, logger, deepFreeze, mergeCustomizerNoArrays, shallowCopy} from "./stuff";
+import {mergeArraysSmart, logger, deepFreeze, mergeCustomizerNoArrays, shallowCopy, omit} from "./stuff";
 import clone from "clone";
 
 import { compileConfig } from "./configSerialize";
@@ -50,7 +49,7 @@ export const extendConfig = (config, configId, canCompile = true) => {
 
   extendTypesConfig(config.types, config);
   extendFieldsConfig(config.fields, config);
-  extendFuncArgsConfig(config.funcs, config);
+  extendFuncsConfig(config.funcs, config);
 
   const momentLocale = config.settings.locale.moment;
   if (momentLocale) {
@@ -121,29 +120,32 @@ function extendTypeConfig(type, typeConfig, config) {
 
 function extendFieldsConfig(subconfig, config, path = []) {
   for (let field in subconfig) {
-    extendFieldConfig(subconfig[field], config, [...path, field]);
+    const fieldPathArr = [...path, field];
+    extendFieldConfig(subconfig[field], config, fieldPathArr);
     if (subconfig[field].subfields) {
-      extendFieldsConfig(subconfig[field].subfields, config, [...path, field]);
+      extendFieldsConfig(subconfig[field].subfields, config, fieldPathArr);
     }
   }
 }
 
-function extendFuncArgsConfig(subconfig, config, path = []) {
+function extendFuncsConfig(subconfig, config, path = []) {
   if (!subconfig) return;
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
   for (let funcKey in subconfig) {
-    const funcPath = [...path, funcKey].join(fieldSeparator);
+    const funcPathArr = [...path, funcKey];
+    const funcPathStr = funcPathArr.join(fieldSeparator);
     const funcDef = subconfig[funcKey];
     if (funcDef.returnType) {
+      funcDef.type = funcDef.returnType;
       if (!config.__funcsCntByType[funcDef.returnType])
         config.__funcsCntByType[funcDef.returnType] = 0;
       config.__funcsCntByType[funcDef.returnType]++;
     }
-    extendFieldConfig(funcDef, config, null, false);
+    extendFieldConfig(funcDef, config, funcPathArr, false);
 
     if (funcDef.args) {
       for (let argKey in funcDef.args) {
-        extendFieldConfig(funcDef.args[argKey], config, null, true);
+        extendFieldConfig(funcDef.args[argKey], config, [...funcPathArr, argKey], true);
       }
       // isOptional can be only in the end
       const argKeys = Object.keys(funcDef.args);
@@ -151,7 +153,7 @@ function extendFuncArgsConfig(subconfig, config, path = []) {
       for (const argKey of argKeys.reverse()) {
         const argDef = funcDef.args[argKey];
         if (!tmpIsOptional && argDef.isOptional) {
-          logger.info(`Arg ${argKey} for func ${funcPath} can't be optional`);
+          logger.info(`Arg ${argKey} for func ${funcPathStr} can't be optional`);
           delete argDef.isOptional;
         }
         if (!argDef.isOptional)
@@ -160,7 +162,7 @@ function extendFuncArgsConfig(subconfig, config, path = []) {
     }
 
     if (funcDef.subfields) {
-      extendFuncArgsConfig(funcDef.subfields, config, [...path, funcKey]);
+      extendFuncsConfig(funcDef.subfields, config, [...path, funcKey]);
     }
   }
 }
@@ -196,7 +198,11 @@ function normalizeFieldSettings(fieldConfig, config, type) {
   }
 }
 
-function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) {
+function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false) {
+  let { showLabels, fieldSeparator } = config.settings;
+  fieldSeparator = fieldSeparator ?? ".";
+  const argKey = path[path.length - 1];
+  const funcKey = isFuncArg ? path.slice(0, path.length-1).join(fieldSeparator) : path.join(fieldSeparator);
   const isFunc = !!fieldConfig.returnType;
   const type = fieldConfig.type || fieldConfig.returnType;
   // const isGroup = type === "!struct" || type === "!group";
@@ -225,65 +231,104 @@ function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) 
 
   if (isFuncArg) {
     fieldConfig._isFuncArg = true;
+    fieldConfig._argKey = argKey;
+    fieldConfig._funcKey = funcKey;
+  }
+  if (isFunc) {
+    fieldConfig._isFunc = true;
+    fieldConfig._funcKey = funcKey;
   }
 
   normalizeFieldSettings(fieldConfig, config, type);
 
   // copy from type to field
-  Object.keys(typeConfig).filter((k) => !["widgets", "operators", "defaultOperator"].includes(k)).map((k) => {
+  const excludeKeysFromType = ["widgets", "operators", "defaultOperator"];
+  Object.keys(typeConfig).filter((k) => !excludeKeysFromType.includes(k)).map((k) => {
     if (!fieldConfig[k]) {
       fieldConfig[k] = shallowCopy(typeConfig[k]);
     }
   });
 
-  // copy widgets
-  if (!isFunc) { // tip: func always have its own widget
-    const excludeOperatorsForType = typeConfig.excludeOperators || [];
-    if (!fieldConfig.widgets)
-      fieldConfig.widgets = {};
-    for (let widget in typeConfig.widgets) {
-      let fieldWidgetConfig = fieldConfig.widgets[widget] || {};
-      const typeWidgetConfig = typeConfig.widgets[widget] || {};
+  // copy/merge widgets
+  const excludeOperatorsForType = typeConfig.excludeOperators || [];
+  if (!fieldConfig.widgets)
+    fieldConfig.widgets = {};
+  for (let widget in typeConfig.widgets) {
+    let fieldWidgetConfig = { ...(fieldConfig.widgets[widget] || {}) };
+    const typeWidgetConfig = typeConfig.widgets[widget] || {};
+
+    // merge operators, defaultOperator
+    if (!isFuncArg) { // tip: operators are not used for func args
       const defOp = fieldWidgetConfig.defaultOperator;
-      if (!isFuncArg) {
-        const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
-        const shouldIncludeOperators = fieldConfig.preferWidgets
-          && (widget == "field" || fieldConfig.preferWidgets.includes(widget))
-          || excludeOperators.length > 0;
-        if (fieldWidgetConfig.operators) {
-          const addOperators = fieldWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
-          fieldWidgetConfig.operators = addOperators;
-          // operators = [...(operators || []), ...addOperators];
-          operators = mergeArraysSmart(operators, addOperators);
-        } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
-          const addOperators = typeWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
-          fieldWidgetConfig.operators = addOperators;
-          // operators = [...(operators || []), ...addOperators];
-          operators = mergeArraysSmart(operators, addOperators);
-        }
-        if (defOp && !excludeOperators.includes(defOp)) {
-          if (!defaultOperator || !hasOwnDefaultOperator && widget === fieldConfig.mainWidget) {
-            // tip: defOp can overwrite default operator from type config
-            defaultOperator = defOp;
-          }
+      const excludeOperators = [...excludeOperatorsForField, ...excludeOperatorsForType];
+      const shouldIncludeOperators = fieldConfig.preferWidgets
+        && (widget === "field" || fieldConfig.preferWidgets.includes(widget))
+        || excludeOperators.length > 0;
+      if (fieldWidgetConfig.operators) {
+        const addOperators = fieldWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
+        fieldWidgetConfig.operators = addOperators;
+        // operators = [...(operators || []), ...addOperators];
+        operators = mergeArraysSmart(operators, addOperators);
+      } else if (shouldIncludeOperators && typeWidgetConfig.operators) {
+        const addOperators = typeWidgetConfig.operators.filter(op => !excludeOperators.includes(op));
+        fieldWidgetConfig.operators = addOperators;
+        // operators = [...(operators || []), ...addOperators];
+        operators = mergeArraysSmart(operators, addOperators);
+      }
+      if (defOp && !excludeOperators.includes(defOp)) {
+        if (!defaultOperator || !hasOwnDefaultOperator && widget === fieldConfig.mainWidget) {
+          // tip: defOp can overwrite default operator from type config
+          defaultOperator = defOp;
         }
       }
+    }
 
-      if (widget === fieldConfig.mainWidget) {
-        fieldWidgetConfig.widgetProps = {
-          ...(typeWidgetConfig.widgetProps || {}),
-          ...(fieldConfig.mainWidgetProps || {}),
-          ...(fieldWidgetConfig.widgetProps || {}),
+    // merge widgetProps
+    if (widget === fieldConfig.mainWidget) {
+      fieldWidgetConfig.widgetProps = {
+        ...(typeWidgetConfig.widgetProps || {}),
+        ...(fieldConfig.mainWidgetProps || {}),
+        ...(fieldWidgetConfig.widgetProps || {}),
+      };
+    } else {
+      fieldWidgetConfig.widgetProps = {
+        ...(typeWidgetConfig.widgetProps || {}),
+        ...(fieldWidgetConfig.widgetProps || {}),
+      };
+    }
+
+    // merge opProps
+    const opKeys = Array.from(new Set([
+      ...Object.keys(typeWidgetConfig.opProps || {}),
+      ...Object.keys(fieldWidgetConfig.opProps || {}),
+    ]));
+    if (opKeys.length) {
+      const opProps = {};
+      for (let op of opKeys) {
+        opProps[op] = {
+          ...(typeWidgetConfig.opProps?.[op] || {}),
+          ...(fieldWidgetConfig.opProps?.[op] || {}),
         };
       }
-
-      fieldWidgetConfig = {
-        ...typeWidgetConfig,
-        ...fieldWidgetConfig,
-      };
-
-      fieldConfig.widgets[widget] = fieldWidgetConfig;
+      fieldWidgetConfig.opProps = opProps;
     }
+
+    // label for func arg
+    let { valueLabel, valuePlaceholder } = fieldWidgetConfig;
+    if (isFuncArg) {
+      if (!valueLabel)
+        fieldWidgetConfig.valueLabel = fieldConfig.label || argKey;
+      if (!valuePlaceholder && !showLabels)
+        fieldWidgetConfig.valuePlaceholder = fieldConfig.label || argKey;
+    }
+
+    // copy other widget configs from type to field
+    fieldWidgetConfig = {
+      ...typeWidgetConfig,
+      ...fieldWidgetConfig,
+    };
+
+    fieldConfig.widgets[widget] = fieldWidgetConfig;
   }
 
   if (!isFuncArg) { // tip: operators are not used for func args
@@ -295,12 +340,14 @@ function extendFieldConfig(fieldConfig, config, path = null, isFuncArg = false) 
     }
   }
 
-  const { fieldName, inGroup } = computeFieldName(config, path);
-  if (fieldName) {
-    fieldConfig.fieldName = fieldName;
-    if (!config.__fieldNames[fieldName])
-      config.__fieldNames[fieldName] = [];
-    config.__fieldNames[fieldName].push({fullPath: path, inGroup});
+  if (!isFuncArg && !isFunc) {
+    const { fieldName, inGroup } = computeFieldName(config, path);
+    if (fieldName) {
+      fieldConfig.fieldName = fieldName;
+      if (!config.__fieldNames[fieldName])
+        config.__fieldNames[fieldName] = [];
+      config.__fieldNames[fieldName].push({fullPath: path, inGroup});
+    }
   }
 }
 
