@@ -19,6 +19,18 @@ const WithConfirmFn = (Cmp) => (
   }
 );
 
+const getWidgetId = ({
+  id, isLHS, delta, parentFuncs,
+}) => {
+  return [
+    id,
+    isLHS ? "L" : "R",
+    isLHS ? -1 : (delta || 0),
+    (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
+  ].join(":");
+};
+
 export {
-  Col, dummyFn, DragIcon, WithConfirmFn
+  Col, dummyFn, DragIcon, WithConfirmFn,
+  getWidgetId,
 };

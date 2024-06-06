@@ -1,6 +1,6 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
-  isFieldDescendantOfField, getFieldCacheKey, _getFromConfigCache, _saveToConfigCache,
+  isFieldDescendantOfField, getFieldId, _getFromConfigCache, _saveToConfigCache,
 } from "./configUtils";
 import last from "lodash/last";
 import {completeFuncValue} from "./funcUtils";
@@ -142,7 +142,7 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
-  const fieldCacheKey = getFieldCacheKey(field);
+  const fieldCacheKey = getFieldId(field);
   const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}__${valueSrc}` : null;
   const cached = _getFromConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey);
   if (cached)

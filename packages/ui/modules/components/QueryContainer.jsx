@@ -79,7 +79,7 @@ export default class QueryContainer extends Component {
   };
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
-    value: (nextValue, prevValue, state) => { return false; }
+    value: (nextValue, prevValue) => { return false; }
   });
 
   onPropsChanged(nextProps) {

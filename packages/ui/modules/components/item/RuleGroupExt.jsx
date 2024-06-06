@@ -156,7 +156,6 @@ class RuleGroupExt extends BasicGroup {
       selectedFieldSrc={selectedFieldSrc}
       selectedOperator={selectedOperator}
       setOperator={setOperator}
-      selectedFieldPartsLabels={["group"]}
       showOperator={showOperator}
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}

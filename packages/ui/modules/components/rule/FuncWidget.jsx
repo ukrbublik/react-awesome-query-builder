@@ -3,7 +3,7 @@ import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import FuncSelect from "./FuncSelect";
 import Widget from "./Widget";
-import {Col} from "../utils";
+import {Col, getWidgetId} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 const {getFuncConfig} = Utils.ConfigUtils;
 const {shallowEqual} = Utils.OtherUtils;
@@ -62,13 +62,7 @@ export default class FuncWidget extends Component {
   setFunc = (funcKey, _meta = {}) => {
     const { isLHS, delta, parentFuncs, id } = this.props;
     if (!_meta.widgetId) {
-      const widgetId = [
-        id,
-        isLHS ? "L" : "R",
-        isLHS ? -1 : (delta || 0),
-        (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
-        "F",
-      ].join(":");
+      const widgetId = getWidgetId({ id, isLHS, delta, parentFuncs });
       _meta.widgetId = widgetId;
     }
 

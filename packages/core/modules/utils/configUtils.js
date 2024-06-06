@@ -182,7 +182,7 @@ export const getFieldPathParts = (field, config, onlyKeys = false) => {
       .map((parts) => parts.join(fieldSeparator));
 };
 
-export const getFieldCacheKey = (field) => {
+export const getFieldId = (field) => {
   if (typeof field === "string" || Array.isArray(field)) {
     return `field:${getFieldPath(field)}`;
   }
@@ -303,7 +303,7 @@ export const getOperatorConfig = (config, operator, field = null) => {
     return null;
   const opConfig = config.operators[operator];
   if (field) {
-    const fieldCacheKey = getFieldCacheKey(field);
+    const fieldCacheKey = getFieldId(field);
     const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}` : null;
     const cached = _getFromConfigCache(config, "getOperatorConfig", cacheKey);
     if (cached)
@@ -330,7 +330,7 @@ export const getFieldWidgetConfig = (config, field, operator = null, widget = nu
   if (!field)
     return null;
   const fieldConfig = getFieldConfig(config, field);
-  const fieldCacheKey = getFieldCacheKey(field);
+  const fieldCacheKey = getFieldId(field);
   if (!widget) {
     widget = getWidgetForFieldOp(config, field, operator, valueSrc);
   }
