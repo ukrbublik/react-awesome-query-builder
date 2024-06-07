@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
@@ -18,7 +18,7 @@ const typeToColor = {
   "delRule": "secondary",
 };
 
-export default (props) => {
+export default memo((props) => {
   const {type, label, onClick, readonly, renderIcon} = props;
   const iconProps = {
     type,
@@ -46,4 +46,4 @@ export default (props) => {
       >{label}</Button>
     );
   }
-};
+});

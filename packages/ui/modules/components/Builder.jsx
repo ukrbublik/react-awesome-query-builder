@@ -16,22 +16,7 @@ class Builder extends Component {
   };
 
   shouldComponentUpdate(nextProps, nextState) {
-    const prevProps = this.props;
-    let should = this.pureShouldComponentUpdate(nextProps, nextState);
-    if (should) {
-      let chs = [];
-      for (let k in nextProps) {
-        let changed = (nextProps[k] !== prevProps[k]);
-        if (changed && k != "__isInternalValueChange") {
-          chs.push(k);
-        }
-      }
-      if (!chs.length)
-        should = false;
-      //optimize render
-      if (chs.length == 1 && chs[0] == "tree" && nextProps.__isInternalValueChange)
-        should = false;
-    }
+    const should = this.pureShouldComponentUpdate(nextProps, nextState);
     return should;
   }
 

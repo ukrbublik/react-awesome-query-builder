@@ -36,18 +36,15 @@ export const getDefaultFieldSrc = (config, canGetFirst = true) => {
 };
 
 export const getDefaultOperator = (config, field, canGetFirst = true) => {
-  let {defaultOperator} = config.settings;
   const fieldConfig = getFieldConfig(config, field);
   const fieldOperators = fieldConfig?.operators || [];
-  if (defaultOperator && !fieldOperators.includes(defaultOperator))
-    defaultOperator = null;
-  let fieldDefaultOperator = fieldConfig?.defaultOperator;
-  if (fieldDefaultOperator && !fieldOperators.includes(fieldDefaultOperator))
-    fieldDefaultOperator = null;
-  if (!fieldDefaultOperator && canGetFirst)
-    fieldDefaultOperator = getFirstOperator(config, field);
-  const fieldHasExplicitDefOp = fieldConfig?._origDefaultOperator;
-  const op = fieldHasExplicitDefOp && fieldDefaultOperator || defaultOperator || fieldDefaultOperator;
+  let {defaultOperator: globalDefaultOperator} = config.settings;
+  if (globalDefaultOperator && !fieldOperators.includes(globalDefaultOperator))
+    globalDefaultOperator = null;
+  const fieldDefaultOperator = fieldConfig?.defaultOperator;
+  const fieldOwnDefaultOperator = fieldConfig?.ownDefaultOperator;
+  const firstOperator = canGetFirst ? getFirstOperator(config, field) : null;
+  const op = fieldOwnDefaultOperator || globalDefaultOperator || fieldDefaultOperator || firstOperator;
   return op;
 };
 

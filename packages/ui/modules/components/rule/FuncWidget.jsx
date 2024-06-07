@@ -3,10 +3,9 @@ import { Utils } from "@react-awesome-query-builder/core";
 import PropTypes from "prop-types";
 import FuncSelect from "./FuncSelect";
 import Widget from "./Widget";
-import {Col} from "../utils";
+import {Col, getWidgetId} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 const {getFuncConfig} = Utils.ConfigUtils;
-const {setFunc, setArgValue, setArgValueSrc} = Utils.FuncUtils;
 const {shallowEqual} = Utils.OtherUtils;
 
 
@@ -63,26 +62,13 @@ export default class FuncWidget extends Component {
   setFunc = (funcKey, _meta = {}) => {
     const { isLHS, delta, parentFuncs, id } = this.props;
     if (!_meta.widgetId) {
-      const widgetId = [
-        id,
-        isLHS ? "L" : "R",
-        isLHS ? -1 : (delta || 0),
-        (parentFuncs || []).map(([f, a]) => `${f}(${a})`).join("/"),
-        "F",
-      ].join(":");
+      const widgetId = getWidgetId({ id, isLHS, delta, parentFuncs });
       _meta.widgetId = widgetId;
     }
 
     this.props.setFuncValue(
       isLHS ? -1 : (delta || 0), parentFuncs, null, funcKey, "!func", undefined, _meta
     );
-
-    // old bubbling
-    // this.props.setValue(
-    //   setFunc(this.props.value, funcKey, this.props.config),
-    //   undefined,
-    //   _meta,
-    // );
   };
 
   setArgValue = (argKey, argVal, widgetType, asyncListValues, _meta) => {
@@ -91,16 +77,6 @@ export default class FuncWidget extends Component {
     this.props.setFuncValue(
       isLHS ? -1 : (delta || 0), parentFuncs, argKey, argVal, widgetType, asyncListValues, _meta
     );
-
-    // old bubbling
-    // const {funcDefinition} = this.meta;
-    // const {args} = funcDefinition;
-    // const argDefinition = args[argKey];
-    // this.props.setValue(
-    //   setArgValue(this.props.value, argKey, argVal, argDefinition, config),
-    //   asyncListValues,
-    //   _meta,
-    // );
   };
 
   setArgValueSrc = (argKey, argValSrc, _meta) => {
@@ -109,16 +85,6 @@ export default class FuncWidget extends Component {
     this.props.setFuncValue(
       isLHS ? -1 : (delta || 0), parentFuncs, argKey, argValSrc, "!valueSrc", undefined, _meta
     );
-
-    // old bubbling
-    // const {funcDefinition} = this.meta;
-    // const {args} = funcDefinition;
-    // const argDefinition = args[argKey];
-    // this.props.setValue(
-    //   setArgValueSrc(this.props.value, argKey, argValSrc, argDefinition, config),
-    //   undefined,
-    //   _meta,
-    // );
   };
 
   renderFuncSelect = () => {

@@ -1043,6 +1043,9 @@ interface WidgetConfigForType {
   widgetProps?: Optional<Widget>;
   opProps?: Optional<Operator>;
   operators?: Array<string>;
+  defaultOperator?: string;
+  valueLabel?: string;
+  valuePlaceholder?: string;
 }
 
 interface Type {
@@ -1051,7 +1054,9 @@ interface Type {
   widgets: TypedMap<WidgetConfigForType>;
   mainWidget?: string;
   excludeOperators?: Array<string>;
+  mainWidgetProps?: Optional<Widget>;
 }
+
 export type Types = TypedMap<Type>;
 
 
@@ -1319,7 +1324,6 @@ export interface BehaviourSettings {
   maxNumberOfRules?: Number;
   maxNumberOfCases?: Number;
   showErrorMessage?: boolean;
-  optimizeRenderWithInternals?: boolean;
   canShortMongoQuery?: boolean;
   convertableWidgets?: TypedMap<Array<string>>;
   removeEmptyGroupsOnLoad?: boolean;
@@ -1484,4 +1488,5 @@ export declare const CoreConfig: CoreConfig;
 export declare const BasicFuncs: Funcs;
 export declare const TreeStore: TreeStore;
 export declare const TreeActions: TreeActions;
+export declare const Immutable: any;
 

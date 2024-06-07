@@ -4,9 +4,8 @@ import {
 import {
   getFieldPathLabels, getWidgetForFieldOp, formatFieldName, completeValue
 } from "../utils/ruleUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {SqlString} from "../utils/export";
@@ -144,7 +143,7 @@ const formatRule = (item, config, meta) => {
       const valueType = iValueType ? iValueType.get(ind) : null;
       const cValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       let fv = formatValue(
         meta, config, cValue, valueSrc, valueType, fieldWidgetDefinition, fieldDefinition, operator, opDef, asyncListValues
       );
@@ -208,7 +207,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc == "func") {
     ret = formatFunc(meta, config, currentValue);
   } else {
-    if (typeof fieldWidgetDef.sqlFormatValue === "function") {
+    if (typeof fieldWidgetDef?.sqlFormatValue === "function") {
       const fn = fieldWidgetDef.sqlFormatValue;
       const args = [
         currentValue,

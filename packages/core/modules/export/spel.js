@@ -4,9 +4,8 @@ import {
 import {
   getWidgetForFieldOp, formatFieldName, getFieldPartsConfigs, completeValue
 } from "../utils/ruleUtils";
-import omit from "lodash/omit";
 import pick from "lodash/pick";
-import {getOpCardinality, logger, widgetDefKeysToOmit, opDefKeysToOmit} from "../utils/stuff";
+import {getOpCardinality, logger, widgetDefKeysToOmit, opDefKeysToOmit, omit} from "../utils/stuff";
 import {defaultConjunction} from "../utils/defaultUtils";
 import {List, Map} from "immutable";
 import {spelEscape} from "../utils/export";
@@ -353,7 +352,7 @@ const formatItemValue = (config, properties, meta, operator, parentField, expect
       const valueType = iValueType ? iValueType.get(ind) : null;
       const cValue = completeValue(currentValue, valueSrc, config);
       const widget = getWidgetForFieldOp(config, field, operator, valueSrc);
-      const fieldWidgetDef = omit(getFieldWidgetConfig(config, field, operator, widget, valueSrc), ["factory"]);
+      const fieldWidgetDef = getFieldWidgetConfig(config, field, operator, widget, valueSrc, { forExport: true });
       const fv = formatValue(
         meta, config, cValue, valueSrc, valueType, fieldWidgetDef, fieldDef, operator, operatorDefinition, parentField, asyncListValues
       );
@@ -385,7 +384,7 @@ const formatValue = (meta, config, currentValue, valueSrc, valueType, fieldWidge
   } else if (valueSrc === "func") {
     ret = formatFunc(meta, config, currentValue, parentField);
   } else {
-    if (typeof fieldWidgetDef.spelFormatValue === "function") {
+    if (typeof fieldWidgetDef?.spelFormatValue === "function") {
       const fn = fieldWidgetDef.spelFormatValue;
       const args = [
         currentValue,
@@ -471,7 +470,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     const doEscape = argConfig.spelEscapeForFormat ?? true;
     const operator = null;
     const widget = getWidgetForFieldOp(config, argConfig, operator, argValueSrc);
-    const fieldWidgetDef = omit(getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc), ["factory"]);
+    const fieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, widget, argValueSrc, { forExport: true });
 
     const formattedArgVal = formatValue(
       meta, config, argValue, argValueSrc, argConfig.type, fieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
@@ -484,7 +483,7 @@ const formatFunc = (meta, config, currentValue, parentField = null) => {
     let formattedDefaultVal;
     if (formattedArgVal === undefined && !isOptional && defaultValue != undefined) {
       const defaultWidget = getWidgetForFieldOp(config, argConfig, operator, defaultValueSrc);
-      const defaultFieldWidgetDef = omit( getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc), ["factory"] );
+      const defaultFieldWidgetDef = getFieldWidgetConfig(config, argConfig, operator, defaultWidget, defaultValueSrc, { forExport: true });
       formattedDefaultVal = formatValue(
         meta, config, defaultValue, defaultValueSrc, argConfig.type, defaultFieldWidgetDef, fieldDef, null, null, parentField, argAsyncListValues
       );

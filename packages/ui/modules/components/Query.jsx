@@ -16,7 +16,6 @@ class Query extends Component {
     renderBuilder: PropTypes.func,
     tree: PropTypes.any, //instanceOf(Immutable.Map)
     //dispatch: PropTypes.func.isRequired,
-    //__isInternalValueChange
     //__lastAction
     //getMemoizedTree: PropTypes.func.isRequired,
     //getBasicConfig: PropTypes.func.isRequired,
@@ -77,13 +76,12 @@ class Query extends Component {
   }
 
   render() {
-    const {config, renderBuilder, dispatch, __isInternalValueChange} = this.props;
+    const {config, renderBuilder, dispatch} = this.props;
     const builderProps = {
       tree: this.validatedTree,
       actions: this.actions,
       config: config,
       dispatch: dispatch,
-      __isInternalValueChange
     };
 
     return renderBuilder(builderProps);
@@ -95,7 +93,6 @@ const ConnectedQuery = connect(
   (state) => {
     return {
       tree: state.tree,
-      __isInternalValueChange: state.__isInternalValueChange,
       __lastAction: state.__lastAction,
     };
   },

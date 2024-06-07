@@ -5,7 +5,6 @@ import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {RuleGroupActions} from "./RuleGroupActions";
 import FieldWrapper from "../rule/FieldWrapper";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import {WithConfirmFn} from "../utils";
 
 
@@ -21,11 +20,10 @@ class RuleGroup extends BasicGroup {
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "rule_group--children";

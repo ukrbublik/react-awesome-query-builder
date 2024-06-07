@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import keys from "lodash/keys";
 import pickBy from "lodash/pickBy";
 import mapValues from "lodash/mapValues";
-import {useOnPropsChanged} from "../../utils/reactUtils";
+import {useOnPropsChanged, pureShouldComponentUpdate, liteShouldComponentUpdate} from "../../utils/reactUtils";
 const {getFieldConfig, getOperatorConfig} = Utils.ConfigUtils;
 
 
@@ -14,6 +14,7 @@ export default class Operator extends Component {
     groupId: PropTypes.string,
     config: PropTypes.object.isRequired,
     selectedField: PropTypes.any,
+    selectedFieldId: PropTypes.string,
     selectedFieldType: PropTypes.string,
     selectedFieldSrc: PropTypes.string,
     selectedOperator: PropTypes.string,
@@ -38,6 +39,11 @@ export default class Operator extends Component {
       this.meta = this.getMeta(nextProps);
     }
   }
+
+  shouldComponentUpdate = liteShouldComponentUpdate(this, {
+    // tip: rely on selectedFieldId instead
+    selectedField: (nextValue, prevValue) => { return false; }
+  });
 
   getMeta({config, selectedField, selectedFieldType, selectedOperator}) {
     const fieldConfig = getFieldConfig(config, selectedField);

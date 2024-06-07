@@ -713,7 +713,7 @@ export const validateValue = (
       // const fieldSettings = fieldConfig?.fieldSettings;
       const w = getWidgetForFieldOp(config, field, operator, valueSrc);
       const operatorDefinition = operator ? getOperatorConfig(config, operator, field) : null;
-      const fieldWidgetDefinition = omit(getFieldWidgetConfig(config, field, operator, w, valueSrc), ["factory"]);
+      const fieldWidgetDefinition = getFieldWidgetConfig(config, field, operator, w, valueSrc, { forExport: true });
       const rightFieldDefinition = (valueSrc === "field" ? getFieldConfig(config, value) : null);
       const fieldSettings = fieldWidgetDefinition; // widget definition merged with fieldSettings
 
@@ -1133,6 +1133,7 @@ export const getNewValueForFieldOp = function (
   const currentValue = current.get("value");
   const currentValueSrc = current.get("valueSrc", new Immutable.List());
   const currentValueType = current.get("valueType", new Immutable.List());
+  const currentValueError = current.get("valueError", new Immutable.List());
   const asyncListValues = current.get("asyncListValues");
 
   const currentOperatorConfig = getOperatorConfig(oldConfig, currentOperator);
@@ -1167,6 +1168,9 @@ export const getNewValueForFieldOp = function (
       // different fields of select types has different listValues
       canReuseValue = false;
     }
+  }
+  if (!currentValue?.size && operatorCardinality || currentValue?.size && !operatorCardinality) {
+    canReuseValue = false;
   }
 
   // validate func LHS
@@ -1234,9 +1238,9 @@ export const getNewValueForFieldOp = function (
   }
   const defaultValueSrc = valueSources[0];
   let defaultValueType;
-  if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
+  if (operatorCardinality === 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
     defaultValueType = firstWidgetConfig.type;
-  } else if (operatorCardinality == 1 && newFieldConfig && newFieldConfig.type !== undefined) {
+  } else if (operatorCardinality === 1 && newFieldConfig && newFieldConfig.type !== undefined) {
     defaultValueType = newFieldConfig.type === "!group" ? "number" : newFieldConfig.type;
   }
 
@@ -1353,15 +1357,24 @@ export const getNewValueForFieldOp = function (
   }
 
   // build new values
-  let newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-    return valueFixes[i] !== undefined ? valueFixes[i] : (canReuseValue ? currentValue.get(i) : undefined);
-  }));
-  const newValueSrc = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-    return valueSrcFixes[i] ?? (canReuseValue && currentValueSrc.get(i) || null);
-  }));
-  const newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
-    return valueTypeFixes[i] ?? (canReuseValue && currentValueType.get(i) || null);
-  }));
+  let newValue = currentValue;
+  if (valueFixes.length > 0 || !canReuseValue) {
+    newValue = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+      return valueFixes[i] !== undefined ? valueFixes[i] : (canReuseValue ? currentValue.get(i) : undefined);
+    }));
+  }
+  let newValueSrc = currentValueSrc;
+  if (valueSrcFixes.length > 0 || !canReuseValue) {
+    newValueSrc = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+      return valueSrcFixes[i] ?? (canReuseValue && currentValueSrc.get(i) || null);
+    }));
+  }
+  let newValueType = currentValueType;
+  if (valueTypeFixes.length > 0 || !canReuseValue) {
+    newValueType = new Immutable.List(Array.from({length: operatorCardinality}, (_ignore, i) => {
+      return valueTypeFixes[i] ?? (canReuseValue && currentValueType.get(i) || null);
+    }));
+  }
 
   // Validate range
   const rangeErrorObj = validateRange(config, newField, newOperator, newValue, newValueSrc);
@@ -1389,7 +1402,12 @@ export const getNewValueForFieldOp = function (
     });
   }
 
-  const newValueError = new Immutable.List(valueErrors);
+  let newValueError = currentValueError;
+  const hasValueErrorChanged = currentValueError?.size !== valueErrors.length
+    || valueErrors.filter((v, i) => (v != currentValueError.get(i))).length > 0;
+  if (hasValueErrorChanged) {
+    newValueError = new Immutable.List(valueErrors);
+  }
 
   return {
     canReuseValue, newValue, newValueSrc, newValueType, operatorCardinality, fixedField: newField,

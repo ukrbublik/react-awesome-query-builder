@@ -32,11 +32,10 @@ class RuleGroupExt extends BasicGroup {
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "rule_group_ext--children";
@@ -157,7 +156,6 @@ class RuleGroupExt extends BasicGroup {
       selectedFieldSrc={selectedFieldSrc}
       selectedOperator={selectedOperator}
       setOperator={setOperator}
-      selectedFieldPartsLabels={["group"]}
       showOperator={showOperator}
       showOperatorLabel={showOperatorLabel}
       selectedFieldWidgetConfig={selectedFieldWidgetConfig}
@@ -187,6 +185,7 @@ class RuleGroupExt extends BasicGroup {
       operatorOptions,
       value,
       valueType, // new Immutable.List(["number"])
+      // todo: aggregation can be not only number?
       valueSrc: ["value"], //new Immutable.List(["value"]), // should be fixed in isEmptyRuleGroupExtPropertiesAndChildren
       //asyncListValues,
       valueError,
@@ -208,6 +207,7 @@ class RuleGroupExt extends BasicGroup {
       {...this._buildWidgetProps(this.props)}
       config={config}
       setValue={!immutableValuesMode ? this.props.setValue : dummyFn}
+      // todo: aggregation can be not only number?
       setValueSrc={dummyFn}
       readonly={immutableValuesMode || isLocked}
       id={this.props.id}

@@ -5,7 +5,6 @@ import GroupContainer from "../containers/GroupContainer";
 import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {SwitchGroupActions} from "./SwitchGroupActions";
-import {useOnPropsChanged} from "../../utils/reactUtils";
 import {Col, dummyFn, WithConfirmFn} from "../utils";
 import classNames from "classnames";
 const {getTotalReordableNodesCountInTree, getTotalRulesCountInTree} = Utils.TreeUtils;
@@ -18,11 +17,10 @@ class SwitchGroup extends BasicGroup {
 
   constructor(props) {
     super(props);
-    useOnPropsChanged(this);
-    this.onPropsChanged(props);
   }
 
   onPropsChanged(nextProps) {
+    super.onPropsChanged(nextProps);
   }
 
   childrenClassName = () => "switch_group--children";

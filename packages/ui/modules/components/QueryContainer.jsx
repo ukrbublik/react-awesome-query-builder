@@ -6,12 +6,12 @@ import context from "../stores/context";
 import {createStore} from "redux";
 import {Provider} from "react-redux";
 import * as actions from "../actions";
-import {createConfigMemo} from "../utils/configUtils";
 import {immutableEqual} from "../utils/stuff";
-import {createValidationMemo} from "../utils/validation";
+import {createValidationMemo} from "../utils/validationMemo";
 import {liteShouldComponentUpdate, useOnPropsChanged} from "../utils/reactUtils";
 import ConnectedQuery from "./Query";
 const {defaultRoot} = Utils.DefaultUtils;
+const {createConfigMemo} = Utils.ConfigUtils;
 
 
 export default class QueryContainer extends Component {
@@ -35,9 +35,14 @@ export default class QueryContainer extends Component {
     super(props, context);
     useOnPropsChanged(this);
 
-    const { getExtended, getBasic } = createConfigMemo();
-    this.getMemoizedConfig = getExtended;
-    this.getBasicConfig = getBasic;
+    const { getExtendedConfig, getBasicConfig, clearConfigMemo } = createConfigMemo({
+      reactIndex: this._reactInternals?.index ?? -1,
+      maxSize: 2, // current and prev
+      canCompile: true,
+    });
+    this.getMemoizedConfig = getExtendedConfig;
+    this.getBasicConfig = getBasicConfig;
+    this.clearConfigMemo = clearConfigMemo;
     this.getMemoizedTree = createValidationMemo();
     
     const config = this.getMemoizedConfig(props);
@@ -58,6 +63,10 @@ export default class QueryContainer extends Component {
     this.QueryWrapper = (pr) => config.settings.renderProvider(pr, config.ctx);
   }
 
+  componentWillUnmount() {
+    this.clearConfigMemo();
+  }
+
   setLastTree = (lastTree) => {
     if (this.prevTree) {
       this.prevprevTree = this.prevTree;
@@ -70,7 +79,7 @@ export default class QueryContainer extends Component {
   };
 
   shouldComponentUpdate = liteShouldComponentUpdate(this, {
-    value: (nextValue, prevValue, state) => { return false; }
+    value: (nextValue, prevValue) => { return false; }
   });
 
   onPropsChanged(nextProps) {

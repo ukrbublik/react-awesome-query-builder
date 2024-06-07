@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 
@@ -15,6 +15,20 @@ export default (props) => {
   };
 
   const numberValue = value == undefined ? "" : value;
+
+  const InputProps = useMemo(() => ({
+    readOnly: readonly,
+  }), [
+    readonly
+  ]);
+
+  const inputProps = useMemo(() => ({
+    min,
+    max,
+    step,
+  }), [
+    min, max, step
+  ]);
   
   return (
     <FormControl>
@@ -23,14 +37,8 @@ export default (props) => {
         type="number"
         value={numberValue}
         placeholder={!readonly ? placeholder : ""}
-        InputProps={{
-          readOnly: readonly,
-        }}
-        inputProps={{
-          min: min,
-          max: max,
-          step: step,
-        }}
+        InputProps={InputProps}
+        inputProps={inputProps}
         disabled={readonly}
         onChange={onChange}
         size="small"

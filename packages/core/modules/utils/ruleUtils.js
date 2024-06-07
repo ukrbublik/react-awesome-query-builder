@@ -1,6 +1,6 @@
 import {
   getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldRawConfig, getFuncConfig, getFieldParts,
-  isFieldDescendantOfField
+  isFieldDescendantOfField, getFieldId, _getFromConfigCache, _saveToConfigCache,
 } from "./configUtils";
 import last from "lodash/last";
 import {completeFuncValue} from "./funcUtils";
@@ -97,19 +97,19 @@ export const getFieldPartsConfigs = (field, config, parentField = null) => {
 };
 
 export const getValueLabel = (config, field, operator, delta, valueSrc = null, isSpecialRange = false) => {
-  const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
-  const {showLabels} = config.settings;
-  const fieldConfig = getFieldConfig(config, field);
+  // const isFuncArg = field && typeof field == "object" && !!field.func && !!field.arg;
+  // const {showLabels} = config.settings;
+  // const fieldConfig = getFieldConfig(config, field);
   const fieldWidgetConfig = getFieldWidgetConfig(config, field, operator, null, valueSrc) || {};
   const mergedOpConfig = getOperatorConfig(config, operator, field) || {};
-    
+
   const cardinality = isSpecialRange ? 1 : mergedOpConfig.cardinality;
   let ret = null;
   if (cardinality > 1) {
     const valueLabels = fieldWidgetConfig.valueLabels || mergedOpConfig.valueLabels;
     if (valueLabels)
       ret = valueLabels[delta];
-    if (ret && typeof ret != "object") {
+    if (ret && typeof ret !== "object") {
       ret = {label: ret, placeholder: ret};
     }
     if (!ret) {
@@ -121,12 +121,13 @@ export const getValueLabel = (config, field, operator, delta, valueSrc = null, i
   } else {
     let label = fieldWidgetConfig.valueLabel;
     let placeholder = fieldWidgetConfig.valuePlaceholder;
-    if (isFuncArg) {
-      if (!label)
-        label = fieldConfig.label || field.arg;
-      if (!placeholder && !showLabels)
-        placeholder = fieldConfig.label || field.arg;
-    }
+    // tip: this logic moved to extendFieldConfig(), see comment "label for func arg"
+    // if (isFuncArg) {
+    //   if (!label)
+    //     label = fieldConfig.label || field.arg;
+    //   if (!placeholder && !showLabels)
+    //     placeholder = fieldConfig.label || field.arg;
+    // }
 
     ret = {
       label: label || config.settings.valueLabel, 
@@ -141,6 +142,11 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
   let valueSrcs = [];
   if (!field)
     return {widgets, valueSrcs};
+  const fieldCacheKey = getFieldId(field);
+  const cacheKey = fieldCacheKey ? `${fieldCacheKey}__${operator}__${valueSrc}` : null;
+  const cached = _getFromConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey);
+  if (cached)
+    return cached;
   const isFuncArg = typeof field === "object" && (!!field.func && !!field.arg || field._isFuncArg);
   const fieldConfig = getFieldConfig(config, field);
   const opConfig = operator ? config.operators[operator] : null;
@@ -153,21 +159,21 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
       }
       const widgetValueSrc = config.widgets[widget].valueSrc || "value";
       let canAdd = true;
-      if (widget == "field") {
+      if (widget === "field") {
         canAdd = canAdd && filterValueSourcesForField(config, ["field"], fieldConfig).length > 0;
       }
-      if (widget == "func") {
+      if (widget === "func") {
         canAdd = canAdd && filterValueSourcesForField(config, ["func"], fieldConfig).length > 0;
       }
       // If can't check operators, don't add
       // Func args don't have operators
-      if (valueSrc == "value" && !widgetConfig.operators && !isFuncArg && field != "!case_value")
+      if (valueSrc === "value" && !widgetConfig.operators && !isFuncArg && field !== "!case_value")
         canAdd = false;
       if (widgetConfig.operators && operator)
         canAdd = canAdd && widgetConfig.operators.indexOf(operator) != -1;
-      if (valueSrc && valueSrc != widgetValueSrc && valueSrc != "const")
+      if (valueSrc && valueSrc != widgetValueSrc && valueSrc !== "const")
         canAdd = false;
-      if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc != "value"))
+      if (opConfig && opConfig.cardinality == 0 && (widgetValueSrc !== "value"))
         canAdd = false;
       if (canAdd) {
         widgets.push(widget);
@@ -188,18 +194,20 @@ function _getWidgetsAndSrcsForFieldOp (config, field, operator = null, valueSrc 
     } else if (w == fieldConfig.mainWidget) {
       wg += 100;
     }
-    if (w == "field") {
+    if (w === "field") {
       wg -= 1;
     }
-    if (w == "func") {
+    if (w === "func") {
       wg -= 2;
     }
     return wg;
   };
 
   widgets.sort((w1, w2) => (widgetWeight(w2) - widgetWeight(w1)));
-    
-  return {widgets, valueSrcs};
+
+  const res = { widgets, valueSrcs };
+  _saveToConfigCache(config, "_getWidgetsAndSrcsForFieldOp", cacheKey, res);
+  return res;
 }
 
 export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) => {
@@ -210,19 +218,23 @@ export const getWidgetsForFieldOp = (config, field, operator, valueSrc = null) =
 export const filterValueSourcesForField = (config, valueSrcs, fieldDefinition) => {
   if (!fieldDefinition)
     return valueSrcs;
-  const fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
+  let fieldType = fieldDefinition.type ?? fieldDefinition.returnType;
+  if (fieldType === "!group") {
+    // todo: aggregation can be not only number?
+    fieldType = "number";
+  }
   if (!valueSrcs)
     valueSrcs = Object.keys(config.settings.valueSourcesInfo);
   return valueSrcs.filter(vs => {
     let canAdd = true;
-    if (vs == "field") {
+    if (vs === "field") {
       if (config.__fieldsCntByType) {
         // tip: LHS field can be used as arg in RHS function
         const minCnt = fieldDefinition._isFuncArg ? 0 : 1;
         canAdd = canAdd && config.__fieldsCntByType[fieldType] > minCnt;
       }
     }
-    if (vs == "func") {
+    if (vs === "func") {
       if (config.__funcsCntByType)
         canAdd = canAdd && !!config.__funcsCntByType[fieldType];
       if (fieldDefinition.funcs)

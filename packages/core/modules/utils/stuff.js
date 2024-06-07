@@ -1,8 +1,5 @@
 import Immutable, { Map } from "immutable";
-import omit from "lodash/omit";
 import {default as uuid} from "./uuid";
-
-const isObject = (v) => (typeof v == "object" && v !== null && !Array.isArray(v));
 
 export {uuid};
 
@@ -13,6 +10,25 @@ export const widgetDefKeysToOmit = [
 export const opDefKeysToOmit = [
   "formatOp", "mongoFormatOp", "sqlFormatOp", "jsonLogic", "spelFormatOp"
 ];
+
+export const isObject = (v) => {
+  return typeof v === "object" && v !== null && Object.prototype.toString.call(v) === "[object Object]";
+};
+
+export const shallowCopy = (v) => {
+  if (typeof v === "object" && v !== null) {
+    if (Array.isArray(v)) {
+      return [...v];
+    } else if (isObject(v)) {
+      return {...v};
+    }
+  }
+  return v;
+};
+
+export const omit = (obj, keys) => {
+  return Object.fromEntries(Object.entries(obj).filter(([k]) => !keys.includes(k)));
+};
 
 // RegExp.quote = function (str) {
 //     return str.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
@@ -248,9 +264,11 @@ export function mergeArraysSmart(arr1, arr2) {
 }
 
 export const deepFreeze = obj => {
-  if (typeof obj === "object" && obj !== null) {
+  if (typeof obj === "object" && obj !== null && !isDirtyJSX(obj)) {
     Object.keys(obj).forEach(prop => {
-      deepFreeze(obj[prop]);
+      if (prop !== "__cache") {
+        deepFreeze(obj[prop]);
+      }
     });
     Object.freeze(obj);
   }
