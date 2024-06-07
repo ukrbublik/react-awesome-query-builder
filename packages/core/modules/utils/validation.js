@@ -1169,6 +1169,9 @@ export const getNewValueForFieldOp = function (
       canReuseValue = false;
     }
   }
+  if (currentValue?.size != operatorCardinality) {
+    canReuseValue = false;
+  }
 
   // validate func LHS
   let newFieldError;
@@ -1235,9 +1238,9 @@ export const getNewValueForFieldOp = function (
   }
   const defaultValueSrc = valueSources[0];
   let defaultValueType;
-  if (operatorCardinality == 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
+  if (operatorCardinality === 1 && firstWidgetConfig && firstWidgetConfig.type !== undefined) {
     defaultValueType = firstWidgetConfig.type;
-  } else if (operatorCardinality == 1 && newFieldConfig && newFieldConfig.type !== undefined) {
+  } else if (operatorCardinality === 1 && newFieldConfig && newFieldConfig.type !== undefined) {
     defaultValueType = newFieldConfig.type === "!group" ? "number" : newFieldConfig.type;
   }
 
