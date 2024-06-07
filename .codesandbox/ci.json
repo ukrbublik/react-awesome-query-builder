@@ -15,5 +15,5 @@
     "/packages/sandbox_next"
   ],
   "node": "18",
-  "buildCommand": "build-libs"
+  "buildCommand": false
 }
