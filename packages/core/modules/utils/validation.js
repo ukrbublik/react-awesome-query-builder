@@ -1169,7 +1169,7 @@ export const getNewValueForFieldOp = function (
       canReuseValue = false;
     }
   }
-  if (currentValue?.size != operatorCardinality) {
+  if (!currentValue?.size && operatorCardinality || currentValue?.size && !operatorCardinality) {
     canReuseValue = false;
   }
 

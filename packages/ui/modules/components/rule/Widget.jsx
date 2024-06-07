@@ -7,7 +7,7 @@ import {useOnPropsChanged} from "../../utils/reactUtils";
 import pick from "lodash/pick";
 import WidgetFactory from "./WidgetFactory";
 import classNames from "classnames";
-import {Col, getWidgetId} from "../utils";
+import {Col, getWidgetId, getRenderFromConfig} from "../utils";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
 const { createListFromArray } = Utils.DefaultUtils;
@@ -90,8 +90,7 @@ export default class Widget extends Component {
     if (configChanged) {
       const { config } = nextProps;
       const { renderValueSources } = config.settings;
-      this.ValueSources = (pr) => renderValueSources(pr, config.ctx);
-      this.ValueSources.displayName = "ValueSources";
+      this.ValueSources = getRenderFromConfig(config, renderValueSources);
     }
   }
 

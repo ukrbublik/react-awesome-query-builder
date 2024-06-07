@@ -30,7 +30,19 @@ const getWidgetId = ({
   ].join(":");
 };
 
+const getRenderFromConfig = (config, renderFn) => {
+  let Cmp;
+  if (typeof renderFn === "function") {
+    Cmp = (pr) => renderFn?.(pr, config.ctx);
+    Cmp.displayName = renderFn.name;
+  } else {
+    Cmp = renderFn;
+  }
+  return Cmp;
+};
+
 export {
   Col, dummyFn, DragIcon, WithConfirmFn,
   getWidgetId,
+  getRenderFromConfig,
 };

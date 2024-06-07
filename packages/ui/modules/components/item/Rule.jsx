@@ -8,7 +8,7 @@ import FieldWrapper from "../rule/FieldWrapper";
 import Widget from "../rule/Widget";
 import OperatorOptions from "../rule/OperatorOptions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, dummyFn, WithConfirmFn} from "../utils";
+import {Col, dummyFn, WithConfirmFn, getRenderFromConfig} from "../utils";
 import classNames from "classnames";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig, getFieldId} = Utils.ConfigUtils;
 const {isEmptyRuleProperties} = Utils.RuleUtils;
@@ -73,14 +73,10 @@ class Rule extends Component {
     if (configChanged) {
       const { config } = nextProps;
       const { renderIcon, renderButton, renderButtonGroup, renderSwitch } = config.settings;
-      this.Icon = (pr) => renderIcon?.(pr, config.ctx);
-      this.Icon.displayName = "Icon";
-      this.Btn = (pr) => renderButton?.(pr, config.ctx);
-      this.Btn.displayName = "Btn";
-      this.BtnGrp = (pr) => renderButtonGroup?.(pr, config.ctx);
-      this.BtnGrp.displayName = "BtnGrp";
-      this.Switch = (pr) => renderSwitch?.(pr, config.ctx);
-      this.Switch.displayName = "Switch";
+      this.Icon = getRenderFromConfig(config, renderIcon);
+      this.Btn = getRenderFromConfig(config, renderButton);
+      this.BtnGrp = getRenderFromConfig(config, renderButtonGroup);
+      this.Switch = getRenderFromConfig(config, renderSwitch);
     }
     this.doRemove = () => {
       this.props.removeSelf();

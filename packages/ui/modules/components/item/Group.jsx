@@ -7,7 +7,7 @@ import Draggable from "../containers/Draggable";
 import classNames from "classnames";
 import { Item } from "./Item";
 import {GroupActions} from "./GroupActions";
-import {WithConfirmFn, dummyFn} from "../utils";
+import {WithConfirmFn, dummyFn, getRenderFromConfig} from "../utils";
 import {useOnPropsChanged} from "../../utils/reactUtils";
 const {isEmptyGroupChildren} = Utils.RuleUtils;
 
@@ -61,18 +61,10 @@ export class BasicGroup extends Component {
     if (configChanged) {
       const { config } = nextProps;
       const { renderIcon, renderConjs, renderBeforeActions, renderAfterActions } = config.settings;
-      this.Icon = (pr) => renderIcon?.(pr, config.ctx);
-      this.Icon.displayName = "Icon";
-      this.Conjs = (pr) => renderConjs?.(pr, config.ctx);
-      this.Conjs.displayName = "Conjs";
-      this.BeforeActions = typeof renderBeforeActions === "function" ? (pr) => renderBeforeActions?.(pr, config.ctx) : renderBeforeActions;
-      if (typeof this.BeforeActions === "function") {
-        this.BeforeActions.displayName = "BeforeActions";
-      }
-      this.AfterActions = typeof renderAfterActions === "function" ? (pr) => renderAfterActions?.(pr, config.ctx) : renderAfterActions;
-      if (typeof this.AfterActions === "function") {
-        this.AfterActions.displayName = "AfterActions";
-      }
+      this.Icon = getRenderFromConfig(config, renderIcon);
+      this.Conjs = getRenderFromConfig(config, renderConjs);
+      this.BeforeActions = getRenderFromConfig(config, renderBeforeActions);
+      this.AfterActions = getRenderFromConfig(config, renderAfterActions);
     }
 
     this.doRemove = () => {
