@@ -14,5 +14,6 @@
     "/packages/sandbox_simple",
     "/packages/sandbox_next"
   ],
-  "node": "18"
+  "node": "18",
+  "buildCommand": false
 }
