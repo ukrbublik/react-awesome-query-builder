@@ -879,11 +879,12 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
         });
       }
       // validate min/max
+      const minMaxContext = fieldSettings.min != undefined && fieldSettings.max != undefined ? constants._CONTEXT_MIN_MAX : undefined;
       if (fieldSettings.min != null && value < fieldSettings.min) {
         fixedValue = canFix ? fieldSettings.min : value;
         allErrors.push({
           key: constants.VALUE_MIN_CONSTRAINT_FAIL,
-          args: { value, fieldSettings },
+          args: { value, fieldSettings, context: minMaxContext },
           fixed: canFix,
           fixedFrom: canFix ? value : undefined,
           fixedTo: canFix ? fixedValue : undefined,
@@ -893,7 +894,7 @@ const validateNormalValue = (field, value, valueSrc, valueType, asyncListValues,
         fixedValue = canFix ? fieldSettings.max : value;
         allErrors.push({
           key: constants.VALUE_MAX_CONSTRAINT_FAIL,
-          args: { value, fieldSettings },
+          args: { value, fieldSettings, context: minMaxContext },
           fixed: canFix,
           fixedFrom: canFix ? value : undefined,
           fixedTo: canFix ? fixedValue : undefined,
