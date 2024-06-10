@@ -13,7 +13,6 @@ import * as inits from "../support/inits";
 import { export_checks, with_qb, expect_objects_equal } from "../support/utils";
 import { SliderMark, configMixin, makeCtx, zipInits, expectedZipConfig } from "../support/zipConfigs";
 import chai from "chai";
-import sinon from "sinon";
 import deepEqualInAnyOrder from "deep-equal-in-any-order";
 import merge from "lodash/merge";
 const { ConfigUtils } = Utils;
@@ -53,7 +52,13 @@ describe("Compressed config", () => {
         const zipConfig = ConfigUtils.compressConfig(config, BaseConfig);
         const decConfig = ConfigUtils.decompressConfig(zipConfig, BaseConfig);
         export_checks(() => decConfig, inits.with_ops, "JsonLogic", {}, [], {
-          withRender: configKey !== "CoreConfig"
+          withRender: configKey !== "CoreConfig",
+          ignoreLog: (errText) => {
+            // tip: It's the issue with antd's Select component in "multiple" mode for React 17 (in React 18 it's fine)
+            return configKey === "AntdConfig" && errText.includes("Can't perform a React state update on an unmounted component")
+              && errText.includes("a useEffect cleanup function") && errText.includes("at Overflow")
+            ;
+          }
         });
       });
     });
