@@ -49,8 +49,8 @@ describe("change props", () => {
   });
 
   describe("load tree with another config", async () => {
-    await with_qb(configs.simple_with_number, inits.with_num_and_num2, "JsonLogic", (qb, {expect_checks}) => {
-      expect_checks({
+    await with_qb(configs.simple_with_number, inits.with_num_and_num2, "JsonLogic", async (qb, {expect_checks}) => {
+      await expect_checks({
         logic: inits.with_number
       });
     }, {

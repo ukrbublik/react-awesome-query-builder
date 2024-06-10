@@ -125,6 +125,7 @@ const DemoQueryBuilder: React.FC = () => {
       sql: true,
       actions: false,
       withProfile: false,
+      queryBuilder: true,
     },
   });
 
@@ -804,6 +805,7 @@ const DemoQueryBuilder: React.FC = () => {
       </div>
       <div>
         Output: &nbsp;
+        <button onClick={switchRenderBlock.bind(null, "queryBuilder")}>Builder: {state.renderBocks.queryBuilder ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "validation")}>Validation: {state.renderBocks.validation ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "jsTree")}>Tree: {state.renderBocks.jsTree ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "jsonlogic")}>JsonLogic: {state.renderBocks.jsonlogic ? "on" : "off"}</button>
@@ -812,41 +814,41 @@ const DemoQueryBuilder: React.FC = () => {
         <button onClick={switchRenderBlock.bind(null, "sql")}>SQL: {state.renderBocks.sql ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "mongo")}>Mongo: {state.renderBocks.mongo ? "on" : "off"}</button>
         <button onClick={switchRenderBlock.bind(null, "elasticSearch")}>ElasticSearch: {state.renderBocks.elasticSearch ? "on" : "off"}</button>
-        <button onClick={switchRenderBlock.bind(null, "actions")}>Actions: {state.renderBocks.actions ? "on" : "off"}</button>
+        {state.renderBocks.queryBuilder && <button onClick={switchRenderBlock.bind(null, "actions")}>Actions in console: {state.renderBocks.actions ? "on" : "off"}</button>}
       </div>
       <div>
         Data: &nbsp;
-        <button onClick={resetValue}>reset</button>
-        <button onClick={clearValue}>clear</button>
-        <button onClick={runActions}>run actions</button>
-        <button onClick={removeNumFromConfig}>change config: remove num field</button>
+        <button onClick={resetValue}>Reset</button>
+        <button onClick={clearValue}>Clear</button>
+        {state.renderBocks.queryBuilder && <button onClick={runActions}>Run actions</button>}
+        <button onClick={removeNumFromConfig}>Change config: remove num field</button>
       </div>
       <div>
         Validation: &nbsp;
-        <button onClick={validateToConsole}>show errors in console</button>
-        <button onClick={sanitizeLight}>validate</button>
-        <button onClick={sanitize}>sanitize</button>
-        <button onClick={sanitizeAndFix}>sanitize & fix</button>
+        <button onClick={validateToConsole}>Show errors in console</button>
+        <button onClick={sanitizeLight}>Validate</button>
+        <button onClick={sanitize}>Sanitize</button>
+        <button onClick={sanitizeAndFix}>Sanitize & fix</button>
       </div>
       <div>
         Benchmark: &nbsp;
-        <button onClick={timeExport}>export</button>
-        <button onClick={timeValidation}>validation</button>
-        <button onClick={timeActions}>actions</button>
-        <button onClick={switchRenderBlock.bind(null, "withProfile")}>profile: {state.renderBocks.withProfile ? "on" : "off"}</button>
+        <button onClick={timeExport}>Export</button>
+        <button onClick={timeValidation}>Validation</button>
+        <button onClick={timeActions}>Actions</button>
+        <button onClick={switchRenderBlock.bind(null, "withProfile")}>with profile: {state.renderBocks.withProfile ? "on" : "off"}</button>
       </div>
 
       {renderSpelInputBlock(state)}
 
       <ImportSkinStyles skin={state.skin} />
-      
-      <Query
+
+      {state.renderBocks.queryBuilder && <Query
         {...state.config}
         value={state.tree}
         onInit={onChange}
         onChange={onChange}
         renderBuilder={renderBuilder}
-      />
+      />}
 
       <div className="query-builder-result">
         {renderResult(state)}

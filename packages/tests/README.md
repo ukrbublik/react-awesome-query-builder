@@ -76,7 +76,7 @@ See [known issue #1](#known-issues-in-debug-mode).
 Now you can put breakpoints on your test code in VSCode (and library code too!).  
 
 
-### Idle
+### Pause test
 
 Here is a useful setup for writing new tests.
 
@@ -88,8 +88,8 @@ Here is a useful setup for writing new tests.
 - In your test code use `await pauseTest();` to pause test execution. It's like `debugger;` but better for writing tests. You can inspect and interact with web page, use browser console etc.
 - Type `continueTest()` in browser console to continue test execution.
 
-If you update test code, Karma won't reload the `DEBUG RUNNER` page automatically. It's fine. Just reload the page (`F5`) manually. You should see one of these messages in terminal when tests are recompiled after your chnages and ready to be executed:
-- `WARN [karma]: Delaying execution, these browsers are not ready: Chrome xxx`
+If you update test code, Karma won't reload the `DEBUG RUNNER` page automatically. It's fine. Just reload the page (`F5`) manually. You should see these messages in terminal when tests are recompiled after your changes and ready to be executed:
+- `webpack 5.91.0 compiled successfully in xxxx ms`
 - `WARN [karma]: No captured browser, open http://localhost:9877/`.
 
 Why `await pauseTest();` is better that `debugger;` for writing tests?  

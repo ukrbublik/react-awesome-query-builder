@@ -31,7 +31,11 @@ describe("basic query", () => {
         strict: true,
         expectedLoadErrors: [
           "Root  >>  Empty query"
-        ]
+        ],
+        // occurs only in debug mode
+        // ignoreLog: (errText) => {
+        //   return errText.includes(" is deprecated in StrictMode") && errText.includes("findDOMNode");
+        // }
       });
     });
   });

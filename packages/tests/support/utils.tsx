@@ -1,6 +1,5 @@
 import React, { ReactElement } from "react";
 import { mount, shallow, ReactWrapper, MountRendererProps } from "enzyme";
-import { act } from "react-dom/test-utils";
 import sinon, {spy} from "sinon";
 import { expect } from "chai";
 const stringify = JSON.stringify;
@@ -73,21 +72,21 @@ interface ExtectedExports {
 interface CheckExpects {
   expect_jlogic: (jlogics: Array<null | undefined | JsonLogicTree>, changeIndex?: number) => void;
   expect_queries: (queries: Array<string>) => void;
-  expect_checks: (expects: ExtectedExports) => void;
+  expect_checks: (expects: ExtectedExports) => Promise<void>;
   expect_tree_validation_errors_in_console: (errs: string[]) => void;
 }
-interface CheckUtils {
-  pauseTest: (addToGlobal?: Record<string, unknown>) => Promise<void>;
-  continueTest: () => void;
-  onChange: sinon.SinonSpy<Parameters<OnChange>>;
-  onInit: sinon.SinonSpy<Parameters<OnInit>>;
-  consoleData: ConsoleData;
-}
-interface CheckMeta extends CheckExpects, CheckUtils  {
+interface DebugUtils {
   qb: ReactWrapper;
   config: Config;
+  onChange: sinon.SinonSpy<Parameters<OnChange>>;
+  onInit: sinon.SinonSpy<Parameters<OnInit>>;
   initialTree: ImmutableTree;
   initialJsonTree: JsonTree;
+  consoleData: ConsoleData;
+  pauseTest: (addToGlobal?: Record<string, unknown>) => Promise<void>;
+  continueTest: () => void;
+}
+interface CheckMeta extends CheckExpects, DebugUtils  {
 }
 interface DoOptions {
   attach?: boolean; // default: true
@@ -126,6 +125,11 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
     } as Console;
     for (const method of ConsoleMethods) {
       mockedConsole[method] = (...args: string[]) => {
+        // Prevent using of mocked console inside `ignoreLog()` or `globalIgnoreFn()`
+        const _console = console;
+        // eslint-disable-next-line no-global-assign
+        console = origConsole;
+
         let finalArgs = [...args];
         if (args[0] === "Fixed tree errors: " || args[0] === "Tree check errors: ") {
           // Convert errors from `validateAndFixTree` or `checkTree`
@@ -136,14 +140,27 @@ const mockConsole = (options?: DoOptions, _configName?: string) => {
         }
         const errText = finalArgs.map(a => typeof a === "object" ? JSON.stringify(a) : `${a}`).join("\n");
         consoleData[method]?.push(errText);
-        if (!options?.ignoreLog?.(errText) && !globalIgnoreFn(errText)) {
+        const ignore = options?.ignoreLog?.(errText) || globalIgnoreFn(errText);
+
+        // eslint-disable-next-line no-global-assign
+        console = _console;
+
+        if (!ignore) {
           origConsole[method].apply(null, [...finalArgs, "@", getCurrentTestName()]);
         }
       };
     }
   }
 
-  return {mockedConsole, consoleData, origConsole};
+  // eslint-disable-next-line no-global-assign
+  console = mockedConsole;
+
+  const restoreConsole = () => {
+    // eslint-disable-next-line no-global-assign
+    console = origConsole;
+  };
+
+  return {consoleData, restoreConsole, mockedConsole, origConsole};
 };
 
 const stringifyValidationErrors = (errors: ValidationItemErrors[]) => {
@@ -173,10 +190,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
   }
   let errors: string[] = [];
 
-  // mock console
-  const {mockedConsole, origConsole} = mockConsole(options);
-  // eslint-disable-next-line no-global-assign
-  console = mockedConsole;
+  const {restoreConsole} = mockConsole(options);
 
   let tree: ImmutableTree | undefined;
   if (valueFormat === "JsonLogic") {
@@ -200,9 +214,7 @@ export const load_tree = (value: TreeValue, config: Config, valueFormat: TreeVal
     }
   }
 
-  // restore console
-  // eslint-disable-next-line no-global-assign
-  console = origConsole;
+  restoreConsole();
 
   return {tree, errors};
 };
@@ -239,6 +251,204 @@ export  const with_qb_skins = async (config_fn: ConfigFns, value: TreeValue, val
   await do_with_qb("bootstrap", BootstrapConfig, config_fn, value, valueFormat, checks, options);
   await do_with_qb("fluent", FluentUIConfig, config_fn, value, valueFormat, checks, options);
 };
+
+const activateIdle = (
+  buildDebugVars?: () => Record<string, unknown>,
+  printDebug?: () => void,
+) => {
+  const isDebugPage = document.location.href.includes("/debug.html");
+  const idleOptions: SleepOptions = {};
+  let isIdle = false;
+  const pauseTest = async (addToGlobal?: Record<string, unknown>) => {
+    exposeDebugVars();
+    printDebug?.();
+
+    if (isDebugPage) {
+      console.log("Pausing test... Type `continueTest()` to continue");
+      if (addToGlobal) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        Object.assign((window as any).dbg, addToGlobal);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        Object.assign(window as any, addToGlobal);
+      }
+      isIdle = true;
+      const startIdleTime = new Date();
+      while (isIdle) {
+        await sleep(500, idleOptions);
+        const currentTime = new Date();
+        const isTimedOut = process?.env?.MAX_IDLE_TIME
+          && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME );
+        if (isTimedOut) {
+          isIdle = false;
+          break;
+        }
+      }
+      isIdle = false;
+    }
+  };
+  const continueTest = () => {
+    if (isIdle) {
+      isIdle = false;
+      if (idleOptions?.wakeUp) {
+        idleOptions?.wakeUp();
+      }
+    }
+  };
+
+  const exposeDebugVars = () => {
+    const dbg = buildDebugVars?.() || {};
+    // expose to window
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (window as any).dbg = dbg;
+    if (isDebugPage) {
+      for (const k in dbg) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (window as any)[k] = dbg[k];
+      }
+    }
+  };
+
+  return {
+    pauseTest, continueTest, exposeDebugVars,
+  };
+};
+
+const renderQueryBuilder = (
+  config: Config,
+  tree: ImmutableTree,
+  options?: DoOptions,
+  configName?: string,
+  extraDebug?: Record<string, unknown>,
+) => {
+  // eslint-disable-next-line prefer-const
+  let qb: ReactWrapper;
+  const onChange = spy() as DebugUtils["onChange"];
+  const onInit = spy() as DebugUtils["onInit"];
+
+  // mock console
+  const {restoreConsole, consoleData} = mockConsole(options, configName);
+
+  // idle
+  const buildDebugVars = () => {
+    const qbDom = qb.first().getDOMNode();
+    const ruleErrors = qb.find(".rule--error").map(e => e.text());
+
+    const dbg: Record<string, unknown> = {
+      ...debugUtils,
+      ...(extraDebug || {}),
+      ruleErrors,
+      qbDom,
+      Utils,
+      configs,
+      inits,
+      expect,
+    };
+    return dbg;
+  };
+  const printDebug = () => {
+    const qbDom = qb.first().getDOMNode();
+    console.dirxml( qbDom );
+  };
+  const { pauseTest, continueTest, exposeDebugVars } = activateIdle(buildDebugVars, printDebug);
+
+  let qbWrapper: HTMLElement;
+  
+  const mountOptions: MountRendererProps = {};
+  if (options?.attach !== false) {
+    qbWrapper = global.document.createElement("div");
+    global.document.body.appendChild(qbWrapper);
+    mountOptions.attachTo = qbWrapper;
+  }
+
+  const render_builder = (props: BuilderProps) => (
+    <div className="query-builder-container" style={{padding: "10px"}}>
+      <div className="query-builder qb-lite">
+        <Builder {...props} />
+      </div>
+    </div>
+  );
+
+  const query = () => {
+    let cmp = (
+      <Query
+        {...config}
+        value={tree as ImmutableTree}
+        renderBuilder={render_builder}
+        onChange={onChange}
+        onInit={onInit}
+      />
+    );
+    if (options?.strict) {
+      cmp = (
+        <React.StrictMode>
+          {cmp}
+        </React.StrictMode>
+      );
+    }
+    return cmp;
+  };
+
+  // debug
+  const updateTestTimeout = () => {
+    setCurrentTestTimeout(parseInt(process?.env?.DEBUG_TEST_TIMEOUT ?? "60000"));
+  };
+  if (options?.debug) {
+    updateTestTimeout();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  qb = mount( query(), mountOptions );
+
+  // debug
+  const initialTree = onInit.getCall(0).args[0];
+  const initialJsonTree = getTree(initialTree);
+  const debugUtils: DebugUtils = {
+    qb,
+    config,
+    onChange,
+    onInit,
+    pauseTest,
+    continueTest,
+    consoleData,
+    initialTree,
+    initialJsonTree,
+    // tree,
+  };
+
+  if (options?.debug) {
+    exposeDebugVars();
+  }
+
+  // destroy
+  const destroyQb = async () => {
+    if (options?.attach !== false) {
+      // @ts-ignore
+      qb.detach();
+      // @ts-ignore
+      global.document.body.removeChild(qbWrapper);
+      // @ts-ignore
+      qb.unmount();
+      // @ts-ignore
+      qbWrapper.remove();
+    } else {
+      // @ts-ignore
+      qb.unmount();
+    }
+
+    onChange.resetHistory();
+
+    // needed to catch potential "Warning: Can't perform a React state update on an unmounted component."
+    await sleep(0);
+
+    restoreConsole();
+  };
+
+  return {
+    qb,
+    destroyQb,
+    debugUtils,
+  };
+};
   
 const do_with_qb = async (
   configName: string, BasicConfig: Config, config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat,
@@ -269,152 +479,20 @@ const do_with_qb = async (
     expect(options?.expectedLoadErrors?.length ?? 0, "expectedLoadErrors count").equal(0);
   }
 
-  // eslint-disable-next-line prefer-const
-  let qb: ReactWrapper;
-  const onChange = spy() as CheckUtils["onChange"];
-  const onInit = spy() as CheckUtils["onInit"];
-  // mock console
-  const {mockedConsole, origConsole, consoleData} = mockConsole(options, configName);
-  // eslint-disable-next-line no-global-assign
-  console = mockedConsole;
-
-  const isDebugPage = document.location.href.includes("/debug.html");
-
-  const idleOptions: SleepOptions = {};
-  let isIdle = false;
-
-  const pauseTest = async (addToGlobal?: Record<string, unknown>) => {
-    exposeDebugVars();
-    printDebug();
-
-    if (isDebugPage) {
-      console.log("Pausing test... Type `continueTest()` to continue");
-      if (addToGlobal) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        Object.assign((window as any).dbg, addToGlobal);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        Object.assign(window as any, addToGlobal);
-      }
-      isIdle = true;
-      const startIdleTime = new Date();
-      while (isIdle) {
-        await sleep(500, idleOptions);
-        const currentTime = new Date();
-        const isTimedOut = process?.env?.MAX_IDLE_TIME
-          && (currentTime.getTime() - startIdleTime.getTime()) >= parseInt(process?.env?.MAX_IDLE_TIME );
-        if (isTimedOut) {
-          isIdle = false;
-          break;
-        }
-      }
-      isIdle = false;
-    }
-  };
-
-  const continueTest = () => {
-    if (isIdle) {
-      isIdle = false;
-      if (idleOptions?.wakeUp) {
-        idleOptions?.wakeUp();
-      }
-    }
-  };
-
-  const exposeDebugVars = () => {
-    const qbDom = qb.first().getDOMNode();
-    const initialTree = onInit.getCall(0).args[0] ;
-    const initialJsonTree = getTree(initialTree);
-    const ruleErrors = qb.find(".rule--error").map(e => e.text());
-
-    const dbg: Record<string, unknown> = {
-      ...checkMeta,
-      tree,
-      errors,
-      extendedConfig,
-      initialTree,
-      initialJsonTree,
-      Utils,
-      ruleErrors,
-      qbDom,
-      expect,
-      configs,
-      inits,
-    };
-
-    // expose to window
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (window as any).dbg = dbg;
-    if (isDebugPage) {
-      for (const k in dbg) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        (window as any)[k] = dbg[k];
-      }
-    }
-  };
-
-  const printDebug = () => {
-    const qbDom = qb.first().getDOMNode();
-    console.dirxml( qbDom );
-  };
-
-  const updateTestTimeout = () => {
-    setCurrentTestTimeout(parseInt(process?.env?.DEBUG_TEST_TIMEOUT ?? "60000"));
-  };
-
-  let qbWrapper: HTMLElement;
-  
-  const mountOptions: MountRendererProps = {};
-  if (options?.attach !== false) {
-    qbWrapper = global.document.createElement("div");
-    global.document.body.appendChild(qbWrapper);
-    mountOptions.attachTo = qbWrapper;
-  }
-
-  const query = () => {
-    let cmp = (
-      <Query
-        {...config}
-        value={tree as ImmutableTree}
-        renderBuilder={render_builder}
-        onChange={onChange}
-        onInit={onInit}
-      />
-    );
-    if (options?.strict) {
-      cmp = (
-        <React.StrictMode>
-          {cmp}
-        </React.StrictMode>
-      );
-    }
-    return cmp;
-  };
-
-  if (options?.debug) {
-    updateTestTimeout();
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  qb = mount(
-    query(), 
-    mountOptions
-  );
-
-  const initialTree = onInit.getCall(0).args[0] ;
-  const initialJsonTree = getTree(initialTree);
-  const checkMeta: CheckMeta = {
+  // Render
+  const {
     qb,
-    config,
-    initialTree,
-    initialJsonTree,
+    destroyQb,
+    debugUtils,
+  } = renderQueryBuilder(config, tree!, options, configName, {
+    errors,
+    extendedConfig,
+  });
+  const { onChange, consoleData } = debugUtils;
 
-    // utils
-    pauseTest,
-    continueTest,
-    onInit,
-    onChange,
-    consoleData,
-
+  // Checks
+  const checkMeta: CheckMeta = {
+    ...debugUtils,
     // expects
     expect_jlogic: (jlogics, changeIndex = 0) => {
       expect_jlogic_before_and_after(config, tree as ImmutableTree, onChange, jlogics, changeIndex);
@@ -422,8 +500,8 @@ const do_with_qb = async (
     expect_queries: (queries) => {
       expect_queries_before_and_after(config, tree as ImmutableTree, onChange, queries);
     },
-    expect_checks: (expects) => {
-      do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
+    expect_checks: async (expects) => {
+      await do_export_checks(extendedConfig, tree as ImmutableTree, expects, {
         ...options,
         withRender: false, 
         insideIt: true,
@@ -442,48 +520,18 @@ const do_with_qb = async (
       expect(errs?.[0] ?? "").to.equal(expectedLines.join("\n"));
     },
   };
-
-  if (options?.debug) {
-    exposeDebugVars();
-  }
-
   // @ts-ignore
   await checks(qb, checkMeta);
 
-  if (options?.attach !== false) {
-    // @ts-ignore
-    qb.detach();
-    // @ts-ignore
-    global.document.body.removeChild(qbWrapper);
-    // @ts-ignore
-    qb.unmount();
-    // @ts-ignore
-    qbWrapper.remove();
-  } else {
-    // @ts-ignore
-    qb.unmount();
-  }
-
-  // restore console
-  // eslint-disable-next-line no-global-assign
-  console = origConsole;
-  
-  onChange.resetHistory();
+  // Destroy
+  await destroyQb();
 };
-  
-const render_builder = (props: BuilderProps) => (
-  <div className="query-builder-container" style={{padding: "10px"}}>
-    <div className="query-builder qb-lite">
-      <Builder {...props} />
-    </div>
-  </div>
-);
-  
+
 export const empty_value = {id: uuid(), type: "group"};
 
 // ----------- export checks
 
-const do_export_checks = (config: Config, tree: ImmutableTree, expects?: ExtectedExports, options?: DoOptions) => {
+const do_export_checks = async (config: Config, tree: ImmutableTree, expects?: ExtectedExports, options?: DoOptions) => {
   const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
 
   if (!expects || Object.values(expects).some(e => e === "?")) {
@@ -577,27 +625,16 @@ const do_export_checks = (config: Config, tree: ImmutableTree, expects?: Extecte
     });
 
     if (options?.withRender) {
-
-      act(() => {
-        // mock console
-        const {mockedConsole, origConsole} = mockConsole(options);
-        // eslint-disable-next-line no-global-assign
-        console = mockedConsole;
-
-        const qb = mount(
-          <Query
-            {...config}
-            value={tree}
-            renderBuilder={render_builder}
-            onChange={emptyOnChange}
-          />
-        );
-        qb.unmount();
-
-        // restore console
-        // eslint-disable-next-line no-global-assign
-        console = origConsole;
-      });
+      const render = async () => {
+        // Render
+        const { destroyQb } = renderQueryBuilder(config, tree!, options);
+        await destroyQb();
+      };
+      if (options?.insideIt) {
+        await render();
+      } else {
+        doIt("should render without errors", render);
+      }
     }
   }
 };
@@ -606,9 +643,13 @@ export const export_checks = (
   config_fn: ConfigFns, value: TreeValue, valueFormat: TreeValueFormat,
   expects?: ExtectedExports, expectedLoadErrors: Array<string> = [], options: DoOptions = {}
 ) => {
+  // tip: No need to make this func async (and wait for do_export_checks),
+  //  because `export_checks` should be called only inside `decribe` (insideIt is expected to be false)
   const doIt = options?.insideIt ? ((name: string, func: Function) => { func(); }) : it;
   const config_fns = (Array.isArray(config_fn) ? config_fn : [config_fn]) as ConfigFn[];
   const config = config_fns.reduce((c, f) => f(c), BasicConfig as Config);
+
+  const withRender = options?.insideIt ? false : (options?.withRender ?? true);
 
   let tree, errors: string[] = [];
   try {
@@ -630,7 +671,7 @@ export const export_checks = (
 
       do_export_checks(config, tree as ImmutableTree, expects, {
         ...options,
-        withRender: options?.withRender ?? true,
+        withRender,
       });
     } else {
       doIt("should load tree without errors", () => {
@@ -640,7 +681,7 @@ export const export_checks = (
   } else {
     do_export_checks(config, tree as ImmutableTree, expects, {
       ...options,
-      withRender: options?.withRender ?? true,
+      withRender,
     });
   }
 };
