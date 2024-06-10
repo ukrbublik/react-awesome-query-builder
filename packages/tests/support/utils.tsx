@@ -484,7 +484,7 @@ const do_with_qb = async (
     qb,
     destroyQb,
     debugUtils,
-  } = await renderQueryBuilder(config, tree!, options, configName, {
+  } = renderQueryBuilder(config, tree!, options, configName, {
     errors,
     extendedConfig,
   });

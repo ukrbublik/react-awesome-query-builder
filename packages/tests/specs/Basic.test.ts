@@ -21,7 +21,7 @@ describe("basic query", () => {
 
   describe("strict mode", () => {
     it("should not produce warnings", async () => {
-      await with_qb(configs.simple_with_number, empty_value, "default", async (qb, { consoleData }) => {
+      await with_qb(configs.simple_with_number, empty_value, "default", (qb, { consoleData }) => {
         expect(qb.find(".query-builder")).to.have.length(1);
         const consoleErrors = consoleData.error?.join("\n");
         const consoleWarns = consoleData.warn?.join("\n");
