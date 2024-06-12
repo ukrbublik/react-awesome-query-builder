@@ -527,8 +527,11 @@ interface ConfigUtils {
 interface ExportUtils {
   spelEscape(val: any): string;
   spelFormatConcat(parts: SpelConcatParts): string;
-  jsonLogicFormatConcat(parts: SpelConcatParts): any;
   spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
+  // todo: remove
+  jsonLogicFormatConcat(parts: SpelConcatParts): any;
+  // todo: remove
+  jsonLogicImportConcat(val: any): SpelConcatParts | undefined;
 }
 interface ListUtils {
   getTitleInListValues(listValues: ListValues, value: string | number): string;
@@ -825,6 +828,7 @@ export interface FieldProps<C = Config> {
 /////////////////
 
 type SpelImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => [any, string[] | string | undefined];
+type JsonLogicImportValue = (val: any, wgtDef?: Widget, args?: TypedMap<any>) => any | undefined; // can throw
 
 type FormatValue =                  (val: RuleValue, fieldDef: Field, wgtDef: Widget, isForDisplay: boolean, op: string, opDef: Operator, rightFieldDef?: Field) => string;
 type SqlFormatValue =               (val: RuleValue, fieldDef: Field, wgtDef: Widget, op: string, opDef: Operator, rightFieldDef?: Field) => string;
@@ -853,6 +857,7 @@ export interface BaseWidget<C = Config, WP = WidgetProps<C>> {
   hideOperator?: boolean;
   operatorInlineLabel?: string;
   jsonLogic?: JsonLogicFormatValue | SerializedFunction;
+  jsonLogicImport?: JsonLogicImportValue | SerializedFunction;
   //obsolete:
   validateValue?: ValidateValue | SerializedFunction;
   //@ui
@@ -1360,7 +1365,7 @@ type SqlFormatFunc = (formattedArgs: TypedMap<string>) => string;
 type FormatFunc = (formattedArgs: TypedMap<string>, isForDisplay: boolean) => string;
 type MongoFormatFunc = (formattedArgs: TypedMap<MongoValue>) => MongoValue;
 type JsonLogicFormatFunc = (formattedArgs: TypedMap<JsonLogicValue>) => JsonLogicTree;
-type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue>;
+type JsonLogicImportFunc = (val: JsonLogicValue) => Array<RuleValue> | undefined; // can throw
 type SpelImportFunc = (spel: SpelRawValue) => Array<RuleValue>;
 type SpelFormatFunc = (formattedArgs: TypedMap<string>) => string;
 

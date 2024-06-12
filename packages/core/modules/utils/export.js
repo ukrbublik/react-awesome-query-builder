@@ -129,16 +129,6 @@ export const spelEscape = (val, numberToFloat = false, arrayToArray = false) => 
   }
 };
 
-export const jsonLogicFormatConcat = (parts) => {
-  if (parts && Array.isArray(parts) && parts.length) {
-    return parts
-      .map(part => part?.value ?? part)
-      .filter(r => r != undefined);
-  } else {
-    return undefined;
-  }
-};
-
 export const spelFormatConcat = (parts) => {
   if (parts && Array.isArray(parts) && parts.length) {
     return parts
@@ -185,6 +175,35 @@ export const spelImportConcat = (val) => {
     }
   }).filter(v => v != undefined);
   return [res, errors];
+};
+
+// todo: remove
+export const jsonLogicFormatConcat = (parts) => {
+  if (parts && Array.isArray(parts) && parts.length) {
+    return parts
+      .map(part => part?.value ?? part)
+      .filter(r => r != undefined);
+  } else {
+    return undefined;
+  }
+};
+
+// todo: remove
+export const jsonLogicImportConcat = (val) => {
+  if (val == undefined)
+    return undefined;
+  let errors = [];
+  const parts = Array.isArray(val) ? val : [val];
+  const res = parts.filter(v => v != undefined).map(v => {
+    return {
+      type: "property", 
+      value: v
+    };
+  });
+  if (errors.length) {
+    throw new Error(errors.join("\n"));
+  }
+  return res;
 };
 
 export const stringifyForDisplay = (v) => (v == null ? "NULL" : v.toString());

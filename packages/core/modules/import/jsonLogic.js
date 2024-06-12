@@ -33,10 +33,7 @@ export const _loadFromJsonLogic = (logicTree, config, returnErrors = true) => {
   };
   const extendedConfig = extendConfig(config, undefined, false);
   const conv = buildConv(extendedConfig);
-  let jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, "rule", meta) : undefined;
-  if (jsTree && jsTree.type != "group") {
-    jsTree = wrapInDefaultConj(jsTree, extendedConfig);
-  }
+  const jsTree = logicTree ? convertFromLogic(logicTree, conv, extendedConfig, ["rule", "group", "switch"], meta) : undefined;
   const immTree = jsTree ? loadTree(jsTree) : undefined;
 
   if (returnErrors) {
@@ -100,7 +97,8 @@ const buildConv = (config) => {
   };
 };
 
-const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
+// expectedTypes - "val", "rule", "group", "switch", "case_val"
+const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false, fieldConfig, widget, parentField = null, _isLockedLogic = false) => {
   let op, vals;
   if (isJsonLogic(logic)) {
     op = Object.keys(logic)[0];
@@ -116,19 +114,35 @@ const convertFromLogic = (logic, conv, config, expectedType, meta, not = false, 
   const isEmptyOp = op == "!" && (vals.length == 1 && vals[0] && isJsonLogic(vals[0]) && conv.varKeys.includes(Object.keys(vals[0])[0]));
   const isRev = op == "!" && !isEmptyOp;
   const isLocked = lockedOp && op == lockedOp;
+  const isSwitch = expectedTypes.includes("switch");
+  const isRoot = isSwitch;
   if (isLocked) {
-    ret = convertFromLogic(vals[0], conv, config, expectedType, meta, not, fieldConfig, widget, parentField, true);
+    ret = convertFromLogic(vals[0], conv, config, expectedTypes, meta, not, fieldConfig, widget, parentField, true);
   } else if (isRev) {
     // reverse with not
-    ret = convertFromLogic(vals[0], conv, config, expectedType, meta, !not, fieldConfig, widget, parentField);
-  } else if(expectedType == "val") {
+    ret = convertFromLogic(vals[0], conv, config, expectedTypes, meta, !not, fieldConfig, widget, parentField);
+  } else if(expectedTypes.includes("case_val")) {
+    ret = convertValRhs(logic, fieldConfig, widget, config, meta);
+  } else if(expectedTypes.includes("val")) {
     // not is not used here
     ret = convertFieldRhs(op, vals, conv, config, not, meta, parentField) 
       || convertFuncRhs(op, vals, conv, config, not, fieldConfig, meta, parentField) 
       || convertValRhs(logic, fieldConfig, widget, config, meta);
-  } else if(expectedType == "rule") {
-    ret = convertConj(op, vals, conv, config, not, meta, parentField, false) 
-    || convertOp(op, vals, conv, config, not, meta, parentField);
+  } else {
+    if (expectedTypes.includes("switch")) {
+      ret = convertIf(op, vals, conv, config, not, meta, parentField);
+    }
+    if (ret == undefined && expectedTypes.includes("group")) {
+      ret = convertConj(op, vals, conv, config, not, meta, parentField, false);
+    }
+    if (ret == undefined && expectedTypes.includes("rule")) {
+      ret = convertOp(op, vals, conv, config, not, meta, parentField);
+    }
+    if (ret) {
+      if (isRoot && !["group", "switch_group"].includes(ret.type)) {
+        ret = wrapInDefaultConj(ret, config);
+      }
+    }
   }
 
   const afterErrorsCnt = meta.errors.length;
@@ -148,7 +162,8 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   if (val === undefined)
     val = fieldConfig?.defaultValue;
   if (val === undefined) return undefined;
-  const widgetConfig = config.widgets[widget || fieldConfig?.mainWidget];
+  widget = widget || fieldConfig?.mainWidget;
+  const widgetConfig = config.widgets[widget];
   const fieldType = fieldConfig?.type;
 
   if (fieldType && !widgetConfig) {
@@ -162,7 +177,7 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   }
 
   // number of seconds -> time string
-  if (fieldType == "time" && typeof val == "number") {
+  if (fieldType === "time" && typeof val === "number") {
     const [h, m, s] = [Math.floor(val / 60 / 60) % 24, Math.floor(val / 60) % 60, val % 60];
     const valueFormat = widgetConfig.valueFormat;
     if (valueFormat) {
@@ -202,6 +217,15 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
   if (val && fieldConfig?.fieldSettings?.asyncFetch) {
     const vals = Array.isArray(val) ? val : [val];
     asyncListValues = vals;
+  }
+
+  if (widgetConfig.jsonLogicImport) {
+    try {
+      val = widgetConfig.jsonLogicImport.call(config.ctx, val);
+    } catch(e) {
+      meta.errors.push(`Can't import value ${val} using import func of widget ${widget}: ${e?.message ?? e}`);
+      val = undefined;
+    }
   }
 
   return {
@@ -370,7 +394,7 @@ const convertFuncRhs = (op, vals, conv, config, not, fieldConfig = null, meta, p
       const argConfig = funcConfig.args[argKey];
       let argVal;
       if (argConfig) {
-        argVal = convertFromLogic(val, conv, config, "val", meta, false, argConfig, null, parentField);
+        argVal = convertFromLogic(val, conv, config, ["val"], meta, false, argConfig, null, parentField);
       }
       return argVal !== undefined ? {...acc, [argKey]: argVal} : acc;
     }, {});
@@ -422,7 +446,7 @@ const convertConj = (op, vals, conv, config, not, meta, parentField = null, isRu
   if (conjKey) {
     let type = "group";
     const children = vals
-      .map(v => convertFromLogic(v, conv, config, "rule", meta, false, null, null, parentField))
+      .map(v => convertFromLogic(v, conv, config, ["rule", "group"], meta, false, null, null, parentField))
       .filter(r => r !== undefined)
       .reduce((acc, r) => ({...acc, [r.id] : r}), {});
     const complexFields = Object.values(children)
@@ -580,7 +604,7 @@ const _parseRule = (op, arity, vals, parentField, conv, config, isRevArgs, meta)
   // config.settings.groupOperators are used for group count (cardinality = 0 is exception)
   // but don't confuse with "all-in" or "some-in" for multiselect
   const isAllOrSomeInForMultiselect
-    = (op == "all" || op == "some")
+    = (op === "all" || op === "some")
     && isJsonLogic(vals[1])
     && Object.keys(vals[1])[0] == "in"
     && vals[1]["in"][0]?.["var"] === "";
@@ -649,11 +673,11 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   if (!op) return undefined;
 
   const arity = vals.length;
-  if ((op == "all" || op == "some") && isJsonLogic(vals[1])) {
+  if ((op === "all" || op === "some") && isJsonLogic(vals[1])) {
     // special case for "all-in" and "some-in"
     const op2 = Object.keys(vals[1])[0];
     const isEmptyVar = vals[1][op2][0]?.["var"] === "";
-    if (op2 == "in" && isEmptyVar) {
+    if (op2 === "in" && isEmptyVar) {
       vals = [
         vals[0],
         vals[1][op2][1]
@@ -706,7 +730,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   const widget = getWidgetForFieldOp(config, field, opKey, null);
 
   const convertedArgs = args
-    .map(v => convertFromLogic(v, conv, config, "val", meta, false, fieldConfig, widget, parentField));
+    .map(v => convertFromLogic(v, conv, config, ["val"], meta, false, fieldConfig, widget, parentField));
   if (convertedArgs.filter(v => v === undefined).length) {
     //meta.errors.push(`Undefined arg for field ${field} and op ${opKey}`);
     return undefined;
@@ -762,7 +786,7 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
         operator: opKey,
       }
     };
-    if (fieldConfig.mode == "array") {
+    if (fieldConfig.mode === "array") {
       Object.assign(res.properties, {
         value: convertedArgs.map(v => v.value),
         valueSrc: convertedArgs.map(v => v.valueSrc),
@@ -794,3 +818,85 @@ const convertOp = (op, vals, conv, config, not, meta, parentField = null) => {
   return res;
 };
 
+
+const convertIf = (op, vals, conv, config, not, meta, parentField = null) => {
+  if (op?.toLowerCase() !== "if") return undefined;
+
+  const flat = flatizeTernary(vals);
+
+  const cases = flat.map(([cond, val]) => ([
+    cond ? convertFromLogic(cond, conv, config, ["rule", "group"], meta, false, null, null, parentField) : null,
+    buildCaseValProperties(config, meta, conv, val),
+  ]));
+  const children1 = cases.map(([cond, val]) => wrapInCase(cond, val, config, meta));
+
+  const switchI = {
+    type: "switch_group",
+    id: uuid(),
+    children1,
+    properties: {}
+  };
+
+  return switchI;
+};
+
+const flatizeTernary = (children) => {
+  let flat = [];
+  function _processTernaryChildren(tern) {
+    let [cond, if_val, else_val] = tern;
+    flat.push([cond, if_val]);
+    const else_op = isJsonLogic(else_val) ? Object.keys(else_val)[0] : null;
+    if (else_op?.toLowerCase() === "if") {
+      _processTernaryChildren(else_val[else_op]);
+    } else {
+      flat.push([undefined, else_val]);
+    }
+  }
+  _processTernaryChildren(children);
+  return flat;
+};
+
+const wrapInCase = (cond, valProperties, config, meta) => {
+  let caseI;
+  if (cond) {
+    caseI = {...cond};
+    if (caseI.type) {
+      if (caseI.type != "group") {
+        caseI = wrapInDefaultConj(caseI, config);
+      }
+      caseI.type = "case_group";
+    } else {
+      meta.errors.push(`Unexpected case: ${JSON.stringify(caseI)}`);
+      caseI = undefined;
+    }
+  } else {
+    caseI = {
+      id: uuid(),
+      type: "case_group",
+      properties: {}
+    };
+  }
+
+  if (caseI) {
+    caseI.properties = {
+      ...caseI.properties,
+      ...valProperties
+    };
+  }
+
+  return caseI;
+};
+
+const buildCaseValProperties = (config, meta, conv, val) => {
+  const caseValueFieldConfig = getFieldConfig(config, "!case_value");
+  const widget = caseValueFieldConfig.mainWidget;
+  const widgetDef = config.widgets[widget];
+  const convVal = convertFromLogic(val, conv, config, ["val", "case_val"], meta, false, caseValueFieldConfig, widget);
+  const { value: normVal } = convVal;
+  let valProperties = {
+    value: [normVal],
+    valueSrc: ["value"],
+    valueType: ["case_value"]
+  };
+  return valProperties;
+};

@@ -1262,7 +1262,7 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   const widgetDef = config.widgets["case_value"];
   const importCaseValue = widgetDef?.spelImportValue;
   if (importCaseValue) {
-    const [normVal, normErrors] = importCaseValue(convVal);
+    const [normVal, normErrors] = importCaseValue.call(config.ctx, convVal);
     normErrors.map(e => meta.errors.push(e));
     if (normVal) {
       valProperties = {
@@ -1272,7 +1272,7 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
       };
     }
   } else {
-    meta.errors.push("No fucntion to import case value");
+    meta.errors.push("No function to import case value");
   }
   return valProperties;
 };

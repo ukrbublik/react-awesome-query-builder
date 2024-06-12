@@ -16,6 +16,7 @@ export default (): Config => {
       spelFormatValue: QbUtils.ExportUtils.spelFormatConcat,
       spelImportValue: QbUtils.ExportUtils.spelImportConcat,
       jsonLogic: QbUtils.ExportUtils.jsonLogicFormatConcat,
+      jsonLogicImport: QbUtils.ExportUtils.jsonLogicImportConcat,
       factory: ({value, setValue, id}: WidgetProps) => 
         <ReactSelect 
           value={value as SpelConcatPart[]}

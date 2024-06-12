@@ -35,6 +35,7 @@ export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfields
   if (!field)
     return null;
   if (field == "!case_value") {
+    // todo: configure
     return {
       type: "case_value",
       mainWidget: "case_value",
