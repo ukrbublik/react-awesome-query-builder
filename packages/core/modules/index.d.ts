@@ -125,7 +125,9 @@ export type FlatItem = {
   // unused
   _top: number;
   collapsed: boolean;
-  // @deprecated use isLeaf instead
+  /**
+   * @deprecated use isLeaf instead
+   */
   leaf: boolean;
 };
 export type FlatTree = {
@@ -396,6 +398,9 @@ export interface ImmutableTree<P = _TreeI> extends ImmutableBasicItem<P> {}
 // Utils
 /////////////////
 
+/**
+ * @deprecated
+ */
 export interface SpelConcatPart {
   value: string;
   type: "property" | "variable" | "const";
@@ -475,9 +480,13 @@ interface Import {
   getTree(tree: ImmutableTree, light: boolean, children1AsArray: false): OldJsonTree;
   loadTree(jsonTree: JsonTree): ImmutableTree;
   loadTree(jsonTree: OldJsonTree): ImmutableTree;
-  // @deprecated Use Utils.sanitizeTree() instead
+  /**
+   * @deprecated Use Utils.sanitizeTree() instead
+   */
   checkTree(tree: ImmutableTree, config: Config): ImmutableTree;
-  // @deprecated Use Utils.Validation.isValidTree()
+  /**
+   * @deprecated Use Utils.Validation.isValidTree()
+   */
   isValidTree(tree: ImmutableTree, config: Config): boolean;
   isImmutableTree(tree: any): boolean;
   isTree(tree: any): boolean; // is JsonTree ?
@@ -491,7 +500,9 @@ interface Import {
 }
 interface Export {
   jsonLogicFormat(tree: ImmutableTree, config: Config): JsonLogicResult;
-  // @deprecated
+  /**
+   * @deprecated
+   */
   queryBuilderFormat(tree: ImmutableTree, config: Config): Object | undefined;
   queryString(tree: ImmutableTree, config: Config, isForDisplay?: boolean, isDebugMode?: boolean): string | undefined;
   sqlFormat(tree: ImmutableTree, config: Config): string | undefined;
@@ -526,12 +537,14 @@ interface ConfigUtils {
 }
 interface ExportUtils {
   spelEscape(val: any): string;
+  /**
+   * @deprecated
+   */
   spelFormatConcat(parts: SpelConcatParts): string;
+  /**
+   * @deprecated
+   */
   spelImportConcat(val: SpelConcatValue): [SpelConcatParts | undefined, Array<string>];
-  // todo: remove
-  jsonLogicFormatConcat(parts: SpelConcatParts): any;
-  // todo: remove
-  jsonLogicImportConcat(val: any): SpelConcatParts | undefined;
 }
 interface ListUtils {
   getTitleInListValues(listValues: ListValues, value: string | number): string;
@@ -554,11 +567,13 @@ interface TreeUtils {
   getFlatTree(tree: ImmutableTree): FlatTree;
   getTotalReordableNodesCountInTree(tree: ImmutableTree): number;
   getTotalRulesCountInTree(tree: ImmutableTree): number;
-  // @deprecated
+  /**
+   * @deprecated
+   */
   getTreeBadFields(tree: ImmutableTree, config: Config): Array<FieldPath>;
   isEmptyTree(tree: ImmutableTree): boolean;
   // case mode
-  getSwitchValues(tree: ImmutableTree): Array<SpelConcatParts | null>;
+  getSwitchValues(tree: ImmutableTree): Array<any | null>;
 }
 interface OtherUtils {
   uuid(): string;

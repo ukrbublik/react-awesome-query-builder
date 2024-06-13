@@ -24,10 +24,38 @@ const emptyJsonTree: JsonSwitchGroup = {
 };
 const emptyTree: ImmutableTree = QbUtils.loadTree(emptyJsonTree);
 
+const ternaryJsonLogic = {
+  "if": [
+    {
+      "and": [
+        {
+          "==": [
+            { "var": "color" },
+            "blue"
+          ]
+        },
+        {
+          "==": [
+            { "var": "color" },
+            "yellow"
+          ]
+        }
+      ]
+    },
+    "Ukraine",
+    null
+  ]
+};
+const initialTreeFromJsonLogic: ImmutableTree = QbUtils.loadFromJsonLogic(ternaryJsonLogic, config);
+
+const ternarySpel = "((color == 'blue' && color == 'yellow') ? 'Ukraine' : null)";
+const [initialTreeFromSpel, _] = QbUtils.loadFromSpel(ternarySpel, config);
 
 const Demo: React.FC = () => {
   const [state, setState] = useState({
-    tree: emptyTree,
+    tree: initialTreeFromJsonLogic,
+    // tree: initialTreeFromSpel,
+    // tree: emptyTree,
     config: config,
     spelStr: "",
     spelErrors: [] as string[],
