@@ -1,4 +1,4 @@
-import React, { FC, memo } from "react";
+import React, { FC, memo, useCallback, useMemo } from "react";
 import Creatable from "react-select/creatable";
 import { MultiValue } from "react-select";
 import { SpelConcatPart } from "@react-awesome-query-builder/ui";
@@ -38,7 +38,7 @@ const MltSelector: FC<Iprops> = ({
   value,
   setValue,
 }) => {
-  function initMltSelectValueHandler(list: OptionItem[], val: SpelConcatPart[]) {
+  const initMltSelectValueHandler = (list: OptionItem[], val: SpelConcatPart[]) => {
     if (val) {
       return val.map((item: SpelConcatPart) => {
         let res = item.type != "const" && list && list.find((obj) => obj.id === item.value);
@@ -49,29 +49,33 @@ const MltSelector: FC<Iprops> = ({
       });
     }
     return [];
-  }
+  };
 
-  function changeHandler(values: MultiValue<OptionItem>, actionMeta: any, setValue: (value: SpelConcatPart[]) => void): any[] {
+  const onChange = useCallback((values: MultiValue<OptionItem>, actionMeta: any): any[] => {
     const res = values.map((val) => ({
       value: val.id || val.label,
       type: val.__isNew__ ? "const" : "property"
     }));
     setValue(res as SpelConcatPart[]);
     return res;
-  }
+  }, [setValue]);
+
+  const getOptionValue = useCallback((option: OptionItem) => option.id, []);
+  const getOptionLabel = useCallback((option: OptionItem) => option.label, []);
+
+  const aValue = useMemo(() => initMltSelectValueHandler(options, value!), [value]);
 
   return (
     <Creatable
       menuPortalTarget={document.body}
+      menuPosition={"fixed"}
       key={k}
       isMulti
       options={options}
-      value={initMltSelectValueHandler(options, value!)}
-      getOptionValue={(option: OptionItem) => option.id}
-      getOptionLabel={(option: OptionItem) => option.label}
-      onChange={(values, actionMeta) => {
-        changeHandler(values, actionMeta, setValue);
-      }}
+      value={aValue}
+      getOptionValue={getOptionValue}
+      getOptionLabel={getOptionLabel}
+      onChange={onChange}
     />
   );
 };
