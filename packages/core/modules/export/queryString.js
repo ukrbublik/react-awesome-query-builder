@@ -53,7 +53,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
 
   const isRuleGroup = (type === "rule_group");
   // TIP: don't cut group for mode == 'struct' and don't do aggr format (maybe later)
-  const groupField = isRuleGroup && mode == "array" ? properties.get("field") : null;
+  const groupField = isRuleGroup && mode === "array" ? properties.get("field") : null;
   const groupOperator = type === "rule_group" ? properties.get("operator") : null;
   const groupOperatorCardinality = groupOperator ? config.operators[groupOperator]?.cardinality ?? 1 : undefined;
   const canHaveEmptyChildren = isRuleGroup && mode === "array" && groupOperatorCardinality >= 1;
@@ -70,7 +70,7 @@ const formatGroup = (item, config, meta, parentField = null) => {
     conjunction = defaultConjunction(config);
   const conjunctionDefinition = config.conjunctions[conjunction];
 
-  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay) : null;
+  const conjStr = list.size ? conjunctionDefinition.formatConj(list, conjunction, not, isForDisplay, groupField) : null;
   
   let ret;
   if (groupField) {
@@ -244,6 +244,9 @@ const formatRule = (item, config, meta, parentField = null, returnArgs = false) 
   if (returnArgs) {
     return args;
   } else {
+    if (formattedValue === undefined)
+      return undefined;
+
     //format expr
     let ret = fn.call(config.ctx, ...args);
 
@@ -316,7 +319,7 @@ const formatField = (config, meta, field, parentField = null, cutParentField = t
     const fieldLabel2 = fieldDefinition.label2 || fieldFullLabel;
     const formatFieldFn = config.settings.formatField;
     const fieldName = formatFieldName(field, config, meta, cutParentField ? parentField : null, {useTableName: true});
-    ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay);
+    ret = formatFieldFn(fieldName, fieldParts, fieldLabel2, fieldDefinition, config, isForDisplay, parentField);
   } else if(isDebugMode) {
     ret = "?";
   }
