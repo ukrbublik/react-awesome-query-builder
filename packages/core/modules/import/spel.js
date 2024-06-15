@@ -720,6 +720,9 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       value,
     };
   } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
+    /**
+     * @deprecated
+     */
     return buildCaseValueConcat(spel, conv, config, meta);
   }
 
@@ -1227,6 +1230,9 @@ const buildCase = (cond, val, conv, config, meta, spel = null) => {
   return caseI;
 };
 
+/**
+ * @deprecated
+ */
 const buildCaseValueConcat = (spel, conv, config, meta) => {
   let flat = [];
   function _processConcatChildren(children) {
@@ -1254,25 +1260,41 @@ const buildCaseValueConcat = (spel, conv, config, meta) => {
 const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   let valProperties = {};
   let convVal;
-  if (val?.type == "op-plus") {
+  let widget;
+  const caseValueFieldConfig = getFieldConfig(config, "!case_value");
+  if (val?.type === "op-plus") {
+    /**
+     * @deprecated
+     */
+    widget = "case_value";
     convVal = buildCaseValueConcat(val, conv, config, meta);
   } else {
+    widget = caseValueFieldConfig?.mainWidget;
     convVal = convertArg(val, conv, config, meta, spel);
   }
-  const widgetDef = config.widgets["case_value"];
-  const importCaseValue = widgetDef?.spelImportValue;
-  if (importCaseValue) {
-    const [normVal, normErrors] = importCaseValue.call(config.ctx, convVal);
-    normErrors.map(e => meta.errors.push(e));
-    if (normVal) {
-      valProperties = {
-        value: [normVal],
-        valueSrc: ["value"],
-        valueType: ["case_value"]
-      };
+  const widgetDef = config.widgets[widget];
+  if (widget === "case_value") {
+    /**
+     * @deprecated
+     */
+    const importCaseValue = widgetDef?.spelImportValue;
+    if (importCaseValue) {
+      const [normVal, normErrors] = importCaseValue.call(config.ctx, convVal);
+      normErrors.map(e => meta.errors.push(e));
+      if (normVal != undefined) {
+        valProperties = {
+          value: [normVal],
+          valueSrc: ["value"],
+          valueType: [widgetDef?.type ?? "case_value"]
+        };
+      }
     }
-  } else {
-    meta.errors.push("No function to import case value");
+  } else if (convVal != undefined && convVal?.value != undefined) {
+    valProperties = {
+      value: [convVal.value],
+      valueSrc: [convVal.valueSrc],
+      valueType: [convVal.valueType],
+    };
   }
   return valProperties;
 };

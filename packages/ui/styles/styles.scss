@@ -423,23 +423,24 @@ $rule-group-actions-offset-left: 10px !default;
 
 .case_group {
   border-width: $case-border;
-}
 
-.case_group--body {
-  display: flex;
-  flex-direction: row;
-  margin-top: $item-offset;
-  margin-bottom: $item-offset;
-
-  .case_group--children {
-    flex: auto;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
+  .case_group--body {
+    display: flex;
+    flex-direction: row;
+    margin-top: $item-offset;
+    margin-bottom: $item-offset;
   
+    .case_group--children {
+      flex: auto;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+  }
+
   .case_group--value {
     margin-top: 0;
     margin-bottom: 0;
+    margin-left: $item-offset;
     margin-right: $item-offset;
   }
 }

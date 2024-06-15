@@ -386,6 +386,9 @@ Render settings:
 |renderAfterWidget | | 
 |renderBeforeActions | | 
 |renderAfterActions | | 
+|renderSwitchPrefix |`IF` | For ternary mode - render on top of all confitions
+|renderBeforeCaseValue |`<span>then</span>` | For ternary mode - render before case value (except default case), after case condition tree
+|renderAfterCaseValue | | For ternary mode - render after case value (except default case)
 |defaultSliderWidth |`200px` |Width for slider
 |defaultSelectWidth |`200px` |Width for select
 |defaultSearchWidth |`100px` |Width for search in autocomplete
@@ -422,6 +425,8 @@ Other settings:
 |fieldSeparatorDisplay |`.` |Separator for struct fields in UI.
 |defaultField | |Field to be selected by default for new rule.
 |defaultOperator | |Operator to be selected by default for new rule.
+|caseValueField | |(For ternary mode) Special field config to be used for displaying widget in "then" parts. +
+  Example: `{type: "text"}` for simple text input in "then" part
 |===
 
 Localization:
@@ -457,6 +462,9 @@ Localization:
 |removeGroupConfirmOptions.okText |Yes
 |removeGroupConfirmOptions.okType |`danger`
 |removeGroupConfirmOptions.cancelText |Cancel
+|defaultCaseLabel |Default:
+|addCaseLabel |Add condition
+|addDefaultCaseLabel |Add default condition
 |===
 
 

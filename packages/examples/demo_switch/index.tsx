@@ -49,7 +49,10 @@ const ternaryJsonLogic = {
 const initialTreeFromJsonLogic: ImmutableTree = QbUtils.loadFromJsonLogic(ternaryJsonLogic, config);
 
 const ternarySpel = "((color == 'blue' && color == 'yellow') ? 'Ukraine' : null)";
-const [initialTreeFromSpel, _] = QbUtils.loadFromSpel(ternarySpel, config);
+const [initialTreeFromSpel, spelLoadingErrors] = QbUtils.loadFromSpel(ternarySpel, config);
+if (spelLoadingErrors?.length) {
+  console.warn("Errors while importing from SpEL: ", spelLoadingErrors);
+}
 
 const Demo: React.FC = () => {
   const [state, setState] = useState({

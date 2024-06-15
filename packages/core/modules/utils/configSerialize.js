@@ -117,6 +117,8 @@ const compileMetaSettings = {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
   },
 
+  caseValueField: compileMetaField,
+
   canCompareFieldWithField: { type: "f", args: ["leftField", "leftFieldConfig", "rightField", "rightFieldConfig", "op"] },
   formatReverse: { type: "f", args: ["q", "op", "reversedOp", "operatorDefinition", "revOperatorDefinition", "isForDisplay"] },
   sqlFormatReverse: { type: "f", args: ["q"] },
@@ -148,18 +150,28 @@ const compileMetaSettings = {
   renderAfterWidget: { type: "rf" },
   renderBeforeActions: { type: "rf" },
   renderAfterActions: { type: "rf" },
+  renderBeforeCaseValue: { type: "rf" },
+  renderAfterCaseValue: { type: "rf" },
   renderRuleError: { type: "rf" },
+};
+
+const compileMetaFieldLike = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+};
+
+const compileMetaField = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+  widgets: {
+    x: compileMetaWidgetForType
+  },
+  mainWidgetProps: compileMetaWidget
 };
 
 const compileMeta = {
   fields: {
-    x: {
-      fieldSettings: compileMetaFieldSettings,
-      widgets: {
-        x: compileMetaWidgetForType
-      },
-      mainWidgetProps: compileMetaWidget
-    },
+    x: compileMetaField,
   },
   widgets: {
     x: compileMetaWidget
@@ -179,13 +191,11 @@ const compileMeta = {
   },
   funcs: {
     x: {
+      ...compileMetaFieldLike,
       ...compileMetaFunc,
-      ...compileMetaFieldSettings,
-      fieldSettings: compileMetaFieldSettings,
       args: {
         x: {
-          ...compileMetaFieldSettings,
-          fieldSettings: compileMetaFieldSettings,
+          ...compileMetaFieldLike,
         }
       }
     }

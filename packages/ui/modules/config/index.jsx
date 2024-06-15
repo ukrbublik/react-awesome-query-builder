@@ -81,6 +81,9 @@ const widgets = {
       //showSearch: true
     }
   },
+  /**
+   * @deprecated
+   */
   case_value: {
     ...CoreConfig.widgets.case_value,
     // simple text value
@@ -125,7 +128,8 @@ const settings = {
   renderValueSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderFieldSources: (props, {RCE, W: {VanillaValueSources}}) => RCE(VanillaValueSources, props),
   renderConfirm: (props, {W: {vanillaConfirm}}) => vanillaConfirm(props),
-  renderSwitchPrefix: "Conditions",
+  renderSwitchPrefix: "IF",
+  renderBeforeCaseValue: (props, {RCE}) => RCE("span", {children: [" then "]}),
 
   customFieldSelectProps: {
     showSearch: true

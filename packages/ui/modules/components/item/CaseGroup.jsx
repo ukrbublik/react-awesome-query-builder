@@ -5,7 +5,7 @@ import Draggable from "../containers/Draggable";
 import {BasicGroup} from "./Group";
 import {GroupActions} from "./GroupActions";
 import {useOnPropsChanged} from "../../utils/reactUtils";
-import {Col, dummyFn, WithConfirmFn} from "../utils";
+import {Col, dummyFn, WithConfirmFn, getRenderFromConfig} from "../utils";
 import Widget from "../rule/Widget";
 import classNames from "classnames";
 
@@ -23,7 +23,17 @@ class CaseGroup extends BasicGroup {
   }
 
   onPropsChanged(nextProps) {
+    const prevProps = this.props;
+    const configChanged = !this.renderBeforeCaseValue || prevProps?.config !== nextProps?.config;
+
     super.onPropsChanged(nextProps);
+
+    if (configChanged) {
+      const { config } = nextProps;
+      const { renderBeforeCaseValue, renderAfterCaseValue } = config.settings;
+      this.BeforeCaseValue = getRenderFromConfig(config, renderBeforeCaseValue);
+      this.AfterCaseValue = getRenderFromConfig(config, renderAfterCaseValue);
+    }
   }
 
   isDefaultCase() {
@@ -82,7 +92,9 @@ class CaseGroup extends BasicGroup {
     return (
       <div className={"case_group--body"}>
         {this.renderCondition()}
+        {this.renderBeforeValue()}
         {this.renderValue()}
+        {this.renderAfterValue()}
       </div>
     );
   }
@@ -124,6 +136,26 @@ class CaseGroup extends BasicGroup {
     if (this.isDefaultCase())
       return false;
     return super.canAddRule();
+  }
+
+  renderBeforeValue() {
+    const BeforeCaseValue = this.BeforeCaseValue;
+    if (BeforeCaseValue == undefined)
+      return null;
+    return <BeforeCaseValue
+      key="values-before"
+      {...this.props}
+    />;
+  }
+
+  renderAfterValue() {
+    const AfterCaseValue = this.AfterCaseValue;
+    if (AfterCaseValue == undefined)
+      return null;
+    return <AfterCaseValue
+      key="values-after"
+      {...this.props}
+    />;
   }
 
   renderValue() {

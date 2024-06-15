@@ -1,5 +1,3 @@
-
-
 export const settings = {
   formatField: (field, parts, label2, fieldDefinition, config, isForDisplay) => {
     if (isForDisplay)
@@ -7,8 +5,6 @@ export const settings = {
     else
       return field;
   },
-
-
   fieldSources: ["field"],
   keepInputOnChangeFieldSrc: true,
   fieldItemKeysForSearch: ["label", "path", "altLabel", "grouplabel"],

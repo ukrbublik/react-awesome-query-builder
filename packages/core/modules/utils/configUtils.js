@@ -34,15 +34,8 @@ function* _iterateFields(config, subfields, path, subfieldsKey = "subfields") {
 export const getFieldRawConfig = (config, field, fieldsKey = "fields", subfieldsKey = "subfields") => {
   if (!field)
     return null;
-  if (field == "!case_value") {
-    // todo: configure
-    return {
-      type: "case_value",
-      mainWidget: "case_value",
-      widgets: {
-        "case_value": config.widgets["case_value"]
-      }
-    };
+  if (field === "!case_value") {
+    return config?.settings?.caseValueField;
   }
   const fieldSeparator = config?.settings?.fieldSeparator || ".";
   const parts = getFieldParts(field, config);

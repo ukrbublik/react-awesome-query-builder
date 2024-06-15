@@ -92,6 +92,9 @@ export type MultiSelectWidget<C = Config> = _MultiSelectWidget<C>;
 export type BooleanWidget<C = Config> = _BooleanWidget<C>;
 export type FieldWidget<C = Config> = _FieldWidget<C>;
 export type FuncWidget<C = Config> = _FuncWidget<C>;
+/**
+ * @deprecated
+ */
 export type CaseValueWidget<C = Config> = _CaseValueWidget<C>;
 export type ProximityProps<C = Config> = _ProximityProps<C>;
 export type ProximityOptions<C = Config> = _ProximityOptions<C>;
@@ -105,6 +108,9 @@ export type SelectWidgetProps<C = Config> = _SelectWidgetProps<C>;
 export type MultiSelectWidgetProps<C = Config> = _MultiSelectWidgetProps<C>;
 export type TreeSelectWidgetProps<C = Config> = _TreeSelectWidgetProps<C>;
 export type TreeMultiSelectWidgetProps<C = Config> = _TreeMultiSelectWidgetProps<C>;
+/**
+ * @deprecated
+ */
 export type CaseValueWidgetProps<C = Config> = _CaseValueWidgetProps<C>;
 export type CoreOperators<C = Config> = _CoreOperators<C>;
 export type CoreWidgets<C = Config> = _CoreWidgets<C>;
@@ -336,6 +342,8 @@ export interface RenderSettings {
   renderAfterWidget?: FactoryWithContext<RuleProps> | SerializedFunction;
   renderBeforeActions?: FactoryWithContext<RuleProps> | SerializedFunction;
   renderAfterActions?: FactoryWithContext<RuleProps> | SerializedFunction;
+  renderBeforeCaseValue?: FactoryWithContext<RuleProps> | SerializedFunction;
+  renderAfterCaseValue?: FactoryWithContext<RuleProps> | SerializedFunction;
   renderRuleError?: FactoryWithContext<RuleErrorProps> | SerializedFunction;
   renderSwitchPrefix?: RenderedReactElement | SerializedFunction;
   defaultSliderWidth?: string;

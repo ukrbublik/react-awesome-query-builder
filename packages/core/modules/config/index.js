@@ -933,6 +933,9 @@ const widgets = {
     valueLabel: "Function",
     valuePlaceholder: "Select function",
   },
+  /**
+   * @deprecated
+   */
   case_value: {
     valueSrc: "value",
     type: "case_value",
@@ -1217,10 +1220,15 @@ const types = {
       }
     }
   },
+  /**
+   * @deprecated
+   */
   "case_value": {
     mainWidget: "case_value",
     widgets: {
-      case_value: {}
+      case_value: {
+        widgetProps: {},
+      }
     }
   },
 };

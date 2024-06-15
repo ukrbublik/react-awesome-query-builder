@@ -794,6 +794,9 @@ export type SelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> 
 export type MultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & MultiSelectFieldSettings;
 export type TreeSelectWidgetProps<C = Config> = BaseWidgetProps<C, string | number> & TreeSelectFieldSettings;
 export type TreeMultiSelectWidgetProps<C = Config> = BaseWidgetProps<C, string[] | number[]> & TreeMultiSelectFieldSettings;
+/**
+ * @deprecated
+ */
 export type CaseValueWidgetProps<C = Config> = BaseWidgetProps<C> & CaseValueFieldSettings;
 
 
@@ -911,6 +914,9 @@ export type SelectWidget<C = Config, WP = SelectWidgetProps<C>> = BaseWidget<C, 
 export type MultiSelectWidget<C = Config, WP = MultiSelectWidgetProps<C>> = BaseWidget<C, WP> & MultiSelectFieldSettings;
 export type TreeSelectWidget<C = Config, WP = TreeSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeSelectFieldSettings;
 export type TreeMultiSelectWidget<C = Config, WP = TreeMultiSelectWidgetProps<C>> = BaseWidget<C, WP> & TreeMultiSelectFieldSettings;
+/**
+ * @deprecated
+ */
 export type CaseValueWidget<C = Config, WP = CaseValueWidgetProps<C>> = BaseWidget<C, WP> & CaseValueFieldSettings;
 
 // tip: use generic WidgetProps here, TS can't determine correct factory
@@ -1161,6 +1167,9 @@ export interface BooleanFieldSettings<V = boolean> extends BasicFieldSettings<V>
   labelYes?: RenderedReactElement;
   labelNo?: RenderedReactElement;
 }
+/**
+ * @deprecated
+ */
 export interface CaseValueFieldSettings<V = any> extends BasicFieldSettings<V> {
 }
 // tip: use RuleValue here, TS can't determine correct types in `validateValue`
@@ -1358,6 +1367,7 @@ export interface BehaviourSettings {
 }
 
 export interface OtherSettings {
+  caseValueField?: Field;
   fieldSeparator?: string;
   fieldSeparatorDisplay?: string;
   formatReverse?: FormatReverse | SerializedFunction;
@@ -1473,6 +1483,9 @@ export interface CoreWidgets<C = Config> extends Widgets<C> {
   boolean: BooleanWidget<C>;
   field: FieldWidget<C>;
   func: FuncWidget<C>;
+  /**
+   * @deprecated
+   */
   case_value: CaseValueWidget<C>;
 }
 

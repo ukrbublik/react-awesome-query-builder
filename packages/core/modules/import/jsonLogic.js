@@ -219,7 +219,7 @@ const convertValRhs = (val, fieldConfig, widget, config, meta) => {
     asyncListValues = vals;
   }
 
-  if (widgetConfig.jsonLogicImport) {
+  if (widgetConfig?.jsonLogicImport) {
     try {
       val = widgetConfig.jsonLogicImport.call(config.ctx, val);
     } catch(e) {
@@ -889,14 +889,25 @@ const wrapInCase = (cond, valProperties, config, meta) => {
 
 const buildCaseValProperties = (config, meta, conv, val) => {
   const caseValueFieldConfig = getFieldConfig(config, "!case_value");
+  if (!caseValueFieldConfig) {
+    meta.errors.push("Missing caseValueField in settings");
+    return undefined;
+  }
   const widget = caseValueFieldConfig.mainWidget;
   const widgetDef = config.widgets[widget];
+  if (!widgetDef) {
+    meta.errors.push(`No widget ${widget} for case value`);
+    return undefined;
+  }
   const convVal = convertFromLogic(val, conv, config, ["val", "case_val"], meta, false, caseValueFieldConfig, widget);
-  const { value: normVal } = convVal;
+  if (convVal == undefined) {
+    return undefined;
+  }
+  const { value, valueSrc, valueType} = convVal;
   let valProperties = {
-    value: [normVal],
-    valueSrc: ["value"],
-    valueType: ["case_value"]
+    value: [value],
+    valueSrc: [valueSrc ?? "value"],
+    valueType: [valueType ?? widgetDef?.type]
   };
   return valProperties;
 };

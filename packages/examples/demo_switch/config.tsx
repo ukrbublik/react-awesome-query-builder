@@ -61,7 +61,7 @@ export default (): Config => {
 
   const widgets: Widgets = {
     ...InitialConfig.widgets,
-    //case_value: caseValueWidgetConfig
+    case_value: caseValueWidgetConfig
   };
 
   const fields: Fields = {
@@ -114,6 +114,18 @@ export default (): Config => {
 
   const settings: Settings = {
     ...InitialConfig.settings,
+    caseValueField: {
+      // type: "case_value", // >> Encomment to see using of SpelConcatPart
+      type: "select",
+      mainWidgetProps: {
+        valueLabel: "Then",
+        valuePlaceholder: "Then",
+      },
+      fieldSettings: {
+        listValues: ["Ukraine", "USA", "other"],
+        // todo: support validateValue for caseValueField
+      }
+    },
     maxNumberOfCases: 3,
     canRegroupCases: true,
     maxNesting: 3,
