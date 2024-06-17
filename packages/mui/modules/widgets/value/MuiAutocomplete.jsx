@@ -99,17 +99,17 @@ export default (props) => {
   const renderInput = (params) => {
     // parity with Antd
     const shouldRenderSelected = !multiple && !open;
-    const selectedTitle = selectedListValue?.title ?? "";
+    const selectedTitle = selectedListValue?.title ?? value.toString();
     const shouldHide = multiple && !open;
-    const value = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? "");
+    const renderValue = shouldRenderSelected ? selectedTitle : (shouldHide ? "" : inputValue ?? value.toString());
     return (
       <TextField 
         variant="standard"
         {...params}
         inputProps={{
-          ...params.inputProps,
-          value,
           "aria-label": ariaLabel,
+          ...params.inputProps,
+          value: renderValue,
         }}
         InputProps={{
           ...params.InputProps,
