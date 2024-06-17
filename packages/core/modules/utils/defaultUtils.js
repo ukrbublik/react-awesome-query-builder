@@ -148,8 +148,16 @@ export const defaultRoot = (config, canAddDefaultRule = true) => {
   });
 };
 
-export const createListFromArray = (ids) => {
-  return new Immutable.List(ids);
+export const createListWithOneElement = (el) => {
+  if (isImmutable(el))
+    return el; // already Immutable
+  return createListFromArray([el]);
+};
+
+export const createListFromArray = (arr) => {
+  if (isImmutable(arr))
+    return arr; // already Immutable
+  return new Immutable.List(arr);
 };
 
 export const emptyProperties = () => new Immutable.Map();

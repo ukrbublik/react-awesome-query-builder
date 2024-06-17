@@ -243,6 +243,9 @@ function extendFieldConfig(fieldConfig, config, path = [], isFuncArg = false, is
     fieldConfig._isFunc = true;
     fieldConfig._funcKey = funcKey;
   }
+  if (isCaseValue) {
+    fieldConfig._isCaseValue = true;
+  }
 
   normalizeFieldSettings(fieldConfig, config, type);
 

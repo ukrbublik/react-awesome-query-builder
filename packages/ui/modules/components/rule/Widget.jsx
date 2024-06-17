@@ -10,7 +10,7 @@ import classNames from "classnames";
 import {Col, getWidgetId, getRenderFromConfig} from "../utils";
 const {getFieldConfig, getOperatorConfig, getFieldWidgetConfig} = Utils.ConfigUtils;
 const {getValueSourcesForFieldOp, getWidgetForFieldOp, getValueLabel} = Utils.RuleUtils;
-const { createListFromArray } = Utils.DefaultUtils;
+const { createListWithOneElement } = Utils.DefaultUtils;
 const {shallowEqual} = Utils.OtherUtils;
 const { isImmutable } = Utils.TreeUtils;
 
@@ -132,8 +132,8 @@ export default class Widget extends Component {
     let iValueSrcs = valueSrcs;
     let iValues = values;
     if (isFuncArg || isForRuleGroup || isCaseValue) {
-      iValueSrcs = createListFromArray([valueSrcs]);
-      iValues = createListFromArray([values]);
+      iValueSrcs = createListWithOneElement(valueSrcs);
+      iValues = createListWithOneElement(values);
     }
 
     let fieldDefinition = getFieldConfig(config, field);

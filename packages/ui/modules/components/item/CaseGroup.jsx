@@ -159,7 +159,7 @@ class CaseGroup extends BasicGroup {
   }
 
   renderValue() {
-    const { config, isLocked, value, setValue, id } = this.props;
+    const { config, isLocked, value, valueSrc, valueError, setValue, setValueSrc, setFuncValue, id } = this.props;
     const { immutableValuesMode } = config.settings;
 
     const widget = <Widget
@@ -168,12 +168,13 @@ class CaseGroup extends BasicGroup {
       field={"!case_value"}
       operator={null}
       value={value}
-      valueSrc={"value"}
-      valueError={null}
+      valueSrc={valueSrc ?? "value"}
+      valueError={valueError}
       fieldError={null}
       config={config}
       setValue={!immutableValuesMode ? setValue : dummyFn}
-      setValueSrc={dummyFn}
+      setValueSrc={!immutableValuesMode ? setValueSrc : dummyFn}
+      setFuncValue={!immutableValuesMode ? setFuncValue : dummyFn}
       readonly={immutableValuesMode || isLocked}
       id={id}
       groupId={null}

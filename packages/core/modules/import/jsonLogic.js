@@ -121,8 +121,6 @@ const convertFromLogic = (logic, conv, config, expectedTypes, meta, not = false,
   } else if (isRev) {
     // reverse with not
     ret = convertFromLogic(vals[0], conv, config, expectedTypes, meta, !not, fieldConfig, widget, parentField);
-  } else if(expectedTypes.includes("case_val")) {
-    ret = convertValRhs(logic, fieldConfig, widget, config, meta);
   } else if(expectedTypes.includes("val")) {
     // not is not used here
     ret = convertFieldRhs(op, vals, conv, config, not, meta, parentField) 

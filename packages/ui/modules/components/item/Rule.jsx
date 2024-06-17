@@ -46,6 +46,7 @@ class Rule extends Component {
     removeSelf: PropTypes.func,
     setValue: PropTypes.func,
     setValueSrc: PropTypes.func,
+    setFuncValue: PropTypes.func,
     reordableNodesCnt: PropTypes.number,
     totalRulesCnt: PropTypes.number,
     parentReordableNodesCnt: PropTypes.number,
@@ -72,11 +73,16 @@ class Rule extends Component {
     }
     if (configChanged) {
       const { config } = nextProps;
-      const { renderIcon, renderButton, renderButtonGroup, renderSwitch } = config.settings;
+      const {
+        renderIcon, renderButton, renderButtonGroup, renderSwitch, renderBeforeWidget, renderAfterWidget, renderRuleError,
+      } = config.settings;
       this.Icon = getRenderFromConfig(config, renderIcon);
       this.Btn = getRenderFromConfig(config, renderButton);
       this.BtnGrp = getRenderFromConfig(config, renderButtonGroup);
       this.Switch = getRenderFromConfig(config, renderSwitch);
+      this.BeforeWidget = getRenderFromConfig(config, renderBeforeWidget);
+      this.AfterWidget = getRenderFromConfig(config, renderAfterWidget);
+      this.RuleError = getRenderFromConfig(config, renderRuleError);
     }
     this.doRemove = () => {
       this.props.removeSelf();
@@ -262,31 +268,32 @@ class Rule extends Component {
   }
 
   renderBeforeWidget() {
-    const {config} = this.props;
-    const { renderBeforeWidget } = config.settings;
-    return renderBeforeWidget 
-        && <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
-          {typeof renderBeforeWidget === "function" ? renderBeforeWidget(this.props, config.ctx) : renderBeforeWidget}
-        </Col>;
+    const BeforeWidget = this.BeforeWidget;
+    if (!BeforeWidget)
+      return null;
+    return <Col key={"before-widget-for-" +this.props.selectedOperator} className="rule--before-widget">
+      <BeforeWidget {...this.props} />
+    </Col>;
   }
 
   renderAfterWidget() {
-    const {config} = this.props;
-    const { renderAfterWidget } = config.settings;
-    return renderAfterWidget 
-        && <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
-          {typeof renderAfterWidget === "function" ? renderAfterWidget(this.props, config.ctx) : renderAfterWidget}
-        </Col>;
+    const AfterWidget = this.AfterWidget;
+    if (!AfterWidget)
+      return null;
+    return <Col key={"after-widget-for-" +this.props.selectedOperator} className="rule--after-widget">
+      <AfterWidget {...this.props} />
+    </Col>;
   }
 
   renderError() {
     const {config, valueError, fieldError} = this.props;
-    const { renderRuleError, showErrorMessage } = config.settings;
+    const { showErrorMessage } = config.settings;
+    const RuleError = this.RuleError;
     const oneError = [fieldError, ...(valueError?.toArray() || [])].filter(e => !!e).shift() || null;
     return showErrorMessage && oneError 
-        && <div className="rule--error">
-          {renderRuleError ? renderRuleError({error: oneError}, config.ctx) : oneError}
-        </div>;
+      && <div className="rule--error">
+        {RuleError ? <RuleError error={oneError} /> : oneError}
+      </div>;
   }
 
   renderDrag() {

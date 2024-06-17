@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  Utils as QbUtils, 
-  Widgets, CaseValueWidget, Fields, Config, Settings, SpelConcatPart, WidgetProps
+  Utils as QbUtils, BasicFuncs,
+  Widgets, CaseValueWidget, Fields, Config, Settings, SpelConcatPart, WidgetProps, Funcs,
 } from "@react-awesome-query-builder/ui";
 import { MuiConfig } from "@react-awesome-query-builder/mui";
 import ReactSelect from "./select";
@@ -115,14 +115,15 @@ export default (): Config => {
   const settings: Settings = {
     ...InitialConfig.settings,
     caseValueField: {
-      // type: "case_value", // >> Encomment to see using of SpelConcatPart
+      // type: "case_value", // >> Uncomment to see using of SpelConcatPart
       type: "select",
       mainWidgetProps: {
         valueLabel: "Then",
         valuePlaceholder: "Then",
       },
+      // valueSources: ["value", "func", "field"], // value sources are supported
       fieldSettings: {
-        listValues: ["Ukraine", "USA", "other"],
+        listValues: ["Ukraine", "other"],
         // todo: support validateValue for caseValueField
       }
     },
@@ -132,8 +133,15 @@ export default (): Config => {
     canLeaveEmptyCase: false,
   };
 
+  const funcs: Funcs = {
+    LOWER: BasicFuncs.LOWER,
+    UPPER: BasicFuncs.UPPER,
+    LINEAR_REGRESSION: BasicFuncs.LINEAR_REGRESSION,
+  };
+
   const config: Config = {
     ...InitialConfig,
+    funcs,
     widgets,
     fields,
     settings

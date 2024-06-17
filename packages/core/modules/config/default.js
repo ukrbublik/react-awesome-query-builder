@@ -5,6 +5,9 @@ export const settings = {
     else
       return field;
   },
+  caseValueField: {
+    type: "case_value",
+  },
   fieldSources: ["field"],
   keepInputOnChangeFieldSrc: true,
   fieldItemKeysForSearch: ["label", "path", "altLabel", "grouplabel"],

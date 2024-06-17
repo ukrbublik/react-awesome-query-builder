@@ -719,7 +719,7 @@ const convertArg = (spel, conv, config, meta, parentSpel) => {
       valueType,
       value,
     };
-  } else if (spel.type == "op-plus" && parentSpel?.type == "ternary") {
+  } else if (spel.type === "op-plus" && parentSpel?.type === "ternary" && config.settings.caseValueField?.type === "case_value") {
     /**
      * @deprecated
      */
@@ -1237,7 +1237,7 @@ const buildCaseValueConcat = (spel, conv, config, meta) => {
   let flat = [];
   function _processConcatChildren(children) {
     children.map(child => {
-      if (child.type == "op-plus") {
+      if (child.type === "op-plus") {
         _processConcatChildren(child.children);
       } else {
         const convertedChild = convertArg(child, conv, config, meta, spel);
@@ -1262,7 +1262,7 @@ const buildCaseValProperties = (config, meta, conv, val, spel = null) => {
   let convVal;
   let widget;
   const caseValueFieldConfig = getFieldConfig(config, "!case_value");
-  if (val?.type === "op-plus") {
+  if (val?.type === "op-plus" && config.settings.caseValueField?.type === "case_value") {
     /**
      * @deprecated
      */

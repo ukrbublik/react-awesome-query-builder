@@ -112,6 +112,20 @@ const compileMetaFunc = {
   spelFormatFunc: { type: "f", args: ["formattedArgs"] },
 };
 
+const compileMetaFieldLike = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+};
+
+const compileMetaField = {
+  ...compileMetaFieldSettings,
+  fieldSettings: compileMetaFieldSettings,
+  widgets: {
+    x: compileMetaWidgetForType
+  },
+  mainWidgetProps: compileMetaWidget
+};
+
 const compileMetaSettings = {
   locale: {
     mui: { type: "f", args: [], invokeWith: [], ignore: "jl" },
@@ -153,20 +167,6 @@ const compileMetaSettings = {
   renderBeforeCaseValue: { type: "rf" },
   renderAfterCaseValue: { type: "rf" },
   renderRuleError: { type: "rf" },
-};
-
-const compileMetaFieldLike = {
-  ...compileMetaFieldSettings,
-  fieldSettings: compileMetaFieldSettings,
-};
-
-const compileMetaField = {
-  ...compileMetaFieldSettings,
-  fieldSettings: compileMetaFieldSettings,
-  widgets: {
-    x: compileMetaWidgetForType
-  },
-  mainWidgetProps: compileMetaWidget
 };
 
 const compileMeta = {

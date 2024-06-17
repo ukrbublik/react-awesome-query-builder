@@ -156,7 +156,7 @@ export const spelImportConcat = (val) => {
   let errors = [];
   const parts = val.valueType == "case_value" ? val.value : [val];
   const res = parts.map(child => {
-    if (child.valueSrc == "value") {
+    if (child.valueSrc === "value") {
       if (child.value === null) {
         return undefined;
       } else {
@@ -165,7 +165,7 @@ export const spelImportConcat = (val) => {
           value: child.value
         };
       }
-    } else if (child.valueSrc == "field") {
+    } else if (child.valueSrc === "field") {
       return {
         type: (child.isVariable ? "variable" : "property"), 
         value: child.value
