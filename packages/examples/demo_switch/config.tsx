@@ -131,6 +131,7 @@ export default (): Config => {
     canRegroupCases: true,
     maxNesting: 3,
     canLeaveEmptyCase: false,
+    // showErrorMessage: true,
   };
 
   const funcs: Funcs = {
