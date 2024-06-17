@@ -346,13 +346,13 @@ const useListValuesAutocomplete = ({
     }
     if (!option && allowCustomValues) {
       // there is just string value, it's not item from list
-      return valueOrOption;
+      return valueOrOption.toString();
     }
     if (!option) {
       // weird
-      return valueOrOption;
+      return valueOrOption.toString();
     }
-    return option.title || option.label || option.value; // fallback to value
+    return option.title || option.label || option.value.toString(); // fallback to value
   };
 
   const fixedOptions = uif === "mui" ? fixListValuesGroupOrder(options) : options;
